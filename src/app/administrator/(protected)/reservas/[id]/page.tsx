@@ -1,0 +1,577 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { supabase } from "@/lib/supabase/client";
+import { 
+  ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
+  CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
+  FileText, DollarSign, Package, ExternalLink, Edit
+} from "lucide-react";
+import Link from "next/link";
+
+interface Booking {
+  id: string;
+  booking_number: string;
+  pickup_date: string;
+  dropoff_date: string;
+  pickup_time: string;
+  dropoff_time: string;
+  days: number;
+  base_price: number;
+  extras_price: number;
+  total_price: number;
+  deposit_amount: number;
+  status: string;
+  payment_status: string;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  customer_dni: string;
+  customer_address: string;
+  customer_city: string;
+  customer_postal_code: string;
+  notes: string;
+  admin_notes: string;
+  created_at: string;
+  vehicle: {
+    id: string;
+    name: string;
+    brand: string;
+    model: string;
+    internal_code: string;
+  };
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    total_bookings: number;
+  };
+  pickup_location: {
+    name: string;
+    address: string;
+  };
+  dropoff_location: {
+    name: string;
+    address: string;
+  };
+  booking_extras: Array<{
+    id: string;
+    quantity: number;
+    unit_price: number;
+    total_price: number;
+    extra: {
+      name: string;
+      price_type: string;
+    };
+  }>;
+}
+
+const statusColors: Record<string, { bg: string; text: string; label: string; icon: any }> = {
+  pending: { bg: "bg-yellow-100", text: "text-yellow-800", label: "Pendiente", icon: Clock },
+  confirmed: { bg: "bg-green-100", text: "text-green-800", label: "Confirmada", icon: CheckCircle },
+  in_progress: { bg: "bg-blue-100", text: "text-blue-800", label: "En curso", icon: Car },
+  completed: { bg: "bg-gray-100", text: "text-gray-800", label: "Completada", icon: CheckCircle },
+  cancelled: { bg: "bg-red-100", text: "text-red-800", label: "Cancelada", icon: XCircle },
+};
+
+const paymentStatusColors: Record<string, { bg: string; text: string; label: string }> = {
+  pending: { bg: "bg-yellow-100", text: "text-yellow-800", label: "Pendiente" },
+  partial: { bg: "bg-orange-100", text: "text-orange-800", label: "Parcial" },
+  paid: { bg: "bg-green-100", text: "text-green-800", label: "Pagado" },
+  refunded: { bg: "bg-gray-100", text: "text-gray-800", label: "Reembolsado" },
+};
+
+export default function ReservaDetalleAdminPage() {
+  const router = useRouter();
+  const params = useParams();
+  const bookingId = params.id as string;
+  
+  const [booking, setBooking] = useState<Booking | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  useEffect(() => {
+    if (bookingId) {
+      loadBooking();
+    }
+  }, [bookingId]);
+
+  const loadBooking = async () => {
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase
+        .from('bookings')
+        .select(`
+          *,
+          vehicle:vehicles(id, name, brand, model, internal_code),
+          customer:customers(id, name, email, phone, total_bookings),
+          pickup_location:locations!pickup_location_id(name, address),
+          dropoff_location:locations!dropoff_location_id(name, address),
+          booking_extras(
+            id,
+            quantity,
+            unit_price,
+            total_price,
+            extra:extras(name, price_type)
+          )
+        `)
+        .eq('id', bookingId)
+        .single();
+
+      if (error) throw error;
+      setBooking(data as any);
+    } catch (error: any) {
+      console.error('Error loading booking:', error);
+      setMessage({ type: 'error', text: error.message || 'Error al cargar la reserva' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStatus = async (newStatus: string) => {
+    if (!confirm(`¿Cambiar el estado de la reserva a "${statusColors[newStatus]?.label}"?`)) {
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      
+      const { error } = await supabase
+        .from('bookings')
+        .update({ status: newStatus })
+        .eq('id', bookingId);
+
+      if (error) throw error;
+
+      setMessage({ type: 'success', text: 'Estado actualizado correctamente' });
+      loadBooking();
+    } catch (error: any) {
+      console.error('Error updating status:', error);
+      setMessage({ type: 'error', text: error.message || 'Error al actualizar el estado' });
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const updatePaymentStatus = async (newStatus: string) => {
+    if (!confirm(`¿Cambiar el estado de pago a "${paymentStatusColors[newStatus]?.label}"?`)) {
+      return;
+    }
+
+    try {
+      setUpdating(true);
+      
+      const updateData: any = { payment_status: newStatus };
+      
+      // Si se marca como pagado y la reserva está pendiente, cambiar a confirmada
+      if (newStatus === 'paid' && booking?.status === 'pending') {
+        updateData.status = 'confirmed';
+      }
+
+      const { error } = await supabase
+        .from('bookings')
+        .update(updateData)
+        .eq('id', bookingId);
+
+      if (error) throw error;
+
+      setMessage({ type: 'success', text: 'Estado de pago actualizado correctamente' });
+      loadBooking();
+    } catch (error: any) {
+      console.error('Error updating payment status:', error);
+      setMessage({ type: 'error', text: error.message || 'Error al actualizar el estado de pago' });
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando reserva...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!booking) {
+    return (
+      <div className="text-center py-12">
+        <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">Reserva no encontrada</h2>
+        <Link href="/administrator/reservas" className="text-furgocasa-orange hover:underline">
+          Volver a reservas
+        </Link>
+      </div>
+    );
+  }
+
+  const StatusIcon = statusColors[booking.status]?.icon || Clock;
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <Link 
+            href="/administrator/reservas"
+            className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange mb-2 transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 mr-1" />
+            Volver a reservas
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900">Reserva {booking.booking_number}</h1>
+          <p className="text-gray-600 mt-1">
+            Creada el {new Date(booking.created_at).toLocaleDateString('es-ES', { 
+              day: 'numeric', 
+              month: 'long', 
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+        </div>
+        
+        {/* Botones de acción */}
+        <div className="flex gap-3">
+          <Link
+            href={`/administrator/reservas/${bookingId}/editar`}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium shadow-sm"
+          >
+            <Edit className="h-4 w-4" />
+            Editar reserva
+          </Link>
+          
+          <a
+            href={`/reservar/${bookingId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
+          >
+            <ExternalLink className="h-4 w-4" />
+            Ver vista del cliente
+          </a>
+        </div>
+      </div>
+
+      {/* Message */}
+      {message && (
+        <div className={`p-4 rounded-lg flex items-start gap-3 ${
+          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+        }`}>
+          {message.type === 'success' ? (
+            <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+          ) : (
+            <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+          )}
+          <p>{message.text}</p>
+        </div>
+      )}
+
+      {/* Status Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Status */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <StatusIcon className="h-6 w-6 text-gray-600" />
+            <h3 className="font-semibold text-gray-900">Estado de la reserva</h3>
+          </div>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${statusColors[booking.status]?.bg} ${statusColors[booking.status]?.text} font-semibold mb-4`}>
+            {statusColors[booking.status]?.label}
+          </div>
+          <div className="space-y-2">
+            {booking.status === 'pending' && (
+              <button
+                onClick={() => updatePaymentStatus('paid')}
+                disabled={updating}
+                className="w-full px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+              >
+                Marcar como pagado y confirmar
+              </button>
+            )}
+            {booking.status === 'confirmed' && (
+              <button
+                onClick={() => updateStatus('in_progress')}
+                disabled={updating}
+                className="w-full px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+              >
+                Marcar en curso
+              </button>
+            )}
+            {booking.status === 'in_progress' && (
+              <button
+                onClick={() => updateStatus('completed')}
+                disabled={updating}
+                className="w-full px-3 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+              >
+                Marcar completada
+              </button>
+            )}
+            {booking.status !== 'cancelled' && (
+              <button
+                onClick={() => updateStatus('cancelled')}
+                disabled={updating}
+                className="w-full px-3 py-2 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50"
+              >
+                Cancelar reserva
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Payment Status */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <CreditCard className="h-6 w-6 text-gray-600" />
+            <h3 className="font-semibold text-gray-900">Estado del pago</h3>
+          </div>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${paymentStatusColors[booking.payment_status]?.bg} ${paymentStatusColors[booking.payment_status]?.text} font-semibold mb-4`}>
+            {paymentStatusColors[booking.payment_status]?.label}
+          </div>
+          <div className="space-y-2">
+            {booking.payment_status === 'pending' && (
+              <button
+                onClick={() => updatePaymentStatus('paid')}
+                disabled={updating}
+                className="w-full px-3 py-2 text-sm bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+              >
+                Marcar como pagado
+              </button>
+            )}
+            {booking.payment_status === 'paid' && booking.status === 'cancelled' && (
+              <button
+                onClick={() => updatePaymentStatus('refunded')}
+                disabled={updating}
+                className="w-full px-3 py-2 text-sm bg-gray-600 text-white rounded hover:bg-gray-700 disabled:opacity-50"
+              >
+                Marcar como reembolsado
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Price Summary */}
+        <div className="bg-gradient-to-br from-furgocasa-orange to-orange-600 text-white rounded-xl shadow-sm p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <DollarSign className="h-6 w-6" />
+            <h3 className="font-semibold">Resumen económico</h3>
+          </div>
+          <div className="space-y-2 text-sm mb-4">
+            <div className="flex justify-between">
+              <span className="opacity-90">Precio base:</span>
+              <span className="font-semibold">{booking.base_price.toFixed(2)}€</span>
+            </div>
+            {booking.extras_price > 0 && (
+              <div className="flex justify-between">
+                <span className="opacity-90">Extras:</span>
+                <span className="font-semibold">{booking.extras_price.toFixed(2)}€</span>
+              </div>
+            )}
+            <div className="flex justify-between pt-2 border-t border-white/20">
+              <span className="opacity-90">Fianza:</span>
+              <span className="font-semibold">{booking.deposit_amount.toFixed(2)}€</span>
+            </div>
+          </div>
+          <div className="text-3xl font-bold">{booking.total_price.toFixed(2)}€</div>
+          <p className="text-sm opacity-90 mt-1">{booking.days} días de alquiler</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Main Info */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Vehicle */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Car className="h-6 w-6 text-furgocasa-blue" />
+              Vehículo
+            </h3>
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
+                <Car className="h-8 w-8 text-gray-400" />
+              </div>
+              <div>
+                {booking.vehicle.internal_code && (
+                  <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-blue-100 text-blue-800 rounded mb-1">
+                    {booking.vehicle.internal_code}
+                  </span>
+                )}
+                <p className="font-semibold text-gray-900 text-lg">{booking.vehicle.name}</p>
+                <p className="text-sm text-gray-600">{booking.vehicle.brand} · {booking.vehicle.model}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Dates & Location */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <Calendar className="h-6 w-6 text-furgocasa-blue" />
+              Fechas y ubicación
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500 uppercase font-medium mb-2">Recogida</p>
+                <p className="font-semibold text-gray-900">
+                  {new Date(booking.pickup_date).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">{booking.pickup_time}</p>
+              </div>
+
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-500 uppercase font-medium mb-2">Devolución</p>
+                <p className="font-semibold text-gray-900">
+                  {new Date(booking.dropoff_date).toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                  })}
+                </p>
+                <p className="text-sm text-gray-600 mt-1">{booking.dropoff_time}</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-start gap-3">
+                <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-gray-500 uppercase font-medium">Recogida en</p>
+                  <p className="font-semibold text-gray-900">{booking.pickup_location.name}</p>
+                  {booking.pickup_location.address && (
+                    <p className="text-sm text-gray-600">{booking.pickup_location.address}</p>
+                  )}
+                </div>
+              </div>
+
+              {booking.pickup_location.name !== booking.dropoff_location.name && (
+                <div className="flex items-start gap-3">
+                  <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium">Devolución en</p>
+                    <p className="font-semibold text-gray-900">{booking.dropoff_location.name}</p>
+                    {booking.dropoff_location.address && (
+                      <p className="text-sm text-gray-600">{booking.dropoff_location.address}</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Extras */}
+          {booking.booking_extras && booking.booking_extras.length > 0 && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <Package className="h-6 w-6 text-furgocasa-blue" />
+                Extras
+              </h3>
+              <div className="space-y-3">
+                {booking.booking_extras.map((item: any) => (
+                  <div key={item.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-gray-900">{item.extra.name}</p>
+                      <p className="text-sm text-gray-600">
+                        Cantidad: {item.quantity} × {item.unit_price.toFixed(2)}€
+                      </p>
+                    </div>
+                    <p className="font-semibold text-gray-900">{item.total_price.toFixed(2)}€</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Notes */}
+          {(booking.notes || booking.admin_notes) && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <FileText className="h-6 w-6 text-furgocasa-blue" />
+                Notas
+              </h3>
+              {booking.notes && (
+                <div className="mb-4">
+                  <p className="text-sm text-gray-500 uppercase font-medium mb-2">Notas del cliente</p>
+                  <p className="text-gray-700">{booking.notes}</p>
+                </div>
+              )}
+              {booking.admin_notes && (
+                <div>
+                  <p className="text-sm text-gray-500 uppercase font-medium mb-2">Notas internas</p>
+                  <p className="text-gray-700">{booking.admin_notes}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Sidebar - Customer Info */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <User className="h-6 w-6 text-furgocasa-blue" />
+              Cliente
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-gray-500 uppercase font-medium mb-1">Nombre</p>
+                <p className="font-semibold text-gray-900">{booking.customer_name}</p>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500 uppercase font-medium mb-1">Email</p>
+                <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                  <Mail className="h-4 w-4" />
+                  {booking.customer_email}
+                </a>
+              </div>
+
+              <div>
+                <p className="text-sm text-gray-500 uppercase font-medium mb-1">Teléfono</p>
+                <a href={`tel:${booking.customer_phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                  <Phone className="h-4 w-4" />
+                  {booking.customer_phone}
+                </a>
+              </div>
+
+              {booking.customer_dni && (
+                <div>
+                  <p className="text-sm text-gray-500 uppercase font-medium mb-1">DNI/NIE</p>
+                  <p className="text-gray-900">{booking.customer_dni}</p>
+                </div>
+              )}
+
+              {booking.customer_address && (
+                <div>
+                  <p className="text-sm text-gray-500 uppercase font-medium mb-1">Dirección</p>
+                  <p className="text-gray-900">{booking.customer_address}</p>
+                  <p className="text-sm text-gray-600">{booking.customer_postal_code} {booking.customer_city}</p>
+                </div>
+              )}
+
+              {booking.customer && (
+                <div className="pt-4 border-t border-gray-200">
+                  <p className="text-sm text-gray-500">Total reservas del cliente</p>
+                  <p className="text-2xl font-bold text-furgocasa-orange">{booking.customer.total_bookings}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+

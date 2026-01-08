@@ -1,0 +1,311 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 18 100% 50%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 18 100% 50%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 18 100% 50%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 18 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-amiko;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+  }
+}
+
+/* Custom styles for Furgocasa */
+@layer components {
+  .btn-primary {
+    @apply bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-semibold py-3 px-6 rounded-lg transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply bg-furgocasa-blue hover:bg-furgocasa-blue-light text-white font-semibold py-3 px-6 rounded-lg transition-colors;
+  }
+
+  .card-vehicle {
+    @apply bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow;
+  }
+
+  .search-widget {
+    @apply bg-white rounded-2xl shadow-2xl p-6 lg:p-8;
+  }
+
+  .admin-sidebar {
+    @apply bg-furgocasa-blue text-white min-h-screen w-64;
+  }
+
+  .admin-content {
+    @apply flex-1 bg-gray-50 min-h-screen;
+  }
+
+  /* Container responsive: padding reducido en mobile/tablet */
+  .container-responsive {
+    @apply px-4 lg:px-8;
+  }
+
+  /* Grid responsive: 1 col mobile/tablet, múltiples en desktop */
+  .grid-responsive-2 {
+    @apply grid grid-cols-1 lg:grid-cols-2 gap-6;
+  }
+
+  .grid-responsive-3 {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+  }
+
+  .grid-responsive-4 {
+    @apply grid grid-cols-1 lg:grid-cols-4 gap-6;
+  }
+
+  /* Text responsive: más pequeño en mobile/tablet */
+  .text-responsive-xl {
+    @apply text-2xl lg:text-4xl;
+  }
+
+  .text-responsive-lg {
+    @apply text-xl lg:text-3xl;
+  }
+
+  .text-responsive-md {
+    @apply text-lg lg:text-2xl;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Calendar custom styles */
+.rdp {
+  --rdp-cell-size: 32px;
+  --rdp-accent-color: theme('colors.furgocasa-blue');
+  --rdp-background-color: theme('colors.furgocasa-blue / 10%');
+}
+
+@media (min-width: 768px) {
+  .rdp {
+    --rdp-cell-size: 40px;
+  }
+}
+
+/* =========================================
+   UTILIDADES RESPONSIVE
+   Mobile + Tablet (hasta 1023px): diseño apilado y táctil
+   Desktop (1024px+): diseño horizontal y espacioso
+   ========================================= */
+
+/* Espaciado de secciones */
+.section-padding {
+  @apply py-12 lg:py-24;
+}
+
+/* Ocultar en mobile/tablet, mostrar en desktop */
+.hidden-mobile {
+  @apply hidden lg:block;
+}
+
+/* Ocultar en desktop, mostrar en mobile/tablet */
+.hidden-desktop {
+  @apply block lg:hidden;
+}
+
+/* Elementos táctiles más grandes en mobile/tablet */
+@media (max-width: 1023px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Botones más grandes para táctil */
+  .btn-primary,
+  .btn-secondary {
+    @apply py-4 px-8 text-base;
+  }
+
+  /* Inputs más grandes para táctil */
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  select,
+  textarea {
+    @apply py-3 px-4 text-base;
+  }
+}
+
+/* Desktop: elementos más compactos */
+@media (min-width: 1024px) {
+  /* Aprovechar espacio horizontal */
+  .desktop-horizontal {
+    @apply flex flex-row items-center gap-6;
+  }
+
+  /* Hover effects solo en desktop */
+  .hover-desktop:hover {
+    @apply transform scale-105 shadow-xl;
+  }
+}
+
+.rdp-day_selected:not([disabled]) {
+  background-color: theme('colors.furgocasa-blue');
+}
+
+.rdp-day_selected:hover:not([disabled]) {
+  background-color: theme('colors.blue.700');
+}
+
+/* =========================================
+   ESTRATEGIA RESPONSIVE: MOBILE+TABLET vs DESKTOP
+   Mobile + Tablet: hasta 1023px (diseño táctil)
+   Desktop: 1024px+ (diseño mouse/teclado)
+   ========================================= */
+
+/* Asegurar que el calendario ocupe todo el ancho en móvil/tablet */
+@media (max-width: 1023px) {
+  .rdp-months {
+    width: 100%;
+  }
+  
+  .rdp-month {
+    width: 100%;
+  }
+  
+  .rdp-table {
+    width: 100%;
+  }
+}
+
+/* Tiptap Editor Styles */
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror p {
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror li {
+  margin-bottom: 0.25rem;
+}
+
+.ProseMirror blockquote {
+  border-left: 3px solid #e5e7eb;
+  padding-left: 1rem;
+  margin-left: 0;
+  color: #6b7280;
+  font-style: italic;
+}
+
+.ProseMirror a {
+  color: #ff6600;
+  text-decoration: underline;
+}
+
+.ProseMirror a:hover {
+  color: #e55900;
+}
+
+.ProseMirror strong {
+  font-weight: 700;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+

@@ -1,0 +1,120 @@
+import crypto from "crypto";
+
+/**
+ * Cifra los datos usando 3DES con la clave del comercio
+ */
+export function encrypt3DES(data: string, key: string): string {
+  const keyBuffer = Buffer.from(key, "base64");
+  const iv = Buffer.alloc(8, 0);
+
+  const cipher = crypto.createCipheriv("des-ede3-cbc", keyBuffer, iv);
+  cipher.setAutoPadding(true);
+
+  let encrypted = cipher.update(data, "utf8", "base64");
+  encrypted += cipher.final("base64");
+
+  return encrypted;
+}
+
+/**
+ * Descifra los datos usando 3DES
+ */
+export function decrypt3DES(data: string, key: string): string {
+  const keyBuffer = Buffer.from(key, "base64");
+  const iv = Buffer.alloc(8, 0);
+
+  const decipher = crypto.createDecipheriv("des-ede3-cbc", keyBuffer, iv);
+  decipher.setAutoPadding(true);
+
+  let decrypted = decipher.update(data, "base64", "utf8");
+  decrypted += decipher.final("utf8");
+
+  return decrypted;
+}
+
+/**
+ * Genera la firma SHA-256 MAC para Redsys
+ */
+export function createSignature(
+  merchantParameters: string,
+  secretKey: string,
+  orderNumber: string
+): string {
+  // 1. Derivar clave específica para este pedido
+  const derivedKey = encrypt3DES(orderNumber, secretKey);
+
+  // 2. Crear HMAC SHA256 con la clave derivada
+  const hmac = crypto.createHmac("sha256", Buffer.from(derivedKey, "base64"));
+  hmac.update(merchantParameters);
+
+  // 3. Devolver en base64
+  return hmac.digest("base64");
+}
+
+/**
+ * Valida la firma recibida de Redsys
+ */
+export function validateSignature(
+  merchantParameters: string,
+  signature: string,
+  secretKey: string
+): boolean {
+  // Decodificar parámetros para obtener el número de pedido
+  const params = JSON.parse(
+    Buffer.from(merchantParameters, "base64").toString("utf8")
+  );
+  const orderNumber = params.Ds_Order;
+
+  // Generar firma esperada
+  const expectedSignature = createSignature(
+    merchantParameters,
+    secretKey,
+    orderNumber
+  );
+
+  // Comparar firmas (URL-safe base64)
+  const normalizedExpected = expectedSignature
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+  
+  const normalizedReceived = signature
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+
+  return normalizedExpected === normalizedReceived;
+}
+
+/**
+ * Cifra un token de pago para almacenamiento seguro
+ */
+export function encryptToken(token: string): string {
+  const algorithm = "aes-256-cbc";
+  const key = Buffer.from(process.env.ENCRYPTION_KEY!, "hex");
+  const iv = crypto.randomBytes(16);
+
+  const cipher = crypto.createCipheriv(algorithm, key, iv);
+  let encrypted = cipher.update(token, "utf8", "hex");
+  encrypted += cipher.final("hex");
+
+  return iv.toString("hex") + ":" + encrypted;
+}
+
+/**
+ * Descifra un token de pago almacenado
+ */
+export function decryptToken(encryptedToken: string): string {
+  const algorithm = "aes-256-cbc";
+  const key = Buffer.from(process.env.ENCRYPTION_KEY!, "hex");
+
+  const parts = encryptedToken.split(":");
+  const iv = Buffer.from(parts[0], "hex");
+  const encrypted = parts[1];
+
+  const decipher = crypto.createDecipheriv(algorithm, key, iv);
+  let decrypted = decipher.update(encrypted, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+
+  return decrypted;
+}

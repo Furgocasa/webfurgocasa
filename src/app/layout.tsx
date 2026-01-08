@@ -1,0 +1,201 @@
+import type { Metadata, Viewport } from "next";
+import { Rubik, Amiko } from "next/font/google";
+import "./globals.css";
+import { Toaster } from "sonner";
+import { Providers } from "@/components/providers";
+import { CookieProvider, CookieBanner, CookieSettingsModal } from "@/components/cookies";
+import WhatsAppChatbot from "@/components/whatsapp-chatbot";
+import BackToTop from "@/components/back-to-top";
+import Script from "next/script";
+
+// Rubik - Para títulos y headings
+const rubik = Rubik({ 
+  subsets: ["latin"],
+  variable: "--font-rubik",
+  weight: ["300", "400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+// Amiko - Para cuerpo de texto
+const amiko = Amiko({ 
+  subsets: ["latin"],
+  variable: "--font-amiko",
+  weight: ["400", "600", "700"],
+  display: "swap",
+});
+
+export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://www.furgocasa.com"),
+  title: {
+    default: "Furgocasa Campervans | Alquiler de Campers y Autocaravanas en Murcia",
+    template: "%s | Furgocasa",
+  },
+  description:
+    "Alquila tu camper o autocaravana en Murcia. Vive la aventura con Furgocasa. Flota de vehículos equipados para tus vacaciones.",
+  keywords: [
+    "alquiler camper",
+    "alquiler autocaravana",
+    "camper Murcia",
+    "autocaravana Murcia",
+    "furgoneta camper",
+    "vacaciones camper",
+    "furgocasa",
+  ],
+  authors: [{ name: "Furgocasa" }],
+  creator: "Furgocasa",
+  // Favicon y iconos
+  icons: {
+    icon: [
+      { url: "/images/brand/favicon.png", type: "image/png" },
+      { url: "/images/brand/favicon.png", sizes: "32x32", type: "image/png" },
+      { url: "/images/brand/favicon.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: [
+      { url: "/images/brand/favicon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/images/brand/favicon.png",
+  },
+  // Manifest para PWA
+  manifest: "/manifest.json",
+  openGraph: {
+    type: "website",
+    locale: "es_ES",
+    url: "https://www.furgocasa.com",
+    siteName: "Furgocasa",
+    title: "Furgocasa | Alquiler de Campers y Autocaravanas en Murcia",
+    description:
+      "Alquila tu camper o autocaravana en Murcia. Vive la aventura con Furgocasa.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Furgocasa - Alquiler de Campers",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Furgocasa | Alquiler de Campers en Murcia",
+    description: "Alquila tu camper o autocaravana en Murcia.",
+    images: ["/og-image.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  // Verificación de propiedad (añadir IDs reales cuando estén disponibles)
+  verification: {
+    google: "tu-codigo-de-verificacion-google",
+    // yandex: "tu-codigo-yandex",
+    // yahoo: "tu-codigo-yahoo",
+  },
+};
+
+// ✅ Viewport configuration (Next.js 15+)
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#1e40af" },
+    { media: "(prefers-color-scheme: dark)", color: "#1e3a8a" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        {/* Google Analytics - Con consentimiento por defecto denegado */}
+        <Script
+          id="gtag-consent-default"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              
+              // Consentimiento por defecto denegado (GDPR compliant)
+              gtag('consent', 'default', {
+                'analytics_storage': 'denied',
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'functionality_storage': 'denied',
+                'personalization_storage': 'denied',
+                'security_storage': 'granted'
+              });
+            `,
+          }}
+        />
+        
+        {/* Google Analytics - Reemplaza G-XXXXXXXXXX con tu ID real */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XXXXXXXXXX', {
+                page_path: window.location.pathname,
+              });
+            `,
+          }}
+        />
+
+        {/* Facebook Pixel - Reemplaza XXXXXXXXXX con tu ID real */}
+        <Script
+          id="facebook-pixel"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              !function(f,b,e,v,n,t,s)
+              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+              n.queue=[];t=b.createElement(e);t.async=!0;
+              t.src=v;s=b.getElementsByTagName(e)[0];
+              s.parentNode.insertBefore(t,s)}(window, document,'script',
+              'https://connect.facebook.net/en_US/fbevents.js');
+              
+              // Inicializar con consentimiento denegado por defecto
+              fbq('consent', 'revoke');
+              fbq('init', 'XXXXXXXXXX');
+              fbq('track', 'PageView');
+            `,
+          }}
+        />
+      </head>
+      <body className={`${rubik.variable} ${amiko.variable} font-sans`}>
+        <Providers>
+          <CookieProvider>
+            {children}
+            <CookieBanner />
+            <CookieSettingsModal />
+            <BackToTop />
+            <WhatsAppChatbot />
+            <Toaster position="top-right" richColors />
+          </CookieProvider>
+        </Providers>
+      </body>
+    </html>
+  );
+}

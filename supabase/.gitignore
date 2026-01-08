@@ -1,0 +1,13 @@
+# Supabase local development
+.branches
+.temp
+.env.local
+
+# Backups
+*.backup
+*.dump
+
+
+
+
+
