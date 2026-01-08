@@ -8,7 +8,8 @@ import {
   Fuel, 
   ArrowRight,
   Info,
-  Percent
+  Percent,
+  TrendingDown
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import type { VehicleWithImages } from "@/types/database";
@@ -155,19 +156,22 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
             </Link>
           </div>
           
-          {/* Info sobre descuentos disponibles */}
-          {!pricing.hasDurationDiscount && (
-            <Link 
-              href="/tarifas#descuentos" 
-              className="flex items-center gap-1.5 px-3 py-2.5 mt-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group/discount"
-            >
-              <Info className="h-3.5 w-3.5 flex-shrink-0 text-furgocasa-orange" />
-              <span className="text-xs font-medium text-gray-700">
-                {t("Descuentos por duración: hasta -30% por alquiler de +1, +2 o +3 semanas")}
-              </span>
-              <ArrowRight className="h-3 w-3 flex-shrink-0 text-furgocasa-orange ml-auto group-hover/discount:translate-x-0.5 transition-transform" />
-            </Link>
-          )}
+          {/* Info sobre descuentos disponibles - SIEMPRE VISIBLE */}
+          <Link 
+            href="/tarifas#descuentos" 
+            className="flex items-center gap-2 px-3 py-2.5 mt-3 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 hover:shadow-md rounded-lg transition-all group/discount"
+          >
+            <TrendingDown className="h-4 w-4 flex-shrink-0 text-green-600" />
+            <div className="flex-1">
+              <p className="text-xs font-bold text-gray-900">
+                {t("Descuentos por duración")}
+              </p>
+              <p className="text-xs text-gray-600">
+                -10% (7d) · -20% (14d) · -30% (21d)
+              </p>
+            </div>
+            <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 text-green-600 opacity-0 group-hover/discount:opacity-100 group-hover/discount:translate-x-0.5 transition-all" />
+          </Link>
         </div>
       </div>
     </div>

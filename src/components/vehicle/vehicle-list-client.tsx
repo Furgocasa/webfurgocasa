@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { LocalizedLink } from "@/components/localized-link";
-import { Car, Users, Bed, Fuel, Settings, ArrowRight, Filter, Gauge, X } from "lucide-react";
+import { Car, Users, Bed, Fuel, Settings, ArrowRight, Filter, Gauge, X, Calendar, TrendingDown } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { useLanguage } from "@/contexts/language-context";
 
@@ -292,20 +292,39 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                 )}
 
                 {/* Precio y CTA */}
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <div>
-                    <p className="text-sm text-gray-600">{t("Desde")}</p>
-                    <p className="text-2xl font-heading font-bold text-furgocasa-blue">
-                      {vehicle.base_price_per_day}€
-                      <span className="text-sm text-gray-600 font-normal">/{t("día")}</span>
-                    </p>
+                <div className="pt-4 border-t border-gray-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-sm text-gray-600">{t("Desde")}</p>
+                      <p className="text-2xl font-heading font-bold text-furgocasa-blue">
+                        {vehicle.base_price_per_day}€
+                        <span className="text-sm text-gray-600 font-normal">/{t("día")}</span>
+                      </p>
+                    </div>
+                    <LocalizedLink
+                      href={`/vehiculos/${vehicle.slug}`}
+                      className="flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                    >
+                      {t("Ver detalles")}
+                      <ArrowRight className="h-5 w-5" />
+                    </LocalizedLink>
                   </div>
+                  
+                  {/* Badge de descuentos por duración */}
                   <LocalizedLink
-                    href={`/vehiculos/${vehicle.slug}`}
-                    className="flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3 px-6 rounded-lg transition-colors"
+                    href="/tarifas"
+                    className="flex items-center gap-2 p-3 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg hover:shadow-md transition-all group"
                   >
-                    {t("Ver detalles")}
-                    <ArrowRight className="h-5 w-5" />
+                    <TrendingDown className="h-5 w-5 text-green-600 flex-shrink-0" />
+                    <div className="flex-1 text-xs">
+                      <p className="font-bold text-gray-900 mb-0.5">
+                        {t("Descuentos por duración")}
+                      </p>
+                      <p className="text-gray-600">
+                        -10% (7d) · -20% (14d) · -30% (21d)
+                      </p>
+                    </div>
+                    <ArrowRight className="h-4 w-4 text-green-600 flex-shrink-0 opacity-0 group-hover:opacity-100 transform group-hover:translate-x-1 transition-all" />
                   </LocalizedLink>
                 </div>
               </div>
