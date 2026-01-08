@@ -1,4 +1,6 @@
-import { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/language-context";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
@@ -235,7 +237,6 @@ async function loadBlogArticles(): Promise<BlogArticle[]> {
  * ✅ SERVER COMPONENT - Sin "Cargando...", SEO óptimo
  */
 export default async function LocationPage({ params }: { params: Promise<{ location: string }> }) {
-  const { t } = useLanguage();
   const { location: locationParam } = await params;
   
   // ✅ Cargar TODOS los datos en paralelo en el servidor

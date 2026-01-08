@@ -70,7 +70,7 @@ export default function BlogCategoriasPage() {
       if (editingId) {
         const { data, error } = await supabase
           .from('content_categories')
-          .update(dataToSave)
+          .update(dataToSave as any)
           .eq('id', editingId)
           .select('id');
 
@@ -82,7 +82,7 @@ export default function BlogCategoriasPage() {
       } else {
         const { data, error } = await supabase
           .from('content_categories')
-          .insert(dataToSave)
+          .insert(dataToSave as any)
           .select('id');
 
         if (error) throw error;
