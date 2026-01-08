@@ -68,9 +68,9 @@ export default function BlogCategoriasPage() {
       };
 
       if (editingId) {
-        // @ts-ignore - Problema de tipos generados de Supabase
         const { data, error } = await supabase
           .from('content_categories')
+          // @ts-expect-error - Bypass tipo incorrecto generado por Supabase
           .update(dataToSave)
           .eq('id', editingId)
           .select('id');
@@ -81,9 +81,9 @@ export default function BlogCategoriasPage() {
         }
         showMessage('success', 'Categoría actualizada correctamente');
       } else {
-        // @ts-ignore - Problema de tipos generados de Supabase
         const { data, error } = await supabase
           .from('content_categories')
+          // @ts-expect-error - Bypass tipo incorrecto generado por Supabase
           .insert(dataToSave)
           .select('id');
 
