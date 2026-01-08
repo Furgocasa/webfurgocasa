@@ -127,9 +127,9 @@ export default function NewPostPage() {
       // Guardar en Supabase
       const { data: newPost, error } = await supabase
         .from("posts")
-        .insert(postData)
+        .insert(postData as any)
         .select("id")
-        .single();
+        .single<{ id: string }>();
       
       if (error) {
         console.error("Error guardando post:", error);
@@ -146,7 +146,7 @@ export default function NewPostPage() {
         
         await supabase
           .from("post_tags")
-          .insert(tagRelations);
+          .insert(tagRelations as any);
       }
       
       router.push("/administrator/blog/articulos");
