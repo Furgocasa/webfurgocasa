@@ -389,7 +389,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                 key={vehicle.id}
                 className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
               >
-                <Link href={`/vehiculos/${vehicle.slug}`} className="block">
+                <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
                   <div className="h-56 lg:h-64 bg-gray-200 relative overflow-hidden">
                     {vehicle.main_image ? (
                       <img
@@ -404,7 +404,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   </div>
-                </Link>
+                </LocalizedLink>
                 
                 <div className="p-6 lg:p-8 text-center">
                   <LocalizedLink href={`/vehiculos/${vehicle.slug}`}>
