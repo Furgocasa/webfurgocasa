@@ -1,7 +1,4 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useLanguage } from "@/contexts/language-context";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import { Header } from "@/components/layout/header";
@@ -17,6 +14,9 @@ import {
   HelpCircle,
   BookOpen
 } from "lucide-react";
+
+// Helper para traducciones estáticas (Server Component)
+const t = (key: string) => key;
 
 // ✅ Server-side Supabase client
 const supabase = createClient(
