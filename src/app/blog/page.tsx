@@ -64,7 +64,12 @@ export default function BlogPage() {
         if (postsError) {
           console.error('Error loading posts:', postsError);
         } else {
-          setPosts(postsData || []);
+          // Transformar category de array a objeto único
+          const transformedPosts = postsData?.map(post => ({
+            ...post,
+            category: Array.isArray(post.category) ? post.category[0] : post.category
+          })) || [];
+          setPosts(transformedPosts);
         }
 
         // Cargar categorías

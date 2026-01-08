@@ -60,7 +60,17 @@ export default function BlogComentariosPage() {
         .order('created_at', { ascending: false });
 
       if (fetchError) throw fetchError;
-      setComments(data || []);
+      
+      // Transformar category anidado de array a objeto único
+      const transformedComments = data?.map(comment => ({
+        ...comment,
+        post: comment.post ? {
+          ...comment.post,
+          category: Array.isArray(comment.post.category) ? comment.post.category[0] : comment.post.category
+        } : comment.post
+      })) || [];
+      
+      setComments(transformedComments);
       setError(null);
     } catch (err: any) {
       console.error('Error fetching comments:', err);

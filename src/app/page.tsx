@@ -105,7 +105,13 @@ export default function HomePage() {
         .order('published_at', { ascending: false })
         .limit(3);
 
-      setBlogArticles(articles || []);
+      // Transformar category de array a objeto único
+      const transformedArticles = articles?.map(article => ({
+        ...article,
+        category: Array.isArray(article.category) ? article.category[0] : article.category
+      })) || [];
+
+      setBlogArticles(transformedArticles);
     }
 
     loadData();
