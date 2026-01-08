@@ -114,7 +114,13 @@ export default function BlogCategoryPage() {
 
         const { data: postsData, count } = await query;
 
-        setPosts(postsData || []);
+        // Transformar category de array a objeto único
+        const transformedPosts = postsData?.map(post => ({
+          ...post,
+          category: Array.isArray(post.category) ? post.category[0] : post.category
+        })) || [];
+
+        setPosts(transformedPosts);
         setTotalPosts(count || 0);
       }
 

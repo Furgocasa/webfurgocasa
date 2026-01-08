@@ -135,7 +135,12 @@ export default function BlogPostPage() {
       const { data: postData, error } = await query.single();
 
       if (postData) {
-        setPost(postData);
+        // Transformar category de array a objeto único
+        const transformedPost = {
+          ...postData,
+          category: Array.isArray(postData.category) ? postData.category[0] : postData.category
+        };
+        setPost(transformedPost);
 
         // Incrementar vistas
         await supabase

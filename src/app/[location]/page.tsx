@@ -222,7 +222,13 @@ async function loadBlogArticles(): Promise<BlogArticle[]> {
     .order('published_at', { ascending: false })
     .limit(3);
 
-  return articles || [];
+  // Transformar category de array a objeto único
+  const transformedArticles = articles?.map(article => ({
+    ...article,
+    category: Array.isArray(article.category) ? article.category[0] : article.category
+  })) || [];
+
+  return transformedArticles;
 }
 
 /**
