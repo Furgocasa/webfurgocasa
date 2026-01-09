@@ -325,9 +325,9 @@ function ReservarVehiculoContent() {
             </p>
           </div>
 
-          <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
             {/* Main Content */}
-            <div className="space-y-4 md:space-y-6">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
               {/* Gallery */}
               <VehicleGallery images={vehicle.images || []} vehicleName={vehicle.name} />
 
@@ -573,9 +573,34 @@ function ReservarVehiculoContent() {
 
               {/* Mobile CTA Bottom - Solo visible en móvil */}
               <div className="lg:hidden bg-white rounded-xl shadow-lg p-5 sticky bottom-0 border-t-2 border-furgocasa-orange">
-                <div className="flex items-center justify-between mb-3">
+                {/* Resumen detallado en móvil */}
+                <div className="mb-4 space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{t("Alquiler")} ({days} {t("días")})</span>
+                    <span className="font-semibold">{formatPrice(basePrice)}</span>
+                  </div>
+                  
+                  {selectedExtras.map((item) => {
+                    let price = 0;
+                    if (item.extra.price_type === 'per_unit') {
+                      price = (item.extra.price_per_unit || 0);
+                    } else {
+                      price = (item.extra.price_per_day || 0) * days;
+                    }
+                    return (
+                      <div key={item.extra.id} className="flex justify-between text-sm">
+                        <span className="text-gray-600">
+                          {item.extra.name} {item.quantity > 1 && `(x${item.quantity})`}
+                        </span>
+                        <span className="font-semibold">{formatPrice(price * item.quantity)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                
+                <div className="flex items-center justify-between mb-3 pt-3 border-t border-gray-200">
                   <div>
-                    <p className="text-xs text-gray-500">{t("Total")} ({days} {t("días")})</p>
+                    <p className="text-xs text-gray-500">{t("Total")}</p>
                     <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
                   </div>
                   <button
@@ -586,11 +611,95 @@ function ReservarVehiculoContent() {
                     <ArrowRight className="h-5 w-5" />
                   </button>
                 </div>
-                {selectedExtras.length > 0 && (
-                  <p className="text-xs text-gray-500 text-center">
-                    Incluye {selectedExtras.length} extra{selectedExtras.length > 1 ? 's' : ''}
-                  </p>
-                )}
+              </div>
+            </div>
+
+            {/* Sidebar - Price Summary - Solo desktop */}
+            <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:h-fit">
+              <div className="bg-white rounded-2xl shadow-sm p-6">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">{t("Resumen")}</h3>
+
+                {/* Dates */}
+                <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
+                  <div className="flex items-start gap-3">
+                    <Calendar className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-gray-500">{t("Recogida")}</p>
+                      <p className="font-semibold text-gray-900">
+                        {pickupDate && new Date(pickupDate).toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'short'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <Calendar className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-gray-500">{t("Devolución")}</p>
+                      <p className="font-semibold text-gray-900">
+                        {dropoffDate && new Date(dropoffDate).toLocaleDateString('es-ES', {
+                          day: 'numeric',
+                          month: 'short'
+                        })}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3">
+                    <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-gray-500">{t("Ubicación")}</p>
+                      <p className="font-semibold text-gray-900 capitalize">{pickupLocation}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Price Breakdown */}
+                <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600">{t("Alquiler")} ({days} {t("días")})</span>
+                    <span className="font-semibold">{formatPrice(basePrice)}</span>
+                  </div>
+
+                  {selectedExtras.map((item) => {
+                    // Calcular precio correctamente según el tipo
+                    let price = 0;
+                    if (item.extra.price_type === 'per_unit') {
+                      // Precio único por toda la reserva
+                      price = (item.extra.price_per_unit || 0);
+                    } else {
+                      // Precio por día multiplicado por número de días
+                      price = (item.extra.price_per_day || 0) * days;
+                    }
+                    return (
+                      <div key={item.extra.id} className="flex justify-between text-sm">
+                        <span className="text-gray-600">
+                          {item.extra.name} {item.quantity > 1 && `(x${item.quantity})`}
+                        </span>
+                        <span className="font-semibold">{formatPrice(price * item.quantity)}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Total */}
+                <div className="mb-6">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-700 font-medium">{t("Total")}</span>
+                    <span className="text-3xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
+                  </div>
+                </div>
+
+                {/* Continue Button */}
+                <button
+                  onClick={handleContinue}
+                  className="w-full bg-furgocasa-orange text-white font-semibold py-4 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                >
+                  {t("Continuar con la reserva")}
+                  <ArrowRight className="h-5 w-5" />
+                </button>
               </div>
             </div>
           </div>
