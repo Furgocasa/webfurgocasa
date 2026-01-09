@@ -173,7 +173,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${rubik.variable} ${amiko.variable} font-sans`}>
+      <body className={`${rubik.variable} ${amiko.variable} font-sans pt-[120px]`}>{/* pt-[120px] para compensar header fijo */}
         <Providers>
           <CookieProvider>
             {children}
