@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Car, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { SmartTooltip } from "@/components/admin/smart-tooltip";
 import type { Database } from "@/lib/supabase/database.types";
+import { useAdminData } from "@/hooks/use-admin-data";
 
 type VehicleRow = Database['public']['Tables']['vehicles']['Row'];
 
@@ -80,15 +81,181 @@ export default function CalendarioPage() {
   const router = useRouter();
   const [startDate, setStartDate] = useState(new Date());
   const [monthsToShow, setMonthsToShow] = useState(3); // Por defecto 3 meses
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<(Booking & { vehicle?: Vehicle }) | null>(null);
   
   // Estado para ordenamiento
   const [sortField, setSortField] = useState<'internal_code' | 'name'>('internal_code');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Cargar vehículos con el hook
+  const { 
+    data: vehicles, 
+    loading: vehiclesLoading, 
+    error: vehiclesError 
+  } = useAdminData<Vehicle[]>({
+    queryFn: async () => {
+      const result = await supabase
+        .from('vehicles')
+        .select('id, name, brand, slug, internal_code')
+        .eq('is_for_rent', true)
+        .order('internal_code', { ascending: true, nullsFirst: false });
+      
+      return {
+        data: (result.data || []) as Vehicle[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
+
+  // Cargar bookings con el hook (depende de startDate y monthsToShow)
+  const { 
+    data: bookingsRaw, 
+    loading: bookingsLoading, 
+    error: bookingsError 
+  } = useAdminData<any[]>({
+    queryFn: async () => {
+      // Calcular rango de fechas para los meses a mostrar
+      const firstDay = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+      const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + monthsToShow, 0);
+
+      const result = await supabase
+        .from('bookings')
+        .select(`
+          id,
+          booking_number,
+          vehicle_id,
+          customer_id,
+          pickup_location_id,
+          dropoff_location_id,
+          pickup_date,
+          pickup_time,
+          dropoff_date,
+          dropoff_time,
+          status,
+          payment_status,
+          total_price,
+          deposit_amount,
+          amount_paid,
+          notes
+        `)
+        .gte('dropoff_date', firstDay.toISOString().split('T')[0])
+        .lte('pickup_date', lastDay.toISOString().split('T')[0])
+        .neq('status', 'cancelled')
+        .order('pickup_date');
+
+      return {
+        data: result.data || [],
+        error: result.error
+      };
+    },
+    dependencies: [startDate, monthsToShow],
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
+
+  // Estado local para bookings enriquecidos
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [enrichmentLoading, setEnrichmentLoading] = useState(false);
+
+  // Enriquecer bookings cuando cambien los datos raw
+  useEffect(() => {
+    const enrichBookings = async () => {
+      if (!bookingsRaw || bookingsRaw.length === 0) {
+        setBookings([]);
+        return;
+      }
+
+      try {
+        setEnrichmentLoading(true);
+
+        const customerIds = [...new Set(bookingsRaw.map(b => b.customer_id).filter((id): id is string => Boolean(id)))];
+        const vehicleIds = [...new Set(bookingsRaw.map(b => b.vehicle_id).filter((id): id is string => Boolean(id)))];
+        const locationIds = [...new Set([
+          ...bookingsRaw.map(b => b.pickup_location_id),
+          ...bookingsRaw.map(b => b.dropoff_location_id)
+        ].filter((id): id is string => Boolean(id)))];
+
+        // Cargar customers
+        const { data: customersData } = await supabase
+          .from('customers')
+          .select('id, name, email, phone')
+          .in('id', customerIds);
+
+        // Cargar vehicles
+        const { data: vehiclesData } = await supabase
+          .from('vehicles')
+          .select('id, name, brand, model, internal_code, plate_number, year')
+          .in('id', vehicleIds);
+
+        // Cargar locations
+        const { data: locationsData } = await supabase
+          .from('locations')
+          .select('id, name, address, city')
+          .in('id', locationIds);
+
+        // Cargar booking extras
+        const { data: bookingExtrasData } = await supabase
+          .from('booking_extras')
+          .select(`
+            id,
+            booking_id,
+            extra_id,
+            quantity,
+            price_per_unit,
+            subtotal,
+            extras (
+              id,
+              name,
+              description
+            )
+          `)
+          .in('booking_id', bookingsRaw.map(b => b.id));
+
+        // Mapear relaciones
+        const customersMap = new Map(customersData?.map(c => [c.id, c]) || []);
+        const vehiclesMap = new Map(vehiclesData?.map(v => [v.id, v]) || []);
+        const locationsMap = new Map(locationsData?.map(l => [l.id, l]) || []);
+        const extrasMap = new Map<string, any[]>();
+        
+        bookingExtrasData?.forEach(be => {
+          if (!extrasMap.has(be.booking_id)) {
+            extrasMap.set(be.booking_id, []);
+          }
+          extrasMap.get(be.booking_id)?.push({
+            id: be.id,
+            quantity: be.quantity,
+            price_per_unit: be.price_per_unit,
+            subtotal: be.subtotal,
+            extra: be.extras
+          });
+        });
+
+        const enriched = bookingsRaw.map(booking => ({
+          ...booking,
+          customer: customersMap.get(booking.customer_id) || null,
+          vehicle: vehiclesMap.get(booking.vehicle_id) || null,
+          pickup_location: locationsMap.get(booking.pickup_location_id) || null,
+          dropoff_location: locationsMap.get(booking.dropoff_location_id) || null,
+          extras: extrasMap.get(booking.id) || []
+        } as unknown as Booking));
+
+        setBookings(enriched);
+      } catch (err) {
+        console.error('[Calendario] Error enriching bookings:', err);
+      } finally {
+        setEnrichmentLoading(false);
+      }
+    };
+
+    enrichBookings();
+  }, [bookingsRaw]);
+
+  const loading = vehiclesLoading || bookingsLoading || enrichmentLoading;
 
   // Detectar si es móvil o tablet
   useEffect(() => {
@@ -274,7 +441,7 @@ export default function CalendarioPage() {
   };
 
   // Ordenar vehículos
-  const sortedVehicles = [...vehicles].sort((a, b) => {
+  const sortedVehicles = (vehicles || []).sort((a, b) => {
     let aValue: string;
     let bValue: string;
 
