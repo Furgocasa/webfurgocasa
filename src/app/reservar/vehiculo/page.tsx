@@ -305,6 +305,17 @@ function ReservarVehiculoContent() {
       {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
       <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
         <div className="container mx-auto px-4 py-3">
+          {/* Link "Volver a la búsqueda" - SIEMPRE visible */}
+          <div className="mb-2">
+            <Link 
+              href={`/buscar?${searchParams.toString()}`}
+              className="inline-flex items-center text-xs text-gray-600 hover:text-furgocasa-orange transition-colors"
+            >
+              <ArrowLeft className="h-3 w-3 mr-1" />
+              {t("Volver a la búsqueda")}
+            </Link>
+          </div>
+          
           <div className="flex items-center justify-between gap-4">
             {/* Info del vehículo */}
             <div className="flex items-center gap-3 min-w-0">
