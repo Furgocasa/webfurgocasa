@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
+import { useAdminData } from "@/hooks/use-admin-data";
 
 interface Booking {
   id: string;
@@ -73,32 +74,14 @@ function formatDateTime(date: string): string {
 type SortField = 'booking_number' | 'customer' | 'internal_code' | 'vehicle' | 'pickup_date' | 'dropoff_date' | 'pickup_location' | 'dropoff_location' | 'total_price' | 'amount_paid' | 'status' | 'payment_status' | 'created_at';
 
 export default function BookingsPage() {
-  const [bookings, setBookings] = useState<Booking[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [initialLoadDone, setInitialLoadDone] = useState(false);
-  
   // Estados para ordenamiento - por defecto por fecha de creación descendente
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  useEffect(() => {
-    // Pequeño delay para asegurar que el cliente esté inicializado
-    const timer = setTimeout(() => {
-      loadBookings();
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  const loadBookings = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      
-      console.log('[Bookings] Starting load...');
-      
-      const { data, error } = await supabase
+  // Usar el hook para cargar datos con retry automático
+  const { data: bookings, loading, error, refetch } = useAdminData<Booking[]>({
+    queryFn: async () => {
+      const result = await supabase
         .from('bookings')
         .select(`
           *,
@@ -108,30 +91,16 @@ export default function BookingsPage() {
           dropoff_location:locations!dropoff_location_id(id, name)
         `)
         .order('created_at', { ascending: false });
-
-      if (error) {
-        console.error('[Bookings] Supabase error:', error);
-        throw error;
-      }
       
-      console.log('[Bookings] Loaded successfully:', data?.length || 0, 'records');
-      setBookings((data || []) as Booking[]);
-      setInitialLoadDone(true);
-    } catch (err: any) {
-      console.error('[Bookings] Error loading:', err);
-      setError(err.message);
-      
-      // Retry automático solo si es la primera carga
-      if (!initialLoadDone && bookings.length === 0) {
-        console.log('[Bookings] Retrying in 1.5 seconds...');
-        setTimeout(() => {
-          loadBookings();
-        }, 1500);
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+      return {
+        data: (result.data || []) as Booking[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -189,8 +158,8 @@ export default function BookingsPage() {
 
       if (error) throw error;
 
-      // Actualizar lista local
-      setBookings(bookings.filter(b => b.id !== bookingId));
+      // Recargar datos
+      refetch();
       alert('Reserva eliminada correctamente');
     } catch (err: any) {
       console.error('Error deleting booking:', err);
@@ -200,6 +169,7 @@ export default function BookingsPage() {
 
   // Ordenar reservas
   const sortedBookings = useMemo(() => {
+    if (!bookings) return [];
     return [...bookings].sort((a, b) => {
       let aValue: any;
       let bValue: any;
