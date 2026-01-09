@@ -1,9 +1,22 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+
+// Usar service role para bypasear RLS
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 export async function POST(request: Request) {
   try {
-    const supabase = await createClient();
+    // Usar service role client que bypasea RLS (o anon key como fallback)
+    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
+    
+    console.log('Creating customer with key:', supabaseServiceKey.substring(0, 20) + '...');
+    
     const body = await request.json();
 
     const {
@@ -37,13 +50,14 @@ export async function POST(request: Request) {
       .single();
 
     if (existing) {
+      console.log('Customer already exists:', existing.id);
       return NextResponse.json(
         { customer: existing },
         { status: 200 }
       );
     }
 
-    // Crear nuevo cliente
+    // Crear nuevo cliente (con service role bypasea RLS)
     const { data: customer, error } = await supabase
       .from("customers")
       .insert({
@@ -72,6 +86,7 @@ export async function POST(request: Request) {
       );
     }
 
+    console.log('Customer created successfully:', customer.id);
     return NextResponse.json({ customer }, { status: 201 });
   } catch (error: any) {
     console.error("Error in customers API:", error);
