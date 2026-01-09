@@ -92,61 +92,61 @@ export default function OfertasPage() {
           </div>
 
           <div className="container mx-auto px-4 relative z-10">
-            <div className="text-center mb-16">
-              <span className="inline-block px-6 py-2 bg-white/10 backdrop-blur-md rounded-full text-sm font-bold tracking-widest uppercase mb-6 border border-white/20">
+            <div className="text-center mb-10 md:mb-16">
+              <span className="inline-block px-4 md:px-6 py-1.5 md:py-2 bg-white/10 backdrop-blur-md rounded-full text-xs md:text-sm font-bold tracking-wider md:tracking-widest uppercase mb-4 md:mb-6 border border-white/20">
                 {t("Promoción Especial")}
               </span>
-              <h2 className="text-5xl md:text-8xl font-heading font-bold text-white mb-4 tracking-tight drop-shadow-2xl">
+              <h2 className="text-3xl md:text-8xl font-heading font-bold text-white mb-2 md:mb-4 tracking-tight drop-shadow-2xl">
                 {t("INVIERNO MÁGICO")}
               </h2>
-              <p className="text-2xl md:text-4xl text-cyan-300 font-heading font-bold tracking-wide mt-2">
+              <p className="text-xl md:text-4xl text-cyan-300 font-heading font-bold tracking-wide mt-1 md:mt-2">
                 2026
               </p>
             </div>
 
             <div className="max-w-6xl mx-auto">
               {/* Texto principal */}
-              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-[3rem] p-10 md:p-16 mb-12 shadow-2xl text-center">
-                <h3 className="text-3xl md:text-5xl font-heading font-bold text-white mb-8 leading-tight">
+              <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl md:rounded-[3rem] p-6 md:p-16 mb-8 md:mb-12 shadow-2xl text-center">
+                <h3 className="text-xl md:text-5xl font-heading font-bold text-white mb-4 md:mb-8 leading-tight">
                   {t("¡TU AVENTURA INVERNAL!")}
                 </h3>
-                <p className="text-blue-100 text-lg md:text-xl mb-0 leading-relaxed max-w-3xl mx-auto font-light">
+                <p className="text-blue-100 text-sm md:text-xl mb-0 leading-relaxed max-w-3xl mx-auto font-light">
                   {t("¡Descubre el invierno con FURGOCASA! Viaja con libertad en nuestras camper vans totalmente equipadas. Del norte nevado al sur más cálido, ¡tú decides el camino!")}
                 </p>
               </div>
 
               {/* Descuento destacado - Card principal */}
-              <div className="grid md:grid-cols-2 gap-8 mb-12">
-                <div className="bg-gradient-to-br from-furgocasa-orange to-red-500 rounded-[3rem] p-12 text-center shadow-2xl transform hover:scale-[1.02] transition-transform duration-300 flex flex-col justify-center relative overflow-hidden group">
+              <div className="grid md:grid-cols-2 gap-4 md:gap-8 mb-8 md:mb-12">
+                <div className="bg-gradient-to-br from-furgocasa-orange to-red-500 rounded-2xl md:rounded-[3rem] p-6 md:p-12 text-center shadow-2xl transform hover:scale-[1.02] transition-transform duration-300 flex flex-col justify-center relative overflow-hidden group">
                   <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10"></div>
-                  <h3 className="text-6xl md:text-8xl font-heading font-bold text-white mb-2 tracking-tighter">
+                  <h3 className="text-4xl md:text-8xl font-heading font-bold text-white mb-1 md:mb-2 tracking-tighter">
                     -15%
                   </h3>
-                  <p className="text-xl md:text-2xl font-bold text-white/90 mb-8 uppercase tracking-widest border-b border-white/20 pb-8 mx-10">
+                  <p className="text-sm md:text-2xl font-bold text-white/90 mb-4 md:mb-8 uppercase tracking-wide md:tracking-widest border-b border-white/20 pb-4 md:pb-8 mx-4 md:mx-10">
                     {t("Descuento Invierno")}
                   </p>
-                  <div className="space-y-4 text-white font-medium text-lg md:text-xl">
-                    <p className="flex items-center justify-center gap-2"><Zap className="w-5 h-5" /> {t("En TODAS nuestras campers")}</p>
-                    <p className="flex items-center justify-center gap-2"><Clock className="w-5 h-5" /> {t("¡ALQUILA MÍNIMO 10 DÍAS!")}</p>
+                  <div className="space-y-2 md:space-y-4 text-white font-medium text-sm md:text-xl">
+                    <p className="flex items-center justify-center gap-2"><Zap className="w-4 h-4 md:w-5 md:h-5" /> {t("En TODAS nuestras campers")}</p>
+                    <p className="flex items-center justify-center gap-2"><Clock className="w-4 h-4 md:w-5 md:h-5" /> {t("¡ALQUILA MÍNIMO 10 DÍAS!")}</p>
                   </div>
                 </div>
 
                 {/* Código promocional */}
-                <div className="bg-white text-gray-900 rounded-[3rem] p-12 text-center shadow-2xl flex flex-col justify-center border border-gray-100">
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6">
+                <div className="bg-white text-gray-900 rounded-2xl md:rounded-[3rem] p-6 md:p-12 text-center shadow-2xl flex flex-col justify-center border border-gray-100">
+                  <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider md:tracking-widest mb-4 md:mb-6">
                     {t("CÓDIGO PROMOCIONAL")}
                   </p>
                   <div className="relative group cursor-pointer w-full" onClick={handleCopyCode}>
-                    <div className="bg-gray-50 rounded-2xl p-8 mb-4 border-2 border-dashed border-gray-300 group-hover:border-furgocasa-blue group-hover:bg-blue-50 transition-all duration-300">
-                      <div className="text-4xl md:text-6xl font-mono font-bold text-furgocasa-blue tracking-wider">
+                    <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 md:p-8 mb-3 md:mb-4 border-2 border-dashed border-gray-300 group-hover:border-furgocasa-blue group-hover:bg-blue-50 transition-all duration-300">
+                      <div className="text-2xl md:text-6xl font-mono font-bold text-furgocasa-blue tracking-wider">
                         INV2026
                       </div>
                     </div>
-                    <div className="absolute top-1/2 right-6 -translate-y-1/2 text-gray-400 group-hover:text-furgocasa-blue transition-colors bg-white p-2 rounded-full shadow-sm">
-                      {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+                    <div className="absolute top-1/2 right-3 md:right-6 -translate-y-1/2 text-gray-400 group-hover:text-furgocasa-blue transition-colors bg-white p-1.5 md:p-2 rounded-full shadow-sm">
+                      {copied ? <Check className="w-4 h-4 md:w-5 md:h-5 text-green-500" /> : <Copy className="w-4 h-4 md:w-5 md:h-5" />}
                     </div>
                   </div>
-                  <p className="text-gray-500 text-sm mb-8 font-medium">
+                  <p className="text-gray-500 text-xs md:text-sm mb-4 md:mb-8 font-medium">
                     {copied ? <span className="text-green-500">{t("¡Copiado al portapapeles!")}</span> : t("Haz clic para copiar el código")}
                   </p>
                   <LocalizedLink

@@ -74,24 +74,24 @@ export default function QuienesSomosPage() {
         </section>
 
         {/* Stats */}
-        <section className="py-24 bg-furgocasa-blue text-white">
+        <section className="py-16 md:py-24 bg-furgocasa-blue text-white">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
               <div>
-                <p className="text-5xl font-heading font-bold mb-2">10+</p>
-                <p className="text-blue-200 uppercase tracking-widest text-sm">{t("Años de experiencia")}</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">10+</p>
+                <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Años de experiencia")}</p>
               </div>
               <div>
-                <p className="text-5xl font-heading font-bold mb-2">500+</p>
-                <p className="text-blue-200 uppercase tracking-widest text-sm">{t("Viajes realizados")}</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">500+</p>
+                <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Viajes realizados")}</p>
               </div>
               <div>
-                <p className="text-5xl font-heading font-bold mb-2">15</p>
-                <p className="text-blue-200 uppercase tracking-widest text-sm">{t("Vehículos Premium")}</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">15</p>
+                <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Vehículos Premium")}</p>
               </div>
               <div>
-                <p className="text-5xl font-heading font-bold mb-2">4.9</p>
-                <p className="text-blue-200 uppercase tracking-widest text-sm">{t("Valoración Media")}</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.9</p>
+                <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Valoración Media")}</p>
               </div>
             </div>
           </div>

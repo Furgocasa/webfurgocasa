@@ -67,18 +67,18 @@ export default function ReservarPage() {
         <div className="h-24 bg-gray-50"></div>
 
         {/* Proceso de reserva - Modernizado */}
-        <section className="py-24 bg-gray-50">
+        <section className="py-16 md:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-heading font-bold text-gray-900 mb-4">
+            <div className="text-center mb-10 md:mb-16">
+              <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-3 md:mb-4">
                 {t("¿Cómo funciona?")}
               </h2>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 text-base md:text-lg">
                 {t("Reserva tu camper en 4 sencillos pasos")}
               </p>
             </div>
 
-            <div className="grid md:grid-cols-4 gap-8 max-w-6xl mx-auto relative">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 max-w-6xl mx-auto relative">
               {/* Línea conectora (desktop) */}
               <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gray-200 -z-10 rounded-full"></div>
 
@@ -89,18 +89,18 @@ export default function ReservarPage() {
                 { step: "4", title: "Confirma y paga", desc: "Reserva abonando solo el 50%", icon: CreditCard },
               ].map((item, index) => (
                 <div key={item.step} className="flex flex-col items-center text-center group">
-                  <div className="w-24 h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border-4 border-gray-50 relative z-10">
-                    <div className="w-16 h-16 bg-furgocasa-blue text-white rounded-full flex items-center justify-center">
-                      <item.icon className="h-8 w-8" />
+                  <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform duration-300 border-2 md:border-4 border-gray-50 relative z-10">
+                    <div className="w-12 h-12 md:w-16 md:h-16 bg-furgocasa-blue text-white rounded-full flex items-center justify-center">
+                      <item.icon className="h-5 w-5 md:h-8 md:w-8" />
                     </div>
-                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-furgocasa-orange text-white rounded-full flex items-center justify-center font-bold text-sm shadow-md">
+                    <div className="absolute -top-1 -right-1 md:-top-2 md:-right-2 w-6 h-6 md:w-8 md:h-8 bg-furgocasa-orange text-white rounded-full flex items-center justify-center font-bold text-xs md:text-sm shadow-md">
                       {item.step}
                     </div>
                   </div>
-                  <h3 className="font-heading font-bold text-xl text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
+                  <h3 className="font-heading font-bold text-sm md:text-xl text-gray-900 mb-1 md:mb-2 group-hover:text-furgocasa-blue transition-colors">
                     {t(item.title)}
                   </h3>
-                  <p className="text-gray-600 text-sm max-w-[200px]">
+                  <p className="text-gray-600 text-xs md:text-sm max-w-[150px] md:max-w-[200px]">
                     {t(item.desc)}
                   </p>
                 </div>
