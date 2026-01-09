@@ -51,14 +51,88 @@ export function VehicleGallery({ images, vehicleName }: VehicleGalleryProps) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden w-full" style={{ maxWidth: '100%' }}>
-        {/* Imagen principal */}
-        <div className="relative aspect-[4/3] md:aspect-[16/10] bg-gradient-to-br from-gray-900 to-gray-800 group overflow-hidden">
+      {/* ======================= */}
+      {/* VERSIÓN MÓVIL (< md) */}
+      {/* ======================= */}
+      <div className="md:hidden bg-white rounded-xl shadow-lg overflow-hidden">
+        {/* Contenedor de imagen móvil - ancho fijo al 100% */}
+        <div className="relative w-full bg-gray-900">
+          <img
+            src={currentImage.image_url}
+            alt={currentImage.alt_text || `${vehicleName} - Imagen ${currentIndex + 1}`}
+            className="w-full h-auto block"
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
+
+          {/* Controles móvil */}
+          {sortedImages.length > 1 && (
+            <>
+              <button
+                onClick={goToPrevious}
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 rounded-full shadow-lg"
+                aria-label="Anterior"
+              >
+                <ChevronLeft className="h-5 w-5 text-gray-900" />
+              </button>
+              <button
+                onClick={goToNext}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-white/90 rounded-full shadow-lg"
+                aria-label="Siguiente"
+              >
+                <ChevronRight className="h-5 w-5 text-gray-900" />
+              </button>
+
+              {/* Contador móvil */}
+              <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
+                {currentIndex + 1} / {sortedImages.length}
+              </div>
+            </>
+          )}
+
+          {/* Badge principal móvil */}
+          {currentImage.is_primary && (
+            <div className="absolute top-2 left-2 px-2 py-1 bg-furgocasa-orange text-white text-xs font-semibold rounded">
+              ⭐ Principal
+            </div>
+          )}
+        </div>
+
+        {/* Miniaturas móvil */}
+        {sortedImages.length > 1 && (
+          <div className="p-2 bg-gray-50 border-t overflow-x-auto">
+            <div className="flex gap-2">
+              {sortedImages.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`flex-shrink-0 w-14 h-10 rounded overflow-hidden border-2 ${
+                    index === currentIndex
+                      ? "border-furgocasa-orange"
+                      : "border-gray-200"
+                  }`}
+                >
+                  <img
+                    src={image.image_url}
+                    alt={`Miniatura ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* ======================= */}
+      {/* VERSIÓN DESKTOP (>= md) */}
+      {/* ======================= */}
+      <div className="hidden md:block bg-white rounded-2xl shadow-lg overflow-hidden">
+        {/* Imagen principal desktop */}
+        <div className="relative aspect-[16/10] bg-gradient-to-br from-gray-900 to-gray-800 group">
           <img
             src={currentImage.image_url}
             alt={currentImage.alt_text || `${vehicleName} - Imagen ${currentIndex + 1}`}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            style={{ maxWidth: '100%' }}
           />
 
           {/* Overlay con zoom */}
@@ -71,68 +145,66 @@ export function VehicleGallery({ images, vehicleName }: VehicleGalleryProps) {
             </div>
           </button>
 
-          {/* Controles de navegación */}
+          {/* Controles desktop */}
           {sortedImages.length > 1 && (
             <>
               <button
                 onClick={goToPrevious}
-                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 p-2 md:p-3 bg-white/95 hover:bg-white rounded-full shadow-xl transition-all hover:scale-110"
+                className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/95 hover:bg-white rounded-full shadow-xl transition-all hover:scale-110"
                 aria-label="Imagen anterior"
               >
-                <ChevronLeft className="h-5 w-5 md:h-6 md:w-6 text-gray-900" />
+                <ChevronLeft className="h-6 w-6 text-gray-900" />
               </button>
               <button
                 onClick={goToNext}
-                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 p-2 md:p-3 bg-white/95 hover:bg-white rounded-full shadow-xl transition-all hover:scale-110"
+                className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/95 hover:bg-white rounded-full shadow-xl transition-all hover:scale-110"
                 aria-label="Siguiente imagen"
               >
-                <ChevronRight className="h-5 w-5 md:h-6 md:w-6 text-gray-900" />
+                <ChevronRight className="h-6 w-6 text-gray-900" />
               </button>
 
-              {/* Contador elegante */}
-              <div className="absolute bottom-2 md:bottom-4 right-2 md:right-4 px-3 md:px-4 py-1 md:py-2 bg-black/80 backdrop-blur-sm text-white text-xs md:text-sm rounded-lg font-medium">
+              {/* Contador desktop */}
+              <div className="absolute bottom-4 right-4 px-4 py-2 bg-black/80 backdrop-blur-sm text-white text-sm rounded-lg font-medium">
                 {currentIndex + 1} / {sortedImages.length}
               </div>
             </>
           )}
 
-          {/* Badge de imagen principal */}
+          {/* Badge principal desktop */}
           {currentImage.is_primary && (
-            <div className="absolute top-2 md:top-4 left-2 md:left-4 px-2 md:px-3 py-1 bg-furgocasa-orange text-white text-xs md:text-sm font-semibold rounded-lg shadow-lg">
-              ⭐ Principal
+            <div className="absolute top-4 left-4 px-3 py-1 bg-furgocasa-orange text-white text-sm font-semibold rounded-lg shadow-lg">
+              ⭐ Imagen Principal
             </div>
           )}
         </div>
 
-        {/* Galería de miniaturas mejorada */}
+        {/* Miniaturas desktop */}
         {sortedImages.length > 1 && (
-          <div className="p-3 md:p-6 bg-gray-50 border-t">
-            <div className="relative">
-              <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
-                {sortedImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentIndex(index)}
-                    className={`flex-shrink-0 w-16 md:w-24 aspect-video rounded-lg overflow-hidden border-2 transition-all ${
-                      index === currentIndex
-                        ? "border-furgocasa-orange ring-2 md:ring-4 ring-furgocasa-orange/30 scale-105"
-                        : "border-gray-300 hover:border-furgocasa-orange/50 hover:scale-105"
-                    }`}
-                  >
-                    <img
-                      src={image.image_url}
-                      alt={image.alt_text || `${vehicleName} - Miniatura ${index + 1}`}
-                      className="w-full h-full object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+          <div className="p-6 bg-gray-50 border-t">
+            <div className="flex gap-3 overflow-x-auto pb-2">
+              {sortedImages.map((image, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`flex-shrink-0 w-24 aspect-video rounded-lg overflow-hidden border-2 transition-all ${
+                    index === currentIndex
+                      ? "border-furgocasa-orange ring-4 ring-furgocasa-orange/30 scale-105"
+                      : "border-gray-300 hover:border-furgocasa-orange/50 hover:scale-105"
+                  }`}
+                >
+                  <img
+                    src={image.image_url}
+                    alt={image.alt_text || `${vehicleName} - Miniatura ${index + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+              ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* Lightbox (modal de imagen ampliada) */}
+      {/* Lightbox (compartido) */}
       {isLightboxOpen && (
         <div
           className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
