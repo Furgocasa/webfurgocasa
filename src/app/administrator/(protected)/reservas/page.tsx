@@ -76,13 +76,19 @@ export default function BookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [initialLoadDone, setInitialLoadDone] = useState(false);
   
   // Estados para ordenamiento - por defecto por fecha de creación descendente
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
-    loadBookings();
+    // Pequeño delay para asegurar que el cliente esté inicializado
+    const timer = setTimeout(() => {
+      loadBookings();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const loadBookings = async () => {
@@ -90,7 +96,7 @@ export default function BookingsPage() {
       setLoading(true);
       setError(null);
       
-      console.log('Loading bookings...');
+      console.log('[Bookings] Starting load...');
       
       const { data, error } = await supabase
         .from('bookings')
@@ -104,22 +110,23 @@ export default function BookingsPage() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Supabase error:', error);
+        console.error('[Bookings] Supabase error:', error);
         throw error;
       }
       
-      console.log('Bookings loaded:', data?.length || 0);
+      console.log('[Bookings] Loaded successfully:', data?.length || 0, 'records');
       setBookings((data || []) as Booking[]);
+      setInitialLoadDone(true);
     } catch (err: any) {
-      console.error('Error loading bookings:', err);
+      console.error('[Bookings] Error loading:', err);
       setError(err.message);
       
-      // Retry automático después de 1 segundo si falla la primera vez
-      if (bookings.length === 0) {
-        console.log('Retrying in 1 second...');
+      // Retry automático solo si es la primera carga
+      if (!initialLoadDone && bookings.length === 0) {
+        console.log('[Bookings] Retrying in 1.5 seconds...');
         setTimeout(() => {
           loadBookings();
-        }, 1000);
+        }, 1500);
       }
     } finally {
       setLoading(false);

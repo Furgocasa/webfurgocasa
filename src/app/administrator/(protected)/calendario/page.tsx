@@ -101,7 +101,12 @@ export default function CalendarioPage() {
   }, []);
 
   useEffect(() => {
-    loadData();
+    // Pequeño delay para asegurar que el cliente esté inicializado
+    const timer = setTimeout(() => {
+      loadData();
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [startDate, monthsToShow]);
 
   const loadData = async () => {
