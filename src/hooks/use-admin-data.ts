@@ -78,20 +78,18 @@ export function useAdminData<T = any>({
       
       setError(err.message || 'Error al cargar datos');
 
-      // Retry automático si no hemos alcanzado el límite
-      // Para AbortError, siempre reintentamos
-      const shouldRetry = isAbortError ? true : attemptCount < retryCount;
-      
-      if (shouldRetry && attemptCount < retryCount) {
+      // Retry automático si no hemos alcanzado el límite (máximo retryCount intentos)
+      if (attemptCount < retryCount) {
         const delay = retryDelay * (attemptCount + 1); // Backoff exponencial
-        console.log(`[useAdminData] Retrying in ${delay}ms... (${isAbortError ? 'AbortError' : 'normal error'})`);
+        console.log(`[useAdminData] Retrying in ${delay}ms... (attempt ${attemptCount + 1}/${retryCount}, ${isAbortError ? 'AbortError' : 'normal error'})`);
         setAttemptCount(prev => prev + 1);
         
         setTimeout(() => {
           loadData(true);
         }, delay);
       } else {
-        console.error('[useAdminData] Max retry attempts reached');
+        console.error(`[useAdminData] Max retry attempts reached (${retryCount}/${retryCount})`);
+        setLoading(false);
       }
     } finally {
       if (!isRetry) {
