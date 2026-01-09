@@ -385,12 +385,12 @@ function NuevaReservaContent() {
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
             <p className="text-gray-600 mb-4">{error}</p>
-            <Link 
-              href="/reservar"
+            <button 
+              onClick={() => router.back()}
               className="inline-block bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors"
             >
-              {t("Volver a buscar")}
-            </Link>
+              {t("Volver atrás")}
+            </button>
           </div>
         </div>
         <Footer />
@@ -408,13 +408,13 @@ function NuevaReservaContent() {
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Breadcrumb */}
           <div className="mb-8">
-            <Link 
-              href="/reservar"
+            <button 
+              onClick={() => router.back()}
               className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              {t("Volver a la búsqueda")}
-            </Link>
+              {t("Volver al paso anterior")}
+            </button>
           </div>
 
           {/* Header */}
