@@ -345,7 +345,7 @@ function ReservarVehiculoContent() {
         </div>
       </div>
       
-      <main className="min-h-screen bg-gray-50 pt-[200px] py-6 md:py-12 overflow-x-hidden">
+      <main className="min-h-screen bg-gray-50 pt-[150px] py-6 md:py-12 overflow-x-hidden">
         <div className="container mx-auto px-4 max-w-7xl">{/* Quitado overflow-hidden para permitir sticky */}
           {/* Breadcrumb */}
           <div className="mb-8">

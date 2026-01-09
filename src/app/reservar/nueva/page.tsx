@@ -447,7 +447,7 @@ function NuevaReservaContent() {
         </div>
       </div>
       
-      <main className="min-h-screen bg-gray-50 pt-[200px] py-12">
+      <main className="min-h-screen bg-gray-50 pt-[150px] py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
