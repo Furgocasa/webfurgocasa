@@ -98,47 +98,53 @@ export default function TarifasPage() {
 
               <div className="overflow-hidden rounded-2xl shadow-xl border border-gray-100 bg-white">
                 <div className="overflow-x-auto">
-                  <table className="w-full">
+                  <table className="w-full min-w-[600px]">
                     <thead>
                       <tr className="bg-furgocasa-blue text-white">
-                        <th className="py-6 px-6 text-left font-heading font-bold text-lg border-r border-blue-800/30">
+                        <th className="py-3 md:py-6 px-2 md:px-6 text-left font-heading font-bold text-xs md:text-lg border-r border-blue-800/30">
                           {t("Temporada")}
                         </th>
-                        <th className="py-6 px-6 text-center font-heading font-bold border-r border-blue-800/30 bg-white/5">
-                          {t("Menos de una semana")}
+                        <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base border-r border-blue-800/30 bg-white/5">
+                          <span className="hidden md:inline">{t("Menos de una semana")}</span>
+                          <span className="md:hidden">&lt;7d</span>
                         </th>
-                        <th className="py-6 px-6 text-center font-heading font-bold border-r border-blue-800/30 bg-white/10">
-                          {t("Al menos una semana")}
+                        <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base border-r border-blue-800/30 bg-white/10">
+                          <span className="hidden md:inline">{t("Al menos una semana")}</span>
+                          <span className="md:hidden">7d+</span>
                         </th>
-                        <th className="py-6 px-6 text-center font-heading font-bold border-r border-blue-800/30 bg-white/5">
-                          {t("Al menos dos semanas")}
+                        <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base border-r border-blue-800/30 bg-white/5">
+                          <span className="hidden md:inline">{t("Al menos dos semanas")}</span>
+                          <span className="md:hidden">14d+</span>
                         </th>
-                        <th className="py-6 px-6 text-center font-heading font-bold bg-white/10">
-                          {t("Al menos 3 semanas")}
+                        <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base bg-white/10">
+                          <span className="hidden md:inline">{t("Al menos 3 semanas")}</span>
+                          <span className="md:hidden">21d+</span>
                         </th>
                       </tr>
                     </thead>
                     <tbody>
                       {pricingTable.map((row, index) => (
                         <tr key={row.season} className={`group hover:bg-blue-50/50 transition-colors ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'}`}>
-                          <td className="py-6 px-6 font-bold text-gray-900 border-r border-gray-100 flex items-center gap-2">
-                            <span className={`w-3 h-3 rounded-full ${
-                              row.season === "Baja" ? "bg-furgocasa-blue" : 
-                              row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-500"
-                            }`}></span>
-                            {t(row.season)}
+                          <td className="py-3 md:py-6 px-2 md:px-6 font-bold text-gray-900 border-r border-gray-100">
+                            <div className="flex items-center gap-1 md:gap-2">
+                              <span className={`w-2 md:w-3 h-2 md:h-3 rounded-full flex-shrink-0 ${
+                                row.season === "Baja" ? "bg-furgocasa-blue" : 
+                                row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-500"
+                              }`}></span>
+                              <span className="text-sm md:text-base">{t(row.season)}</span>
+                            </div>
                           </td>
-                          <td className="py-6 px-6 text-center text-gray-600 font-bold text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">
-                            {row.lessThanWeek} €
+                          <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">
+                            {row.lessThanWeek}€
                           </td>
-                          <td className="py-6 px-6 text-center text-furgocasa-blue font-bold text-2xl border-r border-gray-100 bg-furgocasa-blue/5">
-                            {row.oneWeek} €
+                          <td className="py-3 md:py-6 px-2 md:px-6 text-center text-furgocasa-blue font-bold text-base md:text-2xl border-r border-gray-100 bg-furgocasa-blue/5">
+                            {row.oneWeek}€
                           </td>
-                          <td className="py-6 px-6 text-center text-gray-600 font-bold text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">
-                            {row.twoWeeks} €
+                          <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">
+                            {row.twoWeeks}€
                           </td>
-                          <td className="py-6 px-6 text-center text-gray-600 font-bold text-xl group-hover:text-furgocasa-blue transition-colors">
-                            {row.threeWeeks} €
+                          <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl group-hover:text-furgocasa-blue transition-colors">
+                            {row.threeWeeks}€
                           </td>
                         </tr>
                       ))}

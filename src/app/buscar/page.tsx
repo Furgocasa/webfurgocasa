@@ -166,10 +166,10 @@ function SearchResultsContent() {
                   </div>
 
                   {/* Filters and Sort */}
-                  <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex flex-wrap items-center gap-2 md:gap-3">
                     {/* Night capacity filter */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500 hidden sm:inline">{t("Plazas noche")}:</span>
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <span className="text-xs md:text-sm text-gray-500 hidden sm:inline">{t("Plazas noche")}:</span>
                       <div className="flex rounded-lg border border-gray-300 overflow-hidden">
                         {[
                           { value: "all", label: t("Todas") },
@@ -179,7 +179,7 @@ function SearchResultsContent() {
                           <button
                             key={option.value}
                             onClick={() => setBedsFilter(option.value as BedsFilter)}
-                            className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                            className={`px-2 md:px-3 py-2 text-xs md:text-sm font-medium transition-colors touch-manipulation ${
                               bedsFilter === option.value
                                 ? "bg-furgocasa-orange text-white"
                                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -192,8 +192,8 @@ function SearchResultsContent() {
                     </div>
 
                     {/* Transmission filter */}
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500 hidden sm:inline">{t("Cambio")}:</span>
+                    <div className="flex items-center gap-1 md:gap-2">
+                      <span className="text-xs md:text-sm text-gray-500 hidden sm:inline">{t("Cambio")}:</span>
                       <div className="flex rounded-lg border border-gray-300 overflow-hidden">
                         {[
                           { value: "all", label: t("Todos") },
@@ -203,7 +203,7 @@ function SearchResultsContent() {
                           <button
                             key={option.value}
                             onClick={() => setTransmissionFilter(option.value as TransmissionFilter)}
-                            className={`px-3 py-1.5 text-sm font-medium transition-colors ${
+                            className={`px-2 md:px-3 py-2 text-xs md:text-sm font-medium transition-colors touch-manipulation ${
                               transmissionFilter === option.value
                                 ? "bg-furgocasa-orange text-white"
                                 : "bg-white text-gray-700 hover:bg-gray-50"
@@ -219,9 +219,9 @@ function SearchResultsContent() {
                     {hasActiveFilters && (
                       <button
                         onClick={clearFilters}
-                        className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
+                        className="flex items-center gap-1 px-2 md:px-3 py-2 text-xs md:text-sm text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors touch-manipulation"
                       >
-                        <X className="h-4 w-4" />
+                        <X className="h-3 w-3 md:h-4 md:w-4" />
                         {t("Limpiar")}
                       </button>
                     )}
@@ -233,7 +233,7 @@ function SearchResultsContent() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as SortOption)}
-                      className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent text-sm"
+                      className="px-2 md:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent text-xs md:text-sm"
                     >
                       <option value="recommended">{t("Recomendados")}</option>
                       <option value="price_asc">{t("Precio: menor a mayor")}</option>
