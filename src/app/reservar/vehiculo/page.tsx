@@ -274,7 +274,7 @@ function ReservarVehiculoContent() {
       <Header />
       
       {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
-      <div className="sticky top-[120px] lg:top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40">
+      <div className="fixed top-[120px] lg:top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             {/* Info del vehículo */}
@@ -305,7 +305,7 @@ function ReservarVehiculoContent() {
         </div>
       </div>
       
-      <main className="min-h-screen bg-gray-50 py-6 md:py-12 overflow-x-hidden">
+      <main className="min-h-screen bg-gray-50 py-6 md:py-12 overflow-x-hidden pt-[200px]">{/* pt-[200px] para compensar header fijo (120px) + sticky resumen (80px aprox) */}
         <div className="container mx-auto px-4 max-w-7xl">{/* Quitado overflow-hidden para permitir sticky */}
           {/* Breadcrumb */}
           <div className="mb-8">
