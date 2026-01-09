@@ -563,8 +563,8 @@ function ReservarVehiculoContent() {
             </div>
 
             {/* Sidebar - Price Summary - Solo desktop */}
-            <div className="hidden lg:block space-y-6">
-              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
+            <div className="hidden lg:block">
+              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-8 self-start">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{t("Resumen")}</h3>
 
                 {/* Dates */}
@@ -614,10 +614,11 @@ function ReservarVehiculoContent() {
                   {selectedExtras.map((item) => {
                     // Calcular precio correctamente según el tipo
                     let price = 0;
-                    if (item.extra.price_type === 'per_rental' || item.extra.price_type === 'one_time') {
-                      price = item.extra.price_per_rental || 0;
+                    if (item.extra.price_type === 'per_unit') {
+                      // Precio único por toda la reserva
+                      price = (item.extra.price_per_unit || 0);
                     } else {
-                      // per_day
+                      // Precio por día multiplicado por número de días
                       price = (item.extra.price_per_day || 0) * days;
                     }
                     return (
