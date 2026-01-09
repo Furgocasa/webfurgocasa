@@ -127,7 +127,7 @@ export default function VentasPage() {
           )
         `)
         .eq('is_for_sale', true)
-        .eq('sale_status', 'available')
+        .neq('status', 'inactive')
         .order('created_at', { ascending: false });
 
       if (error) {
@@ -135,17 +135,29 @@ export default function VentasPage() {
         return;
       }
 
+      // Filtrar por sale_status después de traer los datos
+      // Si sale_status es NULL, se considera 'available' por defecto
+      // Solo excluimos si es explícitamente 'sold' o 'reserved'
+      const availableVehicles = data?.filter(vehicle => {
+        const saleStatus = vehicle.sale_status?.toLowerCase();
+        return saleStatus !== 'sold' && saleStatus !== 'reserved';
+      }) || [];
+
+      console.log('[Ventas] Total vehicles with is_for_sale=true:', data?.length || 0);
+      console.log('[Ventas] Available vehicles (excluding sold/reserved):', availableVehicles.length);
+
       // Transformar datos
-      const vehiclesData = data?.map(vehicle => ({
+      const vehiclesData = availableVehicles.map(vehicle => ({
         ...vehicle,
         category: Array.isArray(vehicle.category) ? vehicle.category[0] : vehicle.category,
         main_image: Array.isArray(vehicle.vehicle_images) && vehicle.vehicle_images.length > 0 
           ? vehicle.vehicle_images.find((img: any) => img.is_primary) || vehicle.vehicle_images[0]
           : undefined,
         sale_highlights: vehicle.sale_highlights || [],
-        vehicle_equipment: vehicle.vehicle_equipment || []
-      })) || [];
+        vehicle_equipment: vehicle.equipment || []
+      }));
 
+      console.log('[Ventas] Processed vehicles:', vehiclesData.length);
       setVehiclesForSale(vehiclesData as VehicleForSale[]);
     } catch (error) {
       console.error('Error:', error);
