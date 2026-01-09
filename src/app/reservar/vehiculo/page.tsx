@@ -30,8 +30,8 @@ interface Extra {
   id: string;
   name: string;
   description: string;
-  price_per_day: number;
-  price_per_rental: number;
+  price_per_day: number | null;
+  price_per_rental: number | null;
   price_type: 'per_day' | 'per_rental' | 'one_time';
   max_quantity: number;
   icon: string;
@@ -73,10 +73,11 @@ function ReservarVehiculoContent() {
     // Calcular precio según el tipo de extra
     let price = 0;
     if (item.extra.price_type === 'per_rental' || item.extra.price_type === 'one_time') {
-      price = item.extra.price_per_rental;
+      // Precio único por toda la reserva
+      price = (item.extra.price_per_rental || 0);
     } else {
-      // per_day
-      price = item.extra.price_per_day * days;
+      // Precio por día multiplicado por número de días
+      price = (item.extra.price_per_day || 0) * days;
     }
     return sum + (price * item.quantity);
   }, 0);
@@ -151,6 +152,18 @@ function ReservarVehiculoContent() {
       }
       
       console.log('Extras loaded:', extrasData);
+      
+      // Debug detallado de cada extra
+      if (extrasData) {
+        extrasData.forEach(extra => {
+          console.log(`Extra "${extra.name}":`, {
+            price_type: extra.price_type,
+            price_per_day: extra.price_per_day,
+            price_per_rental: extra.price_per_rental
+          });
+        });
+      }
+      
       setExtras((extrasData || []) as Extra[]);
       
     } catch (error: any) {
