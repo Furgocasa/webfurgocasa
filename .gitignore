@@ -52,5 +52,5 @@ SUPABASE_CREDENTIALS.txt
 *.mov
 *.avi
 
-# Carpeta de imágenes completa (usar Supabase Storage en producción)
-images/
+# Nota: Las imágenes de /public/images/ SÍ se incluyen en el repo
+# Los vehículos y contenido dinámico usan Supabase Storage
