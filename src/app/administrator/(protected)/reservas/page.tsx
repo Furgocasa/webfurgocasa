@@ -53,7 +53,11 @@ const paymentStatusConfig: Record<string, { bg: string; text: string; label: str
 };
 
 function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" });
+  return new Date(date).toLocaleDateString("es-ES", { 
+    day: "2-digit", 
+    month: "2-digit",
+    year: "numeric"
+  });
 }
 
 function formatDateTime(date: string): string {
