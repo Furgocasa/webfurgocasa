@@ -68,11 +68,11 @@ export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps)
       {/* Overlay gradient */}
       <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
 
-      {/* Navigation Arrows */}
+      {/* Navigation Arrows - Ocultos en móvil para no interferir con el buscador */}
       <button
         onClick={prevSlide}
         disabled={isTransitioning}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all disabled:opacity-50"
+        className="hidden md:block absolute left-4 top-1/3 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all disabled:opacity-50"
         aria-label="Previous slide"
       >
         <ChevronLeft className="h-6 w-6" />
@@ -80,14 +80,14 @@ export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps)
       <button
         onClick={nextSlide}
         disabled={isTransitioning}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all disabled:opacity-50"
+        className="hidden md:block absolute right-4 top-1/3 -translate-y-1/2 z-20 bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white p-3 rounded-full transition-all disabled:opacity-50"
         aria-label="Next slide"
       >
         <ChevronRight className="h-6 w-6" />
       </button>
 
-      {/* Dots Navigation */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+      {/* Dots Navigation - Más arriba en móvil */}
+      <div className="absolute bottom-[45%] md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
         {images.map((_, index) => (
           <button
             key={index}
