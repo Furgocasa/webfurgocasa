@@ -149,6 +149,8 @@ function ReservarVehiculoContent() {
         console.error('Extras error:', extrasError);
         throw extrasError;
       }
+      
+      console.log('Extras loaded:', extrasData);
       setExtras((extrasData || []) as Extra[]);
       
     } catch (error: any) {
@@ -433,9 +435,18 @@ function ReservarVehiculoContent() {
                           // Calcular precio según el tipo
                           let priceDisplay = '';
                           if (extra.price_type === 'per_rental' || extra.price_type === 'one_time') {
-                            priceDisplay = `${formatPrice(extra.price_per_rental)} / ${t("reserva")}`;
+                            // Para extras de precio único, usar price_per_rental
+                            const price = extra.price_per_rental || 0;
+                            priceDisplay = `${formatPrice(price)} / ${t("reserva")}`;
                           } else {
-                            priceDisplay = `${formatPrice(extra.price_per_day)} / ${t("día")}`;
+                            // Para extras por día, usar price_per_day
+                            const price = extra.price_per_day || 0;
+                            priceDisplay = `${formatPrice(price)} / ${t("día")}`;
+                          }
+                          
+                          // Debug log para ver los datos
+                          if (extra.price_per_rental === 0 && extra.price_per_day === 0) {
+                            console.log('Extra sin precio:', extra.name, extra);
                           }
 
                           return (
