@@ -92,7 +92,7 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
           </div>
         </div>
 
-        <div className="container mx-auto px-4 py-4 md:py-8">
+        <div className="container mx-auto px-4 py-4 md:py-8 max-w-7xl overflow-hidden">
           {/* Mobile CTA - Visible solo en móvil, arriba */}
           <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 mb-4">
             <div className="flex items-center justify-between mb-3">
@@ -117,9 +117,9 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
             </a>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-4 md:gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
             {/* Columna principal */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-8">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
               {/* Galería */}
               <VehicleGallery 
                 images={vehicle.images || []} 
