@@ -12,7 +12,7 @@ export default function AdminLayout({
     email: 'admin@furgocasa.com',
     name: 'Administrador',
     role: 'admin' as const,
-    avatar_url: null,
+    avatar_url: null as string | null,
     is_active: true,
     last_login: new Date().toISOString(),
     created_at: new Date().toISOString(),

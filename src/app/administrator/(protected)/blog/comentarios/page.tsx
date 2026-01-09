@@ -3,15 +3,12 @@
 import { useState, useEffect } from "react";
 import supabase from "@/lib/supabase/client";
 import { Search, Trash2, CheckCircle, XCircle, Clock, MessageSquare, AlertCircle } from "lucide-react";
+import type { Database } from "@/lib/supabase/database.types";
 
-interface Comment {
-  id: string;
-  content: string;
-  author_name: string;
-  author_email: string;
+type CommentRow = Database['public']['Tables']['comments']['Row'];
+
+interface Comment extends Omit<CommentRow, 'status'> {
   status: string;
-  created_at: string;
-  post_id: string;
   post?: {
     id: string;
     title: string;
@@ -64,6 +61,7 @@ export default function BlogComentariosPage() {
       // Transformar category anidado de array a objeto único
       const transformedComments = data?.map(comment => ({
         ...comment,
+        status: comment.status || 'pending',
         post: comment.post ? {
           ...comment.post,
           category: Array.isArray(comment.post.category) ? comment.post.category[0] : comment.post.category
@@ -258,7 +256,7 @@ export default function BlogComentariosPage() {
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-gray-500">{formatDateTime(comment.created_at)}</p>
+                  <p className="text-sm text-gray-500">{formatDateTime(comment.created_at || '')}</p>
                   <div className="flex gap-2">
                     {comment.status !== 'approved' && (
                       <button 

@@ -3,15 +3,9 @@
 import { useState, useEffect } from "react";
 import supabase from "@/lib/supabase/client";
 import { Plus, Search, Edit, Trash2, Save, X, FolderOpen, AlertCircle } from "lucide-react";
+import type { Database } from "@/lib/supabase/database.types";
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  is_active: boolean;
-  sort_order: number;
-}
+type Category = Database['public']['Tables']['content_categories']['Row'];
 
 export default function BlogCategoriasPage() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -70,7 +64,6 @@ export default function BlogCategoriasPage() {
       if (editingId) {
         const { data, error } = await supabase
           .from('content_categories')
-          // @ts-expect-error - Bypass tipo incorrecto generado por Supabase
           .update(dataToSave)
           .eq('id', editingId)
           .select('id');
@@ -83,7 +76,6 @@ export default function BlogCategoriasPage() {
       } else {
         const { data, error } = await supabase
           .from('content_categories')
-          // @ts-expect-error - Bypass tipo incorrecto generado por Supabase
           .insert(dataToSave)
           .select('id');
 
@@ -108,7 +100,7 @@ export default function BlogCategoriasPage() {
     setFormData({
       name: category.name,
       description: category.description || '',
-      is_active: category.is_active,
+      is_active: category.is_active ?? true,
     });
     setEditingId(category.id);
     setShowAddForm(true);
@@ -262,9 +254,9 @@ export default function BlogCategoriasPage() {
                   </div>
                 </div>
                 <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                  category.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                  category.is_active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
                 }`}>
-                  {category.is_active ? 'Activa' : 'Inactiva'}
+                  {category.is_active !== false ? 'Activa' : 'Inactiva'}
                 </span>
               </div>
 

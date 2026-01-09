@@ -43,13 +43,20 @@ export default async function AdminDashboard() {
       };
     });
 
-  const statCards = [
+  const statCards: Array<{
+    name: string;
+    value: string;
+    icon: any;
+    change: string;
+    changeType: "positive" | "negative" | "neutral";
+    href: string;
+  }> = [
     {
       name: "Reservas hoy",
       value: stats.todayBookings.toString(),
       icon: Calendar,
       change: todayActions.length > 0 ? `${todayActions.length} acciones programadas` : "Sin acciones hoy",
-      changeType: "neutral" as const,
+      changeType: "neutral",
       href: "/administrator/reservas",
     },
     {
@@ -57,7 +64,7 @@ export default async function AdminDashboard() {
       value: `${stats.monthRevenue.toLocaleString("es-ES")}€`,
       icon: CreditCard,
       change: "Reservas confirmadas y completadas",
-      changeType: "positive" as const,
+      changeType: "positive",
       href: "/administrator/pagos",
     },
     {
@@ -65,7 +72,7 @@ export default async function AdminDashboard() {
       value: `${stats.availableVehicles}/${stats.totalVehicles}`,
       icon: Car,
       change: `${stats.totalVehicles - stats.availableVehicles} en alquiler o mantenimiento`,
-      changeType: "neutral" as const,
+      changeType: "neutral",
       href: "/administrator/vehiculos",
     },
     {
@@ -73,7 +80,7 @@ export default async function AdminDashboard() {
       value: (allBookings?.length || 0).toString(),
       icon: Users,
       change: `${stats.pendingBookings} pendientes de confirmar`,
-      changeType: stats.pendingBookings > 0 ? "neutral" as const : "positive" as const,
+      changeType: stats.pendingBookings > 0 ? "neutral" : "positive",
       href: "/administrator/clientes",
     },
   ];

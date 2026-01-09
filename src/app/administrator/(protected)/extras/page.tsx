@@ -11,11 +11,15 @@ interface Extra {
   description: string | null;
   price_per_day: number | null;
   price_per_unit: number | null;
-  price_type: 'per_day' | 'per_unit' | 'fixed';
-  is_active: boolean;
-  sort_order: number;
+  price_per_rental: number | null;
+  price_type: string | null;
+  is_active: boolean | null;
+  sort_order: number | null;
   max_quantity: number | null;
   icon: string | null;
+  image_url?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export default function ExtrasPage() {
@@ -126,8 +130,8 @@ export default function ExtrasPage() {
       description: extra.description || '',
       price_per_day: extra.price_per_day?.toString() || '',
       price_per_unit: extra.price_per_unit?.toString() || '',
-      price_type: extra.price_type,
-      is_active: extra.is_active,
+      price_type: (extra.price_type as 'per_day' | 'per_unit' | 'fixed') || 'per_day',
+      is_active: extra.is_active ?? true,
       max_quantity: extra.max_quantity?.toString() || '',
       icon: extra.icon || '',
     });
@@ -448,14 +452,14 @@ export default function ExtrasPage() {
                         </td>
                         <td className="px-6 py-4 text-center">
                           <button
-                            onClick={() => toggleActive(extra.id, extra.is_active)}
+                            onClick={() => toggleActive(extra.id, extra.is_active ?? true)}
                             className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
-                              extra.is_active 
+                              extra.is_active !== false
                                 ? 'bg-green-100 text-green-700 hover:bg-green-200' 
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                             }`}
                           >
-                            {extra.is_active ? 'Activo' : 'Inactivo'}
+                            {extra.is_active !== false ? 'Activo' : 'Inactivo'}
                           </button>
                         </td>
                         <td className="px-6 py-4">

@@ -153,7 +153,7 @@ export default function ReservaPage() {
       if (data.vehicle && data.vehicle.images) {
         const primaryImage = data.vehicle.images.find((img: any) => img.is_primary);
         const firstImage = data.vehicle.images[0];
-        data.vehicle.main_image = primaryImage?.image_url || firstImage?.image_url || null;
+        (data.vehicle as any).main_image = primaryImage?.image_url || firstImage?.image_url || null;
       }
 
       setBooking(data as any);

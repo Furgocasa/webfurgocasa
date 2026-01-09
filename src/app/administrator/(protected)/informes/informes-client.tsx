@@ -46,8 +46,10 @@ import { es } from "date-fns/locale";
 interface Vehicle {
   id: string;
   name: string;
-  internal_code?: string;
-  is_for_rent: boolean;
+  slug: string;
+  internal_code: string | null;
+  is_for_rent: boolean | null;
+  status: string | null;
 }
 
 interface Booking {
@@ -57,15 +59,15 @@ interface Booking {
   pickup_date: string;
   dropoff_date: string;
   total_price: number;
-  status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
-  created_at: string;
+  status: string | null;
+  created_at: string | null;
   customer_name: string;
   customer_email: string;
   days: number;
   vehicle?: {
     id: string;
     name: string;
-    internal_code?: string;
+    internal_code?: string | null;
   };
 }
 
@@ -75,7 +77,7 @@ interface Season {
   slug: string;
   start_date: string;
   end_date: string;
-  is_active: boolean;
+  is_active: boolean | null;
 }
 
 interface InformesClientProps {
@@ -902,7 +904,7 @@ export default function InformesClient({
                 <XAxis dataKey="month" tick={{ fill: '#6B7280', fontSize: 12 }} />
                 <YAxis tick={{ fill: '#6B7280', fontSize: 12 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
                 <Tooltip 
-                  formatter={(value: number) => [value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }), 'Ingresos']}
+                  formatter={(value) => [(value as number).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }), 'Ingresos']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB' }}
                 />
                 <Bar dataKey="ingresos" fill="#F97316" radius={[4, 4, 0, 0]} />
@@ -932,7 +934,7 @@ export default function InformesClient({
                 <XAxis dataKey="month" tick={{ fill: '#6B7280', fontSize: 12 }} />
                 <YAxis domain={[0, 100]} tick={{ fill: '#6B7280', fontSize: 12 }} tickFormatter={(v) => `${v}%`} />
                 <Tooltip 
-                  formatter={(value: number) => [`${value}%`, 'Ocupación']}
+                  formatter={(value) => [`${value}%`, 'Ocupación']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB' }}
                 />
                 <Line 
@@ -971,7 +973,7 @@ export default function InformesClient({
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value: number) => value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                  formatter={(value) => (value as number).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB' }}
                 />
               </PieChart>
@@ -1098,8 +1100,8 @@ export default function InformesClient({
               <XAxis type="number" tick={{ fill: '#6B7280', fontSize: 12 }} />
               <YAxis dataKey="name" type="category" tick={{ fill: '#6B7280', fontSize: 12 }} width={80} />
               <Tooltip 
-                formatter={(value: number, name: string) => {
-                  if (name === 'ingresos') return [value.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }), 'Ingresos'];
+                formatter={(value, name) => {
+                  if (name === 'ingresos') return [(value as number).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }), 'Ingresos'];
                   if (name === 'ocupacion') return [`${value}%`, 'Ocupación'];
                   return [value, name];
                 }}

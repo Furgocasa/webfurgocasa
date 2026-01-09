@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { LocalizedLink } from "@/components/localized-link";
@@ -8,6 +8,14 @@ import { Calendar, Clock, ArrowRight, BookOpen, Search, Mail, Tag, ArrowLeft, Fi
 import { useLanguage } from "@/contexts/language-context";
 import { supabase } from "@/lib/supabase/client";
 import { useParams, useSearchParams } from "next/navigation";
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
 import { getCategorySlugInSpanish, getCategoryName, translateCategorySlug, blogCategoryNames } from "@/lib/blog-translations";
 
 interface Category {
@@ -58,7 +66,7 @@ function formatDate(date: string) {
   });
 }
 
-export default function BlogCategoryPage() {
+function BlogCategoryContent() {
   const params = useParams();
   const searchParams = useSearchParams();
   const { t, language } = useLanguage();
@@ -382,6 +390,14 @@ export default function BlogCategoryPage() {
       </main>
       <Footer />
     </>
+  );
+}
+
+export default function BlogCategoryPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <BlogCategoryContent />
+    </Suspense>
   );
 }
 

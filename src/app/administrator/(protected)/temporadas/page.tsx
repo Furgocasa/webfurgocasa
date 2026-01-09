@@ -12,13 +12,16 @@ interface Season {
   slug: string;
   start_date: string;
   end_date: string;
-  price_less_than_week: number;
-  price_one_week: number;
-  price_two_weeks: number;
-  price_three_weeks: number;
-  year: number;
-  min_days: number;
-  is_active: boolean;
+  price_less_than_week: number | null;
+  price_one_week: number | null;
+  price_two_weeks: number | null;
+  price_three_weeks: number | null;
+  year: number | null;
+  min_days: number | null;
+  is_active: boolean | null;
+  base_price_per_day?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 // Precios base de temporada BAJA (no se registran en BD)
@@ -31,7 +34,7 @@ const PRECIO_BAJA = {
 
 // Determinar tipo de temporada según el sobrecoste
 const getTipoTemporada = (season: Season) => {
-  const sobrecoste = season.price_less_than_week - PRECIO_BAJA.price_less_than_week;
+  const sobrecoste = (season.price_less_than_week ?? 0) - PRECIO_BAJA.price_less_than_week;
   if (sobrecoste >= 60) return { tipo: 'ALTA', color: '#EF4444', sobrecoste };
   if (sobrecoste >= 30) return { tipo: 'MEDIA', color: '#F59E0B', sobrecoste };
   return { tipo: 'BAJA', color: '#3B82F6', sobrecoste: 0 };

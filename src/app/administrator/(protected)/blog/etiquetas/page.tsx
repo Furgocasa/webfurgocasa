@@ -3,14 +3,9 @@
 import { useState, useEffect } from "react";
 import supabase from "@/lib/supabase/client";
 import { Plus, Edit, Trash2, Save, X, Tag, AlertCircle } from "lucide-react";
+import type { Database } from "@/lib/supabase/database.types";
 
-interface ContentTag {
-  id: string;
-  name: string;
-  slug: string;
-  color: string | null;
-  sort_order: number;
-}
+type ContentTag = Database['public']['Tables']['tags']['Row'];
 
 export default function BlogEtiquetasPage() {
   const [tags, setTags] = useState<ContentTag[]>([]);
@@ -22,7 +17,7 @@ export default function BlogEtiquetasPage() {
 
   const [formData, setFormData] = useState({
     name: '',
-    color: '#3B82F6',
+    description: '',
   });
 
   useEffect(() => {
@@ -33,7 +28,7 @@ export default function BlogEtiquetasPage() {
     try {
       setLoading(true);
       const { data, error } = await supabase
-        .from('content_tags')
+        .from('tags')
         .select('*')
         .order('name', { ascending: true });
 
@@ -61,12 +56,12 @@ export default function BlogEtiquetasPage() {
       const dataToSave = {
         name: formData.name,
         slug: slug,
-        color: formData.color,
+        description: formData.description || null,
       };
 
       if (editingId) {
         const { data, error } = await supabase
-          .from('content_tags')
+          .from('tags')
           .update(dataToSave)
           .eq('id', editingId)
           .select('id');
@@ -78,7 +73,7 @@ export default function BlogEtiquetasPage() {
         showMessage('success', 'Etiqueta actualizada correctamente');
       } else {
         const { data, error } = await supabase
-          .from('content_tags')
+          .from('tags')
           .insert(dataToSave)
           .select('id');
 
@@ -102,7 +97,7 @@ export default function BlogEtiquetasPage() {
   const handleEdit = (tag: ContentTag) => {
     setFormData({
       name: tag.name,
-      color: tag.color || '#3B82F6',
+      description: tag.description || '',
     });
     setEditingId(tag.id);
     setShowAddForm(true);
@@ -113,7 +108,7 @@ export default function BlogEtiquetasPage() {
 
     try {
       const { data, error } = await supabase
-        .from('content_tags')
+        .from('tags')
         .delete()
         .eq('id', id)
         .select('id');
@@ -131,7 +126,7 @@ export default function BlogEtiquetasPage() {
   };
 
   const resetForm = () => {
-    setFormData({ name: '', color: '#3B82F6' });
+    setFormData({ name: '', description: '' });
     setEditingId(null);
     setShowAddForm(false);
   };
@@ -192,23 +187,15 @@ export default function BlogEtiquetasPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Color
+                  Descripción
                 </label>
-                <div className="flex gap-2">
-                  <input
-                    type="color"
-                    value={formData.color}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="h-10 w-20 border border-gray-300 rounded-lg cursor-pointer"
-                  />
-                  <input
-                    type="text"
-                    value={formData.color}
-                    onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                    placeholder="#3B82F6"
-                  />
-                </div>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  placeholder="Descripción de la etiqueta..."
+                />
               </div>
             </div>
 
@@ -248,13 +235,9 @@ export default function BlogEtiquetasPage() {
               {tags.map((tag) => (
                 <div
                   key={tag.id}
-                  className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition-all"
-                  style={{ backgroundColor: `${tag.color}15` }}
+                  className="group relative inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 hover:border-gray-300 transition-all bg-blue-50"
                 >
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: tag.color || '#3B82F6' }}
-                  />
+                  <Tag className="h-4 w-4 text-blue-600" />
                   <span className="font-medium text-gray-900">{tag.name}</span>
                   <span className="text-xs text-gray-500">/{tag.slug}</span>
                   

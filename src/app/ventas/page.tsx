@@ -146,7 +146,7 @@ export default function VentasPage() {
         vehicle_equipment: vehicle.vehicle_equipment || []
       })) || [];
 
-      setVehiclesForSale(vehiclesData);
+      setVehiclesForSale(vehiclesData as VehicleForSale[]);
     } catch (error) {
       console.error('Error:', error);
     } finally {

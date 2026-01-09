@@ -41,10 +41,12 @@ interface Equipment {
   slug: string;
   description: string | null;
   icon: string;
-  category: string;
-  is_active: boolean;
-  is_standard: boolean;
-  sort_order: number;
+  category: string | null;
+  is_active: boolean | null;
+  is_standard: boolean | null;
+  sort_order: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 interface EquipmentForm {
@@ -138,7 +140,7 @@ export default function EquipamientoPage() {
       } else {
         // Crear nuevo
         const maxOrder = equipment.length > 0 
-          ? Math.max(...equipment.map(e => e.sort_order)) + 1 
+          ? Math.max(...equipment.map(e => e.sort_order ?? 0)) + 1 
           : 0;
 
         const { error } = await supabase
@@ -180,9 +182,9 @@ export default function EquipamientoPage() {
       slug: eq.slug,
       description: eq.description || "",
       icon: eq.icon,
-      category: eq.category,
-      is_active: eq.is_active,
-      is_standard: eq.is_standard,
+      category: eq.category || "general",
+      is_active: eq.is_active ?? true,
+      is_standard: eq.is_standard ?? false,
     });
     setEditingId(eq.id);
     setShowForm(true);
@@ -475,7 +477,7 @@ export default function EquipamientoPage() {
               </tr>
             ) : (
               filteredEquipment.map((eq) => {
-                const catInfo = getCategoryInfo(eq.category);
+                const catInfo = getCategoryInfo(eq.category || "general");
                 return (
                   <tr key={eq.id} className="border-b border-gray-100 hover:bg-gray-50">
                     <td className="py-3 px-4">

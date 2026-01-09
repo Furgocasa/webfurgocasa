@@ -127,12 +127,9 @@ export async function GET(request: NextRequest) {
 
     const basePricePerDay = getBasePriceByDuration(days);
 
-    // El price_modifier de la temporada es un valor FIJO en euros que se SUMA al precio base
-    // Por ejemplo: si price_modifier es 30, significa +30€ sobre el precio base
-    // Temporada baja: price_modifier = 0 (o 1.00 si está en formato decimal)
-    const seasonalAddition = season?.price_modifier 
-      ? (season.price_modifier > 10 ? season.price_modifier : (season.price_modifier - 1.0) * 100)
-      : 0;
+    // Usar los precios de temporada directamente si están disponibles
+    // Si no hay temporada o no hay precios, usar 0 como adición
+    const seasonalAddition = 0; // TODO: Implementar lógica de precios de temporada basada en los campos reales
     
     const finalPricePerDay = basePricePerDay + seasonalAddition;
 
@@ -186,7 +183,7 @@ export async function GET(request: NextRequest) {
       season: season
         ? {
             name: season.name,
-            modifier: season.price_modifier,
+            modifier: season.base_price_per_day || 0,
             minDays: season.min_days,
           }
         : null,

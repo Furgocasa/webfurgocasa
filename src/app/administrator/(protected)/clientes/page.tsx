@@ -15,13 +15,14 @@ async function getAllCustomers() {
 
   if (error) {
     console.error('Error fetching customers:', error);
-    return { data: null, error };
+    return { data: null as any, error };
   }
 
-  return { data, error: null };
+  return { data, error: null as any };
 }
 
-function formatDate(date: string): string {
+function formatDate(date: string | null): string {
+  if (!date) return '-';
   return new Date(date).toLocaleDateString("es-ES", { 
     day: "2-digit", 
     month: "short", 
@@ -46,6 +47,7 @@ export default async function ClientesPage() {
   const customersList = customers || [];
   const totalCustomers = customersList.length;
   const activeCustomers = customersList.filter(c => {
+    if (!c.created_at) return false;
     const lastBooking = new Date(c.created_at);
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
@@ -84,6 +86,7 @@ export default async function ClientesPage() {
           <p className="text-sm text-gray-500">Este mes</p>
           <p className="text-2xl font-bold text-purple-600">
             {customersList.filter(c => {
+              if (!c.created_at) return false;
               const date = new Date(c.created_at);
               const now = new Date();
               return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();

@@ -23,6 +23,12 @@ interface VehicleCardProps {
     pricePerDay: number;
     totalPrice: number;
     season: string;
+    hasDurationDiscount?: boolean;
+    discountPercentage?: number;
+    originalPricePerDay?: number;
+    durationDiscount?: number;
+    originalTotalPrice?: number;
+    savings?: number;
   };
   searchParams: {
     pickup_date: string;
@@ -52,7 +58,7 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
   const reservationUrl = `/reservar/vehiculo?${bookingParams.toString()}`;
 
   // Get main image
-  const mainImage = vehicle.images?.find((img) => img.is_primary) || vehicle.images?.[0];
+  const mainImage = vehicle.images?.find((img) => img.is_main) || vehicle.images?.[0];
 
   return (
     <div className="card-vehicle group">
@@ -60,8 +66,8 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
       <div className="relative h-48 bg-gray-200 overflow-hidden">
         {mainImage ? (
           <Image
-            src={mainImage.image_url}
-            alt={mainImage.alt_text || vehicle.name}
+            src={mainImage.url}
+            alt={mainImage.alt || vehicle.name}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"

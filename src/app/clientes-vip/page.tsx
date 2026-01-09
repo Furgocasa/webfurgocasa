@@ -1,12 +1,12 @@
+"use client";
+
 import { Header } from "@/components/layout/header";
 import { useLanguage } from "@/contexts/language-context";
 import { Footer } from "@/components/layout/footer";
 import { LocalizedLink } from "@/components/localized-link";
 import { Crown, Percent, Gift, Calendar, Star, CheckCircle, ArrowRight } from "lucide-react";
-export const metadata = {
-  title: "Clientes VIP | Furgocasa Campervans",
-  description: "Únete al programa VIP de Furgocasa y disfruta de descuentos exclusivos, prioridad en reservas y beneficios especiales.",
-};
+
+// Metadata movido a layout.tsx o se debe crear un archivo metadata.ts separado
 
 const benefits = [
   { icon: Percent, title: "10% de descuento permanente", description: "En todos tus alquileres, sin códigos ni condiciones" },

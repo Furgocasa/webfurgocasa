@@ -165,15 +165,17 @@ export default async function PagosPage() {
                 </tr>
               ) : (
                 paymentsList.map((payment) => {
-                  const StatusIcon = statusConfig[payment.status]?.icon || Clock;
-                  const statusStyle = statusConfig[payment.status] || statusConfig.pending;
-                  const methodStyle = methodConfig[payment.payment_method] || methodConfig.card;
+                  const paymentStatus = payment.status || 'pending';
+                  const paymentMethod = payment.payment_method || 'card';
+                  const StatusIcon = statusConfig[paymentStatus]?.icon || Clock;
+                  const statusStyle = statusConfig[paymentStatus] || statusConfig.pending;
+                  const methodStyle = methodConfig[paymentMethod] || methodConfig.card;
 
                   return (
                     <tr key={payment.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <p className="font-mono text-sm font-medium text-gray-900">
-                          {payment.transaction_id || payment.id.slice(0, 8)}
+                          {payment.order_number || payment.id.slice(0, 8)}
                         </p>
                       </td>
                       <td className="px-6 py-4">
@@ -205,7 +207,7 @@ export default async function PagosPage() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <p className="text-sm text-gray-600">{formatDateTime(payment.created_at)}</p>
+                        <p className="text-sm text-gray-600">{formatDateTime(payment.created_at || '')}</p>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center justify-end gap-2">

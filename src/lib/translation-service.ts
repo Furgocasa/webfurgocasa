@@ -84,7 +84,7 @@ async function translateWithOpenAI(text: string, targetLang: 'en' | 'es'): Promi
 /**
  * Obtiene traducción del caché o traduce con IA
  */
-export async function translate(text: string, targetLang: 'en' | 'es'): Promise<string> {
+export async function translate(text: string, targetLang: string): Promise<string> {
   // Si el idioma objetivo es español, devuelve el original
   if (targetLang === 'es') {
     return text;
@@ -115,7 +115,7 @@ export async function translate(text: string, targetLang: 'en' | 'es'): Promise<
 /**
  * Traduce múltiples textos en paralelo (más eficiente)
  */
-export async function translateBatch(texts: string[], targetLang: 'en' | 'es'): Promise<string[]> {
+export async function translateBatch(texts: string[], targetLang: string): Promise<string[]> {
   return Promise.all(texts.map(text => translate(text, targetLang)));
 }
 

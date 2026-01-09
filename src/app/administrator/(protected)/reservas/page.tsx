@@ -10,11 +10,11 @@ interface Booking {
   booking_number: string;
   pickup_date: string;
   dropoff_date: string;
-  status: string;
-  payment_status: string;
+  status: string | null;
+  payment_status: string | null;
   total_price: number;
-  amount_paid: number;
-  created_at: string;
+  amount_paid: number | null;
+  created_at: string | null;
   vehicle: {
     id: string;
     name: string;
@@ -96,7 +96,7 @@ export default function BookingsPage() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setBookings(data || []);
+      setBookings((data || []) as Booking[]);
     } catch (err: any) {
       console.error('Error loading bookings:', err);
       setError(err.message);
@@ -226,12 +226,12 @@ export default function BookingsPage() {
           bValue = b.payment_status;
           break;
         case 'created_at':
-          aValue = new Date(a.created_at).getTime();
-          bValue = new Date(b.created_at).getTime();
+          aValue = new Date(a.created_at || 0).getTime();
+          bValue = new Date(b.created_at || 0).getTime();
           break;
         default:
-          aValue = a.created_at;
-          bValue = b.created_at;
+          aValue = a.created_at || '';
+          bValue = b.created_at || '';
       }
 
       if (typeof aValue === 'string') {
@@ -255,7 +255,7 @@ export default function BookingsPage() {
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
   const monthCount = bookingsList.filter(b => {
-    const bookingDate = new Date(b.created_at);
+    const bookingDate = new Date(b.created_at || 0);
     return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
   }).length;
 
@@ -446,8 +446,9 @@ export default function BookingsPage() {
                 </tr>
               ) : (
                 bookingsList.map((booking) => {
-                  const StatusIcon = statusConfig[booking.status]?.icon || Clock;
-                  const statusStyle = statusConfig[booking.status] || statusConfig.pending;
+                  const bookingStatus = booking.status || 'pending';
+                  const StatusIcon = statusConfig[bookingStatus]?.icon || Clock;
+                  const statusStyle = statusConfig[bookingStatus] || statusConfig.pending;
                   
                   // Calcular días de diferencia
                   const pickupDate = new Date(booking.pickup_date);
@@ -463,7 +464,7 @@ export default function BookingsPage() {
                       {/* Reserva */}
                       <td className="px-4 py-4">
                         <p className="font-medium text-gray-900 text-sm">{booking.booking_number}</p>
-                        <p className="text-xs text-gray-500">{formatDateTime(booking.created_at)}</p>
+                        <p className="text-xs text-gray-500">{formatDateTime(booking.created_at || '')}</p>
                       </td>
                       
                       {/* Cliente */}
@@ -532,7 +533,7 @@ export default function BookingsPage() {
                       {/* Estado (desplegable) */}
                       <td className="px-4 py-4 text-center">
                         <select
-                          value={booking.status}
+                          value={booking.status || 'pending'}
                           onChange={(e) => handleStatusChange(booking.id, e.target.value)}
                           className={`text-xs font-medium px-3 py-1.5 rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 ${statusStyle.bg} ${statusStyle.text}`}
                         >

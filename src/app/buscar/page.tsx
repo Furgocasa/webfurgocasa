@@ -1,7 +1,15 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
 import { useQuery } from "@tanstack/react-query";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
@@ -22,7 +30,7 @@ type BedsFilter = "all" | "2" | "4";
 type TransmissionFilter = "all" | "manual" | "automatic";
 type SortOption = "recommended" | "price_asc" | "price_desc" | "capacity";
 
-export default function SearchResultsPage() {
+function SearchResultsContent() {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
 
@@ -295,5 +303,13 @@ export default function SearchResultsPage() {
 
       <Footer />
     </>
+  );
+}
+
+export default function SearchResultsPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <SearchResultsContent />
+    </Suspense>
   );
 }

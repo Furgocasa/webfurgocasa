@@ -179,11 +179,11 @@ export default function EditarVehiculoPage() {
           has_awning: data.has_awning ?? false,
           is_for_rent: data.is_for_rent ?? true,
           base_price_per_day: data.base_price_per_day,
-          status: data.status || 'available',
+          status: (data.status || 'available') as 'available' | 'inactive' | 'maintenance' | 'rented',
           is_for_sale: data.is_for_sale ?? false,
           sale_price: data.sale_price,
           sale_price_negotiable: data.sale_price_negotiable ?? false,
-          sale_status: data.sale_status || 'available',
+          sale_status: (data.sale_status || 'available') as 'available' | 'reserved' | 'sold',
           mileage: data.mileage || 0,
           mileage_unit: data.mileage_unit || 'km',
         });

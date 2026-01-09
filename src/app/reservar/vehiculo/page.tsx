@@ -1,8 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useLanguage } from "@/contexts/language-context";
 import { useRouter, useSearchParams } from "next/navigation";
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
@@ -34,7 +42,7 @@ interface SelectedExtra {
   quantity: number;
 }
 
-export default function ReservarVehiculoPage() {
+function ReservarVehiculoContent() {
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -141,7 +149,7 @@ export default function ReservarVehiculoPage() {
         console.error('Extras error:', extrasError);
         throw extrasError;
       }
-      setExtras(extrasData || []);
+      setExtras((extrasData || []) as Extra[]);
       
     } catch (error: any) {
       console.error('Error loading data:', error);
@@ -616,5 +624,13 @@ export default function ReservarVehiculoPage() {
 
       <Footer />
     </>
+  );
+}
+
+export default function ReservarVehiculoPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <ReservarVehiculoContent />
+    </Suspense>
   );
 }

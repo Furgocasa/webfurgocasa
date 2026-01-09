@@ -22,7 +22,7 @@ export async function GET() {
     
     for (const table of tables) {
       const { data, error } = await supabase
-        .from(table)
+        .from(table as any)
         .select('*')
         .limit(1);
       

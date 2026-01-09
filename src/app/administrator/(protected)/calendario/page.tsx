@@ -5,16 +5,19 @@ import { supabase } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Car, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { SmartTooltip } from "@/components/admin/smart-tooltip";
+import type { Database } from "@/lib/supabase/database.types";
+
+type VehicleRow = Database['public']['Tables']['vehicles']['Row'];
 
 interface Vehicle {
   id: string;
   name: string;
-  brand: string;
+  brand: string | null;
   slug: string;
   internal_code: string | null;
-  model?: string;
-  plate_number?: string;
-  year?: number;
+  model?: string | null;
+  plate_number?: string | null;
+  year?: number | null;
 }
 
 interface Customer {
@@ -151,16 +154,16 @@ export default function CalendarioPage() {
       }
 
       // Cargar datos relacionados manualmente si es necesario
-      const enrichedBookings = bookingsData || [];
+      let enrichedBookings: Booking[] = [];
       
       // Si hay bookings, cargar las relaciones
-      if (enrichedBookings.length > 0) {
-        const customerIds = [...new Set(enrichedBookings.map(b => b.customer_id).filter(Boolean))];
-        const vehicleIds = [...new Set(enrichedBookings.map(b => b.vehicle_id))];
+      if (bookingsData && bookingsData.length > 0) {
+        const customerIds = [...new Set(bookingsData.map(b => b.customer_id).filter((id): id is string => Boolean(id)))];
+        const vehicleIds = [...new Set(bookingsData.map(b => b.vehicle_id).filter((id): id is string => Boolean(id)))];
         const locationIds = [...new Set([
-          ...enrichedBookings.map(b => b.pickup_location_id),
-          ...enrichedBookings.map(b => b.dropoff_location_id)
-        ].filter(Boolean))];
+          ...bookingsData.map(b => b.pickup_location_id),
+          ...bookingsData.map(b => b.dropoff_location_id)
+        ].filter((id): id is string => Boolean(id)))];
 
         // Cargar customers
         const { data: customersData } = await supabase
@@ -191,11 +194,11 @@ export default function CalendarioPage() {
             unit_price,
             total_price
           `)
-          .in('booking_id', enrichedBookings.map(b => b.id));
+          .in('booking_id', bookingsData.map(b => b.id));
 
         // Si hay extras, cargar sus detalles
-        const extraIds = [...new Set((bookingExtrasData || []).map(be => be.extra_id).filter(Boolean))];
-        let extrasData = [];
+        const extraIds = [...new Set((bookingExtrasData || []).map(be => be.extra_id).filter((id): id is string => Boolean(id)))];
+        let extrasData: { id: string; name: string; description: string | null }[] = [];
         if (extraIds.length > 0) {
           const { data } = await supabase
             .from('extras')
@@ -211,22 +214,26 @@ export default function CalendarioPage() {
         const extrasMap = new Map(extrasData.map(e => [e.id, e]));
 
         // Enriquecer los bookings con las relaciones
-        enrichedBookings.forEach(booking => {
-          booking.customer = customersMap.get(booking.customer_id) || null;
-          booking.vehicle = vehiclesMap.get(booking.vehicle_id) || null;
-          booking.pickup_location = locationsMap.get(booking.pickup_location_id) || null;
-          booking.dropoff_location = locationsMap.get(booking.dropoff_location_id) || null;
-          
-          // Agregar extras del booking
-          const bookingExtras = (bookingExtrasData || [])
+        enrichedBookings = bookingsData.map(booking => ({
+          ...booking,
+          customer: customersMap.get(booking.customer_id ?? '') || null,
+          vehicle: vehiclesMap.get(booking.vehicle_id ?? '') || undefined,
+          pickup_location: locationsMap.get(booking.pickup_location_id ?? '') || undefined,
+          dropoff_location: locationsMap.get(booking.dropoff_location_id ?? '') || undefined,
+          booking_extras: (bookingExtrasData || [])
             .filter(be => be.booking_id === booking.id)
             .map(be => ({
-              ...be,
-              extra: extrasMap.get(be.extra_id) || null
-            }));
-          
-          booking.booking_extras = bookingExtras;
-        });
+              id: be.id,
+              quantity: be.quantity || 0,
+              price_per_unit: be.unit_price,
+              subtotal: be.total_price,
+              extra: {
+                id: be.extra_id,
+                name: extrasMap.get(be.extra_id)?.name || '',
+                description: extrasMap.get(be.extra_id)?.description || undefined
+              }
+            }))
+        } as unknown as Booking));
       }
 
       setBookings(enrichedBookings);
@@ -632,7 +639,6 @@ export default function CalendarioPage() {
                                                 </div>
                                               </>
                                             }
-                                            triggerMode="hover"
                                           >
                                             <div className="w-full h-full"></div>
                                           </SmartTooltip>
@@ -656,7 +662,6 @@ export default function CalendarioPage() {
                                                 </div>
                                               </>
                                             }
-                                            triggerMode="hover"
                                           >
                                             <div className="w-full h-full"></div>
                                           </SmartTooltip>

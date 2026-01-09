@@ -1,8 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useLanguage } from "@/contexts/language-context";
 import { useSearchParams, useRouter } from "next/navigation";
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
@@ -39,7 +47,7 @@ interface Payment {
   };
 }
 
-export default function PagoExitoPage() {
+function PagoExitoContent() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -276,3 +284,10 @@ export default function PagoExitoPage() {
   );
 }
 
+export default function PagoExitoPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <PagoExitoContent />
+    </Suspense>
+  );
+}

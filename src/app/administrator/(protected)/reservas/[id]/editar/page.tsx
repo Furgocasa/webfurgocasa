@@ -11,28 +11,37 @@ import Link from "next/link";
 interface Location {
   id: string;
   name: string;
-  city: string;
+  city: string | null;
 }
 
 interface Vehicle {
   id: string;
   name: string;
-  brand: string;
-  internal_code: string;
+  brand: string | null;
+  internal_code: string | null;
 }
 
 interface Extra {
   id: string;
   name: string;
-  price_per_day: number;
-  price_per_rental: number;
-  price_type: string;
+  description?: string | null;
+  price_per_day: number | null;
+  price_per_rental: number | null;
+  price_per_unit?: number | null;
+  price_type: string | null;
+  max_quantity?: number | null;
+  is_active?: boolean | null;
+  icon?: string | null;
+  image_url?: string | null;
+  sort_order?: number | null;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 interface BookingExtra {
   id: string;
   extra_id: string;
-  quantity: number;
+  quantity: number | null;
   unit_price: number;
   total_price: number;
   extra: {
@@ -81,7 +90,7 @@ interface FormData {
 export default function EditarReservaPage() {
   const router = useRouter();
   const params = useParams();
-  const bookingId = bookingId as string;
+  const bookingId = params.id as string;
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -192,21 +201,21 @@ export default function EditarReservaPage() {
         pickup_time: booking.pickup_time,
         dropoff_date: booking.dropoff_date,
         dropoff_time: booking.dropoff_time,
-        days: booking.days,
-        base_price: booking.base_price,
-        extras_price: booking.extras_price,
-        total_price: booking.total_price,
-        deposit_amount: booking.deposit_amount,
-        amount_paid: booking.amount_paid || 0,  // Nuevo: cargar monto pagado
-        status: booking.status,
-        payment_status: booking.payment_status,
-        customer_name: booking.customer_name,
-        customer_email: booking.customer_email,
-        customer_phone: booking.customer_phone,
-        customer_dni: booking.customer_dni || '',
-        customer_address: booking.customer_address || '',
-        customer_city: booking.customer_city || '',
-        customer_postal_code: booking.customer_postal_code || '',
+        days: booking.days ?? 1,
+        base_price: booking.base_price ?? 0,
+        extras_price: booking.extras_price ?? 0,
+        total_price: booking.total_price ?? 0,
+        deposit_amount: booking.deposit_amount ?? 1000,
+        amount_paid: booking.amount_paid ?? 0,
+        status: booking.status ?? 'pending',
+        payment_status: booking.payment_status ?? 'pending',
+        customer_name: booking.customer_name ?? '',
+        customer_email: booking.customer_email ?? '',
+        customer_phone: booking.customer_phone ?? '',
+        customer_dni: booking.customer_dni ?? '',
+        customer_address: booking.customer_address ?? '',
+        customer_city: booking.customer_city ?? '',
+        customer_postal_code: booking.customer_postal_code ?? '',
         notes: booking.notes || '',
         admin_notes: booking.admin_notes || '',
       });
@@ -256,9 +265,9 @@ export default function EditarReservaPage() {
       const extra = extras.find(e => e.id === extraId);
       if (extra && quantity > 0) {
         if (extra.price_type === 'per_day') {
-          total += extra.price_per_day * quantity * formData.days;
+          total += (extra.price_per_day ?? 0) * quantity * formData.days;
         } else {
-          total += extra.price_per_rental * quantity;
+          total += (extra.price_per_rental ?? 0) * quantity;
         }
       }
     });
@@ -340,7 +349,7 @@ export default function EditarReservaPage() {
             const extra = extras.find(e => e.id === extraId);
             if (!extra) return null;
 
-            const unitPrice = extra.price_type === 'per_day' ? extra.price_per_day : extra.price_per_rental;
+            const unitPrice = extra.price_type === 'per_day' ? (extra.price_per_day ?? 0) : (extra.price_per_rental ?? 0);
             const totalPrice = extra.price_type === 'per_day' 
               ? unitPrice * quantity * formData.days 
               : unitPrice * quantity;

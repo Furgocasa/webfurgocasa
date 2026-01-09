@@ -1,7 +1,16 @@
 "use client";
 
+import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/contexts/language-context";
+
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { XCircle, RefreshCw, Phone, Mail, HelpCircle } from "lucide-react";
@@ -43,7 +52,7 @@ const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
   },
 };
 
-export default function PagoErrorPage() {
+function PagoErrorContent() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   
@@ -177,3 +186,10 @@ export default function PagoErrorPage() {
   );
 }
 
+export default function PagoErrorPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <PagoErrorContent />
+    </Suspense>
+  );
+}

@@ -16,11 +16,16 @@ interface Location {
   email: string | null;
   latitude: number | null;
   longitude: number | null;
-  is_active: boolean;
-  is_pickup: boolean;
-  is_dropoff: boolean;
-  opening_hours: any;
+  is_active: boolean | null;
+  is_pickup: boolean | null;
+  is_dropoff: boolean | null;
+  opening_time?: string | null;
+  closing_time?: string | null;
+  extra_fee?: number | null;
+  notes?: string | null;
   sort_order: number;
+  created_at?: string | null;
+  updated_at?: string | null;
 }
 
 export default function UbicacionesPage() {
@@ -64,7 +69,7 @@ export default function UbicacionesPage() {
         .order('sort_order', { ascending: true });
 
       if (error) throw error;
-      setLocations(data || []);
+      setLocations((data || []) as Location[]);
     } catch (error: any) {
       console.error('Error loading locations:', error);
       showMessage('error', 'Error al cargar las ubicaciones');
@@ -144,9 +149,9 @@ export default function UbicacionesPage() {
       email: location.email || '',
       latitude: location.latitude?.toString() || '',
       longitude: location.longitude?.toString() || '',
-      is_active: location.is_active,
-      is_pickup: location.is_pickup,
-      is_dropoff: location.is_dropoff,
+      is_active: location.is_active ?? true,
+      is_pickup: location.is_pickup ?? true,
+      is_dropoff: location.is_dropoff ?? true,
     });
     setEditingId(location.id);
     setShowAddForm(true);
@@ -492,7 +497,7 @@ export default function UbicacionesPage() {
                   </div>
                 </div>
                 <button
-                  onClick={() => toggleActive(location.id, location.is_active)}
+                  onClick={() => toggleActive(location.id, location.is_active ?? true)}
                   className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                     location.is_active 
                       ? 'bg-green-100 text-green-700 hover:bg-green-200' 

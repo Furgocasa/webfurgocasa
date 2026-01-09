@@ -1,8 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useLanguage } from "@/contexts/language-context";
 import { useRouter, useSearchParams } from "next/navigation";
+
+// Loading component
+function LoadingState() {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+    </div>
+  );
+}
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
@@ -42,7 +51,7 @@ interface SelectedExtra {
   price_per_rental: number;
 }
 
-export default function NuevaReservaPage() {
+function NuevaReservaContent() {
   const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -790,5 +799,14 @@ export default function NuevaReservaPage() {
 
       <Footer />
     </>
+  );
+}
+
+// Wrapper con Suspense para useSearchParams
+export default function NuevaReservaPage() {
+  return (
+    <Suspense fallback={<LoadingState />}>
+      <NuevaReservaContent />
+    </Suspense>
   );
 }
