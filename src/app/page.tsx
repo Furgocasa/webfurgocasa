@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from "@/lib/supabase/client";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { SearchWidget } from "@/components/booking/search-widget";
@@ -23,12 +23,6 @@ import {
   BookOpen,
   HelpCircle
 } from "lucide-react";
-
-// ✅ Supabase cliente servidor
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
 
 interface FeaturedVehicle {
   id: string;
@@ -61,16 +55,25 @@ export default function HomePage() {
 
   useEffect(() => {
     async function loadData() {
+      console.log('[Home] Loading featured vehicles and blog articles...');
+      
       // Cargar vehículos
-      const { data: vehicles } = await supabase
+      const { data: vehicles, error: vehiclesError } = await supabase
         .from('vehicles')
         .select(`
           *,
           images:vehicle_images(*)
         `)
         .eq('is_for_rent', true)
+        .neq('status', 'inactive')
         .order('internal_code', { ascending: true })
         .limit(3);
+
+      if (vehiclesError) {
+        console.error('[Home] Error loading vehicles:', vehiclesError);
+      } else {
+        console.log('[Home] Loaded vehicles:', vehicles?.length || 0);
+      }
 
       const processedVehicles = vehicles?.map((vehicle: any) => {
         const primaryImage = vehicle.images?.find((img: any) => img.is_primary);
@@ -86,6 +89,7 @@ export default function HomePage() {
         };
       }) || [];
 
+      console.log('[Home] Processed vehicles:', processedVehicles.length);
       setFeaturedVehicles(processedVehicles);
 
       // Cargar artículos del blog
