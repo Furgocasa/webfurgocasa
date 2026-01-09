@@ -1,6 +1,12 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 14, TypeScript, Supabase, Redsys y TinyMCE.
+[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](./CHANGELOG.md)
+[![Status](https://img.shields.io/badge/status-production-success.svg)](https://webfurgocasa.vercel.app)
+[![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
+
+**🎉 VERSIÓN 1.0 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
+
+Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, Redsys y TinyMCE.
 
 ## 🚨 ADVERTENCIA CRÍTICA - LEER ANTES DE MODIFICAR CÓDIGO
 
@@ -699,7 +705,13 @@ Furgocasa integra dos herramientas de IA diseñadas para mejorar la experiencia 
 
 ## 🚀 Despliegue
 
-### Vercel (recomendado)
+### ✅ Producción actual: Vercel
+
+**URL**: https://webfurgocasa.vercel.app
+
+El proyecto está desplegado en Vercel con deploy automático desde GitHub.
+
+### Configuración de Vercel
 
 1. **Conecta tu repositorio**
    ```bash
@@ -728,6 +740,19 @@ Furgocasa integra dos herramientas de IA diseñadas para mejorar la experiencia 
 - ✅ Configura correctamente `REDSYS_NOTIFICATION_URL`
 - ✅ Habilita HTTPS en Redsys
 - ✅ Configura CORS en Supabase
+
+### 🔧 Problemas resueltos para Deploy
+
+Durante el primer deploy a producción se resolvieron varios problemas técnicos:
+
+1. **Errores de TypeScript** - Nullabilidad de tipos Supabase
+2. **Suspense Boundaries** - useSearchParams() requiere Suspense en Next.js 15
+3. **Imágenes estáticas** - .gitignore impedía subir public/images/
+4. **Imágenes de vehículos** - Nombres de campos diferentes entre componentes
+5. **Favicon** - Configuración manual vs detección automática
+6. **Slider móvil** - Flechas superpuestas con buscador
+
+**📋 Ver [CHANGELOG.md](./CHANGELOG.md) para detalles completos de cada problema y solución.**
 
 ### Otros proveedores
 
@@ -829,6 +854,8 @@ Componentes optimizados para móvil:
 ### 📑 ÍNDICE MAESTRO
 
 **👉 [INDICE-DOCUMENTACION.md](./INDICE-DOCUMENTACION.md)** - Navegación completa de toda la documentación
+
+**📋 [CHANGELOG.md](./CHANGELOG.md)** - Historial de versiones y problemas resueltos
 
 ---
 
@@ -999,5 +1026,9 @@ Para consultas sobre el proyecto: [contacto@furgocasa.com](mailto:contacto@furgo
 
 Desarrollado con ❤️ para Furgocasa
 
-**Version**: 1.0.0  
-**Última actualización**: Enero 2026
+**Versión**: 1.0.0  
+**Estado**: ✅ Producción  
+**URL**: https://webfurgocasa.vercel.app  
+**Última actualización**: 9 de Enero 2026
+
+📋 Ver [CHANGELOG.md](./CHANGELOG.md) para historial completo de cambios.

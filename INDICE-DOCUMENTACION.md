@@ -1,8 +1,20 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Última actualización**: 8 de Enero, 2026
+**Versión**: 1.0.0 ✅ PRODUCCIÓN  
+**URL**: https://webfurgocasa.vercel.app  
+**Última actualización**: 9 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🎉 VERSIÓN 1.0 EN PRODUCCIÓN
+
+El proyecto está desplegado y funcionando en producción. Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
+- ✅ Historial de versiones
+- ✅ Problemas resueltos para el deploy en Vercel
+- ✅ Defectos conocidos pendientes
+- ✅ Roadmap de próximas versiones
 
 ---
 
@@ -13,6 +25,7 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 | Documento | Descripción | Cuándo leer |
 |-----------|-------------|-------------|
 | **[README.md](./README.md)** | Punto de entrada principal | Siempre primero |
+| **[CHANGELOG.md](./CHANGELOG.md)** | Historial versiones, problemas deploy | Al debuggear o deployar |
 | **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** | ⚠️ **REGLAS OBLIGATORIAS** - Queries a Supabase | ANTES de hacer ANY query |
 | **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** | Schema real con campos exactos | Al consultar tablas |
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
@@ -146,6 +159,7 @@ Ver carpeta `supabase/`:
 ```
 📁 furgocasa-app/
 ├── 🚨 README.md                           ← Punto de entrada
+├── 📋 CHANGELOG.md                        ← Historial de versiones y deploy
 ├── 🚨 REGLAS-SUPABASE-OBLIGATORIAS.md     ← ⚠️ LEER ANTES DE QUERIES
 ├── 🚨 SUPABASE-SCHEMA-REAL.md             ← Schema real con campos exactos
 ├── 🚨 PAGINAS-VEHICULOS-GARANTIA.md       ← ⚠️ Garantía páginas vehículos
@@ -251,4 +265,4 @@ Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
 
 ---
 
-**Total de documentos activos**: 18 archivos .md en raíz + subdirectorios
+**Total de documentos activos**: 19 archivos .md en raíz + subdirectorios (incluyendo CHANGELOG.md)
