@@ -84,6 +84,10 @@ export default function BookingsPage() {
   const loadBookings = async () => {
     try {
       setLoading(true);
+      setError(null);
+      
+      console.log('Loading bookings...');
+      
       const { data, error } = await supabase
         .from('bookings')
         .select(`
@@ -95,11 +99,24 @@ export default function BookingsPage() {
         `)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Bookings loaded:', data?.length || 0);
       setBookings((data || []) as Booking[]);
     } catch (err: any) {
       console.error('Error loading bookings:', err);
       setError(err.message);
+      
+      // Retry automático después de 1 segundo si falla la primera vez
+      if (bookings.length === 0) {
+        console.log('Retrying in 1 second...');
+        setTimeout(() => {
+          loadBookings();
+        }, 1000);
+      }
     } finally {
       setLoading(false);
     }
