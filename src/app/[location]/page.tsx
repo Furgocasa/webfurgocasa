@@ -258,7 +258,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
       <Header />
 
       {/* Hero Section - CON SLIDER DE IMÁGENES */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-visible">
         {/* Background slider - ABSOLUTE PARA OCUPAR TODO EL FONDO */}
         <div className="absolute inset-0 w-full h-full">
           <HeroSlider 

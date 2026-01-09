@@ -86,8 +86,8 @@ export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps)
         <ChevronRight className="h-6 w-6" />
       </button>
 
-      {/* Dots Navigation - Debajo del buscador en móvil, arriba en desktop */}
-      <div className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+      {/* Dots Navigation - Ocultos en móvil (autoplay activo), visibles en desktop */}
+      <div className="hidden md:flex absolute bottom-6 left-1/2 -translate-x-1/2 z-10 gap-2">
         {images.map((_, index) => (
           <button
             key={index}
