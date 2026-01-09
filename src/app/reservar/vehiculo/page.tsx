@@ -274,7 +274,7 @@ function ReservarVehiculoContent() {
       <Header />
       
       <main className="min-h-screen bg-gray-50 py-6 md:py-12 overflow-x-hidden">
-        <div className="container mx-auto px-4 max-w-7xl overflow-hidden">
+        <div className="container mx-auto px-4 max-w-7xl">{/* Quitado overflow-hidden para permitir sticky */}
           {/* Breadcrumb */}
           <div className="mb-8">
             <Link 
@@ -563,8 +563,8 @@ function ReservarVehiculoContent() {
             </div>
 
             {/* Sidebar - Price Summary - Solo desktop */}
-            <div className="hidden lg:block">
-              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-8 self-start">
+            <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:h-fit">
+              <div className="bg-white rounded-2xl shadow-sm p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{t("Resumen")}</h3>
 
                 {/* Dates */}
