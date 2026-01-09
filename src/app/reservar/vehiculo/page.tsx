@@ -61,17 +61,6 @@ function ReservarVehiculoContent() {
   const [selectedExtras, setSelectedExtras] = useState<SelectedExtra[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showStickyHeader, setShowStickyHeader] = useState(false);
-
-  // Detectar scroll para mostrar/ocultar sticky header
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowStickyHeader(window.scrollY > 300);
-    };
-    
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Calculate days and prices
   const days = pickupDate && dropoffDate
@@ -284,17 +273,15 @@ function ReservarVehiculoContent() {
     <>
       <Header />
       
-      {/* Sticky Header compacto - aparece al hacer scroll */}
-      <div className={`fixed top-0 left-0 right-0 bg-white shadow-lg z-50 transition-transform duration-300 ${
-        showStickyHeader ? 'translate-y-0' : '-translate-y-full'
-      }`}>
+      {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
+      <div className="sticky top-[64px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             {/* Info del vehículo */}
             <div className="flex items-center gap-3 min-w-0">
               <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
               <div className="min-w-0">
-                <p className="font-bold text-gray-900 text-sm truncate">{vehicle?.name}</p>
+                <p className="font-bold text-gray-900 text-sm truncate">{vehicle?.name || 'Cargando...'}</p>
                 <p className="text-xs text-gray-500">{days} {t("días")}</p>
               </div>
             </div>
@@ -307,7 +294,8 @@ function ReservarVehiculoContent() {
               </div>
               <button
                 onClick={handleContinue}
-                className="bg-furgocasa-orange text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2 whitespace-nowrap"
+                disabled={!vehicle}
+                className="bg-furgocasa-orange text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {t("Continuar")}
                 <ArrowRight className="h-4 w-4" />
@@ -337,9 +325,9 @@ function ReservarVehiculoContent() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
+          <div className="max-w-5xl mx-auto">
             {/* Main Content */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {/* Gallery */}
               <VehicleGallery images={vehicle.images || []} vehicleName={vehicle.name} />
 
@@ -603,95 +591,6 @@ function ReservarVehiculoContent() {
                     Incluye {selectedExtras.length} extra{selectedExtras.length > 1 ? 's' : ''}
                   </p>
                 )}
-              </div>
-            </div>
-
-            {/* Sidebar - Price Summary - Solo desktop */}
-            <div className="hidden lg:block lg:sticky lg:top-24 lg:self-start lg:h-fit">
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4">{t("Resumen")}</h3>
-
-                {/* Dates */}
-                <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
-                  <div className="flex items-start gap-3">
-                    <Calendar className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="text-gray-500">{t("Recogida")}</p>
-                      <p className="font-semibold text-gray-900">
-                        {pickupDate && new Date(pickupDate).toLocaleDateString('es-ES', {
-                          day: 'numeric',
-                          month: 'short'
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <Calendar className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="text-gray-500">{t("Devolución")}</p>
-                      <p className="font-semibold text-gray-900">
-                        {dropoffDate && new Date(dropoffDate).toLocaleDateString('es-ES', {
-                          day: 'numeric',
-                          month: 'short'
-                        })}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-start gap-3">
-                    <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
-                    <div className="text-sm">
-                      <p className="text-gray-500">{t("Ubicación")}</p>
-                      <p className="font-semibold text-gray-900 capitalize">{pickupLocation}</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Price Breakdown */}
-                <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{t("Alquiler")} ({days} {t("días")})</span>
-                    <span className="font-semibold">{formatPrice(basePrice)}</span>
-                  </div>
-
-                  {selectedExtras.map((item) => {
-                    // Calcular precio correctamente según el tipo
-                    let price = 0;
-                    if (item.extra.price_type === 'per_unit') {
-                      // Precio único por toda la reserva
-                      price = (item.extra.price_per_unit || 0);
-                    } else {
-                      // Precio por día multiplicado por número de días
-                      price = (item.extra.price_per_day || 0) * days;
-                    }
-                    return (
-                      <div key={item.extra.id} className="flex justify-between text-sm">
-                        <span className="text-gray-600">
-                          {item.extra.name} {item.quantity > 1 && `(x${item.quantity})`}
-                        </span>
-                        <span className="font-semibold">{formatPrice(price * item.quantity)}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Total */}
-                <div className="mb-6">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-700 font-medium">{t("Total")}</span>
-                    <span className="text-3xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
-                  </div>
-                </div>
-
-                {/* Continue Button */}
-                <button
-                  onClick={handleContinue}
-                  className="w-full bg-furgocasa-orange text-white font-semibold py-4 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
-                >
-                  {t("Continuar con la reserva")}
-                  <ArrowRight className="h-5 w-5" />
-                </button>
               </div>
             </div>
           </div>
