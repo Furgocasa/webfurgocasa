@@ -57,17 +57,19 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
   // URL a la página de detalle del vehículo con selección de extras
   const reservationUrl = `/reservar/vehiculo?${bookingParams.toString()}`;
 
-  // Get main image
-  const mainImage = vehicle.images?.find((img) => img.is_main) || vehicle.images?.[0];
+  // Get main image - Supabase usa image_url, is_primary, alt_text
+  const mainImage = vehicle.images?.find((img: any) => img.is_primary || img.is_main) || vehicle.images?.[0];
+  const imageUrl = mainImage?.image_url || mainImage?.url;
+  const imageAlt = mainImage?.alt_text || mainImage?.alt || vehicle.name;
 
   return (
     <div className="card-vehicle group">
       {/* Image */}
       <div className="relative h-48 bg-gray-200 overflow-hidden">
-        {mainImage ? (
+        {imageUrl ? (
           <Image
-            src={mainImage.url}
-            alt={mainImage.alt || vehicle.name}
+            src={imageUrl}
+            alt={imageAlt}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover group-hover:scale-105 transition-transform duration-300"
