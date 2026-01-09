@@ -65,13 +65,26 @@ export function useAdminData<T = any>({
       setData(result.data);
       setAttemptCount(0); // Reset attempt count on success
     } catch (err: any) {
-      console.error('[useAdminData] Error:', err);
+      // Manejo especial para AbortError
+      const isAbortError = err.name === 'AbortError' || 
+                          err.message?.includes('AbortError') || 
+                          err.message?.includes('signal is aborted');
+      
+      if (isAbortError) {
+        console.warn('[useAdminData] AbortError detected - request was cancelled, retrying...');
+      } else {
+        console.error('[useAdminData] Error:', err);
+      }
+      
       setError(err.message || 'Error al cargar datos');
 
       // Retry automático si no hemos alcanzado el límite
-      if (attemptCount < retryCount) {
+      // Para AbortError, siempre reintentamos
+      const shouldRetry = isAbortError ? true : attemptCount < retryCount;
+      
+      if (shouldRetry && attemptCount < retryCount) {
         const delay = retryDelay * (attemptCount + 1); // Backoff exponencial
-        console.log(`[useAdminData] Retrying in ${delay}ms...`);
+        console.log(`[useAdminData] Retrying in ${delay}ms... (${isAbortError ? 'AbortError' : 'normal error'})`);
         setAttemptCount(prev => prev + 1);
         
         setTimeout(() => {

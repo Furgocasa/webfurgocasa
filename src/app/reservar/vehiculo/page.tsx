@@ -169,13 +169,26 @@ function ReservarVehiculoContent() {
       setRetryCount(0);
       
     } catch (error: any) {
-      console.error('[ReservarVehiculo] Error loading data:', error);
+      // Manejo especial para AbortError
+      const isAbortError = error.name === 'AbortError' || 
+                          error.message?.includes('AbortError') || 
+                          error.message?.includes('signal is aborted');
+      
+      if (isAbortError) {
+        console.warn('[ReservarVehiculo] AbortError detected - request was cancelled, retrying...');
+      } else {
+        console.error('[ReservarVehiculo] Error loading data:', error);
+      }
+      
       const errorMsg = error.message || error.toString() || 'Error al cargar los datos';
       
       // Retry automático si no hemos alcanzado el límite
-      if (retryCount < 3) {
+      // Para AbortError, siempre reintentamos
+      const shouldRetry = isAbortError ? true : retryCount < 3;
+      
+      if (shouldRetry && retryCount < 3) {
         const delay = 1000 * (retryCount + 1); // 1s, 2s, 3s
-        console.log(`[ReservarVehiculo] Retrying in ${delay}ms...`);
+        console.log(`[ReservarVehiculo] Retrying in ${delay}ms... (${isAbortError ? 'AbortError' : 'normal error'})`);
         setRetryCount(prev => prev + 1);
         
         setTimeout(() => {
