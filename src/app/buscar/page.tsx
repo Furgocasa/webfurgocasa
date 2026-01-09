@@ -102,45 +102,7 @@ function SearchResultsContent() {
     <>
       <Header />
 
-      {/* Sticky Header - Resumen de búsqueda - SIEMPRE VISIBLE debajo del menú */}
-      <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between gap-4">
-            {/* Fechas */}
-            <div className="flex items-center gap-2 min-w-0">
-              <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
-              <div className="text-sm text-gray-600 truncate">
-                <span className="font-semibold">
-                  {searchParams.get("pickup_date") 
-                    ? new Date(searchParams.get("pickup_date")!).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
-                    : ''}
-                </span>
-                <span className="mx-1">→</span>
-                <span className="font-semibold">
-                  {searchParams.get("dropoff_date") 
-                    ? new Date(searchParams.get("dropoff_date")!).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })
-                    : ''}
-                </span>
-                <span className="ml-2 text-gray-400">
-                  ({data?.searchParams?.days || 0} {t("días")})
-                </span>
-              </div>
-            </div>
-
-            {/* Ubicaciones (oculto en móvil) */}
-            <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-              <span className="capitalize">{searchParams.get("pickup_location")}</span>
-            </div>
-
-            {/* Resultados */}
-            <div className="flex items-center gap-2">
-              <p className="text-sm text-gray-500">{filteredVehicles.length} {t("disponible")}{filteredVehicles.length !== 1 ? "s" : ""}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <main className="min-h-screen bg-gray-50 pt-[200px]">
+      <main className="min-h-screen bg-gray-50">
         {/* Search Summary */}
         <div className="bg-furgocasa-blue py-6">
           <div className="container mx-auto px-4">
