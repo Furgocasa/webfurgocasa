@@ -1,10 +1,10 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.1-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://webfurgocasa.vercel.app)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
+**🎉 VERSIÓN 1.0.1 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, Redsys y TinyMCE.
 
@@ -745,12 +745,24 @@ El proyecto está desplegado en Vercel con deploy automático desde GitHub.
 
 Durante el primer deploy a producción se resolvieron varios problemas técnicos:
 
+#### v1.0.0 - Deploy inicial
 1. **Errores de TypeScript** - Nullabilidad de tipos Supabase
 2. **Suspense Boundaries** - useSearchParams() requiere Suspense en Next.js 15
 3. **Imágenes estáticas** - .gitignore impedía subir public/images/
 4. **Imágenes de vehículos** - Nombres de campos diferentes entre componentes
 5. **Favicon** - Configuración manual vs detección automática
 6. **Slider móvil** - Flechas superpuestas con buscador
+7. **BucketType** - Faltaba 'extras' en tipos de Storage
+8. **Idiomas de traducción** - Tipos restringidos a ES/EN
+
+#### v1.0.1 - Optimización proceso de reserva
+1. **Imagen/título clicables** - Cards de vehículos en búsqueda ahora completamente clicables
+2. **Precios de extras** - Corregido uso de `price_per_unit` en lugar de `price_per_rental` inexistente
+3. **Suma de extras** - Total ahora incluye correctamente el precio de extras seleccionados
+4. **Mensaje de fianza** - Eliminado mensaje erróneo de 500€ (real: 1000€ por transferencia)
+5. **CTA móvil** - Botón "Continuar" reposicionado al final en `/reservar/vehiculo`
+6. **Clientes duplicados** - API route con service role para evitar errores RLS
+7. **Navegación volver** - Botón "Volver" ahora retrocede al paso anterior correctamente
 
 **📋 Ver [CHANGELOG.md](./CHANGELOG.md) para detalles completos de cada problema y solución.**
 
@@ -1026,7 +1038,7 @@ Para consultas sobre el proyecto: [contacto@furgocasa.com](mailto:contacto@furgo
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 1.0.0  
+**Versión**: 1.0.1  
 **Estado**: ✅ Producción  
 **URL**: https://webfurgocasa.vercel.app  
 **Última actualización**: 9 de Enero 2026

@@ -4,6 +4,250 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔄 [1.0.1] - 9 de Enero 2026 - **Optimización del Proceso de Reserva**
+
+### ✅ Mejoras implementadas en el flujo de reservas
+
+#### 1. **Imagen y título clicables en tarjetas de vehículos**
+
+**Problema**: En la página de resultados de búsqueda (`/buscar`), solo el botón "Reservar" permitía continuar. Los usuarios esperaban poder hacer clic en la imagen o el título del vehículo.
+
+**Solución**: Convertir imagen y título en enlaces clicables:
+
+```tsx
+// src/components/booking/vehicle-card.tsx
+// Imagen ahora es un Link
+<Link href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
+  <Image src={imageUrl} alt={imageAlt} fill className="object-cover" />
+</Link>
+
+// Título ahora es un Link
+<Link href={reservationUrl}>
+  <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-furgocasa-orange">
+    {vehicle.name}
+  </h3>
+</Link>
+```
+
+---
+
+#### 2. **Corrección de precios de extras**
+
+**Problema**: Los extras con "precio único" mostraban "0€ / día" porque el frontend buscaba campos incorrectos en la base de datos.
+
+**Causa**: Discrepancia entre los nombres de campos:
+- Base de datos usa: `price_per_unit` (precio único) y `price_per_day` (precio por día)
+- Frontend buscaba: `price_per_rental` (campo inexistente)
+
+**Solución**: Actualizar interfaz y lógica de precios:
+
+```typescript
+// src/app/reservar/vehiculo/page.tsx
+interface Extra {
+  price_per_day: number | null;
+  price_per_unit: number | null;  // ✅ Corregido (antes: price_per_rental)
+  price_type: 'per_day' | 'per_unit';  // ✅ Corregido (antes: 'per_rental' | 'one_time')
+}
+
+// Cálculo de precio
+if (extra.price_type === 'per_unit') {
+  price = (extra.price_per_unit || 0);  // Precio único
+} else {
+  price = (extra.price_per_day || 0) * days;  // Precio por día
+}
+
+// Display
+if (extra.price_type === 'per_unit') {
+  priceDisplay = `${formatPrice(price)} / ${t("unidad")}`;
+} else {
+  priceDisplay = `${formatPrice(price)} / ${t("día")}`;
+}
+```
+
+**Resultado**: 
+- Extras "Por unidad" ahora muestran: **20.00€ / unidad**, **30.00€ / unidad**
+- Extras "Por día" muestran: **10.00€ / día**, **5.00€ / día**
+
+---
+
+#### 3. **Suma de extras al total de la reserva**
+
+**Problema**: Los extras seleccionados no se sumaban correctamente al precio total.
+
+**Causa**: Faltaba null coalescing en el cálculo de precios, causando valores `NaN` cuando los campos eran `null`.
+
+**Solución**: Agregar null coalescing y lógica correcta:
+
+```typescript
+const extrasPrice = selectedExtras.reduce((sum, item) => {
+  let price = 0;
+  if (item.extra.price_type === 'per_unit') {
+    price = (item.extra.price_per_unit || 0);  // ✅ Null coalescing
+  } else {
+    price = (item.extra.price_per_day || 0) * days;  // ✅ Null coalescing
+  }
+  return sum + (price * item.quantity);
+}, 0);
+
+const totalPrice = basePrice + extrasPrice;  // ✅ Ahora suma correctamente
+```
+
+---
+
+#### 4. **Eliminación del mensaje erróneo de fianza**
+
+**Problema**: Aparecía el mensaje "La fianza (500€) se paga en la entrega" que era incorrecto.
+
+**Realidad**: La fianza es de 1.000€ y se paga por transferencia antes del alquiler (ya está en las condiciones generales).
+
+**Solución**: Eliminar referencias a la fianza en:
+- `src/app/reservar/vehiculo/page.tsx` - Sidebar de resumen (desktop)
+- `src/app/reservar/nueva/page.tsx` - Resumen de precios
+
+---
+
+#### 5. **CTA móvil reposicionado en página de detalles**
+
+**Problema**: En móvil, el botón "Continuar" estaba sticky arriba, lo que invitaba a hacer clic antes de ver los extras disponibles más abajo.
+
+**Solución**: Implementar diseño móvil mejorado:
+
+```tsx
+// src/app/reservar/vehiculo/page.tsx
+
+// Arriba: Info simple NO sticky
+<div className="lg:hidden bg-gray-50 rounded-xl p-3 mb-4 border border-gray-200">
+  <p className="text-sm text-gray-600 text-center">
+    {days} días · Total: <span className="font-bold">{formatPrice(totalPrice)}</span>
+  </p>
+</div>
+
+// Abajo: CTA sticky en bottom
+<div className="lg:hidden bg-white rounded-xl shadow-lg p-5 sticky bottom-0 border-t-2">
+  <div className="flex items-center justify-between mb-3">
+    <div>
+      <p className="text-xs text-gray-500">Total ({days} días)</p>
+      <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
+    </div>
+    <button onClick={handleContinue} className="bg-furgocasa-orange...">
+      Continuar <ArrowRight />
+    </button>
+  </div>
+</div>
+```
+
+**UX mejorada**: Usuario ve primero el total, explora extras, y encuentra el botón de continuar al final.
+
+---
+
+#### 6. **Manejo de clientes duplicados**
+
+**Problema**: Al crear una reserva con un cliente existente, aparecía error:
+```
+new row violates row-level security policy for table "customers"
+```
+
+**Causa**: La página intentaba insertar clientes directamente en Supabase desde el frontend, pero las políticas RLS lo bloqueaban para usuarios no autenticados.
+
+**Solución**: Crear API route con service role key que bypasea RLS:
+
+```typescript
+// src/app/api/customers/route.ts (NUEVO)
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+                           process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+export async function POST(request: Request) {
+  const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
+  
+  // Verificar si cliente ya existe por email o DNI
+  const { data: existing } = await supabase
+    .from("customers")
+    .select("id")
+    .or(`email.eq.${email},dni.eq.${dni}`)
+    .limit(1)
+    .single();
+
+  if (existing) {
+    return NextResponse.json({ customer: existing }, { status: 200 });
+  }
+
+  // Crear nuevo cliente (service role bypasea RLS)
+  const { data: customer, error } = await supabase
+    .from("customers")
+    .insert({ ...customerData })
+    .select("id")
+    .single();
+
+  return NextResponse.json({ customer }, { status: 201 });
+}
+```
+
+**Frontend ahora usa el API route**:
+
+```typescript
+// src/app/reservar/nueva/page.tsx
+// 1. Buscar cliente existente por email O DNI
+const { data: existingCustomers } = await supabase
+  .from('customers')
+  .select('id, total_bookings, total_spent')
+  .or(`email.eq.${customerEmail},dni.eq.${customerDni}`)
+  .limit(1);
+
+if (existingCustomers && existingCustomers.length > 0) {
+  customerId = existingCustomers[0].id;  // ✅ Usar existente
+} else {
+  // Crear nuevo usando API route
+  const createResponse = await fetch('/api/customers', {
+    method: 'POST',
+    body: JSON.stringify({ ...customerData }),
+  });
+  
+  const { customer } = await createResponse.json();
+  customerId = customer.id;  // ✅ Usar nuevo
+}
+```
+
+**Configuración necesaria en Vercel**:
+- Agregar variable de entorno: `SUPABASE_SERVICE_ROLE_KEY`
+
+---
+
+#### 7. **Navegación "Volver" corregida**
+
+**Problema**: En la página "Crear reserva nueva" (`/reservar/nueva`), el botón "Volver" redirigía a `/reservar` (home), perdiendo todo el contexto de la reserva.
+
+**Solución**: Usar `router.back()` para retroceder al paso anterior:
+
+```tsx
+// src/app/reservar/nueva/page.tsx
+// Antes
+<Link href="/reservar">Volver a la búsqueda</Link>
+
+// Después
+<button onClick={() => router.back()}>Volver al paso anterior</button>
+```
+
+**Flujo de navegación completo**:
+1. **Búsqueda** → Selección de fechas/ubicaciones
+2. **Resultados** (`/buscar`) → "Volver a resultados" ✅
+3. **Detalles vehículo** (`/reservar/vehiculo`) → "Volver a resultados" ✅
+4. **Crear reserva** (`/reservar/nueva`) → "Volver al paso anterior" ✅ (ahora retrocede correctamente)
+
+---
+
+### 📊 Resumen de archivos modificados
+
+- `src/components/booking/vehicle-card.tsx` - Imagen y título clicables
+- `src/app/reservar/vehiculo/page.tsx` - Precios extras, CTA móvil, fianza
+- `src/app/reservar/nueva/page.tsx` - Navegación, lógica clientes duplicados, fianza
+- `src/app/api/customers/route.ts` - **NUEVO** - API para crear clientes con service role
+
+---
+
 ## 🎉 [1.0.0] - 9 de Enero 2026 - **PRODUCCIÓN**
 
 ### ✅ Primer despliegue en producción
@@ -232,4 +476,4 @@ async translate(text: string, targetLang: string): Promise<string>
 
 ---
 
-**Última actualización**: 9 de Enero 2026
+**Última actualización**: 9 de Enero 2026 - v1.0.1

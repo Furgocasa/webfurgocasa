@@ -1,6 +1,6 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.0 ✅ PRODUCCIÓN  
+**Versión**: 1.0.1 ✅ PRODUCCIÓN  
 **URL**: https://webfurgocasa.vercel.app  
 **Última actualización**: 9 de Enero, 2026
 
@@ -8,11 +8,12 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 
 ---
 
-## 🎉 VERSIÓN 1.0 EN PRODUCCIÓN
+## 🎉 VERSIÓN 1.0.1 EN PRODUCCIÓN
 
 El proyecto está desplegado y funcionando en producción. Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
-- ✅ Historial de versiones
+- ✅ Historial de versiones (v1.0.0 y v1.0.1)
 - ✅ Problemas resueltos para el deploy en Vercel
+- ✅ Mejoras del proceso de reserva (v1.0.1)
 - ✅ Defectos conocidos pendientes
 - ✅ Roadmap de próximas versiones
 
