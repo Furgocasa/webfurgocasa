@@ -51,13 +51,14 @@ export function VehicleGallery({ images, vehicleName }: VehicleGalleryProps) {
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden w-full max-w-full">
+      <div className="bg-white rounded-2xl shadow-lg overflow-hidden w-full" style={{ maxWidth: '100%' }}>
         {/* Imagen principal */}
-        <div className="relative aspect-[4/3] md:aspect-[16/10] bg-gradient-to-br from-gray-900 to-gray-800 group w-full overflow-hidden">
+        <div className="relative aspect-[4/3] md:aspect-[16/10] bg-gradient-to-br from-gray-900 to-gray-800 group overflow-hidden">
           <img
             src={currentImage.image_url}
             alt={currentImage.alt_text || `${vehicleName} - Imagen ${currentIndex + 1}`}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            style={{ maxWidth: '100%' }}
           />
 
           {/* Overlay con zoom */}

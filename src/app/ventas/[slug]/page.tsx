@@ -68,7 +68,7 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
     <>
       <Header />
 
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 overflow-x-hidden">
         {/* Breadcrumb */}
         <div className="bg-white border-b border-gray-200">
           <div className="container mx-auto px-4 py-4">
