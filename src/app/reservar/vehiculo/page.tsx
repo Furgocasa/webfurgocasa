@@ -61,6 +61,7 @@ function ReservarVehiculoContent() {
   const [selectedExtras, setSelectedExtras] = useState<SelectedExtra[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   // Calculate days and prices
   const days = pickupDate && dropoffDate
@@ -91,14 +92,22 @@ function ReservarVehiculoContent() {
       return;
     }
     
-    loadData();
+    // Delay inicial y retry automático
+    const timer = setTimeout(() => {
+      loadData();
+    }, 200);
+    
+    return () => clearTimeout(timer);
   }, [vehicleId]);
 
-  const loadData = async () => {
+  const loadData = async (isRetry = false) => {
     try {
-      setLoading(true);
+      if (!isRetry) {
+        setLoading(true);
+        setError(null);
+      }
       
-      console.log('Loading vehicle:', vehicleId);
+      console.log(`[ReservarVehiculo] ${isRetry ? 'Retry' : 'Loading'} vehicle: ${vehicleId} (attempt ${retryCount + 1}/4)`);
       
       // Load vehicle
       const { data: vehicleData, error: vehicleError } = await supabase
@@ -119,13 +128,15 @@ function ReservarVehiculoContent() {
         .single();
 
       if (vehicleError) {
-        console.error('Vehicle error:', vehicleError);
+        console.error('[ReservarVehiculo] Vehicle error:', vehicleError);
         throw vehicleError;
       }
       
       if (!vehicleData) {
         throw new Error('Vehículo no encontrado o no disponible');
       }
+      
+      console.log('[ReservarVehiculo] Vehicle loaded successfully');
       
       // Sort images by is_primary first, then sort_order
       if (vehicleData.images) {
@@ -147,30 +158,37 @@ function ReservarVehiculoContent() {
         .order('name', { ascending: true });
 
       if (extrasError) {
-        console.error('Extras error:', extrasError);
+        console.error('[ReservarVehiculo] Extras error:', extrasError);
         throw extrasError;
       }
       
-      console.log('Extras loaded:', extrasData);
-      
-      // Debug detallado de cada extra
-      if (extrasData) {
-        extrasData.forEach(extra => {
-          console.log(`Extra "${extra.name}":`, {
-            price_type: extra.price_type,
-            price_per_day: extra.price_per_day,
-            price_per_unit: extra.price_per_unit
-          });
-        });
-      }
-      
+      console.log('[ReservarVehiculo] Extras loaded successfully:', extrasData?.length || 0);
       setExtras((extrasData || []) as Extra[]);
       
+      // Reset retry count on success
+      setRetryCount(0);
+      
     } catch (error: any) {
-      console.error('Error loading data:', error);
-      setError(error.message || error.toString() || 'Error al cargar los datos');
+      console.error('[ReservarVehiculo] Error loading data:', error);
+      const errorMsg = error.message || error.toString() || 'Error al cargar los datos';
+      
+      // Retry automático si no hemos alcanzado el límite
+      if (retryCount < 3) {
+        const delay = 1000 * (retryCount + 1); // 1s, 2s, 3s
+        console.log(`[ReservarVehiculo] Retrying in ${delay}ms...`);
+        setRetryCount(prev => prev + 1);
+        
+        setTimeout(() => {
+          loadData(true);
+        }, delay);
+      } else {
+        console.error('[ReservarVehiculo] Max retry attempts reached');
+        setError(errorMsg);
+      }
     } finally {
-      setLoading(false);
+      if (!isRetry) {
+        setLoading(false);
+      }
     }
   };
 
