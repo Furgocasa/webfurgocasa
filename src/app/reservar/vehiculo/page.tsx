@@ -274,7 +274,7 @@ function ReservarVehiculoContent() {
       <Header />
       
       {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
-      <div className="sticky top-[64px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40">
+      <div className="sticky top-[120px] lg:top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             {/* Info del vehículo */}
