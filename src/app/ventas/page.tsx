@@ -164,7 +164,9 @@ export default function VentasPage() {
           ? vehicle.vehicle_images.find((img: any) => img.is_primary) || vehicle.vehicle_images[0]
           : undefined,
         sale_highlights: vehicle.sale_highlights || [],
-        vehicle_equipment: (vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []
+        vehicle_equipment: ((vehicle as any).vehicle_equipment || [])
+          .map((ve: any) => ve?.equipment)
+          .filter((eq: any) => eq != null) || []
       }));
 
       console.log('[Ventas] Processed vehicles:', vehiclesData.length);
@@ -461,7 +463,9 @@ export default function VentasPage() {
                     {/* Equipamiento */}
                     <div className="mb-4">
                       <VehicleEquipmentDisplay
-                        equipment={(vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []}
+                        equipment={((vehicle as any).vehicle_equipment || [])
+                          .map((ve: any) => ve?.equipment)
+                          .filter((eq: any) => eq != null)}
                         variant="icons"
                         maxVisible={6}
                       />
