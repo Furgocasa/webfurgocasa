@@ -31,8 +31,8 @@ interface Extra {
   name: string;
   description: string;
   price_per_day: number | null;
-  price_per_rental: number | null;
-  price_type: 'per_day' | 'per_rental' | 'one_time';
+  price_per_unit: number | null;
+  price_type: 'per_day' | 'per_unit';
   max_quantity: number;
   icon: string;
 }
@@ -72,9 +72,9 @@ function ReservarVehiculoContent() {
   const extrasPrice = selectedExtras.reduce((sum, item) => {
     // Calcular precio según el tipo de extra
     let price = 0;
-    if (item.extra.price_type === 'per_rental' || item.extra.price_type === 'one_time') {
+    if (item.extra.price_type === 'per_unit') {
       // Precio único por toda la reserva
-      price = (item.extra.price_per_rental || 0);
+      price = (item.extra.price_per_unit || 0);
     } else {
       // Precio por día multiplicado por número de días
       price = (item.extra.price_per_day || 0) * days;
@@ -159,7 +159,7 @@ function ReservarVehiculoContent() {
           console.log(`Extra "${extra.name}":`, {
             price_type: extra.price_type,
             price_per_day: extra.price_per_day,
-            price_per_rental: extra.price_per_rental
+            price_per_unit: extra.price_per_unit
           });
         });
       }
@@ -447,10 +447,10 @@ function ReservarVehiculoContent() {
                           
                           // Calcular precio según el tipo
                           let priceDisplay = '';
-                          if (extra.price_type === 'per_rental' || extra.price_type === 'one_time') {
-                            // Para extras de precio único, usar price_per_rental
-                            const price = extra.price_per_rental || 0;
-                            priceDisplay = `${formatPrice(price)} / ${t("reserva")}`;
+                          if (extra.price_type === 'per_unit') {
+                            // Para extras de precio único, usar price_per_unit
+                            const price = extra.price_per_unit || 0;
+                            priceDisplay = `${formatPrice(price)} / ${t("unidad")}`;
                           } else {
                             // Para extras por día, usar price_per_day
                             const price = extra.price_per_day || 0;
@@ -458,7 +458,7 @@ function ReservarVehiculoContent() {
                           }
                           
                           // Debug log para ver los datos
-                          if (extra.price_per_rental === 0 && extra.price_per_day === 0) {
+                          if ((extra.price_per_unit === 0 || !extra.price_per_unit) && (extra.price_per_day === 0 || !extra.price_per_day)) {
                             console.log('Extra sin precio:', extra.name, extra);
                           }
 
