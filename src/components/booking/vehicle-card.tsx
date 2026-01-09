@@ -64,8 +64,8 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
 
   return (
     <div className="card-vehicle group">
-      {/* Image */}
-      <div className="relative h-48 bg-gray-200 overflow-hidden">
+      {/* Image - Clicable */}
+      <Link href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -86,12 +86,14 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
             {vehicle.category.name}
           </span>
         )}
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="p-5">
-        {/* Title */}
-        <h3 className="text-xl font-bold text-gray-900 mb-2">{vehicle.name}</h3>
+        {/* Title - Clicable */}
+        <Link href={reservationUrl}>
+          <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-furgocasa-orange transition-colors cursor-pointer">{vehicle.name}</h3>
+        </Link>
 
         {/* Short description */}
         {vehicle.short_description && (

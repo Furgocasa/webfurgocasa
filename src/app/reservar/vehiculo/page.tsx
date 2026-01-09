@@ -271,20 +271,11 @@ function ReservarVehiculoContent() {
             </Link>
           </div>
 
-          {/* Mobile Summary - Sticky en móvil */}
-          <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 mb-4 sticky top-0 z-40">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500">{days} {t("días")}</p>
-                <p className="text-xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
-              </div>
-              <button
-                onClick={handleContinue}
-                className="bg-furgocasa-orange text-white font-semibold py-2.5 px-5 rounded-lg text-sm"
-              >
-                {t("Continuar")}
-              </button>
-            </div>
+          {/* Mobile Summary - NO sticky, info simple arriba */}
+          <div className="lg:hidden bg-gray-50 rounded-xl p-3 mb-4 border border-gray-200">
+            <p className="text-sm text-gray-600 text-center">
+              {days} {t("días")} · {t("Total")}: <span className="font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
@@ -523,6 +514,28 @@ function ReservarVehiculoContent() {
                   ))}
                 </div>
               </div>
+
+              {/* Mobile CTA Bottom - Solo visible en móvil */}
+              <div className="lg:hidden bg-white rounded-xl shadow-lg p-5 sticky bottom-0 border-t-2 border-furgocasa-orange">
+                <div className="flex items-center justify-between mb-3">
+                  <div>
+                    <p className="text-xs text-gray-500">{t("Total")} ({days} {t("días")})</p>
+                    <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
+                  </div>
+                  <button
+                    onClick={handleContinue}
+                    className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2"
+                  >
+                    {t("Continuar")}
+                    <ArrowRight className="h-5 w-5" />
+                  </button>
+                </div>
+                {selectedExtras.length > 0 && (
+                  <p className="text-xs text-gray-500 text-center">
+                    Incluye {selectedExtras.length} extra{selectedExtras.length > 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Sidebar - Price Summary - Solo desktop */}
@@ -575,9 +588,14 @@ function ReservarVehiculoContent() {
                   </div>
 
                   {selectedExtras.map((item) => {
-                    const price = item.extra.price_per_rental > 0 
-                      ? item.extra.price_per_rental 
-                      : item.extra.price_per_day * days;
+                    // Calcular precio correctamente según el tipo
+                    let price = 0;
+                    if (item.extra.price_type === 'per_rental' || item.extra.price_type === 'one_time') {
+                      price = item.extra.price_per_rental || 0;
+                    } else {
+                      // per_day
+                      price = (item.extra.price_per_day || 0) * days;
+                    }
                     return (
                       <div key={item.extra.id} className="flex justify-between text-sm">
                         <span className="text-gray-600">
@@ -595,9 +613,6 @@ function ReservarVehiculoContent() {
                     <span className="text-gray-700 font-medium">{t("Total")}</span>
                     <span className="text-3xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    * {t("La fianza (500€) se paga en la entrega")}
-                  </p>
                 </div>
 
                 {/* Continue Button */}

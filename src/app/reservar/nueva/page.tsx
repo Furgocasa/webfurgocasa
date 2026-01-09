@@ -202,17 +202,24 @@ function NuevaReservaContent() {
       // Step 1: Create or update customer
       let customerId: string;
       
-      // Check if customer already exists by email
-      const { data: existingCustomers } = await supabase
+      // Check if customer already exists by email or DNI (sin auth requerido)
+      const { data: existingCustomers, error: searchError } = await supabase
         .from('customers')
         .select('id, total_bookings, total_spent')
-        .eq('email', customerEmail)
+        .or(`email.eq.${customerEmail},dni.eq.${customerDni}`)
         .limit(1);
       
+      if (searchError) {
+        console.error('Error searching customer:', searchError);
+        // Si falla la búsqueda, intentar crear directamente
+      }
+      
       if (existingCustomers && existingCustomers.length > 0) {
-        // Update existing customer
+        // Customer exists - use existing ID
         customerId = existingCustomers[0].id;
+        console.log('Using existing customer:', customerId);
         
+        // Try to update customer info (optional, may fail due to RLS)
         const { error: updateError } = await supabase
           .from('customers')
           .update({
@@ -231,13 +238,15 @@ function NuevaReservaContent() {
           .eq('id', customerId);
         
         if (updateError) {
-          console.error('Error updating customer:', updateError);
+          console.warn('Could not update customer info (using existing):', updateError);
+          // No lanzar error, continuar con el customer existente
         }
       } else {
-        // Create new customer
-        const { data: newCustomer, error: customerError } = await supabase
-          .from('customers')
-          .insert({
+        // Create new customer using API route to bypass RLS
+        const createResponse = await fetch('/api/customers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
             email: customerEmail,
             name: customerName,
             phone: customerPhone,
@@ -249,14 +258,17 @@ function NuevaReservaContent() {
             country: customerCountry,
             driver_license: customerDriverLicense || null,
             driver_license_expiry: customerDriverLicenseExpiry || null,
-            total_bookings: 0,
-            total_spent: 0,
-          })
-          .select('id')
-          .single();
+          }),
+        });
         
-        if (customerError) throw customerError;
-        customerId = newCustomer.id;
+        if (!createResponse.ok) {
+          const errorData = await createResponse.json();
+          throw new Error(errorData.error || 'Error al crear cliente');
+        }
+        
+        const { customer } = await createResponse.json();
+        customerId = customer.id;
+        console.log('Created new customer:', customerId);
       }
 
       // Step 2: Generate booking number
@@ -774,21 +786,13 @@ function NuevaReservaContent() {
                         </div>
                       );
                     })}
-                    
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">{t("Fianza")} *</span>
-                      <span className="font-semibold">500,00€</span>
-                    </div>
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium">{t("Total")}</span>
                       <span className="text-3xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-2">
-                      * {t("La fianza se devuelve al finalizar el alquiler")}
-                    </p>
                   </div>
                 </div>
               )}
