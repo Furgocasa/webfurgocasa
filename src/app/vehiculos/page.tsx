@@ -53,35 +53,45 @@ export const metadata: Metadata = {
 
 // ✅ Cargar vehículos en el servidor
 async function loadVehicles(): Promise<Vehicle[]> {
-  const { data, error } = await supabase
-    .from('vehicles')
-    .select(`
-      *,
-      vehicle_images:vehicle_images(*),
-      vehicle_equipment(
-        id,
-        equipment(*)
-      )
-    `)
-    .eq('is_for_rent', true)
-    .eq('status', 'available')
-    .order('internal_code');
+  try {
+    console.log('[Vehiculos] Loading vehicles...');
+    
+    const { data, error } = await supabase
+      .from('vehicles')
+      .select(`
+        *,
+        vehicle_images:vehicle_images(*),
+        vehicle_equipment(
+          id,
+          equipment(*)
+        )
+      `)
+      .eq('is_for_rent', true)
+      .neq('status', 'inactive') // Excluir inactivos
+      .order('internal_code');
 
-  if (error) {
-    console.error('Error loading vehicles:', error);
+    if (error) {
+      console.error('[Vehiculos] Error loading vehicles:', error);
+      return [];
+    }
+
+    console.log('[Vehiculos] Total vehicles loaded:', data?.length || 0);
+
+    // Transformar datos para obtener solo la imagen principal
+    const vehiclesData = data?.map(vehicle => ({
+      ...vehicle,
+      main_image: Array.isArray(vehicle.vehicle_images) && vehicle.vehicle_images.length > 0 
+        ? vehicle.vehicle_images.find((img: any) => img.is_primary) || vehicle.vehicle_images[0]
+        : undefined,
+      vehicle_equipment: (vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []
+    })) || [];
+
+    console.log('[Vehiculos] Processed vehicles:', vehiclesData.length);
+    return vehiclesData as Vehicle[];
+  } catch (error) {
+    console.error('[Vehiculos] Unexpected error:', error);
     return [];
   }
-
-  // Transformar datos para obtener solo la imagen principal
-  const vehiclesData = data?.map(vehicle => ({
-    ...vehicle,
-    main_image: Array.isArray(vehicle.vehicle_images) && vehicle.vehicle_images.length > 0 
-      ? vehicle.vehicle_images.find((img: any) => img.is_primary) || vehicle.vehicle_images[0]
-      : undefined,
-    vehicle_equipment: vehicle.vehicle_equipment || []
-  })) || [];
-
-  return vehiclesData as Vehicle[];
 }
 
 // ✅ SERVER COMPONENT

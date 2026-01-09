@@ -87,6 +87,8 @@ export default function VentasPage() {
   const [vehiclesForSale, setVehiclesForSale] = useState<VehicleForSale[]>([]);
   const [categories, setCategories] = useState<VehicleCategory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
   
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
@@ -96,12 +98,22 @@ export default function VentasPage() {
   const [sortBy, setSortBy] = useState('price-asc');
 
   useEffect(() => {
-    loadData();
+    // Delay inicial y retry automático
+    const timer = setTimeout(() => {
+      loadData();
+    }, 200);
+    
+    return () => clearTimeout(timer);
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (isRetry = false) => {
     try {
-      setLoading(true);
+      if (!isRetry) {
+        setLoading(true);
+        setError(null);
+      }
+
+      console.log(`[Ventas] ${isRetry ? 'Retry' : 'Loading'} data... (attempt ${retryCount + 1}/4)`);
       
       // Cargar categorías
       const { data: categoriesData } = await supabase
@@ -115,7 +127,7 @@ export default function VentasPage() {
       }
 
       // Cargar vehículos
-      const { data, error } = await supabase
+      const { data, error: vehiclesError } = await supabase
         .from('vehicles')
         .select(`
           *,
@@ -130,14 +142,12 @@ export default function VentasPage() {
         .neq('status', 'inactive')
         .order('created_at', { ascending: false });
 
-      if (error) {
-        console.error('Error loading vehicles for sale:', error);
-        return;
+      if (vehiclesError) {
+        console.error('[Ventas] Error loading vehicles:', vehiclesError);
+        throw vehiclesError;
       }
 
       // Filtrar por sale_status después de traer los datos
-      // Si sale_status es NULL, se considera 'available' por defecto
-      // Solo excluimos si es explícitamente 'sold' o 'reserved'
       const availableVehicles = data?.filter(vehicle => {
         const saleStatus = vehicle.sale_status?.toLowerCase();
         return saleStatus !== 'sold' && saleStatus !== 'reserved';
@@ -154,15 +164,47 @@ export default function VentasPage() {
           ? vehicle.vehicle_images.find((img: any) => img.is_primary) || vehicle.vehicle_images[0]
           : undefined,
         sale_highlights: vehicle.sale_highlights || [],
-        vehicle_equipment: vehicle.equipment || []
+        vehicle_equipment: (vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []
       }));
 
       console.log('[Ventas] Processed vehicles:', vehiclesData.length);
       setVehiclesForSale(vehiclesData as VehicleForSale[]);
-    } catch (error) {
-      console.error('Error:', error);
+      
+      // Reset retry count on success
+      setRetryCount(0);
+      
+    } catch (err: any) {
+      // Manejo especial para AbortError
+      const isAbortError = err.name === 'AbortError' || 
+                          err.message?.includes('AbortError') || 
+                          err.message?.includes('signal is aborted');
+      
+      if (isAbortError) {
+        console.warn('[Ventas] AbortError detected - request was cancelled, retrying...');
+      } else {
+        console.error('[Ventas] Error:', err);
+      }
+      
+      const errorMsg = err.message || err.toString() || 'Error al cargar vehículos';
+      
+      // Retry automático si no hemos alcanzado el límite (máximo 3 intentos)
+      if (retryCount < 3) {
+        const delay = 1000 * (retryCount + 1); // 1s, 2s, 3s
+        console.log(`[Ventas] Retrying in ${delay}ms... (attempt ${retryCount + 1}/3, ${isAbortError ? 'AbortError' : 'normal error'})`);
+        setRetryCount(prev => prev + 1);
+        
+        setTimeout(() => {
+          loadData(true);
+        }, delay);
+      } else {
+        console.error('[Ventas] Max retry attempts reached (3/3)');
+        setError(errorMsg);
+        setLoading(false);
+      }
     } finally {
-      setLoading(false);
+      if (!isRetry) {
+        setLoading(false);
+      }
     }
   };
 
