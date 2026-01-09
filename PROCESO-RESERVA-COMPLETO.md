@@ -1,8 +1,8 @@
 # 📋 PROCESO DE RESERVA COMPLETO - Guía Técnica
 
-**Versión**: 1.0.1  
+**Versión**: 1.0.2  
 **Última actualización**: 9 de Enero 2026  
-**Estado**: ✅ Producción
+**Estado**: ✅ Producción - TOTALMENTE FUNCIONAL
 
 ---
 
@@ -39,10 +39,24 @@ Acción: Click en "Buscar"
 ### Paso 2: Resultados de búsqueda
 **URL**: `/buscar`
 
+**✅ v1.0.2: DISPONIBILIDAD CORRECTA**
+
 **Componente**: `VehicleListClient`
 - Muestra vehículos disponibles
+  - ✅ **Solo reservas `confirmed` e `in_progress` bloquean vehículos**
+  - ✅ Reservas `pending` NO bloquean disponibilidad (fix v1.0.2)
 - Filtros por capacidad, tipo, precio
 - Cada vehículo en un `VehicleCard`
+
+**API Availability** (`/api/availability/route.ts`):
+```typescript
+// ✅ v1.0.2: Solo bloquean reservas activas
+const { data: conflictingBookings } = await supabase
+  .from("bookings")
+  .select("vehicle_id")
+  .in("status", ["confirmed", "in_progress"])  // ✅ Correcto
+  .or(`and(pickup_date.lte.${dropoffDate},dropoff_date.gte.${pickupDate})`);
+```
 
 **Interacciones**:
 - ✅ Click en imagen → Continúa reserva
@@ -57,21 +71,69 @@ Usuario selecciona vehículo
 ### Paso 3: Detalles del vehículo y selección de extras
 **URL**: `/reservar/vehiculo`
 
+**✅ v1.0.2: UX PERFECCIONADA**
+
+**Estructura Visual**:
+```
+┌────────────────────────────────────┐ 0px
+│ Header Principal (sticky, z-50)   │
+├────────────────────────────────────┤ 120px
+│ Sticky Header - Resumen (z-40)    │
+│ ← Volver | 🚗 Vehículo | 💰 Total │
+├────────────────────────────────────┤ 230px
+│ ↕ Margen: 40px (pt-[150px])       │
+├────────────────────────────────────┤ 270px
+│ CONTENIDO PRINCIPAL                │
+│ ┌───────────┬─────────────────┐   │
+│ │ Galería   │ Sidebar PC      │   │
+│ │ Detalles  │ (sticky)        │   │
+│ │ Extras    │ - Resumen       │   │
+│ └───────────┴─────────────────┘   │
+└────────────────────────────────────┘
+```
+
 **Muestra**:
-- Galería de imágenes del vehículo (`VehicleGallery`)
-- Información técnica (plazas, camas, equipamiento)
-- Extras disponibles agrupados por categoría
-- Resumen de reserva con precio total
+- **Sticky Header**: Siempre visible con resumen de reserva
+  - Link "Volver a la búsqueda" accesible en todo momento ✅
+  - Vehículo, fechas y total visible
+  - Botón "Continuar" en header móvil
+- **Galería de imágenes** del vehículo (`VehicleGallery`)
+- **Información técnica** (plazas, camas, equipamiento)
+- **Extras disponibles** agrupados por categoría
+  - ✅ Diferencia correcta entre "Por día" y "Por unidad"
+  - ✅ Precios mostrados correctamente (no más "0€ / día")
+  - ✅ Permite seleccionar cantidad de cada extra
+  - ✅ Actualiza el total en tiempo real (suma correcta)
+- **Resumen de reserva** (sidebar en PC, CTA móvil)
 
-**Extras**:
-- Diferencia entre "Por día" y "Por unidad"
-- Permite seleccionar cantidad de cada extra
-- Actualiza el total en tiempo real
+**UX PC (≥768px)**:
+- Layout 3 columnas: `grid-cols-1 md:grid-cols-3`
+- Sidebar derecho sticky (`top-[230px]`) con resumen completo
+- Contenido principal ocupa 2/3 del ancho
 
-**UX Móvil**:
-- Info de total arriba (NO sticky)
-- Contenido completo en medio
-- Botón "Continuar" sticky abajo
+**UX Móvil (<768px)**:
+- Sticky header con resumen compacto
+- CTA "Continuar" en header móvil con total visible
+
+**Extras - Cálculo correcto**:
+```typescript
+// ✅ Diferenciación correcta
+if (extra.price_type === 'per_unit') {
+  precio = extra.price_per_unit;  // Precio único
+  display = "20.00€ / unidad";
+} else {
+  precio = extra.price_per_day * días;  // Precio por día
+  display = "5.00€ / día";
+}
+
+// ✅ Suma al total
+totalPrice = basePrice + extrasPrice;
+```
+
+**Retry Logic** (v1.0.2):
+- 3 reintentos automáticos con backoff (1s, 2s, 3s)
+- Manejo especial de AbortError
+- Logging detallado: `[ReservarVehiculo] Retry vehicle: {id} (attempt 1/3)`
 
 ```
 Usuario selecciona extras (opcional)
@@ -82,6 +144,23 @@ Click en "Continuar"
 ### Paso 4: Formulario de datos del cliente
 **URL**: `/reservar/nueva`
 
+**✅ v1.0.2: DISEÑO CONSISTENTE CON /reservar/vehiculo**
+
+**Estructura Visual**:
+```
+┌────────────────────────────────────┐ 0px
+│ Header Principal (sticky, z-50)   │
+├────────────────────────────────────┤ 120px
+│ Sticky Header - Resumen (z-40)    │
+│ ← Volver al paso anterior          │
+│ 🚗 Vehículo | Días | 💰 Total     │
+├────────────────────────────────────┤ 230px
+│ ↕ Margen: 40px (pt-[150px])       │
+├────────────────────────────────────┤ 270px
+│ FORMULARIO DE CLIENTE              │
+└────────────────────────────────────┘
+```
+
 **Formulario**:
 - Datos personales (nombre, email, teléfono, DNI)
 - Dirección completa
@@ -89,12 +168,23 @@ Click en "Continuar"
 - Licencia de conducir y fecha de expiración
 - Aceptación de términos y condiciones
 
-**Proceso**:
-1. Verifica si el cliente ya existe (por email o DNI)
-2. Si existe → Usa ID del cliente existente
-3. Si no existe → Crea nuevo cliente vía API `/api/customers`
+**Proceso** (✅ v1.0.2 - Sin duplicados):
+1. **Detección de cliente existente** por email O DNI
+   ```typescript
+   const { data: existingCustomers } = await supabase
+     .from('customers')
+     .select('id')
+     .or(`email.eq.${email},dni.eq.${dni}`)
+     .limit(1);
+   ```
+2. Si existe → Usa ID del cliente existente ✅
+3. Si no existe → Crea nuevo cliente vía API `/api/customers` ✅
 4. Crea booking en la tabla `bookings`
 5. Vincula extras seleccionados en `booking_extras`
+
+**Navegación**:
+- Botón "Volver al paso anterior" → `router.back()` ✅
+- Ya NO enlaza estáticamente a home (fix v1.0.2)
 
 ```
 Usuario completa formulario
@@ -105,6 +195,8 @@ Click en "Reservar ahora"
 ### Paso 5: Confirmación de reserva
 **URL**: `/reservar/[booking_id]`
 
+**✅ v1.0.2: INFORMACIÓN CORRECTA**
+
 **Muestra**:
 - Número de reserva
 - Resumen completo de la reserva
@@ -112,6 +204,8 @@ Click en "Reservar ahora"
 - Extras seleccionados
 - Datos del cliente
 - Precio total
+- **Depósito**: 1000€ vía transferencia ✅ (corregido desde 500€)
+- **Teléfono de contacto**: Correcto desde footer ✅
 
 ---
 
