@@ -122,7 +122,7 @@ export default function HomePage() {
       <Header />
       
       {/* Hero Section con Slider */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-visible">
         {/* Background slider - ABSOLUTE PARA OCUPAR TODO EL FONDO */}
         <div className="absolute inset-0 w-full h-full">
           <HeroSlider 
@@ -178,7 +178,7 @@ export default function HomePage() {
       </section>
 
       {/* Sección: Los mejores modelos en alquiler */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="relative z-0 py-16 lg:py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <span className="inline-block px-4 py-2 bg-furgocasa-blue/10 text-furgocasa-blue rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
