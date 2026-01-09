@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Search, Eye, Car, Tag, Home, ArrowUpDown, ArrowUp, ArrowDown, Package } from "lucide-react";
 import supabase from "@/lib/supabase/client";
 import VehicleActions from "./vehicle-actions";
+import { useAdminData } from "@/hooks/use-admin-data";
 
 interface VehicleExtra {
   id: string;
@@ -57,10 +58,6 @@ const saleStatusColors: Record<string, { bg: string; text: string; label: string
 };
 
 export default function VehiclesPage() {
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [categories, setCategories] = useState<VehicleCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -71,27 +68,38 @@ export default function VehiclesPage() {
   const [sortField, setSortField] = useState<string>('internal_code');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      
-      // Cargar categorías
-      const { data: categoriesData } = await supabase
+  // Cargar categorías con el hook
+  const { 
+    data: categories, 
+    loading: categoriesLoading, 
+    error: categoriesError 
+  } = useAdminData<VehicleCategory[]>({
+    queryFn: async () => {
+      const result = await supabase
         .from('vehicle_categories')
         .select('id, name')
         .eq('is_active', true)
         .order('sort_order', { ascending: true });
       
-      if (categoriesData) {
-        setCategories(categoriesData);
-      }
+      return {
+        data: (result.data || []) as VehicleCategory[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
 
-      // Cargar vehículos con sus extras e imágenes, ordenados por código interno por defecto
-      const { data: vehiclesData, error } = await supabase
+  // Cargar vehículos raw con el hook
+  const { 
+    data: vehiclesRaw, 
+    loading: vehiclesLoading, 
+    error: vehiclesError,
+    refetch: refetchVehicles
+  } = useAdminData<any[]>({
+    queryFn: async () => {
+      const result = await supabase
         .from('vehicles')
         .select(`
           *,
@@ -99,16 +107,34 @@ export default function VehiclesPage() {
           images:vehicle_images(*)
         `)
         .order('internal_code', { ascending: true, nullsFirst: false });
+      
+      return {
+        data: result.data || [],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
 
-      if (error) {
-        console.error('Error loading vehicles:', error);
+  // Estado local para vehículos procesados
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [processingExtras, setProcessingExtras] = useState(false);
+
+  // Procesar extras cuando cambien los datos raw
+  useEffect(() => {
+    const processExtras = async () => {
+      if (!vehiclesRaw || vehiclesRaw.length === 0) {
+        setVehicles([]);
         return;
       }
 
-      // Cargar extras de cada vehículo y procesar imágenes
-      if (vehiclesData) {
+      try {
+        setProcessingExtras(true);
+
         const vehiclesWithExtras = await Promise.all(
-          vehiclesData.map(async (vehicle) => {
+          vehiclesRaw.map(async (vehicle) => {
             const { data: extrasData } = await supabase
               .from('vehicle_available_extras')
               .select(`
@@ -132,12 +158,20 @@ export default function VehiclesPage() {
         );
 
         setVehicles(vehiclesWithExtras as Vehicle[]);
+      } catch (error) {
+        console.error('[Vehicles] Error processing extras:', error);
+      } finally {
+        setProcessingExtras(false);
       }
-    } catch (error) {
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
+    };
+
+    processExtras();
+  }, [vehiclesRaw]);
+
+  const loading = categoriesLoading || vehiclesLoading || processingExtras;
+
+  const loadData = () => {
+    refetchVehicles();
   };
 
   // Función para manejar el ordenamiento
@@ -308,7 +342,7 @@ export default function VehiclesPage() {
               className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
             >
               <option value="">Todas las categorías</option>
-              {categories.map(cat => (
+              {(categories || []).map(cat => (
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>

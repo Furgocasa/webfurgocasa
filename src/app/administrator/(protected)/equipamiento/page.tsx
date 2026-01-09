@@ -15,6 +15,7 @@ import {
 import { supabase } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { EquipmentIcon } from "@/components/vehicle/equipment-display";
+import { useAdminData } from "@/hooks/use-admin-data";
 
 // Lista de iconos disponibles
 const AVAILABLE_ICONS = [
@@ -79,34 +80,32 @@ function generateSlug(name: string): string {
 }
 
 export default function EquipamientoPage() {
-  const [equipment, setEquipment] = useState<Equipment[]>([]);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<EquipmentForm>(defaultForm);
   const [filterCategory, setFilterCategory] = useState<string>("all");
 
-  useEffect(() => {
-    loadEquipment();
-  }, []);
-
-  const loadEquipment = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
+  // Usar el hook para cargar datos con retry automático
+  const { data: equipment, loading, error, refetch } = useAdminData<Equipment[]>({
+    queryFn: async () => {
+      const result = await supabase
         .from("equipment")
         .select("*")
         .order("sort_order", { ascending: true });
+      
+      return {
+        data: (result.data || []) as Equipment[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
 
-      if (error) throw error;
-      setEquipment(data || []);
-    } catch (error) {
-      console.error("Error loading equipment:", error);
-      toast.error("Error al cargar equipamientos");
-    } finally {
-      setLoading(false);
-    }
+  const loadEquipment = () => {
+    refetch();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,8 +138,8 @@ export default function EquipamientoPage() {
         toast.success("Equipamiento actualizado");
       } else {
         // Crear nuevo
-        const maxOrder = equipment.length > 0 
-          ? Math.max(...equipment.map(e => e.sort_order ?? 0)) + 1 
+        const maxOrder = (equipment || []).length > 0 
+          ? Math.max(...(equipment || []).map(e => e.sort_order ?? 0)) + 1 
           : 0;
 
         const { error } = await supabase
@@ -248,8 +247,8 @@ export default function EquipamientoPage() {
   };
 
   const filteredEquipment = filterCategory === "all" 
-    ? equipment 
-    : equipment.filter(eq => eq.category === filterCategory);
+    ? (equipment || [])
+    : (equipment || []).filter(eq => eq.category === filterCategory);
 
   const getCategoryInfo = (category: string) => {
     return CATEGORIES.find(c => c.value === category) || CATEGORIES[CATEGORIES.length - 1];
@@ -435,10 +434,10 @@ export default function EquipamientoPage() {
               : "bg-gray-100 text-gray-700 hover:bg-gray-200"
           }`}
         >
-          Todos ({equipment.length})
+          Todos ({(equipment || []).length})
         </button>
         {CATEGORIES.map(cat => {
-          const count = equipment.filter(eq => eq.category === cat.value).length;
+          const count = (equipment || []).filter(eq => eq.category === cat.value).length;
           if (count === 0) return null;
           return (
             <button
