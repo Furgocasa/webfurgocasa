@@ -517,7 +517,7 @@ export default function CalendarioPage() {
   };
 
   const getBookingsForVehicle = (vehicleId: string) => {
-    return bookings.filter(b => b.vehicle_id === vehicleId);
+    return (bookings || []).filter(b => b.vehicle_id === vehicleId);
   };
 
   const getStatusColor = (status: string) => {
@@ -659,7 +659,7 @@ export default function CalendarioPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-y-visible">
           {loading ? (
             <div className="p-12 text-center text-gray-500">Cargando calendario...</div>
-          ) : vehicles.length === 0 ? (
+          ) : (vehicles || []).length === 0 ? (
             <div className="p-12 text-center">
               <Car className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500">No hay vehículos disponibles para alquiler</p>
@@ -996,7 +996,7 @@ export default function CalendarioPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500 mb-1">Total vehículos</p>
-          <p className="text-2xl font-bold text-gray-900">{vehicles.length}</p>
+          <p className="text-2xl font-bold text-gray-900">{(vehicles || []).length}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500 mb-1">Reservas en el período</p>
@@ -1005,7 +1005,7 @@ export default function CalendarioPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500 mb-1">Vehículos disponibles</p>
           <p className="text-2xl font-bold text-green-600">
-            {vehicles.length - new Set(bookings.map(b => b.vehicle_id)).size}
+            {(vehicles || []).length - new Set((bookings || []).map(b => b.vehicle_id)).size}
           </p>
         </div>
       </div>
