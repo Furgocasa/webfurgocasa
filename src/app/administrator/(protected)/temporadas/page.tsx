@@ -5,6 +5,7 @@ import supabase from "@/lib/supabase/client";
 import { Calendar, Plus, Trash2, Save, AlertCircle, Euro } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { useAdminData } from "@/hooks/use-admin-data";
 
 interface Season {
   id: string;
@@ -42,31 +43,30 @@ const getTipoTemporada = (season: Season) => {
 
 export default function TemporadasAdmin() {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
-  const [seasons, setSeasons] = useState<Season[]>([]);
-  const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  useEffect(() => {
-    loadSeasons();
-  }, [selectedYear]);
-
-  const loadSeasons = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
+  // Usar el hook para cargar datos con retry automático (depende de selectedYear)
+  const { data: seasons, loading, error, refetch } = useAdminData<Season[]>({
+    queryFn: async () => {
+      const result = await supabase
         .from('seasons')
         .select('*')
         .eq('year', selectedYear)
         .order('start_date');
+      
+      return {
+        data: (result.data || []) as Season[],
+        error: result.error
+      };
+    },
+    dependencies: [selectedYear],
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
 
-      if (error) throw error;
-      setSeasons(data || []);
-    } catch (error: any) {
-      console.error('Error loading seasons:', error);
-      showMessage('error', 'Error al cargar las temporadas');
-    } finally {
-      setLoading(false);
-    }
+  const loadSeasons = () => {
+    refetch();
   };
 
   const handleDeleteSeason = async (id: string) => {
@@ -166,7 +166,7 @@ export default function TemporadasAdmin() {
           <div className="p-12 text-center text-gray-500">
             Cargando temporadas...
           </div>
-        ) : seasons.length === 0 ? (
+        ) : (seasons || []).length === 0 ? (
           <div className="p-12 text-center text-gray-500">
             <p className="mb-2">No hay temporadas configuradas para este año</p>
             <p className="text-xs">(Todo el año se considera TEMPORADA BAJA)</p>
@@ -203,7 +203,7 @@ export default function TemporadasAdmin() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {seasons.map((season) => {
+                {(seasons || []).map((season) => {
                   const start = new Date(season.start_date);
                   const end = new Date(season.end_date);
                   const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
@@ -267,7 +267,7 @@ export default function TemporadasAdmin() {
       </div>
 
       {/* Price Details */}
-      {seasons.length > 0 && (
+      {(seasons || []).length > 0 && (
         <div className="mt-8 bg-gray-50 rounded-xl p-6">
           <h3 className="text-lg font-bold text-gray-900 mb-4">Detalle de Precios por Temporada</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

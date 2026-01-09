@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import supabase from "@/lib/supabase/client";
 import { Plus, Search, Edit, Trash2, Save, X, MapPin, AlertCircle, Phone, Mail } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
+import { useAdminData } from "@/hooks/use-admin-data";
 
 interface Location {
   id: string;
@@ -29,8 +30,6 @@ interface Location {
 }
 
 export default function UbicacionesPage() {
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -56,26 +55,26 @@ export default function UbicacionesPage() {
     is_dropoff: true,
   });
 
-  useEffect(() => {
-    loadLocations();
-  }, []);
-
-  const loadLocations = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
+  // Usar el hook para cargar datos con retry automático
+  const { data: locations, loading, error, refetch } = useAdminData<Location[]>({
+    queryFn: async () => {
+      const result = await supabase
         .from('locations')
         .select('*')
         .order('sort_order', { ascending: true });
+      
+      return {
+        data: (result.data || []) as Location[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
 
-      if (error) throw error;
-      setLocations((data || []) as Location[]);
-    } catch (error: any) {
-      console.error('Error loading locations:', error);
-      showMessage('error', 'Error al cargar las ubicaciones');
-    } finally {
-      setLoading(false);
-    }
+  const loadLocations = () => {
+    refetch();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -228,7 +227,7 @@ export default function UbicacionesPage() {
     setTimeout(() => setMessage(null), 3000);
   };
 
-  const filteredLocations = locations.filter(location =>
+  const filteredLocations = (locations || []).filter(location =>
     location.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     location.city?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -265,7 +264,7 @@ export default function UbicacionesPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Total ubicaciones</p>
-          <p className="text-2xl font-bold text-gray-900">{locations.length}</p>
+          <p className="text-2xl font-bold text-gray-900">{locations?.length || 0}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Activas</p>

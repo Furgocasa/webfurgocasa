@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import supabase from "@/lib/supabase/client";
 import { Plus, Search, Edit, Trash2, Save, X, Package, Euro, AlertCircle } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
+import { useAdminData } from "@/hooks/use-admin-data";
 
 interface Extra {
   id: string;
@@ -23,8 +24,6 @@ interface Extra {
 }
 
 export default function ExtrasPage() {
-  const [extras, setExtras] = useState<Extra[]>([]);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -47,26 +46,27 @@ export default function ExtrasPage() {
     icon: '',
   });
 
-  useEffect(() => {
-    loadExtras();
-  }, []);
-
-  const loadExtras = async () => {
-    try {
-      setLoading(true);
-      const { data, error } = await supabase
+  // Usar el hook para cargar datos con retry automático
+  const { data: extras, loading, error, refetch } = useAdminData<Extra[]>({
+    queryFn: async () => {
+      const result = await supabase
         .from('extras')
         .select('*')
         .order('sort_order', { ascending: true });
+      
+      return {
+        data: (result.data || []) as Extra[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
 
-      if (error) throw error;
-      setExtras(data || []);
-    } catch (error: any) {
-      console.error('Error loading extras:', error);
-      showMessage('error', 'Error al cargar los extras');
-    } finally {
-      setLoading(false);
-    }
+  // Mantener función loadExtras para recargar después de cambios (ahora solo llama refetch)
+  const loadExtras = () => {
+    refetch();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -207,7 +207,7 @@ export default function ExtrasPage() {
     setTimeout(() => setMessage(null), 3000);
   };
 
-  const filteredExtras = extras.filter(extra =>
+  const filteredExtras = (extras || []).filter(extra =>
     extra.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -488,7 +488,7 @@ export default function ExtrasPage() {
             </div>
             <div className="px-6 py-4 border-t border-gray-100">
               <p className="text-sm text-gray-600">
-                Mostrando {filteredExtras.length} de {extras.length} extras
+                Mostrando {filteredExtras.length} de {extras?.length || 0} extras
               </p>
             </div>
           </>
