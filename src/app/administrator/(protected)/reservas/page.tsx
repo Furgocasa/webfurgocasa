@@ -408,6 +408,9 @@ export default function BookingsPage() {
                     {renderSortIcon('dropoff_date')}
                   </div>
                 </th>
+                <th className="px-3 py-4 text-center text-sm font-semibold text-gray-900">
+                  Duración
+                </th>
                 <th 
                   className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('pickup_location')}
@@ -509,12 +512,17 @@ export default function BookingsPage() {
                       {/* Fecha inicio */}
                       <td className="px-4 py-4">
                         <p className="text-gray-900 text-sm font-medium">{formatDate(booking.pickup_date)}</p>
-                        <p className="text-xs text-gray-500">{days} {days === 1 ? 'día' : 'días'}</p>
                       </td>
                       
                       {/* Fecha fin */}
                       <td className="px-4 py-4">
                         <p className="text-gray-900 text-sm font-medium">{formatDate(booking.dropoff_date)}</p>
+                      </td>
+                      
+                      {/* Duración */}
+                      <td className="px-3 py-4 text-center">
+                        <p className="text-gray-900 text-sm font-semibold">{days}</p>
+                        <p className="text-xs text-gray-500">{days === 1 ? 'día' : 'días'}</p>
                       </td>
                       
                       {/* Ubicación recogida */}
