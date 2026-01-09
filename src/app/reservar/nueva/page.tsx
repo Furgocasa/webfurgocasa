@@ -407,6 +407,17 @@ function NuevaReservaContent() {
       {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
       <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
         <div className="container mx-auto px-4 py-3">
+          {/* Link "Volver" - SIEMPRE visible en el header */}
+          <div className="mb-2">
+            <button 
+              onClick={() => router.back()}
+              className="inline-flex items-center text-xs text-gray-600 hover:text-furgocasa-orange transition-colors"
+            >
+              <ArrowLeft className="h-3 w-3 mr-1" />
+              {t("Volver al paso anterior")}
+            </button>
+          </div>
+
           <div className="flex items-center justify-between gap-4">
             {/* Info del vehículo */}
             <div className="flex items-center gap-3 min-w-0">
@@ -438,17 +449,6 @@ function NuevaReservaContent() {
       
       <main className="min-h-screen bg-gray-50 pt-[200px] py-12">
         <div className="container mx-auto px-4 max-w-6xl">
-          {/* Breadcrumb */}
-          <div className="mb-8">
-            <button 
-              onClick={() => router.back()}
-              className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t("Volver al paso anterior")}
-            </button>
-          </div>
-
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
