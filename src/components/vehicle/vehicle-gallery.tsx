@@ -54,14 +54,13 @@ export function VehicleGallery({ images, vehicleName }: VehicleGalleryProps) {
       {/* ======================= */}
       {/* VERSIÓN MÓVIL (< md) */}
       {/* ======================= */}
-      <div className="md:hidden bg-white rounded-xl shadow-lg overflow-hidden">
-        {/* Contenedor de imagen móvil - ancho fijo al 100% */}
-        <div className="relative w-full bg-gray-900">
+      <div className="md:hidden bg-white rounded-xl shadow-lg overflow-hidden w-full max-w-full">
+        {/* Contenedor de imagen móvil - altura fija, recorte con object-cover */}
+        <div className="relative w-full h-56 sm:h-64 bg-gray-900 overflow-hidden">
           <img
             src={currentImage.image_url}
             alt={currentImage.alt_text || `${vehicleName} - Imagen ${currentIndex + 1}`}
-            className="w-full h-auto block"
-            style={{ maxWidth: '100%', height: 'auto' }}
+            className="w-full h-full object-cover"
           />
 
           {/* Controles móvil */}
