@@ -291,7 +291,7 @@ function NuevaReservaContent() {
           base_price: basePrice,
           extras_price: extrasPrice,
           total_price: totalPrice,
-          deposit_amount: 500, // Default deposit
+          deposit_amount: 1000, // Fianza estándar
           status: 'pending',
           payment_status: 'pending',
           // Snapshot de datos del cliente para histórico

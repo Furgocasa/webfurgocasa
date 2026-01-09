@@ -536,7 +536,7 @@ export default function ReservaPage() {
                   
                   <div className="flex justify-between text-sm">
                     <span className="opacity-90">{t("Fianza")} *</span>
-                    <span className="font-semibold">{booking.deposit_amount.toFixed(2)}€</span>
+                    <span className="font-semibold">1.000,00€</span>
                   </div>
                 </div>
 
@@ -618,9 +618,9 @@ export default function ReservaPage() {
                   {t("Si tienes alguna duda sobre tu reserva, no dudes en contactarnos.")}
                 </p>
                 <div className="space-y-2 text-sm">
-                  <a href="tel:+34968000000" className="flex items-center gap-2 text-furgocasa-blue hover:text-furgocasa-orange">
+                  <a href="tel:+34868364161" className="flex items-center gap-2 text-furgocasa-blue hover:text-furgocasa-orange">
                     <Phone className="h-4 w-4" />
-                    +34 968 000 000
+                    +34 868 364 161
                   </a>
                   <a href="mailto:info@furgocasa.com" className="flex items-center gap-2 text-furgocasa-blue hover:text-furgocasa-orange">
                     <Mail className="h-4 w-4" />
