@@ -23,6 +23,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { bookingId, amount, paymentType = "full" } = body;
 
+    // 🔍 LOG: Verificar datos recibidos
+    console.log("📥 Redsys Initiate - Datos recibidos:", {
+      bookingId,
+      amount,
+      amountType: typeof amount,
+      paymentType,
+    });
+
     // Validaciones
     if (!bookingId) {
       return NextResponse.json(
@@ -32,6 +40,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (!amount || amount <= 0) {
+      console.error("❌ Amount inválido:", amount);
       return NextResponse.json(
         { error: "Cantidad inválida" },
         { status: 400 }
@@ -65,6 +74,15 @@ export async function POST(request: NextRequest) {
 
     // Configuración de Redsys
     const config = getRedsysConfig();
+
+    // 🔍 LOG: Verificar configuración
+    console.log("⚙️ Redsys Config:", {
+      merchantCode: config.merchantCode,
+      terminal: config.terminal,
+      hasSecretKey: !!config.secretKey,
+      urlOk: config.urlOk,
+      notificationUrl: config.notificationUrl,
+    });
 
     // Generar parámetros según el tipo de pago
     let formData;
@@ -100,6 +118,28 @@ export async function POST(request: NextRequest) {
         },
         config
       );
+    }
+
+    // 🔍 LOG: Verificar formData generado
+    console.log("📤 FormData generado:", {
+      hasSignature: !!formData.Ds_Signature,
+      hasParams: !!formData.Ds_MerchantParameters,
+      paramsLength: formData.Ds_MerchantParameters?.length,
+    });
+
+    // Decodificar y mostrar los parámetros para debug
+    try {
+      const decodedParams = JSON.parse(
+        Buffer.from(formData.Ds_MerchantParameters, "base64").toString("utf8")
+      );
+      console.log("🔍 Parámetros decodificados:", {
+        amount: decodedParams.DS_MERCHANT_AMOUNT,
+        order: decodedParams.DS_MERCHANT_ORDER,
+        terminal: decodedParams.DS_MERCHANT_TERMINAL,
+        merchantCode: decodedParams.DS_MERCHANT_MERCHANTCODE,
+      });
+    } catch (e) {
+      console.error("Error decodificando parámetros:", e);
     }
 
     // Registrar el pago en la base de datos como pendiente
