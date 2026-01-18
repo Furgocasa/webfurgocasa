@@ -47,16 +47,19 @@ export function daysBetween(from: Date, to: Date): number {
 
 /**
  * Generate order number for Redsys
- * Format: YYYYMMDDHHmmssXXXX (4-12 alphanumeric)
+ * Format: PPYYYYMMDDHHMM (4-12 alphanumeric, único por minuto + random)
  */
 export function generateOrderNumber(prefix?: string): string {
   const now = new Date();
+  // Formato: YYYYMMDDHHMM + random 2 dígitos
   const timestamp = now.getFullYear().toString() +
     (now.getMonth() + 1).toString().padStart(2, "0") +
     now.getDate().toString().padStart(2, "0") +
-    Date.now().toString().slice(-4);
+    now.getHours().toString().padStart(2, "0") +
+    now.getMinutes().toString().padStart(2, "0") +
+    Math.floor(Math.random() * 100).toString().padStart(2, "0");
   
-  return prefix ? `${prefix}${timestamp}`.slice(0, 12) : timestamp;
+  return prefix ? `${prefix}${timestamp}`.slice(0, 12) : timestamp.slice(0, 12);
 }
 
 /**
