@@ -144,6 +144,29 @@ export default function PagoPage() {
         throw new Error(data.error || 'Error al iniciar el pago');
       }
 
+      // 🔍 LOG: Ver la respuesta del backend
+      console.log('📥 Respuesta del backend:', {
+        success: data.success,
+        redsysUrl: data.redsysUrl,
+        hasFormData: !!data.formData,
+        formDataKeys: data.formData ? Object.keys(data.formData) : [],
+      });
+
+      // 🔍 LOG: Decodificar los parámetros para verificar
+      if (data.formData?.Ds_MerchantParameters) {
+        try {
+          const decoded = JSON.parse(atob(data.formData.Ds_MerchantParameters));
+          console.log('🔍 Parámetros en frontend:', {
+            amount: decoded.DS_MERCHANT_AMOUNT,
+            order: decoded.DS_MERCHANT_ORDER,
+            terminal: decoded.DS_MERCHANT_TERMINAL,
+            merchantCode: decoded.DS_MERCHANT_MERCHANTCODE,
+          });
+        } catch (e) {
+          console.error('Error decodificando parámetros en frontend:', e);
+        }
+      }
+
       // Crear formulario oculto y enviarlo a Redsys
       const form = document.createElement('form');
       form.method = 'POST';
@@ -156,7 +179,15 @@ export default function PagoPage() {
         input.name = key;
         input.value = value as string;
         form.appendChild(input);
+        
+        // 🔍 LOG: Ver qué se está añadiendo al formulario
+        console.log(`📝 Campo añadido: ${key} = ${value?.toString().substring(0, 50)}...`);
       });
+
+      // 🔍 LOG: Ver el formulario completo antes de enviarlo
+      console.log('📤 Enviando formulario a:', form.action);
+      console.log('📤 Método:', form.method);
+      console.log('📤 Número de campos:', form.elements.length);
 
       // Añadir formulario al DOM y enviarlo
       document.body.appendChild(form);
