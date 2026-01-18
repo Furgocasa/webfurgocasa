@@ -40,14 +40,17 @@ export function createSignature(
   secretKey: string,
   orderNumber: string
 ): string {
-  // 1. Derivar clave específica para este pedido
-  const derivedKey = encrypt3DES(orderNumber, secretKey);
+  // 1. Derivar clave específica para este pedido usando 3DES
+  const derivedKeyBase64 = encrypt3DES(orderNumber, secretKey);
+  
+  // 2. Convertir la clave derivada de base64 a Buffer
+  const derivedKeyBuffer = Buffer.from(derivedKeyBase64, "base64");
 
-  // 2. Crear HMAC SHA256 con la clave derivada
-  const hmac = crypto.createHmac("sha256", Buffer.from(derivedKey, "base64"));
+  // 3. Crear HMAC SHA256 con la clave derivada (en bytes, no base64)
+  const hmac = crypto.createHmac("sha256", derivedKeyBuffer);
   hmac.update(merchantParameters);
 
-  // 3. Devolver en base64
+  // 4. Devolver en base64
   return hmac.digest("base64");
 }
 
