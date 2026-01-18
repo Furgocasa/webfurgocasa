@@ -47,19 +47,28 @@ export function daysBetween(from: Date, to: Date): number {
 
 /**
  * Generate order number for Redsys
- * Format: PPYYYYMMDDHHMM (4-12 alphanumeric, único por minuto + random)
+ * Format: 4-12 alphanumeric characters, must be unique
+ * Uses: YYMMDDHHMMSSmmm (year 2 digits + timestamp + milliseconds)
  */
 export function generateOrderNumber(prefix?: string): string {
   const now = new Date();
-  // Formato: YYYYMMDDHHMM + random 2 dígitos
-  const timestamp = now.getFullYear().toString() +
-    (now.getMonth() + 1).toString().padStart(2, "0") +
-    now.getDate().toString().padStart(2, "0") +
-    now.getHours().toString().padStart(2, "0") +
-    now.getMinutes().toString().padStart(2, "0") +
-    Math.floor(Math.random() * 100).toString().padStart(2, "0");
+  const timestamp = 
+    now.getFullYear().toString().slice(-2) + // YY (últimos 2 dígitos del año)
+    (now.getMonth() + 1).toString().padStart(2, "0") + // MM
+    now.getDate().toString().padStart(2, "0") + // DD
+    now.getHours().toString().padStart(2, "0") + // HH
+    now.getMinutes().toString().padStart(2, "0") + // MM
+    now.getSeconds().toString().padStart(2, "0") + // SS
+    now.getMilliseconds().toString().padStart(3, "0").slice(0, 2); // mmm (2 dígitos)
   
-  return prefix ? `${prefix}${timestamp}`.slice(0, 12) : timestamp.slice(0, 12);
+  // Sin prefix: 14 caracteres → cortamos a 12
+  // Con prefix "FC": FC + 10 caracteres del timestamp = 12 total
+  if (prefix) {
+    // Prefix + timestamp, cortado a 12 caracteres total
+    return (prefix + timestamp).slice(0, 12);
+  }
+  
+  return timestamp.slice(0, 12);
 }
 
 /**
