@@ -274,83 +274,67 @@ function NuevaReservaContent() {
       // Step 2: Generate booking number
       const bookingNumber = `FG${Date.now().toString().slice(-8)}`;
 
-      // Step 3: Create booking (incluyendo snapshot de datos del cliente)
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          booking_number: bookingNumber,
-          vehicle_id: vehicle.id,
-          customer_id: customerId,
-          pickup_date: pickupDate,
-          dropoff_date: dropoffDate,
-          pickup_time: pickupTime || '11:00',
-          dropoff_time: dropoffTime || '11:00',
-          pickup_location_id: pickupLocation.id,
-          dropoff_location_id: dropoffLocation.id,
-          days: days,
-          base_price: basePrice,
-          extras_price: extrasPrice,
-          total_price: totalPrice,
-          deposit_amount: 1000, // Fianza estándar
-          status: 'pending',
-          payment_status: 'pending',
-          // Snapshot de datos del cliente para histórico
-          customer_name: customerName,
-          customer_email: customerEmail,
-          customer_phone: customerPhone,
-          customer_dni: customerDni,
-          customer_address: customerAddress,
-          customer_city: customerCity,
-          customer_postal_code: customerPostalCode,
-          notes: notes,
-        })
-        .select()
-        .single();
-
-      if (bookingError) throw bookingError;
-
-      // Step 4: Create booking_extras entries
-      if (selectedExtras.length > 0) {
-        const bookingExtrasData = selectedExtras.map(extra => {
-          const unitPrice = extra.price_per_rental > 0 
-            ? extra.price_per_rental 
-            : extra.price_per_day * days;
-          
-          return {
-            booking_id: booking.id,
-            extra_id: extra.id,
-            quantity: extra.quantity,
-            unit_price: unitPrice,
-            total_price: unitPrice * extra.quantity,
-          };
-        });
-
-        const { error: extrasError } = await supabase
-          .from('booking_extras')
-          .insert(bookingExtrasData);
-
-        if (extrasError) {
-          console.error('Error creating booking extras:', extrasError);
-          // Don't throw error, just log it
-        }
-      }
-
-      // Step 5: Update customer statistics
-      if (existingCustomers && existingCustomers.length > 0) {
-        const { error: statsError } = await supabase
-          .from('customers')
-          .update({
-            total_bookings: (existingCustomers[0].total_bookings || 0) + 1,
-            total_spent: (existingCustomers[0].total_spent || 0) + totalPrice,
-          })
-          .eq('id', customerId);
+      // Step 3: Crear booking desde API (bypasea RLS)
+      const bookingExtrasData = selectedExtras.map(extra => {
+        const unitPrice = extra.price_per_rental > 0 
+          ? extra.price_per_rental 
+          : extra.price_per_day * days;
         
-        if (statsError) {
-          console.error('Error updating customer stats:', statsError);
-        }
+        return {
+          extra_id: extra.id,
+          quantity: extra.quantity,
+          unit_price: unitPrice,
+          total_price: unitPrice * extra.quantity,
+        };
+      });
+
+      const createBookingResponse = await fetch('/api/bookings/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          booking: {
+            booking_number: bookingNumber,
+            vehicle_id: vehicle.id,
+            customer_id: customerId,
+            pickup_date: pickupDate,
+            dropoff_date: dropoffDate,
+            pickup_time: pickupTime || '11:00',
+            dropoff_time: dropoffTime || '11:00',
+            pickup_location_id: pickupLocation.id,
+            dropoff_location_id: dropoffLocation.id,
+            days: days,
+            base_price: basePrice,
+            extras_price: extrasPrice,
+            total_price: totalPrice,
+            deposit_amount: 1000, // Fianza estándar
+            status: 'pending',
+            payment_status: 'pending',
+            // Snapshot de datos del cliente para histórico
+            customer_name: customerName,
+            customer_email: customerEmail,
+            customer_phone: customerPhone,
+            customer_dni: customerDni,
+            customer_address: customerAddress,
+            customer_city: customerCity,
+            customer_postal_code: customerPostalCode,
+            notes: notes,
+          },
+          extras: bookingExtrasData,
+          customerStats: {
+            customer_id: customerId,
+            total_price: totalPrice,
+          },
+        }),
+      });
+
+      if (!createBookingResponse.ok) {
+        const errorData = await createBookingResponse.json();
+        throw new Error(errorData.error || 'Error al crear la reserva');
       }
 
-      // Step 6: Enviar email de confirmación de reserva creada
+      const { booking } = await createBookingResponse.json();
+
+      // Step 4: Enviar email de confirmación de reserva creada
       try {
         await fetch('/api/bookings/send-email', {
           method: 'POST',
