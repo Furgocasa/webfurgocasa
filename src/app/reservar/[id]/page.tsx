@@ -9,7 +9,7 @@ import { formatPrice } from "@/lib/utils";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
-  FileText, Package, Download, Home
+  FileText, Package
 } from "lucide-react";
 import Link from "next/link";
 
@@ -18,49 +18,29 @@ const getCountryName = (countryCode: string | null | undefined): string => {
   if (!countryCode) return '';
   
   const countryMap: Record<string, string> = {
-    'ESP': 'España',
-    'ES': 'España',
-    'ARG': 'Argentina',
-    'AR': 'Argentina',
-    'MEX': 'México',
-    'MX': 'México',
-    'COL': 'Colombia',
-    'CO': 'Colombia',
-    'CHI': 'Chile',
-    'CL': 'Chile',
-    'PER': 'Perú',
-    'PE': 'Perú',
-    'VEN': 'Venezuela',
-    'VE': 'Venezuela',
-    'ECU': 'Ecuador',
-    'EC': 'Ecuador',
-    'URY': 'Uruguay',
-    'UY': 'Uruguay',
-    'PRY': 'Paraguay',
-    'PY': 'Paraguay',
-    'BOL': 'Bolivia',
-    'BO': 'Bolivia',
-    'BRA': 'Brasil',
-    'BR': 'Brasil',
-    'PRT': 'Portugal',
-    'PT': 'Portugal',
-    'FRA': 'Francia',
-    'FR': 'Francia',
-    'ITA': 'Italia',
-    'IT': 'Italia',
-    'DEU': 'Alemania',
-    'DE': 'Alemania',
-    'GBR': 'Reino Unido',
-    'GB': 'Reino Unido',
-    'UK': 'Reino Unido',
-    'USA': 'Estados Unidos',
-    'US': 'Estados Unidos',
-    'CAN': 'Canadá',
-    'CA': 'Canadá',
+    'ESP': 'España', 'ES': 'España',
+    'ARG': 'Argentina', 'AR': 'Argentina',
+    'MEX': 'México', 'MX': 'México',
+    'COL': 'Colombia', 'CO': 'Colombia',
+    'CHI': 'Chile', 'CL': 'Chile',
+    'PER': 'Perú', 'PE': 'Perú',
+    'VEN': 'Venezuela', 'VE': 'Venezuela',
+    'ECU': 'Ecuador', 'EC': 'Ecuador',
+    'URY': 'Uruguay', 'UY': 'Uruguay',
+    'PRY': 'Paraguay', 'PY': 'Paraguay',
+    'BOL': 'Bolivia', 'BO': 'Bolivia',
+    'BRA': 'Brasil', 'BR': 'Brasil',
+    'PRT': 'Portugal', 'PT': 'Portugal',
+    'FRA': 'Francia', 'FR': 'Francia',
+    'ITA': 'Italia', 'IT': 'Italia',
+    'DEU': 'Alemania', 'DE': 'Alemania',
+    'GBR': 'Reino Unido', 'GB': 'Reino Unido', 'UK': 'Reino Unido',
+    'USA': 'Estados Unidos', 'US': 'Estados Unidos',
+    'CAN': 'Canadá', 'CA': 'Canadá',
   };
   
   const upperCode = countryCode.toUpperCase().trim();
-  return countryMap[upperCode] || countryCode; // Si no está en el mapa, devuelve el valor original
+  return countryMap[upperCode] || countryCode;
 };
 
 interface Booking {
@@ -262,6 +242,12 @@ export default function ReservaPage() {
   const daysUntilPickup = Math.ceil((pickupDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
   const secondPaymentDue = daysUntilPickup <= 15; // 15 días antes o menos
 
+  // Separar nombre y apellidos
+  const fullName = booking.customer_name || '';
+  const nameParts = fullName.trim().split(/\s+/);
+  const firstName = nameParts[0] || '';
+  const lastName = nameParts.slice(1).join(' ') || '';
+
   return (
     <>
       <Header />
@@ -432,21 +418,6 @@ export default function ReservaPage() {
             </div>
           )}
 
-          {/* Confirmada (mensaje estándar si no aplica sistema de pagos) */}
-          {booking.status === 'confirmed' && booking.payment_status === 'paid' && amountPaid >= totalPrice && (
-            <div className="bg-green-50 border border-green-200 rounded-2xl p-6 mb-6">
-              <div className="flex items-start gap-4">
-                <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900 mb-2">{t("¡Tu reserva está confirmada!")}</h3>
-                  <p className="text-gray-600">
-                    {t("Hemos enviado la confirmación a tu email. No olvides traer tu DNI/NIE y el carnet de conducir el día de la recogida.")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Content - Izquierda */}
             <div className="lg:col-span-2 space-y-6">
@@ -484,29 +455,18 @@ export default function ReservaPage() {
                 
                 <div className="space-y-3">
                   {/* Nombre y Apellidos */}
-                  {(() => {
-                    const fullName = booking.customer_name || '';
-                    const nameParts = fullName.trim().split(/\s+/);
-                    const firstName = nameParts[0] || '';
-                    const lastName = nameParts.slice(1).join(' ') || '';
-                    
-                    return (
-                      <>
-                        {firstName && (
-                          <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
-                            <p className="text-sm text-gray-600 font-medium">{t("Nombre del conductor principal")}:</p>
-                            <p className="text-gray-900">{firstName}</p>
-                          </div>
-                        )}
-                        {lastName && (
-                          <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
-                            <p className="text-sm text-gray-600 font-medium">{t("Apellidos del conductor principal")}:</p>
-                            <p className="text-gray-900">{lastName}</p>
-                          </div>
-                        )}
-                      </>
-                    );
-                  })()}
+                  {firstName && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Nombre del conductor principal")}:</p>
+                      <p className="text-gray-900">{firstName}</p>
+                    </div>
+                  )}
+                  {lastName && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Apellidos del conductor principal")}:</p>
+                      <p className="text-gray-900">{lastName}</p>
+                    </div>
+                  )}
 
                   {/* DNI - ID nº */}
                   {booking.customer_dni && (
@@ -711,17 +671,6 @@ export default function ReservaPage() {
                   </div>
                 </div>
               )}
-
-              {/* Customer Notes */}
-              {booking.notes && (
-                <div className="bg-white rounded-2xl shadow-sm p-6">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                    <FileText className="h-6 w-6 text-furgocasa-blue" />
-                    {t("Tus notas")}
-                  </h2>
-                  <p className="text-gray-700">{booking.notes}</p>
-                </div>
-              )}
             </div>
 
             {/* Sidebar - Derecha */}
@@ -834,7 +783,7 @@ export default function ReservaPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t("Email")}</p>
-                  <a href="mailto:info@furgocasa.com?subject=Solicitud de modificación/cancelación - Reserva ${booking.booking_number}" 
+                  <a href={`mailto:info@furgocasa.com?subject=Solicitud de modificación/cancelación - Reserva ${booking.booking_number}`}
                      className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 min-w-0 text-sm sm:text-base">
                     <Mail className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                     <span className="break-all">info@furgocasa.com</span>
@@ -852,7 +801,8 @@ export default function ReservaPage() {
               <div className="pt-4 border-t border-gray-200">
                 <p className="text-xs text-gray-500">
                   {t("Asegúrate de incluir tu número de reserva")} ({booking.booking_number}) {t("en tu mensaje para que podamos ayudarte más rápidamente.")}<br/>
-                  {t("Consulta nuestra")} <Link href="/tarifas" className="text-furgocasa-blue hover:underline">{t("política de cancelación")}</Link> {t("para más información.")}</p>
+                  {t("Consulta nuestra")} <Link href="/tarifas" className="text-furgocasa-blue hover:underline">{t("política de cancelación")}</Link> {t("para más información.")}
+                </p>
               </div>
             </div>
           </div>
@@ -863,4 +813,3 @@ export default function ReservaPage() {
     </>
   );
 }
-
