@@ -100,14 +100,18 @@ export async function POST(request: NextRequest) {
             const newAmountPaid = (booking.amount_paid || 0) + payment.amount;
             const isFullyPaid = newAmountPaid >= booking.total_price;
 
-            await supabase
+            const { error: bookingUpdateError } = await supabase
               .from("bookings")
               .update({
                 amount_paid: newAmountPaid,
                 payment_status: isFullyPaid ? "paid" : "partial",
-                status: isFullyPaid ? "confirmed" : booking.total_price > 0 ? "pending_payment" : "confirmed",
+                status: "confirmed",
               })
               .eq("id", payment.booking_id);
+
+            if (bookingUpdateError) {
+              console.error("❌ Error actualizando reserva:", bookingUpdateError);
+            }
 
             console.log("✅ Reserva actualizada:", {
               bookingId: payment.booking_id,

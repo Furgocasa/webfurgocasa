@@ -40,12 +40,14 @@ function PagoCanceladoContent() {
               </Link>
             )}
 
-            <Link
-              href="/mis-reservas"
-              className="w-full inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-            >
-              Ver mis reservas
-            </Link>
+            {bookingId && (
+              <Link
+                href={`/reservar/${bookingId}`}
+                className="w-full inline-flex items-center justify-center px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+              >
+                Ver mi reserva
+              </Link>
+            )}
 
             <Link
               href="/"
