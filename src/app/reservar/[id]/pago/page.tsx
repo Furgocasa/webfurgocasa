@@ -97,8 +97,8 @@ export default function PagoPage() {
     // Si no se ha pagado nada, primer pago es 50%
     if (amountPaid === 0) {
       return {
-        firstPayment: Math.ceil(total * 0.5), // 50% redondeado hacia arriba
-        secondPayment: Math.floor(total * 0.5), // Resto
+        firstPayment: total * 0.5, // 50% exacto (con decimales)
+        secondPayment: total * 0.5, // 50% exacto (con decimales)
         isPending50: false,
       };
     }
