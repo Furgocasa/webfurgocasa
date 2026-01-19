@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // ⚠️ Deshabilitar React Strict Mode temporalmente para evitar AbortErrors
+  // React 18 Strict Mode desmonta y remonta componentes en desarrollo
+  // causando que Supabase cancele peticiones
+  reactStrictMode: false,
+  
   // Ignorar errores de TypeScript durante el build para permitir despliegue
   // TODO: Arreglar los tipos gradualmente y quitar esta opción
   typescript: {
