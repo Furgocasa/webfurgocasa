@@ -216,20 +216,28 @@ async function migrateData() {
   const oldCustomerIdMap = new Map<number, OldCustomer>();
   customersData.forEach(c => oldCustomerIdMap.set(c.id, c));
   
-  const customersToInsert = customersData.map(customer => ({
-    email: customer.email || `cliente${customer.id}@legacy.furgocasa.com`,
-    name: `${customer.first_name} ${customer.last_name}`.trim().substring(0, 100),
-    phone: customer.phone ? String(customer.phone).substring(0, 20) : null,
-    dni: customer.docnum ? String(customer.docnum).substring(0, 20) : null,
-    address: customer.address ? String(customer.address).substring(0, 200) : null,
-    city: customer.city ? String(customer.city).substring(0, 100) : null,
-    postal_code: customer.zip ? String(customer.zip).substring(0, 10) : null,
-    country: customer.country || 'ESP',
-    date_of_birth: customer.bdate ? getDateFromUnix(customer.bdate) : null,
-    notes: customer.notes ? String(customer.notes).substring(0, 500) : null,
-    total_bookings: 0,
-    total_spent: 0,
-  }));
+  const customersToInsert = customersData.map(customer => {
+    // Los datos de la BD antigua están mal estructurados:
+    // - address y city son IDs numéricos (no texto)
+    // - zip a veces tiene la dirección pero no el código postal
+    // - docnum también parece ser un ID numérico
+    // Solo usamos los campos que tienen sentido: nombre, email, teléfono, país
+    
+    return {
+      email: customer.email || `cliente${customer.id}@legacy.furgocasa.com`,
+      name: `${customer.first_name} ${customer.last_name}`.trim().substring(0, 100),
+      phone: customer.phone ? String(customer.phone).substring(0, 20) : null,
+      dni: null, // docnum no es DNI, es un código numérico sin sentido
+      address: null, // address es un ID numérico, no una dirección
+      city: null, // city es 0 o un ID, no un nombre de ciudad
+      postal_code: null, // zip a veces tiene dirección completa, no código postal
+      country: customer.country || 'ESP',
+      date_of_birth: null, // bdate tiene "M"/"F" (género), no fecha de nacimiento
+      notes: customer.notes ? String(customer.notes).substring(0, 500) : null,
+      total_bookings: 0,
+      total_spent: 0,
+    };
+  });
 
   // Insertar clientes en lotes de 100 (usando upsert para evitar duplicados)
   let customersInserted = 0;
