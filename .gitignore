@@ -54,3 +54,7 @@ SUPABASE_CREDENTIALS.txt
 
 # Nota: Las imágenes de /public/images/ SÍ se incluyen en el repo
 # Los vehículos y contenido dinámico usan Supabase Storage
+
+# Archivos de migración de datos antiguos (demasiado grandes)
+OLD_FURGOCASA_DATOS/*-mysql*
+OLD_FURGOCASA_DATOS/orders-raw*.txt
