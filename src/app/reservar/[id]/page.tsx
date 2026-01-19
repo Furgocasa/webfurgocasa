@@ -5,7 +5,6 @@ import { useLanguage } from "@/contexts/language-context";
 import { useRouter, useParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { supabase } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
@@ -119,32 +118,16 @@ export default function ReservaPage() {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          vehicle:vehicles(
-            id, 
-            name, 
-            brand, 
-            model,
-            images:vehicle_images(image_url, is_primary, sort_order)
-          ),
-          pickup_location:locations!pickup_location_id(name, address),
-          dropoff_location:locations!dropoff_location_id(name, address),
-          booking_extras(
-            id,
-            quantity,
-            unit_price,
-            total_price,
-            extra:extras(name, description)
-          )
-        `)
-        .eq('id', bookingId)
-        .single();
+      const response = await fetch(`/api/bookings/${bookingId}`);
+      const payload = await response.json();
 
-      if (error) throw error;
-      
+      if (!response.ok) {
+        setError(payload?.error || 'Error al cargar la reserva');
+        return;
+      }
+
+      const data = payload?.booking;
+
       if (!data) {
         setError('Reserva no encontrada');
         return;

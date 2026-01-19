@@ -5,7 +5,6 @@ import { useLanguage } from "@/contexts/language-context";
 import { useRouter, useParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { supabase } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
 import { 
   ArrowLeft, CreditCard, CheckCircle, AlertCircle, 
@@ -63,19 +62,16 @@ export default function PagoPage() {
     try {
       setLoading(true);
       
-      const { data, error } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          vehicle:vehicles(name, brand, model),
-          pickup_location:locations!pickup_location_id(name),
-          dropoff_location:locations!dropoff_location_id(name)
-        `)
-        .eq('id', bookingId)
-        .single();
+      const response = await fetch(`/api/bookings/${bookingId}`);
+      const payload = await response.json();
 
-      if (error) throw error;
-      
+      if (!response.ok) {
+        setError(payload?.error || 'Error al cargar la reserva');
+        return;
+      }
+
+      const data = payload?.booking;
+
       if (!data) {
         setError('Reserva no encontrada');
         return;
