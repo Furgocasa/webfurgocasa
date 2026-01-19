@@ -211,7 +211,7 @@ export default function ExtrasPage() {
     extra.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const activeCount = extras.filter(e => e.is_active).length;
+  const activeCount = (extras || []).filter(e => e.is_active).length;
 
   return (
     <div className="space-y-6">
@@ -243,7 +243,7 @@ export default function ExtrasPage() {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Total extras</p>
-          <p className="text-2xl font-bold text-gray-900">{extras.length}</p>
+          <p className="text-2xl font-bold text-gray-900">{(extras || []).length}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Activos</p>
@@ -251,7 +251,7 @@ export default function ExtrasPage() {
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Inactivos</p>
-          <p className="text-2xl font-bold text-gray-400">{extras.length - activeCount}</p>
+          <p className="text-2xl font-bold text-gray-400">{(extras || []).length - activeCount}</p>
         </div>
       </div>
 
