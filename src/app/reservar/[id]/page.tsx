@@ -23,6 +23,8 @@ interface Booking {
   days: number;
   base_price: number;
   extras_price: number;
+  location_fee: number;
+  discount: number;
   total_price: number;
   deposit_amount: number;
   amount_paid: number;
@@ -31,6 +33,10 @@ interface Booking {
   customer_name: string;
   customer_email: string;
   customer_phone: string;
+  customer_dni: string | null;
+  customer_address: string | null;
+  customer_city: string | null;
+  customer_postal_code: string | null;
   notes: string;
   created_at: string;
   vehicle: {
@@ -223,6 +229,9 @@ export default function ReservaPage() {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {t("Reserva")} {booking.booking_number}
               </h1>
+              <p className="text-sm text-gray-500 mb-3">
+                {t("Número de confirmación")}: {booking.id.substring(0, 13)}-{new Date(booking.created_at).getTime()}
+              </p>
               <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${statusInfo.bg} ${statusInfo.text} font-semibold mb-3`}>
                 {statusInfo.label}
               </div>
@@ -525,6 +534,20 @@ export default function ReservaPage() {
                       <span className="font-semibold">{formatPrice(booking.extras_price)}</span>
                     </div>
                   )}
+
+                  {booking.location_fee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="opacity-90">{t("Comisión de entrega/recogida")}</span>
+                      <span className="font-semibold">{formatPrice(booking.location_fee)}</span>
+                    </div>
+                  )}
+
+                  {booking.discount > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="opacity-90">{t("Descuento")}</span>
+                      <span className="font-semibold text-green-300">- {formatPrice(booking.discount)}</span>
+                    </div>
+                  )}
                   
                   <div className="flex justify-between text-sm">
                     <span className="opacity-90">{t("Fianza")} *</span>
@@ -581,9 +604,16 @@ export default function ReservaPage() {
                 
                 <div className="space-y-3">
                   <div>
-                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Nombre")}</p>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Nombre completo")}</p>
                     <p className="text-gray-900 font-medium">{booking.customer_name}</p>
                   </div>
+
+                  {booking.customer_dni && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("DNI / ID")}</p>
+                      <p className="text-gray-900 font-medium">{booking.customer_dni}</p>
+                    </div>
+                  )}
 
                   <div>
                     <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Email")}</p>
@@ -600,6 +630,19 @@ export default function ReservaPage() {
                       {booking.customer_phone}
                     </a>
                   </div>
+
+                  {booking.customer_address && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Dirección")}</p>
+                      <p className="text-gray-900">{booking.customer_address}</p>
+                      {(booking.customer_postal_code || booking.customer_city) && (
+                        <p className="text-gray-600 text-sm mt-1">
+                          {booking.customer_postal_code && `${booking.customer_postal_code} `}
+                          {booking.customer_city}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -619,6 +662,40 @@ export default function ReservaPage() {
                     info@furgocasa.com
                   </a>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Formulario de cancelación/modificación */}
+          <div className="mt-8 bg-gray-50 border border-gray-200 rounded-2xl p-6">
+            <h2 className="text-xl font-bold text-gray-900 mb-4">{t("Solicitud de cancelación / modificación")}</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              {t("Si deseas cancelar o modificar tu reserva, por favor contáctanos directamente. Te responderemos lo antes posible.")}
+            </p>
+            
+            <div className="bg-white rounded-xl p-6 space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-1">{t("Email")}</p>
+                  <a href="mailto:info@furgocasa.com?subject=Solicitud de modificación/cancelación - Reserva ${booking.booking_number}" 
+                     className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                    <Mail className="h-5 w-5" />
+                    info@furgocasa.com
+                  </a>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-1">{t("Teléfono")}</p>
+                  <a href="tel:+34868364161" className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                    <Phone className="h-5 w-5" />
+                    +34 868 364 161
+                  </a>
+                </div>
+              </div>
+              
+              <div className="pt-4 border-t border-gray-200">
+                <p className="text-xs text-gray-500">
+                  {t("Asegúrate de incluir tu número de reserva")} ({booking.booking_number}) {t("en tu mensaje para que podamos ayudarte más rápidamente.")}<br/>
+                  {t("Consulta nuestra")} <Link href="/tarifas" className="text-furgocasa-blue hover:underline">{t("política de cancelación")}</Link> {t("para más información.")}</p>
               </div>
             </div>
           </div>
