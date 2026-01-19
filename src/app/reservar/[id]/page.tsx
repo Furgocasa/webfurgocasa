@@ -39,6 +39,13 @@ interface Booking {
   customer_postal_code: string | null;
   notes: string;
   created_at: string;
+  customer?: {
+    id: string;
+    date_of_birth: string | null;
+    country: string | null;
+    driver_license: string | null;
+    driver_license_expiry: string | null;
+  } | null;
   vehicle: {
     id: string;
     name: string;
@@ -615,6 +622,13 @@ export default function ReservaPage() {
                     </div>
                   )}
 
+                  {booking.customer?.date_of_birth && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Fecha de nacimiento")}</p>
+                      <p className="text-gray-900">{new Date(booking.customer.date_of_birth).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    </div>
+                  )}
+
                   <div>
                     <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Email")}</p>
                     <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm">
@@ -639,6 +653,21 @@ export default function ReservaPage() {
                         <p className="text-gray-600 text-sm mt-1">
                           {booking.customer_postal_code && `${booking.customer_postal_code} `}
                           {booking.customer_city}
+                        </p>
+                      )}
+                      {booking.customer?.country && (
+                        <p className="text-gray-600 text-sm">{booking.customer.country}</p>
+                      )}
+                    </div>
+                  )}
+
+                  {booking.customer?.driver_license && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Carnet de conducir")}</p>
+                      <p className="text-gray-900">{booking.customer.driver_license}</p>
+                      {booking.customer.driver_license_expiry && (
+                        <p className="text-gray-600 text-sm mt-1">
+                          {t("Caducidad")}: {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </p>
                       )}
                     </div>

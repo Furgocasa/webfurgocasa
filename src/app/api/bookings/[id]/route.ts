@@ -22,6 +22,13 @@ export async function GET(
       .select(
         `
         *,
+        customer:customers(
+          id,
+          date_of_birth,
+          country,
+          driver_license,
+          driver_license_expiry
+        ),
         vehicle:vehicles(
           id, 
           name, 
