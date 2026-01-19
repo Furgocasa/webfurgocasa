@@ -441,13 +441,13 @@ export default function ReservaPage() {
                     )}
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 text-xl">{booking.vehicle.name}</p>
+                    <p className="font-bold text-gray-900 text-xl">
+                      {booking.vehicle.internal_code && (
+                        <span className="text-furgocasa-orange">{booking.vehicle.internal_code} - </span>
+                      )}
+                      {booking.vehicle.name}
+                    </p>
                     <p className="text-gray-600">{booking.vehicle.brand} · {booking.vehicle.model}</p>
-                    {booking.vehicle.internal_code && (
-                      <p className="text-sm text-furgocasa-orange font-bold mt-1">
-                        {t("Código interno")}: {booking.vehicle.internal_code}
-                      </p>
-                    )}
                   </div>
                 </div>
               </div>
