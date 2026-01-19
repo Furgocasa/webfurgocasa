@@ -273,27 +273,29 @@ export default function ReservaPage() {
 
           {/* Primer pago realizado - Esperando segundo pago */}
           {booking.status === 'confirmed' && amountPaid >= firstPayment && amountPaid < totalPrice && (
-            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-6">
+            <div className={`rounded-2xl p-6 mb-6 ${secondPaymentDue ? 'bg-red-50 border border-red-200' : 'bg-blue-50 border border-blue-200'}`}>
               <div className="flex items-start gap-4">
                 {secondPaymentDue ? (
-                  <AlertCircle className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-1" />
                 ) : (
                   <CheckCircle className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
                 )}
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-900 mb-2">
                     {secondPaymentDue ? (
-                      t("Segundo pago disponible")
+                      t("⚠️ Segundo pago urgente")
                     ) : (
                       t("Primer pago completado ✓")
                     )}
                   </h3>
                   <p className="text-gray-600 mb-2">
                     {secondPaymentDue ? (
-                      t("Ya estamos a menos de 15 días del inicio. Es momento de completar el pago.")
+                      <>
+                        <strong className="text-red-700">{t("¡Atención!")}</strong> {t("Faltan")} {daysUntilPickup} {t("días para el inicio del alquiler. El segundo pago debe realizarse como máximo 15 días antes.")}
+                      </>
                     ) : (
                       <>
-                        {t("Has pagado")} {formatPrice(amountPaid)}. {t("El segundo pago")} ({formatPrice(secondPayment)}) {t("se debe realizar máximo 15 días antes del inicio")} ({pickupDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}).
+                        {t("Has pagado")} {formatPrice(amountPaid)}. {t("Puedes realizar el segundo pago cuando quieras. Debe completarse como máximo 15 días antes del inicio")} ({pickupDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}).
                       </>
                     )}
                   </p>
@@ -313,20 +315,26 @@ export default function ReservaPage() {
                       </div>
                     </div>
                   </div>
-                  {secondPaymentDue && (
-                    <button
-                      onClick={() => router.push(`/reservar/${bookingId}/pago?amount=${pendingAmount.toFixed(2)}`)}
-                      className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center gap-2"
-                    >
-                      <CreditCard className="h-5 w-5" />
-                      {t("Completar pago")} ({formatPrice(pendingAmount)})
-                    </button>
-                  )}
-                  {!secondPaymentDue && daysUntilPickup > 15 && (
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                  
+                  {/* Botón siempre visible */}
+                  <button
+                    onClick={() => router.push(`/reservar/${bookingId}/pago?amount=${pendingAmount.toFixed(2)}`)}
+                    className={`font-semibold py-3 px-6 rounded-lg transition-colors inline-flex items-center gap-2 ${
+                      secondPaymentDue 
+                        ? 'bg-red-600 text-white hover:bg-red-700' 
+                        : 'bg-furgocasa-orange text-white hover:bg-orange-600'
+                    }`}
+                  >
+                    <CreditCard className="h-5 w-5" />
+                    {secondPaymentDue ? t("Pagar ahora") : t("Realizar segundo pago")} ({formatPrice(pendingAmount)})
+                  </button>
+
+                  {/* Aviso informativo si hay tiempo */}
+                  {!secondPaymentDue && (
+                    <p className="mt-3 text-sm text-gray-600 flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      {t("El segundo pago estará disponible en")} {daysUntilPickup - 15} {t("días")}
-                    </div>
+                      {t("Recuerda completar el pago antes del")} {new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })} ({daysUntilPickup - 15} {t("días restantes")})
+                    </p>
                   )}
                 </div>
               </div>
