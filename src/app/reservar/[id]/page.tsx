@@ -81,6 +81,7 @@ interface Booking {
     name: string;
     brand: string;
     model: string;
+    internal_code?: string;
     main_image?: string;
   };
   pickup_location: {
@@ -442,6 +443,11 @@ export default function ReservaPage() {
                   <div>
                     <p className="font-bold text-gray-900 text-xl">{booking.vehicle.name}</p>
                     <p className="text-gray-600">{booking.vehicle.brand} · {booking.vehicle.model}</p>
+                    {booking.vehicle.internal_code && (
+                      <p className="text-sm text-furgocasa-orange font-bold mt-1">
+                        {t("Código interno")}: {booking.vehicle.internal_code}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

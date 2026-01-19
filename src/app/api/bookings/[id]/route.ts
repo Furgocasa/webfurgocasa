@@ -34,6 +34,7 @@ export async function GET(
           name, 
           brand, 
           model,
+          internal_code,
           images:vehicle_images(image_url, is_primary, sort_order)
         ),
         pickup_location:locations!pickup_location_id(name, address),
