@@ -1,22 +1,32 @@
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY no está configurado");
+// Hacer que la clave sea opcional durante el build
+const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+
+if (!stripeSecretKey && process.env.NODE_ENV !== 'production') {
+  console.warn("⚠️ STRIPE_SECRET_KEY no está configurado. Stripe no funcionará.");
 }
 
 /**
  * Cliente de Stripe para operaciones del servidor
+ * Se crea solo si la clave está disponible
  */
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2024-12-18.acacia",
-  typescript: true,
-});
+export const stripe = stripeSecretKey
+  ? new Stripe(stripeSecretKey, {
+      apiVersion: "2024-12-18.acacia",
+      typescript: true,
+    })
+  : null;
 
 /**
  * Configuración de Stripe
  */
 export function getStripeConfig() {
   const baseUrl = process.env.NEXT_PUBLIC_URL || "http://localhost:3000";
+
+  if (!process.env.STRIPE_SECRET_KEY) {
+    throw new Error("STRIPE_SECRET_KEY no está configurado");
+  }
 
   return {
     publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
@@ -38,6 +48,10 @@ export async function createCheckoutSession(params: {
   description: string;
   paymentType: "deposit" | "full";
 }) {
+  if (!stripe) {
+    throw new Error("Stripe no está configurado. Verifica STRIPE_SECRET_KEY.");
+  }
+
   const config = getStripeConfig();
   const { amount, bookingId, bookingNumber, customerEmail, description, paymentType } = params;
 
@@ -84,6 +98,10 @@ export async function createCheckoutSession(params: {
  * Verifica la firma del webhook de Stripe
  */
 export function constructWebhookEvent(payload: string | Buffer, signature: string) {
+  if (!stripe) {
+    throw new Error("Stripe no está configurado. Verifica STRIPE_SECRET_KEY.");
+  }
+  
   const config = getStripeConfig();
   return stripe.webhooks.constructEvent(payload, signature, config.webhookSecret);
 }
@@ -92,6 +110,10 @@ export function constructWebhookEvent(payload: string | Buffer, signature: strin
  * Obtiene los detalles de una sesión de Checkout
  */
 export async function getCheckoutSession(sessionId: string) {
+  if (!stripe) {
+    throw new Error("Stripe no está configurado. Verifica STRIPE_SECRET_KEY.");
+  }
+  
   return await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ["payment_intent"],
   });
@@ -101,6 +123,9 @@ export async function getCheckoutSession(sessionId: string) {
  * Crea un reembolso
  */
 export async function createRefund(paymentIntentId: string, amount?: number) {
+  if (!stripe) {
+    throw new Error("Stripe no está configurado. Verifica STRIPE_SECRET_KEY.");
+  }
   const refundParams: Stripe.RefundCreateParams = {
     payment_intent: paymentIntentId,
   };

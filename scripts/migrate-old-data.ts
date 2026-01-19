@@ -514,13 +514,32 @@ async function migrateData() {
     };
   });
 
+  // Verificar que no haya duplicados antes de insertar
+  console.log('\n🔍 Verificando duplicados...');
+  const { data: existingBookings } = await supabase
+    .from('bookings')
+    .select('customer_email, pickup_date, vehicle_id');
+  
+  const existingSet = new Set(
+    existingBookings?.map(b => `${b.customer_email}-${b.pickup_date}-${b.vehicle_id}`) || []
+  );
+  
+  const bookingsToInsertFiltered = bookingsToInsert.filter(b => {
+    const key = `${b.customer_email}-${b.pickup_date}-${b.vehicle_id}`;
+    return !existingSet.has(key);
+  });
+  
+  console.log(`   ${bookingsToInsert.length} reservas a procesar`);
+  console.log(`   ${bookingsToInsertFiltered.length} son nuevas (sin duplicados)`);
+  console.log(`   ${bookingsToInsert.length - bookingsToInsertFiltered.length} ya existen (saltadas)\n`);
+
   // Insertar reservas en lotes
   let bookingsInserted = 0;
   let bookingsWithCustomer = 0;
   let bookingsWithoutCustomer = 0;
   
-  for (let i = 0; i < bookingsToInsert.length; i += batchSize) {
-    const batch = bookingsToInsert.slice(i, i + batchSize);
+  for (let i = 0; i < bookingsToInsertFiltered.length; i += batchSize) {
+    const batch = bookingsToInsertFiltered.slice(i, i + batchSize);
     const { data, error } = await supabase
       .from('bookings')
       .insert(batch)
@@ -535,7 +554,7 @@ async function migrateData() {
       const withCustomer = batch.filter(b => b.customer_id !== null).length;
       bookingsWithCustomer += withCustomer;
       bookingsWithoutCustomer += batch.length - withCustomer;
-      console.log(`   ✓ Lote ${Math.floor(i / batchSize) + 1} completado (${bookingsInserted}/${bookingsToInsert.length})`);
+      console.log(`   ✓ Lote ${Math.floor(i / batchSize) + 1} completado (${bookingsInserted}/${bookingsToInsertFiltered.length})`);
     }
   }
 
