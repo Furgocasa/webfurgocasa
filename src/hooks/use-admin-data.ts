@@ -26,16 +26,15 @@ export function useAdminData<T = any>({
   queryFn,
   dependencies = [],
   enabled = true,
-  retryCount = 3,
-  retryDelay = 1000,
-  initialDelay = 200,
+  retryCount = 2, // Reducido a 2 reintentos
+  retryDelay = 500, // Reducido a 500ms
+  initialDelay = 0, // Sin delay inicial
 }: UseAdminDataOptions<T>): UseAdminDataResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [attemptCount, setAttemptCount] = useState(0);
 
-  const loadData = async (isRetry = false) => {
+  const loadData = async (isRetry = false, currentAttempt = 0) => {
     if (!enabled) {
       setLoading(false);
       return;
@@ -47,7 +46,7 @@ export function useAdminData<T = any>({
         setError(null);
       }
 
-      console.log(`[useAdminData] ${isRetry ? 'Retry' : 'Loading'} data... (attempt ${attemptCount + 1}/${retryCount + 1})`);
+      console.log(`[useAdminData] ${isRetry ? 'Retry' : 'Loading'} data... (attempt ${currentAttempt + 1}/${retryCount})`);
 
       // Verificar que Supabase está listo
       if (!supabase) {
@@ -63,52 +62,48 @@ export function useAdminData<T = any>({
 
       console.log('[useAdminData] Data loaded successfully');
       setData(result.data);
-      setAttemptCount(0); // Reset attempt count on success
+      setLoading(false);
     } catch (err: any) {
-      // Manejo especial para AbortError
-      const isAbortError = err.name === 'AbortError' || 
-                          err.message?.includes('AbortError') || 
-                          err.message?.includes('signal is aborted');
+      console.error('[useAdminData] Error loading data:', {
+        message: err.message,
+        code: err.code,
+        name: err.name,
+      });
       
-      if (isAbortError) {
-        console.warn('[useAdminData] AbortError detected - request was cancelled, retrying...');
-      } else {
-        console.error('[useAdminData] Error:', err);
-      }
+      const errorMsg = err.message || 'Error al cargar datos';
       
-      setError(err.message || 'Error al cargar datos');
-
-      // Retry automático si no hemos alcanzado el límite (máximo retryCount intentos)
-      if (attemptCount < retryCount) {
-        const delay = retryDelay * (attemptCount + 1); // Backoff exponencial
-        console.log(`[useAdminData] Retrying in ${delay}ms... (attempt ${attemptCount + 1}/${retryCount}, ${isAbortError ? 'AbortError' : 'normal error'})`);
-        setAttemptCount(prev => prev + 1);
+      // Solo reintentar AbortError y errores de red, NO otros errores
+      const shouldRetry = (
+        err.name === 'AbortError' || 
+        err.message?.includes('network') ||
+        err.message?.includes('timeout')
+      ) && currentAttempt < retryCount - 1;
+      
+      if (shouldRetry) {
+        const delay = retryDelay;
+        console.log(`[useAdminData] Network error, retrying in ${delay}ms... (attempt ${currentAttempt + 1}/${retryCount})`);
         
         setTimeout(() => {
-          loadData(true);
+          loadData(true, currentAttempt + 1);
         }, delay);
       } else {
-        console.error(`[useAdminData] Max retry attempts reached (${retryCount}/${retryCount})`);
-        setLoading(false);
-      }
-    } finally {
-      if (!isRetry) {
+        // Error final
+        if (currentAttempt > 0) {
+          console.error(`[useAdminData] Max retry attempts reached`);
+        }
+        setError(errorMsg);
         setLoading(false);
       }
     }
   };
 
   useEffect(() => {
-    // Delay inicial para asegurar que todo esté inicializado
-    const timer = setTimeout(() => {
+    if (enabled) {
       loadData();
-    }, initialDelay);
-
-    return () => clearTimeout(timer);
+    }
   }, [...dependencies]);
 
   const refetch = () => {
-    setAttemptCount(0);
     loadData();
   };
 
