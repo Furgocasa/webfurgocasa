@@ -611,15 +611,34 @@ function NuevaReservaContent() {
                       <label htmlFor="country" className="block text-sm font-medium text-gray-700 mb-2">
                         {t("País")} *
                       </label>
-                      <input
-                        type="text"
+                      <select
                         id="country"
                         required
                         value={customerCountry}
                         onChange={(e) => setCustomerCountry(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
-                        placeholder="España"
-                      />
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent bg-white"
+                      >
+                        <option value="España">España</option>
+                        <option value="Argentina">Argentina</option>
+                        <option value="México">México</option>
+                        <option value="Colombia">Colombia</option>
+                        <option value="Chile">Chile</option>
+                        <option value="Perú">Perú</option>
+                        <option value="Venezuela">Venezuela</option>
+                        <option value="Ecuador">Ecuador</option>
+                        <option value="Uruguay">Uruguay</option>
+                        <option value="Paraguay">Paraguay</option>
+                        <option value="Bolivia">Bolivia</option>
+                        <option value="Brasil">Brasil</option>
+                        <option value="Portugal">Portugal</option>
+                        <option value="Francia">Francia</option>
+                        <option value="Italia">Italia</option>
+                        <option value="Alemania">Alemania</option>
+                        <option value="Reino Unido">Reino Unido</option>
+                        <option value="Estados Unidos">Estados Unidos</option>
+                        <option value="Canadá">Canadá</option>
+                        <option value="Otro">Otro</option>
+                      </select>
                     </div>
                   </div>
 

@@ -13,6 +13,56 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+// Función para normalizar códigos de país a nombres completos
+const getCountryName = (countryCode: string | null | undefined): string => {
+  if (!countryCode) return '';
+  
+  const countryMap: Record<string, string> = {
+    'ESP': 'España',
+    'ES': 'España',
+    'ARG': 'Argentina',
+    'AR': 'Argentina',
+    'MEX': 'México',
+    'MX': 'México',
+    'COL': 'Colombia',
+    'CO': 'Colombia',
+    'CHI': 'Chile',
+    'CL': 'Chile',
+    'PER': 'Perú',
+    'PE': 'Perú',
+    'VEN': 'Venezuela',
+    'VE': 'Venezuela',
+    'ECU': 'Ecuador',
+    'EC': 'Ecuador',
+    'URY': 'Uruguay',
+    'UY': 'Uruguay',
+    'PRY': 'Paraguay',
+    'PY': 'Paraguay',
+    'BOL': 'Bolivia',
+    'BO': 'Bolivia',
+    'BRA': 'Brasil',
+    'BR': 'Brasil',
+    'PRT': 'Portugal',
+    'PT': 'Portugal',
+    'FRA': 'Francia',
+    'FR': 'Francia',
+    'ITA': 'Italia',
+    'IT': 'Italia',
+    'DEU': 'Alemania',
+    'DE': 'Alemania',
+    'GBR': 'Reino Unido',
+    'GB': 'Reino Unido',
+    'UK': 'Reino Unido',
+    'USA': 'Estados Unidos',
+    'US': 'Estados Unidos',
+    'CAN': 'Canadá',
+    'CA': 'Canadá',
+  };
+  
+  const upperCode = countryCode.toUpperCase().trim();
+  return countryMap[upperCode] || countryCode; // Si no está en el mapa, devuelve el valor original
+};
+
 interface Booking {
   id: string;
   booking_number: string;
@@ -490,7 +540,7 @@ export default function ReservaPage() {
                   {booking.customer?.country && (
                     <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("País del conductor principal")}:</p>
-                      <p className="text-gray-900">{booking.customer.country}</p>
+                      <p className="text-gray-900">{getCountryName(booking.customer.country)}</p>
                     </div>
                   )}
 
