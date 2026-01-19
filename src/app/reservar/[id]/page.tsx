@@ -349,7 +349,7 @@ export default function ReservaPage() {
                   {!secondPaymentDue && (
                     <p className="mt-3 text-sm text-gray-600 flex items-center gap-2">
                       <Clock className="h-4 w-4" />
-                      {t("Recuerda completar el pago antes del")} {new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })} ({daysUntilPickup - 15} {t("días restantes")})
+                      {t("Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })})
                     </p>
                   )}
                 </div>
@@ -394,7 +394,7 @@ export default function ReservaPage() {
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Content */}
+            {/* Main Content - Izquierda */}
             <div className="lg:col-span-2 space-y-6">
               {/* Vehicle */}
               <div className="bg-white rounded-2xl shadow-sm p-6">
@@ -421,14 +421,93 @@ export default function ReservaPage() {
                 </div>
               </div>
 
-              {/* Dates & Location */}
+              {/* Tus datos */}
+              <div className="bg-white rounded-2xl shadow-sm p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <User className="h-6 w-6 text-furgocasa-blue" />
+                  {t("Tus datos")}
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Nombre completo")}</p>
+                    <p className="text-gray-900 font-medium">{booking.customer_name}</p>
+                  </div>
+
+                  {booking.customer_dni && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("DNI / ID")}</p>
+                      <p className="text-gray-900 font-medium">{booking.customer_dni}</p>
+                    </div>
+                  )}
+
+                  {booking.customer?.date_of_birth && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Fecha de nacimiento")}</p>
+                      <p className="text-gray-900">{new Date(booking.customer.date_of_birth).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    </div>
+                  )}
+
+                  {booking.customer?.country && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("País")}</p>
+                      <p className="text-gray-900">{booking.customer.country}</p>
+                    </div>
+                  )}
+
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Email")}</p>
+                    <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm">
+                      <Mail className="h-4 w-4" />
+                      {booking.customer_email}
+                    </a>
+                  </div>
+
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Teléfono")}</p>
+                    <a href={`tel:${booking.customer_phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm">
+                      <Phone className="h-4 w-4" />
+                      {booking.customer_phone}
+                    </a>
+                  </div>
+
+                  {booking.customer_address && (
+                    <div className="md:col-span-2">
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Dirección")}</p>
+                      <p className="text-gray-900">{booking.customer_address}</p>
+                      {(booking.customer_postal_code || booking.customer_city) && (
+                        <p className="text-gray-600 text-sm mt-1">
+                          {booking.customer_postal_code && `${booking.customer_postal_code} `}
+                          {booking.customer_city}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {booking.customer?.driver_license && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Carnet de conducir")}</p>
+                      <p className="text-gray-900 font-medium">{booking.customer.driver_license}</p>
+                    </div>
+                  )}
+
+                  {booking.customer?.driver_license_expiry && (
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Caducidad del carnet")}</p>
+                      <p className="text-gray-900">{new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Fechas */}
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <Calendar className="h-6 w-6 text-furgocasa-blue" />
-                  {t("Fechas y ubicación")}
+                  {t("Fechas")}
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <p className="text-sm text-gray-500 uppercase font-medium mb-2">{t("Recogida")}</p>
                     <p className="font-semibold text-gray-900">
@@ -454,8 +533,21 @@ export default function ReservaPage() {
                     </p>
                     <p className="text-sm text-gray-600 mt-1">{booking.dropoff_time}</p>
                   </div>
-                </div>
 
+                  <div className="md:col-span-2 p-4 bg-blue-50 rounded-lg">
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Duración")}</p>
+                    <p className="font-bold text-furgocasa-blue text-xl">{booking.days} {booking.days === 1 ? t("día") : t("días")}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ubicación */}
+              <div className="bg-white rounded-2xl shadow-sm p-6">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <MapPin className="h-6 w-6 text-furgocasa-blue" />
+                  {t("Ubicación")}
+                </h2>
+                
                 <div className="space-y-4">
                   <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
                     <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
@@ -523,7 +615,7 @@ export default function ReservaPage() {
               )}
             </div>
 
-            {/* Sidebar */}
+            {/* Sidebar - Derecha */}
             <div className="space-y-6">
               {/* Price Summary */}
               <div className="bg-gradient-to-br from-furgocasa-orange to-orange-600 text-white rounded-2xl shadow-lg p-6 sticky top-24">
@@ -600,79 +692,6 @@ export default function ReservaPage() {
                 <p className="text-xs opacity-75">
                   * {t("La fianza se devuelve al finalizar el alquiler si no hay daños")}
                 </p>
-              </div>
-
-              {/* Contact Info */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <User className="h-6 w-6 text-furgocasa-blue" />
-                  {t("Tus datos")}
-                </h3>
-                
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Nombre completo")}</p>
-                    <p className="text-gray-900 font-medium">{booking.customer_name}</p>
-                  </div>
-
-                  {booking.customer_dni && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("DNI / ID")}</p>
-                      <p className="text-gray-900 font-medium">{booking.customer_dni}</p>
-                    </div>
-                  )}
-
-                  {booking.customer?.date_of_birth && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Fecha de nacimiento")}</p>
-                      <p className="text-gray-900">{new Date(booking.customer.date_of_birth).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                    </div>
-                  )}
-
-                  <div>
-                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Email")}</p>
-                    <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4" />
-                      {booking.customer_email}
-                    </a>
-                  </div>
-
-                  <div>
-                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Teléfono")}</p>
-                    <a href={`tel:${booking.customer_phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm">
-                      <Phone className="h-4 w-4" />
-                      {booking.customer_phone}
-                    </a>
-                  </div>
-
-                  {booking.customer_address && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Dirección")}</p>
-                      <p className="text-gray-900">{booking.customer_address}</p>
-                      {(booking.customer_postal_code || booking.customer_city) && (
-                        <p className="text-gray-600 text-sm mt-1">
-                          {booking.customer_postal_code && `${booking.customer_postal_code} `}
-                          {booking.customer_city}
-                        </p>
-                      )}
-                      {booking.customer?.country && (
-                        <p className="text-gray-600 text-sm">{booking.customer.country}</p>
-                      )}
-                    </div>
-                  )}
-
-                  {booking.customer?.driver_license && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Carnet de conducir")}</p>
-                      <p className="text-gray-900">{booking.customer.driver_license}</p>
-                      {booking.customer.driver_license_expiry && (
-                        <p className="text-gray-600 text-sm mt-1">
-                          {t("Caducidad")}: {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        </p>
-                      )}
-                    </div>
-                  )}
-                </div>
               </div>
 
               {/* Help */}
