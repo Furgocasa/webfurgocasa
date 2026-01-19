@@ -50,7 +50,30 @@ export async function POST(request: Request) {
       .single();
 
     if (existing) {
-      console.log('Customer already exists:', existing.id);
+      console.log('Customer already exists, updating:', existing.id);
+      
+      // Actualizar datos del cliente existente
+      const { error: updateError } = await supabase
+        .from("customers")
+        .update({
+          name,
+          phone,
+          dni,
+          date_of_birth: date_of_birth || null,
+          address,
+          city,
+          postal_code,
+          country,
+          driver_license: driver_license || null,
+          driver_license_expiry: driver_license_expiry || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existing.id);
+
+      if (updateError) {
+        console.error("Error updating customer:", updateError);
+      }
+      
       return NextResponse.json(
         { customer: existing },
         { status: 200 }

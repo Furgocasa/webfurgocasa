@@ -311,7 +311,7 @@ export default function ReservaPage() {
                       </>
                     ) : (
                       <>
-                        {t("Has pagado")} {formatPrice(amountPaid)}. {t("Puedes realizar el segundo pago cuando quieras. Debe completarse como máximo 15 días antes del inicio")} ({pickupDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}).
+                        {t("Has pagado")} {formatPrice(amountPaid)}. {t("Puedes realizar el segundo pago cuando quieras.")}
                       </>
                     )}
                   </p>
