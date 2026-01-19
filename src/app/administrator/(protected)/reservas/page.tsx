@@ -74,6 +74,12 @@ function formatDateTime(date: string): string {
 type SortField = 'booking_number' | 'customer' | 'internal_code' | 'vehicle' | 'pickup_date' | 'dropoff_date' | 'pickup_location' | 'dropoff_location' | 'total_price' | 'amount_paid' | 'status' | 'payment_status' | 'created_at';
 
 export default function BookingsPage() {
+  // Estados para búsqueda y paginación
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
   // Estados para ordenamiento - por defecto por fecha de creación descendente
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -131,10 +137,8 @@ export default function BookingsPage() {
 
       if (error) throw error;
       
-      // Actualizar estado local
-      setBookings(bookings.map(b => 
-        b.id === bookingId ? { ...b, status: newStatus } : b
-      ));
+      // Recargar datos
+      refetch();
     } catch (err: any) {
       console.error('Error updating status:', err);
       alert('Error al actualizar el estado');
@@ -245,14 +249,58 @@ export default function BookingsPage() {
     });
   }, [bookings, sortField, sortDirection]);
 
-  const bookingsList = sortedBookings;
-  const pendingCount = bookingsList.filter(b => b.status === 'pending').length;
-  const confirmedCount = bookingsList.filter(b => b.status === 'confirmed').length;
-  const inProgressCount = bookingsList.filter(b => b.status === 'in_progress').length;
+  // Filtrar reservas con búsqueda en tiempo real
+  const filteredBookings = useMemo(() => {
+    let filtered = [...sortedBookings];
+
+    // Búsqueda en tiempo real
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(booking => 
+        booking.booking_number.toLowerCase().includes(search) ||
+        booking.customer?.name?.toLowerCase().includes(search) ||
+        booking.customer?.email?.toLowerCase().includes(search) ||
+        booking.customer?.phone?.toLowerCase().includes(search) ||
+        booking.vehicle?.name?.toLowerCase().includes(search) ||
+        booking.vehicle?.internal_code?.toLowerCase().includes(search) ||
+        booking.pickup_location?.name?.toLowerCase().includes(search) ||
+        booking.dropoff_location?.name?.toLowerCase().includes(search)
+      );
+    }
+
+    // Filtro por estado
+    if (statusFilter) {
+      filtered = filtered.filter(booking => booking.status === statusFilter);
+    }
+
+    return filtered;
+  }, [sortedBookings, searchTerm, statusFilter]);
+
+  // Paginación
+  const totalItems = filteredBookings.length;
+  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage);
+  
+  const paginatedBookings = useMemo(() => {
+    if (itemsPerPage === -1) return filteredBookings;
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredBookings.slice(start, end);
+  }, [filteredBookings, currentPage, itemsPerPage]);
+
+  // Resetear página al cambiar filtros
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, itemsPerPage]);
+
+  const bookingsList = paginatedBookings;
+  const allBookings = bookings || [];
+  const pendingCount = allBookings.filter(b => b.status === 'pending').length;
+  const confirmedCount = allBookings.filter(b => b.status === 'confirmed').length;
+  const inProgressCount = allBookings.filter(b => b.status === 'in_progress').length;
   
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
-  const monthCount = bookingsList.filter(b => {
+  const monthCount = allBookings.filter(b => {
     const bookingDate = new Date(b.created_at || 0);
     return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
   }).length;
@@ -313,16 +361,37 @@ export default function BookingsPage() {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input type="text" placeholder="Buscar por cliente, nº reserva, vehículo..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent" />
+            <input 
+              type="text" 
+              placeholder="Buscar por cliente, nº reserva, vehículo..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent" 
+            />
           </div>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange">
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
             <option value="">Todos los estados</option>
             <option value="pending">Pendiente</option>
             <option value="confirmed">Confirmada</option>
             <option value="in_progress">En curso</option>
             <option value="completed">Completada</option>
+            <option value="cancelled">Cancelada</option>
           </select>
-          <input type="date" className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange" />
+          <select 
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
+            <option value="10">10 por página</option>
+            <option value="20">20 por página</option>
+            <option value="50">50 por página</option>
+            <option value="100">100 por página</option>
+            <option value="-1">Todos</option>
+          </select>
         </div>
       </div>
 
@@ -441,8 +510,12 @@ export default function BookingsPage() {
                 <tr>
                   <td colSpan={12} className="px-6 py-12 text-center text-gray-500">
                     <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p className="text-lg font-medium">No hay reservas registradas</p>
-                    <p className="text-sm mt-1">Las reservas aparecerán aquí cuando se creen</p>
+                    <p className="text-lg font-medium">
+                      {searchTerm || statusFilter ? 'No se encontraron reservas' : 'No hay reservas registradas'}
+                    </p>
+                    <p className="text-sm mt-1">
+                      {searchTerm || statusFilter ? 'Intenta ajustar los filtros de búsqueda' : 'Las reservas aparecerán aquí cuando se creen'}
+                    </p>
                   </td>
                 </tr>
               ) : (
@@ -591,10 +664,28 @@ export default function BookingsPage() {
           </table>
         </div>
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-sm text-gray-600">Mostrando 1-{bookingsList.length} de {bookingsList.length} reservas</p>
+          <p className="text-sm text-gray-600">
+            Mostrando {bookingsList.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} reservas
+            {searchTerm || statusFilter ? ' (filtradas)' : ''}
+          </p>
           <div className="flex gap-2">
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 disabled:opacity-50" disabled>Anterior</button>
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 disabled:opacity-50" disabled>Siguiente</button>
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === 1 || itemsPerPage === -1}
+            >
+              Anterior
+            </button>
+            <span className="px-3 py-1 text-sm text-gray-600">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === totalPages || itemsPerPage === -1}
+            >
+              Siguiente
+            </button>
           </div>
         </div>
       </div>

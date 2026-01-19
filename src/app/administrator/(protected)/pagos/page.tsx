@@ -1,27 +1,27 @@
+"use client";
+
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, Download, Eye, CreditCard, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { supabase } from "@/lib/supabase/client";
+import { useAdminData } from "@/hooks/use-admin-data";
 
-async function getAllPayments() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('payments')
-    .select(`
-      *,
-      booking:bookings(
-        id,
-        booking_number,
-        customer:customers(name, email)
-      )
-    `)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching payments:', error);
-    return { data: null, error };
-  }
-
-  return { data, error: null };
+interface Payment {
+  id: string;
+  booking_id: string;
+  amount: number | null;
+  payment_method: string | null;
+  status: string | null;
+  order_number: string | null;
+  created_at: string | null;
+  booking: {
+    id: string;
+    booking_number: string;
+    customer: {
+      name: string;
+      email: string;
+    } | null;
+  } | null;
 }
 
 const statusConfig: Record<string, { icon: typeof CheckCircle; bg: string; text: string; label: string }> = {
@@ -49,33 +49,120 @@ function formatDateTime(date: string): string {
   });
 }
 
-export default async function PagosPage() {
-  const { data: payments, error } = await getAllPayments();
+export default function PagosPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [methodFilter, setMethodFilter] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Usar el hook para cargar datos con retry automático
+  const { data: payments, loading, error } = useAdminData<Payment[]>({
+    queryFn: async () => {
+      const result = await supabase
+        .from('payments')
+        .select(`
+          *,
+          booking:bookings(
+            id,
+            booking_number,
+            customer:customers(name, email)
+          )
+        `)
+        .order('created_at', { ascending: false });
+      
+      return {
+        data: (result.data || []) as Payment[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
+
+  // Filtrar pagos con búsqueda en tiempo real
+  const filteredPayments = useMemo(() => {
+    if (!payments) return [];
+    
+    let filtered = [...payments];
+
+    // Búsqueda en tiempo real
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(payment => 
+        (payment.order_number?.toLowerCase().includes(search)) ||
+        (payment.id.toLowerCase().includes(search)) ||
+        (payment.booking?.booking_number?.toLowerCase().includes(search)) ||
+        (payment.booking?.customer?.name?.toLowerCase().includes(search)) ||
+        (payment.booking?.customer?.email?.toLowerCase().includes(search))
+      );
+    }
+
+    // Filtro por estado
+    if (statusFilter) {
+      filtered = filtered.filter(payment => payment.status === statusFilter);
+    }
+
+    // Filtro por método de pago
+    if (methodFilter) {
+      filtered = filtered.filter(payment => payment.payment_method === methodFilter);
+    }
+
+    return filtered;
+  }, [payments, searchTerm, statusFilter, methodFilter]);
+
+  // Paginación
+  const totalItems = filteredPayments.length;
+  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage);
+  
+  const paginatedPayments = useMemo(() => {
+    if (itemsPerPage === -1) return filteredPayments;
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredPayments.slice(start, end);
+  }, [filteredPayments, currentPage, itemsPerPage]);
+
+  // Resetear página al cambiar filtros
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, methodFilter, itemsPerPage]);
+
+  const paymentsList = paginatedPayments;
+  const allPayments = payments || [];
+  
+  const totalAmount = allPayments
+    .filter(p => p.status === 'completed')
+    .reduce((sum, p) => sum + (p.amount || 0), 0);
+  
+  const pendingAmount = allPayments
+    .filter(p => p.status === 'pending')
+    .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+  const completedCount = allPayments.filter(p => p.status === 'completed').length;
+  const pendingCount = allPayments.filter(p => p.status === 'pending').length;
+  const failedCount = allPayments.filter(p => p.status === 'failed').length;
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <p className="text-gray-500">Cargando pagos...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
       <div className="space-y-6">
         <div className="bg-red-50 border border-red-200 rounded-xl p-6">
           <h2 className="text-red-800 font-semibold">Error al cargar pagos</h2>
-          <p className="text-red-600 text-sm mt-2">{error.message}</p>
+          <p className="text-red-600 text-sm mt-2">{error}</p>
         </div>
       </div>
     );
   }
-
-  const paymentsList = payments || [];
-  
-  const totalAmount = paymentsList
-    .filter(p => p.status === 'completed')
-    .reduce((sum, p) => sum + (p.amount || 0), 0);
-  
-  const pendingAmount = paymentsList
-    .filter(p => p.status === 'pending')
-    .reduce((sum, p) => sum + (p.amount || 0), 0);
-
-  const completedCount = paymentsList.filter(p => p.status === 'completed').length;
-  const pendingCount = paymentsList.filter(p => p.status === 'pending').length;
-  const failedCount = paymentsList.filter(p => p.status === 'failed').length;
 
   return (
     <div className="space-y-6">
@@ -118,22 +205,44 @@ export default async function PagosPage() {
             <input 
               type="text" 
               placeholder="Buscar por nº reserva, cliente, referencia..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent" 
             />
           </div>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange">
+          <select 
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
             <option value="">Todos los estados</option>
             <option value="pending">Pendiente</option>
             <option value="completed">Completado</option>
             <option value="failed">Fallido</option>
             <option value="refunded">Reembolsado</option>
           </select>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange">
+          <select 
+            value={methodFilter}
+            onChange={(e) => setMethodFilter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
             <option value="">Todos los métodos</option>
             <option value="card">Tarjeta</option>
             <option value="redsys">Redsys</option>
             <option value="transfer">Transferencia</option>
             <option value="cash">Efectivo</option>
+            <option value="paypal">PayPal</option>
+          </select>
+          <select 
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
+            <option value="10">10 por página</option>
+            <option value="20">20 por página</option>
+            <option value="50">50 por página</option>
+            <option value="100">100 por página</option>
+            <option value="-1">Todos</option>
           </select>
         </div>
       </div>
@@ -159,8 +268,12 @@ export default async function PagosPage() {
                 <tr>
                   <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                     <CreditCard className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                    <p className="text-lg font-medium">No hay pagos registrados</p>
-                    <p className="text-sm mt-1">Los pagos aparecerán aquí cuando se procesen</p>
+                    <p className="text-lg font-medium">
+                      {searchTerm || statusFilter || methodFilter ? 'No se encontraron pagos' : 'No hay pagos registrados'}
+                    </p>
+                    <p className="text-sm mt-1">
+                      {searchTerm || statusFilter || methodFilter ? 'Intenta ajustar los filtros de búsqueda' : 'Los pagos aparecerán aquí cuando se procesen'}
+                    </p>
                   </td>
                 </tr>
               ) : (
@@ -229,13 +342,25 @@ export default async function PagosPage() {
         </div>
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Mostrando 1-{paymentsList.length} de {paymentsList.length} pagos
+            Mostrando {paymentsList.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} pagos
+            {searchTerm || statusFilter || methodFilter ? ' (filtrados)' : ''}
           </p>
           <div className="flex gap-2">
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50" disabled>
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === 1 || itemsPerPage === -1}
+            >
               Anterior
             </button>
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50" disabled>
+            <span className="px-3 py-1 text-sm text-gray-600">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === totalPages || itemsPerPage === -1}
+            >
               Siguiente
             </button>
           </div>

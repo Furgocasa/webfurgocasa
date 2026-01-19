@@ -1,24 +1,22 @@
+"use client";
+
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Plus, Search, Phone, MapPin, Calendar, Mail } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { supabase } from "@/lib/supabase/client";
+import { useAdminData } from "@/hooks/use-admin-data";
 import ClientActions from "./client-actions";
 
-async function getAllCustomers() {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from('customers')
-    .select(`
-      *,
-      bookings:bookings(count)
-    `)
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching customers:', error);
-    return { data: null as any, error };
-  }
-
-  return { data, error: null as any };
+interface Customer {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  dni: string | null;
+  city: string | null;
+  country: string | null;
+  created_at: string | null;
+  bookings?: { count: number }[];
 }
 
 function formatDate(date: string | null): string {
@@ -30,19 +28,87 @@ function formatDate(date: string | null): string {
   });
 }
 
-export default async function ClientesPage() {
-  const { data: customers, error } = await getAllCustomers();
+export default function ClientesPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  if (error) {
-    return (
-      <div className="space-y-6">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-          <h2 className="text-red-800 font-semibold">Error al cargar clientes</h2>
-          <p className="text-red-600 text-sm mt-2">{error.message}</p>
-        </div>
-      </div>
-    );
-  }
+  // Usar el hook para cargar datos con retry automático
+  const { data: customers, loading, error } = useAdminData<Customer[]>({
+    queryFn: async () => {
+      const result = await supabase
+        .from('customers')
+        .select(`
+          *,
+          bookings:bookings(count)
+        `)
+        .order('created_at', { ascending: false });
+      
+      return {
+        data: (result.data || []) as Customer[],
+        error: result.error
+      };
+    },
+    retryCount: 3,
+    retryDelay: 1000,
+    initialDelay: 200,
+  });
+
+  // Filtrar y buscar clientes
+  const filteredCustomers = useMemo(() => {
+    if (!customers) return [];
+    
+    let filtered = [...customers];
+
+    // Búsqueda en tiempo real
+    if (searchTerm) {
+      const search = searchTerm.toLowerCase();
+      filtered = filtered.filter(customer => 
+        (customer.name?.toLowerCase().includes(search)) ||
+        (customer.email?.toLowerCase().includes(search)) ||
+        (customer.phone?.toLowerCase().includes(search)) ||
+        (customer.dni?.toLowerCase().includes(search)) ||
+        (customer.city?.toLowerCase().includes(search)) ||
+        (customer.country?.toLowerCase().includes(search))
+      );
+    }
+
+    // Filtro de estado
+    if (filterStatus === 'active') {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      filtered = filtered.filter(c => {
+        if (!c.created_at) return false;
+        return new Date(c.created_at) > sixMonthsAgo;
+      });
+    } else if (filterStatus === 'inactive') {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      filtered = filtered.filter(c => {
+        if (!c.created_at) return true;
+        return new Date(c.created_at) <= sixMonthsAgo;
+      });
+    }
+
+    return filtered;
+  }, [customers, searchTerm, filterStatus]);
+
+  // Paginación
+  const totalItems = filteredCustomers.length;
+  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage);
+  
+  const paginatedCustomers = useMemo(() => {
+    if (itemsPerPage === -1) return filteredCustomers;
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredCustomers.slice(start, end);
+  }, [filteredCustomers, currentPage, itemsPerPage]);
+
+  // Resetear página al cambiar filtros
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchTerm, filterStatus, itemsPerPage]);
 
   const customersList = customers || [];
   const totalCustomers = customersList.length;
@@ -53,6 +119,27 @@ export default async function ClientesPage() {
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
     return lastBooking > sixMonthsAgo;
   }).length;
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <p className="text-gray-500">Cargando clientes...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+          <h2 className="text-red-800 font-semibold">Error al cargar clientes</h2>
+          <p className="text-red-600 text-sm mt-2">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -103,13 +190,30 @@ export default async function ClientesPage() {
             <input 
               type="text" 
               placeholder="Buscar por nombre, email, teléfono..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent" 
             />
           </div>
-          <select className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange">
+          <select 
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
             <option value="">Todos los clientes</option>
             <option value="active">Activos</option>
             <option value="inactive">Inactivos</option>
+          </select>
+          <select 
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
+            <option value="10">10 por página</option>
+            <option value="20">20 por página</option>
+            <option value="50">50 por página</option>
+            <option value="100">100 por página</option>
+            <option value="-1">Todos</option>
           </select>
         </div>
       </div>
@@ -129,18 +233,22 @@ export default async function ClientesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {customersList.length === 0 ? (
+              {paginatedCustomers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center">
                       <Mail className="h-12 w-12 mb-4 text-gray-300" />
-                      <p className="text-lg font-medium">No hay clientes registrados</p>
-                      <p className="text-sm mt-1">Los clientes aparecerán aquí cuando hagan reservas</p>
+                      <p className="text-lg font-medium">
+                        {searchTerm || filterStatus ? 'No se encontraron clientes' : 'No hay clientes registrados'}
+                      </p>
+                      <p className="text-sm mt-1">
+                        {searchTerm || filterStatus ? 'Intenta ajustar los filtros de búsqueda' : 'Los clientes aparecerán aquí cuando hagan reservas'}
+                      </p>
                     </div>
                   </td>
                 </tr>
               ) : (
-                customersList.map((customer) => (
+                paginatedCustomers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -201,13 +309,25 @@ export default async function ClientesPage() {
         </div>
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Mostrando 1-{customersList.length} de {customersList.length} clientes
+            Mostrando {paginatedCustomers.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} clientes
+            {searchTerm || filterStatus ? ' (filtrados)' : ''}
           </p>
           <div className="flex gap-2">
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50" disabled>
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === 1 || itemsPerPage === -1}
+            >
               Anterior
             </button>
-            <button className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50" disabled>
+            <span className="px-3 py-1 text-sm text-gray-600">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === totalPages || itemsPerPage === -1}
+            >
               Siguiente
             </button>
           </div>
