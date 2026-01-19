@@ -350,7 +350,22 @@ function NuevaReservaContent() {
         }
       }
 
-      // Step 6: Redirect to booking detail page
+      // Step 6: Enviar email de confirmación de reserva creada
+      try {
+        await fetch('/api/bookings/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'booking_created',
+            bookingId: booking.id,
+          }),
+        });
+      } catch (emailError) {
+        console.error('Error enviando email de confirmación:', emailError);
+        // No bloqueamos el proceso si falla el email
+      }
+
+      // Step 7: Redirect to booking detail page
       router.push(`/reservar/${booking.id}`);
       
     } catch (error: any) {

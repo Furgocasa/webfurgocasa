@@ -1,0 +1,281 @@
+# Sistema de Envío de Emails - Furgocasa
+
+## 📧 Descripción General
+
+Este documento describe el sistema completo de envío de correos electrónicos implementado en la aplicación Furgocasa. El sistema envía notificaciones automáticas tanto a los clientes como a la empresa en los momentos clave del proceso de reserva.
+
+## 🎯 Momentos de Envío
+
+### 1. Reserva Creada (Pendiente de Pago)
+**Cuándo:** Cuando un cliente completa el formulario de reserva y se crea en la base de datos.
+
+**Quién recibe:**
+- ✉️ **Cliente:** Email con detalles de la reserva y enlace para proceder al pago
+- ✉️ **Empresa (info@furgocasa.com):** Notificación de nueva reserva pendiente
+
+**Archivo:** `src/app/reservar/nueva/page.tsx` (línea ~353)
+
+### 2. Primer Pago Confirmado
+**Cuándo:** Cuando Redsys notifica que se ha completado el primer pago (puede ser 50% o 100%).
+
+**Quién recibe:**
+- ✉️ **Cliente:** Confirmación de pago y reserva confirmada
+- ✉️ **Empresa:** Notificación de pago recibido
+
+**Archivo:** `src/app/api/redsys/notification/route.ts` (línea ~132)
+
+### 3. Segundo Pago Confirmado
+**Cuándo:** Cuando el cliente completa el pago del 50% restante.
+
+**Quién recibe:**
+- ✉️ **Cliente:** Confirmación de pago completo con recordatorios para el día de recogida
+- ✉️ **Empresa:** Notificación de pago completo
+
+**Archivo:** `src/app/api/redsys/notification/route.ts` (línea ~132)
+
+## 📁 Estructura de Archivos
+
+```
+src/
+├── lib/
+│   └── email/
+│       ├── index.ts              # Funciones principales de envío
+│       ├── resend-client.ts      # Cliente de Resend
+│       └── templates.ts          # Plantillas HTML de emails
+└── app/
+    └── api/
+        └── bookings/
+            └── send-email/
+                └── route.ts      # API endpoint para envío de emails
+```
+
+## 🔧 Configuración
+
+### Variables de Entorno Requeridas
+
+Añade las siguientes variables a tu archivo `.env`:
+
+```env
+# Resend API
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
+RESEND_FROM_EMAIL=noreply@furgocasa.com
+
+# Email de la empresa (para recibir notificaciones)
+COMPANY_EMAIL=info@furgocasa.com
+
+# URL de la aplicación (para producción)
+NEXT_PUBLIC_APP_URL=https://furgocasa.com
+```
+
+### Obtener API Key de Resend
+
+1. Regístrate en [Resend](https://resend.com)
+2. Ve a "API Keys" en el dashboard
+3. Crea una nueva API Key
+4. Copia la key y añádela a `.env` como `RESEND_API_KEY`
+
+### Configurar Dominio de Envío
+
+1. En Resend, ve a "Domains"
+2. Añade tu dominio `furgocasa.com`
+3. Configura los registros DNS según las instrucciones
+4. Verifica el dominio
+5. Actualiza `RESEND_FROM_EMAIL` con un email de tu dominio verificado
+
+## 📋 Funciones Principales
+
+### `sendBookingCreatedEmail()`
+Envía email cuando se crea una reserva (pendiente de pago).
+
+```typescript
+import { sendBookingCreatedEmail } from '@/lib/email';
+
+await sendBookingCreatedEmail(customerEmail, {
+  bookingNumber: 'FG12345678',
+  customerName: 'Juan Pérez',
+  vehicleName: 'Camper Volkswagen California',
+  pickupDate: '2026-06-15',
+  dropoffDate: '2026-06-22',
+  // ... más datos
+});
+```
+
+### `sendFirstPaymentConfirmedEmail()`
+Envía email cuando se confirma el primer pago.
+
+```typescript
+import { sendFirstPaymentConfirmedEmail } from '@/lib/email';
+
+await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
+```
+
+### `sendSecondPaymentConfirmedEmail()`
+Envía email cuando se completa el segundo pago.
+
+```typescript
+import { sendSecondPaymentConfirmedEmail } from '@/lib/email';
+
+await sendSecondPaymentConfirmedEmail(customerEmail, bookingData);
+```
+
+## 🎨 Plantillas de Email
+
+Todas las plantillas están en `src/lib/email/templates.ts` y siguen un diseño consistente:
+
+- **Header:** Logo y nombre de Furgocasa con degradado naranja
+- **Contenido:** Información específica de la reserva
+- **Detalles:** Boxes con información estructurada
+- **Botones CTA:** Enlaces a la reserva o al panel de administración
+- **Footer:** Información de contacto y disclaimer
+
+### Colores de la Marca
+- **Naranja principal:** `#f97316`
+- **Azul principal:** `#1e3a8a`
+- **Verde (éxito):** `#10b981`
+- **Amarillo (warning):** `#f59e0b`
+
+## 🔄 Flujo de Integración
+
+### En el Frontend (Cliente)
+
+```typescript
+// Al crear una reserva
+try {
+  await fetch('/api/bookings/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      type: 'booking_created',
+      bookingId: booking.id,
+    }),
+  });
+} catch (error) {
+  console.error('Error enviando email:', error);
+  // No bloquear el proceso
+}
+```
+
+### En el Backend (Notificación de Redsys)
+
+```typescript
+// Al recibir confirmación de pago
+const isFirstPayment = currentPaid === 0;
+const emailType = isFirstPayment ? 'first_payment' : 'second_payment';
+
+await fetch('/api/bookings/send-email', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    type: emailType,
+    bookingId: payment.booking_id,
+  }),
+});
+```
+
+## 🧪 Testing
+
+### Modo de Desarrollo
+
+Durante el desarrollo, puedes usar:
+
+```env
+# Email de prueba (recibirás los emails en tu inbox)
+RESEND_FROM_EMAIL=onboarding@resend.dev
+COMPANY_EMAIL=tu-email@ejemplo.com
+```
+
+### Test Manual
+
+1. Crea una reserva de prueba en la aplicación
+2. Verifica que recibes el email de "Reserva creada"
+3. Completa un pago de prueba con Redsys
+4. Verifica que recibes el email de "Pago confirmado"
+
+### Logs
+
+Los emails dejan logs en consola:
+
+```
+✅ Email de reserva creada enviado al cliente: { id: '...' }
+✅ Notificación de reserva enviada a la empresa: { id: '...' }
+📧 Enviando email de tipo: first_payment
+```
+
+## ⚠️ Manejo de Errores
+
+El sistema está diseñado para **no bloquear** el proceso de reserva si falla el envío de emails:
+
+```typescript
+try {
+  await sendEmail(...);
+} catch (emailError) {
+  console.error('Error enviando email:', emailError);
+  // No se lanza el error, el proceso continúa
+}
+```
+
+### Logs de Errores
+
+```
+❌ Error enviando email de reserva creada: [error message]
+```
+
+## 📊 Monitoreo
+
+### En Resend Dashboard
+
+1. Ve a "Logs" para ver todos los emails enviados
+2. Revisa el estado: `Delivered`, `Bounced`, `Failed`
+3. Ve detalles de cada email (opens, clicks, etc.)
+
+### En la Aplicación
+
+Los logs de consola te permiten rastrear:
+- Cuándo se intentó enviar un email
+- Si fue exitoso o falló
+- El ID del email en Resend
+
+## 🔒 Seguridad
+
+- ✅ La API Key de Resend está en variables de entorno
+- ✅ Los emails se envían desde el servidor (nunca desde el cliente)
+- ✅ Se valida el `bookingId` antes de enviar
+- ✅ Solo se pueden enviar 3 tipos de emails predefinidos
+
+## 🚀 Producción
+
+### Checklist antes de ir a producción:
+
+- [ ] Configurar dominio en Resend y verificar DNS
+- [ ] Actualizar `RESEND_FROM_EMAIL` con email del dominio verificado
+- [ ] Actualizar `COMPANY_EMAIL` con el email real de la empresa
+- [ ] Actualizar `NEXT_PUBLIC_APP_URL` con la URL de producción
+- [ ] Verificar que los enlaces en los emails apuntan a la URL correcta
+- [ ] Hacer pruebas de envío completo en producción
+- [ ] Monitorear los primeros envíos en el dashboard de Resend
+
+## 📞 Soporte
+
+Si tienes problemas con el envío de emails:
+
+1. Verifica que las variables de entorno estén configuradas
+2. Revisa los logs de consola para errores específicos
+3. Comprueba el dashboard de Resend para ver el estado de los envíos
+4. Verifica que el dominio esté correctamente verificado en Resend
+
+## 🎉 Funcionalidades Adicionales Posibles
+
+Ideas para futuras mejoras:
+
+- [ ] Email de recordatorio 7 días antes de la recogida
+- [ ] Email de recordatorio para el segundo pago
+- [ ] Email de agradecimiento después de la devolución
+- [ ] Email con encuesta de satisfacción
+- [ ] Emails en múltiples idiomas según el usuario
+- [ ] Templates personalizados por vehículo
+- [ ] Sistema de preferencias de notificaciones del cliente
+
+---
+
+**Última actualización:** 19 de enero de 2026
+**Versión:** 1.0.0

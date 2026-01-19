@@ -207,6 +207,18 @@ rl.on('close', () => {
     
     console.log(`✅ ${allBookings.length} reservas procesadas`);
     
+    // Cargar vehículos
+    console.log('\n🚗 Cargando información de vehículos...');
+    const vehiclesData = JSON.parse(fs.readFileSync('vehicles.json', 'utf-8'));
+    const vehiclesMap = new Map(vehiclesData.map(v => [v.id, v.name]));
+    
+    // Agregar nombres de vehículos
+    allBookings.forEach(booking => {
+        booking.vehicle_name = vehiclesMap.get(booking.idcar) || '';
+    });
+    
+    console.log(`✅ Nombres de vehículos agregados`);
+    
     // Filtrar activas
     const activeBookings = allBookings.filter(b => b.consegna && b.consegna >= now);
     const pending = activeBookings.filter(b => b.ritiro > now);

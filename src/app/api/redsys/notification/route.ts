@@ -126,11 +126,40 @@ export async function POST(request: NextRequest) {
           console.error("Error actualizando reserva:", bookingError);
         } else {
           console.log(`✅ Reserva actualizada: amount_paid=${newPaid}, payment_status=${newPaymentStatus}`);
+          
+          // Enviar email de confirmación según el estado del pago
+          try {
+            // Determinar si es el primer pago o el segundo
+            const isFirstPayment = currentPaid === 0;
+            const isSecondPayment = !isFirstPayment && newPaid < totalPrice;
+            const isFullPayment = newPaid >= totalPrice;
+            
+            let emailType: 'first_payment' | 'second_payment' = 'first_payment';
+            
+            if (isSecondPayment || isFullPayment) {
+              // Si ya había un pago previo, este es el segundo pago
+              emailType = isFirstPayment ? 'first_payment' : 'second_payment';
+            }
+            
+            // Enviar email de forma asíncrona (no bloqueante)
+            fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/bookings/send-email`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: emailType,
+                bookingId: payment.booking_id,
+              }),
+            }).catch(emailError => {
+              console.error('Error enviando email de confirmación:', emailError);
+            });
+            
+            console.log(`📧 Enviando email de tipo: ${emailType}`);
+          } catch (emailError) {
+            console.error('Error al intentar enviar email:', emailError);
+            // No bloqueamos el proceso si falla el email
+          }
         }
       }
-
-      // TODO: Enviar email de confirmación al cliente
-      // await sendConfirmationEmail(payment.booking_id);
     }
 
     // 7. Responder a Redsys con OK

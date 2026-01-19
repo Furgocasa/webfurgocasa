@@ -154,6 +154,19 @@ VALUES ('Madrid - Sede Principal', 'madrid-principal', true, true);
 ### Los archivos JSON están vacíos
 **Solución**: Verifica que la base de datos MySQL se restauró correctamente y que las consultas SQL se ejecutan sin errores.
 
+### ⚠️ Reservas sin vincular a clientes
+**Problema**: Algunas reservas quedan con `customer_id = NULL`
+
+**Causa**: La base de datos antigua no tiene relación directa entre reservas y clientes. Solo usa email/nombre para vincular, y estos pueden no coincidir.
+
+**Solución**:
+1. El script mejorado intenta vincular por email, nombre y teléfono
+2. Si aún hay reservas sin vincular, ejecuta:
+   ```bash
+   npx tsx scripts/fix-customer-links.ts
+   ```
+3. Ver documentación completa: [`PROBLEMA-VINCULACION-CLIENTES.md`](./PROBLEMA-VINCULACION-CLIENTES.md)
+
 ---
 
 ## 🎯 Datos que se Migran

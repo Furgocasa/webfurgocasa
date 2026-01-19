@@ -1,14 +1,14 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.2-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.3-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://webfurgocasa.vercel.app)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0.2 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
+**🎉 VERSIÓN 1.0.3 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
 
 > **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
 
-Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, Redsys y TinyMCE.
+Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
 ## 🚨 ADVERTENCIA CRÍTICA - LEER ANTES DE MODIFICAR CÓDIGO
 
@@ -46,7 +46,7 @@ Este proyecto tiene una arquitectura **ESTRICTA** para SEO que **NO PUEDE VIOLAR
 - **Frontend**: Next.js 14 (App Router), React 18, TypeScript
 - **Estilos**: TailwindCSS, Radix UI, Lucide Icons
 - **Backend**: Supabase (PostgreSQL + Auth + Storage)
-- **Pagos**: Redsys (TPV Virtual Español)
+- **Pagos**: **Sistema Dual** - Redsys (TPV Español, 0.3% comisión) + Stripe (Internacional, alternativa)
 - **Editor**: TinyMCE Cloud
 - **Estado**: Zustand, React Query
 - **Formularios**: React Hook Form + Zod
@@ -99,7 +99,12 @@ Este proyecto tiene una arquitectura **ESTRICTA** para SEO que **NO PUEDE VIOLAR
   - Estado de pagos y próximos vencimientos
   - Botones para completar pagos pendientes
   - Datos de contacto del cliente
-- ✅ Pago seguro con Redsys (TPV Virtual Español)
+- ✅ **Sistema de pagos dual - Redsys + Stripe** 💳
+  - **Selector de método de pago** en pantalla de checkout
+  - **Redsys**: Pasarela española (0.3% comisión) - Método principal
+  - **Stripe**: Alternativa internacional (1.4% + 0.25€) - Para pruebas y respaldo
+  - Usuario elige su método preferido antes de pagar
+  - Ambos métodos completamente integrados y funcionales
 - ✅ Blog completo con categorías, etiquetas y SEO
 - ✅ Páginas de artículos individuales
 - ✅ **Página de Inteligencia Artificial**
@@ -312,10 +317,15 @@ NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key
 
-# Redsys
+# Redsys (Método de pago principal - 0.3% comisión)
 REDSYS_MERCHANT_CODE=tu-codigo-comercio
 REDSYS_TERMINAL=001
 REDSYS_SECRET_KEY=tu-clave-secreta
+
+# Stripe (Método de pago alternativo - 1.4% + 0.25€)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
+STRIPE_SECRET_KEY=sk_test_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
 
 # TinyMCE
 NEXT_PUBLIC_TINYMCE_API_KEY=tu-api-key
@@ -332,6 +342,7 @@ NEXT_PUBLIC_URL=http://localhost:3000
    - `supabase/schema.sql` - Esquema principal
    - `supabase/blog-schema.sql` - Sistema de blog
    - `supabase/migrations/20250107_create_seasons_table.sql` - Sistema de temporadas
+   - `supabase/add-stripe-support.sql` - **NUEVO**: Soporte para Stripe
    - `supabase/vehicles-sale-update.sql` - Actualización de vehículos en venta (opcional)
 
 ### 4. Crear primer administrador
@@ -647,11 +658,22 @@ src/components/booking/
 - **Completamente pagada**: 100% del total pagado
 - **Disponibilidad del segundo pago**: Se activa automáticamente cuando faltan 15 días o menos
 
-### Integración con Redsys:
+### Integración con pasarelas de pago:
+
+**Redsys** (Método principal - 0.3% comisión):
 - TPV Virtual Español homologado
 - Pago seguro con tarjeta
 - Redirección automática a página de confirmación
 - Webhooks para actualización de estado de pago en tiempo real
+
+**Stripe** (Método alternativo - 1.4% + 0.25€):
+- Pasarela internacional
+- Stripe Checkout hosted
+- Testing inmediato con tarjetas de prueba
+- Webhooks firmados para máxima seguridad
+- Fácil activación y configuración
+
+**Selector de método**: El usuario elige su método preferido en la página de pago.
 
 ## 🎨 Sistema de Diseño
 
@@ -854,9 +876,12 @@ El proyecto está desplegado en Vercel con deploy automático desde GitHub.
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_ROLE_KEY`
-   - `REDSYS_MERCHANT_CODE`
+   - `REDSYS_MERCHANT_CODE` ← Método principal (0.3%)
    - `REDSYS_TERMINAL`
    - `REDSYS_SECRET_KEY`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` ← **NUEVO**: Método alternativo
+   - `STRIPE_SECRET_KEY` ← **NUEVO**
+   - `STRIPE_WEBHOOK_SECRET` ← **NUEVO**
    - `NEXT_PUBLIC_TINYMCE_API_KEY`
    - `NEXT_PUBLIC_URL` (tu dominio en producción)
 
@@ -1106,10 +1131,33 @@ Estos documentos son **OBLIGATORIOS** antes de tocar cualquier página pública:
   - Calendario visual
   - Descuentos por duración
 
-- **[REDSYS-CONFIGURACION.md](./REDSYS-CONFIGURACION.md)**
-  - Integración con TPV Redsys
-  - Configuración de pagos
-  - Webhooks y notificaciones
+#### 💳 Sistemas de Pago (DUAL: Redsys + Stripe)
+
+**⚠️ IMPORTANTE:** El sistema soporta DOS métodos de pago. Revisar documentación según necesidad:
+
+1. **[METODOS-PAGO-RESUMEN.md](./METODOS-PAGO-RESUMEN.md)** ← **EMPEZAR AQUÍ**
+   - Resumen ejecutivo del sistema dual
+   - Comparativa Redsys vs Stripe
+   - Estado actual y próximos pasos
+
+2. **[REDSYS-CONFIGURACION.md](./REDSYS-CONFIGURACION.md)** ← Método principal (0.3%)
+   - Integración con TPV Redsys
+   - Configuración de pagos
+   - Webhooks y notificaciones
+
+3. **[STRIPE-VERCEL-PRODUCCION.md](./STRIPE-VERCEL-PRODUCCION.md)** ← **NUEVO** - Método alternativo
+   - Guía paso a paso para configurar Stripe en Vercel
+   - Configuración de webhook en producción
+   - Testing con tarjetas de prueba
+
+4. **[STRIPE-CONFIGURACION.md](./STRIPE-CONFIGURACION.md)** ← **NUEVO** - Referencia completa
+   - Documentación completa de Stripe
+   - Troubleshooting detallado
+   - Comparativa de costos
+
+5. **[STRIPE-SETUP-RAPIDO.md](./STRIPE-SETUP-RAPIDO.md)** ← Para desarrollo local
+   - Configuración con Stripe CLI
+   - Testing en localhost
 
 - **[TINY_EDITOR_README.md](./TINY_EDITOR_README.md)**
   - Configuración de TinyMCE
@@ -1166,9 +1214,9 @@ Para consultas sobre el proyecto: [contacto@furgocasa.com](mailto:contacto@furgo
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 1.0.1  
+**Versión**: 1.0.3 ← Sistema Dual de Pagos  
 **Estado**: ✅ Producción  
 **URL**: https://webfurgocasa.vercel.app  
-**Última actualización**: 9 de Enero 2026
+**Última actualización**: 19 de Enero 2026
 
 📋 Ver [CHANGELOG.md](./CHANGELOG.md) para historial completo de cambios.

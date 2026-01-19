@@ -4,6 +4,113 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🚀 [1.0.3] - 19 de Enero 2026 - **💳 Sistema Dual de Pagos: Redsys + Stripe**
+
+### ✨ **Nueva Funcionalidad Principal: Selector de Método de Pago**
+
+**Implementado sistema de pagos dual que permite al usuario elegir entre dos pasarelas:**
+
+#### 📦 **Integración Completa de Stripe**
+- ✅ Cliente Stripe con funciones helper (`src/lib/stripe/index.ts`)
+- ✅ Endpoint de inicio de pago (`/api/stripe/initiate`)
+- ✅ Webhook para notificaciones en tiempo real (`/api/stripe/webhook`)
+- ✅ Página de pago cancelado (`/pago/cancelado`)
+- ✅ Manejo de eventos: checkout.session.completed, payment_intent.succeeded, etc.
+
+#### 🎨 **Interfaz de Usuario Mejorada**
+- ✅ Selector visual de método de pago en `/reservar/[id]/pago`
+- ✅ Logos y descripciones de cada método (Redsys / Stripe)
+- ✅ Lógica de redirección según método seleccionado
+- ✅ UI responsive adaptada a móvil y desktop
+
+#### 🗄️ **Base de Datos Actualizada**
+- ✅ Nueva columna `payment_method` ('redsys' o 'stripe')
+- ✅ Columnas específicas de Stripe: `stripe_session_id`, `stripe_payment_intent_id`
+- ✅ Índices optimizados para búsquedas
+- ✅ Script SQL: `supabase/add-stripe-support.sql`
+
+#### 📚 **Documentación Completa**
+- ✅ **METODOS-PAGO-RESUMEN.md**: Resumen ejecutivo del sistema dual
+- ✅ **STRIPE-VERCEL-PRODUCCION.md**: Guía paso a paso para Vercel (PRODUCCIÓN)
+- ✅ **STRIPE-CONFIGURACION.md**: Documentación técnica completa
+- ✅ **STRIPE-SETUP-RAPIDO.md**: Configuración para desarrollo local
+- ✅ **IMPLEMENTACION-STRIPE-COMPLETA.md**: Resumen de implementación
+- ✅ README.md actualizado con nuevo stack tecnológico
+- ✅ REDSYS-CONFIGURACION.md actualizado con referencias al sistema dual
+- ✅ INDICE-DOCUMENTACION.md actualizado con nuevos documentos
+
+### 🎯 **Ventajas del Sistema Dual**
+
+| Ventaja | Descripción |
+|---------|-------------|
+| **Flexibilidad** | Usuario elige su método preferido |
+| **Sin bloqueos** | Stripe funciona inmediatamente con claves de test |
+| **Respaldo** | Si Redsys falla, Stripe está disponible |
+| **A/B Testing** | Medir tasas de conversión de cada método |
+| **Económico** | Redsys (0.3%) como principal, Stripe (1.4% + 0.25€) como alternativa |
+
+### 📊 **Comparativa de Métodos**
+
+| Método | Comisión | Ejemplo 1,000€ | Estado | Uso Recomendado |
+|--------|----------|----------------|--------|-----------------|
+| **Redsys** | 0.3% | 3€ | ✅ Implementado | Método principal |
+| **Stripe** | 1.4% + 0.25€ | 14.25€ | ✅ Implementado | Alternativa y pruebas |
+
+### 🔧 **Variables de Entorno Nuevas**
+
+Añadir a `.env.local` y **Vercel**:
+
+```env
+# Stripe (nuevo)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
+STRIPE_SECRET_KEY=sk_test_xxxxx
+STRIPE_WEBHOOK_SECRET=whsec_xxxxx
+```
+
+### 📦 **Archivos Nuevos**
+
+```
+src/
+├── lib/stripe/
+│   └── index.ts                          # Cliente Stripe y helpers
+├── app/api/stripe/
+│   ├── initiate/route.ts                 # Iniciar pago Stripe
+│   └── webhook/route.ts                  # Webhook Stripe
+└── app/pago/
+    └── cancelado/page.tsx                # Página de pago cancelado
+
+supabase/
+└── add-stripe-support.sql                # Migración BD
+
+Documentación/:
+├── METODOS-PAGO-RESUMEN.md               # Resumen ejecutivo
+├── STRIPE-VERCEL-PRODUCCION.md           # Configuración Vercel
+├── STRIPE-CONFIGURACION.md               # Documentación completa
+├── STRIPE-SETUP-RAPIDO.md                # Setup local
+└── IMPLEMENTACION-STRIPE-COMPLETA.md     # Resumen implementación
+```
+
+### 📝 **Archivos Modificados**
+
+- **`src/app/reservar/[id]/pago/page.tsx`**: Selector visual de método de pago
+- **`package.json`**: Añadidas dependencias `stripe` y `@stripe/stripe-js`
+- **`README.md`**: Stack tecnológico y nueva sección de pagos
+- **`REDSYS-CONFIGURACION.md`**: Referencias al sistema dual
+- **`INDICE-DOCUMENTACION.md`**: Nuevos documentos añadidos
+
+### 🚀 **Despliegue en Producción**
+
+**Pasos para activar Stripe en Vercel:**
+1. Obtener claves de Stripe (test o producción)
+2. Añadir 3 variables de entorno en Vercel
+3. Ejecutar SQL en Supabase (`add-stripe-support.sql`)
+4. Configurar webhook en Stripe Dashboard
+5. Redesplegar aplicación
+
+**Ver**: `STRIPE-VERCEL-PRODUCCION.md` para guía completa paso a paso.
+
+---
+
 ## 🚀 [1.0.2] - 9 de Enero 2026 - **Estabilización y Optimización en Producción**
 
 ### 🎯 **ESTADO: PRODUCCIÓN TOTALMENTE FUNCIONAL**

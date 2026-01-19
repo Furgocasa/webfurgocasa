@@ -1,8 +1,8 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.2 ✅ PRODUCCIÓN - TOTALMENTE FUNCIONAL  
+**Versión**: 1.0.3 ✅ PRODUCCIÓN - SISTEMA DE EMAILS AÑADIDO  
 **URL**: https://webfurgocasa.vercel.app  
-**Última actualización**: 9 de Enero, 2026
+**Última actualización**: 19 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
 
@@ -86,11 +86,18 @@ El proyecto está desplegado y funcionando perfectamente en producción. Ver **[
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo completo paso a paso |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ **NUEVO** - Reglas gestión de clientes |
 
-### 💳 Pagos
+### 💳 Pagos y Notificaciones
 
 | Documento | Descripción |
 |-----------|-------------|
-| **[REDSYS-CONFIGURACION.md](./REDSYS-CONFIGURACION.md)** | Integración con TPV Redsys |
+| **[REDSYS-CONFIGURACION.md](./REDSYS-CONFIGURACION.md)** | Integración con TPV Redsys (0.3% comisión) |
+| **[STRIPE-CONFIGURACION.md](./STRIPE-CONFIGURACION.md)** | ⚠️ **NUEVO** - Integración con Stripe (alternativa) |
+| **[STRIPE-VERCEL-PRODUCCION.md](./STRIPE-VERCEL-PRODUCCION.md)** | ⚠️ **NUEVO** - 🚀 Configurar Stripe en Vercel (USAR ESTE) |
+| **[STRIPE-SETUP-RAPIDO.md](./STRIPE-SETUP-RAPIDO.md)** | Guía para desarrollo local (localhost) |
+| **[METODOS-PAGO-RESUMEN.md](./METODOS-PAGO-RESUMEN.md)** | ⚠️ **NUEVO** - Comparativa y decisiones de métodos de pago |
+| **[SISTEMA-EMAILS.md](./SISTEMA-EMAILS.md)** | Sistema completo de envío de emails |
+| **[PRUEBAS-EMAILS.md](./PRUEBAS-EMAILS.md)** | Guía de testing del sistema de emails |
+| **[IMPLEMENTACION-EMAILS-RESUMEN.md](./IMPLEMENTACION-EMAILS-RESUMEN.md)** | Resumen técnico de la implementación |
 
 ### 📅 Temporadas
 
@@ -105,12 +112,13 @@ El proyecto está desplegado y funcionando perfectamente en producción. Ver **[
 | **[DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)** | Sistema de diseño, colores, tipografía |
 | **[RESPONSIVE_STRATEGY.md](./RESPONSIVE_STRATEGY.md)** | Estrategia responsive, breakpoints |
 
-### ✍️ Contenido
+### ✍️ Contenido y Blog
 
 | Documento | Descripción |
 |-----------|-------------|
 | **[TINY_EDITOR_README.md](./TINY_EDITOR_README.md)** | Configuración de TinyMCE |
 | **[GENERACION-CONTENIDO-IA.md](./GENERACION-CONTENIDO-IA.md)** | Herramientas IA para clientes |
+| **[SOLUCION-BLOG-FRONTEND.md](./SOLUCION-BLOG-FRONTEND.md)** | ⚠️ Solución: Blog no carga en frontend (RLS) |
 
 ### 🗄️ Base de Datos
 
@@ -125,6 +133,18 @@ Ver carpeta `supabase/`:
 - **[supabase/SETUP.md](./supabase/SETUP.md)** - Configuración paso a paso
 - **[supabase/schema.sql](./supabase/schema.sql)** - Esquema completo (⚠️ puede no coincidir con la realidad)
 - **[supabase/create-first-admin.sql](./supabase/create-first-admin.sql)** - Crear admin
+
+### 🔄 Migración de Datos Antiguos
+
+⚠️ **DOCUMENTOS PARA MIGRACIÓN DESDE BASE DATOS ANTIGUA:**
+- **[OLD_FURGOCASA_DATOS/README-MIGRACION.md](./OLD_FURGOCASA_DATOS/README-MIGRACION.md)** - Guía principal de migración
+- **[OLD_FURGOCASA_DATOS/PROBLEMA-VINCULACION-CLIENTES.md](./OLD_FURGOCASA_DATOS/PROBLEMA-VINCULACION-CLIENTES.md)** - ⚠️ Problema y solución: reservas sin vincular
+- **[OLD_FURGOCASA_DATOS/GUIA-SCRIPTS-VINCULACION.md](./OLD_FURGOCASA_DATOS/GUIA-SCRIPTS-VINCULACION.md)** - ⚠️ Guía completa de scripts de vinculación
+
+Ver carpeta `scripts/`:
+- **`migrate-old-data.ts`** - Script principal de migración (mejorado)
+- **`fix-customer-links.ts`** - Reparación automática post-migración
+- **`link-bookings-interactive.ts`** - Vinculación interactiva manual
 
 ---
 
@@ -156,8 +176,13 @@ Ver carpeta `supabase/`:
 2. Aplica **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)**
 3. Verifica con **[CHECKLIST-PRE-COMMIT.md](./CHECKLIST-PRE-COMMIT.md)**
 
-### Voy a configurar pagos
-1. Lee **[REDSYS-CONFIGURACION.md](./REDSYS-CONFIGURACION.md)**
+### Voy a configurar pagos o emails
+1. Lee **[METODOS-PAGO-RESUMEN.md](./METODOS-PAGO-RESUMEN.md)** ⚠️ **NUEVO** - Ver estado actual
+2. Para Redsys: **[REDSYS-CONFIGURACION.md](./REDSYS-CONFIGURACION.md)**
+3. Para Stripe EN PRODUCCIÓN: **[STRIPE-VERCEL-PRODUCCION.md](./STRIPE-VERCEL-PRODUCCION.md)** ⚠️ **NUEVO** 🚀
+4. Para Stripe en local: **[STRIPE-SETUP-RAPIDO.md](./STRIPE-SETUP-RAPIDO.md)**
+5. Para emails: **[SISTEMA-EMAILS.md](./SISTEMA-EMAILS.md)**
+6. Testing de emails: **[PRUEBAS-EMAILS.md](./PRUEBAS-EMAILS.md)**
 
 ### Voy a trabajar con imágenes
 1. Lee **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)**
@@ -189,9 +214,17 @@ Ver carpeta `supabase/`:
 ├── 📖 SISTEMA-MEDIA-RESUMEN.md            ← Medios
 ├── 📖 GALERIA-MULTIPLE-VEHICULOS.md       ← Galería vehículos
 ├── 📖 SISTEMA_TEMPORADAS.md               ← Temporadas
-├── 📖 REDSYS-CONFIGURACION.md             ← Pagos
+├── 📖 REDSYS-CONFIGURACION.md             ← Pagos Redsys
+├── 📖 STRIPE-CONFIGURACION.md             ← ⚠️ NUEVO - Pagos Stripe (referencia)
+├── 📖 STRIPE-VERCEL-PRODUCCION.md         ← ⚠️ NUEVO - 🚀 Setup Stripe EN PRODUCCIÓN
+├── 📖 STRIPE-SETUP-RAPIDO.md              ← Setup Stripe en localhost
+├── 📖 METODOS-PAGO-RESUMEN.md             ← ⚠️ NUEVO - Comparativa pagos
+├── 📖 SISTEMA-EMAILS.md                   ← Sistema de emails
+├── 📖 PRUEBAS-EMAILS.md                   ← ⚠️ NUEVO - Testing de emails
+├── 📖 IMPLEMENTACION-EMAILS-RESUMEN.md    ← ⚠️ NUEVO - Resumen implementación
 ├── 📖 TINY_EDITOR_README.md               ← TinyMCE
 ├── 📖 GENERACION-CONTENIDO-IA.md          ← IA tools
+├── 📖 SOLUCION-BLOG-FRONTEND.md           ← ⚠️ Blog no carga (RLS)
 ├── 📖 DESIGN_SYSTEM.md                    ← Diseño
 ├── 📖 RESPONSIVE_STRATEGY.md              ← Responsive
 └── 📁 supabase/
@@ -214,8 +247,11 @@ Ver carpeta `supabase/`:
 - **i18n**: `I18N_IMPLEMENTATION.md`
 - **Admin**: `ADMIN_SETUP.md`, `BUSCADOR-GLOBAL-ADMIN.md`
 - **Medios**: `SISTEMA-MEDIA-RESUMEN.md`, `GALERIA-MULTIPLE-VEHICULOS.md`
-- **Pagos**: `REDSYS-CONFIGURACION.md`
+- **Pagos**: `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO**, `REDSYS-CONFIGURACION.md`, `STRIPE-CONFIGURACION.md` ⚠️ **NUEVO**
+- **Emails**: `SISTEMA-EMAILS.md`, `PRUEBAS-EMAILS.md`
+- **Blog**: `SOLUCION-BLOG-FRONTEND.md` ⚠️ Si no cargan artículos
 - **Base de datos**: `supabase/README.md`, `supabase/schema.sql`
+- **Migración datos**: `OLD_FURGOCASA_DATOS/README-MIGRACION.md` ⚠️ **NUEVO**, `OLD_FURGOCASA_DATOS/GUIA-SCRIPTS-VINCULACION.md` ⚠️ **NUEVO**
 
 ### Por Pregunta
 
@@ -227,8 +263,17 @@ Ver carpeta `supabase/`:
 | ¿Cómo configuro SEO? | `NORMAS-SEO-OBLIGATORIAS.md` |
 | ¿Cómo creo un admin? | `ADMIN_SETUP.md` |
 | ¿Cómo subo imágenes? | `SISTEMA-MEDIA-RESUMEN.md` |
-| ¿Cómo funciona el pago? | `REDSYS-CONFIGURACION.md` |
+| ¿Cómo funciona el pago? | `METODOS-PAGO-RESUMEN.md`, `REDSYS-CONFIGURACION.md` |
+| ¿Cómo configurar Stripe EN PRODUCCIÓN? | `STRIPE-VERCEL-PRODUCCION.md` ⚠️ **NUEVO** 🚀 |
+| ¿Cómo configurar Stripe en local? | `STRIPE-SETUP-RAPIDO.md` |
+| ¿Qué método de pago usar? | `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO** |
+| ¿Cómo configurar emails automáticos? | `SISTEMA-EMAILS.md` |
+| ¿Cómo probar el sistema de emails? | `PRUEBAS-EMAILS.md` ⚠️ **NUEVO** |
 | ¿Cómo funcionan las temporadas? | `SISTEMA_TEMPORADAS.md` |
+| ¿Por qué no cargan los artículos del blog? | `SOLUCION-BLOG-FRONTEND.md` |
+| ¿Cómo migro datos desde MySQL/VikRentCar? | `OLD_FURGOCASA_DATOS/README-MIGRACION.md` ⚠️ **NUEVO** |
+| ¿Por qué hay reservas sin cliente vinculado? | `OLD_FURGOCASA_DATOS/PROBLEMA-VINCULACION-CLIENTES.md` ⚠️ **NUEVO** |
+| ¿Cómo vincular reservas a clientes? | `OLD_FURGOCASA_DATOS/GUIA-SCRIPTS-VINCULACION.md` ⚠️ **NUEVO** |
 
 ---
 
@@ -276,4 +321,4 @@ Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
 
 ---
 
-**Total de documentos activos**: 19 archivos .md en raíz + subdirectorios (incluyendo CHANGELOG.md)
+**Total de documentos activos**: 26 archivos .md en raíz + subdirectorios (incluyendo nuevos de pagos)
