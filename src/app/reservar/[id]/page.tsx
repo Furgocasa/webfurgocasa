@@ -339,22 +339,22 @@ export default function ReservaPage() {
 
           {/* Primer pago realizado - Esperando segundo pago */}
           {booking.status === 'confirmed' && amountPaid >= firstPayment && amountPaid < totalPrice && (
-            <div className={`rounded-2xl p-6 mb-6 ${secondPaymentDue ? 'bg-red-50 border border-red-200' : 'bg-blue-50 border border-blue-200'}`}>
-              <div className="flex items-start gap-4">
+            <div className={`rounded-2xl p-4 sm:p-6 mb-6 ${secondPaymentDue ? 'bg-red-50 border border-red-200' : 'bg-blue-50 border border-blue-200'}`}>
+              <div className="flex items-start gap-3 sm:gap-4">
                 {secondPaymentDue ? (
-                  <AlertCircle className="h-6 w-6 text-red-600 flex-shrink-0 mt-1" />
+                  <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 flex-shrink-0 mt-1" />
                 ) : (
-                  <CheckCircle className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 flex-shrink-0 mt-1" />
                 )}
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900 mb-2">
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">
                     {secondPaymentDue ? (
                       t("⚠️ Segundo pago urgente")
                     ) : (
                       t("Primer pago completado ✓")
                     )}
                   </h3>
-                  <p className="text-gray-600 mb-2">
+                  <p className="text-gray-600 mb-3 text-sm sm:text-base">
                     {secondPaymentDue ? (
                       <>
                         <strong className="text-red-700">{t("¡Atención!")}</strong> {t("Faltan")} {daysUntilPickup} {t("días para el inicio del alquiler. El segundo pago debe realizarse como máximo 15 días antes.")}
@@ -365,19 +365,19 @@ export default function ReservaPage() {
                       </>
                     )}
                   </p>
-                  <div className="bg-white rounded-lg p-4 mb-4">
+                  <div className="bg-white rounded-lg p-3 sm:p-4 mb-4">
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center text-sm">
+                      <div className="flex justify-between items-center text-xs sm:text-sm">
                         <span className="text-gray-600">{t("Total de la reserva")}:</span>
                         <span className="font-semibold">{formatPrice(totalPrice)}</span>
                       </div>
-                      <div className="flex justify-between items-center text-sm">
+                      <div className="flex justify-between items-center text-xs sm:text-sm">
                         <span className="text-gray-600">{t("Ya pagado")}:</span>
                         <span className="font-semibold text-green-600">{formatPrice(amountPaid)}</span>
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t">
-                        <span className="text-gray-900 font-medium">{t("Pendiente")}:</span>
-                        <span className="text-xl font-bold text-furgocasa-orange">{formatPrice(pendingAmount)}</span>
+                        <span className="text-gray-900 font-medium text-sm sm:text-base">{t("Pendiente")}:</span>
+                        <span className="text-lg sm:text-xl font-bold text-furgocasa-orange">{formatPrice(pendingAmount)}</span>
                       </div>
                     </div>
                   </div>
@@ -385,21 +385,25 @@ export default function ReservaPage() {
                   {/* Botón siempre visible */}
                   <button
                     onClick={() => router.push(`/reservar/${bookingId}/pago?amount=${pendingAmount.toFixed(2)}`)}
-                    className={`font-semibold py-3 px-6 rounded-lg transition-colors inline-flex items-center gap-2 ${
+                    className={`w-full sm:w-auto font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base ${
                       secondPaymentDue 
                         ? 'bg-red-600 text-white hover:bg-red-700' 
                         : 'bg-furgocasa-orange text-white hover:bg-orange-600'
                     }`}
                   >
-                    <CreditCard className="h-5 w-5" />
-                    {secondPaymentDue ? t("Pagar ahora") : t("Realizar segundo pago")} ({formatPrice(pendingAmount)})
+                    <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="truncate">
+                      {secondPaymentDue ? t("Pagar ahora") : t("Realizar segundo pago")} ({formatPrice(pendingAmount)})
+                    </span>
                   </button>
 
                   {/* Aviso informativo si hay tiempo */}
                   {!secondPaymentDue && (
-                    <p className="mt-3 text-sm text-gray-600 flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      {t("Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })})
+                    <p className="mt-3 text-xs sm:text-sm text-gray-600 flex items-start gap-2">
+                      <Clock className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      <span>
+                        {t("Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })})
+                      </span>
                     </p>
                   )}
                 </div>
@@ -800,19 +804,19 @@ export default function ReservaPage() {
               </div>
 
               {/* Help */}
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                <h3 className="font-bold text-gray-900 mb-2">{t("¿Necesitas ayuda?")}</h3>
-                <p className="text-sm text-gray-600 mb-4">
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-6">
+                <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">{t("¿Necesitas ayuda?")}</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mb-4">
                   {t("Si tienes alguna duda sobre tu reserva, no dudes en contactarnos.")}
                 </p>
-                <div className="space-y-2 text-sm">
+                <div className="space-y-2 text-xs sm:text-sm">
                   <a href="tel:+34868364161" className="flex items-center gap-2 text-furgocasa-blue hover:text-furgocasa-orange">
-                    <Phone className="h-4 w-4" />
-                    +34 868 364 161
+                    <Phone className="h-4 w-4 flex-shrink-0" />
+                    <span>+34 868 364 161</span>
                   </a>
-                  <a href="mailto:info@furgocasa.com" className="flex items-center gap-2 text-furgocasa-blue hover:text-furgocasa-orange">
-                    <Mail className="h-4 w-4" />
-                    info@furgocasa.com
+                  <a href="mailto:info@furgocasa.com" className="flex items-center gap-2 text-furgocasa-blue hover:text-furgocasa-orange min-w-0">
+                    <Mail className="h-4 w-4 flex-shrink-0" />
+                    <span className="break-all">info@furgocasa.com</span>
                   </a>
                 </div>
               </div>
@@ -820,27 +824,27 @@ export default function ReservaPage() {
           </div>
 
           {/* Formulario de cancelación/modificación */}
-          <div className="mt-8 bg-gray-50 border border-gray-200 rounded-2xl p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">{t("Solicitud de cancelación / modificación")}</h2>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="mt-8 bg-gray-50 border border-gray-200 rounded-2xl p-4 sm:p-6">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-3 sm:mb-4">{t("Solicitud de cancelación / modificación")}</h2>
+            <p className="text-xs sm:text-sm text-gray-600 mb-4">
               {t("Si deseas cancelar o modificar tu reserva, por favor contáctanos directamente. Te responderemos lo antes posible.")}
             </p>
             
-            <div className="bg-white rounded-xl p-6 space-y-4">
+            <div className="bg-white rounded-xl p-4 sm:p-6 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm font-medium text-gray-700 mb-1">{t("Email")}</p>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t("Email")}</p>
                   <a href="mailto:info@furgocasa.com?subject=Solicitud de modificación/cancelación - Reserva ${booking.booking_number}" 
-                     className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
-                    <Mail className="h-5 w-5" />
-                    info@furgocasa.com
+                     className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 min-w-0 text-sm sm:text-base">
+                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span className="break-all">info@furgocasa.com</span>
                   </a>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-gray-700 mb-1">{t("Teléfono")}</p>
-                  <a href="tel:+34868364161" className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
-                    <Phone className="h-5 w-5" />
-                    +34 868 364 161
+                  <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t("Teléfono")}</p>
+                  <a href="tel:+34868364161" className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm sm:text-base">
+                    <Phone className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                    <span>+34 868 364 161</span>
                   </a>
                 </div>
               </div>
