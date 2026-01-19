@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { useAdminData } from "@/hooks/use-admin-data";
+import { formatPrice } from "@/lib/utils";
 
 interface Booking {
   id: string;
@@ -586,9 +587,9 @@ export default function BookingsPage() {
                       
                       {/* Total */}
                       <td className="px-4 py-4 text-right">
-                        <p className="font-bold text-gray-900 text-sm">{totalPrice.toFixed(2)}€</p>
+                        <p className="font-bold text-gray-900 text-sm">{formatPrice(totalPrice)}</p>
                         {pendingAmount > 0 && (
-                          <p className="text-xs text-red-600 mt-1">Pdte: {pendingAmount.toFixed(2)}€</p>
+                          <p className="text-xs text-red-600 mt-1">Pdte: {formatPrice(pendingAmount)}</p>
                         )}
                       </td>
                       
@@ -599,7 +600,7 @@ export default function BookingsPage() {
                           amountPaid >= totalPrice ? 'text-green-600' : 
                           'text-orange-600'
                         }`}>
-                          {amountPaid.toFixed(2)}€
+                          {formatPrice(amountPaid)}
                         </p>
                         <p className="text-xs text-gray-500 mt-1">
                           {amountPaid === 0 ? 'Sin pagos' : 
