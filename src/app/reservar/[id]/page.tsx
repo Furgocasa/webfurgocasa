@@ -425,76 +425,131 @@ export default function ReservaPage() {
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                   <User className="h-6 w-6 text-furgocasa-blue" />
-                  {t("Tus datos")}
+                  {t("Datos del conductor principal")}
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Nombre completo")}</p>
-                    <p className="text-gray-900 font-medium">{booking.customer_name}</p>
-                  </div>
+                <div className="space-y-3">
+                  {/* Nombre y Apellidos */}
+                  {(() => {
+                    const fullName = booking.customer_name || '';
+                    const nameParts = fullName.trim().split(/\s+/);
+                    const firstName = nameParts[0] || '';
+                    const lastName = nameParts.slice(1).join(' ') || '';
+                    
+                    return (
+                      <>
+                        {firstName && (
+                          <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                            <p className="text-sm text-gray-600 font-medium">{t("Nombre del conductor principal")}:</p>
+                            <p className="text-gray-900">{firstName}</p>
+                          </div>
+                        )}
+                        {lastName && (
+                          <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                            <p className="text-sm text-gray-600 font-medium">{t("Apellidos del conductor principal")}:</p>
+                            <p className="text-gray-900">{lastName}</p>
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
 
+                  {/* DNI - ID nº */}
                   {booking.customer_dni && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("DNI / ID")}</p>
-                      <p className="text-gray-900 font-medium">{booking.customer_dni}</p>
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("DNI - ID nº")}:</p>
+                      <p className="text-gray-900">{booking.customer_dni}</p>
                     </div>
                   )}
 
-                  {booking.customer?.date_of_birth && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Fecha de nacimiento")}</p>
-                      <p className="text-gray-900">{new Date(booking.customer.date_of_birth).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  {/* Dirección del conductor principal */}
+                  {booking.customer_address && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Dirección del conductor principal")}:</p>
+                      <p className="text-gray-900">{booking.customer_address}</p>
                     </div>
                   )}
 
+                  {/* Código postal del conductor principal */}
+                  {booking.customer_postal_code && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Código postal del conductor principal")}:</p>
+                      <p className="text-gray-900">{booking.customer_postal_code}</p>
+                    </div>
+                  )}
+
+                  {/* Municipio del conductor principal */}
+                  {booking.customer_city && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Municipio del conductor principal")}:</p>
+                      <p className="text-gray-900">{booking.customer_city}</p>
+                    </div>
+                  )}
+
+                  {/* País del conductor principal */}
                   {booking.customer?.country && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("País")}</p>
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("País del conductor principal")}:</p>
                       <p className="text-gray-900">{booking.customer.country}</p>
                     </div>
                   )}
 
-                  <div>
-                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Email")}</p>
-                    <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4" />
-                      {booking.customer_email}
-                    </a>
-                  </div>
+                  {/* Edad del conductor principal */}
+                  {booking.customer?.date_of_birth && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Edad del conductor principal")}:</p>
+                      <p className="text-gray-900">
+                        {(() => {
+                          const birthDate = new Date(booking.customer.date_of_birth);
+                          const today = new Date();
+                          let age = today.getFullYear() - birthDate.getFullYear();
+                          const monthDiff = today.getMonth() - birthDate.getMonth();
+                          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                            age--;
+                          }
+                          return age;
+                        })()}
+                      </p>
+                    </div>
+                  )}
 
-                  <div>
-                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Teléfono")}</p>
-                    <a href={`tel:${booking.customer_phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2 text-sm">
+                  {/* Fecha de caducidad carnet conducir del conductor principal */}
+                  {booking.customer?.driver_license_expiry && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Fecha de caducidad carnet conducir del conductor principal")}:</p>
+                      <p className="text-gray-900">
+                        {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { 
+                          day: '2-digit', 
+                          month: '2-digit', 
+                          year: 'numeric' 
+                        })}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Teléfono */}
+                  <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <p className="text-sm text-gray-600 font-medium">{t("Teléfono")}:</p>
+                    <a href={`tel:${booking.customer_phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
                       <Phone className="h-4 w-4" />
                       {booking.customer_phone}
                     </a>
                   </div>
 
-                  {booking.customer_address && (
-                    <div className="md:col-span-2">
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Dirección")}</p>
-                      <p className="text-gray-900">{booking.customer_address}</p>
-                      {(booking.customer_postal_code || booking.customer_city) && (
-                        <p className="text-gray-600 text-sm mt-1">
-                          {booking.customer_postal_code && `${booking.customer_postal_code} `}
-                          {booking.customer_city}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                  {/* e-Mail */}
+                  <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <p className="text-sm text-gray-600 font-medium">{t("e-Mail")}:</p>
+                    <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                      <Mail className="h-4 w-4" />
+                      {booking.customer_email}
+                    </a>
+                  </div>
 
-                  {booking.customer?.driver_license && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Carnet de conducir")}</p>
-                      <p className="text-gray-900 font-medium">{booking.customer.driver_license}</p>
-                    </div>
-                  )}
-
-                  {booking.customer?.driver_license_expiry && (
-                    <div>
-                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Caducidad del carnet")}</p>
-                      <p className="text-gray-900">{new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  {/* Comentarios */}
+                  {booking.notes && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2">
+                      <p className="text-sm text-gray-600 font-medium">{t("Comentarios")}:</p>
+                      <p className="text-gray-900 whitespace-pre-wrap">{booking.notes}</p>
                     </div>
                   )}
                 </div>
