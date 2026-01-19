@@ -18,7 +18,7 @@ updated_payment AS (
   SET
     status = 'authorized',
     payment_method = 'stripe',
-    notes = CONCAT(COALESCE(notes, ''), ' | Ajuste manual por pago Stripe confirmado'),
+    notes = CONCAT(COALESCE(payments.notes, ''), ' | Ajuste manual por pago Stripe confirmado'),
     updated_at = NOW()
   FROM target_payment
   WHERE payments.id = target_payment.id

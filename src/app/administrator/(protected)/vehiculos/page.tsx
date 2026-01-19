@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { Plus, Search, Eye, Car, Tag, Home, ArrowUpDown, ArrowUp, ArrowDown, Package } from "lucide-react";
 import supabase from "@/lib/supabase/client";
@@ -88,7 +88,6 @@ export default function VehiclesPage() {
     },
     retryCount: 3,
     retryDelay: 1000,
-    initialDelay: 200,
   });
 
   // Cargar vehículos raw con el hook
@@ -115,7 +114,6 @@ export default function VehiclesPage() {
     },
     retryCount: 3,
     retryDelay: 1000,
-    initialDelay: 200,
   });
 
   // Estado local para vehículos procesados

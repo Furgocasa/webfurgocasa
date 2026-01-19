@@ -26,9 +26,9 @@ export function useAdminData<T = any>({
   queryFn,
   dependencies = [],
   enabled = true,
-  retryCount = 2, // Reducido a 2 reintentos
-  retryDelay = 500, // Reducido a 500ms
-  initialDelay = 0, // Sin delay inicial
+  retryCount = 2,
+  retryDelay = 500,
+  initialDelay = 0,
 }: UseAdminDataOptions<T>): UseAdminDataResult<T> {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);

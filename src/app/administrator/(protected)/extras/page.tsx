@@ -61,7 +61,6 @@ export default function ExtrasPage() {
     },
     retryCount: 3,
     retryDelay: 1000,
-    initialDelay: 200,
   });
 
   // Mantener función loadExtras para recargar después de cambios (ahora solo llama refetch)

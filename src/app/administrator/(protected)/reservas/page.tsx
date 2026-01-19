@@ -105,7 +105,6 @@ export default function BookingsPage() {
     },
     retryCount: 3,
     retryDelay: 1000,
-    initialDelay: 200,
   });
 
   const handleSort = (field: SortField) => {

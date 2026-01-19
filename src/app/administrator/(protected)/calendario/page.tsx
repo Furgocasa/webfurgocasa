@@ -108,7 +108,6 @@ export default function CalendarioPage() {
     },
     retryCount: 3,
     retryDelay: 1000,
-    initialDelay: 200,
   });
 
   // Cargar bookings con el hook (depende de startDate y monthsToShow)
@@ -155,7 +154,6 @@ export default function CalendarioPage() {
     dependencies: [startDate, monthsToShow],
     retryCount: 3,
     retryDelay: 1000,
-    initialDelay: 200,
   });
 
   // Estado local para bookings enriquecidos

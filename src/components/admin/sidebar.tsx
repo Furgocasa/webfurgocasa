@@ -152,7 +152,12 @@ function AdminSidebarComponent({ admin, isOpen = true, onClose }: AdminSidebarPr
 
         {/* Logo */}
       <div className="p-6 border-b border-white/10">
-        <Link href="/administrator" onClick={handleLinkClick} className="flex flex-col items-center gap-2">
+        <Link 
+          href="/administrator" 
+          onClick={handleLinkClick} 
+          className="flex flex-col items-center gap-2"
+          prefetch={false}
+        >
           <Image
             src="/images/brand/LOGO BLANCO.png"
             alt="Furgocasa"
@@ -201,6 +206,7 @@ function AdminSidebarComponent({ admin, isOpen = true, onClose }: AdminSidebarPr
                           key={child.href}
                           href={child.href}
                           onClick={handleLinkClick}
+                          prefetch={false}
                           className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm touch-target ${
                             pathname === child.href
                               ? "bg-white/20 text-white"
@@ -218,6 +224,7 @@ function AdminSidebarComponent({ admin, isOpen = true, onClose }: AdminSidebarPr
                 <Link
                   href={item.href}
                   onClick={handleLinkClick}
+                  prefetch={false}
                   className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors touch-target ${
                     active
                       ? "bg-furgocasa-orange text-white"
