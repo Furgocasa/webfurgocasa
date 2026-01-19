@@ -65,12 +65,37 @@ function PagoExitoContent() {
     try {
       setLoading(true);
 
-      // Intentar obtener el último pago autorizado del usuario
-      // En producción, deberías usar el Ds_Order de Redsys para identificar el pago
+      // Stripe: session_id en la URL
+      const stripeSessionId = searchParams.get("session_id");
+      
+      // Redsys: Ds_MerchantParameters en la URL
       const merchantParams = searchParams.get("Ds_MerchantParameters");
       
       let orderNumber: string | null = null;
       
+      // Si viene de Stripe, buscar por stripe_session_id
+      if (stripeSessionId) {
+        const { data, error } = await supabase
+          .from("payments")
+          .select(`
+            *,
+            booking:bookings(
+              *,
+              vehicle:vehicles(name, brand, model),
+              pickup_location:locations!pickup_location_id(name),
+              dropoff_location:locations!dropoff_location_id(name)
+            )
+          `)
+          .eq("stripe_session_id", stripeSessionId)
+          .single();
+
+        if (!error && data) {
+          setPayment(data as any);
+          return;
+        }
+      }
+      
+      // Si viene de Redsys, decodificar parámetros
       if (merchantParams) {
         try {
           const decoded = JSON.parse(atob(merchantParams));
@@ -80,7 +105,7 @@ function PagoExitoContent() {
         }
       }
 
-      // Si tenemos el número de pedido, buscar ese pago específico
+      // Si tenemos el número de pedido (Redsys), buscar ese pago específico
       if (orderNumber) {
         const { data, error } = await supabase
           .from("payments")
