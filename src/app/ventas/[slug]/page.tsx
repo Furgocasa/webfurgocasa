@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { createClient } from "@/lib/supabase/server";
+import { formatPrice } from "@/lib/utils";
 
 // Cargar vehículo desde Supabase
 async function getVehicle(slug: string) {
@@ -47,10 +48,6 @@ const conditionLabels: Record<string, { label: string; color: string }> = {
   good: { label: "Buen estado", color: "bg-yellow-100 text-yellow-700" },
   fair: { label: "Aceptable", color: "bg-orange-100 text-orange-700" },
 };
-
-function formatPrice(price: number): string {
-  return price.toLocaleString("es-ES") + " €";
-}
 
 function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("es-ES", { month: "long", year: "numeric" });
@@ -326,7 +323,7 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
                       ¿Prefieres alquilarlo primero?
                     </p>
                     <p className="text-sm text-blue-600 mb-3">
-                      Este vehículo también está disponible para alquiler desde {vehicle.base_price_per_day}€/día
+                      Este vehículo también está disponible para alquiler desde {formatPrice(vehicle.base_price_per_day)}/día
                     </p>
                     <Link
                       href={`/vehiculos/${vehicle.slug}`}

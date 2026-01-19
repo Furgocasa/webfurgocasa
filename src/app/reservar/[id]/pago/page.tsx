@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
+import { formatPrice } from "@/lib/utils";
 import { 
   ArrowLeft, CreditCard, CheckCircle, AlertCircle, 
   Calendar, MapPin, Car, User, Mail, Phone, Clock
@@ -352,20 +353,20 @@ export default function PagoPage() {
               <div className="p-6 bg-gradient-to-r from-furgocasa-blue to-blue-700 rounded-lg text-white">
                 <div className="flex items-center justify-between mb-4">
                   <p className="text-sm opacity-90">{t("Total reserva")}</p>
-                  <p className="text-2xl font-bold">{booking.total_price.toFixed(2)}€</p>
+                  <p className="text-2xl font-bold">{formatPrice(booking.total_price)}</p>
                 </div>
                 
                 {booking.amount_paid > 0 && (
                   <div className="flex items-center justify-between mb-2 text-green-200">
                     <p className="text-sm">{t("Ya pagado")}</p>
-                    <p className="font-semibold">-{booking.amount_paid.toFixed(2)}€</p>
+                    <p className="font-semibold">-{formatPrice(booking.amount_paid)}</p>
                   </div>
                 )}
                 
                 <div className="pt-4 border-t border-white/30">
                   <div className="flex items-center justify-between">
                     <p className="font-medium">{t("Pendiente de pago")}</p>
-                    <p className="text-3xl font-bold">{(booking.total_price - (booking.amount_paid || 0)).toFixed(2)}€</p>
+                    <p className="text-3xl font-bold">{formatPrice(booking.total_price - (booking.amount_paid || 0))}</p>
                   </div>
                 </div>
               </div>
@@ -385,8 +386,8 @@ export default function PagoPage() {
                   {t("Política de pago Furgocasa")}
                 </h3>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• <strong>50%</strong> {t("al realizar la reserva")} ({paymentInfo.firstPayment.toFixed(2)}€)</li>
-                  <li>• <strong>50%</strong> {t("máximo 15 días antes de la recogida")} ({paymentInfo.secondPayment.toFixed(2)}€)</li>
+                  <li>• <strong>50%</strong> {t("al realizar la reserva")} ({formatPrice(paymentInfo.firstPayment)})</li>
+                  <li>• <strong>50%</strong> {t("máximo 15 días antes de la recogida")} ({formatPrice(paymentInfo.secondPayment)})</li>
                 </ul>
               </div>
             )}
@@ -419,11 +420,11 @@ export default function PagoPage() {
                     <CreditCard className="h-5 w-5" />
                     {paymentInfo.isPending50 ? (
                       <>
-                        {t("Pagar restante")} - {amountToPay.toFixed(2)}€
+                        {t("Pagar restante")} - {formatPrice(amountToPay)}
                       </>
                     ) : (
                       <>
-                        {t("Pagar 50% ahora")} - {amountToPay.toFixed(2)}€
+                        {t("Pagar 50% ahora")} - {formatPrice(amountToPay)}
                       </>
                     )}
                   </>
@@ -438,7 +439,7 @@ export default function PagoPage() {
                   className="w-full bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-semibold py-4 px-6 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <CreditCard className="h-5 w-5" />
-                  {t("Pagar total ahora")} - {booking.total_price.toFixed(2)}€
+                  {t("Pagar total ahora")} - {formatPrice(booking.total_price)}
                 </button>
               )}
             </div>

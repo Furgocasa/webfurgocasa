@@ -6,6 +6,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
+import { formatPrice } from "@/lib/utils";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
@@ -269,10 +270,10 @@ export default function ReservaPage() {
                   <div className="bg-white rounded-lg p-4 mb-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium">{t("Pago inicial")} (50%):</span>
-                      <span className="text-2xl font-bold text-furgocasa-orange">{firstPayment.toFixed(2)}€</span>
+                      <span className="text-2xl font-bold text-furgocasa-orange">{formatPrice(firstPayment)}</span>
                     </div>
                     <p className="text-sm text-gray-500 mt-2">
-                      {t("El segundo pago")} ({secondPayment.toFixed(2)}€) {t("se realizará máximo 15 días antes del inicio del alquiler")}.
+                      {t("El segundo pago")} ({formatPrice(secondPayment)}) {t("se realizará máximo 15 días antes del inicio del alquiler")}.
                     </p>
                   </div>
                   <button
@@ -280,7 +281,7 @@ export default function ReservaPage() {
                     className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center gap-2"
                   >
                     <CreditCard className="h-5 w-5" />
-                    {t("Pagar")} {firstPayment.toFixed(2)}€ {t("y confirmar")}
+                    {t("Pagar")} {formatPrice(firstPayment)} {t("y confirmar")}
                   </button>
                 </div>
               </div>
@@ -309,7 +310,7 @@ export default function ReservaPage() {
                       t("Ya estamos a menos de 15 días del inicio. Es momento de completar el pago.")
                     ) : (
                       <>
-                        {t("Has pagado")} {amountPaid.toFixed(2)}€. {t("El segundo pago")} ({secondPayment.toFixed(2)}€) {t("se debe realizar máximo 15 días antes del inicio")} ({pickupDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}).
+                        {t("Has pagado")} {formatPrice(amountPaid)}. {t("El segundo pago")} ({formatPrice(secondPayment)}) {t("se debe realizar máximo 15 días antes del inicio")} ({pickupDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}).
                       </>
                     )}
                   </p>
@@ -317,15 +318,15 @@ export default function ReservaPage() {
                     <div className="space-y-2">
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-600">{t("Total de la reserva")}:</span>
-                        <span className="font-semibold">{totalPrice.toFixed(2)}€</span>
+                        <span className="font-semibold">{formatPrice(totalPrice)}</span>
                       </div>
                       <div className="flex justify-between items-center text-sm">
                         <span className="text-gray-600">{t("Ya pagado")}:</span>
-                        <span className="font-semibold text-green-600">{amountPaid.toFixed(2)}€</span>
+                        <span className="font-semibold text-green-600">{formatPrice(amountPaid)}</span>
                       </div>
                       <div className="flex justify-between items-center pt-2 border-t">
                         <span className="text-gray-900 font-medium">{t("Pendiente")}:</span>
-                        <span className="text-xl font-bold text-furgocasa-orange">{pendingAmount.toFixed(2)}€</span>
+                        <span className="text-xl font-bold text-furgocasa-orange">{formatPrice(pendingAmount)}</span>
                       </div>
                     </div>
                   </div>
@@ -335,7 +336,7 @@ export default function ReservaPage() {
                       className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center gap-2"
                     >
                       <CreditCard className="h-5 w-5" />
-                      {t("Completar pago")} ({pendingAmount.toFixed(2)}€)
+                      {t("Completar pago")} ({formatPrice(pendingAmount)})
                     </button>
                   )}
                   {!secondPaymentDue && daysUntilPickup > 15 && (
@@ -362,7 +363,7 @@ export default function ReservaPage() {
                   <div className="bg-white rounded-lg p-4">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium">{t("Total pagado")}:</span>
-                      <span className="text-2xl font-bold text-green-600">{amountPaid.toFixed(2)}€</span>
+                      <span className="text-2xl font-bold text-green-600">{formatPrice(amountPaid)}</span>
                     </div>
                   </div>
                 </div>
@@ -495,7 +496,7 @@ export default function ReservaPage() {
                           </p>
                         </div>
                         <p className="font-bold text-furgocasa-orange text-lg ml-4">
-                          {item.total_price.toFixed(2)}€
+                          {formatPrice(item.total_price)}
                         </p>
                       </div>
                     ))}
@@ -524,19 +525,19 @@ export default function ReservaPage() {
                 <div className="space-y-3 mb-4 pb-4 border-b border-white/20">
                   <div className="flex justify-between text-sm">
                     <span className="opacity-90">{t("Alquiler")} ({booking.days} días)</span>
-                    <span className="font-semibold">{booking.base_price.toFixed(2)}€</span>
+                    <span className="font-semibold">{formatPrice(booking.base_price)}</span>
                   </div>
                   
                   {booking.extras_price > 0 && (
                     <div className="flex justify-between text-sm">
                       <span className="opacity-90">{t("Extras")}</span>
-                      <span className="font-semibold">{booking.extras_price.toFixed(2)}€</span>
+                      <span className="font-semibold">{formatPrice(booking.extras_price)}</span>
                     </div>
                   )}
                   
                   <div className="flex justify-between text-sm">
                     <span className="opacity-90">{t("Fianza")} *</span>
-                    <span className="font-semibold">1.000,00€</span>
+                    <span className="font-semibold">1.000,00 €</span>
                   </div>
                 </div>
 
@@ -545,16 +546,16 @@ export default function ReservaPage() {
                   <div className="space-y-2 mb-4 pb-4 border-b border-white/20">
                     <div className="flex justify-between text-sm">
                       <span className="opacity-90">{t("Primer pago")} (50%)</span>
-                      <span className="font-semibold">{firstPayment.toFixed(2)}€</span>
+                      <span className="font-semibold">{formatPrice(firstPayment)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="opacity-90">{t("Segundo pago")} (50%)</span>
-                      <span className="font-semibold">{secondPayment.toFixed(2)}€</span>
+                      <span className="font-semibold">{formatPrice(secondPayment)}</span>
                     </div>
                     {amountPaid > 0 && (
                       <div className="flex justify-between text-sm pt-2 border-t border-white/20">
                         <span className="opacity-90">{t("Ya pagado")}</span>
-                        <span className="font-semibold text-green-300">{amountPaid.toFixed(2)}€ ✓</span>
+                        <span className="font-semibold text-green-300">{formatPrice(amountPaid)} ✓</span>
                       </div>
                     )}
                   </div>
@@ -562,10 +563,10 @@ export default function ReservaPage() {
 
                 <div className="mb-4">
                   <p className="text-sm opacity-90 mb-1">{t("Total")}</p>
-                  <p className="text-4xl font-bold">{booking.total_price.toFixed(2)}€</p>
+                  <p className="text-4xl font-bold">{formatPrice(booking.total_price)}</p>
                   {pendingAmount > 0 && (
                     <p className="text-sm mt-2 opacity-90">
-                      {t("Pendiente")}: <span className="font-bold">{pendingAmount.toFixed(2)}€</span>
+                      {t("Pendiente")}: <span className="font-bold">{formatPrice(pendingAmount)}</span>
                     </p>
                   )}
                   {amountPaid >= totalPrice && (

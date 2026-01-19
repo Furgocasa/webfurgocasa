@@ -7,6 +7,7 @@ import { getVehicleBySlug } from "@/lib/supabase/queries";
 import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { translateServer } from "@/lib/i18n/server-translation";
+import { formatPrice } from "@/lib/utils";
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // Función de traducción del servidor
@@ -37,7 +38,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
           <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 mb-4 flex items-center justify-between">
             <div>
               <p className="text-xs text-gray-500">{t("Desde")}</p>
-              <p className="text-2xl font-bold text-furgocasa-orange">{vehicle.base_price_per_day}€<span className="text-sm font-normal text-gray-500">{t("/día")}</span></p>
+              <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(vehicle.base_price_per_day)}<span className="text-sm font-normal text-gray-500">{t("/día")}</span></p>
             </div>
             <LocalizedLink href={`/reservar?vehiculo=${vehicle.slug}`} className="bg-furgocasa-orange text-white font-semibold py-2.5 px-5 rounded-lg hover:bg-furgocasa-orange-dark transition-colors text-sm">
               {t("Reservar")}
@@ -187,7 +188,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
               <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
                 <div className="text-center mb-6">
                   <p className="text-sm text-gray-500">{t("Desde")}</p>
-                  <p className="text-4xl font-bold text-furgocasa-orange">{vehicle.base_price_per_day}€<span className="text-lg font-normal text-gray-500">{t("/día")}</span></p>
+                  <p className="text-4xl font-bold text-furgocasa-orange">{formatPrice(vehicle.base_price_per_day)}<span className="text-lg font-normal text-gray-500">{t("/día")}</span></p>
                 </div>
                 <LocalizedLink href={`/reservar?vehiculo=${vehicle.slug}`} className="block w-full bg-furgocasa-orange text-white text-center font-semibold py-3 px-4 rounded-lg hover:bg-furgocasa-orange-dark transition-colors mb-3">
                   {t("Reservar ahora")}

@@ -6,12 +6,16 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
- * Format price in EUR
+ * Format price in EUR with Spanish format (1.111,11 €)
+ * Always uses thousand separator (.) even for numbers < 10.000
  */
 export function formatPrice(amount: number): string {
   return new Intl.NumberFormat("es-ES", {
     style: "currency",
     currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    useGrouping: true,
   }).format(amount);
 }
 

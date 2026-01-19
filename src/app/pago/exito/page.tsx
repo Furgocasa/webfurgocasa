@@ -14,6 +14,7 @@ function LoadingState() {
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
+import { formatPrice } from "@/lib/utils";
 import { CheckCircle, Calendar, Car, MapPin, Download, Mail } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 
@@ -161,13 +162,13 @@ function PagoExitoContent() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">{t("Importe pagado")}:</span>
-                        <span className="font-bold text-green-700">{payment.amount.toFixed(2)}€</span>
+                        <span className="font-bold text-green-700">{formatPrice(payment.amount)}</span>
                       </div>
                       {payment.booking.total_price > payment.booking.amount_paid && (
                         <div className="flex justify-between pt-2 border-t border-green-200">
                           <span className="text-gray-600">{t("Pendiente de pago")}:</span>
                           <span className="font-bold text-orange-600">
-                            {(payment.booking.total_price - payment.booking.amount_paid).toFixed(2)}€
+                            {formatPrice(payment.booking.total_price - payment.booking.amount_paid)}
                           </span>
                         </div>
                       )}

@@ -32,12 +32,12 @@ const includedFree = [
 ];
 
 const extrasOptional = [
-  { name: "Sábanas y almohadas", price: "30 €", per: "viaje" },
-  { name: "Edredón invierno", price: "20 €", per: "viaje" },
-  { name: "Toallas de baño", price: "20 €", per: "viaje" },
-  { name: "Mascotas permitidas", price: "40 €", per: "viaje" },
-  { name: "Aparcamiento en Murcia", price: "10 €", per: "día" },
-  { name: "2ª cama (4 plazas)", price: "10 €", per: "día" },
+  { name: "Sábanas y almohadas", price: "30,00 €", per: "viaje" },
+  { name: "Edredón invierno", price: "20,00 €", per: "viaje" },
+  { name: "Toallas de baño", price: "20,00 €", per: "viaje" },
+  { name: "Mascotas permitidas", price: "40,00 €", per: "viaje" },
+  { name: "Aparcamiento en Murcia", price: "10,00 €", per: "día" },
+  { name: "2ª cama (4 plazas)", price: "10,00 €", per: "día" },
 ];
 
 const cancellationPolicy = [
@@ -48,9 +48,9 @@ const cancellationPolicy = [
 ];
 
 const returnFees = [
-  { service: "Vaciado aguas grises", price: "20€", note: "IVA incluido" },
-  { service: "Vaciado WC químico", price: "70€", note: "IVA incluido" },
-  { service: "Limpieza interior", price: "Desde 120€", note: "IVA incluido" },
+  { service: "Vaciado aguas grises", price: "20,00 €", note: "IVA incluido" },
+  { service: "Vaciado WC químico", price: "70,00 €", note: "IVA incluido" },
+  { service: "Limpieza interior", price: "Desde 120,00 €", note: "IVA incluido" },
 ];
 
 export default function TarifasPage() {
@@ -453,7 +453,7 @@ export default function TarifasPage() {
                   {t("Importante")}
                 </h4>
                 <p className="text-red-900/80 leading-relaxed font-medium">
-                  {t("Si realizas una reserva y, tras aportar la documentación, no acreditas el cumplimiento de los requisitos, el alquiler será cancelado y se aplicará una comisión de gestión de 40€ (IVA incluido).")}
+                  {t("Si realizas una reserva y, tras aportar la documentación, no acreditas el cumplimiento de los requisitos, el alquiler será cancelado y se aplicará una comisión de gestión de 40,00 € (IVA incluido).")}
                 </p>
               </div>
             </div>
@@ -541,7 +541,7 @@ export default function TarifasPage() {
                       {t("Seguro de Cancelación")}
                     </h4>
                     <p className="text-blue-100 text-lg leading-relaxed mb-6">
-                      {t("Por 5€/día (contratado al reservar), se limita el coste de cancelación en el periodo de 59 a 16 días a dicho importe.")}
+                      {t("Por 5,00 €/día (contratado al reservar), se limita el coste de cancelación en el periodo de 59 a 16 días a dicho importe.")}
                     </p>
                     <p className="text-xs text-blue-300 font-medium uppercase tracking-wide">
                       {t("* No aplica si restan menos de 16 días para el alquiler")}
@@ -651,11 +651,11 @@ export default function TarifasPage() {
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>{t("Si el daño no alcanza 900€, asumes el coste de reparación")}</span>
+                    <span>{t("Si el daño no alcanza 900,00 €, asumes el coste de reparación")}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>{t("Si supera 900€, ese es el máximo a pagar")}</span>
+                    <span>{t("Si supera 900,00 €, ese es el máximo a pagar")}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
@@ -704,8 +704,8 @@ export default function TarifasPage() {
                     {t("Penalizaciones por retraso")}
                   </h3>
                    <ul className="space-y-2 mb-4">
-                    <li className="flex justify-between text-sm"><span>{t("Primera hora")}</span> <span className="font-bold">40€</span></li>
-                    <li className="flex justify-between text-sm"><span>{t("Hora adicional")}</span> <span className="font-bold">20€</span></li>
+                    <li className="flex justify-between text-sm"><span>{t("Primera hora")}</span> <span className="font-bold">40,00 €</span></li>
+                    <li className="flex justify-between text-sm"><span>{t("Hora adicional")}</span> <span className="font-bold">20,00 €</span></li>
                   </ul>
                   <p className="text-xs text-gray-400">
                     {t("Si prevés llegar tarde, avisa cuanto antes para intentar ampliar el alquiler.")}

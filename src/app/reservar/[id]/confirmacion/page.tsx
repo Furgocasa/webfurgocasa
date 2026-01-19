@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
+import { formatPrice } from "@/lib/utils";
 import { 
   CheckCircle, AlertCircle, Calendar, MapPin, Car, 
   User, Mail, Phone, Building, CreditCard, Copy, Check
@@ -256,7 +257,7 @@ export default function ConfirmacionPage() {
 
               <div className="p-6 bg-gradient-to-r from-furgocasa-orange to-orange-600 rounded-lg text-white">
                 <p className="text-sm opacity-90 mb-1">{t("Importe a transferir")}</p>
-                <p className="text-4xl font-bold">{booking.total_price.toFixed(2)}€</p>
+                <p className="text-4xl font-bold">{formatPrice(booking.total_price)}</p>
               </div>
             </div>
 

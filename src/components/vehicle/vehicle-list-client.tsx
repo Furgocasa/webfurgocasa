@@ -5,6 +5,7 @@ import { LocalizedLink } from "@/components/localized-link";
 import { Car, Users, Bed, Fuel, Settings, ArrowRight, Filter, Gauge, X, Calendar, TrendingDown } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { useLanguage } from "@/contexts/language-context";
+import { formatPrice } from "@/lib/utils";
 
 // Tipos de filtro
 type BedsFilter = "all" | "2" | "4";
@@ -297,7 +298,7 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                     <div>
                       <p className="text-sm text-gray-600">{t("Desde")}</p>
                       <p className="text-2xl font-heading font-bold text-furgocasa-blue">
-                        {vehicle.base_price_per_day}€
+                        {formatPrice(vehicle.base_price_per_day)}
                         <span className="text-sm text-gray-600 font-normal">/{t("día")}</span>
                       </p>
                     </div>
