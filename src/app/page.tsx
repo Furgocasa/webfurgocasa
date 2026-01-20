@@ -156,18 +156,26 @@ export default async function HomePage() {
         </section>
 
         {/* Sección: Los mejores modelos en alquiler */}
-        <section className="relative py-16 lg:py-24 bg-gray-50">
+        <section className="py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-12 lg:mb-16">
-              <span className="inline-block px-4 py-2 bg-furgocasa-blue/10 text-furgocasa-blue rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+            {/* H2 Principal de la sección */}
+            <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
+              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
                 NUESTRA FLOTA
-              </span>
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
-                Los mejores modelos en alquiler
               </h2>
-              <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-                Furgonetas campers de gran volumen, perfectas para viajar en familia o pareja
-              </p>
+
+              {/* Intro a flota */}
+              <div className="text-center max-w-3xl mx-auto">
+                <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
+                  Flota de vehículos de máxima calidad
+                </h3>
+                <p className="text-base lg:text-lg text-gray-700 leading-relaxed mb-3">
+                  <strong>FURGOCASA:</strong> estamos especializados en el alquiler de vehículos campers van de gran volumen.
+                </p>
+                <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
+                  Contamos con los mejores modelos de furgonetas campers del mercado.
+                </p>
+              </div>
             </div>
 
             {/* Grid de vehículos */}
@@ -211,16 +219,6 @@ export default async function HomePage() {
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="text-center mt-12">
-              <LocalizedLink
-                href="/vehiculos"
-                className="inline-flex items-center gap-2 bg-furgocasa-blue text-white font-heading font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-blue-dark transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-              >
-                Ver toda la flota
-                <span className="text-2xl">→</span>
-              </LocalizedLink>
             </div>
           </div>
         </section>
