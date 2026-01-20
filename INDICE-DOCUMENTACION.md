@@ -42,7 +42,7 @@ Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
 | **[CHANGELOG.md](./CHANGELOG.md)** | Historial versiones, problemas deploy, **v1.0.4 FIX CRÍTICO** | Al debuggear o deployar |
 | **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** | ⚠️ **INCLUYE REGLAS DE SUPABASE CLIENT** | Antes de tocar CUALQUIER código |
 | **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** | ⚠️ **REGLAS OBLIGATORIAS** - Queries a Supabase | ANTES de hacer ANY query |
-| **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** | ⚠️ **NUEVO** - Fix crítico autenticación | Ver qué se rompió y cómo se arregló |
+| **[CHANGELOG.md](./CHANGELOG.md)** | Fix crítico autenticación v1.0.4 | Ver qué se rompió y cómo se arregló |
 | **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** | Schema real con campos exactos | Al consultar tablas |
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
@@ -58,8 +58,7 @@ Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
 
 | Documento | Descripción |
 |-----------|-------------|
-| **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** | ⚠️ **NUEVO** - Fix crítico sistema autenticación v1.0.4 |
-| **[CORRECCION-CALENDARIO.md](./CORRECCION-CALENDARIO.md)** | ⚠️ **NUEVO** - Fixes específicos del calendario admin |
+| **[CHANGELOG.md](./CHANGELOG.md)** | Fix crítico sistema autenticación v1.0.4 (ver sección v1.0.4) |
 | **[CONFIGURACION-META-PIXEL.md](./CONFIGURACION-META-PIXEL.md)** | Configuración Meta Pixel con carga condicional |
 | **README.md** | Sección "Sistema de Autenticación - CÓMO FUNCIONA" |
 
@@ -175,7 +174,7 @@ Ver carpeta `scripts/`:
 
 ### Voy a trabajar con autenticación o datos
 1. Lee **[README.md](./README.md)** sección "Sistema de Autenticación" ⚠️ **OBLIGATORIO**
-2. Lee **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** ⚠️ **NUEVO**
+2. Lee **[CHANGELOG.md](./CHANGELOG.md)** v1.0.4 ⚠️
 3. Lee **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** ⚠️
 4. **NO TOQUES** `src/lib/supabase/client.ts` ni `server.ts`
 5. **NO TOQUES** los hooks `use-paginated-data.ts`, `use-admin-data.ts`, `use-all-data-progressive.ts`
@@ -224,8 +223,6 @@ Ver carpeta `scripts/`:
 ├── 📋 CHANGELOG.md                        ← Historial (v1.0.4 FIX CRÍTICO)
 ├── 🔴 REGLAS-ARQUITECTURA-NEXTJS.md       ← INCLUYE REGLAS SUPABASE CLIENT
 ├── 🔴 REGLAS-SUPABASE-OBLIGATORIAS.md     ← ⚠️ LEER ANTES DE QUERIES
-├── 🔴 CORRECCION-ERRORES-ADMIN.md         ← ⚠️ NUEVO - Fix autenticación v1.0.4
-├── 🔴 CORRECCION-CALENDARIO.md            ← ⚠️ NUEVO - Fix calendario
 ├── 🔴 CONFIGURACION-META-PIXEL.md         ← Meta Pixel condicional
 ├── 🚨 SUPABASE-SCHEMA-REAL.md             ← Schema real con campos exactos
 ├── 🚨 PAGINAS-VEHICULOS-GARANTIA.md       ← ⚠️ Garantía páginas vehículos
@@ -272,9 +269,9 @@ Ver carpeta `scripts/`:
 
 ### Por Tema
 
-- **Autenticación y datos**: `CORRECCION-ERRORES-ADMIN.md` ⚠️ **NUEVO**, `REGLAS-SUPABASE-OBLIGATORIAS.md`
+- **Autenticación y datos**: `CHANGELOG.md` v1.0.4, `REGLAS-SUPABASE-OBLIGATORIAS.md`
 - **Cliente Supabase**: `README.md` sección "Sistema de Autenticación", `REGLAS-ARQUITECTURA-NEXTJS.md`
-- **Calendario admin**: `CORRECCION-CALENDARIO.md` ⚠️ **NUEVO**
+- **Calendario admin**: `CHANGELOG.md` v1.0.4 (sección calendario)
 - **Meta Pixel**: `CONFIGURACION-META-PIXEL.md`
 - **Reservas**: `FLUJO-RESERVAS-CRITICO.md` ⚠️ **CORE DEL NEGOCIO**
 - **Clientes**: `GESTION-CLIENTES-OBLIGATORIO.md` ⚠️ **NUEVO**
@@ -295,10 +292,10 @@ Ver carpeta `scripts/`:
 
 | Pregunta | Documento |
 |----------|-----------|
-| ¿Por qué el admin dejó de funcionar? | `CORRECCION-ERRORES-ADMIN.md` ⚠️ **NUEVO** |
+| ¿Por qué el admin dejó de funcionar? | `CHANGELOG.md` v1.0.4 |
 | ¿Cómo uso correctamente el cliente Supabase? | `README.md` + `REGLAS-ARQUITECTURA-NEXTJS.md` |
 | ¿Puedo modificar `client.ts` o `server.ts`? | **NO** - Ver `README.md` sección "Reglas Absolutas" |
-| ¿Por qué el calendario no carga? | `CORRECCION-CALENDARIO.md` ⚠️ **NUEVO** |
+| ¿Por qué el calendario no carga? | `CHANGELOG.md` v1.0.4 (sección calendario) |
 | ¿Cómo configuro Meta Pixel? | `CONFIGURACION-META-PIXEL.md` |
 | ¿Puedo usar `"use client"` en esta página? | `REGLAS-ARQUITECTURA-NEXTJS.md` |
 | ¿Cómo traduzco en Server Component? | `GUIA-TRADUCCION.md` |
@@ -325,8 +322,9 @@ Ver carpeta `scripts/`:
 
 ## ✅ DOCUMENTOS OBSOLETOS ELIMINADOS
 
-Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
+Estos documentos ya NO existen (fueron eliminados):
 
+### Eliminados el 8 de Enero, 2026:
 - ❌ `MULTIIDIOMA-AUDIT.md` - Obsoleto
 - ❌ `MULTIIDIOMA-INFORME-COMPLETO.md` - Obsoleto
 - ❌ `CORRECCION-ENLACES-MULTIIDIOMA.md` - Obsoleto
@@ -345,6 +343,14 @@ Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
 - ❌ `ORGANIZACION-BLOG-CARPETAS.md` - Obsoleto
 - ❌ `RESUMEN-MIGRACION-BLOG.md` - Obsoleto
 - ❌ `BLOG-TRANSLATION-README.md` - Obsoleto
+
+### Eliminados el 20 de Enero, 2026:
+- ❌ `DOCUMENTACION-COMPLETA-v1.0.4.md` - Resumen temporal de auditoría (información ya está en README.md y CHANGELOG.md)
+- ❌ `FIX-SINGLETON-PENDIENTE.md` - Lista de archivos pendientes de corrección (ya completado)
+- ❌ `CORRECCION-ERRORES-ADMIN.md` - Fix crítico v1.0.4 (información completa en CHANGELOG.md v1.0.4)
+- ❌ `CORRECCION-CALENDARIO.md` - Fix calendario v1.0.4 (información completa en CHANGELOG.md v1.0.4)
+- ❌ `CORRECCION-CLIENTES-TOTALES.md` - Fix simple ya aplicado (información en CHANGELOG.md)
+- ❌ `CORRECCION-CUSTOMER-PHONE-OBLIGATORIO.md` - Fix simple ya aplicado (información en CHANGELOG.md)
 
 ---
 
@@ -367,5 +373,6 @@ Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
 
 ---
 
-**Total de documentos activos**: 33 archivos .md en raíz + subdirectorios  
-**Última actualización crítica**: v1.0.4 - Fix sistema autenticación (20 Enero 2026)
+**Total de documentos activos**: 27 archivos .md en raíz + subdirectorios  
+**Última actualización crítica**: v1.0.4 - Fix sistema autenticación (20 Enero 2026)  
+**Última limpieza de obsoletos**: 20 Enero 2026

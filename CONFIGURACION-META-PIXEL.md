@@ -3,7 +3,7 @@
 **Última actualización**: 20 de Enero 2026 - v1.0.4
 
 > ⚠️ **ESTE FIX ES PARTE DEL RELEASE v1.0.4**  
-> Ver también: `CORRECCION-ERRORES-ADMIN.md`, `CHANGELOG.md` v1.0.4
+> Ver también: `CHANGELOG.md` v1.0.4
 
 ---
 
@@ -87,7 +87,7 @@ Para verificar que el pixel está funcionando correctamente:
 
 ## 📚 Documentación Relacionada
 
-- **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** - Fix completo del administrador v1.0.4
+- **[CHANGELOG.md](./CHANGELOG.md)** - v1.0.4 con fix completo del administrador
 - **[CHANGELOG.md](./CHANGELOG.md)** - v1.0.4 con todos los cambios
 
 ---

@@ -91,6 +91,8 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
 
   // Obtener posts destacados (solo en la primera página sin filtros)
   let featuredPosts: Post[] = [];
+  let featuredIds: string[] = [];
+  
   if (page === 1 && !categorySlug && !searchQuery) {
     const { data: featuredData } = await supabase
       .from('posts')
@@ -116,8 +118,12 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
         ...post,
         category: Array.isArray(post.category) ? post.category[0] : post.category
       }));
+      featuredIds = featuredData.map(post => post.id);
     }
   }
+
+  // Filtrar posts regulares para excluir los destacados
+  const regularPosts = posts.filter(post => !featuredIds.includes(post.id));
 
   // Cargar categorías con contador
   const { data: categoriesData } = await supabase
@@ -146,7 +152,7 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
   }
 
   return { 
-    posts, 
+    posts: regularPosts, 
     categories, 
     totalCount: count || 0,
     featuredPosts 

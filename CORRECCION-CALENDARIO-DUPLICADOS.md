@@ -3,8 +3,7 @@
 **Última actualización**: 20 de Enero 2026
 
 > ℹ️ **NOTA**: Este documento trata sobre la corrección de duplicados visuales  
-> Para el fix de autenticación del calendario, ver `CORRECCION-CALENDARIO.md`  
-> Para el fix general del admin, ver `CORRECCION-ERRORES-ADMIN.md`
+> Para el fix de autenticación del calendario y otros fixes, ver `CHANGELOG.md` v1.0.4
 
 ---
 
@@ -308,8 +307,7 @@ ALTER TABLE bookings ENABLE TRIGGER prevent_booking_conflicts;
 
 ## 📚 Documentación Relacionada
 
-- **[CORRECCION-CALENDARIO.md](./CORRECCION-CALENDARIO.md)** - Corrección de carga del calendario
-- **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** - Fix general del administrador
+- **[CHANGELOG.md](./CHANGELOG.md)** - v1.0.4 con fixes del calendario y administrador
 - **[README.md](./README.md)** - Arquitectura general
 
 ---

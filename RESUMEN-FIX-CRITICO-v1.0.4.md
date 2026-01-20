@@ -193,12 +193,10 @@ export const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonK
    - Carga condicional
    - Variables de entorno
 
-2. **`CORRECCION-ERRORES-ADMIN.md`**
-   - Tracking completo de errores
+2. **`CHANGELOG.md`** (actualizado)
+   - Tracking completo de errores en v1.0.4
    - Progreso de fixes
    - Estado de cada sección
-
-3. **`CORRECCION-CALENDARIO.md`**
    - Problemas específicos del calendario
    - Batch loading de booking_extras
    - Validaciones de null
@@ -297,8 +295,6 @@ git add REGLAS-ARQUITECTURA-NEXTJS.md
 git add REGLAS-SUPABASE-OBLIGATORIAS.md
 git add INDICE-DOCUMENTACION.md
 git add CONFIGURACION-META-PIXEL.md
-git add CORRECCION-ERRORES-ADMIN.md
-git add CORRECCION-CALENDARIO.md
 git commit -m "docs: actualizar toda la documentación con fix crítico v1.0.4"
 
 # 3. Push a producción

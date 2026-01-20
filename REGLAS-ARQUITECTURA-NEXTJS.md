@@ -245,7 +245,7 @@ Si no estás 100% seguro si una página debe ser Server o Client Component:
 
 - **CHANGELOG.md v1.0.4** - Fix crítico del sistema de autenticación
 - **README.md** - Arquitectura completa y reglas de oro
-- **CORRECCION-ERRORES-ADMIN.md** - Tracking de errores y fixes
+- **CHANGELOG.md** v1.0.4 - Tracking de errores y fixes
 
 ---
 

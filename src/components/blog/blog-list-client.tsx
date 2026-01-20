@@ -237,10 +237,12 @@ export function BlogListClient({
         {/* Posts destacados */}
         {featuredPosts.length > 0 && (
           <div className="mb-16">
-            <h2 className="text-3xl font-heading font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <div className="flex items-center gap-3 mb-2">
               <Sparkles className="h-8 w-8 text-furgocasa-orange" />
-              {t("Artículos Destacados")}
-            </h2>
+              <h2 className="text-3xl font-heading font-bold text-gray-900">
+                {t("Artículos Destacados")}
+              </h2>
+            </div>
             <p className="text-gray-600 mb-8">{t("Los mejores artículos seleccionados para ti")}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featuredPosts.map((post) => {
@@ -250,7 +252,7 @@ export function BlogListClient({
                   <LocalizedLink
                     key={post.id}
                     href={`/blog/${translatedCategorySlug}/${post.slug}`}
-                    className="group bg-gradient-to-br from-white to-blue-50 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-furgocasa-orange/20"
+                    className="group bg-gradient-to-br from-white to-blue-50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-furgocasa-orange/30"
                   >
                     <div className="h-56 bg-gray-200 relative overflow-hidden">
                       {post.featured_image ? (
@@ -266,36 +268,36 @@ export function BlogListClient({
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
                       <div className="absolute top-3 left-3">
-                        <span className="bg-furgocasa-orange text-white px-3 py-1 rounded-full text-xs font-bold uppercase flex items-center gap-1 shadow-lg">
-                          <Sparkles className="h-3 w-3" />
+                        <span className="bg-furgocasa-orange text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase flex items-center gap-1.5 shadow-lg">
+                          <Sparkles className="h-3.5 w-3.5" />
                           {t("Destacado")}
                         </span>
                       </div>
                       {post.category && (
                         <div className="absolute top-3 right-3">
-                          <span className="bg-white/90 text-gray-900 px-2 py-1 rounded-full text-xs font-semibold">
+                          <span className="bg-white/95 text-gray-900 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
                             {getCategoryName(post.category.slug, language)}
                           </span>
                         </div>
                       )}
                     </div>
                     <div className="p-6">
-                      <h3 className="text-xl font-heading font-bold text-gray-900 mb-3 group-hover:text-furgocasa-blue transition-colors line-clamp-2">
+                      <h3 className="text-xl font-heading font-bold text-gray-900 mb-3 group-hover:text-furgocasa-blue transition-colors line-clamp-2 leading-tight">
                         {post.title}
                       </h3>
                       {post.excerpt && (
-                        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{post.excerpt}</p>
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-3 leading-relaxed">{post.excerpt}</p>
                       )}
                       <div className="flex items-center justify-between text-xs text-gray-500 pt-3 border-t border-gray-200">
                         {post.published_at && (
-                          <span className="flex items-center gap-1">
-                            <Calendar className="h-3 w-3" />
+                          <span className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
                             {new Date(post.published_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </span>
                         )}
                         {post.reading_time > 0 && (
-                          <span className="flex items-center gap-1 font-medium">
-                            <Clock className="h-3 w-3" />
+                          <span className="flex items-center gap-1.5 font-medium text-furgocasa-blue">
+                            <Clock className="h-3.5 w-3.5" />
                             {post.reading_time} min
                           </span>
                         )}
@@ -304,6 +306,18 @@ export function BlogListClient({
                   </LocalizedLink>
                 );
               })}
+            </div>
+            
+            {/* Separador visual */}
+            <div className="mt-16 mb-12 relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t-2 border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span className="bg-gray-50 px-6 py-2 text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                  {t("Todos los artículos")}
+                </span>
+              </div>
             </div>
           </div>
         )}

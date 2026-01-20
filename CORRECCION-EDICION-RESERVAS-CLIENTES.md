@@ -3,7 +3,7 @@
 **Última actualización**: 20 de Enero 2026
 
 > ℹ️ **NOTA**: Este cambio es independiente del fix crítico v1.0.4  
-> Para el fix de autenticación del admin, ver `CORRECCION-ERRORES-ADMIN.md`
+> Para el fix de autenticación del admin, ver `CHANGELOG.md` v1.0.4
 
 ---
 
@@ -303,7 +303,6 @@ WHERE bookings.id = 'booking-id';
 ## 📚 Documentación Relacionada
 
 - **[MIGRACION-CLIENTES-NORMALIZADOS.md](./MIGRACION-CLIENTES-NORMALIZADOS.md)** - Migración de datos
-- **[CORRECCION-CUSTOMER-PHONE-OBLIGATORIO.md](./CORRECCION-CUSTOMER-PHONE-OBLIGATORIO.md)** - Fix de campo phone
 - **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** - Reglas de gestión
 
 ---

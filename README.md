@@ -832,8 +832,7 @@ NEXT_PUBLIC_GA_ID (opcional)
 
 #### Autenticación y Datos
 - **ESTE README.md** - Arquitectura y reglas absolutas
-- **CORRECCION-ERRORES-ADMIN.md** - Fix del sistema de autenticación
-- **CORRECCION-CALENDARIO.md** - Fix específico del calendario
+- **CHANGELOG.md** v1.0.4 - Fix del sistema de autenticación y calendario
 
 #### Base de Datos
 - **SUPABASE-SCHEMA-REAL.md** - Schema real y actualizado

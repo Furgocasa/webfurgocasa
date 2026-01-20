@@ -190,8 +190,7 @@ for (const batch of batches) {
 
 #### **Nuevos Documentos**:
 - ✅ **`CONFIGURACION-META-PIXEL.md`** - Configuración Meta Pixel
-- ✅ **`CORRECCION-ERRORES-ADMIN.md`** - Tracking detallado de todos los errores y fixes
-- ✅ **`CORRECCION-CALENDARIO.md`** - Fixes específicos del calendario
+- ✅ **`CHANGELOG.md`** - Tracking detallado de todos los errores y fixes (este documento)
 
 #### **Actualizados**:
 - ✅ **`README.md`** - Sección completa sobre arquitectura de autenticación
