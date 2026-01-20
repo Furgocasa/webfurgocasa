@@ -201,10 +201,38 @@ npx tsx scripts/test-rental-days.ts
 
 ## Migración de Datos Antiguos
 
+### Script Automático de Recálculo
+
+He creado un script para recalcular automáticamente los días de reservas existentes:
+
+```bash
+# 1. Ver qué cambios se harían (sin aplicarlos)
+npx tsx scripts/fix-booking-days.ts --dry-run
+
+# 2. Revisar los cambios propuestos
+
+# 3. Aplicar cambios si todo es correcto
+npx tsx scripts/fix-booking-days.ts --apply
+```
+
+**El script:**
+- ✅ Consulta todas las reservas existentes
+- ✅ Recalcula días usando `calculateRentalDays()` con fechas y horas
+- ✅ Identifica reservas con días incorrectos
+- ✅ Asigna `10:00` como hora por defecto si falta `dropoff_time`
+- ✅ Muestra resumen detallado antes de aplicar cambios
+- ✅ Solo actualiza si se usa `--apply`
+
+Ver: `scripts/README-fix-booking-days.md` para documentación completa del script.
+
+### Pasos Manuales (Si se prefiere)
+
 Si hay reservas antiguas sin `dropoff_time`:
 - Usar valor por defecto `'10:00'` (hora estándar de devolución)
 - Recalcular el campo `days` usando `calculateRentalDays()`
 - Actualizar precios si es necesario
+
+**IMPORTANTE:** El script NO modifica precios, solo corrige el campo `days` para reflejar la duración real del alquiler.
 
 ## Documentación para Clientes
 
