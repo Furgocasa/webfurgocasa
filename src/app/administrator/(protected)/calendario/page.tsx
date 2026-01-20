@@ -543,26 +543,26 @@ export default function CalendarioPage() {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <button
               onClick={previousPeriod}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
               title={`${monthsToShow} ${periodLabel} anterior${monthsToShow > 1 ? 'es' : ''}`}
             >
-              <ChevronLeft className="h-6 w-6" />
+              <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
             </button>
             
             <button
               onClick={goToToday}
-              className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              className="px-3 md:px-4 py-1.5 md:py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0"
             >
               Hoy
             </button>
 
-            <div className="text-center min-w-[200px]">
+            <div className="text-center min-w-[160px] md:min-w-[200px] flex-1">
               <div className="flex items-center justify-center gap-2">
-                <CalendarIcon className="h-5 w-5 text-gray-500" />
-                <span className="text-lg font-bold text-gray-900 capitalize">
+                <CalendarIcon className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
+                <span className="text-base md:text-lg font-bold text-gray-900 capitalize">
                   {months[0].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
                   {monthsToShow > 1 && (
                     <> - {months[months.length - 1].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</>
@@ -573,10 +573,10 @@ export default function CalendarioPage() {
 
             <button
               onClick={nextPeriod}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
               title={`${monthsToShow} ${periodLabel} siguiente${monthsToShow > 1 ? 's' : ''}`}
             >
-              <ChevronRight className="h-6 w-6" />
+              <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
             </button>
           </div>
         </div>
@@ -784,7 +784,7 @@ export default function CalendarioPage() {
                                                 {pickupBookings.map((booking, idx) => (
                                                   <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
                                                     <div className="font-semibold text-green-400 mb-1">🟢 RECOGIDA {pickupBookings.length > 1 ? `#${idx + 1}` : ''}</div>
-                                                    <div className="font-bold text-base">{booking.pickup_time || '10:00'}</div>
+                                                    <div className="font-bold text-base">{booking.pickup_time?.substring(0, 5) || '10:00'}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
                                                       📍 {booking.pickup_location?.name || 'Sin ubicación'}
                                                     </div>
@@ -821,7 +821,7 @@ export default function CalendarioPage() {
                                                 {dropoffBookings.map((booking, idx) => (
                                                   <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
                                                     <div className="font-semibold text-red-400 mb-1">🔴 DEVOLUCIÓN {dropoffBookings.length > 1 ? `#${idx + 1}` : ''}</div>
-                                                    <div className="font-bold text-base">{booking.dropoff_time || '10:00'}</div>
+                                                    <div className="font-bold text-base">{booking.dropoff_time?.substring(0, 5) || '10:00'}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
                                                       📍 {booking.dropoff_location?.name || 'Sin ubicación'}
                                                     </div>
@@ -938,7 +938,7 @@ export default function CalendarioPage() {
                                         {vehicle?.internal_code || 'N/A'}
                                       </span>
                                       <span className="text-[8px] opacity-75">
-                                        {isPickup ? event.booking.pickup_time : event.booking.dropoff_time}
+                                        {(isPickup ? event.booking.pickup_time : event.booking.dropoff_time)?.substring(0, 5)}
                                       </span>
                                     </div>
                                   </div>
@@ -1081,14 +1081,14 @@ export default function CalendarioPage() {
                     <div className="font-bold text-gray-900">
                       {new Date(selectedBooking.pickup_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
-                    <div className="text-sm text-gray-600">{selectedBooking.pickup_time || '10:00'}</div>
+                    <div className="text-sm text-gray-600">{selectedBooking.pickup_time?.substring(0, 5) || '10:00'}</div>
                   </div>
                   <div className="bg-red-50 rounded-lg p-3 border border-red-200">
                     <div className="text-xs font-semibold text-red-700 mb-1">🔴 Devolución</div>
                     <div className="font-bold text-gray-900">
                       {new Date(selectedBooking.dropoff_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
                     </div>
-                    <div className="text-sm text-gray-600">{selectedBooking.dropoff_time || '10:00'}</div>
+                    <div className="text-sm text-gray-600">{selectedBooking.dropoff_time?.substring(0, 5) || '10:00'}</div>
                   </div>
                 </div>
               </div>

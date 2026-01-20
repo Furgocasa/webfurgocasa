@@ -10,16 +10,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-interface Payment {
-  id: string;
-  amount: number;
-  status: string;
-  payment_type: string;
-  payment_method: string;
-  created_at: string;
-  order_number: string;
-}
-
 interface Booking {
   id: string;
   booking_number: string;
@@ -32,6 +22,7 @@ interface Booking {
   extras_price: number;
   total_price: number;
   deposit_amount: number;
+  amount_paid: number | null;
   status: string;
   payment_status: string;
   customer_name: string;
@@ -104,7 +95,6 @@ export default function ReservaDetalleAdminPage() {
   const bookingId = params.id as string;
   
   const [booking, setBooking] = useState<Booking | null>(null);
-  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -160,16 +150,6 @@ export default function ReservaDetalleAdminPage() {
       
       console.log('Booking loaded:', data); // Debug: ver datos cargados
       setBooking(data as any);
-
-      // Cargar pagos de la reserva
-      const { data: paymentsData, error: paymentsError } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('booking_id', bookingId)
-        .order('created_at', { ascending: false });
-
-      if (paymentsError) throw paymentsError;
-      setPayments(paymentsData || []);
 
     } catch (error: any) {
       console.error('Error loading booking:', error);
@@ -263,13 +243,14 @@ export default function ReservaDetalleAdminPage() {
 
   const StatusIcon = statusColors[booking.status]?.icon || Clock;
 
-  // Calcular total pagado (solo pagos autorizados)
-  const totalPaid = payments
-    .filter(p => p.status === 'authorized')
-    .reduce((sum, p) => sum + Number(p.amount), 0);
-
+  // Obtener datos de pago directamente del booking (campo amount_paid)
+  const totalPaid = booking.amount_paid || 0;
+  
   // Calcular pendiente
   const totalPending = booking.total_price - totalPaid;
+  
+  // Calcular porcentaje pagado
+  const percentagePaid = booking.total_price > 0 ? (totalPaid / booking.total_price) * 100 : 0;
 
   return (
     <div className="space-y-6">

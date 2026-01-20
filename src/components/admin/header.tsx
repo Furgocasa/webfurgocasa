@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAdminAuth } from "@/contexts/admin-auth-context";
 import {
-  Bell,
   LogOut,
   User,
   Settings,
@@ -25,7 +24,6 @@ export function AdminHeader({ admin, onMenuClick }: AdminHeaderProps) {
   const router = useRouter();
   const { logout } = useAdminAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -54,41 +52,6 @@ export function AdminHeader({ admin, onMenuClick }: AdminHeaderProps) {
             <ExternalLink className="h-5 w-5" />
             <span className="hidden lg:inline text-sm">Ver web</span>
           </a>
-          <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-target"
-              aria-label="Notificaciones"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-lg border border-gray-200 z-[60]">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-900">Notificaciones</h3>
-                </div>
-                <div className="max-h-96 overflow-y-auto">
-                  <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                    <p className="text-sm text-gray-900">Nueva reserva recibida</p>
-                    <p className="text-xs text-gray-500 mt-1">Hace 5 minutos</p>
-                  </div>
-                  <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                    <p className="text-sm text-gray-900">Pago confirmado FC2401-0015</p>
-                    <p className="text-xs text-gray-500 mt-1">Hace 1 hora</p>
-                  </div>
-                </div>
-                <div className="p-3 border-t border-gray-100">
-                  <a
-                    href="/administrator/notificaciones"
-                    className="text-sm text-furgocasa-orange hover:underline"
-                  >
-                    Ver todas las notificaciones
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -143,7 +106,6 @@ export function AdminHeader({ admin, onMenuClick }: AdminHeaderProps) {
 export function AdminHeaderCompact({ admin, onMenuClick }: AdminHeaderProps) {
   const { logout } = useAdminAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -179,44 +141,6 @@ export function AdminHeaderCompact({ admin, onMenuClick }: AdminHeaderProps) {
             <ExternalLink className="h-5 w-5" />
             <span className="hidden xl:inline text-sm">Ver web</span>
           </a>
-
-          {/* Notifications */}
-          <div className="relative">
-            <button
-              onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-target"
-              aria-label="Notificaciones"
-            >
-              <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-
-            {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] bg-white rounded-xl shadow-lg border border-gray-200 z-[60]">
-                <div className="p-4 border-b border-gray-100">
-                  <h3 className="font-semibold text-gray-900">Notificaciones</h3>
-                </div>
-                <div className="max-h-96 overflow-y-auto">
-                  <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                    <p className="text-sm text-gray-900">Nueva reserva recibida</p>
-                    <p className="text-xs text-gray-500 mt-1">Hace 5 minutos</p>
-                  </div>
-                  <div className="p-4 hover:bg-gray-50 cursor-pointer">
-                    <p className="text-sm text-gray-900">Pago confirmado FC2401-0015</p>
-                    <p className="text-xs text-gray-500 mt-1">Hace 1 hora</p>
-                  </div>
-                </div>
-                <div className="p-3 border-t border-gray-100">
-                  <a
-                    href="/administrator/notificaciones"
-                    className="text-sm text-furgocasa-orange hover:underline"
-                  >
-                    Ver todas las notificaciones
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
 
           {/* User menu */}
           <div className="relative">
