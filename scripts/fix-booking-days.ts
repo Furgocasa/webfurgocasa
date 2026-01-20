@@ -9,8 +9,13 @@
  * - --apply: Aplica los cambios realmente
  */
 
+import { config } from 'dotenv';
+import { resolve } from 'path';
 import { createClient } from '@supabase/supabase-js';
 import { calculateRentalDays } from '../src/lib/utils';
+
+// Cargar variables de entorno desde .env.local
+config({ path: resolve(process.cwd(), '.env.local') });
 
 // Configuración de Supabase
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -62,6 +67,23 @@ async function main() {
   
   console.log('━'.repeat(60));
   console.log('\n📊 Consultando reservas...\n');
+
+  // Primero, obtener todas las reservas para diagnóstico
+  const { data: allBookings, error: allError } = await supabase
+    .from('bookings')
+    .select('id, booking_number, pickup_date, dropoff_date')
+    .order('created_at', { ascending: false });
+
+  if (allError) {
+    console.error('❌ Error al consultar todas las reservas:', allError);
+  } else {
+    console.log(`📋 Total de reservas en BD: ${allBookings?.length || 0}`);
+    if (allBookings && allBookings.length > 0) {
+      const withDates = allBookings.filter(b => b.pickup_date && b.dropoff_date);
+      console.log(`   Con fechas de recogida/devolución: ${withDates.length}`);
+      console.log(`   Sin fechas: ${allBookings.length - withDates.length}\n`);
+    }
+  }
 
   // Obtener todas las reservas que tienen fechas
   const { data: bookings, error } = await supabase
