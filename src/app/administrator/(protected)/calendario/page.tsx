@@ -720,21 +720,33 @@ export default function CalendarioPage() {
                                 // Reserva principal para mostrar (la primera activa en el día)
                                 const dayBooking = dayBookings.length > 0 ? dayBookings[0] : null;
 
-                                // VALIDACIÓN CRÍTICA: Detectar conflictos de reservas
-                                // Si hay más de una reserva activa en el mismo día para el mismo vehículo,
-                                // es un error grave que necesita corrección
+                                // VALIDACIÓN CRÍTICA: Detectar conflictos de reservas REALES
+                                // Verificar si hay solapamiento considerando las horas
+                                let realConflicts = 0;
                                 if (dayBookings.length > 1) {
-                                  console.error(
-                                    `[CALENDARIO ERROR] Conflicto detectado para vehículo ${vehicle.internal_code || vehicle.name}`,
-                                    `en fecha ${currentDateStr}:`,
-                                    `${dayBookings.length} reservas simultáneas:`,
-                                    dayBookings.map(b => ({
-                                      booking_number: b.booking_number,
-                                      pickup: b.pickup_date,
-                                      dropoff: b.dropoff_date,
-                                      customer: b.customer?.name
-                                    }))
-                                  );
+                                  // Comprobar cada par de reservas para ver si se solapan en horas
+                                  for (let i = 0; i < dayBookings.length; i++) {
+                                    for (let j = i + 1; j < dayBookings.length; j++) {
+                                      const booking1 = dayBookings[i];
+                                      const booking2 = dayBookings[j];
+                                      
+                                      const booking1Pickup = new Date(`${booking1.pickup_date}T${booking1.pickup_time || '10:00'}`);
+                                      const booking1Dropoff = new Date(`${booking1.dropoff_date}T${booking1.dropoff_time || '10:00'}`);
+                                      const booking2Pickup = new Date(`${booking2.pickup_date}T${booking2.pickup_time || '10:00'}`);
+                                      const booking2Dropoff = new Date(`${booking2.dropoff_date}T${booking2.dropoff_time || '10:00'}`);
+                                      
+                                      // Hay conflicto real si los periodos se solapan
+                                      if (booking1Pickup < booking2Dropoff && booking1Dropoff > booking2Pickup) {
+                                        realConflicts++;
+                                        console.error(
+                                          `[CALENDARIO ERROR] Conflicto detectado para vehículo ${vehicle.internal_code || vehicle.name}`,
+                                          `en fecha ${currentDateStr}:`,
+                                          `Reserva 1: ${booking1.booking_number} (${booking1.pickup_date} ${booking1.pickup_time} - ${booking1.dropoff_date} ${booking1.dropoff_time})`,
+                                          `Reserva 2: ${booking2.booking_number} (${booking2.pickup_date} ${booking2.pickup_time} - ${booking2.dropoff_date} ${booking2.dropoff_time})`
+                                        );
+                                      }
+                                    }
+                                  }
                                 }
 
                                 return (
@@ -748,7 +760,7 @@ export default function CalendarioPage() {
                                       <div
                                         className={`h-12 flex items-center justify-center relative group/booking ${
                                           getStatusColor(dayBooking.status)
-                                        } ${dayBookings.length > 1 ? 'ring-2 ring-yellow-500 ring-inset' : ''} cursor-pointer hover:opacity-80 transition-opacity`}
+                                        } ${realConflicts > 0 ? 'ring-2 ring-yellow-500 ring-inset' : ''} cursor-pointer hover:opacity-80 transition-opacity`}
                                         onClick={(e) => {
                                           // Si es el marcador verde o rojo, no hacer nada (para que se vea el tooltip)
                                           if ((e.target as HTMLElement).closest('.smart-tooltip-trigger')) {
@@ -758,8 +770,8 @@ export default function CalendarioPage() {
                                           // En PC y móvil, abrir modal
                                           setSelectedBooking(dayBooking);
                                         }}
-                                        title={dayBookings.length > 1 
-                                          ? `⚠️ CONFLICTO: ${dayBookings.length} reservas simultáneas\n${dayBookings.map(b => `- ${b.booking_number} (${b.customer?.name})`).join('\n')}\n\nClick para ver detalles`
+                                        title={realConflicts > 0
+                                          ? `⚠️ CONFLICTO: ${dayBookings.length} reservas con solapamiento horario\n${dayBookings.map(b => `- ${b.booking_number} (${b.customer?.name})`).join('\n')}\n\nClick para ver detalles`
                                           : `${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\nClick para ver detalles`
                                         }
                                       >
@@ -794,9 +806,9 @@ export default function CalendarioPage() {
                                         
                                         {/* Número de reservas activas - mostrar WARNING si hay más de 1 */}
                                         <span className={`text-[10px] font-bold ${
-                                          dayBookings.length > 1 ? 'text-yellow-900 bg-yellow-300 px-1 rounded animate-pulse' : 'text-white'
+                                          realConflicts > 0 ? 'text-yellow-900 bg-yellow-300 px-1 rounded animate-pulse' : 'text-white'
                                         }`}>
-                                          {dayBookings.length > 1 && '⚠️ '}
+                                          {realConflicts > 0 && '⚠️ '}
                                           {dayBookings.length}
                                         </span>
 

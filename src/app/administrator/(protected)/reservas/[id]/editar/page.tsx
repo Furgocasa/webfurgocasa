@@ -252,6 +252,9 @@ export default function EditarReservaPage() {
 
       if (bookingError) throw bookingError;
 
+      console.log('Booking data loaded:', booking); // Debug
+      console.log('Booking extras loaded:', booking.booking_extras); // Debug
+      
       setBookingNumber(booking.booking_number);
       
       // Guardar customer_id y datos del cliente
@@ -342,18 +345,27 @@ export default function EditarReservaPage() {
   // Se editan en la página de clientes
 
   const handleExtraChange = (extraId: string, quantity: number) => {
+    console.log(`Changing extra ${extraId} to quantity ${quantity}`); // Debug
     setBookingExtras(prev => {
       if (quantity === 0) {
         const newExtras = { ...prev };
         delete newExtras[extraId];
+        console.log('Removed extra, new state:', newExtras); // Debug
         return newExtras;
       }
-      return { ...prev, [extraId]: quantity };
+      const newExtras = { ...prev, [extraId]: quantity };
+      console.log('Updated extras, new state:', newExtras); // Debug
+      return newExtras;
     });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    console.log('=== STARTING SAVE OPERATION ===');
+    console.log('Current formData:', formData);
+    console.log('Current bookingExtras:', bookingExtras);
+    console.log('Available extras:', extras);
 
     if (!formData.vehicle_id || !formData.pickup_location_id || !formData.dropoff_location_id) {
       setMessage({ type: 'error', text: 'Por favor, completa todos los campos obligatorios' });
@@ -367,9 +379,9 @@ export default function EditarReservaPage() {
 
       // VALIDACIÓN CRÍTICA: Verificar disponibilidad del vehículo
       // Comprobar si hay otras reservas del mismo vehículo en las fechas seleccionadas
-      const { data: conflictingBookings, error: checkError } = await supabase
+      const { data: potentialConflicts, error: checkError } = await supabase
         .from('bookings')
-        .select('id, booking_number, customer_name, pickup_date, dropoff_date')
+        .select('id, booking_number, customer_name, pickup_date, dropoff_date, pickup_time, dropoff_time')
         .eq('vehicle_id', formData.vehicle_id)
         .neq('id', bookingId) // Excluir la reserva actual
         .neq('status', 'cancelled')
@@ -382,7 +394,22 @@ export default function EditarReservaPage() {
         return;
       }
 
-      if (conflictingBookings && conflictingBookings.length > 0) {
+      // Filtrar conflictos reales considerando las horas
+      const conflictingBookings = potentialConflicts?.filter(booking => {
+        // Crear objetos Date con fecha y hora completas
+        const currentPickup = new Date(`${formData.pickup_date}T${formData.pickup_time}`);
+        const currentDropoff = new Date(`${formData.dropoff_date}T${formData.dropoff_time}`);
+        const bookingPickup = new Date(`${booking.pickup_date}T${booking.pickup_time}`);
+        const bookingDropoff = new Date(`${booking.dropoff_date}T${booking.dropoff_time}`);
+
+        // Verificar si realmente hay solapamiento considerando fecha Y hora
+        // Hay conflicto si:
+        // - La nueva reserva empieza antes de que termine la existente Y
+        // - La nueva reserva termina después de que empiece la existente
+        return currentPickup < bookingDropoff && currentDropoff > bookingPickup;
+      }) || [];
+
+      if (conflictingBookings.length > 0) {
         const conflictInfo = conflictingBookings.map(b => 
           `${b.booking_number} (${b.customer_name || 'Sin nombre'}) del ${b.pickup_date} al ${b.dropoff_date}`
         ).join('\n');
@@ -396,41 +423,54 @@ export default function EditarReservaPage() {
       }
 
       // Actualizar reserva (NO se tocan datos del cliente, solo snapshot básico)
+      const updateData = {
+        vehicle_id: formData.vehicle_id,
+        pickup_location_id: formData.pickup_location_id,
+        dropoff_location_id: formData.dropoff_location_id,
+        pickup_date: formData.pickup_date,
+        pickup_time: formData.pickup_time,
+        dropoff_date: formData.dropoff_date,
+        dropoff_time: formData.dropoff_time,
+        days: formData.days,
+        base_price: formData.base_price,
+        extras_price: formData.extras_price,
+        total_price: formData.total_price,
+        deposit_amount: formData.deposit_amount,
+        amount_paid: formData.amount_paid,
+        status: formData.status,
+        payment_status: formData.payment_status,
+        // Snapshot básico del cliente (solo nombre y email para auditoría)
+        customer_name: customerData?.name || formData.customer_name,
+        customer_email: customerData?.email || formData.customer_email,
+        notes: formData.notes,
+        admin_notes: formData.admin_notes,
+        updated_at: new Date().toISOString(),
+      };
+      
+      console.log('Updating booking with data:', updateData); // Debug
+      
       const { error: updateError } = await supabase
         .from('bookings')
-        .update({
-          vehicle_id: formData.vehicle_id,
-          pickup_location_id: formData.pickup_location_id,
-          dropoff_location_id: formData.dropoff_location_id,
-          pickup_date: formData.pickup_date,
-          pickup_time: formData.pickup_time,
-          dropoff_date: formData.dropoff_date,
-          dropoff_time: formData.dropoff_time,
-          days: formData.days,
-          base_price: formData.base_price,
-          extras_price: formData.extras_price,
-          total_price: formData.total_price,
-          deposit_amount: formData.deposit_amount,
-          amount_paid: formData.amount_paid,
-          status: formData.status,
-          payment_status: formData.payment_status,
-          // Snapshot básico del cliente (solo nombre y email para auditoría)
-          customer_name: customerData?.name || formData.customer_name,
-          customer_email: customerData?.email || formData.customer_email,
-          notes: formData.notes,
-          admin_notes: formData.admin_notes,
-          updated_at: new Date().toISOString(),
-        })
+        .update(updateData)
         .eq('id', bookingId);
 
       if (updateError) throw updateError;
 
       // 2. Actualizar extras
+      console.log('Current booking extras:', bookingExtras); // Debug
+      
       // Eliminar extras existentes
-      await supabase
+      const { error: deleteError } = await supabase
         .from('booking_extras')
         .delete()
         .eq('booking_id', bookingId);
+      
+      if (deleteError) {
+        console.error('Error deleting old extras:', deleteError);
+        throw deleteError;
+      }
+      
+      console.log('Old extras deleted successfully'); // Debug
 
       // Insertar nuevos extras
       if (Object.keys(bookingExtras).length > 0) {
@@ -454,12 +494,20 @@ export default function EditarReservaPage() {
           })
           .filter(item => item !== null);
 
+        console.log('Inserting new extras:', extrasToInsert); // Debug
+        
         if (extrasToInsert.length > 0) {
-          const { error: extrasError } = await supabase
+          const { error: extrasError, data: insertedData } = await supabase
             .from('booking_extras')
-            .insert(extrasToInsert);
+            .insert(extrasToInsert)
+            .select();
 
-          if (extrasError) throw extrasError;
+          if (extrasError) {
+            console.error('Error inserting new extras:', extrasError);
+            throw extrasError;
+          }
+          
+          console.log('New extras inserted successfully:', insertedData); // Debug
         }
       }
 

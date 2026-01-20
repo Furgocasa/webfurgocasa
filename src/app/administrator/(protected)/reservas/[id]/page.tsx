@@ -120,6 +120,7 @@ export default function ReservaDetalleAdminPage() {
       setLoading(true);
       const supabase = createClient(); // ✅ Crear instancia
       
+      // Forzar una consulta fresca sin cache
       const { data, error } = await supabase
         .from('bookings')
         .select(`
@@ -156,6 +157,8 @@ export default function ReservaDetalleAdminPage() {
         .single();
 
       if (error) throw error;
+      
+      console.log('Booking loaded:', data); // Debug: ver datos cargados
       setBooking(data as any);
 
       // Cargar pagos de la reserva

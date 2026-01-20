@@ -254,10 +254,10 @@ export default function NuevaReservaPage() {
       setSaving(true);
       setMessage(null);
 
-      // VALIDACIÓN: Verificar disponibilidad del vehículo
-      const { data: conflictingBookings, error: checkError } = await supabase
+      // VALIDACIÓN: Verificar disponibilidad del vehículo considerando fecha Y hora
+      const { data: potentialConflicts, error: checkError } = await supabase
         .from('bookings')
-        .select('id, booking_number, customer_name, pickup_date, dropoff_date')
+        .select('id, booking_number, customer_name, pickup_date, dropoff_date, pickup_time, dropoff_time')
         .eq('vehicle_id', formData.vehicle_id)
         .neq('status', 'cancelled')
         .or(`and(pickup_date.lte.${formData.dropoff_date},dropoff_date.gte.${formData.pickup_date})`);
@@ -269,7 +269,22 @@ export default function NuevaReservaPage() {
         return;
       }
 
-      if (conflictingBookings && conflictingBookings.length > 0) {
+      // Filtrar conflictos reales considerando las horas
+      const conflictingBookings = potentialConflicts?.filter(booking => {
+        // Crear objetos Date con fecha y hora completas
+        const newPickup = new Date(`${formData.pickup_date}T${formData.pickup_time}`);
+        const newDropoff = new Date(`${formData.dropoff_date}T${formData.dropoff_time}`);
+        const bookingPickup = new Date(`${booking.pickup_date}T${booking.pickup_time}`);
+        const bookingDropoff = new Date(`${booking.dropoff_date}T${booking.dropoff_time}`);
+
+        // Verificar si realmente hay solapamiento considerando fecha Y hora
+        // Hay conflicto si:
+        // - La nueva reserva empieza antes de que termine la existente Y
+        // - La nueva reserva termina después de que empiece la existente
+        return newPickup < bookingDropoff && newDropoff > bookingPickup;
+      }) || [];
+
+      if (conflictingBookings.length > 0) {
         const conflictInfo = conflictingBookings.map(b => 
           `${b.booking_number} (${b.customer_name || 'Sin nombre'}) del ${b.pickup_date} al ${b.dropoff_date}`
         ).join('\n');
