@@ -132,10 +132,30 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "bounce-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0) translateX(0)", opacity: "0.6" },
+          "50%": { transform: "translateY(-10px) translateX(5px)", opacity: "0.4" },
+        },
+        "spin-slow": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
+        },
+        "wiggle": {
+          "0%, 100%": { transform: "rotate(-3deg)" },
+          "50%": { transform: "rotate(3deg)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "bounce-slow": "bounce-slow 3s ease-in-out infinite",
+        "float": "float 4s ease-in-out infinite",
+        "spin-slow": "spin-slow 8s linear infinite",
+        "wiggle": "wiggle 1s ease-in-out infinite",
       },
     },
   },
