@@ -188,19 +188,28 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
  * Cumple con NORMAS-SEO-OBLIGATORIAS.md - generateStaticParams obligatorio
  */
 export async function generateStaticParams() {
-  const { data: locations } = await supabase
-    .from('sale_location_targets')
-    .select('slug')
-    .eq('is_active', true)
-    .order('display_order');
+  try {
+    const { data: locations, error } = await supabase
+      .from('sale_location_targets')
+      .select('slug')
+      .eq('is_active', true)
+      .order('display_order');
 
-  if (!locations) return [];
+    // Si la tabla no existe o hay error, devolver array vacío (las páginas se generarán on-demand)
+    if (error || !locations) {
+      console.warn('[generateStaticParams] sale_location_targets table not found or error:', error?.message);
+      return [];
+    }
 
-  // ⚡ Generar rutas en español (las otras versiones se manejan por middleware)
-  // Next.js pre-generará estas páginas en build time para SEO óptimo
-  return locations.map((loc) => ({
-    location: `venta-autocaravanas-camper-${loc.slug}`
-  }));
+    // ⚡ Generar rutas en español (las otras versiones se manejan por middleware)
+    // Next.js pre-generará estas páginas en build time para SEO óptimo
+    return locations.map((loc) => ({
+      location: `venta-autocaravanas-camper-${loc.slug}`
+    }));
+  } catch (error) {
+    console.error('[generateStaticParams] Error loading sale locations:', error);
+    return [];
+  }
 }
 
 /**

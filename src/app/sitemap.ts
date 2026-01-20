@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { data: vehiclesRent },
     { data: vehiclesSale },
     { data: locations },
-    { data: saleLocations },
+    { data: saleLocations, error: saleLocationsError },
   ] = await Promise.all([
     supabase
       .from('posts')
@@ -66,7 +66,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from('sale_location_targets')
       .select('slug, updated_at')
       .eq('is_active', true)
-      .order('display_order', { ascending: true }),
+      .order('display_order', { ascending: true })
+      .then(result => {
+        // Si la tabla no existe aún, devolver array vacío sin fallar
+        if (result.error) {
+          console.warn('[sitemap] sale_location_targets not found:', result.error.message);
+          return { data: null, error: result.error };
+        }
+        return result;
+      }),
   ]);
 
   const postList = (posts || []) as PostRow[];
@@ -75,6 +83,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const saleList = (vehiclesSale || []) as VehicleRow[];
   const locationList = (locations || []) as LocationRow[];
   const saleLocationList = (saleLocations || []) as LocationRow[];
+
+  if (saleLocationsError) {
+    console.warn('[sitemap] Skipping sale location pages - table not ready yet');
+  }
 
   const locales = i18n.locales;
   const entries: MetadataRoute.Sitemap = [];
