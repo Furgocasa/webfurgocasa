@@ -22,21 +22,19 @@ PASO 1: PREPARATIVOS EN VERCEL
 5. Vercel te mostrará qué registros DNS necesitas configurar. 
    Normalmente serán:
    
-   OPCIÓN A - Registros A (más común):
-   - Tipo: A
-   - Host: @
-   - Value: 76.76.21.21 (IP de ejemplo, usa la que te dé Vercel)
+   ✅ VERCEL TE PIDE ESTOS VALORES ESPECÍFICOS:
    
+   Para furgocasa.com (dominio raíz):
    - Tipo: A
-   - Host: www
-   - Value: 76.76.21.21 (IP de ejemplo, usa la que te dé Vercel)
-
-   OPCIÓN B - Registro CNAME para www:
+   - Host: @ (o furgocasa.com)
+   - Value: 216.198.79.1
+   
+   Para www.furgocasa.com:
    - Tipo: CNAME
    - Host: www
-   - Value: cname.vercel-dns.com (ejemplo, usa el que te dé Vercel)
+   - Value: 84e15c1fe0a9edd9.vercel-dns-017.com.
 
-6. ¡NO CIERRES LA VENTANA DE VERCEL! Necesitarás ver estos valores.
+6. ¡NO CIERRES LA VENTANA DE VERCEL! Necesitarás copiar exactamente estos valores.
 
 =================================================================
 PASO 2: MODIFICACIONES EN OVH
@@ -52,27 +50,34 @@ Inicia sesión en OVH y ve a la zona DNS de furgocasa.com.
 
 Busca estos dos registros:
 
-❌ ELIMINAR/MODIFICAR:
+❌ CAMBIO 1 - Dominio raíz (furgocasa.com):
+   
+   ANTES:
    Tipo: A
    Host: @ (o furgocasa.com.)
-   Valor actual: 46.105.204.26
+   Valor: 46.105.204.26
 
-✅ CAMBIAR A:
+   DESPUÉS:
    Tipo: A
    Host: @
-   Valor nuevo: [LA IP QUE TE DIO VERCEL]
+   Valor: 216.198.79.1
    TTL: 300 (5 minutos, para poder revertir rápido si hay problemas)
 
-❌ ELIMINAR/MODIFICAR:
+❌ CAMBIO 2 - Subdominio www (www.furgocasa.com):
+   
+   ANTES:
    Tipo: A
    Host: www
-   Valor actual: 46.105.204.26
+   Valor: 46.105.204.26
 
-✅ CAMBIAR A:
-   Tipo: A
+   DESPUÉS:
+   Tipo: CNAME
    Host: www
-   Valor nuevo: [LA IP QUE TE DIO VERCEL]
+   Valor: 84e15c1fe0a9edd9.vercel-dns-017.com.
    TTL: 300 (5 minutos)
+   
+   ⚠️ IMPORTANTE: Cambias de tipo A a CNAME. Primero elimina el registro A 
+   de www y luego crea el nuevo CNAME.
 
 ────────────────────────────────────────────────────────────────
 2.2. ELIMINAR REGISTROS TXT INNECESARIOS DE OVH (OPCIONAL)

@@ -114,6 +114,18 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      // Redirección de la URL de Vercel al dominio personalizado (308 permanente)
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'webfurgocasa.vercel.app',
+          },
+        ],
+        destination: 'https://www.furgocasa.com/:path*',
+        permanent: true,
+      },
       // Redirect de publicaciones a blog (301 permanente)
       {
         source: '/publicaciones',
