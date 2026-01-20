@@ -1,10 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { ArrowUp } from 'lucide-react';
 
 export default function BackToTop() {
+  const pathname = usePathname();
   const [isVisible, setIsVisible] = useState(false);
+
+  // No mostrar en la sección de administración
+  const isAdminSection = pathname.startsWith('/administrator');
 
   useEffect(() => {
     // Mostrar el botón cuando el usuario hace scroll hacia abajo
@@ -29,6 +34,11 @@ export default function BackToTop() {
       behavior: 'smooth',
     });
   };
+
+  // Si estamos en admin, no renderizar nada
+  if (isAdminSection) {
+    return null;
+  }
 
   return (
     <>

@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { X, Send, MessageCircle } from 'lucide-react';
 
 const WHATSAPP_NUMBER = '34673414053';
@@ -13,9 +14,18 @@ const QUICK_QUESTIONS = [
 ];
 
 export default function WhatsAppChatbot() {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState('');
   const [hasInteracted, setHasInteracted] = useState(false);
+
+  // No mostrar en la sección de administración
+  const isAdminSection = pathname.startsWith('/administrator');
+
+  // Si estamos en admin, no renderizar nada
+  if (isAdminSection) {
+    return null;
+  }
 
   const handleQuickQuestion = (question: string) => {
     setMessage(question);
