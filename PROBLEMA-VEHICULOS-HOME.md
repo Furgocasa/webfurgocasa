@@ -1,118 +1,178 @@
-# 🐛 PROBLEMA: Vehículos destacados no se muestran en la HOME
+# ✅ PROBLEMA RESUELTO: Vehículos destacados en HOME
 
 ## Fecha: 20 de enero de 2026
+## Estado: ✅ **COMPLETAMENTE RESUELTO Y EN PRODUCCIÓN**
 
-## 🔴 Problema identificado
+---
 
-La sección "Los mejores modelos en alquiler" en la home **no muestra los 3 vehículos destacados**, aunque:
-- ✅ Los vehículos SÍ están en la base de datos
-- ✅ Se muestran correctamente en `/vehiculos`
-- ✅ Hay 9 vehículos activos disponibles
+## 🔴 Problema Original
 
-## 🔍 Causa raíz
+La sección "Los mejores modelos en alquiler" en la home **no mostraba las imágenes de los vehículos**, aunque:
+- ✅ Los vehículos SÍ estaban en la base de datos
+- ✅ Se mostraban correctamente en páginas de localización
+- ✅ Había vehículos activos disponibles
 
-Error en la query de Supabase en `src/lib/home/server-actions.ts`:
+---
 
-### ❌ Query incorrecta (antes):
-```typescript
-.select(`
-  id,
-  name,
-  slug,
-  brand,
-  model,
-  passengers,
-  beds,
-  images:vehicle_images(image_url, is_primary)  // ❌ Alias incorrecto
-`)
+## 🔍 Diagnóstico Completo
+
+### Primera Iteración (Fallida)
+Inicialmente se pensó que era un problema de query SQL con alias incorrectos.
+
+**❌ NO fue la solución correcta** - El problema era más profundo.
+
+### Segunda Iteración (Exitosa) ✅
+
+Después de comparar con las páginas de localización que SÍ funcionaban, se identificaron **DOS problemas principales**:
+
+#### Problema 1: Componente Visual Incorrecto
+**Archivo**: `src/app/page.tsx`
+
+```tsx
+// ❌ ANTES - VehicleImageSlider no renderizaba
+<VehicleImageSlider 
+  images={vehicle.images}
+  alt={vehicle.name}
+  autoPlay={true}
+  interval={4000}
+/>
+
+// ✅ AHORA - Renderizado directo funciona
+{vehicle.main_image ? (
+  <img
+    src={vehicle.main_image}
+    alt={vehicle.name}
+    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+  />
+) : (
+  <div className="w-full h-full flex items-center justify-center bg-gray-300">
+    <Package className="h-16 w-16 text-gray-400" />
+  </div>
+)}
 ```
 
-La query usaba un alias `images:vehicle_images` que Supabase no estaba interpretando correctamente, causando que:
-1. No se obtuvieran las imágenes
-2. El mapeo posterior fallaba silenciosamente
-3. No había logging de errores para diagnosticar
+#### Problema 2: Función de Carga Diferente
+**Archivo**: `src/lib/home/server-actions.ts`
 
-### ✅ Query corregida (después):
 ```typescript
-.select(`
-  id,
-  name,
-  slug,
-  brand,
-  model,
-  passengers,
-  beds,
-  vehicle_images(image_url, is_primary)  // ✅ Nombre directo de la tabla
-`)
+// ❌ ANTES - Consulta y orden diferentes
+.select('id, name, slug, brand, model, passengers, beds, vehicle_images(...)')
+.eq('is_for_rent', true)
+.neq('status', 'inactive')
+.order('created_at', { ascending: false })  // ← Orden incorrecto
+
+// ✅ AHORA - Idéntico a páginas de localización
+.select('*, images:vehicle_images(*)')
+.eq('is_for_rent', true)
+.order('internal_code', { ascending: true })  // ← Orden correcto
+
+// Y busca imagen primaria igual:
+const primaryImage = vehicle.images?.find((img: any) => img.is_primary);
+const firstImage = vehicle.images?.[0];
 ```
 
-Además:
-- ✅ Añadido manejo de errores con `console.error`
-- ✅ Verificación explícita de error en la respuesta
-- ✅ Cambio en el mapeo de `vehicle.images` a `vehicle.vehicle_images`
+---
 
-## 📝 Cambios realizados
+## ✅ Solución Implementada
 
-### Archivo modificado: `src/lib/home/server-actions.ts`
+### Commit 1: `8abeff6` - Unificar estructura HTML
+- ✅ Eliminado `VehicleImageSlider` component
+- ✅ Implementado renderizado directo con `<img>`
+- ✅ Copiada estructura EXACTA de páginas de localización
+- ✅ Añadidos títulos y textos descriptivos
 
-**Líneas 30-66**: Función `getFeaturedVehicles()`
+### Commit 2: `024abf9` - Unificar carga de datos
+- ✅ Cambiado orden: `created_at` → `internal_code`
+- ✅ Cambiada selección: campos específicos → `SELECT *`
+- ✅ Unificada lógica de búsqueda de imagen primaria
+- ✅ Eliminado filtro innecesario
 
-Cambios principales:
-1. Eliminado alias `images:` en la query de Supabase
-2. Añadida desestructuración del error: `{ data: vehicles, error }`
-3. Añadido logging de errores
-4. Actualizado mapeo de `vehicle.images` → `vehicle.vehicle_images`
+### Commit 3: `805ada1` - Optimizar SEO
+- ✅ Mejorado título: "NUESTRA FLOTA" → "LAS MEJORES CAMPER VANS EN ALQUILER"
 
-## 🎯 Resultado esperado
+---
 
-Después del fix:
-- ✅ La home mostrará 3 vehículos destacados
-- ✅ Se ordenarán por `internal_code` ascendente
-- ✅ Mostrarán la imagen principal (`is_primary = true`)
-- ✅ Si no hay imagen principal, se usa la primera disponible
-- ✅ Los errores se logearán en consola para debugging
+## 🎯 Resultado Final
 
-## ✅ Testing
+### Consistencia Completa
 
-Para verificar que funciona:
+**Home y Localizaciones ahora usan**:
+- ✅ La MISMA consulta SQL
+- ✅ El MISMO orden (`internal_code`)
+- ✅ La MISMA lógica para imágenes
+- ✅ El MISMO diseño visual
+- ✅ Los MISMOS 3 vehículos
 
-1. **Recargar la home**: `https://www.furgocasa.com`
-2. **Verificar sección**: "Los mejores modelos en alquiler"
-3. **Debe mostrar 3 vehículos** con:
-   - Imagen principal
-   - Nombre
-   - Marca y modelo
-   - Plazas y camas
-   - Enlace a detalle
+### Beneficios Obtenidos
 
-## 📊 Vehículos en base de datos
+1. ✅ **Imágenes visibles** en Home
+2. ✅ **Diseño coherente** en toda la web
+3. ✅ **Código mantenible** (DRY - Don't Repeat Yourself)
+4. ✅ **Mejor SEO** con keywords específicas
+5. ✅ **Experiencia de usuario consistente**
 
-Actualmente hay 9 vehículos activos:
-1. Dreamer D55 Fun
-2. Knaus Boxstar 600 Street
-3. Weinsberg CaraTour 600 MQ
-4. Knaus Boxstar 600 Family
-5. Adria Twin Plus 600 SP Family
-6. Knaus Boxlife 600 DQ
-7. Weinsberg Carabus 600 MQ
-8. Weinsberg Carabus 540 MQ
-9. Dethleffs Globetrail DS
+---
 
-La home mostrará los 3 primeros según orden de `internal_code`.
+## 📊 Vehículos Mostrados (en orden)
 
-## 🔧 Próximos pasos
+Los 3 vehículos destacados (ordenados por `internal_code`):
 
-Si después del fix todavía no se muestran:
+1. **Dreamer D55 Fun** (FU0006)
+2. **Knaus Boxstar 600 Street** (FU0010)
+3. **Weinsberg CaraTour 600 MQ** (FU0011)
 
-1. **Verificar políticas RLS**: `vehicle_images` debe permitir SELECT público
-2. **Verificar imágenes**: Comprobar que los vehículos tienen imágenes asignadas
-3. **Verificar `is_primary`**: Al menos uno debe tener `is_primary = true`
-4. **Revisar logs**: Vercel Functions logs para ver errores de Supabase
+---
 
-## Prioridad
+## ✅ Testing Verificado
 
-🟡 **MEDIA** - No crítico pero afecta presentación de la home
+**URL Producción**: https://www.furgocasa.com
 
-## Estado
+**Verificado**:
+- ✅ 3 vehículos visibles con imágenes
+- ✅ Nombres y descripciones correctos
+- ✅ Enlaces funcionando
+- ✅ Hover effects aplicados
+- ✅ Responsive design correcto
+- ✅ Mismo comportamiento que páginas de localización
 
-✅ **SOLUCIONADO** - Query corregida, pendiente verificación en producción
+---
+
+## 📚 Documentación Relacionada
+
+- **[SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)** - Documentación completa y detallada
+- **[CHANGELOG.md](./CHANGELOG.md)** - Entrada v1.0.5
+- **[README.md](./README.md)** - Actualizado con última versión
+
+---
+
+## 🎓 Lecciones Aprendidas
+
+1. **El problema NO siempre está donde parece**: El HTML se veía bien, pero el problema estaba en la carga de datos Y en el componente de renderizado.
+
+2. **Copiar lo que funciona es válido**: En lugar de intentar arreglar el código roto, copiamos la estructura completa de las páginas que funcionaban.
+
+3. **Consistencia es crucial**: Usar la misma lógica en toda la aplicación previene bugs difíciles de rastrear.
+
+4. **Orden de consulta importa**: El `order by internal_code` era crítico para obtener los vehículos correctos.
+
+5. **Documentar exhaustivamente**: Este problema nos costó varios intentos. La documentación detallada ayuda a evitar repetir errores.
+
+---
+
+## 🚀 Estado Final
+
+| Aspecto | Estado |
+|---------|--------|
+| **Imágenes en Home** | ✅ Funcionando |
+| **Consistencia visual** | ✅ Completa |
+| **Carga de datos** | ✅ Unificada |
+| **SEO optimizado** | ✅ Mejorado |
+| **Testing** | ✅ Verificado en producción |
+| **Documentación** | ✅ Completa |
+
+---
+
+**Autor**: Cursor AI + Narciso Pardo  
+**Última actualización**: 20 Enero 2026  
+**Prioridad**: 🟢 **RESUELTA**  
+**Estado**: ✅ **EN PRODUCCIÓN**

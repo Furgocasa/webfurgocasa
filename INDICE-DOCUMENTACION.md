@@ -1,10 +1,37 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.4 ✅ PRODUCCIÓN - FIX CRÍTICO AUTENTICACIÓN  
+**Versión**: 1.0.5 ✅ PRODUCCIÓN - UNIFICACIÓN VEHÍCULOS HOME  
 **URL**: https://www.furgocasa.com  
 **Última actualización**: 20 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🎨 VERSIÓN 1.0.5 - UNIFICACIÓN VISUALIZACIÓN VEHÍCULOS
+
+**✅ ESTADO: TOTALMENTE FUNCIONAL** - Vehículos ahora visibles y consistentes en toda la web.
+
+**PROBLEMA RESUELTO**: Las imágenes de vehículos NO se mostraban en la página Home, mientras que en páginas de localización SÍ funcionaban. **AHORA FUNCIONA EN TODAS**.
+
+Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
+- 🎨 **v1.0.5 (ACTUAL)**: Unificación visualización vehículos Home
+- 🔴 **v1.0.4**: Fix crítico sistema autenticación - Eliminado singleton
+- ✅ **v1.0.3**: Sistema dual de pagos (Redsys + Stripe)
+- ✅ **v1.0.2**: Estabilización completa, fixes críticos de producción
+- ✅ **v1.0.1**: Mejoras del proceso de reserva
+- ✅ **v1.0.0**: Problemas resueltos para deploy en Vercel
+
+### 🎯 Highlights v1.0.5:
+- ✅ **Imágenes funcionando en Home**: Renderizado directo con `<img>` tag
+- ✅ **Diseño consistente**: Home y localizaciones usan misma estructura
+- ✅ **Código unificado**: Función `getFeaturedVehicles()` idéntica a localizaciones
+- ✅ **SEO mejorado**: Título optimizado "LAS MEJORES CAMPER VANS EN ALQUILER"
+- ✅ **Mismos vehículos**: 3 vehículos destacados consistentes en toda la web
+
+**📚 Documentación nueva**:
+- **[SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)** - Documentación completa del problema y solución
+- **[PROBLEMA-VEHICULOS-HOME.md](./PROBLEMA-VEHICULOS-HOME.md)** - Actualizado con solución final
 
 ---
 
@@ -13,13 +40,6 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 **✅ ESTADO: TOTALMENTE FUNCIONAL** - Fix crítico del sistema de autenticación aplicado.
 
 **PROBLEMA RESUELTO**: TODAS las secciones del administrador dejaron de funcionar debido a un patrón singleton en el cliente Supabase. **AHORA TODAS FUNCIONAN**.
-
-Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
-- 🔴 **v1.0.4 (ACTUAL)**: Fix crítico sistema autenticación - Eliminado singleton
-- ✅ **v1.0.3**: Sistema dual de pagos (Redsys + Stripe)
-- ✅ **v1.0.2**: Estabilización completa, fixes críticos de producción
-- ✅ **v1.0.1**: Mejoras del proceso de reserva
-- ✅ **v1.0.0**: Problemas resueltos para deploy en Vercel
 
 ### 🚨 Highlights v1.0.4:
 - 🔴 **FIX CRÍTICO**: Eliminado singleton en `src/lib/supabase/client.ts`
@@ -211,9 +231,11 @@ Ver carpeta `scripts/`:
 5. Para emails: **[SISTEMA-EMAILS.md](./SISTEMA-EMAILS.md)**
 6. Testing de emails: **[PRUEBAS-EMAILS.md](./PRUEBAS-EMAILS.md)**
 
-### Voy a trabajar con imágenes
-1. Lee **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)**
-2. Para vehículos: **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)**
+### Voy a trabajar con imágenes o vehículos en Home
+1. Lee **[SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)** ⚠️ **NUEVO** - Problema y solución vehículos
+2. Lee **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)**
+3. Para vehículos: **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)**
+4. NO uses `VehicleImageSlider` - usa `<img>` directo
 
 ---
 
@@ -222,7 +244,9 @@ Ver carpeta `scripts/`:
 ```
 📁 furgocasa-app/
 ├── 🚨 README.md                           ← Punto de entrada + REGLAS ABSOLUTAS
-├── 📋 CHANGELOG.md                        ← Historial (v1.0.4 FIX CRÍTICO)
+├── 📋 CHANGELOG.md                        ← Historial (v1.0.5 VEHÍCULOS + v1.0.4 FIX CRÍTICO)
+├── 🎨 SOLUCION-VEHICULOS-HOME.md          ← ⚠️ NUEVO v1.0.5 - Problema y solución completa
+├── 🎨 PROBLEMA-VEHICULOS-HOME.md          ← ⚠️ ACTUALIZADO - Estado resuelto
 ├── 🔴 REGLAS-ARQUITECTURA-NEXTJS.md       ← INCLUYE REGLAS SUPABASE CLIENT
 ├── 🔴 REGLAS-SUPABASE-OBLIGATORIAS.md     ← ⚠️ LEER ANTES DE QUERIES
 ├── 🔴 CONFIGURACION-META-PIXEL.md         ← Meta Pixel condicional

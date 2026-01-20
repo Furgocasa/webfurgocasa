@@ -4,6 +4,109 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🎨 [1.0.5] - 20 de Enero 2026 - **Unificación Visualización Vehículos Home**
+
+### ✅ **PROBLEMA RESUELTO: Vehículos no visibles en Home**
+
+**Síntomas**:
+- ❌ Imágenes de vehículos NO mostraban en página Home
+- ✅ Imágenes funcionaban correctamente en páginas de localización
+- ❌ Diseño inconsistente entre Home y localizaciones
+
+**Causa raíz**:
+1. **Componente incorrecto**: Uso de `VehicleImageSlider` que no renderizaba imágenes
+2. **Carga de datos diferente**: Función `getFeaturedVehicles()` usaba consulta y orden diferentes a páginas de localización
+
+---
+
+### 🔧 **CAMBIOS IMPLEMENTADOS**
+
+#### 1. Unificación Estructura HTML (`8abeff6`)
+**Archivo**: `src/app/page.tsx`
+
+- ❌ Eliminado: `VehicleImageSlider` component
+- ✅ Añadido: Renderizado directo con `<img>` tag
+- ✅ Copiada estructura EXACTA de páginas de localización
+- ✅ Añadidos textos descriptivos de Furgocasa
+- ✅ Título, subtítulo y descripción coherentes
+
+**Antes**:
+```tsx
+<VehicleImageSlider 
+  images={vehicle.images}
+  alt={vehicle.name}
+/>
+```
+
+**Ahora**:
+```tsx
+{vehicle.main_image ? (
+  <img
+    src={vehicle.main_image}
+    alt={vehicle.name}
+    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+  />
+) : (
+  <div className="w-full h-full flex items-center justify-center bg-gray-300">
+    <Package className="h-16 w-16 text-gray-400" />
+  </div>
+)}
+```
+
+#### 2. Unificación Carga de Datos (`024abf9`)
+**Archivo**: `src/lib/home/server-actions.ts`
+
+- ✅ Cambiado: `order('created_at')` → `order('internal_code')` (igual que localizaciones)
+- ✅ Cambiado: Selección específica → `SELECT *, images:vehicle_images(*)` (completa)
+- ✅ Unificada: Lógica de búsqueda de imagen primaria
+- ✅ Eliminado: Filtro `.neq('status', 'inactive')` innecesario
+
+**Antes**:
+```typescript
+.select('id, name, slug, brand, model, passengers, beds, vehicle_images(...)')
+.eq('is_for_rent', true)
+.neq('status', 'inactive')
+.order('created_at', { ascending: false })
+```
+
+**Ahora**:
+```typescript
+.select('*, images:vehicle_images(*)')
+.eq('is_for_rent', true)
+.order('internal_code', { ascending: true })
+```
+
+#### 3. Optimización SEO del Título (`805ada1`)
+**Archivo**: `src/app/page.tsx`
+
+- ✅ Mejorado: "NUESTRA FLOTA" → "LAS MEJORES CAMPER VANS EN ALQUILER"
+- ✅ Keywords específicas para mejor posicionamiento
+
+---
+
+### 📊 **RESULTADO**
+
+**Home y Localizaciones ahora usan**:
+- ✅ La MISMA consulta SQL
+- ✅ El MISMO orden de vehículos (`internal_code`)
+- ✅ La MISMA lógica para imágenes
+- ✅ El MISMO diseño visual
+- ✅ Los MISMOS 3 vehículos destacados
+
+**Beneficios**:
+1. ✅ Imágenes visibles en Home
+2. ✅ Diseño coherente en toda la web
+3. ✅ Código más mantenible (DRY)
+4. ✅ Mejor SEO con keywords optimizadas
+
+---
+
+### 📝 **DOCUMENTACIÓN NUEVA**
+
+- **`SOLUCION-VEHICULOS-HOME.md`**: Documentación completa del problema y solución
+
+---
+
 ## 🔴 [1.0.4] - 20 de Enero 2026 - **FIX CRÍTICO: Sistema de Autenticación Supabase**
 
 ### 🚨 **PROBLEMA CRÍTICO RESUELTO**

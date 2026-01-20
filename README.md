@@ -1,14 +1,38 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.4-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.5-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0.4 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 1.0.5 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
 > **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
+
+---
+
+## 🎨 ÚLTIMA ACTUALIZACIÓN: Unificación Visualización Vehículos (v1.0.5)
+
+**20 Enero 2026** - Problema resuelto y en producción
+
+### ✅ Problema Resuelto
+
+- **Imágenes de vehículos** ahora visibles en página Home
+- **Diseño consistente** entre Home y páginas de localización
+- **Mismos vehículos** mostrados en toda la web
+- **Mejor SEO** con título optimizado "LAS MEJORES CAMPER VANS EN ALQUILER"
+
+### 🔧 Solución Técnica
+
+1. **Eliminado** `VehicleImageSlider` component (no funcionaba)
+2. **Implementado** renderizado directo con `<img>` tag
+3. **Unificada** función `getFeaturedVehicles()` con mismo orden que localizaciones
+4. **Copiada** estructura HTML completa de páginas que funcionaban
+
+**Documentación completa**: [SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)
+
+**Commits**: `8abeff6`, `024abf9`, `805ada1`
 
 ---
 
