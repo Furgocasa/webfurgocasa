@@ -15,7 +15,9 @@ export function AdminFABButton() {
   const pathname = usePathname();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isPWA, setIsPWA] = useState(false);
-  const [showButton, setShowButton] = useState(false);
+
+  // No mostrar si estamos en la sección de administrador
+  const isAdminSection = pathname.startsWith('/administrator');
 
   useEffect(() => {
     // Detectar si es PWA
@@ -45,16 +47,13 @@ export function AdminFABButton() {
     checkAdmin();
   }, []);
 
-  useEffect(() => {
-    // Mostrar botón solo si:
-    // - Es PWA instalada
-    // - Es admin autenticado
-    // - NO está en la sección de administrador
-    const shouldShow = isPWA && isAdmin && !pathname.startsWith('/administrator');
-    setShowButton(shouldShow);
-  }, [isPWA, isAdmin, pathname]);
-
-  if (!showButton) return null;
+  // No renderizar si:
+  // - No es PWA
+  // - No es admin
+  // - Está en la sección de administrador
+  if (!isPWA || !isAdmin || isAdminSection) {
+    return null;
+  }
 
   return (
     <Link
