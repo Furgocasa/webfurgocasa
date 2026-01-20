@@ -7,7 +7,6 @@ import { HeroSlider } from "@/components/hero-slider";
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { LocalizedLink } from "@/components/localized-link";
-import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
 import { 
   MessageSquare,
   Map,
@@ -156,7 +155,7 @@ export default async function HomePage() {
           </div>
         </section>
 
-        {/* Sección: Los mejores modelos */}
+        {/* Sección: Los mejores modelos en alquiler */}
         <section className="relative py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
@@ -171,47 +170,43 @@ export default async function HomePage() {
               </p>
             </div>
 
+            {/* Grid de vehículos */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
               {featuredVehiclesHome.map((vehicle) => (
                 <div
                   key={vehicle.id}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
                 >
                   <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
                     <div className="h-56 lg:h-64 bg-gray-200 relative overflow-hidden">
-                      <VehicleImageSlider 
-                        images={vehicle.images}
-                        alt={vehicle.name}
-                        autoPlay={true}
-                        interval={4000}
-                      />
+                      {vehicle.main_image ? (
+                        <img
+                          src={vehicle.main_image}
+                          alt={vehicle.name}
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                          <Package className="h-16 w-16 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
                   </LocalizedLink>
                   
                   <div className="p-6 lg:p-8 text-center">
                     <LocalizedLink href={`/vehiculos/${vehicle.slug}`}>
-                      <h3 className="text-xl lg:text-2xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
+                      <h4 className="text-xl lg:text-2xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
                         {vehicle.name}
-                      </h3>
+                      </h4>
                       <p className="text-sm text-gray-600 mb-4">{vehicle.brand} {vehicle.model}</p>
                     </LocalizedLink>
                     
-                    <div className="flex gap-4 justify-center text-sm text-gray-500 mb-4">
-                      <span className="flex items-center gap-1">
-                        <Users className="h-4 w-4" />
-                        {vehicle.passengers} plazas
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Package className="h-4 w-4" />
-                        {vehicle.beds} camas
-                      </span>
-                    </div>
-                    
                     <LocalizedLink
-                      href={`/vehiculos/${vehicle.slug}`}
+                      href="/vehiculos"
                       className="inline-flex items-center gap-2 text-furgocasa-orange font-bold uppercase tracking-wider hover:text-furgocasa-orange-dark transition-colors text-sm"
                     >
-                      Ver detalles <span className="text-xl">→</span>
+                      Ver más campers <span className="text-xl">→</span>
                     </LocalizedLink>
                   </div>
                 </div>
