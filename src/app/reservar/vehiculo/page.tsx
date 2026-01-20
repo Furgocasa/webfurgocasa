@@ -16,7 +16,7 @@ import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Users, Bed, Fuel, Settings, 
-  ArrowRight, Plus, Minus, AlertCircle, Loader2, Ruler, Car
+  ArrowRight, Plus, Minus, AlertCircle, Loader2, Ruler, Car, Info
 } from "lucide-react";
 import Link from "next/link";
 import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
