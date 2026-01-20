@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PublicLayout } from "@/components/layout/public-layout";
 import { SearchWidget } from "@/components/booking/search-widget";
 import { HeroSlider } from "@/components/hero-slider";
 import { useLanguage } from "@/contexts/language-context";
@@ -122,7 +123,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <>
+    <PublicLayout>
       <Header />
       
       {/* Hero Section con Slider - Sin espacio entre header y slider */}
@@ -511,6 +512,6 @@ export default function HomePage() {
       </section>
 
       <Footer />
-    </>
+    </PublicLayout>
   );
 }
