@@ -122,7 +122,7 @@ export default async function HomePage() {
             />
           </div>
           
-          <div className="relative z-10 container mx-auto px-4 text-center">
+          <div className="relative z-[200] container mx-auto px-4 text-center">
             <div className="max-w-6xl mx-auto space-y-3">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
                 Furgocasa Campervans
@@ -156,7 +156,7 @@ export default async function HomePage() {
         </section>
 
         {/* Sección: Los mejores modelos */}
-        <section className="relative z-0 py-16 lg:py-24 bg-gray-50">
+        <section className="relative py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <span className="inline-block px-4 py-2 bg-furgocasa-blue/10 text-furgocasa-blue rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
