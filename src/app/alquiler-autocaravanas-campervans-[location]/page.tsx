@@ -61,25 +61,36 @@ export async function generateMetadata({
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       title: `Alquiler de Autocaravanas en ${location.name} | Furgocasa`,
-      description: `Alquiler de campers cerca de ${location.name}. ${distanceInfo}. Flota premium desde 95€/día.`,
+      description: `Alquiler de campers cerca de ${location.name}. ${distanceInfo ? distanceInfo + '.' : ''} Flota premium desde 95€/día con kilómetros ilimitados.`,
       type: "website",
       url: url,
-      siteName: "Furgocasa",
-      images: location.hero_image ? [
+      siteName: "Furgocasa - Alquiler de Autocaravanas",
+      images: [
         {
-          url: location.hero_image,
+          url: location.hero_image || "https://furgocasa.com/images/slides/hero-01.webp",
           width: 1200,
           height: 630,
-          alt: `Alquiler de campers en ${location.name}`,
+          alt: `Alquiler de campers y autocaravanas cerca de ${location.name}`,
+          type: "image/webp",
+        },
+        {
+          url: "https://furgocasa.com/images/slides/hero-02.webp",
+          width: 1200,
+          height: 630,
+          alt: "Flota premium Furgocasa - Campers de gran volumen",
+          type: "image/webp",
         }
-      ] : [],
+      ],
       locale: "es_ES",
+      countryName: "España",
     },
     twitter: {
       card: "summary_large_image",
-      title: `Alquiler Camper ${location.name} | Furgocasa`,
-      description: `Autocaravanas cerca de ${location.name}. Desde 95€/día.`,
-      images: location.hero_image ? [location.hero_image] : [],
+      site: "@furgocasa",
+      creator: "@furgocasa",
+      title: `Alquiler Camper ${location.name} | Desde 95€/día`,
+      description: `Autocaravanas cerca de ${location.name}. ${distanceInfo ? 'A solo ' + location.distance_km + ' km de Murcia.' : ''} Kilómetros ilimitados. Flota premium.`,
+      images: [location.hero_image || "https://furgocasa.com/images/slides/hero-01.webp"],
     },
     alternates: {
       canonical: url,

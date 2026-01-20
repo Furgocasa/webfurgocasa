@@ -1,9 +1,18 @@
+import { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
-export const metadata = {
-  title: "Política de Privacidad | Furgocasa Campervans",
-  description: "Política de privacidad y protección de datos de Furgocasa. Información sobre cómo tratamos tus datos personales.",
+export const metadata: Metadata = {
+  title: "Política de Privacidad y Protección de Datos | Furgocasa",
+  description: "Política de privacidad y protección de datos de Furgocasa S.L. Información sobre cómo tratamos y protegemos tus datos personales según RGPD.",
+  keywords: "politica privacidad furgocasa, proteccion datos, rgpd, lopd, privacidad datos personales",
+  robots: {
+    index: true,
+    follow: false,
+  },
+  alternates: {
+    canonical: "https://furgocasa.com/privacidad",
+  },
 };
 
 export default function PrivacidadPage() {

@@ -1,9 +1,17 @@
+import { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
-export const metadata = {
-  title: "Aviso Legal | Furgocasa Campervans",
-  description: "Aviso legal y términos de uso del sitio web de Furgocasa, empresa de alquiler de campers y autocaravanas.",
+export const metadata: Metadata = {
+  title: "Aviso Legal | Furgocasa Campervans - Alquiler de Autocaravanas Murcia",
+  description: "Aviso legal y términos de uso de Furgocasa S.L. Información legal sobre el alquiler de autocaravanas y campers en Murcia.",
+  robots: {
+    index: true,
+    follow: false, // No seguir enlaces en páginas legales
+  },
+  alternates: {
+    canonical: "https://furgocasa.com/aviso-legal",
+  },
 };
 
 export default function AvisoLegalPage() {

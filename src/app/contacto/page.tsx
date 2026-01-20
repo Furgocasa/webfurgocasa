@@ -4,26 +4,51 @@ import { Footer } from "@/components/layout/footer";
 import { LocalizedLink } from "@/components/localized-link";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from "lucide-react";
 import { translateServer } from "@/lib/i18n/server-translation";
+import { ContactPageJsonLd } from "@/components/static-pages/jsonld";
 
-// ✅ METADATOS SEO
+// 🎯 Metadata SEO optimizada
 export const metadata: Metadata = {
-  title: "Contacto | Furgocasa Campervans",
-  description: "Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com",
-  keywords: "contacto furgocasa, alquiler autocaravanas murcia contacto, furgocasa murcia, telefono furgocasa",
+  title: "Contacto | Furgocasa - Alquiler de Autocaravanas en Murcia",
+  description: "Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com. Lunes a Viernes 09:00-18:00.",
+  keywords: "contacto furgocasa, telefono furgocasa murcia, email furgocasa, direccion furgocasa, horario furgocasa, alquiler autocaravanas murcia contacto",
+  authors: [{ name: "Furgocasa" }],
   openGraph: {
     title: "Contacto | Furgocasa Campervans",
-    description: "Contáctanos para alquilar tu autocaravana en Murcia. Sede en Casillas.",
+    description: "Contáctanos para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61.",
     type: "website",
+    url: "https://furgocasa.com/contacto",
+    siteName: "Furgocasa",
     locale: "es_ES",
+  },
+  twitter: {
+    card: "summary",
+    title: "Contacto | Furgocasa",
+    description: "Teléfono: 868 36 41 61 | Email: info@furgocasa.com",
+  },
+  alternates: {
+    canonical: "https://furgocasa.com/contacto",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
+// ✅ Server Component
 export default function ContactoPage() {
   // Usar traducción del servidor (por ahora español por defecto)
   const t = (key: string) => translateServer(key, 'es');
   
   return (
     <>
+      <ContactPageJsonLd />
       <Header />
       <main className="min-h-screen bg-gray-50 pt-20">
         {/* Hero Section */}

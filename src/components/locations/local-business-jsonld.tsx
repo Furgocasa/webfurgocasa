@@ -5,20 +5,24 @@ interface LocalBusinessJsonLdProps {
 }
 
 export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
+  // ✅ CORRECTO según Google: LocalBusiness con sede real en Murcia
+  // y "areaServed" indicando que sirve a otras ciudades
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "name": `Furgocasa - Alquiler de Campers cerca de ${location.name}`,
-    "description": location.meta_description || `Alquiler de autocaravanas y campers cerca de ${location.name}. Flota premium, kilómetros ilimitados.`,
+    "name": "Furgocasa",
+    "alternateName": `Furgocasa - Alquiler de Campers cerca de ${location.name}`,
+    "description": `Empresa de alquiler de autocaravanas y campers con sede en Murcia. Servimos a clientes de ${location.name} y toda ${location.region}. Flota premium con kilómetros ilimitados.`,
     "url": `https://furgocasa.com/alquiler-autocaravanas-campervans-${location.slug}`,
     "telephone": "+34868364161",
     "email": "info@furgocasa.com",
     "priceRange": "95€ - 155€",
+    // ⚠️ IMPORTANTE: La dirección es la REAL (Murcia), no la ciudad de la landing
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Avenida Puente Tocinos, 4",
-      "addressLocality": "Casillas - Murcia",
-      "addressRegion": "Región de Murcia",
+      "addressLocality": "Casillas",
+      "addressRegion": "Murcia",
       "postalCode": "30007",
       "addressCountry": "ES"
     },
@@ -27,19 +31,31 @@ export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
       "latitude": "38.0265",
       "longitude": "-1.1635"
     },
+    // ✅ "areaServed" indica las áreas que sirves DESDE tu ubicación
     "areaServed": [
       {
         "@type": "City",
         "name": location.name,
-        "address": {
-          "@type": "PostalAddress",
-          "addressRegion": location.region,
-          "addressCountry": "ES"
+        "containedInPlace": {
+          "@type": "AdministrativeArea",
+          "name": location.province
         }
       },
       {
         "@type": "State",
         "name": location.region
+      },
+      {
+        "@type": "City",
+        "name": "Murcia"
+      },
+      {
+        "@type": "State",
+        "name": "Región de Murcia"
+      },
+      {
+        "@type": "State",
+        "name": "Comunidad Valenciana"
       }
     ],
     "openingHoursSpecification": [
@@ -77,10 +93,19 @@ export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
     "aggregateRating": {
       "@type": "AggregateRating",
       "ratingValue": "4.9",
-      "reviewCount": "250",
-      "bestRating": "5"
+      "reviewCount": "500",
+      "bestRating": "5",
+      "worstRating": "1"
     },
-    "image": location.hero_image || "https://furgocasa.com/og-image.jpg"
+    "image": [
+      location.hero_image || "https://furgocasa.com/images/slides/hero-01.webp",
+      "https://furgocasa.com/logo.png"
+    ],
+    "logo": "https://furgocasa.com/logo.png",
+    "sameAs": [
+      "https://www.facebook.com/furgocasa",
+      "https://www.instagram.com/furgocasa"
+    ]
   };
 
   // Breadcrumb específico de la localización
