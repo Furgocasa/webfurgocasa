@@ -618,13 +618,23 @@ export default function CalendarioPage() {
                               {days.map((day) => {
                                 const isTodayFlag = isToday(day, monthDate);
                                 
-                                // Buscar si hay una reserva que incluya este día
-                                const dayBooking = vehicleBookings.find(booking =>
+                                // Buscar TODAS las reservas que incluyan este día
+                                const dayBookings = vehicleBookings.filter(booking =>
                                   isDateInRange(day, monthDate, booking.pickup_date, booking.dropoff_date)
                                 );
 
-                                const isPickup = dayBooking && isPickupDate(day, monthDate, dayBooking.pickup_date);
-                                const isDropoff = dayBooking && isDropoffDate(day, monthDate, dayBooking.dropoff_date);
+                                // Buscar reservas que empiezan en este día
+                                const pickupBookings = vehicleBookings.filter(booking =>
+                                  isPickupDate(day, monthDate, booking.pickup_date)
+                                );
+
+                                // Buscar reservas que terminan en este día
+                                const dropoffBookings = vehicleBookings.filter(booking =>
+                                  isDropoffDate(day, monthDate, booking.dropoff_date)
+                                );
+
+                                // Reserva principal para mostrar (la más reciente o la primera)
+                                const dayBooking = dayBookings.length > 0 ? dayBookings[0] : null;
 
                                 return (
                                   <div
@@ -649,44 +659,66 @@ export default function CalendarioPage() {
                                         }}
                                         title={`${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\nClick para ver detalles`}
                                       >
-                                        {/* Indicador de inicio (verde) con tooltip */}
-                                        {isPickup && (
+                                        {/* Indicadores de inicio (verde) - puede haber múltiples */}
+                                        {pickupBookings.length > 0 && (
                                           <SmartTooltip
                                             className="absolute top-0.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-green-500 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger"
                                             content={
                                               <>
-                                                <div className="font-semibold text-green-400 mb-1">🟢 RECOGIDA</div>
-                                                <div className="font-bold text-base">{dayBooking.pickup_time || '10:00'}</div>
-                                                <div className="text-gray-300 text-xs mt-1">
-                                                  📍 {dayBooking.pickup_location?.name || 'Sin ubicación'}
-                                                </div>
+                                                {pickupBookings.map((booking, idx) => (
+                                                  <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
+                                                    <div className="font-semibold text-green-400 mb-1">🟢 RECOGIDA {pickupBookings.length > 1 ? `#${idx + 1}` : ''}</div>
+                                                    <div className="font-bold text-base">{booking.pickup_time || '10:00'}</div>
+                                                    <div className="text-gray-300 text-xs mt-1">
+                                                      📍 {booking.pickup_location?.name || 'Sin ubicación'}
+                                                    </div>
+                                                    <div className="text-gray-400 text-xs mt-1">
+                                                      {booking.booking_number}
+                                                    </div>
+                                                  </div>
+                                                ))}
                                               </>
                                             }
                                           >
-                                            <div className="w-full h-full"></div>
+                                            <div className="w-full h-full flex items-center justify-center">
+                                              {pickupBookings.length > 1 && (
+                                                <span className="text-[8px] font-bold text-white">{pickupBookings.length}</span>
+                                              )}
+                                            </div>
                                           </SmartTooltip>
                                         )}
                                         
-                                        {/* Número de reserva */}
+                                        {/* Número de reservas activas */}
                                         <span className="text-[10px] font-bold text-white">
-                                          1
+                                          {dayBookings.length}
                                         </span>
 
-                                        {/* Indicador de fin (rojo) con tooltip */}
-                                        {isDropoff && (
+                                        {/* Indicadores de fin (rojo) - puede haber múltiples */}
+                                        {dropoffBookings.length > 0 && (
                                           <SmartTooltip
                                             className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-500 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger"
                                             content={
                                               <>
-                                                <div className="font-semibold text-red-400 mb-1">🔴 DEVOLUCIÓN</div>
-                                                <div className="font-bold text-base">{dayBooking.dropoff_time || '10:00'}</div>
-                                                <div className="text-gray-300 text-xs mt-1">
-                                                  📍 {dayBooking.dropoff_location?.name || 'Sin ubicación'}
-                                                </div>
+                                                {dropoffBookings.map((booking, idx) => (
+                                                  <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
+                                                    <div className="font-semibold text-red-400 mb-1">🔴 DEVOLUCIÓN {dropoffBookings.length > 1 ? `#${idx + 1}` : ''}</div>
+                                                    <div className="font-bold text-base">{booking.dropoff_time || '10:00'}</div>
+                                                    <div className="text-gray-300 text-xs mt-1">
+                                                      📍 {booking.dropoff_location?.name || 'Sin ubicación'}
+                                                    </div>
+                                                    <div className="text-gray-400 text-xs mt-1">
+                                                      {booking.booking_number}
+                                                    </div>
+                                                  </div>
+                                                ))}
                                               </>
                                             }
                                           >
-                                            <div className="w-full h-full"></div>
+                                            <div className="w-full h-full flex items-center justify-center">
+                                              {dropoffBookings.length > 1 && (
+                                                <span className="text-[8px] font-bold text-white">{dropoffBookings.length}</span>
+                                              )}
+                                            </div>
                                           </SmartTooltip>
                                         )}
                                       </div>

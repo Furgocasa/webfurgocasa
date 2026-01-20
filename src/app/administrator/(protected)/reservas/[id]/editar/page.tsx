@@ -50,6 +50,21 @@ interface BookingExtra {
   };
 }
 
+interface Customer {
+  id: string;
+  name: string | null;
+  email: string | null;
+  phone: string | null;
+  dni: string | null;
+  address: string | null;
+  city: string | null;
+  postal_code: string | null;
+  country: string | null;
+  date_of_birth: string | null;
+  driver_license: string | null;
+  driver_license_expiry: string | null;
+}
+
 interface FormData {
   // Vehículo y ubicaciones
   vehicle_id: string;
@@ -68,20 +83,15 @@ interface FormData {
   extras_price: number;
   total_price: number;
   deposit_amount: number;
-  amount_paid: number;  // Nuevo: monto pagado
+  amount_paid: number;
   
   // Estados
   status: string;
   payment_status: string;
   
-  // Cliente
+  // Snapshot básico del cliente (solo para GDPR/auditoría)
   customer_name: string;
   customer_email: string;
-  customer_phone: string;
-  customer_dni: string;
-  customer_address: string;
-  customer_city: string;
-  customer_postal_code: string;
   
   // Notas
   notes: string;
@@ -98,6 +108,8 @@ export default function EditarReservaPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
   const [bookingNumber, setBookingNumber] = useState('');
+  const [customerId, setCustomerId] = useState<string>('');
+  const [customerData, setCustomerData] = useState<Customer | null>(null);
   const [locations, setLocations] = useState<Location[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [extras, setExtras] = useState<Extra[]>([]);
@@ -117,16 +129,11 @@ export default function EditarReservaPage() {
     extras_price: 0,
     total_price: 0,
     deposit_amount: 1000,
-    amount_paid: 0,  // Nuevo: inicializar en 0
+    amount_paid: 0,
     status: 'pending',
     payment_status: 'pending',
     customer_name: '',
     customer_email: '',
-    customer_phone: '',
-    customer_dni: '',
-    customer_address: '',
-    customer_city: '',
-    customer_postal_code: '',
     notes: '',
     admin_notes: '',
   });

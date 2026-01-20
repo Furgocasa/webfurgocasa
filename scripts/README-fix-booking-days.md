@@ -116,12 +116,19 @@ Reservas sin hora devolución:   3 (se usará 10:00)
 
 ## 🔐 Variables de Entorno Requeridas
 
-El script necesita acceso a Supabase:
+El script necesita acceso administrativo a Supabase para bypass las políticas RLS:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=tu_url_de_supabase
-NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
+SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 ```
+
+⚠️ **IMPORTANTE:** Este script usa `SUPABASE_SERVICE_ROLE_KEY` (no la anon key) para poder acceder a todas las reservas sin restricciones de RLS.
+
+**Dónde encontrar la Service Role Key:**
+1. Ve a tu proyecto en Supabase Dashboard
+2. Settings → API
+3. Copia la `service_role` key (⚠️ Mantenla secreta, NO la expongas en el frontend)
 
 Estas variables deben estar en tu archivo `.env.local`
 

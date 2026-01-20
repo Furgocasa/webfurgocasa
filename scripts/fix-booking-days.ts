@@ -17,17 +17,18 @@ import { calculateRentalDays } from '../src/lib/utils';
 // Cargar variables de entorno desde .env.local
 config({ path: resolve(process.cwd(), '.env.local') });
 
-// Configuración de Supabase
+// Configuración de Supabase - USAR SERVICE ROLE KEY para bypass RLS
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Error: Variables de entorno NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY requeridas');
+if (!supabaseUrl || !supabaseServiceKey) {
+  console.error('❌ Error: Variables de entorno NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY requeridas');
   console.error('Asegúrate de tener un archivo .env.local con estas variables');
+  console.error('El script necesita SUPABASE_SERVICE_ROLE_KEY para bypass las políticas RLS');
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 interface Booking {
   id: string;
@@ -111,21 +112,46 @@ async function main() {
 
   // Analizar cada reserva
   for (const booking of bookings) {
-    // Si no tiene dropoff_time, usar 10:00 por defecto
-    const dropoffTime = booking.dropoff_time || '10:00';
+    // Extraer fecha y hora de los campos (pueden venir como timestamp completo o separados)
+    let pickupDate = booking.pickup_date;
+    let pickupTime = booking.pickup_time || '10:00';
+    let dropoffDate = booking.dropoff_date;
+    let dropoffTime = booking.dropoff_time || '10:00';
+    
+    // Si pickup_date contiene espacio, es un timestamp completo: "2026-08-17 11:00:00"
+    if (pickupDate && pickupDate.includes(' ')) {
+      const [date, time] = pickupDate.split(' ');
+      pickupDate = date;
+      pickupTime = time.substring(0, 5); // "11:00:00" -> "11:00"
+    }
+    
+    // Si dropoff_date contiene espacio, es un timestamp completo
+    if (dropoffDate && dropoffDate.includes(' ')) {
+      const [date, time] = dropoffDate.split(' ');
+      dropoffDate = date;
+      dropoffTime = time.substring(0, 5);
+    }
+    
+    // Debug solo para la primera reserva
+    if (toUpdate.length === 0 && correct.length === 0) {
+      console.log('\n🔍 DEBUG primera reserva:');
+      console.log(`   pickup_date original: "${booking.pickup_date}"`);
+      console.log(`   pickup_date parseado: "${pickupDate}"`);
+      console.log(`   pickup_time parseado: "${pickupTime}"`);
+      console.log(`   dropoff_date original: "${booking.dropoff_date}"`);
+      console.log(`   dropoff_date parseado: "${dropoffDate}"`);
+      console.log(`   dropoff_time parseado: "${dropoffTime}"`);
+    }
     
     if (!booking.dropoff_time) {
       noDropoffTime.push(booking);
     }
 
-    // Si no tiene pickup_time, usar 10:00 por defecto
-    const pickupTime = booking.pickup_time || '10:00';
-
     // Calcular días correctos
     const correctDays = calculateRentalDays(
-      booking.pickup_date,
+      pickupDate,
       pickupTime,
-      booking.dropoff_date,
+      dropoffDate,
       dropoffTime
     );
 
@@ -137,8 +163,8 @@ async function main() {
         customer_name: booking.customer_name,
         oldDays: booking.days,
         newDays: correctDays,
-        pickup: `${booking.pickup_date} ${pickupTime}`,
-        dropoff: `${booking.dropoff_date} ${dropoffTime}`,
+        pickup: `${pickupDate} ${pickupTime}`,
+        dropoff: `${dropoffDate} ${dropoffTime}`,
       });
     } else {
       correct.push(booking);
