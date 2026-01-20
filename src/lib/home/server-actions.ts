@@ -48,7 +48,7 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
     `)
     .eq('is_for_rent', true)
     .neq('status', 'inactive')
-    .order('internal_code', { ascending: true })
+    .order('created_at', { ascending: false })
     .limit(3);
 
   if (error) {

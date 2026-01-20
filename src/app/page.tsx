@@ -98,6 +98,7 @@ export default async function HomePage() {
   const featuredVehicles = await getFeaturedVehicles();
   const blogArticles = await getLatestBlogArticles(3);
   const stats = await getCompanyStats();
+  const featuredVehiclesHome = featuredVehicles.slice(0, 3);
 
   return (
     <>
@@ -171,7 +172,7 @@ export default async function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
-              {featuredVehicles.map((vehicle) => (
+              {featuredVehiclesHome.map((vehicle) => (
                 <div
                   key={vehicle.id}
                   className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
