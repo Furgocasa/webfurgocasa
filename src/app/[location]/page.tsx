@@ -275,7 +275,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
         {/* Content - RELATIVE Z-10 PARA ESTAR ENCIMA */}
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-4xl mx-auto space-y-2">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-white leading-tight" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.8)' }}>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold text-white leading-tight mt-8 md:mt-0" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.8)' }}>
               {t("Alquiler de Autocaravanas")}
             </h1>
             
@@ -284,8 +284,8 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
             </h1>
             
             {/* Subtítulo más discreto */}
-            <p className="text-base md:text-lg lg:text-xl text-white/90 mt-4 font-light leading-relaxed max-w-2xl mx-auto" style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.8)' }}>
-              {t("Las mejores furgonetas campers de gran volumen en alquiler")}
+            <p className="text-base md:text-lg lg:text-xl text-white/90 mt-4 font-light leading-relaxed max-w-2xl mx-auto px-4" style={{ textShadow: '2px 2px 6px rgba(0,0,0,0.8)' }}>
+              {t("Las mejores furgonetas campers")}<br className="md:hidden" /> {t("de gran volumen en alquiler")}
             </p>
           </div>
 
