@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { Clock, ChevronDown } from "lucide-react";
 
 // Generate time slots: 10:00-13:00 and 17:00-19:00 in 30-minute intervals
@@ -25,6 +26,20 @@ export function TimeSelector({
   maxTime = "20:00",
 }: TimeSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Calcular posición del dropdown cuando se abre
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
 
   // Filter time slots based on min/max
   const availableSlots = TIME_SLOTS.filter((time) => {
@@ -35,6 +50,7 @@ export function TimeSelector({
     <div className="relative">
       {/* Trigger button */}
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-md bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-1 focus:ring-furgocasa-blue focus:border-furgocasa-blue transition-colors"
@@ -47,17 +63,24 @@ export function TimeSelector({
         />
       </button>
 
-      {/* Dropdown */}
-      {isOpen && (
+      {/* Dropdown - Renderizado en Portal para estar siempre encima */}
+      {isOpen && typeof window !== 'undefined' && createPortal(
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[99]"
+            className="fixed inset-0 z-[99998]"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Options */}
-          <div className="absolute top-full left-0 right-0 mt-1 z-[100] bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-y-auto">
+          {/* Options - Posicionado absolutamente desde el body */}
+          <div 
+            className="fixed z-[99999] bg-white rounded-md shadow-2xl border border-gray-200 max-h-[250px] overflow-y-auto"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              width: `${dropdownPosition.width}px`,
+            }}
+          >
             {availableSlots.map((time) => (
               <button
                 key={time}
@@ -76,7 +99,8 @@ export function TimeSelector({
               </button>
             ))}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

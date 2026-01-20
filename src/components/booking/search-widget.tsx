@@ -95,7 +95,7 @@ export function SearchWidget() {
   };
 
   return (
-    <div className="relative bg-white p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-2xl z-50">
+    <div className="relative bg-white p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-2xl z-[100]">
       <form onSubmit={handleSearch} className="space-y-4 lg:space-y-5">
         {/* Location (única para recogida y devolución) */}
         <div className="space-y-2">

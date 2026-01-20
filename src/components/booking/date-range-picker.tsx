@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DayPicker, DateRange } from "react-day-picker";
@@ -27,6 +28,8 @@ export function DateRangePicker({
 }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [numberOfMonths, setNumberOfMonths] = useState(2);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -38,6 +41,18 @@ export function DateRangePicker({
     window.addEventListener('resize', updateMonths);
     return () => window.removeEventListener('resize', updateMonths);
   }, []);
+
+  // Calcular posición del dropdown cuando se abre
+  useEffect(() => {
+    if (isOpen && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + window.scrollY + 8,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
 
   // Calculate min date (+3 days from today)
   const today = new Date();
@@ -136,6 +151,7 @@ export function DateRangePicker({
     <div className="relative">
       {/* Trigger button */}
       <button
+        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-md bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-1 focus:ring-furgocasa-blue focus:border-furgocasa-blue transition-colors"
@@ -163,17 +179,24 @@ export function DateRangePicker({
         </div>
       </button>
 
-      {/* Calendar dropdown */}
-      {isOpen && (
+      {/* Calendar dropdown - Renderizado en Portal para estar siempre encima */}
+      {isOpen && typeof window !== 'undefined' && createPortal(
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[9998]"
+            className="fixed inset-0 z-[99998] bg-black/10"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Calendar */}
-          <div className="absolute top-full left-0 right-0 md:left-0 md:right-auto mt-2 z-[9999] bg-white rounded-xl shadow-xl border border-gray-200 p-2 md:p-4 w-full md:w-auto">
+          {/* Calendar - Posicionado absolutamente desde el body */}
+          <div 
+            className="fixed z-[99999] bg-white rounded-xl shadow-2xl border border-gray-200 p-2 md:p-4 max-h-[70vh] overflow-y-auto"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              left: `${dropdownPosition.left}px`,
+              minWidth: window.innerWidth < 768 ? `${dropdownPosition.width}px` : 'auto',
+            }}
+          >
             {/* Helper text cuando hay fechas seleccionadas */}
             {dateRange.from && dateRange.to && (
               <div className="mb-2 md:mb-3 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-lg">
@@ -272,7 +295,8 @@ export function DateRangePicker({
               )}
             </div>
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

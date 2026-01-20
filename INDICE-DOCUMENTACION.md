@@ -60,6 +60,7 @@ Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
 |-----------|-------------|
 | **[CHANGELOG.md](./CHANGELOG.md)** | Fix crítico sistema autenticación v1.0.4 (ver sección v1.0.4) |
 | **[CONFIGURACION-META-PIXEL.md](./CONFIGURACION-META-PIXEL.md)** | Configuración Meta Pixel con carga condicional |
+| **[CONFIGURACION-GOOGLE-ANALYTICS.md](./CONFIGURACION-GOOGLE-ANALYTICS.md)** | ⚠️ **NUEVO** - Configuración Google Analytics (G-G5YLBN5XXZ) con exclusión de páginas admin |
 | **README.md** | Sección "Sistema de Autenticación - CÓMO FUNCIONA" |
 
 ### 🌍 Internacionalización (i18n)
@@ -224,6 +225,7 @@ Ver carpeta `scripts/`:
 ├── 🔴 REGLAS-ARQUITECTURA-NEXTJS.md       ← INCLUYE REGLAS SUPABASE CLIENT
 ├── 🔴 REGLAS-SUPABASE-OBLIGATORIAS.md     ← ⚠️ LEER ANTES DE QUERIES
 ├── 🔴 CONFIGURACION-META-PIXEL.md         ← Meta Pixel condicional
+├── 🔴 CONFIGURACION-GOOGLE-ANALYTICS.md   ← ⚠️ NUEVO - Google Analytics con exclusión admin
 ├── 🚨 SUPABASE-SCHEMA-REAL.md             ← Schema real con campos exactos
 ├── 🚨 PAGINAS-VEHICULOS-GARANTIA.md       ← ⚠️ Garantía páginas vehículos
 ├── 🚨 GESTION-CLIENTES-OBLIGATORIO.md     ← ⚠️ Gestión de clientes
@@ -273,6 +275,7 @@ Ver carpeta `scripts/`:
 - **Cliente Supabase**: `README.md` sección "Sistema de Autenticación", `REGLAS-ARQUITECTURA-NEXTJS.md`
 - **Calendario admin**: `CHANGELOG.md` v1.0.4 (sección calendario)
 - **Meta Pixel**: `CONFIGURACION-META-PIXEL.md`
+- **Google Analytics**: `CONFIGURACION-GOOGLE-ANALYTICS.md` ⚠️ **NUEVO**
 - **Reservas**: `FLUJO-RESERVAS-CRITICO.md` ⚠️ **CORE DEL NEGOCIO**
 - **Clientes**: `GESTION-CLIENTES-OBLIGATORIO.md` ⚠️ **NUEVO**
 - **Cálculo de días**: `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO**
@@ -297,6 +300,7 @@ Ver carpeta `scripts/`:
 | ¿Puedo modificar `client.ts` o `server.ts`? | **NO** - Ver `README.md` sección "Reglas Absolutas" |
 | ¿Por qué el calendario no carga? | `CHANGELOG.md` v1.0.4 (sección calendario) |
 | ¿Cómo configuro Meta Pixel? | `CONFIGURACION-META-PIXEL.md` |
+| ¿Cómo configuro Google Analytics? | `CONFIGURACION-GOOGLE-ANALYTICS.md` ⚠️ **NUEVO** |
 | ¿Puedo usar `"use client"` en esta página? | `REGLAS-ARQUITECTURA-NEXTJS.md` |
 | ¿Cómo traduzco en Server Component? | `GUIA-TRADUCCION.md` |
 | ¿Por qué no puedo usar useLanguage()? | `GUIA-TRADUCCION.md` |

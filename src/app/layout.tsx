@@ -7,6 +7,8 @@ import { CookieProvider, CookieBanner, CookieSettingsModal } from "@/components/
 import WhatsAppChatbot from "@/components/whatsapp-chatbot";
 import BackToTop from "@/components/back-to-top";
 import { AdminFABButton } from "@/components/admin-fab-button";
+import { GoogleAnalytics } from "@/components/analytics";
+import { AnalyticsDebug } from "@/components/analytics-debug";
 import Script from "next/script";
 
 // Rubik - Para títulos y headings
@@ -108,49 +110,6 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        {/* Google Analytics - Con consentimiento por defecto denegado */}
-        <Script
-          id="gtag-consent-default"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              
-              // Consentimiento por defecto denegado (GDPR compliant)
-              gtag('consent', 'default', {
-                'analytics_storage': 'denied',
-                'ad_storage': 'denied',
-                'ad_user_data': 'denied',
-                'ad_personalization': 'denied',
-                'functionality_storage': 'denied',
-                'personalization_storage': 'denied',
-                'security_storage': 'granted'
-              });
-            `,
-          }}
-        />
-        
-        {/* Google Analytics - Reemplaza G-XXXXXXXXXX con tu ID real */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="gtag-init"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-XXXXXXXXXX', {
-                page_path: window.location.pathname,
-              });
-            `,
-          }}
-        />
-
         {/* Facebook Pixel - Solo si está configurado */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
           <Script
@@ -179,6 +138,10 @@ export default function RootLayout({
       <body className={`${rubik.variable} ${amiko.variable} font-sans`}>
         <Providers>
           <CookieProvider>
+            {/* Google Analytics - EXCLUYE páginas /administrator */}
+            <GoogleAnalytics />
+            {/* Debug de Analytics (solo en desarrollo) */}
+            <AnalyticsDebug />
             {children}
             <CookieBanner />
             <CookieSettingsModal />
