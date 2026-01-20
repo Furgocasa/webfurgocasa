@@ -118,8 +118,13 @@ export default function CalendarioPage() {
   } = useAdminData<any[]>({
     queryFn: async () => {
       // Calcular rango de fechas para los meses a mostrar
-      const firstDay = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
-      const lastDay = new Date(startDate.getFullYear(), startDate.getMonth() + monthsToShow, 0);
+      // Construir fechas en formato ISO sin conversión UTC
+      const firstYear = startDate.getFullYear();
+      const firstMonth = startDate.getMonth();
+      const firstDayStr = `${firstYear}-${String(firstMonth + 1).padStart(2, '0')}-01`;
+      
+      const lastDayDate = new Date(firstYear, firstMonth + monthsToShow, 0);
+      const lastDayStr = `${lastDayDate.getFullYear()}-${String(lastDayDate.getMonth() + 1).padStart(2, '0')}-${String(lastDayDate.getDate()).padStart(2, '0')}`;
 
       const result = await supabase
         .from('bookings')
@@ -141,8 +146,8 @@ export default function CalendarioPage() {
           amount_paid,
           notes
         `)
-        .gte('dropoff_date', firstDay.toISOString().split('T')[0])
-        .lte('pickup_date', lastDay.toISOString().split('T')[0])
+        .gte('dropoff_date', firstDayStr)
+        .lte('pickup_date', lastDayStr)
         .neq('status', 'cancelled')
         .order('pickup_date');
 
