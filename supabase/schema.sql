@@ -273,14 +273,10 @@ CREATE TABLE bookings (
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
     payment_status VARCHAR(20) DEFAULT 'pending' CHECK (payment_status IN ('pending', 'partial', 'paid', 'refunded')),
     
-    -- Datos del cliente (snapshot para auditoría)
+    -- Datos del cliente (snapshot mínimo para auditoría GDPR)
+    -- Solo se mantienen nombre y email. El resto se obtiene via JOIN con customers
     customer_name VARCHAR(200) NOT NULL,
     customer_email VARCHAR(255) NOT NULL,
-    customer_phone VARCHAR(50), -- Opcional: puede ser NULL
-    customer_dni VARCHAR(20),
-    customer_address TEXT,
-    customer_city VARCHAR(100),
-    customer_postal_code VARCHAR(20),
     
     -- Notas
     notes TEXT,
@@ -290,6 +286,12 @@ CREATE TABLE bookings (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Comentarios sobre normalización de datos
+COMMENT ON COLUMN bookings.customer_id IS 'FK a customers - Todos los datos del cliente se obtienen via JOIN';
+COMMENT ON COLUMN bookings.customer_name IS 'Snapshot del nombre para auditoría/GDPR si el cliente se elimina';
+COMMENT ON COLUMN bookings.customer_email IS 'Snapshot del email para auditoría/GDPR si el cliente se elimina';
+COMMENT ON TABLE bookings IS 'Reservas normalizadas: datos del cliente via JOIN con customers, solo snapshot mínimo guardado';
 
 -- Índices para reservas
 CREATE INDEX idx_bookings_vehicle ON bookings(vehicle_id);
