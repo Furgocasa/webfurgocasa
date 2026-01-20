@@ -236,7 +236,7 @@ export default function UbicacionesPage() {
     location.city?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const activeCount = locations.filter(l => l.is_active).length;
+  const activeCount = (locations || []).filter(l => l.is_active).length;
 
   return (
     <div className="space-y-6">
@@ -276,11 +276,11 @@ export default function UbicacionesPage() {
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Recogida</p>
-          <p className="text-2xl font-bold text-blue-600">{locations.filter(l => l.is_pickup).length}</p>
+          <p className="text-2xl font-bold text-blue-600">{(locations || []).filter(l => l.is_pickup).length}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Entrega</p>
-          <p className="text-2xl font-bold text-purple-600">{locations.filter(l => l.is_dropoff).length}</p>
+          <p className="text-2xl font-bold text-purple-600">{(locations || []).filter(l => l.is_dropoff).length}</p>
         </div>
       </div>
 
