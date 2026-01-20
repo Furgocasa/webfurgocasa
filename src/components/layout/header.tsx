@@ -53,7 +53,7 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-50 w-full">
+    <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-[1000] w-full">
       {/* Top bar - Optimizado para mobile/tablet */}
       <div className="bg-gradient-to-r from-furgocasa-blue to-furgocasa-blue-dark text-white py-2.5">
         <div className="container mx-auto px-4 flex justify-between items-center text-sm">
@@ -83,10 +83,10 @@ export function Header() {
               {languageDropdownOpen && (
                 <>
                   <div
-                    className="fixed inset-0 z-40"
+                    className="fixed inset-0 z-[1100]"
                     onClick={() => setLanguageDropdownOpen(false)}
                   />
-                  <div className="absolute right-0 top-full mt-2 z-50 bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden min-w-[160px]">
+                  <div className="absolute right-0 top-full mt-2 z-[1200] bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden min-w-[160px]">
                     <button
                       onClick={() => handleLanguageChange('es')}
                       className={`w-full px-4 py-3 text-left flex items-center gap-3 transition-all duration-200 touch-target ${
@@ -180,7 +180,7 @@ export function Header() {
               </div>
               
               {furgocasaDropdownOpen && (
-                <div className="absolute left-0 top-full pt-2 z-50">
+                <div className="absolute left-0 top-full pt-2 z-[1200]">
                   <div className="w-72 bg-white rounded-xl shadow-2xl border border-gray-100 py-2 overflow-hidden">
                     {furgocasaDropdown.map((item, index) => (
                       <LocalizedLink

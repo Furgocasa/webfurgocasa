@@ -49,7 +49,7 @@ export function GoogleAnalytics() {
       (window as any).gtag = gtag;
 
       // Configurar consentimiento por defecto (GDPR compliant)
-      gtag('consent', 'default', {
+      (window as any).gtag('consent', 'default', {
         'analytics_storage': 'denied',
         'ad_storage': 'denied',
         'ad_user_data': 'denied',
@@ -67,8 +67,8 @@ export function GoogleAnalytics() {
 
       // Inicializar Google Analytics cuando el script cargue
       script.onload = () => {
-        gtag('js', new Date());
-        gtag('config', GA_MEASUREMENT_ID, {
+        (window as any).gtag('js', new Date());
+        (window as any).gtag('config', GA_MEASUREMENT_ID, {
           page_path: pathname,
           send_page_view: true
         });
@@ -88,9 +88,12 @@ export function GoogleAnalytics() {
     // Enviar pageview cuando cambia la ruta (solo páginas públicas)
     if (typeof window !== 'undefined' && (window as any).gtag && pathname) {
       console.log('[Analytics] Enviando pageview:', pathname);
+      console.log('[Analytics] dataLayer actual:', (window as any).dataLayer);
       (window as any).gtag('config', GA_MEASUREMENT_ID, {
         page_path: pathname,
       });
+    } else {
+      console.warn('[Analytics] No se pudo enviar pageview. gtag disponible:', !!(window as any).gtag, 'pathname:', pathname);
     }
   }, [pathname]);
 

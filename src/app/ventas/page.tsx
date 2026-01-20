@@ -178,24 +178,28 @@ export default function VentasPage() {
                           err.message?.includes('signal is aborted');
       
       if (isAbortError) {
-        console.warn('[Ventas] AbortError detected - request was cancelled, retrying...');
-      } else {
-        console.error('[Ventas] Error:', err);
+        // NO reintentar AbortError - significa que la request fue cancelada intencionalmente
+        console.warn('[Ventas] AbortError detected - request was cancelled by navigation/user');
+        setError('La carga fue cancelada. Por favor, recarga la página.');
+        setLoading(false);
+        return;
       }
+      
+      console.error('[Ventas] Error:', err);
       
       const errorMsg = err.message || err.toString() || 'Error al cargar vehículos';
       
-      // Retry automático si no hemos alcanzado el límite (máximo 3 intentos)
-      if (retryCount < 3) {
-        const delay = 1000 * (retryCount + 1); // 1s, 2s, 3s
-        console.log(`[Ventas] Retrying in ${delay}ms... (attempt ${retryCount + 1}/3, ${isAbortError ? 'AbortError' : 'normal error'})`);
+      // Retry automático SOLO para errores de red (máximo 1 intento adicional)
+      if (retryCount < 1) {
+        const delay = 2000; // 2 segundos
+        console.log(`[Ventas] Retrying in ${delay}ms... (attempt ${retryCount + 1}/1)`);
         setRetryCount(prev => prev + 1);
         
         setTimeout(() => {
           loadData(true);
         }, delay);
       } else {
-        console.error('[Ventas] Max retry attempts reached (3/3)');
+        console.error('[Ventas] Max retry attempts reached (1/1)');
         setError(errorMsg);
         setLoading(false);
       }

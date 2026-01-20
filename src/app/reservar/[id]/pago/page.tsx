@@ -411,36 +411,32 @@ export default function PagoPage() {
                 {t("Selecciona el método de pago")}
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Redsys */}
-                <button
-                  onClick={() => setPaymentMethod('redsys')}
-                  className={`p-4 border-2 rounded-lg transition-all ${
-                    paymentMethod === 'redsys'
-                      ? 'border-furgocasa-orange bg-orange-50'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                      paymentMethod === 'redsys' ? 'border-furgocasa-orange' : 'border-gray-300'
-                    }`}>
-                      {paymentMethod === 'redsys' && (
-                        <div className="w-3 h-3 rounded-full bg-furgocasa-orange"></div>
-                      )}
+                {/* Redsys - TEMPORALMENTE DESHABILITADO */}
+                <div className="relative">
+                  <button
+                    disabled
+                    className="w-full p-4 border-2 rounded-lg transition-all border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                      </div>
+                      <div className="text-left flex-1">
+                        <p className="font-semibold text-gray-500">Redsys</p>
+                        <p className="text-xs text-gray-400">Pasarela bancaria española</p>
+                      </div>
+                      <img 
+                        src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Redsys.jpg" 
+                        alt="Redsys" 
+                        className="h-5 object-contain opacity-50"
+                      />
                     </div>
-                    <div className="text-left flex-1">
-                      <p className="font-semibold text-gray-900">Redsys</p>
-                      <p className="text-xs text-gray-500">Pasarela bancaria española</p>
-                    </div>
-                    <img 
-                      src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Redsys.jpg" 
-                      alt="Redsys" 
-                      className="h-5 object-contain"
-                    />
+                  </button>
+                  <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
+                    {t("Próximamente")}
                   </div>
-                </button>
+                </div>
 
-                {/* Stripe */}
+                {/* Stripe - ACTIVO */}
                 <button
                   onClick={() => setPaymentMethod('stripe')}
                   className={`p-4 border-2 rounded-lg transition-all ${

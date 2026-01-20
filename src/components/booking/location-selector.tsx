@@ -70,12 +70,12 @@ export function LocationSelector({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[9998]"
+            className="fixed inset-0 z-[100]"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Options */}
-          <div className="absolute top-full left-0 right-0 mt-1 z-[9999] bg-white rounded-md shadow-2xl border border-gray-200 overflow-hidden max-h-[250px] overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 z-[200] bg-white rounded-md shadow-2xl border border-gray-200 overflow-hidden max-h-[250px] overflow-y-auto">
             {LOCATIONS.map((location) => (
               <button
                 key={location.id}

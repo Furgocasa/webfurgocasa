@@ -168,12 +168,12 @@ export function DateRangePicker({
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[9998]"
+            className="fixed inset-0 z-[100]"
             onClick={() => setIsOpen(false)}
           />
 
           {/* Calendar */}
-          <div className="absolute top-full left-0 right-0 md:left-0 md:right-auto mt-2 z-[9999] bg-white rounded-xl shadow-2xl border border-gray-200 p-2 md:p-4 w-full md:w-auto max-h-[70vh] overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 md:left-0 md:right-auto mt-2 z-[200] bg-white rounded-xl shadow-2xl border border-gray-200 p-2 md:p-4 w-full md:w-auto max-h-[70vh] overflow-y-auto">
             {/* Helper text cuando hay fechas seleccionadas */}
             {dateRange.from && dateRange.to && (
               <div className="mb-2 md:mb-3 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-lg">

@@ -122,7 +122,7 @@ export default async function HomePage() {
             />
           </div>
           
-          <div className="relative z-[200] container mx-auto px-4 text-center">
+          <div className="relative z-10 container mx-auto px-4 text-center">
             <div className="max-w-6xl mx-auto space-y-3">
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
                 Furgocasa Campervans
