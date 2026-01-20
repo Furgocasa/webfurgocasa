@@ -23,7 +23,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 overflow-x-hidden">
+      <main className="min-h-screen bg-gray-50 overflow-x-hidden pt-20 md:pt-0">
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-4">
             <LocalizedLink href="/vehiculos" className="inline-flex items-center gap-2 text-gray-600 hover:text-furgocasa-orange">

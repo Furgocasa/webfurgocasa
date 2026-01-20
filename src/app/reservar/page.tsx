@@ -43,13 +43,13 @@ export default function ReservarPage() {
       <Header />
       <main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
-        <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 pt-32 pb-48 relative overflow-visible">
+        <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 pt-28 md:pt-32 pb-48 relative overflow-visible">
           <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}></div>
           
           <div className="container mx-auto px-4 relative z-10 text-center">
-            <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6 tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6 tracking-tight mt-4 md:mt-0">
               {t("Reserva tu aventura")}
             </h1>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-12 font-light">

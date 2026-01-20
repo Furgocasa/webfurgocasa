@@ -104,10 +104,7 @@ function SearchResultsContent() {
     <>
       <Header />
 
-      {/* Espaciador para compensar el header fixed (altura aprox: 120-140px en desktop, 100px en mobile) */}
-      <div className="h-24 md:h-32"></div>
-
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 pt-24 md:pt-28">
         {/* Search Summary */}
         <div className="bg-furgocasa-blue py-6">
           <div className="container mx-auto px-4">
