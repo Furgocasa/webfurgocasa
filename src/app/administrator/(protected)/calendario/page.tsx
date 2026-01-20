@@ -94,6 +94,7 @@ export default function CalendarioPage() {
     loading: vehiclesLoading, 
     error: vehiclesError 
   } = useAdminData<Vehicle[]>({
+    queryKey: ['vehicles-calendar'], // QueryKey único para caché
     queryFn: async () => {
       const supabase = createClient();
       const result = await supabase
@@ -109,6 +110,7 @@ export default function CalendarioPage() {
     },
     retryCount: 3,
     retryDelay: 1000,
+    staleTime: 1000 * 60 * 30, // 30 minutos - lista de vehículos cambia poco
   });
 
   // Cargar bookings con el hook (depende de startDate y monthsToShow)
@@ -117,6 +119,8 @@ export default function CalendarioPage() {
     loading: bookingsLoading, 
     error: bookingsError 
   } = useAdminData<any[]>({
+    queryKey: ['bookings-calendar'], // QueryKey único para caché del calendario
+    dependencies: [startDate, monthsToShow], // Recargar cuando cambien estas dependencias
     queryFn: async () => {
       const supabase = createClient();
       // Calcular rango de fechas para los meses a mostrar
@@ -161,6 +165,7 @@ export default function CalendarioPage() {
     dependencies: [startDate, monthsToShow],
     retryCount: 3,
     retryDelay: 1000,
+    staleTime: 1000 * 60 * 10, // 10 minutos - las reservas del calendario se actualizan con frecuencia moderada
   });
 
   // Estado local para bookings enriquecidos

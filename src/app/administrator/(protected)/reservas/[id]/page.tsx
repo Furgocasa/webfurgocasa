@@ -10,6 +10,16 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+interface Payment {
+  id: string;
+  amount: number;
+  status: string;
+  payment_type: string;
+  payment_method: string;
+  created_at: string;
+  order_number: string;
+}
+
 interface Booking {
   id: string;
   booking_number: string;
@@ -94,6 +104,7 @@ export default function ReservaDetalleAdminPage() {
   const bookingId = params.id as string;
   
   const [booking, setBooking] = useState<Booking | null>(null);
+  const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
@@ -145,6 +156,17 @@ export default function ReservaDetalleAdminPage() {
 
       if (error) throw error;
       setBooking(data as any);
+
+      // Cargar pagos de la reserva
+      const { data: paymentsData, error: paymentsError } = await supabase
+        .from('payments')
+        .select('*')
+        .eq('booking_id', bookingId)
+        .order('created_at', { ascending: false });
+
+      if (paymentsError) throw paymentsError;
+      setPayments(paymentsData || []);
+
     } catch (error: any) {
       console.error('Error loading booking:', error);
       setMessage({ type: 'error', text: error.message || 'Error al cargar la reserva' });
@@ -234,6 +256,14 @@ export default function ReservaDetalleAdminPage() {
   }
 
   const StatusIcon = statusColors[booking.status]?.icon || Clock;
+
+  // Calcular total pagado (solo pagos autorizados)
+  const totalPaid = payments
+    .filter(p => p.status === 'authorized')
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+
+  // Calcular pendiente
+  const totalPending = booking.total_price - totalPaid;
 
   return (
     <div className="space-y-6">
@@ -355,6 +385,25 @@ export default function ReservaDetalleAdminPage() {
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full ${paymentStatusColors[booking.payment_status]?.bg} ${paymentStatusColors[booking.payment_status]?.text} font-semibold mb-4`}>
             {paymentStatusColors[booking.payment_status]?.label}
           </div>
+          
+          {/* Desglose de pagos */}
+          <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Total de la reserva:</span>
+              <span className="font-semibold text-gray-900">{booking.total_price.toFixed(2)}€</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-sm text-gray-600">Total pagado:</span>
+              <span className="font-semibold text-green-600">{totalPaid.toFixed(2)}€</span>
+            </div>
+            <div className="flex justify-between items-center pt-2 border-t border-gray-200">
+              <span className="text-sm font-medium text-gray-900">Pendiente:</span>
+              <span className={`font-bold ${totalPending > 0 ? 'text-orange-600' : 'text-green-600'}`}>
+                {totalPending.toFixed(2)}€
+              </span>
+            </div>
+          </div>
+
           <div className="space-y-2">
             {booking.payment_status === 'pending' && (
               <button
