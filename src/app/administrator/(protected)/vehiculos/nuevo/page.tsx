@@ -91,12 +91,10 @@ export default function NuevoVehiculoPage() {
     
     if (error) {
       console.error('Error loading categories:', error);
-    } else if (data) {
+    } else if (data && data.length > 0) {
       setCategories(data);
-      // Seleccionar la primera categoría por defecto si existe
-      if (data.length > 0 && !formData.category_id) {
-        setFormData(prev => ({ ...prev, category_id: data[0].id }));
-      }
+      // Seleccionar la primera categoría por defecto automáticamente
+      setFormData(prev => ({ ...prev, category_id: data[0].id }));
     }
   };
 
@@ -260,7 +258,6 @@ export default function NuevoVehiculoPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
                 required
               >
-                <option value="">Selecciona una categoría</option>
                 {categories.map(cat => (
                   <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
