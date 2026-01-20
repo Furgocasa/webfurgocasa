@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import { LocalizedLink } from "@/components/localized-link";
 import { Car, Users, Bed, Fuel, Settings, ArrowRight, Filter, Gauge, X, Calendar, TrendingDown } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
+import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
 import { useLanguage } from "@/contexts/language-context";
 import { formatPrice } from "@/lib/utils";
 
@@ -33,6 +34,7 @@ interface Vehicle {
     image_url: string;
     alt_text: string;
   };
+  images?: string[];
   vehicle_equipment?: any[];
 }
 
@@ -232,18 +234,12 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
               {/* Imagen */}
               <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
                 <div className="h-64 bg-gray-200 relative overflow-hidden">
-                  {vehicle.main_image?.image_url ? (
-                    <img
-                      src={vehicle.main_image.image_url}
-                      alt={vehicle.main_image.alt_text || vehicle.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-300 to-gray-400">
-                      <Car className="h-20 w-20 text-white/50" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <VehicleImageSlider
+                    images={vehicle.images || (vehicle.main_image?.image_url ? [vehicle.main_image.image_url] : [])}
+                    alt={vehicle.name}
+                    autoPlay={true}
+                    interval={4000}
+                  />
                 </div>
               </LocalizedLink>
 

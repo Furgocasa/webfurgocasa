@@ -93,6 +93,7 @@ Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
 |-----------|-------------|
 | **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)** | Gestión de medios y Storage |
 | **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)** | Galería múltiple con drag & drop |
+| **[SLIDER-IMAGENES-VEHICULOS.md](./SLIDER-IMAGENES-VEHICULOS.md)** | ⚠️ **NUEVO** - Slider de 2-3 imágenes en tarjetas de vehículos |
 
 ### 💼 Reservas
 

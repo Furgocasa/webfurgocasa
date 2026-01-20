@@ -35,6 +35,7 @@ interface Vehicle {
     image_url: string;
     alt_text: string;
   };
+  images?: string[];
   vehicle_equipment?: any[];
 }
 
@@ -77,14 +78,26 @@ async function loadVehicles(): Promise<Vehicle[]> {
 
     console.log('[Vehiculos] Total vehicles loaded:', data?.length || 0);
 
-    // Transformar datos para obtener solo la imagen principal
-    const vehiclesData = data?.map(vehicle => ({
-      ...vehicle,
-      main_image: Array.isArray(vehicle.vehicle_images) && vehicle.vehicle_images.length > 0 
-        ? vehicle.vehicle_images.find((img: any) => img.is_primary) || vehicle.vehicle_images[0]
-        : undefined,
-      vehicle_equipment: (vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []
-    })) || [];
+    // Transformar datos para obtener múltiples imágenes
+    const vehiclesData = data?.map(vehicle => {
+      // Ordenar imágenes: primero la principal, luego por sort_order
+      const sortedImages = (vehicle.vehicle_images as any[] || [])
+        .sort((a: any, b: any) => {
+          if (a.is_primary) return -1;
+          if (b.is_primary) return 1;
+          return (a.sort_order || 0) - (b.sort_order || 0);
+        });
+
+      const mainImage = sortedImages.find((img: any) => img.is_primary) || sortedImages[0];
+      const imageUrls = sortedImages.slice(0, 3).map((img: any) => img.image_url);
+
+      return {
+        ...vehicle,
+        main_image: mainImage,
+        images: imageUrls,
+        vehicle_equipment: (vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []
+      };
+    }) || [];
 
     console.log('[Vehiculos] Processed vehicles:', vehiclesData.length);
     return vehiclesData as Vehicle[];

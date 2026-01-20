@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import { useState } from "react";
 import { MapPin, ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 
@@ -35,22 +34,8 @@ export function LocationSelector({
   placeholder = "Selecciona ubicación",
 }: LocationSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
   const LOCATIONS = getLocations(t);
-
-  // Calcular posición del dropdown cuando se abre
-  useEffect(() => {
-    if (isOpen && buttonRef.current) {
-      const rect = buttonRef.current.getBoundingClientRect();
-      setDropdownPosition({
-        top: rect.bottom + 4, // Sin scrollY porque position: fixed es respecto al viewport
-        left: rect.left,      // Sin scrollX porque position: fixed es respecto al viewport
-        width: rect.width,
-      });
-    }
-  }, [isOpen]);
 
   // Find selected location
   const selectedLocation = LOCATIONS.find((loc) => loc.id === value);
@@ -59,7 +44,6 @@ export function LocationSelector({
     <div className="relative">
       {/* Trigger button */}
       <button
-        ref={buttonRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-md bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-1 focus:ring-furgocasa-blue focus:border-furgocasa-blue transition-colors text-left"
@@ -81,24 +65,17 @@ export function LocationSelector({
         />
       </button>
 
-      {/* Dropdown - Renderizado en Portal para estar siempre encima */}
-      {isOpen && typeof window !== 'undefined' && createPortal(
+      {/* Dropdown */}
+      {isOpen && (
         <>
           {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[99998]"
+            className="fixed inset-0 z-[9998]"
             onClick={() => setIsOpen(false)}
           />
 
-          {/* Options - Posicionado absolutamente desde el body */}
-          <div 
-            className="fixed z-[99999] bg-white rounded-md shadow-2xl border border-gray-200 overflow-hidden max-h-[250px] overflow-y-auto"
-            style={{
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`,
-            }}
-          >
+          {/* Options */}
+          <div className="absolute top-full left-0 right-0 mt-1 z-[9999] bg-white rounded-md shadow-2xl border border-gray-200 overflow-hidden max-h-[250px] overflow-y-auto">
             {LOCATIONS.map((location) => (
               <button
                 key={location.id}
@@ -124,8 +101,7 @@ export function LocationSelector({
               </button>
             ))}
           </div>
-        </>,
-        document.body
+        </>
       )}
     </div>
   );

@@ -7,6 +7,7 @@ import { HeroSlider } from "@/components/hero-slider";
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { LocalizedLink } from "@/components/localized-link";
+import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
 import { 
   MessageSquare,
   Map,
@@ -177,20 +178,12 @@ export default async function HomePage() {
                 >
                   <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
                     <div className="h-56 lg:h-64 bg-gray-200 relative overflow-hidden">
-                      {vehicle.main_image ? (
-                        <Image
-                          src={vehicle.main_image}
-                          alt={vehicle.name}
-                          fill
-                          className="object-cover group-hover:scale-110 transition-transform duration-500"
-                          loading="eager"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-300">
-                          <Package className="h-16 w-16 text-gray-400" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                      <VehicleImageSlider 
+                        images={vehicle.images}
+                        alt={vehicle.name}
+                        autoPlay={true}
+                        interval={4000}
+                      />
                     </div>
                   </LocalizedLink>
                   

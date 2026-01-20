@@ -10,6 +10,7 @@ export interface FeaturedVehicle {
   passengers: number;
   beds: number;
   main_image: string | null;
+  images: string[];
 }
 
 export interface BlogArticle {
@@ -43,7 +44,7 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
       model,
       passengers,
       beds,
-      vehicle_images(image_url, is_primary)
+      vehicle_images(image_url, is_primary, sort_order)
     `)
     .eq('is_for_rent', true)
     .neq('status', 'inactive')
@@ -57,17 +58,29 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
 
   if (!vehicles) return [];
 
-  return vehicles.map(vehicle => ({
-    id: vehicle.id,
-    name: vehicle.name,
-    slug: vehicle.slug,
-    brand: vehicle.brand,
-    model: vehicle.model,
-    passengers: vehicle.passengers,
-    beds: vehicle.beds,
-    main_image: (vehicle.vehicle_images as any)?.find((img: any) => img.is_primary)?.image_url || 
-                (vehicle.vehicle_images as any)?.[0]?.image_url || null
-  }));
+  return vehicles.map(vehicle => {
+    // Ordenar imágenes: primero la principal, luego por sort_order
+    const sortedImages = (vehicle.vehicle_images as any[] || [])
+      .sort((a: any, b: any) => {
+        if (a.is_primary) return -1;
+        if (b.is_primary) return 1;
+        return (a.sort_order || 0) - (b.sort_order || 0);
+      })
+      .map((img: any) => img.image_url)
+      .slice(0, 3); // Máximo 3 imágenes por vehículo
+
+    return {
+      id: vehicle.id,
+      name: vehicle.name,
+      slug: vehicle.slug,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      passengers: vehicle.passengers,
+      beds: vehicle.beds,
+      main_image: sortedImages[0] || null,
+      images: sortedImages
+    };
+  });
 });
 
 // ⚡ Obtener últimos artículos del blog

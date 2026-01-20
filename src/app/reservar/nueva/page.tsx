@@ -402,8 +402,8 @@ function NuevaReservaContent() {
     <>
       <Header />
       
-      {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
-      <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
+      {/* Sticky Header - Resumen de reserva */}
+      <div className="sticky top-[112px] md:top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-30 w-full">
         <div className="container mx-auto px-4 py-3">
           {/* Link "Volver" - SIEMPRE visible en el header */}
           <div className="mb-2">
@@ -445,7 +445,7 @@ function NuevaReservaContent() {
         </div>
       </div>
       
-      <main className="min-h-screen bg-gray-50 pt-[150px] py-12">
+      <main className="min-h-screen bg-gray-50 py-8 md:py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
