@@ -18,7 +18,9 @@ import { SearchSummary } from "@/components/booking/search-summary";
 import { Loader2, Car, AlertCircle, Filter, X } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 async function fetchAvailability(params: URLSearchParams) {
-  const response = await fetch(`/api/availability?${params.toString()}`);
+  const response = await fetch(`/api/availability?${params.toString()}`, {
+    cache: "no-store",
+  });
   if (!response.ok) {
     throw new Error("Error al buscar disponibilidad");
   }

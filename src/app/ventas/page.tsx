@@ -264,7 +264,7 @@ export default function VentasPage() {
     <>
       <Header />
 
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 pt-20">
         {/* Hero */}
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">

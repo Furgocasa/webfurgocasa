@@ -12,6 +12,9 @@ import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display"
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // Cargar vehículo desde Supabase
 async function getVehicle(slug: string) {
   const supabase = await createClient();

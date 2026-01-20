@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { calculateRentalDays, calculatePricingDays } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
+
 /**
  * GET /api/availability
  * 
@@ -186,7 +190,7 @@ export async function GET(request: NextRequest) {
       locationFee = dropoffLoc?.extra_fee || 0;
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       searchParams: {
         pickupDate,
@@ -210,6 +214,10 @@ export async function GET(request: NextRequest) {
       vehicles: vehiclesWithPrices || [],
       totalResults: vehiclesWithPrices?.length || 0,
     });
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+    response.headers.set("Pragma", "no-cache");
+    response.headers.set("Expires", "0");
+    return response;
   } catch (error) {
     console.error("Error en búsqueda de disponibilidad:", error);
     return NextResponse.json(

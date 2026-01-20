@@ -218,6 +218,14 @@ export const routeTranslations = {
     fr: "/location-camping-car", 
     de: "/wohnmobil-mieten" 
   },
+  // Páginas de venta por localización (patrón base dinámico)
+  // El patrón completo sería: /es/venta-autocaravanas-camper-{location}
+  "/venta-autocaravanas-camper": { 
+    es: "/venta-autocaravanas-camper", 
+    en: "/campervans-for-sale-in", 
+    fr: "/camping-cars-a-vendre", 
+    de: "/wohnmobile-zu-verkaufen" 
+  },
 } as const;
 
 /**
@@ -290,16 +298,26 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
         const translatedBase = routeTranslations["/alquiler-autocaravanas-campervans"][targetLang];
         translatedPath = `${translatedBase}-${location}`;
       } else {
-        // Si es una ruta dinámica normal, traducir la parte base
-        const pathSegments = cleanPath.split('/').filter(Boolean);
-        if (pathSegments.length > 0) {
-          const baseRoute = '/' + pathSegments[0];
-          if (routeTranslations[baseRoute as keyof typeof routeTranslations]) {
-            const translatedBase = routeTranslations[baseRoute as keyof typeof routeTranslations][targetLang];
-            const restOfPath = pathSegments.slice(1);
-            translatedPath = restOfPath.length > 0 
-              ? `${translatedBase}/${restOfPath.join('/')}` 
-              : translatedBase;
+        // Manejar rutas dinámicas de venta por localización (pattern: /venta-autocaravanas-camper-{location})
+        const saleLocationPattern = /^\/(venta-autocaravanas-camper|campervans-for-sale-in|camping-cars-a-vendre|wohnmobile-zu-verkaufen)-(.+)$/;
+        const saleLocationMatch = cleanPath.match(saleLocationPattern);
+        
+        if (saleLocationMatch) {
+          const [, basePattern, location] = saleLocationMatch;
+          const translatedBase = routeTranslations["/venta-autocaravanas-camper"][targetLang];
+          translatedPath = `${translatedBase}-${location}`;
+        } else {
+          // Si es una ruta dinámica normal, traducir la parte base
+          const pathSegments = cleanPath.split('/').filter(Boolean);
+          if (pathSegments.length > 0) {
+            const baseRoute = '/' + pathSegments[0];
+            if (routeTranslations[baseRoute as keyof typeof routeTranslations]) {
+              const translatedBase = routeTranslations[baseRoute as keyof typeof routeTranslations][targetLang];
+              const restOfPath = pathSegments.slice(1);
+              translatedPath = restOfPath.length > 0 
+                ? `${translatedBase}/${restOfPath.join('/')}` 
+                : translatedBase;
+            }
           }
         }
       }
