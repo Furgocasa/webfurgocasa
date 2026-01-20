@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
@@ -118,6 +118,7 @@ export default function ReservaDetalleAdminPage() {
   const loadBooking = async () => {
     try {
       setLoading(true);
+      const supabase = createClient(); // ✅ Crear instancia
       
       const { data, error } = await supabase
         .from('bookings')
@@ -182,6 +183,7 @@ export default function ReservaDetalleAdminPage() {
 
     try {
       setUpdating(true);
+      const supabase = createClient(); // ✅ Crear instancia
       
       const { error } = await supabase
         .from('bookings')
@@ -207,6 +209,7 @@ export default function ReservaDetalleAdminPage() {
 
     try {
       setUpdating(true);
+      const supabase = createClient(); // ✅ Crear instancia
       
       const updateData: any = { payment_status: newStatus };
       

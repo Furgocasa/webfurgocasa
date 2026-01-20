@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { 
   ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Mail, Phone, Package
 } from "lucide-react";
@@ -212,6 +212,7 @@ export default function EditarReservaPage() {
   const loadData = async () => {
     try {
       setLoading(true);
+      const supabase = createClient(); // ✅ Crear instancia
 
       // Cargar reserva con JOIN a customers
       const { data: booking, error: bookingError } = await supabase
@@ -357,6 +358,7 @@ export default function EditarReservaPage() {
     try {
       setSaving(true);
       setMessage(null);
+      const supabase = createClient(); // ✅ Crear instancia
 
       // VALIDACIÓN CRÍTICA: Verificar disponibilidad del vehículo
       // Comprobar si hay otras reservas del mismo vehículo en las fechas seleccionadas
@@ -480,6 +482,7 @@ export default function EditarReservaPage() {
 
     try {
       setSaving(true);
+      const supabase = createClient(); // ✅ Crear instancia
 
       const { error } = await supabase
         .from('bookings')
