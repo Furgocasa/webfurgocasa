@@ -4,7 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
-import { usePaginatedData } from "@/hooks/use-paginated-data";
+import { useAllDataProgressive } from "@/hooks/use-all-data-progressive";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/utils";
 
@@ -73,22 +73,26 @@ export default function BookingsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  // Paginación frontend
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentPage, setCurrentPage] = useState(1);
+
   // Estados para ordenamiento - por defecto por fecha de creación descendente
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const queryClient = useQueryClient();
 
-  // Cargar reservas con paginación del lado del servidor
+  // Cargar TODAS las reservas progresivamente
   const { 
     data: bookings, 
     loading, 
+    loadingMore,
     error,
     totalCount,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedData<Booking>({
+    isComplete,
+    progress,
+  } = useAllDataProgressive<Booking>({
     queryKey: ['bookings'],
     table: 'bookings',
     select: `
@@ -99,7 +103,8 @@ export default function BookingsPage() {
       dropoff_location:locations!dropoff_location_id(id, name)
     `,
     orderBy: { column: 'created_at', ascending: false },
-    pageSize: 20, // Cargar 20 reservas por página
+    initialBatchSize: 10, // Primeros 10 registros inmediatos
+    batchSize: 50,        // Luego cargar de 50 en 50
   });
 
   const handleSort = (field: SortField) => {
@@ -131,7 +136,7 @@ export default function BookingsPage() {
 
       if (error) throw error;
       
-      // Invalidar caché para refrescar
+      // Invalidar caché
       queryClient.invalidateQueries({ queryKey: ['bookings'] });
     } catch (err: any) {
       console.error('Error updating status:', err);
@@ -165,7 +170,7 @@ export default function BookingsPage() {
     }
   };
 
-  // Ordenar reservas
+  // Ordenar TODAS las reservas
   const sortedBookings = useMemo(() => {
     if (!bookings) return [];
     return [...bookings].sort((a, b) => {
@@ -243,7 +248,7 @@ export default function BookingsPage() {
     });
   }, [bookings, sortField, sortDirection]);
 
-  // Filtrar reservas con búsqueda en tiempo real
+  // Filtrar reservas con búsqueda en tiempo real (sobre TODAS las reservas)
   const filteredBookings = useMemo(() => {
     let filtered = [...sortedBookings];
 
@@ -270,7 +275,21 @@ export default function BookingsPage() {
     return filtered;
   }, [sortedBookings, searchTerm, statusFilter]);
 
-  const bookingsList = filteredBookings;
+  // Paginación frontend sobre datos filtrados
+  const totalItems = filteredBookings.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  
+  const paginatedBookings = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    const end = start + itemsPerPage;
+    return filteredBookings.slice(start, end);
+  }, [filteredBookings, currentPage, itemsPerPage]);
+
+  // Resetear página al cambiar filtros
+  useMemo(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, itemsPerPage]);
+
   const allBookings = bookings || [];
   const pendingCount = allBookings.filter(b => b.status === 'pending').length;
   const confirmedCount = allBookings.filter(b => b.status === 'confirmed').length;
@@ -283,7 +302,7 @@ export default function BookingsPage() {
     return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
   }).length;
 
-  if (loading && bookingsList.length === 0) {
+  if (loading && allBookings.length === 0) {
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
@@ -311,6 +330,20 @@ export default function BookingsPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Reservas</h1>
           <p className="text-gray-600 mt-1">Gestiona todas las reservas de tu flota</p>
+          {/* Indicador de carga progresiva */}
+          {loadingMore && (
+            <div className="flex items-center gap-2 mt-2">
+              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
+              <span className="text-sm text-blue-600">
+                Cargando más reservas... {progress}% ({bookings.length}/{totalCount})
+              </span>
+            </div>
+          )}
+          {isComplete && totalCount > 10 && (
+            <p className="text-sm text-green-600 mt-2">
+              ✓ Todas las reservas cargadas ({totalCount})
+            </p>
+          )}
         </div>
         <div className="flex gap-3">
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -359,6 +392,16 @@ export default function BookingsPage() {
             <option value="in_progress">En curso</option>
             <option value="completed">Completada</option>
             <option value="cancelled">Cancelada</option>
+          </select>
+          <select 
+            value={itemsPerPage}
+            onChange={(e) => setItemsPerPage(Number(e.target.value))}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+          >
+            <option value="10">10 por página</option>
+            <option value="20">20 por página</option>
+            <option value="50">50 por página</option>
+            <option value="100">100 por página</option>
           </select>
         </div>
       </div>
@@ -474,7 +517,7 @@ export default function BookingsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {bookingsList.length === 0 ? (
+              {paginatedBookings.length === 0 ? (
                 <tr>
                   <td colSpan={13} className="px-6 py-12 text-center text-gray-500">
                     <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
@@ -487,7 +530,7 @@ export default function BookingsPage() {
                   </td>
                 </tr>
               ) : (
-                bookingsList.map((booking) => {
+                paginatedBookings.map((booking) => {
                   const bookingStatus = booking.status || 'pending';
                   const StatusIcon = statusConfig[bookingStatus]?.icon || Clock;
                   const statusStyle = statusConfig[bookingStatus] || statusConfig.pending;
@@ -632,32 +675,32 @@ export default function BookingsPage() {
           </table>
         </div>
         
-        {/* Botón Cargar Más */}
-        {hasNextPage && (
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center">
-            <button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              className="btn-secondary flex items-center gap-2"
-            >
-              {isFetchingNextPage ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Cargando...
-                </>
-              ) : (
-                <>Cargar más reservas</>
-              )}
-            </button>
-          </div>
-        )}
-        
-        {/* Info de paginación */}
+        {/* Paginación Frontend */}
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Mostrando {bookingsList.length} de {totalCount} reservas
+            Mostrando {paginatedBookings.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} reservas
             {searchTerm || statusFilter ? ' (filtradas)' : ''}
+            {loadingMore && ` • Cargando todas... ${progress}%`}
           </p>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === 1}
+            >
+              Anterior
+            </button>
+            <span className="px-3 py-1 text-sm text-gray-600">
+              Página {currentPage} de {totalPages}
+            </span>
+            <button 
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+            </button>
+          </div>
         </div>
       </div>
     </div>
