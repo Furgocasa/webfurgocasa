@@ -99,11 +99,30 @@ export function AdminAuthProvider({
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
+      setIsLoading(true);
+      
+      // Cerrar sesión en Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Error al cerrar sesión:', error);
+        throw error;
+      }
+      
+      // Limpiar estado local
       setAdmin(null);
+      
+      // Redirigir al login
       router.push('/administrator/login');
+      router.refresh();
     } catch (error) {
       console.error('Error logging out:', error);
+      // Aún así intentar limpiar y redirigir
+      setAdmin(null);
+      router.push('/administrator/login');
+      router.refresh();
+    } finally {
+      setIsLoading(false);
     }
   };
 
