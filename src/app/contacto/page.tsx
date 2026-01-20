@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: "Contacto | Furgocasa Campervans",
     description: "Contáctanos para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61.",
     type: "website",
-    url: "https://furgocasa.com/contacto",
+    url: "https://www.furgocasa.com/contacto",
     siteName: "Furgocasa",
     locale: "es_ES",
   },
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description: "Teléfono: 868 36 41 61 | Email: info@furgocasa.com",
   },
   alternates: {
-    canonical: "https://furgocasa.com/contacto",
+    canonical: "https://www.furgocasa.com/contacto",
   },
   robots: {
     index: true,

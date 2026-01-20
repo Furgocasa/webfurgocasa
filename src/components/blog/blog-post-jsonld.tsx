@@ -17,19 +17,19 @@ export function BlogPostJsonLd({ post, url }: BlogPostJsonLdProps) {
     "author": {
       "@type": "Organization",
       "name": "Furgocasa",
-      "url": "https://furgocasa.com",
+      "url": "https://www.furgocasa.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://furgocasa.com/logo.png"
+        "url": "https://www.furgocasa.com/logo.png"
       }
     },
     "publisher": {
       "@type": "Organization",
       "name": "Furgocasa",
-      "url": "https://furgocasa.com",
+      "url": "https://www.furgocasa.com",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://furgocasa.com/logo.png"
+        "url": "https://www.furgocasa.com/logo.png"
       }
     },
     "mainEntityOfPage": {
@@ -51,19 +51,19 @@ export function BlogPostJsonLd({ post, url }: BlogPostJsonLdProps) {
         "@type": "ListItem",
         "position": 1,
         "name": "Inicio",
-        "item": "https://furgocasa.com"
+        "item": "https://www.furgocasa.com"
       },
       {
         "@type": "ListItem",
         "position": 2,
         "name": "Blog",
-        "item": "https://furgocasa.com/blog"
+        "item": "https://www.furgocasa.com/blog"
       },
       {
         "@type": "ListItem",
         "position": 3,
         "name": post.category.name,
-        "item": `https://furgocasa.com/blog/${post.category.slug}`
+        "item": `https://www.furgocasa.com/blog/${post.category.slug}`
       },
       {
         "@type": "ListItem",

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     follow: false, // No seguir enlaces en páginas legales
   },
   alternates: {
-    canonical: "https://furgocasa.com/aviso-legal",
+    canonical: "https://www.furgocasa.com/aviso-legal",
   },
 };
 

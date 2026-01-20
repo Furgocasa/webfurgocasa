@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
   
-  const baseUrl = 'https://furgocasa.com';
+  const baseUrl = 'https://www.furgocasa.com';
   
   // Obtener todos los posts publicados
   const { data: posts } = await supabase

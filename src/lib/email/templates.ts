@@ -144,7 +144,7 @@ export function getEmailBaseTemplate(content: string): string {
       <p>
         📞 <a href="tel:+34868364161">+34 868 364 161</a><br>
         📧 <a href="mailto:info@furgocasa.com">info@furgocasa.com</a><br>
-        🌐 <a href="https://furgocasa.com">www.furgocasa.com</a>
+        🌐 <a href="https://www.furgocasa.com">www.furgocasa.com</a>
       </p>
       <p style="margin-top: 20px; font-size: 12px; color: #9ca3af;">
         Este correo ha sido enviado automáticamente. Por favor, no respondas a este email.<br>
@@ -281,7 +281,7 @@ export function getBookingCreatedTemplate(data: BookingEmailData): string {
       </div>
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://furgocasa.com/reservar/${data.bookingNumber}" class="button">
+        <a href="https://www.furgocasa.com/reservar/${data.bookingNumber}" class="button">
           Ver mi reserva y proceder al pago
         </a>
       </div>
@@ -383,7 +383,7 @@ export function getFirstPaymentConfirmedTemplate(data: BookingEmailData): string
       `}
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://furgocasa.com/reservar/${data.bookingNumber}" class="button">
+        <a href="https://www.furgocasa.com/reservar/${data.bookingNumber}" class="button">
           Ver detalles de mi reserva
         </a>
       </div>
@@ -468,7 +468,7 @@ export function getSecondPaymentConfirmedTemplate(data: BookingEmailData): strin
       </div>
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://furgocasa.com/reservar/${data.bookingNumber}" class="button">
+        <a href="https://www.furgocasa.com/reservar/${data.bookingNumber}" class="button">
           Ver mi reserva
         </a>
       </div>
@@ -604,7 +604,7 @@ export function getCompanyNotificationTemplate(
       </div>
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://furgocasa.com/admin/reservas" class="button">
+        <a href="https://www.furgocasa.com/admin/reservas" class="button">
           Ver en el panel de administración
         </a>
       </div>

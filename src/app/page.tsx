@@ -33,25 +33,25 @@ export const metadata: Metadata = {
     title: "Furgocasa | Alquiler de Campers y Autocaravanas en Murcia",
     description: "Tu hotel 5 estrellas sobre ruedas. Flota premium desde 95€/día con kilómetros ilimitados. Dreamer, Knaus, Weinsberg.",
     type: "website",
-    url: "https://furgocasa.com",
+    url: "https://www.furgocasa.com",
     siteName: "Furgocasa - Alquiler de Autocaravanas",
     images: [
       {
-        url: "https://furgocasa.com/images/slides/hero-01.webp",
+        url: "https://www.furgocasa.com/images/slides/hero-01.webp",
         width: 1200,
         height: 630,
         alt: "Furgocasa - Alquiler de Campers en Murcia",
         type: "image/webp",
       },
       {
-        url: "https://furgocasa.com/images/slides/hero-02.webp",
+        url: "https://www.furgocasa.com/images/slides/hero-02.webp",
         width: 1200,
         height: 630,
         alt: "Flota premium Furgocasa",
         type: "image/webp",
       },
       {
-        url: "https://furgocasa.com/images/slides/hero-03.webp",
+        url: "https://www.furgocasa.com/images/slides/hero-03.webp",
         width: 1200,
         height: 630,
         alt: "Interior camper Furgocasa",
@@ -67,10 +67,10 @@ export const metadata: Metadata = {
     creator: "@furgocasa",
     title: "Furgocasa | Alquiler Camper Murcia",
     description: "Autocaravanas premium desde 95€/día. Kilómetros ilimitados. Tu hotel 5⭐ sobre ruedas.",
-    images: ["https://furgocasa.com/images/slides/hero-01.webp"],
+    images: ["https://www.furgocasa.com/images/slides/hero-01.webp"],
   },
   alternates: {
-    canonical: "https://furgocasa.com",
+    canonical: "https://www.furgocasa.com",
   },
   robots: {
     index: true,

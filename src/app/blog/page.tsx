@@ -15,11 +15,11 @@ export const metadata: Metadata = {
     title: "Blog de Viajes en Camper | Furgocasa",
     description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España.",
     type: "website",
-    url: "https://furgocasa.com/blog",
+    url: "https://www.furgocasa.com/blog",
     siteName: "Furgocasa",
     images: [
       {
-        url: "https://furgocasa.com/og-blog.jpg",
+        url: "https://www.furgocasa.com/og-blog.jpg",
         width: 1200,
         height: 630,
         alt: "Blog de Viajes en Camper - Furgocasa",
@@ -30,11 +30,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Blog de Viajes en Camper | Furgocasa",
     description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana",
-    images: ["https://furgocasa.com/og-blog.jpg"],
+    images: ["https://www.furgocasa.com/og-blog.jpg"],
     creator: "@furgocasa",
   },
   alternates: {
-    canonical: "https://furgocasa.com/blog",
+    canonical: "https://www.furgocasa.com/blog",
   },
   robots: {
     index: true,

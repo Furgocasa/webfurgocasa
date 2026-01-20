@@ -11,7 +11,7 @@ export const metadata: Metadata = {
     follow: false,
   },
   alternates: {
-    canonical: "https://furgocasa.com/privacidad",
+    canonical: "https://www.furgocasa.com/privacidad",
   },
 };
 

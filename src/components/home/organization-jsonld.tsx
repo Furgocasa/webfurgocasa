@@ -4,8 +4,8 @@ export function OrganizationJsonLd() {
     "@type": ["Organization", "LocalBusiness"],
     "name": "Furgocasa",
     "legalName": "Furgocasa S.L.",
-    "url": "https://furgocasa.com",
-    "logo": "https://furgocasa.com/logo.png",
+    "url": "https://www.furgocasa.com",
+    "logo": "https://www.furgocasa.com/logo.png",
     "description": "Empresa especializada en alquiler de autocaravanas y campers de gran volumen en Murcia. Flota premium con kilómetros ilimitados.",
     "foundingDate": "2012",
     "telephone": "+34868364161",
@@ -94,8 +94,8 @@ export function ProductJsonLd({ vehicles }: ProductJsonLdProps) {
     "@type": "Product",
     "name": `${vehicle.brand} ${vehicle.model} - ${vehicle.name}`,
     "description": `Camper van de ${vehicle.passengers} plazas con ${vehicle.beds} camas. Equipada con cocina, baño, calefacción y todo lo necesario para tu aventura.`,
-    "image": vehicle.main_image || "https://furgocasa.com/default-vehicle.jpg",
-    "url": `https://furgocasa.com/vehiculos/${vehicle.slug}`,
+    "image": vehicle.main_image || "https://www.furgocasa.com/default-vehicle.jpg",
+    "url": `https://www.furgocasa.com/vehiculos/${vehicle.slug}`,
     "brand": {
       "@type": "Brand",
       "name": vehicle.brand
@@ -155,12 +155,12 @@ export function WebsiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Furgocasa",
-    "url": "https://furgocasa.com",
+    "url": "https://www.furgocasa.com",
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://furgocasa.com/buscar?q={search_term_string}"
+        "urlTemplate": "https://www.furgocasa.com/buscar?q={search_term_string}"
       },
       "query-input": "required name=search_term_string"
     }

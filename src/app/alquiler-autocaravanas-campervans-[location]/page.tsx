@@ -156,12 +156,12 @@ export default async function LocationPage({
           
           <div className="container mx-auto px-4 h-full flex items-center relative z-10">
             <div className="max-w-3xl text-white">
-              <h1 className="text-4xl md:text-6xl font-heading font-bold mb-6 leading-tight">
+              <h1 className="text-4xl md:text-6xl font-heading font-bold mb-6 leading-tight mt-16 md:mt-0">
                 Alquiler de Autocaravanas<br />
                 <span className="text-furgocasa-orange">en {location.name}</span>
               </h1>
-              <p className="text-xl md:text-2xl mb-8 text-blue-100 font-light">
-                Las mejores furgonetas campers de gran volumen en alquiler
+              <p className="text-lg md:text-2xl mb-8 text-blue-100 font-light px-2 md:px-0">
+                Las mejores furgonetas campers<br className="md:hidden" /> de gran volumen en alquiler
               </p>
               {distanceInfo && (
                 <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl px-6 py-4 mb-8 w-fit">
