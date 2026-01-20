@@ -2,6 +2,37 @@
 
 **LEER ANTES DE HACER CUALQUIER QUERY A SUPABASE**
 
+**Última actualización**: 20 de Enero 2026 - v1.0.4
+
+---
+
+## 🚨 REGLA #0: CREAR CLIENTE CORRECTAMENTE
+
+### ✅ **PATRÓN CORRECTO (OBLIGATORIO)**
+
+```typescript
+// ✅ SIEMPRE crear instancia dentro de funciones async
+import { createClient } from '@/lib/supabase/client';
+
+const loadData = async () => {
+  const supabase = createClient(); // ✅ Nueva instancia con sesión actualizada
+  const { data } = await supabase.from('table').select('*');
+  return data;
+};
+```
+
+### ❌ **NUNCA HACER ESTO**
+
+```typescript
+// ❌ NO importar supabase estáticamente
+import { supabase } from '@/lib/supabase/client'; // ❌ MALO
+await supabase.from('table').select(); // ❌ Sesión desactualizada
+```
+
+**Consecuencia**: Errores de autenticación, RLS violations, AbortError
+
+**Ver**: `README.md` sección "Sistema de Autenticación" para más detalles
+
 ---
 
 ## 🚨 REGLA #1: SIEMPRE usar `*` en relaciones
@@ -157,15 +188,65 @@ const { data } = await supabase
 
 ---
 
+## 🚨 REGLA #9: Dividir queries grandes en lotes
+
+**Problema**: URLs demasiado largas causan error 400
+
+```typescript
+// ❌ MALO - Más de 50-100 IDs
+.in('booking_id', [id1, id2, ..., id150])
+
+// ✅ BUENO - Dividir en lotes
+const batchSize = 50;
+const batches = [];
+for (let i = 0; i < ids.length; i += batchSize) {
+  batches.push(ids.slice(i, i + batchSize));
+}
+
+for (const batch of batches) {
+  const { data } = await supabase
+    .from('table')
+    .select('*')
+    .in('id', batch);
+  
+  if (data) allData.push(...data);
+}
+```
+
+**Aplicado en**: `src/app/administrator/(protected)/calendario/page.tsx`
+
+---
+
+## 🚨 REGLA #10: Validar datos antes de usar
+
+```typescript
+// ❌ MALO - Crash si null
+const result = vehicles.find(v => v.id === id);
+
+// ✅ BUENO - Validación
+if (!vehicles || vehicles.length === 0) {
+  return defaultValue;
+}
+const result = vehicles.find(v => v.id === id);
+```
+
+---
+
 ## ✅ CHECKLIST antes de hacer un PR
 
+- [ ] Todas las queries crean instancia con `createClient()`
 - [ ] Todas las queries usan `*` en relaciones
 - [ ] No se usa `.eq('is_available', ...)` en ninguna parte
 - [ ] No se ordena por `category` en la tabla `extras`
 - [ ] La tabla correcta es `vehicle_categories`, no `categories`
 - [ ] La relación `vehicle_equipment` está incluida donde se necesita equipamiento
+- [ ] Queries con más de 50 IDs se dividen en lotes
+- [ ] Validaciones de null antes de usar datos
 
 ---
 
-**Última actualización:** 2026-01-08  
-**Ver también:** `SUPABASE-SCHEMA-REAL.md` para el schema completo
+**Última actualización:** 2026-01-20 (v1.0.4)  
+**Ver también:** 
+- `SUPABASE-SCHEMA-REAL.md` para el schema completo
+- `README.md` para arquitectura de autenticación
+- `CHANGELOG.md` v1.0.4 para fix crítico de autenticación

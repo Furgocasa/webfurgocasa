@@ -1,294 +1,458 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.3-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.4-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://webfurgocasa.vercel.app)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0.3 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
+**🎉 VERSIÓN 1.0.4 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
 
 > **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
-## 🚨 ADVERTENCIA CRÍTICA - LEER ANTES DE MODIFICAR CÓDIGO
+---
 
-**⚠️ REGLAS OBLIGATORIAS DE ARQUITECTURA:**
+## 🚨 REGLAS ABSOLUTAS - NO TOCAR LO QUE FUNCIONA
 
-Este proyecto tiene una arquitectura **ESTRICTA** para SEO que **NO PUEDE VIOLARSE**:
+### ⛔ ADVERTENCIA CRÍTICA
 
-### ❌ NUNCA HACER:
-- ❌ Convertir páginas públicas en Client Components (`"use client"`)
-- ❌ Usar `useLanguage()` en Server Components
-- ❌ Eliminar metadatos SEO de las páginas
-- ❌ Mover lógica de carga de datos al cliente
+**SI ALGO FUNCIONA CORRECTAMENTE, NO LO TOQUES**
 
-### ✅ SIEMPRE HACER:
-- ✅ Mantener páginas públicas como **Server Components**
-- ✅ Usar `translateServer()` para traducciones en servidor
-- ✅ Usar `useLanguage()` **solo** en Client Components interactivos
-- ✅ Mantener `export const metadata` en todas las páginas
+Esta aplicación ha pasado por múltiples iteraciones y correcciones. Cada "mejora" sin entender la arquitectura ha causado regresiones graves. 
 
-### 📚 Documentos OBLIGATORIOS:
+### 📜 REGLAS DE ORO (NUNCA VIOLAR)
 
-**LEER ANTES DE TOCAR CUALQUIER PÁGINA PÚBLICA:**
+#### 1️⃣ **SISTEMA DE AUTENTICACIÓN SUPABASE** ⚠️ **CRÍTICO**
 
-1. **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** ⚠️ **CRÍTICO**
-2. **[GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)** ⚠️ **CRÍTICO**
-3. **[AUDITORIA-SEO-CRITICA.md](./AUDITORIA-SEO-CRITICA.md)** - Consecuencias de violar reglas
-4. **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)** - Normas SEO
+**REGLA ABSOLUTA**: NO modificar `src/lib/supabase/client.ts` ni `src/lib/supabase/server.ts`
 
-**Violar estas reglas = Destruir el SEO = Pérdida de 30-50% de tráfico orgánico**
+**✅ FUNCIONAMIENTO CORRECTO ACTUAL:**
+
+```typescript
+// ✅ Client-side (Browser) - client.ts
+export function createClient() {
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+}
+
+// ✅ Server-side (Next.js) - server.ts  
+export async function createClient() {
+  const cookieStore = await cookies();
+  return createServerClient<Database>(...);
+}
+```
+
+**❌ NUNCA HACER:**
+
+```typescript
+// ❌ NO USAR SINGLETON - Causa sesiones desactualizadas
+let browserClient = null;
+if (!browserClient) {
+  browserClient = createBrowserClient(...);
+}
+return browserClient; // ❌ MALO - sesión congelada
+
+// ❌ NO importar supabase estáticamente en componentes cliente
+import { supabase } from '@/lib/supabase/client'; // ❌ MALO
+// EN SU LUGAR:
+import { createClient } from '@/lib/supabase/client'; // ✅ BUENO
+const supabase = createClient(); // ✅ Crear instancia fresca
+```
+
+**POR QUÉ ES CRÍTICO:**
+- El singleton causa que TODAS las peticiones usen la misma sesión desactualizada
+- Los administradores pierden autenticación en páginas cliente
+- Causa errores RLS (Row Level Security) y `AbortError`
+- **ESTO FUE EL ERROR QUE ROMPIÓ TODO EL ADMINISTRADOR**
+
+#### 2️⃣ **HOOKS DE DATOS - NO MODIFICAR** ⚠️ **CRÍTICO**
+
+**REGLA**: Los hooks `usePaginatedData`, `useAdminData` y `useAllDataProgressive` funcionan correctamente. **NO LOS TOQUES**.
+
+**✅ PATRÓN CORRECTO EN LOS HOOKS:**
+
+```typescript
+// src/hooks/use-paginated-data.ts
+export function usePaginatedData<T>({ table, select, ... }) {
+  const query = useInfiniteQuery({
+    queryFn: async ({ pageParam = 0 }) => {
+      const supabase = createClient(); // ✅ Nueva instancia en CADA query
+      let queryBuilder = supabase.from(table).select(select);
+      // ...
+    }
+  });
+}
+
+// src/hooks/use-admin-data.ts
+export function useAdminData<T>({ queryFn, ... }) {
+  const loadData = async () => {
+    const supabase = createClient(); // ✅ Nueva instancia
+    const result = await queryFn();
+    // ...
+  };
+}
+```
+
+**CONSECUENCIA SI SE MODIFICAN MAL:**
+- TODAS las secciones del administrador dejan de cargar
+- Errores `[usePaginatedData] Error`, `[useAdminData] Error`
+- Pérdida de acceso al panel completo
+
+#### 3️⃣ **ARQUITECTURA NEXT.JS - SERVER VS CLIENT** ⚠️ **CRÍTICO**
+
+**REGLA**: Las páginas públicas son Server Components, las páginas del admin son Client Components.
+
+| Tipo de Página | Componente | Cliente Supabase | Hook/Query |
+|----------------|------------|------------------|------------|
+| **Páginas públicas** | Server Component | `createClient()` de `/server.ts` | Directo con `await` |
+| **Dashboard admin** | Server Component | `createClient()` de `/server.ts` | Queries desde `/queries.ts` |
+| **Páginas admin (CRUD)** | Client Component (`"use client"`) | `createClient()` de `/client.ts` | Hooks de React Query |
+
+**✅ CORRECTO - Página pública:**
+```typescript
+// Sin "use client"
+import { createClient } from '@/lib/supabase/server';
+
+export default async function VehiculosPage() {
+  const supabase = await createClient();
+  const { data } = await supabase.from('vehicles').select('*');
+  return <div>...</div>;
+}
+```
+
+**✅ CORRECTO - Página admin:**
+```typescript
+"use client";
+import { usePaginatedData } from '@/hooks/use-paginated-data';
+
+export default function VehiculosAdminPage() {
+  const { data } = usePaginatedData({ table: 'vehicles', ... });
+  return <div>...</div>;
+}
+```
+
+**❌ NUNCA:**
+- Añadir `"use client"` a páginas públicas (destruye SEO)
+- Usar hooks de React en Server Components
+- Importar `createClient` de `/client.ts` en Server Components
+
+#### 4️⃣ **SISTEMA i18n - NO ROMPER** ⚠️ **CRÍTICO**
+
+**REGLA**: El sistema de traducciones dual funciona. NO LO CAMBIES.
+
+- **Server Components**: `translateServer(key, locale)`
+- **Client Components**: `useLanguage()` hook
+
+**❌ NUNCA usar `useLanguage()` en Server Components** - Causa errores de hidratación
+
+**📖 Ver:** `REGLAS-ARQUITECTURA-NEXTJS.md` y `GUIA-TRADUCCION.md`
+
+#### 5️⃣ **FLUJO DE RESERVA - SAGRADO** ⚠️ **CRÍTICO**
+
+**REGLA**: El flujo de reserva es secuencial y TODOS los pasos son obligatorios.
+
+```
+/reservar → /buscar → /reservar/vehiculo → /reservar/nueva → /reservar/[id] → /reservar/[id]/pago → /reservar/[id]/confirmacion
+```
+
+**NUNCA:**
+- Eliminar ninguna de estas páginas
+- Saltar pasos en el flujo
+- Cambiar el orden de los pasos
+- Modificar los parámetros URL sin actualizar TODO el flujo
+
+**📖 Ver:** `FLUJO-RESERVAS-CRITICO.md` y `PROCESO-RESERVA-COMPLETO.md`
+
+---
+
+## 🔧 Fix Crítico v1.0.4 - Sistema de Autenticación
+
+### **PROBLEMA CRÍTICO RESUELTO: Administrador completamente roto**
+
+**FECHA**: 20 de Enero 2026
+
+**SÍNTOMAS:**
+- ✅ Dashboard del admin funcionaba
+- ❌ Vehículos, Reservas, Clientes, Pagos, Extras, Equipamiento, Temporadas, Ubicaciones y Calendario NO cargaban
+- ❌ Errores en consola: `[usePaginatedData] Error`, `[useAdminData] Error`, `AbortError`
+- ❌ Error: `Cannot read properties of null (reading 'find')` en Calendario
+
+**CAUSA RAÍZ:**
+
+El archivo `src/lib/supabase/client.ts` usaba un **patrón singleton** que congelaba la sesión de autenticación:
+
+```typescript
+// ❌ CÓDIGO PROBLEMÁTICO (NUNCA VOLVER A ESTO)
+let browserClient = null;
+
+export function createClient() {
+  if (!browserClient) {
+    browserClient = createBrowserClient(...); // Se crea UNA VEZ
+  }
+  return browserClient; // SIEMPRE retorna la MISMA instancia
+}
+```
+
+**CONSECUENCIAS:**
+1. Primera carga después de login → Sesión OK
+2. Navegación a otra sección → **Misma instancia con sesión vieja**
+3. Peticiones fallan porque la sesión no se refresca
+4. RLS (Row Level Security) rechaza las peticiones
+5. TODAS las secciones del admin fallan
+
+**SOLUCIÓN APLICADA:**
+
+```typescript
+// ✅ CÓDIGO CORRECTO (MANTENER SIEMPRE ASÍ)
+export function createClient() {
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  // ✅ Nueva instancia en CADA llamada = sesión siempre actualizada
+}
+```
+
+**ARCHIVOS MODIFICADOS:**
+- ✅ `src/lib/supabase/client.ts` - Eliminado singleton
+- ✅ `src/hooks/use-paginated-data.ts` - Crear instancia en queryFn
+- ✅ `src/hooks/use-admin-data.ts` - Crear instancia en loadData
+- ✅ `src/hooks/use-all-data-progressive.ts` - Crear instancia en loadAllData
+- ✅ Todas las páginas del admin - Usar `createClient()` en funciones async
+
+**RESULTADO:**
+- ✅ Todas las secciones del administrador funcionan
+- ✅ Sin errores de autenticación
+- ✅ Sin AbortError
+- ✅ Sin errores de RLS
+- ✅ Calendario funciona con carga en lotes
+
+### **Fix Adicional: Meta Pixel**
+
+**PROBLEMA:** Error `[Meta Pixel] - Invalid PixelID: null` en consola
+
+**SOLUCIÓN:** Carga condicional solo si existe la variable de entorno
+
+```tsx
+{process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+  <Script id="facebook-pixel" ... />
+)}
+```
+
+**📖 Ver:** `CONFIGURACION-META-PIXEL.md`
 
 ---
 
 ## 🛠️ Stack Tecnológico
 
-- **Frontend**: Next.js 14 (App Router), React 18, TypeScript
+- **Frontend**: Next.js 15 (App Router), React 18, TypeScript
 - **Estilos**: TailwindCSS, Radix UI, Lucide Icons
 - **Backend**: Supabase (PostgreSQL + Auth + Storage)
-- **Pagos**: **Sistema Dual** - Redsys (TPV Español, 0.3% comisión) + Stripe (Internacional, alternativa)
+- **Autenticación**: Supabase Auth con RLS (Row Level Security)
+- **Pagos**: **Sistema Dual** - Redsys (TPV Español, 0.3%) + Stripe (Internacional, 1.4% + 0.25€)
 - **Editor**: TinyMCE Cloud
-- **Estado**: Zustand, React Query
+- **Estado**: Zustand, React Query (@tanstack/react-query)
 - **Formularios**: React Hook Form + Zod
 - **Fechas**: date-fns
 - **Traducciones**: Sistema i18n multiidioma con URLs localizadas (ES/EN/FR/DE)
 - **Despliegue**: Vercel (recomendado)
 
+---
+
+## 🏗️ ARQUITECTURA DE LA APLICACIÓN
+
+### 📊 Diagrama de Arquitectura
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         FURGOCASA APP                            │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────┐         ┌─────────────────────┐
+│   PÁGINAS PÚBLICAS  │         │   PANEL ADMINISTRADOR│
+│  (Server Components)│         │  (Client Components) │
+└──────────┬──────────┘         └──────────┬──────────┘
+           │                               │
+           │ usa                          │ usa
+           ↓                               ↓
+┌─────────────────────┐         ┌─────────────────────┐
+│  createClient()     │         │  createClient()     │
+│  /lib/supabase/     │         │  /lib/supabase/     │
+│  server.ts          │         │  client.ts          │
+│                     │         │                     │
+│  • cookies()        │         │  • createBrowser    │
+│  • Server Auth      │         │    Client           │
+│  • Service Role     │         │  • Nueva instancia  │
+│                     │         │    en CADA llamada  │
+└──────────┬──────────┘         └──────────┬──────────┘
+           │                               │
+           │                               │ usa
+           │                               ↓
+           │                    ┌─────────────────────┐
+           │                    │  HOOKS DE DATOS     │
+           │                    │  • usePaginatedData │
+           │                    │  • useAdminData     │
+           │                    │  • useAllData...    │
+           │                    └──────────┬──────────┘
+           │                               │
+           └───────────┬───────────────────┘
+                       │
+                       ↓
+            ┌──────────────────────┐
+            │   SUPABASE BACKEND   │
+            │   • PostgreSQL       │
+            │   • RLS habilitado   │
+            │   • Storage          │
+            │   • Auth             │
+            └──────────────────────┘
+```
+
+### 🔐 Sistema de Autenticación - CÓMO FUNCIONA
+
+#### **Dos Tipos de Clientes Supabase:**
+
+1. **Cliente Servidor** (`/lib/supabase/server.ts`)
+   - **Dónde**: Server Components, API Routes, Server Actions
+   - **Cómo**: Lee cookies de Next.js para obtener sesión
+   - **Cuándo**: Páginas públicas, dashboard admin
+   - **Seguridad**: Puede usar service_role si es necesario
+
+2. **Cliente Navegador** (`/lib/supabase/client.ts`)  
+   - **Dónde**: Client Components (con `"use client"`)
+   - **Cómo**: `createBrowserClient` mantiene sesión en localStorage del navegador
+   - **Cuándo**: Páginas interactivas del admin (vehiculos, reservas, etc.)
+   - **Seguridad**: Solo anon_key, RLS protege datos
+
+#### **Por Qué Necesitamos NUEVA Instancia en Cada Llamada:**
+
+```typescript
+// ❌ PROBLEMA - Singleton (NO USAR NUNCA)
+let client = createBrowserClient(...); // Se crea una vez
+export const supabase = client; // TODAS las llamadas usan esta instancia
+
+// Flujo:
+// 1. Usuario hace login → client tiene sesión A
+// 2. Usuario navega a /vehiculos → client SIGUE con sesión A (puede estar expirada)
+// 3. Usuario navega a /reservas → client SIGUE con sesión A vieja
+// 4. Las peticiones FALLAN porque la sesión no se refresca
+
+// ✅ SOLUCIÓN - Nueva instancia (USAR SIEMPRE)
+export function createClient() {
+  return createBrowserClient(...); // Nueva instancia cada vez
+}
+
+// Flujo:
+// 1. Usuario hace login → guarda token en localStorage
+// 2. Usuario navega a /vehiculos → createClient() lee token ACTUAL de localStorage
+// 3. Usuario navega a /reservas → createClient() lee token ACTUAL de localStorage  
+// 4. Todas las peticiones usan sesión actualizada = TODO FUNCIONA
+```
+
+#### **Cómo Usar Correctamente:**
+
+```typescript
+// ✅ EN HOOKS
+export function usePaginatedData({ table }) {
+  const query = useInfiniteQuery({
+    queryFn: async () => {
+      const supabase = createClient(); // ✅ SIEMPRE crear instancia aquí
+      const { data } = await supabase.from(table).select();
+      return data;
+    }
+  });
+}
+
+// ✅ EN FUNCIONES ASYNC DE COMPONENTES
+const handleDelete = async (id: string) => {
+  const supabase = createClient(); // ✅ Crear instancia
+  await supabase.from('table').delete().eq('id', id);
+};
+
+// ✅ EN PÁGINAS SERVER COMPONENT
+export default async function Page() {
+  const supabase = await createClient(); // ✅ Server client
+  const { data } = await supabase.from('table').select();
+}
+```
+
+### 🗂️ **Estructura de Archivos de Autenticación**
+
+```
+src/lib/supabase/
+├── client.ts              ⚠️ NO TOCAR - Cliente para navegador
+│   └── createClient()     ⚠️ Retorna NUEVA instancia siempre
+│
+├── server.ts              ⚠️ NO TOCAR - Cliente para servidor
+│   └── createClient()     ⚠️ Lee cookies de Next.js
+│
+├── queries.ts             ✅ Se puede extender - Queries reutilizables
+│   ├── getAllVehicles()   ✅ Usa createClient() de server.ts
+│   └── getDashboardStats() ✅ Usa createClient() de server.ts
+│
+└── database.types.ts      ℹ️ Generado - Tipos de Supabase
+```
+
+---
+
+## 📋 SECCIONES DEL ADMINISTRADOR - ESTADO ACTUAL
+
+### ✅ TODAS FUNCIONANDO CORRECTAMENTE
+
+| Sección | Ruta | Estado | Hook Usado | Notas |
+|---------|------|--------|------------|-------|
+| **Dashboard** | `/administrator` | ✅ | Server Component | Usa `queries.ts` |
+| **Vehículos** | `/administrator/vehiculos` | ✅ | `usePaginatedData` | CRUD completo |
+| **Reservas** | `/administrator/reservas` | ✅ | `useAllDataProgressive` | Con filtros |
+| **Clientes** | `/administrator/clientes` | ✅ | `usePaginatedData` | Con búsqueda |
+| **Pagos** | `/administrator/pagos` | ✅ | `usePaginatedData` | Lectura |
+| **Extras** | `/administrator/extras` | ✅ | `useAdminData` | CRUD inline |
+| **Equipamiento** | `/administrator/equipamiento` | ✅ | `useAdminData` | CRUD inline |
+| **Temporadas** | `/administrator/temporadas` | ✅ | `useAdminData` | Por año |
+| **Ubicaciones** | `/administrator/ubicaciones` | ✅ | `useAdminData` | CRUD inline |
+| **Calendario** | `/administrator/calendario` | ✅ | `useAdminData` (x2) | Vista Gantt |
+
+**⚠️ SI UNA SECCIÓN DEJA DE FUNCIONAR:**
+
+1. **NO TOQUES LOS HOOKS** - El problema NO está ahí
+2. Verifica que la página usa `createClient()` correctamente:
+   ```typescript
+   const supabase = createClient(); // ✅ Dentro de la función
+   ```
+3. Verifica que el `queryFn` del hook crea instancia:
+   ```typescript
+   queryFn: async () => {
+     const supabase = createClient(); // ✅ Debe estar aquí
+   }
+   ```
+4. Verifica políticas RLS en Supabase
+5. Limpia caché: `rm -rf .next` y reinicia servidor
+
+---
+
 ## 🚀 Características
 
 ### Sitio Público
 - ✅ **Página de inicio dinámica**
-  - Slider hero con imágenes de campañas
-  - Sección de modelos destacados con imágenes reales de vehículos desde BD
-  - Buscador de disponibilidad integrado
 - ✅ Búsqueda de vehículos por fechas y ubicación
 - ✅ **Catálogo de vehículos con imágenes dinámicas**
-  - Todas las imágenes cargadas desde tabla `vehicle_images`
-  - Galería de imágenes con lightbox en detalle de vehículo
-  - Fallbacks elegantes si no hay imágenes
-- ✅ **Proceso de reserva completo paso a paso** 🎯 **OPTIMIZADO v1.0.2**
-  - **Paso 1**: Búsqueda de disponibilidad por fechas y ubicación (`/buscar`)
-    - Solo reservas `confirmed` e `in_progress` bloquean vehículos
-    - Reservas `pending` NO bloquean disponibilidad ✅
-    - Filtros avanzados (plazas, transmisión) y ordenamiento
-  - **Paso 2**: Selección de vehículo y extras (`/reservar/vehiculo`)
-    - Sticky header con resumen de reserva siempre visible
-    - Link "Volver a la búsqueda" accesible en todo momento
-    - Extras con precios por día o precio único correctamente diferenciados
-    - Suma automática de extras en el total
-    - Sidebar sticky en PC, resumen móvil optimizado
-    - Retry automático con manejo de AbortError (3 intentos)
-  - **Paso 3**: Datos del cliente (`/reservar/nueva`)
-    - Sticky header con resumen de reserva
-    - Link "Volver al paso anterior" siempre visible
-    - Detección automática de clientes existentes por DNI/email
-    - Creación/actualización inteligente sin duplicados
-    - Formulario completo con validación
-  - **Paso 4**: Confirmación y pago (`/reservar/[id]`)
-    - Depósito correcto: 1000€ (vía transferencia)
-    - Datos de contacto correctos
-    - Estado de la reserva y siguiente paso
+- ✅ **Proceso de reserva completo paso a paso** 🎯
 - ✅ **Sistema de pago fraccionado (50%-50%)**
-  - Primer 50% al confirmar reserva
-  - Segundo 50% hasta 15 días antes del alquiler
-  - Gestión automática de pagos parciales
-  - Botones de pago activos según estado y fechas
-- ✅ **Página de reserva pública para clientes** (`/reservar/[id]`)
-  - Ver detalles completos de su reserva
-  - Resumen de vehículo, fechas, ubicaciones y extras
-  - Estado de pagos y próximos vencimientos
-  - Botones para completar pagos pendientes
-  - Datos de contacto del cliente
 - ✅ **Sistema de pagos dual - Redsys + Stripe** 💳
-  - **Selector de método de pago** en pantalla de checkout
-  - **Redsys**: Pasarela española (0.3% comisión) - Método principal
-  - **Stripe**: Alternativa internacional (1.4% + 0.25€) - Para pruebas y respaldo
-  - Usuario elige su método preferido antes de pagar
-  - Ambos métodos completamente integrados y funcionales
-- ✅ Blog completo con categorías, etiquetas y SEO
-- ✅ Páginas de artículos individuales
-- ✅ **Página de Inteligencia Artificial**
-  - Información sobre GPT Chat de Viaje
-  - Detalles del WhatsApp Bot de asistencia técnica
-  - Beneficios de la IA para clientes
-- ✅ **Sistema de internacionalización (i18n) con URLs localizadas**
-  - 4 idiomas: Español, Inglés, Francés, Alemán
-  - URLs con prefijos: `/es/`, `/en/`, `/fr/`, `/de/`
-  - Cambio automático de URL al seleccionar idioma
-  - SEO optimizado con URLs traducidas
-  - Middleware inteligente con detección automática de idioma
-- ✅ Sistema de traducciones multiidioma
-- ✅ Sistema de gestión de temporadas y tarifas con descuentos por duración
-- ✅ Diseño responsive (móvil, tablet, desktop)
+- ✅ Blog completo con categorías y SEO
+- ✅ **Sistema i18n con URLs localizadas** (ES/EN/FR/DE)
+- ✅ Sistema de cookies GDPR compliant
+- ✅ Diseño responsive total
 
-### Panel de Administración (`/administrator`)
+### Panel de Administración
 - ✅ Login seguro con Supabase Auth
 - ✅ **PWA (Progressive Web App)** 📱
-  - Instalable en dispositivos móviles (iOS Safari y Android Chrome)
-  - Funciona como una app nativa en modo standalone
-  - Accesos directos a Reservas, Vehículos y Clientes
-  - Caché inteligente para mejor rendimiento offline
-  - Banner de instalación automático para administradores
 - ✅ Dashboard con estadísticas en tiempo real
 - ✅ **Buscador Global Inteligente** 🔍
-  - Búsqueda en tiempo real con debounce
-  - Categorización automática (vehículos, reservas, clientes, extras, ubicaciones)
-  - Búsqueda en cascada (buscar "Murcia" encuentra ubicación + reservas en Murcia)
-  - Atajos de teclado (Ctrl+K / Cmd+K)
-  - Navegación directa con un clic
-- ✅ **Gestión completa de vehículos (CRUD)**
-  - Alta, edición y baja de vehículos
-  - **Galería de imágenes múltiple** con ordenación drag & drop
-  - Selección de imagen principal
-  - Control de mantenimiento
-  - Vehículos para alquiler y venta
-  - Código interno para organización
-  - Tabla sortable por todas las columnas
-- ✅ **Sistema de Media/Imágenes Avanzado**
-  - Biblioteca de medios con Supabase Storage
-  - Organización por carpetas (vehículos, blog, extras)
-  - Drag & drop para subir múltiples archivos
-  - Selector de imágenes reutilizable con multi-selección
-  - Gestión de metadatos (alt text, orden)
-  - Creación de carpetas desde el selector
-  - Eliminación de archivos y carpetas
-- ✅ **Gestión de reservas avanzada**
-  - **Calendario visual estilo Gantt** (PC y móvil/tablet)
-    - Vista desktop con scroll horizontal
-    - Vista mobile tipo Notion Calendar
-    - Tooltips inteligentes con posicionamiento dinámico
-    - Modal con detalles completos al hacer clic
-    - Indicadores visuales de inicio/fin de alquiler
-  - Edición completa de reservas
-  - **Gestión de pagos parciales** (50%-50%)
-    - Seguimiento de cantidad pagada vs pendiente
-    - Cálculo automático de estado de pago
-  - Filtros y ordenación por múltiples campos
-  - Estados de reserva con colores (pendiente, confirmada, en curso, completada, cancelada)
-  - Búsqueda rápida desde el buscador global
-  - Eliminación de reservas
-  - Cambio de estado inline desde la tabla
+- ✅ **Gestión completa de vehículos**
+- ✅ **Sistema de Media/Imágenes**
+- ✅ **Gestión de reservas con calendario Gantt**
 - ✅ **Sistema de temporadas y tarifas**
-  - Temporada alta, media y baja
-  - Tarifas personalizadas por temporada
-  - Calendario visual de temporadas
-- ✅ **Blog CMS con TinyMCE Editor**
-  - Crear/editar artículos con editor visual
-  - Gestión de categorías y etiquetas
-  - Moderación de comentarios
-  - SEO por artículo (meta title, description, keywords)
-  - Biblioteca de medios integrada
+- ✅ **Blog CMS con TinyMCE**
 - ✅ Gestión de clientes (CRM)
-- ✅ Gestión de pagos y fianzas
-- ✅ Gestión de extras/accesorios
+- ✅ Gestión de pagos
+- ✅ Gestión de extras/equipamiento
 - ✅ Gestión de ubicaciones
-
-## 🔧 Fixes Críticos v1.0.2 - Producción Estable
-
-### **Problemas Resueltos en Producción:**
-
-#### **1. AbortError: Loop Infinito Corregido** ✅
-- **Problema**: Requests de Supabase entraban en loop infinito de reintentos
-- **Causa**: Lógica contradictoria en retry (`shouldRetry = isAbortError ? true : retryCount < 3`)
-- **Solución**: Límite estricto de 3 intentos para TODOS los errores
-- **Impacto**: Páginas `/reservar/vehiculo`, `/ventas`, admin pages
-- **Resultado**: Sistema robusto, sin loops, logs claros
-
-#### **2. Carga de Vehículos Optimizada** ✅
-- **Páginas afectadas**: `/vehiculos`, `/ventas`, `/buscar`, Home
-- **Fixes aplicados**:
-  - Query unificada: `.neq('status', 'inactive')` en lugar de `.eq('status', 'available')`
-  - Mapeo correcto: `vehicle_equipment?.map(ve => ve?.equipment).filter(eq => eq != null)`
-  - Retry logic con AbortError detection en páginas client-side
-  - Logging consistente para debugging
-- **Resultado**: Carga confiable, sin crashes, equipamiento visible
-
-#### **3. Disponibilidad de Vehículos - Lógica Correcta** ✅
-- **Problema**: Reservas `pending` bloqueaban disponibilidad incorrectamente
-- **Solución**: Solo `confirmed` e `in_progress` bloquean vehículos
-- **Archivo**: `src/app/api/availability/route.ts`
-- **Impacto**: Clientes pueden reservar vehículos con reservas pendientes
-
-#### **4. Proceso de Reserva - UX Perfeccionada** ✅
-- **Sticky Headers**: Implementados en `/reservar/vehiculo` y `/reservar/nueva`
-  - Resumen de reserva siempre visible
-  - Link "Volver" accesible en todo momento
-  - Diseño consistente en todo el flujo
-- **Extras**: Precios correctos (por día vs precio único)
-- **Suma total**: Extras se suman correctamente
-- **Depósito**: Corregido a 1000€ (vía transferencia)
-- **Clientes**: Detección automática de duplicados por DNI/email
-
-#### **5. Páginas de Venta - Equipamiento Visible** ✅
-- **Problema**: `Cannot read properties of undefined (reading 'id')`
-- **Causa**: `ve.equipment` undefined en algunos registros
-- **Solución**: `.filter(eq => eq != null)` después del map
-- **Resultado**: `/ventas` muestra equipamiento sin crashes
-
-#### **6. Admin Pages - Carga Robusta** ✅
-- **Hook personalizado**: `useAdminData` con retry automático
-- **Features**:
-  - Delay inicial de 200ms (espera inicialización)
-  - 3 reintentos con backoff exponencial
-  - Manejo especial de AbortError
-  - Logging detallado
-- **Páginas**: Reservas, Calendario, Extras, Ubicaciones, Temporadas, Equipamiento, Vehículos
-- **Resultado**: Carga consistente a la primera, sin recargas manuales
-
-#### **7. Mobile Responsive - Optimizado** ✅
-- **Imágenes de vehículos**: Ajustadas correctamente en detalle
-- **Hero slider**: Flechas y dots sin solapamiento con búsqueda
-- **Calendario de búsqueda**: No se oculta detrás de siguiente sección
-- **Headers sticky**: Diseño responsive sin solapamientos
-
-#### **8. Favicon y Manifest** ✅
-- **Problema**: "Resource size is not correct" en manifest
-- **Solución**: Corregidos paths a `/icon.png` (Next.js 15 metadata)
-- **Resultado**: PWA correctamente configurada
-
-### **Arquitectura de Carga de Datos:**
-
-| Tipo Componente | Estrategia | Archivos |
-|-----------------|------------|----------|
-| **Server Components** | Try-catch básico + logging | `/vehiculos/page.tsx` |
-| **Client Components** | Retry logic (3x) + AbortError | `/ventas/page.tsx`, `/reservar/vehiculo` |
-| **Admin Pages** | `useAdminData` hook con retry | Todos los admin pages |
-
-### **Logging Consistente:**
-
-Todos los componentes implementan logging detallado para debugging:
-
-```typescript
-[Vehiculos] Loading vehicles...
-[Vehiculos] Total vehicles loaded: 5
-[Ventas] Loading data... (attempt 1/4)
-[Ventas] Processed vehicles: 6
-[ReservarVehiculo] Vehicle loaded successfully
-[ReservarVehiculo] Extras loaded successfully: 7
-[useAdminData] Data loaded successfully
-```
-
-### **Estado de Producción:**
-
-| Funcionalidad | Estado | Notas |
-|---------------|--------|-------|
-| Búsqueda y disponibilidad | ✅ | Lógica correcta, solo confirmed/in_progress bloquean |
-| Proceso de reserva | ✅ | UX perfeccionada, sticky headers, cálculos correctos |
-| Gestión de clientes | ✅ | Detección de duplicados, sin errores RLS |
-| Carga de vehículos | ✅ | Optimizada con retry, sin AbortError loops |
-| Admin pages | ✅ | useAdminData hook robusto, carga a la primera |
-| Mobile responsive | ✅ | Todas las páginas adaptadas correctamente |
-| Favicon/PWA | ✅ | Manifest corregido, sin errores de recursos |
-
----
-
-## 🎯 Mejoras Pendientes (Opcional)
-
-- [ ] Implementar precios por temporada en `/api/availability/route.ts` (actualmente en 0)
-- [ ] Re-habilitar `strictNullChecks` en `tsconfig.json` (requiere refactor completo)
-- [ ] Remover `ignoreBuildErrors: true` de `next.config.js` (después de fix de tipos)
-- [ ] Implementar tests unitarios y e2e
-- [ ] Optimizar imágenes con next/image en todos los componentes
 
 ---
 
@@ -323,12 +487,16 @@ NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
 SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key
 
-# Redsys (Método de pago principal - 0.3% comisión)
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Redsys (Método principal - 0.3% comisión)
 REDSYS_MERCHANT_CODE=tu-codigo-comercio
 REDSYS_TERMINAL=001
 REDSYS_SECRET_KEY=tu-clave-secreta
+REDSYS_NOTIFICATION_URL=https://tu-dominio.com/api/redsys/notification
 
-# Stripe (Método de pago alternativo - 1.4% + 0.25€)
+# Stripe (Método alternativo - 1.4% + 0.25€)
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxx
 STRIPE_SECRET_KEY=sk_test_xxxxx
 STRIPE_WEBHOOK_SECRET=whsec_xxxxx
@@ -336,8 +504,9 @@ STRIPE_WEBHOOK_SECRET=whsec_xxxxx
 # TinyMCE
 NEXT_PUBLIC_TINYMCE_API_KEY=tu-api-key
 
-# App
-NEXT_PUBLIC_URL=http://localhost:3000
+# Marketing (Opcionales)
+NEXT_PUBLIC_META_PIXEL_ID=tu-pixel-id  # Opcional - Sin esto no hay error
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX         # Opcional - Google Analytics
 ```
 
 ### 3. Configurar la base de datos
@@ -345,32 +514,39 @@ NEXT_PUBLIC_URL=http://localhost:3000
 1. Crea un proyecto en Supabase
 2. Ve al SQL Editor
 3. Ejecuta los siguientes scripts en orden:
-   - `supabase/schema.sql` - Esquema principal
-   - `supabase/blog-schema.sql` - Sistema de blog
-   - `supabase/migrations/20250107_create_seasons_table.sql` - Sistema de temporadas
-   - `supabase/add-stripe-support.sql` - **NUEVO**: Soporte para Stripe
-   - `supabase/vehicles-sale-update.sql` - Actualización de vehículos en venta (opcional)
+
+```sql
+-- 1. Schema principal
+supabase/schema.sql
+
+-- 2. Políticas RLS (ROW LEVEL SECURITY) - CRÍTICO
+supabase/fix-all-rls-policies.sql
+
+-- 3. Sistema de blog
+supabase/blog-schema.sql
+
+-- 4. Migración a clientes normalizados (IMPORTANTE)
+supabase/migrate-bookings-to-normalized-customers.sql
+
+-- 5. Soporte para Stripe
+supabase/add-stripe-support.sql
+```
+
+**⚠️ IMPORTANTE:** El script `fix-all-rls-policies.sql` es CRÍTICO. Sin él, el administrador no podrá acceder a los datos.
 
 ### 4. Crear primer administrador
 
-**IMPORTANTE:** Antes de poder acceder al panel de administración, debes crear un usuario administrador en Supabase.
-
-#### Paso 1: Crear usuario en Supabase Auth
+**Paso 1: Crear usuario en Supabase Auth**
 
 1. Ve a tu proyecto de Supabase
-2. En el panel izquierdo, haz clic en **"Authentication"** → **"Users"**
-3. Haz clic en **"Add user"** → **"Create new user"**
-4. Introduce:
-   - Email: `admin@furgocasa.com` (o el email que prefieras)
-   - Password: Una contraseña segura
-   - Confirma la contraseña
-5. Haz clic en **"Create user"**
-6. **Copia el UUID del usuario** (aparece en la columna "UID")
+2. **Authentication** → **Users** → **Add user**
+3. Email: `admin@furgocasa.com`
+4. Password: Una contraseña segura
+5. **Copia el UUID del usuario**
 
-#### Paso 2: Asignar permisos de administrador
+**Paso 2: Asignar permisos**
 
-1. En Supabase, ve al **"SQL Editor"**
-2. Ejecuta el siguiente script (reemplaza `'uuid-del-usuario'` con el UUID que copiaste):
+En SQL Editor ejecuta (reemplaza el UUID):
 
 ```sql
 INSERT INTO admins (user_id, email, name, role, is_active)
@@ -383,481 +559,235 @@ VALUES (
 );
 ```
 
-3. Ahora ya puedes iniciar sesión en `/administrator/login` con tu email y contraseña
-
 **Roles disponibles:**
-- `superadmin` - Acceso total al sistema
+- `superadmin` - Acceso total
 - `admin` - Acceso completo excepto gestión de usuarios
-- `editor` - Solo puede editar contenido (blog, vehículos)
+- `editor` - Solo editar contenido
 - `viewer` - Solo lectura
 
-**Script completo disponible en:** `supabase/create-first-admin.sql`
+### 5. Verificar políticas RLS
 
-### 5. Iniciar el servidor
+**MUY IMPORTANTE:** Verifica que las políticas RLS están activas:
+
+```sql
+-- En SQL Editor de Supabase:
+SELECT tablename, policyname, cmd 
+FROM pg_policies 
+WHERE tablename IN ('vehicles', 'bookings', 'customers', 'payments')
+ORDER BY tablename, policyname;
+```
+
+**Debes ver:**
+- `public_select_vehicles` - Lectura pública
+- `admin_all_vehicles` - Admin puede todo
+- `public_insert_bookings` - Crear reservas público
+- `admin_all_bookings` - Admin puede todo
+- etc.
+
+**Si NO ves estas políticas**, ejecuta `supabase/fix-all-rls-policies.sql`
+
+### 6. Iniciar el servidor
 
 ```bash
 npm run dev
 ```
 
-- Web pública: [http://localhost:3000](http://localhost:3000) (redirige a [http://localhost:3000/es/](http://localhost:3000/es/))
+- Web pública: [http://localhost:3000](http://localhost:3000)
 - Panel admin: [http://localhost:3000/administrator](http://localhost:3000/administrator)
-
-**Nota sobre URLs:** El sistema i18n redirigirá automáticamente desde `/` a `/es/` (o al idioma detectado del navegador). Todas las páginas públicas tendrán prefijos de idioma.
 
 ### Comandos disponibles
 
 ```bash
-npm run dev          # Inicia servidor de desarrollo
-npm run build        # Construye para producción
-npm run start        # Inicia servidor de producción
-npm run lint         # Ejecuta el linter
+npm run dev          # Desarrollo
+npm run build        # Build producción
+npm run start        # Servidor producción
+npm run lint         # Linter
 ```
 
-## 📁 Estructura del proyecto
+---
+
+## 📁 Estructura del Proyecto
 
 ```
 src/
 ├── app/
-│   ├── page.tsx                     # Home con buscador
-│   ├── buscar/                      # Resultados de búsqueda
-│   ├── blog/                        # Blog público
-│   │   ├── page.tsx                 # Listado de artículos
-│   │   └── [slug]/                  # Artículo individual
-│   ├── inteligencia-artificial/     # Página de IA
-│   ├── vehiculos/                   # Catálogo de vehículos
-│   ├── tarifas/                     # Información de tarifas
-│   ├── contacto/                    # Página de contacto
-│   ├── administrator/               # Panel de administración
-│   │   ├── login/                   # Login de admin
-│   │   ├── page.tsx                 # Dashboard
-│   │   ├── vehiculos/               # Gestión de vehículos
-│   │   ├── reservas/                # Gestión de reservas
-│   │   ├── temporadas/              # Gestión de temporadas
-│   │   └── blog/                    # Gestión de blog
-│   │       └── articulos/    
-│   │           └── nuevo/           # Editor con TinyMCE
-│   └── api/
-│       ├── availability/            # API de disponibilidad
-│       └── redsys/                  # Integración de pagos
+│   ├── (public)/                    # Páginas públicas (Server Components)
+│   │   ├── page.tsx                 # Home ⚠️ Server Component
+│   │   ├── buscar/                  # Búsqueda ⚠️ Server Component
+│   │   ├── vehiculos/               # Catálogo ⚠️ Server Component
+│   │   ├── blog/                    # Blog ⚠️ Server Component
+│   │   └── contacto/                # Contacto ⚠️ Server Component
+│   │
+│   ├── reservar/                    # Sistema de reservas
+│   │   ├── page.tsx                 # Búsqueda inicial ⚠️ CRÍTICO
+│   │   ├── vehiculo/page.tsx        # Detalle + Extras ⚠️ MUY CRÍTICO
+│   │   ├── nueva/page.tsx           # Formulario cliente ⚠️ MUY CRÍTICO
+│   │   └── [id]/
+│   │       ├── page.tsx             # Ver reserva ⚠️ CRÍTICO
+│   │       ├── pago/page.tsx        # Pasarela ⚠️ CRÍTICO
+│   │       └── confirmacion/        # Confirmación ⚠️ CRÍTICO
+│   │
+│   ├── administrator/
+│   │   ├── (auth)/login/            # Login admin
+│   │   ├── (protected)/             # Páginas protegidas
+│   │   │   ├── layout.tsx           # ⚠️ Verifica auth (Server)
+│   │   │   ├── page.tsx             # Dashboard ✅ (Server)
+│   │   │   ├── vehiculos/           # ✅ (Client) - usePaginatedData
+│   │   │   ├── reservas/            # ✅ (Client) - useAllDataProgressive  
+│   │   │   ├── clientes/            # ✅ (Client) - usePaginatedData
+│   │   │   ├── pagos/               # ✅ (Client) - usePaginatedData
+│   │   │   ├── extras/              # ✅ (Client) - useAdminData
+│   │   │   ├── equipamiento/        # ✅ (Client) - useAdminData
+│   │   │   ├── temporadas/          # ✅ (Client) - useAdminData
+│   │   │   ├── ubicaciones/         # ✅ (Client) - useAdminData
+│   │   │   └── calendario/          # ✅ (Client) - useAdminData x2
+│   │   └── api/
+│   │       ├── availability/        # API disponibilidad
+│   │       ├── bookings/            # API reservas
+│   │       ├── redsys/              # Webhooks Redsys
+│   │       └── stripe/              # Webhooks Stripe
+│   │
+│   └── layout.tsx                   # Root layout
+│
 ├── components/
-│   ├── admin/
-│   │   ├── sidebar.tsx              # Navegación admin
-│   │   ├── header.tsx               # Header admin
-│   │   └── tiny-editor.tsx          # Editor TinyMCE
-│   ├── booking/                     # Componentes de reserva
-│   │   ├── search-widget.tsx        # Widget de búsqueda
-│   │   ├── date-range-picker.tsx    # Selector de fechas
-│   │   └── vehicle-card.tsx         # Tarjeta de vehículo
-│   ├── cookies/                     # Sistema de cookies
-│   │   ├── cookie-banner.tsx        # Banner de cookies
-│   │   └── cookie-context.tsx       # Contexto de cookies
-│   └── layout/                      # Header, Footer públicos
+│   ├── admin/                       # Componentes admin (Client)
+│   ├── booking/                     # Componentes reserva
+│   ├── layout/                      # Header, Footer (Client + Server)
+│   ├── cookies/                     # Sistema cookies (Client)
+│   └── vehicle/                     # Componentes vehículos
+│
 ├── contexts/
-│   └── language-context.tsx         # Contexto de idiomas
+│   ├── admin-auth-context.tsx       # ⚠️ Auth admin (Client)
+│   └── language-context.tsx         # ⚠️ i18n (Client solo)
+│
+├── hooks/
+│   ├── use-paginated-data.ts        # ⚠️ NO TOCAR - Paginación
+│   ├── use-admin-data.ts            # ⚠️ NO TOCAR - Datos admin
+│   └── use-all-data-progressive.ts  # ⚠️ NO TOCAR - Carga progresiva
+│
 ├── lib/
-│   ├── supabase/                    # Clientes Supabase
-│   ├── redsys/                      # Integración pagos
-│   ├── translation-service.ts       # Servicio de traducciones
-│   └── translations-preload.ts      # Traducciones precargadas
+│   ├── supabase/
+│   │   ├── client.ts                # ⚠️⚠️⚠️ NO TOCAR - Cliente browser
+│   │   ├── server.ts                # ⚠️⚠️⚠️ NO TOCAR - Cliente server
+│   │   ├── queries.ts               # ✅ Queries reutilizables
+│   │   └── database.types.ts        # Tipos generados
+│   │
+│   ├── i18n/
+│   │   ├── config.ts                # Configuración idiomas
+│   │   └── server-translation.ts    # ⚠️ Solo para Server Components
+│   │
+│   ├── redsys/                      # Integración Redsys
+│   ├── stripe/                      # Integración Stripe
+│   └── utils.ts                     # Utilidades
+│
 └── types/
-    ├── database.ts                  # Tipos de vehículos/reservas
-    └── blog.ts                      # Tipos de blog
+    ├── database.ts                  # Tipos de BD
+    └── blog.ts                      # Tipos blog
 ```
+
+---
+
+## 🔍 DEBUGGING - Cuando Algo No Funciona
+
+### Checklist de Diagnóstico
+
+#### ❌ Error: "Las secciones del admin no cargan"
+
+```bash
+# 1. Verifica que el usuario está autenticado
+# En consola del navegador:
+> localStorage.getItem('supabase.auth.token')
+# Debe retornar un objeto JSON con access_token
+
+# 2. Verifica que createClient() crea nueva instancia
+# En src/lib/supabase/client.ts debe decir:
+export function createClient() {
+  return createBrowserClient(...); // ✅ Sin singleton
+}
+
+# 3. Verifica que los hooks crean instancia
+# Busca en los archivos de hooks:
+grep -r "const supabase = createClient()" src/hooks/
+
+# 4. Limpia caché
+rm -rf .next
+npm run dev
+```
+
+#### ❌ Error: "AbortError" o "Query error"
+
+```typescript
+// Verifica que TODAS las funciones async crean instancia:
+
+// ❌ MALO
+const { data } = await supabase.from('table').select();
+
+// ✅ BUENO  
+const supabase = createClient();
+const { data } = await supabase.from('table').select();
+```
+
+#### ❌ Error: "RLS policy violation"
+
+```sql
+-- Ejecuta en SQL Editor:
+supabase/fix-all-rls-policies.sql
+```
+
+#### ❌ Error: "Cannot read properties of null"
+
+- Verifica que los datos se cargan antes de usarlos
+- Añade validaciones: `if (!data) return;`
+- Muestra estados de carga apropiados
+
+---
+
+## 💳 Sistema de Pago Fraccionado 50%-50%
+
+### Política de pago:
+1. **Primera mitad (50%)**: Al confirmar reserva
+2. **Segunda mitad (50%)**: Hasta 15 días antes del alquiler
+
+### Métodos de pago:
+
+**Redsys** (Principal - 0.3%):
+- TPV Español homologado
+- Configuración en `REDSYS-CONFIGURACION.md`
+
+**Stripe** (Alternativo - 1.4% + 0.25€):
+- Pasarela internacional
+- Configuración en `STRIPE-CONFIGURACION.md`
+
+---
 
 ## 📝 Base de Datos
 
 ### Tablas principales:
-- `vehicles`, `vehicle_categories` - Gestión de vehículos con especificaciones completas
-- **`vehicle_images`** - Galería de imágenes múltiple por vehículo
-  - `image_url`, `alt_text`, `is_primary`, `sort_order`
-  - Sistema de ordenación drag & drop
-- `vehicle_available_extras` - Relación vehículos-extras disponibles
-- `locations` - Ubicaciones de recogida/entrega
-- `bookings` - Reservas de clientes con gestión de pagos parciales
-- `booking_extras` - Extras seleccionados en cada reserva
-- `customers` - Información de clientes
+- `vehicles` - Vehículos de la flota
+- `vehicle_images` - Galería múltiple
+- `vehicle_categories` - Categorías
+- `equipment` - Equipamiento disponible
+- `vehicle_equipment` - Equipamiento por vehículo
+- `locations` - Ubicaciones recogida/devolución
+- `seasons` - Temporadas y tarifas
+- `extras` - Extras disponibles
+- `vehicle_available_extras` - Extras por vehículo
+- `bookings` - Reservas ⚠️ Tabla crítica
+- `booking_extras` - Extras en reservas
+- `customers` - Clientes ⚠️ Tabla crítica
 - `payments` - Pagos y transacciones
-- `extras` - Extras y accesorios
-- `seasons` - Temporadas y tarifas (alta, media, baja)
-- `blocked_dates` - Fechas bloqueadas para mantenimiento
+- `admins` - Administradores ⚠️ Para RLS
 
-### Tablas de blog:
-- `blog_posts` - Artículos del blog
-- `blog_categories` - Categorías de artículos
-- `blog_tags`, `blog_post_tags` - Etiquetas y relaciones
-- `blog_comments` - Comentarios de usuarios
-- `admins` - Administradores del sistema
-- `media` - Biblioteca de medios (imágenes, videos)
-- `activity_log` - Registro de actividad del sistema
+### RLS (Row Level Security):
 
-### Supabase Storage Buckets:
-- `vehicles` - Imágenes de vehículos organizadas por carpetas (FU0010, FU0011, etc.)
-- `blog` - Imágenes de artículos del blog
-- `extras` - Imágenes de extras/accesorios
-- `media` - Recursos generales
+**✅ POLÍTICAS ACTIVAS:**
+- Usuarios anónimos: Lectura de vehículos, categorías, extras, ubicaciones, temporadas
+- Usuarios anónimos: Crear reservas
+- Administradores: Acceso total a TODO (verificado con `admins.user_id = auth.uid()`)
 
-> 📄 Los scripts SQL están en el directorio `/supabase/`
+**📖 Ver:** `supabase/fix-all-rls-policies.sql` para todas las políticas
 
-## 📋 Flujo de Reserva Completo
-
-> ⚠️ **ADVERTENCIA CRÍTICA**: Este flujo de reserva es el CORE del negocio. Las páginas listadas aquí son **OBLIGATORIAS** y **NO PUEDEN ELIMINARSE**. Cualquier modificación debe documentarse inmediatamente.
-
-### Paso a paso del proceso de reserva (EN ORDEN):
-
-1. **Búsqueda de disponibilidad** (`/reservar` o `/buscar`)
-   - **Archivo**: `src/app/reservar/page.tsx` ⚠️ CRÍTICO
-   - Usuario introduce fechas, ubicación y horarios
-   - Sistema valida disponibilidad en tiempo real
-   - Componente: `SearchWidget`
-
-2. **Resultados de búsqueda** (`/buscar?params`)
-   - **Archivo**: `src/app/buscar/page.tsx` ⚠️ CRÍTICO
-   - Muestra tarjetas de vehículos disponibles con precio calculado
-   - Información de equipamiento, capacidad y características
-   - Componente: `VehicleCard` con botón "Reservar"
-   - **El botón "Reservar" lleva a** → `/reservar/vehiculo?params`
-
-3. **⚠️ Detalle del vehículo + Selección de extras** (`/reservar/vehiculo?params`)
-   - **Archivo**: `src/app/reservar/vehiculo/page.tsx` ⚠️ **MUY CRÍTICO - ESTA PÁGINA SE PERDIÓ ANTERIORMENTE**
-   - **PROPÓSITO**: Página intermedia OBLIGATORIA antes del formulario
-   - Muestra galería completa de imágenes del vehículo
-   - Descripción detallada del vehículo
-   - Equipamiento incluido con iconos
-   - **Selector de extras** (opcional pero importante):
-     - Muestra todos los extras disponibles agrupados por categoría
-     - Permite añadir/quitar extras con cantidad
-     - Calcula precio total incluyendo extras
-   - Resumen lateral con:
-     - Fechas de recogida/devolución
-     - Ubicaciones
-     - Precio base del vehículo
-     - Precio de cada extra seleccionado
-     - Precio total
-   - **Botón "Continuar con la reserva"** lleva a → `/reservar/nueva?params` (incluyendo extras en URL)
-
-4. **⚠️ Formulario de datos del cliente** (`/reservar/nueva?params`)
-   - **Archivo**: `src/app/reservar/nueva/page.tsx` ⚠️ **MUY CRÍTICO - ESTA PÁGINA SE PERDIÓ ANTERIORMENTE**
-   - **PROPÓSITO**: Captura datos personales del cliente
-   - Cliente completa sus datos personales:
-     - Nombre completo (obligatorio)
-     - Email (obligatorio)
-     - Teléfono (obligatorio)
-     - DNI/NIE (obligatorio)
-     - Dirección (obligatorio)
-     - Notas adicionales (opcional)
-   - **Procesamiento de extras desde URL**:
-     - Lee parámetros `extra_N_id` y `extra_N_quantity`
-     - Carga datos de extras desde Supabase
-     - Calcula precio total (base + extras)
-   - Resumen lateral muestra:
-     - Imagen y datos del vehículo
-     - Fechas y ubicaciones
-     - Precio base
-     - **Lista de extras seleccionados con precios**
-     - Precio total
-   - **Al enviar el formulario**:
-     - Crea registro en tabla `bookings`
-     - Crea registros en tabla `booking_extras` para cada extra
-     - Redirige a `/reservar/[id]`
-
-5. **Detalles de la reserva** (`/reservar/[id]`)
-   - **Archivo**: `src/app/reservar/[id]/page.tsx` ⚠️ CRÍTICO
-   - Muestra toda la información de la reserva
-   - Número de reserva único
-   - Estado actual (pendiente, confirmada, en curso, completada, cancelada)
-   - Sistema de pagos fraccionados con botones de pago activos según corresponda
-   - **Muestra extras incluidos en la reserva**
-
-6. **Proceso de pago** (`/reservar/[id]/pago`)
-   - **Archivo**: `src/app/reservar/[id]/pago/page.tsx` ⚠️ CRÍTICO
-   - Integración con Redsys TPV
-   - Redirección segura para pago con tarjeta
-   - Confirmación automática tras pago exitoso
-
-7. **Confirmación final** (`/reservar/[id]/confirmacion`)
-   - **Archivo**: `src/app/reservar/[id]/confirmacion/page.tsx` ⚠️ CRÍTICO
-   - Resumen completo de la reserva
-   - Instrucciones para el día de recogida
-   - Email de confirmación automático
-
-### 🗺️ Mapa completo de rutas del sistema de reservas:
-
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    FLUJO DE RESERVA COMPLETO                         │
-└─────────────────────────────────────────────────────────────────────┘
-
-1. /reservar                         → Búsqueda inicial (SearchWidget)
-   [Usuario introduce fechas/ubicación]
-                  ↓
-2. /buscar?params                    → Lista de vehículos disponibles
-   [Muestra VehicleCard con botón "Reservar"]
-                  ↓ (Click en "Reservar")
-3. /reservar/vehiculo?params         → ⚠️ Detalle + Selección de extras
-   [Galería, descripción, extras]    → ⚠️ PÁGINA QUE SE PERDIÓ
-   [vehicle_id + dates + extras]
-                  ↓ (Click en "Continuar")
-4. /reservar/nueva?params            → ⚠️ Formulario de datos cliente
-   [Nombre, email, teléfono, DNI]    → ⚠️ PÁGINA QUE SE PERDIÓ
-   [Crea booking + booking_extras]
-                  ↓ (Submit form)
-5. /reservar/[id]                    → Detalles de reserva creada
-   [Muestra estado y botones de pago]
-                  ↓ (Click en "Pagar")
-6. /reservar/[id]/pago?amount=X      → Pasarela Redsys
-   [Integración TPV]
-                  ↓ (Pago exitoso)
-7. /reservar/[id]/confirmacion       → Confirmación final
-   [Instrucciones y resumen]
-```
-
-### 📁 Archivos CRÍTICOS del sistema de reservas:
-
-```
-src/app/
-├── reservar/
-│   ├── page.tsx                     ⚠️ CRÍTICO - Búsqueda inicial
-│   ├── vehiculo/
-│   │   └── page.tsx                 ⚠️ MUY CRÍTICO - Detalle + Extras (SE PERDIÓ)
-│   ├── nueva/
-│   │   └── page.tsx                 ⚠️ MUY CRÍTICO - Formulario cliente (SE PERDIÓ)
-│   └── [id]/
-│       ├── page.tsx                 ⚠️ CRÍTICO - Ver reserva
-│       ├── pago/
-│       │   └── page.tsx             ⚠️ CRÍTICO - Pasarela pago
-│       └── confirmacion/
-│           └── page.tsx             ⚠️ CRÍTICO - Confirmación
-├── buscar/
-│   └── page.tsx                     ⚠️ CRÍTICO - Resultados búsqueda
-└── vehiculos/
-    └── [slug]/
-        └── page.tsx                 ℹ️ Detalle público (catálogo)
-
-src/components/booking/
-├── search-widget.tsx                ⚠️ CRÍTICO - Widget de búsqueda
-├── vehicle-card.tsx                 ⚠️ CRÍTICO - Tarjeta de vehículo
-├── date-range-picker.tsx
-├── location-selector.tsx
-└── time-selector.tsx
-```
-
-### ⚠️ REGLAS CRÍTICAS DEL FLUJO DE RESERVA:
-
-1. **NUNCA ELIMINAR** ninguna de las páginas marcadas como CRÍTICAS
-2. **El flujo es SECUENCIAL**: No se puede saltar pasos
-3. **La página `/reservar/vehiculo`** es OBLIGATORIA entre la lista y el formulario
-4. **La página `/reservar/nueva`** es OBLIGATORIA para capturar datos del cliente
-5. **Los extras se pasan por URL** desde `/reservar/vehiculo` a `/reservar/nueva`
-6. **VehicleCard SIEMPRE** debe apuntar a `/reservar/vehiculo`, NO a `/reservar/nueva`
-7. **Cualquier modificación** al flujo debe actualizarse en este README inmediatamente
-
-## 💳 Sistema de Pago Fraccionado 50%-50%
-
-### Política de pago Furgocasa:
-1. **Primera mitad (50%)**: Se paga al realizar la reserva para confirmarla
-2. **Segunda mitad (50%)**: Vence máximo 15 días antes del inicio del alquiler
-3. **Modificaciones**: Si se modifica la reserva (extras, fechas), el segundo pago cubre el total pendiente
-
-### Estados de pago en `/reservar/[id]`:
-- **Pendiente inicial**: Reserva creada, esperando primer pago (50%)
-- **Confirmada - Pago parcial**: Primer 50% pagado, esperando segundo pago
-- **Completamente pagada**: 100% del total pagado
-- **Disponibilidad del segundo pago**: Se activa automáticamente cuando faltan 15 días o menos
-
-### Integración con pasarelas de pago:
-
-**Redsys** (Método principal - 0.3% comisión):
-- TPV Virtual Español homologado
-- Pago seguro con tarjeta
-- Redirección automática a página de confirmación
-- Webhooks para actualización de estado de pago en tiempo real
-
-**Stripe** (Método alternativo - 1.4% + 0.25€):
-- Pasarela internacional
-- Stripe Checkout hosted
-- Testing inmediato con tarjetas de prueba
-- Webhooks firmados para máxima seguridad
-- Fácil activación y configuración
-
-**Selector de método**: El usuario elige su método preferido en la página de pago.
-
-## 🎨 Sistema de Diseño
-
-El proyecto utiliza un sistema de diseño consistente:
-
-- **Colores principales**:
-  - `furgocasa-blue`: #1E40AF (azul corporativo)
-  - `furgocasa-orange`: #FF6B35 (naranja de acción)
-- **Tipografías**: Sistema de fuentes optimizado
-- **Componentes**: Radix UI para accesibilidad
-- **Iconos**: Lucide React
-- **Animaciones**: Tailwind CSS Animate
-
-> 📖 Ver `DESIGN_SYSTEM.md` para guía completa de diseño.
-
-## 🔐 Seguridad
-
-- **Row Level Security (RLS)** en todas las tablas de Supabase
-- **Autenticación** con Supabase Auth (email/password)
-- **Validación de firma** en notificaciones Redsys (HMAC SHA-256)
-- **Protección de rutas**: El panel `/administrator` requiere login y rol de admin
-- **Sanitización de HTML**: DOMPurify para contenido del blog
-- **Variables de entorno**: Nunca exponer secrets en el cliente
-- **HTTPS obligatorio**: En producción para pagos con Redsys
-
-## 📝 TinyMCE - Configuración
-
-El editor TinyMCE está configurado con:
-- Plugins: links, imágenes, tablas, código, listas, etc.
-- Idioma español
-- Templates predefinidos (CTAs, info boxes)
-- Subida de imágenes a Supabase Storage
-- Estilos personalizados acordes a la marca
-
-Para obtener tu API key gratuita:
-1. Ve a [tiny.cloud](https://www.tiny.cloud/)
-2. Crea una cuenta
-3. Copia tu API key
-4. Añádela a `.env.local`
-
-## 🌍 Sistema de Internacionalización (i18n)
-
-Furgocasa incluye un **sistema completo de i18n con URLs localizadas** optimizado para SEO.
-
-### ⚠️ Sistema de Traducción Dual
-
-**IMPORTANTE:** Este proyecto usa DOS sistemas de traducción diferentes:
-
-1. **Server Components (páginas públicas)** → `translateServer()` ✅
-2. **Client Components (interactivos)** → `useLanguage()` hook ✅
-
-### Uso correcto:
-
-```typescript
-// ✅ EN SERVER COMPONENTS (páginas públicas)
-import { translateServer } from "@/lib/i18n/server-translation";
-
-export default function MiPagina() {
-  const t = (key: string) => translateServer(key, 'es');
-  return <h1>{t("Mi título")}</h1>;
-}
-
-// ✅ EN CLIENT COMPONENTS (componentes interactivos)
-"use client";
-import { useLanguage } from "@/contexts/language-context";
-
-export function MiComponente() {
-  const { t } = useLanguage();
-  return <div>{t("Mi texto")}</div>;
-}
-```
-
-**📖 Ver [GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md) para guía completa**
-
-### Características
-
-- **4 idiomas soportados**: Español 🇪🇸, Inglés 🇬🇧, Francés 🇫🇷, Alemán 🇩🇪
-- **URLs con prefijos de idioma**: `/es/`, `/en/`, `/fr/`, `/de/`
-- **Cambio automático de URL** al seleccionar idioma desde el selector
-- **Middleware inteligente** que detecta el idioma del navegador
-- **Rutas traducidas** SEO-friendly para cada idioma
-- **Preservación del SEO** de las URLs existentes
-
-### Estructura de URLs
-
-```
-Español:  https://furgocasa.com/es/contacto
-Inglés:   https://furgocasa.com/en/contact
-Francés:  https://furgocasa.com/fr/contact
-Alemán:   https://furgocasa.com/de/kontakt
-```
-
-### Funcionamiento
-
-1. **Usuario sin prefijo**: `https://furgocasa.com/` → Redirige a `/es/` (o idioma del navegador)
-2. **Usuario con prefijo**: `https://furgocasa.com/es/tarifas` → Muestra la página de tarifas en español
-3. **Cambio de idioma**: El selector cambia automáticamente de `/es/tarifas` a `/en/rates`
-
-### Componentes
-
-- **`translateServer(key, locale)`**: Traducción para Server Components ✅
-- **Hook `useLanguage()`**: Traducción para Client Components ✅
-- **Selector de idiomas**: Dropdown con banderas y nombres en el header
-
-**⚠️ NUNCA usar `useLanguage()` en Server Components - Ver [GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)**
-
-### Uso del sistema de traducciones
-
-```tsx
-// ✅ Server Components
-import { translateServer } from "@/lib/i18n/server-translation";
-
-export default function MiPagina() {
-  const t = (key: string) => translateServer(key, 'es');
-  return <div><T>Este texto se traduce en servidor</T></div>;
-}
-
-// ✅ Client Components
-"use client";
-import { useLanguage } from "@/contexts/language-context";
-
-export function MiComponente() {
-  const { language, setLanguage, t } = useLanguage();
-  return (
-    <div>
-      <p>{t("Este texto se traduce en cliente")}</p>
-      <button onClick={() => setLanguage('en')}>Switch to English</button>
-    </div>
-  );
-}
-```
-
-### Configuración
-
-- **Archivo de configuración**: `src/lib/i18n/config.ts`
-- **Traducciones estáticas**: `src/lib/translations-preload.ts`
-- **Traducción servidor**: `src/lib/i18n/server-translation.ts` ⚠️ **NUEVO**
-- **Traducciones de rutas**: `src/lib/route-translations.ts`
-- **Context de idioma**: `src/contexts/language-context.tsx` (solo Client)
-- **Middleware**: `src/middleware.ts`
-
-### Rutas Traducidas (Ejemplos)
-
-| ES | EN | FR | DE |
-|----|----|----|----|
-| `/es/vehiculos` | `/en/vehicles` | `/fr/vehicules` | `/de/fahrzeuge` |
-| `/es/tarifas` | `/en/rates` | `/fr/tarifs` | `/de/preise` |
-| `/es/contacto` | `/en/contact` | `/fr/contact` | `/de/kontakt` |
-| `/es/quienes-somos` | `/en/about-us` | `/fr/a-propos` | `/de/uber-uns` |
-
-> 📖 Ver `I18N_IMPLEMENTATION.md` para documentación técnica completa
-> 📖 Ver `TRADUCCIONES.md` para más detalles sobre el sistema de traducciones
-
-## 🤖 Herramientas de Inteligencia Artificial
-
-Furgocasa integra dos herramientas de IA diseñadas para mejorar la experiencia del cliente:
-
-### GPT Chat de Viaje
-- **Propósito**: Guía personalizada para planificar rutas y viajes
-- **Funcionalidades**:
-  - Planificación de rutas origen-destino
-  - Diseño de itinerarios personalizados
-  - Recomendaciones de pernocta
-  - Creación de cuadernos de bitácora
-- **Requisitos**: Cuenta de ChatGPT
-- **Acceso**: Se proporciona tras la confirmación de reserva
-
-### WhatsApp Bot - Asistente Técnico
-- **Propósito**: Soporte técnico 24/7 durante el viaje
-- **Funcionalidades**:
-  - Resolución de dudas de funcionamiento
-  - Asistencia inmediata ante incidencias
-  - Admite mensajes de texto y notas de voz
-  - Instrucciones técnicas precisas
-- **Disponibilidad**: 24/7 durante todo el período de alquiler
-- **Acceso**: Se proporciona al inicio del viaje
-
-> 💡 **Nota**: La página `/inteligencia-artificial` presenta toda la información sobre estas herramientas a los clientes.
+---
 
 ## 🚀 Despliegue
 
@@ -865,370 +795,256 @@ Furgocasa integra dos herramientas de IA diseñadas para mejorar la experiencia 
 
 **URL**: https://webfurgocasa.vercel.app
 
-El proyecto está desplegado en Vercel con deploy automático desde GitHub.
+### Configuración de variables en Vercel:
 
-### Configuración de Vercel
-
-1. **Conecta tu repositorio**
-   ```bash
-   # Instala Vercel CLI
-   npm install -g vercel
-   
-   # Despliega
-   vercel
-   ```
-
-2. **Configura las variables de entorno** en Vercel Dashboard:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `REDSYS_MERCHANT_CODE` ← Método principal (0.3%)
-   - `REDSYS_TERMINAL`
-   - `REDSYS_SECRET_KEY`
-   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` ← **NUEVO**: Método alternativo
-   - `STRIPE_SECRET_KEY` ← **NUEVO**
-   - `STRIPE_WEBHOOK_SECRET` ← **NUEVO**
-   - `NEXT_PUBLIC_TINYMCE_API_KEY`
-   - `NEXT_PUBLIC_URL` (tu dominio en producción)
-
-3. **Despliega automáticamente** desde GitHub
-
-### Variables en producción:
-- ✅ Actualiza `NEXT_PUBLIC_URL` a tu dominio
-- ✅ Usa credenciales de producción de Redsys
-- ✅ Configura correctamente `REDSYS_NOTIFICATION_URL`
-- ✅ Habilita HTTPS en Redsys
-- ✅ Configura CORS en Supabase
-
-### 🔧 Problemas resueltos para Deploy
-
-Durante el primer deploy a producción se resolvieron varios problemas técnicos:
-
-#### v1.0.0 - Deploy inicial
-1. **Errores de TypeScript** - Nullabilidad de tipos Supabase
-2. **Suspense Boundaries** - useSearchParams() requiere Suspense en Next.js 15
-3. **Imágenes estáticas** - .gitignore impedía subir public/images/
-4. **Imágenes de vehículos** - Nombres de campos diferentes entre componentes
-5. **Favicon** - Configuración manual vs detección automática
-6. **Slider móvil** - Flechas superpuestas con buscador
-7. **BucketType** - Faltaba 'extras' en tipos de Storage
-8. **Idiomas de traducción** - Tipos restringidos a ES/EN
-
-#### v1.0.1 - Optimización proceso de reserva
-1. **Imagen/título clicables** - Cards de vehículos en búsqueda ahora completamente clicables
-2. **Precios de extras** - Corregido uso de `price_per_unit` en lugar de `price_per_rental` inexistente
-3. **Suma de extras** - Total ahora incluye correctamente el precio de extras seleccionados
-4. **Mensaje de fianza** - Eliminado mensaje erróneo de 500€ (real: 1000€ por transferencia)
-5. **CTA móvil** - Botón "Continuar" reposicionado al final en `/reservar/vehiculo`
-6. **Clientes duplicados** - API route con service role para evitar errores RLS
-7. **Navegación volver** - Botón "Volver" ahora retrocede al paso anterior correctamente
-
-**📋 Ver [CHANGELOG.md](./CHANGELOG.md) para detalles completos de cada problema y solución.**
-
-### Otros proveedores
-
-El proyecto también puede desplegarse en:
-- **Netlify**: Compatible con Next.js
-- **Railway**: Soporte completo para Next.js
-- **AWS Amplify**: Requiere configuración adicional
-
-## 💻 Desarrollo en Windows
-
-Este proyecto se desarrolla en Windows con PowerShell. Comandos útiles:
-
-```powershell
-# Liberar puerto 3000 si está ocupado
-Get-NetTCPConnection -LocalPort 3000 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force }
-
-# Iniciar servidor
-npm run dev
-
-# Ver procesos de Node
-Get-Process node
+```
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_APP_URL
+REDSYS_MERCHANT_CODE
+REDSYS_TERMINAL
+REDSYS_SECRET_KEY
+REDSYS_NOTIFICATION_URL
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+NEXT_PUBLIC_TINYMCE_API_KEY
+NEXT_PUBLIC_META_PIXEL_ID (opcional)
+NEXT_PUBLIC_GA_ID (opcional)
 ```
 
-## 📄 Páginas Públicas Principales
+---
 
-- `/` - Home con hero slider y buscador
-- `/buscar` - Búsqueda de vehículos disponibles
-- `/vehiculos` - Catálogo completo de vehículos
-- `/vehiculos/[slug]` - Detalle de vehículo individual
-- `/blog` - Blog con artículos
-- `/blog/[slug]` - Artículo individual del blog
-- `/inteligencia-artificial` - Info sobre herramientas de IA
-- `/tarifas` - Información de precios y temporadas
-- `/contacto` - Formulario de contacto
-- `/como-funciona` - Guía de cómo funciona el alquiler
-- `/faqs` - Preguntas frecuentes
-- `/aviso-legal`, `/privacidad`, `/cookies` - Legal
+## 📚 DOCUMENTACIÓN COMPLETA
 
-## 📱 Responsive
+### 🔴 DOCUMENTOS CRÍTICOS (Leer PRIMERO)
 
-El diseño es totalmente responsive:
-- Desktop (1280px+)
-- Tablet (768px - 1279px)
-- Móvil (< 768px)
+| Documento | Importancia | Cuándo Leer |
+|-----------|-------------|-------------|
+| **REGLAS-ARQUITECTURA-NEXTJS.md** | 🔴 CRÍTICO | Antes de modificar CUALQUIER página |
+| **GUIA-TRADUCCION.md** | 🔴 CRÍTICO | Antes de añadir textos traducibles |
+| **REGLAS-SUPABASE-OBLIGATORIAS.md** | 🔴 CRÍTICO | Antes de hacer queries |
+| **FLUJO-RESERVAS-CRITICO.md** | 🔴 CRÍTICO | Antes de tocar sistema de reservas |
+| **CHECKLIST-PRE-COMMIT.md** | 🔴 USAR SIEMPRE | Antes de cada commit |
 
-Componentes optimizados para móvil:
-- Menú hamburguesa en header
-- Cards adaptativas
-- Formularios táctiles
-- Imágenes optimizadas con Next.js Image
+### 🟠 Documentación Técnica Principal
 
-## 📝 Funcionalidades Completadas
+#### Autenticación y Datos
+- **ESTE README.md** - Arquitectura y reglas absolutas
+- **CORRECCION-ERRORES-ADMIN.md** - Fix del sistema de autenticación
+- **CORRECCION-CALENDARIO.md** - Fix específico del calendario
 
-- ✅ **Sistema i18n con URLs localizadas** (ES/EN/FR/DE)
-  - URLs con prefijos de idioma (`/es/`, `/en/`, `/fr/`, `/de/`)
-  - Cambio automático de URL al seleccionar idioma
-  - Middleware con detección automática de idioma del navegador
-  - Rutas traducidas optimizadas para SEO
-- ✅ Sistema de traducciones multiidioma (ES/EN/FR/DE)
-- ✅ **Buscador Global Administrador** 🔍
-  - Búsqueda inteligente en tiempo real
-  - Búsqueda en cascada (clientes → reservas, ubicaciones → reservas)
-  - 5 categorías: vehículos, reservas, clientes, extras, ubicaciones
-  - Atajos de teclado y navegación directa
-- ✅ **Sistema de Media/Imágenes**
-  - Biblioteca completa con Supabase Storage
-  - Organización por carpetas
-  - Galería múltiple para vehículos
-  - Drag & drop multiarchivo
-- ✅ **Calendario de Reservas Avanzado**
-  - Vista PC estilo Gantt
-  - Vista móvil/tablet estilo Notion Calendar
-  - Tooltips informativos
-  - Navegación directa a reservas
-- ✅ Página de Inteligencia Artificial con información de GPT Chat y WhatsApp Bot
-- ✅ Sistema de temporadas con calendario visual
-- ✅ Blog completo con TinyMCE
-- ✅ Sistema de cookies y privacidad
-- ✅ Diseño responsive completo
-- ✅ Integración con Redsys para pagos
-- ✅ Gestión completa de reservas con pagos parciales
+#### Base de Datos
+- **SUPABASE-SCHEMA-REAL.md** - Schema real y actualizado
+- **MIGRACION-CLIENTES-NORMALIZADOS.md** - Sistema de clientes actual
+- **supabase/README.md** - Guía de Supabase
+- **supabase/SETUP.md** - Configuración paso a paso
 
-## 📝 TODO / Próximos pasos
+#### Sistemas Específicos
+- **PROCESO-RESERVA-COMPLETO.md** - Flujo de reserva completo
+- **GESTION-CLIENTES-OBLIGATORIO.md** - Sistema de clientes
+- **PAGINAS-VEHICULOS-GARANTIA.md** - Páginas de vehículos
+- **SISTEMA_TEMPORADAS.md** - Temporadas y tarifas
+- **SISTEMA-MEDIA-RESUMEN.md** - Gestión de imágenes
+- **GALERIA-MULTIPLE-VEHICULOS.md** - Galería de vehículos
 
-- [ ] Implementación real de GPT Chat de Viaje
-- [ ] Implementación real de WhatsApp Bot
-- [ ] Generación de PDF de contratos
-- [ ] Envío de emails transaccionales automatizados
-- [ ] Calendario visual de reservas mejorado (admin)
-- [✅] **PWA para panel de administrador** - Instalable en móvil
-- [ ] Sistema de reviews y valoraciones
-- [ ] Galería de imágenes avanzada en artículos
-- [ ] Búsqueda avanzada de artículos del blog
-- [ ] Dashboard con gráficos y analíticas avanzadas
-- [ ] Sistema de notificaciones push
+#### Pagos
+- **METODOS-PAGO-RESUMEN.md** - Resumen sistema dual
+- **REDSYS-CONFIGURACION.md** - Configuración Redsys
+- **STRIPE-CONFIGURACION.md** - Configuración Stripe
+- **STRIPE-VERCEL-PRODUCCION.md** - Deploy Stripe
 
-## 📚 Documentación Adicional
+#### Admin y Optimización
+- **ADMIN_SETUP.md** - Setup administrador
+- **BUSCADOR-GLOBAL-ADMIN.md** - Buscador global
+- **PWA-ADMIN-GUIA.md** - PWA del admin
+- **OPTIMIZACION-ADMIN.md** - Optimizaciones
 
-### 📑 ÍNDICE MAESTRO
+#### Marketing
+- **CONFIGURACION-META-PIXEL.md** - Meta Pixel (Facebook)
+- **NORMAS-SEO-OBLIGATORIAS.md** - SEO
+- **AUDITORIA-SEO-CRITICA.md** - Impacto SEO
 
-**👉 [INDICE-DOCUMENTACION.md](./INDICE-DOCUMENTACION.md)** - Navegación completa de toda la documentación
+#### Otros
+- **I18N_IMPLEMENTATION.md** - Sistema i18n
+- **TRADUCCIONES.md** - Traducciones
+- **DESIGN_SYSTEM.md** - Sistema de diseño
+- **RESPONSIVE_STRATEGY.md** - Responsive
+- **TINY_EDITOR_README.md** - Editor TinyMCE
 
-**📋 [CHANGELOG.md](./CHANGELOG.md)** - Historial de versiones y problemas resueltos
+### 📑 ÍNDICE COMPLETO
+
+**👉 [INDICE-DOCUMENTACION.md](./INDICE-DOCUMENTACION.md)** - Navegación de TODA la documentación
 
 ---
 
-### 🚨 Documentos CRÍTICOS (Leer PRIMERO antes de modificar código)
+## ⚠️ LECCIONES APRENDIDAS - ERRORES QUE NO REPETIR
 
-Estos documentos son **OBLIGATORIOS** antes de tocar cualquier página pública:
+### 1. **NO usar Singleton en Cliente Supabase**
+- **Error cometido**: Usar `let browserClient` que se crea una vez
+- **Consecuencia**: TODAS las secciones del admin dejaron de funcionar
+- **Solución**: `createClient()` retorna nueva instancia siempre
+- **Commit fix**: `03a61ec` (20 Enero 2026)
 
-1. **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** ⚠️ **CRÍTICO**
-   - Reglas absolutas de Server/Client Components
-   - Qué NO hacer NUNCA
-   - Consecuencias de violar las reglas
-   
-2. **[GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)** ⚠️ **CRÍTICO**
-   - Sistema dual de traducción (translateServer vs useLanguage)
-   - Cuándo usar cada uno
-   - Errores comunes y cómo evitarlos
-   
-3. **[CHECKLIST-PRE-COMMIT.md](./CHECKLIST-PRE-COMMIT.md)** ⚠️ **USAR ANTES DE COMMIT**
-   - Checklist de verificación paso a paso
-   - Test rápidos para validar cambios
-   - Guía de decisión rápida
+### 2. **NO importar `supabase` estáticamente**
+- **Error cometido**: `import { supabase }` en componentes
+- **Consecuencia**: Sesión congelada, errores de autenticación
+- **Solución**: `const supabase = createClient()` dentro de funciones
 
-4. **[AUDITORIA-SEO-CRITICA.md](./AUDITORIA-SEO-CRITICA.md)**
-   - Por qué Server Components son críticos para SEO
-   - Impacto real de arquitectura incorrecta
-   - Métricas de éxito
+### 3. **NO omitir createClient() en hooks**
+- **Error cometido**: Hooks usaban `supabase` directamente
+- **Consecuencia**: Todos los datos fallan al cargar
+- **Solución**: Cada `queryFn` crea su instancia
 
-5. **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)**
-   - Normas SEO obligatorias del proyecto
-   - Estructura de metadatos
-   - Best practices
+### 4. **NO cargar demasiados IDs en una query**
+- **Error cometido**: `.in('booking_id', [100+ IDs])`
+- **Consecuencia**: Error 400 - URL demasiado larga
+- **Solución**: Dividir en lotes de 50 IDs
 
----
+### 5. **NO asumir que los datos no son null**
+- **Error cometido**: `vehicles.find()` sin validar que vehicles existe
+- **Consecuencia**: `Cannot read properties of null`
+- **Solución**: Siempre validar: `if (!vehicles) return;`
 
-### 📖 Documentación Técnica (Por área)
-
-#### ⚠️ Base de Datos (CRÍTICO)
-- **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** ⚠️
-  - **LEER ANTES DE HACER CUALQUIER QUERY**
-  - Reglas obligatorias para queries
-  - Errores comunes y soluciones
-  
-- **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)**
-  - Schema real obtenido directamente de Supabase
-  - Todos los campos exactos de cada tabla
-  - Queries correctas por página
-  - **ESTE ES EL SCHEMA REAL - El schema.sql puede estar desactualizado**
-
-#### 🚗 Páginas de Vehículos (CRÍTICO)
-- **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** ⚠️ 
-  - **LEER ANTES DE MODIFICAR CUALQUIER PÁGINA DE VEHÍCULOS**
-  - Checklist completo de campos obligatorios
-  - Estructura y orden de secciones
-  - Componentes obligatorios (VehicleGallery, VehicleEquipmentDisplay)
-  - Proceso de verificación
-  - **Garantiza que todas las páginas muestran TODOS los campos**
-
-- **[GUIA-QUERIES-VEHICULOS.md](./GUIA-QUERIES-VEHICULOS.md)**
-  - Queries específicas para cada página de vehículos
-  - Ejemplos de uso correcto
-
-#### 👥 Gestión de Clientes (CRÍTICO - NUEVO)
-- **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** ⚠️ **NUEVO**
-  - **LEER ANTES DE MODIFICAR FORMULARIO DE RESERVA**
-  - Reglas obligatorias para tabla `customers`
-  - Campos obligatorios del formulario
-  - Lógica de creación/actualización de clientes
-  - Snapshot de datos en `bookings`
-  - Actualización automática de estadísticas
-  - **Garantiza que los datos de clientes se manejan correctamente**
-
-#### Internacionalización
-- **[I18N_IMPLEMENTATION.md](./I18N_IMPLEMENTATION.md)**
-  - Sistema de URLs localizadas con prefijos
-  - Middleware de detección de idioma
-  - Configuración técnica completa
-
-- **[TRADUCCIONES.md](./TRADUCCIONES.md)**
-  - Sistema de traducciones cliente (useLanguage)
-  - Diccionario de traducciones estáticas
-  - Cómo agregar nuevas traducciones
-
-#### Administración
-- **[ADMIN_SETUP.md](./ADMIN_SETUP.md)**
-  - Configuración inicial del panel de administración
-  - Creación de primer admin
-  - Roles y permisos
-
-- **[BUSCADOR-GLOBAL-ADMIN.md](./BUSCADOR-GLOBAL-ADMIN.md)**
-  - Buscador global inteligente
-  - Búsqueda en cascada
-  - Atajos de teclado
-
-- **[PWA-ADMIN-GUIA.md](./PWA-ADMIN-GUIA.md)** ⚠️ **NUEVO**
-  - Progressive Web App para administrador
-  - Instalación en iOS y Android
-  - Configuración de caché y service worker
-  - Accesos directos y optimización móvil
-
-#### Sistema de Medios
-- **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)**
-  - Gestión de medios e imágenes
-  - Supabase Storage
-  - Organización por carpetas
-
-- **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)**
-  - Galería de imágenes múltiple
-  - Drag & drop ordenación
-  - Imagen principal
-
-#### Otros Sistemas
-- **[SISTEMA_TEMPORADAS.md](./SISTEMA_TEMPORADAS.md)**
-  - Gestión de temporadas y tarifas
-  - Calendario visual
-  - Descuentos por duración
-
-#### 💳 Sistemas de Pago (DUAL: Redsys + Stripe)
-
-**⚠️ IMPORTANTE:** El sistema soporta DOS métodos de pago. Revisar documentación según necesidad:
-
-1. **[METODOS-PAGO-RESUMEN.md](./METODOS-PAGO-RESUMEN.md)** ← **EMPEZAR AQUÍ**
-   - Resumen ejecutivo del sistema dual
-   - Comparativa Redsys vs Stripe
-   - Estado actual y próximos pasos
-
-2. **[REDSYS-CONFIGURACION.md](./REDSYS-CONFIGURACION.md)** ← Método principal (0.3%)
-   - Integración con TPV Redsys
-   - Configuración de pagos
-   - Webhooks y notificaciones
-
-3. **[STRIPE-VERCEL-PRODUCCION.md](./STRIPE-VERCEL-PRODUCCION.md)** ← **NUEVO** - Método alternativo
-   - Guía paso a paso para configurar Stripe en Vercel
-   - Configuración de webhook en producción
-   - Testing con tarjetas de prueba
-
-4. **[STRIPE-CONFIGURACION.md](./STRIPE-CONFIGURACION.md)** ← **NUEVO** - Referencia completa
-   - Documentación completa de Stripe
-   - Troubleshooting detallado
-   - Comparativa de costos
-
-5. **[STRIPE-SETUP-RAPIDO.md](./STRIPE-SETUP-RAPIDO.md)** ← Para desarrollo local
-   - Configuración con Stripe CLI
-   - Testing en localhost
-
-- **[TINY_EDITOR_README.md](./TINY_EDITOR_README.md)**
-  - Configuración de TinyMCE
-  - Plugins y templates
-  - Subida de imágenes
-
-- **[GENERACION-CONTENIDO-IA.md](./GENERACION-CONTENIDO-IA.md)**
-  - Herramientas de IA para clientes
-  - GPT Chat de Viaje
-  - WhatsApp Bot
-
-- **[DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md)**
-  - Guía de diseño
-  - Colores corporativos
-  - Componentes UI
-
-- **[RESPONSIVE_STRATEGY.md](./RESPONSIVE_STRATEGY.md)**
-  - Estrategia responsive
-  - Breakpoints
-  - Componentes móviles
+### 6. **NO modificar código que funciona "para mejorarlo"**
+- **Error cometido**: Cambiar a singleton "para optimizar"
+- **Consecuencia**: Todo el admin se rompe
+- **Solución**: **SI FUNCIONA, NO LO TOQUES**
 
 ---
 
-### 📁 Documentación de Bases de Datos
+## 🔧 Troubleshooting Rápido
 
-- **[supabase/schema.sql](./supabase/schema.sql)** - Esquema completo
-- **[supabase/create-first-admin.sql](./supabase/create-first-admin.sql)** - Crear admin
-- **[supabase/README.md](./supabase/README.md)** - Guía de Supabase
-- **[supabase/SETUP.md](./supabase/SETUP.md)** - Configuración paso a paso
+### Problema: Admin no carga datos
 
-## 🔗 Enlaces Útiles
+**Solución rápida:**
+```bash
+# 1. Limpia caché
+rm -rf .next
 
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Supabase Documentation](https://supabase.com/docs)
-- [Redsys Integration Guide](https://pagosonline.redsys.es/conexion-insite.html)
-- [TinyMCE Documentation](https://www.tiny.cloud/docs/)
-- [TailwindCSS Documentation](https://tailwindcss.com/docs)
+# 2. Verifica client.ts
+cat src/lib/supabase/client.ts | grep -A5 "createClient"
+# Debe decir: return createBrowserClient(...)
+# NO debe tener: if (!browserClient)
 
-## 🤝 Contribuir
+# 3. Reinicia
+npm run dev
 
-Si deseas contribuir al proyecto:
+# 4. Hard refresh en navegador (Ctrl+Shift+R)
+```
 
-1. Fork el repositorio
-2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. Push a la rama (`git push origin feature/AmazingFeature`)
-5. Abre un Pull Request
+### Problema: Meta Pixel error
 
-## 📧 Contacto
+Añade a `.env.local`:
+```
+NEXT_PUBLIC_META_PIXEL_ID=tu-pixel-id
+```
 
-Para consultas sobre el proyecto: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
+O ignora el error - no afecta funcionalidad.
+
+### Problema: RLS policy error
+
+```sql
+-- Ejecuta en Supabase SQL Editor:
+SELECT * FROM supabase/fix-all-rls-policies.sql
+```
+
+---
+
+## 📊 Estado Actual de Producción
+
+### ✅ FUNCIONAL AL 100%
+
+| Área | Estado | Última Verificación |
+|------|--------|---------------------|
+| Sitio público | ✅ | 20 Enero 2026 |
+| Sistema de reservas | ✅ | 20 Enero 2026 |
+| Dashboard admin | ✅ | 20 Enero 2026 |
+| Gestión vehículos | ✅ | 20 Enero 2026 |
+| Gestión reservas | ✅ | 20 Enero 2026 |
+| Gestión clientes | ✅ | 20 Enero 2026 |
+| Gestión pagos | ✅ | 20 Enero 2026 |
+| Extras | ✅ | 20 Enero 2026 |
+| Equipamiento | ✅ | 20 Enero 2026 |
+| Temporadas | ✅ | 20 Enero 2026 |
+| Ubicaciones | ✅ | 20 Enero 2026 |
+| Calendario | ✅ | 20 Enero 2026 |
+| Pagos Redsys | ✅ | 19 Enero 2026 |
+| Pagos Stripe | ✅ | 19 Enero 2026 |
+| Blog/CMS | ✅ | 18 Enero 2026 |
+| i18n (ES/EN/FR/DE) | ✅ | 17 Enero 2026 |
+| PWA Admin | ✅ | 16 Enero 2026 |
+
+---
+
+## 📞 Soporte y Contacto
+
+Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
+
+---
+
+## 📜 Historial de Versiones
+
+### v1.0.4 (20 Enero 2026) - Fix Crítico Autenticación
+- 🔴 **FIX CRÍTICO**: Eliminado singleton en cliente Supabase
+- ✅ Todas las secciones del administrador funcionando
+- ✅ Meta Pixel carga condicional
+- ✅ Calendario con carga en lotes
+- ✅ Validaciones de null mejoradas
+
+### v1.0.3 (19 Enero 2026) - Sistema Dual de Pagos
+- ✅ Integración completa de Stripe
+- ✅ Selector de método de pago
+- ✅ Webhooks de ambas pasarelas
+
+### v1.0.2 (18 Enero 2026) - Optimización UX
+- ✅ Sticky headers en proceso de reserva
+- ✅ Fix AbortError loops
+- ✅ Carga optimizada de vehículos
+
+### v1.0.1 (17 Enero 2026) - Correcciones Post-Deploy
+- ✅ URLs localizadas funcionando
+- ✅ Extras y precios corregidos
+
+### v1.0.0 (16 Enero 2026) - Deploy Inicial
+- ✅ Primera versión en producción
+
+**📋 Ver [CHANGELOG.md](./CHANGELOG.md) para historial completo**
 
 ---
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 1.0.3 ← Sistema Dual de Pagos  
-**Estado**: ✅ Producción  
+**Versión**: 1.0.4 - Fix Crítico Autenticación  
+**Estado**: ✅ Producción Estable  
 **URL**: https://webfurgocasa.vercel.app  
-**Última actualización**: 19 de Enero 2026
+**Última actualización**: 20 de Enero 2026  
 
-📋 Ver [CHANGELOG.md](./CHANGELOG.md) para historial completo de cambios.
+---
+
+## ⚡ Quick Start
+
+```bash
+# 1. Instalar
+npm install
+
+# 2. Configurar
+cp .env.example .env.local
+# Edita .env.local con tus credenciales
+
+# 3. Base de datos
+# Ejecuta scripts SQL en Supabase (ver sección Instalación)
+
+# 4. Crear admin
+# Ejecuta SQL para crear primer usuario admin
+
+# 5. Iniciar
+npm run dev
+
+# 6. Acceder
+# Público: http://localhost:3000
+# Admin: http://localhost:3000/administrator
+```
+
+**¿Problemas?** → Revisa sección "Troubleshooting Rápido" arriba

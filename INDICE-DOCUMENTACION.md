@@ -1,54 +1,67 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.3 ✅ PRODUCCIÓN - SISTEMA DE EMAILS AÑADIDO  
+**Versión**: 1.0.4 ✅ PRODUCCIÓN - FIX CRÍTICO AUTENTICACIÓN  
 **URL**: https://webfurgocasa.vercel.app  
-**Última actualización**: 19 de Enero, 2026
+**Última actualización**: 20 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
 
 ---
 
-## 🎉 VERSIÓN 1.0.2 EN PRODUCCIÓN - ESTABLE
+## 🔴 VERSIÓN 1.0.4 - FIX CRÍTICO AUTENTICACIÓN
 
-**✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas.
+**✅ ESTADO: TOTALMENTE FUNCIONAL** - Fix crítico del sistema de autenticación aplicado.
 
-El proyecto está desplegado y funcionando perfectamente en producción. Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
-- ✅ **v1.0.2 (ACTUAL)**: Estabilización completa, fixes críticos de producción
+**PROBLEMA RESUELTO**: TODAS las secciones del administrador dejaron de funcionar debido a un patrón singleton en el cliente Supabase. **AHORA TODAS FUNCIONAN**.
+
+Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
+- 🔴 **v1.0.4 (ACTUAL)**: Fix crítico sistema autenticación - Eliminado singleton
+- ✅ **v1.0.3**: Sistema dual de pagos (Redsys + Stripe)
+- ✅ **v1.0.2**: Estabilización completa, fixes críticos de producción
 - ✅ **v1.0.1**: Mejoras del proceso de reserva
 - ✅ **v1.0.0**: Problemas resueltos para deploy en Vercel
-- ✅ Roadmap de próximas versiones
 
-### 🚀 Highlights v1.0.2:
-- ✅ **AbortError loop infinito RESUELTO**: Límite estricto de 3 reintentos
-- ✅ **Carga de vehículos optimizada**: Query unificada, retry logic robusto
-- ✅ **Disponibilidad correcta**: Solo reservas confirmed/in_progress bloquean
-- ✅ **Proceso de reserva perfeccionado**: Sticky headers, UX consistente
-- ✅ **Admin pages robustas**: Hook `useAdminData` con carga a la primera
-- ✅ **Mobile responsive**: Todas las páginas adaptadas correctamente
-- ✅ **Equipment mapping seguro**: Sin crashes por undefined
+### 🚨 Highlights v1.0.4:
+- 🔴 **FIX CRÍTICO**: Eliminado singleton en `src/lib/supabase/client.ts`
+- ✅ **TODAS las secciones del admin funcionando**: Vehículos, Reservas, Clientes, Pagos, Extras, Equipamiento, Temporadas, Ubicaciones, Calendario
+- ✅ **Calendario optimizado**: Carga en lotes de booking_extras
+- ✅ **Meta Pixel**: Carga condicional sin errores
+- ✅ **Validaciones**: Checks de null antes de usar datos
+
+**⚠️ LECCIÓN APRENDIDA**: SI ALGO FUNCIONA, NO LO TOQUES. Ver `README.md` sección "Reglas Absolutas".
 
 ---
 
 ## 🚨 DOCUMENTOS CRÍTICOS - LEER PRIMERO
 
-**⚠️ OBLIGATORIO leer antes de modificar cualquier página pública**
+**⚠️ OBLIGATORIO leer antes de modificar cualquier código**
 
 | Documento | Descripción | Cuándo leer |
 |-----------|-------------|-------------|
-| **[README.md](./README.md)** | Punto de entrada principal | Siempre primero |
-| **[CHANGELOG.md](./CHANGELOG.md)** | Historial versiones, problemas deploy | Al debuggear o deployar |
+| **[README.md](./README.md)** | Punto de entrada principal, arquitectura completa | **SIEMPRE PRIMERO** |
+| **[CHANGELOG.md](./CHANGELOG.md)** | Historial versiones, problemas deploy, **v1.0.4 FIX CRÍTICO** | Al debuggear o deployar |
+| **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** | ⚠️ **INCLUYE REGLAS DE SUPABASE CLIENT** | Antes de tocar CUALQUIER código |
 | **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** | ⚠️ **REGLAS OBLIGATORIAS** - Queries a Supabase | ANTES de hacer ANY query |
+| **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** | ⚠️ **NUEVO** - Fix crítico autenticación | Ver qué se rompió y cómo se arregló |
 | **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** | Schema real con campos exactos | Al consultar tablas |
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
-| **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ **NUEVO** - Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
+| **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo de reservas | Antes de tocar /reservar/** |
-| **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** | Reglas críticas de Server/Client Components | Antes de tocar `page.tsx` |
 | **[GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)** | Sistema de traducción dual | Cuando uses `t()` |
 | **[CHECKLIST-PRE-COMMIT.md](./CHECKLIST-PRE-COMMIT.md)** | Verificación pre-commit | Antes de cada commit |
 
 ---
 
 ## 📖 DOCUMENTACIÓN POR ÁREA
+
+### 🔐 **Autenticación y Sistema de Datos (CRÍTICO - NUEVO)**
+
+| Documento | Descripción |
+|-----------|-------------|
+| **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** | ⚠️ **NUEVO** - Fix crítico sistema autenticación v1.0.4 |
+| **[CORRECCION-CALENDARIO.md](./CORRECCION-CALENDARIO.md)** | ⚠️ **NUEVO** - Fixes específicos del calendario admin |
+| **[CONFIGURACION-META-PIXEL.md](./CONFIGURACION-META-PIXEL.md)** | Configuración Meta Pixel con carga condicional |
+| **README.md** | Sección "Sistema de Autenticación - CÓMO FUNCIONA" |
 
 ### 🌍 Internacionalización (i18n)
 
@@ -155,9 +168,17 @@ Ver carpeta `scripts/`:
 ## 🎯 GUÍAS RÁPIDAS
 
 ### Estoy empezando
-1. Lee **[README.md](./README.md)**
-2. Configura con **[supabase/SETUP.md](./supabase/SETUP.md)**
-3. Crea admin con **[ADMIN_SETUP.md](./ADMIN_SETUP.md)**
+1. Lee **[README.md](./README.md)** - **SECCIÓN "REGLAS ABSOLUTAS"** ⚠️
+2. Lee **[CHANGELOG.md](./CHANGELOG.md)** v1.0.4 - Ver qué se rompió antes
+3. Configura con **[supabase/SETUP.md](./supabase/SETUP.md)**
+4. Crea admin con **[ADMIN_SETUP.md](./ADMIN_SETUP.md)**
+
+### Voy a trabajar con autenticación o datos
+1. Lee **[README.md](./README.md)** sección "Sistema de Autenticación" ⚠️ **OBLIGATORIO**
+2. Lee **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** ⚠️ **NUEVO**
+3. Lee **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** ⚠️
+4. **NO TOQUES** `src/lib/supabase/client.ts` ni `server.ts`
+5. **NO TOQUES** los hooks `use-paginated-data.ts`, `use-admin-data.ts`, `use-all-data-progressive.ts`
 
 ### Voy a trabajar con reservas o clientes
 1. Lee **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** ⚠️ **OBLIGATORIO**
@@ -199,16 +220,19 @@ Ver carpeta `scripts/`:
 
 ```
 📁 furgocasa-app/
-├── 🚨 README.md                           ← Punto de entrada
-├── 📋 CHANGELOG.md                        ← Historial de versiones y deploy
-├── 🚨 REGLAS-SUPABASE-OBLIGATORIAS.md     ← ⚠️ LEER ANTES DE QUERIES
+├── 🚨 README.md                           ← Punto de entrada + REGLAS ABSOLUTAS
+├── 📋 CHANGELOG.md                        ← Historial (v1.0.4 FIX CRÍTICO)
+├── 🔴 REGLAS-ARQUITECTURA-NEXTJS.md       ← INCLUYE REGLAS SUPABASE CLIENT
+├── 🔴 REGLAS-SUPABASE-OBLIGATORIAS.md     ← ⚠️ LEER ANTES DE QUERIES
+├── 🔴 CORRECCION-ERRORES-ADMIN.md         ← ⚠️ NUEVO - Fix autenticación v1.0.4
+├── 🔴 CORRECCION-CALENDARIO.md            ← ⚠️ NUEVO - Fix calendario
+├── 🔴 CONFIGURACION-META-PIXEL.md         ← Meta Pixel condicional
 ├── 🚨 SUPABASE-SCHEMA-REAL.md             ← Schema real con campos exactos
 ├── 🚨 PAGINAS-VEHICULOS-GARANTIA.md       ← ⚠️ Garantía páginas vehículos
-├── 🚨 GESTION-CLIENTES-OBLIGATORIO.md     ← ⚠️ NUEVO - Gestión de clientes
+├── 🚨 GESTION-CLIENTES-OBLIGATORIO.md     ← ⚠️ Gestión de clientes
 ├── 🚨 FLUJO-RESERVAS-CRITICO.md           ← CORE DEL NEGOCIO
 ├── 🚨 REGLA-CALCULO-DIAS-ALQUILER.md      ← ⚠️ CRÍTICO - Cálculo días 24h
 ├── 📖 RESUMEN-IMPLEMENTACION-DIAS.md      ← Resumen técnico días
-├── 🚨 REGLAS-ARQUITECTURA-NEXTJS.md       ← CRÍTICO
 ├── 🚨 GUIA-TRADUCCION.md                  ← CRÍTICO
 ├── 🚨 CHECKLIST-PRE-COMMIT.md             ← Usar antes de commit
 ├── 🚨 AUDITORIA-SEO-CRITICA.md            ← Leer antes de cambios
@@ -248,6 +272,10 @@ Ver carpeta `scripts/`:
 
 ### Por Tema
 
+- **Autenticación y datos**: `CORRECCION-ERRORES-ADMIN.md` ⚠️ **NUEVO**, `REGLAS-SUPABASE-OBLIGATORIAS.md`
+- **Cliente Supabase**: `README.md` sección "Sistema de Autenticación", `REGLAS-ARQUITECTURA-NEXTJS.md`
+- **Calendario admin**: `CORRECCION-CALENDARIO.md` ⚠️ **NUEVO**
+- **Meta Pixel**: `CONFIGURACION-META-PIXEL.md`
 - **Reservas**: `FLUJO-RESERVAS-CRITICO.md` ⚠️ **CORE DEL NEGOCIO**
 - **Clientes**: `GESTION-CLIENTES-OBLIGATORIO.md` ⚠️ **NUEVO**
 - **Cálculo de días**: `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO**
@@ -267,6 +295,11 @@ Ver carpeta `scripts/`:
 
 | Pregunta | Documento |
 |----------|-----------|
+| ¿Por qué el admin dejó de funcionar? | `CORRECCION-ERRORES-ADMIN.md` ⚠️ **NUEVO** |
+| ¿Cómo uso correctamente el cliente Supabase? | `README.md` + `REGLAS-ARQUITECTURA-NEXTJS.md` |
+| ¿Puedo modificar `client.ts` o `server.ts`? | **NO** - Ver `README.md` sección "Reglas Absolutas" |
+| ¿Por qué el calendario no carga? | `CORRECCION-CALENDARIO.md` ⚠️ **NUEVO** |
+| ¿Cómo configuro Meta Pixel? | `CONFIGURACION-META-PIXEL.md` |
 | ¿Puedo usar `"use client"` en esta página? | `REGLAS-ARQUITECTURA-NEXTJS.md` |
 | ¿Cómo traduzco en Server Component? | `GUIA-TRADUCCION.md` |
 | ¿Por qué no puedo usar useLanguage()? | `GUIA-TRADUCCION.md` |
@@ -334,4 +367,5 @@ Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
 
 ---
 
-**Total de documentos activos**: 30 archivos .md en raíz + subdirectorios (incluyendo PWA)
+**Total de documentos activos**: 33 archivos .md en raíz + subdirectorios  
+**Última actualización crítica**: v1.0.4 - Fix sistema autenticación (20 Enero 2026)

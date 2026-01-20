@@ -4,6 +4,339 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔴 [1.0.4] - 20 de Enero 2026 - **FIX CRÍTICO: Sistema de Autenticación Supabase**
+
+### 🚨 **PROBLEMA CRÍTICO RESUELTO**
+
+**Síntomas**:
+- ✅ Dashboard del administrador funcionaba
+- ❌ TODAS las demás secciones del admin NO cargaban (Vehículos, Reservas, Clientes, Pagos, Extras, Equipamiento, Temporadas, Ubicaciones, Calendario)
+- ❌ Errores en consola: `[usePaginatedData] Error`, `[useAdminData] Error`, `AbortError`
+- ❌ Error: `Cannot read properties of null (reading 'find')` en Calendario
+- ❌ Calendario: Error 400 por URL demasiado larga en query de `booking_extras`
+
+**Fecha de detección**: 20 de Enero 2026  
+**Gravedad**: 🔴 **CRÍTICA** - Todo el panel de administración inutilizable excepto dashboard
+
+---
+
+### 🔍 **CAUSA RAÍZ IDENTIFICADA**
+
+El archivo `src/lib/supabase/client.ts` usaba un **patrón singleton** que congelaba la sesión de autenticación:
+
+```typescript
+// ❌ CÓDIGO PROBLEMÁTICO (NUNCA VOLVER A ESTO)
+let browserClient: SupabaseClient<Database> | null = null;
+
+export function createClient() {
+  if (!browserClient) {
+    browserClient = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  }
+  return browserClient; // ❌ SIEMPRE retorna la MISMA instancia
+}
+```
+
+**Por qué fallaba**:
+1. **Primera carga después de login** → Sesión OK, client se crea con token válido
+2. **Navegación a /vehiculos** → `createClient()` retorna LA MISMA instancia (sesión puede estar expirada)
+3. **Peticiones fallan** porque la sesión no se refresca automáticamente
+4. **RLS (Row Level Security) rechaza** las peticiones → Error
+5. **TODAS las secciones del admin fallan** en cadena
+
+**Impacto**:
+- Cliente singleton almacenaba token de autenticación en memoria
+- Token NO se actualizaba en cada llamada
+- Supabase lee token de `localStorage` del navegador
+- Singleton ignoraba cambios en `localStorage`
+- **Resultado**: Peticiones sin autenticación válida = RLS error
+
+---
+
+### ✅ **SOLUCIÓN APLICADA**
+
+**Eliminado el patrón singleton completamente**:
+
+```typescript
+// ✅ CÓDIGO CORRECTO (MANTENER SIEMPRE ASÍ)
+export function createClient() {
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  // ✅ Nueva instancia en CADA llamada
+  // ✅ Lee token ACTUAL de localStorage cada vez
+  // ✅ Sesión siempre actualizada
+}
+
+// ✅ Export para compatibilidad (pero mejor usar createClient())
+export const supabase = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+```
+
+**Por qué funciona ahora**:
+1. Cada llamada a `createClient()` crea nueva instancia
+2. Nueva instancia lee token ACTUAL de `localStorage`
+3. Token siempre está actualizado
+4. RLS valida correctamente
+5. **Todas las peticiones funcionan**
+
+---
+
+### 🔧 **ARCHIVOS MODIFICADOS**
+
+#### **1. Cliente Supabase - Eliminado Singleton**
+- **`src/lib/supabase/client.ts`** ⚠️ **ARCHIVO CRÍTICO**
+  - ❌ Eliminado: Variable `browserClient` singleton
+  - ✅ Añadido: `createClient()` retorna nueva instancia siempre
+  - ✅ Comentarios explicativos sobre por qué NO usar singleton
+
+#### **2. Hooks de Datos - Asegurar Instancia Fresca**
+Todos los hooks actualizados para crear instancia dentro de sus funciones:
+
+- **`src/hooks/use-paginated-data.ts`**
+  - ✅ `const supabase = createClient()` dentro de `queryFn`
+  - Afecta: Vehículos, Clientes, Pagos
+
+- **`src/hooks/use-admin-data.ts`**
+  - ✅ `const supabase = createClient()` dentro de `loadData`
+  - Afecta: Extras, Equipamiento, Temporadas, Ubicaciones, Calendario
+
+- **`src/hooks/use-all-data-progressive.ts`**
+  - ✅ `const supabase = createClient()` dentro de `loadAllData`
+  - Afecta: Reservas (carga progresiva)
+
+#### **3. Páginas Admin - Funciones Async**
+Páginas que ejecutan operaciones directas (eliminar, actualizar estado, etc.):
+
+- **`src/app/administrator/(protected)/reservas/page.tsx`**
+  - ✅ `handleStatusChange` y `handleDelete` crean instancia
+
+- **`src/app/administrator/(protected)/extras/page.tsx`**
+  - ✅ `handleSubmit`, `confirmDelete`, `toggleActive` crean instancia
+
+- **`src/app/administrator/(protected)/equipamiento/page.tsx`**
+  - ✅ `handleSubmit`, `handleDelete`, `handleToggleActive`, `handleToggleStandard` crean instancia
+
+- **`src/app/administrator/(protected)/temporadas/page.tsx`**
+  - ✅ `handleDeleteSeason` crea instancia
+
+- **`src/app/administrator/(protected)/ubicaciones/page.tsx`**
+  - ✅ `handleSubmit`, `confirmDelete`, `toggleActive` crean instancia
+
+#### **4. Calendario - Fixes Adicionales**
+- **`src/app/administrator/(protected)/calendario/page.tsx`**
+  - ✅ Crear instancia en `queryFn` para `vehicles` y `bookingsRaw`
+  - ✅ **Carga en lotes** de `booking_extras` (50 IDs por batch) para evitar URL demasiado larga
+  - ✅ Validación `if (!vehicles)` en `getMobileCalendarEvents` para evitar crash
+  - ✅ Estados de loading y error en UI
+
+**Batch Loading Pattern**:
+```typescript
+// ✅ ANTES: Una query con 100+ IDs → Error 400
+.in('booking_id', [id1, id2, ..., id100])
+
+// ✅ AHORA: Dividir en lotes de 50
+const batchSize = 50;
+const batches = [];
+for (let i = 0; i < bookingIds.length; i += batchSize) {
+  batches.push(bookingIds.slice(i, i + batchSize));
+}
+
+for (const batch of batches) {
+  const { data } = await supabase
+    .from('booking_extras')
+    .select('...')
+    .in('booking_id', batch);
+  
+  if (data) bookingExtrasData.push(...data);
+}
+```
+
+---
+
+### ✅ **FIXES ADICIONALES**
+
+#### **1. Meta Pixel - Carga Condicional**
+- **Archivo**: `src/app/layout.tsx`
+- **Problema**: Error `[Meta Pixel] - Invalid PixelID: null` cuando variable no está configurada
+- **Solución**: Carga condicional solo si existe `NEXT_PUBLIC_META_PIXEL_ID`
+
+```tsx
+{process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+  <Script id="facebook-pixel" strategy="afterInteractive" ... />
+)}
+```
+
+**Documentación**: `CONFIGURACION-META-PIXEL.md`
+
+---
+
+### 📊 **RESULTADO FINAL**
+
+| Sección Admin | Estado Antes | Estado Después | Hook/Método |
+|---------------|--------------|----------------|-------------|
+| Dashboard | ✅ | ✅ | Server Component (queries.ts) |
+| Vehículos | ❌ | ✅ | usePaginatedData |
+| Reservas | ❌ | ✅ | useAllDataProgressive |
+| Clientes | ❌ | ✅ | usePaginatedData |
+| Pagos | ❌ | ✅ | usePaginatedData |
+| Extras | ❌ | ✅ | useAdminData |
+| Equipamiento | ❌ | ✅ | useAdminData |
+| Temporadas | ❌ | ✅ | useAdminData |
+| Ubicaciones | ❌ | ✅ | useAdminData |
+| Calendario | ❌ | ✅ | useAdminData (x2) + batch loading |
+
+**✅ TODAS LAS SECCIONES FUNCIONANDO CORRECTAMENTE**
+
+---
+
+### 📚 **DOCUMENTACIÓN ACTUALIZADA**
+
+#### **Nuevos Documentos**:
+- ✅ **`CONFIGURACION-META-PIXEL.md`** - Configuración Meta Pixel
+- ✅ **`CORRECCION-ERRORES-ADMIN.md`** - Tracking detallado de todos los errores y fixes
+- ✅ **`CORRECCION-CALENDARIO.md`** - Fixes específicos del calendario
+
+#### **Actualizados**:
+- ✅ **`README.md`** - Sección completa sobre arquitectura de autenticación
+- ✅ **`REGLAS-ARQUITECTURA-NEXTJS.md`** - Reglas de uso de cliente Supabase
+- ✅ **`REGLAS-SUPABASE-OBLIGATORIAS.md`** - Patrón correcto de uso de `createClient()`
+- ✅ **`INDICE-DOCUMENTACION.md`** - Referencias a nuevos docs
+
+---
+
+### ⚠️ **LECCIONES APRENDIDAS - CRÍTICAS**
+
+#### **1. NO usar Singleton en Cliente Supabase**
+```typescript
+// ❌ NUNCA HACER ESTO
+let client = null;
+if (!client) client = createClient();
+
+// ✅ SIEMPRE HACER ESTO
+export function createClient() {
+  return createBrowserClient(...);
+}
+```
+
+**Razón**: Next.js con SSR + Supabase Auth necesita leer sesión fresca de `localStorage` en cada petición.
+
+#### **2. NO importar `supabase` estáticamente**
+```typescript
+// ❌ MALO - Sesión congelada
+import { supabase } from '@/lib/supabase/client';
+await supabase.from('table').select();
+
+// ✅ BUENO - Sesión actualizada
+import { createClient } from '@/lib/supabase/client';
+const supabase = createClient();
+await supabase.from('table').select();
+```
+
+#### **3. Crear instancia DENTRO de funciones async**
+```typescript
+// ✅ EN HOOKS
+queryFn: async () => {
+  const supabase = createClient(); // ✅ Aquí
+  return await supabase.from('table').select();
+}
+
+// ✅ EN HANDLERS
+const handleDelete = async (id) => {
+  const supabase = createClient(); // ✅ Aquí
+  await supabase.from('table').delete().eq('id', id);
+}
+```
+
+#### **4. Dividir queries grandes en lotes**
+```typescript
+// ❌ MALO - URL demasiado larga
+.in('id', [1,2,3,...,100])
+
+// ✅ BUENO - Lotes de 50
+const batchSize = 50;
+for (let i = 0; i < ids.length; i += batchSize) {
+  const batch = ids.slice(i, i + batchSize);
+  const { data } = await supabase.from('table').select().in('id', batch);
+}
+```
+
+#### **5. Validar datos antes de usar**
+```typescript
+// ❌ MALO - Crash si null
+vehicles.find(v => v.id === id)
+
+// ✅ BUENO - Validación
+if (!vehicles || vehicles.length === 0) return {};
+vehicles.find(v => v.id === id)
+```
+
+---
+
+### 🚀 **DEPLOY EN PRODUCCIÓN**
+
+**Commits principales**:
+- `03a61ec` - Fix crítico: Eliminar singleton en cliente Supabase
+- `7d2a8e4` - Fix calendario: Batch loading y validaciones
+- `2f1b6d9` - Fix Meta Pixel: Carga condicional
+
+**URL Producción**: https://webfurgocasa.vercel.app
+
+**Verificación**:
+- ✅ Todas las secciones del admin cargan correctamente
+- ✅ Sin errores en consola
+- ✅ Calendario funciona con reservas de cualquier cantidad
+- ✅ Meta Pixel solo carga si está configurado
+
+---
+
+### 🎯 **TESTING REALIZADO**
+
+| Prueba | Resultado |
+|--------|-----------|
+| Login admin → Dashboard | ✅ Carga correcta |
+| Dashboard → Vehículos | ✅ Carga correcta |
+| Dashboard → Reservas | ✅ Carga correcta |
+| Dashboard → Clientes | ✅ Carga correcta |
+| Dashboard → Calendario | ✅ Carga correcta |
+| Crear/Editar en cada sección | ✅ Funciona correcta |
+| Eliminar registros | ✅ Funciona correcta |
+| Cambiar estado inline | ✅ Funciona correcta |
+| Navegación entre secciones | ✅ Sin errores |
+| Refresh manual de página | ✅ Mantiene sesión |
+| Hard refresh (Ctrl+Shift+R) | ✅ Mantiene sesión |
+
+---
+
+### ⚠️ **REGLA ABSOLUTA PARA FUTURO**
+
+**SI ALGO FUNCIONA CORRECTAMENTE, NO LO TOQUES**
+
+Este fix fue necesario porque se intentó "optimizar" con un singleton. El resultado:
+- ❌ TODO el panel de administración roto
+- ❌ Horas de debugging
+- ❌ Experiencia del usuario afectada
+
+**De ahora en adelante**:
+1. ✅ Leer documentación ANTES de modificar
+2. ✅ Entender POR QUÉ algo está así ANTES de cambiarlo
+3. ✅ Si funciona, dejarlo como está
+4. ✅ Documentar CUALQUIER cambio arquitectónico
+
+---
+
+### 📦 **ARCHIVOS DEL RELEASE**
+
+**Modificados**: 17 archivos
+- 1 archivo crítico de infraestructura (`client.ts`)
+- 3 hooks reutilizables
+- 10 páginas del admin
+- 3 documentos nuevos
+
+**Sin breaking changes** en:
+- ✅ API pública
+- ✅ Páginas públicas
+- ✅ Sistema de reservas
+- ✅ Flujo de pagos
+
+---
+
 ## 🚀 [1.0.3] - 19 de Enero 2026 - **💳 Sistema Dual de Pagos: Redsys + Stripe**
 
 ### ✨ **Nueva Funcionalidad Principal: Selector de Método de Pago**

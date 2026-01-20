@@ -1,5 +1,89 @@
 # 🚨 REGLAS CRÍTICAS - NUNCA VIOLAR
 
+## ⚠️ ADVERTENCIA: SI ALGO FUNCIONA, NO LO TOQUES
+
+**Fecha última actualización**: 20 de Enero 2026  
+**Versión**: 1.0.4
+
+Este documento contiene reglas ABSOLUTAS que NO PUEDEN VIOLARSE bajo ninguna circunstancia.
+
+**Violaciones recientes que rompieron la aplicación**:
+- ❌ 20/01/2026: Singleton en `client.ts` → TODO el admin roto
+- ❌ Ver CHANGELOG.md v1.0.4 para detalles
+
+---
+
+## 🔴 REGLA #0: CLIENTE SUPABASE - NO TOCAR
+
+### ⚠️ **ARCHIVOS SAGRADOS - NO MODIFICAR**
+
+Estos archivos funcionan correctamente. **NO LOS TOQUES**:
+
+- **`src/lib/supabase/client.ts`** ⚠️⚠️⚠️ **NUNCA TOCAR**
+- **`src/lib/supabase/server.ts`** ⚠️⚠️⚠️ **NUNCA TOCAR**
+- **`src/hooks/use-paginated-data.ts`** ⚠️ **NO TOCAR**
+- **`src/hooks/use-admin-data.ts`** ⚠️ **NO TOCAR**
+- **`src/hooks/use-all-data-progressive.ts`** ⚠️ **NO TOCAR**
+
+### ✅ **PATRÓN CORRECTO ACTUAL**
+
+```typescript
+// ✅ client.ts - CORRECTO (NO CAMBIAR)
+export function createClient() {
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  // ✅ Nueva instancia cada vez = sesión actualizada
+}
+
+// ✅ server.ts - CORRECTO (NO CAMBIAR)
+export async function createClient() {
+  const cookieStore = await cookies();
+  return createServerClient<Database>(...);
+}
+```
+
+### ❌ **NUNCA HACER (CAUSA FALLO TOTAL)**
+
+```typescript
+// ❌ NO USAR SINGLETON - Rompe TODA la autenticación
+let browserClient = null;
+export function createClient() {
+  if (!browserClient) {
+    browserClient = createBrowserClient(...);
+  }
+  return browserClient; // ❌ Sesión congelada = admin roto
+}
+```
+
+**Consecuencia**: TODAS las secciones del administrador dejan de funcionar.
+
+### ✅ **CÓMO USAR CORRECTAMENTE**
+
+```typescript
+// ✅ EN HOOKS
+export function usePaginatedData({ table }) {
+  const query = useInfiniteQuery({
+    queryFn: async () => {
+      const supabase = createClient(); // ✅ SIEMPRE crear instancia aquí
+      return await supabase.from(table).select();
+    }
+  });
+}
+
+// ✅ EN HANDLERS DE COMPONENTES
+const handleDelete = async (id: string) => {
+  const supabase = createClient(); // ✅ Crear instancia
+  await supabase.from('table').delete().eq('id', id);
+};
+
+// ✅ EN SERVER COMPONENTS
+export default async function Page() {
+  const supabase = await createClient(); // ✅ Server client
+  const { data } = await supabase.from('table').select();
+}
+```
+
+---
+
 ## ❌ PROHIBIDO ABSOLUTAMENTE
 
 ### 1. **NUNCA CONVERTIR PÁGINAS PÚBLICAS EN CLIENT COMPONENTS**
@@ -155,5 +239,16 @@ Si no estás 100% seguro si una página debe ser Server o Client Component:
 
 ---
 
-**Fecha**: 8 de Enero, 2026  
-**Importancia**: 🔴 **CRÍTICA** - Afecta directamente al negocio
+---
+
+## 📖 DOCUMENTACIÓN RELACIONADA
+
+- **CHANGELOG.md v1.0.4** - Fix crítico del sistema de autenticación
+- **README.md** - Arquitectura completa y reglas de oro
+- **CORRECCION-ERRORES-ADMIN.md** - Tracking de errores y fixes
+
+---
+
+**Fecha creación**: 8 de Enero, 2026  
+**Última actualización**: 20 de Enero, 2026 (v1.0.4)  
+**Importancia**: 🔴 **CRÍTICA** - Afecta directamente al negocio y funcionalidad
