@@ -2,9 +2,10 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
-import { useAdminData } from "@/hooks/use-admin-data";
+import { usePaginatedData } from "@/hooks/use-paginated-data";
+import { useQueryClient } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/utils";
 
 interface Booking {
@@ -47,13 +48,6 @@ const statusConfig: Record<string, { icon: typeof CheckCircle; bg: string; text:
   cancelled: { icon: XCircle, bg: "bg-red-100", text: "text-red-700", label: "Cancelada" },
 };
 
-const paymentStatusConfig: Record<string, { bg: string; text: string; label: string }> = {
-  pending: { bg: "bg-yellow-100", text: "text-yellow-700", label: "Pendiente" },
-  partial: { bg: "bg-orange-100", text: "text-orange-700", label: "Parcial" },
-  paid: { bg: "bg-green-100", text: "text-green-700", label: "Pagado" },
-  refunded: { bg: "bg-gray-100", text: "text-gray-700", label: "Reembolsado" },
-};
-
 function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("es-ES", { 
     day: "2-digit", 
@@ -75,37 +69,37 @@ function formatDateTime(date: string): string {
 type SortField = 'booking_number' | 'customer' | 'internal_code' | 'vehicle' | 'pickup_date' | 'dropoff_date' | 'pickup_location' | 'dropoff_location' | 'total_price' | 'amount_paid' | 'status' | 'payment_status' | 'created_at';
 
 export default function BookingsPage() {
-  // Estados para búsqueda y paginación
+  // Estados para búsqueda y filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
 
   // Estados para ordenamiento - por defecto por fecha de creación descendente
   const [sortField, setSortField] = useState<SortField>('created_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
-  // Usar el hook para cargar datos con retry automático
-  const { data: bookings, loading, error, refetch } = useAdminData<Booking[]>({
-    queryFn: async () => {
-      const result = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          vehicle:vehicles(id, name, slug, internal_code),
-          customer:customers(id, name, email, phone),
-          pickup_location:locations!pickup_location_id(id, name),
-          dropoff_location:locations!dropoff_location_id(id, name)
-        `)
-        .order('created_at', { ascending: false });
-      
-      return {
-        data: (result.data || []) as Booking[],
-        error: result.error
-      };
-    },
-    retryCount: 3,
-    retryDelay: 1000,
+  const queryClient = useQueryClient();
+
+  // Cargar reservas con paginación del lado del servidor
+  const { 
+    data: bookings, 
+    loading, 
+    error,
+    totalCount,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePaginatedData<Booking>({
+    queryKey: ['bookings'],
+    table: 'bookings',
+    select: `
+      *,
+      vehicle:vehicles(id, name, slug, internal_code),
+      customer:customers(id, name, email, phone),
+      pickup_location:locations!pickup_location_id(id, name),
+      dropoff_location:locations!dropoff_location_id(id, name)
+    `,
+    orderBy: { column: 'created_at', ascending: false },
+    pageSize: 20, // Cargar 20 reservas por página
   });
 
   const handleSort = (field: SortField) => {
@@ -137,8 +131,8 @@ export default function BookingsPage() {
 
       if (error) throw error;
       
-      // Recargar datos
-      refetch();
+      // Invalidar caché para refrescar
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
     } catch (err: any) {
       console.error('Error updating status:', err);
       alert('Error al actualizar el estado');
@@ -162,8 +156,8 @@ export default function BookingsPage() {
 
       if (error) throw error;
 
-      // Recargar datos
-      refetch();
+      // Invalidar caché
+      queryClient.invalidateQueries({ queryKey: ['bookings'] });
       alert('Reserva eliminada correctamente');
     } catch (err: any) {
       console.error('Error deleting booking:', err);
@@ -276,23 +270,7 @@ export default function BookingsPage() {
     return filtered;
   }, [sortedBookings, searchTerm, statusFilter]);
 
-  // Paginación
-  const totalItems = filteredBookings.length;
-  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage);
-  
-  const paginatedBookings = useMemo(() => {
-    if (itemsPerPage === -1) return filteredBookings;
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredBookings.slice(start, end);
-  }, [filteredBookings, currentPage, itemsPerPage]);
-
-  // Resetear página al cambiar filtros
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, itemsPerPage]);
-
-  const bookingsList = paginatedBookings;
+  const bookingsList = filteredBookings;
   const allBookings = bookings || [];
   const pendingCount = allBookings.filter(b => b.status === 'pending').length;
   const confirmedCount = allBookings.filter(b => b.status === 'confirmed').length;
@@ -305,10 +283,11 @@ export default function BookingsPage() {
     return bookingDate.getMonth() === currentMonth && bookingDate.getFullYear() === currentYear;
   }).length;
 
-  if (loading) {
+  if (loading && bookingsList.length === 0) {
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-furgocasa-orange mb-4" />
           <p className="text-gray-500">Cargando reservas...</p>
         </div>
       </div>
@@ -380,17 +359,6 @@ export default function BookingsPage() {
             <option value="in_progress">En curso</option>
             <option value="completed">Completada</option>
             <option value="cancelled">Cancelada</option>
-          </select>
-          <select 
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
-          >
-            <option value="10">10 por página</option>
-            <option value="20">20 por página</option>
-            <option value="50">50 por página</option>
-            <option value="100">100 por página</option>
-            <option value="-1">Todos</option>
           </select>
         </div>
       </div>
@@ -508,7 +476,7 @@ export default function BookingsPage() {
             <tbody className="divide-y divide-gray-100">
               {bookingsList.length === 0 ? (
                 <tr>
-                  <td colSpan={12} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={13} className="px-6 py-12 text-center text-gray-500">
                     <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                     <p className="text-lg font-medium">
                       {searchTerm || statusFilter ? 'No se encontraron reservas' : 'No hay reservas registradas'}
@@ -663,30 +631,33 @@ export default function BookingsPage() {
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            Mostrando {bookingsList.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} reservas
-            {searchTerm || statusFilter ? ' (filtradas)' : ''}
-          </p>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
-              disabled={currentPage === 1 || itemsPerPage === -1}
+        
+        {/* Botón Cargar Más */}
+        {hasNextPage && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center">
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="btn-secondary flex items-center gap-2"
             >
-              Anterior
-            </button>
-            <span className="px-3 py-1 text-sm text-gray-600">
-              Página {currentPage} de {totalPages}
-            </span>
-            <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
-              disabled={currentPage === totalPages || itemsPerPage === -1}
-            >
-              Siguiente
+              {isFetchingNextPage ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                <>Cargar más reservas</>
+              )}
             </button>
           </div>
+        )}
+        
+        {/* Info de paginación */}
+        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Mostrando {bookingsList.length} de {totalCount} reservas
+            {searchTerm || statusFilter ? ' (filtradas)' : ''}
+          </p>
         </div>
       </div>
     </div>

@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Phone, MapPin, Calendar, Mail } from "lucide-react";
+import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
-import { useAdminData } from "@/hooks/use-admin-data";
+import { usePaginatedData } from "@/hooks/use-paginated-data";
 import ClientActions from "./client-actions";
 
 interface Customer {
@@ -31,31 +31,28 @@ function formatDate(date: string | null): string {
 export default function ClientesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  // Usar el hook para cargar datos con retry automático
-  const { data: customers, loading, error } = useAdminData<Customer[]>({
-    queryFn: async () => {
-      const result = await supabase
-        .from('customers')
-        .select(`
-          *,
-          bookings:bookings(count)
-        `)
-        .order('created_at', { ascending: false });
-      
-      return {
-        data: (result.data || []) as Customer[],
-        error: result.error
-      };
-    },
-    retryCount: 3,
-    retryDelay: 1000,
-    initialDelay: 200,
+  // Cargar clientes con paginación del lado del servidor
+  const { 
+    data: customers, 
+    loading, 
+    error,
+    totalCount,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePaginatedData<Customer>({
+    queryKey: ['customers'],
+    table: 'customers',
+    select: `
+      *,
+      bookings:bookings(count)
+    `,
+    orderBy: { column: 'created_at', ascending: false },
+    pageSize: 20, // Cargar 20 clientes por página
   });
 
-  // Filtrar y buscar clientes
+  // Filtrar clientes en el lado del cliente (solo sobre los datos ya cargados)
   const filteredCustomers = useMemo(() => {
     if (!customers) return [];
     
@@ -94,24 +91,8 @@ export default function ClientesPage() {
     return filtered;
   }, [customers, searchTerm, filterStatus]);
 
-  // Paginación
-  const totalItems = filteredCustomers.length;
-  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage);
-  
-  const paginatedCustomers = useMemo(() => {
-    if (itemsPerPage === -1) return filteredCustomers;
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredCustomers.slice(start, end);
-  }, [filteredCustomers, currentPage, itemsPerPage]);
-
-  // Resetear página al cambiar filtros
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchTerm, filterStatus, itemsPerPage]);
-
   const customersList = customers || [];
-  const totalCustomers = customersList.length;
+  const totalCustomers = totalCount;
   const activeCustomers = customersList.filter(c => {
     if (!c.created_at) return false;
     const lastBooking = new Date(c.created_at);
@@ -120,10 +101,11 @@ export default function ClientesPage() {
     return lastBooking > sixMonthsAgo;
   }).length;
 
-  if (loading) {
+  if (loading && customersList.length === 0) {
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-furgocasa-orange mb-4" />
           <p className="text-gray-500">Cargando clientes...</p>
         </div>
       </div>
@@ -204,17 +186,6 @@ export default function ClientesPage() {
             <option value="active">Activos</option>
             <option value="inactive">Inactivos</option>
           </select>
-          <select 
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
-          >
-            <option value="10">10 por página</option>
-            <option value="20">20 por página</option>
-            <option value="50">50 por página</option>
-            <option value="100">100 por página</option>
-            <option value="-1">Todos</option>
-          </select>
         </div>
       </div>
 
@@ -233,7 +204,7 @@ export default function ClientesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {paginatedCustomers.length === 0 ? (
+              {filteredCustomers.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center">
@@ -248,7 +219,7 @@ export default function ClientesPage() {
                   </td>
                 </tr>
               ) : (
-                paginatedCustomers.map((customer) => (
+                filteredCustomers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -307,30 +278,33 @@ export default function ClientesPage() {
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            Mostrando {paginatedCustomers.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} clientes
-            {searchTerm || filterStatus ? ' (filtrados)' : ''}
-          </p>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
-              disabled={currentPage === 1 || itemsPerPage === -1}
+        
+        {/* Botón Cargar Más */}
+        {hasNextPage && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center">
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="btn-secondary flex items-center gap-2"
             >
-              Anterior
-            </button>
-            <span className="px-3 py-1 text-sm text-gray-600">
-              Página {currentPage} de {totalPages}
-            </span>
-            <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
-              disabled={currentPage === totalPages || itemsPerPage === -1}
-            >
-              Siguiente
+              {isFetchingNextPage ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                <>Cargar más clientes</>
+              )}
             </button>
           </div>
+        )}
+        
+        {/* Info de paginación */}
+        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Mostrando {filteredCustomers.length} de {totalCount} clientes
+            {searchTerm || filterStatus ? ' (filtrados)' : ''}
+          </p>
         </div>
       </div>
     </div>

@@ -2,9 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Search, Download, Eye, CreditCard, CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
-import { useAdminData } from "@/hooks/use-admin-data";
+import { Search, Download, Eye, CreditCard, CheckCircle, Clock, XCircle, AlertCircle, Loader2 } from "lucide-react";
+import { usePaginatedData } from "@/hooks/use-paginated-data";
 
 interface Payment {
   id: string;
@@ -53,32 +52,29 @@ export default function PagosPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [methodFilter, setMethodFilter] = useState("");
-  const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
 
-  // Usar el hook para cargar datos con retry automático
-  const { data: payments, loading, error } = useAdminData<Payment[]>({
-    queryFn: async () => {
-      const result = await supabase
-        .from('payments')
-        .select(`
-          *,
-          booking:bookings(
-            id,
-            booking_number,
-            customer:customers(name, email)
-          )
-        `)
-        .order('created_at', { ascending: false });
-      
-      return {
-        data: (result.data || []) as Payment[],
-        error: result.error
-      };
-    },
-    retryCount: 3,
-    retryDelay: 1000,
-    initialDelay: 200,
+  // Cargar pagos con paginación del lado del servidor
+  const { 
+    data: payments, 
+    loading, 
+    error,
+    totalCount,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePaginatedData<Payment>({
+    queryKey: ['payments'],
+    table: 'payments',
+    select: `
+      *,
+      booking:bookings(
+        id,
+        booking_number,
+        customer:customers(name, email)
+      )
+    `,
+    orderBy: { column: 'created_at', ascending: false },
+    pageSize: 20, // Cargar 20 pagos por página
   });
 
   // Filtrar pagos con búsqueda en tiempo real
@@ -112,23 +108,7 @@ export default function PagosPage() {
     return filtered;
   }, [payments, searchTerm, statusFilter, methodFilter]);
 
-  // Paginación
-  const totalItems = filteredPayments.length;
-  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalItems / itemsPerPage);
-  
-  const paginatedPayments = useMemo(() => {
-    if (itemsPerPage === -1) return filteredPayments;
-    const start = (currentPage - 1) * itemsPerPage;
-    const end = start + itemsPerPage;
-    return filteredPayments.slice(start, end);
-  }, [filteredPayments, currentPage, itemsPerPage]);
-
-  // Resetear página al cambiar filtros
-  useMemo(() => {
-    setCurrentPage(1);
-  }, [searchTerm, statusFilter, methodFilter, itemsPerPage]);
-
-  const paymentsList = paginatedPayments;
+  const paymentsList = filteredPayments;
   const allPayments = payments || [];
   
   const totalAmount = allPayments
@@ -143,10 +123,11 @@ export default function PagosPage() {
   const pendingCount = allPayments.filter(p => p.status === 'pending').length;
   const failedCount = allPayments.filter(p => p.status === 'failed').length;
 
-  if (loading) {
+  if (loading && paymentsList.length === 0) {
     return (
       <div className="space-y-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-furgocasa-orange mb-4" />
           <p className="text-gray-500">Cargando pagos...</p>
         </div>
       </div>
@@ -232,17 +213,6 @@ export default function PagosPage() {
             <option value="transfer">Transferencia</option>
             <option value="cash">Efectivo</option>
             <option value="paypal">PayPal</option>
-          </select>
-          <select 
-            value={itemsPerPage}
-            onChange={(e) => setItemsPerPage(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
-          >
-            <option value="10">10 por página</option>
-            <option value="20">20 por página</option>
-            <option value="50">50 por página</option>
-            <option value="100">100 por página</option>
-            <option value="-1">Todos</option>
           </select>
         </div>
       </div>
@@ -340,34 +310,36 @@ export default function PagosPage() {
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-sm text-gray-600">
-            Mostrando {paymentsList.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} pagos
-            {searchTerm || statusFilter || methodFilter ? ' (filtrados)' : ''}
-          </p>
-          <div className="flex gap-2">
-            <button 
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
-              disabled={currentPage === 1 || itemsPerPage === -1}
+        
+        {/* Botón Cargar Más */}
+        {hasNextPage && (
+          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center">
+            <button
+              onClick={() => fetchNextPage()}
+              disabled={isFetchingNextPage}
+              className="btn-secondary flex items-center gap-2"
             >
-              Anterior
-            </button>
-            <span className="px-3 py-1 text-sm text-gray-600">
-              Página {currentPage} de {totalPages}
-            </span>
-            <button 
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              className="px-3 py-1 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed" 
-              disabled={currentPage === totalPages || itemsPerPage === -1}
-            >
-              Siguiente
+              {isFetchingNextPage ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Cargando...
+                </>
+              ) : (
+                <>Cargar más pagos</>
+              )}
             </button>
           </div>
+        )}
+        
+        {/* Info de paginación */}
+        <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+          <p className="text-sm text-gray-600">
+            Mostrando {paymentsList.length} de {totalCount} pagos
+            {searchTerm || statusFilter || methodFilter ? ' (filtrados)' : ''}
+          </p>
         </div>
       </div>
     </div>
   );
 }
-
 
