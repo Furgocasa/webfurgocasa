@@ -4,6 +4,113 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🏗️ [1.0.6] - 20 de Enero 2026 - **Refactorización Arquitectura Layout**
+
+### ✅ **CAMBIO ARQUITECTÓNICO MAYOR**
+
+**Migración de Header/Footer a layout.tsx global con header sticky**
+
+---
+
+### 🎯 **PROBLEMA ORIGINAL**
+- Header/Footer duplicados en 40+ páginas individuales
+- Header `position: fixed` requería padding compensatorio en cada página
+- Espaciado inconsistente en móvil
+- Barras sticky internas causaban problemas visuales
+
+---
+
+### 🔧 **CAMBIOS IMPLEMENTADOS**
+
+#### 1. Header de Fixed a Sticky (`72160d6`)
+**Archivo**: `src/components/layout/header.tsx`
+
+```tsx
+// Antes
+<header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-[1000] w-full">
+
+// Ahora  
+<header className="bg-white shadow-sm sticky top-0 z-[1000] w-full">
+```
+
+**Beneficios**:
+- El contenido fluye naturalmente después del header
+- No requiere padding compensatorio en las páginas
+- Mejor comportamiento en scroll
+
+#### 2. Header/Footer Global en layout.tsx (`72160d6`)
+**Archivo**: `src/app/layout.tsx`
+
+```tsx
+<Header />
+{children}
+<Footer />
+```
+
+**Beneficios**:
+- Principio DRY: definidos una sola vez
+- Imposible olvidar Header/Footer en páginas nuevas
+- Mantenimiento simplificado
+
+#### 3. Eliminación de Imports Duplicados (40 páginas)
+- Removido `import { Header }` de todas las páginas públicas
+- Removido `import { Footer }` de todas las páginas públicas
+- Eliminado padding-top compensatorio (`pt-24`, `pt-28`, `pt-32`)
+
+#### 4. Eliminación de PublicLayout Padding (`868e5d1`)
+**Archivo**: `src/components/layout/public-layout.tsx`
+
+```tsx
+// Antes
+<div className="pt-[120px]">{children}</div>
+
+// Ahora
+<>{children}</>
+```
+
+#### 5. UX Mejorada en Páginas de Reserva (`0afc84c`, `31718fc`)
+**Archivos**: `src/app/reservar/vehiculo/page.tsx`, `src/app/reservar/nueva/page.tsx`
+
+- ❌ Eliminadas barras sticky superiores feas
+- ✅ Añadido link "Volver" elegante con animación
+- ✅ Barra flotante fija inferior en móvil:
+  - Precio total siempre visible
+  - Se actualiza en tiempo real al añadir extras
+  - Botón CTA prominente
+
+---
+
+### 📱 **MEJORAS RESPONSIVE**
+
+| Dispositivo | Solución |
+|-------------|----------|
+| **Desktop (lg+)** | Sidebar sticky a la derecha |
+| **Móvil/Tablet** | Barra flotante fija inferior |
+
+---
+
+### 📁 **ARCHIVOS MODIFICADOS**
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/components/layout/header.tsx` | `fixed` → `sticky` |
+| `src/app/layout.tsx` | Añadido Header/Footer global |
+| `src/components/layout/public-layout.tsx` | Eliminado `pt-[120px]` |
+| 40 páginas en `src/app/` | Removido Header/Footer/padding |
+| `src/app/reservar/vehiculo/page.tsx` | Nueva UX con barra flotante |
+| `src/app/reservar/nueva/page.tsx` | Nueva UX con barra flotante |
+
+---
+
+### ✅ **RESULTADO FINAL**
+
+- Todas las páginas se ven correctamente en móvil y desktop
+- Arquitectura profesional estilo Next.js 13+
+- Código más limpio y mantenible
+- UX mejorada en proceso de reserva
+
+---
+
 ## 🎨 [1.0.5] - 20 de Enero 2026 - **Unificación Visualización Vehículos Home**
 
 ### ✅ **PROBLEMA RESUELTO: Vehículos no visibles en Home**

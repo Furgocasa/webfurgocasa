@@ -3,7 +3,7 @@
 ## ⚠️ ADVERTENCIA: SI ALGO FUNCIONA, NO LO TOQUES
 
 **Fecha última actualización**: 20 de Enero 2026  
-**Versión**: 1.0.4
+**Versión**: 1.0.6
 
 Este documento contiene reglas ABSOLUTAS que NO PUEDEN VIOLARSE bajo ninguna circunstancia.
 
@@ -155,6 +155,34 @@ export function MiComponente() {
 
 ## 🏗️ ARQUITECTURA OBLIGATORIA
 
+### ⚠️ HEADER Y FOOTER GLOBAL (v1.0.6+)
+
+**IMPORTANTE**: A partir de v1.0.6, Header y Footer están en `layout.tsx` global.
+
+```typescript
+// src/app/layout.tsx
+<Header />   // ← GLOBAL - sticky
+{children}   // ← Contenido de las páginas
+<Footer />   // ← GLOBAL
+```
+
+**NO añadir Header/Footer en páginas individuales** - ya están incluidos automáticamente.
+
+### Header Sticky (NO Fixed)
+
+```typescript
+// ✅ CORRECTO - Header sticky (v1.0.6+)
+<header className="sticky top-0 z-[1000]">
+
+// ❌ INCORRECTO - Header fixed (legacy)
+<header className="fixed top-0">
+```
+
+**Beneficios de sticky**:
+- El contenido fluye naturalmente después del header
+- NO requiere padding compensatorio en las páginas
+- Mejor comportamiento en scroll
+
 ### Patrón correcto para páginas públicas:
 
 ```
@@ -163,6 +191,7 @@ Server Component (page.tsx)
 ├── Carga de datos en servidor ✅
 ├── HTML estático con contenido SEO ✅
 ├── Traducciones con translateServer() ✅
+├── NO incluir Header/Footer (están en layout) ✅
 └── Client Components solo para interactividad
     ├── Filtros
     ├── Formularios
@@ -173,7 +202,7 @@ Server Component (page.tsx)
 ### Ejemplo completo:
 
 ```typescript
-// ✅ CORRECTO - src/app/vehiculos/page.tsx
+// ✅ CORRECTO - src/app/vehiculos/page.tsx (v1.0.6+)
 import { translateServer } from "@/lib/i18n/server-translation";
 import { VehicleListClient } from "@/components/vehicle/vehicle-list-client";
 
@@ -184,17 +213,16 @@ export default async function VehiculosPage() {
   const vehicles = await loadVehicles(); // Carga en servidor
   
   return (
-    <>
-      <Header />
-      <main>
-        {/* Contenido SEO estático */}
+    // ✅ NO incluir Header/Footer - ya están en layout.tsx
+    <main className="min-h-screen bg-gray-50">
+      {/* Hero section - puede empezar directamente */}
+      <section className="bg-gradient-to-br from-furgocasa-blue ...">
         <h1>{t("Nuestra Flota")}</h1>
-        
-        {/* Componente interactivo */}
-        <VehicleListClient vehicles={vehicles} />
-      </main>
-      <Footer />
-    </>
+      </section>
+      
+      {/* Componente interactivo */}
+      <VehicleListClient vehicles={vehicles} />
+    </main>
   );
 }
 ```

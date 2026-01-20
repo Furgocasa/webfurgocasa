@@ -1,10 +1,10 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.5-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.6-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0.5 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 1.0.6 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
 > **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
 
@@ -12,25 +12,44 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## 🎨 ÚLTIMA ACTUALIZACIÓN: Unificación Visualización Vehículos (v1.0.5)
+## 🏗️ ÚLTIMA ACTUALIZACIÓN: Refactorización Layout Global (v1.0.6)
 
-**20 Enero 2026** - Problema resuelto y en producción
+**20 Enero 2026** - Arquitectura mejorada en producción
 
-### ✅ Problema Resuelto
+### ✅ Cambios Arquitectónicos
 
-- **Imágenes de vehículos** ahora visibles en página Home
+- **Header/Footer global** en `layout.tsx` (ya no en cada página)
+- **Header sticky** en lugar de fixed (mejor UX)
+- **40+ páginas limpiadas** - eliminados imports duplicados
+- **UX mejorada** en páginas de reserva con barra flotante móvil
+
+### 🎯 Beneficios
+
+| Antes | Ahora |
+|-------|-------|
+| Header/Footer en cada página | Header/Footer en layout.tsx |
+| `position: fixed` + padding compensatorio | `position: sticky` natural |
+| Barras sticky feas en reserva | Barra flotante elegante en móvil |
+| 40+ imports duplicados | 0 imports duplicados |
+
+### 📱 Nueva UX Móvil (Reservas)
+
+- Barra flotante fija en la parte inferior
+- Precio total siempre visible
+- Se actualiza en tiempo real al añadir extras
+- Botón CTA prominente
+
+**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.6
+
+---
+
+## 🎨 Versión 1.0.5: Unificación Visualización Vehículos
+
+**20 Enero 2026**
+
+- **Imágenes de vehículos** visibles en página Home
 - **Diseño consistente** entre Home y páginas de localización
-- **Mismos vehículos** mostrados en toda la web
-- **Mejor SEO** con título optimizado "LAS MEJORES CAMPER VANS EN ALQUILER"
-
-### 🔧 Solución Técnica
-
-1. **Eliminado** `VehicleImageSlider` component (no funcionaba)
-2. **Implementado** renderizado directo con `<img>` tag
-3. **Unificada** función `getFeaturedVehicles()` con mismo orden que localizaciones
-4. **Copiada** estructura HTML completa de páginas que funcionaban
-
-**Documentación completa**: [SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)
+- **Mejor SEO** con título optimizado
 
 **Commits**: `8abeff6`, `024abf9`, `805ada1`
 
