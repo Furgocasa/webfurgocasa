@@ -6,6 +6,7 @@ import { Providers } from "@/components/providers";
 import { CookieProvider, CookieBanner, CookieSettingsModal } from "@/components/cookies";
 import WhatsAppChatbot from "@/components/whatsapp-chatbot";
 import BackToTop from "@/components/back-to-top";
+import { AdminFABButton } from "@/components/admin-fab-button";
 import Script from "next/script";
 
 // Rubik - Para títulos y headings
@@ -183,6 +184,7 @@ export default function RootLayout({
             <CookieSettingsModal />
             <BackToTop />
             <WhatsAppChatbot />
+            <AdminFABButton />
             <Toaster position="top-right" richColors />
           </CookieProvider>
         </Providers>

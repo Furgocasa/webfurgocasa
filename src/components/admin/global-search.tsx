@@ -171,7 +171,6 @@ export function GlobalSearch() {
     <div ref={searchRef} className="relative flex-1 max-w-2xl">
       {/* Search Input */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
         <input
           ref={inputRef}
           type="text"
@@ -179,8 +178,11 @@ export function GlobalSearch() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => results && setShowResults(true)}
           placeholder="Buscar en todo (Ctrl+K)"
-          className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent transition-all"
+          className="w-full pl-4 pr-10 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent transition-all"
         />
+        {!loading && !query && (
+          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+        )}
         {loading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 animate-spin" />
         )}
