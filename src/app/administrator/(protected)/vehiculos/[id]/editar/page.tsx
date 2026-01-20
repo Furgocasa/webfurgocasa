@@ -265,7 +265,10 @@ export default function EditarVehiculoPage() {
 
       const { error } = await supabase
         .from('vehicles')
-        .update(formData)
+        .update({
+          ...formData,
+          internal_code: internalCode
+        })
         .eq('id', vehicleId);
 
       if (error) throw error;
@@ -510,6 +513,20 @@ export default function EditarVehiculoPage() {
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
                 placeholder="0000-XXX"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Código Interno
+              </label>
+              <input
+                type="text"
+                value={internalCode}
+                onChange={(e) => setInternalCode(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                placeholder="FU0000"
+              />
+              <p className="text-xs text-gray-500 mt-1">Código de identificación interna del vehículo</p>
             </div>
 
             <div className="md:col-span-2">

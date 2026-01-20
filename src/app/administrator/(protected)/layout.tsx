@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { AdminLayoutClient } from "@/components/admin/admin-layout-client";
 import { AdminAuthProvider } from "@/contexts/admin-auth-context";
+import { QueryProvider } from "@/providers/query-provider";
 
 // ✅ OPTIMIZACIÓN: Usar 'auto' en lugar de 'force-dynamic' permite mejor caching
 export const dynamic = "auto";
@@ -48,8 +49,10 @@ export default async function AdministratorLayout({
 
   // ✅ El contexto manejará la autenticación en el cliente (sin llamadas en cada navegación)
   return (
-    <AdminAuthProvider initialAdmin={initialAdmin}>
-      <AdminLayoutClient admin={initialAdmin}>{children}</AdminLayoutClient>
-    </AdminAuthProvider>
+    <QueryProvider>
+      <AdminAuthProvider initialAdmin={initialAdmin}>
+        <AdminLayoutClient admin={initialAdmin}>{children}</AdminLayoutClient>
+      </AdminAuthProvider>
+    </QueryProvider>
   );
 }
