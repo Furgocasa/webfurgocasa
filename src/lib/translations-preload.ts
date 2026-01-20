@@ -1850,6 +1850,28 @@ export const staticTranslations = {
     en: "Follow us on social media and don't miss any article"
   },
   "Síguenos en Facebook": { es: "Síguenos en Facebook", en: "Follow us on Facebook" },
+  
+  // ===== PRECIOS Y REGLAS DE PRICING =====
+  "Precio especial 2 días": {
+    es: "Precio especial 2 días",
+    en: "Special 2-day pricing"
+  },
+  "Alquileres de 2 días se cobran como 3 días (mismo precio)": {
+    es: "Alquileres de 2 días se cobran como 3 días (mismo precio)",
+    en: "2-day rentals are charged as 3 days (same price)"
+  },
+  "Alquileres de 2 días se cobran como 3 días": {
+    es: "Alquileres de 2 días se cobran como 3 días",
+    en: "2-day rentals are charged as 3 days"
+  },
+  "Descuento aplicado": {
+    es: "Descuento aplicado",
+    en: "Discount applied"
+  },
+  "Descuentos por duración": {
+    es: "Descuentos por duración",
+    en: "Duration discounts"
+  },
 };
 
 /**

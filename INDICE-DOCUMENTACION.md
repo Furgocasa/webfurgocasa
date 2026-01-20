@@ -85,6 +85,8 @@ El proyecto está desplegado y funcionando perfectamente en producción. Ver **[
 |-----------|-------------|
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo completo paso a paso |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ **NUEVO** - Reglas gestión de clientes |
+| **[REGLA-CALCULO-DIAS-ALQUILER.md](./REGLA-CALCULO-DIAS-ALQUILER.md)** | ⚠️ **CRÍTICO** - Cálculo de días con períodos de 24h |
+| **[RESUMEN-IMPLEMENTACION-DIAS.md](./RESUMEN-IMPLEMENTACION-DIAS.md)** | Resumen técnico de la implementación del cálculo de días |
 
 ### 💳 Pagos y Notificaciones
 
@@ -158,8 +160,9 @@ Ver carpeta `scripts/`:
 ### Voy a trabajar con reservas o clientes
 1. Lee **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** ⚠️ **OBLIGATORIO**
 2. Lee **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** ⚠️ **NUEVO**
-3. Verifica que existen todas las páginas listadas
-4. NO modifiques el flujo sin documentar
+3. Lee **[REGLA-CALCULO-DIAS-ALQUILER.md](./REGLA-CALCULO-DIAS-ALQUILER.md)** ⚠️ **CRÍTICO**
+4. Verifica que existen todas las páginas listadas
+5. NO modifiques el flujo sin documentar
 
 ### Voy a modificar una página pública
 1. Lee **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** ⚠️
@@ -201,6 +204,8 @@ Ver carpeta `scripts/`:
 ├── 🚨 PAGINAS-VEHICULOS-GARANTIA.md       ← ⚠️ Garantía páginas vehículos
 ├── 🚨 GESTION-CLIENTES-OBLIGATORIO.md     ← ⚠️ NUEVO - Gestión de clientes
 ├── 🚨 FLUJO-RESERVAS-CRITICO.md           ← CORE DEL NEGOCIO
+├── 🚨 REGLA-CALCULO-DIAS-ALQUILER.md      ← ⚠️ CRÍTICO - Cálculo días 24h
+├── 📖 RESUMEN-IMPLEMENTACION-DIAS.md      ← Resumen técnico días
 ├── 🚨 REGLAS-ARQUITECTURA-NEXTJS.md       ← CRÍTICO
 ├── 🚨 GUIA-TRADUCCION.md                  ← CRÍTICO
 ├── 🚨 CHECKLIST-PRE-COMMIT.md             ← Usar antes de commit
@@ -241,6 +246,7 @@ Ver carpeta `scripts/`:
 
 - **Reservas**: `FLUJO-RESERVAS-CRITICO.md` ⚠️ **CORE DEL NEGOCIO**
 - **Clientes**: `GESTION-CLIENTES-OBLIGATORIO.md` ⚠️ **NUEVO**
+- **Cálculo de días**: `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO**
 - **Arquitectura y reglas**: `REGLAS-ARQUITECTURA-NEXTJS.md`
 - **Traducciones**: `GUIA-TRADUCCION.md`, `TRADUCCIONES.md`
 - **SEO**: `AUDITORIA-SEO-CRITICA.md`, `NORMAS-SEO-OBLIGATORIAS.md`
@@ -274,6 +280,8 @@ Ver carpeta `scripts/`:
 | ¿Cómo migro datos desde MySQL/VikRentCar? | `OLD_FURGOCASA_DATOS/README-MIGRACION.md` ⚠️ **NUEVO** |
 | ¿Por qué hay reservas sin cliente vinculado? | `OLD_FURGOCASA_DATOS/PROBLEMA-VINCULACION-CLIENTES.md` ⚠️ **NUEVO** |
 | ¿Cómo vincular reservas a clientes? | `OLD_FURGOCASA_DATOS/GUIA-SCRIPTS-VINCULACION.md` ⚠️ **NUEVO** |
+| ¿Cómo se calculan los días de alquiler? | `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO** |
+| ¿Por qué cobran día completo si excedo 1 minuto? | `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO** |
 
 ---
 
@@ -321,4 +329,4 @@ Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
 
 ---
 
-**Total de documentos activos**: 26 archivos .md en raíz + subdirectorios (incluyendo nuevos de pagos)
+**Total de documentos activos**: 28 archivos .md en raíz + subdirectorios (incluyendo nuevos de pagos y días)

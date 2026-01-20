@@ -7,6 +7,7 @@ import {
   ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Mail, Phone, Package
 } from "lucide-react";
 import Link from "next/link";
+import { calculateRentalDays } from "@/lib/utils";
 
 interface Location {
   id: string;
@@ -137,16 +138,19 @@ export default function EditarReservaPage() {
   }, [bookingId]);
 
   useEffect(() => {
-    // Calcular días cuando cambian las fechas
-    if (formData.pickup_date && formData.dropoff_date) {
-      const pickup = new Date(formData.pickup_date);
-      const dropoff = new Date(formData.dropoff_date);
-      const days = Math.ceil((dropoff.getTime() - pickup.getTime()) / (1000 * 60 * 60 * 24));
+    // Calcular días cuando cambian las fechas o las horas
+    if (formData.pickup_date && formData.dropoff_date && formData.pickup_time && formData.dropoff_time) {
+      const days = calculateRentalDays(
+        formData.pickup_date,
+        formData.pickup_time,
+        formData.dropoff_date,
+        formData.dropoff_time
+      );
       if (days > 0) {
         setFormData(prev => ({ ...prev, days }));
       }
     }
-  }, [formData.pickup_date, formData.dropoff_date]);
+  }, [formData.pickup_date, formData.dropoff_date, formData.pickup_time, formData.dropoff_time]);
 
   useEffect(() => {
     // Recalcular precio total

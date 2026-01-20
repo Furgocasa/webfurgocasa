@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { calculateRentalDays, calculatePricingDays } from "@/lib/utils";
 
 /**
  * GET /api/availability
@@ -9,6 +10,8 @@ import { createClient } from "@/lib/supabase/server";
  * Query params:
  * - pickup_date: Fecha de recogida (YYYY-MM-DD)
  * - dropoff_date: Fecha de devolución (YYYY-MM-DD)
+ * - pickup_time: Hora de recogida (HH:MM) - default: 10:00
+ * - dropoff_time: Hora de devolución (HH:MM) - default: 10:00
  * - pickup_location: ID de ubicación de recogida
  * - dropoff_location: ID de ubicación de devolución (opcional)
  * - category: Slug de categoría (opcional)
@@ -19,6 +22,8 @@ export async function GET(request: NextRequest) {
     
     const pickupDate = searchParams.get("pickup_date");
     const dropoffDate = searchParams.get("dropoff_date");
+    const pickupTime = searchParams.get("pickup_time") || "10:00";
+    const dropoffTime = searchParams.get("dropoff_time") || "10:00";
     const pickupLocation = searchParams.get("pickup_location");
     const dropoffLocation = searchParams.get("dropoff_location") || pickupLocation;
     const category = searchParams.get("category");
@@ -99,10 +104,12 @@ export async function GET(request: NextRequest) {
     );
 
     // 5. Calcular precios para cada vehículo
-    const days = Math.ceil(
-      (new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) /
-        (1000 * 60 * 60 * 24)
-    );
+    // IMPORTANTE: Usar calculateRentalDays que considera las horas (períodos completos de 24h)
+    const days = calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime);
+    
+    // Regla de negocio: 2 días se cobran como 3
+    const pricingDays = calculatePricingDays(days);
+    const hasTwoDayPricing = days === 2;
 
     // Obtener temporada aplicable
     const { data: season } = await supabase
@@ -119,15 +126,17 @@ export async function GET(request: NextRequest) {
      * - 7-13 días: 85€/día
      * - 14-20 días: 75€/día
      * - 21+ días: 65€/día
+     * 
+     * IMPORTANTE: Usa pricingDays (no days) porque 2 días se cobran como 3
      */
-    const getBasePriceByDuration = (days: number): number => {
-      if (days >= 21) return 65;
-      if (days >= 14) return 75;
-      if (days >= 7) return 85;
+    const getBasePriceByDuration = (pricingDays: number): number => {
+      if (pricingDays >= 21) return 65;
+      if (pricingDays >= 14) return 75;
+      if (pricingDays >= 7) return 85;
       return 95;
     };
 
-    const basePricePerDay = getBasePriceByDuration(days);
+    const basePricePerDay = getBasePriceByDuration(pricingDays);
 
     // Usar los precios de temporada directamente si están disponibles
     // Si no hay temporada o no hay precios, usar 0 como adición
@@ -137,7 +146,8 @@ export async function GET(request: NextRequest) {
 
     // Calcular precios
     const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
-      const totalPrice = finalPricePerDay * days;
+      // Usar pricingDays para el cálculo (2 días = 3 días de precio)
+      const totalPrice = finalPricePerDay * pricingDays;
 
       // Calcular cuánto se está ahorrando respecto al precio sin descuento por duración
       const fullPricePerDay = 95 + seasonalAddition; // Precio base sin descuento por duración
@@ -147,11 +157,13 @@ export async function GET(request: NextRequest) {
       return {
         ...vehicle,
         pricing: {
-          days,
+          days, // Días reales del alquiler
+          pricingDays, // Días usados para calcular el precio
+          hasTwoDayPricing, // Flag para mostrar aviso
           pricePerDay: Math.round(finalPricePerDay * 100) / 100,
           originalPricePerDay: Math.round(fullPricePerDay * 100) / 100,
           totalPrice: Math.round(totalPrice * 100) / 100,
-          originalTotalPrice: Math.round(fullPricePerDay * days * 100) / 100,
+          originalTotalPrice: Math.round(fullPricePerDay * pricingDays * 100) / 100,
           season: season?.name || "Temporada Baja",
           seasonalAddition: seasonalAddition,
           durationDiscount: discountPercentage,
@@ -178,9 +190,13 @@ export async function GET(request: NextRequest) {
       searchParams: {
         pickupDate,
         dropoffDate,
+        pickupTime,
+        dropoffTime,
         pickupLocation,
         dropoffLocation,
         days,
+        pricingDays,
+        hasTwoDayPricing,
       },
       season: season
         ? {

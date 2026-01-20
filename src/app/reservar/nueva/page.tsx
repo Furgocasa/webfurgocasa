@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, calculateRentalDays, calculatePricingDays } from "@/lib/utils";
 
 interface VehicleData {
   id: string;
@@ -87,17 +87,21 @@ function NuevaReservaContent() {
   const [customerDriverLicenseExpiry, setCustomerDriverLicenseExpiry] = useState("");
   const [notes, setNotes] = useState("");
 
-  // Calculate days and price
-  const days = pickupDate && dropoffDate
-    ? Math.ceil((new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) / (1000 * 60 * 60 * 24))
+  // Calculate days and price - IMPORTANTE: usar calculateRentalDays con horas
+  const days = pickupDate && dropoffDate && pickupTime && dropoffTime
+    ? calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime)
     : 0;
   
-  const basePrice = vehicle ? vehicle.base_price_per_day * days : 0;
+  // Regla de negocio: 2 días se cobran como 3
+  const pricingDays = calculatePricingDays(days);
+  const hasTwoDayPricing = days === 2;
+  
+  const basePrice = vehicle ? vehicle.base_price_per_day * pricingDays : 0;
   
   const extrasPrice = selectedExtras.reduce((sum, extra) => {
     const price = extra.price_per_rental > 0 
       ? extra.price_per_rental 
-      : extra.price_per_day * days;
+      : extra.price_per_day * pricingDays;
     return sum + (price * extra.quantity);
   }, 0);
   

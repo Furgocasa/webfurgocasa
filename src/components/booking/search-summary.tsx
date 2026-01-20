@@ -5,6 +5,8 @@ import { es } from "date-fns/locale";
 import { Calendar, MapPin, Clock, Edit2 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/language-context";
+import { calculateRentalDays } from "@/lib/utils";
+
 interface SearchSummaryProps {
   pickupDate: string;
   dropoffDate: string;
@@ -28,10 +30,8 @@ export function SearchSummary({
     return format(date, "EEE, d 'de' MMM", { locale: es });
   };
 
-  const days = Math.ceil(
-    (new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
+  // IMPORTANTE: Usar calculateRentalDays que considera las horas
+  const days = calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime);
 
   return (
     <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">

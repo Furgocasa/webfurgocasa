@@ -20,6 +20,8 @@ interface VehicleCardProps {
   vehicle: VehicleWithImages;
   pricing: {
     days: number;
+    pricingDays?: number;
+    hasTwoDayPricing?: boolean;
     pricePerDay: number;
     totalPrice: number;
     season: string;
@@ -132,6 +134,21 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
 
         {/* Pricing */}
         <div className="border-t pt-4">
+          {/* Aviso importante: 2 días se cobran como 3 */}
+          {pricing.hasTwoDayPricing && (
+            <div className="mb-2 flex items-center gap-2 bg-amber-50 border border-amber-300 px-3 py-2 rounded-lg">
+              <Info className="h-4 w-4 text-amber-600 flex-shrink-0" />
+              <div>
+                <p className="text-xs font-bold text-amber-900">
+                  {t("Precio especial 2 días")}
+                </p>
+                <p className="text-xs text-amber-700">
+                  {t("Alquileres de 2 días se cobran como 3 días (mismo precio)")}
+                </p>
+              </div>
+            </div>
+          )}
+          
           {/* Mostrar descuento aplicado si existe */}
           {pricing.hasDurationDiscount && (
             <div className="mb-2 flex items-center gap-2 bg-green-50 border border-green-200 px-3 py-1.5 rounded-lg">
@@ -150,7 +167,15 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
                 </p>
               )}
               <p className="text-sm text-gray-500">
-                {pricing.days} {t("días")} × {formatPrice(pricing.pricePerDay)}{t("/día")}
+                {pricing.hasTwoDayPricing ? (
+                  <>
+                    {pricing.days} {t("días")} (cobra {pricing.pricingDays}) × {formatPrice(pricing.pricePerDay)}{t("/día")}
+                  </>
+                ) : (
+                  <>
+                    {pricing.days} {t("días")} × {formatPrice(pricing.pricePerDay)}{t("/día")}
+                  </>
+                )}
               </p>
               <p className="text-2xl font-bold text-furgocasa-orange">
                 {formatPrice(pricing.totalPrice)}

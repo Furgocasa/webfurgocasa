@@ -43,10 +43,72 @@ export function formatDate(date: Date | string, format: "short" | "long" = "shor
 
 /**
  * Calculate number of days between two dates
+ * @deprecated Use calculateRentalDays instead for rental calculations
  */
 export function daysBetween(from: Date, to: Date): number {
   const diffTime = Math.abs(to.getTime() - from.getTime());
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Calculate rental days according to Furgocasa business rules:
+ * - Rentals are charged in complete 24-hour periods, no proration
+ * - If pickup is 12th at 10:00 and return is 15th at 10:00 = 3 days
+ * - If pickup is 12th at 10:00 and return is 15th at 10:01 = 4 days (one minute over = full extra day)
+ * 
+ * @param pickupDate - Pickup date (YYYY-MM-DD)
+ * @param pickupTime - Pickup time (HH:MM)
+ * @param dropoffDate - Dropoff date (YYYY-MM-DD)
+ * @param dropoffTime - Dropoff time (HH:MM)
+ * @returns Number of rental days (minimum 1)
+ * 
+ * @example
+ * calculateRentalDays('2024-01-12', '10:00', '2024-01-15', '10:00') // 3 days
+ * calculateRentalDays('2024-01-12', '10:00', '2024-01-15', '10:30') // 4 days
+ */
+export function calculateRentalDays(
+  pickupDate: string,
+  pickupTime: string,
+  dropoffDate: string,
+  dropoffTime: string
+): number {
+  // Combinar fecha y hora en timestamps completos
+  const pickupDateTime = new Date(`${pickupDate}T${pickupTime}:00`);
+  const dropoffDateTime = new Date(`${dropoffDate}T${dropoffTime}:00`);
+  
+  // Calcular diferencia en milisegundos
+  const diffMs = dropoffDateTime.getTime() - pickupDateTime.getTime();
+  
+  // Convertir a días (con decimales)
+  const diffDays = diffMs / (1000 * 60 * 60 * 24);
+  
+  // Si hay cualquier exceso sobre días completos, se cobra un día más
+  // Math.ceil redondea hacia arriba: 3.0 = 3, 3.001 = 4
+  const rentalDays = Math.ceil(diffDays);
+  
+  // Mínimo 1 día
+  return Math.max(1, rentalDays);
+}
+
+/**
+ * Calculate pricing days according to Furgocasa business rules:
+ * - 2-day rentals are charged as 3 days (minimum pricing rule)
+ * - All other durations are charged as actual days
+ * 
+ * @param actualDays - Actual rental days calculated with calculateRentalDays()
+ * @returns Number of days to use for pricing calculations
+ * 
+ * @example
+ * calculatePricingDays(2) // 3 (charges 3 days even though rental is 2)
+ * calculatePricingDays(3) // 3
+ * calculatePricingDays(4) // 4
+ */
+export function calculatePricingDays(actualDays: number): number {
+  // Regla de negocio: 2 días se cobran como 3
+  if (actualDays === 2) {
+    return 3;
+  }
+  return actualDays;
 }
 
 /**

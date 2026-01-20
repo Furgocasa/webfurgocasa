@@ -21,7 +21,7 @@ import {
 import Link from "next/link";
 import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, calculateRentalDays, calculatePricingDays } from "@/lib/utils";
 
 // No necesitamos interfaces específicas, usamos los datos tal cual vienen de Supabase
 // Los nombres de campos reales son: image_url, alt_text, is_primary (según SUPABASE-SCHEMA-REAL.md)
@@ -63,12 +63,16 @@ function ReservarVehiculoContent() {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
-  // Calculate days and prices
-  const days = pickupDate && dropoffDate
-    ? Math.ceil((new Date(dropoffDate).getTime() - new Date(pickupDate).getTime()) / (1000 * 60 * 60 * 24))
+  // Calculate days and prices - IMPORTANTE: usar calculateRentalDays con horas
+  const days = pickupDate && dropoffDate && pickupTime && dropoffTime
+    ? calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime)
     : 0;
   
-  const basePrice = vehicle ? vehicle.base_price_per_day * days : 0;
+  // Regla de negocio: 2 días se cobran como 3
+  const pricingDays = calculatePricingDays(days);
+  const hasTwoDayPricing = days === 2;
+  
+  const basePrice = vehicle ? vehicle.base_price_per_day * pricingDays : 0;
   
   const extrasPrice = selectedExtras.reduce((sum, item) => {
     // Calcular precio según el tipo de extra
@@ -77,8 +81,8 @@ function ReservarVehiculoContent() {
       // Precio único por toda la reserva
       price = (item.extra.price_per_unit || 0);
     } else {
-      // Precio por día multiplicado por número de días
-      price = (item.extra.price_per_day || 0) * days;
+      // Precio por día multiplicado por número de días de pricing
+      price = (item.extra.price_per_day || 0) * pricingDays;
     }
     return sum + (price * item.quantity);
   }, 0);
@@ -613,10 +617,27 @@ function ReservarVehiculoContent() {
 
               {/* Mobile CTA Bottom - Solo visible en móvil */}
               <div className="lg:hidden bg-white rounded-xl shadow-lg p-5 sticky bottom-0 border-t-2 border-furgocasa-orange">
+                {/* Aviso 2 días = 3 días */}
+                {hasTwoDayPricing && (
+                  <div className="mb-3 flex items-start gap-2 bg-amber-50 border border-amber-300 px-3 py-2 rounded-lg">
+                    <Info className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-bold text-amber-900">
+                        {t("Precio especial 2 días")}
+                      </p>
+                      <p className="text-xs text-amber-700">
+                        {t("Alquileres de 2 días se cobran como 3 días")}
+                      </p>
+                    </div>
+                  </div>
+                )}
+                
                 {/* Resumen detallado en móvil */}
                 <div className="mb-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{t("Alquiler")} ({days} {t("días")})</span>
+                    <span className="text-gray-600">
+                      {t("Alquiler")} ({days} {hasTwoDayPricing && `→ ${pricingDays}`} {t("días")})
+                    </span>
                     <span className="font-semibold">{formatPrice(basePrice)}</span>
                   </div>
                   
@@ -625,7 +646,7 @@ function ReservarVehiculoContent() {
                     if (item.extra.price_type === 'per_unit') {
                       price = (item.extra.price_per_unit || 0);
                     } else {
-                      price = (item.extra.price_per_day || 0) * days;
+                      price = (item.extra.price_per_day || 0) * pricingDays;
                     }
                     return (
                       <div key={item.extra.id} className="flex justify-between text-sm">
@@ -696,10 +717,27 @@ function ReservarVehiculoContent() {
                   </div>
                 </div>
 
+                {/* Aviso 2 días = 3 días */}
+                {hasTwoDayPricing && (
+                  <div className="mb-4 flex items-start gap-2 bg-amber-50 border border-amber-300 px-3 py-2 rounded-lg">
+                    <Info className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs font-bold text-amber-900">
+                        {t("Precio especial 2 días")}
+                      </p>
+                      <p className="text-xs text-amber-700">
+                        {t("Alquileres de 2 días se cobran como 3 días")}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {/* Price Breakdown */}
                 <div className="space-y-3 mb-6 pb-6 border-b border-gray-200">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">{t("Alquiler")} ({days} {t("días")})</span>
+                    <span className="text-gray-600">
+                      {t("Alquiler")} ({days} {hasTwoDayPricing && `→ ${pricingDays}`} {t("días")})
+                    </span>
                     <span className="font-semibold">{formatPrice(basePrice)}</span>
                   </div>
 
@@ -710,8 +748,8 @@ function ReservarVehiculoContent() {
                       // Precio único por toda la reserva
                       price = (item.extra.price_per_unit || 0);
                     } else {
-                      // Precio por día multiplicado por número de días
-                      price = (item.extra.price_per_day || 0) * days;
+                      // Precio por día multiplicado por número de días de pricing
+                      price = (item.extra.price_per_day || 0) * pricingDays;
                     }
                     return (
                       <div key={item.extra.id} className="flex justify-between text-sm">

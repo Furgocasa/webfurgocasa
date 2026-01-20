@@ -569,10 +569,8 @@ export default function BookingsPage() {
                   const StatusIcon = statusConfig[bookingStatus]?.icon || Clock;
                   const statusStyle = statusConfig[bookingStatus] || statusConfig.pending;
                   
-                  // Calcular días de diferencia
-                  const pickupDate = new Date(booking.pickup_date);
-                  const dropoffDate = new Date(booking.dropoff_date);
-                  const days = Math.ceil((dropoffDate.getTime() - pickupDate.getTime()) / (1000 * 60 * 60 * 24));
+                  // Usar días de la reserva guardados en BD (ya calculados con horas)
+                  const days = booking.days || 0;
                   
                   const totalPrice = booking.total_price || 0;
                   const amountPaid = booking.amount_paid || 0;

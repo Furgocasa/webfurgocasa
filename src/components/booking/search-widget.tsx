@@ -9,6 +9,7 @@ import { DateRangePicker } from "./date-range-picker";
 import { LocationSelector } from "./location-selector";
 import { TimeSelector } from "./time-selector";
 import { useLanguage } from "@/contexts/language-context";
+import { calculateRentalDays } from "@/lib/utils";
 
 export function SearchWidget() {
   const router = useRouter();
@@ -38,19 +39,21 @@ export function SearchWidget() {
     setLocation(locationId);
     // Si cambia a Madrid y las fechas actuales no cumplen el mínimo, resetear
     if (locationId === "madrid" && dateRange.from && dateRange.to) {
-      const days = Math.ceil((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+      const pickupDate = format(dateRange.from, 'yyyy-MM-dd');
+      const dropoffDate = format(dateRange.to, 'yyyy-MM-dd');
+      const days = calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime);
       if (days < 10) {
         setDateRange({ from: undefined, to: undefined });
       }
     }
   };
 
-  // Calcular número de días del rango
+  // Calcular número de días del rango con las horas
   const calculateDays = () => {
     if (!dateRange.from || !dateRange.to) return 0;
-    const diffTime = dateRange.to.getTime() - dateRange.from.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    const pickupDate = format(dateRange.from, 'yyyy-MM-dd');
+    const dropoffDate = format(dateRange.to, 'yyyy-MM-dd');
+    return calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime);
   };
 
   // Validar que el rango cumple con el mínimo de días
