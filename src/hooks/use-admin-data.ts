@@ -1,18 +1,20 @@
 /**
  * Hook para cargar datos en páginas de administrador
- * Incluye retry automático y manejo robusto de errores
+ * Utiliza React Query para caché automático y retry
  */
 
-import { useState, useEffect } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 
 interface UseAdminDataOptions<T> {
   queryFn: () => Promise<{ data: T | null; error: any }>;
+  queryKey?: string[];
   dependencies?: any[];
   enabled?: boolean;
   retryCount?: number;
   retryDelay?: number;
   initialDelay?: number;
+  staleTime?: number; // Tiempo de caché en milisegundos
 }
 
 interface UseAdminDataResult<T> {
@@ -24,35 +26,27 @@ interface UseAdminDataResult<T> {
 
 export function useAdminData<T = any>({
   queryFn,
+  queryKey = ['admin-data'],
   dependencies = [],
   enabled = true,
   retryCount = 2,
   retryDelay = 500,
   initialDelay = 0,
+  staleTime = 1000 * 60 * 60, // 1 hora por defecto (datos de configuración)
 }: UseAdminDataOptions<T>): UseAdminDataResult<T> {
-  const [data, setData] = useState<T | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const loadData = async (isRetry = false, currentAttempt = 0) => {
-    if (!enabled) {
-      setLoading(false);
-      return;
-    }
+  // Crear queryKey única basada en dependencies
+  const finalQueryKey = [...queryKey, ...dependencies];
 
-    try {
-      if (!isRetry) {
-        setLoading(true);
-        setError(null);
-      }
-
-      console.log(`[useAdminData] ${isRetry ? 'Retry' : 'Loading'} data... (attempt ${currentAttempt + 1}/${retryCount})`);
-
-      // Crear instancia del cliente para asegurar autenticación correcta
-      const supabase = createClient();
+  const query = useQuery({
+    queryKey: finalQueryKey,
+    queryFn: async () => {
+      console.log(`[useAdminData] Loading data...`);
       
-      if (!supabase) {
-        throw new Error('Supabase client not initialized');
+      // Delay inicial si es necesario
+      if (initialDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, initialDelay));
       }
 
       const result = await queryFn();
@@ -63,56 +57,25 @@ export function useAdminData<T = any>({
       }
 
       console.log('[useAdminData] Data loaded successfully');
-      setData(result.data);
-      setLoading(false);
-    } catch (err: any) {
-      console.error('[useAdminData] Error loading data:', {
-        message: err.message,
-        code: err.code,
-        name: err.name,
-      });
-      
-      const errorMsg = err.message || 'Error al cargar datos';
-      
-      // Solo reintentar AbortError y errores de red, NO otros errores
-      const shouldRetry = (
-        err.name === 'AbortError' || 
-        err.message?.includes('network') ||
-        err.message?.includes('timeout')
-      ) && currentAttempt < retryCount - 1;
-      
-      if (shouldRetry) {
-        const delay = retryDelay;
-        console.log(`[useAdminData] Network error, retrying in ${delay}ms... (attempt ${currentAttempt + 1}/${retryCount})`);
-        
-        setTimeout(() => {
-          loadData(true, currentAttempt + 1);
-        }, delay);
-      } else {
-        // Error final
-        if (currentAttempt > 0) {
-          console.error(`[useAdminData] Max retry attempts reached`);
-        }
-        setError(errorMsg);
-        setLoading(false);
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (enabled) {
-      loadData();
-    }
-  }, [...dependencies]);
+      return result.data;
+    },
+    enabled,
+    staleTime, // Caché agresivo
+    gcTime: staleTime * 2, // Mantener el doble en memoria
+    retry: retryCount,
+    retryDelay: (attemptIndex) => Math.min(retryDelay * (attemptIndex + 1), 3000),
+    refetchOnWindowFocus: false,
+  });
 
   const refetch = () => {
-    loadData();
+    console.log('[useAdminData] Manual refetch requested');
+    queryClient.invalidateQueries({ queryKey: finalQueryKey });
   };
 
   return {
-    data,
-    loading,
-    error,
+    data: query.data ?? null,
+    loading: query.isLoading,
+    error: query.error ? (query.error as any).message || 'Error al cargar datos' : null,
     refetch,
   };
 }

@@ -88,6 +88,7 @@ export default function EquipamientoPage() {
 
   // Usar el hook para cargar datos con retry automático
   const { data: equipment, loading, error, refetch } = useAdminData<Equipment[]>({
+    queryKey: ['equipment'], // Identificador único para caché
     queryFn: async () => {
       const supabase = createClient();
       const result = await supabase
@@ -103,6 +104,7 @@ export default function EquipamientoPage() {
     retryCount: 3,
     retryDelay: 1000,
     initialDelay: 200,
+    staleTime: 1000 * 60 * 60, // 1 hora - el equipamiento casi nunca cambia
   });
 
   const loadEquipment = () => {

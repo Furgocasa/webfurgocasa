@@ -27,6 +27,28 @@ export function usePaginatedData<T = any>({
 }: UsePaginatedDataOptions) {
   const queryClient = useQueryClient();
 
+  // Determinar staleTime según la tabla (caché más agresivo para datos que cambian poco)
+  const getStaleTime = () => {
+    // Extras y equipamiento casi nunca cambian - 1 hora
+    if (table === 'extras' || table === 'equipment') {
+      return 1000 * 60 * 60;
+    }
+    // Vehículos cambian poco - 30 minutos
+    if (table === 'vehicles' || table === 'vehicle_categories') {
+      return 1000 * 60 * 30;
+    }
+    // Clientes y pagos - 15 minutos
+    if (table === 'customers' || table === 'payments') {
+      return 1000 * 60 * 15;
+    }
+    // Reservas más dinámicas - 10 minutos
+    if (table === 'bookings') {
+      return 1000 * 60 * 10;
+    }
+    // Default: 30 minutos
+    return 1000 * 60 * 30;
+  };
+
   const query = useInfiniteQuery({
     queryKey: [...queryKey, filters, orderBy, pageSize],
     queryFn: async ({ pageParam = 0 }) => {
@@ -70,8 +92,8 @@ export function usePaginatedData<T = any>({
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 0,
     enabled,
-    staleTime: 1000 * 60 * 5, // 5 minutos de caché
-    gcTime: 1000 * 60 * 10, // 10 minutos antes de limpiar caché inactivo
+    staleTime: getStaleTime(), // Caché adaptativo según tipo de datos
+    gcTime: getStaleTime() * 2, // Mantener el doble de tiempo en memoria
   });
 
   // Aplanar todas las páginas en un solo array

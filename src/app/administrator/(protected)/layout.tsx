@@ -7,7 +7,7 @@ import type { Metadata, Viewport } from "next";
 
 // ✅ OPTIMIZACIÓN: Usar 'auto' en lugar de 'force-dynamic' permite mejor caching
 export const dynamic = "auto";
-export const revalidate = 300; // Revalidar cada 5 minutos como máximo
+export const revalidate = 1800; // Revalidar cada 30 minutos como máximo (datos cambian poco)
 
 // ✅ PWA: Metadatos específicos para el panel de administrador
 export const metadata: Metadata = {

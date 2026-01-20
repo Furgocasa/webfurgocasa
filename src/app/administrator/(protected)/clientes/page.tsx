@@ -16,6 +16,8 @@ interface Customer {
   city: string | null;
   country: string | null;
   created_at: string | null;
+  total_bookings: number;
+  total_spent: number;
   bookings?: { count: number }[];
 }
 
@@ -44,10 +46,7 @@ export default function ClientesPage() {
   } = usePaginatedData<Customer>({
     queryKey: ['customers'],
     table: 'customers',
-    select: `
-      *,
-      bookings:bookings(count)
-    `,
+    select: '*',
     orderBy: { column: 'created_at', ascending: false },
     pageSize: 20, // Cargar 20 clientes por página
   });
@@ -148,7 +147,7 @@ export default function ClientesPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Con reservas</p>
           <p className="text-2xl font-bold text-blue-600">
-            {customersList.filter(c => c.bookings && c.bookings.length > 0).length}
+            {customersList.filter(c => (c.total_bookings || 0) > 0).length}
           </p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
@@ -199,6 +198,7 @@ export default function ClientesPage() {
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contacto</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ubicación</th>
                 <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Reservas</th>
+                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Total gastado</th>
                 <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Registro</th>
                 <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Acciones</th>
               </tr>
@@ -206,7 +206,7 @@ export default function ClientesPage() {
             <tbody className="divide-y divide-gray-100">
               {filteredCustomers.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center">
                       <Mail className="h-12 w-12 mb-4 text-gray-300" />
                       <p className="text-lg font-medium">
@@ -257,7 +257,12 @@ export default function ClientesPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="inline-flex px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-700">
-                        {customer.bookings?.[0]?.count || 0}
+                        {customer.total_bookings || 0}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <span className="font-semibold text-green-600">
+                        {(customer.total_spent || 0).toFixed(2)}€
                       </span>
                     </td>
                     <td className="px-6 py-4">

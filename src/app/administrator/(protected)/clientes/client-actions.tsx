@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Eye, Edit, Mail, Trash2 } from "lucide-react";
-import supabase from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 
 interface ClientActionsProps {
   customerId: string;
@@ -17,6 +17,7 @@ export default function ClientActions({ customerId, customerEmail }: ClientActio
     if (!confirm('¿Estás seguro de eliminar este cliente? Esta acción no se puede deshacer.')) return;
 
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('customers')
         .delete()

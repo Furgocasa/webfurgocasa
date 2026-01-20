@@ -48,6 +48,7 @@ export default function ExtrasPage() {
 
   // Usar el hook para cargar datos con retry automático
   const { data: extras, loading, error, refetch } = useAdminData<Extra[]>({
+    queryKey: ['extras'], // Identificador único para caché
     queryFn: async () => {
       const supabase = createClient();
       const result = await supabase
@@ -62,6 +63,7 @@ export default function ExtrasPage() {
     },
     retryCount: 3,
     retryDelay: 1000,
+    staleTime: 1000 * 60 * 60, // 1 hora - los extras casi nunca cambian
   });
 
   // Mantener función loadExtras para recargar después de cambios (ahora solo llama refetch)

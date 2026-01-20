@@ -85,6 +85,7 @@ export default function VehiclesPage() {
       
       return (result.data || []) as VehicleCategory[];
     },
+    staleTime: 1000 * 60 * 60, // 1 hora - las categorías casi nunca cambian
   });
 
   // Cargar vehículos con paginación y JOIN optimizado de extras
