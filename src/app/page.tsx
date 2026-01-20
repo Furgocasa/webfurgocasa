@@ -125,8 +125,8 @@ export default function HomePage() {
     <>
       <Header />
       
-      {/* Hero Section con Slider */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-visible">
+      {/* Hero Section con Slider - Sin espacio entre header y slider */}
+      <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden -mt-[120px] lg:-mt-[132px] pt-[120px] lg:pt-[132px]">
         {/* Background slider - ABSOLUTE PARA OCUPAR TODO EL FONDO */}
         <div className="absolute inset-0 w-full h-full">
           <HeroSlider 
