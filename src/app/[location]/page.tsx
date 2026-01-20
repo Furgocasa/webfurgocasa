@@ -8,9 +8,11 @@ import { DestinationsGrid } from "@/components/destinations-grid";
 import { HeroSlider } from "@/components/hero-slider";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { LocalizedLink } from "@/components/localized-link";
+import { SaleLocationJsonLd } from "@/components/locations/sale-location-jsonld";
 import { 
   CheckCircle,
   Package,
+  MapPin,
   HelpCircle,
   BookOpen
 } from "lucide-react";
@@ -82,6 +84,42 @@ interface FeaturedVehicle {
   main_image: string | null;
 }
 
+interface VehicleForSale {
+  id: string;
+  name: string;
+  slug: string;
+  brand: string;
+  model: string;
+  year: number;
+  sale_price: number;
+  main_image: string | null;
+  short_description: string | null;
+  mileage: number;
+}
+
+interface SaleLocationData {
+  id: string;
+  name: string;
+  slug: string;
+  province: string;
+  region: string;
+  meta_title: string;
+  meta_description: string;
+  h1_title: string;
+  intro_text: string | null;
+  content_sections: any;
+  distance_km: number | null;
+  travel_time_minutes: number | null;
+  featured_image?: string | null;
+  hero_image?: string | null;
+  nearest_location: {
+    id: string;
+    name: string;
+    city: string;
+    address: string;
+  } | null;
+}
+
 interface BlogArticle {
   id: string;
   title: string;
@@ -99,7 +137,7 @@ interface BlogArticle {
 /**
  * Extrae el slug de la ciudad del parámetro de la URL multi-idioma
  */
-function extractCitySlug(locationParam: string): string {
+function extractRentalCitySlug(locationParam: string): string {
   const patterns = [
     /^alquiler-autocaravanas-campervans-(.+)$/,  // español
     /^rent-campervan-motorhome-(.+)$/,           // inglés
@@ -117,35 +155,131 @@ function extractCitySlug(locationParam: string): string {
   return locationParam;
 }
 
+function extractSaleCitySlug(locationParam: string): string {
+  const patterns = [
+    /^venta-autocaravanas-camper-(.+)$/,  // español
+    /^campervans-for-sale-in-(.+)$/,      // inglés
+    /^camping-cars-a-vendre-(.+)$/,       // francés
+    /^wohnmobile-zu-verkaufen-(.+)$/,     // alemán
+  ];
+
+  for (const pattern of patterns) {
+    const match = locationParam.match(pattern);
+    if (match) {
+      return match[1];
+    }
+  }
+
+  return locationParam;
+}
+
+function getSeoPageKind(locationParam: string): "rent" | "sale" | "unknown" {
+  if (
+    /^alquiler-autocaravanas-campervans-(.+)$/.test(locationParam) ||
+    /^rent-campervan-motorhome-(.+)$/.test(locationParam) ||
+    /^location-camping-car-(.+)$/.test(locationParam) ||
+    /^wohnmobil-mieten-(.+)$/.test(locationParam)
+  ) {
+    return "rent";
+  }
+
+  if (
+    /^venta-autocaravanas-camper-(.+)$/.test(locationParam) ||
+    /^campervans-for-sale-in-(.+)$/.test(locationParam) ||
+    /^camping-cars-a-vendre-(.+)$/.test(locationParam) ||
+    /^wohnmobile-zu-verkaufen-(.+)$/.test(locationParam)
+  ) {
+    return "sale";
+  }
+
+  return "unknown";
+}
+
 /**
  * ✅ GENERA METADATA DINÁMICA PARA SEO (Server-side)
  */
 export async function generateMetadata({ params }: { params: Promise<{ location: string }> }): Promise<Metadata> {
   const { location: locationParam } = await params;
-  const citySlug = extractCitySlug(locationParam);
-  
-  const { data: location } = await supabase
-    .from('location_targets')
-    .select('name, province, meta_title, meta_description')
+  const kind = getSeoPageKind(locationParam);
+
+  // Por defecto, mantener el comportamiento actual (alquiler) para no romper rutas existentes
+  if (kind !== "sale") {
+    const citySlug = extractRentalCitySlug(locationParam);
+    
+    const { data: location } = await supabase
+      .from('location_targets')
+      .select('name, province, meta_title, meta_description')
+      .eq('slug', citySlug)
+      .eq('is_active', true)
+      .single();
+
+    if (!location) {
+      return {
+        title: 'Ubicación no encontrada | Furgocasa Campervans',
+        description: 'La ubicación solicitada no está disponible.',
+      };
+    }
+
+    return {
+      title: location.meta_title || `Alquiler de Autocaravanas en ${location.name} | Furgocasa Campervans`,
+      description: location.meta_description || `Alquila tu autocaravana camper en ${location.name}, ${location.province}. Las mejores campers de gran volumen. Reserva online con Furgocasa.`,
+      openGraph: {
+        title: location.meta_title || `Alquiler de Autocaravanas en ${location.name} | Furgocasa Campervans`,
+        description: location.meta_description || `Alquila tu autocaravana camper en ${location.name}`,
+        type: 'website',
+        locale: 'es_ES',
+      },
+    };
+  }
+
+  // Venta por ciudad
+  const citySlug = extractSaleCitySlug(locationParam);
+  const { data: saleLocation } = await supabase
+    .from('sale_location_targets')
+    .select('name, province, region, meta_title, meta_description, featured_image')
     .eq('slug', citySlug)
     .eq('is_active', true)
     .single();
 
-  if (!location) {
+  if (!saleLocation) {
     return {
       title: 'Ubicación no encontrada | Furgocasa Campervans',
       description: 'La ubicación solicitada no está disponible.',
+      robots: { index: false, follow: false },
     };
   }
 
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.furgocasa.com';
+  const pageUrl = `${baseUrl}/es/venta-autocaravanas-camper-${citySlug}`;
+  const ogImage = saleLocation.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
+
   return {
-    title: location.meta_title || `Alquiler de Autocaravanas en ${location.name} | Furgocasa Campervans`,
-    description: location.meta_description || `Alquila tu autocaravana camper en ${location.name}, ${location.province}. Las mejores campers de gran volumen. Reserva online con Furgocasa.`,
+    title: saleLocation.meta_title || `Venta de Autocaravanas en ${saleLocation.name} | Furgocasa`,
+    description: saleLocation.meta_description || `Compra tu autocaravana o camper en ${saleLocation.name}, ${saleLocation.province}. Vehículos premium con garantía y financiación. Entrega cerca de ti.`,
     openGraph: {
-      title: location.meta_title || `Alquiler de Autocaravanas en ${location.name} | Furgocasa Campervans`,
-      description: location.meta_description || `Alquila tu autocaravana camper en ${location.name}`,
+      title: saleLocation.meta_title || `Venta de Autocaravanas en ${saleLocation.name}`,
+      description: saleLocation.meta_description || `Compra tu autocaravana en ${saleLocation.name}. Vehículos premium con garantía.`,
       type: 'website',
+      url: pageUrl,
+      siteName: 'Furgocasa - Venta de Autocaravanas',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `Venta de autocaravanas y campers en ${saleLocation.name} - Furgocasa`,
+          type: 'image/webp',
+        },
+      ],
       locale: 'es_ES',
+      countryName: 'España',
+    },
+    alternates: {
+      canonical: pageUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -153,8 +287,8 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 /**
  * ✅ CARGA DE DATOS EN EL SERVIDOR (Server-side)
  */
-async function loadLocationData(locationParam: string): Promise<LocationData | null> {
-  const citySlug = extractCitySlug(locationParam);
+async function loadRentalLocationData(locationParam: string): Promise<LocationData | null> {
+  const citySlug = extractRentalCitySlug(locationParam);
   
   const { data, error } = await supabase
     .from('location_targets')
@@ -177,6 +311,31 @@ async function loadLocationData(locationParam: string): Promise<LocationData | n
   }
   
   return data as LocationData;
+}
+
+async function loadSaleLocationData(locationParam: string): Promise<SaleLocationData | null> {
+  const citySlug = extractSaleCitySlug(locationParam);
+
+  const { data, error } = await supabase
+    .from('sale_location_targets')
+    .select(`
+      *,
+      nearest_location:locations!nearest_location_id(
+        id,
+        name,
+        city,
+        address
+      )
+    `)
+    .eq('slug', citySlug)
+    .eq('is_active', true)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data as SaleLocationData;
 }
 
 async function loadFeaturedVehicles(): Promise<FeaturedVehicle[]> {
@@ -205,6 +364,39 @@ async function loadFeaturedVehicles(): Promise<FeaturedVehicle[]> {
   }) || [];
 
   return processedVehicles;
+}
+
+async function loadVehiclesForSale(): Promise<VehicleForSale[]> {
+  const { data: vehicles } = await supabase
+    .from('vehicles')
+    .select(`
+      *,
+      images:vehicle_images(*)
+    `)
+    .eq('is_for_sale', true)
+    .eq('sale_status', 'available')
+    .order('sale_price', { ascending: true })
+    .limit(6);
+
+  const processedVehicles = vehicles?.map((vehicle: any) => {
+    const primaryImage = vehicle.images?.find((img: any) => img.is_primary);
+    const firstImage = vehicle.images?.[0];
+
+    return {
+      id: vehicle.id,
+      name: vehicle.name,
+      slug: vehicle.slug,
+      brand: vehicle.brand,
+      model: vehicle.model,
+      year: vehicle.year,
+      sale_price: vehicle.sale_price,
+      main_image: primaryImage?.image_url || firstImage?.image_url || null,
+      short_description: vehicle.short_description,
+      mileage: vehicle.mileage,
+    };
+  });
+
+  return processedVehicles || [];
 }
 
 async function loadBlogArticles(): Promise<BlogArticle[]> {
@@ -238,10 +430,162 @@ async function loadBlogArticles(): Promise<BlogArticle[]> {
  */
 export default async function LocationPage({ params }: { params: Promise<{ location: string }> }) {
   const { location: locationParam } = await params;
+  const kind = getSeoPageKind(locationParam);
+
+  // ✅ VENTA: /venta-autocaravanas-camper-{ciudad} (y traducciones en /en, /fr, /de)
+  if (kind === "sale") {
+    const [saleLocationData, vehiclesForSale] = await Promise.all([
+      loadSaleLocationData(locationParam),
+      loadVehiclesForSale(),
+    ]);
+
+    if (!saleLocationData) {
+      notFound();
+    }
+
+    const hasNearestLocation = saleLocationData.nearest_location !== null;
+    const distanceInfo =
+      saleLocationData.distance_km && saleLocationData.travel_time_minutes
+        ? `A ${saleLocationData.distance_km} km (${Math.floor(saleLocationData.travel_time_minutes / 60)}h ${saleLocationData.travel_time_minutes % 60}min)`
+        : "";
+
+    return (
+      <>
+        <Header />
+
+        {/* ✅ SCHEMA.ORG JSON-LD (SEO estructurado) */}
+        <SaleLocationJsonLd location={saleLocationData as any} />
+
+        <main className="min-h-screen bg-gray-50">
+          {/* Hero */}
+          <section className="relative bg-gradient-to-br from-furgocasa-orange via-furgocasa-orange-light to-orange-100 py-20">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto text-center">
+                <div className="flex items-center justify-center gap-2 mb-4">
+                  <MapPin className="h-6 w-6 text-white" />
+                  <p className="text-white/90 font-medium">
+                    {saleLocationData.province} · {saleLocationData.region}
+                  </p>
+                </div>
+
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white mb-6">
+                  {saleLocationData.h1_title}
+                </h1>
+
+                {saleLocationData.intro_text && (
+                  <p className="text-xl text-white/95 mb-8 leading-relaxed">
+                    {saleLocationData.intro_text}
+                  </p>
+                )}
+
+                {hasNearestLocation && distanceInfo && (
+                  <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full text-white">
+                    <CheckCircle className="h-5 w-5" />
+                    <span>
+                      Entrega desde {saleLocationData.nearest_location!.city} · {distanceInfo}
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
+
+          {/* Vehículos en venta */}
+          <section className="py-16">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
+                  Autocaravanas Disponibles en {saleLocationData.name}
+                </h2>
+                <p className="text-lg text-gray-600">
+                  Vehículos premium, garantía y financiación. Entrega cerca de {saleLocationData.name}.
+                </p>
+              </div>
+
+              {vehiclesForSale.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                  {vehiclesForSale.map((vehicle) => (
+                    <LocalizedLink
+                      key={vehicle.id}
+                      href={`/ventas/${vehicle.slug}`}
+                      className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+                    >
+                      <div className="aspect-[4/3] relative bg-gray-200 overflow-hidden">
+                        {vehicle.main_image ? (
+                          <img
+                            src={vehicle.main_image}
+                            alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - Venta en ${saleLocationData.name}`}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Package className="h-16 w-16 text-gray-400" />
+                          </div>
+                        )}
+                        <div className="absolute top-4 right-4 bg-furgocasa-orange text-white px-4 py-2 rounded-full font-bold text-lg shadow-lg">
+                          {vehicle.sale_price.toLocaleString("es-ES")}€
+                        </div>
+                      </div>
+
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-furgocasa-orange transition-colors">
+                          {vehicle.name}
+                        </h3>
+
+                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                          <span>{vehicle.brand} {vehicle.model}</span>
+                          <span>·</span>
+                          <span>{vehicle.year}</span>
+                          {vehicle.mileage > 0 && (
+                            <>
+                              <span>·</span>
+                              <span>{vehicle.mileage.toLocaleString()} km</span>
+                            </>
+                          )}
+                        </div>
+
+                        {vehicle.short_description && (
+                          <p className="text-gray-600 text-sm line-clamp-2">
+                            {vehicle.short_description}
+                          </p>
+                        )}
+                      </div>
+                    </LocalizedLink>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
+                  <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    No hay vehículos disponibles actualmente
+                  </h3>
+                  <p className="text-gray-600 mb-6">
+                    Estamos actualizando nuestro stock. Consulta disponibilidad.
+                  </p>
+                </div>
+              )}
+
+              <div className="text-center">
+                <LocalizedLink
+                  href="/ventas"
+                  className="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold px-8 py-4 rounded-xl transition-colors"
+                >
+                  Ver Todos los Vehículos en Venta
+                </LocalizedLink>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <Footer />
+      </>
+    );
+  }
   
   // ✅ Cargar TODOS los datos en paralelo en el servidor
   const [locationData, featuredVehicles, blogArticles] = await Promise.all([
-    loadLocationData(locationParam),
+    loadRentalLocationData(locationParam),
     loadFeaturedVehicles(),
     loadBlogArticles(),
   ]);
