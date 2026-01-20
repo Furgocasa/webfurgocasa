@@ -26,6 +26,12 @@ interface Extra {
   price_type: string;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export default function NuevoVehiculoPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -33,6 +39,7 @@ export default function NuevoVehiculoPage() {
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [internalCode, setInternalCode] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -71,24 +78,27 @@ export default function NuevoVehiculoPage() {
   });
 
   useEffect(() => {
-    // Cargar la categoría por defecto automáticamente
-    const loadDefaultCategory = async () => {
-      const { data } = await supabase
-        .from('vehicle_categories')
-        .select('id')
-        .eq('is_active', true)
-        .order('sort_order')
-        .limit(1)
-        .single();
-      
-      if (data) {
-        setFormData(prev => ({ ...prev, category_id: data.id }));
-      }
-    };
-
-    loadDefaultCategory();
+    loadCategories();
     loadExtras();
   }, []);
+
+  const loadCategories = async () => {
+    const { data, error } = await supabase
+      .from('vehicle_categories')
+      .select('id, name, slug')
+      .eq('is_active', true)
+      .order('sort_order');
+    
+    if (error) {
+      console.error('Error loading categories:', error);
+    } else if (data) {
+      setCategories(data);
+      // Seleccionar la primera categoría por defecto si existe
+      if (data.length > 0 && !formData.category_id) {
+        setFormData(prev => ({ ...prev, category_id: data[0].id }));
+      }
+    }
+  };
 
   const loadExtras = async () => {
     const { data, error } = await supabase
@@ -130,7 +140,7 @@ export default function NuevoVehiculoPage() {
     }
 
     if (!formData.category_id) {
-      setMessage({ type: 'error', text: 'No se pudo asignar la categoría. Por favor, ejecuta el script crear-categoria-default.sql' });
+      setMessage({ type: 'error', text: 'Debes seleccionar una categoría para el vehículo' });
       return;
     }
 
@@ -238,6 +248,23 @@ export default function NuevoVehiculoPage() {
                 placeholder="adria-twin-plus-600-sp"
               />
               <p className="text-xs text-gray-500 mt-1">Se genera automáticamente desde el nombre</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Categoría *
+              </label>
+              <select
+                value={formData.category_id}
+                onChange={(e) => setFormData(prev => ({ ...prev, category_id: e.target.value }))}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                required
+              >
+                <option value="">Selecciona una categoría</option>
+                {categories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </select>
             </div>
 
             <div>
