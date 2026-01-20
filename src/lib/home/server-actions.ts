@@ -37,18 +37,11 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
   const { data: vehicles, error } = await supabase
     .from('vehicles')
     .select(`
-      id,
-      name,
-      slug,
-      brand,
-      model,
-      passengers,
-      beds,
-      vehicle_images(image_url, is_primary, sort_order)
+      *,
+      images:vehicle_images(*)
     `)
     .eq('is_for_rent', true)
-    .neq('status', 'inactive')
-    .order('created_at', { ascending: false })
+    .order('internal_code', { ascending: true })
     .limit(3);
 
   if (error) {
@@ -58,17 +51,10 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
 
   if (!vehicles) return [];
 
-  return vehicles.map(vehicle => {
-    // Ordenar imágenes: primero la principal, luego por sort_order
-    const sortedImages = (vehicle.vehicle_images as any[] || [])
-      .sort((a: any, b: any) => {
-        if (a.is_primary) return -1;
-        if (b.is_primary) return 1;
-        return (a.sort_order || 0) - (b.sort_order || 0);
-      })
-      .map((img: any) => img.image_url)
-      .slice(0, 3); // Máximo 3 imágenes por vehículo
-
+  return vehicles.map((vehicle: any) => {
+    const primaryImage = vehicle.images?.find((img: any) => img.is_primary);
+    const firstImage = vehicle.images?.[0];
+    
     return {
       id: vehicle.id,
       name: vehicle.name,
@@ -77,8 +63,8 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
       model: vehicle.model,
       passengers: vehicle.passengers,
       beds: vehicle.beds,
-      main_image: sortedImages[0] || null,
-      images: sortedImages
+      main_image: primaryImage?.image_url || firstImage?.image_url || null,
+      images: [primaryImage?.image_url || firstImage?.image_url].filter(Boolean)
     };
   });
 });
