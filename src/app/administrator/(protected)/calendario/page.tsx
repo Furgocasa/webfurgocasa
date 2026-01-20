@@ -350,20 +350,29 @@ export default function CalendarioPage() {
   };
 
   const isDateInRange = (day: number, monthDate: Date, pickup: string, dropoff: string) => {
-    const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
-    const dateStr = date.toISOString().split('T')[0];
+    // Crear fecha en formato ISO sin conversión de zona horaria
+    const year = monthDate.getFullYear();
+    const month = String(monthDate.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(day).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
     return dateStr >= pickup && dateStr <= dropoff;
   };
 
   const isPickupDate = (day: number, monthDate: Date, pickup: string) => {
-    const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
-    const dateStr = date.toISOString().split('T')[0];
+    // Crear fecha en formato ISO sin conversión de zona horaria
+    const year = monthDate.getFullYear();
+    const month = String(monthDate.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(day).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
     return dateStr === pickup;
   };
 
   const isDropoffDate = (day: number, monthDate: Date, dropoff: string) => {
-    const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
-    const dateStr = date.toISOString().split('T')[0];
+    // Crear fecha en formato ISO sin conversión de zona horaria
+    const year = monthDate.getFullYear();
+    const month = String(monthDate.getMonth() + 1).padStart(2, '0');
+    const dayStr = String(day).padStart(2, '0');
+    const dateStr = `${year}-${month}-${dayStr}`;
     return dateStr === dropoff;
   };
 
