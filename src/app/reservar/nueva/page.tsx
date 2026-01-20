@@ -14,7 +14,7 @@ function LoadingState() {
 }
 import { supabase } from"@/lib/supabase/client";
 import { 
-  ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
+  ArrowLeft, ArrowRight, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, AlertCircle, Loader2, FileText, Users, Bed
 } from"lucide-react";
 import Link from"next/link";
@@ -432,7 +432,7 @@ function NuevaReservaContent() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Form */}
             <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+              <form id="reservation-form" onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <User className="h-6 w-6 text-furgocasa-blue" />
                   {t("Tus datos")}
@@ -819,8 +819,51 @@ function NuevaReservaContent() {
               )}
             </div>
           </div>
+          
+          {/* Espaciador para la barra flotante en móvil */}
+          <div className="lg:hidden h-28"></div>
         </div>
       </main>
+
+      {/* Barra flotante fija inferior - Solo móvil/tablet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50 safe-area-inset-bottom">
+        <div className="container mx-auto px-4 py-3">
+          {/* Info del vehículo compacta */}
+          <div className="flex items-center gap-3 mb-2 pb-2 border-b border-gray-100">
+            <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold text-gray-900 text-sm truncate">{vehicle?.name}</p>
+              <p className="text-xs text-gray-500">{days} {days === 1 ? t("día") : t("días")}</p>
+            </div>
+          </div>
+          
+          {/* Precio total y botón */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500">{t("Total a pagar")}</p>
+              <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
+            </div>
+            <button
+              type="submit"
+              form="reservation-form"
+              disabled={submitting}
+              className="bg-furgocasa-orange text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-orange-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  {t("Procesando...")}
+                </>
+              ) : (
+                <>
+                  {t("Confirmar")}
+                  <ArrowRight className="h-5 w-5" />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
 </>
   );
 }

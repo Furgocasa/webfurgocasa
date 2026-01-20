@@ -1,6 +1,7 @@
 import { Metadata } from"next";
-import { MapPin, Wifi, Droplets, Plug, Trash2, ShowerHead, Search } from"lucide-react";
+import { MapPin, Wifi, Droplets, Plug, Trash2, ShowerHead, Search, ExternalLink, Sparkles, Route, Map, Shield } from"lucide-react";
 import { translateServer } from"@/lib/i18n/server-translation";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title:"Mapa de Áreas para Autocaravanas | Furgocasa Campervans",

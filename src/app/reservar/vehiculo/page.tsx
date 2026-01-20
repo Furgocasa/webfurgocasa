@@ -557,64 +557,8 @@ function ReservarVehiculoContent() {
                 </div>
               </div>
 
-              {/* Mobile CTA Bottom - Solo visible en móvil */}
-              <div className="lg:hidden bg-white rounded-xl shadow-lg p-5 sticky bottom-0 border-t-2 border-furgocasa-orange">
-                {/* Aviso 2 días = 3 días */}
-                {hasTwoDayPricing && (
-                  <div className="mb-3 flex items-start gap-2 bg-amber-50 border border-amber-300 px-3 py-2 rounded-lg">
-                    <Info className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs font-bold text-amber-900">
-                        {t("Precio especial 2 días")}
-                      </p>
-                      <p className="text-xs text-amber-700">
-                        {t("Alquileres de 2 días se cobran como 3 días")}
-                      </p>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Resumen detallado en móvil */}
-                <div className="mb-4 space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">
-                      {t("Alquiler")} ({days} {hasTwoDayPricing && `→ ${pricingDays}`} {t("días")})
-                    </span>
-                    <span className="font-semibold">{formatPrice(basePrice)}</span>
-                  </div>
-                  
-                  {selectedExtras.map((item) => {
-                    let price = 0;
-                    if (item.extra.price_type === 'per_unit') {
-                      price = (item.extra.price_per_unit || 0);
-                    } else {
-                      price = (item.extra.price_per_day || 0) * pricingDays;
-                    }
-                    return (
-                      <div key={item.extra.id} className="flex justify-between text-sm">
-                        <span className="text-gray-600">
-                          {item.extra.name} {item.quantity > 1 && `(x${item.quantity})`}
-                        </span>
-                        <span className="font-semibold">{formatPrice(price * item.quantity)}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                
-                <div className="flex items-center justify-between mb-3 pt-3 border-t border-gray-200">
-                  <div>
-                    <p className="text-xs text-gray-500">{t("Total")}</p>
-                    <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
-                  </div>
-                  <button
-                    onClick={handleContinue}
-                    className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2"
-                  >
-                    {t("Continuar")}
-                    <ArrowRight className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
+              {/* Espaciador para la barra flotante en móvil */}
+              <div className="lg:hidden h-24"></div>
             </div>
 
             {/* Sidebar - Price Summary - Solo desktop */}
@@ -725,6 +669,53 @@ function ReservarVehiculoContent() {
           </div>
         </div>
       </main>
+
+      {/* Barra flotante fija inferior - Solo móvil/tablet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50 safe-area-inset-bottom">
+        <div className="container mx-auto px-4 py-3">
+          {/* Desglose de precios expandible */}
+          {selectedExtras.length > 0 && (
+            <div className="mb-2 pb-2 border-b border-gray-100">
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>{t("Alquiler")} ({days} {t("días")})</span>
+                <span>{formatPrice(basePrice)}</span>
+              </div>
+              {selectedExtras.slice(0, 2).map((item) => {
+                let price = 0;
+                if (item.extra.price_type === 'per_unit') {
+                  price = (item.extra.price_per_unit || 0);
+                } else {
+                  price = (item.extra.price_per_day || 0) * pricingDays;
+                }
+                return (
+                  <div key={item.extra.id} className="flex justify-between text-xs text-gray-500">
+                    <span>{item.extra.name} {item.quantity > 1 && `×${item.quantity}`}</span>
+                    <span>+{formatPrice(price * item.quantity)}</span>
+                  </div>
+                );
+              })}
+              {selectedExtras.length > 2 && (
+                <p className="text-xs text-gray-400">+{selectedExtras.length - 2} {t("extras más")}</p>
+              )}
+            </div>
+          )}
+          
+          {/* Precio total y botón */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500">{t("Total")}</p>
+              <p className="text-2xl font-bold text-furgocasa-orange transition-all duration-300">{formatPrice(totalPrice)}</p>
+            </div>
+            <button
+              onClick={handleContinue}
+              className="bg-furgocasa-orange text-white font-bold py-3 px-8 rounded-xl hover:bg-orange-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-orange-200"
+            >
+              {t("Continuar")}
+              <ArrowRight className="h-5 w-5" />
+            </button>
+          </div>
+        </div>
+      </div>
 </>
   );
 }
