@@ -164,14 +164,19 @@ export default function EditarReservaPage() {
   }, [formData.pickup_date, formData.dropoff_date, formData.pickup_time, formData.dropoff_time]);
 
   useEffect(() => {
-    // Recalcular precio total
+    // Recalcular precio total cuando cambian los extras, días o precio base
     const extrasTotal = calculateExtrasTotal();
-    setFormData(prev => ({
-      ...prev,
-      extras_price: extrasTotal,
-      total_price: prev.base_price + extrasTotal
-    }));
-  }, [bookingExtras, formData.days, formData.base_price]);
+    const newTotal = formData.base_price + extrasTotal;
+    
+    // Solo actualizar si hay cambios reales
+    if (formData.extras_price !== extrasTotal || formData.total_price !== newTotal) {
+      setFormData(prev => ({
+        ...prev,
+        extras_price: extrasTotal,
+        total_price: newTotal
+      }));
+    }
+  }, [bookingExtras, formData.days, formData.base_price, extras]);
 
   useEffect(() => {
     // Calcular automáticamente el payment_status según el monto pagado
@@ -459,8 +464,15 @@ export default function EditarReservaPage() {
       }
 
       setMessage({ type: 'success', text: 'Reserva actualizada correctamente' });
+      
+      // Recargar los datos para verificar que se guardaron
+      await loadData();
+      
+      // Dar un momento para que el usuario vea el mensaje de éxito
       setTimeout(() => {
         router.push(`/administrator/reservas/${bookingId}`);
+        // Forzar recarga de la página de detalle
+        router.refresh();
       }, 1500);
 
     } catch (error: any) {
