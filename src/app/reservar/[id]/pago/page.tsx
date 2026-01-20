@@ -50,7 +50,7 @@ export default function PagoPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'redsys' | 'stripe'>('redsys');
+  const [paymentMethod, setPaymentMethod] = useState<'redsys' | 'stripe'>('stripe'); // Stripe por defecto, Redsys temporalmente deshabilitado
 
   useEffect(() => {
     if (bookingId) {

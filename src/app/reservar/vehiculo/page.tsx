@@ -306,52 +306,52 @@ function ReservarVehiculoContent() {
     <>
       <Header />
       
-      {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
-      <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
-        <div className="container mx-auto px-4 py-3">
-          {/* Link "Volver a la búsqueda" - SIEMPRE visible */}
-          <div className="mb-2">
-            <Link 
-              href={`/buscar?${searchParams.toString()}`}
-              className="inline-flex items-center text-xs text-gray-600 hover:text-furgocasa-orange transition-colors"
-            >
-              <ArrowLeft className="h-3 w-3 mr-1" />
-              {t("Volver a la búsqueda")}
-            </Link>
-          </div>
-          
-          <div className="flex items-center justify-between gap-4">
-            {/* Info del vehículo */}
-            <div className="flex items-center gap-3 min-w-0">
-              <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
-              <div className="min-w-0">
-                <p className="font-bold text-gray-900 text-sm truncate">{vehicle?.name || 'Cargando...'}</p>
-                <p className="text-xs text-gray-500">{days} {t("días")}</p>
+      <main className="min-h-screen bg-gray-50 py-6 md:py-12 overflow-x-hidden">
+        <div className="container mx-auto px-4 max-w-7xl">
+          {/* Barra de resumen - Sticky dentro del main */}
+          <div className="sticky top-[100px] md:top-[112px] bg-white shadow-md border-b border-gray-200 z-30 w-full -mx-4 px-4 mb-6 rounded-b-lg">
+            <div className="py-3">
+              {/* Link "Volver a la búsqueda" */}
+              <div className="mb-2">
+                <Link 
+                  href={`/buscar?${searchParams.toString()}`}
+                  className="inline-flex items-center text-xs text-gray-600 hover:text-furgocasa-orange transition-colors"
+                >
+                  <ArrowLeft className="h-3 w-3 mr-1" />
+                  {t("Volver a la búsqueda")}
+                </Link>
+              </div>
+              
+              <div className="flex items-center justify-between gap-4">
+                {/* Info del vehículo */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-bold text-gray-900 text-sm truncate">{vehicle?.name || 'Cargando...'}</p>
+                    <p className="text-xs text-gray-500">{days} {t("días")}</p>
+                  </div>
+                </div>
+                
+                {/* Total y botón */}
+                <div className="flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500">{t("Total")}</p>
+                    <p className="text-lg font-bold text-furgocasa-orange whitespace-nowrap">{formatPrice(totalPrice)}</p>
+                  </div>
+                  <button
+                    onClick={handleContinue}
+                    disabled={!vehicle}
+                    className="bg-furgocasa-orange text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {t("Continuar")}
+                    <ArrowRight className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
-            
-            {/* Total y botón */}
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-xs text-gray-500">{t("Total")}</p>
-                <p className="text-lg font-bold text-furgocasa-orange whitespace-nowrap">{formatPrice(totalPrice)}</p>
-              </div>
-              <button
-                onClick={handleContinue}
-                disabled={!vehicle}
-                className="bg-furgocasa-orange text-white font-semibold py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {t("Continuar")}
-                <ArrowRight className="h-4 w-4" />
-              </button>
-            </div>
           </div>
-        </div>
-      </div>
-      
-      <main className="min-h-screen bg-gray-50 pt-[150px] py-6 md:py-12 overflow-x-hidden">
-        <div className="container mx-auto px-4 max-w-7xl">{/* Quitado overflow-hidden para permitir sticky */}
-          {/* Breadcrumb */}
+
+          {/* Breadcrumb - Ahora debajo de la barra sticky */}
           <div className="mb-8">
             <Link 
               href={`/buscar?${searchParams.toString()}`}

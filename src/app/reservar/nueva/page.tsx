@@ -402,51 +402,51 @@ function NuevaReservaContent() {
     <>
       <Header />
       
-      {/* Sticky Header - Resumen de reserva */}
-      <div className="sticky top-[112px] md:top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-30 w-full">
-        <div className="container mx-auto px-4 py-3">
-          {/* Link "Volver" - SIEMPRE visible en el header */}
-          <div className="mb-2">
-            <button 
-              onClick={() => router.back()}
-              className="inline-flex items-center text-xs text-gray-600 hover:text-furgocasa-orange transition-colors"
-            >
-              <ArrowLeft className="h-3 w-3 mr-1" />
-              {t("Volver al paso anterior")}
-            </button>
-          </div>
-
-          <div className="flex items-center justify-between gap-4">
-            {/* Info del vehículo */}
-            <div className="flex items-center gap-3 min-w-0">
-              <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
-              <div className="min-w-0">
-                <p className="font-semibold text-gray-900 truncate text-sm">{vehicle?.name || t("Cargando...")}</p>
-                <p className="text-xs text-gray-500">{days} {days === 1 ? t("día") : t("días")}</p>
-              </div>
-            </div>
-
-            {/* Fechas (oculto en móvil) */}
-            <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="h-4 w-4" />
-              <span>{pickupDate ? new Date(pickupDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : ''}</span>
-              <span>→</span>
-              <span>{dropoffDate ? new Date(dropoffDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : ''}</span>
-            </div>
-
-            {/* Precio Total */}
-            <div className="flex items-center gap-2">
-              <div className="text-right">
-                <p className="text-xs text-gray-500 hidden md:block">{t("Total")}</p>
-                <p className="text-lg md:text-xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
       <main className="min-h-screen bg-gray-50 py-8 md:py-12">
         <div className="container mx-auto px-4 max-w-6xl">
+          {/* Barra de resumen - Sticky dentro del main */}
+          <div className="sticky top-[100px] md:top-[112px] bg-white shadow-md border-b border-gray-200 z-30 -mx-4 px-4 mb-6 rounded-b-lg">
+            <div className="py-3">
+              {/* Link "Volver" */}
+              <div className="mb-2">
+                <button 
+                  onClick={() => router.back()}
+                  className="inline-flex items-center text-xs text-gray-600 hover:text-furgocasa-orange transition-colors"
+                >
+                  <ArrowLeft className="h-3 w-3 mr-1" />
+                  {t("Volver al paso anterior")}
+                </button>
+              </div>
+
+              <div className="flex items-center justify-between gap-4">
+                {/* Info del vehículo */}
+                <div className="flex items-center gap-3 min-w-0">
+                  <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-900 truncate text-sm">{vehicle?.name || t("Cargando...")}</p>
+                    <p className="text-xs text-gray-500">{days} {days === 1 ? t("día") : t("días")}</p>
+                  </div>
+                </div>
+
+                {/* Fechas (oculto en móvil) */}
+                <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
+                  <Calendar className="h-4 w-4" />
+                  <span>{pickupDate ? new Date(pickupDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : ''}</span>
+                  <span>→</span>
+                  <span>{dropoffDate ? new Date(dropoffDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : ''}</span>
+                </div>
+
+                {/* Precio Total */}
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <p className="text-xs text-gray-500 hidden md:block">{t("Total")}</p>
+                    <p className="text-lg md:text-xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
