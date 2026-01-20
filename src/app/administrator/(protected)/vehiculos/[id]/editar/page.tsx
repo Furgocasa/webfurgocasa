@@ -97,54 +97,51 @@ export default function EditarVehiculoPage() {
   });
 
   useEffect(() => {
-    loadCategories();
-    loadExtras();
-    loadEquipment();
+    const loadInitialData = async () => {
+      // Cargar categorías
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('vehicle_categories')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .order('sort_order');
+      
+      if (categoriesError) {
+        console.error('Error loading categories:', categoriesError);
+      } else if (categoriesData) {
+        setCategories(categoriesData);
+      }
+
+      // Cargar extras
+      const { data: extrasData, error: extrasError } = await supabase
+        .from('extras')
+        .select('id, name, price_per_day, price_type')
+        .eq('is_active', true)
+        .order('name');
+      
+      if (extrasError) {
+        console.error('Error loading extras:', extrasError);
+      } else if (extrasData) {
+        setExtras(extrasData);
+      }
+
+      // Cargar equipamiento
+      const { data: equipmentData, error: equipmentError } = await supabase
+        .from('equipment')
+        .select('id, name, slug, icon, category, is_standard, is_active')
+        .eq('is_active', true)
+        .order('category')
+        .order('sort_order');
+      
+      if (equipmentError) {
+        console.error('Error loading equipment:', equipmentError);
+      } else if (equipmentData) {
+        setEquipmentList(equipmentData);
+      }
+    };
+
+    loadInitialData();
     loadVehicleData();
   }, [vehicleId]);
-
-  const loadCategories = async () => {
-    const { data, error } = await supabase
-      .from('vehicle_categories')
-      .select('id, name, slug')
-      .eq('is_active', true)
-      .order('sort_order');
-    
-    if (error) {
-      console.error('Error loading categories:', error);
-    } else if (data) {
-      setCategories(data);
-    }
-  };
-
-  const loadExtras = async () => {
-    const { data, error } = await supabase
-      .from('extras')
-      .select('id, name, price_per_day, price_type')
-      .eq('is_active', true)
-      .order('name');
-    
-    if (error) {
-      console.error('Error loading extras:', error);
-    } else if (data) {
-      setExtras(data);
-    }
-  };
-
-  const loadEquipment = async () => {
-    const { data, error } = await supabase
-      .from('equipment')
-      .select('id, name, slug, icon, category, is_standard, is_active')
-      .eq('is_active', true)
-      .order('category')
-      .order('sort_order');
-    
-    if (error) {
-      console.error('Error loading equipment:', error);
-    } else if (data) {
-      setEquipmentList(data);
-    }
-  };
 
   const loadVehicleData = async () => {
     try {

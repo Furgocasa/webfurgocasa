@@ -78,39 +78,38 @@ export default function NuevoVehiculoPage() {
   });
 
   useEffect(() => {
-    loadCategories();
-    loadExtras();
+    const loadInitialData = async () => {
+      // Cargar categorías
+      const { data: categoriesData, error: categoriesError } = await supabase
+        .from('vehicle_categories')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .order('sort_order');
+      
+      if (categoriesError) {
+        console.error('Error loading categories:', categoriesError);
+      } else if (categoriesData && categoriesData.length > 0) {
+        setCategories(categoriesData);
+        // Seleccionar la primera categoría por defecto automáticamente
+        setFormData(prev => ({ ...prev, category_id: categoriesData[0].id }));
+      }
+
+      // Cargar extras
+      const { data: extrasData, error: extrasError } = await supabase
+        .from('extras')
+        .select('id, name, price_per_day, price_type')
+        .eq('is_active', true)
+        .order('name');
+      
+      if (extrasError) {
+        console.error('Error loading extras:', extrasError);
+      } else if (extrasData) {
+        setExtras(extrasData);
+      }
+    };
+
+    loadInitialData();
   }, []);
-
-  const loadCategories = async () => {
-    const { data, error } = await supabase
-      .from('vehicle_categories')
-      .select('id, name, slug')
-      .eq('is_active', true)
-      .order('sort_order');
-    
-    if (error) {
-      console.error('Error loading categories:', error);
-    } else if (data && data.length > 0) {
-      setCategories(data);
-      // Seleccionar la primera categoría por defecto automáticamente
-      setFormData(prev => ({ ...prev, category_id: data[0].id }));
-    }
-  };
-
-  const loadExtras = async () => {
-    const { data, error } = await supabase
-      .from('extras')
-      .select('id, name, price_per_day, price_type')
-      .eq('is_active', true)
-      .order('name');
-    
-    if (error) {
-      console.error('Error loading extras:', error);
-    } else if (data) {
-      setExtras(data);
-    }
-  };
 
   const generateSlug = (name: string) => {
     return name
