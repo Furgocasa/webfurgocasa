@@ -397,7 +397,7 @@ function NuevaReservaContent() {
 <main className="min-h-screen bg-gray-50 pt-6 pb-8 md:pt-8 md:pb-12">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Barra de resumen - Sticky dentro del main */}
-          <div className="sticky top-[120px] md:top-[132px] bg-white shadow-md border-b border-gray-200 z-30 -mx-4 px-4 mb-6 rounded-b-lg">
+          <div className="sticky top-[104px] md:top-[120px] bg-white shadow-md border-b border-gray-200 z-30 -mx-4 px-4 mb-6 rounded-b-lg">
             <div className="py-3">
               {/* Link"Volver" */}
               <div className="mb-2">
