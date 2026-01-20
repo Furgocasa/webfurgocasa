@@ -1,5 +1,12 @@
 # Configuración de Meta Pixel (Facebook Pixel)
 
+**Última actualización**: 20 de Enero 2026 - v1.0.4
+
+> ⚠️ **ESTE FIX ES PARTE DEL RELEASE v1.0.4**  
+> Ver también: `CORRECCION-ERRORES-ADMIN.md`, `CHANGELOG.md` v1.0.4
+
+---
+
 ## Problema Resuelto
 
 Se ha corregido el error `[Meta Pixel] - Invalid PixelID: null` que aparecía en la consola del navegador.
@@ -75,3 +82,16 @@ Para verificar que el pixel está funcionando correctamente:
 - Este cambio también afecta a Google Analytics que usa un ID de placeholder `G-XXXXXXXXXX`
 - Se recomienda configurar también `NEXT_PUBLIC_GA_ID` para Google Analytics
 - Ambos IDs son opcionales y la aplicación funciona sin ellos
+
+---
+
+## 📚 Documentación Relacionada
+
+- **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** - Fix completo del administrador v1.0.4
+- **[CHANGELOG.md](./CHANGELOG.md)** - v1.0.4 con todos los cambios
+
+---
+
+**Commit**: `7d2a8e4` - fix: carga condicional de Meta Pixel  
+**Fecha**: 20 de Enero 2026  
+**Estado**: ✅ En producción

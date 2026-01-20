@@ -1,5 +1,12 @@
 # Corrección: Sistema de Normalización Cliente-Reserva
 
+**Última actualización**: 20 de Enero 2026
+
+> ℹ️ **NOTA**: Este cambio es independiente del fix crítico v1.0.4  
+> Para el fix de autenticación del admin, ver `CORRECCION-ERRORES-ADMIN.md`
+
+---
+
 ## Problema Identificado
 
 Al intentar editar una reserva, el sistema intentaba actualizar campos de cliente (como `customer_address`) que ya no existen en la tabla `bookings` tras la normalización a la tabla `customers`, generando un error 400.
@@ -290,3 +297,16 @@ WHERE bookings.id = 'booking-id';
 - El snapshot (customer_name, customer_email) en bookings se actualiza automáticamente al guardar la reserva
 - Si se elimina un cliente, las reservas mantienen el snapshot por GDPR
 - Las estadísticas del cliente (total_bookings, total_spent) se actualizan mediante triggers o manualmente
+
+---
+
+## 📚 Documentación Relacionada
+
+- **[MIGRACION-CLIENTES-NORMALIZADOS.md](./MIGRACION-CLIENTES-NORMALIZADOS.md)** - Migración de datos
+- **[CORRECCION-CUSTOMER-PHONE-OBLIGATORIO.md](./CORRECCION-CUSTOMER-PHONE-OBLIGATORIO.md)** - Fix de campo phone
+- **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** - Reglas de gestión
+
+---
+
+**Fecha**: Enero 2026  
+**Estado**: ✅ Implementado

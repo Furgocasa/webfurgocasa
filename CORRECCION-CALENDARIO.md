@@ -1,6 +1,19 @@
 # Corrección del Calendario de Administración
 
-## Problema Identificado
+**Última actualización**: 20 de Enero 2026 - v1.0.4  
+**Estado**: ✅ COMPLETADO
+
+> ⚠️ **ESTE FIX ES PARTE DEL RELEASE v1.0.4**  
+> El calendario tuvo 3 problemas principales que se corrigieron:
+> 1. **Error de autenticación** (parte del fix crítico singleton)
+> 2. **Error 400 en booking_extras** (URL demasiado larga)
+> 3. **Error "Cannot read properties of null"** (validación de vehicles)
+>
+> Ver también: `CORRECCION-ERRORES-ADMIN.md`, `RESUMEN-FIX-CRITICO-v1.0.4.md`
+
+---
+
+## 🚨 Problemas Identificados
 
 La página del calendario (`/administrator/calendario`) no cargaba correctamente y mostraba múltiples errores:
 
@@ -156,14 +169,33 @@ useEffect(() => {
 
 ## Estado Actual - COMPLETADO ✅
 
-✅ **Importaciones corregidas**
-✅ **Protección contra null**
-✅ **Carga en lotes de booking_extras**
-✅ **Estados de carga y error**
-✅ **Detección visual de conflictos**
+✅ **Importaciones corregidas** (parte del fix singleton v1.0.4)  
+✅ **Protección contra null**  
+✅ **Carga en lotes de booking_extras**  
+✅ **Estados de carga y error**  
+✅ **Detección visual de conflictos**  
 ✅ **Autenticación correcta en todas las queries**
 
-El calendario debería cargar correctamente ahora. Si aún hay errores, verificar:
+El calendario funciona correctamente. Si aún hay errores, verificar:
+- Que se haya aplicado el fix del singleton (`CORRECCION-ERRORES-ADMIN.md`)
+- Que los permisos RLS estén correctos
+- Consola del navegador para detalles
+
+---
+
+## 📚 Documentación Relacionada
+
+- **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** - Fix principal de autenticación
+- **[RESUMEN-FIX-CRITICO-v1.0.4.md](./RESUMEN-FIX-CRITICO-v1.0.4.md)** - Resumen ejecutivo completo
+- **[CHANGELOG.md](./CHANGELOG.md)** - v1.0.4 con todos los cambios
+- **[README.md](./README.md)** - Arquitectura y reglas
+- **[CORRECCION-CALENDARIO-DUPLICADOS.md](./CORRECCION-CALENDARIO-DUPLICADOS.md)** - Corrección de duplicados visuales
+
+---
+
+**Commit**: Parte del fix crítico v1.0.4  
+**Fecha**: 20 de Enero 2026  
+**Estado**: ✅ En producción (https://webfurgocasa.vercel.app)
 - Que el administrador esté autenticado correctamente
 - Que las políticas RLS permitan lectura de vehicles, bookings, customers y locations
 - Que no haya datos corruptos en la base de datos

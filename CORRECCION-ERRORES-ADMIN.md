@@ -1,8 +1,16 @@
 # Corrección de Errores en Secciones del Administrador
 
-## Problema Identificado
+**Última actualización**: 20 de Enero 2026 - v1.0.4  
+**Estado**: ✅ COMPLETADO - TODAS las secciones funcionando
 
-Los errores `[usePaginatedData] Error` y `[useAdminData] Error` se debían a que los hooks y páginas del administrador estaban importando el cliente de Supabase de forma estática, lo que causaba problemas con la autenticación de administradores.
+> ⚠️ **ESTE DOCUMENTO ES PARTE DEL FIX CRÍTICO v1.0.4**  
+> Ver también: `README.md`, `CHANGELOG.md` v1.0.4, `RESUMEN-FIX-CRITICO-v1.0.4.md`
+
+---
+
+## 🚨 Problema Identificado
+
+Los errores `[usePaginatedData] Error` y `[useAdminData] Error` se debían a que el archivo `src/lib/supabase/client.ts` usaba un **patrón singleton** que congelaba la sesión de autenticación, causando que TODAS las secciones del administrador fallaran excepto el dashboard.
 
 ## Solución Aplicada
 
@@ -96,31 +104,97 @@ Todas las secciones principales del administrador han sido corregidas y ahora de
 ✅ **Ubicaciones**: Funcionando correctamente
 ✅ **Calendario**: Funcionando correctamente
 
-## Pruebas Recomendadas
+## 🔍 Causa Raíz (Descubierta 20 Enero 2026)
 
-Para verificar que todo funciona correctamente, se recomienda:
+El problema NO estaba en los hooks individuales, sino en el **patrón singleton** del archivo `src/lib/supabase/client.ts`:
 
-1. **Reiniciar el servidor de desarrollo** (`npm run dev`)
-2. **Probar cada sección del administrador**:
-   - Vehículos: Listar, crear, editar
-   - Reservas: Listar, ver detalle, cambiar estado
-   - Clientes: Listar, filtrar
-   - Pagos: Listar
-   - Extras: Listar, crear, editar, eliminar
-   - Equipamiento: Listar, crear, editar, eliminar
-   - Temporadas: Listar, eliminar
-   - Ubicaciones: Listar, crear, editar, eliminar
-   - Calendario: Visualizar reservas
+```typescript
+// ❌ CÓDIGO PROBLEMÁTICO (YA CORREGIDO)
+let browserClient = null;
+export function createClient() {
+  if (!browserClient) {
+    browserClient = createBrowserClient(...);
+  }
+  return browserClient; // ❌ Sesión congelada
+}
+```
 
-3. **Verificar en la consola** que no aparecen errores de:
-   - `[usePaginatedData] Error`
-   - `[useAdminData] Error`
-   - `AbortError`
-   - `[Meta Pixel] - Invalid PixelID`
+**Por qué fallaba**:
+1. Login → Se crea `browserClient` con token
+2. Navegación a otra sección → Se retorna LA MISMA instancia
+3. Token puede haber expirado/cambiado → Cliente NO se entera
+4. Peticiones fallan → RLS error → TODO el admin falla
 
-## Resultado Esperado
+**Ver detalles completos**: `RESUMEN-FIX-CRITICO-v1.0.4.md`
 
-- ✅ Todas las secciones cargan datos correctamente
-- ✅ No hay errores en la consola del navegador
-- ✅ Las operaciones CRUD funcionan correctamente
-- ✅ La autenticación de administrador se mantiene en todas las operaciones
+---
+
+## ✅ Solución Final Aplicada
+
+### 1. Cliente Supabase - Eliminado Singleton (CRÍTICO)
+
+**Archivo**: `src/lib/supabase/client.ts`
+
+```typescript
+// ✅ CÓDIGO CORRECTO (MANTENER SIEMPRE ASÍ)
+export function createClient() {
+  return createBrowserClient<Database>(supabaseUrl, supabaseAnonKey);
+  // ✅ Nueva instancia cada vez = sesión actualizada
+}
+```
+
+**⚠️ NUNCA VOLVER A USAR SINGLETON EN ESTE ARCHIVO**
+
+### 2. Hooks de Datos (Actualizados para usar createClient correctamente)
+
+Todos los hooks ahora crean instancia DENTRO de sus funciones async.
+
+---
+
+## 📊 Testing Completo Realizado
+
+### Verificación Paso a Paso
+- [x] Login admin → Dashboard ✅
+- [x] Dashboard → Vehículos ✅
+- [x] Dashboard → Reservas ✅
+- [x] Dashboard → Clientes ✅
+- [x] Dashboard → Pagos ✅
+- [x] Dashboard → Extras ✅
+- [x] Dashboard → Equipamiento ✅
+- [x] Dashboard → Temporadas ✅
+- [x] Dashboard → Ubicaciones ✅
+- [x] Dashboard → Calendario ✅
+- [x] Crear/Editar/Eliminar en cada sección ✅
+- [x] Navegación entre secciones ✅
+- [x] Refresh manual (F5) ✅
+- [x] Hard refresh (Ctrl+Shift+R) ✅
+- [x] Logout y login de nuevo ✅
+
+### Sin Errores en Consola
+- [x] Sin `[usePaginatedData] Error` ✅
+- [x] Sin `[useAdminData] Error` ✅
+- [x] Sin `AbortError` ✅
+- [x] Sin `Cannot read properties of null` ✅
+- [x] Sin `400 Bad Request` ✅
+- [x] Meta Pixel solo carga si configurado ✅
+
+---
+
+## 📚 Documentación Relacionada
+
+- **[README.md](./README.md)** - Sección "REGLAS ABSOLUTAS" y "Sistema de Autenticación"
+- **[CHANGELOG.md](./CHANGELOG.md)** - v1.0.4 completo con causa raíz y solución
+- **[RESUMEN-FIX-CRITICO-v1.0.4.md](./RESUMEN-FIX-CRITICO-v1.0.4.md)** - Resumen ejecutivo completo
+- **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** - REGLA #0: Cliente Supabase
+- **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** - REGLA #0: Crear cliente correctamente
+- **[CORRECCION-CALENDARIO.md](./CORRECCION-CALENDARIO.md)** - Fixes adicionales del calendario
+
+---
+
+## 🎯 Resultado Final
+
+**✅ TODAS LAS SECCIONES FUNCIONANDO AL 100%**
+
+**Commit**: `03a61ec` - fix: eliminar singleton en cliente Supabase  
+**Fecha**: 20 de Enero 2026  
+**Estado**: ✅ En producción (https://webfurgocasa.vercel.app)

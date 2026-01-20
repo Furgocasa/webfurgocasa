@@ -1,5 +1,13 @@
 # Corrección de Calendario y Sistema de Validación de Reservas
 
+**Última actualización**: 20 de Enero 2026
+
+> ℹ️ **NOTA**: Este documento trata sobre la corrección de duplicados visuales  
+> Para el fix de autenticación del calendario, ver `CORRECCION-CALENDARIO.md`  
+> Para el fix general del admin, ver `CORRECCION-ERRORES-ADMIN.md`
+
+---
+
 ## Problema Identificado
 
 El calendario del administrador mostraba **duplicación visual de reservas**, con múltiples puntos de inicio (verdes) y fin (rojos) para una misma reserva, y números incorrectos de reservas simultáneas en algunos días.
@@ -298,6 +306,14 @@ ALTER TABLE bookings ENABLE TRIGGER prevent_booking_conflicts;
 
 ---
 
-**Fecha**: 2026-01-20
-**Autor**: Sistema de IA - Cursor
+## 📚 Documentación Relacionada
+
+- **[CORRECCION-CALENDARIO.md](./CORRECCION-CALENDARIO.md)** - Corrección de carga del calendario
+- **[CORRECCION-ERRORES-ADMIN.md](./CORRECCION-ERRORES-ADMIN.md)** - Fix general del administrador
+- **[README.md](./README.md)** - Arquitectura general
+
+---
+
+**Fecha**: 2026-01-20  
+**Autor**: Sistema de IA - Cursor  
 **Estado**: ✅ Implementado y listo para pruebas

@@ -1,5 +1,12 @@
 # Corrección: Campo customer_phone Obligatorio
 
+**Última actualización**: 20 de Enero 2026
+
+> ℹ️ **NOTA**: Este problema es independiente del fix crítico v1.0.4  
+> Ver `CORRECCION-ERRORES-ADMIN.md` para el fix de autenticación del administrador
+
+---
+
 ## Problema
 
 Al editar una reserva y cambiar el vehículo, se produce el error:
@@ -83,3 +90,15 @@ Después de ejecutar el script SQL, verifica que funciona:
 - Los datos del cliente **NO se editan desde la reserva**, sino desde la página de clientes
 - El snapshot en `bookings` es solo para auditoría y no debe ser editado directamente
 - Si necesitas actualizar datos del cliente, usa el botón "Editar cliente" en el formulario de reserva
+
+---
+
+## 📚 Documentación Relacionada
+
+- **[CORRECCION-EDICION-RESERVAS-CLIENTES.md](./CORRECCION-EDICION-RESERVAS-CLIENTES.md)** - Sistema de normalización cliente-reserva
+- **[MIGRACION-CLIENTES-NORMALIZADOS.md](./MIGRACION-CLIENTES-NORMALIZADOS.md)** - Migración de datos
+
+---
+
+**Fecha**: Enero 2026  
+**Estado**: ✅ Corregido
