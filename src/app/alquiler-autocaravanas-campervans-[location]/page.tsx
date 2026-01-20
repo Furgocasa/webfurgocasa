@@ -134,7 +134,7 @@ export default async function LocationPage({
       <LocalBusinessJsonLd location={location} />
 <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section className="relative h-[600px] overflow-hidden pt-28 md:pt-0">
+        <section className="relative h-[600px] overflow-hidden">
           {location.hero_image ? (
             <Image
               src={location.hero_image}

@@ -105,7 +105,7 @@ export default async function HomePage() {
       
       <PublicLayout>
 {/* Hero Section con Slider */}
-        <section className="relative h-screen min-h-[600px] flex items-center justify-center lg:-mt-[132px] pt-[120px] lg:pt-[132px]">
+        <section className="relative h-screen min-h-[600px] flex items-center justify-center">
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <HeroSlider 
               images={["/images/slides/hero-01.webp","/images/slides/hero-02.webp","/images/slides/hero-03.webp","/images/slides/hero-04.webp","/images/slides/hero-05.webp",
