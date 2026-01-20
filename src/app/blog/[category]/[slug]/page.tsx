@@ -1,68 +1,89 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { LocalizedLink } from "@/components/localized-link";
-import { Calendar, User, Clock, ArrowLeft, Share2, Facebook, Twitter, Linkedin, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
-import { supabase } from "@/lib/supabase/client";
-import { useParams } from "next/navigation";
-import { getCategorySlugInSpanish, getCategoryName, translateCategorySlug } from "@/lib/blog-translations";
+import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
+import { getPostBySlug, getRelatedPosts, incrementPostViews, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
+import { getCategoryName } from "@/lib/blog-translations";
+import { ShareButtons } from "@/components/blog/share-buttons";
+import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
+// ⚡ ISR: Revalidar cada hora
+export const revalidate = 3600;
+
+// 🚀 Pre-generar las rutas más populares en build time
+export async function generateStaticParams() {
+  const posts = await getAllPublishedPostSlugs();
+  
+  // Generar las primeras 50 más recientes para build inicial
+  return posts.slice(0, 50);
 }
 
-interface TagItem {
-  id: string;
-  name: string;
-  slug: string;
-}
+// 🎯 Metadata dinámica para SEO óptimo
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: { category: string; slug: string } 
+}): Promise<Metadata> {
+  const post = await getPostBySlug(params.slug, params.category);
 
-interface Post {
-  id: string;
-  title: string;
-  title_en: string | null;
-  slug: string;
-  slug_en: string | null;
-  excerpt: string | null;
-  excerpt_en: string | null;
-  content: string;
-  content_en: string | null;
-  featured_image: string | null;
-  published_at: string | null;
-  reading_time: number;
-  views: number;
-  meta_title: string | null;
-  meta_description: string | null;
-  category: Category | null;
-  tags?: TagItem[];
-}
+  if (!post) {
+    return {
+      title: "Artículo no encontrado | Furgocasa",
+      description: "El artículo que buscas no existe o ha sido eliminado."
+    };
+  }
 
-interface RelatedPost {
-  id: string;
-  title: string;
-  title_en: string | null;
-  slug: string;
-  slug_en: string | null;
-  featured_image: string | null;
-  published_at: string | null;
-  reading_time: number;
+  const url = `https://furgocasa.com/blog/${params.category}/${params.slug}`;
+  
+  return {
+    title: post.meta_title || `${post.title} | Furgocasa Blog`,
+    description: post.meta_description || post.excerpt || post.title,
+    authors: [{ name: "Furgocasa" }],
+    keywords: post.tags?.map(tag => tag.name).join(", "),
+    openGraph: {
+      title: post.title,
+      description: post.excerpt || post.meta_description || "",
+      type: "article",
+      url: url,
+      images: post.featured_image ? [
+        {
+          url: post.featured_image,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        }
+      ] : [],
+      publishedTime: post.published_at || undefined,
+      modifiedTime: post.updated_at || undefined,
+      authors: ["Furgocasa"],
+      section: post.category?.name || "Blog",
+      tags: post.tags?.map(tag => tag.name),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt || post.meta_description || "",
+      images: post.featured_image ? [post.featured_image] : [],
+      creator: "@furgocasa",
+    },
+    alternates: {
+      canonical: url,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+  };
 }
-
-// Mapeo de slugs a nombres
-const categoryNames: Record<string, string> = {
-  rutas: "Rutas",
-  noticias: "Noticias",
-  vehiculos: "Vehículos",
-  consejos: "Consejos",
-  destinos: "Destinos",
-  equipamiento: "Equipamiento",
-};
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("es-ES", {
@@ -72,165 +93,36 @@ function formatDate(date: string) {
   });
 }
 
-export default function BlogPostPage() {
-  const params = useParams();
-  const { t, language } = useLanguage();
-  
-  const categorySlug = params.category as string;
-  const postSlug = params.slug as string;
-  
-  // Convertir el slug de categoría a español si no lo está (la BD tiene slugs en español)
-  const esCategorySlug = getCategorySlugInSpanish(categorySlug, language);
-
-  const [post, setPost] = useState<Post | null>(null);
-  const [relatedPosts, setRelatedPosts] = useState<RelatedPost[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // Helper para obtener el contenido en el idioma actual
-  const getTranslated = (es: string | null, en: string | null): string => {
-    if (language === 'en' && en) return en;
-    return es || '';
-  };
-
-  useEffect(() => {
-    async function loadPost() {
-      setLoading(true);
-
-      // Buscar por slug_en si el idioma es inglés, sino por slug español
-      const slugToSearch = postSlug;
-      const slugField = language === 'en' ? 'slug_en' : 'slug';
-      
-      console.log(`🔍 Buscando post con ${slugField}:`, slugToSearch);
-
-      // Intentar buscar por el slug en el idioma actual
-      let query = supabase
-        .from("posts")
-        .select(`
-          id,
-          title,
-          title_en,
-          slug,
-          slug_en,
-          excerpt,
-          excerpt_en,
-          content,
-          content_en,
-          featured_image,
-          published_at,
-          reading_time,
-          views,
-          meta_title,
-          meta_description,
-          category:content_categories(id, name, slug, description)
-        `)
-        .eq("status", "published");
-
-      // Buscar por slug_en si es inglés, sino por slug
-      if (language === 'en') {
-        query = query.or(`slug_en.eq.${slugToSearch},slug.eq.${slugToSearch}`);
-      } else {
-        query = query.eq('slug', slugToSearch);
-      }
-
-      const { data: postData, error } = await query.single();
-
-      if (postData) {
-        // Transformar category de array a objeto único
-        const transformedPost = {
-          ...postData,
-          category: Array.isArray(postData.category) ? postData.category[0] : postData.category
-        };
-        setPost(transformedPost);
-
-        // Incrementar vistas
-        await supabase
-          .from("posts")
-          .update({ views: (postData.views || 0) + 1 })
-          .eq("id", postData.id);
-
-        // Cargar posts relacionados (misma categoría)
-        if (postData.category) {
-          const { data: related } = await supabase
-            .from("posts")
-            .select("id, title, title_en, slug, slug_en, featured_image, published_at, reading_time")
-            .eq("category_id", postData.category.id)
-            .eq("status", "published")
-            .neq("id", postData.id)
-            .order("published_at", { ascending: false })
-            .limit(3);
-
-          setRelatedPosts(related || []);
-        }
-
-        // Cargar tags del post
-        const { data: postTags } = await supabase
-          .from("post_tags")
-          .select("tag:tags(id, name, slug)")
-          .eq("post_id", postData.id);
-
-        if (postTags && postData) {
-          setPost({
-            ...postData,
-            tags: postTags.map((pt: any) => pt.tag).filter(Boolean),
-          });
-        }
-      }
-
-      setLoading(false);
-    }
-
-    if (postSlug) {
-      loadPost();
-    }
-  }, [postSlug]);
-
-  // Obtener el nombre de la categoría traducido
-  const categoryName = post?.category?.slug 
-    ? getCategoryName(post.category.slug, language)
-    : getCategoryName(esCategorySlug, language);
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-blue"></div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
+// 🎨 Server Component principal
+export default async function BlogPostPage({ 
+  params 
+}: { 
+  params: { category: string; slug: string } 
+}) {
+  // Obtener post desde el servidor
+  const post = await getPostBySlug(params.slug, params.category);
 
   if (!post) {
-    return (
-      <>
-        <Header />
-        <main className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">
-          <BookOpen className="h-16 w-16 text-gray-300 mb-4" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            {t("Artículo no encontrado")}
-          </h1>
-          <p className="text-gray-500 mb-8">
-            {t("El artículo que buscas no existe o ha sido eliminado.")}
-          </p>
-          <LocalizedLink 
-            href={`/blog/${categorySlug}`} 
-            className="inline-flex items-center gap-2 bg-furgocasa-blue text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            {t("Volver a {categoryName}")}
-          </LocalizedLink>
-        </main>
-        <Footer />
-      </>
-    );
+    notFound();
   }
 
-  // URL actual para compartir
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  // Obtener posts relacionados
+  const relatedPosts = post.category_id 
+    ? await getRelatedPosts(post.category_id, post.id)
+    : [];
+
+  // Incrementar vistas (sin esperar)
+  incrementPostViews(post.id, post.views).catch(console.error);
+
+  const categoryName = post.category?.slug 
+    ? getCategoryName(post.category.slug, 'es')
+    : "Blog";
+
+  const url = `https://furgocasa.com/blog/${params.category}/${params.slug}`;
 
   return (
     <>
+      <BlogPostJsonLd post={post} url={url} />
       <Header />
 
       <main className="min-h-screen bg-gray-50 font-amiko">
@@ -242,25 +134,25 @@ export default function BlogPostPage() {
 
           <div className="container mx-auto px-4 relative z-10">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 text-white/70 text-sm mb-8 flex-wrap">
+            <nav className="flex items-center gap-2 text-white/70 text-sm mb-8 flex-wrap" aria-label="Breadcrumb">
               <LocalizedLink href="/" className="hover:text-white transition-colors">Inicio</LocalizedLink>
               <ChevronRight className="h-4 w-4" />
               <LocalizedLink href="/blog" className="hover:text-white transition-colors">Blog</LocalizedLink>
               <ChevronRight className="h-4 w-4" />
-              <LocalizedLink href={`/blog/${categorySlug}`} className="hover:text-white transition-colors">{categoryName}</LocalizedLink>
+              <LocalizedLink href={`/blog/${params.category}`} className="hover:text-white transition-colors">{categoryName}</LocalizedLink>
               <ChevronRight className="h-4 w-4" />
-              <span className="text-white font-medium truncate max-w-[200px]">{getTranslated(post.title, post.title_en)}</span>
+              <span className="text-white font-medium truncate max-w-[200px]">{post.title}</span>
             </nav>
 
             <div className="max-w-4xl mx-auto text-center">
               <LocalizedLink 
-                href={`/blog/${categorySlug}`}
+                href={`/blog/${params.category}`}
                 className="inline-block px-4 py-1.5 bg-furgocasa-orange text-white rounded-full text-xs font-bold uppercase tracking-wider mb-6 shadow-lg hover:bg-furgocasa-orange-dark transition-colors"
               >
                 {categoryName}
               </LocalizedLink>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold text-white mb-8 leading-tight">
-                {getTranslated(post.title, post.title_en)}
+                {post.title}
               </h1>
               
               <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-blue-100 font-medium bg-white/10 backdrop-blur-md rounded-2xl py-4 px-6 text-sm">
@@ -271,23 +163,23 @@ export default function BlogPostPage() {
                 <span className="w-1 h-1 bg-blue-300 rounded-full hidden md:block"></span>
                 {post.published_at && (
                   <>
-                    <span className="flex items-center gap-2">
+                    <time dateTime={post.published_at} className="flex items-center gap-2">
                       <Calendar className="h-4 w-4 text-furgocasa-orange" />
                       {formatDate(post.published_at)}
-                    </span>
+                    </time>
                     <span className="w-1 h-1 bg-blue-300 rounded-full hidden md:block"></span>
                   </>
                 )}
                 <span className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-furgocasa-orange" />
-                  {post.reading_time || 5} {t("min lectura")}
+                  {post.reading_time || 5} min lectura
                 </span>
                 {post.views > 0 && (
                   <>
                     <span className="w-1 h-1 bg-blue-300 rounded-full hidden md:block"></span>
                     <span className="flex items-center gap-2">
                       <Eye className="h-4 w-4 text-furgocasa-orange" />
-                      {post.views} {t("visitas")}
+                      {post.views} visitas
                     </span>
                   </>
                 )}
@@ -301,11 +193,17 @@ export default function BlogPostPage() {
           <div className="max-w-5xl mx-auto">
             <div className="h-64 md:h-[500px] bg-gray-200 rounded-3xl shadow-2xl flex items-center justify-center text-gray-400 overflow-hidden border-4 border-white">
               {post.featured_image ? (
-                <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover" />
+                <img 
+                  src={post.featured_image} 
+                  alt={post.title} 
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  fetchPriority="high"
+                />
               ) : (
                 <div className="flex flex-col items-center">
                   <BookOpen className="h-24 w-24 mb-4 opacity-50" />
-                  <span className="font-heading font-bold text-xl">{t("Imagen del artículo")}</span>
+                  <span className="font-heading font-bold text-xl">Imagen del artículo</span>
                 </div>
               )}
             </div>
@@ -315,38 +213,8 @@ export default function BlogPostPage() {
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-7xl mx-auto">
             <div className="grid lg:grid-cols-12 gap-12">
-              {/* Share Sidebar (Desktop) */}
-              <div className="lg:col-span-1 hidden lg:block">
-                <div className="sticky top-32 flex flex-col gap-4 items-center">
-                  <p className="text-xs font-bold text-gray-400 uppercase rotate-180 mb-4" style={{ writingMode: 'vertical-rl' }}>
-                    {t("Compartir")}
-                  </p>
-                  <a 
-                    href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-white text-blue-600 rounded-full shadow-md hover:scale-110 transition-transform"
-                  >
-                    <Facebook className="h-5 w-5" />
-                  </a>
-                  <a 
-                    href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(post.title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-white text-sky-500 rounded-full shadow-md hover:scale-110 transition-transform"
-                  >
-                    <Twitter className="h-5 w-5" />
-                  </a>
-                  <a 
-                    href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(post.title)}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-3 bg-white text-blue-700 rounded-full shadow-md hover:scale-110 transition-transform"
-                  >
-                    <Linkedin className="h-5 w-5" />
-                  </a>
-                </div>
-              </div>
+              {/* Share Sidebar */}
+              <ShareButtons shareUrl={url} title={post.title} />
 
               {/* Content */}
               <article className="lg:col-span-8">
@@ -376,7 +244,7 @@ export default function BlogPostPage() {
                     prose-hr:my-12 prose-hr:border-gray-200
                     prose-code:text-furgocasa-blue prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-base
                     prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8"
-                  dangerouslySetInnerHTML={{ __html: getTranslated(post.content, post.content_en) }}
+                  dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
                 {/* Tags */}
@@ -397,50 +265,19 @@ export default function BlogPostPage() {
                   </div>
                 )}
 
-                {/* Share Mobile */}
-                <div className="lg:hidden mt-8 pt-8 border-t border-gray-100">
-                  <p className="text-gray-900 font-bold mb-4 text-center">{t("Compartir artículo")}</p>
-                  <div className="flex gap-4 justify-center">
-                    <a 
-                      href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 bg-blue-600 text-white rounded-full shadow-lg"
-                    >
-                      <Facebook className="h-5 w-5" />
-                    </a>
-                    <a 
-                      href={`https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(post.title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 bg-sky-500 text-white rounded-full shadow-lg"
-                    >
-                      <Twitter className="h-5 w-5" />
-                    </a>
-                    <a 
-                      href={`https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(post.title)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 bg-blue-700 text-white rounded-full shadow-lg"
-                    >
-                      <Linkedin className="h-5 w-5" />
-                    </a>
-                  </div>
-                </div>
-
                 {/* CTA */}
                 <div className="mt-16 bg-furgocasa-blue rounded-3xl p-8 md:p-12 text-white text-center relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                   <div className="relative z-10">
-                    <h3 className="text-3xl font-heading font-bold mb-4">{t("¿Te ha inspirado este artículo?")}</h3>
+                    <h3 className="text-3xl font-heading font-bold mb-4">¿Te ha inspirado este artículo?</h3>
                     <p className="text-blue-100 mb-8 text-lg">
-                      {t("Haz realidad tu viaje. Reserva tu camper y empieza a explorar estos destinos increíbles.")}
+                      Haz realidad tu viaje. Reserva tu camper y empieza a explorar estos destinos increíbles.
                     </p>
                     <LocalizedLink
                       href="/reservar"
                       className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold py-4 px-8 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
                     >
-                      {t("Ver disponibilidad y precios")}
+                      Ver disponibilidad y precios
                     </LocalizedLink>
                   </div>
                 </div>
@@ -453,13 +290,13 @@ export default function BlogPostPage() {
                   {relatedPosts.length > 0 && (
                     <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
                       <h3 className="text-lg font-heading font-bold text-gray-900 mb-6 border-b border-gray-100 pb-2">
-                        {t("Más en {categoryName}")}
+                        Más en {categoryName}
                       </h3>
                       <ul className="space-y-6">
                         {relatedPosts.map((related) => (
                           <li key={related.id}>
                             <LocalizedLink
-                              href={`/blog/${categorySlug}/${related.slug}`}
+                              href={`/blog/${params.category}/${related.slug}`}
                               className="block group"
                             >
                               {related.featured_image && (
@@ -468,37 +305,38 @@ export default function BlogPostPage() {
                                     src={related.featured_image} 
                                     alt={related.title}
                                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    loading="lazy"
                                   />
                                 </div>
                               )}
                               <p className="text-gray-900 font-bold leading-tight group-hover:text-furgocasa-blue transition-colors line-clamp-2">
-                                {getTranslated(related.title, related.title_en)}
+                                {related.title}
                               </p>
                               {related.published_at && (
-                                <p className="text-xs text-gray-400 mt-2">
+                                <time dateTime={related.published_at} className="text-xs text-gray-400 mt-2 block">
                                   {formatDate(related.published_at)}
-                                </p>
+                                </time>
                               )}
                             </LocalizedLink>
                           </li>
                         ))}
                       </ul>
                       <LocalizedLink 
-                        href={`/blog/${categorySlug}`}
+                        href={`/blog/${params.category}`}
                         className="block text-center text-sm font-bold text-furgocasa-blue hover:text-furgocasa-orange mt-6 pt-4 border-t border-gray-100 transition-colors"
                       >
-                        {t("Ver más artículos de {categoryName}")} →
+                        Ver más artículos de {categoryName} →
                       </LocalizedLink>
                     </div>
                   )}
                   
                   {/* Back to category */}
                   <LocalizedLink 
-                    href={`/blog/${categorySlug}`}
+                    href={`/blog/${params.category}`}
                     className="flex items-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-xl transition-colors"
                   >
                     <ArrowLeft className="h-4 w-4" />
-                    {t("Volver a {categoryName}")}
+                    Volver a {categoryName}
                   </LocalizedLink>
                 </div>
               </aside>
@@ -511,4 +349,3 @@ export default function BlogPostPage() {
     </>
   );
 }
-

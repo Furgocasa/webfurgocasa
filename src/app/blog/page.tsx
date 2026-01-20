@@ -7,12 +7,45 @@ import { BlogSkeleton } from "@/components/blog/blog-skeleton";
 import { BookOpen } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Blog de Viajes en Camper | Furgocasa",
-  description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos para viajar en camper.",
+  title: "Blog de Viajes en Camper y Autocaravanas | Consejos, Rutas y Destinos | Furgocasa",
+  description: "Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente.",
+  keywords: "blog camper, viajes autocaravana, rutas camper españa, consejos autocaravana, destinos camper, alquiler campers murcia, camping autocaravana, vida en camper",
+  authors: [{ name: "Furgocasa" }],
   openGraph: {
     title: "Blog de Viajes en Camper | Furgocasa",
-    description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana",
+    description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España.",
     type: "website",
+    url: "https://furgocasa.com/blog",
+    siteName: "Furgocasa",
+    images: [
+      {
+        url: "https://furgocasa.com/og-blog.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Blog de Viajes en Camper - Furgocasa",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog de Viajes en Camper | Furgocasa",
+    description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana",
+    images: ["https://furgocasa.com/og-blog.jpg"],
+    creator: "@furgocasa",
+  },
+  alternates: {
+    canonical: "https://furgocasa.com/blog",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 

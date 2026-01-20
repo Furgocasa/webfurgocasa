@@ -351,6 +351,9 @@ Estos documentos ya NO existen (fueron eliminados):
 - ❌ `CORRECCION-CALENDARIO.md` - Fix calendario v1.0.4 (información completa en CHANGELOG.md v1.0.4)
 - ❌ `CORRECCION-CLIENTES-TOTALES.md` - Fix simple ya aplicado (información en CHANGELOG.md)
 - ❌ `CORRECCION-CUSTOMER-PHONE-OBLIGATORIO.md` - Fix simple ya aplicado (información en CHANGELOG.md)
+- ❌ `FIX-CRITICO-TRIGGERS-CLIENTES.md` - Redundante con CORRECCION-STATS-CLIENTES.md (más completo)
+- ❌ `FIX-VALIDACION-HORAS-RESERVAS.md` - Fix ya aplicado (información técnica en código y SISTEMA-PREVENCION-CONFLICTOS.md)
+- ❌ `FIX-EDICION-RESERVAS.md` - Fix ya aplicado (información técnica en código)
 
 ---
 
@@ -373,6 +376,6 @@ Estos documentos ya NO existen (fueron eliminados):
 
 ---
 
-**Total de documentos activos**: 27 archivos .md en raíz + subdirectorios  
+**Total de documentos activos**: 24 archivos .md en raíz + subdirectorios  
 **Última actualización crítica**: v1.0.4 - Fix sistema autenticación (20 Enero 2026)  
 **Última limpieza de obsoletos**: 20 Enero 2026
