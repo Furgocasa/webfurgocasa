@@ -114,7 +114,7 @@ supabase db execute --file supabase/fix-customer-stats-complete.sql
 
 1. **Accede al panel de administración**
    ```
-   https://webfurgocasa.vercel.app/administrator/clientes
+   https://www.furgocasa.com/administrator/clientes
    ```
 
 2. **Verifica que las columnas ahora muestran datos:**

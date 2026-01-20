@@ -1,10 +1,10 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
 [![Version](https://img.shields.io/badge/version-1.0.4-green.svg)](./CHANGELOG.md)
-[![Status](https://img.shields.io/badge/status-production-success.svg)](https://webfurgocasa.vercel.app)
+[![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0.4 EN PRODUCCIÓN** - [https://webfurgocasa.vercel.app](https://webfurgocasa.vercel.app)
+**🎉 VERSIÓN 1.0.4 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
 > **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
 
@@ -833,7 +833,7 @@ supabase/fix-all-rls-policies.sql
 
 ### ✅ Producción actual: Vercel
 
-**URL**: https://webfurgocasa.vercel.app
+**URL**: https://www.furgocasa.com
 
 ### Configuración de variables en Vercel:
 
@@ -1057,7 +1057,7 @@ Desarrollado con ❤️ para Furgocasa
 
 **Versión**: 1.0.4 - Fix Crítico Autenticación  
 **Estado**: ✅ Producción Estable  
-**URL**: https://webfurgocasa.vercel.app  
+**URL**: https://www.furgocasa.com  
 **Última actualización**: 20 de Enero 2026  
 
 ---

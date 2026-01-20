@@ -322,7 +322,7 @@ const hmac = crypto.createHmac("sha256", derivedKeyBuffer); // ✅ Usar buffer
 
 **Posibles causas**:
 1. 🔴 El `merchantCode` (347036410) no está dado de alta correctamente en Redsys
-2. 🔴 La URL de callback (`https://webfurgocasa.vercel.app`) no está autorizada en Redsys
+2. 🔴 La URL de callback (`https://www.furgocasa.com`) no está autorizada en Redsys
 3. 🔴 Falta alguna configuración en el panel de administración de Redsys
 4. 🔴 El terminal "001" no está configurado para este comercio
 5. 🔴 Las credenciales son de producción pero el comercio no está activado
@@ -339,8 +339,8 @@ const hmac = crypto.createHmac("sha256", derivedKeyBuffer); // ✅ Usar buffer
 - **Terminal**: 001
 - **Error**: SIS0042 y recursos 404 (CSS, JS, logo)
 - **URLs de callback**:
-  - Producción: https://webfurgocasa.vercel.app
-  - Pruebas: https://furgocasa.com
+  - Producción: https://www.furgocasa.com
+  - Pruebas: https://furgocasa.com (servidor antiguo)
 - **Preguntas específicas**:
   1. ¿Está el comercio 347036410 dado de alta correctamente?
   2. ¿Está el terminal 001 activo?

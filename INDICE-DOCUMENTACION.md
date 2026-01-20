@@ -1,7 +1,7 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
 **Versión**: 1.0.4 ✅ PRODUCCIÓN - FIX CRÍTICO AUTENTICACIÓN  
-**URL**: https://webfurgocasa.vercel.app  
+**URL**: https://www.furgocasa.com  
 **Última actualización**: 20 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.

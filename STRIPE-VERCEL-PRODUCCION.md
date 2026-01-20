@@ -1,6 +1,6 @@
 # 🚀 Configurar Stripe en PRODUCCIÓN (Vercel)
 
-**Tu app está en**: https://webfurgocasa.vercel.app  
+**Tu app está en**: https://www.furgocasa.com  
 **Estado**: Desplegada y funcionando  
 **Objetivo**: Añadir Stripe como método de pago en producción
 
@@ -73,7 +73,7 @@ El webhook permite que Stripe notifique a tu app cuando se completa un pago.
 
 **Endpoint URL**:
 ```
-https://webfurgocasa.vercel.app/api/stripe/webhook
+https://www.furgocasa.com/api/stripe/webhook
 ```
 
 **Events to send** (selecciona estos 4):
@@ -120,7 +120,7 @@ Ahora puedes probar el flujo completo:
 
 ### 1. Crear una Reserva de Prueba
 
-1. Ve a: **https://webfurgocasa.vercel.app**
+1. Ve a: **https://www.furgocasa.com**
 2. Crea una reserva (cualquier vehículo, fechas futuras)
 3. Completa el formulario de cliente
 4. Llegarás a la página de pago
@@ -218,7 +218,7 @@ STRIPE_WEBHOOK_SECRET = whsec_XXXXX (crear nuevo webhook)
 ### 4. Crear Nuevo Webhook de Producción
 
 1. En Stripe (modo producción), crea un nuevo webhook
-2. Misma URL: `https://webfurgocasa.vercel.app/api/stripe/webhook`
+2. Misma URL: `https://www.furgocasa.com/api/stripe/webhook`
 3. Mismos eventos
 4. Copia el nuevo `whsec_...` de producción
 
@@ -279,7 +279,7 @@ Para ver si el webhook llegó a tu API:
 
 **Solución**:
 1. Ve a Stripe → Webhooks → Tu webhook
-2. Verifica que la URL es: `https://webfurgocasa.vercel.app/api/stripe/webhook` (sin espacios)
+2. Verifica que la URL es: `https://www.furgocasa.com/api/stripe/webhook` (sin espacios)
 3. Verifica que el signing secret está en Vercel
 4. Revisa los logs de eventos en Stripe para ver el error
 

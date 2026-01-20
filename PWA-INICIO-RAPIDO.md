@@ -8,7 +8,7 @@ Ahora el panel de administrador de Furgocasa se puede **instalar como una app en
 
 ### iPhone (Safari)
 1. Abre Safari
-2. Ve a: `https://webfurgocasa.vercel.app/administrator`
+2. Ve a: `https://www.furgocasa.com/administrator`
 3. Inicia sesión
 4. Toca el botón de **Compartir** (⬆️)
 5. Desplázate y toca **"Añadir a pantalla de inicio"**
@@ -17,7 +17,7 @@ Ahora el panel de administrador de Furgocasa se puede **instalar como una app en
 
 ### Android (Chrome)
 1. Abre Chrome
-2. Ve a: `https://webfurgocasa.vercel.app/administrator`
+2. Ve a: `https://www.furgocasa.com/administrator`
 3. Inicia sesión
 4. Aparecerá un banner: **"Instalar app"**
    - Si no aparece: Menú (⋮) → "Instalar aplicación"
