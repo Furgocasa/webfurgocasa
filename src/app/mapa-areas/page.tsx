@@ -1,7 +1,6 @@
 import { Metadata } from"next";
-import { MapPin, Wifi, Droplets, Plug, Trash2, ShowerHead, Search, ExternalLink, Sparkles, Route, Map, Shield } from"lucide-react";
+import { MapPin, Wifi, Droplets, Plug, Trash2, ShowerHead, ExternalLink, Sparkles, Route, Map, Shield } from"lucide-react";
 import { translateServer } from"@/lib/i18n/server-translation";
-import Link from "next/link";
 
 export const metadata: Metadata = {
   title:"Mapa de Áreas para Autocaravanas | Furgocasa Campervans",
@@ -42,36 +41,6 @@ export default function MapaAreasPage() {
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{t("Mapa de Áreas")}</h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">{t("Encuentra las mejores áreas de servicio y pernocta para tu camper en España")}</p>
-          </div>
-        </section>
-
-        {/* Filtros */}
-        <section className="bg-white border-b sticky top-0 z-20">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input type="text" placeholder="Buscar por ciudad o zona..." className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg" />
-              </div>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg">
-                <option value="">Todos los tipos</option>
-                <option value="area_servicio">Áreas de servicio</option>
-                <option value="parking">Parkings</option>
-                <option value="camping">Campings</option>
-              </select>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg">
-                <option value="">Todos los servicios</option>
-                <option value="agua">Con agua</option>
-                <option value="vaciado">Con vaciado</option>
-                <option value="electricidad">Con electricidad</option>
-                <option value="wifi">Con WiFi</option>
-              </select>
-              <select className="px-4 py-2 border border-gray-300 rounded-lg">
-                <option value="">Cualquier precio</option>
-                <option value="gratis">Gratuitas</option>
-                <option value="pago">De pago</option>
-              </select>
-            </div>
           </div>
         </section>
 

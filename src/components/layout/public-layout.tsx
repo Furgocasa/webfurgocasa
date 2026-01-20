@@ -6,12 +6,12 @@ interface PublicLayoutProps {
 
 /**
  * Layout wrapper para páginas públicas
- * Añade el padding-top necesario para compensar el header fijo
+ * Con header sticky, el contenido fluye naturalmente
  */
 export function PublicLayout({ children }: PublicLayoutProps) {
   return (
-    <div className="pt-[120px]">
+    <>
       {children}
-    </div>
+    </>
   );
 }
