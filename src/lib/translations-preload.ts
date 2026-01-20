@@ -1100,6 +1100,332 @@ export const staticTranslations = {
     es: "¿Te interesa alguna de estas ofertas?",
     en: "Interested in any of these offers?"
   },
+
+  // ===== PÁGINA DE DETALLE DE RESERVA /reservar/[id] =====
+  "Cargando información de la reserva...": {
+    es: "Cargando información de la reserva...",
+    en: "Loading booking information..."
+  },
+  "Error": {
+    es: "Error",
+    en: "Error"
+  },
+  "Reserva no encontrada": {
+    es: "Reserva no encontrada",
+    en: "Booking not found"
+  },
+  "Volver al inicio": {
+    es: "Volver al inicio",
+    en: "Back to home"
+  },
+  "Reserva": {
+    es: "Reserva",
+    en: "Booking"
+  },
+  "Número de confirmación": {
+    es: "Número de confirmación",
+    en: "Confirmation number"
+  },
+  "Reserva creada el": {
+    es: "Reserva creada el",
+    en: "Booking created on"
+  },
+  "Primer pago (50%)": {
+    es: "Primer pago (50%)",
+    en: "First payment (50%)"
+  },
+  "Para confirmar tu reserva, necesitamos el pago del 50% del total.": {
+    es: "Para confirmar tu reserva, necesitamos el pago del 50% del total.",
+    en: "To confirm your booking, we need payment of 50% of the total."
+  },
+  "Pago inicial": {
+    es: "Pago inicial",
+    en: "Initial payment"
+  },
+  "El segundo pago": {
+    es: "El segundo pago",
+    en: "The second payment"
+  },
+  "se realizará máximo 15 días antes del inicio del alquiler": {
+    es: "se realizará máximo 15 días antes del inicio del alquiler",
+    en: "must be completed no later than 15 days before the start of the rental"
+  },
+  "Pagar": {
+    es: "Pagar",
+    en: "Pay"
+  },
+  "y confirmar": {
+    es: "y confirmar",
+    en: "and confirm"
+  },
+  "⚠️ Segundo pago urgente": {
+    es: "⚠️ Segundo pago urgente",
+    en: "⚠️ Second payment urgent"
+  },
+  "Primer pago completado ✓": {
+    es: "Primer pago completado ✓",
+    en: "First payment completed ✓"
+  },
+  "¡Atención!": {
+    es: "¡Atención!",
+    en: "Attention!"
+  },
+  "Faltan": {
+    es: "Faltan",
+    en: "Only"
+  },
+  "días para el inicio del alquiler. El segundo pago debe realizarse como máximo 15 días antes.": {
+    es: "días para el inicio del alquiler. El segundo pago debe realizarse como máximo 15 días antes.",
+    en: "days until rental starts. The second payment must be completed no later than 15 days before."
+  },
+  "Has pagado": {
+    es: "Has pagado",
+    en: "You have paid"
+  },
+  "Puedes realizar el segundo pago cuando quieras.": {
+    es: "Puedes realizar el segundo pago cuando quieras.",
+    en: "You can make the second payment whenever you want."
+  },
+  "Total de la reserva": {
+    es: "Total de la reserva",
+    en: "Booking total"
+  },
+  "Ya pagado": {
+    es: "Ya pagado",
+    en: "Already paid"
+  },
+  "Pendiente": {
+    es: "Pendiente",
+    en: "Pending"
+  },
+  "Pagar ahora": {
+    es: "Pagar ahora",
+    en: "Pay now"
+  },
+  "Realizar segundo pago": {
+    es: "Realizar segundo pago",
+    en: "Make second payment"
+  },
+  "Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler": {
+    es: "Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler",
+    en: "Remember: the second payment must be completed no later than 15 days before the start of the rental"
+  },
+  "¡Pago completado!": {
+    es: "¡Pago completado!",
+    en: "Payment completed!"
+  },
+  "Has completado el pago total de la reserva. ¡Todo listo para tu aventura!": {
+    es: "Has completado el pago total de la reserva. ¡Todo listo para tu aventura!",
+    en: "You have completed the total booking payment. All set for your adventure!"
+  },
+  "Total pagado": {
+    es: "Total pagado",
+    en: "Total paid"
+  },
+  "Tu vehículo": {
+    es: "Tu vehículo",
+    en: "Your vehicle"
+  },
+  "Datos del conductor principal": {
+    es: "Datos del conductor principal",
+    en: "Main driver information"
+  },
+  "Nombre del conductor principal": {
+    es: "Nombre del conductor principal",
+    en: "Main driver's first name"
+  },
+  "Apellidos del conductor principal": {
+    es: "Apellidos del conductor principal",
+    en: "Main driver's last name"
+  },
+  "DNI - ID nº": {
+    es: "DNI - ID nº",
+    en: "ID Number"
+  },
+  "Dirección del conductor principal": {
+    es: "Dirección del conductor principal",
+    en: "Main driver's address"
+  },
+  "Código postal del conductor principal": {
+    es: "Código postal del conductor principal",
+    en: "Main driver's postal code"
+  },
+  "Municipio del conductor principal": {
+    es: "Municipio del conductor principal",
+    en: "Main driver's city"
+  },
+  "País del conductor principal": {
+    es: "País del conductor principal",
+    en: "Main driver's country"
+  },
+  "Edad del conductor principal": {
+    es: "Edad del conductor principal",
+    en: "Main driver's age"
+  },
+  "Fecha de caducidad carnet conducir del conductor principal": {
+    es: "Fecha de caducidad carnet conducir del conductor principal",
+    en: "Main driver's license expiry date"
+  },
+  "e-Mail": {
+    es: "e-Mail",
+    en: "e-Mail"
+  },
+  "Comentarios": {
+    es: "Comentarios",
+    en: "Comments"
+  },
+  "Fechas": {
+    es: "Fechas",
+    en: "Dates"
+  },
+  "Recogida": {
+    es: "Recogida",
+    en: "Pick-up"
+  },
+  "Devolución": {
+    es: "Devolución",
+    en: "Drop-off"
+  },
+  "Duración": {
+    es: "Duración",
+    en: "Duration"
+  },
+  "Ubicación": {
+    es: "Ubicación",
+    en: "Location"
+  },
+  "Punto de recogida": {
+    es: "Punto de recogida",
+    en: "Pick-up point"
+  },
+  "Punto de devolución": {
+    es: "Punto de devolución",
+    en: "Drop-off point"
+  },
+  "Extras incluidos": {
+    es: "Extras incluidos",
+    en: "Included extras"
+  },
+  "Cantidad": {
+    es: "Cantidad",
+    en: "Quantity"
+  },
+  "Resumen de pago": {
+    es: "Resumen de pago",
+    en: "Payment summary"
+  },
+  "Alquiler": {
+    es: "Alquiler",
+    en: "Rental"
+  },
+  "Extras": {
+    es: "Extras",
+    en: "Extras"
+  },
+  "Comisión de entrega/recogida": {
+    es: "Comisión de entrega/recogida",
+    en: "Delivery/pick-up fee"
+  },
+  "Descuento": {
+    es: "Descuento",
+    en: "Discount"
+  },
+  "Fianza": {
+    es: "Fianza",
+    en: "Deposit"
+  },
+  "La fianza se devuelve al finalizar el alquiler si no hay daños": {
+    es: "La fianza se devuelve al finalizar el alquiler si no hay daños",
+    en: "The deposit is returned at the end of the rental if there is no damage"
+  },
+  "Total": {
+    es: "Total",
+    en: "Total"
+  },
+  "Pagado completamente": {
+    es: "Pagado completamente",
+    en: "Fully paid"
+  },
+  "¿Necesitas ayuda?": {
+    es: "¿Necesitas ayuda?",
+    en: "Need help?"
+  },
+  "Si tienes alguna duda sobre tu reserva, no dudes en contactarnos.": {
+    es: "Si tienes alguna duda sobre tu reserva, no dudes en contactarnos.",
+    en: "If you have any questions about your booking, don't hesitate to contact us."
+  },
+  "Solicitud de cancelación / modificación": {
+    es: "Solicitud de cancelación / modificación",
+    en: "Cancellation / modification request"
+  },
+  "Si deseas cancelar o modificar tu reserva, por favor contáctanos directamente. Te responderemos lo antes posible.": {
+    es: "Si deseas cancelar o modificar tu reserva, por favor contáctanos directamente. Te responderemos lo antes posible.",
+    en: "If you wish to cancel or modify your booking, please contact us directly. We will respond as soon as possible."
+  },
+  "Asegúrate de incluir tu número de reserva": {
+    es: "Asegúrate de incluir tu número de reserva",
+    en: "Make sure to include your booking number"
+  },
+  "en tu mensaje para que podamos ayudarte más rápidamente.": {
+    es: "en tu mensaje para que podamos ayudarte más rápidamente.",
+    en: "in your message so we can help you more quickly."
+  },
+  "Consulta nuestra": {
+    es: "Consulta nuestra",
+    en: "Check our"
+  },
+  "política de cancelación": {
+    es: "política de cancelación",
+    en: "cancellation policy"
+  },
+  "para más información.": {
+    es: "para más información.",
+    en: "for more information."
+  },
+  "Pendiente de pago": {
+    es: "Pendiente de pago",
+    en: "Pending payment"
+  },
+  "Confirmada": {
+    es: "Confirmada",
+    en: "Confirmed"
+  },
+  "En curso": {
+    es: "En curso",
+    en: "In progress"
+  },
+  "Completada": {
+    es: "Completada",
+    en: "Completed"
+  },
+  "Cancelada": {
+    es: "Cancelada",
+    en: "Cancelled"
+  },
+  "Tu reserva está creada. Completa el pago para confirmarla.": {
+    es: "Tu reserva está creada. Completa el pago para confirmarla.",
+    en: "Your booking is created. Complete payment to confirm it."
+  },
+  "Tu reserva está confirmada. ¡Prepárate para tu aventura!": {
+    es: "Tu reserva está confirmada. ¡Prepárate para tu aventura!",
+    en: "Your booking is confirmed. Get ready for your adventure!"
+  },
+  "¡Disfruta tu viaje! El vehículo está actualmente en uso.": {
+    es: "¡Disfruta tu viaje! El vehículo está actualmente en uso.",
+    en: "Enjoy your trip! The vehicle is currently in use."
+  },
+  "Tu alquiler ha finalizado. ¡Esperamos verte pronto!": {
+    es: "Tu alquiler ha finalizado. ¡Esperamos verte pronto!",
+    en: "Your rental has ended. We hope to see you soon!"
+  },
+  "Esta reserva ha sido cancelada.": {
+    es: "Esta reserva ha sido cancelada.",
+    en: "This booking has been cancelled."
+  },
+  "Pendiente de pago": {
+    es: "Pendiente de pago",
+    en: "Pending payment"
+  },
   "Contáctanos sin compromiso": {
     es: "Contáctanos sin compromiso",
     en: "Contact us without obligation"
@@ -1547,6 +1873,229 @@ export const staticTranslations = {
     en: "Monday to Friday: 10:00 - 14:00 | 17:00 - 19:30"
   },
   "Consultar disponibilidad": { es: "Consultar disponibilidad", en: "Check availability" },
+  
+  // ===== PÁGINA DE CONFIRMACIÓN /reservar/[id]/confirmacion =====
+  "¡Reserva creada correctamente!": {
+    es: "¡Reserva creada correctamente!",
+    en: "Booking created successfully!"
+  },
+  "Número de reserva": {
+    es: "Número de reserva",
+    en: "Booking number"
+  },
+  "Pendiente de transferencia": {
+    es: "Pendiente de transferencia",
+    en: "Pending bank transfer"
+  },
+  "Instrucciones de pago": {
+    es: "Instrucciones de pago",
+    en: "Payment instructions"
+  },
+  "Para confirmar tu reserva, realiza una transferencia bancaria por el importe total a la cuenta indicada. Una vez recibido el pago, confirmaremos tu reserva por email.": {
+    es: "Para confirmar tu reserva, realiza una transferencia bancaria por el importe total a la cuenta indicada. Una vez recibido el pago, confirmaremos tu reserva por email.",
+    en: "To confirm your booking, make a bank transfer for the total amount to the indicated account. Once payment is received, we will confirm your booking by email."
+  },
+  "Banco": {
+    es: "Banco",
+    en: "Bank"
+  },
+  "Copiado": {
+    es: "Copiado",
+    en: "Copied"
+  },
+  "Copiar": {
+    es: "Copiar",
+    en: "Copy"
+  },
+  "Beneficiario": {
+    es: "Beneficiario",
+    en: "Beneficiary"
+  },
+  "Concepto": {
+    es: "Concepto",
+    en: "Reference"
+  },
+  "Importe a transferir": {
+    es: "Importe a transferir",
+    en: "Amount to transfer"
+  },
+  "Asegúrate de incluir el número de reserva en el concepto de la transferencia para que podamos identificar tu pago correctamente.": {
+    es: "Asegúrate de incluir el número de reserva en el concepto de la transferencia para que podamos identificar tu pago correctamente.",
+    en: "Make sure to include the booking number in the transfer reference so we can identify your payment correctly."
+  },
+  "Resumen de la reserva": {
+    es: "Resumen de la reserva",
+    en: "Booking summary"
+  },
+  "Vehículo": {
+    es: "Vehículo",
+    en: "Vehicle"
+  },
+  "Recogida en": {
+    es: "Recogida en",
+    en: "Pick-up at"
+  },
+  "Devolución en": {
+    es: "Devolución en",
+    en: "Drop-off at"
+  },
+  "Próximos pasos": {
+    es: "Próximos pasos",
+    en: "Next steps"
+  },
+  "Realiza la transferencia": {
+    es: "Realiza la transferencia",
+    en: "Make the transfer"
+  },
+  "Utiliza los datos bancarios proporcionados arriba": {
+    es: "Utiliza los datos bancarios proporcionados arriba",
+    en: "Use the bank details provided above"
+  },
+  "Espera la confirmación": {
+    es: "Espera la confirmación",
+    en: "Wait for confirmation"
+  },
+  "Te enviaremos un email en cuanto recibamos tu pago (generalmente 24-48h)": {
+    es: "Te enviaremos un email en cuanto recibamos tu pago (generalmente 24-48h)",
+    en: "We will send you an email as soon as we receive your payment (usually 24-48h)"
+  },
+  "Recoge tu vehículo": {
+    es: "Recoge tu vehículo",
+    en: "Pick up your vehicle"
+  },
+  "En la fecha indicada, acude a recoger tu camper con la documentación necesaria": {
+    es: "En la fecha indicada, acude a recoger tu camper con la documentación necesaria",
+    en: "On the indicated date, go pick up your camper with the necessary documentation"
+  },
+  "Hemos enviado un email a": {
+    es: "Hemos enviado un email a",
+    en: "We have sent an email to"
+  },
+  "con toda esta información": {
+    es: "con toda esta información",
+    en: "with all this information"
+  },
+
+  // ===== PÁGINA DE PAGO /reservar/[id]/pago =====
+  "Detalles de la reserva": {
+    es: "Detalles de la reserva",
+    en: "Booking details"
+  },
+  "Cliente": {
+    es: "Cliente",
+    en: "Customer"
+  },
+  "Total reserva": {
+    es: "Total reserva",
+    en: "Booking total"
+  },
+  "Proceder con el pago": {
+    es: "Proceder con el pago",
+    en: "Proceed with payment"
+  },
+  "Selecciona el método de pago": {
+    es: "Selecciona el método de pago",
+    en: "Select payment method"
+  },
+  "Pasarela bancaria española": {
+    es: "Pasarela bancaria española",
+    en: "Spanish payment gateway"
+  },
+  "Pago internacional seguro": {
+    es: "Pago internacional seguro",
+    en: "Secure international payment"
+  },
+  "Política de pago Furgocasa": {
+    es: "Política de pago Furgocasa",
+    en: "Furgocasa payment policy"
+  },
+  "al realizar la reserva": {
+    es: "al realizar la reserva",
+    en: "when booking"
+  },
+  "máximo 15 días antes de la recogida": {
+    es: "máximo 15 días antes de la recogida",
+    en: "no later than 15 days before pick-up"
+  },
+  "Segundo pago pendiente": {
+    es: "Segundo pago pendiente",
+    en: "Second payment pending"
+  },
+  "Ya realizaste el primer pago. Este es el importe restante para completar tu reserva.": {
+    es: "Ya realizaste el primer pago. Este es el importe restante para completar tu reserva.",
+    en: "You already made the first payment. This is the remaining amount to complete your booking."
+  },
+  "Redirigiendo a pasarela de pago...": {
+    es: "Redirigiendo a pasarela de pago...",
+    en: "Redirecting to payment gateway..."
+  },
+  "Pagar restante": {
+    es: "Pagar restante",
+    en: "Pay remaining"
+  },
+  "Pagar 50% ahora": {
+    es: "Pagar 50% ahora",
+    en: "Pay 50% now"
+  },
+  "Pagar total ahora": {
+    es: "Pagar total ahora",
+    en: "Pay total now"
+  },
+  "Pago seguro con Redsys": {
+    es: "Pago seguro con Redsys",
+    en: "Secure payment with Redsys"
+  },
+  "Pago seguro con Stripe": {
+    es: "Pago seguro con Stripe",
+    en: "Secure payment with Stripe"
+  },
+  "Tus datos están protegidos mediante conexión SSL encriptada. No almacenamos datos de tarjeta.": {
+    es: "Tus datos están protegidos mediante conexión SSL encriptada. No almacenamos datos de tarjeta.",
+    en: "Your data is protected by encrypted SSL connection. We do not store card data."
+  },
+
+  // ===== PÁGINA ÉXITO PAGO /pago/exito =====
+  "Verificando pago...": {
+    es: "Verificando pago...",
+    en: "Verifying payment..."
+  },
+  "¡Pago realizado con éxito!": {
+    es: "¡Pago realizado con éxito!",
+    en: "Payment successful!"
+  },
+  "Tu reserva ha sido confirmada": {
+    es: "Tu reserva ha sido confirmada",
+    en: "Your booking has been confirmed"
+  },
+  "Detalles de la transacción": {
+    es: "Detalles de la transacción",
+    en: "Transaction details"
+  },
+  "Referencia pago": {
+    es: "Referencia pago",
+    en: "Payment reference"
+  },
+  "Importe pagado": {
+    es: "Importe pagado",
+    en: "Amount paid"
+  },
+  "El pago restante debe realizarse como máximo 15 días antes de la fecha de recogida.": {
+    es: "El pago restante debe realizarse como máximo 15 días antes de la fecha de recogida.",
+    en: "The remaining payment must be completed no later than 15 days before the pick-up date."
+  },
+  "Te hemos enviado un email de confirmación a": {
+    es: "Te hemos enviado un email de confirmación a",
+    en: "We have sent you a confirmation email to"
+  },
+  "Ver mi reserva": {
+    es: "Ver mi reserva",
+    en: "View my booking"
+  },
+  "Tu pago ha sido procesado correctamente. Pronto recibirás un email de confirmación con todos los detalles de tu reserva.": {
+    es: "Tu pago ha sido procesado correctamente. Pronto recibirás un email de confirmación con todos los detalles de tu reserva.",
+    en: "Your payment has been processed successfully. You will soon receive a confirmation email with all the details of your booking."
+  },
+  
   "¿Prefieres que te ayudemos?": { es: "¿Prefieres que te ayudemos?", en: "Would you prefer us to help you?" },
   "Llámanos y nuestro equipo te asesorará para elegir la mejor camper para tu viaje sin compromiso.": {
     es: "Llámanos y nuestro equipo te asesorará para elegir la mejor camper para tu viaje sin compromiso.",

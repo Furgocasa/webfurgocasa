@@ -11,7 +11,7 @@ export default function InteligenciaArtificialPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko">
+      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-purple-900 via-blue-900 to-furgocasa-blue py-20 relative overflow-hidden">
           {/* Decoración de fondo */}
