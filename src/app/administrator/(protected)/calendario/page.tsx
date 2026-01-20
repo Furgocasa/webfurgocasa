@@ -1041,7 +1041,7 @@ export default function CalendarioPage() {
       {/* Modal de información de reserva (todas las resoluciones) */}
       {selectedBooking && (
         <div 
-          className="fixed inset-0 bg-black/50 z-[100] flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 z-[1100] flex items-end sm:items-center justify-center p-4"
           onClick={() => setSelectedBooking(null)}
         >
           <div 
