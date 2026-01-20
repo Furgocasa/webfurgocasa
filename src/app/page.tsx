@@ -108,7 +108,7 @@ export default async function HomePage() {
         <Header />
         
         {/* Hero Section con Slider */}
-        <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden -mt-[120px] lg:-mt-[132px] pt-[120px] lg:pt-[132px]">
+        <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden -mt-[120px] lg:-mt-[132px] pt-[200px] lg:pt-[132px]">
           <div className="absolute inset-0 w-full h-full">
             <HeroSlider 
               images={[

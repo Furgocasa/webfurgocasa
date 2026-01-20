@@ -1,0 +1,220 @@
+=================================================================
+BACKUP CONFIGURACIÓN DNS OVH - furgocasa.com
+Fecha: 20 de enero de 2026
+=================================================================
+
+IMPORTANTE: Esta es la configuración DNS completa antes de migrar a Vercel.
+Si necesitas revertir los cambios, restaura esta configuración exacta en OVH.
+
+=================================================================
+REGISTROS DNS COMPLETOS
+=================================================================
+
+---------- REGISTROS TXT ----------
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "1|www.furgocasa.com"
+
+Dominio: www.furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "3|welcome"
+
+Dominio: www.webmail.furgocasa.com.
+TTL: 60
+Tipo: TXT
+Destino: "4|https://mail.ovh.net/roundcube/"
+
+Dominio: webmail.furgocasa.com.
+TTL: 60
+Tipo: TXT
+Destino: "4|https://mail.ovh.net/roundcube/"
+
+Dominio: www.furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "google-site-verification=XdSPsgba3G9a1Msc1PPBRti1T8vuV9h3mMjXlxL16BA"
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "google-site-verification=XdSPsgba3G9a1Msc1PPBRti1T8vuV9h3mMjXlxL16BA"
+
+Dominio: www.furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "l|es"
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "facebook-domain-verification=038n6pvvpp7ts3tp9z9n8tohwm77et"
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "google-site-verification=Ig8m_s6hOyNb7V4Nnc5UbLejUU_V5pzYqMTCSFjK3iI"
+
+Dominio: www.furgocasa.com.
+TTL: 0
+Tipo: TXT
+Destino: "google-site-verification=Ig8m_s6hOyNb7V4Nnc5UbLejUU_V5pzYqMTCSFjK3iI"
+
+---------- REGISTROS A (DIRECCIONES IP) ----------
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: A
+Destino: 46.105.204.26
+⚠️ ESTE ES EL REGISTRO QUE APUNTA AL SERVIDOR VIEJO
+
+Dominio: www.furgocasa.com.
+TTL: 0
+Tipo: A
+Destino: 46.105.204.26
+⚠️ ESTE ES EL REGISTRO QUE APUNTA AL SERVIDOR VIEJO
+
+Dominio: www.webmail.furgocasa.com.
+TTL: 0
+Tipo: A
+Destino: 213.186.33.5
+
+Dominio: webmail.furgocasa.com.
+TTL: 0
+Tipo: A
+Destino: 213.186.33.5
+
+---------- REGISTROS NS (NAME SERVERS) ----------
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: NS
+Destino: dns12.ovh.net.
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: NS
+Destino: ns12.ovh.net.
+
+---------- REGISTROS SRV (SERVICIOS) ----------
+
+Dominio: _autodiscover._tcp.furgocasa.com.
+TTL: 0
+Tipo: SRV
+Destino: 0 0 443 mailconfig.ovh.net.
+
+Dominio: _imaps._tcp.furgocasa.com.
+TTL: 0
+Tipo: SRV
+Destino: 0 0 993 ssl0.ovh.net.
+
+Dominio: _submission._tcp.furgocasa.com.
+TTL: 0
+Tipo: SRV
+Destino: 0 0 465 ssl0.ovh.net.
+
+---------- REGISTROS CNAME (ALIAS) ----------
+
+Dominio: ftp.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: furgocasa.com.
+
+Dominio: autoconfig.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: mailconfig.ovh.net.
+
+Dominio: autodiscover.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: mailconfig.ovh.net.
+
+Dominio: mail.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: ssl0.ovh.net.
+
+Dominio: smtp.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: ssl0.ovh.net.
+
+Dominio: pop3.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: ssl0.ovh.net.
+
+Dominio: imap.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: ssl0.ovh.net.
+
+Dominio: ovhmo3368304-selector2._domainkey.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: ovhmo3368304-selector2._domainkey.1592635.gu.dkim.mail.ovh.net.
+
+Dominio: ovhmo3368304-selector1._domainkey.furgocasa.com.
+TTL: 0
+Tipo: CNAME
+Destino: ovhmo3368304-selector1._domainkey.1592636.gu.dkim.mail.ovh.net.
+
+---------- REGISTROS MX (EMAIL) ----------
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: MX
+Prioridad: 1
+Destino: mx1.mail.ovh.net.
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: MX
+Prioridad: 5
+Destino: mx2.mail.ovh.net.
+
+Dominio: furgocasa.com.
+TTL: 0
+Tipo: MX
+Prioridad: 100
+Destino: mx3.mail.ovh.net.
+
+---------- REGISTROS SPF (ANTISPAM) ----------
+
+Dominio: furgocasa.com.
+TTL: 600
+Tipo: SPF
+Destino: "v=spf1 include:mx.ovh.com ~all"
+
+=================================================================
+NOTAS IMPORTANTES
+=================================================================
+
+1. REGISTROS DE EMAIL (NO TOCAR):
+   - Todos los registros MX
+   - Todos los CNAME de mail, smtp, imap, pop3
+   - Todos los registros SRV (_autodiscover, _imaps, _submission)
+   - Los registros DKIM (ovhmo3368304-selector1 y selector2)
+   - El registro SPF
+
+2. REGISTROS A CAMBIAR PARA VERCEL:
+   - furgocasa.com. A 46.105.204.26 → Cambiar a IPs de Vercel
+   - www.furgocasa.com. A 46.105.204.26 → Cambiar a IPs de Vercel
+
+3. REGISTROS A MANTENER:
+   - Todos los TXT de verificación (Google, Facebook)
+   - Todos los NS (name servers)
+   - Todos los relacionados con email y webmail
+
+4. REGISTROS A ELIMINAR (opcionales):
+   - TXT "1|www.furgocasa.com" (parece redirección OVH)
+   - TXT "3|welcome" (parece configuración OVH)
+   - TXT "l|es" (configuración de idioma OVH)
+   - CNAME ftp.furgocasa.com (si no usas FTP)
+
+=================================================================
+FIN DEL BACKUP
+=================================================================
