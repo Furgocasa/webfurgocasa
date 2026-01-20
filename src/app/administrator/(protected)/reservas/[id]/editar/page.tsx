@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { calculateRentalDays } from "@/lib/utils";
+import EditarClienteModal from "@/components/admin/EditarClienteModal";
 
 interface Location {
   id: string;
@@ -116,6 +117,9 @@ export default function EditarReservaPage() {
   const [bookingExtras, setBookingExtras] = useState<Record<string, number>>({});
   const [existingExtras, setExistingExtras] = useState<BookingExtra[]>([]);
   
+  // Estado para el modal de editar cliente
+  const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
+  
   const [formData, setFormData] = useState<FormData>({
     vehicle_id: '',
     pickup_location_id: '',
@@ -179,6 +183,31 @@ export default function EditarReservaPage() {
       setFormData(prev => ({ ...prev, payment_status: 'partial' }));
     }
   }, [formData.amount_paid, formData.total_price]);
+
+  const reloadCustomerData = async () => {
+    if (!customerId) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', customerId)
+        .single();
+
+      if (error) throw error;
+      
+      setCustomerData(data);
+      
+      // Actualizar también el snapshot en formData
+      setFormData(prev => ({
+        ...prev,
+        customer_name: data.name || '',
+        customer_email: data.email || '',
+      }));
+    } catch (error) {
+      console.error('Error reloading customer data:', error);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -697,12 +726,13 @@ export default function EditarReservaPage() {
                   Datos del Cliente
                 </h2>
                 {customerId && (
-                  <Link
-                    href={`/administrator/clientes/${customerId}`}
+                  <button
+                    type="button"
+                    onClick={() => setIsEditClientModalOpen(true)}
                     className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-furgocasa-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
                   >
                     Editar cliente
-                  </Link>
+                  </button>
                 )}
               </div>
               
@@ -1032,6 +1062,16 @@ export default function EditarReservaPage() {
           </div>
         </div>
       </form>
+
+      {/* Modal para editar cliente */}
+      {customerId && (
+        <EditarClienteModal
+          isOpen={isEditClientModalOpen}
+          onClose={() => setIsEditClientModalOpen(false)}
+          customerId={customerId}
+          onSave={reloadCustomerData}
+        />
+      )}
     </div>
   );
 }
