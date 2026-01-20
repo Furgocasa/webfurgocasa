@@ -33,7 +33,7 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const { data: vehicles } = await supabase
+  const { data: vehicles, error } = await supabase
     .from('vehicles')
     .select(`
       id,
@@ -43,12 +43,17 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
       model,
       passengers,
       beds,
-      images:vehicle_images(image_url, is_primary)
+      vehicle_images(image_url, is_primary)
     `)
     .eq('is_for_rent', true)
     .neq('status', 'inactive')
     .order('internal_code', { ascending: true })
     .limit(3);
+
+  if (error) {
+    console.error('Error fetching featured vehicles:', error);
+    return [];
+  }
 
   if (!vehicles) return [];
 
@@ -60,8 +65,8 @@ export const getFeaturedVehicles = cache(async (): Promise<FeaturedVehicle[]> =>
     model: vehicle.model,
     passengers: vehicle.passengers,
     beds: vehicle.beds,
-    main_image: (vehicle.images as any)?.find((img: any) => img.is_primary)?.image_url || 
-                (vehicle.images as any)?.[0]?.image_url || null
+    main_image: (vehicle.vehicle_images as any)?.find((img: any) => img.is_primary)?.image_url || 
+                (vehicle.vehicle_images as any)?.[0]?.image_url || null
   }));
 });
 
