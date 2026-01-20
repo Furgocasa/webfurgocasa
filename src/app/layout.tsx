@@ -110,6 +110,56 @@ export default function RootLayout({
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
+        {/* Google Analytics - Con consentimiento por defecto denegado */}
+        <Script
+          id="gtag-consent-default"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              
+              // Consentimiento por defecto denegado (GDPR compliant)
+              gtag('consent', 'default', {
+                'analytics_storage': 'denied',
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'functionality_storage': 'denied',
+                'personalization_storage': 'denied',
+                'security_storage': 'granted'
+              });
+            `,
+          }}
+        />
+        
+        {/* Google Analytics - Script principal */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-G5YLBN5XXZ"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="gtag-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              
+              // Solo inicializar si NO estamos en página de administrador
+              if (!window.location.pathname.startsWith('/administrator') && !window.location.pathname.startsWith('/admin')) {
+                gtag('config', 'G-G5YLBN5XXZ', {
+                  page_path: window.location.pathname,
+                });
+                console.log('[Analytics] Google Analytics inicializado para:', window.location.pathname);
+              } else {
+                console.log('[Analytics] Página de administrador detectada. Analytics NO se inicializará.');
+              }
+            `,
+          }}
+        />
+
         {/* Facebook Pixel - Solo si está configurado */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
           <Script
@@ -138,7 +188,7 @@ export default function RootLayout({
       <body className={`${rubik.variable} ${amiko.variable} font-sans`}>
         <Providers>
           <CookieProvider>
-            {/* Google Analytics - EXCLUYE páginas /administrator */}
+            {/* Componente para trackear navegación entre páginas */}
             <GoogleAnalytics />
             {/* Debug de Analytics (solo en desarrollo) */}
             <AnalyticsDebug />
