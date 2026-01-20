@@ -458,12 +458,12 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
 
         <main className="min-h-screen bg-gray-50">
           {/* Hero */}
-          <section className="relative bg-gradient-to-br from-furgocasa-orange via-furgocasa-orange-light to-orange-100 py-20">
+          <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16 md:py-20">
             <div className="container mx-auto px-4">
               <div className="max-w-4xl mx-auto text-center">
                 <div className="flex items-center justify-center gap-2 mb-4">
-                  <MapPin className="h-6 w-6 text-white" />
-                  <p className="text-white/90 font-medium">
+                  <MapPin className="h-6 w-6 text-furgocasa-orange" />
+                  <p className="text-white/80 font-medium">
                     {saleLocationData.province} · {saleLocationData.region}
                   </p>
                 </div>
@@ -473,14 +473,14 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                 </h1>
 
                 {saleLocationData.intro_text && (
-                  <p className="text-xl text-white/95 mb-8 leading-relaxed">
+                  <p className="text-xl text-white/80 mb-8 leading-relaxed max-w-2xl mx-auto">
                     {saleLocationData.intro_text}
                   </p>
                 )}
 
                 {hasNearestLocation && distanceInfo && (
-                  <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full text-white">
-                    <CheckCircle className="h-5 w-5" />
+                  <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full text-white border border-white/20">
+                    <CheckCircle className="h-5 w-5 text-green-400" />
                     <span>
                       Entrega desde {saleLocationData.nearest_location!.city} · {distanceInfo}
                     </span>
