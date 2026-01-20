@@ -430,10 +430,6 @@ export default function ReservaDetalleAdminPage() {
                 <span className="font-semibold">{booking.extras_price.toFixed(2)}€</span>
               </div>
             )}
-            <div className="flex justify-between pt-2 border-t border-white/20">
-              <span className="opacity-90">Fianza:</span>
-              <span className="font-semibold">{booking.deposit_amount.toFixed(2)}€</span>
-            </div>
           </div>
           <div className="text-3xl font-bold">{booking.total_price.toFixed(2)}€</div>
           <p className="text-sm opacity-90 mt-1">{booking.days} días de alquiler</p>
