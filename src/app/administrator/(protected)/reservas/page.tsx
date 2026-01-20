@@ -12,7 +12,9 @@ interface Booking {
   id: string;
   booking_number: string;
   pickup_date: string;
+  pickup_time: string;
   dropoff_date: string;
+  dropoff_time: string;
   status: string | null;
   payment_status: string | null;
   total_price: number;
@@ -598,11 +600,13 @@ export default function BookingsPage() {
                       {/* Fecha inicio */}
                       <td className="px-4 py-4">
                         <p className="text-gray-900 text-sm font-medium">{formatDate(booking.pickup_date)}</p>
+                        <p className="text-xs text-gray-500">{booking.pickup_time || '10:00'}</p>
                       </td>
                       
                       {/* Fecha fin */}
                       <td className="px-4 py-4">
                         <p className="text-gray-900 text-sm font-medium">{formatDate(booking.dropoff_date)}</p>
+                        <p className="text-xs text-gray-500">{booking.dropoff_time || '10:00'}</p>
                       </td>
                       
                       {/* Duración */}
