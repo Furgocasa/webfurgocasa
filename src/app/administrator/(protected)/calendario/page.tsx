@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Car, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { SmartTooltip } from "@/components/admin/smart-tooltip";
@@ -118,6 +118,7 @@ export default function CalendarioPage() {
     error: bookingsError 
   } = useAdminData<any[]>({
     queryFn: async () => {
+      const supabase = createClient();
       // Calcular rango de fechas para los meses a mostrar
       // Construir fechas en formato ISO sin conversión UTC
       const firstYear = startDate.getFullYear();
@@ -176,6 +177,7 @@ export default function CalendarioPage() {
 
       try {
         setEnrichmentLoading(true);
+        const supabase = createClient();
 
         const customerIds = [...new Set(bookingsRaw.map(b => b.customer_id).filter((id): id is string => Boolean(id)))];
         const vehicleIds = [...new Set(bookingsRaw.map(b => b.vehicle_id).filter((id): id is string => Boolean(id)))];
@@ -202,23 +204,40 @@ export default function CalendarioPage() {
           .select('id, name, address, city')
           .in('id', locationIds);
 
-        // Cargar booking extras
-        const { data: bookingExtrasData } = await supabase
-          .from('booking_extras')
-          .select(`
-            id,
-            booking_id,
-            extra_id,
-            quantity,
-            price_per_unit,
-            subtotal,
-            extras (
-              id,
-              name,
-              description
-            )
-          `)
-          .in('booking_id', bookingsRaw.map(b => b.id));
+        // Cargar booking extras - Solo si hay bookings
+        let bookingExtrasData: any[] = [];
+        if (bookingsRaw.length > 0) {
+          const bookingIds = bookingsRaw.map(b => b.id);
+          // Dividir en lotes más pequeños para evitar URLs demasiado largas
+          const batchSize = 50;
+          const batches = [];
+          for (let i = 0; i < bookingIds.length; i += batchSize) {
+            batches.push(bookingIds.slice(i, i + batchSize));
+          }
+          
+          for (const batch of batches) {
+            const { data } = await supabase
+              .from('booking_extras')
+              .select(`
+                id,
+                booking_id,
+                extra_id,
+                quantity,
+                price_per_unit,
+                subtotal,
+                extras (
+                  id,
+                  name,
+                  description
+                )
+              `)
+              .in('booking_id', batch);
+            
+            if (data) {
+              bookingExtrasData.push(...data);
+            }
+          }
+        }
 
         // Mapear relaciones
         const customersMap = new Map(customersData?.map(c => [c.id, c]) || []);
@@ -420,6 +439,11 @@ export default function CalendarioPage() {
       booking: Booking & { vehicle?: Vehicle };
     }>> = {};
 
+    // Verificar que vehicles no sea null antes de procesar
+    if (!vehicles || vehicles.length === 0) {
+      return events;
+    }
+
     bookings.forEach(booking => {
       const vehicle = vehicles.find(v => v.id === booking.vehicle_id);
       const bookingWithVehicle = { ...booking, vehicle };
@@ -448,6 +472,40 @@ export default function CalendarioPage() {
   };
 
   const mobileEvents = isMobile ? getMobileCalendarEvents() : {};
+
+  // Mostrar estado de carga
+  if (vehiclesLoading && !vehicles) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p className="text-gray-600">Cargando calendario...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Mostrar errores si los hay
+  if (vehiclesError || bookingsError) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
+          <h2 className="text-red-800 font-semibold">Error al cargar el calendario</h2>
+          <p className="text-red-600 text-sm mt-2">
+            {vehiclesError || bookingsError}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Recargar página
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
