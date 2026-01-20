@@ -88,10 +88,14 @@ export default function NuevoVehiculoPage() {
       
       if (categoriesError) {
         console.error('Error loading categories:', categoriesError);
+        console.error('Error details:', JSON.stringify(categoriesError, null, 2));
       } else if (categoriesData && categoriesData.length > 0) {
+        console.log('Categories loaded:', categoriesData);
         setCategories(categoriesData);
         // Seleccionar la primera categoría por defecto automáticamente
         setFormData(prev => ({ ...prev, category_id: categoriesData[0].id }));
+      } else {
+        console.warn('No categories found or empty result');
       }
 
       // Cargar extras
@@ -103,8 +107,12 @@ export default function NuevoVehiculoPage() {
       
       if (extrasError) {
         console.error('Error loading extras:', extrasError);
+        console.error('Error details:', JSON.stringify(extrasError, null, 2));
       } else if (extrasData) {
+        console.log('Extras loaded:', extrasData);
         setExtras(extrasData);
+      } else {
+        console.warn('No extras found or empty result');
       }
     };
 

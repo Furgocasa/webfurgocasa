@@ -107,8 +107,12 @@ export default function EditarVehiculoPage() {
       
       if (categoriesError) {
         console.error('Error loading categories:', categoriesError);
+        console.error('Error details:', JSON.stringify(categoriesError, null, 2));
       } else if (categoriesData) {
+        console.log('Categories loaded:', categoriesData);
         setCategories(categoriesData);
+      } else {
+        console.warn('No categories found or empty result');
       }
 
       // Cargar extras
@@ -120,8 +124,12 @@ export default function EditarVehiculoPage() {
       
       if (extrasError) {
         console.error('Error loading extras:', extrasError);
+        console.error('Error details:', JSON.stringify(extrasError, null, 2));
       } else if (extrasData) {
+        console.log('Extras loaded:', extrasData);
         setExtras(extrasData);
+      } else {
+        console.warn('No extras found or empty result');
       }
 
       // Cargar equipamiento
@@ -134,8 +142,12 @@ export default function EditarVehiculoPage() {
       
       if (equipmentError) {
         console.error('Error loading equipment:', equipmentError);
+        console.error('Error details:', JSON.stringify(equipmentError, null, 2));
       } else if (equipmentData) {
+        console.log('Equipment loaded:', equipmentData);
         setEquipmentList(equipmentData);
+      } else {
+        console.warn('No equipment found or empty result');
       }
     };
 
