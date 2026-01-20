@@ -308,8 +308,8 @@ function ReservarVehiculoContent() {
       
       <main className="min-h-screen bg-gray-50 py-6 md:py-12 overflow-x-hidden">
         <div className="container mx-auto px-4 max-w-7xl">
-          {/* Barra de resumen - Sticky dentro del main */}
-          <div className="sticky top-[100px] md:top-[112px] bg-white shadow-md border-b border-gray-200 z-30 w-full -mx-4 px-4 mb-6 rounded-b-lg">
+          {/* Barra de resumen - Sticky pegada al navbar */}
+          <div className="sticky top-[100px] md:top-[112px] bg-white shadow-md border-b border-gray-200 z-30 -mx-4 px-4 mb-6 rounded-b-lg">
             <div className="py-3">
               {/* Link "Volver a la búsqueda" */}
               <div className="mb-2">
@@ -349,24 +349,6 @@ function ReservarVehiculoContent() {
                 </div>
               </div>
             </div>
-          </div>
-
-          {/* Breadcrumb - Ahora debajo de la barra sticky */}
-          <div className="mb-8">
-            <Link 
-              href={`/buscar?${searchParams.toString()}`}
-              className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange transition-colors"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              {t("Volver a resultados")}
-            </Link>
-          </div>
-
-          {/* Mobile Summary - NO sticky, info simple arriba */}
-          <div className="lg:hidden bg-gray-50 rounded-xl p-3 mb-4 border border-gray-200">
-            <p className="text-sm text-gray-600 text-center">
-              {days} {t("días")} · {t("Total")}: <span className="font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
-            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">

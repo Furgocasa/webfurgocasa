@@ -66,12 +66,12 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Obtener reservas que se solapan con las fechas solicitadas
-    // SOLO bloquean vehículos las reservas confirmadas o en curso
-    // Las reservas 'pending' NO bloquean disponibilidad
+    // Solo bloquean vehículos las reservas con al menos el primer pago
     const { data: conflictingBookings, error: bookingsError } = await supabase
       .from("bookings")
       .select("vehicle_id")
-      .in("status", ["confirmed", "in_progress"])
+      .in("status", ["confirmed", "in_progress", "completed"])
+      .in("payment_status", ["partial", "paid"])
       .or(`and(pickup_date.lte.${dropoffDate},dropoff_date.gte.${pickupDate})`);
 
     if (bookingsError) {
