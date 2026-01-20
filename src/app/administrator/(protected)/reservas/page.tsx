@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
@@ -68,6 +68,10 @@ function formatDateTime(date: string): string {
 
 type SortField = 'booking_number' | 'customer' | 'internal_code' | 'vehicle' | 'pickup_date' | 'dropoff_date' | 'pickup_location' | 'dropoff_location' | 'total_price' | 'amount_paid' | 'status' | 'payment_status' | 'created_at';
 
+// Claves para localStorage
+const SORT_FIELD_KEY = 'bookings_sort_field';
+const SORT_DIRECTION_KEY = 'bookings_sort_direction';
+
 export default function BookingsPage() {
   // Estados para búsqueda y filtros
   const [searchTerm, setSearchTerm] = useState("");
@@ -77,11 +81,30 @@ export default function BookingsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Estados para ordenamiento - por defecto por fecha de creación descendente
-  const [sortField, setSortField] = useState<SortField>('created_at');
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  // Estados para ordenamiento - cargar desde localStorage o usar default
+  const [sortField, setSortField] = useState<SortField>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(SORT_FIELD_KEY);
+      return (saved as SortField) || 'created_at';
+    }
+    return 'created_at';
+  });
+  
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem(SORT_DIRECTION_KEY);
+      return (saved as 'asc' | 'desc') || 'desc';
+    }
+    return 'desc';
+  });
 
   const queryClient = useQueryClient();
+
+  // Guardar preferencia de ordenación en localStorage
+  useEffect(() => {
+    localStorage.setItem(SORT_FIELD_KEY, sortField);
+    localStorage.setItem(SORT_DIRECTION_KEY, sortDirection);
+  }, [sortField, sortDirection]);
 
   // Cargar TODAS las reservas progresivamente
   const { 
@@ -92,6 +115,7 @@ export default function BookingsPage() {
     totalCount,
     isComplete,
     progress,
+    refetch: refetchBookings,
   } = useAllDataProgressive<Booking>({
     queryKey: ['bookings'],
     table: 'bookings',
@@ -136,8 +160,8 @@ export default function BookingsPage() {
 
       if (error) throw error;
       
-      // Invalidar caché
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      // Refrescar datos
+      refetchBookings();
     } catch (err: any) {
       console.error('Error updating status:', err);
       alert('Error al actualizar el estado');
@@ -161,8 +185,9 @@ export default function BookingsPage() {
 
       if (error) throw error;
 
-      // Invalidar caché
-      queryClient.invalidateQueries({ queryKey: ['bookings'] });
+      // Refrescar datos automáticamente
+      refetchBookings();
+      
       alert('Reserva eliminada correctamente');
     } catch (err: any) {
       console.error('Error deleting booking:', err);

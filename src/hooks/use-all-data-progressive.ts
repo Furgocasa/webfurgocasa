@@ -34,6 +34,7 @@ export function useAllDataProgressive<T = any>({
   const [error, setError] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -49,6 +50,7 @@ export function useAllDataProgressive<T = any>({
         console.log('[useAllDataProgressive] Iniciando carga...');
         setLoading(true);
         setError(null);
+        setIsComplete(false);
 
         // PASO 1: Cargar el primer lote (10 registros) inmediatamente
         console.log(`[useAllDataProgressive] Cargando primer lote (${initialBatchSize} registros)...`);
@@ -159,11 +161,11 @@ export function useAllDataProgressive<T = any>({
     return () => {
       isCancelled = true;
     };
-  }, [table, select, JSON.stringify(orderBy), JSON.stringify(filters), initialBatchSize, batchSize, enabled]);
+  }, [table, select, JSON.stringify(orderBy), JSON.stringify(filters), initialBatchSize, batchSize, enabled, refreshTrigger]);
 
   const refetch = () => {
-    queryClient.invalidateQueries({ queryKey });
-    // El useEffect se encargará de recargar
+    console.log('[useAllDataProgressive] Refetch solicitado');
+    setRefreshTrigger(prev => prev + 1);
   };
 
   return {
