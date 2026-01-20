@@ -561,16 +561,16 @@ export default function CalendarioPage() {
                               <div
                                 key={day}
                                 className={`w-12 flex-shrink-0 text-center border-r border-gray-200 ${
-                                  isTodayFlag ? 'bg-blue-50' : ''
+                                  isTodayFlag ? 'bg-yellow-300 border-l-2 border-r-2 border-yellow-400' : ''
                                 }`}
                               >
                                 <div className={`text-xs font-semibold pt-2 ${
-                                  isTodayFlag ? 'text-blue-600' : 'text-gray-700'
+                                  isTodayFlag ? 'text-yellow-900' : 'text-gray-700'
                                 }`}>
                                   {day}
                                 </div>
                                 <div className={`text-[10px] pb-2 ${
-                                  isTodayFlag ? 'text-blue-500' : 'text-gray-500'
+                                  isTodayFlag ? 'text-yellow-800' : 'text-gray-500'
                                 }`}>
                                   {getDayName(day, monthDate)}
                                 </div>
@@ -630,7 +630,7 @@ export default function CalendarioPage() {
                                   <div
                                     key={day}
                                     className={`w-12 flex-shrink-0 border-r border-gray-200 relative ${
-                                      isTodayFlag ? 'bg-blue-50' : ''
+                                      isTodayFlag ? 'bg-yellow-300 border-l-2 border-r-2 border-yellow-400' : ''
                                     }`}
                                   >
                                     {dayBooking ? (
@@ -752,12 +752,12 @@ export default function CalendarioPage() {
                           <div 
                             key={day}
                             className={`aspect-square border rounded-lg p-1 ${
-                              isTodayFlag ? 'bg-blue-50 border-blue-300' : 'border-gray-200'
+                              isTodayFlag ? 'bg-yellow-300 border-yellow-500 border-2 shadow-md' : 'border-gray-200'
                             }`}
                           >
                             {/* Número del día */}
                             <div className={`text-xs font-semibold text-center mb-1 ${
-                              isTodayFlag ? 'text-blue-700' : 'text-gray-700'
+                              isTodayFlag ? 'text-yellow-900 font-extrabold' : 'text-gray-700'
                             }`}>
                               {day}
                             </div>
