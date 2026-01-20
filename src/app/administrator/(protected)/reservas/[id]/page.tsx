@@ -26,11 +26,6 @@ interface Booking {
   payment_status: string;
   customer_name: string;
   customer_email: string;
-  customer_phone: string;
-  customer_dni: string;
-  customer_address: string;
-  customer_city: string;
-  customer_postal_code: string;
   notes: string;
   admin_notes: string;
   created_at: string;
@@ -46,7 +41,17 @@ interface Booking {
     name: string;
     email: string;
     phone: string;
+    dni: string;
+    address: string;
+    city: string;
+    postal_code: string;
+    country: string;
+    date_of_birth: string | null;
+    driver_license: string | null;
+    driver_license_expiry: string | null;
+    notes: string | null;
     total_bookings: number;
+    total_spent: number;
   };
   pickup_location: {
     name: string;
@@ -108,7 +113,23 @@ export default function ReservaDetalleAdminPage() {
         .select(`
           *,
           vehicle:vehicles(id, name, brand, model, internal_code),
-          customer:customers(id, name, email, phone, total_bookings),
+          customer:customers(
+            id, 
+            name, 
+            email, 
+            phone, 
+            dni, 
+            address, 
+            city, 
+            postal_code, 
+            country,
+            date_of_birth,
+            driver_license,
+            driver_license_expiry,
+            notes,
+            total_bookings,
+            total_spent
+          ),
           pickup_location:locations!pickup_location_id(name, address),
           dropoff_location:locations!dropoff_location_id(name, address),
           booking_extras(
@@ -524,50 +545,115 @@ export default function ReservaDetalleAdminPage() {
               Cliente
             </h3>
             
-            <div className="space-y-4">
-              <div>
-                <p className="text-sm text-gray-500 uppercase font-medium mb-1">Nombre</p>
-                <p className="font-semibold text-gray-900">{booking.customer_name}</p>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 uppercase font-medium mb-1">Email</p>
-                <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
-                  <Mail className="h-4 w-4" />
-                  {booking.customer_email}
-                </a>
-              </div>
-
-              <div>
-                <p className="text-sm text-gray-500 uppercase font-medium mb-1">Teléfono</p>
-                <a href={`tel:${booking.customer_phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
-                  <Phone className="h-4 w-4" />
-                  {booking.customer_phone}
-                </a>
-              </div>
-
-              {booking.customer_dni && (
+            {booking.customer ? (
+              <div className="space-y-4">
                 <div>
-                  <p className="text-sm text-gray-500 uppercase font-medium mb-1">DNI/NIE</p>
-                  <p className="text-gray-900">{booking.customer_dni}</p>
+                  <p className="text-sm text-gray-500 uppercase font-medium mb-1">Nombre</p>
+                  <p className="font-semibold text-gray-900">{booking.customer.name}</p>
                 </div>
-              )}
 
-              {booking.customer_address && (
                 <div>
-                  <p className="text-sm text-gray-500 uppercase font-medium mb-1">Dirección</p>
-                  <p className="text-gray-900">{booking.customer_address}</p>
-                  <p className="text-sm text-gray-600">{booking.customer_postal_code} {booking.customer_city}</p>
+                  <p className="text-sm text-gray-500 uppercase font-medium mb-1">Email</p>
+                  <a href={`mailto:${booking.customer.email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                    <Mail className="h-4 w-4" />
+                    {booking.customer.email}
+                  </a>
                 </div>
-              )}
 
-              {booking.customer && (
+                {booking.customer.phone && (
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">Teléfono</p>
+                    <a href={`tel:${booking.customer.phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                      <Phone className="h-4 w-4" />
+                      {booking.customer.phone}
+                    </a>
+                  </div>
+                )}
+
+                {booking.customer.dni && (
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">DNI/NIE</p>
+                    <p className="text-gray-900">{booking.customer.dni}</p>
+                  </div>
+                )}
+
+                {booking.customer.date_of_birth && (
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">Fecha de Nacimiento</p>
+                    <p className="text-gray-900">
+                      {new Date(booking.customer.date_of_birth).toLocaleDateString('es-ES', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </p>
+                  </div>
+                )}
+
+                {booking.customer.address && (
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">Dirección</p>
+                    <p className="text-gray-900">{booking.customer.address}</p>
+                    {(booking.customer.postal_code || booking.customer.city) && (
+                      <p className="text-sm text-gray-600">
+                        {booking.customer.postal_code && `${booking.customer.postal_code} `}
+                        {booking.customer.city}
+                      </p>
+                    )}
+                    {booking.customer.country && (
+                      <p className="text-sm text-gray-500 mt-1">{booking.customer.country}</p>
+                    )}
+                  </div>
+                )}
+
+                {(booking.customer.driver_license || booking.customer.driver_license_expiry) && (
+                  <div>
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-1">Permiso de Conducir</p>
+                    {booking.customer.driver_license && (
+                      <p className="text-gray-900">{booking.customer.driver_license}</p>
+                    )}
+                    {booking.customer.driver_license_expiry && (
+                      <p className="text-sm text-gray-600">
+                        Vence: {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES')}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-500">Total reservas del cliente</p>
-                  <p className="text-2xl font-bold text-furgocasa-orange">{booking.customer.total_bookings}</p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Reservas totales</p>
+                      <p className="text-2xl font-bold text-furgocasa-orange">{booking.customer.total_bookings}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Total gastado</p>
+                      <p className="text-2xl font-bold text-green-600">{booking.customer.total_spent?.toFixed(2)}€</p>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {booking.customer.notes && (
+                  <div className="pt-4 border-t border-gray-200">
+                    <p className="text-sm text-gray-500 uppercase font-medium mb-2">Notas del cliente</p>
+                    <p className="text-sm text-gray-700 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
+                      {booking.customer.notes}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p className="text-sm text-yellow-800">
+                  Cliente eliminado o no vinculado
+                </p>
+                <div className="mt-3 space-y-2">
+                  <p className="text-xs text-gray-600">Datos registrados en la reserva:</p>
+                  <p className="text-sm"><strong>Nombre:</strong> {booking.customer_name}</p>
+                  <p className="text-sm"><strong>Email:</strong> {booking.customer_email}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

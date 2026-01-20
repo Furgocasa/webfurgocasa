@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import supabase from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { Calendar, Plus, Trash2, Save, AlertCircle, Euro } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -48,6 +48,7 @@ export default function TemporadasAdmin() {
   // Usar el hook para cargar datos con retry automático (depende de selectedYear)
   const { data: seasons, loading, error, refetch } = useAdminData<Season[]>({
     queryFn: async () => {
+      const supabase = createClient();
       const result = await supabase
         .from('seasons')
         .select('*')
@@ -73,6 +74,7 @@ export default function TemporadasAdmin() {
     if (!confirm('¿Estás seguro de eliminar esta temporada?')) return;
 
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from('seasons')
         .delete()

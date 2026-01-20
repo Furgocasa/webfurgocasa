@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import supabase from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { Plus, Search, Edit, Trash2, Save, X, MapPin, AlertCircle, Phone, Mail } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useAdminData } from "@/hooks/use-admin-data";
@@ -58,6 +58,7 @@ export default function UbicacionesPage() {
   // Usar el hook para cargar datos con retry automático
   const { data: locations, loading, error, refetch } = useAdminData<Location[]>({
     queryFn: async () => {
+      const supabase = createClient();
       const result = await supabase
         .from('locations')
         .select('*')
@@ -86,6 +87,7 @@ export default function UbicacionesPage() {
 
     try {
       setSaving(true);
+      const supabase = createClient();
       const slug = formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       
       const dataToSave = {
@@ -160,8 +162,9 @@ export default function UbicacionesPage() {
     if (!deleteConfirm.id) return;
 
     try {
+      const supabase = createClient();
       const id = deleteConfirm.id;
-      const { data, error } = await supabase
+      const { data, error} = await supabase
         .from('locations')
         .delete()
         .eq('id', id)
@@ -187,6 +190,7 @@ export default function UbicacionesPage() {
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('locations')
         .update({ is_active: !currentStatus })

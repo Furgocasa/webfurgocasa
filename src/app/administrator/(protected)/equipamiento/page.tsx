@@ -12,7 +12,7 @@ import {
   GripVertical,
   Star,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import { EquipmentIcon } from "@/components/vehicle/equipment-display";
 import { useAdminData } from "@/hooks/use-admin-data";
@@ -89,6 +89,7 @@ export default function EquipamientoPage() {
   // Usar el hook para cargar datos con retry automático
   const { data: equipment, loading, error, refetch } = useAdminData<Equipment[]>({
     queryFn: async () => {
+      const supabase = createClient();
       const result = await supabase
         .from("equipment")
         .select("*")
@@ -117,6 +118,7 @@ export default function EquipamientoPage() {
 
     try {
       setSaving(true);
+      const supabase = createClient();
       const slug = form.slug || generateSlug(form.name);
       
       if (editingId) {
@@ -195,6 +197,7 @@ export default function EquipamientoPage() {
     }
 
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from("equipment")
         .delete()
@@ -211,6 +214,7 @@ export default function EquipamientoPage() {
 
   const handleToggleActive = async (eq: Equipment) => {
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from("equipment")
         .update({ is_active: !eq.is_active })
@@ -226,6 +230,7 @@ export default function EquipamientoPage() {
 
   const handleToggleStandard = async (eq: Equipment) => {
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from("equipment")
         .update({ is_standard: !eq.is_standard })

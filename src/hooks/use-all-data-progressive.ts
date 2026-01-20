@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 import { useQueryClient } from '@tanstack/react-query';
 
 interface UseAllDataProgressiveOptions {
@@ -51,6 +51,9 @@ export function useAllDataProgressive<T = any>({
         setLoading(true);
         setError(null);
         setIsComplete(false);
+
+        // Crear instancia del cliente para asegurar autenticación correcta
+        const supabase = createClient();
 
         // PASO 1: Cargar el primer lote (10 registros) inmediatamente
         console.log(`[useAllDataProgressive] Cargando primer lote (${initialBatchSize} registros)...`);

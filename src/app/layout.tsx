@@ -150,28 +150,30 @@ export default function RootLayout({
           }}
         />
 
-        {/* Facebook Pixel - Reemplaza XXXXXXXXXX con tu ID real */}
-        <Script
-          id="facebook-pixel"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              
-              // Inicializar con consentimiento denegado por defecto
-              fbq('consent', 'revoke');
-              fbq('init', 'XXXXXXXXXX');
-              fbq('track', 'PageView');
-            `,
-          }}
-        />
+        {/* Facebook Pixel - Solo si está configurado */}
+        {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
+          <Script
+            id="facebook-pixel"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                !function(f,b,e,v,n,t,s)
+                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+                n.queue=[];t=b.createElement(e);t.async=!0;
+                t.src=v;s=b.getElementsByTagName(e)[0];
+                s.parentNode.insertBefore(t,s)}(window, document,'script',
+                'https://connect.facebook.net/en_US/fbevents.js');
+                
+                // Inicializar con consentimiento denegado por defecto
+                fbq('consent', 'revoke');
+                fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
+                fbq('track', 'PageView');
+              `,
+            }}
+          />
+        )}
       </head>
       <body className={`${rubik.variable} ${amiko.variable} font-sans pt-[120px]`}>{/* pt-[120px] para compensar header fijo */}
         <Providers>

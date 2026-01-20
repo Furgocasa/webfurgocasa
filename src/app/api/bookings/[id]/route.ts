@@ -24,10 +24,20 @@ export async function GET(
         *,
         customer:customers(
           id,
-          date_of_birth,
+          name,
+          email,
+          phone,
+          dni,
+          address,
+          city,
+          postal_code,
           country,
+          date_of_birth,
           driver_license,
-          driver_license_expiry
+          driver_license_expiry,
+          notes,
+          total_bookings,
+          total_spent
         ),
         vehicle:vehicles(
           id, 

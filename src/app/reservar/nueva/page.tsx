@@ -313,14 +313,9 @@ function NuevaReservaContent() {
             deposit_amount: 1000, // Fianza estándar
             status: 'pending',
             payment_status: 'pending',
-            // Snapshot de datos del cliente para histórico
+            // Snapshot básico del cliente (solo nombre y email para GDPR/auditoría)
             customer_name: customerName,
             customer_email: customerEmail,
-            customer_phone: customerPhone,
-            customer_dni: customerDni,
-            customer_address: customerAddress,
-            customer_city: customerCity,
-            customer_postal_code: customerPostalCode,
             notes: notes,
           },
           extras: bookingExtrasData,

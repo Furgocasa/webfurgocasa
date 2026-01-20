@@ -60,19 +60,23 @@ interface Booking {
   amount_paid: number;
   status: string;
   payment_status: string;
+  // Snapshot básico (solo para GDPR si el cliente se elimina)
   customer_name: string;
   customer_email: string;
-  customer_phone: string;
-  customer_dni: string | null;
-  customer_address: string | null;
-  customer_city: string | null;
-  customer_postal_code: string | null;
   notes: string;
   created_at: string;
-  customer?: {
+  // Datos actuales del cliente (cargados via JOIN desde customers)
+  customer: {
     id: string;
-    date_of_birth: string | null;
+    name: string;
+    email: string;
+    phone: string;
+    dni: string | null;
+    address: string | null;
+    city: string | null;
+    postal_code: string | null;
     country: string | null;
+    date_of_birth: string | null;
     driver_license: string | null;
     driver_license_expiry: string | null;
   } | null;
@@ -475,34 +479,34 @@ export default function ReservaPage() {
                   )}
 
                   {/* DNI - ID nº */}
-                  {booking.customer_dni && (
+                  {booking.customer?.dni && (
                     <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("DNI - ID nº")}:</p>
-                      <p className="text-gray-900">{booking.customer_dni}</p>
+                      <p className="text-gray-900">{booking.customer.dni}</p>
                     </div>
                   )}
 
                   {/* Dirección del conductor principal */}
-                  {booking.customer_address && (
+                  {booking.customer?.address && (
                     <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Dirección del conductor principal")}:</p>
-                      <p className="text-gray-900">{booking.customer_address}</p>
+                      <p className="text-gray-900">{booking.customer.address}</p>
                     </div>
                   )}
 
                   {/* Código postal del conductor principal */}
-                  {booking.customer_postal_code && (
+                  {booking.customer?.postal_code && (
                     <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Código postal del conductor principal")}:</p>
-                      <p className="text-gray-900">{booking.customer_postal_code}</p>
+                      <p className="text-gray-900">{booking.customer.postal_code}</p>
                     </div>
                   )}
 
                   {/* Municipio del conductor principal */}
-                  {booking.customer_city && (
+                  {booking.customer?.city && (
                     <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Municipio del conductor principal")}:</p>
-                      <p className="text-gray-900">{booking.customer_city}</p>
+                      <p className="text-gray-900">{booking.customer.city}</p>
                     </div>
                   )}
 
@@ -548,20 +552,22 @@ export default function ReservaPage() {
                   )}
 
                   {/* Teléfono */}
-                  <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
-                    <p className="text-sm text-gray-600 font-medium">{t("Teléfono")}:</p>
-                    <a href={`tel:${booking.customer_phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      {booking.customer_phone}
-                    </a>
-                  </div>
+                  {booking.customer?.phone && (
+                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                      <p className="text-sm text-gray-600 font-medium">{t("Teléfono")}:</p>
+                      <a href={`tel:${booking.customer.phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                        <Phone className="h-4 w-4" />
+                        {booking.customer.phone}
+                      </a>
+                    </div>
+                  )}
 
                   {/* e-Mail */}
                   <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
                     <p className="text-sm text-gray-600 font-medium">{t("e-Mail")}:</p>
-                    <a href={`mailto:${booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                    <a href={`mailto:${booking.customer?.email || booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
                       <Mail className="h-4 w-4" />
-                      {booking.customer_email}
+                      {booking.customer?.email || booking.customer_email}
                     </a>
                   </div>
 

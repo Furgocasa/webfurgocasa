@@ -4,7 +4,7 @@
  */
 
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 interface UsePaginatedDataOptions {
   queryKey: string[];
@@ -31,6 +31,9 @@ export function usePaginatedData<T = any>({
     queryKey: [...queryKey, filters, orderBy, pageSize],
     queryFn: async ({ pageParam = 0 }) => {
       console.log(`[usePaginatedData] Loading page ${pageParam}...`);
+      
+      // Crear instancia del cliente para asegurar autenticación correcta
+      const supabase = createClient();
       
       let queryBuilder = supabase
         .from(table)

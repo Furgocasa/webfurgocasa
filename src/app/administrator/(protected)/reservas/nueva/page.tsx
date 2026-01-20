@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { supabase } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { 
-  ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Mail, Phone, Package
+  ArrowLeft, Save, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Package, Plus, Search
 } from "lucide-react";
 import Link from "next/link";
 import { calculateRentalDays } from "@/lib/utils";
@@ -32,22 +32,6 @@ interface Extra {
   price_type: string | null;
   max_quantity?: number | null;
   is_active?: boolean | null;
-  icon?: string | null;
-  image_url?: string | null;
-  sort_order?: number | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-}
-
-interface BookingExtra {
-  id: string;
-  extra_id: string;
-  quantity: number | null;
-  unit_price: number;
-  total_price: number;
-  extra: {
-    name: string;
-  };
 }
 
 interface Customer {
@@ -55,17 +39,12 @@ interface Customer {
   name: string | null;
   email: string | null;
   phone: string | null;
-  dni: string | null;
-  address: string | null;
-  city: string | null;
-  postal_code: string | null;
-  country: string | null;
-  date_of_birth: string | null;
-  driver_license: string | null;
-  driver_license_expiry: string | null;
 }
 
 interface FormData {
+  // Cliente
+  customer_id: string;
+  
   // Vehículo y ubicaciones
   vehicle_id: string;
   pickup_location_id: string;
@@ -89,34 +68,31 @@ interface FormData {
   status: string;
   payment_status: string;
   
-  // Snapshot básico del cliente (solo para GDPR/auditoría)
-  customer_name: string;
-  customer_email: string;
-  
   // Notas
   notes: string;
   admin_notes: string;
 }
 
-export default function EditarReservaPage() {
+export default function NuevaReservaPage() {
   const router = useRouter();
-  const params = useParams();
-  const bookingId = params.id as string;
+  const supabase = createClient();
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   
-  const [bookingNumber, setBookingNumber] = useState('');
-  const [customerId, setCustomerId] = useState<string>('');
-  const [customerData, setCustomerData] = useState<Customer | null>(null);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [customerSearch, setCustomerSearch] = useState("");
+  const [showCustomerDropdown, setShowCustomerDropdown] = useState(false);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  
   const [locations, setLocations] = useState<Location[]>([]);
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [extras, setExtras] = useState<Extra[]>([]);
   const [bookingExtras, setBookingExtras] = useState<Record<string, number>>({});
-  const [existingExtras, setExistingExtras] = useState<BookingExtra[]>([]);
   
   const [formData, setFormData] = useState<FormData>({
+    customer_id: '',
     vehicle_id: '',
     pickup_location_id: '',
     dropoff_location_id: '',
@@ -132,17 +108,13 @@ export default function EditarReservaPage() {
     amount_paid: 0,
     status: 'pending',
     payment_status: 'pending',
-    customer_name: '',
-    customer_email: '',
     notes: '',
     admin_notes: '',
   });
 
   useEffect(() => {
-    if (bookingId) {
-      loadData();
-    }
-  }, [bookingId]);
+    loadData();
+  }, []);
 
   useEffect(() => {
     // Calcular días cuando cambian las fechas o las horas
@@ -184,74 +156,12 @@ export default function EditarReservaPage() {
     try {
       setLoading(true);
 
-      // Cargar reserva con JOIN a customers
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .select(`
-          *,
-          customer:customers(
-            id,
-            name,
-            email,
-            phone,
-            dni,
-            address,
-            city,
-            postal_code,
-            country,
-            date_of_birth,
-            driver_license,
-            driver_license_expiry
-          ),
-          booking_extras(
-            id,
-            extra_id,
-            quantity,
-            unit_price,
-            total_price,
-            extra:extras(name)
-          )
-        `)
-        .eq('id', bookingId)
-        .single();
-
-      if (bookingError) throw bookingError;
-
-      setBookingNumber(booking.booking_number);
-      
-      // Guardar customer_id y datos del cliente
-      setCustomerId(booking.customer_id || '');
-      setCustomerData(booking.customer || null);
-      
-      setFormData({
-        vehicle_id: booking.vehicle_id,
-        pickup_location_id: booking.pickup_location_id,
-        dropoff_location_id: booking.dropoff_location_id,
-        pickup_date: booking.pickup_date,
-        pickup_time: booking.pickup_time,
-        dropoff_date: booking.dropoff_date,
-        dropoff_time: booking.dropoff_time,
-        days: booking.days ?? 1,
-        base_price: booking.base_price ?? 0,
-        extras_price: booking.extras_price ?? 0,
-        total_price: booking.total_price ?? 0,
-        deposit_amount: booking.deposit_amount ?? 1000,
-        amount_paid: booking.amount_paid ?? 0,
-        status: booking.status ?? 'pending',
-        payment_status: booking.payment_status ?? 'pending',
-        customer_name: booking.customer_name ?? '',
-        customer_email: booking.customer_email ?? '',
-        notes: booking.notes || '',
-        admin_notes: booking.admin_notes || '',
-      });
-
-      // Convertir extras existentes a formato del estado
-      const extrasMap: Record<string, number> = {};
-      booking.booking_extras?.forEach((be: any) => {
-        extrasMap[be.extra_id] = be.quantity;
-      });
-      setBookingExtras(extrasMap);
-      setExistingExtras(booking.booking_extras || []);
+      // Cargar clientes
+      const { data: customersData } = await supabase
+        .from('customers')
+        .select('id, name, email, phone')
+        .order('name');
+      setCustomers(customersData || []);
 
       // Cargar ubicaciones
       const { data: locationsData } = await supabase
@@ -261,7 +171,7 @@ export default function EditarReservaPage() {
         .order('name');
       setLocations(locationsData || []);
 
-      // Cargar vehículos ordenados por código interno (como en el calendario)
+      // Cargar vehículos ordenados por código interno
       const { data: vehiclesData } = await supabase
         .from('vehicles')
         .select('id, name, brand, internal_code')
@@ -303,9 +213,6 @@ export default function EditarReservaPage() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // ELIMINADO: Los datos del cliente ya NO se editan aquí
-  // Se editan en la página de clientes
-
   const handleExtraChange = (extraId: string, quantity: number) => {
     setBookingExtras(prev => {
       if (quantity === 0) {
@@ -317,8 +224,26 @@ export default function EditarReservaPage() {
     });
   };
 
+  const handleCustomerSelect = (customer: Customer) => {
+    setSelectedCustomer(customer);
+    setCustomerSearch(customer.name || '');
+    setFormData(prev => ({ ...prev, customer_id: customer.id }));
+    setShowCustomerDropdown(false);
+  };
+
+  const filteredCustomers = customers.filter(c => 
+    c.name?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    c.email?.toLowerCase().includes(customerSearch.toLowerCase()) ||
+    c.phone?.toLowerCase().includes(customerSearch.toLowerCase())
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.customer_id) {
+      setMessage({ type: 'error', text: 'Por favor, selecciona un cliente' });
+      return;
+    }
 
     if (!formData.vehicle_id || !formData.pickup_location_id || !formData.dropoff_location_id) {
       setMessage({ type: 'error', text: 'Por favor, completa todos los campos obligatorios' });
@@ -329,13 +254,11 @@ export default function EditarReservaPage() {
       setSaving(true);
       setMessage(null);
 
-      // VALIDACIÓN CRÍTICA: Verificar disponibilidad del vehículo
-      // Comprobar si hay otras reservas del mismo vehículo en las fechas seleccionadas
+      // VALIDACIÓN: Verificar disponibilidad del vehículo
       const { data: conflictingBookings, error: checkError } = await supabase
         .from('bookings')
         .select('id, booking_number, customer_name, pickup_date, dropoff_date')
         .eq('vehicle_id', formData.vehicle_id)
-        .neq('id', bookingId) // Excluir la reserva actual
         .neq('status', 'cancelled')
         .or(`and(pickup_date.lte.${formData.dropoff_date},dropoff_date.gte.${formData.pickup_date})`);
 
@@ -359,10 +282,16 @@ export default function EditarReservaPage() {
         return;
       }
 
-      // Actualizar reserva (NO se tocan datos del cliente, solo snapshot básico)
-      const { error: updateError } = await supabase
+      // Obtener datos del cliente para el snapshot
+      const customer = customers.find(c => c.id === formData.customer_id);
+
+      // Crear reserva
+      const { data: booking, error: bookingError } = await supabase
         .from('bookings')
-        .update({
+        .insert({
+          customer_id: formData.customer_id,
+          customer_name: customer?.name || '',
+          customer_email: customer?.email || '',
           vehicle_id: formData.vehicle_id,
           pickup_location_id: formData.pickup_location_id,
           dropoff_location_id: formData.dropoff_location_id,
@@ -378,25 +307,15 @@ export default function EditarReservaPage() {
           amount_paid: formData.amount_paid,
           status: formData.status,
           payment_status: formData.payment_status,
-          // Snapshot básico del cliente (solo nombre y email para auditoría)
-          customer_name: customerData?.name || formData.customer_name,
-          customer_email: customerData?.email || formData.customer_email,
           notes: formData.notes,
           admin_notes: formData.admin_notes,
-          updated_at: new Date().toISOString(),
         })
-        .eq('id', bookingId);
+        .select()
+        .single();
 
-      if (updateError) throw updateError;
+      if (bookingError) throw bookingError;
 
-      // 2. Actualizar extras
-      // Eliminar extras existentes
-      await supabase
-        .from('booking_extras')
-        .delete()
-        .eq('booking_id', bookingId);
-
-      // Insertar nuevos extras
+      // Insertar extras
       if (Object.keys(bookingExtras).length > 0) {
         const extrasToInsert = Object.entries(bookingExtras)
           .map(([extraId, quantity]) => {
@@ -409,7 +328,7 @@ export default function EditarReservaPage() {
               : unitPrice * quantity;
 
             return {
-              booking_id: bookingId,
+              booking_id: booking.id,
               extra_id: extraId,
               quantity,
               unit_price: unitPrice,
@@ -427,46 +346,15 @@ export default function EditarReservaPage() {
         }
       }
 
-      setMessage({ type: 'success', text: 'Reserva actualizada correctamente' });
+      setMessage({ type: 'success', text: 'Reserva creada correctamente' });
       setTimeout(() => {
-        router.push(`/administrator/reservas/${bookingId}`);
+        router.push(`/administrator/reservas/${booking.id}`);
       }, 1500);
 
     } catch (error: any) {
-      console.error('Error updating booking:', error);
-      setMessage({ type: 'error', text: error.message || 'Error al actualizar la reserva' });
+      console.error('Error creating booking:', error);
+      setMessage({ type: 'error', text: error.message || 'Error al crear la reserva' });
     } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!confirm('¿Estás seguro de que deseas eliminar esta reserva? Esta acción no se puede deshacer.')) {
-      return;
-    }
-
-    if (!confirm('Esta es una acción irreversible. ¿Confirmas la eliminación?')) {
-      return;
-    }
-
-    try {
-      setSaving(true);
-
-      const { error } = await supabase
-        .from('bookings')
-        .delete()
-        .eq('id', bookingId);
-
-      if (error) throw error;
-
-      setMessage({ type: 'success', text: 'Reserva eliminada correctamente' });
-      setTimeout(() => {
-        router.push('/administrator/reservas');
-      }, 1500);
-
-    } catch (error: any) {
-      console.error('Error deleting booking:', error);
-      setMessage({ type: 'error', text: error.message || 'Error al eliminar la reserva' });
       setSaving(false);
     }
   };
@@ -476,7 +364,7 @@ export default function EditarReservaPage() {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
-          <p className="text-gray-600">Cargando reserva...</p>
+          <p className="text-gray-600">Cargando datos...</p>
         </div>
       </div>
     );
@@ -488,23 +376,14 @@ export default function EditarReservaPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <Link 
-            href={`/administrator/reservas/${bookingId}`}
+            href="/administrator/reservas"
             className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange mb-2 transition-colors"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Volver a la reserva
+            Volver a reservas
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Editar Reserva {bookingNumber}</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Nueva Reserva</h1>
         </div>
-
-        <button
-          onClick={handleDelete}
-          disabled={saving}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
-        >
-          <Trash2 className="h-4 w-4" />
-          Eliminar reserva
-        </button>
       </div>
 
       {/* Message */}
@@ -517,7 +396,7 @@ export default function EditarReservaPage() {
           ) : (
             <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
           )}
-          <p>{message.text}</p>
+          <p className="whitespace-pre-line">{message.text}</p>
         </div>
       )}
 
@@ -526,6 +405,79 @@ export default function EditarReservaPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
+            {/* Cliente */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <User className="h-6 w-6 text-furgocasa-blue" />
+                Cliente
+              </h2>
+              
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Seleccionar cliente *
+                  </label>
+                  <div className="relative">
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                      <input
+                        type="text"
+                        value={customerSearch}
+                        onChange={(e) => {
+                          setCustomerSearch(e.target.value);
+                          setShowCustomerDropdown(true);
+                        }}
+                        onFocus={() => setShowCustomerDropdown(true)}
+                        placeholder="Buscar por nombre, email o teléfono..."
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                        required
+                      />
+                    </div>
+                    
+                    {showCustomerDropdown && filteredCustomers.length > 0 && (
+                      <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+                        {filteredCustomers.map(customer => (
+                          <button
+                            key={customer.id}
+                            type="button"
+                            onClick={() => handleCustomerSelect(customer)}
+                            className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                          >
+                            <p className="font-medium text-gray-900">{customer.name}</p>
+                            <p className="text-sm text-gray-600">{customer.email}</p>
+                            {customer.phone && (
+                              <p className="text-sm text-gray-500">{customer.phone}</p>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {selectedCustomer && (
+                  <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm font-medium text-green-900 mb-1">✓ Cliente seleccionado</p>
+                    <p className="text-sm text-green-800">
+                      {selectedCustomer.name} • {selectedCustomer.email}
+                    </p>
+                  </div>
+                )}
+
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-xs text-blue-900 font-medium mb-1">ℹ️ ¿No encuentras el cliente?</p>
+                  <Link
+                    href="/administrator/clientes/nuevo"
+                    target="_blank"
+                    className="inline-flex items-center gap-1 text-xs text-blue-700 hover:text-blue-900 font-medium"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Crear nuevo cliente (se abrirá en nueva pestaña)
+                  </Link>
+                </div>
+              </div>
+            </div>
+
             {/* Vehículo */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -689,128 +641,6 @@ export default function EditarReservaPage() {
               </div>
             </div>
 
-            {/* Cliente - SOLO LECTURA */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
-                  <User className="h-6 w-6 text-furgocasa-blue" />
-                  Datos del Cliente
-                </h2>
-                {customerId && (
-                  <Link
-                    href={`/administrator/clientes/${customerId}`}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-furgocasa-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    Editar cliente
-                  </Link>
-                )}
-              </div>
-              
-              {!customerData ? (
-                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <p className="text-sm text-yellow-800">
-                    No hay cliente vinculado a esta reserva
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Nombre completo
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.name || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Email
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.email || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Teléfono
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.phone || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        DNI/NIE
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.dni || '-'}</p>
-                    </div>
-
-                    <div className="md:col-span-2 p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Dirección
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.address || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Ciudad
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.city || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Código Postal
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.postal_code || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        País
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.country || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Fecha de Nacimiento
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">
-                        {customerData.date_of_birth 
-                          ? new Date(customerData.date_of_birth).toLocaleDateString('es-ES') 
-                          : '-'}
-                      </p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Permiso de Conducir
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">{customerData.driver_license || '-'}</p>
-                    </div>
-
-                    <div className="p-3 bg-gray-50 rounded-lg">
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        Vencimiento del Permiso
-                      </label>
-                      <p className="text-sm font-medium text-gray-900">
-                        {customerData.driver_license_expiry 
-                          ? new Date(customerData.driver_license_expiry).toLocaleDateString('es-ES') 
-                          : '-'}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-xs text-blue-900 font-medium mb-1">ℹ️ Información importante</p>
-                    <p className="text-xs text-blue-800">
-                      Los datos del cliente no se pueden editar desde aquí. Para editarlos, haz clic en el botón "Editar cliente" arriba.
-                    </p>
-                  </div>
-                </>
-              )}
-            </div>
-
             {/* Notas */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
               <h2 className="text-xl font-bold text-gray-900 mb-4">Notas</h2>
@@ -916,9 +746,6 @@ export default function EditarReservaPage() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
                     required
                   />
-                  <p className="text-xs text-gray-500 mt-1">
-                    Introduce el total pagado hasta el momento (suma de todos los pagos)
-                  </p>
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg space-y-2">
@@ -958,21 +785,7 @@ export default function EditarReservaPage() {
                     {formData.payment_status === 'pending' && 'Pendiente'}
                     {formData.payment_status === 'partial' && 'Pago Parcial'}
                     {formData.payment_status === 'paid' && 'Pagado'}
-                    {formData.payment_status === 'refunded' && 'Reembolsado'}
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    El estado se actualiza automáticamente según el monto pagado
-                  </p>
-                </div>
-
-                {/* Ejemplos de pagos */}
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-xs text-blue-900 font-medium mb-2">💡 Ejemplos de uso:</p>
-                  <ul className="text-xs text-blue-800 space-y-1">
-                    <li>• Cliente paga 200€ → Introduce 200€</li>
-                    <li>• Luego paga 150€ más → Introduce 350€ (total acumulado)</li>
-                    <li>• Completa el pago → Introduce {formData.total_price.toFixed(2)}€</li>
-                  </ul>
                 </div>
               </div>
             </div>
@@ -983,7 +796,7 @@ export default function EditarReservaPage() {
               
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Estado actual
+                  Estado inicial
                 </label>
                 <select
                   value={formData.status}
@@ -996,9 +809,6 @@ export default function EditarReservaPage() {
                   <option value="completed">Completada</option>
                   <option value="cancelled">Cancelada</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-2">
-                  El estado de pago se gestiona automáticamente en la sección "Control de Pagos"
-                </p>
               </div>
             </div>
 
@@ -1012,18 +822,18 @@ export default function EditarReservaPage() {
                 {saving ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    Guardando...
+                    Creando...
                   </>
                 ) : (
                   <>
                     <Save className="h-5 w-5" />
-                    Guardar cambios
+                    Crear reserva
                   </>
                 )}
               </button>
 
               <Link
-                href={`/administrator/reservas/${bookingId}`}
+                href="/administrator/reservas"
                 className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
               >
                 Cancelar
@@ -1035,4 +845,3 @@ export default function EditarReservaPage() {
     </div>
   );
 }
-

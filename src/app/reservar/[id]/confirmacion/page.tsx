@@ -25,7 +25,12 @@ interface Booking {
   payment_status: string;
   customer_name: string;
   customer_email: string;
-  customer_phone: string;
+  customer: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+  } | null;
   vehicle: {
     name: string;
     brand: string;

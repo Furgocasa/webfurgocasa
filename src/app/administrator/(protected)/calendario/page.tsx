@@ -95,6 +95,7 @@ export default function CalendarioPage() {
     error: vehiclesError 
   } = useAdminData<Vehicle[]>({
     queryFn: async () => {
+      const supabase = createClient();
       const result = await supabase
         .from('vehicles')
         .select('id, name, brand, slug, internal_code')
@@ -423,13 +424,13 @@ export default function CalendarioPage() {
       const vehicle = vehicles.find(v => v.id === booking.vehicle_id);
       const bookingWithVehicle = { ...booking, vehicle };
       
-      // Agregar evento de recogida
-      const pickupKey = new Date(booking.pickup_date).toISOString().split('T')[0];
+      // Agregar evento de recogida (formato ISO sin conversión UTC)
+      const pickupKey = booking.pickup_date; // Ya está en formato YYYY-MM-DD
       if (!events[pickupKey]) events[pickupKey] = [];
       events[pickupKey].push({ type: 'pickup', booking: bookingWithVehicle });
       
-      // Agregar evento de devolución
-      const dropoffKey = new Date(booking.dropoff_date).toISOString().split('T')[0];
+      // Agregar evento de devolución (formato ISO sin conversión UTC)
+      const dropoffKey = booking.dropoff_date; // Ya está en formato YYYY-MM-DD
       if (!events[dropoffKey]) events[dropoffKey] = [];
       events[dropoffKey].push({ type: 'dropoff', booking: bookingWithVehicle });
     });
@@ -632,23 +633,46 @@ export default function CalendarioPage() {
                               {days.map((day) => {
                                 const isTodayFlag = isToday(day, monthDate);
                                 
+                                // Crear fecha ISO del día actual sin conversión UTC
+                                const year = monthDate.getFullYear();
+                                const month = String(monthDate.getMonth() + 1).padStart(2, '0');
+                                const dayStr = String(day).padStart(2, '0');
+                                const currentDateStr = `${year}-${month}-${dayStr}`;
+                                
                                 // Buscar TODAS las reservas que incluyan este día
                                 const dayBookings = vehicleBookings.filter(booking =>
-                                  isDateInRange(day, monthDate, booking.pickup_date, booking.dropoff_date)
+                                  currentDateStr >= booking.pickup_date && currentDateStr <= booking.dropoff_date
                                 );
 
-                                // Buscar reservas que empiezan en este día
+                                // Buscar reservas que empiezan EXACTAMENTE en este día
                                 const pickupBookings = vehicleBookings.filter(booking =>
-                                  isPickupDate(day, monthDate, booking.pickup_date)
+                                  booking.pickup_date === currentDateStr
                                 );
 
-                                // Buscar reservas que terminan en este día
+                                // Buscar reservas que terminan EXACTAMENTE en este día
                                 const dropoffBookings = vehicleBookings.filter(booking =>
-                                  isDropoffDate(day, monthDate, booking.dropoff_date)
+                                  booking.dropoff_date === currentDateStr
                                 );
 
-                                // Reserva principal para mostrar (la más reciente o la primera)
+                                // Reserva principal para mostrar (la primera activa en el día)
                                 const dayBooking = dayBookings.length > 0 ? dayBookings[0] : null;
+
+                                // VALIDACIÓN CRÍTICA: Detectar conflictos de reservas
+                                // Si hay más de una reserva activa en el mismo día para el mismo vehículo,
+                                // es un error grave que necesita corrección
+                                if (dayBookings.length > 1) {
+                                  console.error(
+                                    `[CALENDARIO ERROR] Conflicto detectado para vehículo ${vehicle.internal_code || vehicle.name}`,
+                                    `en fecha ${currentDateStr}:`,
+                                    `${dayBookings.length} reservas simultáneas:`,
+                                    dayBookings.map(b => ({
+                                      booking_number: b.booking_number,
+                                      pickup: b.pickup_date,
+                                      dropoff: b.dropoff_date,
+                                      customer: b.customer?.name
+                                    }))
+                                  );
+                                }
 
                                 return (
                                   <div
@@ -661,7 +685,7 @@ export default function CalendarioPage() {
                                       <div
                                         className={`h-12 flex items-center justify-center relative group/booking ${
                                           getStatusColor(dayBooking.status)
-                                        } cursor-pointer hover:opacity-80 transition-opacity`}
+                                        } ${dayBookings.length > 1 ? 'ring-2 ring-yellow-500 ring-inset' : ''} cursor-pointer hover:opacity-80 transition-opacity`}
                                         onClick={(e) => {
                                           // Si es el marcador verde o rojo, no hacer nada (para que se vea el tooltip)
                                           if ((e.target as HTMLElement).closest('.smart-tooltip-trigger')) {
@@ -671,7 +695,10 @@ export default function CalendarioPage() {
                                           // En PC y móvil, abrir modal
                                           setSelectedBooking(dayBooking);
                                         }}
-                                        title={`${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\nClick para ver detalles`}
+                                        title={dayBookings.length > 1 
+                                          ? `⚠️ CONFLICTO: ${dayBookings.length} reservas simultáneas\n${dayBookings.map(b => `- ${b.booking_number} (${b.customer?.name})`).join('\n')}\n\nClick para ver detalles`
+                                          : `${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\nClick para ver detalles`
+                                        }
                                       >
                                         {/* Indicadores de inicio (verde) - puede haber múltiples */}
                                         {pickupBookings.length > 0 && (
@@ -702,8 +729,11 @@ export default function CalendarioPage() {
                                           </SmartTooltip>
                                         )}
                                         
-                                        {/* Número de reservas activas */}
-                                        <span className="text-[10px] font-bold text-white">
+                                        {/* Número de reservas activas - mostrar WARNING si hay más de 1 */}
+                                        <span className={`text-[10px] font-bold ${
+                                          dayBookings.length > 1 ? 'text-yellow-900 bg-yellow-300 px-1 rounded animate-pulse' : 'text-white'
+                                        }`}>
+                                          {dayBookings.length > 1 && '⚠️ '}
                                           {dayBookings.length}
                                         </span>
 

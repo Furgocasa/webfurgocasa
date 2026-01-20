@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { useAllDataProgressive } from "@/hooks/use-all-data-progressive";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatPrice } from "@/lib/utils";
@@ -15,6 +15,7 @@ interface Booking {
   pickup_time: string;
   dropoff_date: string;
   dropoff_time: string;
+  days: number;
   status: string | null;
   payment_status: string | null;
   total_price: number;
@@ -162,6 +163,7 @@ export default function BookingsPage() {
 
   const handleStatusChange = async (bookingId: string, newStatus: string) => {
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from('bookings')
         .update({ status: newStatus })
@@ -183,6 +185,7 @@ export default function BookingsPage() {
     }
 
     try {
+      const supabase = createClient();
       // Primero eliminar los extras de la reserva
       await supabase.from('booking_extras').delete().eq('booking_id', bookingId);
       

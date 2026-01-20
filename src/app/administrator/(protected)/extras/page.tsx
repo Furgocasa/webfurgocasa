@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import supabase from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { Plus, Search, Edit, Trash2, Save, X, Package, Euro, AlertCircle } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useAdminData } from "@/hooks/use-admin-data";
@@ -49,6 +49,7 @@ export default function ExtrasPage() {
   // Usar el hook para cargar datos con retry automático
   const { data: extras, loading, error, refetch } = useAdminData<Extra[]>({
     queryFn: async () => {
+      const supabase = createClient();
       const result = await supabase
         .from('extras')
         .select('*')
@@ -77,6 +78,7 @@ export default function ExtrasPage() {
 
     try {
       setSaving(true);
+      const supabase = createClient();
       const dataToSave = {
         name: formData.name,
         description: formData.description || null,
@@ -142,6 +144,7 @@ export default function ExtrasPage() {
     if (!deleteConfirm.id) return;
 
     try {
+      const supabase = createClient();
       const id = deleteConfirm.id;
       const { data, error } = await supabase
         .from('extras')
@@ -169,6 +172,7 @@ export default function ExtrasPage() {
 
   const toggleActive = async (id: string, currentStatus: boolean) => {
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('extras')
         .update({ is_active: !currentStatus })

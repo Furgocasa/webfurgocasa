@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2 } from "lucide-react";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { usePaginatedData } from "@/hooks/use-paginated-data";
 import ClientActions from "./client-actions";
 

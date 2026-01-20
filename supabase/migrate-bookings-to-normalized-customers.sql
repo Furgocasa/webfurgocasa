@@ -50,20 +50,43 @@ WHERE c.id = b.customer_id
     OR (c.postal_code IS NULL AND b.customer_postal_code IS NOT NULL)
   );
 
--- PASO 4: Eliminar columnas redundantes de bookings
-ALTER TABLE bookings DROP COLUMN IF EXISTS customer_phone;
-ALTER TABLE bookings DROP COLUMN IF EXISTS customer_dni;
-ALTER TABLE bookings DROP COLUMN IF EXISTS customer_address;
-ALTER TABLE bookings DROP COLUMN IF EXISTS customer_city;
-ALTER TABLE bookings DROP COLUMN IF EXISTS customer_postal_code;
-ALTER TABLE bookings DROP COLUMN IF EXISTS customer_country;
+-- PASO 4: Eliminar vistas dependientes antes de eliminar columnas
+DROP VIEW IF EXISTS bookings_with_customer_details CASCADE;
 
--- PASO 5: Agregar comentarios descriptivos
+-- PASO 5: Eliminar columnas redundantes de bookings
+ALTER TABLE bookings DROP COLUMN IF EXISTS customer_phone CASCADE;
+ALTER TABLE bookings DROP COLUMN IF EXISTS customer_dni CASCADE;
+ALTER TABLE bookings DROP COLUMN IF EXISTS customer_address CASCADE;
+ALTER TABLE bookings DROP COLUMN IF EXISTS customer_city CASCADE;
+ALTER TABLE bookings DROP COLUMN IF EXISTS customer_postal_code CASCADE;
+ALTER TABLE bookings DROP COLUMN IF EXISTS customer_country CASCADE;
+
+-- PASO 6: Recrear vista con la nueva estructura normalizada
+CREATE OR REPLACE VIEW bookings_with_customer_details AS
+SELECT 
+    b.*,
+    c.phone as customer_phone,
+    c.dni as customer_dni,
+    c.address as customer_address,
+    c.city as customer_city,
+    c.postal_code as customer_postal_code,
+    c.country as customer_country,
+    c.date_of_birth as customer_date_of_birth,
+    c.driver_license as customer_driver_license,
+    c.driver_license_expiry as customer_driver_license_expiry,
+    c.total_bookings as customer_total_bookings,
+    c.total_spent as customer_total_spent
+FROM bookings b
+LEFT JOIN customers c ON b.customer_id = c.id;
+
+COMMENT ON VIEW bookings_with_customer_details IS 'Vista que combina bookings con datos actualizados de customers mediante JOIN';
+
+-- PASO 7: Agregar comentarios descriptivos
 COMMENT ON COLUMN bookings.customer_id IS 'Referencia al cliente - todos los demás datos se obtienen por JOIN';
 COMMENT ON COLUMN bookings.customer_name IS 'Snapshot del nombre (por GDPR/auditoría)';
 COMMENT ON COLUMN bookings.customer_email IS 'Snapshot del email (por GDPR/auditoría)';
 
--- PASO 6: Verificar resultado
+-- PASO 8: Verificar resultado
 SELECT 
     column_name, 
     data_type, 
@@ -73,7 +96,7 @@ WHERE table_name = 'bookings'
   AND column_name LIKE 'customer%'
 ORDER BY ordinal_position;
 
--- PASO 7: Mostrar ejemplo de cómo hacer queries ahora
+-- PASO 9: Mostrar ejemplo de cómo hacer queries ahora
 -- ============================================
 -- EJEMPLO DE QUERY CORRECTO POST-MIGRACIÓN:
 -- ============================================
@@ -94,7 +117,7 @@ LEFT JOIN customers c ON b.customer_id = c.id
 WHERE b.id = 'booking-uuid-here';
 */
 
--- PASO 8: Estadísticas finales
+-- PASO 10: Estadísticas finales
 SELECT 
     'Migración completada' as status,
     COUNT(*) as total_bookings,

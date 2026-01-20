@@ -4,7 +4,7 @@
  */
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/client';
 
 interface UseAdminDataOptions<T> {
   queryFn: () => Promise<{ data: T | null; error: any }>;
@@ -48,7 +48,9 @@ export function useAdminData<T = any>({
 
       console.log(`[useAdminData] ${isRetry ? 'Retry' : 'Loading'} data... (attempt ${currentAttempt + 1}/${retryCount})`);
 
-      // Verificar que Supabase está listo
+      // Crear instancia del cliente para asegurar autenticación correcta
+      const supabase = createClient();
+      
       if (!supabase) {
         throw new Error('Supabase client not initialized');
       }
