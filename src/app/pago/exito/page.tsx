@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { useLanguage } from "@/contexts/language-context";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from"react";
+import { useLanguage } from"@/contexts/language-context";
+import { useSearchParams, useRouter } from"next/navigation";
 
 function LoadingState() {
   return (
@@ -11,12 +11,10 @@ function LoadingState() {
     </div>
   );
 }
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { supabase } from "@/lib/supabase/client";
-import { formatPrice } from "@/lib/utils";
-import { CheckCircle, Calendar, Car, MapPin, Download, Mail } from "lucide-react";
-import { LocalizedLink } from "@/components/localized-link";
+import { supabase } from"@/lib/supabase/client";
+import { formatPrice } from"@/lib/utils";
+import { CheckCircle, Calendar, Car, MapPin, Download, Mail } from"lucide-react";
+import { LocalizedLink } from"@/components/localized-link";
 
 interface Payment {
   id: string;
@@ -135,23 +133,19 @@ function PagoExitoContent() {
   if (loading) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
             <p className="text-gray-600">Verificando pago...</p>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   return (
     <>
-      <Header />
-      
-      <main className="min-h-screen bg-gradient-to-b from-green-50 to-gray-50 py-12">
+<main className="min-h-screen bg-gradient-to-b from-green-50 to-gray-50 py-12">
         <div className="container mx-auto px-4 max-w-2xl">
           {/* Success Card */}
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
@@ -257,7 +251,7 @@ function PagoExitoContent() {
                   {payment.booking.total_price > payment.booking.amount_paid && (
                     <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-6">
                       <p className="text-sm text-yellow-800">
-                        <strong>{t("Recuerda:")}</strong>{" "}
+                        <strong>{t("Recuerda:")}</strong>{""}
                         {t("El pago restante debe realizarse como máximo 15 días antes de la fecha de recogida.")}
                       </p>
                     </div>
@@ -267,7 +261,7 @@ function PagoExitoContent() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2 text-sm text-gray-600 justify-center">
                       <Mail className="h-4 w-4" />
-                      {t("Te hemos enviado un email de confirmación a")}{" "}
+                      {t("Te hemos enviado un email de confirmación a")}{""}
                       <strong>{payment.booking.customer_email}</strong>
                     </div>
 
@@ -304,9 +298,7 @@ function PagoExitoContent() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }
 

@@ -1,25 +1,21 @@
-import { Metadata } from "next";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-
+import { Metadata } from"next";
 export const metadata: Metadata = {
-  title: "Política de Privacidad y Protección de Datos | Furgocasa",
-  description: "Política de privacidad y protección de datos de Furgocasa S.L. Información sobre cómo tratamos y protegemos tus datos personales según RGPD.",
-  keywords: "politica privacidad furgocasa, proteccion datos, rgpd, lopd, privacidad datos personales",
+  title:"Política de Privacidad y Protección de Datos | Furgocasa",
+  description:"Política de privacidad y protección de datos de Furgocasa S.L. Información sobre cómo tratamos y protegemos tus datos personales según RGPD.",
+  keywords:"politica privacidad furgocasa, proteccion datos, rgpd, lopd, privacidad datos personales",
   robots: {
     index: true,
     follow: false,
   },
   alternates: {
-    canonical: "https://www.furgocasa.com/privacidad",
+    canonical:"https://www.furgocasa.com/privacidad",
   },
 };
 
 export default function PrivacidadPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-furgocasa-blue py-12">
           <div className="container mx-auto px-4">
             <h1 className="text-3xl md:text-4xl font-bold text-white">Política de Privacidad</h1>
@@ -115,7 +111,6 @@ export default function PrivacidadPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

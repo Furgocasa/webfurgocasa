@@ -1,84 +1,81 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { MapPin, Shield, Clock, Car, Plug, Camera, Phone, CheckCircle, Euro, Droplets, Scale, FileCheck, Maximize, Key } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
+import { MapPin, Shield, Clock, Car, Plug, Camera, Phone, CheckCircle, Euro, Droplets, Scale, FileCheck, Maximize, Key } from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
 export default function ParkingMurciaPage() {
   const { t } = useLanguage();
 
   const features = [
     { 
       icon: Key, 
-      title: "Acceso Libre", 
-      description: "Accede a nuestras instalaciones en cualquier momento, sin restricciones horarias."
+      title:"Acceso Libre", 
+      description:"Accede a nuestras instalaciones en cualquier momento, sin restricciones horarias."
     },
     { 
       icon: Camera, 
-      title: "Video Vigilancia", 
-      description: "Contamos con un sistema de videovigilancia para garantizar la seguridad de las instalaciones."
+      title:"Video Vigilancia", 
+      description:"Contamos con un sistema de videovigilancia para garantizar la seguridad de las instalaciones."
     },
     { 
       icon: Maximize, 
-      title: "Plazas Grandes", 
-      description: "Ofrecemos plazas amplias para facilitar la maniobrabilidad de tu autocaravana."
+      title:"Plazas Grandes", 
+      description:"Ofrecemos plazas amplias para facilitar la maniobrabilidad de tu autocaravana."
     },
     { 
       icon: FileCheck, 
-      title: "Licencia de Actividad", 
-      description: "Operamos con todas las licencias y permisos necesarios, asegurando un servicio profesional."
+      title:"Licencia de Actividad", 
+      description:"Operamos con todas las licencias y permisos necesarios, asegurando un servicio profesional."
     },
     { 
       icon: Shield, 
-      title: "Cobertura de Seguro", 
-      description: "Tu vehículo estará protegido bajo nuestra póliza de seguro mientras permanezca aquí."
+      title:"Cobertura de Seguro", 
+      description:"Tu vehículo estará protegido bajo nuestra póliza de seguro mientras permanezca aquí."
     },
     { 
       icon: Plug, 
-      title: "Plazas con Electricidad", 
-      description: "Disponemos de plazas equipadas con suministro eléctrico para mantener tus baterías."
+      title:"Plazas con Electricidad", 
+      description:"Disponemos de plazas equipadas con suministro eléctrico para mantener tus baterías."
     },
     { 
       icon: Droplets, 
-      title: "Zona de Aguas", 
-      description: "Zona habilitada para el abastecimiento de agua potable y vaciado de grises."
+      title:"Zona de Aguas", 
+      description:"Zona habilitada para el abastecimiento de agua potable y vaciado de grises."
     },
     { 
       icon: Scale, 
-      title: "Vaciado WC químico", 
-      description: "Punto específico para el vaciado seguro y limpio de los depósitos de tu WC químico."
+      title:"Vaciado WC químico", 
+      description:"Punto específico para el vaciado seguro y limpio de los depósitos de tu WC químico."
     },
   ];
 
   const reasons = [
     {
-      title: "Ubicación estratégica",
-      description: "Situado en un punto clave de Murcia con fácil acceso desde las principales vías. Inicia tus viajes sin complicaciones."
+      title:"Ubicación estratégica",
+      description:"Situado en un punto clave de Murcia con fácil acceso desde las principales vías. Inicia tus viajes sin complicaciones."
     },
     {
-      title: "Comodidad y servicios",
-      description: "Plazas amplias, electricidad, zonas de carga y descarga. Acceso 24/7 adaptado a tu horario."
+      title:"Comodidad y servicios",
+      description:"Plazas amplias, electricidad, zonas de carga y descarga. Acceso 24/7 adaptado a tu horario."
     },
     {
-      title: "Seguridad garantizada",
-      description: "Videovigilancia 24/7, recinto cerrado y seguro incluido. Tu vehículo protegido como nuestra propia flota."
+      title:"Seguridad garantizada",
+      description:"Videovigilancia 24/7, recinto cerrado y seguro incluido. Tu vehículo protegido como nuestra propia flota."
     },
     {
-      title: "Tarifas competitivas",
-      description: "Tarifas flexibles por meses o larga duración. Servicio profesional y legalmente establecido."
+      title:"Tarifas competitivas",
+      description:"Tarifas flexibles por meses o larga duración. Servicio profesional y legalmente establecido."
     },
   ];
 
   const prices = [
-    { period: "1 MES", price: "105", note: "/ mes" },
-    { period: "3 MESES", price: "95", note: "/ mes" },
-    { period: "6 MESES", price: "85", note: "/ mes" },
+    { period:"1 MES", price:"105", note:"/ mes" },
+    { period:"3 MESES", price:"95", note:"/ mes" },
+    { period:"6 MESES", price:"85", note:"/ mes" },
   ];
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
         <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 py-24 overflow-hidden">
           {/* Background pattern */}
@@ -303,7 +300,6 @@ export default function ParkingMurciaPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

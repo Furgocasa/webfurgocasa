@@ -1,19 +1,15 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-
 export default function CookiesPage() {
   const openCookieSettings = () => {
-    if (typeof window !== "undefined") {
+    if (typeof window !=="undefined") {
       window.dispatchEvent(new CustomEvent("openCookieSettings"));
     }
   };
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-furgocasa-blue py-12">
           <div className="container mx-auto px-4">
             <h1 className="text-3xl md:text-4xl font-bold text-white">Política de Cookies</h1>
@@ -101,7 +97,7 @@ export default function CookiesPage() {
               <h2>3. ¿Cómo gestionar las cookies?</h2>
               <p>
                 Puedes gestionar tus preferencias de cookies en cualquier momento haciendo clic en el 
-                botón "Configurar cookies" que encontrarás más abajo o en el pie de página de nuestro sitio web.
+                botón"Configurar cookies" que encontrarás más abajo o en el pie de página de nuestro sitio web.
               </p>
               <p>
                 También puedes configurar tu navegador para que rechace todas las cookies o para que 
@@ -159,7 +155,6 @@ export default function CookiesPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

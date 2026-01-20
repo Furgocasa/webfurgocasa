@@ -9,6 +9,8 @@ import BackToTop from "@/components/back-to-top";
 import { AdminFABButton } from "@/components/admin-fab-button";
 import { GoogleAnalytics } from "@/components/analytics";
 import { AnalyticsDebug } from "@/components/analytics-debug";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
 import Script from "next/script";
 
 // Rubik - Para títulos y headings
@@ -192,7 +194,17 @@ export default function RootLayout({
             <GoogleAnalytics />
             {/* Debug de Analytics (solo en desarrollo) */}
             <AnalyticsDebug />
+            
+            {/* Header global - sticky para que el contenido fluya naturalmente */}
+            <Header />
+            
+            {/* Contenido de las páginas */}
             {children}
+            
+            {/* Footer global */}
+            <Footer />
+            
+            {/* Componentes flotantes */}
             <CookieBanner />
             <CookieSettingsModal />
             <BackToTop />

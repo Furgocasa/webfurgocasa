@@ -1,30 +1,28 @@
-import { Metadata } from "next";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { Users, Heart, Star } from "lucide-react";
-import { AboutPageJsonLd } from "@/components/static-pages/jsonld";
+import { Metadata } from"next";
+import { Users, Heart, Star } from"lucide-react";
+import { AboutPageJsonLd } from"@/components/static-pages/jsonld";
 
 // 🎯 Metadata SEO optimizada
 export const metadata: Metadata = {
-  title: "Quiénes Somos | Furgocasa - Alquiler de Autocaravanas en Murcia",
-  description: "Furgocasa es una empresa familiar nacida de la pasión por el mundo camper. Desde 2012, ofrecemos alquiler de autocaravanas premium en Murcia con más de 500 viajes realizados.",
-  keywords: "quienes somos furgocasa, empresa alquiler camper murcia, historia furgocasa, familia furgocasa, autocaravanas murcia",
-  authors: [{ name: "Furgocasa" }],
+  title:"Quiénes Somos | Furgocasa - Alquiler de Autocaravanas en Murcia",
+  description:"Furgocasa es una empresa familiar nacida de la pasión por el mundo camper. Desde 2012, ofrecemos alquiler de autocaravanas premium en Murcia con más de 500 viajes realizados.",
+  keywords:"quienes somos furgocasa, empresa alquiler camper murcia, historia furgocasa, familia furgocasa, autocaravanas murcia",
+  authors: [{ name:"Furgocasa" }],
   openGraph: {
-    title: "Quiénes Somos | Furgocasa - Empresa Familiar de Campers",
-    description: "Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2012.",
-    type: "website",
-    url: "https://www.furgocasa.com/quienes-somos",
-    siteName: "Furgocasa",
-    locale: "es_ES",
+    title:"Quiénes Somos | Furgocasa - Empresa Familiar de Campers",
+    description:"Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2012.",
+    type:"website",
+    url:"https://www.furgocasa.com/quienes-somos",
+    siteName:"Furgocasa",
+    locale:"es_ES",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Quiénes Somos | Furgocasa",
-    description: "Empresa familiar de alquiler de autocaravanas en Murcia desde 2012.",
+    card:"summary_large_image",
+    title:"Quiénes Somos | Furgocasa",
+    description:"Empresa familiar de alquiler de autocaravanas en Murcia desde 2012.",
   },
   alternates: {
-    canonical: "https://www.furgocasa.com/quienes-somos",
+    canonical:"https://www.furgocasa.com/quienes-somos",
   },
   robots: {
     index: true,
@@ -44,8 +42,7 @@ export default function QuienesSomosPage() {
   return (
     <>
       <AboutPageJsonLd />
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-24 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -139,7 +136,6 @@ export default function QuienesSomosPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

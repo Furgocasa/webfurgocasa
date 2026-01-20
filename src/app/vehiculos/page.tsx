@@ -1,11 +1,9 @@
-import { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { VehicleListClient } from "@/components/vehicle/vehicle-list-client";
-import { LocalizedLink } from "@/components/localized-link";
-import { Car } from "lucide-react";
-import { translateServer } from "@/lib/i18n/server-translation";
+import { Metadata } from"next";
+import { createClient } from"@supabase/supabase-js";
+import { VehicleListClient } from"@/components/vehicle/vehicle-list-client";
+import { LocalizedLink } from"@/components/localized-link";
+import { Car } from"lucide-react";
+import { translateServer } from"@/lib/i18n/server-translation";
 
 // ✅ Supabase cliente servidor
 const supabase = createClient(
@@ -41,14 +39,14 @@ interface Vehicle {
 
 // ✅ METADATOS SEO
 export const metadata: Metadata = {
-  title: "Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
-  description: "Descubre nuestra flota de autocaravanas y campers de gran volumen. Vehículos de 2 y 4 plazas, totalmente equipados. Desde 95€/día con kilómetros ilimitados.",
-  keywords: "alquiler autocaravanas, alquiler campers, furgonetas camper, motorhomes alquiler, weinsberg, dreamer, knaus",
+  title:"Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
+  description:"Descubre nuestra flota de autocaravanas y campers de gran volumen. Vehículos de 2 y 4 plazas, totalmente equipados. Desde 95€/día con kilómetros ilimitados.",
+  keywords:"alquiler autocaravanas, alquiler campers, furgonetas camper, motorhomes alquiler, weinsberg, dreamer, knaus",
   openGraph: {
-    title: "Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
-    description: "Nuestra flota de autocaravanas campers de gran volumen. Totalmente equipadas desde 95€/día.",
-    type: "website",
-    locale: "es_ES",
+    title:"Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
+    description:"Nuestra flota de autocaravanas campers de gran volumen. Totalmente equipadas desde 95€/día.",
+    type:"website",
+    locale:"es_ES",
   },
 };
 
@@ -117,9 +115,7 @@ export default async function VehiculosPage() {
 
   return (
     <>
-      <Header />
-      
-      <main className="min-h-screen bg-gray-50 pt-24 md:pt-20">
+<main className="min-h-screen bg-gray-50">
         {/* Hero Section - SEO Content */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16 md:py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -168,8 +164,6 @@ export default async function VehiculosPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }

@@ -1,17 +1,15 @@
-import { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
+import { Metadata } from"next";
+import { createClient } from"@supabase/supabase-js";
+import { LocalizedLink } from"@/components/localized-link";
 
 export const revalidate = 86400;
 
 export const metadata: Metadata = {
-  title: "Sitemap HTML",
-  description: "Mapa del sitio en HTML con todas las URLs públicas.",
+  title:"Sitemap HTML",
+  description:"Mapa del sitio en HTML con todas las URLs públicas.",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.furgocasa.com";
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||"https://www.furgocasa.com";
 
 type CategoryRow = {
   slug: string;
@@ -35,57 +33,57 @@ type LocationRow = {
 };
 
 const staticPages: Array<{ path: string; label: string }> = [
-  { path: "/", label: "Inicio" },
-  { path: "/blog", label: "Blog" },
-  { path: "/vehiculos", label: "Vehículos" },
-  { path: "/ventas", label: "Ventas" },
-  { path: "/tarifas", label: "Tarifas" },
-  { path: "/reservar", label: "Reservar" },
-  { path: "/buscar", label: "Buscar" },
-  { path: "/contacto", label: "Contacto" },
-  { path: "/como-funciona", label: "Cómo funciona" },
-  { path: "/documentacion-alquiler", label: "Documentación alquiler" },
-  { path: "/guia-camper", label: "Guía camper" },
-  { path: "/mapa-areas", label: "Mapa de áreas" },
-  { path: "/parking-murcia", label: "Parking Murcia" },
-  { path: "/ofertas", label: "Ofertas" },
-  { path: "/publicaciones", label: "Publicaciones" },
-  { path: "/clientes-vip", label: "Clientes VIP" },
-  { path: "/quienes-somos", label: "Quiénes somos" },
-  { path: "/faqs", label: "FAQs" },
-  { path: "/como-reservar-fin-semana", label: "Cómo reservar fin de semana" },
-  { path: "/inteligencia-artificial", label: "Inteligencia artificial" },
-  { path: "/video-tutoriales", label: "Video tutoriales" },
-  { path: "/aviso-legal", label: "Aviso legal" },
-  { path: "/privacidad", label: "Privacidad" },
-  { path: "/cookies", label: "Cookies" },
-  { path: "/pago/exito", label: "Pago éxito" },
-  { path: "/pago/error", label: "Pago error" },
-  { path: "/pago/cancelado", label: "Pago cancelado" },
-  { path: "/sitemap-html", label: "Sitemap HTML" },
+  { path:"/", label:"Inicio" },
+  { path:"/blog", label:"Blog" },
+  { path:"/vehiculos", label:"Vehículos" },
+  { path:"/ventas", label:"Ventas" },
+  { path:"/tarifas", label:"Tarifas" },
+  { path:"/reservar", label:"Reservar" },
+  { path:"/buscar", label:"Buscar" },
+  { path:"/contacto", label:"Contacto" },
+  { path:"/como-funciona", label:"Cómo funciona" },
+  { path:"/documentacion-alquiler", label:"Documentación alquiler" },
+  { path:"/guia-camper", label:"Guía camper" },
+  { path:"/mapa-areas", label:"Mapa de áreas" },
+  { path:"/parking-murcia", label:"Parking Murcia" },
+  { path:"/ofertas", label:"Ofertas" },
+  { path:"/publicaciones", label:"Publicaciones" },
+  { path:"/clientes-vip", label:"Clientes VIP" },
+  { path:"/quienes-somos", label:"Quiénes somos" },
+  { path:"/faqs", label:"FAQs" },
+  { path:"/como-reservar-fin-semana", label:"Cómo reservar fin de semana" },
+  { path:"/inteligencia-artificial", label:"Inteligencia artificial" },
+  { path:"/video-tutoriales", label:"Video tutoriales" },
+  { path:"/aviso-legal", label:"Aviso legal" },
+  { path:"/privacidad", label:"Privacidad" },
+  { path:"/cookies", label:"Cookies" },
+  { path:"/pago/exito", label:"Pago éxito" },
+  { path:"/pago/error", label:"Pago error" },
+  { path:"/pago/cancelado", label:"Pago cancelado" },
+  { path:"/sitemap-html", label:"Sitemap HTML" },
 ];
 
 const faqPages: Array<{ slug: string; label: string }> = [
-  { slug: "edad-minima-alquiler", label: "Edad mínima alquiler" },
-  { slug: "permiso-conducir", label: "Permiso de conducir" },
-  { slug: "alquiler-fin-semana", label: "Alquiler fin de semana" },
-  { slug: "como-reservar", label: "Cómo reservar" },
-  { slug: "precios-impuestos", label: "Precios e impuestos" },
-  { slug: "accesorios-gratuitos", label: "Accesorios gratuitos" },
-  { slug: "proposito-fianza", label: "Propósito de la fianza" },
-  { slug: "horarios-entrega", label: "Horarios de entrega" },
-  { slug: "documentos-necesarios", label: "Documentos necesarios" },
-  { slug: "funcionamiento-camper", label: "Funcionamiento de la camper" },
+  { slug:"edad-minima-alquiler", label:"Edad mínima alquiler" },
+  { slug:"permiso-conducir", label:"Permiso de conducir" },
+  { slug:"alquiler-fin-semana", label:"Alquiler fin de semana" },
+  { slug:"como-reservar", label:"Cómo reservar" },
+  { slug:"precios-impuestos", label:"Precios e impuestos" },
+  { slug:"accesorios-gratuitos", label:"Accesorios gratuitos" },
+  { slug:"proposito-fianza", label:"Propósito de la fianza" },
+  { slug:"horarios-entrega", label:"Horarios de entrega" },
+  { slug:"documentos-necesarios", label:"Documentos necesarios" },
+  { slug:"funcionamiento-camper", label:"Funcionamiento de la camper" },
 ];
 
 function getCategorySlug(category: PostRow["category"]) {
-  if (!category) return "general";
-  if (Array.isArray(category)) return category[0]?.slug || "general";
-  return category.slug || "general";
+  if (!category) return"general";
+  if (Array.isArray(category)) return category[0]?.slug ||"general";
+  return category.slug ||"general";
 }
 
 function buildLabel(path: string) {
-  if (path === "/") return baseUrl;
+  if (path ==="/") return baseUrl;
   return `${baseUrl}${path}`;
 }
 
@@ -106,7 +104,7 @@ export default async function SitemapHtmlPage() {
     supabase
       .from("posts")
       .select("slug, title, category:content_categories(slug)")
-      .eq("status", "published")
+      .eq("status","published")
       .order("published_at", { ascending: false }),
     supabase
       .from("content_categories")
@@ -116,13 +114,13 @@ export default async function SitemapHtmlPage() {
       .from("vehicles")
       .select("slug, name")
       .eq("is_for_rent", true)
-      .neq("status", "inactive")
+      .neq("status","inactive")
       .order("internal_code", { ascending: true, nullsFirst: false }),
     supabase
       .from("vehicles")
       .select("slug, name")
       .eq("is_for_sale", true)
-      .eq("sale_status", "available")
+      .eq("sale_status","available")
       .order("internal_code", { ascending: true, nullsFirst: false }),
     supabase
       .from("location_targets")
@@ -145,8 +143,7 @@ export default async function SitemapHtmlPage() {
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
@@ -361,7 +358,6 @@ export default async function SitemapHtmlPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

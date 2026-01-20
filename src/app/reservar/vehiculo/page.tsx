@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useLanguage } from "@/contexts/language-context";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from"react";
+import { useLanguage } from"@/contexts/language-context";
+import { useRouter, useSearchParams } from"next/navigation";
 
 function LoadingState() {
   return (
@@ -11,17 +11,15 @@ function LoadingState() {
     </div>
   );
 }
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from"@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Users, Bed, Fuel, Settings, 
   ArrowRight, Plus, Minus, AlertCircle, Loader2, Ruler, Car, Info
-} from "lucide-react";
-import Link from "next/link";
-import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
-import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
-import { formatPrice, calculateRentalDays, calculatePricingDays } from "@/lib/utils";
+} from"lucide-react";
+import Link from"next/link";
+import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
+import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
+import { formatPrice, calculateRentalDays, calculatePricingDays } from"@/lib/utils";
 
 // No necesitamos interfaces específicas, usamos los datos tal cual vienen de Supabase
 // Los nombres de campos reales son: image_url, alt_text, is_primary (según SUPABASE-SCHEMA-REAL.md)
@@ -265,23 +263,20 @@ function ReservarVehiculoContent() {
   if (loading) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="h-12 w-12 text-furgocasa-orange mx-auto mb-4 animate-spin" />
             <p className="text-gray-600">{t("Cargando vehículo...")}</p>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   if (error || !vehicle) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
@@ -294,8 +289,7 @@ function ReservarVehiculoContent() {
             </Link>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
@@ -304,14 +298,12 @@ function ReservarVehiculoContent() {
 
   return (
     <>
-      <Header />
-      
-      <main className="min-h-screen bg-gray-50 pt-24 md:pt-28 py-6 md:py-12 overflow-x-hidden">
+<main className="min-h-screen bg-gray-50 py-6 md:py-12 overflow-x-hidden">
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Barra de resumen - Sticky pegada al navbar */}
           <div className="sticky top-[100px] md:top-[112px] bg-white shadow-md border-b border-gray-200 z-30 -mx-4 px-4 mb-6 rounded-b-lg">
             <div className="py-3">
-              {/* Link "Volver a la búsqueda" */}
+              {/* Link"Volver a la búsqueda" */}
               <div className="mb-2">
                 <Link 
                   href={`/buscar?${searchParams.toString()}`}
@@ -765,9 +757,7 @@ function ReservarVehiculoContent() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }
 

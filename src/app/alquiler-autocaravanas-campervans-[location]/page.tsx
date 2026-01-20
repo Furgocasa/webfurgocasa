@@ -1,17 +1,15 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { SearchWidget } from "@/components/booking/search-widget";
-import { LocalBusinessJsonLd } from "@/components/locations/local-business-jsonld";
+import { Metadata } from"next";
+import { notFound } from"next/navigation";
+import { SearchWidget } from"@/components/booking/search-widget";
+import { LocalBusinessJsonLd } from"@/components/locations/local-business-jsonld";
 import {
   getLocationBySlug,
   getAllLocations,
   getAvailableVehicles,
   formatDistanceInfo,
   type LocationData
-} from "@/lib/locations/server-actions";
-import { LocalizedLink } from "@/components/localized-link";
+} from"@/lib/locations/server-actions";
+import { LocalizedLink } from"@/components/localized-link";
 import { 
   MapPin, 
   Clock, 
@@ -22,8 +20,8 @@ import {
   Euro,
   Shield,
   Zap
-} from "lucide-react";
-import Image from "next/image";
+} from"lucide-react";
+import Image from"next/image";
 
 // ⚡ ISR: Revalidar cada 24 horas (contenido bastante estático)
 export const revalidate = 86400;
@@ -46,8 +44,8 @@ export async function generateMetadata({
 
   if (!location) {
     return {
-      title: "Ubicación no encontrada | Furgocasa",
-      description: "La ubicación que buscas no existe."
+      title:"Ubicación no encontrada | Furgocasa",
+      description:"La ubicación que buscas no existe."
     };
   }
 
@@ -58,39 +56,39 @@ export async function generateMetadata({
     title: location.meta_title || `Alquiler de Campers en ${location.name} | Desde 95€/día | Furgocasa`,
     description: location.meta_description || `Alquiler de autocaravanas y campers cerca de ${location.name}, ${location.province}. ${distanceInfo}. Flota premium con kilómetros ilimitados. ¡Reserva ahora!`,
     keywords: `alquiler camper ${location.name}, autocaravana ${location.name}, motorhome ${location.province}, alquiler furgoneta camper ${location.region}, casa rodante ${location.name}`,
-    authors: [{ name: "Furgocasa" }],
+    authors: [{ name:"Furgocasa" }],
     openGraph: {
       title: `Alquiler de Autocaravanas en ${location.name} | Furgocasa`,
       description: `Alquiler de campers cerca de ${location.name}. ${distanceInfo ? distanceInfo + '.' : ''} Flota premium desde 95€/día con kilómetros ilimitados.`,
-      type: "website",
+      type:"website",
       url: url,
-      siteName: "Furgocasa - Alquiler de Autocaravanas",
+      siteName:"Furgocasa - Alquiler de Autocaravanas",
       images: [
         {
-          url: location.hero_image || "https://furgocasa.com/images/slides/hero-01.webp",
+          url: location.hero_image ||"https://furgocasa.com/images/slides/hero-01.webp",
           width: 1200,
           height: 630,
           alt: `Alquiler de campers y autocaravanas cerca de ${location.name}`,
-          type: "image/webp",
+          type:"image/webp",
         },
         {
-          url: "https://furgocasa.com/images/slides/hero-02.webp",
+          url:"https://furgocasa.com/images/slides/hero-02.webp",
           width: 1200,
           height: 630,
-          alt: "Flota premium Furgocasa - Campers de gran volumen",
-          type: "image/webp",
+          alt:"Flota premium Furgocasa - Campers de gran volumen",
+          type:"image/webp",
         }
       ],
-      locale: "es_ES",
-      countryName: "España",
+      locale:"es_ES",
+      countryName:"España",
     },
     twitter: {
-      card: "summary_large_image",
-      site: "@furgocasa",
-      creator: "@furgocasa",
+      card:"summary_large_image",
+      site:"@furgocasa",
+      creator:"@furgocasa",
       title: `Alquiler Camper ${location.name} | Desde 95€/día`,
       description: `Autocaravanas cerca de ${location.name}. ${distanceInfo ? 'A solo ' + location.distance_km + ' km de Murcia.' : ''} Kilómetros ilimitados. Flota premium.`,
-      images: [location.hero_image || "https://furgocasa.com/images/slides/hero-01.webp"],
+      images: [location.hero_image ||"https://furgocasa.com/images/slides/hero-01.webp"],
     },
     alternates: {
       canonical: url,
@@ -134,9 +132,7 @@ export default async function LocationPage({
   return (
     <>
       <LocalBusinessJsonLd location={location} />
-      <Header />
-
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <section className="relative h-[600px] overflow-hidden pt-28 md:pt-0">
           {location.hero_image ? (
@@ -369,8 +365,6 @@ export default async function LocationPage({
           </div>
         </section>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }

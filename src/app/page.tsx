@@ -1,12 +1,10 @@
-import { Metadata } from "next";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { PublicLayout } from "@/components/layout/public-layout";
-import { SearchWidget } from "@/components/booking/search-widget";
-import { HeroSlider } from "@/components/hero-slider";
-import { DestinationsGrid } from "@/components/destinations-grid";
-import { BlogArticleLink } from "@/components/blog/blog-article-link";
-import { LocalizedLink } from "@/components/localized-link";
+import { Metadata } from"next";
+import { PublicLayout } from"@/components/layout/public-layout";
+import { SearchWidget } from"@/components/booking/search-widget";
+import { HeroSlider } from"@/components/hero-slider";
+import { DestinationsGrid } from"@/components/destinations-grid";
+import { BlogArticleLink } from"@/components/blog/blog-article-link";
+import { LocalizedLink } from"@/components/localized-link";
 import { 
   MessageSquare,
   Map,
@@ -18,59 +16,59 @@ import {
   Package,
   BookOpen,
   HelpCircle
-} from "lucide-react";
-import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from "@/lib/home/server-actions";
-import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/home/organization-jsonld";
-import Image from "next/image";
+} from"lucide-react";
+import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from"@/lib/home/server-actions";
+import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from"@/components/home/organization-jsonld";
+import Image from"next/image";
 
 // 🎯 Metadata SEO optimizada
 export const metadata: Metadata = {
-  title: "Alquiler de Campers y Autocaravanas en Murcia | Desde 95€/día | Furgocasa",
-  description: "Alquiler de autocaravanas y campers de gran volumen en Murcia. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados, equipamiento completo. ¡Reserva tu camper ahora!",
-  keywords: "alquiler camper murcia, autocaravana murcia, alquiler furgoneta camper, motorhome murcia, campervan alquiler, casa rodante murcia, alquiler autocaravana españa",
-  authors: [{ name: "Furgocasa" }],
+  title:"Alquiler de Campers y Autocaravanas en Murcia | Desde 95€/día | Furgocasa",
+  description:"Alquiler de autocaravanas y campers de gran volumen en Murcia. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados, equipamiento completo. ¡Reserva tu camper ahora!",
+  keywords:"alquiler camper murcia, autocaravana murcia, alquiler furgoneta camper, motorhome murcia, campervan alquiler, casa rodante murcia, alquiler autocaravana españa",
+  authors: [{ name:"Furgocasa" }],
   openGraph: {
-    title: "Furgocasa | Alquiler de Campers y Autocaravanas en Murcia",
-    description: "Tu hotel 5 estrellas sobre ruedas. Flota premium desde 95€/día con kilómetros ilimitados. Dreamer, Knaus, Weinsberg.",
-    type: "website",
-    url: "https://www.furgocasa.com",
-    siteName: "Furgocasa - Alquiler de Autocaravanas",
+    title:"Furgocasa | Alquiler de Campers y Autocaravanas en Murcia",
+    description:"Tu hotel 5 estrellas sobre ruedas. Flota premium desde 95€/día con kilómetros ilimitados. Dreamer, Knaus, Weinsberg.",
+    type:"website",
+    url:"https://www.furgocasa.com",
+    siteName:"Furgocasa - Alquiler de Autocaravanas",
     images: [
       {
-        url: "https://www.furgocasa.com/images/slides/hero-01.webp",
+        url:"https://www.furgocasa.com/images/slides/hero-01.webp",
         width: 1200,
         height: 630,
-        alt: "Furgocasa - Alquiler de Campers en Murcia",
-        type: "image/webp",
+        alt:"Furgocasa - Alquiler de Campers en Murcia",
+        type:"image/webp",
       },
       {
-        url: "https://www.furgocasa.com/images/slides/hero-02.webp",
+        url:"https://www.furgocasa.com/images/slides/hero-02.webp",
         width: 1200,
         height: 630,
-        alt: "Flota premium Furgocasa",
-        type: "image/webp",
+        alt:"Flota premium Furgocasa",
+        type:"image/webp",
       },
       {
-        url: "https://www.furgocasa.com/images/slides/hero-03.webp",
+        url:"https://www.furgocasa.com/images/slides/hero-03.webp",
         width: 1200,
         height: 630,
-        alt: "Interior camper Furgocasa",
-        type: "image/webp",
+        alt:"Interior camper Furgocasa",
+        type:"image/webp",
       }
     ],
-    locale: "es_ES",
-    countryName: "España",
+    locale:"es_ES",
+    countryName:"España",
   },
   twitter: {
-    card: "summary_large_image",
-    site: "@furgocasa",
-    creator: "@furgocasa",
-    title: "Furgocasa | Alquiler Camper Murcia",
-    description: "Autocaravanas premium desde 95€/día. Kilómetros ilimitados. Tu hotel 5⭐ sobre ruedas.",
+    card:"summary_large_image",
+    site:"@furgocasa",
+    creator:"@furgocasa",
+    title:"Furgocasa | Alquiler Camper Murcia",
+    description:"Autocaravanas premium desde 95€/día. Kilómetros ilimitados. Tu hotel 5⭐ sobre ruedas.",
     images: ["https://www.furgocasa.com/images/slides/hero-01.webp"],
   },
   alternates: {
-    canonical: "https://www.furgocasa.com",
+    canonical:"https://www.furgocasa.com",
   },
   robots: {
     index: true,
@@ -106,18 +104,11 @@ export default async function HomePage() {
       <WebsiteJsonLd />
       
       <PublicLayout>
-        <Header />
-        
-        {/* Hero Section con Slider */}
+{/* Hero Section con Slider */}
         <section className="relative h-screen min-h-[600px] flex items-center justify-center lg:-mt-[132px] pt-[120px] lg:pt-[132px]">
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <HeroSlider 
-              images={[
-                "/images/slides/hero-01.webp",
-                "/images/slides/hero-02.webp",
-                "/images/slides/hero-03.webp",
-                "/images/slides/hero-04.webp",
-                "/images/slides/hero-05.webp",
+              images={["/images/slides/hero-01.webp","/images/slides/hero-02.webp","/images/slides/hero-03.webp","/images/slides/hero-04.webp","/images/slides/hero-05.webp",
               ]}
             />
           </div>
@@ -240,9 +231,9 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto mb-12 lg:mb-16">
               {[
-                { season: "TEMPORADA BAJA", price: "95", color: "text-furgocasa-blue", border: "border-furgocasa-blue" },
-                { season: "Temporada Media", price: "125", color: "text-furgocasa-orange", border: "border-furgocasa-orange" },
-                { season: "Temporada Alta", price: "155", color: "text-red-500", border: "border-red-500" },
+                { season:"TEMPORADA BAJA", price:"95", color:"text-furgocasa-blue", border:"border-furgocasa-blue" },
+                { season:"Temporada Media", price:"125", color:"text-furgocasa-orange", border:"border-furgocasa-orange" },
+                { season:"Temporada Alta", price:"155", color:"text-red-500", border:"border-red-500" },
               ].map((pricing, index) => (
                 <div
                   key={index}
@@ -311,31 +302,31 @@ export default async function HomePage() {
               {[
                 {
                   icon: Bot,
-                  title: "Inteligencia Artificial",
-                  desc: "Planifica tu ruta perfecta con IA",
-                  link: "/inteligencia-artificial",
-                  color: "from-purple-50 to-purple-100 border-purple-300"
+                  title:"Inteligencia Artificial",
+                  desc:"Planifica tu ruta perfecta con IA",
+                  link:"/inteligencia-artificial",
+                  color:"from-purple-50 to-purple-100 border-purple-300"
                 },
                 {
                   icon: Map,
-                  title: "Mapa de áreas",
-                  desc: "Encuentra áreas de autocaravanas",
-                  link: "/mapa-areas",
-                  color: "from-blue-50 to-blue-100 border-blue-300"
+                  title:"Mapa de áreas",
+                  desc:"Encuentra áreas de autocaravanas",
+                  link:"/mapa-areas",
+                  color:"from-blue-50 to-blue-100 border-blue-300"
                 },
                 {
                   icon: Calendar,
-                  title: "Parking MURCIA",
-                  desc: "Guarda tu camper con seguridad",
-                  link: "/parking-murcia",
-                  color: "from-green-50 to-green-100 border-green-300"
+                  title:"Parking MURCIA",
+                  desc:"Guarda tu camper con seguridad",
+                  link:"/parking-murcia",
+                  color:"from-green-50 to-green-100 border-green-300"
                 },
                 {
                   icon: HelpCircle,
-                  title: "FAQs",
-                  desc: "Resuelve todas tus dudas",
-                  link: "/faqs",
-                  color: "from-orange-50 to-orange-100 border-orange-300"
+                  title:"FAQs",
+                  desc:"Resuelve todas tus dudas",
+                  link:"/faqs",
+                  color:"from-orange-50 to-orange-100 border-orange-300"
                 },
               ].map((service, index) => (
                 <LocalizedLink
@@ -453,12 +444,12 @@ export default async function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
               {[
-                { icon: CheckCircle, title: "Kilómetros ilimitados", desc: "Viaja sin límites ni preocupaciones" },
-                { icon: Users, title: "Atención personalizada", desc: "Te acompañamos antes, durante y después" },
-                { icon: Shield, title: "Vehículos certificados", desc: "Mantenimiento y revisiones exhaustivas" },
-                { icon: Package, title: "Todo incluido", desc: "Utensilios, ropa de cama, kit camping" },
-                { icon: Calendar, title: "Cancelación flexible", desc: "Cancela hasta 60 días antes sin coste" },
-                { icon: MessageSquare, title: "Soporte 24/7", desc: "Asistencia en carretera incluida" },
+                { icon: CheckCircle, title:"Kilómetros ilimitados", desc:"Viaja sin límites ni preocupaciones" },
+                { icon: Users, title:"Atención personalizada", desc:"Te acompañamos antes, durante y después" },
+                { icon: Shield, title:"Vehículos certificados", desc:"Mantenimiento y revisiones exhaustivas" },
+                { icon: Package, title:"Todo incluido", desc:"Utensilios, ropa de cama, kit camping" },
+                { icon: Calendar, title:"Cancelación flexible", desc:"Cancela hasta 60 días antes sin coste" },
+                { icon: MessageSquare, title:"Soporte 24/7", desc:"Asistencia en carretera incluida" },
               ].map((benefit, index) => (
                 <div
                   key={index}
@@ -522,9 +513,7 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
-
-        <Footer />
-      </PublicLayout>
+</PublicLayout>
     </>
   );
 }

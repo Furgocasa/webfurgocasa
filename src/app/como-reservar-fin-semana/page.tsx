@@ -1,25 +1,22 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { Calendar, Clock, CheckCircle, ArrowRight, AlertCircle, Phone, Euro } from "lucide-react";
+import { LocalizedLink } from"@/components/localized-link";
+import { Calendar, Clock, CheckCircle, ArrowRight, AlertCircle, Phone, Euro } from"lucide-react";
 
 export const metadata = {
-  title: "Cómo reservar un fin de semana | Furgocasa Campervans",
-  description: "Guía completa para alquilar una camper de fin de semana. Horarios, precios y condiciones especiales para escapadas cortas.",
+  title:"Cómo reservar un fin de semana | Furgocasa Campervans",
+  description:"Guía completa para alquilar una camper de fin de semana. Horarios, precios y condiciones especiales para escapadas cortas.",
 };
 
 const steps = [
-  { step: "1", title: "Elige tu fecha", desc: "Selecciona el viernes de recogida en nuestro calendario", icon: Calendar },
-  { step: "2", title: "Selecciona el vehículo", desc: "Elige entre los campers disponibles para esas fechas", icon: CheckCircle },
-  { step: "3", title: "Añade extras", desc: "Sillas, mesa, kit de playa... lo que necesites", icon: CheckCircle },
-  { step: "4", title: "Confirma y paga", desc: "Solo el 30% de señal. El resto a la recogida", icon: Euro },
+  { step:"1", title:"Elige tu fecha", desc:"Selecciona el viernes de recogida en nuestro calendario", icon: Calendar },
+  { step:"2", title:"Selecciona el vehículo", desc:"Elige entre los campers disponibles para esas fechas", icon: CheckCircle },
+  { step:"3", title:"Añade extras", desc:"Sillas, mesa, kit de playa... lo que necesites", icon: CheckCircle },
+  { step:"4", title:"Confirma y paga", desc:"Solo el 30% de señal. El resto a la recogida", icon: Euro },
 ];
 
 export default function ComoReservarFinDeSemanaPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
             <Calendar className="h-16 w-16 text-furgocasa-orange mx-auto mb-4" />
@@ -109,16 +106,7 @@ export default function ComoReservarFinDeSemanaPage() {
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">¿Qué incluye?</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-              {[
-                "Seguro a todo riesgo",
-                "Asistencia en carretera 24h",
-                "Kilómetros ilimitados",
-                "Kit de cocina completo",
-                "Ropa de cama y toallas",
-                "Sillas y mesa de camping",
-                "Depósito de agua lleno",
-                "Bombona de gas",
-                "Segundo conductor",
+              {["Seguro a todo riesgo","Asistencia en carretera 24h","Kilómetros ilimitados","Kit de cocina completo","Ropa de cama y toallas","Sillas y mesa de camping","Depósito de agua lleno","Bombona de gas","Segundo conductor",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2 bg-white p-3 rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
@@ -135,10 +123,10 @@ export default function ComoReservarFinDeSemanaPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Preguntas frecuentes</h2>
             <div className="max-w-2xl mx-auto space-y-4">
               {[
-                { q: "¿Puedo recoger el sábado por la mañana?", a: "Sí, pero en ese caso la devolución sería el lunes antes de las 10:00 para completar las 2 noches mínimas." },
-                { q: "¿Hay algún recargo por fin de semana?", a: "No, el precio por día es el mismo. Solo aplicamos las tarifas de temporada correspondientes." },
-                { q: "¿Puedo alargar el alquiler si me gusta?", a: "Sí, si el vehículo está disponible puedes alargar tu estancia. Avísanos con la mayor antelación posible." },
-                { q: "¿Y si llueve todo el fin de semana?", a: "Las condiciones meteorológicas no son motivo de cancelación. Pero recuerda que una camper es genial también con lluvia." },
+                { q:"¿Puedo recoger el sábado por la mañana?", a:"Sí, pero en ese caso la devolución sería el lunes antes de las 10:00 para completar las 2 noches mínimas." },
+                { q:"¿Hay algún recargo por fin de semana?", a:"No, el precio por día es el mismo. Solo aplicamos las tarifas de temporada correspondientes." },
+                { q:"¿Puedo alargar el alquiler si me gusta?", a:"Sí, si el vehículo está disponible puedes alargar tu estancia. Avísanos con la mayor antelación posible." },
+                { q:"¿Y si llueve todo el fin de semana?", a:"Las condiciones meteorológicas no son motivo de cancelación. Pero recuerda que una camper es genial también con lluvia." },
               ].map((faq, i) => (
                 <div key={i} className="bg-gray-50 rounded-xl p-6">
                   <h3 className="font-bold text-gray-900 mb-2">{faq.q}</h3>
@@ -168,7 +156,6 @@ export default function ComoReservarFinDeSemanaPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

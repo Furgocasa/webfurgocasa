@@ -1,8 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
-import { useSearchParams } from "next/navigation";
-import { useLanguage } from "@/contexts/language-context";
+import { Suspense } from"react";
+import { useSearchParams } from"next/navigation";
+import { useLanguage } from"@/contexts/language-context";
 
 function LoadingState() {
   return (
@@ -11,44 +11,34 @@ function LoadingState() {
     </div>
   );
 }
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { XCircle, RefreshCw, Phone, Mail, HelpCircle } from "lucide-react";
-import { LocalizedLink } from "@/components/localized-link";
+import { XCircle, RefreshCw, Phone, Mail, HelpCircle } from"lucide-react";
+import { LocalizedLink } from"@/components/localized-link";
 
 // Códigos de error comunes de Redsys y sus mensajes amigables
-const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
-  "0101": {
-    title: "Tarjeta caducada",
-    description: "La tarjeta que has utilizado ha caducado. Por favor, utiliza otra tarjeta válida.",
-  },
-  "0102": {
-    title: "Tarjeta bloqueada",
-    description: "Tu tarjeta está temporalmente bloqueada. Contacta con tu banco para más información.",
-  },
-  "0116": {
-    title: "Fondos insuficientes",
-    description: "No hay saldo suficiente en la tarjeta para completar la operación.",
-  },
-  "0129": {
-    title: "CVV incorrecto",
-    description: "El código de seguridad (CVV) introducido no es correcto. Verifica el número de 3 dígitos del reverso de tu tarjeta.",
-  },
-  "0184": {
-    title: "Error de autenticación",
-    description: "No se ha podido verificar tu identidad. Asegúrate de completar correctamente la autenticación 3D Secure.",
-  },
-  "0190": {
-    title: "Pago denegado",
-    description: "El banco ha denegado la operación. Contacta con tu entidad bancaria para más información.",
-  },
-  "9915": {
-    title: "Pago cancelado",
-    description: "Has cancelado el proceso de pago. Si fue un error, puedes volver a intentarlo.",
-  },
-  "default": {
-    title: "Error en el pago",
-    description: "Ha ocurrido un error durante el proceso de pago. Por favor, inténtalo de nuevo.",
+const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {"0101": {
+    title:"Tarjeta caducada",
+    description:"La tarjeta que has utilizado ha caducado. Por favor, utiliza otra tarjeta válida.",
+  },"0102": {
+    title:"Tarjeta bloqueada",
+    description:"Tu tarjeta está temporalmente bloqueada. Contacta con tu banco para más información.",
+  },"0116": {
+    title:"Fondos insuficientes",
+    description:"No hay saldo suficiente en la tarjeta para completar la operación.",
+  },"0129": {
+    title:"CVV incorrecto",
+    description:"El código de seguridad (CVV) introducido no es correcto. Verifica el número de 3 dígitos del reverso de tu tarjeta.",
+  },"0184": {
+    title:"Error de autenticación",
+    description:"No se ha podido verificar tu identidad. Asegúrate de completar correctamente la autenticación 3D Secure.",
+  },"0190": {
+    title:"Pago denegado",
+    description:"El banco ha denegado la operación. Contacta con tu entidad bancaria para más información.",
+  },"9915": {
+    title:"Pago cancelado",
+    description:"Has cancelado el proceso de pago. Si fue un error, puedes volver a intentarlo.",
+  },"default": {
+    title:"Error en el pago",
+    description:"Ha ocurrido un error durante el proceso de pago. Por favor, inténtalo de nuevo.",
   },
 };
 
@@ -57,7 +47,7 @@ function PagoErrorContent() {
   const searchParams = useSearchParams();
   
   // Intentar obtener el código de error de Redsys
-  let errorCode = "default";
+  let errorCode ="default";
   const merchantParams = searchParams.get("Ds_MerchantParameters");
   
   if (merchantParams) {
@@ -75,9 +65,7 @@ function PagoErrorContent() {
 
   return (
     <>
-      <Header />
-      
-      <main className="min-h-screen bg-gradient-to-b from-red-50 to-gray-50 py-12">
+<main className="min-h-screen bg-gradient-to-b from-red-50 to-gray-50 py-12">
         <div className="container mx-auto px-4 max-w-2xl">
           {/* Error Card */}
           <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
@@ -100,7 +88,7 @@ function PagoErrorContent() {
                 <p className="text-red-800">
                   {errorInfo.description}
                 </p>
-                {errorCode !== "default" && (
+                {errorCode !=="default" && (
                   <p className="text-sm text-red-600 mt-2">
                     {t("Código de error")}: {errorCode}
                   </p>
@@ -180,9 +168,7 @@ function PagoErrorContent() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }
 

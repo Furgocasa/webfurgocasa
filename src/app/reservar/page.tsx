@@ -1,36 +1,34 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { SearchWidget } from "@/components/booking/search-widget";
-import Link from "next/link";
-import { MapPin, Clock, Phone, Car, ArrowRight, CheckCircle, Calendar, CreditCard } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
+import { SearchWidget } from"@/components/booking/search-widget";
+import Link from"next/link";
+import { MapPin, Clock, Phone, Car, ArrowRight, CheckCircle, Calendar, CreditCard } from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
 const locations = [
   {
-    id: "murcia",
-    name: "Murcia",
-    slug: "murcia",
-    address: "Avenida Puente Tocinos, 4",
-    city: "30007 Casillas, Murcia",
-    phone: "+34 868 364 161",
-    hours: "Lunes a Viernes: 10:00 - 14:00 | 17:00 - 19:30",
-    description: "Nuestra sede central con toda la flota disponible",
-    features: ["Flota completa", "Parking gratuito clientes", "A 15 min de la estación de tren"],
-    image: "/images/locations/murcia.jpg", // Placeholder
+    id:"murcia",
+    name:"Murcia",
+    slug:"murcia",
+    address:"Avenida Puente Tocinos, 4",
+    city:"30007 Casillas, Murcia",
+    phone:"+34 868 364 161",
+    hours:"Lunes a Viernes: 10:00 - 14:00 | 17:00 - 19:30",
+    description:"Nuestra sede central con toda la flota disponible",
+    features: ["Flota completa","Parking gratuito clientes","A 15 min de la estación de tren"],
+    image:"/images/locations/murcia.jpg", // Placeholder
     available: true,
   },
   {
-    id: "madrid",
-    name: "Madrid",
-    slug: "madrid",
-    address: "Servicio de entrega y recogida",
-    city: "Madrid",
-    phone: "+34 868 364 161",
-    hours: "Lunes a Viernes: 10:00 - 14:00 | 17:00 - 19:30",
-    description: "Punto de entrega y recogida en Madrid disponible",
-    features: ["Entrega personalizada", "Cerca del aeropuerto", "Servicio premium"],
-    image: "/images/locations/madrid.jpg", // Placeholder
+    id:"madrid",
+    name:"Madrid",
+    slug:"madrid",
+    address:"Servicio de entrega y recogida",
+    city:"Madrid",
+    phone:"+34 868 364 161",
+    hours:"Lunes a Viernes: 10:00 - 14:00 | 17:00 - 19:30",
+    description:"Punto de entrega y recogida en Madrid disponible",
+    features: ["Entrega personalizada","Cerca del aeropuerto","Servicio premium"],
+    image:"/images/locations/madrid.jpg", // Placeholder
     available: true,
   },
 ];
@@ -40,10 +38,9 @@ export default function ReservarPage() {
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
-        <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 pt-28 md:pt-32 pb-48 relative overflow-visible">
+        <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 pb-48 relative overflow-visible">
           <div className="absolute inset-0 opacity-10" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}></div>
@@ -83,10 +80,10 @@ export default function ReservarPage() {
               <div className="hidden md:block absolute top-12 left-0 w-full h-0.5 bg-gray-200 -z-10 rounded-full"></div>
 
               {[
-                { step: "1", title: "Elige ubicación", desc: "Selecciona dónde recoger tu vehículo", icon: MapPin },
-                { step: "2", title: "Selecciona fechas", desc: "Indica los días de tu viaje", icon: Calendar },
-                { step: "3", title: "Elige vehículo", desc: "Escoge el modelo que mejor te encaje", icon: Car },
-                { step: "4", title: "Confirma y paga", desc: "Reserva abonando solo el 50%", icon: CreditCard },
+                { step:"1", title:"Elige ubicación", desc:"Selecciona dónde recoger tu vehículo", icon: MapPin },
+                { step:"2", title:"Selecciona fechas", desc:"Indica los días de tu viaje", icon: Calendar },
+                { step:"3", title:"Elige vehículo", desc:"Escoge el modelo que mejor te encaje", icon: Car },
+                { step:"4", title:"Confirma y paga", desc:"Reserva abonando solo el 50%", icon: CreditCard },
               ].map((item, index) => (
                 <div key={item.step} className="flex flex-col items-center text-center group">
                   <div className="w-16 h-16 md:w-24 md:h-24 bg-white rounded-full shadow-lg flex items-center justify-center mb-3 md:mb-6 group-hover:scale-110 transition-transform duration-300 border-2 md:border-4 border-gray-50 relative z-10">
@@ -225,7 +222,6 @@ export default function ReservarPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

@@ -1,45 +1,42 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { ChevronDown, HelpCircle, Search } from "lucide-react";
-import { useState } from "react";
-import { useLanguage } from "@/contexts/language-context";
+import { ChevronDown, HelpCircle, Search } from"lucide-react";
+import { useState } from"react";
+import { useLanguage } from"@/contexts/language-context";
 export default function FaqsPage() {
   const { t } = useLanguage();
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const faqs = [
     {
-      question: "Requisitos para alquilar una camper",
-      answer: "Para alquilar una de nuestras campers es necesario tener al menos 25 años y 2 años de antigüedad en el carnet de conducir tipo B. Además, se requiere una fianza de 600€ que se devuelve al finalizar el alquiler si todo está correcto."
+      question:"Requisitos para alquilar una camper",
+      answer:"Para alquilar una de nuestras campers es necesario tener al menos 25 años y 2 años de antigüedad en el carnet de conducir tipo B. Además, se requiere una fianza de 600€ que se devuelve al finalizar el alquiler si todo está correcto."
     },
     {
-      question: "¿Qué incluye el precio del alquiler?",
-      answer: "El precio incluye kilometraje ilimitado (para alquileres de más de 7 días), seguro a todo riesgo con franquicia, asistencia en carretera 24h, menaje de cocina completo, kit de limpieza, calzos niveladores, cable de conexión eléctrica y manguera de agua."
+      question:"¿Qué incluye el precio del alquiler?",
+      answer:"El precio incluye kilometraje ilimitado (para alquileres de más de 7 días), seguro a todo riesgo con franquicia, asistencia en carretera 24h, menaje de cocina completo, kit de limpieza, calzos niveladores, cable de conexión eléctrica y manguera de agua."
     },
     {
-      question: "¿Puedo viajar con mi mascota?",
-      answer: "¡Sí! En Furgocasa somos pet-friendly. Puedes viajar con tu mascota abonando un suplemento de limpieza extra. Solo pedimos que nos avises al hacer la reserva y que cuides el interior del vehículo."
+      question:"¿Puedo viajar con mi mascota?",
+      answer:"¡Sí! En Furgocasa somos pet-friendly. Puedes viajar con tu mascota abonando un suplemento de limpieza extra. Solo pedimos que nos avises al hacer la reserva y que cuides el interior del vehículo."
     },
     {
-      question: "¿Dónde puedo recoger y devolver la camper?",
-      answer: "Nuestra base principal está en Murcia. Las entregas y devoluciones se realizan en nuestras instalaciones. Ofrecemos servicio de transfer al aeropuerto o estación de tren bajo petición y con coste adicional."
+      question:"¿Dónde puedo recoger y devolver la camper?",
+      answer:"Nuestra base principal está en Murcia. Las entregas y devoluciones se realizan en nuestras instalaciones. Ofrecemos servicio de transfer al aeropuerto o estación de tren bajo petición y con coste adicional."
     },
     {
-      question: "¿Qué pasa si tengo una avería durante el viaje?",
-      answer: "Contamos con asistencia en carretera 24/7 en toda Europa. Además, dispones de nuestro teléfono de soporte técnico y el chat de IA para resolver dudas menores o guiarte en caso de incidencia."
+      question:"¿Qué pasa si tengo una avería durante el viaje?",
+      answer:"Contamos con asistencia en carretera 24/7 en toda Europa. Además, dispones de nuestro teléfono de soporte técnico y el chat de IA para resolver dudas menores o guiarte en caso de incidencia."
     },
     {
-      question: "¿Hay límite de kilómetros?",
-      answer: "Para alquileres de 7 días o más, el kilometraje es ilimitado. Para alquileres más cortos, incluimos 300km por día. El exceso se cobra a 0,25€/km."
+      question:"¿Hay límite de kilómetros?",
+      answer:"Para alquileres de 7 días o más, el kilometraje es ilimitado. Para alquileres más cortos, incluimos 300km por día. El exceso se cobra a 0,25€/km."
     }
   ];
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -113,7 +110,6 @@ export default function FaqsPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

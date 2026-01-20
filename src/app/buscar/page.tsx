@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useState, useMemo, Suspense } from"react";
+import { useSearchParams } from"next/navigation";
 
 function LoadingState() {
   return (
@@ -10,16 +10,14 @@ function LoadingState() {
     </div>
   );
 }
-import { useQuery } from "@tanstack/react-query";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { VehicleCard } from "@/components/booking/vehicle-card";
-import { SearchSummary } from "@/components/booking/search-summary";
-import { Loader2, Car, AlertCircle, Filter, X } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
+import { useQuery } from"@tanstack/react-query";
+import { VehicleCard } from"@/components/booking/vehicle-card";
+import { SearchSummary } from"@/components/booking/search-summary";
+import { Loader2, Car, AlertCircle, Filter, X } from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
 async function fetchAvailability(params: URLSearchParams) {
   const response = await fetch(`/api/availability?${params.toString()}`, {
-    cache: "no-store",
+    cache:"no-store",
   });
   if (!response.ok) {
     throw new Error("Error al buscar disponibilidad");
@@ -28,9 +26,9 @@ async function fetchAvailability(params: URLSearchParams) {
 }
 
 // Tipos de filtro
-type BedsFilter = "all" | "2" | "4";
-type TransmissionFilter = "all" | "manual" | "automatic";
-type SortOption = "recommended" | "price_asc" | "price_desc" | "capacity";
+type BedsFilter ="all" |"2" |"4";
+type TransmissionFilter ="all" |"manual" |"automatic";
+type SortOption ="recommended" |"price_asc" |"price_desc" |"capacity";
 
 function SearchResultsContent() {
   const searchParams = useSearchParams();
@@ -54,7 +52,7 @@ function SearchResultsContent() {
     let vehicles = [...data.vehicles];
 
     // Filtrar por camas
-    if (bedsFilter !== "all") {
+    if (bedsFilter !=="all") {
       vehicles = vehicles.filter((v: any) => {
         const beds = v.beds || v.sleeping_capacity || 0;
         return beds === parseInt(bedsFilter);
@@ -62,10 +60,10 @@ function SearchResultsContent() {
     }
 
     // Filtrar por transmisión
-    if (transmissionFilter !== "all") {
+    if (transmissionFilter !=="all") {
       vehicles = vehicles.filter((v: any) => {
-        const transmission = (v.transmission || "").toLowerCase();
-        if (transmissionFilter === "automatic") {
+        const transmission = (v.transmission ||"").toLowerCase();
+        if (transmissionFilter ==="automatic") {
           return transmission.includes("auto") || transmission.includes("automátic");
         }
         return transmission.includes("manual");
@@ -74,13 +72,13 @@ function SearchResultsContent() {
 
     // Ordenar
     switch (sortBy) {
-      case "price_asc":
+      case"price_asc":
         vehicles.sort((a: any, b: any) => (a.pricing?.total || 0) - (b.pricing?.total || 0));
         break;
-      case "price_desc":
+      case"price_desc":
         vehicles.sort((a: any, b: any) => (b.pricing?.total || 0) - (a.pricing?.total || 0));
         break;
-      case "capacity":
+      case"capacity":
         vehicles.sort((a: any, b: any) => (b.seats || 0) - (a.seats || 0));
         break;
       default:
@@ -92,7 +90,7 @@ function SearchResultsContent() {
   }, [data?.vehicles, bedsFilter, transmissionFilter, sortBy]);
 
   // Comprobar si hay filtros activos
-  const hasActiveFilters = bedsFilter !== "all" || transmissionFilter !== "all";
+  const hasActiveFilters = bedsFilter !=="all" || transmissionFilter !=="all";
 
   // Limpiar todos los filtros
   const clearFilters = () => {
@@ -102,19 +100,17 @@ function SearchResultsContent() {
 
   return (
     <>
-      <Header />
-
-      <main className="min-h-screen bg-gray-50 pt-24 md:pt-28">
+<main className="min-h-screen bg-gray-50">
         {/* Search Summary */}
         <div className="bg-furgocasa-blue py-6">
           <div className="container mx-auto px-4">
             <SearchSummary
-              pickupDate={searchParams.get("pickup_date") || ""}
-              dropoffDate={searchParams.get("dropoff_date") || ""}
-              pickupTime={searchParams.get("pickup_time") || "10:00"}
-              dropoffTime={searchParams.get("dropoff_time") || "10:00"}
-              pickupLocation={searchParams.get("pickup_location") || ""}
-              dropoffLocation={searchParams.get("dropoff_location") || ""}
+              pickupDate={searchParams.get("pickup_date") ||""}
+              dropoffDate={searchParams.get("dropoff_date") ||""}
+              pickupTime={searchParams.get("pickup_time") ||"10:00"}
+              dropoffTime={searchParams.get("dropoff_time") ||"10:00"}
+              pickupLocation={searchParams.get("pickup_location") ||""}
+              dropoffLocation={searchParams.get("dropoff_location") ||""}
             />
           </div>
         </div>
@@ -147,7 +143,7 @@ function SearchResultsContent() {
                   {/* Count */}
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">
-                      {filteredVehicles.length} {t("vehículo")}{filteredVehicles.length !== 1 ? "s" : ""} {t("disponible")}{filteredVehicles.length !== 1 ? "s" : ""}
+                      {filteredVehicles.length} {t("vehículo")}{filteredVehicles.length !== 1 ?"s" :""} {t("disponible")}{filteredVehicles.length !== 1 ?"s" :""}
                       {hasActiveFilters && filteredVehicles.length !== data.totalResults && (
                         <span className="text-sm font-normal text-gray-500 ml-2">
                           ({t("de")} {data.totalResults} {t("total")})
@@ -159,7 +155,7 @@ function SearchResultsContent() {
                         {t("Temporada")}: <span className="font-medium">{data.season.name}</span>
                         {data.season.modifier !== 1 && (
                           <span className="ml-2">
-                            ({data.season.modifier > 1 ? "+" : ""}
+                            ({data.season.modifier > 1 ?"+" :""}
                             {Math.round((data.season.modifier - 1) * 100)}%)
                           </span>
                         )}
@@ -174,17 +170,17 @@ function SearchResultsContent() {
                       <span className="text-xs md:text-sm text-gray-500 hidden sm:inline">{t("Plazas noche")}:</span>
                       <div className="flex rounded-lg border border-gray-300 overflow-hidden">
                         {[
-                          { value: "all", label: t("Todas") },
-                          { value: "2", label: "2" },
-                          { value: "4", label: "4" },
+                          { value:"all", label: t("Todas") },
+                          { value:"2", label:"2" },
+                          { value:"4", label:"4" },
                         ].map((option) => (
                           <button
                             key={option.value}
                             onClick={() => setBedsFilter(option.value as BedsFilter)}
                             className={`px-2 md:px-3 py-2 text-xs md:text-sm font-medium transition-colors touch-manipulation ${
                               bedsFilter === option.value
-                                ? "bg-furgocasa-orange text-white"
-                                : "bg-white text-gray-700 hover:bg-gray-50"
+                                ?"bg-furgocasa-orange text-white"
+                                :"bg-white text-gray-700 hover:bg-gray-50"
                             }`}
                           >
                             {option.label}
@@ -198,17 +194,17 @@ function SearchResultsContent() {
                       <span className="text-xs md:text-sm text-gray-500 hidden sm:inline">{t("Cambio")}:</span>
                       <div className="flex rounded-lg border border-gray-300 overflow-hidden">
                         {[
-                          { value: "all", label: t("Todos") },
-                          { value: "manual", label: t("Manual") },
-                          { value: "automatic", label: t("Auto") },
+                          { value:"all", label: t("Todos") },
+                          { value:"manual", label: t("Manual") },
+                          { value:"automatic", label: t("Auto") },
                         ].map((option) => (
                           <button
                             key={option.value}
                             onClick={() => setTransmissionFilter(option.value as TransmissionFilter)}
                             className={`px-2 md:px-3 py-2 text-xs md:text-sm font-medium transition-colors touch-manipulation ${
                               transmissionFilter === option.value
-                                ? "bg-furgocasa-orange text-white"
-                                : "bg-white text-gray-700 hover:bg-gray-50"
+                                ?"bg-furgocasa-orange text-white"
+                                :"bg-white text-gray-700 hover:bg-gray-50"
                             }`}
                           >
                             {option.label}
@@ -287,12 +283,12 @@ function SearchResultsContent() {
                       vehicle={vehicle}
                       pricing={vehicle.pricing}
                       searchParams={{
-                        pickup_date: searchParams.get("pickup_date") || "",
-                        dropoff_date: searchParams.get("dropoff_date") || "",
-                        pickup_time: searchParams.get("pickup_time") || "10:00",
-                        dropoff_time: searchParams.get("dropoff_time") || "10:00",
-                        pickup_location: searchParams.get("pickup_location") || "",
-                        dropoff_location: searchParams.get("dropoff_location") || "",
+                        pickup_date: searchParams.get("pickup_date") ||"",
+                        dropoff_date: searchParams.get("dropoff_date") ||"",
+                        pickup_time: searchParams.get("pickup_time") ||"10:00",
+                        dropoff_time: searchParams.get("dropoff_time") ||"10:00",
+                        pickup_location: searchParams.get("pickup_location") ||"",
+                        dropoff_location: searchParams.get("dropoff_location") ||"",
                       }}
                     />
                   ))}
@@ -302,9 +298,7 @@ function SearchResultsContent() {
           )}
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }
 

@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { Calendar, Clock, ArrowRight, BookOpen, Search, Mail, Tag, ArrowLeft, Filter } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
-import { supabase } from "@/lib/supabase/client";
-import { useParams, useSearchParams } from "next/navigation";
+import { useEffect, useState, Suspense } from"react";
+import { LocalizedLink } from"@/components/localized-link";
+import { Calendar, Clock, ArrowRight, BookOpen, Search, Mail, Tag, ArrowLeft, Filter } from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
+import { supabase } from"@/lib/supabase/client";
+import { useParams, useSearchParams } from"next/navigation";
 
 function LoadingState() {
   return (
@@ -16,7 +14,7 @@ function LoadingState() {
     </div>
   );
 }
-import { getCategorySlugInSpanish, getCategoryName, translateCategorySlug, blogCategoryNames } from "@/lib/blog-translations";
+import { getCategorySlugInSpanish, getCategoryName, translateCategorySlug, blogCategoryNames } from"@/lib/blog-translations";
 
 interface Category {
   id: string;
@@ -40,29 +38,29 @@ interface Post {
 
 // Mapeo de slugs a nombres para mostrar
 const categoryNames: Record<string, string> = {
-  rutas: "Rutas",
-  noticias: "Noticias",
-  vehiculos: "Vehículos",
-  consejos: "Consejos",
-  destinos: "Destinos",
-  equipamiento: "Equipamiento",
+  rutas:"Rutas",
+  noticias:"Noticias",
+  vehiculos:"Vehículos",
+  consejos:"Consejos",
+  destinos:"Destinos",
+  equipamiento:"Equipamiento",
 };
 
 // Descripciones por categoría
 const categoryDescriptions: Record<string, string> = {
-  rutas: "Las mejores rutas en camper por España y Europa. Descubre destinos increíbles, consejos de viaje y experiencias únicas.",
-  noticias: "Mantente al día con las últimas novedades del mundo camper, eventos, ferias y actualidad del sector.",
-  vehiculos: "Conoce los mejores vehículos para viajar, comparativas, análisis y recomendaciones de expertos.",
-  consejos: "Guías prácticas y consejos para sacar el máximo partido a tu experiencia camper.",
-  destinos: "Descubre los mejores destinos para viajar en camper, desde playas hasta montañas.",
-  equipamiento: "Todo sobre accesorios, equipamiento y gadgets para tu camper.",
+  rutas:"Las mejores rutas en camper por España y Europa. Descubre destinos increíbles, consejos de viaje y experiencias únicas.",
+  noticias:"Mantente al día con las últimas novedades del mundo camper, eventos, ferias y actualidad del sector.",
+  vehiculos:"Conoce los mejores vehículos para viajar, comparativas, análisis y recomendaciones de expertos.",
+  consejos:"Guías prácticas y consejos para sacar el máximo partido a tu experiencia camper.",
+  destinos:"Descubre los mejores destinos para viajar en camper, desde playas hasta montañas.",
+  equipamiento:"Todo sobre accesorios, equipamiento y gadgets para tu camper.",
 };
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+    day:"numeric",
+    month:"long",
+    year:"numeric",
   });
 }
 
@@ -72,7 +70,7 @@ function BlogCategoryContent() {
   const { t, language } = useLanguage();
   
   const categorySlug = params.category as string;
-  const page = parseInt(searchParams.get("page") || "1");
+  const page = parseInt(searchParams.get("page") ||"1");
   const POSTS_PER_PAGE = 9;
   
   // Convertir el slug de categoría a español si no lo está (la BD tiene slugs en español)
@@ -114,9 +112,9 @@ function BlogCategoryContent() {
             reading_time,
             views,
             category:content_categories(id, name, slug, description, image_url)
-          `, { count: "exact" })
+          `, { count:"exact" })
           .eq("category_id", categoryData.id)
-          .eq("status", "published")
+          .eq("status","published")
           .order("published_at", { ascending: false })
           .range(from, to);
 
@@ -144,7 +142,7 @@ function BlogCategoryContent() {
   const categoryName = getCategoryName(esCategorySlug, language);
   
   // Obtener la descripción traducida o usar la de la BD
-  const categoryDescription = category?.description || "";
+  const categoryDescription = category?.description ||"";
 
   // Filtrar posts por búsqueda
   const filteredPosts = searchQuery
@@ -157,8 +155,7 @@ function BlogCategoryContent() {
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           {/* Background Pattern */}
@@ -178,7 +175,7 @@ function BlogCategoryContent() {
 
             <div className="text-center">
               <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur rounded-full text-xs font-bold text-white uppercase tracking-wider mb-6">
-                {totalPosts} {totalPosts === 1 ? "artículo" : "artículos"}
+                {totalPosts} {totalPosts === 1 ?"artículo" :"artículos"}
               </span>
               <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6">
                 {categoryName}
@@ -209,8 +206,8 @@ function BlogCategoryContent() {
                     href={`/blog/${translatedSlug}`}
                     className={`px-5 py-2 rounded-full font-bold text-sm tracking-wide uppercase whitespace-nowrap transition-all ${
                       esCategorySlug === esSlug
-                        ? "bg-furgocasa-orange text-white shadow-md transform scale-105"
-                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        ?"bg-furgocasa-orange text-white shadow-md transform scale-105"
+                        :"bg-gray-100 text-gray-600 hover:bg-gray-200"
                     }`}
                   >
                     {name}
@@ -338,8 +335,8 @@ function BlogCategoryContent() {
                         href={`/blog/${categorySlug}?page=${pageNum}`}
                         className={`w-12 h-12 rounded-xl font-bold flex items-center justify-center transition-colors ${
                           page === pageNum
-                            ? "bg-furgocasa-blue text-white shadow-lg transform scale-105"
-                            : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300"
+                            ?"bg-furgocasa-blue text-white shadow-lg transform scale-105"
+                            :"bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300"
                         }`}
                       >
                         {pageNum}
@@ -388,8 +385,7 @@ function BlogCategoryContent() {
           </div>
         </div>
       </main>
-      <Footer />
-    </>
+</>
   );
 }
 

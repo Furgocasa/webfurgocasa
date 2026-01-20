@@ -1,58 +1,55 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import Link from "next/link";
-import { Play, Car, ArrowRight, Calendar, Gauge, Euro } from "lucide-react";
+import Link from"next/link";
+import { Play, Car, ArrowRight, Calendar, Gauge, Euro } from"lucide-react";
 
 export const metadata = {
-  title: "Videos de Campers en Venta | Furgocasa Campervans",
-  description: "Mira los videos de nuestras campers y autocaravanas en venta. Recorrido completo interior y exterior de cada vehículo.",
+  title:"Videos de Campers en Venta | Furgocasa Campervans",
+  description:"Mira los videos de nuestras campers y autocaravanas en venta. Recorrido completo interior y exterior de cada vehículo.",
 };
 
 // TODO: Cargar desde Supabase/YouTube API
 const videos = [
   {
-    id: "1",
-    title: "Volkswagen California Ocean T6.1 2021",
-    slug: "vw-california-ocean-t61-2021",
-    youtubeId: "dQw4w9WgXcQ", // Placeholder
+    id:"1",
+    title:"Volkswagen California Ocean T6.1 2021",
+    slug:"vw-california-ocean-t61-2021",
+    youtubeId:"dQw4w9WgXcQ", // Placeholder
     thumbnail: null,
     price: 72000,
     mileage: 45000,
     year: 2021,
-    description: "Recorrido completo por este California Ocean en estado impecable. Un solo propietario.",
-    duration: "12:34",
+    description:"Recorrido completo por este California Ocean en estado impecable. Un solo propietario.",
+    duration:"12:34",
   },
   {
-    id: "2",
-    title: "Ford Transit Custom Nugget 2022",
-    slug: "ford-transit-nugget-2022",
-    youtubeId: "dQw4w9WgXcQ", // Placeholder
+    id:"2",
+    title:"Ford Transit Custom Nugget 2022",
+    slug:"ford-transit-nugget-2022",
+    youtubeId:"dQw4w9WgXcQ", // Placeholder
     thumbnail: null,
     price: 58000,
     mileage: 28000,
     year: 2022,
-    description: "Tour por el Nugget prácticamente nuevo. Garantía oficial Ford hasta 2025.",
-    duration: "10:45",
+    description:"Tour por el Nugget prácticamente nuevo. Garantía oficial Ford hasta 2025.",
+    duration:"10:45",
   },
   {
-    id: "3",
-    title: "Fiat Ducato Roller Team 284 2020",
-    slug: "fiat-ducato-roller-team-284-2020",
-    youtubeId: "dQw4w9WgXcQ", // Placeholder
+    id:"3",
+    title:"Fiat Ducato Roller Team 284 2020",
+    slug:"fiat-ducato-roller-team-284-2020",
+    youtubeId:"dQw4w9WgXcQ", // Placeholder
     thumbnail: null,
     price: 52000,
     mileage: 62000,
     year: 2020,
-    description: "Autocaravana perfilada muy completa. Ideal para familias.",
-    duration: "15:20",
+    description:"Autocaravana perfilada muy completa. Ideal para familias.",
+    duration:"15:20",
   },
 ];
 
 export default function VideosVentasPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
             <Play className="h-16 w-16 text-furgocasa-orange mx-auto mb-4" />
@@ -169,7 +166,6 @@ export default function VideosVentasPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

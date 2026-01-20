@@ -1,12 +1,10 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { MapPin, Phone, Mail, CheckCircle, Package } from "lucide-react";
-import Image from "next/image";
-import { SaleLocationJsonLd } from "@/components/locations/sale-location-jsonld";
+import { Metadata } from"next";
+import { notFound } from"next/navigation";
+import { createClient } from"@supabase/supabase-js";
+import { LocalizedLink } from"@/components/localized-link";
+import { MapPin, Phone, Mail, CheckCircle, Package } from"lucide-react";
+import Image from"next/image";
+import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
 
 // ⚡ Server-side Supabase client - Server Component por defecto (SEO optimizado)
 const supabase = createClient(
@@ -345,9 +343,7 @@ export default async function SaleLocationPage({
 
   return (
     <>
-      <Header />
-      
-      {/* ✅ SCHEMA.ORG JSON-LD (SEO estructurado) - 3 tipos como páginas de alquiler */}
+{/* ✅ SCHEMA.ORG JSON-LD (SEO estructurado) - 3 tipos como páginas de alquiler */}
       <SaleLocationJsonLd location={locationData} />
       
       {/* ✅ MAIN: Contenido principal (HTML semántico) */}
@@ -613,7 +609,6 @@ export default async function SaleLocationPage({
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

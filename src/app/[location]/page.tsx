@@ -1,21 +1,19 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { SearchWidget } from "@/components/booking/search-widget";
-import { DestinationsGrid } from "@/components/destinations-grid";
-import { HeroSlider } from "@/components/hero-slider";
-import { BlogArticleLink } from "@/components/blog/blog-article-link";
-import { LocalizedLink } from "@/components/localized-link";
-import { SaleLocationJsonLd } from "@/components/locations/sale-location-jsonld";
+import { Metadata } from"next";
+import { notFound } from"next/navigation";
+import { createClient } from"@supabase/supabase-js";
+import { SearchWidget } from"@/components/booking/search-widget";
+import { DestinationsGrid } from"@/components/destinations-grid";
+import { HeroSlider } from"@/components/hero-slider";
+import { BlogArticleLink } from"@/components/blog/blog-article-link";
+import { LocalizedLink } from"@/components/localized-link";
+import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
 import { 
   CheckCircle,
   Package,
   MapPin,
   HelpCircle,
   BookOpen
-} from "lucide-react";
+} from"lucide-react";
 
 // Helper para traducciones estáticas (Server Component)
 const t = (key: string) => key;
@@ -173,14 +171,14 @@ function extractSaleCitySlug(locationParam: string): string {
   return locationParam;
 }
 
-function getSeoPageKind(locationParam: string): "rent" | "sale" | "unknown" {
+function getSeoPageKind(locationParam: string):"rent" |"sale" |"unknown" {
   if (
     /^alquiler-autocaravanas-campervans-(.+)$/.test(locationParam) ||
     /^rent-campervan-motorhome-(.+)$/.test(locationParam) ||
     /^location-camping-car-(.+)$/.test(locationParam) ||
     /^wohnmobil-mieten-(.+)$/.test(locationParam)
   ) {
-    return "rent";
+    return"rent";
   }
 
   if (
@@ -189,10 +187,10 @@ function getSeoPageKind(locationParam: string): "rent" | "sale" | "unknown" {
     /^camping-cars-a-vendre-(.+)$/.test(locationParam) ||
     /^wohnmobile-zu-verkaufen-(.+)$/.test(locationParam)
   ) {
-    return "sale";
+    return"sale";
   }
 
-  return "unknown";
+  return"unknown";
 }
 
 /**
@@ -203,7 +201,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   const kind = getSeoPageKind(locationParam);
 
   // Por defecto, mantener el comportamiento actual (alquiler) para no romper rutas existentes
-  if (kind !== "sale") {
+  if (kind !=="sale") {
     const citySlug = extractRentalCitySlug(locationParam);
     
     const { data: location } = await supabase
@@ -426,14 +424,14 @@ async function loadBlogArticles(): Promise<BlogArticle[]> {
 }
 
 /**
- * ✅ SERVER COMPONENT - Sin "Cargando...", SEO óptimo
+ * ✅ SERVER COMPONENT - Sin"Cargando...", SEO óptimo
  */
 export default async function LocationPage({ params }: { params: Promise<{ location: string }> }) {
   const { location: locationParam } = await params;
   const kind = getSeoPageKind(locationParam);
 
   // ✅ VENTA: /venta-autocaravanas-camper-{ciudad} (y traducciones en /en, /fr, /de)
-  if (kind === "sale") {
+  if (kind ==="sale") {
     const [saleLocationData, vehiclesForSale] = await Promise.all([
       loadSaleLocationData(locationParam),
       loadVehiclesForSale(),
@@ -447,13 +445,11 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
     const distanceInfo =
       saleLocationData.distance_km && saleLocationData.travel_time_minutes
         ? `A ${saleLocationData.distance_km} km (${Math.floor(saleLocationData.travel_time_minutes / 60)}h ${saleLocationData.travel_time_minutes % 60}min)`
-        : "";
+        :"";
 
     return (
       <>
-        <Header />
-
-        {/* ✅ SCHEMA.ORG JSON-LD (SEO estructurado) */}
+{/* ✅ SCHEMA.ORG JSON-LD (SEO estructurado) */}
         <SaleLocationJsonLd location={saleLocationData as any} />
 
         <main className="min-h-screen bg-gray-50">
@@ -577,9 +573,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
             </div>
           </section>
         </main>
-
-        <Footer />
-      </>
+</>
     );
   }
   
@@ -599,19 +593,12 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
 
   return (
     <>
-      <Header />
-
-      {/* Hero Section - CON SLIDER DE IMÁGENES - Sin espacio entre header y slider */}
+{/* Hero Section - CON SLIDER DE IMÁGENES - Sin espacio entre header y slider */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden lg:-mt-[132px] pt-[120px] lg:pt-[132px]">
         {/* Background slider - ABSOLUTE PARA OCUPAR TODO EL FONDO */}
         <div className="absolute inset-0 w-full h-full">
           <HeroSlider 
-            images={[
-              "/images/slides/hero-01.webp",
-              "/images/slides/hero-02.webp",
-              "/images/slides/hero-03.webp",
-              "/images/slides/hero-04.webp",
-              "/images/slides/hero-05.webp",
+            images={["/images/slides/hero-01.webp","/images/slides/hero-02.webp","/images/slides/hero-03.webp","/images/slides/hero-04.webp","/images/slides/hero-05.webp",
             ]}
           />
         </div>
@@ -673,7 +660,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                 )}
               </div>
             ) : (
-              // NO TIENE OFICINA - Texto "Vale la pena venir"
+              // NO TIENE OFICINA - Texto"Vale la pena venir"
               <div className="text-center max-w-4xl mx-auto mb-8 bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-2xl p-6 lg:p-10 shadow-lg">
                 <p className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
                   {t("No estamos en")} {locationData.name}{' '}
@@ -1091,9 +1078,9 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto mb-12 lg:mb-16">
             {[
-              { season: "TEMPORADA BAJA", price: "95", color: "text-furgocasa-blue", border: "border-furgocasa-blue" },
-              { season: "Temporada Media", price: "125", color: "text-furgocasa-orange", border: "border-furgocasa-orange" },
-              { season: "Temporada Alta", price: "155", color: "text-red-500", border: "border-red-500" },
+              { season:"TEMPORADA BAJA", price:"95", color:"text-furgocasa-blue", border:"border-furgocasa-blue" },
+              { season:"Temporada Media", price:"125", color:"text-furgocasa-orange", border:"border-furgocasa-orange" },
+              { season:"Temporada Alta", price:"155", color:"text-red-500", border:"border-red-500" },
             ].map((pricing, index) => (
               <div
                 key={index}
@@ -1145,12 +1132,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
               </div>
               
               <ul className="space-y-3 lg:space-y-4">
-                {[
-                  "Kilómetros ilimitados",
-                  "Conductor/es adicional/es",
-                  "Utensilios de cocina completos",
-                  "Kit de camping (mesa y sillas)",
-                  "Cancelación gratuita hasta 60 días antes",
+                {["Kilómetros ilimitados","Conductor/es adicional/es","Utensilios de cocina completos","Kit de camping (mesa y sillas)","Cancelación gratuita hasta 60 días antes",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-3 bg-white p-3 lg:p-4 rounded-xl shadow-sm">
                     <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -1175,11 +1157,11 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
               
               <ul className="space-y-3 lg:space-y-4">
                 {[
-                  { name: "Silla para bebé", price: "30€" },
-                  { name: "Bicicletas", price: "50€" },
-                  { name: "Toldo lateral", price: "Consultar" },
-                  { name: "Kit de playa", price: "Consultar" },
-                  { name: "Seguro a todo riesgo", price: "Consultar" },
+                  { name:"Silla para bebé", price:"30€" },
+                  { name:"Bicicletas", price:"50€" },
+                  { name:"Toldo lateral", price:"Consultar" },
+                  { name:"Kit de playa", price:"Consultar" },
+                  { name:"Seguro a todo riesgo", price:"Consultar" },
                 ].map((item) => (
                   <li key={item.name} className="flex items-center justify-between bg-white p-3 lg:p-4 rounded-xl shadow-sm">
                     <span className="text-gray-700 text-sm lg:text-base">{t(item.name)}</span>
@@ -1306,20 +1288,20 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
             <div className="space-y-4">
               {[
                 {
-                  q: "¿Cuál es el kilometraje incluido?",
-                  a: "Todos nuestros alquileres incluyen kilómetros ilimitados. Viaja sin preocuparte por la distancia.",
+                  q:"¿Cuál es el kilometraje incluido?",
+                  a:"Todos nuestros alquileres incluyen kilómetros ilimitados. Viaja sin preocuparte por la distancia.",
                 },
                 {
-                  q: "¿Necesito carnet especial para conducir una autocaravana?",
-                  a: "No, con el carnet de conducir B (coche) es suficiente para todos nuestros vehículos.",
+                  q:"¿Necesito carnet especial para conducir una autocaravana?",
+                  a:"No, con el carnet de conducir B (coche) es suficiente para todos nuestros vehículos.",
                 },
                 {
-                  q: "¿Qué edades se permiten para conductores?",
-                  a: "La edad mínima para conducir es de 25 años y se requieren al menos 2 años de experiencia de conducción.",
+                  q:"¿Qué edades se permiten para conductores?",
+                  a:"La edad mínima para conducir es de 25 años y se requieren al menos 2 años de experiencia de conducción.",
                 },
                 {
-                  q: "¿Puedo viajar fuera de España?",
-                  a: "Sí, se puede viajar por toda Europa. Consulta las condiciones específicas para algunos países.",
+                  q:"¿Puedo viajar fuera de España?",
+                  a:"Sí, se puede viajar por toda Europa. Consulta las condiciones específicas para algunos países.",
                 },
               ].map((faq, index) => (
                 <details
@@ -1339,8 +1321,6 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
           </div>
         </div>
       </section>
-
-      <Footer />
-    </>
+</>
   );
 }

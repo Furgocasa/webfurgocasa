@@ -1,17 +1,14 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
+import { LocalizedLink } from"@/components/localized-link";
+import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight } from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
 export default function GuiaCamperPage() {
   const { t } = useLanguage();
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -78,13 +75,7 @@ export default function GuiaCamperPage() {
                     {t("Funciones principales")}
                   </h3>
                   <ul className="space-y-4">
-                    {[
-                      "Encender el automático de la electricidad",
-                      "Encender la bomba de aguas limpias",
-                      "Verificar el estado de carga de las baterías",
-                      "Verificar la cantidad restante de aguas limpias",
-                      "Comprobar si el deposito de aguas sucias esta lleno",
-                      "Encender la iluminación exterior (según modelo)"
+                    {["Encender el automático de la electricidad","Encender la bomba de aguas limpias","Verificar el estado de carga de las baterías","Verificar la cantidad restante de aguas limpias","Comprobar si el deposito de aguas sucias esta lleno","Encender la iluminación exterior (según modelo)"
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3 text-gray-600">
                         <ArrowRight className="h-5 w-5 text-furgocasa-orange flex-shrink-0 mt-0.5" />
@@ -342,7 +333,6 @@ export default function GuiaCamperPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

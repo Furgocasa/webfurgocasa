@@ -1,18 +1,16 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
+import Link from"next/link";
+import { notFound } from"next/navigation";
 import { 
   ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Bed, 
   CheckCircle, Phone, Mail, MapPin, Shield, Wrench, Ruler,
   Share2, Heart
-} from "lucide-react";
-import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
-import { createClient } from "@/lib/supabase/server";
-import { formatPrice } from "@/lib/utils";
+} from"lucide-react";
+import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
+import { createClient } from"@/lib/supabase/server";
+import { formatPrice } from"@/lib/utils";
 
-export const dynamic = "force-dynamic";
+export const dynamic ="force-dynamic";
 export const revalidate = 0;
 
 // Cargar vehículo desde Supabase
@@ -45,15 +43,15 @@ async function getVehicle(slug: string) {
 }
 
 const conditionLabels: Record<string, { label: string; color: string }> = {
-  new: { label: "Nuevo", color: "bg-green-100 text-green-700" },
-  like_new: { label: "Como nuevo", color: "bg-emerald-100 text-emerald-700" },
-  excellent: { label: "Excelente", color: "bg-blue-100 text-blue-700" },
-  good: { label: "Buen estado", color: "bg-yellow-100 text-yellow-700" },
-  fair: { label: "Aceptable", color: "bg-orange-100 text-orange-700" },
+  new: { label:"Nuevo", color:"bg-green-100 text-green-700" },
+  like_new: { label:"Como nuevo", color:"bg-emerald-100 text-emerald-700" },
+  excellent: { label:"Excelente", color:"bg-blue-100 text-blue-700" },
+  good: { label:"Buen estado", color:"bg-yellow-100 text-yellow-700" },
+  fair: { label:"Aceptable", color:"bg-orange-100 text-orange-700" },
 };
 
 function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("es-ES", { month: "long", year: "numeric" });
+  return new Date(date).toLocaleDateString("es-ES", { month:"long", year:"numeric" });
 }
 
 export default async function VehicleSalePage({ params }: { params: Promise<{ slug: string }> }) {
@@ -66,9 +64,7 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
 
   return (
     <>
-      <Header />
-
-      <main className="min-h-screen bg-gray-50 overflow-x-hidden">
+<main className="min-h-screen bg-gray-50 overflow-x-hidden">
         {/* Breadcrumb */}
         <div className="bg-white border-b border-gray-200">
           <div className="container mx-auto px-4 py-4">
@@ -377,8 +373,6 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }

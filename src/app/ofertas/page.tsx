@@ -1,11 +1,9 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
-import { useState } from "react";
+import { LocalizedLink } from"@/components/localized-link";
+import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile } from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
+import { useState } from"react";
 
 export default function OfertasPage() {
   const { t } = useLanguage();
@@ -18,18 +16,17 @@ export default function OfertasPage() {
   };
 
   const benefits = [
-    { icon: <Zap className="w-8 h-8 text-yellow-500" />, title: "Flota Moderna", desc: "Autocaravanas nuevas y totalmente equipadas para tu comodidad" },
-    { icon: <Snowflake className="w-8 h-8 text-blue-400" />, title: "Calefacción Total", desc: "Disfruta del invierno con calefacción estacionaria en todas las campers" },
-    { icon: <Map className="w-8 h-8 text-green-500" />, title: "Libertad Total", desc: "Viaja a tu ritmo. Norte, sur, playa, montaña... ¡Tú decides!" },
-    { icon: <Phone className="w-8 h-8 text-furgocasa-blue" />, title: "Asistencia 24/7", desc: "Soporte técnico siempre disponible durante todo tu viaje" },
-    { icon: <Shield className="w-8 h-8 text-purple-500" />, title: "Sin Sorpresas", desc: "Precio final transparente. Todo incluido desde el principio" },
-    { icon: <Smile className="w-8 h-8 text-orange-500" />, title: "Experiencia Única", desc: "Vive momentos inolvidables. Este será TU mejor invierno" },
+    { icon: <Zap className="w-8 h-8 text-yellow-500" />, title:"Flota Moderna", desc:"Autocaravanas nuevas y totalmente equipadas para tu comodidad" },
+    { icon: <Snowflake className="w-8 h-8 text-blue-400" />, title:"Calefacción Total", desc:"Disfruta del invierno con calefacción estacionaria en todas las campers" },
+    { icon: <Map className="w-8 h-8 text-green-500" />, title:"Libertad Total", desc:"Viaja a tu ritmo. Norte, sur, playa, montaña... ¡Tú decides!" },
+    { icon: <Phone className="w-8 h-8 text-furgocasa-blue" />, title:"Asistencia 24/7", desc:"Soporte técnico siempre disponible durante todo tu viaje" },
+    { icon: <Shield className="w-8 h-8 text-purple-500" />, title:"Sin Sorpresas", desc:"Precio final transparente. Todo incluido desde el principio" },
+    { icon: <Smile className="w-8 h-8 text-orange-500" />, title:"Experiencia Única", desc:"Vive momentos inolvidables. Este será TU mejor invierno" },
   ];
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-24 relative overflow-hidden">
           {/* Background Pattern */}
@@ -208,11 +205,11 @@ export default function OfertasPage() {
                 <div className="hidden md:block absolute top-8 left-0 w-full h-1 bg-gray-200 -z-10 rounded-full"></div>
                 
                 {[
-                  { step: "1", text: "Elige fechas (min 10 días)", icon: Calendar },
-                  { step: "2", text: "Selecciona tu camper", icon: Check },
-                  { step: "3", text: "Usa código INV2026", icon: Ticket },
-                  { step: "4", text: "Descuento aplicado", icon: Zap },
-                  { step: "5", text: "¡A disfrutar!", icon: Smile },
+                  { step:"1", text:"Elige fechas (min 10 días)", icon: Calendar },
+                  { step:"2", text:"Selecciona tu camper", icon: Check },
+                  { step:"3", text:"Usa código INV2026", icon: Ticket },
+                  { step:"4", text:"Descuento aplicado", icon: Zap },
+                  { step:"5", text:"¡A disfrutar!", icon: Smile },
                 ].map((item, index) => (
                   <div key={index} className="flex flex-col items-center text-center p-4 z-10 group">
                     <div className="w-16 h-16 bg-white border-4 border-gray-100 group-hover:border-furgocasa-blue rounded-2xl flex items-center justify-center mb-6 shadow-lg transform group-hover:scale-110 transition-all duration-300">
@@ -329,7 +326,6 @@ export default function OfertasPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

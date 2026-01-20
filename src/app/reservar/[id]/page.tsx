@@ -1,17 +1,15 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useLanguage } from "@/contexts/language-context";
-import { useRouter, useParams } from "next/navigation";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { formatPrice } from "@/lib/utils";
+import { useState, useEffect } from"react";
+import { useLanguage } from"@/contexts/language-context";
+import { useRouter, useParams } from"next/navigation";
+import { formatPrice } from"@/lib/utils";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
   FileText, Package
-} from "lucide-react";
-import Link from "next/link";
+} from"lucide-react";
+import Link from"next/link";
 
 // Función para normalizar códigos de país a nombres completos
 const getCountryName = (countryCode: string | null | undefined): string => {
@@ -110,39 +108,39 @@ interface Booking {
 
 const statusConfig: Record<string, { bg: string; text: string; label: string; icon: any; description: string }> = {
   pending: { 
-    bg: "bg-yellow-100", 
-    text: "text-yellow-800", 
-    label: "Pendiente de pago", 
+    bg:"bg-yellow-100", 
+    text:"text-yellow-800", 
+    label:"Pendiente de pago", 
     icon: Clock,
-    description: "Tu reserva está creada. Completa el pago para confirmarla."
+    description:"Tu reserva está creada. Completa el pago para confirmarla."
   },
   confirmed: { 
-    bg: "bg-green-100", 
-    text: "text-green-800", 
-    label: "Confirmada", 
+    bg:"bg-green-100", 
+    text:"text-green-800", 
+    label:"Confirmada", 
     icon: CheckCircle,
-    description: "Tu reserva está confirmada. ¡Prepárate para tu aventura!"
+    description:"Tu reserva está confirmada. ¡Prepárate para tu aventura!"
   },
   in_progress: { 
-    bg: "bg-blue-100", 
-    text: "text-blue-800", 
-    label: "En curso", 
+    bg:"bg-blue-100", 
+    text:"text-blue-800", 
+    label:"En curso", 
     icon: Car,
-    description: "¡Disfruta tu viaje! El vehículo está actualmente en uso."
+    description:"¡Disfruta tu viaje! El vehículo está actualmente en uso."
   },
   completed: { 
-    bg: "bg-gray-100", 
-    text: "text-gray-800", 
-    label: "Completada", 
+    bg:"bg-gray-100", 
+    text:"text-gray-800", 
+    label:"Completada", 
     icon: CheckCircle,
-    description: "Tu alquiler ha finalizado. ¡Esperamos verte pronto!"
+    description:"Tu alquiler ha finalizado. ¡Esperamos verte pronto!"
   },
   cancelled: { 
-    bg: "bg-red-100", 
-    text: "text-red-800", 
-    label: "Cancelada", 
+    bg:"bg-red-100", 
+    text:"text-red-800", 
+    label:"Cancelada", 
     icon: XCircle,
-    description: "Esta reserva ha sido cancelada."
+    description:"Esta reserva ha sido cancelada."
   },
 };
 
@@ -200,23 +198,20 @@ export default function ReservaPage() {
   if (loading) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
             <p className="text-gray-600">{t("Cargando información de la reserva...")}</p>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   if (error || !booking) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
@@ -226,8 +221,7 @@ export default function ReservaPage() {
             </Link>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
@@ -255,9 +249,7 @@ export default function ReservaPage() {
 
   return (
     <>
-      <Header />
-      
-      <main className="min-h-screen bg-gray-50 py-12">
+<main className="min-h-screen bg-gray-50 py-12">
         <div className="container mx-auto px-4 max-w-5xl">
           {/* Breadcrumb */}
           <div className="mb-8">
@@ -820,8 +812,6 @@ export default function ReservaPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }

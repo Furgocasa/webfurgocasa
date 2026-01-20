@@ -1,35 +1,33 @@
-import { Metadata } from "next";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { MapPin, Wifi, Droplets, Plug, Trash2, ShowerHead, Search } from "lucide-react";
-import { translateServer } from "@/lib/i18n/server-translation";
+import { Metadata } from"next";
+import { MapPin, Wifi, Droplets, Plug, Trash2, ShowerHead, Search } from"lucide-react";
+import { translateServer } from"@/lib/i18n/server-translation";
 
 export const metadata: Metadata = {
-  title: "Mapa de Áreas para Autocaravanas | Furgocasa Campervans",
-  description: "Encuentra las mejores áreas de servicio y pernocta para autocaravanas y campers en España. Mapa interactivo con servicios, valoraciones y fotos.",
+  title:"Mapa de Áreas para Autocaravanas | Furgocasa Campervans",
+  description:"Encuentra las mejores áreas de servicio y pernocta para autocaravanas y campers en España. Mapa interactivo con servicios, valoraciones y fotos.",
 };
 
 // TODO: Integrar con API de áreas o base de datos propia
 const areas = [
-  { id: "1", name: "Área de Cabo de Palos", location: "Cartagena, Murcia", type: "area_servicio", services: ["agua", "vaciado", "electricidad"], price: "Gratuita", rating: 4.5, lat: 37.6347, lng: -0.6967 },
-  { id: "2", name: "Parking La Manga", location: "La Manga, Murcia", type: "parking", services: ["agua"], price: "10€/noche", rating: 4.0, lat: 37.6421, lng: -0.7156 },
-  { id: "3", name: "Área Camping Mar Menor", location: "San Javier, Murcia", type: "camping", services: ["agua", "vaciado", "electricidad", "wifi", "duchas"], price: "18€/noche", rating: 4.8, lat: 37.7883, lng: -0.8367 },
-  { id: "4", name: "Área Municipal Águilas", location: "Águilas, Murcia", type: "area_servicio", services: ["agua", "vaciado"], price: "Gratuita", rating: 3.8, lat: 37.4054, lng: -1.5839 },
-  { id: "5", name: "Parking Playa Mazarrón", location: "Mazarrón, Murcia", type: "parking", services: [], price: "Gratuita", rating: 3.5, lat: 37.5614, lng: -1.2614 },
+  { id:"1", name:"Área de Cabo de Palos", location:"Cartagena, Murcia", type:"area_servicio", services: ["agua","vaciado","electricidad"], price:"Gratuita", rating: 4.5, lat: 37.6347, lng: -0.6967 },
+  { id:"2", name:"Parking La Manga", location:"La Manga, Murcia", type:"parking", services: ["agua"], price:"10€/noche", rating: 4.0, lat: 37.6421, lng: -0.7156 },
+  { id:"3", name:"Área Camping Mar Menor", location:"San Javier, Murcia", type:"camping", services: ["agua","vaciado","electricidad","wifi","duchas"], price:"18€/noche", rating: 4.8, lat: 37.7883, lng: -0.8367 },
+  { id:"4", name:"Área Municipal Águilas", location:"Águilas, Murcia", type:"area_servicio", services: ["agua","vaciado"], price:"Gratuita", rating: 3.8, lat: 37.4054, lng: -1.5839 },
+  { id:"5", name:"Parking Playa Mazarrón", location:"Mazarrón, Murcia", type:"parking", services: [], price:"Gratuita", rating: 3.5, lat: 37.5614, lng: -1.2614 },
 ];
 
 const serviceIcons: Record<string, { icon: any; label: string }> = {
-  agua: { icon: Droplets, label: "Agua potable" },
-  vaciado: { icon: Trash2, label: "Vaciado aguas grises" },
-  electricidad: { icon: Plug, label: "Electricidad" },
-  wifi: { icon: Wifi, label: "WiFi" },
-  duchas: { icon: ShowerHead, label: "Duchas" },
+  agua: { icon: Droplets, label:"Agua potable" },
+  vaciado: { icon: Trash2, label:"Vaciado aguas grises" },
+  electricidad: { icon: Plug, label:"Electricidad" },
+  wifi: { icon: Wifi, label:"WiFi" },
+  duchas: { icon: ShowerHead, label:"Duchas" },
 };
 
 const typeLabels: Record<string, { label: string; color: string }> = {
-  area_servicio: { label: "Área de servicio", color: "bg-green-100 text-green-700" },
-  parking: { label: "Parking", color: "bg-blue-100 text-blue-700" },
-  camping: { label: "Camping", color: "bg-orange-100 text-orange-700" },
+  area_servicio: { label:"Área de servicio", color:"bg-green-100 text-green-700" },
+  parking: { label:"Parking", color:"bg-blue-100 text-blue-700" },
+  camping: { label:"Camping", color:"bg-orange-100 text-orange-700" },
 };
 
 export default function MapaAreasPage() {
@@ -38,8 +36,7 @@ export default function MapaAreasPage() {
   
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{t("Mapa de Áreas")}</h1>
@@ -165,7 +162,6 @@ export default function MapaAreasPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

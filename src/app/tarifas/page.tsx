@@ -1,56 +1,48 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
+import { LocalizedLink } from"@/components/localized-link";
 import { 
   CheckCircle, Calendar, Euro, Shield, FileText, AlertCircle, Percent, 
   User, Clock, RefreshCw, Lock, CreditCard, XCircle, Info, Download
-} from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
-import { SeasonsCalendar } from "@/components/seasons-calendar";
+} from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
+import { SeasonsCalendar } from"@/components/seasons-calendar";
 
 const pricingTable = [
-  { season: "Baja", lessThanWeek: "95,00", oneWeek: "85,00", twoWeeks: "75,00", threeWeeks: "65,00" },
-  { season: "Media", lessThanWeek: "125,00", oneWeek: "115,00", twoWeeks: "105,00", threeWeeks: "95,00" },
-  { season: "Alta", lessThanWeek: "155,00", oneWeek: "145,00", twoWeeks: "135,00", threeWeeks: "125,00" },
+  { season:"Baja", lessThanWeek:"95,00", oneWeek:"85,00", twoWeeks:"75,00", threeWeeks:"65,00" },
+  { season:"Media", lessThanWeek:"125,00", oneWeek:"115,00", twoWeeks:"105,00", threeWeeks:"95,00" },
+  { season:"Alta", lessThanWeek:"155,00", oneWeek:"145,00", twoWeeks:"135,00", threeWeeks:"125,00" },
 ];
 
 const discounts = [
-  { percentage: "-10%", description: "Alquileres de 7 días o más", icon: "📅" },
-  { percentage: "-20%", description: "Alquileres de 14 días o más", icon: "🗓️" },
-  { percentage: "-30%", description: "Alquileres de 21 días o más (solo Temp. Baja)", icon: "🔥" },
+  { percentage:"-10%", description:"Alquileres de 7 días o más", icon:"📅" },
+  { percentage:"-20%", description:"Alquileres de 14 días o más", icon:"🗓️" },
+  { percentage:"-30%", description:"Alquileres de 21 días o más (solo Temp. Baja)", icon:"🔥" },
 ];
 
-const includedFree = [
-  "Kilómetros ilimitados",
-  "Conductor/es adicional/es",
-  "Utensilios de cocina completos",
-  "Kit de camping (mesa y sillas)",
-  "Derecho a desistir los primeros 14 días",
-  "Cancelación gratuita hasta 60 días antes",
+const includedFree = ["Kilómetros ilimitados","Conductor/es adicional/es","Utensilios de cocina completos","Kit de camping (mesa y sillas)","Derecho a desistir los primeros 14 días","Cancelación gratuita hasta 60 días antes",
 ];
 
 const extrasOptional = [
-  { name: "Sábanas y almohadas", price: "30,00 €", per: "viaje" },
-  { name: "Edredón invierno", price: "20,00 €", per: "viaje" },
-  { name: "Toallas de baño", price: "20,00 €", per: "viaje" },
-  { name: "Mascotas permitidas", price: "40,00 €", per: "viaje" },
-  { name: "Aparcamiento en Murcia", price: "10,00 €", per: "día" },
-  { name: "2ª cama (4 plazas)", price: "10,00 €", per: "día" },
+  { name:"Sábanas y almohadas", price:"30,00 €", per:"viaje" },
+  { name:"Edredón invierno", price:"20,00 €", per:"viaje" },
+  { name:"Toallas de baño", price:"20,00 €", per:"viaje" },
+  { name:"Mascotas permitidas", price:"40,00 €", per:"viaje" },
+  { name:"Aparcamiento en Murcia", price:"10,00 €", per:"día" },
+  { name:"2ª cama (4 plazas)", price:"10,00 €", per:"día" },
 ];
 
 const cancellationPolicy = [
-  { period: "Más de 60 días antes", charge: "GRATIS", color: "text-green-600", bg: "bg-green-50", border: "border-green-200" },
-  { period: "Entre 59 y 16 días antes", charge: "10% del total", color: "text-yellow-600", bg: "bg-yellow-50", border: "border-yellow-200" },
-  { period: "Entre 15 y 8 días antes", charge: "50% del total", color: "text-orange-600", bg: "bg-orange-50", border: "border-orange-200" },
-  { period: "Menos de 7 días antes", charge: "75% del total", color: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
+  { period:"Más de 60 días antes", charge:"GRATIS", color:"text-green-600", bg:"bg-green-50", border:"border-green-200" },
+  { period:"Entre 59 y 16 días antes", charge:"10% del total", color:"text-yellow-600", bg:"bg-yellow-50", border:"border-yellow-200" },
+  { period:"Entre 15 y 8 días antes", charge:"50% del total", color:"text-orange-600", bg:"bg-orange-50", border:"border-orange-200" },
+  { period:"Menos de 7 días antes", charge:"75% del total", color:"text-red-600", bg:"bg-red-50", border:"border-red-200" },
 ];
 
 const returnFees = [
-  { service: "Vaciado aguas grises", price: "20,00 €", note: "IVA incluido" },
-  { service: "Vaciado WC químico", price: "70,00 €", note: "IVA incluido" },
-  { service: "Limpieza interior", price: "Desde 120,00 €", note: "IVA incluido" },
+  { service:"Vaciado aguas grises", price:"20,00 €", note:"IVA incluido" },
+  { service:"Vaciado WC químico", price:"70,00 €", note:"IVA incluido" },
+  { service:"Limpieza interior", price:"Desde 120,00 €", note:"IVA incluido" },
 ];
 
 export default function TarifasPage() {
@@ -60,8 +52,7 @@ export default function TarifasPage() {
   
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.png')]"></div>
@@ -128,8 +119,8 @@ export default function TarifasPage() {
                           <td className="py-3 md:py-6 px-2 md:px-6 font-bold text-gray-900 border-r border-gray-100">
                             <div className="flex items-center gap-1 md:gap-2">
                               <span className={`w-2 md:w-3 h-2 md:h-3 rounded-full flex-shrink-0 ${
-                                row.season === "Baja" ? "bg-furgocasa-blue" : 
-                                row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-500"
+                                row.season ==="Baja" ?"bg-furgocasa-blue" : 
+                                row.season ==="Media" ?"bg-furgocasa-orange" :"bg-red-500"
                               }`}></span>
                               <span className="text-sm md:text-base">{t(row.season)}</span>
                             </div>
@@ -742,7 +733,6 @@ export default function TarifasPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

@@ -1,32 +1,29 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { useLanguage } from "@/contexts/language-context";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { Crown, Percent, Gift, Calendar, Star, CheckCircle, ArrowRight } from "lucide-react";
+import { useLanguage } from"@/contexts/language-context";
+import { LocalizedLink } from"@/components/localized-link";
+import { Crown, Percent, Gift, Calendar, Star, CheckCircle, ArrowRight } from"lucide-react";
 
 // Metadata movido a layout.tsx o se debe crear un archivo metadata.ts separado
 
 const benefits = [
-  { icon: Percent, title: "10% de descuento permanente", description: "En todos tus alquileres, sin códigos ni condiciones" },
-  { icon: Calendar, title: "Prioridad en reservas", description: "Acceso anticipado a fechas de alta demanda" },
-  { icon: Gift, title: "Extras gratuitos", description: "Sillas de camping, nevera portátil y kit de playa incluidos" },
-  { icon: Star, title: "Late check-out gratuito", description: "Devuelve hasta las 14:00 sin coste adicional" },
+  { icon: Percent, title:"10% de descuento permanente", description:"En todos tus alquileres, sin códigos ni condiciones" },
+  { icon: Calendar, title:"Prioridad en reservas", description:"Acceso anticipado a fechas de alta demanda" },
+  { icon: Gift, title:"Extras gratuitos", description:"Sillas de camping, nevera portátil y kit de playa incluidos" },
+  { icon: Star, title:"Late check-out gratuito", description:"Devuelve hasta las 14:00 sin coste adicional" },
 ];
 
 const howToJoin = [
-  { step: "1", title: "Alquila con nosotros", description: "Completa tu primer alquiler con Furgocasa" },
-  { step: "2", title: "Acumula días", description: "Por cada 10 días de alquiler, entras en el programa VIP" },
-  { step: "3", title: "Disfruta los beneficios", description: "Automáticamente en tu siguiente reserva" },
+  { step:"1", title:"Alquila con nosotros", description:"Completa tu primer alquiler con Furgocasa" },
+  { step:"2", title:"Acumula días", description:"Por cada 10 días de alquiler, entras en el programa VIP" },
+  { step:"3", title:"Disfruta los beneficios", description:"Automáticamente en tu siguiente reserva" },
 ];
 
 export default function ClientesVipPage() {
   const { t } = useLanguage();
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-gradient-to-br from-yellow-500 to-yellow-600 py-16">
           <div className="container mx-auto px-4 text-center">
             <Crown className="h-16 w-16 text-white mx-auto mb-4" />
@@ -58,15 +55,7 @@ export default function ClientesVipPage() {
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">{t("Y además...")}</h2>
             <div className="max-w-2xl mx-auto space-y-4">
-              {[
-                "Acceso a ofertas exclusivas antes que nadie",
-                "Línea de atención preferente",
-                "Invitaciones a eventos y quedadas VIP",
-                "Posibilidad de probar nuevos vehículos antes de añadirlos a la flota",
-                "Regalo de bienvenida en cada alquiler",
-                "Sin fianza adicional (sujeto a historial)",
-                "Flexibilidad en cambios de fechas sin penalización",
-                "Descuento en parking Furgocasa",
+              {["Acceso a ofertas exclusivas antes que nadie","Línea de atención preferente","Invitaciones a eventos y quedadas VIP","Posibilidad de probar nuevos vehículos antes de añadirlos a la flota","Regalo de bienvenida en cada alquiler","Sin fianza adicional (sujeto a historial)","Flexibilidad en cambios de fechas sin penalización","Descuento en parking Furgocasa",
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
@@ -110,7 +99,6 @@ export default function ClientesVipPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

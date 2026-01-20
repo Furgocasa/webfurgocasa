@@ -1,13 +1,11 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { notFound } from "next/navigation";
-import { ArrowLeft, Users, Bed, Fuel, Settings, Ruler } from "lucide-react";
-import { getVehicleBySlug } from "@/lib/supabase/queries";
-import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
-import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
-import { translateServer } from "@/lib/i18n/server-translation";
-import { formatPrice } from "@/lib/utils";
+import { LocalizedLink } from"@/components/localized-link";
+import { notFound } from"next/navigation";
+import { ArrowLeft, Users, Bed, Fuel, Settings, Ruler } from"lucide-react";
+import { getVehicleBySlug } from"@/lib/supabase/queries";
+import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
+import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
+import { translateServer } from"@/lib/i18n/server-translation";
+import { formatPrice } from"@/lib/utils";
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // Función de traducción del servidor
@@ -22,8 +20,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 overflow-x-hidden pt-20 md:pt-0">
+<main className="min-h-screen bg-gray-50 overflow-x-hidden md:pt-0">
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-4">
             <LocalizedLink href="/vehiculos" className="inline-flex items-center gap-2 text-gray-600 hover:text-furgocasa-orange">
@@ -205,7 +202,6 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
           </div>
         </div>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

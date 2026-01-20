@@ -1,17 +1,14 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { Bot, MessageSquare, Map, Wrench, Sparkles, ChevronRight, Brain, Zap, Info } from "lucide-react";
-import { useLanguage } from "@/contexts/language-context";
+import { LocalizedLink } from"@/components/localized-link";
+import { Bot, MessageSquare, Map, Wrench, Sparkles, ChevronRight, Brain, Zap, Info } from"lucide-react";
+import { useLanguage } from"@/contexts/language-context";
 export default function InteligenciaArtificialPage() {
   const { t } = useLanguage();
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-purple-900 via-blue-900 to-furgocasa-blue py-20 relative overflow-hidden">
           {/* Decoración de fondo */}
@@ -103,11 +100,7 @@ export default function InteligenciaArtificialPage() {
 
                 <div className="p-10">
                   <ul className="space-y-4 mb-8">
-                    {[
-                      "Planifica tu ruta perfecta origen-destino",
-                      "Diseña itinerarios a medida",
-                      "Consejos sobre dónde pernoctar",
-                      "Redacta tu cuaderno de bitácora"
+                    {["Planifica tu ruta perfecta origen-destino","Diseña itinerarios a medida","Consejos sobre dónde pernoctar","Redacta tu cuaderno de bitácora"
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <div className="p-1 bg-green-100 rounded-full mt-0.5"><ChevronRight className="h-4 w-4 text-green-600" /></div>
@@ -143,11 +136,7 @@ export default function InteligenciaArtificialPage() {
 
                 <div className="p-10">
                   <ul className="space-y-4 mb-8">
-                    {[
-                      "Resuelve dudas de funcionamiento",
-                      "Ayuda instantánea ante incidencias",
-                      "Admite texto y notas de voz",
-                      "Instrucciones técnicas precisas"
+                    {["Resuelve dudas de funcionamiento","Ayuda instantánea ante incidencias","Admite texto y notas de voz","Instrucciones técnicas precisas"
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <div className="p-1 bg-[#25D366]/20 rounded-full mt-0.5"><Wrench className="h-4 w-4 text-[#128C7E]" /></div>
@@ -173,9 +162,9 @@ export default function InteligenciaArtificialPage() {
 
             <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
               {[
-                { icon: Sparkles, color: "text-purple-600", bg: "bg-purple-100", title: "Tecnología Avanzada", desc: "IA de última generación adaptada al caravaning" },
-                { icon: Map, color: "text-blue-600", bg: "bg-blue-100", title: "Personalización", desc: "Rutas y consejos adaptados a tus gustos" },
-                { icon: Zap, color: "text-yellow-600", bg: "bg-yellow-100", title: "Rapidez", desc: "Soluciones al instante, sin esperas" },
+                { icon: Sparkles, color:"text-purple-600", bg:"bg-purple-100", title:"Tecnología Avanzada", desc:"IA de última generación adaptada al caravaning" },
+                { icon: Map, color:"text-blue-600", bg:"bg-blue-100", title:"Personalización", desc:"Rutas y consejos adaptados a tus gustos" },
+                { icon: Zap, color:"text-yellow-600", bg:"bg-yellow-100", title:"Rapidez", desc:"Soluciones al instante, sin esperas" },
               ].map((item, i) => (
                 <div key={i} className="text-center p-8 rounded-3xl hover:bg-gray-50 transition-colors">
                   <div className={`w-20 h-20 ${item.bg} rounded-full flex items-center justify-center mx-auto mb-6`}>
@@ -208,7 +197,6 @@ export default function InteligenciaArtificialPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

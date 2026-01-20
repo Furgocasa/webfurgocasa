@@ -1,24 +1,20 @@
-import { Metadata } from "next";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-
+import { Metadata } from"next";
 export const metadata: Metadata = {
-  title: "Aviso Legal | Furgocasa Campervans - Alquiler de Autocaravanas Murcia",
-  description: "Aviso legal y términos de uso de Furgocasa S.L. Información legal sobre el alquiler de autocaravanas y campers en Murcia.",
+  title:"Aviso Legal | Furgocasa Campervans - Alquiler de Autocaravanas Murcia",
+  description:"Aviso legal y términos de uso de Furgocasa S.L. Información legal sobre el alquiler de autocaravanas y campers en Murcia.",
   robots: {
     index: true,
     follow: false, // No seguir enlaces en páginas legales
   },
   alternates: {
-    canonical: "https://www.furgocasa.com/aviso-legal",
+    canonical:"https://www.furgocasa.com/aviso-legal",
   },
 };
 
 export default function AvisoLegalPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-furgocasa-blue py-12">
           <div className="container mx-auto px-4">
             <h1 className="text-3xl md:text-4xl font-bold text-white">Aviso Legal</h1>
@@ -75,7 +71,6 @@ export default function AvisoLegalPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

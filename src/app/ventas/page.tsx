@@ -1,9 +1,7 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { useLanguage } from "@/contexts/language-context";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
+import { useLanguage } from"@/contexts/language-context";
+import { LocalizedLink } from"@/components/localized-link";
 import { 
   Car, 
   Calendar, 
@@ -18,10 +16,10 @@ import {
   Tag,
   ArrowRight,
   Loader2
-} from "lucide-react";
-import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase/client";
-import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
+} from"lucide-react";
+import { useState, useEffect } from"react";
+import { supabase } from"@/lib/supabase/client";
+import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
 
 interface VehicleForSale {
   id: string;
@@ -65,21 +63,21 @@ interface VehicleCategory {
 // Mover las etiquetas de condición a componente T para traducción
 function getConditionLabel(condition: string): { label: string; color: string } {
   const labels: Record<string, { label: string; color: string }> = {
-    new: { label: "Nuevo", color: "bg-green-100 text-green-700" },
-    like_new: { label: "Como nuevo", color: "bg-emerald-100 text-emerald-700" },
-    excellent: { label: "Excelente", color: "bg-blue-100 text-blue-700" },
-    good: { label: "Buen estado", color: "bg-yellow-100 text-yellow-700" },
-    fair: { label: "Aceptable", color: "bg-orange-100 text-orange-700" },
+    new: { label:"Nuevo", color:"bg-green-100 text-green-700" },
+    like_new: { label:"Como nuevo", color:"bg-emerald-100 text-emerald-700" },
+    excellent: { label:"Excelente", color:"bg-blue-100 text-blue-700" },
+    good: { label:"Buen estado", color:"bg-yellow-100 text-yellow-700" },
+    fair: { label:"Aceptable", color:"bg-orange-100 text-orange-700" },
   };
   return labels[condition] || labels.good;
 }
 
 function formatPrice(price: number): string {
-  return price.toLocaleString("es-ES") + " €";
+  return price.toLocaleString("es-ES") +" €";
 }
 
 function formatMileage(km: number): string {
-  return km.toLocaleString("es-ES") + " km";
+  return km.toLocaleString("es-ES") +" km";
 }
 
 export default function VentasPage() {
@@ -262,9 +260,7 @@ export default function VentasPage() {
 
   return (
     <>
-      <Header />
-
-      <main className="min-h-screen bg-gray-50 pt-20">
+<main className="min-h-screen bg-gray-50">
         {/* Hero */}
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
@@ -558,8 +554,6 @@ export default function VentasPage() {
           </div>
         </section>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }

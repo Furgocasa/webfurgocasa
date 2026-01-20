@@ -1,16 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useLanguage } from "@/contexts/language-context";
-import { useRouter, useParams } from "next/navigation";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { formatPrice } from "@/lib/utils";
+import { useState, useEffect } from"react";
+import { useLanguage } from"@/contexts/language-context";
+import { useRouter, useParams } from"next/navigation";
+import { formatPrice } from"@/lib/utils";
 import { 
   ArrowLeft, CreditCard, CheckCircle, AlertCircle, 
   Calendar, MapPin, Car, User, Mail, Phone, Clock
-} from "lucide-react";
-import Link from "next/link";
+} from"lucide-react";
+import Link from"next/link";
 
 interface Booking {
   id: string;
@@ -114,14 +112,14 @@ export default function PagoPage() {
   const paymentInfo = calculatePaymentAmounts();
   const amountToPay = paymentInfo.isPending50 ? paymentInfo.secondPayment : paymentInfo.firstPayment;
 
-  const handlePayment = async (paymentType: "deposit" | "full" = "deposit") => {
+  const handlePayment = async (paymentType:"deposit" |"full" ="deposit") => {
     setProcessing(true);
     setError(null);
 
     try {
       // Determinar el monto a cobrar
       let amount = amountToPay;
-      if (paymentType === "full") {
+      if (paymentType ==="full") {
         amount = booking!.total_price - (booking!.amount_paid || 0);
       }
 
@@ -133,7 +131,7 @@ export default function PagoPage() {
           body: JSON.stringify({ 
             bookingId: params.id,
             amount,
-            paymentType: paymentType === "full" ? "full" : "deposit",
+            paymentType: paymentType ==="full" ?"full" :"deposit",
           }),
         });
 
@@ -160,7 +158,7 @@ export default function PagoPage() {
           body: JSON.stringify({ 
             bookingId: params.id,
             amount,
-            paymentType: paymentType === "full" ? "full" : "deposit",
+            paymentType: paymentType ==="full" ?"full" :"deposit",
           }),
         });
 
@@ -231,23 +229,20 @@ export default function PagoPage() {
   if (loading) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
             <p className="text-gray-600">Cargando información de la reserva...</p>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   if (error || !booking) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Error</h2>
@@ -257,16 +252,13 @@ export default function PagoPage() {
             </Link>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   return (
     <>
-      <Header />
-      
-      <main className="min-h-screen bg-gray-50 py-12">
+<main className="min-h-screen bg-gray-50 py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Success Header */}
           <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
@@ -566,9 +558,7 @@ export default function PagoPage() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }
 

@@ -1,13 +1,11 @@
-import { Metadata } from "next";
-import { notFound } from "next/navigation";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
-import { getPostBySlug, getRelatedPosts, incrementPostViews, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
-import { getCategoryName } from "@/lib/blog-translations";
-import { ShareButtons } from "@/components/blog/share-buttons";
-import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
+import { Metadata } from"next";
+import { notFound } from"next/navigation";
+import { LocalizedLink } from"@/components/localized-link";
+import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from"lucide-react";
+import { getPostBySlug, getRelatedPosts, incrementPostViews, getAllPublishedPostSlugs } from"@/lib/blog/server-actions";
+import { getCategoryName } from"@/lib/blog-translations";
+import { ShareButtons } from"@/components/blog/share-buttons";
+import { BlogPostJsonLd } from"@/components/blog/blog-post-jsonld";
 
 // ⚡ ISR: Revalidar cada hora
 export const revalidate = 3600;
@@ -30,8 +28,8 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: "Artículo no encontrado | Furgocasa",
-      description: "El artículo que buscas no existe o ha sido eliminado."
+      title:"Artículo no encontrado | Furgocasa",
+      description:"El artículo que buscas no existe o ha sido eliminado."
     };
   }
 
@@ -40,12 +38,12 @@ export async function generateMetadata({
   return {
     title: post.meta_title || `${post.title} | Furgocasa Blog`,
     description: post.meta_description || post.excerpt || post.title,
-    authors: [{ name: "Furgocasa" }],
-    keywords: post.tags?.map(tag => tag.name).join(", "),
+    authors: [{ name:"Furgocasa" }],
+    keywords: post.tags?.map(tag => tag.name).join(","),
     openGraph: {
       title: post.title,
-      description: post.excerpt || post.meta_description || "",
-      type: "article",
+      description: post.excerpt || post.meta_description ||"",
+      type:"article",
       url: url,
       images: post.featured_image ? [
         {
@@ -58,15 +56,15 @@ export async function generateMetadata({
       publishedTime: post.published_at || undefined,
       modifiedTime: post.updated_at || undefined,
       authors: ["Furgocasa"],
-      section: post.category?.name || "Blog",
+      section: post.category?.name ||"Blog",
       tags: post.tags?.map(tag => tag.name),
     },
     twitter: {
-      card: "summary_large_image",
+      card:"summary_large_image",
       title: post.title,
-      description: post.excerpt || post.meta_description || "",
+      description: post.excerpt || post.meta_description ||"",
       images: post.featured_image ? [post.featured_image] : [],
-      creator: "@furgocasa",
+      creator:"@furgocasa",
     },
     alternates: {
       canonical: url,
@@ -87,9 +85,9 @@ export async function generateMetadata({
 
 function formatDate(date: string) {
   return new Date(date).toLocaleDateString("es-ES", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
+    day:"numeric",
+    month:"long",
+    year:"numeric",
   });
 }
 
@@ -116,16 +114,14 @@ export default async function BlogPostPage({
 
   const categoryName = post.category?.slug 
     ? getCategoryName(post.category.slug, 'es')
-    : "Blog";
+    :"Blog";
 
   const url = `https://furgocasa.com/blog/${params.category}/${params.slug}`;
 
   return (
     <>
       <BlogPostJsonLd post={post} url={url} />
-      <Header />
-
-      <main className="min-h-screen bg-gray-50 font-amiko">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -243,7 +239,7 @@ export default async function BlogPostPage({
                     prose-img:rounded-2xl prose-img:shadow-lg prose-img:my-8
                     prose-hr:my-12 prose-hr:border-gray-200
                     prose-code:text-furgocasa-blue prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-base
-                    prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8"
+                   prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8"
                   dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
@@ -344,8 +340,6 @@ export default async function BlogPostPage({
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }

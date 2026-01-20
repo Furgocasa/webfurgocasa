@@ -1,48 +1,46 @@
 "use client";
 
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { Play, Video, Tag, HelpCircle, ArrowRight } from "lucide-react";
-import { LocalizedLink } from "@/components/localized-link";
-import { useLanguage } from "@/contexts/language-context";
+import { Play, Video, Tag, HelpCircle, ArrowRight } from"lucide-react";
+import { LocalizedLink } from"@/components/localized-link";
+import { useLanguage } from"@/contexts/language-context";
 // NOTA: Reemplaza 'YOUTUBE_ID_AQUI' con los IDs reales de YouTube
 // Ejemplo: si el video es https://www.youtube.com/watch?v=dQw4w9WgXcQ
 // entonces el youtubeId sería: dQw4w9WgXcQ
 const videoTutorials = [
   {
-    title: "Panel de Control",
-    youtubeId: "PANEL_CONTROL_ID", // Reemplazar con ID real
-    description: "Aprende a usar el panel de control de tu camper"
+    title:"Panel de Control",
+    youtubeId:"PANEL_CONTROL_ID", // Reemplazar con ID real
+    description:"Aprende a usar el panel de control de tu camper"
   },
   {
-    title: "Depósitos de agua",
-    youtubeId: "DEPOSITOS_AGUA_ID", // Reemplazar con ID real
-    description: "Cómo funcionan los depósitos de agua limpia y residual"
+    title:"Depósitos de agua",
+    youtubeId:"DEPOSITOS_AGUA_ID", // Reemplazar con ID real
+    description:"Cómo funcionan los depósitos de agua limpia y residual"
   },
   {
-    title: "Sistemas eléctricos",
-    youtubeId: "SISTEMAS_ELECTRICOS_ID", // Reemplazar con ID real
-    description: "Todo sobre el sistema eléctrico de la camper"
+    title:"Sistemas eléctricos",
+    youtubeId:"SISTEMAS_ELECTRICOS_ID", // Reemplazar con ID real
+    description:"Todo sobre el sistema eléctrico de la camper"
   },
   {
-    title: "Calefacción y agua caliente",
-    youtubeId: "CALEFACCION_ID", // Reemplazar con ID real
-    description: "Uso de la calefacción y el sistema de agua caliente"
+    title:"Calefacción y agua caliente",
+    youtubeId:"CALEFACCION_ID", // Reemplazar con ID real
+    description:"Uso de la calefacción y el sistema de agua caliente"
   },
   {
-    title: "Ventanas, cubre soles y mosquiteras",
-    youtubeId: "VENTANAS_ID", // Reemplazar con ID real
-    description: "Manejo de ventanas, cortinas y mosquiteras"
+    title:"Ventanas, cubre soles y mosquiteras",
+    youtubeId:"VENTANAS_ID", // Reemplazar con ID real
+    description:"Manejo de ventanas, cortinas y mosquiteras"
   },
   {
-    title: "Escalón exterior",
-    youtubeId: "ESCALON_ID", // Reemplazar con ID real
-    description: "Uso correcto del escalón exterior"
+    title:"Escalón exterior",
+    youtubeId:"ESCALON_ID", // Reemplazar con ID real
+    description:"Uso correcto del escalón exterior"
   },
   {
-    title: "Nevera y congelador",
-    youtubeId: "NEVERA_ID", // Reemplazar con ID real
-    description: "Funcionamiento de la nevera y congelador"
+    title:"Nevera y congelador",
+    youtubeId:"NEVERA_ID", // Reemplazar con ID real
+    description:"Funcionamiento de la nevera y congelador"
   },
 ];
 
@@ -51,8 +49,7 @@ export default function VideoTutorialesPage() {
 
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
+<main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -165,7 +162,6 @@ export default function VideoTutorialesPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

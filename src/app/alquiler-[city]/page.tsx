@@ -1,10 +1,8 @@
 "use client";
 
-import { useParams } from "next/navigation";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase/client";
+import { useParams } from"next/navigation";
+import { useEffect, useState } from"react";
+import { supabase } from"@/lib/supabase/client";
 
 interface LocationData {
   name: string;
@@ -24,8 +22,8 @@ export default function LocationPage() {
     async function loadData() {
       if (!citySlug) return;
       
-      // El slug viene como "autocaravanas-campervans-murcia"
-      // Necesitamos extraer solo "murcia"
+      // El slug viene como"autocaravanas-campervans-murcia"
+      // Necesitamos extraer solo"murcia"
       const parts = citySlug.split('-');
       const actualSlug = parts[parts.length - 1];
       
@@ -50,34 +48,29 @@ export default function LocationPage() {
   if (loading) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen flex items-center justify-center">
+<div className="min-h-screen flex items-center justify-center">
           <p>Cargando...</p>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   if (!locationData) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen flex items-center justify-center">
+<div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-4xl font-bold mb-4">404 - No encontrado</h1>
             <p>La ubicación no existe.</p>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   return (
     <>
-      <Header />
-      <div className="container mx-auto px-4 py-16">
+<div className="container mx-auto px-4 py-16">
         <h1 className="text-4xl font-bold mb-4">{locationData.meta_title}</h1>
         <p className="text-xl mb-4">{locationData.name}, {locationData.province}</p>
         <p className="text-gray-600">{locationData.region}</p>
@@ -88,7 +81,6 @@ export default function LocationPage() {
           <p className="text-sm text-gray-600">Ubicación: {locationData.name}</p>
         </div>
       </div>
-      <Footer />
-    </>
+</>
   );
 }

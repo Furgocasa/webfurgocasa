@@ -1,32 +1,30 @@
-import { Metadata } from "next";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { LocalizedLink } from "@/components/localized-link";
-import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from "lucide-react";
-import { translateServer } from "@/lib/i18n/server-translation";
-import { ContactPageJsonLd } from "@/components/static-pages/jsonld";
+import { Metadata } from"next";
+import { LocalizedLink } from"@/components/localized-link";
+import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from"lucide-react";
+import { translateServer } from"@/lib/i18n/server-translation";
+import { ContactPageJsonLd } from"@/components/static-pages/jsonld";
 
 // 🎯 Metadata SEO optimizada
 export const metadata: Metadata = {
-  title: "Contacto | Furgocasa - Alquiler de Autocaravanas en Murcia",
-  description: "Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com. Lunes a Viernes 09:00-18:00.",
-  keywords: "contacto furgocasa, telefono furgocasa murcia, email furgocasa, direccion furgocasa, horario furgocasa, alquiler autocaravanas murcia contacto",
-  authors: [{ name: "Furgocasa" }],
+  title:"Contacto | Furgocasa - Alquiler de Autocaravanas en Murcia",
+  description:"Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com. Lunes a Viernes 09:00-18:00.",
+  keywords:"contacto furgocasa, telefono furgocasa murcia, email furgocasa, direccion furgocasa, horario furgocasa, alquiler autocaravanas murcia contacto",
+  authors: [{ name:"Furgocasa" }],
   openGraph: {
-    title: "Contacto | Furgocasa Campervans",
-    description: "Contáctanos para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61.",
-    type: "website",
-    url: "https://www.furgocasa.com/contacto",
-    siteName: "Furgocasa",
-    locale: "es_ES",
+    title:"Contacto | Furgocasa Campervans",
+    description:"Contáctanos para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61.",
+    type:"website",
+    url:"https://www.furgocasa.com/contacto",
+    siteName:"Furgocasa",
+    locale:"es_ES",
   },
   twitter: {
-    card: "summary",
-    title: "Contacto | Furgocasa",
-    description: "Teléfono: 868 36 41 61 | Email: info@furgocasa.com",
+    card:"summary",
+    title:"Contacto | Furgocasa",
+    description:"Teléfono: 868 36 41 61 | Email: info@furgocasa.com",
   },
   alternates: {
-    canonical: "https://www.furgocasa.com/contacto",
+    canonical:"https://www.furgocasa.com/contacto",
   },
   robots: {
     index: true,
@@ -49,8 +47,7 @@ export default function ContactoPage() {
   return (
     <>
       <ContactPageJsonLd />
-      <Header />
-      <main className="min-h-screen bg-gray-50 pt-24 md:pt-20">
+<main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16 md:py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -220,7 +217,6 @@ export default function ContactoPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

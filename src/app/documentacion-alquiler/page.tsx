@@ -1,75 +1,68 @@
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { FileText, Download, Eye, CheckCircle, AlertCircle } from "lucide-react";
+import { FileText, Download, Eye, CheckCircle, AlertCircle } from"lucide-react";
 
 export const metadata = {
-  title: "Documentación de Alquiler | Furgocasa Campervans",
-  description: "Descarga toda la documentación necesaria para tu alquiler de camper: contrato, condiciones generales, checklist de entrega y más.",
+  title:"Documentación de Alquiler | Furgocasa Campervans",
+  description:"Descarga toda la documentación necesaria para tu alquiler de camper: contrato, condiciones generales, checklist de entrega y más.",
 };
 
 const documents = [
   {
-    title: "Contrato de alquiler",
-    description: "Contrato estándar de alquiler de vehículo recreativo. Léelo antes de recoger tu camper.",
-    type: "PDF",
-    size: "245 KB",
+    title:"Contrato de alquiler",
+    description:"Contrato estándar de alquiler de vehículo recreativo. Léelo antes de recoger tu camper.",
+    type:"PDF",
+    size:"245 KB",
     required: true,
-    url: "#",
+    url:"#",
   },
   {
-    title: "Condiciones generales",
-    description: "Todas las condiciones del servicio de alquiler, incluyendo política de cancelación.",
-    type: "PDF",
-    size: "180 KB",
+    title:"Condiciones generales",
+    description:"Todas las condiciones del servicio de alquiler, incluyendo política de cancelación.",
+    type:"PDF",
+    size:"180 KB",
     required: true,
-    url: "#",
+    url:"#",
   },
   {
-    title: "Checklist de entrega",
-    description: "Lista de verificación que se completa al recoger y devolver el vehículo.",
-    type: "PDF",
-    size: "95 KB",
+    title:"Checklist de entrega",
+    description:"Lista de verificación que se completa al recoger y devolver el vehículo.",
+    type:"PDF",
+    size:"95 KB",
     required: false,
-    url: "#",
+    url:"#",
   },
   {
-    title: "Manual de uso rápido",
-    description: "Guía resumida de funcionamiento de tu camper: agua, gas, electricidad y más.",
-    type: "PDF",
-    size: "1.2 MB",
+    title:"Manual de uso rápido",
+    description:"Guía resumida de funcionamiento de tu camper: agua, gas, electricidad y más.",
+    type:"PDF",
+    size:"1.2 MB",
     required: false,
-    url: "#",
+    url:"#",
   },
   {
-    title: "Información del seguro",
-    description: "Detalles de la cobertura del seguro incluido y opciones de ampliación.",
-    type: "PDF",
-    size: "320 KB",
+    title:"Información del seguro",
+    description:"Detalles de la cobertura del seguro incluido y opciones de ampliación.",
+    type:"PDF",
+    size:"320 KB",
     required: false,
-    url: "#",
+    url:"#",
   },
   {
-    title: "Política de combustible",
-    description: "Información sobre el combustible y política de repostaje.",
-    type: "PDF",
-    size: "85 KB",
+    title:"Política de combustible",
+    description:"Información sobre el combustible y política de repostaje.",
+    type:"PDF",
+    size:"85 KB",
     required: false,
-    url: "#",
+    url:"#",
   },
 ];
 
-const requiredDocs = [
-  "DNI o Pasaporte en vigor de todos los conductores",
-  "Carnet de conducir B con mínimo 2 años de antigüedad",
-  "Tarjeta de crédito (no débito) a nombre del conductor principal",
-  "Confirmación de la reserva (enviada por email)",
+const requiredDocs = ["DNI o Pasaporte en vigor de todos los conductores","Carnet de conducir B con mínimo 2 años de antigüedad","Tarjeta de crédito (no débito) a nombre del conductor principal","Confirmación de la reserva (enviada por email)",
 ];
 
 export default function DocumentacionAlquilerPage() {
   return (
     <>
-      <Header />
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
             <FileText className="h-16 w-16 text-furgocasa-orange mx-auto mb-4" />
@@ -167,7 +160,6 @@ export default function DocumentacionAlquilerPage() {
           </div>
         </section>
       </main>
-      <Footer />
-    </>
+</>
   );
 }

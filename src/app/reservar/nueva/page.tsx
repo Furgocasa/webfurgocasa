@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
-import { useLanguage } from "@/contexts/language-context";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, Suspense } from"react";
+import { useLanguage } from"@/contexts/language-context";
+import { useRouter, useSearchParams } from"next/navigation";
 
 // Loading component
 function LoadingState() {
@@ -12,16 +12,14 @@ function LoadingState() {
     </div>
   );
 }
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
-import { supabase } from "@/lib/supabase/client";
+import { supabase } from"@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, AlertCircle, Loader2, FileText, Users, Bed
-} from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
-import { formatPrice, calculateRentalDays, calculatePricingDays } from "@/lib/utils";
+} from"lucide-react";
+import Link from"next/link";
+import Image from"next/image";
+import { formatPrice, calculateRentalDays, calculatePricingDays } from"@/lib/utils";
 
 interface VehicleData {
   id: string;
@@ -362,23 +360,20 @@ function NuevaReservaContent() {
   if (loading) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
             <p className="text-gray-600">{t("Cargando información...")}</p>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
   if (error && !vehicle) {
     return (
       <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+<div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
@@ -391,8 +386,7 @@ function NuevaReservaContent() {
             </button>
           </div>
         </div>
-        <Footer />
-      </>
+</>
     );
   }
 
@@ -400,14 +394,12 @@ function NuevaReservaContent() {
 
   return (
     <>
-      <Header />
-      
-      <main className="min-h-screen bg-gray-50 pt-24 md:pt-28 py-8 md:py-12">
+<main className="min-h-screen bg-gray-50 py-8 md:py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Barra de resumen - Sticky dentro del main */}
           <div className="sticky top-[100px] md:top-[112px] bg-white shadow-md border-b border-gray-200 z-30 -mx-4 px-4 mb-6 rounded-b-lg">
             <div className="py-3">
-              {/* Link "Volver" */}
+              {/* Link"Volver" */}
               <div className="mb-2">
                 <button 
                   onClick={() => router.back()}
@@ -849,9 +841,7 @@ function NuevaReservaContent() {
           </div>
         </div>
       </main>
-
-      <Footer />
-    </>
+</>
   );
 }
 
