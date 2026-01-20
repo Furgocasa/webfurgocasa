@@ -61,7 +61,7 @@ export default function TarifasPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko">
+      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.png')]"></div>

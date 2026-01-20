@@ -7,7 +7,7 @@ import {
   ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Mail, Phone, Package
 } from "lucide-react";
 import Link from "next/link";
-import { calculateRentalDays } from "@/lib/utils";
+import { calculateRentalDays, formatPrice } from "@/lib/utils";
 import EditarClienteModal from "@/components/admin/EditarClienteModal";
 
 interface Location {
@@ -976,15 +976,15 @@ export default function EditarReservaPage() {
                 <div className="pt-4 border-t border-gray-200">
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-600">Precio base:</span>
-                    <span className="font-semibold">{formData.base_price.toFixed(2)}€</span>
+                    <span className="font-semibold">{formatPrice(formData.base_price)}</span>
                   </div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-600">Extras:</span>
-                    <span className="font-semibold">{formData.extras_price.toFixed(2)}€</span>
+                    <span className="font-semibold">{formatPrice(formData.extras_price)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                     <span>Total:</span>
-                    <span className="text-furgocasa-orange">{formData.total_price.toFixed(2)}€</span>
+                    <span className="text-furgocasa-orange">{formatPrice(formData.total_price)}</span>
                   </div>
                 </div>
               </div>
@@ -1017,11 +1017,11 @@ export default function EditarReservaPage() {
                 <div className="p-4 bg-gray-50 rounded-lg space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Total del alquiler:</span>
-                    <span className="font-semibold">{formData.total_price.toFixed(2)}€</span>
+                    <span className="font-semibold">{formatPrice(formData.total_price)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Monto pagado:</span>
-                    <span className="font-semibold text-green-600">{formData.amount_paid.toFixed(2)}€</span>
+                    <span className="font-semibold text-green-600">{formatPrice(formData.amount_paid)}</span>
                   </div>
                   <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
                     <span className="text-gray-600">Pendiente:</span>
@@ -1030,7 +1030,7 @@ export default function EditarReservaPage() {
                         ? 'text-red-600' 
                         : 'text-green-600'
                     }`}>
-                      {(formData.total_price - formData.amount_paid).toFixed(2)}€
+                      {formatPrice(formData.total_price - formData.amount_paid)}
                     </span>
                   </div>
                 </div>
@@ -1064,7 +1064,7 @@ export default function EditarReservaPage() {
                   <ul className="text-xs text-blue-800 space-y-1">
                     <li>• Cliente paga 200€ → Introduce 200€</li>
                     <li>• Luego paga 150€ más → Introduce 350€ (total acumulado)</li>
-                    <li>• Completa el pago → Introduce {formData.total_price.toFixed(2)}€</li>
+                    <li>• Completa el pago → Introduce {formatPrice(formData.total_price)}</li>
                   </ul>
                 </div>
               </div>

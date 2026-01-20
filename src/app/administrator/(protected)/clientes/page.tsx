@@ -6,6 +6,7 @@ import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2 } from "lucide-rea
 import { createClient } from "@/lib/supabase/client";
 import { usePaginatedData } from "@/hooks/use-paginated-data";
 import ClientActions from "./client-actions";
+import { formatPrice } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -262,7 +263,7 @@ export default function ClientesPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <span className="font-semibold text-green-600">
-                        {(customer.total_spent || 0).toFixed(2)}€
+                        {formatPrice(customer.total_spent || 0)}
                       </span>
                     </td>
                     <td className="px-6 py-4">

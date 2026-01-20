@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getDashboardStats, getAllBookings } from "@/lib/supabase/queries";
+import { formatPrice } from "@/lib/utils";
 
 export default async function AdminDashboard() {
   const stats = await getDashboardStats();
@@ -25,7 +26,7 @@ export default async function AdminDashboard() {
     vehicle: booking.vehicle?.name || 'Vehículo no disponible',
     dates: `${new Date(booking.pickup_date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })} - ${new Date(booking.dropoff_date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' })}`,
     status: booking.status,
-    amount: `${booking.total_price?.toFixed(0) || '0'}€`,
+    amount: formatPrice(booking.total_price || 0),
   }));
 
   // Obtener acciones de hoy (entregas y recogidas)
@@ -61,7 +62,7 @@ export default async function AdminDashboard() {
     },
     {
       name: "Ingresos del mes",
-      value: `${stats.monthRevenue.toLocaleString("es-ES")}€`,
+      value: formatPrice(stats.monthRevenue),
       icon: CreditCard,
       change: "Reservas confirmadas y completadas",
       changeType: "positive",

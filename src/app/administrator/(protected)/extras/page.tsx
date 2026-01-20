@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Plus, Search, Edit, Trash2, Save, X, Package, Euro, AlertCircle } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useAdminData } from "@/hooks/use-admin-data";
+import { formatPrice } from "@/lib/utils";
 
 interface Extra {
   id: string;
@@ -440,14 +441,14 @@ export default function ExtrasPage() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           {extra.price_per_day ? (
-                            <span className="font-semibold text-gray-900">{extra.price_per_day.toFixed(2)}€</span>
+                            <span className="font-semibold text-gray-900">{formatPrice(extra.price_per_day)}</span>
                           ) : (
                             <span className="text-gray-400">—</span>
                           )}
                         </td>
                         <td className="px-6 py-4 text-right">
                           {extra.price_per_unit ? (
-                            <span className="font-semibold text-gray-900">{extra.price_per_unit.toFixed(2)}€</span>
+                            <span className="font-semibold text-gray-900">{formatPrice(extra.price_per_unit)}</span>
                           ) : (
                             <span className="text-gray-400">—</span>
                           )}

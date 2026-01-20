@@ -9,6 +9,7 @@ import {
   FileText, DollarSign, Package, ExternalLink, Edit
 } from "lucide-react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 
 interface Booking {
   id: string;
@@ -377,16 +378,16 @@ export default function ReservaDetalleAdminPage() {
           <div className="mb-4 p-4 bg-gray-50 rounded-lg space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total de la reserva:</span>
-              <span className="font-semibold text-gray-900">{booking.total_price.toFixed(2)}€</span>
+              <span className="font-semibold text-gray-900">{formatPrice(booking.total_price)}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-600">Total pagado:</span>
-              <span className="font-semibold text-green-600">{totalPaid.toFixed(2)}€</span>
+              <span className="font-semibold text-green-600">{formatPrice(totalPaid)}</span>
             </div>
             <div className="flex justify-between items-center pt-2 border-t border-gray-200">
               <span className="text-sm font-medium text-gray-900">Pendiente:</span>
               <span className={`font-bold ${totalPending > 0 ? 'text-orange-600' : 'text-green-600'}`}>
-                {totalPending.toFixed(2)}€
+                {formatPrice(totalPending)}
               </span>
             </div>
           </div>
@@ -422,16 +423,16 @@ export default function ReservaDetalleAdminPage() {
           <div className="space-y-2 text-sm mb-4">
             <div className="flex justify-between">
               <span className="opacity-90">Precio base:</span>
-              <span className="font-semibold">{booking.base_price.toFixed(2)}€</span>
+              <span className="font-semibold">{formatPrice(booking.base_price)}</span>
             </div>
             {booking.extras_price > 0 && (
               <div className="flex justify-between">
                 <span className="opacity-90">Extras:</span>
-                <span className="font-semibold">{booking.extras_price.toFixed(2)}€</span>
+                <span className="font-semibold">{formatPrice(booking.extras_price)}</span>
               </div>
             )}
           </div>
-          <div className="text-3xl font-bold">{booking.total_price.toFixed(2)}€</div>
+          <div className="text-3xl font-bold">{formatPrice(booking.total_price)}</div>
           <p className="text-sm opacity-90 mt-1">{booking.days} días de alquiler</p>
         </div>
       </div>
@@ -536,10 +537,10 @@ export default function ReservaDetalleAdminPage() {
                     <div>
                       <p className="font-medium text-gray-900">{item.extra.name}</p>
                       <p className="text-sm text-gray-600">
-                        Cantidad: {item.quantity} × {item.unit_price.toFixed(2)}€
+                        Cantidad: {item.quantity} × {formatPrice(item.unit_price)}
                       </p>
                     </div>
-                    <p className="font-semibold text-gray-900">{item.total_price.toFixed(2)}€</p>
+                    <p className="font-semibold text-gray-900">{formatPrice(item.total_price)}</p>
                   </div>
                 ))}
               </div>
@@ -660,7 +661,7 @@ export default function ReservaDetalleAdminPage() {
                     </div>
                     <div>
                       <p className="text-sm text-gray-500">Total gastado</p>
-                      <p className="text-2xl font-bold text-green-600">{booking.customer.total_spent?.toFixed(2)}€</p>
+                      <p className="text-2xl font-bold text-green-600">{formatPrice(booking.customer.total_spent || 0)}</p>
                     </div>
                   </div>
                 </div>

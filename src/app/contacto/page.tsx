@@ -25,7 +25,7 @@ export default function ContactoPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-gray-50 pt-20">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{

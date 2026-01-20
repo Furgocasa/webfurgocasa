@@ -29,6 +29,7 @@ import {
   ChevronDown,
   Download,
 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 import {
   format,
   startOfMonth,
@@ -800,10 +801,10 @@ export default function InformesClient({
           </div>
           <p className="text-sm text-gray-500">Ingresos</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">
-            {totalRevenue.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+            {formatPrice(totalRevenue)}
           </p>
           <p className="text-xs text-gray-500 mt-1">
-            Media: {avgBookingValue.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}/reserva
+            Media: {formatPrice(avgBookingValue)}/reserva
           </p>
         </div>
 
@@ -904,7 +905,7 @@ export default function InformesClient({
                 <XAxis dataKey="month" tick={{ fill: '#6B7280', fontSize: 12 }} />
                 <YAxis tick={{ fill: '#6B7280', fontSize: 12 }} tickFormatter={(v) => `${(v/1000).toFixed(0)}k`} />
                 <Tooltip 
-                  formatter={(value) => [(value as number).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }), 'Ingresos']}
+                  formatter={(value) => [formatPrice(value as number), 'Ingresos']}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB' }}
                 />
                 <Bar dataKey="ingresos" fill="#F97316" radius={[4, 4, 0, 0]} />
@@ -973,7 +974,7 @@ export default function InformesClient({
                   ))}
                 </Pie>
                 <Tooltip 
-                  formatter={(value) => (value as number).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                  formatter={(value) => formatPrice(value as number)}
                   contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB' }}
                 />
               </PieChart>
@@ -1013,7 +1014,7 @@ export default function InformesClient({
                       </div>
                     </td>
                     <td className="text-right py-3 px-2 font-semibold text-gray-900">
-                      {vehicle.ingresos.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                      {formatPrice(vehicle.ingresos)}
                     </td>
                     <td className="text-right py-3 px-2 text-gray-700">{vehicle.reservas}</td>
                     <td className="text-right py-3 px-2">
@@ -1034,7 +1035,7 @@ export default function InformesClient({
                   <tr>
                     <td className="py-3 px-2 font-bold text-gray-900">Total</td>
                     <td className="text-right py-3 px-2 font-bold text-gray-900">
-                      {totalRevenue.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                      {formatPrice(totalRevenue)}
                     </td>
                     <td className="text-right py-3 px-2 font-bold text-gray-900">{totalBookings}</td>
                     <td className="text-right py-3 px-2 font-bold text-furgocasa-orange">{occupancyData.percentage}%</td>
@@ -1068,7 +1069,7 @@ export default function InformesClient({
                     <td className="py-3 px-4 font-medium text-gray-900">{season.name}</td>
                     <td className="py-3 px-4 text-sm text-gray-500">{season.periodo}</td>
                     <td className="text-right py-3 px-4 font-semibold text-gray-900">
-                      {season.ingresos.toLocaleString('es-ES', { style: 'currency', currency: 'EUR' })}
+                      {formatPrice(season.ingresos)}
                     </td>
                     <td className="text-right py-3 px-4 text-gray-700">{season.reservas}</td>
                     <td className="text-right py-3 px-4">
@@ -1101,7 +1102,7 @@ export default function InformesClient({
               <YAxis dataKey="name" type="category" tick={{ fill: '#6B7280', fontSize: 12 }} width={80} />
               <Tooltip 
                 formatter={(value, name) => {
-                  if (name === 'ingresos') return [(value as number).toLocaleString('es-ES', { style: 'currency', currency: 'EUR' }), 'Ingresos'];
+                  if (name === 'ingresos') return [formatPrice(value as number), 'Ingresos'];
                   if (name === 'ocupacion') return [`${value}%`, 'Ocupación'];
                   return [value, name];
                 }}

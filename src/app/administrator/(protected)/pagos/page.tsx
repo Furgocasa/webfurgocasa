@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, Download, Eye, CreditCard, CheckCircle, Clock, XCircle, AlertCircle, Loader2 } from "lucide-react";
 import { usePaginatedData } from "@/hooks/use-paginated-data";
+import { formatPrice } from "@/lib/utils";
 
 interface Payment {
   id: string;
@@ -162,11 +163,11 @@ export default function PagosPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Total cobrado</p>
-          <p className="text-2xl font-bold text-green-600">{totalAmount.toFixed(2)}€</p>
+          <p className="text-2xl font-bold text-green-600">{formatPrice(totalAmount)}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Pendiente</p>
-          <p className="text-2xl font-bold text-yellow-600">{pendingAmount.toFixed(2)}€</p>
+          <p className="text-2xl font-bold text-yellow-600">{formatPrice(pendingAmount)}</p>
         </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Completados</p>
@@ -280,7 +281,7 @@ export default function PagosPage() {
                       </td>
                       <td className="px-6 py-4 text-right">
                         <span className="font-bold text-gray-900 text-lg">
-                          {payment.amount?.toFixed(2)}€
+                          {formatPrice(payment.amount || 0)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">

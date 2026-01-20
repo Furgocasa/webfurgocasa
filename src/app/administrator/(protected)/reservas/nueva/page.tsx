@@ -7,7 +7,7 @@ import {
   ArrowLeft, Save, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Package, Plus, Search
 } from "lucide-react";
 import Link from "next/link";
-import { calculateRentalDays } from "@/lib/utils";
+import { calculateRentalDays, formatPrice } from "@/lib/utils";
 
 interface Location {
   id: string;
@@ -728,15 +728,15 @@ export default function NuevaReservaPage() {
                 <div className="pt-4 border-t border-gray-200">
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-600">Precio base:</span>
-                    <span className="font-semibold">{formData.base_price.toFixed(2)}€</span>
+                    <span className="font-semibold">{formatPrice(formData.base_price)}</span>
                   </div>
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-600">Extras:</span>
-                    <span className="font-semibold">{formData.extras_price.toFixed(2)}€</span>
+                    <span className="font-semibold">{formatPrice(formData.extras_price)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                     <span>Total:</span>
-                    <span className="text-furgocasa-orange">{formData.total_price.toFixed(2)}€</span>
+                    <span className="text-furgocasa-orange">{formatPrice(formData.total_price)}</span>
                   </div>
                 </div>
               </div>
@@ -766,11 +766,11 @@ export default function NuevaReservaPage() {
                 <div className="p-4 bg-gray-50 rounded-lg space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Total del alquiler:</span>
-                    <span className="font-semibold">{formData.total_price.toFixed(2)}€</span>
+                    <span className="font-semibold">{formatPrice(formData.total_price)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Monto pagado:</span>
-                    <span className="font-semibold text-green-600">{formData.amount_paid.toFixed(2)}€</span>
+                    <span className="font-semibold text-green-600">{formatPrice(formData.amount_paid)}</span>
                   </div>
                   <div className="flex justify-between text-sm pt-2 border-t border-gray-200">
                     <span className="text-gray-600">Pendiente:</span>
@@ -779,7 +779,7 @@ export default function NuevaReservaPage() {
                         ? 'text-red-600' 
                         : 'text-green-600'
                     }`}>
-                      {(formData.total_price - formData.amount_paid).toFixed(2)}€
+                      {formatPrice(formData.total_price - formData.amount_paid)}
                     </span>
                   </div>
                 </div>

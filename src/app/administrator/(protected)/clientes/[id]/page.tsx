@@ -9,6 +9,7 @@ import {
   CheckCircle, Clock, Car, CreditCard, Package
 } from "lucide-react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -258,7 +259,7 @@ export default function ClienteDetallePage() {
             <p className="text-sm text-gray-500 uppercase font-medium">Total Gastado</p>
             <DollarSign className="h-5 w-5 text-green-600" />
           </div>
-          <p className="text-3xl font-bold text-green-600">{(customer.total_spent || 0).toFixed(2)}€</p>
+          <p className="text-3xl font-bold text-green-600">{formatPrice(customer.total_spent || 0)}</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -451,7 +452,7 @@ export default function ClienteDetallePage() {
 
                       <div className="text-right flex-shrink-0">
                         <p className="text-2xl font-bold text-furgocasa-orange mb-2">
-                          {booking.total_price.toFixed(2)}€
+                          {formatPrice(booking.total_price)}
                         </p>
                         <div className="flex flex-col gap-1">
                           <span className={`inline-block px-2 py-1 text-xs rounded-full ${statusColors[booking.status]?.bg} ${statusColors[booking.status]?.text} font-medium`}>

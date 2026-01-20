@@ -29,7 +29,7 @@ export default function OfertasPage() {
   return (
     <>
       <Header />
-      <main className="min-h-screen bg-gray-50 font-amiko">
+      <main className="min-h-screen bg-gray-50 font-amiko pt-20">
         {/* Hero Section - Modernizado */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-24 relative overflow-hidden">
           {/* Background Pattern */}

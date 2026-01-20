@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { 
   X, Save, AlertCircle, CheckCircle, User, Mail, Phone, MapPin, Calendar, CreditCard
 } from "lucide-react";
+import { formatPrice } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -263,7 +264,7 @@ export default function EditarClienteModal({
                         <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                           <p className="text-sm text-green-600 font-medium">Total Gastado</p>
                           <p className="text-2xl font-bold text-green-900">
-                            {(customer.total_spent || 0).toFixed(2)}€
+                            {formatPrice(customer.total_spent || 0)}
                           </p>
                         </div>
                       </div>

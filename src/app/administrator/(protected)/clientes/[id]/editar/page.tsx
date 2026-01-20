@@ -7,6 +7,7 @@ import {
   ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, User, Mail, Phone, MapPin, Calendar, CreditCard
 } from "lucide-react";
 import Link from "next/link";
+import { formatPrice } from "@/lib/utils";
 
 interface Customer {
   id: string;
@@ -234,7 +235,7 @@ export default function EditarClientePage() {
           </Link>
           <h1 className="text-3xl font-bold text-gray-900">Editar Cliente</h1>
           <p className="text-sm text-gray-600 mt-1">
-            {customer.total_bookings} reservas • {customer.total_spent.toFixed(2)}€ gastados
+            {customer.total_bookings} reservas • {formatPrice(customer.total_spent)} gastados
           </p>
         </div>
 
@@ -485,7 +486,7 @@ export default function EditarClientePage() {
 
                 <div className="p-3 bg-green-50 rounded-lg">
                   <p className="text-sm text-gray-600 mb-1">Total Gastado</p>
-                  <p className="text-2xl font-bold text-green-600">{customer.total_spent.toFixed(2)}€</p>
+                  <p className="text-2xl font-bold text-green-600">{formatPrice(customer.total_spent)}</p>
                 </div>
 
                 <div className="p-3 bg-gray-50 rounded-lg">
