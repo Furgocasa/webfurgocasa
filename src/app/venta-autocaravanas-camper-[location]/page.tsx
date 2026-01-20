@@ -17,6 +17,9 @@ const supabase = createClient(
 // 🔄 ISR: Revalidar cada 24 horas
 export const revalidate = 86400;
 
+// ✅ Permitir generación dinámica de páginas no pre-renderizadas
+export const dynamicParams = true;
+
 interface SaleLocationData {
   id: string;
   name: string;
