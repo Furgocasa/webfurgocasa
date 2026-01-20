@@ -68,6 +68,13 @@ function formatDateTime(date: string): string {
   });
 }
 
+function formatTime(time: string): string {
+  if (!time) return '10:00';
+  // Si el tiempo viene en formato HH:MM:SS, extraer solo HH:MM
+  const parts = time.split(':');
+  return `${parts[0]}:${parts[1]}`;
+}
+
 type SortField = 'booking_number' | 'customer' | 'internal_code' | 'vehicle' | 'pickup_date' | 'dropoff_date' | 'pickup_location' | 'dropoff_location' | 'total_price' | 'amount_paid' | 'status' | 'payment_status' | 'created_at';
 
 // Claves para localStorage
@@ -600,13 +607,13 @@ export default function BookingsPage() {
                       {/* Fecha inicio */}
                       <td className="px-4 py-4">
                         <p className="text-gray-900 text-sm font-medium">{formatDate(booking.pickup_date)}</p>
-                        <p className="text-xs text-gray-500">{booking.pickup_time || '10:00'}</p>
+                        <p className="text-xs text-gray-500">{formatTime(booking.pickup_time)}</p>
                       </td>
                       
                       {/* Fecha fin */}
                       <td className="px-4 py-4">
                         <p className="text-gray-900 text-sm font-medium">{formatDate(booking.dropoff_date)}</p>
-                        <p className="text-xs text-gray-500">{booking.dropoff_time || '10:00'}</p>
+                        <p className="text-xs text-gray-500">{formatTime(booking.dropoff_time)}</p>
                       </td>
                       
                       {/* Duración */}
