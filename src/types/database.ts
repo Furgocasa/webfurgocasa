@@ -229,7 +229,7 @@ export interface Database {
           payment_status: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;
           customer_email: string;
-          customer_phone: string;
+          customer_phone: string | null;
           customer_dni: string | null;
           customer_address: string | null;
           customer_city: string | null;
@@ -261,7 +261,7 @@ export interface Database {
           payment_status?: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;
           customer_email: string;
-          customer_phone: string;
+          customer_phone?: string | null;
           customer_dni?: string | null;
           customer_address?: string | null;
           customer_city?: string | null;

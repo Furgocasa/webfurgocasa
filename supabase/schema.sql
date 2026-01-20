@@ -273,10 +273,10 @@ CREATE TABLE bookings (
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
     payment_status VARCHAR(20) DEFAULT 'pending' CHECK (payment_status IN ('pending', 'partial', 'paid', 'refunded')),
     
-    -- Datos del cliente (snapshot)
+    -- Datos del cliente (snapshot para auditoría)
     customer_name VARCHAR(200) NOT NULL,
     customer_email VARCHAR(255) NOT NULL,
-    customer_phone VARCHAR(50) NOT NULL,
+    customer_phone VARCHAR(50), -- Opcional: puede ser NULL
     customer_dni VARCHAR(20),
     customer_address TEXT,
     customer_city VARCHAR(100),

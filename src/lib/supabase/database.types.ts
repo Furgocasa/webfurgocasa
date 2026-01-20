@@ -253,7 +253,7 @@ export type Database = {
           customer_email: string
           customer_id: string | null
           customer_name: string
-          customer_phone: string
+          customer_phone: string | null
           customer_postal_code: string | null
           days: number
           deposit_amount: number | null
@@ -286,7 +286,7 @@ export type Database = {
           customer_email: string
           customer_id?: string | null
           customer_name: string
-          customer_phone: string
+          customer_phone?: string | null
           customer_postal_code?: string | null
           days: number
           deposit_amount?: number | null
@@ -319,7 +319,7 @@ export type Database = {
           customer_email?: string
           customer_id?: string | null
           customer_name?: string
-          customer_phone?: string
+          customer_phone?: string | null
           customer_postal_code?: string | null
           days?: number
           deposit_amount?: number | null

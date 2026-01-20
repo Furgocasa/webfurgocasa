@@ -30,7 +30,7 @@
 -- en el momento de la reserva
 COMMENT ON COLUMN bookings.customer_name IS 'Snapshot: Nombre del cliente en el momento de la reserva';
 COMMENT ON COLUMN bookings.customer_email IS 'Snapshot: Email del cliente en el momento de la reserva';
-COMMENT ON COLUMN bookings.customer_phone IS 'Snapshot: Teléfono del cliente en el momento de la reserva';
+COMMENT ON COLUMN bookings.customer_phone IS 'Snapshot OPCIONAL: Teléfono del cliente en el momento de la reserva (puede ser NULL)';
 COMMENT ON COLUMN bookings.customer_dni IS 'Snapshot: DNI del cliente en el momento de la reserva';
 COMMENT ON COLUMN bookings.customer_address IS 'Snapshot: Dirección del cliente en el momento de la reserva';
 COMMENT ON COLUMN bookings.customer_city IS 'Snapshot: Ciudad del cliente en el momento de la reserva';
@@ -47,8 +47,8 @@ ALTER TABLE bookings
   DROP COLUMN IF EXISTS customer_city,
   DROP COLUMN IF EXISTS customer_postal_code;
   
--- Nota: Mantener customer_name, customer_email, customer_phone 
--- porque son necesarios para emails y facturación
+-- Nota: Mantener customer_name y customer_email (obligatorios)
+-- customer_phone es opcional - se usa si está disponible para emails y facturación
 */
 
 
