@@ -139,7 +139,7 @@ export default function VentasPage() {
           )
         `)
         .eq('is_for_sale', true)
-        .neq('status', 'inactive')
+        .eq('sale_status', 'available')
         .order('created_at', { ascending: false });
 
       if (vehiclesError) {
@@ -147,14 +147,10 @@ export default function VentasPage() {
         throw vehiclesError;
       }
 
-      // Filtrar por sale_status después de traer los datos
-      const availableVehicles = data?.filter(vehicle => {
-        const saleStatus = vehicle.sale_status?.toLowerCase();
-        return saleStatus !== 'sold' && saleStatus !== 'reserved';
-      }) || [];
+      // Los datos ya vienen filtrados desde la BD
+      const availableVehicles = data || [];
 
-      console.log('[Ventas] Total vehicles with is_for_sale=true:', data?.length || 0);
-      console.log('[Ventas] Available vehicles (excluding sold/reserved):', availableVehicles.length);
+      console.log('[Ventas] Available vehicles for sale:', availableVehicles.length);
 
       // Transformar datos
       const vehiclesData = availableVehicles.map(vehicle => ({

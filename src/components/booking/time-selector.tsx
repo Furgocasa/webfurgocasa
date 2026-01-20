@@ -34,8 +34,8 @@ export function TimeSelector({
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
       setDropdownPosition({
-        top: rect.bottom + window.scrollY + 4,
-        left: rect.left + window.scrollX,
+        top: rect.bottom + 4, // Sin scrollY porque position: fixed es respecto al viewport
+        left: rect.left,      // Sin scrollX porque position: fixed es respecto al viewport
         width: rect.width,
       });
     }
