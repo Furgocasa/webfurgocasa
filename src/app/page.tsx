@@ -161,7 +161,7 @@ export default async function HomePage() {
             {/* H2 Principal de la sección */}
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
-                NUESTRA FLOTA
+                LAS MEJORES CAMPER VANS EN ALQUILER
               </h2>
 
               {/* Intro a flota */}
