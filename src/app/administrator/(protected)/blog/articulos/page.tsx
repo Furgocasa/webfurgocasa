@@ -29,6 +29,7 @@ interface Post {
   category: {
     id: string;
     name: string;
+    slug: string;
   } | null;
   author: {
     id: string;
@@ -68,7 +69,7 @@ export default function BlogPostsPage() {
           views,
           published_at,
           created_at,
-          category:content_categories(id, name),
+          category:content_categories(id, name, slug),
           author:admins(id, name)
         `)
         .order('created_at', { ascending: false });
@@ -309,9 +310,9 @@ export default function BlogPostsPage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-2">
-                            {post.status === "published" && (
+                            {post.status === "published" && post.category && (
                               <Link
-                                href={`/blog/${post.slug}`}
+                                href={`/blog/${post.category.slug}/${post.slug}`}
                                 target="_blank"
                                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                                 title="Ver en web"

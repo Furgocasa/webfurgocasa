@@ -1,128 +1,29 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useLanguage } from "@/contexts/language-context";
-import { supabase } from "@/lib/supabase/client";
+import { Suspense } from "react";
+import { Metadata } from "next";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { BlogListClient } from "@/components/blog/blog-list-client";
+import { BlogContent } from "@/components/blog/blog-content";
+import { BlogSkeleton } from "@/components/blog/blog-skeleton";
 import { BookOpen } from "lucide-react";
 
-interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description: string | null;
-  post_count?: number;
-}
+export const metadata: Metadata = {
+  title: "Blog de Viajes en Camper | Furgocasa",
+  description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos para viajar en camper.",
+  openGraph: {
+    title: "Blog de Viajes en Camper | Furgocasa",
+    description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana",
+    type: "website",
+  },
+};
 
-interface Post {
-  id: string;
-  title: string;
-  slug: string;
-  excerpt: string | null;
-  featured_image: string | null;
-  published_at: string | null;
-  reading_time: number;
-  views: number;
-  is_featured: boolean;
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-  } | null;
-}
+// ⚡ Revalidar cada 30 minutos
+export const revalidate = 1800;
 
-// ✅ CLIENT COMPONENT
-export default function BlogPage() {
-  const { t } = useLanguage();
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadData() {
-      try {
-        // Cargar posts
-        const { data: postsData, error: postsError } = await supabase
-          .from('posts')
-          .select(`
-            id,
-            title,
-            slug,
-            excerpt,
-            featured_image,
-            published_at,
-            reading_time,
-            views,
-            is_featured,
-            category:content_categories(id, name, slug)
-          `)
-          .eq('status', 'published')
-          .order('published_at', { ascending: false });
-
-        if (postsError) {
-          console.error('Error loading posts:', postsError);
-        } else {
-          // Transformar category de array a objeto único
-          const transformedPosts = postsData?.map(post => ({
-            ...post,
-            category: Array.isArray(post.category) ? post.category[0] : post.category
-          })) || [];
-          setPosts(transformedPosts);
-        }
-
-        // Cargar categorías
-        const { data: categoriesData, error: categoriesError } = await supabase
-          .from('content_categories')
-          .select('id, name, slug, description')
-          .order('name');
-
-        if (categoriesError) {
-          console.error('Error loading categories:', categoriesError);
-        } else if (categoriesData) {
-          // Contar posts por categoría
-          const categoriesWithCount = await Promise.all(
-            categoriesData.map(async (category) => {
-              const { count } = await supabase
-                .from('posts')
-                .select('id', { count: 'exact', head: true })
-                .eq('status', 'published')
-                .eq('category_id', category.id);
-              
-              return {
-                ...category,
-                post_count: count || 0,
-              };
-            })
-          );
-          setCategories(categoriesWithCount);
-        }
-      } catch (error) {
-        console.error('Error loading blog data:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadData();
-  }, []);
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-blue mb-4"></div>
-            <p className="text-gray-600">{t("Cargando...")}</p>
-          </div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
+export default function BlogPage({
+  searchParams,
+}: {
+  searchParams: { page?: string; category?: string; q?: string };
+}) {
   return (
     <>
       <Header />
@@ -138,19 +39,21 @@ export default function BlogPage() {
             <div className="flex items-center justify-center gap-4 mb-6">
               <BookOpen className="h-12 w-12 text-white" />
               <h1 className="text-4xl md:text-6xl font-heading font-bold text-white">
-                {t("Blog de Viajes en Camper")}
+                Blog de Viajes en Camper
               </h1>
             </div>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed">
-              {t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana")}
+              Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana
             </p>
           </div>
         </section>
 
-        {/* Lista de posts con filtros (Client Component) */}
+        {/* Lista de posts con filtros */}
         <section className="py-16">
           <div className="container mx-auto px-4">
-            <BlogListClient initialPosts={posts} categories={categories} />
+            <Suspense fallback={<BlogSkeleton />}>
+              <BlogContent searchParams={searchParams} />
+            </Suspense>
           </div>
         </section>
 
@@ -158,10 +61,10 @@ export default function BlogPage() {
         <section className="py-16 bg-gradient-to-r from-furgocasa-blue to-furgocasa-blue-dark">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-6">
-              {t("¿Quieres más consejos sobre viajes en camper?")}
+              ¿Quieres más consejos sobre viajes en camper?
             </h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              {t("Síguenos en nuestras redes sociales y no te pierdas ningún artículo")}
+              Síguenos en nuestras redes sociales y no te pierdas ningún artículo
             </p>
             <div className="flex gap-4 justify-center">
               <a
@@ -170,7 +73,7 @@ export default function BlogPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-heading font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg"
               >
-                {t("Síguenos en Facebook")}
+                Síguenos en Facebook
               </a>
             </div>
           </div>
