@@ -59,7 +59,12 @@ interface VehicleForSale {
 /**
  * Extrae el slug de la ciudad del parámetro de la URL multi-idioma
  */
-function extractCitySlug(locationParam: string): string {
+function extractCitySlug(locationParam: string | undefined): string {
+  // Si locationParam es undefined o vacío, devolver string vacío
+  if (!locationParam) {
+    return '';
+  }
+
   const patterns = [
     /^venta-autocaravanas-camper-(.+)$/,  // español
     /^campervans-for-sale-in-(.+)$/,     // inglés
@@ -83,7 +88,32 @@ function extractCitySlug(locationParam: string): string {
  */
 export async function generateMetadata({ params }: { params: Promise<{ location: string }> }): Promise<Metadata> {
   const { location: locationParam } = await params;
+  
+  // Validación: si no hay locationParam, devolver metadata por defecto
+  if (!locationParam) {
+    return {
+      title: 'Ubicación no especificada | Furgocasa Campervans',
+      description: 'La ubicación solicitada no está disponible.',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
+
   const citySlug = extractCitySlug(locationParam);
+  
+  // Si después de extraer el slug está vacío, también retornar
+  if (!citySlug) {
+    return {
+      title: 'Ubicación no encontrada | Furgocasa Campervans',
+      description: 'La ubicación solicitada no está disponible.',
+      robots: {
+        index: false,
+        follow: false,
+      },
+    };
+  }
   
   const { data: location } = await supabase
     .from('sale_location_targets')
@@ -215,8 +245,18 @@ export async function generateStaticParams() {
 /**
  * CARGA DE DATOS EN EL SERVIDOR
  */
-async function loadSaleLocationData(locationParam: string): Promise<SaleLocationData | null> {
+async function loadSaleLocationData(locationParam: string | undefined): Promise<SaleLocationData | null> {
+  // Si no hay locationParam, retornar null
+  if (!locationParam) {
+    return null;
+  }
+
   const citySlug = extractCitySlug(locationParam);
+  
+  // Si el citySlug está vacío después de extraer, retornar null
+  if (!citySlug) {
+    return null;
+  }
   
   const { data, error } = await supabase
     .from('sale_location_targets')
