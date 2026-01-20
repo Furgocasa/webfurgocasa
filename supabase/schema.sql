@@ -268,6 +268,7 @@ CREATE TABLE bookings (
     discount DECIMAL(10,2) DEFAULT 0,
     total_price DECIMAL(10,2) NOT NULL,
     deposit_amount DECIMAL(10,2) DEFAULT 500,
+    amount_paid DECIMAL(10,2) DEFAULT 0, -- Monto ya pagado por el cliente
     
     -- Estados
     status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled')),
