@@ -17,7 +17,8 @@ export function AdminFABButton() {
   const [isPWA, setIsPWA] = useState(false);
 
   // No mostrar si estamos en la sección de administrador
-  const isAdminSection = pathname.startsWith('/administrator');
+  // Detectar tanto /administrator como /es/administrator, /en/administrator, etc.
+  const isAdminSection = pathname.includes('/administrator');
 
   useEffect(() => {
     // Detectar si es PWA

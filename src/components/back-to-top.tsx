@@ -9,7 +9,8 @@ export default function BackToTop() {
   const [isVisible, setIsVisible] = useState(false);
 
   // No mostrar en la sección de administración
-  const isAdminSection = pathname.startsWith('/administrator');
+  // Detectar tanto /administrator como /es/administrator, /en/administrator, etc.
+  const isAdminSection = pathname.includes('/administrator');
 
   useEffect(() => {
     // Mostrar el botón cuando el usuario hace scroll hacia abajo

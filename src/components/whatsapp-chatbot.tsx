@@ -20,7 +20,8 @@ export default function WhatsAppChatbot() {
   const [hasInteracted, setHasInteracted] = useState(false);
 
   // No mostrar en la sección de administración
-  const isAdminSection = pathname.startsWith('/administrator');
+  // Detectar tanto /administrator como /es/administrator, /en/administrator, etc.
+  const isAdminSection = pathname.includes('/administrator');
 
   // Si estamos en admin, no renderizar nada
   if (isAdminSection) {
