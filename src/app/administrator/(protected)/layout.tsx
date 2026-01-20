@@ -3,10 +3,40 @@ import { createClient } from "@/lib/supabase/server";
 import { AdminLayoutClient } from "@/components/admin/admin-layout-client";
 import { AdminAuthProvider } from "@/contexts/admin-auth-context";
 import { QueryProvider } from "@/providers/query-provider";
+import type { Metadata, Viewport } from "next";
 
 // ✅ OPTIMIZACIÓN: Usar 'auto' en lugar de 'force-dynamic' permite mejor caching
 export const dynamic = "auto";
 export const revalidate = 300; // Revalidar cada 5 minutos como máximo
+
+// ✅ PWA: Metadatos específicos para el panel de administrador
+export const metadata: Metadata = {
+  title: "Furgocasa Admin",
+  description: "Panel de administración de Furgocasa",
+  manifest: "/admin-manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Furgocasa Admin",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  openGraph: {
+    type: "website",
+    siteName: "Furgocasa Admin",
+    title: "Furgocasa Admin",
+    description: "Panel de administración de Furgocasa",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#1e40af",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+};
 
 async function getInitialAdmin() {
   try {

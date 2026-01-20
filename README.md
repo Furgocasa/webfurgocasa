@@ -123,6 +123,12 @@ Este proyecto tiene una arquitectura **ESTRICTA** para SEO que **NO PUEDE VIOLAR
 
 ### Panel de Administración (`/administrator`)
 - ✅ Login seguro con Supabase Auth
+- ✅ **PWA (Progressive Web App)** 📱
+  - Instalable en dispositivos móviles (iOS Safari y Android Chrome)
+  - Funciona como una app nativa en modo standalone
+  - Accesos directos a Reservas, Vehículos y Clientes
+  - Caché inteligente para mejor rendimiento offline
+  - Banner de instalación automático para administradores
 - ✅ Dashboard con estadísticas en tiempo real
 - ✅ **Buscador Global Inteligente** 🔍
   - Búsqueda en tiempo real con debounce
@@ -1007,7 +1013,7 @@ Componentes optimizados para móvil:
 - [ ] Generación de PDF de contratos
 - [ ] Envío de emails transaccionales automatizados
 - [ ] Calendario visual de reservas mejorado (admin)
-- [ ] PWA para móvil
+- [✅] **PWA para panel de administrador** - Instalable en móvil
 - [ ] Sistema de reviews y valoraciones
 - [ ] Galería de imágenes avanzada en artículos
 - [ ] Búsqueda avanzada de artículos del blog
@@ -1113,6 +1119,12 @@ Estos documentos son **OBLIGATORIOS** antes de tocar cualquier página pública:
   - Buscador global inteligente
   - Búsqueda en cascada
   - Atajos de teclado
+
+- **[PWA-ADMIN-GUIA.md](./PWA-ADMIN-GUIA.md)** ⚠️ **NUEVO**
+  - Progressive Web App para administrador
+  - Instalación en iOS y Android
+  - Configuración de caché y service worker
+  - Accesos directos y optimización móvil
 
 #### Sistema de Medios
 - **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)**

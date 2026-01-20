@@ -71,6 +71,8 @@ El proyecto está desplegado y funcionando perfectamente en producción. Ver **[
 |-----------|-------------|
 | **[ADMIN_SETUP.md](./ADMIN_SETUP.md)** | Configuración inicial, roles |
 | **[BUSCADOR-GLOBAL-ADMIN.md](./BUSCADOR-GLOBAL-ADMIN.md)** | Buscador global inteligente |
+| **[PWA-ADMIN-GUIA.md](./PWA-ADMIN-GUIA.md)** | ⚠️ **NUEVO** - PWA para panel de administrador |
+| **[ICONOS-PWA.md](./ICONOS-PWA.md)** | Generación de iconos para PWA |
 
 ### 🖼️ Sistema de Medios
 
@@ -216,6 +218,8 @@ Ver carpeta `scripts/`:
 ├── 📖 GUIA-QUERIES-VEHICULOS.md           ← Queries vehículos
 ├── 📖 ADMIN_SETUP.md                      ← Setup admin
 ├── 📖 BUSCADOR-GLOBAL-ADMIN.md            ← Buscador
+├── 📖 PWA-ADMIN-GUIA.md                   ← ⚠️ NUEVO - PWA panel administrador
+├── 📖 ICONOS-PWA.md                       ← Generación iconos PWA
 ├── 📖 SISTEMA-MEDIA-RESUMEN.md            ← Medios
 ├── 📖 GALERIA-MULTIPLE-VEHICULOS.md       ← Galería vehículos
 ├── 📖 SISTEMA_TEMPORADAS.md               ← Temporadas
@@ -251,7 +255,7 @@ Ver carpeta `scripts/`:
 - **Traducciones**: `GUIA-TRADUCCION.md`, `TRADUCCIONES.md`
 - **SEO**: `AUDITORIA-SEO-CRITICA.md`, `NORMAS-SEO-OBLIGATORIAS.md`
 - **i18n**: `I18N_IMPLEMENTATION.md`
-- **Admin**: `ADMIN_SETUP.md`, `BUSCADOR-GLOBAL-ADMIN.md`
+- **Admin**: `ADMIN_SETUP.md`, `BUSCADOR-GLOBAL-ADMIN.md`, `PWA-ADMIN-GUIA.md` ⚠️ **NUEVO**
 - **Medios**: `SISTEMA-MEDIA-RESUMEN.md`, `GALERIA-MULTIPLE-VEHICULOS.md`
 - **Pagos**: `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO**, `REDSYS-CONFIGURACION.md`, `STRIPE-CONFIGURACION.md` ⚠️ **NUEVO**
 - **Emails**: `SISTEMA-EMAILS.md`, `PRUEBAS-EMAILS.md`
@@ -282,6 +286,7 @@ Ver carpeta `scripts/`:
 | ¿Cómo vincular reservas a clientes? | `OLD_FURGOCASA_DATOS/GUIA-SCRIPTS-VINCULACION.md` ⚠️ **NUEVO** |
 | ¿Cómo se calculan los días de alquiler? | `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO** |
 | ¿Por qué cobran día completo si excedo 1 minuto? | `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO** |
+| ¿Cómo instalar el panel de admin como PWA? | `PWA-ADMIN-GUIA.md` ⚠️ **NUEVO** |
 
 ---
 
@@ -329,4 +334,4 @@ Estos documentos ya NO existen (fueron eliminados el 8 de Enero, 2026):
 
 ---
 
-**Total de documentos activos**: 28 archivos .md en raíz + subdirectorios (incluyendo nuevos de pagos y días)
+**Total de documentos activos**: 30 archivos .md en raíz + subdirectorios (incluyendo PWA)
