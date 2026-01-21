@@ -1,5 +1,4 @@
 import { Metadata } from"next";
-import { PublicLayout } from"@/components/layout/public-layout";
 import { SearchWidget } from"@/components/booking/search-widget";
 import { HeroSlider } from"@/components/hero-slider";
 import { DestinationsGrid } from"@/components/destinations-grid";
@@ -103,7 +102,6 @@ export default async function HomePage() {
       <ProductJsonLd vehicles={featuredVehicles} />
       <WebsiteJsonLd />
       
-      <PublicLayout>
 {/* Hero Section con Slider */}
         <section className="relative h-screen min-h-[600px] flex items-center justify-center">
           <div className="absolute inset-0 w-full h-full overflow-hidden">
@@ -519,7 +517,6 @@ export default async function HomePage() {
             </div>
           </div>
         </section>
-</PublicLayout>
     </>
   );
 }
