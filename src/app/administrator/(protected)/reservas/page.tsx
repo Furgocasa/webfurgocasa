@@ -2,10 +2,9 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2 } from "lucide-react";
+import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2, RefreshCw } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
-import { useAllDataProgressive } from "@/hooks/use-all-data-progressive";
-import { useQueryClient } from "@tanstack/react-query";
+import { useAllDataCached } from "@/hooks/use-all-data-cached";
 import { formatPrice } from "@/lib/utils";
 
 interface Booking {
@@ -108,25 +107,21 @@ export default function BookingsPage() {
     return 'desc';
   });
 
-  const queryClient = useQueryClient();
-
   // Guardar preferencia de ordenación en localStorage
   useEffect(() => {
     localStorage.setItem(SORT_FIELD_KEY, sortField);
     localStorage.setItem(SORT_DIRECTION_KEY, sortDirection);
   }, [sortField, sortDirection]);
 
-  // Cargar TODAS las reservas progresivamente
+  // Cargar TODAS las reservas con caché de 2 minutos
   const { 
     data: bookings, 
     loading, 
-    loadingMore,
     error,
     totalCount,
-    isComplete,
-    progress,
     refetch: refetchBookings,
-  } = useAllDataProgressive<Booking>({
+    isRefetching,
+  } = useAllDataCached<Booking>({
     queryKey: ['bookings'],
     table: 'bookings',
     select: `
@@ -137,8 +132,8 @@ export default function BookingsPage() {
       dropoff_location:locations!dropoff_location_id(id, name)
     `,
     orderBy: { column: 'created_at', ascending: false },
-    initialBatchSize: 10, // Primeros 10 registros inmediatos
-    batchSize: 50,        // Luego cargar de 50 en 50
+    // Caché de 2 minutos para reservas (críticas)
+    staleTime: 1000 * 60 * 2,
   });
 
   const handleSort = (field: SortField) => {
@@ -367,27 +362,25 @@ export default function BookingsPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Reservas</h1>
           <p className="text-gray-600 mt-1">Gestiona todas las reservas de tu flota</p>
-          {/* Indicador de carga progresiva */}
-          {loadingMore && (
-            <div className="flex items-center gap-2 mt-2">
-              <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
-              <span className="text-sm text-blue-600">
-                Cargando más reservas... {progress}% ({bookings.length}/{totalCount})
-              </span>
-            </div>
-          )}
-          {isComplete && totalCount > 10 && (
-            <p className="text-sm text-green-600 mt-2">
-              ✓ Todas las reservas cargadas ({totalCount})
-            </p>
-          )}
         </div>
         <div className="flex gap-3">
+          {/* Botón Actualizar */}
+          <button 
+            onClick={() => refetchBookings()}
+            disabled={isRefetching}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            title="Actualizar reservas"
+          >
+            <RefreshCw className={`h-5 w-5 ${isRefetching ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isRefetching ? 'Actualizando...' : 'Actualizar'}</span>
+          </button>
           <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Download className="h-5 w-5" />Exportar
+            <Download className="h-5 w-5" />
+            <span className="hidden sm:inline">Exportar</span>
           </button>
           <Link href="/administrator/reservas/nueva" className="btn-primary flex items-center gap-2">
-            <Plus className="h-5 w-5" />Nueva reserva
+            <Plus className="h-5 w-5" />
+            <span className="hidden sm:inline">Nueva reserva</span>
           </Link>
         </div>
       </div>
@@ -717,7 +710,7 @@ export default function BookingsPage() {
           <p className="text-sm text-gray-600">
             Mostrando {paginatedBookings.length === 0 ? 0 : ((currentPage - 1) * itemsPerPage) + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} de {totalItems} reservas
             {searchTerm || statusFilter ? ' (filtradas)' : ''}
-            {loadingMore && ` • Cargando todas... ${progress}%`}
+            {isRefetching && ' • Actualizando...'}
           </p>
           <div className="flex gap-2">
             <button 

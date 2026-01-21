@@ -2,9 +2,8 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import { usePaginatedData } from "@/hooks/use-paginated-data";
+import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2, RefreshCw } from "lucide-react";
+import { useAllDataCached } from "@/hooks/use-all-data-cached";
 import ClientActions from "./client-actions";
 import { formatPrice } from "@/lib/utils";
 
@@ -35,21 +34,21 @@ export default function ClientesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 
-  // Cargar clientes con paginación del lado del servidor
+  // Cargar TODOS los clientes con caché de 15 minutos
   const { 
     data: customers, 
     loading, 
     error,
     totalCount,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedData<Customer>({
+    refetch: refetchCustomers,
+    isRefetching,
+  } = useAllDataCached<Customer>({
     queryKey: ['customers'],
     table: 'customers',
     select: '*',
     orderBy: { column: 'created_at', ascending: false },
-    pageSize: 20, // Cargar 20 clientes por página
+    // Caché de 15 minutos para clientes
+    staleTime: 1000 * 60 * 15,
   });
 
   // Filtrar clientes en el lado del cliente (solo sobre los datos ya cargados)
@@ -130,9 +129,22 @@ export default function ClientesPage() {
           <h1 className="text-3xl font-bold text-gray-900">Clientes</h1>
           <p className="text-gray-600 mt-1">Gestiona tu base de datos de clientes</p>
         </div>
-        <Link href="/administrator/clientes/nuevo" className="btn-primary flex items-center gap-2">
-          <Plus className="h-5 w-5" />Añadir cliente
-        </Link>
+        <div className="flex gap-3">
+          {/* Botón Actualizar */}
+          <button 
+            onClick={() => refetchCustomers()}
+            disabled={isRefetching}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            title="Actualizar clientes"
+          >
+            <RefreshCw className={`h-5 w-5 ${isRefetching ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isRefetching ? 'Actualizando...' : 'Actualizar'}</span>
+          </button>
+          <Link href="/administrator/clientes/nuevo" className="btn-primary flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            <span className="hidden sm:inline">Añadir cliente</span>
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
@@ -285,31 +297,12 @@ export default function ClientesPage() {
           </table>
         </div>
         
-        {/* Botón Cargar Más */}
-        {hasNextPage && (
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center">
-            <button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              className="btn-secondary flex items-center gap-2"
-            >
-              {isFetchingNextPage ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Cargando...
-                </>
-              ) : (
-                <>Cargar más clientes</>
-              )}
-            </button>
-          </div>
-        )}
-        
-        {/* Info de paginación */}
+        {/* Info de totales */}
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
           <p className="text-sm text-gray-600">
             Mostrando {filteredCustomers.length} de {totalCount} clientes
             {searchTerm || filterStatus ? ' (filtrados)' : ''}
+            {isRefetching && ' • Actualizando...'}
           </p>
         </div>
       </div>

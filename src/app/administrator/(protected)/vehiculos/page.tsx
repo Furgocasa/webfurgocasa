@@ -2,8 +2,9 @@
 
 import { useState, useMemo } from "react";
 import Link from "next/link";
-import { Plus, Search, Car, Tag, Home, ArrowUpDown, ArrowUp, ArrowDown, Package, Loader2 } from "lucide-react";
-import { usePaginatedData, useCachedData } from "@/hooks/use-paginated-data";
+import { Plus, Search, Car, Tag, Home, ArrowUpDown, ArrowUp, ArrowDown, Package, Loader2, RefreshCw } from "lucide-react";
+import { useAllDataCached } from "@/hooks/use-all-data-cached";
+import { useCachedData } from "@/hooks/use-paginated-data";
 import VehicleActions from "./vehicle-actions";
 
 interface VehicleExtra {
@@ -88,15 +89,14 @@ export default function VehiclesPage() {
     staleTime: 1000 * 60 * 60, // 1 hora - las categorías casi nunca cambian
   });
 
-  // Cargar vehículos con paginación y JOIN optimizado de extras
+  // Cargar TODOS los vehículos con caché de 30 minutos
   const { 
     data: vehicles, 
     loading: vehiclesLoading,
     totalCount,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedData<Vehicle>({
+    refetch: refetchVehicles,
+    isRefetching,
+  } = useAllDataCached<Vehicle>({
     queryKey: ['vehicles'],
     table: 'vehicles',
     select: `
@@ -108,7 +108,8 @@ export default function VehiclesPage() {
       )
     `,
     orderBy: { column: 'internal_code', ascending: true },
-    pageSize: 30, // Cargar 30 vehículos por página
+    // Caché de 30 minutos para vehículos
+    staleTime: 1000 * 60 * 30,
   });
 
   const loading = categoriesLoading || vehiclesLoading;
@@ -271,9 +272,22 @@ export default function VehiclesPage() {
           <h1 className="text-3xl font-bold text-gray-900">Vehículos</h1>
           <p className="text-gray-600 mt-1">Gestiona tu flota de campers para alquiler y venta</p>
         </div>
-        <Link href="/administrator/vehiculos/nuevo" className="btn-primary flex items-center gap-2">
-          <Plus className="h-5 w-5" />Añadir vehículo
-        </Link>
+        <div className="flex gap-3">
+          {/* Botón Actualizar */}
+          <button 
+            onClick={() => refetchVehicles()}
+            disabled={isRefetching}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            title="Actualizar vehículos"
+          >
+            <RefreshCw className={`h-5 w-5 ${isRefetching ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">{isRefetching ? 'Actualizando...' : 'Actualizar'}</span>
+          </button>
+          <Link href="/administrator/vehiculos/nuevo" className="btn-primary flex items-center gap-2">
+            <Plus className="h-5 w-5" />
+            <span className="hidden sm:inline">Añadir vehículo</span>
+          </Link>
+        </div>
       </div>
 
       {/* Stats */}
@@ -577,31 +591,12 @@ export default function VehiclesPage() {
           </table>
         </div>
         
-        {/* Botón Cargar Más */}
-        {hasNextPage && (
-          <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-center">
-            <button
-              onClick={() => fetchNextPage()}
-              disabled={isFetchingNextPage}
-              className="btn-secondary flex items-center gap-2"
-            >
-              {isFetchingNextPage ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                  Cargando...
-                </>
-              ) : (
-                <>Cargar más vehículos</>
-              )}
-            </button>
-          </div>
-        )}
-        
-        {/* Info de paginación */}
+        {/* Info de totales */}
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
           <p className="text-sm text-gray-600">
             Mostrando {vehiclesList.length} de {totalCount} vehículos
             {(searchTerm || categoryFilter || typeFilter || statusFilter) && ' (filtrados)'}
+            {isRefetching && ' • Actualizando...'}
           </p>
         </div>
       </div>
