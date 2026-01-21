@@ -2,18 +2,29 @@ import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
 
 /**
- * SITEMAP SEO - CONFIGURACIÓN CANÓNICA
- * =====================================
+ * SITEMAP SEO MULTIIDIOMA - MODELO CORRECTO
+ * ==========================================
  * 
- * IMPORTANTE: Este sitemap genera SOLO URLs canónicas en español sin prefijo de idioma.
+ * ⚠️ IMPORTANTE - NO CAMBIAR ESTA CONFIGURACIÓN ⚠️
  * 
- * ¿Por qué?
- * - El sistema de i18n usa REWRITES (no rutas separadas)
- * - Las URLs traducidas (/vehicles, /vehicules) redirigen internamente a /vehiculos
- * - Google debe indexar SOLO la versión canónica (español)
- * - Las URLs traducidas NO deben estar en el sitemap para evitar duplicados
+ * Este sitemap genera URLs CON prefijo de idioma para TODOS los idiomas,
+ * incluyendo español (/es/).
  * 
- * Estructura canónica: https://www.furgocasa.com/vehiculos (NO /es/vehiculos)
+ * ¿Por qué /es/ es obligatorio?
+ * 1. El sitio anterior en Joomla usaba /es/ y Google ya tiene indexadas esas URLs
+ * 2. Cambiar las URLs perdería todo el posicionamiento SEO acumulado
+ * 3. Es el modelo correcto para SEO multiidioma (cada idioma con su prefijo)
+ * 4. Permite usar hreflang correctamente para conectar versiones de idioma
+ * 
+ * Estructura correcta:
+ * - Español:  https://www.furgocasa.com/es/blog/rutas
+ * - Inglés:   https://www.furgocasa.com/en/blog/routes
+ * - Francés:  https://www.furgocasa.com/fr/blog/itineraires
+ * - Alemán:   https://www.furgocasa.com/de/blog/routen
+ * 
+ * Las URLs SIN prefijo de idioma se redirigen automáticamente a /es/ vía middleware.
+ * 
+ * Documentación completa: /SEO-MULTIIDIOMA-MODELO.md
  */
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -105,15 +116,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
   /**
-   * Añade una entrada al sitemap con URL canónica (sin prefijo de idioma)
-   * Las rutas traducidas usan rewrites, no rutas separadas
+   * Añade una entrada al sitemap con URL canónica EN ESPAÑOL con prefijo /es/
+   * 
+   * ⚠️ IMPORTANTE: Todas las URLs deben llevar /es/ para mantener compatibilidad
+   * con las URLs indexadas del sitio anterior en Joomla.
+   * 
+   * @param path - Ruta sin prefijo de idioma (ej: '/blog/rutas')
+   * @param options - Opciones de sitemap (lastModified, changeFrequency, priority)
    */
   const addEntry = (
     path: string,
     options: Pick<MetadataRoute.Sitemap[number], 'lastModified' | 'changeFrequency' | 'priority'> = {}
   ) => {
+    // ✅ SIEMPRE añadir /es/ para mantener URLs canónicas con prefijo de idioma
     entries.push({
-      url: `${baseUrl}${path}`,
+      url: `${baseUrl}/es${path}`,
       lastModified: options.lastModified || now,
       changeFrequency: options.changeFrequency,
       priority: options.priority,
@@ -163,7 +180,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'funcionamiento-camper',
   ];
 
-  // Páginas estáticas - URLs canónicas en español
+  // Páginas estáticas - URLs canónicas en español CON /es/
   staticPages.forEach((page) => {
     addEntry(page.path, {
       priority: page.priority,

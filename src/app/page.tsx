@@ -20,7 +20,12 @@ import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from"@/li
 import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from"@/components/home/organization-jsonld";
 import Image from"next/image";
 
-// 🎯 Metadata SEO optimizada
+/**
+ * 🎯 Metadata SEO optimizada
+ * 
+ * SEO MULTIIDIOMA - Modelo correcto con prefijo /es/
+ * Ver /SEO-MULTIIDIOMA-MODELO.md para documentación completa
+ */
 export const metadata: Metadata = {
   title:"Las Mejores Campers en Alquiler | Desde 95€/día | Furgocasa",
   description:"Alquiler de autocaravanas y campers de gran volumen. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados, equipamiento completo. ¡Reserva tu camper ahora!",
@@ -30,7 +35,7 @@ export const metadata: Metadata = {
     title:"Furgocasa | Las Mejores Campers y Autocaravanas en Alquiler",
     description:"Tu hotel 5 estrellas sobre ruedas. Flota premium desde 95€/día con kilómetros ilimitados. Dreamer, Knaus, Weinsberg.",
     type:"website",
-    url:"https://www.furgocasa.com",
+    url:"https://www.furgocasa.com/es",
     siteName:"Furgocasa - Alquiler de Autocaravanas",
     images: [
       {
@@ -67,7 +72,14 @@ export const metadata: Metadata = {
     images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
   },
   alternates: {
-    canonical:"https://www.furgocasa.com",
+    canonical:"https://www.furgocasa.com/es",
+    languages: {
+      'es': 'https://www.furgocasa.com/es',
+      'en': 'https://www.furgocasa.com/en',
+      'fr': 'https://www.furgocasa.com/fr',
+      'de': 'https://www.furgocasa.com/de',
+      'x-default': 'https://www.furgocasa.com/es',
+    },
   },
   robots: {
     index: true,

@@ -4,6 +4,10 @@ import { BlogContent } from"@/components/blog/blog-content";
 import { BlogSkeleton } from"@/components/blog/blog-skeleton";
 import { BookOpen } from"lucide-react";
 
+/**
+ * SEO MULTIIDIOMA - Modelo correcto con prefijo /es/
+ * Ver /SEO-MULTIIDIOMA-MODELO.md para documentación completa
+ */
 export const metadata: Metadata = {
   title:"Blog de Viajes en Camper y Autocaravanas | Consejos, Rutas y Destinos | Furgocasa",
   description:"Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente.",
@@ -13,7 +17,7 @@ export const metadata: Metadata = {
     title:"Blog de Viajes en Camper | Furgocasa",
     description:"Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España.",
     type:"website",
-    url:"https://www.furgocasa.com/blog",
+    url:"https://www.furgocasa.com/es/blog",
     siteName:"Furgocasa",
     images: [
       {
@@ -32,7 +36,14 @@ export const metadata: Metadata = {
     creator:"@furgocasa",
   },
   alternates: {
-    canonical:"https://www.furgocasa.com/blog",
+    canonical:"https://www.furgocasa.com/es/blog",
+    languages: {
+      'es': 'https://www.furgocasa.com/es/blog',
+      'en': 'https://www.furgocasa.com/en/blog',
+      'fr': 'https://www.furgocasa.com/fr/blog',
+      'de': 'https://www.furgocasa.com/de/blog',
+      'x-default': 'https://www.furgocasa.com/es/blog',
+    },
   },
   robots: {
     index: true,

@@ -95,6 +95,7 @@ Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
 
 | Documento | Descripción |
 |-----------|-------------|
+| **[SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md)** | ⚠️ **CRÍTICO** - Modelo SEO multiidioma con /es/ obligatorio |
 | **[AUDITORIA-SEO-CRITICA.md](./AUDITORIA-SEO-CRITICA.md)** | Por qué Server Components son críticos |
 | **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)** | Normas SEO del proyecto |
 

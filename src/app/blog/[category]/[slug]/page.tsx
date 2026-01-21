@@ -18,7 +18,12 @@ export async function generateStaticParams() {
   return posts.slice(0, 50);
 }
 
-// 🎯 Metadata dinámica para SEO óptimo
+/**
+ * 🎯 Metadata dinámica para SEO óptimo
+ * 
+ * SEO MULTIIDIOMA - Modelo correcto con prefijo /es/
+ * Ver /SEO-MULTIIDIOMA-MODELO.md para documentación completa
+ */
 export async function generateMetadata({ 
   params 
 }: { 
@@ -33,7 +38,9 @@ export async function generateMetadata({
     };
   }
 
-  const url = `https://furgocasa.com/blog/${params.category}/${params.slug}`;
+  // ⚠️ IMPORTANTE: URLs canónicas SIEMPRE con www y prefijo /es/
+  const baseUrl = 'https://www.furgocasa.com';
+  const esUrl = `${baseUrl}/es/blog/${params.category}/${params.slug}`;
   
   return {
     title: post.meta_title || `${post.title} | Furgocasa Blog`,
@@ -44,7 +51,7 @@ export async function generateMetadata({
       title: post.title,
       description: post.excerpt || post.meta_description ||"",
       type:"article",
-      url: url,
+      url: esUrl,
       images: post.featured_image ? [
         {
           url: post.featured_image,
@@ -67,7 +74,12 @@ export async function generateMetadata({
       creator:"@furgocasa",
     },
     alternates: {
-      canonical: url,
+      canonical: esUrl,
+      languages: {
+        'es': esUrl,
+        // TODO: Cuando se traduzcan los artículos, añadir URLs en otros idiomas
+        'x-default': esUrl,
+      },
     },
     robots: {
       index: true,
@@ -116,7 +128,8 @@ export default async function BlogPostPage({
     ? getCategoryName(post.category.slug, 'es')
     :"Blog";
 
-  const url = `https://furgocasa.com/blog/${params.category}/${params.slug}`;
+  // ⚠️ URL canónica SIEMPRE con www y prefijo /es/
+  const url = `https://www.furgocasa.com/es/blog/${params.category}/${params.slug}`;
 
   return (
     <>
