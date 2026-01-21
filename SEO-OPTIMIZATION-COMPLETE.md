@@ -74,8 +74,14 @@ export async function generateMetadata({ params }): Promise<Metadata> {
       card: "summary_large_image",
       // ... metadata específica de Twitter
     },
+    // ⚠️ IMPORTANTE: Siempre con www y prefijo /es/
+    // Ver SEO-MULTIIDIOMA-MODELO.md para documentación completa
     alternates: {
-      canonical: `https://furgocasa.com/blog/${params.category}/${params.slug}`
+      canonical: `https://www.furgocasa.com/es/blog/${params.category}/${params.slug}`,
+      languages: {
+        'es': `https://www.furgocasa.com/es/blog/${params.category}/${params.slug}`,
+        'x-default': `https://www.furgocasa.com/es/blog/${params.category}/${params.slug}`,
+      }
     },
     robots: {
       index: true,
@@ -134,7 +140,8 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const posts = await getAllPosts();
   return posts.map(post => ({
-    url: `https://furgocasa.com/blog/${post.category}/${post.slug}`,
+    // ⚠️ SIEMPRE con www y prefijo /es/
+    url: `https://www.furgocasa.com/es/blog/${post.category}/${post.slug}`,
     lastModified: post.updated_at,
     changeFrequency: 'weekly',
     priority: 0.8
@@ -162,7 +169,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/administrator/', '/api/', '/admin/'],
       },
     ],
-    sitemap: 'https://furgocasa.com/sitemap.xml',
+    sitemap: 'https://www.furgocasa.com/sitemap.xml',
   }
 }
 ```
@@ -349,3 +356,9 @@ Has pasado de tener un blog con **SEO deficiente** (client-side rendering) a ten
 **Esto es exactamente lo que Google recomienda en 2024-2026 para blogs que quieren rankear.**
 
 El tráfico orgánico debería empezar a crecer significativamente en 2-3 meses. 🚀
+
+---
+
+**Última actualización**: 2026-01-21  
+**Modelo SEO Multiidioma**: Ver [SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md)  
+**Nota**: Todas las URLs deben usar `www.furgocasa.com` con prefijo `/es/` para español.

@@ -165,7 +165,7 @@ Este documento sirve como índice para navegar por todas las optimizaciones SEO 
 ✅ keywords: Relevantes y específicos
 ✅ openGraph: Completo (title, description, images)
 ✅ twitter: Cards optimizadas
-✅ canonical: URLs correctas (www.furgocasa.com)
+✅ canonical: URLs correctas (www.furgocasa.com/es/...)
 ✅ robots: Directivas apropiadas
 ✅ geo: Tags para SEO local
 ```
@@ -272,6 +272,7 @@ Se ha implementado una **estrategia SEO completa de nivel enterprise** siguiendo
 
 ---
 
-**Última actualización:** 2026-01-20  
-**URL Canónica:** https://www.furgocasa.com  
-**Todas las URLs verificadas y corregidas a www.furgocasa.com** ✅
+**Última actualización:** 2026-01-21  
+**URL Canónica:** https://www.furgocasa.com/es  
+**Modelo SEO Multiidioma:** Ver [SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md)  
+**Todas las URLs deben usar prefijo `/es/` para español** ✅

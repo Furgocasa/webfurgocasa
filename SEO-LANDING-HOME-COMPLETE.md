@@ -119,7 +119,18 @@ export const metadata: Metadata = {
   keywords: "alquiler camper murcia, autocaravana murcia...",
   openGraph: { /* Rich content */ },
   twitter: { /* Twitter cards */ },
-  alternates: { canonical: "https://furgocasa.com" },
+  // ⚠️ IMPORTANTE: Siempre usar www y prefijo /es/
+  // Ver SEO-MULTIIDIOMA-MODELO.md para documentación completa
+  alternates: { 
+    canonical: "https://www.furgocasa.com/es",
+    languages: {
+      'es': 'https://www.furgocasa.com/es',
+      'en': 'https://www.furgocasa.com/en',
+      'fr': 'https://www.furgocasa.com/fr',
+      'de': 'https://www.furgocasa.com/de',
+      'x-default': 'https://www.furgocasa.com/es',
+    }
+  },
   robots: { index: true, follow: true },
   verification: { google: 'codigo-aqui' } // ⚠️ Añadir tu código real
 };
@@ -348,5 +359,6 @@ Si necesitas ayuda o ajustes adicionales:
 
 ---
 
-**Última actualización**: 2026-01-20
+**Última actualización**: 2026-01-21  
+**Modelo SEO Multiidioma**: Ver [SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md)  
 **Próxima revisión**: Después del despliegue a producción

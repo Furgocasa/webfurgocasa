@@ -86,35 +86,25 @@ Furgocasa tiene **UNA SOLA SEDE** en Murcia, pero quiere posicionarse para búsq
 
 ### Home Page
 
+> ⚠️ **IMPORTANTE**: URLs siempre con `www` y prefijo `/es/` para español.
+> Ver [SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md) para más detalles.
+
 ```typescript
 openGraph: {
   title: "Furgocasa | Alquiler de Campers en Murcia",
   description: "Tu hotel 5⭐ sobre ruedas. Flota premium desde 95€/día...",
   type: "website",
-  url: "https://furgocasa.com",
+  url: "https://www.furgocasa.com/es",  // ⚠️ SIEMPRE con www y /es/
   siteName: "Furgocasa - Alquiler de Autocaravanas",
   images: [
     {
-      url: "https://furgocasa.com/images/slides/hero-01.webp",
+      url: "https://www.furgocasa.com/images/slides/hero-01.webp",
       width: 1200,
       height: 630,
       alt: "Furgocasa - Alquiler de Campers en Murcia",
       type: "image/webp",
     },
-    {
-      url: "https://furgocasa.com/images/slides/hero-02.webp",
-      width: 1200,
-      height: 630,
-      alt: "Flota premium Furgocasa",
-      type: "image/webp",
-    },
-    {
-      url: "https://furgocasa.com/images/slides/hero-03.webp",
-      width: 1200,
-      height: 630,
-      alt: "Interior camper Furgocasa",
-      type: "image/webp",
-    }
+    // ... más imágenes
   ],
   locale: "es_ES",
   countryName: "España",
@@ -125,7 +115,7 @@ twitter: {
   creator: "@furgocasa",
   title: "Furgocasa | Alquiler Camper Murcia",
   description: "Autocaravanas premium desde 95€/día. Kilómetros ilimitados.",
-  images: ["https://furgocasa.com/images/slides/hero-01.webp"],
+  images: ["https://www.furgocasa.com/images/slides/hero-01.webp"],
 }
 ```
 
@@ -136,23 +126,18 @@ openGraph: {
   title: `Alquiler de Autocaravanas en ${location.name} | Furgocasa`,
   description: `Alquiler de campers cerca de ${location.name}. A ${location.distance_km} km de Murcia. Flota premium desde 95€/día.`,
   type: "website",
-  url: `https://furgocasa.com/alquiler-autocaravanas-campervans-${location.slug}`,
+  // ⚠️ SIEMPRE con www y prefijo /es/
+  url: `https://www.furgocasa.com/es/alquiler-autocaravanas-campervans-${location.slug}`,
   siteName: "Furgocasa - Alquiler de Autocaravanas",
   images: [
     {
-      url: location.hero_image || "https://furgocasa.com/images/slides/hero-01.webp",
+      url: location.hero_image || "https://www.furgocasa.com/images/slides/hero-01.webp",
       width: 1200,
       height: 630,
       alt: `Alquiler de campers y autocaravanas cerca de ${location.name}`,
       type: "image/webp",
     },
-    {
-      url: "https://furgocasa.com/images/slides/hero-02.webp",
-      width: 1200,
-      height: 630,
-      alt: "Flota premium Furgocasa",
-      type: "image/webp",
-    }
+    // ... más imágenes
   ],
   locale: "es_ES",
   countryName: "España",
@@ -163,7 +148,7 @@ twitter: {
   creator: "@furgocasa",
   title: `Alquiler Camper ${location.name} | Desde 95€/día`,
   description: `Autocaravanas cerca de ${location.name}. A solo ${location.distance_km} km de Murcia. Kilómetros ilimitados.`,
-  images: [location.hero_image || "https://furgocasa.com/images/slides/hero-01.webp"],
+  images: [location.hero_image || "https://www.furgocasa.com/images/slides/hero-01.webp"],
 }
 ```
 
@@ -353,5 +338,7 @@ twitter: {
 ---
 
 **Fecha de implementación:** 2026-01-20  
+**Actualización SEO multiidioma:** 2026-01-21  
+**Modelo SEO**: Ver [SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md)  
 **Verificar en producción:** Después del deploy  
 **Revisar métricas:** En 30 días
