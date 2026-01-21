@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { 
   Plus, 
   Search, 
@@ -26,6 +27,7 @@ interface Post {
   views: number;
   published_at: string | null;
   created_at: string;
+  featured_image: string | null;
   category: {
     id: string;
     name: string;
@@ -69,6 +71,7 @@ export default function BlogPostsPage() {
           views,
           published_at,
           created_at,
+          featured_image,
           category:content_categories(id, name, slug),
           author:admins(id, name)
         `)
@@ -273,8 +276,19 @@ export default function BlogPostsPage() {
                       <tr key={post.id} className="hover:bg-gray-50">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center">
-                              <FileText className="h-6 w-6 text-gray-400" />
+                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
+                              {post.featured_image ? (
+                                <Image
+                                  src={post.featured_image}
+                                  alt={post.title}
+                                  width={48}
+                                  height={48}
+                                  className="w-full h-full object-cover"
+                                  unoptimized
+                                />
+                              ) : (
+                                <FileText className="h-6 w-6 text-gray-400" />
+                              )}
                             </div>
                             <div className="max-w-md">
                               <p className="font-medium text-gray-900 truncate">{post.title}</p>

@@ -62,8 +62,8 @@ export const metadata: Metadata = {
       },
     ],
   },
-  // Manifest para PWA
-  manifest: "/manifest.json",
+  // ⚠️ NO incluir manifest aquí - La PWA es SOLO para el panel de administrador
+  // El manifest se define en src/app/administrator/(protected)/layout.tsx
   openGraph: {
     type: "website",
     locale: "es_ES",
