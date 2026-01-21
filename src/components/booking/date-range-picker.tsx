@@ -44,9 +44,9 @@ export function DateRangePicker({
   const minDate = new Date(today);
   minDate.setDate(today.getDate() + 3);
 
-  // Calculate max date (6 months from now)
+  // Calculate max date (36 months from now - 3 years)
   const maxDate = new Date(today);
-  maxDate.setMonth(today.getMonth() + 6);
+  maxDate.setMonth(today.getMonth() + 36);
 
   // Calculate minimum end date based on selected start date
   const getMinEndDate = () => {
