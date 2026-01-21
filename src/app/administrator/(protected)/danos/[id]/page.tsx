@@ -323,43 +323,43 @@ export default function VehicleDamageDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-hidden">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 min-w-0">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           <Link 
             href="/administrator/danos" 
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
-          <div>
-            <div className="flex items-center gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
               {vehicle.internal_code && (
-                <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-mono font-bold bg-blue-100 text-blue-800">
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-blue-100 text-blue-800 flex-shrink-0">
                   {vehicle.internal_code}
                 </span>
               )}
-              <h1 className="text-2xl font-bold text-gray-900">{vehicle.name}</h1>
+              <h1 className="text-lg sm:text-2xl font-bold text-gray-900 truncate">{vehicle.name}</h1>
             </div>
-            <p className="text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 truncate">
               {vehicle.brand} {vehicle.model} · Hoja de daños
             </p>
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 flex-shrink-0">
           <button 
             onClick={loadData}
-            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            title="Actualizar"
           >
             <RefreshCw className="h-4 w-4" />
-            <span className="hidden sm:inline">Actualizar</span>
           </button>
           <DamageReportPDF vehicle={vehicle} damages={damages} />
-          {/* Botón de edición solo visible en desktop - en móvil está más abajo junto al plano */}
+          {/* Botón de edición solo visible en desktop */}
           <button 
             onClick={() => setIsEditing(!isEditing)}
-            className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
               isEditing 
                 ? 'bg-furgocasa-orange text-white' 
                 : 'border border-gray-300 hover:bg-gray-50'
@@ -368,12 +368,12 @@ export default function VehicleDamageDetailPage() {
             {isEditing ? (
               <>
                 <CheckCircle className="h-4 w-4" />
-                <span>Modo Edición</span>
+                <span>Editando</span>
               </>
             ) : (
               <>
                 <Plus className="h-4 w-4" />
-                <span>Añadir Daños</span>
+                <span>Editar</span>
               </>
             )}
           </button>
@@ -405,9 +405,9 @@ export default function VehicleDamageDetailPage() {
       </div>
 
       {/* Main content */}
-      <div className="grid lg:grid-cols-3 gap-6">
+      <div className="grid lg:grid-cols-3 gap-6 min-w-0">
         {/* Vehicle Plan - 2 columns */}
-        <div className="lg:col-span-2 space-y-4">
+        <div className="lg:col-span-2 space-y-4 min-w-0 overflow-hidden">
           {/* Tabs */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="flex border-b border-gray-100">

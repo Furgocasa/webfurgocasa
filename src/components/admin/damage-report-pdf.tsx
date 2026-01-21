@@ -252,14 +252,15 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
       <button
         onClick={generatePDF}
         disabled={generating}
-        className="flex items-center gap-2 px-4 py-2 bg-furgocasa-blue text-white rounded-lg hover:bg-furgocasa-blue/90 transition-colors disabled:opacity-50"
+        className="flex items-center gap-2 px-3 py-2 bg-furgocasa-blue text-white rounded-lg hover:bg-furgocasa-blue/90 transition-colors disabled:opacity-50 text-sm"
+        title="Descargar PDF"
       >
         {generating ? (
           <Loader2 className="h-4 w-4 animate-spin" />
         ) : (
           <FileDown className="h-4 w-4" />
         )}
-        {generating ? 'Generando...' : 'Descargar PDF'}
+        <span className="hidden sm:inline">{generating ? 'Generando...' : 'PDF'}</span>
       </button>
 
       {/* Contenido del PDF (oculto pero renderizado) */}
