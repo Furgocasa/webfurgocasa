@@ -1,12 +1,60 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey =
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// ✅ SEGURIDAD: Validar que las variables de entorno existen (sin fallback peligroso)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// ✅ Esquema de validación con Zod
+const bookingSchema = z.object({
+  vehicle_id: z.string().uuid("ID de vehículo inválido"),
+  customer_id: z.string().uuid("ID de cliente inválido"),
+  pickup_location_id: z.string().uuid("ID de ubicación de recogida inválido"),
+  dropoff_location_id: z.string().uuid("ID de ubicación de devolución inválido"),
+  pickup_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Formato de fecha inválido"),
+  dropoff_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Formato de fecha inválido"),
+  pickup_time: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
+  dropoff_time: z.string().regex(/^\d{2}:\d{2}$/, "Formato de hora inválido"),
+  days: z.number().int().positive(),
+  base_price: z.number().nonnegative(),
+  extras_price: z.number().nonnegative().optional(),
+  location_fee: z.number().nonnegative().optional(),
+  discount: z.number().nonnegative().optional(),
+  total_price: z.number().positive(),
+  deposit_amount: z.number().nonnegative().optional(),
+  customer_name: z.string().min(2).max(200),
+  customer_email: z.string().email().max(255),
+  notes: z.string().max(2000).optional().nullable(),
+});
+
+const extraSchema = z.object({
+  extra_id: z.string().uuid(),
+  quantity: z.number().int().positive(),
+  unit_price: z.number().nonnegative(),
+  total_price: z.number().nonnegative(),
+});
+
+const requestSchema = z.object({
+  booking: bookingSchema,
+  extras: z.array(extraSchema).optional(),
+  customerStats: z.object({
+    customer_id: z.string().uuid(),
+    total_price: z.number().nonnegative(),
+  }).optional(),
+});
 
 export async function POST(request: Request) {
   try {
+    // ✅ SEGURIDAD: Verificar que las variables de entorno están configuradas
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Error: Variables de entorno de Supabase no configuradas");
+      return NextResponse.json(
+        { error: "Error de configuración del servidor" },
+        { status: 500 }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -15,20 +63,19 @@ export async function POST(request: Request) {
     });
 
     const body = await request.json();
-    const { booking, extras, customerStats } = body || {};
-
-    if (
-      !booking ||
-      !booking.vehicle_id ||
-      !booking.customer_id ||
-      !booking.pickup_date ||
-      !booking.dropoff_date
-    ) {
+    
+    // ✅ SEGURIDAD: Validar y sanitizar input con Zod
+    const validationResult = requestSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(", ");
       return NextResponse.json(
-        { error: "Faltan campos requeridos para crear la reserva" },
+        { error: `Datos inválidos: ${errors}` },
         { status: 400 }
       );
     }
+
+    const { booking, extras, customerStats } = validationResult.data;
 
     const { data: createdBooking, error: bookingError } = await supabase
       .from("bookings")

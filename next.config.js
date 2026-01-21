@@ -81,9 +81,74 @@ const nextConfig = {
     }
     return config;
   },
-  // ✅ Headers para optimizar el caché de favicons y archivos estáticos
+  // ✅ Headers de seguridad y caché
   async headers() {
+    // ============================================
+    // CONTENT SECURITY POLICY (CSP)
+    // ============================================
+    // CSP ayuda a prevenir XSS y otros ataques de inyección de código
+    // Documentación: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+    const ContentSecurityPolicy = `
+      default-src 'self';
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data: blob: https://*.supabase.co https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com;
+      font-src 'self' https://fonts.gstatic.com data:;
+      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://www.googletagmanager.com https://connect.facebook.net https://api.stripe.com;
+      frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://www.youtube-nocookie.com;
+      frame-ancestors 'none';
+      form-action 'self' https://sis.redsys.es https://sis-t.redsys.es;
+      base-uri 'self';
+      object-src 'none';
+      upgrade-insecure-requests;
+    `.replace(/\s{2,}/g, ' ').trim();
+
+    // Headers de seguridad comunes para todas las rutas
+    const securityHeaders = [
+      {
+        // Content Security Policy - Principal protección contra XSS
+        key: 'Content-Security-Policy',
+        value: ContentSecurityPolicy,
+      },
+      {
+        // Previene clickjacking - no permite que la página se muestre en iframes
+        key: 'X-Frame-Options',
+        value: 'DENY',
+      },
+      {
+        // Previene MIME type sniffing
+        key: 'X-Content-Type-Options',
+        value: 'nosniff',
+      },
+      {
+        // Protección XSS del navegador (legacy pero útil)
+        key: 'X-XSS-Protection',
+        value: '1; mode=block',
+      },
+      {
+        // Controla qué información se envía en el header Referer
+        key: 'Referrer-Policy',
+        value: 'strict-origin-when-cross-origin',
+      },
+      {
+        // Fuerza HTTPS durante 1 año (incluye subdominios)
+        key: 'Strict-Transport-Security',
+        value: 'max-age=31536000; includeSubDomains',
+      },
+      {
+        // Deshabilita APIs del navegador que no necesitamos
+        key: 'Permissions-Policy',
+        value: 'camera=(), microphone=(), geolocation=(self), interest-cohort=()',
+      },
+    ];
+
     return [
+      // Headers de seguridad para TODAS las rutas
+      {
+        source: '/:path*',
+        headers: securityHeaders,
+      },
+      // Headers de caché para favicon
       {
         source: '/favicon.ico',
         headers: [

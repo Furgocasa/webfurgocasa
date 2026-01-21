@@ -1,13 +1,37 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-// Usar service role para bypasear RLS
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+// ✅ SEGURIDAD: Validar que las variables de entorno existen (sin fallback peligroso)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+// ✅ Esquema de validación con Zod
+const customerSchema = z.object({
+  email: z.string().email("Email inválido").max(255),
+  name: z.string().min(2, "Nombre muy corto").max(200).trim(),
+  phone: z.string().min(9, "Teléfono inválido").max(20),
+  dni: z.string().min(8, "DNI/NIE inválido").max(20),
+  date_of_birth: z.string().optional().nullable(),
+  address: z.string().max(500).optional().nullable(),
+  city: z.string().max(100).optional().nullable(),
+  postal_code: z.string().max(20).optional().nullable(),
+  country: z.string().max(100).optional().nullable(),
+  driver_license: z.string().max(50).optional().nullable(),
+  driver_license_expiry: z.string().optional().nullable(),
+});
 
 export async function POST(request: Request) {
   try {
-    // Usar service role client que bypasea RLS (o anon key como fallback)
+    // ✅ SEGURIDAD: Verificar que las variables de entorno están configuradas
+    if (!supabaseUrl || !supabaseServiceKey) {
+      console.error("Error: Variables de entorno de Supabase no configuradas");
+      return NextResponse.json(
+        { error: "Error de configuración del servidor" },
+        { status: 500 }
+      );
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
@@ -15,9 +39,18 @@ export async function POST(request: Request) {
       }
     });
     
-    console.log('Creating customer with key:', supabaseServiceKey.substring(0, 20) + '...');
-    
     const body = await request.json();
+
+    // ✅ SEGURIDAD: Validar y sanitizar input con Zod
+    const validationResult = customerSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      const errors = validationResult.error.errors.map(e => e.message).join(", ");
+      return NextResponse.json(
+        { error: `Datos inválidos: ${errors}` },
+        { status: 400 }
+      );
+    }
 
     const {
       email,
@@ -31,15 +64,7 @@ export async function POST(request: Request) {
       country,
       driver_license,
       driver_license_expiry,
-    } = body;
-
-    // Validar campos requeridos
-    if (!email || !name || !phone || !dni) {
-      return NextResponse.json(
-        { error: "Faltan campos requeridos" },
-        { status: 400 }
-      );
-    }
+    } = validationResult.data;
 
     // Verificar si el cliente ya existe por email o DNI
     const { data: existing } = await supabase
@@ -50,7 +75,6 @@ export async function POST(request: Request) {
       .single();
 
     if (existing) {
-      console.log('Customer already exists, updating:', existing.id);
       
       // Actualizar datos del cliente existente
       const { error: updateError } = await supabase
@@ -109,7 +133,6 @@ export async function POST(request: Request) {
       );
     }
 
-    console.log('Customer created successfully:', customer.id);
     return NextResponse.json({ customer }, { status: 201 });
   } catch (error: any) {
     console.error("Error in customers API:", error);

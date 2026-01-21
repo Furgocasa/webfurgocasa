@@ -2893,6 +2893,140 @@ export const staticTranslations = {
     es: "Región de Murcia",
     en: "Region of Murcia"
   },
+
+  // =====================================================
+  // PÁGINAS DE VENTA POR UBICACIÓN (Sale Location Pages)
+  // =====================================================
+  
+  // Hero Section
+  "Venta en": {
+    es: "Venta en",
+    en: "For Sale in"
+  },
+  
+  // Sección de vehículos disponibles
+  "Encuentra la autocaravana perfecta para explorar": {
+    es: "Encuentra la autocaravana perfecta para explorar",
+    en: "Find the perfect motorhome to explore"
+  },
+  "y sus alrededores": {
+    es: "y sus alrededores",
+    en: "and its surroundings"
+  },
+  
+  // Por qué comprar con Furgocasa
+  "Por Qué Comprar tu Autocaravana con Furgocasa": {
+    es: "Por Qué Comprar tu Autocaravana con Furgocasa",
+    en: "Why Buy Your Motorhome with Furgocasa"
+  },
+  "Garantía Oficial": {
+    es: "Garantía Oficial",
+    en: "Official Warranty"
+  },
+  "Todos nuestros vehículos cuentan con garantía oficial y revisión completa pre-entrega": {
+    es: "Todos nuestros vehículos cuentan con garantía oficial y revisión completa pre-entrega",
+    en: "All our vehicles come with official warranty and complete pre-delivery inspection"
+  },
+  "Financiación Flexible": {
+    es: "Financiación Flexible",
+    en: "Flexible Financing"
+  },
+  "Opciones de financiación adaptadas a tus necesidades, hasta 120 meses": {
+    es: "Opciones de financiación adaptadas a tus necesidades, hasta 120 meses",
+    en: "Financing options tailored to your needs, up to 120 months"
+  },
+  "Entrega Cerca de Ti": {
+    es: "Entrega Cerca de Ti",
+    en: "Delivery Near You"
+  },
+  "Entrega en": {
+    es: "Entrega en",
+    en: "Delivery in"
+  },
+  "desde Murcia": {
+    es: "desde Murcia",
+    en: "from Murcia"
+  },
+  
+  // FAQs de venta
+  "Preguntas Frecuentes sobre Compra en": {
+    es: "Preguntas Frecuentes sobre Compra en",
+    en: "Frequently Asked Questions about Buying in"
+  },
+  "¿Cuánto cuesta una autocaravana en": {
+    es: "¿Cuánto cuesta una autocaravana en",
+    en: "How much does a motorhome cost in"
+  },
+  "El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ dependiendo del modelo, año y equipamiento. Ofrecemos financiación flexible hasta 120 meses. Entregamos cerca de": {
+    es: "El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ dependiendo del modelo, año y equipamiento. Ofrecemos financiación flexible hasta 120 meses. Entregamos cerca de",
+    en: "The price of our motorhomes for sale ranges from €35,000 to €75,000 depending on the model, year and equipment. We offer flexible financing up to 120 months. We deliver near"
+  },
+  "¿Ofrecen garantía en las autocaravanas en venta?": {
+    es: "¿Ofrecen garantía en las autocaravanas en venta?",
+    en: "Do you offer warranty on motorhomes for sale?"
+  },
+  "Sí, todos nuestros vehículos incluyen garantía oficial. Además, realizamos una revisión completa pre-entrega y te proporcionamos toda la documentación y certificados necesarios.": {
+    es: "Sí, todos nuestros vehículos incluyen garantía oficial. Además, realizamos una revisión completa pre-entrega y te proporcionamos toda la documentación y certificados necesarios.",
+    en: "Yes, all our vehicles include official warranty. In addition, we perform a complete pre-delivery inspection and provide you with all the necessary documentation and certificates."
+  },
+  "¿Puedo financiar la compra de una autocaravana?": {
+    es: "¿Puedo financiar la compra de una autocaravana?",
+    en: "Can I finance the purchase of a motorhome?"
+  },
+  "Por supuesto. Ofrecemos financiación flexible hasta 120 meses con las mejores condiciones del mercado. Nuestro equipo te ayudará a encontrar la mejor opción de financiación adaptada a tu situación.": {
+    es: "Por supuesto. Ofrecemos financiación flexible hasta 120 meses con las mejores condiciones del mercado. Nuestro equipo te ayudará a encontrar la mejor opción de financiación adaptada a tu situación.",
+    en: "Of course. We offer flexible financing up to 120 months with the best market conditions. Our team will help you find the best financing option suited to your situation."
+  },
+  "¿Dónde puedo recoger la autocaravana si la compro desde": {
+    es: "¿Dónde puedo recoger la autocaravana si la compro desde",
+    en: "Where can I pick up the motorhome if I buy it from"
+  },
+  "Puedes recoger tu autocaravana en nuestra sede de Murcia, que está a": {
+    es: "Puedes recoger tu autocaravana en nuestra sede de Murcia, que está a",
+    en: "You can pick up your motorhome at our Murcia headquarters, which is"
+  },
+  "km de": {
+    es: "km de",
+    en: "km from"
+  },
+  "También ofrecemos opciones de entrega personalizada.": {
+    es: "También ofrecemos opciones de entrega personalizada.",
+    en: "We also offer customized delivery options."
+  },
+  "Puedes recoger tu autocaravana en nuestra sede de Murcia. También ofrecemos opciones de entrega personalizada cerca de": {
+    es: "Puedes recoger tu autocaravana en nuestra sede de Murcia. También ofrecemos opciones de entrega personalizada cerca de",
+    en: "You can pick up your motorhome at our Murcia headquarters. We also offer customized delivery options near"
+  },
+  "¿Qué incluye la compra de una autocaravana con Furgocasa?": {
+    es: "¿Qué incluye la compra de una autocaravana con Furgocasa?",
+    en: "What is included when buying a motorhome with Furgocasa?"
+  },
+  "La compra incluye: garantía oficial, revisión completa pre-entrega, transferencia de documentación, ITV en vigor, seguro temporal de traslado, y asesoramiento completo sobre uso y mantenimiento. Además, tienes acceso a nuestro servicio técnico post-venta.": {
+    es: "La compra incluye: garantía oficial, revisión completa pre-entrega, transferencia de documentación, ITV en vigor, seguro temporal de traslado, y asesoramiento completo sobre uso y mantenimiento. Además, tienes acceso a nuestro servicio técnico post-venta.",
+    en: "The purchase includes: official warranty, complete pre-delivery inspection, documentation transfer, valid MOT, temporary transfer insurance, and complete advice on use and maintenance. In addition, you have access to our after-sales technical service."
+  },
+  
+  // CTA Section
+  "¿Listo para Comprar tu Autocaravana en": {
+    es: "¿Listo para Comprar tu Autocaravana en",
+    en: "Ready to Buy Your Motorhome in"
+  },
+  "Nuestro equipo está listo para ayudarte a encontrar la autocaravana perfecta.": {
+    es: "Nuestro equipo está listo para ayudarte a encontrar la autocaravana perfecta.",
+    en: "Our team is ready to help you find the perfect motorhome."
+  },
+  "Financiación, garantía y entrega cerca de": {
+    es: "Financiación, garantía y entrega cerca de",
+    en: "Financing, warranty and delivery near"
+  },
+  "Consultar Disponibilidad": {
+    es: "Consultar Disponibilidad",
+    en: "Check Availability"
+  },
+  "Llamar": {
+    es: "Llamar",
+    en: "Call"
+  },
 };
 
 /**

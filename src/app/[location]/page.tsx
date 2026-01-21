@@ -510,7 +510,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                   <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-6 py-3 rounded-full text-white border border-white/20">
                     <CheckCircle className="h-5 w-5 text-green-400" />
                     <span>
-                      Entrega desde {saleLocationData.nearest_location!.city} · {distanceInfo}
+                      {t("Entrega desde")} {saleLocationData.nearest_location!.city} · {distanceInfo}
                     </span>
                   </div>
                 )}
@@ -523,10 +523,10 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
             <div className="container mx-auto px-4">
               <div className="text-center mb-12">
                 <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
-                  Autocaravanas Disponibles en {saleLocationData.name}
+                  {t("Autocaravanas Disponibles en")} {saleLocationData.name}
                 </h2>
                 <p className="text-lg text-gray-600">
-                  Vehículos premium, garantía y financiación. Entrega cerca de {saleLocationData.name}.
+                  {t("Vehículos premium, garantía y financiación. Entrega cerca de")} {saleLocationData.name}.
                 </p>
               </div>
 
@@ -542,7 +542,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                         {vehicle.main_image ? (
                           <img
                             src={vehicle.main_image}
-                            alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - Venta en ${saleLocationData.name}`}
+                            alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - ${t("Venta en")} ${saleLocationData.name}`}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                             loading="lazy"
                           />
@@ -586,10 +586,10 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                 <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
                   <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-900 mb-2">
-                    No hay vehículos disponibles actualmente
+                    {t("No hay vehículos disponibles actualmente")}
                   </h3>
                   <p className="text-gray-600 mb-6">
-                    Estamos actualizando nuestro stock. Consulta disponibilidad.
+                    {t("Estamos actualizando nuestro stock. Consulta disponibilidad.")}
                   </p>
                 </div>
               )}
@@ -599,7 +599,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                   href="/ventas"
                   className="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold px-8 py-4 rounded-xl transition-colors"
                 >
-                  Ver Todos los Vehículos en Venta
+                  {t("Ver Todos los Vehículos en Venta")}
                 </LocalizedLink>
               </div>
             </div>

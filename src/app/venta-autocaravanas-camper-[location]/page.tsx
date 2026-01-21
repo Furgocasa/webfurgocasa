@@ -5,6 +5,8 @@ import { LocalizedLink } from"@/components/localized-link";
 import { MapPin, Phone, Mail, CheckCircle, Package } from"lucide-react";
 import Image from"next/image";
 import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
+import { translateServer } from"@/lib/i18n/server-translation";
+import type { Locale } from"@/lib/i18n/config";
 
 // ⚡ Server-side Supabase client - Server Component por defecto (SEO optimizado)
 const supabase = createClient(
@@ -81,6 +83,25 @@ function extractCitySlug(locationParam: string | undefined): string {
   }
   
   return locationParam;
+}
+
+/**
+ * Detecta el idioma basándose en el formato de la URL de ubicación
+ */
+function detectLocaleFromLocationParam(locationParam: string | undefined): Locale {
+  if (!locationParam) return 'es';
+  
+  if (/^campervans-for-sale-in-(.+)$/.test(locationParam)) {
+    return 'en';
+  }
+  if (/^camping-cars-a-vendre-(.+)$/.test(locationParam)) {
+    return 'fr';
+  }
+  if (/^wohnmobile-zu-verkaufen-(.+)$/.test(locationParam)) {
+    return 'de';
+  }
+  
+  return 'es'; // Default: español
 }
 
 /**
@@ -325,6 +346,10 @@ export default async function SaleLocationPage({
 }) {
   const { location: locationParam } = await params;
   
+  // ✅ Detectar idioma desde el formato de la URL
+  const locale = detectLocaleFromLocationParam(locationParam);
+  const t = (key: string) => translateServer(key, locale);
+  
   const [locationData, vehicles] = await Promise.all([
     loadSaleLocationData(locationParam),
     loadVehiclesForSale(),
@@ -373,7 +398,7 @@ export default async function SaleLocationPage({
               {hasNearestLocation && distanceInfo && (
                 <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full text-white">
                   <CheckCircle className="h-5 w-5" />
-                  <span>Entrega desde {locationData.nearest_location!.city} · {distanceInfo}</span>
+                  <span>{t("Entrega desde")} {locationData.nearest_location!.city} · {distanceInfo}</span>
                 </div>
               )}
             </div>
@@ -386,10 +411,10 @@ export default async function SaleLocationPage({
             <div className="text-center mb-12">
               {/* ✅ H2: Primera sección principal */}
               <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
-                Autocaravanas Disponibles en {locationData.name}
+                {t("Autocaravanas Disponibles en")} {locationData.name}
               </h2>
               <p className="text-lg text-gray-600">
-                Encuentra la autocaravana perfecta para explorar {locationData.name} y sus alrededores
+                {t("Encuentra la autocaravana perfecta para explorar")} {locationData.name} {t("y sus alrededores")}
               </p>
             </div>
 
@@ -453,10 +478,10 @@ export default async function SaleLocationPage({
               <div className="text-center py-12 bg-white rounded-2xl shadow-sm">
                 <Package className="h-16 w-16 text-gray-400 mx-auto mb-4" />
                 <h3 className="text-xl font-bold text-gray-900 mb-2">
-                  No hay vehículos disponibles actualmente
+                  {t("No hay vehículos disponibles actualmente")}
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Estamos actualizando nuestro stock. Consulta disponibilidad.
+                  {t("Estamos actualizando nuestro stock. Consulta disponibilidad.")}
                 </p>
               </div>
             )}
@@ -466,7 +491,7 @@ export default async function SaleLocationPage({
                 href="/ventas"
                 className="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold px-8 py-4 rounded-xl transition-colors"
               >
-                Ver Todos los Vehículos en Venta
+                {t("Ver Todos los Vehículos en Venta")}
               </LocalizedLink>
             </div>
           </div>
@@ -477,7 +502,7 @@ export default async function SaleLocationPage({
           <div className="container mx-auto px-4">
             {/* ✅ H2: Segunda sección principal */}
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 text-center mb-12">
-              Por Qué Comprar tu Autocaravana con Furgocasa
+              {t("Por Qué Comprar tu Autocaravana con Furgocasa")}
             </h2>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -486,9 +511,9 @@ export default async function SaleLocationPage({
                   <CheckCircle className="h-8 w-8 text-furgocasa-orange" />
                 </div>
                 {/* ✅ H3: Subsección (jerarquía correcta) */}
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Garantía Oficial</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t("Garantía Oficial")}</h3>
                 <p className="text-gray-600">
-                  Todos nuestros vehículos cuentan con garantía oficial y revisión completa pre-entrega
+                  {t("Todos nuestros vehículos cuentan con garantía oficial y revisión completa pre-entrega")}
                 </p>
               </div>
               
@@ -496,9 +521,9 @@ export default async function SaleLocationPage({
                 <div className="w-16 h-16 bg-furgocasa-orange/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="h-8 w-8 text-furgocasa-orange" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Financiación Flexible</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t("Financiación Flexible")}</h3>
                 <p className="text-gray-600">
-                  Opciones de financiación adaptadas a tus necesidades, hasta 120 meses
+                  {t("Opciones de financiación adaptadas a tus necesidades, hasta 120 meses")}
                 </p>
               </div>
               
@@ -506,9 +531,9 @@ export default async function SaleLocationPage({
                 <div className="w-16 h-16 bg-furgocasa-orange/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="h-8 w-8 text-furgocasa-orange" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Entrega Cerca de Ti</h3>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{t("Entrega Cerca de Ti")}</h3>
                 <p className="text-gray-600">
-                  Entrega en {locationData.name} {distanceInfo && `- ${distanceInfo} desde Murcia`}
+                  {t("Entrega en")} {locationData.name} {distanceInfo && `- ${distanceInfo} ${t("desde Murcia")}`}
                 </p>
               </div>
             </div>
@@ -520,55 +545,55 @@ export default async function SaleLocationPage({
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 text-center mb-12">
-                Preguntas Frecuentes sobre Compra en {locationData.name}
+                {t("Preguntas Frecuentes sobre Compra en")} {locationData.name}
               </h2>
               
               <div className="space-y-6">
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    ¿Cuánto cuesta una autocaravana en {locationData.name}?
+                    {t("¿Cuánto cuesta una autocaravana en")} {locationData.name}?
                   </h3>
                   <p className="text-gray-600">
-                    El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ dependiendo del modelo, año y equipamiento. Ofrecemos financiación flexible hasta 120 meses. Entregamos cerca de {locationData.name}.
+                    {t("El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ dependiendo del modelo, año y equipamiento. Ofrecemos financiación flexible hasta 120 meses. Entregamos cerca de")} {locationData.name}.
                   </p>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    ¿Ofrecen garantía en las autocaravanas en venta?
+                    {t("¿Ofrecen garantía en las autocaravanas en venta?")}
                   </h3>
                   <p className="text-gray-600">
-                    Sí, todos nuestros vehículos incluyen garantía oficial. Además, realizamos una revisión completa pre-entrega y te proporcionamos toda la documentación y certificados necesarios.
+                    {t("Sí, todos nuestros vehículos incluyen garantía oficial. Además, realizamos una revisión completa pre-entrega y te proporcionamos toda la documentación y certificados necesarios.")}
                   </p>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    ¿Puedo financiar la compra de una autocaravana?
+                    {t("¿Puedo financiar la compra de una autocaravana?")}
                   </h3>
                   <p className="text-gray-600">
-                    Por supuesto. Ofrecemos financiación flexible hasta 120 meses con las mejores condiciones del mercado. Nuestro equipo te ayudará a encontrar la mejor opción de financiación adaptada a tu situación.
+                    {t("Por supuesto. Ofrecemos financiación flexible hasta 120 meses con las mejores condiciones del mercado. Nuestro equipo te ayudará a encontrar la mejor opción de financiación adaptada a tu situación.")}
                   </p>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    ¿Dónde puedo recoger la autocaravana si la compro desde {locationData.name}?
+                    {t("¿Dónde puedo recoger la autocaravana si la compro desde")} {locationData.name}?
                   </h3>
                   <p className="text-gray-600">
                     {distanceInfo 
-                      ? `Puedes recoger tu autocaravana en nuestra sede de Murcia, que está a ${locationData.distance_km} km de ${locationData.name} (${distanceInfo}). También ofrecemos opciones de entrega personalizada.`
-                      : `Puedes recoger tu autocaravana en nuestra sede de Murcia. También ofrecemos opciones de entrega personalizada cerca de ${locationData.name}.`
+                      ? `${t("Puedes recoger tu autocaravana en nuestra sede de Murcia, que está a")} ${locationData.distance_km} ${t("km de")} ${locationData.name} (${distanceInfo}). ${t("También ofrecemos opciones de entrega personalizada.")}`
+                      : `${t("Puedes recoger tu autocaravana en nuestra sede de Murcia. También ofrecemos opciones de entrega personalizada cerca de")} ${locationData.name}.`
                     }
                   </p>
                 </div>
 
                 <div className="bg-white rounded-xl p-6 shadow-sm">
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    ¿Qué incluye la compra de una autocaravana con Furgocasa?
+                    {t("¿Qué incluye la compra de una autocaravana con Furgocasa?")}
                   </h3>
                   <p className="text-gray-600">
-                    La compra incluye: garantía oficial, revisión completa pre-entrega, transferencia de documentación, ITV en vigor, seguro temporal de traslado, y asesoramiento completo sobre uso y mantenimiento. Además, tienes acceso a nuestro servicio técnico post-venta.
+                    {t("La compra incluye: garantía oficial, revisión completa pre-entrega, transferencia de documentación, ITV en vigor, seguro temporal de traslado, y asesoramiento completo sobre uso y mantenimiento. Además, tienes acceso a nuestro servicio técnico post-venta.")}
                   </p>
                 </div>
               </div>
@@ -581,11 +606,10 @@ export default async function SaleLocationPage({
           <div className="container mx-auto px-4 text-center">
             {/* ✅ H2: Tercera sección principal */}
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-6">
-              ¿Listo para Comprar tu Autocaravana en {locationData.name}?
+              {t("¿Listo para Comprar tu Autocaravana en")} {locationData.name}?
             </h2>
             <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
-              Nuestro equipo está listo para ayudarte a encontrar la autocaravana perfecta. 
-              Financiación, garantía y entrega cerca de {locationData.name}.
+              {t("Nuestro equipo está listo para ayudarte a encontrar la autocaravana perfecta.")} {t("Financiación, garantía y entrega cerca de")} {locationData.name}.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -595,7 +619,7 @@ export default async function SaleLocationPage({
                 className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-furgocasa-blue font-bold px-8 py-4 rounded-xl transition-colors"
               >
                 <Mail className="h-5 w-5" />
-                Consultar Disponibilidad
+                {t("Consultar Disponibilidad")}
               </LocalizedLink>
               
               <a
@@ -603,7 +627,7 @@ export default async function SaleLocationPage({
                 className="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold px-8 py-4 rounded-xl transition-colors"
               >
                 <Phone className="h-5 w-5" />
-                Llamar: 868 36 41 61
+                {t("Llamar")}: 868 36 41 61
               </a>
             </div>
           </div>
