@@ -1,6 +1,9 @@
 /**
  * Funciones helper para gestión de Supabase Storage
- * Buckets: vehicles, blog
+ * Buckets: vehicles, blog, extras, media
+ * 
+ * OPTIMIZACIÓN AUTOMÁTICA:
+ * Todas las imágenes subidas se convierten automáticamente a WebP
  */
 
 import { supabase as supabaseClient } from '@/lib/supabase/client';
@@ -18,6 +21,93 @@ export interface StorageFile {
   path: string;
 }
 
+// Configuración de optimización por bucket
+const OPTIMIZATION_CONFIG: Record<BucketType, {
+  maxWidth: number;
+  maxHeight: number;
+  quality: number;
+}> = {
+  vehicles: { maxWidth: 2000, maxHeight: 1500, quality: 0.90 }, // Alta calidad para vehículos
+  blog: { maxWidth: 1920, maxHeight: 1080, quality: 0.85 },      // Buena calidad para blog
+  extras: { maxWidth: 1200, maxHeight: 900, quality: 0.85 },     // Media calidad para extras
+  media: { maxWidth: 1920, maxHeight: 1080, quality: 0.90 },     // Alta calidad para media general
+};
+
+/**
+ * Optimizar imagen a WebP usando Canvas API del navegador
+ */
+async function optimizeImageToWebP(
+  file: File,
+  bucket: BucketType
+): Promise<File> {
+  return new Promise((resolve, reject) => {
+    const config = OPTIMIZATION_CONFIG[bucket];
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      img.src = e.target?.result as string;
+    };
+
+    img.onload = () => {
+      // Calcular dimensiones manteniendo aspect ratio
+      let { width, height } = img;
+      
+      if (width > config.maxWidth || height > config.maxHeight) {
+        const ratio = Math.min(config.maxWidth / width, config.maxHeight / height);
+        width = Math.round(width * ratio);
+        height = Math.round(height * ratio);
+      }
+
+      // Crear canvas
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      if (!ctx) {
+        reject(new Error('No se pudo crear contexto de canvas'));
+        return;
+      }
+
+      // Dibujar imagen redimensionada
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // Convertir a WebP
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject(new Error('No se pudo convertir a WebP'));
+            return;
+          }
+
+          // Crear nuevo File con nombre .webp
+          const originalName = file.name.replace(/\.[^/.]+$/, '');
+          const webpFile = new File([blob], `${originalName}.webp`, {
+            type: 'image/webp',
+            lastModified: Date.now(),
+          });
+
+          console.log(`✅ Optimizado: ${file.name} (${(file.size / 1024).toFixed(0)}KB) → ${webpFile.name} (${(blob.size / 1024).toFixed(0)}KB)`);
+          resolve(webpFile);
+        },
+        'image/webp',
+        config.quality
+      );
+    };
+
+    img.onerror = () => {
+      reject(new Error('Error al cargar imagen'));
+    };
+
+    reader.onerror = () => {
+      reject(new Error('Error al leer archivo'));
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
 /**
  * Obtener URL pública de un archivo
  */
@@ -27,7 +117,7 @@ export function getPublicUrl(bucket: BucketType, path: string): string {
 }
 
 /**
- * Subir un archivo (cliente)
+ * Subir un archivo (cliente) con optimización automática a WebP
  */
 export async function uploadFile(
   bucket: BucketType,
@@ -35,10 +125,26 @@ export async function uploadFile(
   path?: string
 ): Promise<{ url: string; path: string } | null> {
   try {
+    // OPTIMIZACIÓN AUTOMÁTICA: Convertir imágenes a WebP
+    let fileToUpload = file;
+    
+    if (file.type.startsWith('image/') && file.type !== 'image/webp') {
+      console.log(`🔧 Optimizando ${file.name} a WebP...`);
+      try {
+        fileToUpload = await optimizeImageToWebP(file, bucket);
+      } catch (optimizeError) {
+        console.error('⚠️  Error al optimizar, subiendo original:', optimizeError);
+        // Si falla la optimización, subir el original
+        fileToUpload = file;
+      }
+    } else if (file.type === 'image/webp') {
+      console.log(`✓ ${file.name} ya es WebP, subiendo sin cambios`);
+    }
+
     // Generar nombre único si no se proporciona path
     const timestamp = Date.now();
     const randomString = Math.random().toString(36).substring(2, 15);
-    const extension = file.name.split('.').pop();
+    const extension = fileToUpload.name.split('.').pop();
     const fileName = path 
       ? `${path}/${timestamp}-${randomString}.${extension}` 
       : `${timestamp}-${randomString}.${extension}`;
@@ -46,7 +152,7 @@ export async function uploadFile(
     // Subir archivo
     const { data, error } = await supabaseClient.storage
       .from(bucket)
-      .upload(fileName, file, {
+      .upload(fileName, fileToUpload, {
         cacheControl: '3600',
         upsert: false,
       });
@@ -59,6 +165,7 @@ export async function uploadFile(
     // Obtener URL pública
     const url = getPublicUrl(bucket, data.path);
 
+    console.log(`✅ Subido correctamente: ${data.path}`);
     return {
       url,
       path: data.path,

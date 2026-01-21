@@ -893,6 +893,33 @@ Supabase Storage tiene **4 buckets públicos**:
 - ✅ Previsualizar imágenes
 - ✅ Copiar URL pública
 - ✅ Buscar archivos
+- ✅ **Optimización automática a WebP** 🎨
+
+### ⚡ Optimización Automática a WebP
+
+**¡TODAS las imágenes se optimizan automáticamente al subirlas!**
+
+**Cómo funciona:**
+1. Subes una imagen JPG, PNG o GIF
+2. El sistema la convierte automáticamente a WebP
+3. La redimensiona según el bucket
+4. La sube optimizada a Supabase Storage
+
+**Configuración por bucket:**
+- **vehicles**: 2000x1500px, calidad 90% (alta calidad)
+- **blog**: 1920x1080px, calidad 85%
+- **extras**: 1200x900px, calidad 85%
+- **media**: 1920x1080px, calidad 90%
+
+**Ejemplo:**
+```
+Subes: foto-camper.jpg (5 MB, 4000x3000px)
+      ↓
+Resultado: foto-camper.webp (720 KB, 2000x1500px)
+Ahorro: -84% de espacio ✨
+```
+
+**📖 Más información:** [OPTIMIZACION-IMAGENES-AUTOMATICA.md](./OPTIMIZACION-IMAGENES-AUTOMATICA.md)
 
 ### 📋 Tabla de Especificaciones
 
