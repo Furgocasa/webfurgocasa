@@ -56,10 +56,10 @@ const statusLabels: Record<string, string> = {
   repaired: 'Reparado',
 };
 
-// Componente SVG simplificado para el PDF - Solo daños activos (no reparados)
+// Componente SVG simplificado para el PDF
 function VehicleSVGForPDF({ viewType, damages }: { viewType: ViewType; damages: VehicleDamage[] }) {
-  // Excluir daños reparados del PDF - solo mostrar daños activos
-  const viewDamages = damages.filter(d => d.view_type === viewType && d.status !== 'repaired');
+  // Filtrar por vista (ya recibe solo daños activos desde el componente padre)
+  const viewDamages = damages.filter(d => d.view_type === viewType);
   
   const renderDamageMarkers = () => {
     return viewDamages.map((damage) => (
@@ -330,7 +330,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                 <div key={view} className="border border-gray-200 rounded p-2">
                   <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels[view]}</p>
                   <div className="h-24 flex items-center justify-center">
-                    <VehicleSVGForPDF viewType={view} damages={damages} />
+                    <VehicleSVGForPDF viewType={view} damages={activeDamages} />
                   </div>
                 </div>
               ))}
@@ -347,7 +347,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                 <div key={view} className="border border-gray-200 rounded p-2">
                   <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels[view]}</p>
                   <div className="h-28 flex items-center justify-center">
-                    <VehicleSVGForPDF viewType={view} damages={damages} />
+                    <VehicleSVGForPDF viewType={view} damages={activeDamages} />
                   </div>
                 </div>
               ))}
