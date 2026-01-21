@@ -107,13 +107,19 @@ Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
 | **[PWA-ADMIN-GUIA.md](./PWA-ADMIN-GUIA.md)** | ⚠️ **NUEVO** - PWA para panel de administrador |
 | **[ICONOS-PWA.md](./ICONOS-PWA.md)** | Generación de iconos para PWA |
 
-### 🖼️ Sistema de Medios
+### 🖼️ Sistema de Medios y Storage
 
 | Documento | Descripción |
 |-----------|-------------|
-| **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)** | Gestión de medios y Storage |
-| **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)** | Galería múltiple con drag & drop |
-| **[SLIDER-IMAGENES-VEHICULOS.md](./SLIDER-IMAGENES-VEHICULOS.md)** | ⚠️ **NUEVO** - Slider de 2-3 imágenes en tarjetas de vehículos |
+| **[RESUMEN-FINAL-SISTEMA-COMPLETO.md](./RESUMEN-FINAL-SISTEMA-COMPLETO.md)** | ⚠️ **NUEVO** - Resumen ejecutivo de toda la integración |
+| **[GALERIA-VEHICULOS-STORAGE-INTEGRADO.md](./GALERIA-VEHICULOS-STORAGE-INTEGRADO.md)** | ⚠️ **NUEVO** - Galería de vehículos integrada con storage |
+| **[GESTION-MEDIA-STORAGE.md](./GESTION-MEDIA-STORAGE.md)** | ⚠️ **NUEVO** - Documentación completa del sistema de media storage |
+| **[SOLUCION-RAPIDA-MEDIA.md](./SOLUCION-RAPIDA-MEDIA.md)** | ⚠️ **NUEVO** - Solución rápida en 3 pasos (4 minutos) |
+| **[FAQ-MEDIA-STORAGE.md](./FAQ-MEDIA-STORAGE.md)** | ⚠️ **NUEVO** - Preguntas frecuentes sobre storage |
+| **[RESUMEN-CAMBIOS-MEDIA.md](./RESUMEN-CAMBIOS-MEDIA.md)** | ⚠️ **NUEVO** - Resumen de cambios implementados |
+| **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)** | Gestión de medios y Storage (referencia anterior) |
+| **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)** | Galería múltiple con drag & drop (documentación original) |
+| **[SLIDER-IMAGENES-VEHICULOS.md](./SLIDER-IMAGENES-VEHICULOS.md)** | Slider de 2-3 imágenes en tarjetas de vehículos |
 
 ### 💼 Reservas
 
@@ -231,10 +237,19 @@ Ver carpeta `scripts/`:
 5. Para emails: **[SISTEMA-EMAILS.md](./SISTEMA-EMAILS.md)**
 6. Testing de emails: **[PRUEBAS-EMAILS.md](./PRUEBAS-EMAILS.md)**
 
-### Voy a trabajar con imágenes o vehículos en Home
-1. Lee **[SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)** ⚠️ **NUEVO** - Problema y solución vehículos
+### Voy a trabajar con imágenes, storage o gestión de media
+1. Lee **[RESUMEN-FINAL-SISTEMA-COMPLETO.md](./RESUMEN-FINAL-SISTEMA-COMPLETO.md)** ⚠️ **NUEVO** - Visión general
+2. Para setup rápido: **[SOLUCION-RAPIDA-MEDIA.md](./SOLUCION-RAPIDA-MEDIA.md)** ⚠️ - Solución en 4 minutos
+3. Para entender storage: **[GESTION-MEDIA-STORAGE.md](./GESTION-MEDIA-STORAGE.md)** ⚠️ - Documentación completa
+4. Para galería de vehículos: **[GALERIA-VEHICULOS-STORAGE-INTEGRADO.md](./GALERIA-VEHICULOS-STORAGE-INTEGRADO.md)** ⚠️ **NUEVO**
+5. Consulta dudas en: **[FAQ-MEDIA-STORAGE.md](./FAQ-MEDIA-STORAGE.md)** ⚠️ **NUEVO**
+6. Ejecuta script SQL: `supabase/configurar-storage-media-extras.sql`
+7. Verifica con diagnóstico: `supabase/diagnostico-storage-completo.sql`
+
+### Voy a trabajar con vehículos en Home
+1. Lee **[SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)** ⚠️ - Problema y solución vehículos
 2. Lee **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)**
-3. Para vehículos: **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)**
+3. Para galería múltiple: **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)**
 4. NO uses `VehicleImageSlider` - usa `<img>` directo
 
 ---
@@ -268,8 +283,14 @@ Ver carpeta `scripts/`:
 ├── 📖 BUSCADOR-GLOBAL-ADMIN.md            ← Buscador
 ├── 📖 PWA-ADMIN-GUIA.md                   ← ⚠️ NUEVO - PWA panel administrador
 ├── 📖 ICONOS-PWA.md                       ← Generación iconos PWA
-├── 📖 SISTEMA-MEDIA-RESUMEN.md            ← Medios
-├── 📖 GALERIA-MULTIPLE-VEHICULOS.md       ← Galería vehículos
+├── 📖 RESUMEN-FINAL-SISTEMA-COMPLETO.md  ← ⚠️ NUEVO - Resumen ejecutivo integración completa
+├── 📖 GALERIA-VEHICULOS-STORAGE-INTEGRADO.md ← ⚠️ NUEVO - Galería + Storage integrados
+├── 📖 SISTEMA-MEDIA-RESUMEN.md            ← Medios (referencia anterior)
+├── 📖 GESTION-MEDIA-STORAGE.md            ← ⚠️ NUEVO - Gestión completa de storage
+├── 📖 SOLUCION-RAPIDA-MEDIA.md            ← ⚠️ NUEVO - Solución rápida en 4 minutos
+├── 📖 FAQ-MEDIA-STORAGE.md                ← ⚠️ NUEVO - Preguntas frecuentes storage
+├── 📖 RESUMEN-CAMBIOS-MEDIA.md            ← ⚠️ NUEVO - Resumen cambios media
+├── 📖 GALERIA-MULTIPLE-VEHICULOS.md       ← Galería vehículos (doc original)
 ├── 📖 SISTEMA_TEMPORADAS.md               ← Temporadas
 ├── 📖 REDSYS-CONFIGURACION.md             ← Pagos Redsys
 ├── 📖 STRIPE-CONFIGURACION.md             ← ⚠️ NUEVO - Pagos Stripe (referencia)
@@ -309,7 +330,7 @@ Ver carpeta `scripts/`:
 - **SEO**: `AUDITORIA-SEO-CRITICA.md`, `NORMAS-SEO-OBLIGATORIAS.md`
 - **i18n**: `I18N_IMPLEMENTATION.md`
 - **Admin**: `ADMIN_SETUP.md`, `BUSCADOR-GLOBAL-ADMIN.md`, `PWA-ADMIN-GUIA.md` ⚠️ **NUEVO**
-- **Medios**: `SISTEMA-MEDIA-RESUMEN.md`, `GALERIA-MULTIPLE-VEHICULOS.md`
+- **Medios**: `GESTION-MEDIA-STORAGE.md` ⚠️ **NUEVO**, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO**, `FAQ-MEDIA-STORAGE.md` ⚠️ **NUEVO**, `SISTEMA-MEDIA-RESUMEN.md`, `GALERIA-MULTIPLE-VEHICULOS.md`
 - **Pagos**: `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO**, `REDSYS-CONFIGURACION.md`, `STRIPE-CONFIGURACION.md` ⚠️ **NUEVO**
 - **Emails**: `SISTEMA-EMAILS.md`, `PRUEBAS-EMAILS.md`
 - **Blog**: `SOLUCION-BLOG-FRONTEND.md` ⚠️ Si no cargan artículos
@@ -338,6 +359,10 @@ Ver carpeta `scripts/`:
 | ¿Qué método de pago usar? | `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO** |
 | ¿Cómo configurar emails automáticos? | `SISTEMA-EMAILS.md` |
 | ¿Cómo probar el sistema de emails? | `PRUEBAS-EMAILS.md` ⚠️ **NUEVO** |
+| ¿Cómo subo imágenes? | `GESTION-MEDIA-STORAGE.md`, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
+| ¿Cómo creo carpetas en storage? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
+| ¿Por qué "Nueva Carpeta" no funciona? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
+| ¿Cómo organizo imágenes por buckets? | `GESTION-MEDIA-STORAGE.md`, `FAQ-MEDIA-STORAGE.md` ⚠️ **NUEVO** |
 | ¿Cómo funcionan las temporadas? | `SISTEMA_TEMPORADAS.md` |
 | ¿Por qué no cargan los artículos del blog? | `SOLUCION-BLOG-FRONTEND.md` |
 | ¿Cómo migro datos desde MySQL/VikRentCar? | `OLD_FURGOCASA_DATOS/README-MIGRACION.md` ⚠️ **NUEVO** |
@@ -405,6 +430,7 @@ Estos documentos ya NO existen (fueron eliminados):
 
 ---
 
-**Total de documentos activos**: 24 archivos .md en raíz + subdirectorios  
-**Última actualización crítica**: v1.0.4 - Fix sistema autenticación (20 Enero 2026)  
+**Total de documentos activos**: 30 archivos .md en raíz + subdirectorios  
+**Última actualización crítica**: Sistema Completo de Media y Galería Integrado (21 Enero 2026)  
+**Última actualización anterior**: Sistema de Gestión de Media Storage (21 Enero 2026)  
 **Última limpieza de obsoletos**: 20 Enero 2026

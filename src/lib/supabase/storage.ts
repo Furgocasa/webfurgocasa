@@ -6,7 +6,7 @@
 import { supabase as supabaseClient } from '@/lib/supabase/client';
 
 // Tipos de bucket disponibles
-export type BucketType = 'vehicles' | 'blog' | 'extras';
+export type BucketType = 'vehicles' | 'blog' | 'extras' | 'media';
 
 // Interfaz para archivos
 export interface StorageFile {

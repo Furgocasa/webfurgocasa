@@ -52,6 +52,7 @@ export default function MediaPage() {
   const [previewImage, setPreviewImage] = useState<StorageFile | null>(null);
   const [showCreateFolder, setShowCreateFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
+  const [creatingFolder, setCreatingFolder] = useState(false);
 
   // Cargar archivos y carpetas
   const loadFiles = useCallback(async () => {
@@ -140,6 +141,7 @@ export default function MediaPage() {
     }
 
     try {
+      setCreatingFolder(true);
       const folderPath = currentPath
         ? `${currentPath}/${newFolderName}`
         : newFolderName;
@@ -147,16 +149,18 @@ export default function MediaPage() {
       const success = await createFolder(bucket, folderPath);
 
       if (success) {
-        alert("Carpeta creada correctamente");
+        alert(`✅ Carpeta "${newFolderName}" creada correctamente`);
         setNewFolderName("");
         setShowCreateFolder(false);
         await loadFiles();
       } else {
-        alert("Error al crear carpeta");
+        alert("❌ Error al crear carpeta. Verifica que tengas permisos de administrador.");
       }
     } catch (error) {
       console.error("Error creating folder:", error);
-      alert("Error al crear carpeta");
+      alert("❌ Error al crear carpeta. Intenta de nuevo o contacta con soporte.");
+    } finally {
+      setCreatingFolder(false);
     }
   };
 
@@ -241,7 +245,7 @@ export default function MediaPage() {
         </div>
 
         {/* Tabs de buckets */}
-        <div className="mb-6 flex gap-2">
+        <div className="mb-6 flex gap-2 flex-wrap">
           <button
             onClick={() => {
               setBucket("vehicles");
@@ -267,6 +271,32 @@ export default function MediaPage() {
             }`}
           >
             📝 Blog
+          </button>
+          <button
+            onClick={() => {
+              setBucket("extras");
+              setCurrentPath("");
+            }}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              bucket === "extras"
+                ? "bg-blue-600 text-white shadow-lg"
+                : "bg-white text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            🎁 Extras
+          </button>
+          <button
+            onClick={() => {
+              setBucket("media");
+              setCurrentPath("");
+            }}
+            className={`px-6 py-3 rounded-lg font-semibold transition-colors ${
+              bucket === "media"
+                ? "bg-blue-600 text-white shadow-lg"
+                : "bg-white text-gray-600 hover:bg-gray-50"
+            }`}
+          >
+            📸 Media
           </button>
         </div>
 
@@ -370,7 +400,10 @@ export default function MediaPage() {
           <div className="bg-white p-4 rounded-lg shadow-sm">
             <p className="text-sm text-gray-600 mb-1">Bucket actual</p>
             <p className="text-2xl font-bold text-gray-900">
-              {bucket === "vehicles" ? "🚐 Vehículos" : "📝 Blog"}
+              {bucket === "vehicles" && "🚐 Vehículos"}
+              {bucket === "blog" && "📝 Blog"}
+              {bucket === "extras" && "🎁 Extras"}
+              {bucket === "media" && "📸 Media"}
             </p>
           </div>
         </div>
@@ -670,10 +703,20 @@ export default function MediaPage() {
               </button>
               <button
                 onClick={handleCreateFolder}
-                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
+                disabled={creatingFolder || !newFolderName.trim()}
+                className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <FolderPlus className="h-4 w-4" />
-                Crear Carpeta
+                {creatingFolder ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Creando...
+                  </>
+                ) : (
+                  <>
+                    <FolderPlus className="h-4 w-4" />
+                    Crear Carpeta
+                  </>
+                )}
               </button>
             </div>
           </div>

@@ -3,36 +3,39 @@
 ## ID de Medición
 **G-G5YLBN5XXZ**
 
-## ⚠️ IMPORTANTE - Exclusión de Páginas de Administrador
+## ⚠️ IMPORTANTE - Exclusión Total de Páginas de Administrador
 
-**CRÍTICO**: Google Analytics está configurado para **NO registrar ningún tráfico** en las páginas de administrador.
+**CRÍTICO**: Los scripts de Google Analytics **NO SE CARGAN** en las páginas de administrador.
 
-### Rutas Excluidas del Tracking
-- `/administrator/*` - Todas las páginas del panel de administración
-- `/admin/*` - Rutas alternativas de administración
+### Cómo Funciona la Exclusión
 
-### ¿Cómo Funciona?
+1. **Componente `AnalyticsScripts` (Client-Side)**:
+   - Detecta la ruta actual usando `usePathname()`
+   - Si la ruta comienza con `/administrator` o `/admin`:
+     - NO renderiza ningún script de Google Analytics
+     - NO carga gtag.js
+     - NO inicializa dataLayer
+   - Solo en páginas públicas se cargan los scripts
 
-1. **Componente Client-Side**: `src/components/analytics.tsx`
-   - Usa `usePathname()` de Next.js para detectar la ruta actual
-   - Verifica si la ruta comienza con `/administrator` o `/admin`
-   - Si es una página de administrador:
-     - NO carga el script de Google Analytics
-     - NO envía pageviews
-     - NO registra eventos
-     - Imprime un mensaje en consola para debugging
+2. **Componente `GoogleAnalytics` (Tracking de Navegación)**:
+   - Detecta cambios de ruta
+   - Si es una ruta de admin, NO envía pageviews
+   - Solo trackea navegación en páginas públicas
 
-2. **Verificación en Tiempo Real**
-   ```typescript
-   function isAdminPath(pathname: string | null): boolean {
-     if (!pathname) return false;
-     return pathname.startsWith('/administrator') || pathname.startsWith('/admin');
-   }
-   ```
+### Verificación de la Exclusión
 
-3. **Doble Protección**
-   - Al inicializar: No carga el script si estás en una página admin
-   - En cada cambio de ruta: No envía pageview si navegas a una página admin
+**En páginas de administrador:**
+- ✅ NO se carga el script de gtag.js
+- ✅ NO existe `window.gtag`
+- ✅ NO existe `window.dataLayer` (o está vacío)
+- ✅ NO hay peticiones a googletagmanager.com
+- ✅ Consola muestra: "Ruta de administrador detectada. Scripts de Analytics NO se cargarán."
+
+**En páginas públicas:**
+- ✅ Se carga gtag.js
+- ✅ Se inicializa Analytics
+- ✅ Se envían pageviews
+- ✅ Consola muestra: "Ruta pública detectada. Cargando scripts de Analytics..."
 
 ## Cumplimiento GDPR
 
@@ -134,13 +137,15 @@ function MiComponente() {
 ```
 src/
 ├── components/
-│   ├── analytics.tsx              # Componente principal de Analytics
+│   ├── analytics-scripts.tsx      # Scripts de GA (solo páginas públicas)
+│   ├── analytics.tsx              # Tracking de navegación
+│   ├── analytics-debug.tsx        # Debug visual (desarrollo)
 │   └── cookies/
 │       ├── cookie-context.tsx     # Provider de gestión de cookies
 │       ├── cookie-banner.tsx      # Banner de consentimiento
 │       └── index.ts
 └── app/
-    └── layout.tsx                 # Layout raíz con GoogleAnalytics
+    └── layout.tsx                 # Layout raíz con AnalyticsScripts
 ```
 
 ## Mantenimiento
@@ -152,14 +157,11 @@ const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
 ```
 
 ### Añadir Más Rutas Excluidas
-Modifica la función `isAdminPath()`:
+Modifica el componente `AnalyticsScripts`:
 ```typescript
-function isAdminPath(pathname: string | null): boolean {
-  if (!pathname) return false;
-  return pathname.startsWith('/administrator') 
-      || pathname.startsWith('/admin')
-      || pathname.startsWith('/dashboard'); // Nueva ruta
-}
+const isAdminPage = pathname?.startsWith('/administrator') 
+                 || pathname?.startsWith('/admin')
+                 || pathname?.startsWith('/dashboard'); // Nueva ruta
 ```
 
 ### Deshabilitar Logs de Consola (Producción)

@@ -775,22 +775,15 @@ export default function CalendarioPage() {
                                           : `${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\nClick para ver detalles`
                                         }
                                       >
-                                        {/* Indicadores de inicio - puede haber múltiples */}
-                                        {/* Color verde para reservas confirmadas/en curso, amarillo para pendientes */}
+                                        {/* Indicadores de inicio (verde) - puede haber múltiples */}
                                         {pickupBookings.length > 0 && (
                                           <SmartTooltip
-                                            className={`absolute top-0.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger ${
-                                              pickupBookings.every(b => b.status === 'pending') ? 'bg-yellow-500' : 'bg-green-500'
-                                            }`}
+                                            className="absolute top-0.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-green-500 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger"
                                             content={
                                               <>
                                                 {pickupBookings.map((booking, idx) => (
                                                   <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
-                                                    <div className={`font-semibold mb-1 ${
-                                                      booking.status === 'pending' ? 'text-yellow-400' : 'text-green-400'
-                                                    }`}>
-                                                      {booking.status === 'pending' ? '🟡' : '🟢'} RECOGIDA {pickupBookings.length > 1 ? `#${idx + 1}` : ''}
-                                                    </div>
+                                                    <div className="font-semibold text-green-400 mb-1">🟢 RECOGIDA {pickupBookings.length > 1 ? `#${idx + 1}` : ''}</div>
                                                     <div className="font-bold text-base">{booking.pickup_time?.substring(0, 5) || '10:00'}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
                                                       📍 {booking.pickup_location?.name || 'Sin ubicación'}
@@ -819,22 +812,15 @@ export default function CalendarioPage() {
                                           {dayBookings.length}
                                         </span>
 
-                                        {/* Indicadores de fin - puede haber múltiples */}
-                                        {/* Color rojo para reservas confirmadas/en curso, amarillo para pendientes */}
+                                        {/* Indicadores de fin (rojo) - puede haber múltiples */}
                                         {dropoffBookings.length > 0 && (
                                           <SmartTooltip
-                                            className={`absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger ${
-                                              dropoffBookings.every(b => b.status === 'pending') ? 'bg-yellow-500' : 'bg-red-500'
-                                            }`}
+                                            className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-500 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger"
                                             content={
                                               <>
                                                 {dropoffBookings.map((booking, idx) => (
                                                   <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
-                                                    <div className={`font-semibold mb-1 ${
-                                                      booking.status === 'pending' ? 'text-yellow-400' : 'text-red-400'
-                                                    }`}>
-                                                      {booking.status === 'pending' ? '🟡' : '🔴'} DEVOLUCIÓN {dropoffBookings.length > 1 ? `#${idx + 1}` : ''}
-                                                    </div>
+                                                    <div className="font-semibold text-red-400 mb-1">🔴 DEVOLUCIÓN {dropoffBookings.length > 1 ? `#${idx + 1}` : ''}</div>
                                                     <div className="font-bold text-base">{booking.dropoff_time?.substring(0, 5) || '10:00'}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
                                                       📍 {booking.dropoff_location?.name || 'Sin ubicación'}
@@ -932,21 +918,6 @@ export default function CalendarioPage() {
                               {dayEvents.slice(0, 3).map((event, idx) => {
                                 const vehicle = event.booking.vehicle;
                                 const isPickup = event.type === 'pickup';
-                                const isPending = event.booking.status === 'pending';
-                                
-                                // Debug: ver el estado real de las reservas
-                                if (day === 23 || day === 29) {
-                                  console.log(`[Calendario Móvil] Día ${day}: booking ${event.booking.booking_number}, status: "${event.booking.status}", isPending: ${isPending}`);
-                                }
-                                
-                                // Usar amarillo para pendientes, verde/rojo para confirmadas
-                                const bgColor = isPending 
-                                  ? 'bg-yellow-100 text-yellow-800' 
-                                  : isPickup ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
-                                
-                                const dotColor = isPending 
-                                  ? 'bg-yellow-500' 
-                                  : isPickup ? 'bg-green-500' : 'bg-red-500';
                                 
                                 return (
                                   <div
@@ -957,8 +928,12 @@ export default function CalendarioPage() {
                                     }}
                                     className="cursor-pointer hover:opacity-75 transition-opacity"
                                   >
-                                    <div className={`flex items-center gap-0.5 text-[9px] leading-tight p-0.5 rounded ${bgColor}`}>
-                                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${dotColor}`} />
+                                    <div className={`flex items-center gap-0.5 text-[9px] leading-tight p-0.5 rounded ${
+                                      isPickup ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                    }`}>
+                                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                                        isPickup ? 'bg-green-500' : 'bg-red-500'
+                                      }`} />
                                       <span className="font-bold truncate">
                                         {vehicle?.internal_code || 'N/A'}
                                       </span>
@@ -1013,9 +988,8 @@ export default function CalendarioPage() {
             <div className="flex flex-col gap-1">
               <div className="w-3 h-3 bg-green-500 rounded-sm border border-white shadow-sm"></div>
               <div className="w-3 h-3 bg-red-500 rounded-sm border border-white shadow-sm"></div>
-              <div className="w-3 h-3 bg-yellow-500 rounded-sm border border-white shadow-sm"></div>
             </div>
-            <span className="text-gray-600">Inicio / Fin<br/><span className="text-xs text-gray-500">(amarillo=pendiente)</span></span>
+            <span className="text-gray-600">Inicio / Fin</span>
           </div>
         </div>
       </div>
@@ -1041,7 +1015,7 @@ export default function CalendarioPage() {
       {/* Modal de información de reserva (todas las resoluciones) */}
       {selectedBooking && (
         <div 
-          className="fixed inset-0 bg-black/50 z-[1100] flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 z-[100] flex items-end sm:items-center justify-center p-4"
           onClick={() => setSelectedBooking(null)}
         >
           <div 

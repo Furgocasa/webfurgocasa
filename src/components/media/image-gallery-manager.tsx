@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { UltraSimpleSelector } from "./ultra-simple-selector";
+import { type BucketType } from "@/lib/supabase/storage";
 import {
   X,
   Image as ImageIcon,
@@ -23,7 +24,7 @@ interface ImageGalleryManagerProps {
   images: GalleryImage[];
   onChange: (images: GalleryImage[]) => void;
   maxImages?: number; // Default: 20
-  bucket: "vehicles" | "blog" | "extras";
+  bucket: BucketType;
   suggestedFolder?: string;
 }
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, Suspense } from"react";
-import { useLanguage } from"@/contexts/language-context";
-import { useRouter, useSearchParams } from"next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useLanguage } from "@/contexts/language-context";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // Loading component
 function LoadingState() {
@@ -12,14 +12,16 @@ function LoadingState() {
     </div>
   );
 }
-import { supabase } from"@/lib/supabase/client";
+import { Header } from "@/components/layout/header";
+import { Footer } from "@/components/layout/footer";
+import { supabase } from "@/lib/supabase/client";
 import { 
-  ArrowLeft, ArrowRight, Calendar, MapPin, Car, User, Mail, Phone, 
+  ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, AlertCircle, Loader2, FileText, Users, Bed
-} from"lucide-react";
-import Link from"next/link";
-import Image from"next/image";
-import { formatPrice, calculateRentalDays, calculatePricingDays } from"@/lib/utils";
+} from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import { formatPrice, calculateRentalDays, calculatePricingDays } from "@/lib/utils";
 
 interface VehicleData {
   id: string;
@@ -360,20 +362,23 @@ function NuevaReservaContent() {
   if (loading) {
     return (
       <>
-<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Header />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
             <p className="text-gray-600">{t("Cargando información...")}</p>
           </div>
         </div>
-</>
+        <Footer />
+      </>
     );
   }
 
   if (error && !vehicle) {
     return (
       <>
-<div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Header />
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center max-w-md mx-auto px-4">
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
@@ -386,7 +391,8 @@ function NuevaReservaContent() {
             </button>
           </div>
         </div>
-</>
+        <Footer />
+      </>
     );
   }
 
@@ -394,45 +400,67 @@ function NuevaReservaContent() {
 
   return (
     <>
-<main className="min-h-screen bg-gray-50 pt-6 pb-8 md:pt-8 md:pb-12">
-        <div className="container mx-auto px-4 max-w-6xl">
-          {/* Link Volver - Simple y elegante */}
-          <div className="mb-4">
+      <Header />
+      
+      {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
+      <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
+        <div className="container mx-auto px-4 py-3">
+          {/* Link "Volver" - SIEMPRE visible en el header */}
+          <div className="mb-2">
             <button 
               onClick={() => router.back()}
-              className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange transition-colors group"
+              className="inline-flex items-center text-xs text-gray-600 hover:text-furgocasa-orange transition-colors"
             >
-              <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+              <ArrowLeft className="h-3 w-3 mr-1" />
               {t("Volver al paso anterior")}
             </button>
           </div>
 
-          {/* Header con info del vehículo */}
-          <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                  {t("Completa tu reserva")}
-                </h1>
-                <p className="text-gray-600">
-                  {t("Solo necesitamos algunos datos para confirmar tu reserva")}
-                </p>
-              </div>
-              {/* Mini resumen del vehículo */}
-              <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <Car className="h-8 w-8 text-furgocasa-blue" />
-                <div>
-                  <p className="font-semibold text-gray-900">{vehicle?.name}</p>
-                  <p className="text-sm text-gray-500">{days} {days === 1 ? t("día") : t("días")} · {formatPrice(totalPrice)}</p>
-                </div>
+          <div className="flex items-center justify-between gap-4">
+            {/* Info del vehículo */}
+            <div className="flex items-center gap-3 min-w-0">
+              <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
+              <div className="min-w-0">
+                <p className="font-semibold text-gray-900 truncate text-sm">{vehicle?.name || t("Cargando...")}</p>
+                <p className="text-xs text-gray-500">{days} {days === 1 ? t("día") : t("días")}</p>
               </div>
             </div>
+
+            {/* Fechas (oculto en móvil) */}
+            <div className="hidden md:flex items-center gap-2 text-sm text-gray-600">
+              <Calendar className="h-4 w-4" />
+              <span>{pickupDate ? new Date(pickupDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : ''}</span>
+              <span>→</span>
+              <span>{dropoffDate ? new Date(dropoffDate).toLocaleDateString('es-ES', { day: '2-digit', month: 'short' }) : ''}</span>
+            </div>
+
+            {/* Precio Total */}
+            <div className="flex items-center gap-2">
+              <div className="text-right">
+                <p className="text-xs text-gray-500 hidden md:block">{t("Total")}</p>
+                <p className="text-lg md:text-xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <main className="min-h-screen bg-gray-50 pt-[150px] py-12">
+        <div className="container mx-auto px-4 max-w-6xl">
+          {/* Header */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              {t("Completa tu reserva")}
+            </h1>
+            <p className="text-gray-600">
+              {t("Solo necesitamos algunos datos para confirmar tu reserva")}
+            </p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Form */}
             <div className="lg:col-span-2">
-              <form id="reservation-form" onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+              <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <User className="h-6 w-6 text-furgocasa-blue" />
                   {t("Tus datos")}
@@ -819,52 +847,11 @@ function NuevaReservaContent() {
               )}
             </div>
           </div>
-          
-          {/* Espaciador para la barra flotante en móvil */}
-          <div className="lg:hidden h-28"></div>
         </div>
       </main>
 
-      {/* Barra flotante fija inferior - Solo móvil/tablet */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50 safe-area-inset-bottom">
-        <div className="container mx-auto px-4 py-3">
-          {/* Info del vehículo compacta */}
-          <div className="flex items-center gap-3 mb-2 pb-2 border-b border-gray-100">
-            <Car className="h-5 w-5 text-furgocasa-blue flex-shrink-0" />
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-gray-900 text-sm truncate">{vehicle?.name}</p>
-              <p className="text-xs text-gray-500">{days} {days === 1 ? t("día") : t("días")}</p>
-            </div>
-          </div>
-          
-          {/* Precio total y botón */}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs text-gray-500">{t("Total a pagar")}</p>
-              <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</p>
-            </div>
-            <button
-              type="submit"
-              form="reservation-form"
-              disabled={submitting}
-              className="bg-furgocasa-orange text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-orange-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  {t("Procesando...")}
-                </>
-              ) : (
-                <>
-                  {t("Confirmar")}
-                  <ArrowRight className="h-5 w-5" />
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-</>
+      <Footer />
+    </>
   );
 }
 

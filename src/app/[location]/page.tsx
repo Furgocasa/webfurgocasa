@@ -7,6 +7,7 @@ import { HeroSlider } from"@/components/hero-slider";
 import { BlogArticleLink } from"@/components/blog/blog-article-link";
 import { LocalizedLink } from"@/components/localized-link";
 import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
+import { translateServer, getLocaleFromPath } from"@/lib/i18n/server-translation";
 import { 
   CheckCircle,
   Package,
@@ -14,9 +15,6 @@ import {
   HelpCircle,
   BookOpen
 } from"lucide-react";
-
-// Helper para traducciones estáticas (Server Component)
-const t = (key: string) => key;
 
 // ✅ Server-side Supabase client
 const supabase = createClient(
@@ -171,6 +169,34 @@ function extractSaleCitySlug(locationParam: string): string {
   return locationParam;
 }
 
+/**
+ * Detecta el idioma basándose en el formato de la URL de ubicación
+ */
+function detectLocaleFromLocationParam(locationParam: string): 'es' | 'en' | 'fr' | 'de' {
+  if (
+    /^rent-campervan-motorhome-(.+)$/.test(locationParam) ||
+    /^campervans-for-sale-in-(.+)$/.test(locationParam)
+  ) {
+    return 'en';
+  }
+  
+  if (
+    /^location-camping-car-(.+)$/.test(locationParam) ||
+    /^camping-cars-a-vendre-(.+)$/.test(locationParam)
+  ) {
+    return 'fr';
+  }
+  
+  if (
+    /^wohnmobil-mieten-(.+)$/.test(locationParam) ||
+    /^wohnmobile-zu-verkaufen-(.+)$/.test(locationParam)
+  ) {
+    return 'de';
+  }
+  
+  return 'es'; // Default: español
+}
+
 function getSeoPageKind(locationParam: string):"rent" |"sale" |"unknown" {
   if (
     /^alquiler-autocaravanas-campervans-(.+)$/.test(locationParam) ||
@@ -199,6 +225,8 @@ function getSeoPageKind(locationParam: string):"rent" |"sale" |"unknown" {
 export async function generateMetadata({ params }: { params: Promise<{ location: string }> }): Promise<Metadata> {
   const { location: locationParam } = await params;
   const kind = getSeoPageKind(locationParam);
+  const locale = detectLocaleFromLocationParam(locationParam);
+  const t = (key: string) => translateServer(key, locale);
 
   // Por defecto, mantener el comportamiento actual (alquiler) para no romper rutas existentes
   if (kind !=="sale") {
@@ -213,19 +241,19 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 
     if (!location) {
       return {
-        title: 'Ubicación no encontrada | Furgocasa Campervans',
-        description: 'La ubicación solicitada no está disponible.',
+        title: t('Ubicación no encontrada | Furgocasa Campervans'),
+        description: t('La ubicación solicitada no está disponible.'),
       };
     }
 
     return {
-      title: location.meta_title || `Alquiler de Autocaravanas en ${location.name} | Furgocasa Campervans`,
-      description: location.meta_description || `Alquila tu autocaravana camper en ${location.name}, ${location.province}. Las mejores campers de gran volumen. Reserva online con Furgocasa.`,
+      title: location.meta_title || `${t('Alquiler de Autocaravanas en')} ${location.name} ${t('| Furgocasa Campervans')}`,
+      description: location.meta_description || `${t('Alquila tu autocaravana camper en')} ${location.name}, ${location.province}. ${t('Las mejores campers de gran volumen. Reserva online con Furgocasa.')}`,
       openGraph: {
-        title: location.meta_title || `Alquiler de Autocaravanas en ${location.name} | Furgocasa Campervans`,
-        description: location.meta_description || `Alquila tu autocaravana camper en ${location.name}`,
+        title: location.meta_title || `${t('Alquiler de Autocaravanas en')} ${location.name} ${t('| Furgocasa Campervans')}`,
+        description: location.meta_description || `${t('Alquila tu autocaravana camper en')} ${location.name}`,
         type: 'website',
-        locale: 'es_ES',
+        locale: locale === 'es' ? 'es_ES' : locale === 'en' ? 'en_US' : locale === 'fr' ? 'fr_FR' : 'de_DE',
       },
     };
   }
@@ -241,8 +269,8 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 
   if (!saleLocation) {
     return {
-      title: 'Ubicación no encontrada | Furgocasa Campervans',
-      description: 'La ubicación solicitada no está disponible.',
+      title: t('Ubicación no encontrada | Furgocasa Campervans'),
+      description: t('La ubicación solicitada no está disponible.'),
       robots: { index: false, follow: false },
     };
   }
@@ -252,11 +280,11 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   const ogImage = saleLocation.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
 
   return {
-    title: saleLocation.meta_title || `Venta de Autocaravanas en ${saleLocation.name} | Furgocasa`,
-    description: saleLocation.meta_description || `Compra tu autocaravana o camper en ${saleLocation.name}, ${saleLocation.province}. Vehículos premium con garantía y financiación. Entrega cerca de ti.`,
+    title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name} ${t('| Furgocasa')}`,
+    description: saleLocation.meta_description || `${t('Compra tu autocaravana o camper en')} ${saleLocation.name}, ${saleLocation.province}. ${t('Vehículos premium con garantía y financiación. Entrega cerca de ti.')}`,
     openGraph: {
-      title: saleLocation.meta_title || `Venta de Autocaravanas en ${saleLocation.name}`,
-      description: saleLocation.meta_description || `Compra tu autocaravana en ${saleLocation.name}. Vehículos premium con garantía.`,
+      title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name}`,
+      description: saleLocation.meta_description || `${t('Compra tu autocaravana en')} ${saleLocation.name}. ${t('Vehículos premium con garantía.')}`,
       type: 'website',
       url: pageUrl,
       siteName: 'Furgocasa - Venta de Autocaravanas',
@@ -265,11 +293,11 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
           url: ogImage,
           width: 1200,
           height: 630,
-          alt: `Venta de autocaravanas y campers en ${saleLocation.name} - Furgocasa`,
+          alt: `${t('Venta de autocaravanas y campers en')} ${saleLocation.name} ${t('- Furgocasa')}`,
           type: 'image/webp',
         },
       ],
-      locale: 'es_ES',
+      locale: locale === 'es' ? 'es_ES' : locale === 'en' ? 'en_US' : locale === 'fr' ? 'fr_FR' : 'de_DE',
       countryName: 'España',
     },
     alternates: {
@@ -429,6 +457,10 @@ async function loadBlogArticles(): Promise<BlogArticle[]> {
 export default async function LocationPage({ params }: { params: Promise<{ location: string }> }) {
   const { location: locationParam } = await params;
   const kind = getSeoPageKind(locationParam);
+  
+  // ✅ Detectar idioma desde el formato de la URL
+  const locale = detectLocaleFromLocationParam(locationParam);
+  const t = (key: string) => translateServer(key, locale);
 
   // ✅ VENTA: /venta-autocaravanas-camper-{ciudad} (y traducciones en /en, /fr, /de)
   if (kind ==="sale") {

@@ -70,7 +70,7 @@ export function DestinationsGrid({
                 <h3 className="font-bold text-gray-900 text-sm lg:text-base group-hover:text-furgocasa-blue transition-colors">
                   {destination.name}
                 </h3>
-                <p className="text-xs lg:text-sm text-gray-600">{destination.region}</p>
+                <p className="text-xs lg:text-sm text-gray-600">{t(destination.region)}</p>
               </a>
             );
           })}

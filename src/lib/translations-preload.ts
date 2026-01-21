@@ -2421,6 +2421,478 @@ export const staticTranslations = {
     es: "Descuentos por duración",
     en: "Duration discounts"
   },
+
+  // ===== PÁGINAS DE UBICACIÓN (Location Pages) =====
+  "Alquiler de Autocaravanas": {
+    es: "Alquiler de Autocaravanas",
+    en: "Motorhome Rental"
+  },
+  "en": {
+    es: "en",
+    en: "in"
+  },
+  "Las mejores furgonetas campers": {
+    es: "Las mejores furgonetas campers",
+    en: "The best camper vans"
+  },
+  "de gran volumen en alquiler": {
+    es: "de gran volumen en alquiler",
+    en: "for rent"
+  },
+  "ALQUILER CAMPER": {
+    es: "ALQUILER CAMPER",
+    en: "CAMPER RENTAL"
+  },
+  "Localización de entrega en": {
+    es: "Localización de entrega en",
+    en: "Delivery location in"
+  },
+  "Nuestra sede en": {
+    es: "Nuestra sede en",
+    en: "Our headquarters in"
+  },
+  "No estamos en": {
+    es: "No estamos en",
+    en: "We are not in"
+  },
+  "Pero estamos muy cerca": {
+    es: "Pero estamos muy cerca",
+    en: "But we are very close"
+  },
+  "está a apenas": {
+    es: "está a apenas",
+    en: "is just"
+  },
+  "en coche": {
+    es: "en coche",
+    en: "by car"
+  },
+  "Te merecerá la pena venir": {
+    es: "Te merecerá la pena venir",
+    en: "It will be worth coming"
+  },
+  "Flota de vehículos de máxima calidad": {
+    es: "Flota de vehículos de máxima calidad",
+    en: "Top quality vehicle fleet"
+  },
+  "estamos especializados en el alquiler de vehículos campers van de gran volumen.": {
+    es: "estamos especializados en el alquiler de vehículos campers van de gran volumen.",
+    en: "we specialize in renting large-volume camper vans."
+  },
+  "Contamos con los mejores modelos de furgonetas campers del mercado.": {
+    es: "Contamos con los mejores modelos de furgonetas campers del mercado.",
+    en: "We have the best camper van models on the market."
+  },
+  "Ver más campers": {
+    es: "Ver más campers",
+    en: "See more campers"
+  },
+  "Visitar": {
+    es: "Visitar",
+    en: "Visit"
+  },
+  "en Autocaravana Camper": {
+    es: "en Autocaravana Camper",
+    en: "in Campervan"
+  },
+  "Descubre todo lo que puedes hacer y ver en": {
+    es: "Descubre todo lo que puedes hacer y ver en",
+    en: "Discover everything you can do and see in"
+  },
+  "viajando en camper": {
+    es: "viajando en camper",
+    en: "traveling by camper"
+  },
+  "Qué ver y hacer en": {
+    es: "Qué ver y hacer en",
+    en: "What to see and do in"
+  },
+  "Áreas de autocaravanas cerca de": {
+    es: "Áreas de autocaravanas cerca de",
+    en: "Motorhome areas near"
+  },
+  "Rutas en camper desde": {
+    es: "Rutas en camper desde",
+    en: "Camper routes from"
+  },
+  "Dificultad": {
+    es: "Dificultad",
+    en: "Difficulty"
+  },
+  "en autocaravana": {
+    es: "en autocaravana",
+    en: "by motorhome"
+  },
+  "Explora los principales atractivos turísticos, monumentos históricos, museos y espacios naturales que hacen de": {
+    es: "Explora los principales atractivos turísticos, monumentos históricos, museos y espacios naturales que hacen de",
+    en: "Explore the main tourist attractions, historical monuments, museums and natural spaces that make"
+  },
+  "un destino único.": {
+    es: "un destino único.",
+    en: "a unique destination."
+  },
+  "Áreas de autocaravanas y servicios": {
+    es: "Áreas de autocaravanas y servicios",
+    en: "Motorhome areas and services"
+  },
+  "La zona cuenta con diversas áreas de servicio para autocaravanas, zonas de pernocta y campings bien equipados.": {
+    es: "La zona cuenta con diversas áreas de servicio para autocaravanas, zonas de pernocta y campings bien equipados.",
+    en: "The area has various service areas for motorhomes, overnight parking zones and well-equipped campsites."
+  },
+  "Gastronomía local de": {
+    es: "Gastronomía local de",
+    en: "Local gastronomy of"
+  },
+  "Disfruta de la rica gastronomía de": {
+    es: "Disfruta de la rica gastronomía de",
+    en: "Enjoy the rich gastronomy of"
+  },
+  "con productos frescos y platos tradicionales que no te puedes perder.": {
+    es: "con productos frescos y platos tradicionales que no te puedes perder.",
+    en: "with fresh products and traditional dishes you cannot miss."
+  },
+  "Rutas en camper por": {
+    es: "Rutas en camper por",
+    en: "Camper routes through"
+  },
+  "Descubre rutas de senderismo, parques naturales y paisajes espectaculares en los alrededores de": {
+    es: "Descubre rutas de senderismo, parques naturales y paisajes espectaculares en los alrededores de",
+    en: "Discover hiking routes, natural parks and spectacular landscapes around"
+  },
+  "Alquiler de autocaravanas con Furgocasa": {
+    es: "Alquiler de autocaravanas con Furgocasa",
+    en: "Motorhome rental with Furgocasa"
+  },
+  "Viajar en una": {
+    es: "Viajar en una",
+    en: "Traveling in a"
+  },
+  "autocaravana camper de alquiler": {
+    es: "autocaravana camper de alquiler",
+    en: "rental campervan"
+  },
+  "con Furgocasa te brinda la libertad total de explorar": {
+    es: "con Furgocasa te brinda la libertad total de explorar",
+    en: "with Furgocasa gives you total freedom to explore"
+  },
+  "y sus alrededores a tu propio ritmo. Nuestra flota de": {
+    es: "y sus alrededores a tu propio ritmo. Nuestra flota de",
+    en: "and its surroundings at your own pace. Our fleet of"
+  },
+  "campers": {
+    es: "campers",
+    en: "campers"
+  },
+  "está equipada con todas las comodidades: cocinas completas, camas confortables, baño y todo lo necesario para que tu viaje sea inolvidable.": {
+    es: "está equipada con todas las comodidades: cocinas completas, camas confortables, baño y todo lo necesario para que tu viaje sea inolvidable.",
+    en: "is equipped with all amenities: complete kitchens, comfortable beds, bathroom and everything you need to make your trip unforgettable."
+  },
+  "ALQUILER MOTORHOME": {
+    es: "ALQUILER MOTORHOME",
+    en: "MOTORHOME RENTAL"
+  },
+  "Casas Rodantes en": {
+    es: "Casas Rodantes en",
+    en: "Mobile Homes in"
+  },
+  "¿Qué es un Motorhome?": {
+    es: "¿Qué es un Motorhome?",
+    en: "What is a Motorhome?"
+  },
+  "son términos que se refieren al mismo tipo de vehículo: una furgoneta camper totalmente equipada para viajar con autonomía total.": {
+    es: "son términos que se refieren al mismo tipo de vehículo: una furgoneta camper totalmente equipada para viajar con autonomía total.",
+    en: "are terms that refer to the same type of vehicle: a fully equipped camper van for traveling with total autonomy."
+  },
+  "En Latinoamérica también se conocen como": {
+    es: "En Latinoamérica también se conocen como",
+    en: "In Latin America they are also known as"
+  },
+  "casas rodantes": {
+    es: "casas rodantes",
+    en: "mobile homes"
+  },
+  "o": {
+    es: "o",
+    en: "or"
+  },
+  "casas móviles": {
+    es: "casas móviles",
+    en: "RVs"
+  },
+  "En Furgocasa, nos especializamos en el alquiler de estos vehículos de gran volumen, perfectos para familias y parejas que buscan la máxima comodidad.": {
+    es: "En Furgocasa, nos especializamos en el alquiler de estos vehículos de gran volumen, perfectos para familias y parejas que buscan la máxima comodidad.",
+    en: "At Furgocasa, we specialize in renting these large-volume vehicles, perfect for families and couples looking for maximum comfort."
+  },
+  "Descuento Especial LATAM": {
+    es: "Descuento Especial LATAM",
+    en: "Special LATAM Discount"
+  },
+  "¿Vienes desde Latinoamérica?": {
+    es: "¿Vienes desde Latinoamérica?",
+    en: "Coming from Latin America?"
+  },
+  "Obtén un descuento especial en el alquiler de tu motorhome / casa rodante. Contáctanos y menciona tu país de origen para recibir una oferta personalizada.": {
+    es: "Obtén un descuento especial en el alquiler de tu motorhome / casa rodante. Contáctanos y menciona tu país de origen para recibir una oferta personalizada.",
+    en: "Get a special discount on your motorhome / mobile home rental. Contact us and mention your country of origin to receive a personalized offer."
+  },
+  "¿Cómo se llama en tu país?": {
+    es: "¿Cómo se llama en tu país?",
+    en: "What is it called in your country?"
+  },
+  "Nuestras Motorhomes en": {
+    es: "Nuestras Motorhomes en",
+    en: "Our Motorhomes in"
+  },
+  "Gran volumen:": {
+    es: "Gran volumen:",
+    en: "Large volume:"
+  },
+  "Vehículos espaciosos de hasta 6 metros": {
+    es: "Vehículos espaciosos de hasta 6 metros",
+    en: "Spacious vehicles up to 6 meters"
+  },
+  "Totalmente equipadas:": {
+    es: "Totalmente equipadas:",
+    en: "Fully equipped:"
+  },
+  "Cocina, baño, camas, calefacción": {
+    es: "Cocina, baño, camas, calefacción",
+    en: "Kitchen, bathroom, beds, heating"
+  },
+  "Kilómetros ilimitados:": {
+    es: "Kilómetros ilimitados:",
+    en: "Unlimited kilometers:"
+  },
+  "Viaja sin límites por España y Europa": {
+    es: "Viaja sin límites por España y Europa",
+    en: "Travel without limits throughout Spain and Europe"
+  },
+  "Desde 95€/día:": {
+    es: "Desde 95€/día:",
+    en: "From 95€/day:"
+  },
+  "La mejor relación calidad-precio": {
+    es: "La mejor relación calidad-precio",
+    en: "The best value for money"
+  },
+  "Ver todas las Motorhomes disponibles": {
+    es: "Ver todas las Motorhomes disponibles",
+    en: "See all available Motorhomes"
+  },
+  "LA MEJOR RELACION CALIDAD PRECIO": {
+    es: "LA MEJOR RELACION CALIDAD PRECIO",
+    en: "THE BEST VALUE FOR MONEY"
+  },
+  "Nuestras autocaravanas Camper en alquiler desde": {
+    es: "Nuestras autocaravanas Camper en alquiler desde",
+    en: "Our Camper motorhomes for rent from"
+  },
+  "PAGA el 50% al realizar la RESERVA y la mitad restante 15 días antes del comienzo del alquiler.": {
+    es: "PAGA el 50% al realizar la RESERVA y la mitad restante 15 días antes del comienzo del alquiler.",
+    en: "PAY 50% when making the RESERVATION and the remaining half 15 days before the rental begins."
+  },
+  "TEMPORADA BAJA": {
+    es: "TEMPORADA BAJA",
+    en: "LOW SEASON"
+  },
+  "Temporada Media": {
+    es: "Temporada Media",
+    en: "Mid Season"
+  },
+  "Temporada Alta": {
+    es: "Temporada Alta",
+    en: "High Season"
+  },
+  "Descuentos de hasta el": {
+    es: "Descuentos de hasta el",
+    en: "Discounts of up to"
+  },
+  "en alquileres de 1, 2 o 3 semanas.": {
+    es: "en alquileres de 1, 2 o 3 semanas.",
+    en: "on rentals of 1, 2 or 3 weeks."
+  },
+  "Principales destinos para visitar en campervan": {
+    es: "Principales destinos para visitar en campervan",
+    en: "Top destinations to visit by campervan"
+  },
+  "Descubre los mejores destinos para tu próxima aventura en autocaravana": {
+    es: "Descubre los mejores destinos para tu próxima aventura en autocaravana",
+    en: "Discover the best destinations for your next motorhome adventure"
+  },
+  "Blog de viajes en camper": {
+    es: "Blog de viajes en camper",
+    en: "Camper travel blog"
+  },
+  "Consejos, rutas y experiencias para inspirar tu próxima aventura": {
+    es: "Consejos, rutas y experiencias para inspirar tu próxima aventura",
+    en: "Tips, routes and experiences to inspire your next adventure"
+  },
+  "Ver todos los artículos": {
+    es: "Ver todos los artículos",
+    en: "See all articles"
+  },
+  "Preguntas frecuentes": {
+    es: "Preguntas frecuentes",
+    en: "Frequently asked questions"
+  },
+  "Resuelve tus dudas sobre el alquiler de autocaravanas en": {
+    es: "Resuelve tus dudas sobre el alquiler de autocaravanas en",
+    en: "Solve your doubts about motorhome rental in"
+  },
+  "¿Cuál es el kilometraje incluido?": {
+    es: "¿Cuál es el kilometraje incluido?",
+    en: "What mileage is included?"
+  },
+  "Todos nuestros alquileres incluyen kilómetros ilimitados. Viaja sin preocuparte por la distancia.": {
+    es: "Todos nuestros alquileres incluyen kilómetros ilimitados. Viaja sin preocuparte por la distancia.",
+    en: "All our rentals include unlimited kilometers. Travel without worrying about distance."
+  },
+  "¿Necesito carnet especial para conducir una autocaravana?": {
+    es: "¿Necesito carnet especial para conducir una autocaravana?",
+    en: "Do I need a special license to drive a motorhome?"
+  },
+  "No, con el carnet de conducir B (coche) es suficiente para todos nuestros vehículos.": {
+    es: "No, con el carnet de conducir B (coche) es suficiente para todos nuestros vehículos.",
+    en: "No, a B (car) driver's license is sufficient for all our vehicles."
+  },
+  "¿Qué edades se permiten para conductores?": {
+    es: "¿Qué edades se permiten para conductores?",
+    en: "What ages are allowed for drivers?"
+  },
+  "La edad mínima para conducir es de 25 años y se requieren al menos 2 años de experiencia de conducción.": {
+    es: "La edad mínima para conducir es de 25 años y se requieren al menos 2 años de experiencia de conducción.",
+    en: "The minimum driving age is 25 years and at least 2 years of driving experience is required."
+  },
+  "¿Puedo viajar fuera de España?": {
+    es: "¿Puedo viajar fuera de España?",
+    en: "Can I travel outside Spain?"
+  },
+  "Sí, se puede viajar por toda Europa. Consulta las condiciones específicas para algunos países.": {
+    es: "Sí, se puede viajar por toda Europa. Consulta las condiciones específicas para algunos países.",
+    en: "Yes, you can travel throughout Europe. Check the specific conditions for some countries."
+  },
+  "Silla para bebé": {
+    es: "Silla para bebé",
+    en: "Baby seat"
+  },
+  "Bicicletas": {
+    es: "Bicicletas",
+    en: "Bicycles"
+  },
+  "Toldo lateral": {
+    es: "Toldo lateral",
+    en: "Side awning"
+  },
+  "Kit de playa": {
+    es: "Kit de playa",
+    en: "Beach kit"
+  },
+  "Seguro a todo riesgo": {
+    es: "Seguro a todo riesgo",
+    en: "Comprehensive insurance"
+  },
+
+  // Venta de vehículos (Sale pages)
+  "Autocaravanas Disponibles en": {
+    es: "Autocaravanas Disponibles en",
+    en: "Available Motorhomes in"
+  },
+  "Vehículos premium, garantía y financiación. Entrega cerca de": {
+    es: "Vehículos premium, garantía y financiación. Entrega cerca de",
+    en: "Premium vehicles, warranty and financing. Delivery near"
+  },
+  "No hay vehículos disponibles actualmente": {
+    es: "No hay vehículos disponibles actualmente",
+    en: "No vehicles currently available"
+  },
+  "Estamos actualizando nuestro stock. Consulta disponibilidad.": {
+    es: "Estamos actualizando nuestro stock. Consulta disponibilidad.",
+    en: "We are updating our stock. Check availability."
+  },
+  "Ver Todos los Vehículos en Venta": {
+    es: "Ver Todos los Vehículos en Venta",
+    en: "See All Vehicles for Sale"
+  },
+  "Entrega desde": {
+    es: "Entrega desde",
+    en: "Delivery from"
+  },
+
+  // Meta titles y descriptions para SEO
+  "Ubicación no encontrada | Furgocasa Campervans": {
+    es: "Ubicación no encontrada | Furgocasa Campervans",
+    en: "Location not found | Furgocasa Campervans"
+  },
+  "La ubicación solicitada no está disponible.": {
+    es: "La ubicación solicitada no está disponible.",
+    en: "The requested location is not available."
+  },
+  "Alquiler de Autocaravanas en": {
+    es: "Alquiler de Autocaravanas en",
+    en: "Motorhome Rental in"
+  },
+  "| Furgocasa Campervans": {
+    es: "| Furgocasa Campervans",
+    en: "| Furgocasa Campervans"
+  },
+  "Alquila tu autocaravana camper en": {
+    es: "Alquila tu autocaravana camper en",
+    en: "Rent your campervan in"
+  },
+  "Las mejores campers de gran volumen. Reserva online con Furgocasa.": {
+    es: "Las mejores campers de gran volumen. Reserva online con Furgocasa.",
+    en: "The best large-volume campers. Book online with Furgocasa."
+  },
+  "Venta de Autocaravanas en": {
+    es: "Venta de Autocaravanas en",
+    en: "Motorhomes for Sale in"
+  },
+  "| Furgocasa": {
+    es: "| Furgocasa",
+    en: "| Furgocasa"
+  },
+  "Compra tu autocaravana o camper en": {
+    es: "Compra tu autocaravana o camper en",
+    en: "Buy your motorhome or camper in"
+  },
+  "Vehículos premium con garantía y financiación. Entrega cerca de ti.": {
+    es: "Vehículos premium con garantía y financiación. Entrega cerca de ti.",
+    en: "Premium vehicles with warranty and financing. Delivery near you."
+  },
+  "Compra tu autocaravana en": {
+    es: "Compra tu autocaravana en",
+    en: "Buy your motorhome in"
+  },
+  "Vehículos premium con garantía.": {
+    es: "Vehículos premium con garantía.",
+    en: "Premium vehicles with warranty."
+  },
+  "Venta de autocaravanas y campers en": {
+    es: "Venta de autocaravanas y campers en",
+    en: "Sale of motorhomes and campers in"
+  },
+  "- Furgocasa": {
+    es: "- Furgocasa",
+    en: "- Furgocasa"
+  },
+
+  // Regiones de España (para DestinationsGrid)
+  "Comunidad Valenciana": {
+    es: "Comunidad Valenciana",
+    en: "Valencian Community"
+  },
+  "Castilla-La Mancha": {
+    es: "Castilla-La Mancha",
+    en: "Castilla-La Mancha"
+  },
+  "Andalucía": {
+    es: "Andalucía",
+    en: "Andalusia"
+  },
+  "Región de Murcia": {
+    es: "Región de Murcia",
+    en: "Region of Murcia"
+  },
 };
 
 /**
