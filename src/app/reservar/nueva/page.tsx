@@ -390,8 +390,8 @@ function NuevaReservaContent() {
 
   return (
     <>      
-      {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
-      <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
+      {/* Sticky Header - Resumen de reserva - SOLO VISIBLE EN MÓVIL */}
+      <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full md:hidden">
         <div className="container mx-auto px-4 py-3">
           {/* Link "Volver" - SIEMPRE visible en el header */}
           <div className="mb-2">
@@ -433,7 +433,7 @@ function NuevaReservaContent() {
         </div>
       </div>
       
-      <main className="min-h-screen bg-gray-50 pt-[150px] py-12">
+      <main className="min-h-screen bg-gray-50 pt-[150px] md:pt-8 py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           {/* Header */}
           <div className="bg-white rounded-2xl shadow-sm p-6 md:p-8 mb-6">
@@ -448,7 +448,7 @@ function NuevaReservaContent() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main Form */}
             <div className="lg:col-span-2">
-              <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
+              <form id="reservation-form" onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-sm p-6 md:p-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                   <User className="h-6 w-6 text-furgocasa-blue" />
                   {t("Tus datos")}
@@ -837,6 +837,64 @@ function NuevaReservaContent() {
           </div>
         </div>
       </main>
+
+      {/* Barra flotante fija inferior - Solo móvil/tablet */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50 safe-area-inset-bottom">
+        <div className="container mx-auto px-4 py-3">
+          {/* Desglose de precios expandible */}
+          {selectedExtras.length > 0 && (
+            <div className="mb-2 pb-2 border-b border-gray-100">
+              <div className="flex justify-between text-xs text-gray-500 mb-1">
+                <span>{t("Alquiler")} ({days} {days === 1 ? t("día") : t("días")})</span>
+                <span>{formatPrice(basePrice)}</span>
+              </div>
+              {selectedExtras.slice(0, 2).map((extra) => {
+                let price = 0;
+                if (extra.extra.price_type === 'per_unit') {
+                  price = (extra.extra.price_per_unit || 0);
+                } else {
+                  price = (extra.extra.price_per_day || 0) * days;
+                }
+                return (
+                  <div key={extra.extra.id} className="flex justify-between text-xs text-gray-500">
+                    <span>{extra.extra.name} {extra.quantity > 1 && `×${extra.quantity}`}</span>
+                    <span>+{formatPrice(price * extra.quantity)}</span>
+                  </div>
+                );
+              })}
+              {selectedExtras.length > 2 && (
+                <p className="text-xs text-gray-400">+{selectedExtras.length - 2} {t("extras más")}</p>
+              )}
+            </div>
+          )}
+          
+          {/* Precio total y botón */}
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-gray-500">{t("Total")}</p>
+              <p className="text-2xl font-bold text-furgocasa-orange transition-all duration-300">{formatPrice(totalPrice)}</p>
+            </div>
+            <button
+              type="submit"
+              form="reservation-form"
+              disabled={submitting}
+              className="bg-furgocasa-orange text-white font-bold py-3 px-6 rounded-xl hover:bg-orange-600 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-orange-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {submitting ? (
+                <>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  {t("Creando...")}
+                </>
+              ) : (
+                <>
+                  {t("Crear reserva")}
+                  <CreditCard className="h-5 w-5" />
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
     </>
   );
 }
