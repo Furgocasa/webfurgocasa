@@ -17,7 +17,9 @@
  *   - OPENAI_API_KEY en .env
  */
 
-require('dotenv').config();
+// Cargar variables de entorno de .env.local (prioridad) y .env
+require('dotenv').config({ path: '.env.local' });
+require('dotenv').config(); // fallback a .env
 const { createClient } = require('@supabase/supabase-js');
 
 // Configuración
@@ -63,39 +65,99 @@ const LOCALE_NAMES = {
 };
 
 // Configuración de tablas y campos a traducir
+// Campos con notación de punto (ej: 'content_sections.introduction') acceden a JSON anidado
 const TABLES_CONFIG = {
+  // ========== CONTENIDO PRINCIPAL ==========
   posts: {
     fields: ['title', 'excerpt', 'content', 'meta_title', 'meta_description'],
     filter: { status: 'published' },
   },
+  
+  // ========== VEHÍCULOS ==========
   vehicles: {
-    fields: ['name', 'description', 'short_description'],
-    filter: { is_active: true },
-  },
-  location_targets: {
-    fields: ['name', 'meta_title', 'meta_description', 'h1_title', 'intro_text'],
-    filter: { is_active: true },
-  },
-  sale_location_targets: {
-    fields: ['name', 'meta_title', 'meta_description', 'h1_title', 'intro_text'],
-    filter: { is_active: true },
+    fields: [
+      'name', 'description', 'short_description',
+      'meta_title', 'meta_description',
+      // Campos de venta
+      'sale_description', 'sale_meta_title', 'sale_meta_description',
+    ],
+    filter: {},
+    customFilter: (query) => query.neq('status', 'inactive'),
   },
   vehicle_categories: {
     fields: ['name', 'description'],
     filter: { is_active: true },
   },
+  vehicle_images: {
+    fields: ['alt_text'],
+    filter: {},
+  },
+  
+  // ========== LANDINGS ALQUILER ==========
+  location_targets: {
+    fields: [
+      'name', 'meta_title', 'meta_description', 'h1_title', 'intro_text',
+      // Campos JSON anidados de content_sections (contenido turístico)
+      'content_sections.introduction',
+      'content_sections.gastronomy',
+      'content_sections.practical_tips',
+      // Arrays de objetos (se traducirán como JSON completo)
+      'content_sections.attractions',
+      'content_sections.routes',
+      'content_sections.parking_areas',
+    ],
+    filter: { is_active: true },
+  },
+  
+  // ========== LANDINGS VENTA ==========
+  sale_location_targets: {
+    fields: [
+      'name', 'meta_title', 'meta_description', 'h1_title', 'intro_text',
+      // Campos JSON de content_sections (si tiene contenido)
+      'content_sections.introduction',
+      'content_sections.gastronomy',
+      'content_sections.practical_tips',
+      'content_sections.attractions',
+      'content_sections.routes',
+      'content_sections.parking_areas',
+    ],
+    filter: { is_active: true },
+  },
+  
+  // ========== EXTRAS Y EQUIPAMIENTO ==========
   extras: {
+    fields: ['name', 'description'],
+    filter: { is_active: true },
+  },
+  equipment: {
+    fields: ['name', 'description'],
+    filter: { is_active: true },
+  },
+  
+  // ========== CATEGORÍAS BLOG ==========
+  content_categories: {
+    fields: ['name', 'description', 'meta_title', 'meta_description'],
+    filter: { is_active: true },
+  },
+  tags: {
     fields: ['name', 'description'],
     filter: {},
   },
-  content_categories: {
-    fields: ['name', 'description'],
-    filter: {},
+  
+  // ========== TEMPORADAS Y UBICACIONES ==========
+  seasons: {
+    fields: ['name'],
+    filter: { is_active: true },
+  },
+  locations: {
+    fields: ['name', 'notes'],
+    filter: { is_active: true },
   },
 };
 
 // Descripción del tipo de contenido para el prompt
 const CONTENT_TYPES = {
+  // Campos generales
   title: 'a title/headline',
   excerpt: 'a brief excerpt/summary',
   content: 'article content (preserve HTML)',
@@ -106,6 +168,21 @@ const CONTENT_TYPES = {
   name: 'a name/title',
   h1_title: 'a main page heading (H1)',
   intro_text: 'introductory text',
+  notes: 'additional notes or instructions',
+  alt_text: 'image alt text for SEO (describe the image briefly)',
+  
+  // Campos de venta de vehículos
+  sale_description: 'a detailed description for vehicle sale listing',
+  sale_meta_title: 'an SEO meta title for vehicle sale page (max 60 chars)',
+  sale_meta_description: 'an SEO meta description for vehicle sale page (max 160 chars)',
+  
+  // Campos de content_sections (contenido turístico)
+  'content_sections.introduction': 'an introductory paragraph about a tourist destination',
+  'content_sections.gastronomy': 'text about local gastronomy and food',
+  'content_sections.practical_tips': 'practical travel tips for visitors',
+  'content_sections.attractions': 'a JSON array of tourist attractions (translate title and description fields, keep structure)',
+  'content_sections.routes': 'a JSON array of travel routes (translate title and description fields, keep structure)',
+  'content_sections.parking_areas': 'a JSON array of parking areas (translate name, description and services fields, keep structure)',
 };
 
 // Traducir con OpenAI
@@ -113,13 +190,27 @@ async function translateText(text, targetLocale, contentType) {
   const targetLanguage = LOCALE_NAMES[targetLocale];
   const contentDesc = CONTENT_TYPES[contentType] || 'text';
   const isHtml = text.includes('<') && text.includes('>');
+  const isJson = text.startsWith('[') || text.startsWith('{');
 
-  const systemPrompt = `You are a professional translator for a Spanish campervan rental company.
+  let systemPrompt = `You are a professional translator for a Spanish campervan rental company.
 Translate the following Spanish text to ${targetLanguage}.
 ${isHtml ? 'Preserve all HTML tags and structure exactly.' : ''}
 This is ${contentDesc}.
 Only return the translated text, nothing else.
 Maintain the same tone and style.`;
+
+  // Para arrays/objetos JSON, dar instrucciones especiales
+  if (isJson) {
+    systemPrompt = `You are a professional translator for a Spanish campervan rental company.
+Translate the following JSON from Spanish to ${targetLanguage}.
+IMPORTANT: 
+- Keep the exact same JSON structure
+- Only translate the text values (title, description, name, etc.)
+- Do NOT translate keys, property names, or technical values like "type"
+- Keep arrays of services in their original language or translate them naturally
+- Return valid JSON only, nothing else
+This is ${contentDesc}.`;
+  }
 
   try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -135,7 +226,7 @@ Maintain the same tone and style.`;
           { role: 'user', content: text },
         ],
         temperature: 0.3,
-        max_tokens: Math.min(text.length * 2, 4000),
+        max_tokens: Math.min(text.length * 3, 8000), // More tokens for JSON content
       }),
     });
 
@@ -189,6 +280,41 @@ async function saveTranslation(sourceTable, sourceId, sourceField, locale, trans
   return true;
 }
 
+// Obtener valor de campo (soporta notación de punto para JSON anidado)
+function getFieldValue(record, field) {
+  if (field.includes('.')) {
+    const parts = field.split('.');
+    let value = record;
+    for (const part of parts) {
+      if (value === null || value === undefined) return null;
+      value = value[part];
+    }
+    return value;
+  }
+  return record[field];
+}
+
+// Preparar texto para traducción (maneja strings y objetos JSON)
+function prepareTextForTranslation(value, field) {
+  if (value === null || value === undefined) return null;
+  
+  // Si es un array u objeto (content_sections.attractions, etc.), convertir a JSON
+  if (typeof value === 'object') {
+    // Filtrar arrays vacíos
+    if (Array.isArray(value) && value.length === 0) return null;
+    // Filtrar objetos vacíos
+    if (!Array.isArray(value) && Object.keys(value).length === 0) return null;
+    return JSON.stringify(value, null, 2);
+  }
+  
+  // Si es string
+  if (typeof value === 'string') {
+    return value.trim() || null;
+  }
+  
+  return null;
+}
+
 // Procesar una tabla
 async function processTable(tableName, config) {
   console.log(`\n📋 Procesando tabla: ${tableName}`);
@@ -198,10 +324,15 @@ async function processTable(tableName, config) {
   // Construir query
   let query = supabase.from(tableName).select('*');
   
-  // Aplicar filtros
+  // Aplicar filtros estándar
   Object.entries(config.filter).forEach(([key, value]) => {
     query = query.eq(key, value);
   });
+
+  // Aplicar filtro personalizado si existe (ej: vehicles usa status != 'inactive')
+  if (config.customFilter) {
+    query = config.customFilter(query);
+  }
 
   // Aplicar límite
   if (options.limit) {
@@ -228,9 +359,10 @@ async function processTable(tableName, config) {
 
     // Procesar cada campo
     for (const field of config.fields) {
-      const originalText = record[field];
+      const rawValue = getFieldValue(record, field);
+      const originalText = prepareTextForTranslation(rawValue, field);
       
-      if (!originalText || originalText.trim() === '') {
+      if (!originalText) {
         continue;
       }
 

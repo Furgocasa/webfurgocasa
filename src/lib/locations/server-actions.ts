@@ -9,6 +9,8 @@ export interface LocationData {
   region: string;
   meta_title: string;
   meta_description: string | null;
+  h1_title: string | null;
+  intro_text: string | null;
   distance_km: number | null;
   drive_time_minutes: number | null;
   hero_image: string | null;

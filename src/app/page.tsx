@@ -21,6 +21,7 @@ import {
 } from"lucide-react";
 import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from"@/lib/home/server-actions";
 import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from"@/components/home/organization-jsonld";
+import { getTranslatedRecords } from"@/lib/translations/get-translations";
 import Image from"next/image";
 
 /**
@@ -131,10 +132,43 @@ export default async function HomePage() {
   const t = (key: string) => translateServer(key, locale);
   
   // Cargar datos en el servidor
-  const featuredVehicles = await getFeaturedVehicles();
-  const blogArticles = await getLatestBlogArticles(3);
+  const featuredVehiclesRaw = await getFeaturedVehicles();
+  const blogArticlesRaw = await getLatestBlogArticles(3);
   const stats = await getCompanyStats();
+  
+  // Aplicar traducciones a los vehículos destacados
+  const featuredVehicles = await getTranslatedRecords(
+    'vehicles',
+    featuredVehiclesRaw,
+    ['name', 'short_description'],
+    locale
+  );
   const featuredVehiclesHome = featuredVehicles.slice(0, 3);
+  
+  // Aplicar traducciones a los posts del blog
+  const blogArticles = await getTranslatedRecords(
+    'posts',
+    blogArticlesRaw,
+    ['title', 'excerpt'],
+    locale
+  );
+  
+  // Traducir nombres de categorías si no es español
+  if (locale !== 'es') {
+    for (const article of blogArticles) {
+      if (article.category?.id) {
+        const translatedCats = await getTranslatedRecords(
+          'content_categories',
+          [article.category],
+          ['name'],
+          locale
+        );
+        if (translatedCats[0]?.name) {
+          article.category = { ...article.category, name: translatedCats[0].name };
+        }
+      }
+    }
+  }
 
   return (
     <>
@@ -449,7 +483,12 @@ export default async function HomePage() {
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         {article.published_at && (
                           <time dateTime={article.published_at}>
-                            {new Date(article.published_at).toLocaleDateString('es-ES')}
+                            {new Date(article.published_at).toLocaleDateString(
+                              locale === 'es' ? 'es-ES' : 
+                              locale === 'en' ? 'en-US' : 
+                              locale === 'fr' ? 'fr-FR' : 
+                              locale === 'de' ? 'de-DE' : 'es-ES'
+                            )}
                           </time>
                         )}
                         <span className="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">

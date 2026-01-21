@@ -6,6 +6,7 @@ import { MapPin, Phone, Mail, CheckCircle, Package } from"lucide-react";
 import Image from"next/image";
 import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
 import { translateServer } from"@/lib/i18n/server-translation";
+import { getTranslatedContent } from"@/lib/translations/get-translations";
 import type { Locale } from"@/lib/i18n/config";
 import { headers } from "next/headers";
 
@@ -385,14 +386,39 @@ export default async function SaleLocationPage({
   const locale = await detectLocaleFromRequest();
   const t = (key: string) => translateServer(key, locale);
   
-  const [locationData, vehicles] = await Promise.all([
+  const [locationDataRaw, vehicles] = await Promise.all([
     loadSaleLocationData(locationParam),
     loadVehiclesForSale(),
   ]);
 
-  if (!locationData) {
+  if (!locationDataRaw) {
     notFound();
   }
+
+  // Aplicar traducciones dinámicas de Supabase a los campos de la localización
+  const translatedFields = await getTranslatedContent(
+    'sale_location_targets',
+    locationDataRaw.id,
+    ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
+    locale,
+    {
+      name: locationDataRaw.name,
+      h1_title: locationDataRaw.h1_title || null,
+      meta_title: locationDataRaw.meta_title || null,
+      meta_description: locationDataRaw.meta_description || null,
+      intro_text: locationDataRaw.intro_text || null,
+    }
+  );
+  
+  // Combinar datos originales con traducciones
+  const locationData = {
+    ...locationDataRaw,
+    name: translatedFields.name || locationDataRaw.name,
+    h1_title: translatedFields.h1_title || locationDataRaw.h1_title,
+    meta_title: translatedFields.meta_title || locationDataRaw.meta_title,
+    meta_description: translatedFields.meta_description || locationDataRaw.meta_description,
+    intro_text: translatedFields.intro_text || locationDataRaw.intro_text,
+  };
 
   const hasNearestLocation = locationData.nearest_location !== null;
   const distanceInfo = locationData.distance_km && locationData.travel_time_minutes

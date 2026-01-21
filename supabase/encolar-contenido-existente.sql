@@ -37,24 +37,24 @@ FROM posts CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
 WHERE status = 'published' AND meta_description IS NOT NULL AND meta_description != ''
 ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
 
--- 2. ENCOLAR VEHICLES
+-- 2. ENCOLAR VEHICLES (no tiene is_active, usa status != 'inactive')
 -- =====================================================
 INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
 SELECT 'vehicles', id, 'name', name, locale
 FROM vehicles CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
-WHERE is_active = true AND name IS NOT NULL AND name != ''
+WHERE status != 'inactive' AND name IS NOT NULL AND name != ''
 ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
 
 INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
 SELECT 'vehicles', id, 'description', description, locale
 FROM vehicles CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
-WHERE is_active = true AND description IS NOT NULL AND description != ''
+WHERE status != 'inactive' AND description IS NOT NULL AND description != ''
 ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
 
 INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
 SELECT 'vehicles', id, 'short_description', short_description, locale
 FROM vehicles CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
-WHERE is_active = true AND short_description IS NOT NULL AND short_description != ''
+WHERE status != 'inactive' AND short_description IS NOT NULL AND short_description != ''
 ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
 
 -- 3. ENCOLAR LOCATION_TARGETS
@@ -161,6 +161,64 @@ INSERT INTO translation_queue (source_table, source_id, source_field, source_tex
 SELECT 'extras', id, 'description', description, locale
 FROM extras CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
 WHERE description IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+-- 8. ENCOLAR EQUIPMENT (equipamiento de vehículos)
+-- =====================================================
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'equipment', id, 'name', name, locale
+FROM equipment CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE is_active = true AND name IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'equipment', id, 'description', description, locale
+FROM equipment CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE is_active = true AND description IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+-- 9. ENCOLAR SEASONS (temporadas)
+-- =====================================================
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'seasons', id, 'name', name, locale
+FROM seasons CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE is_active = true AND name IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+-- 10. ENCOLAR LOCATIONS (puntos de recogida/entrega)
+-- =====================================================
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'locations', id, 'name', name, locale
+FROM locations CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE is_active = true AND name IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'locations', id, 'notes', notes, locale
+FROM locations CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE is_active = true AND notes IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+-- 11. ENCOLAR TAGS (etiquetas del blog)
+-- =====================================================
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'tags', id, 'name', name, locale
+FROM tags CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE name IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'tags', id, 'description', description, locale
+FROM tags CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE description IS NOT NULL
+ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
+
+-- 12. ENCOLAR VEHICLE_IMAGES alt_text (SEO imágenes)
+-- =====================================================
+INSERT INTO translation_queue (source_table, source_id, source_field, source_text, locale)
+SELECT 'vehicle_images', id, 'alt_text', alt_text, locale
+FROM vehicle_images CROSS JOIN (SELECT unnest(ARRAY['en', 'fr', 'de']) as locale) l
+WHERE alt_text IS NOT NULL AND alt_text != ''
 ON CONFLICT (source_table, source_id, source_field, locale) DO NOTHING;
 
 -- =====================================================

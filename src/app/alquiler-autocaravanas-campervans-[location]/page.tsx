@@ -12,6 +12,7 @@ import {
 } from"@/lib/locations/server-actions";
 import { LocalizedLink } from"@/components/localized-link";
 import { translateServer } from"@/lib/i18n/server-translation";
+import { getTranslatedContent } from"@/lib/translations/get-translations";
 import type { Locale } from"@/lib/i18n/config";
 import { 
   MapPin, 
@@ -141,9 +142,9 @@ export default async function LocationPage({
   params: { location: string } 
 }) {
   // Obtener datos desde el servidor
-  const location = await getLocationBySlug(params.location);
+  const locationRaw = await getLocationBySlug(params.location);
 
-  if (!location) {
+  if (!locationRaw) {
     notFound();
   }
 
@@ -151,8 +152,33 @@ export default async function LocationPage({
   const headersList = await headers();
   const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   
-  // Función helper para traducciones
+  // Función helper para traducciones UI
   const t = (key: string) => translateServer(key, locale);
+
+  // Aplicar traducciones dinámicas de Supabase a los campos de la localización
+  const translatedFields = await getTranslatedContent(
+    'location_targets',
+    locationRaw.id,
+    ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
+    locale,
+    {
+      name: locationRaw.name,
+      h1_title: locationRaw.h1_title || null,
+      meta_title: locationRaw.meta_title || null,
+      meta_description: locationRaw.meta_description || null,
+      intro_text: locationRaw.intro_text || null,
+    }
+  );
+  
+  // Combinar datos originales con traducciones
+  const location = {
+    ...locationRaw,
+    name: translatedFields.name || locationRaw.name,
+    h1_title: translatedFields.h1_title || locationRaw.h1_title,
+    meta_title: translatedFields.meta_title || locationRaw.meta_title,
+    meta_description: translatedFields.meta_description || locationRaw.meta_description,
+    intro_text: translatedFields.intro_text || locationRaw.intro_text,
+  };
 
   // Obtener vehículos disponibles
   const vehicles = await getAvailableVehicles(3);
