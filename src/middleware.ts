@@ -137,6 +137,63 @@ function translatePathToSpanish(pathname: string): string {
 }
 
 // ============================================
+// CORRECCIÓN DE URLs CON IDIOMA INCORRECTO
+// ============================================
+// Mapeo de rutas españolas a sus traducciones en cada idioma
+const routesByLocale: Record<string, Record<Locale, string>> = {
+  '/vehiculos': { es: '/vehiculos', en: '/vehicles', fr: '/vehicules', de: '/fahrzeuge' },
+  '/reservar': { es: '/reservar', en: '/book', fr: '/reserver', de: '/buchen' },
+  '/tarifas': { es: '/tarifas', en: '/rates', fr: '/tarifs', de: '/preise' },
+  '/contacto': { es: '/contacto', en: '/contact', fr: '/contact', de: '/kontakt' },
+  '/ofertas': { es: '/ofertas', en: '/offers', fr: '/offres', de: '/angebote' },
+  '/ventas': { es: '/ventas', en: '/sales', fr: '/ventes', de: '/verkauf' },
+  '/blog': { es: '/blog', en: '/blog', fr: '/blog', de: '/blog' },
+};
+
+/**
+ * Obtiene la URL correcta según el idioma detectado
+ * Si la URL usa segmentos de otro idioma, devuelve la URL corregida
+ * Ejemplo: /de/vehicles/slug → /de/fahrzeuge/slug
+ */
+function getCorrectUrlForLocale(pathname: string, locale: Locale): string | null {
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length < 1) return null;
+  
+  const firstSegment = '/' + segments[0];
+  
+  // Buscar qué ruta española corresponde a este segmento
+  let spanishRoute: string | null = null;
+  
+  // Primero verificar si es una ruta española directa
+  if (routesByLocale[firstSegment]) {
+    spanishRoute = firstSegment;
+  } else {
+    // Buscar en las traducciones
+    for (const [esRoute, translations] of Object.entries(routesByLocale)) {
+      for (const [lang, translation] of Object.entries(translations)) {
+        if (translation === firstSegment) {
+          spanishRoute = esRoute;
+          break;
+        }
+      }
+      if (spanishRoute) break;
+    }
+  }
+  
+  if (!spanishRoute || !routesByLocale[spanishRoute]) return null;
+  
+  // Obtener la traducción correcta para el locale actual
+  const correctSegment = routesByLocale[spanishRoute][locale];
+  
+  // Si el segmento ya es correcto, no hay que redirigir
+  if (firstSegment === correctSegment) return null;
+  
+  // Construir la URL correcta
+  const restOfPath = segments.slice(1).join('/');
+  return restOfPath ? `${correctSegment}/${restOfPath}` : correctSegment;
+}
+
+// ============================================
 // RATE LIMITING - Inline para Edge Runtime
 // ============================================
 interface RateLimitEntry {
@@ -272,6 +329,15 @@ export async function middleware(request: NextRequest) {
     if (locale) {
       // Tiene locale, hacer rewrite a la ruta sin locale
       const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
+      
+      // ✅ VERIFICAR si la URL usa los segmentos correctos para el idioma
+      // Si no, redirigir a la URL correcta (ej: /de/vehicles/slug → /de/fahrzeuge/slug)
+      const correctPath = getCorrectUrlForLocale(pathnameWithoutLocale, locale);
+      if (correctPath) {
+        // La URL no usa los segmentos correctos para este idioma, redirigir
+        request.nextUrl.pathname = `/${locale}${correctPath}`;
+        return NextResponse.redirect(request.nextUrl, { status: 301 });
+      }
       
       // ✅ TRADUCIR la ruta al español para que Next.js encuentre la página física
       // El usuario ve /fr/vehicules/slug, pero internamente servimos /vehiculos/slug
