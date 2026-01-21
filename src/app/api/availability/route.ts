@@ -140,15 +140,18 @@ export async function GET(request: NextRequest) {
     // Calcular sobrecoste promedio respecto a temporada baja
     const seasonalAddition = calculateSeasonalSurcharge(finalPricePerDay, pricingDays);
 
+    // Calcular el precio original de la temporada actual (sin descuento por duración)
+    // Este es el precio para < 7 días en la temporada dominante
+    const dominantSeason = seasons.find(s => s.name === priceResult.dominantSeason);
+    const originalSeasonPricePerDay = dominantSeason?.price_less_than_week ?? 95; // 95 si es temporada baja
+
     // Calcular precios
     const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
       const totalPrice = priceResult.total;
 
-      // Calcular cuánto se está ahorrando respecto al precio máximo (temporada baja < 7 días)
-      const fullPricePerDay = 95; // Precio base sin descuento por duración
-      const maxPossiblePrice = fullPricePerDay + (seasonalAddition > 0 ? seasonalAddition : 0);
-      const savings = maxPossiblePrice - finalPricePerDay;
-      const discountPercentage = Math.round((savings / maxPossiblePrice) * 100);
+      // Calcular descuento comparando con el precio de la temporada actual para < 7 días
+      const savings = originalSeasonPricePerDay - finalPricePerDay;
+      const discountPercentage = savings > 0 ? Math.round((savings / originalSeasonPricePerDay) * 100) : 0;
 
       return {
         ...vehicle,
@@ -157,9 +160,9 @@ export async function GET(request: NextRequest) {
           pricingDays, // Días usados para calcular el precio
           hasTwoDayPricing, // Flag para mostrar aviso
           pricePerDay: Math.round(finalPricePerDay * 100) / 100,
-          originalPricePerDay: fullPricePerDay,
+          originalPricePerDay: originalSeasonPricePerDay, // Precio de la temporada para < 7 días
           totalPrice: Math.round(totalPrice * 100) / 100,
-          originalTotalPrice: Math.round(fullPricePerDay * pricingDays * 100) / 100,
+          originalTotalPrice: Math.round(originalSeasonPricePerDay * pricingDays * 100) / 100,
           season: priceResult.dominantSeason,
           seasonBreakdown: priceResult.seasonBreakdown,
           seasonalAddition: seasonalAddition,

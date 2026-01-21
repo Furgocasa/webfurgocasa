@@ -139,11 +139,14 @@ export function useSeasonalPricing({
     // Calcular sobrecoste respecto a temporada baja
     const seasonalAddition = calculateSeasonalSurcharge(priceResult.avgPricePerDay, pricingDays);
     
-    // Precio base sin descuento por duración (temporada baja, < 7 días)
-    const fullPricePerDay = PRECIO_TEMPORADA_BAJA.price_less_than_week;
-    const maxPossiblePrice = fullPricePerDay + (seasonalAddition > 0 ? seasonalAddition : 0);
-    const savings = maxPossiblePrice - priceResult.avgPricePerDay;
-    const discountPercentage = Math.round((savings / maxPossiblePrice) * 100);
+    // Precio original de la temporada actual (sin descuento por duración)
+    // Este es el precio para < 7 días en la temporada dominante
+    const dominantSeason = seasons.find(s => s.name === priceResult.dominantSeason);
+    const originalSeasonPricePerDay = dominantSeason?.price_less_than_week ?? PRECIO_TEMPORADA_BAJA.price_less_than_week;
+    
+    // Calcular descuento comparando con el precio de la temporada actual para < 7 días
+    const savings = originalSeasonPricePerDay - priceResult.avgPricePerDay;
+    const discountPercentage = savings > 0 ? Math.round((savings / originalSeasonPricePerDay) * 100) : 0;
 
     return {
       days,
@@ -151,8 +154,8 @@ export function useSeasonalPricing({
       hasTwoDayPricing,
       pricePerDay: priceResult.avgPricePerDay,
       totalPrice: priceResult.total,
-      originalPricePerDay: fullPricePerDay,
-      originalTotalPrice: fullPricePerDay * pricingDays,
+      originalPricePerDay: originalSeasonPricePerDay, // Precio de la temporada para < 7 días
+      originalTotalPrice: originalSeasonPricePerDay * pricingDays,
       season: priceResult.dominantSeason,
       seasonBreakdown: priceResult.seasonBreakdown,
       seasonalAddition,
