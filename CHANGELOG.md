@@ -4,6 +4,84 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🎨 [1.0.7] - 21 de Enero 2026 - **Layout Condicional y Limpieza Admin**
+
+### ✅ **Layout Condicional para Admin vs Público**
+
+Se implementó un sistema de layout condicional que diferencia entre páginas públicas y de administración.
+
+---
+
+### 🎯 **CAMBIOS IMPLEMENTADOS**
+
+#### 1. ConditionalLayout Component (`f4cb816`, `51ca850`)
+**Archivo**: `src/components/layout/conditional-layout.tsx`
+
+```tsx
+// Detecta automáticamente si estamos en rutas de administrador
+const isAdministratorRoute = 
+  pathname?.startsWith("/administrator") || 
+  pathname?.includes("/administrator");
+
+// Solo renderiza Header/Footer en páginas PÚBLICAS
+if (isAdministratorRoute) {
+  return <>{children}</>;
+}
+return (
+  <>
+    <Header />
+    {children}
+    <Footer />
+  </>
+);
+```
+
+**Beneficios**:
+- ✅ Páginas de administrador SIN header ni footer (más limpio)
+- ✅ Páginas públicas CON header y footer automáticamente
+- ✅ Detecta rutas con prefijos de idioma (`/es/administrator`, `/en/administrator`)
+
+#### 2. Eliminación de PublicLayout Duplicado (`fb92b17`, `6d1bdfe`)
+**Problema**: La página principal (`page.tsx`) usaba `<PublicLayout>` que añadía Header+Footer, pero `ConditionalLayout` también los añadía → **Header y Footer duplicados**
+
+**Solución**:
+- Eliminado uso de `PublicLayout` en `page.tsx`
+- Eliminado archivo `public-layout.tsx` (obsoleto)
+- Ahora solo `ConditionalLayout` maneja Header/Footer globalmente
+
+#### 3. Migración de Imágenes Hero a Supabase Storage (`f4cb816`)
+- 32 ciudades con imágenes hero optimizadas en `media/slides/`
+- Mapeo completo de URLs en `src/app/[location]/page.tsx`
+- Script `upload-hero-slides.js` para automatizar subidas
+- Documentación: `GESTION-IMAGENES-SUPABASE.md`, `IMAGENES-HERO-LOCALIZACIONES.md`
+
+#### 4. Actualización .gitignore (`f4cb816`)
+- `furgocasa_images/` excluida (imágenes en Supabase Storage)
+- Logs de migración excluidos
+- Archivos de conflicto de Dropbox excluidos
+
+#### 5. Actualización Hero Slider (`1e57e27`)
+- Añadidas nuevas imágenes: hero-02, hero-03, hero-09
+- Reordenadas para mejor experiencia visual
+
+---
+
+### 📊 **RESUMEN ESTRUCTURA FINAL**
+
+```
+Páginas Públicas (/, /es/, /vehiculos, /reservar, /blog, etc.)
+├── Header (automático via ConditionalLayout)
+├── Contenido de la página
+└── Footer (automático via ConditionalLayout)
+
+Páginas Administrador (/administrator, /es/administrator, etc.)
+├── AdminSidebar (menú lateral)
+├── AdminHeader (compacto)
+└── Contenido del panel (SIN footer)
+```
+
+---
+
 ## 🏗️ [1.0.6] - 20 de Enero 2026 - **Refactorización Arquitectura Layout**
 
 ### ✅ **CAMBIO ARQUITECTÓNICO MAYOR**
