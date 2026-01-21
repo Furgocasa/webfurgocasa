@@ -671,7 +671,7 @@ function ReservarVehiculoContent() {
       </main>
 
       {/* Barra flotante fija inferior - Solo móvil/tablet */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-50 safe-area-inset-bottom">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-[60] safe-area-inset-bottom">
         <div className="container mx-auto px-4 py-3">
           {/* Desglose de precios expandible */}
           {selectedExtras.length > 0 && (
