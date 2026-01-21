@@ -1,9 +1,12 @@
 import { Metadata } from"next";
+import { headers } from"next/headers";
 import { SearchWidget } from"@/components/booking/search-widget";
 import { HeroSlider } from"@/components/hero-slider";
 import { DestinationsGrid } from"@/components/destinations-grid";
 import { BlogArticleLink } from"@/components/blog/blog-article-link";
 import { LocalizedLink } from"@/components/localized-link";
+import { translateServer } from"@/lib/i18n/server-translation";
+import type { Locale } from"@/lib/i18n/config";
 import { 
   MessageSquare,
   Map,
@@ -21,87 +24,112 @@ import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from"@/components/ho
 import Image from"next/image";
 
 /**
- * 🎯 Metadata SEO optimizada
+ * 🎯 Metadata SEO optimizada multiidioma
  * 
  * SEO MULTIIDIOMA - Modelo correcto con prefijo /es/
  * Ver /SEO-MULTIIDIOMA-MODELO.md para documentación completa
+ * 
+ * NOTA: Para metadata dinámica por idioma, usamos generateMetadata
  */
-export const metadata: Metadata = {
-  title:"Las Mejores Campers en Alquiler | Desde 95€/día | Furgocasa",
-  description:"Alquiler de autocaravanas y campers de gran volumen. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados, equipamiento completo. ¡Reserva tu camper ahora!",
-  keywords:"alquiler camper, autocaravana alquiler, alquiler furgoneta camper, motorhome españa, campervan alquiler, casa rodante, alquiler autocaravana españa",
-  authors: [{ name:"Furgocasa" }],
-  openGraph: {
-    title:"Furgocasa | Las Mejores Campers y Autocaravanas en Alquiler",
-    description:"Tu hotel 5 estrellas sobre ruedas. Flota premium desde 95€/día con kilómetros ilimitados. Dreamer, Knaus, Weinsberg.",
-    type:"website",
-    url:"https://www.furgocasa.com/es",
-    siteName:"Furgocasa - Alquiler de Autocaravanas",
-    images: [
-      {
-        url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
-        width: 1920,
-        height: 1080,
-        alt:"Furgocasa - Las Mejores Campers en Alquiler",
-        type:"image/webp",
-      },
-      {
-        url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/new_slider_1.webp",
-        width: 1920,
-        height: 1080,
-        alt:"Flota premium Furgocasa",
-        type:"image/webp",
-      },
-      {
-        url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_1.webp",
-        width: 1920,
-        height: 1080,
-        alt:"Interior camper Furgocasa",
-        type:"image/webp",
-      }
-    ],
-    locale:"es_ES",
-    countryName:"España",
-  },
-  twitter: {
-    card:"summary_large_image",
-    site:"@furgocasa",
-    creator:"@furgocasa",
-    title:"Furgocasa | Las Mejores Campers en Alquiler",
-    description:"Autocaravanas premium desde 95€/día. Kilómetros ilimitados. Tu hotel 5⭐ sobre ruedas.",
-    images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
-  },
-  alternates: {
-    canonical:"https://www.furgocasa.com/es",
-    languages: {
-      'es': 'https://www.furgocasa.com/es',
-      'en': 'https://www.furgocasa.com/en',
-      'fr': 'https://www.furgocasa.com/fr',
-      'de': 'https://www.furgocasa.com/de',
-      'x-default': 'https://www.furgocasa.com/es',
+export async function generateMetadata(): Promise<Metadata> {
+  // Detectar idioma desde headers
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const t = (key: string) => translateServer(key, locale);
+  
+  const baseUrl = 'https://www.furgocasa.com';
+  
+  // Locale para OpenGraph
+  const ogLocales: Record<string, string> = {
+    es: 'es_ES',
+    en: 'en_US',
+    fr: 'fr_FR',
+    de: 'de_DE'
+  };
+  
+  return {
+    title: `${t("Las Mejores Campers en Alquiler")} | ${t("Desde 95€/día")} | Furgocasa`,
+    description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
+    keywords:"alquiler camper, autocaravana alquiler, alquiler furgoneta camper, motorhome españa, campervan alquiler, casa rodante, alquiler autocaravana españa",
+    authors: [{ name:"Furgocasa" }],
+    openGraph: {
+      title: `Furgocasa | ${t("Las Mejores Campers en Alquiler")}`,
+      description: `${t("Tu hotel 5 estrellas sobre ruedas")}. ${t("Flota premium desde 95€/día con kilómetros ilimitados")}. Dreamer, Knaus, Weinsberg.`,
+      type:"website",
+      url: `${baseUrl}/${locale}`,
+      siteName: t("Furgocasa - Alquiler de Autocaravanas"),
+      images: [
+        {
+          url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+          width: 1920,
+          height: 1080,
+          alt: `Furgocasa - ${t("Las Mejores Campers en Alquiler")}`,
+          type:"image/webp",
+        },
+        {
+          url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/new_slider_1.webp",
+          width: 1920,
+          height: 1080,
+          alt: t("Flota premium Dreamer, Knaus, Weinsberg"),
+          type:"image/webp",
+        },
+        {
+          url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_1.webp",
+          width: 1920,
+          height: 1080,
+          alt:"Interior camper Furgocasa",
+          type:"image/webp",
+        }
+      ],
+      locale: ogLocales[locale] || 'es_ES',
     },
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+    twitter: {
+      card:"summary_large_image",
+      site:"@furgocasa",
+      creator:"@furgocasa",
+      title: `Furgocasa | ${t("Las Mejores Campers en Alquiler")}`,
+      description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Kilómetros ilimitados, equipamiento completo")}.`,
+      images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        'es': `${baseUrl}/es`,
+        'en': `${baseUrl}/en`,
+        'fr': `${baseUrl}/fr`,
+        'de': `${baseUrl}/de`,
+        'x-default': `${baseUrl}/es`,
+      },
+    },
+    robots: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
-  },
-  verification: {
-    google: 'tu-codigo-de-verificacion-aqui', // Añadir código de Google Search Console
-  },
-};
+    verification: {
+      google: 'tu-codigo-de-verificacion-aqui', // Añadir código de Google Search Console
+    },
+  };
+}
 
 // ⚡ ISR: Revalidar cada hora
 export const revalidate = 3600;
 
 // ✅ SERVER COMPONENT
 export default async function HomePage() {
+  // Obtener el idioma desde los headers (establecido por el middleware)
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  
+  // Función helper para traducciones
+  const t = (key: string) => translateServer(key, locale);
+  
   // Cargar datos en el servidor
   const featuredVehicles = await getFeaturedVehicles();
   const blogArticles = await getLatestBlogArticles(3);
@@ -138,7 +166,7 @@ export default async function HomePage() {
               <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
               
               <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
-                Tu hotel
+                {t("Tu hotel")}
               </p>
               
               <div className="flex items-center justify-center gap-1" style={{ marginBottom: '0.5rem' }}>
@@ -148,11 +176,11 @@ export default async function HomePage() {
               </div>
               
               <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-6" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-                sobre ruedas
+                {t("sobre ruedas")}
               </p>
               
               <p className="text-sm md:text-base lg:text-lg text-white/85 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-                Las mejores furgonetas campers de gran volumen en alquiler
+                {t("Las mejores furgonetas campers de gran volumen en alquiler")}
               </p>
             </div>
 
@@ -168,19 +196,19 @@ export default async function HomePage() {
             {/* H2 Principal de la sección */}
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
-                LAS MEJORES CAMPER VANS EN ALQUILER
+                {t("LAS MEJORES CAMPER VANS EN ALQUILER")}
               </h2>
 
               {/* Intro a flota */}
               <div className="text-center max-w-3xl mx-auto">
                 <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
-                  Flota de vehículos de máxima calidad
+                  {t("Flota de vehículos de máxima calidad")}
                 </h3>
                 <p className="text-base lg:text-lg text-gray-700 leading-relaxed mb-3">
-                  <strong>FURGOCASA:</strong> estamos especializados en el alquiler de vehículos campers van de gran volumen.
+                  <strong>{t("FURGOCASA:")}</strong> {t("estamos especializados en el alquiler de vehículos campers van de gran volumen.")}
                 </p>
                 <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
-                  Contamos con los mejores modelos de furgonetas campers del mercado.
+                  {t("Contamos con los mejores modelos de furgonetas campers del mercado.")}
                 </p>
               </div>
             </div>
@@ -221,7 +249,7 @@ export default async function HomePage() {
                       href="/vehiculos"
                       className="inline-flex items-center gap-2 text-furgocasa-orange font-bold uppercase tracking-wider hover:text-furgocasa-orange-dark transition-colors text-sm"
                     >
-                      Ver más campers <span className="text-xl">→</span>
+                      {t("Ver más campers")} <span className="text-xl">→</span>
                     </LocalizedLink>
                   </div>
                 </div>
@@ -235,32 +263,32 @@ export default async function HomePage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
-                LA MEJOR RELACIÓN CALIDAD PRECIO
+                {t("LA MEJOR RELACIÓN CALIDAD PRECIO")}
               </span>
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
-                Nuestras autocaravanas Camper en alquiler desde
+                {t("Nuestras autocaravanas Camper en alquiler desde")}
               </h2>
               <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
-                PAGA el 50% al realizar la RESERVA y la mitad restante 15 días antes del comienzo del alquiler.
+                {t("PAGA el 50% al realizar la RESERVA y la mitad restante 15 días antes del comienzo del alquiler.")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto mb-12 lg:mb-16">
               {[
-                { season:"TEMPORADA BAJA", price:"95", color:"text-furgocasa-blue", border:"border-furgocasa-blue" },
-                { season:"Temporada Media", price:"125", color:"text-furgocasa-orange", border:"border-furgocasa-orange" },
-                { season:"Temporada Alta", price:"155", color:"text-red-500", border:"border-red-500" },
+                { seasonKey:"TEMPORADA BAJA", price:"95", color:"text-furgocasa-blue", border:"border-furgocasa-blue" },
+                { seasonKey:"Temporada Media", price:"125", color:"text-furgocasa-orange", border:"border-furgocasa-orange" },
+                { seasonKey:"Temporada Alta", price:"155", color:"text-red-500", border:"border-red-500" },
               ].map((pricing, index) => (
                 <div
                   key={index}
                   className={`bg-white rounded-2xl shadow-xl p-8 lg:p-10 text-center border-t-8 ${pricing.border} transform hover:scale-105 transition-transform duration-300`}
                 >
                   <h3 className="text-base lg:text-lg font-heading font-bold text-gray-500 mb-4 lg:mb-6 uppercase tracking-wider">
-                    {pricing.season}
+                    {t(pricing.seasonKey)}
                   </h3>
                   <div className="flex items-baseline justify-center gap-2 mb-2">
                     <span className={`text-5xl lg:text-6xl font-heading font-bold ${pricing.color}`}>{pricing.price}€</span>
-                    <span className="text-lg lg:text-xl text-gray-400 font-medium">/ día</span>
+                    <span className="text-lg lg:text-xl text-gray-400 font-medium">{t("/ día")}</span>
                   </div>
                 </div>
               ))}
@@ -268,7 +296,7 @@ export default async function HomePage() {
 
             <div className="text-center max-w-3xl mx-auto bg-gray-50 p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
               <p className="text-lg lg:text-xl font-medium text-gray-700">
-                Descuentos de hasta el <span className="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% y -30%</span> en alquileres de 1, 2 o 3 semanas.
+                {t("Descuentos de hasta el")} <span className="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% y -30%</span> {t("en alquileres de 1, 2 o 3 semanas")}.
               </p>
             </div>
 
@@ -277,7 +305,7 @@ export default async function HomePage() {
                 href="/tarifas"
                 className="inline-flex items-center gap-2 text-furgocasa-blue font-bold uppercase tracking-wider hover:text-furgocasa-blue-dark transition-colors"
               >
-                Ver todas las tarifas <span className="text-xl">→</span>
+                {t("Ver todas las tarifas")} <span className="text-xl">→</span>
               </LocalizedLink>
             </div>
           </div>
@@ -290,11 +318,11 @@ export default async function HomePage() {
               <div className="flex items-center justify-center gap-3 mb-4">
                 <Map className="h-8 w-8 text-furgocasa-blue" />
                 <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
-                  Principales destinos para visitar en Campervan
+                  {t("Principales destinos para visitar en Campervan")}
                 </h2>
               </div>
               <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-                Descubre los mejores destinos para tu próxima aventura en autocaravana
+                {t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}
               </p>
             </div>
             
@@ -307,10 +335,10 @@ export default async function HomePage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
-                Servicios que te hacen la vida más fácil
+                {t("Servicios que te hacen la vida más fácil")}
               </h2>
               <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-                Todo lo que necesitas para disfrutar de tu experiencia camper
+                {t("Todo lo que necesitas para disfrutar de tu experiencia camper")}
               </p>
             </div>
 
@@ -318,29 +346,29 @@ export default async function HomePage() {
               {[
                 {
                   icon: Bot,
-                  title:"Inteligencia Artificial",
-                  desc:"Planifica tu ruta perfecta con IA",
+                  titleKey:"Inteligencia Artificial",
+                  descKey:"Planifica tu ruta perfecta con IA",
                   link:"/inteligencia-artificial",
                   color:"from-purple-50 to-purple-100 border-purple-300"
                 },
                 {
                   icon: Map,
-                  title:"Mapa de áreas",
-                  desc:"Encuentra áreas de autocaravanas",
+                  titleKey:"Mapa de áreas",
+                  descKey:"Encuentra áreas de autocaravanas",
                   link:"/mapa-areas",
                   color:"from-blue-50 to-blue-100 border-blue-300"
                 },
                 {
                   icon: Calendar,
-                  title:"Parking MURCIA",
-                  desc:"Guarda tu camper con seguridad",
+                  titleKey:"Parking MURCIA",
+                  descKey:"Guarda tu camper con seguridad",
                   link:"/parking-murcia",
                   color:"from-green-50 to-green-100 border-green-300"
                 },
                 {
                   icon: HelpCircle,
-                  title:"FAQs",
-                  desc:"Resuelve todas tus dudas",
+                  titleKey:"FAQs",
+                  descKey:"Resuelve todas tus dudas",
                   link:"/faqs",
                   color:"from-orange-50 to-orange-100 border-orange-300"
                 },
@@ -352,10 +380,10 @@ export default async function HomePage() {
                 >
                   <service.icon className="h-12 w-12 text-gray-700 mb-4 group-hover:scale-110 transition-transform" />
                   <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">
-                    {service.title}
+                    {t(service.titleKey)}
                   </h3>
                   <p className="text-sm text-gray-700">
-                    {service.desc}
+                    {t(service.descKey)}
                   </p>
                 </LocalizedLink>
               ))}
@@ -371,11 +399,11 @@ export default async function HomePage() {
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <BookOpen className="h-8 w-8 text-furgocasa-blue" />
                   <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
-                    Blog de viajes en camper
+                    {t("Blog de viajes en camper")}
                   </h2>
                 </div>
                 <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-                  Consejos, rutas y experiencias para inspirar tu próxima aventura
+                  {t("Consejos, rutas y experiencias para inspirar tu próxima aventura")}
                 </p>
               </div>
 
@@ -425,7 +453,7 @@ export default async function HomePage() {
                           </time>
                         )}
                         <span className="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">
-                          Leer más →
+                          {t("Leer más")} →
                         </span>
                       </div>
                     </div>
@@ -439,7 +467,7 @@ export default async function HomePage() {
                   className="inline-flex items-center gap-2 bg-furgocasa-blue text-white px-8 py-4 rounded-xl font-bold uppercase tracking-wider hover:bg-furgocasa-blue-dark transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-300"
                 >
                   <BookOpen className="h-5 w-5" />
-                  Ver todos los artículos
+                  {t("Ver más artículos")}
                 </LocalizedLink>
               </div>
             </div>
@@ -451,21 +479,21 @@ export default async function HomePage() {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
-                ¿Por qué elegir Furgocasa?
+                {t("¿Por qué alquilar con Furgocasa?")}
               </h2>
               <p className="text-lg lg:text-xl text-blue-100 max-w-3xl mx-auto">
-                La mejor experiencia en alquiler de autocaravanas
+                {t("La tranquilidad de viajar con los mejores")}
               </p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
               {[
-                { icon: CheckCircle, title:"Kilómetros ilimitados", desc:"Viaja sin límites ni preocupaciones" },
-                { icon: Users, title:"Atención personalizada", desc:"Te acompañamos antes, durante y después" },
-                { icon: Shield, title:"Vehículos certificados", desc:"Mantenimiento y revisiones exhaustivas" },
-                { icon: Package, title:"Todo incluido", desc:"Utensilios, ropa de cama, kit camping" },
-                { icon: Calendar, title:"Cancelación flexible", desc:"Cancela hasta 60 días antes sin coste" },
-                { icon: MessageSquare, title:"Soporte 24/7", desc:"Asistencia en carretera incluida" },
+                { icon: CheckCircle, titleKey:"Kilómetros Ilimitados", descKey:"Viaja sin límites por España y Europa" },
+                { icon: Users, titleKey:"Atención Personalizada", descKey:"Te acompañamos antes, durante y después del viaje" },
+                { icon: Shield, titleKey:"Flota Premium", descKey:"Vehículos modernos y perfectamente equipados" },
+                { icon: Package, titleKey:"Todo Incluido", descKey:"Cocina completa, ropa de cama, kit de camping" },
+                { icon: Calendar, titleKey:"Cancelación flexible", descKey:"Cancela hasta 60 días antes sin coste" },
+                { icon: MessageSquare, titleKey:"Atención 24/7", descKey:"Te acompañamos durante todo el viaje" },
               ].map((benefit, index) => (
                 <div
                   key={index}
@@ -473,10 +501,10 @@ export default async function HomePage() {
                 >
                   <benefit.icon className="h-12 w-12 text-furgocasa-orange mb-4" />
                   <h3 className="text-lg font-heading font-bold mb-2">
-                    {benefit.title}
+                    {t(benefit.titleKey)}
                   </h3>
                   <p className="text-sm text-blue-100">
-                    {benefit.desc}
+                    {t(benefit.descKey)}
                   </p>
                 </div>
               ))}
@@ -486,19 +514,19 @@ export default async function HomePage() {
             <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
               <div>
                 <p className="text-4xl md:text-5xl font-heading font-bold mb-2">{stats.yearsExperience}+</p>
-                <p className="text-blue-200 uppercase tracking-wider text-sm">Años de experiencia</p>
+                <p className="text-blue-200 uppercase tracking-wider text-sm">{t("Años de experiencia")}</p>
               </div>
               <div>
                 <p className="text-4xl md:text-5xl font-heading font-bold mb-2">{stats.totalBookings}+</p>
-                <p className="text-blue-200 uppercase tracking-wider text-sm">Viajes realizados</p>
+                <p className="text-blue-200 uppercase tracking-wider text-sm">{t("Viajes realizados")}</p>
               </div>
               <div>
                 <p className="text-4xl md:text-5xl font-heading font-bold mb-2">{stats.totalVehicles}</p>
-                <p className="text-blue-200 uppercase tracking-wider text-sm">Vehículos Premium</p>
+                <p className="text-blue-200 uppercase tracking-wider text-sm">{t("Vehículos Premium")}</p>
               </div>
               <div>
                 <p className="text-4xl md:text-5xl font-heading font-bold mb-2">{stats.averageRating}</p>
-                <p className="text-blue-200 uppercase tracking-wider text-sm">Valoración Media</p>
+                <p className="text-blue-200 uppercase tracking-wider text-sm">{t("Valoración Media")}</p>
               </div>
             </div>
           </div>
@@ -508,23 +536,23 @@ export default async function HomePage() {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
-              ¿Listo para tu próxima aventura?
+              {t("¿Listo para tu próxima aventura?")}
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Reserva tu camper ahora y comienza a planear tu viaje inolvidable
+              {t("Reserva tu camper ahora y comienza a planear tu viaje inolvidable")}
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <LocalizedLink
                 href="/reservar"
                 className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg text-lg"
               >
-                Reservar ahora
+                {t("Reservar ahora")}
               </LocalizedLink>
               <LocalizedLink
                 href="/contacto"
                 className="inline-flex items-center gap-2 bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-blue hover:text-white transition-all text-lg"
               >
-                Contactar
+                {t("Contactar")}
               </LocalizedLink>
             </div>
           </div>

@@ -5538,8 +5538,614 @@ export const staticTranslations = {
   "Llamar": {
     es: "Llamar",
     en: "Call",
-    fr: "Call",
-    de: "Call"
+    fr: "Appeler",
+    de: "Anrufen"
+  },
+  
+  // ============================================
+  // LANDING PAGES DE ALQUILER POR LOCALIZACIÓN
+  // ============================================
+  "Alquiler de Autocaravanas": {
+    es: "Alquiler de Autocaravanas",
+    en: "Motorhome Rental",
+    fr: "Location de Camping-cars",
+    de: "Wohnmobilvermietung"
+  },
+  "en": {
+    es: "en",
+    en: "in",
+    fr: "à",
+    de: "in"
+  },
+  "Las mejores furgonetas campers de gran volumen en alquiler": {
+    es: "Las mejores furgonetas campers de gran volumen en alquiler",
+    en: "The best large volume camper vans for rent",
+    fr: "Les meilleurs camping-cars de grand volume en location",
+    de: "Die besten Großraum-Campervans zur Miete"
+  },
+  "ALQUILER CAMPER": {
+    es: "ALQUILER CAMPER",
+    en: "CAMPER RENTAL",
+    fr: "LOCATION CAMPING-CAR",
+    de: "WOHNMOBIL MIETEN"
+  },
+  "No estamos en": {
+    es: "No estamos en",
+    en: "We are not in",
+    fr: "Nous ne sommes pas à",
+    de: "Wir sind nicht in"
+  },
+  "¡¡Pero estamos muy cerca!!": {
+    es: "¡¡Pero estamos muy cerca!!",
+    en: "But we are very close!!",
+    fr: "Mais nous sommes très proches !!",
+    de: "Aber wir sind ganz in der Nähe!!"
+  },
+  "Nuestra sede en": {
+    es: "Nuestra sede en",
+    en: "Our headquarters at",
+    fr: "Notre siège à",
+    de: "Unser Standort in"
+  },
+  "está a apenas": {
+    es: "está a apenas",
+    en: "is just",
+    fr: "est à seulement",
+    de: "ist nur"
+  },
+  "km": {
+    es: "km",
+    en: "km",
+    fr: "km",
+    de: "km"
+  },
+  "hora": {
+    es: "hora",
+    en: "hour",
+    fr: "heure",
+    de: "Stunde"
+  },
+  "horas": {
+    es: "horas",
+    en: "hours",
+    fr: "heures",
+    de: "Stunden"
+  },
+  "en coche": {
+    es: "en coche",
+    en: "by car",
+    fr: "en voiture",
+    de: "mit dem Auto"
+  },
+  "¡¡Te merecerá la pena venir!!": {
+    es: "¡¡Te merecerá la pena venir!!",
+    en: "It will be worth coming!!",
+    fr: "Ça vaudra le coup de venir !!",
+    de: "Es lohnt sich zu kommen!!"
+  },
+  "Tu punto de partida perfecto para explorar": {
+    es: "Tu punto de partida perfecto para explorar",
+    en: "Your perfect starting point to explore",
+    fr: "Votre point de départ idéal pour explorer",
+    de: "Ihr perfekter Ausgangspunkt zum Erkunden von"
+  },
+  "en camper": {
+    es: "en camper",
+    en: "by camper",
+    fr: "en camping-car",
+    de: "mit dem Wohnmobil"
+  },
+  "Flota de vehículos de máxima calidad": {
+    es: "Flota de vehículos de máxima calidad",
+    en: "Fleet of top quality vehicles",
+    fr: "Flotte de véhicules de qualité supérieure",
+    de: "Fuhrpark mit Fahrzeugen höchster Qualität"
+  },
+  "Ver más campers": {
+    es: "Ver más campers",
+    en: "See more campers",
+    fr: "Voir plus de camping-cars",
+    de: "Mehr Wohnmobile ansehen"
+  },
+  "LA MEJOR RELACIÓN CALIDAD PRECIO": {
+    es: "LA MEJOR RELACIÓN CALIDAD PRECIO",
+    en: "THE BEST VALUE FOR MONEY",
+    fr: "LE MEILLEUR RAPPORT QUALITÉ-PRIX",
+    de: "DAS BESTE PREIS-LEISTUNGS-VERHÄLTNIS"
+  },
+  "Nuestras autocaravanas Camper en alquiler desde": {
+    es: "Nuestras autocaravanas Camper en alquiler desde",
+    en: "Our Camper motorhomes for rent from",
+    fr: "Nos camping-cars en location à partir de",
+    de: "Unsere Wohnmobile zur Miete ab"
+  },
+  "Temporada Baja": {
+    es: "Temporada Baja",
+    en: "Low Season",
+    fr: "Basse Saison",
+    de: "Nebensaison"
+  },
+  "Temporada Media": {
+    es: "Temporada Media",
+    en: "Mid Season",
+    fr: "Moyenne Saison",
+    de: "Zwischensaison"
+  },
+  "Temporada Alta": {
+    es: "Temporada Alta",
+    en: "High Season",
+    fr: "Haute Saison",
+    de: "Hochsaison"
+  },
+  "/ día": {
+    es: "/ día",
+    en: "/ day",
+    fr: "/ jour",
+    de: "/ Tag"
+  },
+  "Descuentos de hasta el": {
+    es: "Descuentos de hasta el",
+    en: "Discounts up to",
+    fr: "Réductions jusqu'à",
+    de: "Rabatte bis zu"
+  },
+  "en alquileres de 1, 2 o 3 semanas": {
+    es: "en alquileres de 1, 2 o 3 semanas",
+    en: "on rentals of 1, 2 or 3 weeks",
+    fr: "sur les locations de 1, 2 ou 3 semaines",
+    de: "bei Mietdauern von 1, 2 oder 3 Wochen"
+  },
+  "¿Por qué elegir Furgocasa para tu viaje desde": {
+    es: "¿Por qué elegir Furgocasa para tu viaje desde",
+    en: "Why choose Furgocasa for your trip from",
+    fr: "Pourquoi choisir Furgocasa pour votre voyage depuis",
+    de: "Warum Furgocasa für Ihre Reise von"
+  },
+  "Kilómetros Ilimitados": {
+    es: "Kilómetros Ilimitados",
+    en: "Unlimited Kilometers",
+    fr: "Kilométrage Illimité",
+    de: "Unbegrenzte Kilometer"
+  },
+  "Viaja sin límites por España y Europa": {
+    es: "Viaja sin límites por España y Europa",
+    en: "Travel without limits through Spain and Europe",
+    fr: "Voyagez sans limites en Espagne et en Europe",
+    de: "Reisen Sie grenzenlos durch Spanien und Europa"
+  },
+  "Flota Premium": {
+    es: "Flota Premium",
+    en: "Premium Fleet",
+    fr: "Flotte Premium",
+    de: "Premium-Flotte"
+  },
+  "Vehículos modernos y perfectamente equipados": {
+    es: "Vehículos modernos y perfectamente equipados",
+    en: "Modern and fully equipped vehicles",
+    fr: "Véhicules modernes et parfaitement équipés",
+    de: "Moderne und bestens ausgestattete Fahrzeuge"
+  },
+  "Todo Incluido": {
+    es: "Todo Incluido",
+    en: "All Inclusive",
+    fr: "Tout Compris",
+    de: "Alles Inklusive"
+  },
+  "Cocina completa, ropa de cama, kit de camping": {
+    es: "Cocina completa, ropa de cama, kit de camping",
+    en: "Full kitchen, bedding, camping kit",
+    fr: "Cuisine complète, literie, kit de camping",
+    de: "Komplette Küche, Bettwäsche, Camping-Set"
+  },
+  "Atención Personalizada": {
+    es: "Atención Personalizada",
+    en: "Personalized Attention",
+    fr: "Attention Personnalisée",
+    de: "Persönliche Betreuung"
+  },
+  "Te acompañamos antes, durante y después del viaje": {
+    es: "Te acompañamos antes, durante y después del viaje",
+    en: "We accompany you before, during and after the trip",
+    fr: "Nous vous accompagnons avant, pendant et après le voyage",
+    de: "Wir begleiten Sie vor, während und nach der Reise"
+  },
+  "¿Listo para tu aventura desde": {
+    es: "¿Listo para tu aventura desde",
+    en: "Ready for your adventure from",
+    fr: "Prêt pour votre aventure depuis",
+    de: "Bereit für Ihr Abenteuer von"
+  },
+  "Reserva ahora tu camper y comienza a planear tu próximo viaje inolvidable": {
+    es: "Reserva ahora tu camper y comienza a planear tu próximo viaje inolvidable",
+    en: "Book your camper now and start planning your next unforgettable trip",
+    fr: "Réservez votre camping-car maintenant et commencez à planifier votre prochain voyage inoubliable",
+    de: "Buchen Sie jetzt Ihr Wohnmobil und planen Sie Ihre nächste unvergessliche Reise"
+  },
+  "Ver vehículos": {
+    es: "Ver vehículos",
+    en: "View vehicles",
+    fr: "Voir les véhicules",
+    de: "Fahrzeuge ansehen"
+  },
+  "A": {
+    es: "A",
+    en: "At",
+    fr: "À",
+    de: "In"
+  },
+  "de Murcia": {
+    es: "de Murcia",
+    en: "from Murcia",
+    fr: "de Murcie",
+    de: "von Murcia"
+  },
+  
+  // ============================================
+  // HOME PAGE
+  // ============================================
+  "Tu hotel": {
+    es: "Tu hotel",
+    en: "Your hotel",
+    fr: "Votre hôtel",
+    de: "Ihr Hotel"
+  },
+  "sobre ruedas": {
+    es: "sobre ruedas",
+    en: "on wheels",
+    fr: "sur roues",
+    de: "auf Rädern"
+  },
+  "LAS MEJORES CAMPER VANS EN ALQUILER": {
+    es: "LAS MEJORES CAMPER VANS EN ALQUILER",
+    en: "THE BEST CAMPER VANS FOR RENT",
+    fr: "LES MEILLEURS CAMPING-CARS EN LOCATION",
+    de: "DIE BESTEN WOHNMOBILE ZUR MIETE"
+  },
+  "FURGOCASA:": {
+    es: "FURGOCASA:",
+    en: "FURGOCASA:",
+    fr: "FURGOCASA :",
+    de: "FURGOCASA:"
+  },
+  "estamos especializados en el alquiler de vehículos campers van de gran volumen.": {
+    es: "estamos especializados en el alquiler de vehículos campers van de gran volumen.",
+    en: "we specialize in renting large volume camper vans.",
+    fr: "nous sommes spécialisés dans la location de camping-cars de grand volume.",
+    de: "wir sind spezialisiert auf die Vermietung von Großraum-Wohnmobilen."
+  },
+  "Contamos con los mejores modelos de furgonetas campers del mercado.": {
+    es: "Contamos con los mejores modelos de furgonetas campers del mercado.",
+    en: "We have the best camper van models on the market.",
+    fr: "Nous avons les meilleurs modèles de camping-cars du marché.",
+    de: "Wir haben die besten Wohnmobil-Modelle auf dem Markt."
+  },
+  "PAGA el 50% al realizar la RESERVA y la mitad restante 15 días antes del comienzo del alquiler.": {
+    es: "PAGA el 50% al realizar la RESERVA y la mitad restante 15 días antes del comienzo del alquiler.",
+    en: "PAY 50% when making the BOOKING and the remaining half 15 days before the rental starts.",
+    fr: "PAYEZ 50% lors de la RÉSERVATION et l'autre moitié 15 jours avant le début de la location.",
+    de: "ZAHLEN Sie 50% bei der BUCHUNG und die restliche Hälfte 15 Tage vor Mietbeginn."
+  },
+  "TEMPORADA BAJA": {
+    es: "TEMPORADA BAJA",
+    en: "LOW SEASON",
+    fr: "BASSE SAISON",
+    de: "NEBENSAISON"
+  },
+  "Ver todas las tarifas": {
+    es: "Ver todas las tarifas",
+    en: "View all rates",
+    fr: "Voir tous les tarifs",
+    de: "Alle Preise ansehen"
+  },
+  "Principales destinos para visitar en Campervan": {
+    es: "Principales destinos para visitar en Campervan",
+    en: "Top destinations to visit by Campervan",
+    fr: "Principales destinations à visiter en Camping-car",
+    de: "Top-Reiseziele für Wohnmobilreisen"
+  },
+  "Descubre los mejores destinos para tu próxima aventura en autocaravana": {
+    es: "Descubre los mejores destinos para tu próxima aventura en autocaravana",
+    en: "Discover the best destinations for your next motorhome adventure",
+    fr: "Découvrez les meilleures destinations pour votre prochaine aventure en camping-car",
+    de: "Entdecken Sie die besten Reiseziele für Ihr nächstes Wohnmobil-Abenteuer"
+  },
+  "Servicios que te hacen la vida más fácil": {
+    es: "Servicios que te hacen la vida más fácil",
+    en: "Services that make your life easier",
+    fr: "Services qui vous facilitent la vie",
+    de: "Dienste, die Ihnen das Leben erleichtern"
+  },
+  "Todo lo que necesitas para disfrutar de tu experiencia camper": {
+    es: "Todo lo que necesitas para disfrutar de tu experiencia camper",
+    en: "Everything you need to enjoy your camper experience",
+    fr: "Tout ce dont vous avez besoin pour profiter de votre expérience camping-car",
+    de: "Alles, was Sie für Ihr Wohnmobil-Erlebnis brauchen"
+  },
+  "Planifica tu ruta perfecta con IA": {
+    es: "Planifica tu ruta perfecta con IA",
+    en: "Plan your perfect route with AI",
+    fr: "Planifiez votre itinéraire parfait avec l'IA",
+    de: "Planen Sie Ihre perfekte Route mit KI"
+  },
+  "Encuentra áreas de autocaravanas": {
+    es: "Encuentra áreas de autocaravanas",
+    en: "Find motorhome areas",
+    fr: "Trouvez des aires de camping-car",
+    de: "Finden Sie Wohnmobilstellplätze"
+  },
+  "Guarda tu camper con seguridad": {
+    es: "Guarda tu camper con seguridad",
+    en: "Store your camper safely",
+    fr: "Gardez votre camping-car en sécurité",
+    de: "Bewahren Sie Ihr Wohnmobil sicher auf"
+  },
+  "Resuelve todas tus dudas": {
+    es: "Resuelve todas tus dudas",
+    en: "Resolve all your questions",
+    fr: "Résolvez toutes vos questions",
+    de: "Lösen Sie alle Ihre Fragen"
+  },
+  "Últimos artículos del blog": {
+    es: "Últimos artículos del blog",
+    en: "Latest blog articles",
+    fr: "Derniers articles du blog",
+    de: "Neueste Blogartikel"
+  },
+  "Consejos, rutas y experiencias para tu próxima aventura": {
+    es: "Consejos, rutas y experiencias para tu próxima aventura",
+    en: "Tips, routes and experiences for your next adventure",
+    fr: "Conseils, itinéraires et expériences pour votre prochaine aventure",
+    de: "Tipps, Routen und Erfahrungen für Ihr nächstes Abenteuer"
+  },
+  "Ver más artículos del blog": {
+    es: "Ver más artículos del blog",
+    en: "See more blog articles",
+    fr: "Voir plus d'articles du blog",
+    de: "Mehr Blogartikel ansehen"
+  },
+  "¿Por qué alquilar con Furgocasa?": {
+    es: "¿Por qué alquilar con Furgocasa?",
+    en: "Why rent with Furgocasa?",
+    fr: "Pourquoi louer avec Furgocasa ?",
+    de: "Warum bei Furgocasa mieten?"
+  },
+  "La tranquilidad de viajar con los mejores": {
+    es: "La tranquilidad de viajar con los mejores",
+    en: "The peace of mind of traveling with the best",
+    fr: "La tranquillité de voyager avec les meilleurs",
+    de: "Die Ruhe, mit den Besten zu reisen"
+  },
+  "Vehículos nuevos": {
+    es: "Vehículos nuevos",
+    en: "New vehicles",
+    fr: "Véhicules neufs",
+    de: "Neue Fahrzeuge"
+  },
+  "Flota renovada constantemente": {
+    es: "Flota renovada constantemente",
+    en: "Constantly renewed fleet",
+    fr: "Flotte constamment renouvelée",
+    de: "Ständig erneuerte Flotte"
+  },
+  "Atención 24/7": {
+    es: "Atención 24/7",
+    en: "24/7 Support",
+    fr: "Assistance 24h/24",
+    de: "24/7 Support"
+  },
+  "Te acompañamos durante todo el viaje": {
+    es: "Te acompañamos durante todo el viaje",
+    en: "We accompany you throughout the trip",
+    fr: "Nous vous accompagnons tout au long du voyage",
+    de: "Wir begleiten Sie während der gesamten Reise"
+  },
+  "Seguro incluido": {
+    es: "Seguro incluido",
+    en: "Insurance included",
+    fr: "Assurance incluse",
+    de: "Versicherung inklusive"
+  },
+  "Viaja con total tranquilidad": {
+    es: "Viaja con total tranquilidad",
+    en: "Travel with complete peace of mind",
+    fr: "Voyagez en toute tranquillité",
+    de: "Reisen Sie mit völliger Ruhe"
+  },
+  "Equipamiento completo": {
+    es: "Equipamiento completo",
+    en: "Complete equipment",
+    fr: "Équipement complet",
+    de: "Komplette Ausstattung"
+  },
+  "Todo incluido para tu aventura": {
+    es: "Todo incluido para tu aventura",
+    en: "Everything included for your adventure",
+    fr: "Tout compris pour votre aventure",
+    de: "Alles inklusive für Ihr Abenteuer"
+  },
+  "¿Listo para tu próxima aventura?": {
+    es: "¿Listo para tu próxima aventura?",
+    en: "Ready for your next adventure?",
+    fr: "Prêt pour votre prochaine aventure ?",
+    de: "Bereit für Ihr nächstes Abenteuer?"
+  },
+  "Reserva tu camper ahora y comienza a planear tu viaje inolvidable": {
+    es: "Reserva tu camper ahora y comienza a planear tu viaje inolvidable",
+    en: "Book your camper now and start planning your unforgettable trip",
+    fr: "Réservez votre camping-car maintenant et commencez à planifier votre voyage inoubliable",
+    de: "Buchen Sie jetzt Ihr Wohnmobil und planen Sie Ihre unvergessliche Reise"
+  },
+  "Inteligencia Artificial": {
+    es: "Inteligencia Artificial",
+    en: "Artificial Intelligence",
+    fr: "Intelligence Artificielle",
+    de: "Künstliche Intelligenz"
+  },
+  "Mapa de áreas": {
+    es: "Mapa de áreas",
+    en: "Area Map",
+    fr: "Carte des aires",
+    de: "Gebietskarte"
+  },
+  "Parking MURCIA": {
+    es: "Parking MURCIA",
+    en: "MURCIA Parking",
+    fr: "Parking MURCIE",
+    de: "MURCIA Parkplatz"
+  },
+  "Blog de viajes en camper": {
+    es: "Blog de viajes en camper",
+    en: "Camper Travel Blog",
+    fr: "Blog de voyages en camping-car",
+    de: "Wohnmobil-Reiseblog"
+  },
+  "Consejos, rutas y experiencias para inspirar tu próxima aventura": {
+    es: "Consejos, rutas y experiencias para inspirar tu próxima aventura",
+    en: "Tips, routes and experiences to inspire your next adventure",
+    fr: "Conseils, itinéraires et expériences pour inspirer votre prochaine aventure",
+    de: "Tipps, Routen und Erlebnisse für Ihr nächstes Abenteuer"
+  },
+  "Ver más artículos": {
+    es: "Ver más artículos",
+    en: "See more articles",
+    fr: "Voir plus d'articles",
+    de: "Mehr Artikel ansehen"
+  },
+  
+  // ============================================
+  // META TITLES Y DESCRIPTIONS PARA SEO
+  // ============================================
+  "Alquiler de Campers en": {
+    es: "Alquiler de Campers en",
+    en: "Camper Rental in",
+    fr: "Location de Camping-cars à",
+    de: "Wohnmobilvermietung in"
+  },
+  "Desde 95€/día": {
+    es: "Desde 95€/día",
+    en: "From €95/day",
+    fr: "À partir de 95€/jour",
+    de: "Ab 95€/Tag"
+  },
+  "Alquiler de autocaravanas y campers cerca de": {
+    es: "Alquiler de autocaravanas y campers cerca de",
+    en: "Motorhome and camper rental near",
+    fr: "Location de camping-cars près de",
+    de: "Wohnmobil- und Campervermietung in der Nähe von"
+  },
+  "Flota premium con kilómetros ilimitados": {
+    es: "Flota premium con kilómetros ilimitados",
+    en: "Premium fleet with unlimited kilometers",
+    fr: "Flotte premium avec kilométrage illimité",
+    de: "Premium-Flotte mit unbegrenzten Kilometern"
+  },
+  "¡Reserva ahora!": {
+    es: "¡Reserva ahora!",
+    en: "Book now!",
+    fr: "Réservez maintenant !",
+    de: "Jetzt buchen!"
+  },
+  "Las Mejores Campers en Alquiler": {
+    es: "Las Mejores Campers en Alquiler",
+    en: "The Best Campers for Rent",
+    fr: "Les Meilleurs Camping-cars en Location",
+    de: "Die Besten Wohnmobile zur Miete"
+  },
+  "Alquiler de autocaravanas y campers de gran volumen": {
+    es: "Alquiler de autocaravanas y campers de gran volumen",
+    en: "Large volume motorhome and camper rental",
+    fr: "Location de camping-cars et vans de grand volume",
+    de: "Vermietung von Großraum-Wohnmobilen und Campern"
+  },
+  "Flota premium Dreamer, Knaus, Weinsberg": {
+    es: "Flota premium Dreamer, Knaus, Weinsberg",
+    en: "Premium fleet Dreamer, Knaus, Weinsberg",
+    fr: "Flotte premium Dreamer, Knaus, Weinsberg",
+    de: "Premium-Flotte Dreamer, Knaus, Weinsberg"
+  },
+  "Kilómetros ilimitados, equipamiento completo": {
+    es: "Kilómetros ilimitados, equipamiento completo",
+    en: "Unlimited kilometers, complete equipment",
+    fr: "Kilométrage illimité, équipement complet",
+    de: "Unbegrenzte Kilometer, komplette Ausstattung"
+  },
+  "¡Reserva tu camper ahora!": {
+    es: "¡Reserva tu camper ahora!",
+    en: "Book your camper now!",
+    fr: "Réservez votre camping-car maintenant !",
+    de: "Buchen Sie jetzt Ihr Wohnmobil!"
+  },
+  "Tu hotel 5 estrellas sobre ruedas": {
+    es: "Tu hotel 5 estrellas sobre ruedas",
+    en: "Your 5-star hotel on wheels",
+    fr: "Votre hôtel 5 étoiles sur roues",
+    de: "Ihr 5-Sterne-Hotel auf Rädern"
+  },
+  "Flota premium desde 95€/día con kilómetros ilimitados": {
+    es: "Flota premium desde 95€/día con kilómetros ilimitados",
+    en: "Premium fleet from €95/day with unlimited kilometers",
+    fr: "Flotte premium à partir de 95€/jour avec kilométrage illimité",
+    de: "Premium-Flotte ab 95€/Tag mit unbegrenzten Kilometern"
+  },
+  "Alquiler de Autocaravanas": {
+    es: "Alquiler de Autocaravanas",
+    en: "Motorhome Rental",
+    fr: "Location de Camping-cars",
+    de: "Wohnmobilvermietung"
+  },
+  "Furgocasa - Alquiler de Autocaravanas": {
+    es: "Furgocasa - Alquiler de Autocaravanas",
+    en: "Furgocasa - Motorhome Rental",
+    fr: "Furgocasa - Location de Camping-cars",
+    de: "Furgocasa - Wohnmobilvermietung"
+  },
+  "Leer más": {
+    es: "Leer más",
+    en: "Read more",
+    fr: "Lire plus",
+    de: "Mehr lesen"
+  },
+  "Cancelación flexible": {
+    es: "Cancelación flexible",
+    en: "Flexible cancellation",
+    fr: "Annulation flexible",
+    de: "Flexible Stornierung"
+  },
+  "Cancela hasta 60 días antes sin coste": {
+    es: "Cancela hasta 60 días antes sin coste",
+    en: "Cancel up to 60 days before at no cost",
+    fr: "Annulez jusqu'à 60 jours avant sans frais",
+    de: "Stornieren Sie bis zu 60 Tage vorher kostenlos"
+  },
+  "Años de experiencia": {
+    es: "Años de experiencia",
+    en: "Years of experience",
+    fr: "Années d'expérience",
+    de: "Jahre Erfahrung"
+  },
+  "Viajes realizados": {
+    es: "Viajes realizados",
+    en: "Trips completed",
+    fr: "Voyages réalisés",
+    de: "Durchgeführte Reisen"
+  },
+  "Vehículos Premium": {
+    es: "Vehículos Premium",
+    en: "Premium Vehicles",
+    fr: "Véhicules Premium",
+    de: "Premium-Fahrzeuge"
+  },
+  "Valoración Media": {
+    es: "Valoración Media",
+    en: "Average Rating",
+    fr: "Note Moyenne",
+    de: "Durchschnittliche Bewertung"
+  },
+  "Contactar": {
+    es: "Contactar",
+    en: "Contact",
+    fr: "Contacter",
+    de: "Kontakt"
   },
 };
 
