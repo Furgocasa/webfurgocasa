@@ -701,32 +701,32 @@ export const staticTranslations = {
   "Los precios se devengan por períodos completos de 24 horas": {
     es: "Los precios se devengan por períodos completos de 24 horas",
     en: "Prices accrue for complete 24-hour periods",
-    fr: "Prices accrue for complete 24-hour periods",
-    de: "Prices accrue for complete 24-hour periods"
+    fr: "Les prix sont calculés par périodes complètes de 24 heures",
+    de: "Die Preise werden für vollständige 24-Stunden-Zeiträume berechnet"
   },
   "Los descuentos se aplican automáticamente según la duración del alquiler": {
     es: "Los descuentos se aplican automáticamente según la duración del alquiler",
     en: "Discounts are applied automatically based on rental duration",
-    fr: "Discounts are applied automatically based on rental duration",
-    de: "Discounts are applied automatically based on rental duration"
+    fr: "Les réductions sont appliquées automatiquement selon la durée de location",
+    de: "Rabatte werden automatisch basierend auf der Mietdauer angewendet"
   },
   "Vehículos de 4 plazas:": {
     es: "Vehículos de 4 plazas:",
     en: "4-seat vehicles:",
-    fr: "4-seat vehicles:",
-    de: "4-seat vehicles:"
+    fr: "Véhicules 4 places :",
+    de: "4-Sitzer-Fahrzeuge:"
   },
   "En relación a los vehículos de hasta 4 plazas de noche, con dos camas, en el caso de que se desee incluir el colchón de la segunda cama y, por tanto, disfrutar de la posibilidad de que duerman hasta 4 personas, los precios anteriormente mostrados se incrementarán en 10,00 euros día, debiendo el cliente incluir el referido extra de alquiler en el momento de hacer la reserva.": {
     es: "En relación a los vehículos de hasta 4 plazas de noche, con dos camas, en el caso de que se desee incluir el colchón de la segunda cama y, por tanto, disfrutar de la posibilidad de que duerman hasta 4 personas, los precios anteriormente mostrados se incrementarán en 10,00 euros día, debiendo el cliente incluir el referido extra de alquiler en el momento de hacer la reserva.",
     en: "For vehicles with up to 4 sleeping places with two beds, if you wish to include the second bed mattress and therefore enjoy the possibility of up to 4 people sleeping, the prices shown above will be increased by 10.00 euros per day, with the customer having to include said rental extra at the time of booking.",
-    fr: "For vehicles with up to 4 sleeping places with two beds, if you wish to include the second bed mattress and therefore enjoy the possibility of up to 4 people sleeping, the prices shown above will be increased by 10.00 euros per day, with the customer having to include said rental extra at the time of booking.",
-    de: "For vehicles with up to 4 sleeping places with two beds, if you wish to include the second bed mattress and therefore enjoy the possibility of up to 4 people sleeping, the prices shown above will be increased by 10.00 euros per day, with the customer having to include said rental extra at the time of booking."
+    fr: "Pour les véhicules avec jusqu'à 4 places de couchage avec deux lits, si vous souhaitez inclure le matelas du deuxième lit et ainsi profiter de la possibilité de faire dormir jusqu'à 4 personnes, les prix indiqués ci-dessus seront augmentés de 10,00 euros par jour, le client devant inclure cet extra de location au moment de la réservation.",
+    de: "Für Fahrzeuge mit bis zu 4 Schlafplätzen mit zwei Betten, wenn Sie die Matratze des zweiten Bettes hinzufügen möchten und somit die Möglichkeit haben möchten, dass bis zu 4 Personen schlafen können, werden die oben angezeigten Preise um 10,00 Euro pro Tag erhöht, wobei der Kunde dieses Miet-Extra zum Zeitpunkt der Buchung hinzufügen muss."
   },
   "Modificación de fechas:": {
     es: "Modificación de fechas:",
     en: "Date modification:",
-    fr: "Date modification:",
-    de: "Date modification:"
+    fr: "Modification des dates :",
+    de: "Datumsänderung:"
   },
   "En el caso de que, habiéndose realizado una reserva previa, el cliente ejerza el derecho de modificación de fechas de su alquiler y el precio para estos nuevos días haya variado al alza o a la baja, siempre que la reserva se cambie dentro de la misma \"Temporada\", se mantendrá el precio día inicialmente contratado. En caso de que la modificación se realice a temporada distinta, se tendrán en cuenta para el ajuste los precios orientativos mostrados en esta tabla.": {
     es: "En el caso de que, habiéndose realizado una reserva previa, el cliente ejerza el derecho de modificación de fechas de su alquiler y el precio para estos nuevos días haya variado al alza o a la baja, siempre que la reserva se cambie dentro de la misma \"Temporada\", se mantendrá el precio día inicialmente contratado. En caso de que la modificación se realice a temporada distinta, se tendrán en cuenta para el ajuste los precios orientativos mostrados en esta tabla.",
@@ -735,50 +735,50 @@ export const staticTranslations = {
   "Método de pago:": {
     es: "Método de pago:",
     en: "Payment method:",
-    fr: "Payment method:",
-    de: "Payment method:"
+    fr: "Mode de paiement :",
+    de: "Zahlungsmethode:"
   },
   "El método de pago aceptado será el pago con tarjeta de débito o crédito a través de nuestra pasarela de pago segura Redsys.": {
     es: "El método de pago aceptado será el pago con tarjeta de débito o crédito a través de nuestra pasarela de pago segura Redsys.",
     en: "The accepted payment method will be payment by debit or credit card through our secure Redsys payment gateway.",
-    fr: "The accepted payment method will be payment by debit or credit card through our secure Redsys payment gateway.",
-    de: "The accepted payment method will be payment by debit or credit card through our secure Redsys payment gateway."
+    fr: "Le mode de paiement accepté est le paiement par carte de débit ou de crédit via notre passerelle de paiement sécurisée Redsys.",
+    de: "Die akzeptierte Zahlungsmethode ist die Zahlung per Debit- oder Kreditkarte über unser sicheres Redsys-Zahlungsgateway."
   },
   "Consultar precio para mis fechas": {
     es: "Consultar precio para mis fechas",
     en: "Check price for my dates",
-    fr: "Check price for my dates",
-    de: "Check price for my dates"
+    fr: "Vérifier le prix pour mes dates",
+    de: "Preis für meine Daten prüfen"
   },
   "Temporadas de alquiler de autocaravanas Campervans": {
     es: "Temporadas de alquiler de autocaravanas Campervans",
     en: "Campervan rental seasons",
-    fr: "Campervan rental seasons",
-    de: "Campervan rental seasons"
+    fr: "Saisons de location de camping-cars",
+    de: "Wohnmobil-Mietsaisons"
   },
   "Para conocer las fechas de cada temporada consulta nuestro calendario": {
     es: "Para conocer las fechas de cada temporada consulta nuestro calendario",
     en: "To know the dates of each season check our calendar",
-    fr: "To know the dates of each season check our calendar",
-    de: "To know the dates of each season check our calendar"
+    fr: "Pour connaître les dates de chaque saison, consultez notre calendrier",
+    de: "Um die Daten jeder Saison zu erfahren, prüfen Sie unseren Kalender"
   },
   "Meses disponibles para reserva": {
     es: "Meses disponibles para reserva",
     en: "Available months for booking",
-    fr: "Available months for booking",
-    de: "Available months for booking"
+    fr: "Mois disponibles pour la réservation",
+    de: "Verfügbare Monate für Buchungen"
   },
   "Planifica tu viaje con anticipación": {
     es: "Planifica tu viaje con anticipación",
     en: "Plan your trip in advance",
-    fr: "Plan your trip in advance",
-    de: "Plan your trip in advance"
+    fr: "Planifiez votre voyage à l'avance",
+    de: "Planen Sie Ihre Reise im Voraus"
   },
   "Los calendarios de temporadas 2025 y 2026 están disponibles en nuestra oficina": {
     es: "Los calendarios de temporadas 2025 y 2026 están disponibles en nuestra oficina",
     en: "The 2025 and 2026 season calendars are available at our office",
-    fr: "The 2025 and 2026 season calendars are available at our office",
-    de: "The 2025 and 2026 season calendars are available at our office"
+    fr: "Les calendriers des saisons 2025 et 2026 sont disponibles à notre bureau",
+    de: "Die Saisonkalender 2025 und 2026 sind in unserem Büro erhältlich"
   },
   "Solicitar información": {
     es: "Solicitar información",
@@ -789,14 +789,14 @@ export const staticTranslations = {
   "Requisitos del conductor": {
     es: "Requisitos del conductor",
     en: "Driver requirements",
-    fr: "Driver requirements",
-    de: "Driver requirements"
+    fr: "Conditions requises pour le conducteur",
+    de: "Fahreranforderungen"
   },
   "Todo lo que necesitas para alquilar una camper con nosotros": {
     es: "Todo lo que necesitas para alquilar una camper con nosotros",
     en: "Everything you need to rent a camper with us",
-    fr: "Everything you need to rent a camper with us",
-    de: "Everything you need to rent a camper with us"
+    fr: "Tout ce dont vous avez besoin pour louer un camping-car chez nous",
+    de: "Alles was Sie brauchen, um ein Wohnmobil bei uns zu mieten"
   },
   "Edad mínima": {
     es: "Edad mínima",
@@ -807,98 +807,98 @@ export const staticTranslations = {
   "El conductor principal y cada conductor adicional deben tener un mínimo de 25 años de edad.": {
     es: "El conductor principal y cada conductor adicional deben tener un mínimo de 25 años de edad.",
     en: "The main driver and each additional driver must be at least 25 years old.",
-    fr: "The main driver and each additional driver must be at least 25 years old.",
-    de: "The main driver and each additional driver must be at least 25 years old."
+    fr: "Le conducteur principal et chaque conducteur supplémentaire doivent avoir au moins 25 ans.",
+    de: "Der Hauptfahrer und jeder zusätzliche Fahrer muss mindestens 25 Jahre alt sein."
   },
   "Máximo 2 conductores por alquiler": {
     es: "Máximo 2 conductores por alquiler",
     en: "Maximum 2 drivers per rental",
-    fr: "Maximum 2 drivers per rental",
-    de: "Maximum 2 drivers per rental"
+    fr: "Maximum 2 conducteurs par location",
+    de: "Maximal 2 Fahrer pro Miete"
   },
   "Permiso de conducción": {
     es: "Permiso de conducción",
     en: "Driving license",
-    fr: "Driving license",
-    de: "Driving license"
+    fr: "Permis de conduire",
+    de: "Führerschein"
   },
   "Carnet de conducir tipo B en vigor, con una antigüedad mínima de 2 años.": {
     es: "Carnet de conducir tipo B en vigor, con una antigüedad mínima de 2 años.",
     en: "Type B driving license in force, with a minimum seniority of 2 years.",
-    fr: "Type B driving license in force, with a minimum seniority of 2 years.",
-    de: "Type B driving license in force, with a minimum seniority of 2 years."
+    fr: "Permis de conduire de type B en cours de validité, avec une ancienneté minimale de 2 ans.",
+    de: "Gültiger Führerschein der Klasse B mit einer Mindesterfahrung von 2 Jahren."
   },
   "Si no eres residente UE, permiso internacional necesario": {
     es: "Si no eres residente UE, permiso internacional necesario",
     en: "If you are not an EU resident, international permit required",
-    fr: "If you are not an EU resident, international permit required",
-    de: "If you are not an EU resident, international permit required"
+    fr: "Si vous n'êtes pas résident de l'UE, un permis international est requis",
+    de: "Wenn Sie kein EU-Bürger sind, ist ein internationaler Führerschein erforderlich"
   },
   "Documentación": {
     es: "Documentación",
     en: "Documentation",
     fr: "Documentation",
-    de: "Documentation"
+    de: "Dokumentation"
   },
   "Debes enviar copia del DNI/Pasaporte y del carnet de conducir antes del inicio del alquiler.": {
     es: "Debes enviar copia del DNI/Pasaporte y del carnet de conducir antes del inicio del alquiler.",
     en: "You must send a copy of your ID/Passport and driving license before the rental starts.",
-    fr: "You must send a copy of your ID/Passport and driving license before the rental starts.",
-    de: "You must send a copy of your ID/Passport and driving license before the rental starts."
+    fr: "Vous devez envoyer une copie de votre pièce d'identité/passeport et de votre permis de conduire avant le début de la location.",
+    de: "Sie müssen vor Mietbeginn eine Kopie Ihres Ausweises/Reisepasses und Führerscheins senden."
   },
   "Envía la documentación a reservas@furgocasa.com": {
     es: "Envía la documentación a reservas@furgocasa.com",
     en: "Send documentation to reservas@furgocasa.com",
-    fr: "Send documentation to reservas@furgocasa.com",
-    de: "Send documentation to reservas@furgocasa.com"
+    fr: "Envoyez la documentation à reservas@furgocasa.com",
+    de: "Senden Sie die Dokumentation an reservas@furgocasa.com"
   },
   "Documentación necesaria": {
     es: "Documentación necesaria",
     en: "Required documentation",
-    fr: "Required documentation",
-    de: "Required documentation"
+    fr: "Documentation requise",
+    de: "Erforderliche Dokumentation"
   },
   "Antes del inicio del alquiler, necesitamos que nos envíes:": {
     es: "Antes del inicio del alquiler, necesitamos que nos envíes:",
     en: "Before the rental starts, we need you to send us:",
-    fr: "Before the rental starts, we need you to send us:",
-    de: "Before the rental starts, we need you to send us:"
+    fr: "Avant le début de la location, nous avons besoin que vous nous envoyiez :",
+    de: "Vor Mietbeginn benötigen wir von Ihnen:"
   },
   "DNI o Pasaporte": {
     es: "DNI o Pasaporte",
     en: "ID or Passport",
-    fr: "ID or Passport",
-    de: "ID or Passport"
+    fr: "Carte d'identité ou passeport",
+    de: "Ausweis oder Reisepass"
   },
   "en vigor de todos los conductores": {
     es: "en vigor de todos los conductores",
     en: "in force of all drivers",
-    fr: "in force of all drivers",
-    de: "in force of all drivers"
+    fr: "en cours de validité de tous les conducteurs",
+    de: "gültig für alle Fahrer"
   },
   "Carnet de conducir": {
     es: "Carnet de conducir",
     en: "Driving license",
-    fr: "Driving license",
-    de: "Driving license"
+    fr: "Permis de conduire",
+    de: "Führerschein"
   },
   "por ambas caras de todos los conductores": {
     es: "por ambas caras de todos los conductores",
     en: "both sides of all drivers",
-    fr: "both sides of all drivers",
-    de: "both sides of all drivers"
+    fr: "recto-verso de tous les conducteurs",
+    de: "beidseitig von allen Fahrern"
   },
   "Permiso internacional": {
     es: "Permiso internacional",
     en: "International permit",
-    fr: "International permit",
-    de: "International permit"
+    fr: "Permis international",
+    de: "Internationaler Führerschein"
   },
   "si no eres residente en la UE": {
     es: "si no eres residente en la UE",
     en: "if you are not an EU resident",
-    fr: "if you are not an EU resident",
-    de: "if you are not an EU resident"
+    fr: "si vous n'êtes pas résident de l'UE",
+    de: "wenn Sie kein EU-Bürger sind"
   },
   "Importante": {
     es: "Importante",
@@ -1005,68 +1005,68 @@ export const staticTranslations = {
   "Derecho de desistimiento": {
     es: "Derecho de desistimiento",
     en: "Right of withdrawal",
-    fr: "Right of withdrawal",
-    de: "Right of withdrawal"
+    fr: "Droit de retractation",
+    de: "Widerrufsrecht"
   },
   "El cliente dispone de 14 días naturales del derecho a desistir del contrato de alquiler sin necesidad de justificación y sin penalización alguna.": {
     es: "El cliente dispone de 14 días naturales del derecho a desistir del contrato de alquiler sin necesidad de justificación y sin penalización alguna.",
     en: "The customer has 14 calendar days of the right to withdraw from the rental contract without justification and without any penalty.",
-    fr: "The customer has 14 calendar days of the right to withdraw from the rental contract without justification and without any penalty.",
-    de: "The customer has 14 calendar days of the right to withdraw from the rental contract without justification and without any penalty."
+    fr: "Le client dispose de 14 jours calendaires pour se retirer du contrat de location sans justification et sans penalite.",
+    de: "Der Kunde hat 14 Kalendertage das Recht, vom Mietvertrag ohne Begrundung und ohne Strafe zuruckzutreten."
   },
   "El plazo de desistimiento expira a los 14 días naturales del envío de la factura y contrato por parte de FURGOCASA.": {
     es: "El plazo de desistimiento expira a los 14 días naturales del envío de la factura y contrato por parte de FURGOCASA.",
     en: "The withdrawal period expires 14 calendar days after the invoice and contract are sent by FURGOCASA.",
-    fr: "The withdrawal period expires 14 calendar days after the invoice and contract are sent by FURGOCASA.",
-    de: "The withdrawal period expires 14 calendar days after the invoice and contract are sent by FURGOCASA."
+    fr: "Le delai de retractation expire 14 jours calendaires apres l'envoi de la facture et du contrat par FURGOCASA.",
+    de: "Die Widerrufsfrist lauft 14 Kalendertage nach Versand der Rechnung und des Vertrags durch FURGOCASA ab."
   },
   "Si entre la reserva y el inicio del alquiler distan menos de 14 días, el derecho para desistir vence, como tarde, 7 días antes del inicio del viaje.": {
     es: "Si entre la reserva y el inicio del alquiler distan menos de 14 días, el derecho para desistir vence, como tarde, 7 días antes del inicio del viaje.",
     en: "If there are less than 14 days between the reservation and the start of the rental, the right to withdraw expires, at the latest, 7 days before the start of the trip.",
-    fr: "If there are less than 14 days between the reservation and the start of the rental, the right to withdraw expires, at the latest, 7 days before the start of the trip.",
-    de: "If there are less than 14 days between the reservation and the start of the rental, the right to withdraw expires, at the latest, 7 days before the start of the trip."
+    fr: "S'il y a moins de 14 jours entre la reservation et le debut de la location, le droit de retractation expire, au plus tard, 7 jours avant le debut du voyage.",
+    de: "Wenn zwischen der Reservierung und dem Mietbeginn weniger als 14 Tage liegen, erlischt das Widerrufsrecht spatestens 7 Tage vor Reisebeginn."
   },
   "Si la reserva se realiza con menos de 7 días de antelación al inicio del viaje, no podrá ejercitarse este derecho.": {
     es: "Si la reserva se realiza con menos de 7 días de antelación al inicio del viaje, no podrá ejercitarse este derecho.",
     en: "If the reservation is made less than 7 days before the start of the trip, this right cannot be exercised.",
-    fr: "If the reservation is made less than 7 days before the start of the trip, this right cannot be exercised.",
-    de: "If the reservation is made less than 7 days before the start of the trip, this right cannot be exercised."
+    fr: "Si la reservation est effectuee moins de 7 jours avant le debut du voyage, ce droit ne peut etre exerce.",
+    de: "Wenn die Reservierung weniger als 7 Tage vor Reisebeginn erfolgt, kann dieses Recht nicht ausgeubt werden."
   },
   "Modificación de fechas": {
     es: "Modificación de fechas",
     en: "Date modification",
-    fr: "Date modification",
-    de: "Date modification"
+    fr: "Modification des dates",
+    de: "Datumsanderung"
   },
   "El cliente tiene la opción de modificar una vez las fechas de su alquiler sin coste alguno.": {
     es: "El cliente tiene la opción de modificar una vez las fechas de su alquiler sin coste alguno.",
     en: "The customer has the option to modify the dates of their rental once at no cost.",
-    fr: "The customer has the option to modify the dates of their rental once at no cost.",
-    de: "The customer has the option to modify the dates of their rental once at no cost."
+    fr: "Le client a la possibilite de modifier les dates de sa location une fois sans frais.",
+    de: "Der Kunde hat die Moglichkeit, die Daten seiner Miete einmal kostenlos zu andern."
   },
   "Misma temporada": {
     es: "Misma temporada",
     en: "Same season",
-    fr: "Same season",
-    de: "Same season"
+    fr: "Meme saison",
+    de: "Gleiche Saison"
   },
   "Si el precio ha variado pero cambias dentro de la misma temporada, se mantiene el precio día inicial.": {
     es: "Si el precio ha variado pero cambias dentro de la misma temporada, se mantiene el precio día inicial.",
     en: "If the price has varied but you change within the same season, the initial daily price is maintained.",
-    fr: "If the price has varied but you change within the same season, the initial daily price is maintained.",
-    de: "If the price has varied but you change within the same season, the initial daily price is maintained."
+    fr: "Si le prix a varie mais que vous changez au sein de la meme saison, le prix journalier initial est maintenu.",
+    de: "Wenn der Preis variiert hat, Sie aber innerhalb derselben Saison andern, wird der ursprungliche Tagespreis beibehalten."
   },
   "Temporada distinta": {
     es: "Temporada distinta",
     en: "Different season",
-    fr: "Different season",
-    de: "Different season"
+    fr: "Saison differente",
+    de: "Andere Saison"
   },
   "Se aplicará el ajuste según los precios orientativos de la nueva temporada.": {
     es: "Se aplicará el ajuste según los precios orientativos de la nueva temporada.",
     en: "The adjustment will be applied according to the indicative prices of the new season.",
-    fr: "The adjustment will be applied according to the indicative prices of the new season.",
-    de: "The adjustment will be applied according to the indicative prices of the new season."
+    fr: "L'ajustement sera applique selon les prix indicatifs de la nouvelle saison.",
+    de: "Die Anpassung erfolgt nach den Richtpreisen der neuen Saison."
   },
   "Fianza": {
     es: "Fianza",
@@ -1083,44 +1083,44 @@ export const staticTranslations = {
   "Antes de confirmar la cita del alquiler (máximo 72 horas antes), deberás abonar la fianza mediante transferencia bancaria como garantía del fiel cumplimiento del contrato.": {
     es: "Antes de confirmar la cita del alquiler (máximo 72 horas antes), deberás abonar la fianza mediante transferencia bancaria como garantía del fiel cumplimiento del contrato.",
     en: "Before confirming the rental appointment (maximum 72 hours before), you must pay the deposit by bank transfer as a guarantee of faithful compliance with the contract.",
-    fr: "Before confirming the rental appointment (maximum 72 hours before), you must pay the deposit by bank transfer as a guarantee of faithful compliance with the contract.",
-    de: "Before confirming the rental appointment (maximum 72 hours before), you must pay the deposit by bank transfer as a guarantee of faithful compliance with the contract."
+    fr: "Avant de confirmer le rendez-vous de location (maximum 72 heures avant), vous devez payer la caution par virement bancaire en garantie du bon respect du contrat.",
+    de: "Vor Bestatigung des Miettermins (maximal 72 Stunden vorher) mussen Sie die Kaution per Bankuberweisung als Garantie fur die ordnungsgemasse Vertragserfullung zahlen."
   },
   "Pago mediante transferencia bancaria": {
     es: "Pago mediante transferencia bancaria",
     en: "Payment by bank transfer",
-    fr: "Payment by bank transfer",
-    de: "Payment by bank transfer"
+    fr: "Paiement par virement bancaire",
+    de: "Zahlung per Bankuberweisung"
   },
   "Máximo 72 horas antes del inicio": {
     es: "Máximo 72 horas antes del inicio",
     en: "Maximum 72 hours before start",
-    fr: "Maximum 72 hours before start",
-    de: "Maximum 72 hours before start"
+    fr: "Maximum 72 heures avant le debut",
+    de: "Maximal 72 Stunden vor Beginn"
   },
   "Enviar justificante y certificado de titularidad": {
     es: "Enviar justificante y certificado de titularidad",
     en: "Send proof and certificate of ownership",
-    fr: "Send proof and certificate of ownership",
-    de: "Send proof and certificate of ownership"
+    fr: "Envoyer justificatif et certificat de propriete",
+    de: "Nachweis und Eigentumszertifikat senden"
   },
   "El titular debe coincidir con el arrendatario": {
     es: "El titular debe coincidir con el arrendatario",
     en: "The holder must match the lessee",
-    fr: "The holder must match the lessee",
-    de: "The holder must match the lessee"
+    fr: "Le titulaire doit correspondre au locataire",
+    de: "Der Inhaber muss mit dem Mieter ubereinstimmen"
   },
   "Devolución en 10 días laborables tras la devolución": {
     es: "Devolución en 10 días laborables tras la devolución",
     en: "Return within 10 working days after return",
-    fr: "Return within 10 working days after return",
-    de: "Return within 10 working days after return"
+    fr: "Remboursement sous 10 jours ouvrables apres le retour",
+    de: "Ruckerstattung innerhalb von 10 Werktagen nach Ruckgabe"
   },
   "Examen del vehículo durante ese período": {
     es: "Examen del vehículo durante ese período",
     en: "Vehicle examination during that period",
-    fr: "Vehicle examination during that period",
-    de: "Vehicle examination during that period"
+    fr: "Examen du vehicule pendant cette periode",
+    de: "Fahrzeugprufung wahrend dieser Zeit"
   },
   "Seguro a todo riesgo": {
     es: "Seguro a todo riesgo",
@@ -1131,20 +1131,20 @@ export const staticTranslations = {
   "Franquicia por siniestro": {
     es: "Franquicia por siniestro",
     en: "Deductible per claim",
-    fr: "Deductible per claim",
-    de: "Deductible per claim"
+    fr: "Franchise par sinistre",
+    de: "Selbstbeteiligung pro Schadensfall"
   },
   "Coste máximo a sufragar en caso de accidente": {
     es: "Coste máximo a sufragar en caso de accidente",
     en: "Maximum cost to be borne in case of accident",
-    fr: "Maximum cost to be borne in case of accident",
-    de: "Maximum cost to be borne in case of accident"
+    fr: "Cout maximum a supporter en cas d'accident",
+    de: "Maximale Kosten im Unfallfall"
   },
   "Todas nuestras campers cuentan con seguro a todo riesgo apto para alquiler sin conductor. En caso de varios accidentes, la franquicia actúa de forma independiente para cada uno.": {
     es: "Todas nuestras campers cuentan con seguro a todo riesgo apto para alquiler sin conductor. En caso de varios accidentes, la franquicia actúa de forma independiente para cada uno.",
     en: "All our campers have comprehensive insurance suitable for rental without a driver. In case of several accidents, the deductible acts independently for each one.",
-    fr: "All our campers have comprehensive insurance suitable for rental without a driver. In case of several accidents, the deductible acts independently for each one.",
-    de: "All our campers have comprehensive insurance suitable for rental without a driver. In case of several accidents, the deductible acts independently for each one."
+    fr: "Tous nos camping-cars disposent d'une assurance tous risques adaptee a la location sans chauffeur. En cas de plusieurs accidents, la franchise s'applique independamment pour chacun.",
+    de: "Alle unsere Wohnmobile haben eine Vollkaskoversicherung, die fur die Vermietung ohne Fahrer geeignet ist. Bei mehreren Unfallen gilt die Selbstbeteiligung unabhangig fur jeden."
   },
   "Cobertura a todo riesgo incluida": {
     es: "Cobertura a todo riesgo incluida",
@@ -2155,8 +2155,8 @@ export const staticTranslations = {
   "De Lunes a Viernes": {
     es: "De Lunes a Viernes",
     en: "Monday to Friday",
-    fr: "Monday to Friday",
-    de: "Monday to Friday"
+    fr: "Lundi à vendredi",
+    de: "Montag bis Freitag"
   },
   "De 10:00 a 14:00 y de 17:00 a 19:30": {
     es: "De 10:00 a 14:00 y de 17:00 a 19:30",
@@ -2319,8 +2319,8 @@ export const staticTranslations = {
   "¿Tienes alguna duda?": {
     es: "¿Tienes alguna duda?",
     en: "Do you have any questions?",
-    fr: "Do you have any questions?",
-    de: "Do you have any questions?"
+    fr: "Avez-vous des questions ?",
+    de: "Haben Sie Fragen?"
   },
   "Consulta nuestra guía escrita o contáctanos": {
     es: "Consulta nuestra guía escrita o contáctanos",
@@ -2919,8 +2919,8 @@ export const staticTranslations = {
   "camas": {
     es: "camas",
     en: "beds",
-    fr: "beds",
-    de: "beds"
+    fr: "lits",
+    de: "Betten"
   },
   "CONTACTAR CON EXPERTO": {
     es: "CONTACTAR CON EXPERTO",
@@ -3169,8 +3169,8 @@ export const staticTranslations = {
   "Copiar": {
     es: "Copiar",
     en: "Copy",
-    fr: "Copy",
-    de: "Copy"
+    fr: "Copier",
+    de: "Kopieren"
   },
   "Beneficiario": {
     es: "Beneficiario",
@@ -3407,8 +3407,8 @@ export const staticTranslations = {
   "Tu reserva ha sido confirmada": {
     es: "Tu reserva ha sido confirmada",
     en: "Your booking has been confirmed",
-    fr: "Your booking has been confirmed",
-    de: "Your booking has been confirmed"
+    fr: "Votre reservation a ete confirmee",
+    de: "Ihre Buchung wurde bestatigt"
   },
   "Detalles de la transacción": {
     es: "Detalles de la transacción",
@@ -3512,8 +3512,8 @@ export const staticTranslations = {
   "Por favor, inténtalo de nuevo": {
     es: "Por favor, inténtalo de nuevo",
     en: "Please try again",
-    fr: "Please try again",
-    de: "Please try again"
+    fr: "Veuillez reessayer",
+    de: "Bitte versuchen Sie es erneut"
   },
   "vehículo": {
     es: "vehículo",
@@ -3882,8 +3882,8 @@ export const staticTranslations = {
   "Phone": {
     es: "Phone",
     en: "Phone",
-    fr: "Phone",
-    de: "Phone"
+    fr: "Telephone",
+    de: "Telefon"
   },
   "Asunto": {
     es: "Asunto",
@@ -3996,8 +3996,8 @@ export const staticTranslations = {
   "De lunes a viernes": {
     es: "De lunes a viernes",
     en: "Monday to Friday",
-    fr: "Monday to Friday",
-    de: "Monday to Friday"
+    fr: "Lundi à vendredi",
+    de: "Montag bis Freitag"
   },
 
   // ===== PÁGINA OFERTAS - TEXTOS ADICIONALES =====
@@ -5074,8 +5074,8 @@ export const staticTranslations = {
   "Silla para bebé": {
     es: "Silla para bebé",
     en: "Baby seat",
-    fr: "Baby seat",
-    de: "Baby seat"
+    fr: "Siège bébé",
+    de: "Kindersitz"
   },
   "Bicicletas": {
     es: "Bicicletas",
