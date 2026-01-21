@@ -25,6 +25,12 @@ interface VehicleDamage {
   created_at: string | null;
 }
 
+interface VehicleImage {
+  id: string;
+  image_url: string;
+  is_primary: boolean | null;
+}
+
 interface Vehicle {
   id: string;
   name: string;
@@ -34,6 +40,7 @@ interface Vehicle {
   main_image_url: string | null;
   status: string | null;
   vehicle_damages?: VehicleDamage[];
+  vehicle_images?: VehicleImage[];
 }
 
 const severityColors: Record<string, { bg: string; text: string; label: string }> = {
@@ -52,7 +59,7 @@ export default function DamagesPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Cargar vehículos con sus daños
+  // Cargar vehículos con sus daños e imágenes
   const { 
     data: vehicles, 
     loading,
@@ -69,6 +76,11 @@ export default function DamagesPage() {
       internal_code,
       main_image_url,
       status,
+      vehicle_images (
+        id,
+        image_url,
+        is_primary
+      ),
       vehicle_damages (
         id,
         damage_number,
@@ -84,7 +96,7 @@ export default function DamagesPage() {
     staleTime: 1000 * 60 * 5, // 5 minutos
   });
 
-  // Procesar vehículos con estadísticas de daños
+  // Procesar vehículos con estadísticas de daños e imagen principal
   const processedVehicles = useMemo(() => {
     if (!vehicles) return [];
     
@@ -95,8 +107,15 @@ export default function DamagesPage() {
       const exteriorDamages = damages.filter(d => d.damage_type === 'exterior');
       const interiorDamages = damages.filter(d => d.damage_type === 'interior');
       
+      // Obtener imagen principal: primero la marcada como primary, luego la primera, luego main_image_url
+      const images = vehicle.vehicle_images || [];
+      const primaryImage = images.find(img => img.is_primary);
+      const firstImage = images[0];
+      const imageUrl = primaryImage?.image_url || firstImage?.image_url || vehicle.main_image_url;
+      
       return {
         ...vehicle,
+        imageUrl, // Imagen procesada
         totalDamages: damages.length,
         pendingDamages: pendingDamages.length,
         repairedDamages: repairedDamages.length,
@@ -251,9 +270,9 @@ export default function DamagesPage() {
               <div className="flex items-start gap-4">
                 {/* Vehicle Image */}
                 <div className="w-20 h-16 bg-gray-200 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                  {vehicle.main_image_url ? (
+                  {vehicle.imageUrl ? (
                     <img 
-                      src={vehicle.main_image_url} 
+                      src={vehicle.imageUrl} 
                       alt={vehicle.name}
                       className="w-full h-full object-cover"
                     />
