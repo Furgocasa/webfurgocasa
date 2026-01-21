@@ -65,14 +65,14 @@ export async function generateMetadata({
       siteName:"Furgocasa - Alquiler de Autocaravanas",
       images: [
         {
-          url: location.hero_image ||"https://furgocasa.com/images/slides/hero-01.webp",
+          url: location.hero_image ||"https://www.furgocasa.com/images/slides/hero-01.webp",
           width: 1200,
           height: 630,
           alt: `Alquiler de campers y autocaravanas cerca de ${location.name}`,
           type:"image/webp",
         },
         {
-          url:"https://furgocasa.com/images/slides/hero-02.webp",
+          url:"https://www.furgocasa.com/images/slides/hero-02.webp",
           width: 1200,
           height: 630,
           alt:"Flota premium Furgocasa - Campers de gran volumen",
@@ -88,7 +88,7 @@ export async function generateMetadata({
       creator:"@furgocasa",
       title: `Alquiler Camper ${location.name} | Desde 95€/día`,
       description: `Autocaravanas cerca de ${location.name}. ${distanceInfo ? 'A solo ' + location.distance_km + ' km de Murcia.' : ''} Kilómetros ilimitados. Flota premium.`,
-      images: [location.hero_image ||"https://furgocasa.com/images/slides/hero-01.webp"],
+      images: [location.hero_image ||"https://www.furgocasa.com/images/slides/hero-01.webp"],
     },
     alternates: {
       canonical: url,

@@ -14,6 +14,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase/client";
 
 const TinyEditor = dynamic(
   () => import("@/components/admin/tiny-editor").then((mod) => mod.TinyEditor),
@@ -27,23 +28,16 @@ const TinyEditor = dynamic(
   }
 );
 
-const categories = [
-  { id: "1", name: "Destinos", slug: "destinos" },
-  { id: "2", name: "Consejos", slug: "consejos" },
-  { id: "3", name: "Rutas", slug: "rutas" },
-  { id: "4", name: "Noticias", slug: "noticias" },
-  { id: "5", name: "Equipamiento", slug: "equipamiento" },
-];
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+}
 
-const tags = [
-  { id: "1", name: "España" }, 
-  { id: "2", name: "Europa" }, 
-  { id: "3", name: "Principiantes" },
-  { id: "4", name: "Familia" }, 
-  { id: "5", name: "Aventura" }, 
-  { id: "6", name: "Playa" }, 
-  { id: "7", name: "Montaña" },
-];
+interface Tag {
+  id: string;
+  name: string;
+}
 
 function generateSlug(title: string): string {
   return title
@@ -81,22 +75,98 @@ export default function EditPostPage() {
   const [metaDescription, setMetaDescription] = useState("");
   const [metaKeywords, setMetaKeywords] = useState("");
 
+  // Datos cargados de Supabase
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
+
   useEffect(() => {
-    loadPostData();
+    loadInitialData();
   }, [postId]);
 
-  const loadPostData = async () => {
+  const loadInitialData = async () => {
     try {
       setLoading(true);
-      // TODO: Cargar datos desde Supabase
-      // Por ahora usamos datos de ejemplo
-      setTitle("Artículo de ejemplo");
-      setSlug("articulo-de-ejemplo");
-      setExcerpt("Este es un extracto de ejemplo");
-      setContent("<p>Contenido del artículo de ejemplo...</p>");
-      setCategoryId("1");
-      setSelectedTags(["1", "3"]);
-      setStatus("draft");
+      
+      // Cargar categorías
+      const { data: categoriesData } = await supabase
+        .from("content_categories")
+        .select("id, name, slug")
+        .eq("is_active", true)
+        .order("sort_order");
+      
+      if (categoriesData) {
+        setCategories(categoriesData);
+      }
+      
+      // Cargar etiquetas
+      const { data: tagsData } = await supabase
+        .from("tags")
+        .select("id, name")
+        .order("name");
+      
+      if (tagsData) {
+        setTags(tagsData);
+      }
+      
+      // Cargar datos del post
+      const { data: postData, error: postError } = await supabase
+        .from("posts")
+        .select(`
+          id,
+          title,
+          slug,
+          excerpt,
+          content,
+          featured_image,
+          category_id,
+          status,
+          is_featured,
+          allow_comments,
+          published_at,
+          meta_title,
+          meta_description,
+          meta_keywords
+        `)
+        .eq("id", postId)
+        .single();
+      
+      if (postError) {
+        console.error('Error loading post:', postError);
+        setMessage({ type: 'error', text: 'Error al cargar el artículo: ' + postError.message });
+        return;
+      }
+      
+      if (postData) {
+        setTitle(postData.title || "");
+        setSlug(postData.slug || "");
+        setExcerpt(postData.excerpt || "");
+        setContent(postData.content || "");
+        setFeaturedImage(postData.featured_image || "");
+        setCategoryId(postData.category_id || "");
+        setStatus(postData.status as "draft" | "pending" | "published" || "draft");
+        setIsFeatured(postData.is_featured || false);
+        setAllowComments(postData.allow_comments !== false);
+        setMetaTitle(postData.meta_title || "");
+        setMetaDescription(postData.meta_description || "");
+        setMetaKeywords(postData.meta_keywords || "");
+        
+        // Formatear fecha para datetime-local
+        if (postData.published_at) {
+          const date = new Date(postData.published_at);
+          const localDate = date.toISOString().slice(0, 16);
+          setPublishDate(localDate);
+        }
+        
+        // Cargar etiquetas del post
+        const { data: postTagsData } = await supabase
+          .from("post_tags")
+          .select("tag_id")
+          .eq("post_id", postId);
+        
+        if (postTagsData) {
+          setSelectedTags(postTagsData.map(pt => pt.tag_id));
+        }
+      }
       
       setMessage(null);
     } catch (error: any) {
@@ -133,13 +203,16 @@ export default function EditPostPage() {
     setMessage(null);
 
     try {
+      // Calcular tiempo de lectura (aprox 200 palabras por minuto)
+      const wordCount = content.replace(/<[^>]*>/g, '').split(/\s+/).length;
+      const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+      
       const postData = {
-        id: postId,
         title,
         slug,
         excerpt,
         content,
-        featured_image: featuredImage,
+        featured_image: featuredImage || null,
         category_id: categoryId || null,
         status: saveStatus,
         is_featured: isFeatured,
@@ -147,13 +220,45 @@ export default function EditPostPage() {
         meta_title: metaTitle || title,
         meta_description: metaDescription || excerpt,
         meta_keywords: metaKeywords,
+        reading_time: readingTime,
         published_at: saveStatus === "published" ? (publishDate || new Date().toISOString()) : null,
-        tags: selectedTags,
+        updated_at: new Date().toISOString(),
       };
 
-      console.log("Guardando post:", postData);
-      // TODO: Guardar en Supabase
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Actualizar el post en Supabase
+      const { error: updateError } = await supabase
+        .from("posts")
+        .update(postData as any)
+        .eq("id", postId);
+
+      if (updateError) {
+        console.error("Error guardando post:", updateError);
+        setMessage({ type: 'error', text: 'Error al guardar el artículo: ' + updateError.message });
+        return;
+      }
+
+      // Actualizar etiquetas: primero eliminar las existentes
+      await supabase
+        .from("post_tags")
+        .delete()
+        .eq("post_id", postId);
+
+      // Luego insertar las nuevas etiquetas seleccionadas
+      if (selectedTags.length > 0) {
+        const tagRelations = selectedTags.map(tagId => ({
+          post_id: postId,
+          tag_id: tagId,
+        }));
+        
+        const { error: tagsError } = await supabase
+          .from("post_tags")
+          .insert(tagRelations as any);
+        
+        if (tagsError) {
+          console.error("Error guardando etiquetas:", tagsError);
+          // No bloqueamos el guardado si falla solo las etiquetas
+        }
+      }
 
       setMessage({ type: 'success', text: 'Artículo guardado correctamente' });
       

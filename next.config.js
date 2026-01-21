@@ -199,199 +199,275 @@ const nextConfig = {
   async rewrites() {
     return [
       // ============================================
-      // INGLÉS (EN) - Rutas traducidas
+      // INGLÉS (EN) - Rutas traducidas CON PREFIJO /en/
       // ============================================
-      // Rutas principales
+      { source: '/en', destination: '/' },
+      { source: '/en/book', destination: '/reservar' },
+      { source: '/en/book/:path*', destination: '/reservar/:path*' },
+      { source: '/en/vehicles', destination: '/vehiculos' },
+      { source: '/en/vehicles/:slug', destination: '/vehiculos/:slug' },
+      { source: '/en/rates', destination: '/tarifas' },
+      { source: '/en/contact', destination: '/contacto' },
+      { source: '/en/offers', destination: '/ofertas' },
+      { source: '/en/sales', destination: '/ventas' },
+      { source: '/en/sales/:slug', destination: '/ventas/:slug' },
+      { source: '/en/search', destination: '/buscar' },
+      { source: '/en/blog', destination: '/blog' },
+      { source: '/en/blog/:path*', destination: '/blog/:path*' },
+      { source: '/en/about-us', destination: '/quienes-somos' },
+      { source: '/en/camper-guide', destination: '/guia-camper' },
+      { source: '/en/artificial-intelligence', destination: '/inteligencia-artificial' },
+      { source: '/en/areas-map', destination: '/mapa-areas' },
+      { source: '/en/murcia-parking', destination: '/parking-murcia' },
+      { source: '/en/video-tutorials', destination: '/video-tutoriales' },
+      { source: '/en/vip-clients', destination: '/clientes-vip' },
+      { source: '/en/rental-documentation', destination: '/documentacion-alquiler' },
+      { source: '/en/how-it-works', destination: '/como-funciona' },
+      { source: '/en/weekend-booking', destination: '/como-reservar-fin-semana' },
+      { source: '/en/legal-notice', destination: '/aviso-legal' },
+      { source: '/en/privacy', destination: '/privacidad' },
+      { source: '/en/faqs', destination: '/faqs' },
+      { source: '/en/faqs/:slug', destination: '/faqs/:slug' },
+      { source: '/en/payment/success', destination: '/pago/exito' },
+      { source: '/en/payment/error', destination: '/pago/error' },
+      { source: '/en/publications', destination: '/blog' },
+      // Blog EN
+      { source: '/en/blog/routes', destination: '/blog/rutas' },
+      { source: '/en/blog/routes/:slug', destination: '/blog/rutas/:slug' },
+      { source: '/en/blog/news', destination: '/blog/noticias' },
+      { source: '/en/blog/news/:slug', destination: '/blog/noticias/:slug' },
+      { source: '/en/blog/vehicles', destination: '/blog/vehiculos' },
+      { source: '/en/blog/vehicles/:slug', destination: '/blog/vehiculos/:slug' },
+      { source: '/en/blog/tips', destination: '/blog/consejos' },
+      { source: '/en/blog/tips/:slug', destination: '/blog/consejos/:slug' },
+      { source: '/en/blog/destinations', destination: '/blog/destinos' },
+      { source: '/en/blog/destinations/:slug', destination: '/blog/destinos/:slug' },
+      { source: '/en/blog/equipment', destination: '/blog/equipamiento' },
+      { source: '/en/blog/equipment/:slug', destination: '/blog/equipamiento/:slug' },
+      // SEO Location EN
+      { source: '/en/rent-campervan-motorhome-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
+      { source: '/en/campervans-for-sale-in-:location', destination: '/venta-autocaravanas-camper-:location' },
+
+      // ============================================
+      // FRANCÉS (FR) - Rutas traducidas CON PREFIJO /fr/
+      // ============================================
+      { source: '/fr', destination: '/' },
+      { source: '/fr/reserver', destination: '/reservar' },
+      { source: '/fr/reserver/:path*', destination: '/reservar/:path*' },
+      { source: '/fr/vehicules', destination: '/vehiculos' },
+      { source: '/fr/vehicules/:slug', destination: '/vehiculos/:slug' },
+      { source: '/fr/tarifs', destination: '/tarifas' },
+      { source: '/fr/contact', destination: '/contacto' },
+      { source: '/fr/offres', destination: '/ofertas' },
+      { source: '/fr/ventes', destination: '/ventas' },
+      { source: '/fr/ventes/:slug', destination: '/ventas/:slug' },
+      { source: '/fr/recherche', destination: '/buscar' },
+      { source: '/fr/blog', destination: '/blog' },
+      { source: '/fr/blog/:path*', destination: '/blog/:path*' },
+      { source: '/fr/a-propos', destination: '/quienes-somos' },
+      { source: '/fr/guide-camping-car', destination: '/guia-camper' },
+      { source: '/fr/intelligence-artificielle', destination: '/inteligencia-artificial' },
+      { source: '/fr/carte-zones', destination: '/mapa-areas' },
+      { source: '/fr/parking-murcie', destination: '/parking-murcia' },
+      { source: '/fr/tutoriels-video', destination: '/video-tutoriales' },
+      { source: '/fr/clients-vip', destination: '/clientes-vip' },
+      { source: '/fr/documentation-location', destination: '/documentacion-alquiler' },
+      { source: '/fr/comment-ca-marche', destination: '/como-funciona' },
+      { source: '/fr/reservation-weekend', destination: '/como-reservar-fin-semana' },
+      { source: '/fr/mentions-legales', destination: '/aviso-legal' },
+      { source: '/fr/confidentialite', destination: '/privacidad' },
+      { source: '/fr/faqs', destination: '/faqs' },
+      { source: '/fr/faqs/:slug', destination: '/faqs/:slug' },
+      { source: '/fr/paiement/succes', destination: '/pago/exito' },
+      { source: '/fr/paiement/erreur', destination: '/pago/error' },
+      // Blog FR
+      { source: '/fr/blog/itineraires', destination: '/blog/rutas' },
+      { source: '/fr/blog/itineraires/:slug', destination: '/blog/rutas/:slug' },
+      { source: '/fr/blog/actualites', destination: '/blog/noticias' },
+      { source: '/fr/blog/actualites/:slug', destination: '/blog/noticias/:slug' },
+      { source: '/fr/blog/vehicules', destination: '/blog/vehiculos' },
+      { source: '/fr/blog/vehicules/:slug', destination: '/blog/vehiculos/:slug' },
+      { source: '/fr/blog/conseils', destination: '/blog/consejos' },
+      { source: '/fr/blog/conseils/:slug', destination: '/blog/consejos/:slug' },
+      { source: '/fr/blog/destinations', destination: '/blog/destinos' },
+      { source: '/fr/blog/destinations/:slug', destination: '/blog/destinos/:slug' },
+      { source: '/fr/blog/equipement', destination: '/blog/equipamiento' },
+      { source: '/fr/blog/equipement/:slug', destination: '/blog/equipamiento/:slug' },
+      // SEO Location FR
+      { source: '/fr/location-camping-car-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
+      { source: '/fr/camping-cars-a-vendre-:location', destination: '/venta-autocaravanas-camper-:location' },
+
+      // ============================================
+      // ALEMÁN (DE) - Rutas traducidas CON PREFIJO /de/
+      // ============================================
+      { source: '/de', destination: '/' },
+      { source: '/de/buchen', destination: '/reservar' },
+      { source: '/de/buchen/:path*', destination: '/reservar/:path*' },
+      { source: '/de/fahrzeuge', destination: '/vehiculos' },
+      { source: '/de/fahrzeuge/:slug', destination: '/vehiculos/:slug' },
+      { source: '/de/preise', destination: '/tarifas' },
+      { source: '/de/kontakt', destination: '/contacto' },
+      { source: '/de/angebote', destination: '/ofertas' },
+      { source: '/de/verkauf', destination: '/ventas' },
+      { source: '/de/verkauf/:slug', destination: '/ventas/:slug' },
+      { source: '/de/suche', destination: '/buscar' },
+      { source: '/de/blog', destination: '/blog' },
+      { source: '/de/blog/:path*', destination: '/blog/:path*' },
+      { source: '/de/uber-uns', destination: '/quienes-somos' },
+      { source: '/de/wohnmobil-guide', destination: '/guia-camper' },
+      { source: '/de/kunstliche-intelligenz', destination: '/inteligencia-artificial' },
+      { source: '/de/gebietskarte', destination: '/mapa-areas' },
+      { source: '/de/parkplatz-murcia', destination: '/parking-murcia' },
+      { source: '/de/video-anleitungen', destination: '/video-tutoriales' },
+      { source: '/de/vip-kunden', destination: '/clientes-vip' },
+      { source: '/de/mietdokumentation', destination: '/documentacion-alquiler' },
+      { source: '/de/wie-es-funktioniert', destination: '/como-funciona' },
+      { source: '/de/wochenend-buchung', destination: '/como-reservar-fin-semana' },
+      { source: '/de/impressum', destination: '/aviso-legal' },
+      { source: '/de/datenschutz', destination: '/privacidad' },
+      { source: '/de/faqs', destination: '/faqs' },
+      { source: '/de/faqs/:slug', destination: '/faqs/:slug' },
+      { source: '/de/zahlung/erfolg', destination: '/pago/exito' },
+      { source: '/de/zahlung/fehler', destination: '/pago/error' },
+      { source: '/de/publikationen', destination: '/blog' },
+      // Blog DE
+      { source: '/de/blog/routen', destination: '/blog/rutas' },
+      { source: '/de/blog/routen/:slug', destination: '/blog/rutas/:slug' },
+      { source: '/de/blog/nachrichten', destination: '/blog/noticias' },
+      { source: '/de/blog/nachrichten/:slug', destination: '/blog/noticias/:slug' },
+      { source: '/de/blog/fahrzeuge', destination: '/blog/vehiculos' },
+      { source: '/de/blog/fahrzeuge/:slug', destination: '/blog/vehiculos/:slug' },
+      { source: '/de/blog/tipps', destination: '/blog/consejos' },
+      { source: '/de/blog/tipps/:slug', destination: '/blog/consejos/:slug' },
+      { source: '/de/blog/reiseziele', destination: '/blog/destinos' },
+      { source: '/de/blog/reiseziele/:slug', destination: '/blog/destinos/:slug' },
+      { source: '/de/blog/ausrustung', destination: '/blog/equipamiento' },
+      { source: '/de/blog/ausrustung/:slug', destination: '/blog/equipamiento/:slug' },
+      // SEO Location DE
+      { source: '/de/wohnmobil-mieten-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
+      { source: '/de/wohnmobile-zu-verkaufen-:location', destination: '/venta-autocaravanas-camper-:location' },
+
+      // ============================================
+      // SIN PREFIJO - Rutas traducidas (compatibilidad)
+      // ============================================
+      // EN
       { source: '/book', destination: '/reservar' },
-      { source: '/book/:path*', destination: '/reservar/:path*' },
       { source: '/vehicles', destination: '/vehiculos' },
       { source: '/vehicles/:slug', destination: '/vehiculos/:slug' },
       { source: '/rates', destination: '/tarifas' },
-      { source: '/contact', destination: '/contacto' },
-      { source: '/offers', destination: '/ofertas' },
       { source: '/sales', destination: '/ventas' },
       { source: '/sales/:slug', destination: '/ventas/:slug' },
-      { source: '/search', destination: '/buscar' },
-      
-      // Páginas de información
       { source: '/about-us', destination: '/quienes-somos' },
       { source: '/camper-guide', destination: '/guia-camper' },
-      { source: '/artificial-intelligence', destination: '/inteligencia-artificial' },
-      { source: '/areas-map', destination: '/mapa-areas' },
-      { source: '/murcia-parking', destination: '/parking-murcia' },
-      { source: '/video-tutorials', destination: '/video-tutoriales' },
-      { source: '/vip-clients', destination: '/clientes-vip' },
       { source: '/rental-documentation', destination: '/documentacion-alquiler' },
       { source: '/how-it-works', destination: '/como-funciona' },
-      { source: '/weekend-booking', destination: '/como-reservar-fin-semana' },
-      
-      // Páginas legales
-      { source: '/legal-notice', destination: '/aviso-legal' },
-      { source: '/privacy', destination: '/privacidad' },
-
-      // Páginas de pago
-      { source: '/payment/success', destination: '/pago/exito' },
-      { source: '/payment/error', destination: '/pago/error' },
-
-      // Categorías del blog (EN)
-      { source: '/blog/routes', destination: '/blog/rutas' },
-      { source: '/blog/routes/:slug', destination: '/blog/rutas/:slug' },
-      { source: '/blog/news', destination: '/blog/noticias' },
-      { source: '/blog/news/:slug', destination: '/blog/noticias/:slug' },
-      { source: '/blog/vehicles', destination: '/blog/vehiculos' },
-      { source: '/blog/vehicles/:slug', destination: '/blog/vehiculos/:slug' },
-      { source: '/blog/tips', destination: '/blog/consejos' },
-      { source: '/blog/tips/:slug', destination: '/blog/consejos/:slug' },
-      { source: '/blog/destinations', destination: '/blog/destinos' },
-      { source: '/blog/destinations/:slug', destination: '/blog/destinos/:slug' },
-      { source: '/blog/equipment', destination: '/blog/equipamiento' },
-      { source: '/blog/equipment/:slug', destination: '/blog/equipamiento/:slug' },
-      
-      // Rutas dinámicas de localización SEO (EN)
       { source: '/rent-campervan-motorhome-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
       { source: '/campervans-for-sale-in-:location', destination: '/venta-autocaravanas-camper-:location' },
-
-      // ============================================
-      // FRANCÉS (FR) - Rutas traducidas
-      // ============================================
-      // Rutas principales
-      { source: '/reserver', destination: '/reservar' },
-      { source: '/reserver/:path*', destination: '/reservar/:path*' },
+      // FR
       { source: '/vehicules', destination: '/vehiculos' },
-      { source: '/vehicules/:slug', destination: '/vehiculos/:slug' },
-      { source: '/tarifs', destination: '/tarifas' },
-      // /contact es igual en inglés y francés, ya está cubierto
-      { source: '/offres', destination: '/ofertas' },
       { source: '/ventes', destination: '/ventas' },
-      { source: '/ventes/:slug', destination: '/ventas/:slug' },
-      { source: '/recherche', destination: '/buscar' },
-      
-      // Páginas de información (FR)
-      { source: '/a-propos', destination: '/quienes-somos' },
       { source: '/guide-camping-car', destination: '/guia-camper' },
-      { source: '/intelligence-artificielle', destination: '/inteligencia-artificial' },
-      { source: '/carte-zones', destination: '/mapa-areas' },
-      { source: '/parking-murcie', destination: '/parking-murcia' },
-      { source: '/tutoriels-video', destination: '/video-tutoriales' },
-      { source: '/clients-vip', destination: '/clientes-vip' },
-      { source: '/documentation-location', destination: '/documentacion-alquiler' },
-      { source: '/comment-ca-marche', destination: '/como-funciona' },
-      { source: '/reservation-weekend', destination: '/como-reservar-fin-semana' },
-      
-      // Páginas legales (FR)
-      { source: '/mentions-legales', destination: '/aviso-legal' },
-      { source: '/confidentialite', destination: '/privacidad' },
-
-      // Páginas de pago (FR)
-      { source: '/paiement/succes', destination: '/pago/exito' },
-      { source: '/paiement/erreur', destination: '/pago/error' },
-
-      // Categorías del blog (FR)
-      { source: '/blog/itineraires', destination: '/blog/rutas' },
-      { source: '/blog/itineraires/:slug', destination: '/blog/rutas/:slug' },
-      { source: '/blog/actualites', destination: '/blog/noticias' },
-      { source: '/blog/actualites/:slug', destination: '/blog/noticias/:slug' },
-      { source: '/blog/vehicules', destination: '/blog/vehiculos' },
-      { source: '/blog/vehicules/:slug', destination: '/blog/vehiculos/:slug' },
-      { source: '/blog/conseils', destination: '/blog/consejos' },
-      { source: '/blog/conseils/:slug', destination: '/blog/consejos/:slug' },
-      // /blog/destinations es igual en francés
-      { source: '/blog/equipement', destination: '/blog/equipamiento' },
-      { source: '/blog/equipement/:slug', destination: '/blog/equipamiento/:slug' },
-      
-      // Rutas dinámicas de localización SEO (FR)
       { source: '/location-camping-car-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
       { source: '/camping-cars-a-vendre-:location', destination: '/venta-autocaravanas-camper-:location' },
-
-      // ============================================
-      // ALEMÁN (DE) - Rutas traducidas
-      // ============================================
-      // Rutas principales
-      { source: '/buchen', destination: '/reservar' },
-      { source: '/buchen/:path*', destination: '/reservar/:path*' },
+      // DE
       { source: '/fahrzeuge', destination: '/vehiculos' },
-      { source: '/fahrzeuge/:slug', destination: '/vehiculos/:slug' },
-      { source: '/preise', destination: '/tarifas' },
-      { source: '/kontakt', destination: '/contacto' },
-      { source: '/angebote', destination: '/ofertas' },
       { source: '/verkauf', destination: '/ventas' },
-      { source: '/verkauf/:slug', destination: '/ventas/:slug' },
-      { source: '/suche', destination: '/buscar' },
-      
-      // Páginas de información (DE)
-      { source: '/uber-uns', destination: '/quienes-somos' },
       { source: '/wohnmobil-guide', destination: '/guia-camper' },
-      { source: '/kunstliche-intelligenz', destination: '/inteligencia-artificial' },
-      { source: '/gebietskarte', destination: '/mapa-areas' },
-      { source: '/parkplatz-murcia', destination: '/parking-murcia' },
-      { source: '/video-anleitungen', destination: '/video-tutoriales' },
-      { source: '/vip-kunden', destination: '/clientes-vip' },
       { source: '/mietdokumentation', destination: '/documentacion-alquiler' },
-      { source: '/wie-es-funktioniert', destination: '/como-funciona' },
-      { source: '/wochenend-buchung', destination: '/como-reservar-fin-semana' },
-      
-      // Páginas legales (DE)
-      { source: '/impressum', destination: '/aviso-legal' },
+      { source: '/uber-uns', destination: '/quienes-somos' },
       { source: '/datenschutz', destination: '/privacidad' },
-
-      // Páginas de pago (DE)
-      { source: '/zahlung/erfolg', destination: '/pago/exito' },
-      { source: '/zahlung/fehler', destination: '/pago/error' },
-
-      // Categorías del blog (DE)
-      { source: '/blog/routen', destination: '/blog/rutas' },
-      { source: '/blog/routen/:slug', destination: '/blog/rutas/:slug' },
-      { source: '/blog/nachrichten', destination: '/blog/noticias' },
-      { source: '/blog/nachrichten/:slug', destination: '/blog/noticias/:slug' },
-      { source: '/blog/fahrzeuge', destination: '/blog/vehiculos' },
-      { source: '/blog/fahrzeuge/:slug', destination: '/blog/vehiculos/:slug' },
-      { source: '/blog/tipps', destination: '/blog/consejos' },
-      { source: '/blog/tipps/:slug', destination: '/blog/consejos/:slug' },
-      { source: '/blog/reiseziele', destination: '/blog/destinos' },
-      { source: '/blog/reiseziele/:slug', destination: '/blog/destinos/:slug' },
-      { source: '/blog/ausrustung', destination: '/blog/equipamiento' },
-      { source: '/blog/ausrustung/:slug', destination: '/blog/equipamiento/:slug' },
-      
-      // Rutas dinámicas de localización SEO (DE)
       { source: '/wohnmobil-mieten-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
       { source: '/wohnmobile-zu-verkaufen-:location', destination: '/venta-autocaravanas-camper-:location' },
     ];
   },
   async redirects() {
     return [
-      // Redirección de la URL de Vercel al dominio personalizado (308 permanente)
+      // ============================================
+      // REDIRECCIONES CANÓNICAS - CRÍTICO PARA SEO
+      // ============================================
       {
         source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'webfurgocasa.vercel.app',
-          },
-        ],
+        has: [{ type: 'host', value: 'furgocasa.com' }],
         destination: 'https://www.furgocasa.com/:path*',
         permanent: true,
       },
-      // Redirect de publicaciones a blog (301 permanente)
       {
-        source: '/publicaciones',
-        destination: '/blog',
+        source: '/:path*',
+        has: [{ type: 'host', value: 'webfurgocasa.vercel.app' }],
+        destination: 'https://www.furgocasa.com/:path*',
         permanent: true,
       },
-      {
-        source: '/publicaciones/:slug',
-        destination: '/blog/:slug',
-        permanent: true,
-      },
-      {
-        source: '/publications',
-        destination: '/blog',
-        permanent: true,
-      },
-      {
-        source: '/publications/:slug',
-        destination: '/blog/:slug',
-        permanent: true,
-      },
+
+      // ============================================
+      // ESPAÑOL /es/ - Redirigir a raíz (idioma por defecto)
+      // ============================================
+      { source: '/es', destination: '/', permanent: true },
+      { source: '/es/blog/:path*', destination: '/blog/:path*', permanent: true },
+      { source: '/es/vehiculos/:path*', destination: '/vehiculos/:path*', permanent: true },
+      { source: '/es/ventas/:path*', destination: '/ventas/:path*', permanent: true },
+      { source: '/es/reservar/:path*', destination: '/reservar/:path*', permanent: true },
+      { source: '/es/tarifas', destination: '/tarifas', permanent: true },
+      { source: '/es/contacto', destination: '/contacto', permanent: true },
+      { source: '/es/ofertas', destination: '/ofertas', permanent: true },
+      { source: '/es/faqs/:path*', destination: '/faqs/:path*', permanent: true },
+      { source: '/es/quienes-somos', destination: '/quienes-somos', permanent: true },
+      { source: '/es/guia-camper', destination: '/guia-camper', permanent: true },
+      { source: '/es/documentacion-alquiler', destination: '/documentacion-alquiler', permanent: true },
+      { source: '/es/como-funciona', destination: '/como-funciona', permanent: true },
+      { source: '/es/alquiler-autocaravanas-campervans-:loc', destination: '/alquiler-autocaravanas-campervans-:loc', permanent: true },
+      { source: '/es/venta-autocaravanas-camper-:loc', destination: '/venta-autocaravanas-camper-:loc', permanent: true },
+
+      // ============================================
+      // REDIRECCIONES URLs ANTIGUAS DE JOOMLA
+      // ============================================
+      // Páginas de información antigua
+      { source: '/es/inicio/quienes-somos', destination: '/quienes-somos', permanent: true },
+      { source: '/inicio/quienes-somos', destination: '/quienes-somos', permanent: true },
+      { source: '/es/como-funciona-mi-camper-de-alquiler', destination: '/como-funciona', permanent: true },
+      { source: '/como-funciona-mi-camper-de-alquiler', destination: '/como-funciona', permanent: true },
+      { source: '/es/tarifas-y-condiciones', destination: '/tarifas', permanent: true },
+      { source: '/tarifas-y-condiciones', destination: '/tarifas', permanent: true },
+      
+      // Tags de Joomla → Blog
+      { source: '/es/component/tags/tag/:tag', destination: '/blog', permanent: true },
+      { source: '/component/tags/tag/:tag', destination: '/blog', permanent: true },
+      
+      // index.php → Home
+      { source: '/es/index.php/:path*', destination: '/', permanent: true },
+      { source: '/index.php/:path*', destination: '/', permanent: true },
+
+      // ============================================
+      // REDIRECCIONES de términos alternativos ES
+      // ============================================
+      // "casas rodantes" y "motorhome" → rutas correctas
+      { source: '/es/alquiler-casas-rodantes-europa', destination: '/alquiler-motorhome-europa-desde-espana', permanent: true },
+      { source: '/alquiler-casas-rodantes-europa', destination: '/alquiler-motorhome-europa-desde-espana', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-espana', destination: '/', permanent: true },
+      { source: '/alquiler-casas-rodantes-espana', destination: '/', permanent: true },
+      { source: '/es/alquiler-motorhome-espana', destination: '/', permanent: true },
+      { source: '/alquiler-motorhome-espana', destination: '/', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/alquiler-casas-rodantes-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/es/alquiler-motorhome-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/alquiler-motorhome-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-murcia', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/alquiler-casas-rodantes-murcia', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-alicante', destination: '/alquiler-autocaravanas-campervans-alicante', permanent: true },
+      { source: '/alquiler-casas-rodantes-alicante', destination: '/alquiler-autocaravanas-campervans-alicante', permanent: true },
+      
+      // Ciudades sin página propia → página más cercana
+      { source: '/es/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/es/alquiler-autocaravanas-campervans-benalmadena', destination: '/alquiler-autocaravanas-campervans-malaga', permanent: true },
+      { source: '/alquiler-autocaravanas-campervans-benalmadena', destination: '/alquiler-autocaravanas-campervans-malaga', permanent: true },
+
+      // ============================================
+      // REDIRECCIONES DE CONTENIDO ANTIGUO
+      // ============================================
+      { source: '/publicaciones', destination: '/blog', permanent: true },
+      { source: '/publicaciones/:slug', destination: '/blog/:slug', permanent: true },
+      { source: '/publications', destination: '/blog', permanent: true },
+      { source: '/publications/:slug', destination: '/blog/:slug', permanent: true },
     ];
   },
 };

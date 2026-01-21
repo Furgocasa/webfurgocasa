@@ -1,7 +1,20 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
-import { i18n } from '@/lib/i18n/config';
-import { getTranslatedRoute } from '@/lib/route-translations';
+
+/**
+ * SITEMAP SEO - CONFIGURACIÓN CANÓNICA
+ * =====================================
+ * 
+ * IMPORTANTE: Este sitemap genera SOLO URLs canónicas en español sin prefijo de idioma.
+ * 
+ * ¿Por qué?
+ * - El sistema de i18n usa REWRITES (no rutas separadas)
+ * - Las URLs traducidas (/vehicles, /vehicules) redirigen internamente a /vehiculos
+ * - Google debe indexar SOLO la versión canónica (español)
+ * - Las URLs traducidas NO deben estar en el sitemap para evitar duplicados
+ * 
+ * Estructura canónica: https://www.furgocasa.com/vehiculos (NO /es/vehiculos)
+ */
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Usar cliente público para sitemap generation
@@ -10,7 +23,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
   
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.furgocasa.com';
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica
+  const baseUrl = 'https://www.furgocasa.com';
   const now = new Date();
   
   type CategoryRow = { slug: string; name?: string | null };
@@ -88,20 +102,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.warn('[sitemap] Skipping sale location pages - table not ready yet');
   }
 
-  const locales = i18n.locales;
   const entries: MetadataRoute.Sitemap = [];
 
-  const addEntriesForPath = (
+  /**
+   * Añade una entrada al sitemap con URL canónica (sin prefijo de idioma)
+   * Las rutas traducidas usan rewrites, no rutas separadas
+   */
+  const addEntry = (
     path: string,
     options: Pick<MetadataRoute.Sitemap[number], 'lastModified' | 'changeFrequency' | 'priority'> = {}
   ) => {
-    locales.forEach((locale) => {
-      entries.push({
-        url: `${baseUrl}${getTranslatedRoute(path, locale)}`,
-        lastModified: options.lastModified || now,
-        changeFrequency: options.changeFrequency,
-        priority: options.priority,
-      });
+    entries.push({
+      url: `${baseUrl}${path}`,
+      lastModified: options.lastModified || now,
+      changeFrequency: options.changeFrequency,
+      priority: options.priority,
     });
   };
 
@@ -148,64 +163,72 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'funcionamiento-camper',
   ];
 
+  // Páginas estáticas - URLs canónicas en español
   staticPages.forEach((page) => {
-    addEntriesForPath(page.path, {
+    addEntry(page.path, {
       priority: page.priority,
       changeFrequency: page.changeFrequency,
     });
   });
 
+  // Páginas de FAQ
   faqPages.forEach((slug) => {
-    addEntriesForPath(`/faqs/${slug}`, {
+    addEntry(`/faqs/${slug}`, {
       priority: 0.4,
       changeFrequency: 'monthly',
     });
   });
 
+  // Categorías del blog
   categoryList.forEach((category) => {
-    addEntriesForPath(`/blog/${category.slug}`, {
+    addEntry(`/blog/${category.slug}`, {
       priority: 0.7,
       changeFrequency: 'daily',
     });
   });
 
+  // Artículos del blog
   postList.forEach((post) => {
     const categorySlug = Array.isArray(post.category)
       ? post.category[0]?.slug || 'general'
       : post.category?.slug || 'general';
-    addEntriesForPath(`/blog/${categorySlug}/${post.slug}`, {
+    addEntry(`/blog/${categorySlug}/${post.slug}`, {
       priority: 0.8,
       changeFrequency: 'weekly',
       lastModified: post.updated_at || post.published_at || now,
     });
   });
 
+  // Vehículos en alquiler
   rentList.forEach((vehicle) => {
-    addEntriesForPath(`/vehiculos/${vehicle.slug}`, {
+    addEntry(`/vehiculos/${vehicle.slug}`, {
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: vehicle.updated_at || now,
     });
   });
 
+  // Vehículos en venta
   saleList.forEach((vehicle) => {
-    addEntriesForPath(`/ventas/${vehicle.slug}`, {
+    addEntry(`/ventas/${vehicle.slug}`, {
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: vehicle.updated_at || now,
     });
   });
 
+  // Páginas de localización - Alquiler
   locationList.forEach((location) => {
-    addEntriesForPath(`/alquiler-autocaravanas-campervans-${location.slug}`, {
+    addEntry(`/alquiler-autocaravanas-campervans-${location.slug}`, {
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,
     });
   });
 
+  // Páginas de localización - Venta
   saleLocationList.forEach((location) => {
-    addEntriesForPath(`/venta-autocaravanas-camper-${location.slug}`, {
+    addEntry(`/venta-autocaravanas-camper-${location.slug}`, {
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,

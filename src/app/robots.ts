@@ -3,6 +3,9 @@ import { MetadataRoute } from 'next'
 export default function robots(): MetadataRoute.Robots {
   // Rutas que no deben indexarse
   const disallowedPaths = [
+    // Recursos técnicos de Next.js (JS chunks, CSS, imágenes optimizadas)
+    '/_next/',
+    
     // Áreas administrativas
     '/administrator/',
     '/api/',
