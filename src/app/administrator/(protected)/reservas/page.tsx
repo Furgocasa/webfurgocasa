@@ -442,25 +442,34 @@ export default function BookingsPage() {
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
                 <th 
-                  className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('booking_number')}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span>Reserva</span>
                     {renderSortIcon('booking_number')}
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
+                  onClick={() => handleSort('created_at')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Creada</span>
+                    {renderSortIcon('created_at')}
+                  </div>
+                </th>
+                <th 
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('customer')}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span>Cliente</span>
                     {renderSortIcon('customer')}
                   </div>
                 </th>
                 <th 
-                  className="px-3 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('internal_code')}
                 >
                   <div className="flex items-center gap-1">
@@ -469,87 +478,87 @@ export default function BookingsPage() {
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('vehicle')}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span>Vehículo</span>
                     {renderSortIcon('vehicle')}
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('pickup_date')}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span>Inicio</span>
                     {renderSortIcon('pickup_date')}
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('dropoff_date')}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span>Fin</span>
                     {renderSortIcon('dropoff_date')}
                   </div>
                 </th>
-                <th className="px-3 py-4 text-center text-sm font-semibold text-gray-900">
-                  Duración
+                <th className="px-2 py-3 text-center text-xs font-semibold text-gray-900 whitespace-nowrap">
+                  Días
                 </th>
                 <th 
-                  className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('pickup_location')}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span>Recogida</span>
                     {renderSortIcon('pickup_location')}
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-left text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('dropoff_location')}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span>Devolución</span>
                     {renderSortIcon('dropoff_location')}
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-right text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-right text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('total_price')}
                 >
-                  <div className="flex items-center justify-end gap-2">
+                  <div className="flex items-center justify-end gap-1">
                     <span>Total</span>
                     {renderSortIcon('total_price')}
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-right text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-right text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('amount_paid')}
                 >
-                  <div className="flex items-center justify-end gap-2">
+                  <div className="flex items-center justify-end gap-1">
                     <span>Pagado</span>
                     {renderSortIcon('amount_paid')}
                   </div>
                 </th>
                 <th 
-                  className="px-4 py-4 text-center text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 py-3 text-center text-xs font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors whitespace-nowrap"
                   onClick={() => handleSort('status')}
                 >
-                  <div className="flex items-center justify-center gap-2">
+                  <div className="flex items-center justify-center gap-1">
                     <span>Estado</span>
                     {renderSortIcon('status')}
                   </div>
                 </th>
-                <th className="px-4 py-4 text-right text-sm font-semibold text-gray-900">Acciones</th>
+                <th className="px-2 py-3 text-right text-xs font-semibold text-gray-900 whitespace-nowrap">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
               {paginatedBookings.length === 0 ? (
                 <tr>
-                  <td colSpan={13} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={14} className="px-6 py-12 text-center text-gray-500">
                     <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                     <p className="text-lg font-medium">
                       {searchTerm || statusFilter ? 'No se encontraron reservas' : 'No hay reservas registradas'}
@@ -574,126 +583,130 @@ export default function BookingsPage() {
                   
                   return (
                     <tr key={booking.id} className="hover:bg-gray-50">
-                      {/* Reserva */}
-                      <td className="px-4 py-4">
-                        <p className="font-medium text-gray-900 text-sm">{booking.booking_number}</p>
-                        <p className="text-xs text-gray-500">{formatDateTime(booking.created_at || '')}</p>
+                      {/* Código de Reserva */}
+                      <td className="px-2 py-3">
+                        <p className="font-medium text-gray-900 text-xs">{booking.booking_number}</p>
+                      </td>
+                      
+                      {/* Fecha de Creación */}
+                      <td className="px-2 py-3">
+                        <p className="text-xs text-gray-600">{formatDate(booking.created_at || '')}</p>
+                        <p className="text-[10px] text-gray-400">{new Date(booking.created_at || '').toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
                       </td>
                       
                       {/* Cliente */}
-                      <td className="px-4 py-4">
-                        <p className="font-medium text-gray-900 text-sm">{booking.customer?.name || 'Sin nombre'}</p>
-                        <p className="text-xs text-gray-500">{booking.customer?.phone || '—'}</p>
+                      <td className="px-2 py-3">
+                        <p className="font-medium text-gray-900 text-xs truncate max-w-[120px]" title={booking.customer?.name || 'Sin nombre'}>{booking.customer?.name || 'Sin nombre'}</p>
+                        <p className="text-[10px] text-gray-500">{booking.customer?.phone || '—'}</p>
                       </td>
                       
                       {/* Código interno */}
-                      <td className="px-3 py-4">
-                        <span className="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 text-gray-800 text-xs font-mono font-semibold">
+                      <td className="px-2 py-3">
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-800 text-[10px] font-mono font-semibold">
                           {booking.vehicle?.internal_code || '—'}
                         </span>
                       </td>
                       
                       {/* Vehículo */}
-                      <td className="px-4 py-4">
-                        <p className="text-gray-900 text-sm">{booking.vehicle?.name || 'Sin vehículo'}</p>
+                      <td className="px-2 py-3">
+                        <p className="text-gray-900 text-xs truncate max-w-[100px]" title={booking.vehicle?.name || 'Sin vehículo'}>{booking.vehicle?.name || 'Sin vehículo'}</p>
                       </td>
                       
                       {/* Fecha inicio */}
-                      <td className="px-4 py-4">
-                        <p className="text-gray-900 text-sm font-medium">{formatDate(booking.pickup_date)}</p>
-                        <p className="text-xs text-gray-500">{formatTime(booking.pickup_time)}</p>
+                      <td className="px-2 py-3">
+                        <p className="text-gray-900 text-xs font-medium">{formatDate(booking.pickup_date)}</p>
+                        <p className="text-[10px] text-gray-500">{formatTime(booking.pickup_time)}</p>
                       </td>
                       
                       {/* Fecha fin */}
-                      <td className="px-4 py-4">
-                        <p className="text-gray-900 text-sm font-medium">{formatDate(booking.dropoff_date)}</p>
-                        <p className="text-xs text-gray-500">{formatTime(booking.dropoff_time)}</p>
+                      <td className="px-2 py-3">
+                        <p className="text-gray-900 text-xs font-medium">{formatDate(booking.dropoff_date)}</p>
+                        <p className="text-[10px] text-gray-500">{formatTime(booking.dropoff_time)}</p>
                       </td>
                       
                       {/* Duración */}
-                      <td className="px-3 py-4 text-center">
-                        <p className="text-gray-900 text-sm font-semibold">{days}</p>
-                        <p className="text-xs text-gray-500">{days === 1 ? 'día' : 'días'}</p>
+                      <td className="px-2 py-3 text-center">
+                        <p className="text-gray-900 text-xs font-semibold">{days}</p>
                       </td>
                       
                       {/* Ubicación recogida */}
-                      <td className="px-4 py-4">
-                        <p className="text-gray-900 text-sm">{booking.pickup_location?.name || '—'}</p>
+                      <td className="px-2 py-3">
+                        <p className="text-gray-900 text-xs truncate max-w-[80px]" title={booking.pickup_location?.name || '—'}>{booking.pickup_location?.name || '—'}</p>
                       </td>
                       
                       {/* Ubicación devolución */}
-                      <td className="px-4 py-4">
-                        <p className="text-gray-900 text-sm">{booking.dropoff_location?.name || '—'}</p>
+                      <td className="px-2 py-3">
+                        <p className="text-gray-900 text-xs truncate max-w-[80px]" title={booking.dropoff_location?.name || '—'}>{booking.dropoff_location?.name || '—'}</p>
                       </td>
                       
                       {/* Total */}
-                      <td className="px-4 py-4 text-right">
-                        <p className="font-bold text-gray-900 text-sm">{formatPrice(totalPrice)}</p>
+                      <td className="px-2 py-3 text-right">
+                        <p className="font-bold text-gray-900 text-xs">{formatPrice(totalPrice)}</p>
                         {pendingAmount > 0 && (
-                          <p className="text-xs text-red-600 mt-1">Pdte: {formatPrice(pendingAmount)}</p>
+                          <p className="text-[10px] text-red-600">Pdte: {formatPrice(pendingAmount)}</p>
                         )}
                       </td>
                       
                       {/* Pagado */}
-                      <td className="px-4 py-4 text-right">
-                        <p className={`font-semibold text-sm ${
+                      <td className="px-2 py-3 text-right">
+                        <p className={`font-semibold text-xs ${
                           amountPaid === 0 ? 'text-gray-400' : 
                           amountPaid >= totalPrice ? 'text-green-600' : 
                           'text-orange-600'
                         }`}>
                           {formatPrice(amountPaid)}
                         </p>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-[10px] text-gray-500">
                           {amountPaid === 0 ? 'Sin pagos' : 
-                           amountPaid >= totalPrice ? 'Completado' : 
+                           amountPaid >= totalPrice ? 'Pagado' : 
                            `${((amountPaid / totalPrice) * 100).toFixed(0)}%`}
                         </p>
                       </td>
                       
                       {/* Estado (desplegable) */}
-                      <td className="px-4 py-4 text-center">
+                      <td className="px-2 py-3 text-center">
                         <select
                           value={booking.status || 'pending'}
                           onChange={(e) => handleStatusChange(booking.id, e.target.value)}
-                          className={`text-xs font-medium px-3 py-1.5 rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 ${statusStyle.bg} ${statusStyle.text}`}
+                          className={`text-[10px] font-medium px-2 py-1 rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-blue-500 ${statusStyle.bg} ${statusStyle.text}`}
                         >
-                          <option value="pending">⏱ Pendiente</option>
-                          <option value="confirmed">✓ Confirmada</option>
-                          <option value="in_progress">▶ En curso</option>
-                          <option value="completed">✓ Completada</option>
-                          <option value="cancelled">✗ Cancelada</option>
+                          <option value="pending">⏱ Pdte</option>
+                          <option value="confirmed">✓ Conf</option>
+                          <option value="in_progress">▶ Curso</option>
+                          <option value="completed">✓ Comp</option>
+                          <option value="cancelled">✗ Canc</option>
                         </select>
                       </td>
                       
                       {/* Acciones */}
-                      <td className="px-4 py-4">
-                        <div className="flex items-center justify-end gap-1">
+                      <td className="px-2 py-3">
+                        <div className="flex items-center justify-end gap-0.5">
                           <Link 
                             href={`/administrator/reservas/${booking.id}`} 
-                            className="p-2 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded-lg transition-colors" 
+                            className="p-1.5 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded transition-colors" 
                             title="Ver detalles"
                           >
-                            <Eye className="h-4 w-4" />
+                            <Eye className="h-3.5 w-3.5" />
                           </Link>
                           <button 
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors" 
+                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" 
                             title="Enviar email"
                           >
-                            <Mail className="h-4 w-4" />
+                            <Mail className="h-3.5 w-3.5" />
                           </button>
                           <Link 
                             href={`/administrator/reservas/${booking.id}/editar`} 
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" 
+                            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors" 
                             title="Editar"
                           >
-                            <Edit className="h-4 w-4" />
+                            <Edit className="h-3.5 w-3.5" />
                           </Link>
                           <button
                             onClick={() => handleDelete(booking.id, booking.booking_number)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                             title="Eliminar"
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash2 className="h-3.5 w-3.5" />
                           </button>
                         </div>
                       </td>
