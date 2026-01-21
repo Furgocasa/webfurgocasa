@@ -41,7 +41,7 @@ export function useAdminData<T = any>({
 
   const query = useQuery({
     queryKey: finalQueryKey,
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       console.log(`[useAdminData] Loading data...`);
       
       // Delay inicial si es necesario
@@ -49,20 +49,44 @@ export function useAdminData<T = any>({
         await new Promise(resolve => setTimeout(resolve, initialDelay));
       }
 
-      const result = await queryFn();
+      try {
+        const result = await queryFn();
 
-      if (result.error) {
-        console.error('[useAdminData] Query error:', result.error);
-        throw result.error;
+        // Verificar si la petición fue abortada
+        if (signal?.aborted) {
+          console.log('[useAdminData] Request was aborted');
+          throw new Error('Request aborted');
+        }
+
+        if (result.error) {
+          console.error('[useAdminData] Query error:', result.error);
+          throw result.error;
+        }
+
+        console.log('[useAdminData] Data loaded successfully');
+        return result.data;
+      } catch (error: any) {
+        // Ignorar errores de abort - no son errores reales
+        if (error?.name === 'AbortError' || 
+            error?.message?.includes('aborted') || 
+            error?.message?.includes('signal') ||
+            signal?.aborted) {
+          console.log('[useAdminData] Request aborted, ignoring error');
+          return null;
+        }
+        throw error;
       }
-
-      console.log('[useAdminData] Data loaded successfully');
-      return result.data;
     },
     enabled,
     staleTime, // Caché agresivo
     gcTime: staleTime * 2, // Mantener el doble en memoria
-    retry: retryCount,
+    retry: (failureCount, error: any) => {
+      // No reintentar errores de abort
+      if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+        return false;
+      }
+      return failureCount < retryCount;
+    },
     retryDelay: (attemptIndex) => Math.min(retryDelay * (attemptIndex + 1), 3000),
     refetchOnWindowFocus: false,
   });

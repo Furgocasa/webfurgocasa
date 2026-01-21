@@ -61,45 +61,70 @@ export function useAllDataCached<T = any>({
 
   const query = useQuery({
     queryKey: [...queryKey, filters, orderBy],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       console.log(`[useAllDataCached] Cargando ${table}...`);
       
-      const supabase = createClient();
-      
-      let queryBuilder = supabase
-        .from(table)
-        .select(select, { count: 'exact' });
+      try {
+        const supabase = createClient();
+        
+        let queryBuilder = supabase
+          .from(table)
+          .select(select, { count: 'exact' });
 
-      // Aplicar filtros
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          queryBuilder = queryBuilder.eq(key, value);
+        // Aplicar filtros
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            queryBuilder = queryBuilder.eq(key, value);
+          }
+        });
+
+        // Ordenamiento
+        queryBuilder = queryBuilder.order(orderBy.column, { 
+          ascending: orderBy.ascending ?? false 
+        });
+
+        const { data, error, count } = await queryBuilder;
+
+        // Verificar si la petición fue abortada
+        if (signal?.aborted) {
+          console.log(`[useAllDataCached] Request aborted for ${table}`);
+          return { data: [] as T[], count: 0 };
         }
-      });
 
-      // Ordenamiento
-      queryBuilder = queryBuilder.order(orderBy.column, { 
-        ascending: orderBy.ascending ?? false 
-      });
+        if (error) {
+          console.error(`[useAllDataCached] Error en ${table}:`, error);
+          throw error;
+        }
 
-      const { data, error, count } = await queryBuilder;
+        console.log(`[useAllDataCached] ${table}: ${data?.length || 0} registros cargados`);
 
-      if (error) {
-        console.error(`[useAllDataCached] Error en ${table}:`, error);
+        return {
+          data: (data || []) as T[],
+          count: count || 0,
+        };
+      } catch (error: any) {
+        // Ignorar errores de abort - no son errores reales
+        if (error?.name === 'AbortError' || 
+            error?.message?.includes('aborted') || 
+            error?.message?.includes('signal') ||
+            signal?.aborted) {
+          console.log(`[useAllDataCached] Request aborted for ${table}, ignoring error`);
+          return { data: [] as T[], count: 0 };
+        }
         throw error;
       }
-
-      console.log(`[useAllDataCached] ${table}: ${data?.length || 0} registros cargados`);
-
-      return {
-        data: (data || []) as T[],
-        count: count || 0,
-      };
     },
     enabled,
     staleTime: resolvedStaleTime,
     gcTime: resolvedStaleTime * 2, // Mantener en memoria el doble de tiempo
     refetchOnWindowFocus: false,
+    retry: (failureCount, error: any) => {
+      // No reintentar errores de abort
+      if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 
   // Función para forzar recarga

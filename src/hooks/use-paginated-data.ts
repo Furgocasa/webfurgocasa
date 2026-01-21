@@ -51,49 +51,74 @@ export function usePaginatedData<T = any>({
 
   const query = useInfiniteQuery({
     queryKey: [...queryKey, filters, orderBy, pageSize],
-    queryFn: async ({ pageParam = 0 }) => {
+    queryFn: async ({ pageParam = 0, signal }) => {
       console.log(`[usePaginatedData] Loading page ${pageParam}...`);
       
-      // Crear instancia del cliente para asegurar autenticación correcta
-      const supabase = createClient();
-      
-      let queryBuilder = supabase
-        .from(table)
-        .select(select, { count: 'exact' })
-        .range(pageParam * pageSize, (pageParam + 1) * pageSize - 1);
+      try {
+        // Crear instancia del cliente para asegurar autenticación correcta
+        const supabase = createClient();
+        
+        let queryBuilder = supabase
+          .from(table)
+          .select(select, { count: 'exact' })
+          .range(pageParam * pageSize, (pageParam + 1) * pageSize - 1);
 
-      // Aplicar filtros
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          queryBuilder = queryBuilder.eq(key, value);
+        // Aplicar filtros
+        Object.entries(filters).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            queryBuilder = queryBuilder.eq(key, value);
+          }
+        });
+
+        // Ordenamiento
+        queryBuilder = queryBuilder.order(orderBy.column, { 
+          ascending: orderBy.ascending ?? false 
+        });
+
+        const { data, error, count } = await queryBuilder;
+
+        // Verificar si la petición fue abortada
+        if (signal?.aborted) {
+          console.log('[usePaginatedData] Request aborted');
+          return { data: [] as T[], count: 0, nextPage: undefined };
         }
-      });
 
-      // Ordenamiento
-      queryBuilder = queryBuilder.order(orderBy.column, { 
-        ascending: orderBy.ascending ?? false 
-      });
+        if (error) {
+          console.error('[usePaginatedData] Error:', error);
+          throw error;
+        }
 
-      const { data, error, count } = await queryBuilder;
+        console.log(`[usePaginatedData] Loaded ${data?.length || 0} items`);
 
-      if (error) {
-        console.error('[usePaginatedData] Error:', error);
+        return {
+          data: (data || []) as T[],
+          count: count || 0,
+          nextPage: (pageParam + 1) * pageSize < (count || 0) ? pageParam + 1 : undefined,
+        };
+      } catch (error: any) {
+        // Ignorar errores de abort
+        if (error?.name === 'AbortError' || 
+            error?.message?.includes('aborted') || 
+            error?.message?.includes('signal') ||
+            signal?.aborted) {
+          console.log('[usePaginatedData] Request aborted, ignoring error');
+          return { data: [] as T[], count: 0, nextPage: undefined };
+        }
         throw error;
       }
-
-      console.log(`[usePaginatedData] Loaded ${data?.length || 0} items`);
-
-      return {
-        data: (data || []) as T[],
-        count: count || 0,
-        nextPage: (pageParam + 1) * pageSize < (count || 0) ? pageParam + 1 : undefined,
-      };
     },
     getNextPageParam: (lastPage) => lastPage.nextPage,
     initialPageParam: 0,
     enabled,
     staleTime: getStaleTime(), // Caché adaptativo según tipo de datos
     gcTime: getStaleTime() * 2, // Mantener el doble de tiempo en memoria
+    retry: (failureCount, error: any) => {
+      // No reintentar errores de abort
+      if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 
   // Aplanar todas las páginas en un solo array
@@ -135,19 +160,45 @@ export function useCachedData<T = any>({
   
   const query = useInfiniteQuery({
     queryKey,
-    queryFn: async () => {
-      const data = await queryFn();
-      return {
-        data: Array.isArray(data) ? data : [data],
-        count: Array.isArray(data) ? data.length : 1,
-        nextPage: undefined,
-      };
+    queryFn: async ({ signal }) => {
+      try {
+        const data = await queryFn();
+        
+        // Verificar si la petición fue abortada
+        if (signal?.aborted) {
+          console.log('[useCachedData] Request aborted');
+          return { data: [], count: 0, nextPage: undefined };
+        }
+        
+        return {
+          data: Array.isArray(data) ? data : [data],
+          count: Array.isArray(data) ? data.length : 1,
+          nextPage: undefined,
+        };
+      } catch (error: any) {
+        // Ignorar errores de abort
+        if (error?.name === 'AbortError' || 
+            error?.message?.includes('aborted') || 
+            error?.message?.includes('signal') ||
+            signal?.aborted) {
+          console.log('[useCachedData] Request aborted, ignoring error');
+          return { data: [], count: 0, nextPage: undefined };
+        }
+        throw error;
+      }
     },
     getNextPageParam: () => undefined,
     initialPageParam: 0,
     enabled,
     staleTime,
     gcTime: staleTime * 2,
+    retry: (failureCount, error: any) => {
+      // No reintentar errores de abort
+      if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
 
   const allData = query.data?.pages[0]?.data || [];
