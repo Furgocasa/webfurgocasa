@@ -19,6 +19,7 @@ import {
   RefreshCw
 } from "lucide-react";
 import { VehicleDamagePlan, type DamageMark } from "@/components/admin/vehicle-damage-plan";
+import { DamageReportPDF } from "@/components/admin/damage-report-pdf";
 import { createClient } from "@/lib/supabase/client";
 
 interface VehicleDamage {
@@ -352,8 +353,9 @@ export default function VehicleDamageDetailPage() {
             className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <RefreshCw className="h-4 w-4" />
-            Actualizar
+            <span className="hidden sm:inline">Actualizar</span>
           </button>
+          <DamageReportPDF vehicle={vehicle} damages={damages} />
           <button 
             onClick={() => setIsEditing(!isEditing)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
@@ -365,12 +367,12 @@ export default function VehicleDamageDetailPage() {
             {isEditing ? (
               <>
                 <CheckCircle className="h-4 w-4" />
-                Modo Edición
+                <span className="hidden sm:inline">Modo Edición</span>
               </>
             ) : (
               <>
                 <Plus className="h-4 w-4" />
-                Añadir Daños
+                <span className="hidden sm:inline">Añadir Daños</span>
               </>
             )}
           </button>
