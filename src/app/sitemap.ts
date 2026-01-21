@@ -112,7 +112,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/ventas', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/tarifas', priority: 0.8, changeFrequency: 'monthly' },
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/buscar', priority: 0.6, changeFrequency: 'weekly' },
+    // /buscar NO se incluye - está bloqueada en robots.txt
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/como-funciona', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
@@ -130,9 +130,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/aviso-legal', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/privacidad', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
-    { path: '/pago/exito', priority: 0.2, changeFrequency: 'yearly' },
-    { path: '/pago/error', priority: 0.2, changeFrequency: 'yearly' },
-    { path: '/pago/cancelado', priority: 0.2, changeFrequency: 'yearly' },
+    // NOTA: Las páginas de pago (/pago/exito, /pago/error, /pago/cancelado) 
+    // NO se incluyen porque tienen noindex y están bloqueadas en robots.txt
     { path: '/sitemap-html', priority: 0.2, changeFrequency: 'monthly' },
   ];
 
