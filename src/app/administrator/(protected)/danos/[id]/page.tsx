@@ -356,9 +356,10 @@ export default function VehicleDamageDetailPage() {
             <span className="hidden sm:inline">Actualizar</span>
           </button>
           <DamageReportPDF vehicle={vehicle} damages={damages} />
+          {/* Botón de edición solo visible en desktop - en móvil está más abajo junto al plano */}
           <button 
             onClick={() => setIsEditing(!isEditing)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+            className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
               isEditing 
                 ? 'bg-furgocasa-orange text-white' 
                 : 'border border-gray-300 hover:bg-gray-50'
@@ -367,12 +368,12 @@ export default function VehicleDamageDetailPage() {
             {isEditing ? (
               <>
                 <CheckCircle className="h-4 w-4" />
-                <span className="hidden sm:inline">Modo Edición</span>
+                <span>Modo Edición</span>
               </>
             ) : (
               <>
                 <Plus className="h-4 w-4" />
-                <span className="hidden sm:inline">Añadir Daños</span>
+                <span>Añadir Daños</span>
               </>
             )}
           </button>
@@ -458,6 +459,40 @@ export default function VehicleDamageDetailPage() {
                   ))}
               </div>
             </div>
+          </div>
+
+          {/* Edit Mode Button - Visible on mobile near the plan */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              {isEditing ? (
+                <span className="flex items-center gap-2 text-furgocasa-orange font-medium">
+                  <span className="w-2 h-2 bg-furgocasa-orange rounded-full animate-pulse" />
+                  Toca en el plano para añadir un daño
+                </span>
+              ) : (
+                <span>Activa el modo edición para añadir daños</span>
+              )}
+            </div>
+            <button 
+              onClick={() => setIsEditing(!isEditing)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+                isEditing 
+                  ? 'bg-green-500 text-white' 
+                  : 'bg-furgocasa-orange text-white'
+              }`}
+            >
+              {isEditing ? (
+                <>
+                  <CheckCircle className="h-4 w-4" />
+                  Finalizar
+                </>
+              ) : (
+                <>
+                  <Plus className="h-4 w-4" />
+                  Añadir Daños
+                </>
+              )}
+            </button>
           </div>
 
           {/* Vehicle Plan */}
