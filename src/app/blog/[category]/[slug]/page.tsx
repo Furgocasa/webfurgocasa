@@ -1,11 +1,14 @@
 import { Metadata } from"next";
 import { notFound } from"next/navigation";
+import { headers } from"next/headers";
 import { LocalizedLink } from"@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from"lucide-react";
 import { getPostBySlug, getRelatedPosts, incrementPostViews, getAllPublishedPostSlugs } from"@/lib/blog/server-actions";
 import { getCategoryName } from"@/lib/blog-translations";
 import { ShareButtons } from"@/components/blog/share-buttons";
 import { BlogPostJsonLd } from"@/components/blog/blog-post-jsonld";
+import { getTranslatedContent, type Locale } from"@/lib/translations/get-translations";
+import { translateServer } from"@/lib/i18n/server-translation";
 
 // ⚡ ISR: Revalidar cada hora
 export const revalidate = 3600;
@@ -116,7 +119,30 @@ export default async function BlogPostPage({
     notFound();
   }
 
-  // Obtener posts relacionados
+  // Detectar idioma desde headers (middleware)
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  
+  // Función helper para UI estática
+  const t = (key: string) => translateServer(key, locale);
+
+  // 🌐 OBTENER TRADUCCIONES DEL POST DESDE SUPABASE
+  // Si el idioma no es español, busca traducciones en content_translations
+  const translatedPost = await getTranslatedContent(
+    'posts',
+    post.id,
+    ['title', 'excerpt', 'content', 'meta_title', 'meta_description'],
+    locale,
+    {
+      title: post.title,
+      excerpt: post.excerpt,
+      content: post.content,
+      meta_title: post.meta_title,
+      meta_description: post.meta_description,
+    }
+  );
+
+  // Obtener posts relacionados (también traducidos)
   const relatedPosts = post.category_id 
     ? await getRelatedPosts(post.category_id, post.id)
     : [];
@@ -125,11 +151,11 @@ export default async function BlogPostPage({
   incrementPostViews(post.id, post.views).catch(console.error);
 
   const categoryName = post.category?.slug 
-    ? getCategoryName(post.category.slug, 'es')
+    ? getCategoryName(post.category.slug, locale)
     :"Blog";
 
-  // ⚠️ URL canónica SIEMPRE con www y prefijo /es/
-  const url = `https://www.furgocasa.com/es/blog/${params.category}/${params.slug}`;
+  // ⚠️ URL canónica con el idioma actual
+  const url = `https://www.furgocasa.com/${locale}/blog/${params.category}/${params.slug}`;
 
   return (
     <>
@@ -144,13 +170,13 @@ export default async function BlogPostPage({
           <div className="container mx-auto px-4 relative z-10">
             {/* Breadcrumb */}
             <nav className="flex items-center gap-2 text-white/70 text-sm mb-8 flex-wrap" aria-label="Breadcrumb">
-              <LocalizedLink href="/" className="hover:text-white transition-colors">Inicio</LocalizedLink>
+              <LocalizedLink href="/" className="hover:text-white transition-colors">{t("Inicio")}</LocalizedLink>
               <ChevronRight className="h-4 w-4" />
               <LocalizedLink href="/blog" className="hover:text-white transition-colors">Blog</LocalizedLink>
               <ChevronRight className="h-4 w-4" />
               <LocalizedLink href={`/blog/${params.category}`} className="hover:text-white transition-colors">{categoryName}</LocalizedLink>
               <ChevronRight className="h-4 w-4" />
-              <span className="text-white font-medium truncate max-w-[200px]">{post.title}</span>
+              <span className="text-white font-medium truncate max-w-[200px]">{translatedPost.title}</span>
             </nav>
 
             <div className="max-w-4xl mx-auto text-center">
@@ -161,7 +187,7 @@ export default async function BlogPostPage({
                 {categoryName}
               </LocalizedLink>
               <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-bold text-white mb-8 leading-tight">
-                {post.title}
+                {translatedPost.title}
               </h1>
               
               <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-blue-100 font-medium bg-white/10 backdrop-blur-md rounded-2xl py-4 px-6 text-sm">
@@ -181,14 +207,14 @@ export default async function BlogPostPage({
                 )}
                 <span className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-furgocasa-orange" />
-                  {post.reading_time || 5} min lectura
+                  {post.reading_time || 5} {t("min lectura")}
                 </span>
                 {post.views > 0 && (
                   <>
                     <span className="w-1 h-1 bg-blue-300 rounded-full hidden md:block"></span>
                     <span className="flex items-center gap-2">
                       <Eye className="h-4 w-4 text-furgocasa-orange" />
-                      {post.views} visitas
+                      {post.views} {t("visitas")}
                     </span>
                   </>
                 )}
@@ -204,7 +230,7 @@ export default async function BlogPostPage({
               {post.featured_image ? (
                 <img 
                   src={post.featured_image} 
-                  alt={post.title} 
+                  alt={translatedPost.title || ''} 
                   className="w-full h-full object-cover"
                   loading="eager"
                   fetchPriority="high"
@@ -212,7 +238,7 @@ export default async function BlogPostPage({
               ) : (
                 <div className="flex flex-col items-center">
                   <BookOpen className="h-24 w-24 mb-4 opacity-50" />
-                  <span className="font-heading font-bold text-xl">Imagen del artículo</span>
+                  <span className="font-heading font-bold text-xl">{t("Imagen del artículo")}</span>
                 </div>
               )}
             </div>
@@ -253,7 +279,7 @@ export default async function BlogPostPage({
                     prose-hr:my-12 prose-hr:border-gray-200
                     prose-code:text-furgocasa-blue prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-base
                    prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8"
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  dangerouslySetInnerHTML={{ __html: translatedPost.content || '' }}
                 />
 
                 {/* Tags */}

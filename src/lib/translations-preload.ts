@@ -6147,6 +6147,36 @@ export const staticTranslations = {
     fr: "Contacter",
     de: "Kontakt"
   },
+  "min lectura": {
+    es: "min lectura",
+    en: "min read",
+    fr: "min de lecture",
+    de: "Min. Lesezeit"
+  },
+  "visitas": {
+    es: "visitas",
+    en: "views",
+    fr: "vues",
+    de: "Aufrufe"
+  },
+  "Imagen del artículo": {
+    es: "Imagen del artículo",
+    en: "Article image",
+    fr: "Image de l'article",
+    de: "Artikelbild"
+  },
+  "Artículos relacionados": {
+    es: "Artículos relacionados",
+    en: "Related articles",
+    fr: "Articles connexes",
+    de: "Verwandte Artikel"
+  },
+  "Inicio": {
+    es: "Inicio",
+    en: "Home",
+    fr: "Accueil",
+    de: "Startseite"
+  },
 };
 
 /**
