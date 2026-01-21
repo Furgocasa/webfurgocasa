@@ -83,6 +83,7 @@
     "autoprefixer": "^10.4.16",
     "eslint": "^8.56.0",
     "eslint-config-next": "^15.1.0",
+    "jsdom": "^27.4.0",
     "mysql2": "^3.16.1",
     "postcss": "^8.4.32",
     "puppeteer": "^24.34.0",
