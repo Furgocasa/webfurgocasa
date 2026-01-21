@@ -12,8 +12,6 @@ function LoadingState() {
     </div>
   );
 }
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
 import { supabase } from "@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
@@ -361,47 +359,37 @@ function NuevaReservaContent() {
 
   if (loading) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
-            <p className="text-gray-600">{t("Cargando información...")}</p>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-furgocasa-orange mx-auto mb-4"></div>
+          <p className="text-gray-600">{t("Cargando información...")}</p>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
 
   if (error && !vehicle) {
     return (
-      <>
-        <Header />
-        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-          <div className="text-center max-w-md mx-auto px-4">
-            <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
-            <p className="text-gray-600 mb-4">{error}</p>
-            <button 
-              onClick={() => router.back()}
-              className="inline-block bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors"
-            >
-              {t("Volver atrás")}
-            </button>
-          </div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto px-4">
+          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <button 
+            onClick={() => router.back()}
+            className="inline-block bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            {t("Volver atrás")}
+          </button>
         </div>
-        <Footer />
-      </>
+      </div>
     );
   }
 
   const mainImage = vehicle?.images?.find(img => img.is_primary) || vehicle?.images?.[0];
 
   return (
-    <>
-      <Header />
-      
+    <>      
       {/* Sticky Header - Resumen de reserva - SIEMPRE VISIBLE debajo del menú */}
       <div className="fixed top-[120px] left-0 right-0 bg-white shadow-md border-b border-gray-200 z-40 w-full">
         <div className="container mx-auto px-4 py-3">
@@ -849,8 +837,6 @@ function NuevaReservaContent() {
           </div>
         </div>
       </main>
-
-      <Footer />
     </>
   );
 }
