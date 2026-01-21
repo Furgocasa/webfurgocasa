@@ -66,7 +66,7 @@ const LOCALE_NAMES = {
 const TABLES_CONFIG = {
   posts: {
     fields: ['title', 'excerpt', 'content', 'meta_title', 'meta_description'],
-    filter: { is_published: true },
+    filter: { status: 'published' },
   },
   vehicles: {
     fields: ['name', 'description', 'short_description'],
