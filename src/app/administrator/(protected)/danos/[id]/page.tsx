@@ -439,19 +439,19 @@ export default function VehicleDamageDetailPage() {
               </button>
             </div>
 
-            {/* View selector */}
-            <div className="p-4 border-b border-gray-100 bg-gray-50">
-              <div className="flex flex-wrap gap-2">
+            {/* View selector - Diseño compacto tipo pills */}
+            <div className="px-3 py-2 bg-gray-50">
+              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
                 {viewTypes
                   .filter(v => v.category === activeTab)
                   .map(view => (
                     <button
                       key={view.id}
                       onClick={() => setActiveView(view.id)}
-                      className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                      className={`px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all ${
                         activeView === view.id
-                          ? 'bg-furgocasa-blue text-white'
-                          : 'bg-white border border-gray-200 text-gray-600 hover:border-furgocasa-blue'
+                          ? 'bg-furgocasa-blue text-white shadow-sm'
+                          : 'bg-white border border-gray-200 text-gray-600 hover:border-furgocasa-blue hover:text-furgocasa-blue'
                       }`}
                     >
                       {view.label}
@@ -461,38 +461,53 @@ export default function VehicleDamageDetailPage() {
             </div>
           </div>
 
-          {/* Edit Mode Button - Visible on mobile near the plan */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 flex items-center justify-between">
-            <div className="text-sm text-gray-600">
-              {isEditing ? (
-                <span className="flex items-center gap-2 text-furgocasa-orange font-medium">
-                  <span className="w-2 h-2 bg-furgocasa-orange rounded-full animate-pulse" />
-                  Toca en el plano para añadir un daño
-                </span>
-              ) : (
-                <span>Activa el modo edición para añadir daños</span>
-              )}
-            </div>
+          {/* Edit Mode Button - Diseño mejorado para móvil */}
+          <div className={`rounded-xl shadow-sm border overflow-hidden transition-all ${
+            isEditing 
+              ? 'bg-gradient-to-r from-furgocasa-orange/10 to-orange-50 border-furgocasa-orange/30' 
+              : 'bg-white border-gray-100'
+          }`}>
             <button 
               onClick={() => setIsEditing(!isEditing)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
+              className="w-full p-3 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                  isEditing 
+                    ? 'bg-furgocasa-orange text-white' 
+                    : 'bg-gray-100 text-gray-500'
+                }`}>
+                  {isEditing ? (
+                    <Edit2 className="h-5 w-5" />
+                  ) : (
+                    <Plus className="h-5 w-5" />
+                  )}
+                </div>
+                <div className="text-left">
+                  <p className={`text-sm font-medium ${isEditing ? 'text-furgocasa-orange' : 'text-gray-900'}`}>
+                    {isEditing ? 'Modo edición activo' : 'Añadir daños'}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {isEditing ? 'Toca en el plano para marcar' : 'Toca para activar el modo edición'}
+                  </p>
+                </div>
+              </div>
+              <div className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                 isEditing 
                   ? 'bg-green-500 text-white' 
                   : 'bg-furgocasa-orange text-white'
-              }`}
-            >
-              {isEditing ? (
-                <>
-                  <CheckCircle className="h-4 w-4" />
-                  Finalizar
-                </>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  Añadir Daños
-                </>
-              )}
+              }`}>
+                {isEditing ? 'Finalizar' : 'Activar'}
+              </div>
             </button>
+            {isEditing && (
+              <div className="px-3 pb-2">
+                <div className="flex items-center gap-2 text-xs text-furgocasa-orange">
+                  <span className="w-1.5 h-1.5 bg-furgocasa-orange rounded-full animate-pulse" />
+                  <span>Pulsa sobre la imagen para añadir un marcador</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Vehicle Plan */}
