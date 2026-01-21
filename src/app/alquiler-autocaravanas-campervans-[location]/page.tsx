@@ -181,7 +181,7 @@ export default async function LocationPage({
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
               <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6">
-                ALQUILER CAMPER {location.name.toUpperCase()}
+                {`ALQUILER CAMPER ${location.name.toUpperCase()}`}
               </h2>
               {distanceInfo ? (
                 <>
@@ -300,7 +300,7 @@ export default async function LocationPage({
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
               <h3 className="text-3xl font-heading font-bold text-center mb-12">
-                ¿Por qué elegir Furgocasa para tu viaje desde {location.name}?
+                {`¿Por qué elegir Furgocasa para tu viaje desde ${location.name}?`}
               </h3>
               <div className="grid md:grid-cols-2 gap-8">
                 <div className="flex gap-4">
@@ -343,7 +343,7 @@ export default async function LocationPage({
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-heading font-bold mb-6">
-              ¿Listo para tu aventura desde {location.name}?
+              {`¿Listo para tu aventura desde ${location.name}?`}
             </h2>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
               Reserva ahora tu camper y comienza a planear tu próximo viaje inolvidable
