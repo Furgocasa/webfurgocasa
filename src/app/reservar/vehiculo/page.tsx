@@ -19,7 +19,8 @@ import {
 import Link from"next/link";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
-import { formatPrice, calculateRentalDays, calculatePricingDays } from"@/lib/utils";
+import { formatPrice } from"@/lib/utils";
+import { useSeasonalPricing } from"@/hooks/use-seasonal-pricing";
 
 // No necesitamos interfaces específicas, usamos los datos tal cual vienen de Supabase
 // Los nombres de campos reales son: image_url, alt_text, is_primary (según SUPABASE-SCHEMA-REAL.md)
@@ -61,16 +62,15 @@ function ReservarVehiculoContent() {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
 
-  // Calculate days and prices - IMPORTANTE: usar calculateRentalDays con horas
-  const days = pickupDate && dropoffDate && pickupTime && dropoffTime
-    ? calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime)
-    : 0;
+  // Usar hook para calcular precios con temporadas
+  const seasonalPricing = useSeasonalPricing({
+    pickupDate,
+    dropoffDate,
+    pickupTime,
+    dropoffTime
+  });
   
-  // Regla de negocio: 2 días se cobran como 3
-  const pricingDays = calculatePricingDays(days);
-  const hasTwoDayPricing = days === 2;
-  
-  const basePrice = vehicle ? vehicle.base_price_per_day * pricingDays : 0;
+  const { days, pricingDays, hasTwoDayPricing, totalPrice: basePrice } = seasonalPricing;
   
   const extrasPrice = selectedExtras.reduce((sum, item) => {
     // Calcular precio según el tipo de extra

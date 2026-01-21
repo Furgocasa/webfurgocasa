@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { calculateRentalDays, calculatePricingDays } from "@/lib/utils";
+import { 
+  calculateRentalDays, 
+  calculatePricingDays, 
+  calculateSeasonalPrice, 
+  calculateSeasonalSurcharge,
+  Season 
+} from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -116,48 +122,33 @@ export async function GET(request: NextRequest) {
     const pricingDays = calculatePricingDays(days);
     const hasTwoDayPricing = days === 2;
 
-    // Obtener temporada aplicable
-    const { data: season } = await supabase
+    // Obtener TODAS las temporadas activas que cubren el rango de fechas
+    const { data: seasonsData } = await supabase
       .from("seasons")
       .select("*")
       .eq("is_active", true)
-      .lte("start_date", pickupDate)
-      .gte("end_date", pickupDate)
-      .single();
+      .lte("start_date", dropoffDate)
+      .gte("end_date", pickupDate);
 
-    /**
-     * Calcula el precio base por día según la duración (siempre basado en temporada baja)
-     * - Menos de 7 días: 95€/día
-     * - 7-13 días: 85€/día
-     * - 14-20 días: 75€/día
-     * - 21+ días: 65€/día
-     * 
-     * IMPORTANTE: Usa pricingDays (no days) porque 2 días se cobran como 3
-     */
-    const getBasePriceByDuration = (pricingDays: number): number => {
-      if (pricingDays >= 21) return 65;
-      if (pricingDays >= 14) return 75;
-      if (pricingDays >= 7) return 85;
-      return 95;
-    };
-
-    const basePricePerDay = getBasePriceByDuration(pricingDays);
-
-    // Usar los precios de temporada directamente si están disponibles
-    // Si no hay temporada o no hay precios, usar 0 como adición
-    const seasonalAddition = 0; // TODO: Implementar lógica de precios de temporada basada en los campos reales
+    // Usar función centralizada para calcular precios por temporada
+    const seasons = (seasonsData || []) as Season[];
+    const priceResult = calculateSeasonalPrice(pickupDate, pricingDays, seasons);
     
-    const finalPricePerDay = basePricePerDay + seasonalAddition;
+    // Para mostrar el precio promedio por día
+    const finalPricePerDay = priceResult.avgPricePerDay;
+    
+    // Calcular sobrecoste promedio respecto a temporada baja
+    const seasonalAddition = calculateSeasonalSurcharge(finalPricePerDay, pricingDays);
 
     // Calcular precios
     const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
-      // Usar pricingDays para el cálculo (2 días = 3 días de precio)
-      const totalPrice = finalPricePerDay * pricingDays;
+      const totalPrice = priceResult.total;
 
-      // Calcular cuánto se está ahorrando respecto al precio sin descuento por duración
-      const fullPricePerDay = 95 + seasonalAddition; // Precio base sin descuento por duración
-      const savings = fullPricePerDay - finalPricePerDay;
-      const discountPercentage = Math.round((savings / fullPricePerDay) * 100);
+      // Calcular cuánto se está ahorrando respecto al precio máximo (temporada baja < 7 días)
+      const fullPricePerDay = 95; // Precio base sin descuento por duración
+      const maxPossiblePrice = fullPricePerDay + (seasonalAddition > 0 ? seasonalAddition : 0);
+      const savings = maxPossiblePrice - finalPricePerDay;
+      const discountPercentage = Math.round((savings / maxPossiblePrice) * 100);
 
       return {
         ...vehicle,
@@ -166,10 +157,11 @@ export async function GET(request: NextRequest) {
           pricingDays, // Días usados para calcular el precio
           hasTwoDayPricing, // Flag para mostrar aviso
           pricePerDay: Math.round(finalPricePerDay * 100) / 100,
-          originalPricePerDay: Math.round(fullPricePerDay * 100) / 100,
+          originalPricePerDay: fullPricePerDay,
           totalPrice: Math.round(totalPrice * 100) / 100,
           originalTotalPrice: Math.round(fullPricePerDay * pricingDays * 100) / 100,
-          season: season?.name || "Temporada Baja",
+          season: priceResult.dominantSeason,
+          seasonBreakdown: priceResult.seasonBreakdown,
           seasonalAddition: seasonalAddition,
           durationDiscount: discountPercentage,
           hasDurationDiscount: discountPercentage > 0,
@@ -190,6 +182,16 @@ export async function GET(request: NextRequest) {
       locationFee = dropoffLoc?.extra_fee || 0;
     }
 
+    // Información de las temporadas aplicables al período
+    const seasonsInfo = priceResult.seasonBreakdown.map(s => ({
+      name: s.name,
+      days: s.days,
+      pricePerDay: s.pricePerDay,
+    }));
+
+    // Obtener los días mínimos de la temporada dominante (viene del cálculo)
+    const minDays = priceResult.minDays;
+
     const response = NextResponse.json({
       success: true,
       searchParams: {
@@ -203,13 +205,12 @@ export async function GET(request: NextRequest) {
         pricingDays,
         hasTwoDayPricing,
       },
-      season: season
-        ? {
-            name: season.name,
-            modifier: season.base_price_per_day || 0,
-            minDays: season.min_days,
-          }
-        : null,
+      season: {
+        name: priceResult.dominantSeason,
+        seasonalAddition: seasonalAddition,
+        minDays: minDays,
+        breakdown: seasonsInfo,
+      },
       locationFee,
       vehicles: vehiclesWithPrices || [],
       totalResults: vehiclesWithPrices?.length || 0,

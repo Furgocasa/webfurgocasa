@@ -163,3 +163,155 @@ export function slugify(text: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
 }
+
+// ============================================
+// SISTEMA DE PRECIOS POR TEMPORADA
+// ============================================
+
+/**
+ * Precios base de TEMPORADA BAJA (por defecto todo el año)
+ */
+export const PRECIO_TEMPORADA_BAJA = {
+  price_less_than_week: 95,  // < 7 días
+  price_one_week: 85,        // 7-13 días
+  price_two_weeks: 75,       // 14-20 días
+  price_three_weeks: 65,     // 21+ días
+};
+
+/**
+ * Interface para temporadas (datos de la BD)
+ */
+export interface Season {
+  id: string;
+  name: string;
+  slug: string;
+  start_date: string;
+  end_date: string;
+  price_less_than_week: number | null;
+  price_one_week: number | null;
+  price_two_weeks: number | null;
+  price_three_weeks: number | null;
+  min_days: number | null;
+  is_active: boolean | null;
+}
+
+/**
+ * Resultado del cálculo de precios
+ */
+export interface PricingResult {
+  total: number;
+  avgPricePerDay: number;
+  seasonBreakdown: { name: string; days: number; pricePerDay: number }[];
+  dominantSeason: string;
+  minDays: number;
+}
+
+/**
+ * Obtiene el precio por día según la duración total del alquiler
+ * @param season - La temporada (o null para temporada baja)
+ * @param pricingDays - Días totales para determinar el tramo de precio
+ */
+export function getPriceForDayByDuration(season: Season | null, pricingDays: number): number {
+  if (!season) {
+    // Temporada BAJA (por defecto)
+    if (pricingDays >= 21) return PRECIO_TEMPORADA_BAJA.price_three_weeks;
+    if (pricingDays >= 14) return PRECIO_TEMPORADA_BAJA.price_two_weeks;
+    if (pricingDays >= 7) return PRECIO_TEMPORADA_BAJA.price_one_week;
+    return PRECIO_TEMPORADA_BAJA.price_less_than_week;
+  }
+  
+  // Temporada MEDIA o ALTA - usar precios de la temporada
+  if (pricingDays >= 21) return season.price_three_weeks ?? PRECIO_TEMPORADA_BAJA.price_three_weeks;
+  if (pricingDays >= 14) return season.price_two_weeks ?? PRECIO_TEMPORADA_BAJA.price_two_weeks;
+  if (pricingDays >= 7) return season.price_one_week ?? PRECIO_TEMPORADA_BAJA.price_one_week;
+  return season.price_less_than_week ?? PRECIO_TEMPORADA_BAJA.price_less_than_week;
+}
+
+/**
+ * Encuentra la temporada aplicable para una fecha específica
+ * @param dateStr - Fecha en formato YYYY-MM-DD
+ * @param seasons - Lista de temporadas activas
+ */
+export function getSeasonForDate(dateStr: string, seasons: Season[]): Season | null {
+  if (!seasons || seasons.length === 0) return null;
+  
+  return seasons.find(s => {
+    return dateStr >= s.start_date && dateStr <= s.end_date;
+  }) || null;
+}
+
+/**
+ * Calcula el precio total día a día considerando temporadas
+ * 
+ * IMPORTANTE: Este sistema calcula cada día individualmente.
+ * Si un alquiler cruza temporadas, cada día se cobra según su temporada.
+ * 
+ * @param pickupDate - Fecha de recogida (YYYY-MM-DD)
+ * @param pricingDays - Días para calcular (ya ajustados por regla de 2=3 días)
+ * @param seasons - Lista de temporadas activas que pueden aplicar
+ * @returns Resultado con total, promedio y desglose por temporada
+ * 
+ * @example
+ * // Alquiler del 18-28 junio (11 días), cruzando temporadas
+ * // 18-21 jun = MEDIA, 22-28 jun = ALTA
+ * // Resultado: 4 días × 115€ + 7 días × 145€ = 1,475€
+ */
+export function calculateSeasonalPrice(
+  pickupDate: string,
+  pricingDays: number,
+  seasons: Season[]
+): PricingResult {
+  let total = 0;
+  const breakdown: Record<string, { days: number; pricePerDay: number; minDays: number }> = {};
+  
+  // Generar cada día del alquiler
+  const startDate = new Date(pickupDate);
+  
+  for (let i = 0; i < pricingDays; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+    const dateStr = currentDate.toISOString().split('T')[0];
+    
+    const season = getSeasonForDate(dateStr, seasons);
+    const priceForDay = getPriceForDayByDuration(season, pricingDays);
+    const seasonName = season?.name || "Temporada Baja";
+    const minDays = season?.min_days || 2;
+    
+    total += priceForDay;
+    
+    if (!breakdown[seasonName]) {
+      breakdown[seasonName] = { days: 0, pricePerDay: priceForDay, minDays };
+    }
+    breakdown[seasonName].days++;
+  }
+  
+  const seasonBreakdown = Object.entries(breakdown).map(([name, data]) => ({
+    name,
+    days: data.days,
+    pricePerDay: data.pricePerDay
+  }));
+  
+  // Encontrar la temporada dominante (más días)
+  const dominantSeasonEntry = Object.entries(breakdown).reduce((prev, current) => 
+    (current[1].days > prev[1].days) ? current : prev
+  );
+  
+  const dominantSeason = dominantSeasonEntry[0];
+  const minDays = dominantSeasonEntry[1].minDays;
+  
+  return {
+    total,
+    avgPricePerDay: Math.round((total / pricingDays) * 100) / 100,
+    seasonBreakdown,
+    dominantSeason,
+    minDays
+  };
+}
+
+/**
+ * Calcula el sobrecoste promedio respecto a temporada baja
+ */
+export function calculateSeasonalSurcharge(avgPricePerDay: number, pricingDays: number): number {
+  const basePricePerDay = pricingDays >= 21 ? 65 : pricingDays >= 14 ? 75 : pricingDays >= 7 ? 85 : 95;
+  return Math.round((avgPricePerDay - basePricePerDay) * 100) / 100;
+}
