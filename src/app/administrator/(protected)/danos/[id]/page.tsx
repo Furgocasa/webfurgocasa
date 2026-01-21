@@ -439,19 +439,19 @@ export default function VehicleDamageDetailPage() {
               </button>
             </div>
 
-            {/* View selector - Diseño compacto tipo pills */}
-            <div className="px-3 py-2 bg-gray-50">
-              <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            {/* View selector - Grid adaptable */}
+            <div className="p-2 bg-gray-50">
+              <div className="grid grid-cols-3 sm:grid-cols-5 gap-1">
                 {viewTypes
                   .filter(v => v.category === activeTab)
                   .map(view => (
                     <button
                       key={view.id}
                       onClick={() => setActiveView(view.id)}
-                      className={`px-3 py-1.5 text-xs font-medium rounded-full whitespace-nowrap transition-all ${
+                      className={`px-2 py-1.5 text-xs font-medium rounded-lg transition-all text-center ${
                         activeView === view.id
                           ? 'bg-furgocasa-blue text-white shadow-sm'
-                          : 'bg-white border border-gray-200 text-gray-600 hover:border-furgocasa-blue hover:text-furgocasa-blue'
+                          : 'bg-white border border-gray-200 text-gray-600 hover:border-furgocasa-blue'
                       }`}
                     >
                       {view.label}
@@ -461,54 +461,39 @@ export default function VehicleDamageDetailPage() {
             </div>
           </div>
 
-          {/* Edit Mode Button - Diseño mejorado para móvil */}
-          <div className={`rounded-xl shadow-sm border overflow-hidden transition-all ${
-            isEditing 
-              ? 'bg-gradient-to-r from-furgocasa-orange/10 to-orange-50 border-furgocasa-orange/30' 
-              : 'bg-white border-gray-100'
-          }`}>
-            <button 
-              onClick={() => setIsEditing(!isEditing)}
-              className="w-full p-3 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
-                  isEditing 
-                    ? 'bg-furgocasa-orange text-white' 
-                    : 'bg-gray-100 text-gray-500'
-                }`}>
-                  {isEditing ? (
-                    <Edit2 className="h-5 w-5" />
-                  ) : (
-                    <Plus className="h-5 w-5" />
-                  )}
-                </div>
-                <div className="text-left">
-                  <p className={`text-sm font-medium ${isEditing ? 'text-furgocasa-orange' : 'text-gray-900'}`}>
-                    {isEditing ? 'Modo edición activo' : 'Añadir daños'}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {isEditing ? 'Toca en el plano para marcar' : 'Toca para activar el modo edición'}
-                  </p>
-                </div>
-              </div>
-              <div className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                isEditing 
-                  ? 'bg-green-500 text-white' 
-                  : 'bg-furgocasa-orange text-white'
-              }`}>
-                {isEditing ? 'Finalizar' : 'Activar'}
-              </div>
-            </button>
-            {isEditing && (
-              <div className="px-3 pb-2">
-                <div className="flex items-center gap-2 text-xs text-furgocasa-orange">
-                  <span className="w-1.5 h-1.5 bg-furgocasa-orange rounded-full animate-pulse" />
-                  <span>Pulsa sobre la imagen para añadir un marcador</span>
-                </div>
-              </div>
-            )}
-          </div>
+          {/* Edit Mode Button - Compacto para móvil */}
+          <button 
+            onClick={() => setIsEditing(!isEditing)}
+            className={`w-full rounded-xl shadow-sm border p-3 flex items-center gap-3 transition-all ${
+              isEditing 
+                ? 'bg-orange-50 border-furgocasa-orange/40' 
+                : 'bg-white border-gray-100 hover:border-gray-200'
+            }`}
+          >
+            <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
+              isEditing 
+                ? 'bg-furgocasa-orange text-white' 
+                : 'bg-gray-100 text-gray-500'
+            }`}>
+              {isEditing ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+            </div>
+            <div className="flex-1 text-left min-w-0">
+              <p className={`text-sm font-medium truncate ${isEditing ? 'text-furgocasa-orange' : 'text-gray-900'}`}>
+                {isEditing ? 'Toca en el plano para marcar' : 'Añadir daños al vehículo'}
+              </p>
+              {isEditing && (
+                <p className="text-xs text-gray-500 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
+                  Modo edición activo
+                </p>
+              )}
+            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+              isEditing ? 'bg-green-500 text-white' : 'bg-furgocasa-orange text-white'
+            }`}>
+              {isEditing ? 'Listo' : 'Editar'}
+            </span>
+          </button>
 
           {/* Vehicle Plan */}
           <VehicleDamagePlan
