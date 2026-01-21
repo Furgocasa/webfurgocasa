@@ -9,23 +9,15 @@ interface HeroSliderProps {
   autoPlayInterval?: number;
 }
 
-export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps) {
+export function HeroSlider({ images, autoPlayInterval = 20000 }: HeroSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(new Array(images.length).fill(false));
 
   // Precargar todas las imágenes al montar el componente
   useEffect(() => {
-    images.forEach((src, index) => {
+    images.forEach((src) => {
       const img = new window.Image();
       img.src = src;
-      img.onload = () => {
-        setImagesLoaded(prev => {
-          const newLoaded = [...prev];
-          newLoaded[index] = true;
-          return newLoaded;
-        });
-      };
     });
   }, [images]);
 
@@ -65,7 +57,7 @@ export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps)
         {images.map((image, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-500 ${
+            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
               index === currentIndex ? "opacity-100" : "opacity-0"
             }`}
           >
@@ -73,8 +65,8 @@ export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps)
               src={image}
               alt={`Furgocasa Camper ${index + 1}`}
               fill
-              priority={index < 3}
-              loading={index < 3 ? "eager" : "lazy"}
+              priority={index === 0 || index === 1}
+              loading={index === 0 || index === 1 ? "eager" : "lazy"}
               className="object-cover"
               quality={90}
               sizes="100vw"

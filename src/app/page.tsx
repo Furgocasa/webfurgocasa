@@ -34,23 +34,23 @@ export const metadata: Metadata = {
     siteName:"Furgocasa - Alquiler de Autocaravanas",
     images: [
       {
-        url:"https://www.furgocasa.com/images/slides/hero-01.webp",
-        width: 1200,
-        height: 630,
+        url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+        width: 1920,
+        height: 1080,
         alt:"Furgocasa - Alquiler de Campers en Murcia",
         type:"image/webp",
       },
       {
-        url:"https://www.furgocasa.com/images/slides/hero-02.webp",
-        width: 1200,
-        height: 630,
+        url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/new_slider_1.webp",
+        width: 1920,
+        height: 1080,
         alt:"Flota premium Furgocasa",
         type:"image/webp",
       },
       {
-        url:"https://www.furgocasa.com/images/slides/hero-03.webp",
-        width: 1200,
-        height: 630,
+        url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_1.webp",
+        width: 1920,
+        height: 1080,
         alt:"Interior camper Furgocasa",
         type:"image/webp",
       }
@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     creator:"@furgocasa",
     title:"Furgocasa | Alquiler Camper Murcia",
     description:"Autocaravanas premium desde 95€/día. Kilómetros ilimitados. Tu hotel 5⭐ sobre ruedas.",
-    images: ["https://www.furgocasa.com/images/slides/hero-01.webp"],
+    images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
   },
   alternates: {
     canonical:"https://www.furgocasa.com",
@@ -107,15 +107,13 @@ export default async function HomePage() {
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <HeroSlider 
               images={[
-                "/images/slides/hero-01.webp",
-                "/images/slides/hero-02.webp",
-                "/images/slides/hero-03.webp",
-                "/images/slides/hero-05.webp",
-                "/images/slides/hero-09.webp",
-                "/images/slides/hero-11.webp",
-                "/images/slides/hero-13.webp",
-                "/images/slides/hero-15.webp",
+                "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+                "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/new_slider_1.webp",
+                "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/new_slider_2.webp",
+                "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_1.webp",
+                "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_5.webp",
               ]}
+              autoPlayInterval={20000}
             />
           </div>
           
