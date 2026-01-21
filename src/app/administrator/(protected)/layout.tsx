@@ -10,10 +10,22 @@ export const dynamic = "auto";
 export const revalidate = 1800; // Revalidar cada 30 minutos como máximo (datos cambian poco)
 
 // ✅ PWA: Metadatos específicos para el panel de administrador
+// ⚠️ CRÍTICO: robots noindex para NUNCA indexar páginas de admin
 export const metadata: Metadata = {
   title: "Furgocasa Admin",
   description: "Panel de administración de Furgocasa",
   manifest: "/admin-manifest.json",
+  // ⚠️ NUNCA indexar páginas de administración
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
