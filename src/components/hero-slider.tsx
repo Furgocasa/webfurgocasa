@@ -12,6 +12,22 @@ interface HeroSliderProps {
 export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [imagesLoaded, setImagesLoaded] = useState<boolean[]>(new Array(images.length).fill(false));
+
+  // Precargar todas las imágenes al montar el componente
+  useEffect(() => {
+    images.forEach((src, index) => {
+      const img = new window.Image();
+      img.src = src;
+      img.onload = () => {
+        setImagesLoaded(prev => {
+          const newLoaded = [...prev];
+          newLoaded[index] = true;
+          return newLoaded;
+        });
+      };
+    });
+  }, [images]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -57,9 +73,11 @@ export function HeroSlider({ images, autoPlayInterval = 5000 }: HeroSliderProps)
               src={image}
               alt={`Furgocasa Camper ${index + 1}`}
               fill
-              priority={index === 0}
+              priority={index < 3}
+              loading={index < 3 ? "eager" : "lazy"}
               className="object-cover"
-              quality={85}
+              quality={90}
+              sizes="100vw"
             />
           </div>
         ))}

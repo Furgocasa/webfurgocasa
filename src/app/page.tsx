@@ -108,11 +108,13 @@ export default async function HomePage() {
             <HeroSlider 
               images={[
                 "/images/slides/hero-01.webp",
+                "/images/slides/hero-02.webp",
+                "/images/slides/hero-03.webp",
                 "/images/slides/hero-05.webp",
+                "/images/slides/hero-09.webp",
                 "/images/slides/hero-11.webp",
                 "/images/slides/hero-13.webp",
                 "/images/slides/hero-15.webp",
-                "/images/slides/hero-17.webp",
               ]}
             />
           </div>
