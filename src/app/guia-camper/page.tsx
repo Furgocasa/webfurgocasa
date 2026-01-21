@@ -1,338 +1,47 @@
-"use client";
+import { Metadata } from "next";
+import { GuiaCamperClient } from "./guia-camper-client";
 
-import { LocalizedLink } from"@/components/localized-link";
-import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight } from"lucide-react";
-import { useLanguage } from"@/contexts/language-context";
+// 🎯 SEO Metadata - Único y optimizado para /guia-camper
+export const metadata: Metadata = {
+  title: "Guía Completa del Camper | Cómo Usar tu Autocaravana | Furgocasa",
+  description: "Aprende a usar tu camper de alquiler: panel de control, depósitos de agua, electricidad, calefacción, gas y más. Guía práctica para principiantes y expertos.",
+  keywords: "guía camper, cómo usar autocaravana, manual camper, funcionamiento camper, electricidad autocaravana, agua camper, calefacción camper",
+  openGraph: {
+    title: "Guía Completa del Camper | Furgocasa",
+    description: "Todo lo que necesitas saber sobre el funcionamiento de tu camper de alquiler.",
+    type: "website",
+    url: "https://www.furgocasa.com/es/guia-camper",
+    siteName: "Furgocasa",
+    locale: "es_ES",
+  },
+  twitter: {
+    card: "summary",
+    title: "Guía Completa del Camper | Furgocasa",
+    description: "Aprende a usar tu camper de alquiler.",
+  },
+  alternates: {
+    canonical: "https://www.furgocasa.com/es/guia-camper",
+    languages: {
+      'es': 'https://www.furgocasa.com/es/guia-camper',
+      'en': 'https://www.furgocasa.com/en/guia-camper',
+      'fr': 'https://www.furgocasa.com/fr/guia-camper',
+      'de': 'https://www.furgocasa.com/de/guia-camper',
+      'x-default': 'https://www.furgocasa.com/es/guia-camper',
+    },
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+};
+
 export default function GuiaCamperPage() {
-  const { t } = useLanguage();
-
-  return (
-    <>
-<main className="min-h-screen bg-gray-50 font-amiko">
-        {/* Hero Section - Modernizado */}
-        <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
-          <div className="absolute inset-0 opacity-10" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
-
-          <div className="container mx-auto px-4 text-center relative z-10">
-            <BookOpen className="h-16 w-16 text-white/20 mx-auto mb-6" />
-            <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6">
-              {t("Guía Camper")}
-            </h1>
-            <h2 className="text-xl md:text-2xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">
-              {t("Todo lo que necesitas saber sobre el funcionamiento de tu camper de alquiler")}
-            </h2>
-          </div>
-        </section>
-
-        {/* Introducción - Modernizado */}
-        <section className="py-24 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto bg-gray-50 rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-gray-100">
-              <h3 className="text-2xl font-heading font-bold text-gray-900 mb-6 text-center">{t("Bienvenidos al mundo Caravaning")}</h3>
-              <div className="space-y-6 text-gray-600 leading-relaxed text-lg">
-                <p>
-                  {t("En los últimos años las Campervans de Gran Volumen han proliferado en gran medida y se han hecho un hueco importante dentro del sector de Caravaning.")}
-                </p>
-                <p>
-                  {t("Creemos que esto se debe a la optimización y mejora de determinados equipos, sobre todo electrónicos, que han permitido que estos vehículos, en espacios mucho mas reducidos, puedan ofrecer las mismas comodidades básicas que una autocaravana de mayor tamaño. Hablamos por ejemplo de la mayor capacidad en las baterías, menores consumos en la iluminación, luces led, sistemas de calefacción y aguas más eficientes.")}
-                </p>
-                <p>
-                  {t("Al principio, sobre todo si es tu primera vez con una autocaravana, puede que no conozcas como funcionan algunos de estos sistemas o que, haciendo uso de ellos, te surjan dudas acerca de su correcto uso, cuidado y mantenimiento.")}
-                </p>
-                <div className="bg-white p-6 rounded-2xl border-l-4 border-furgocasa-orange shadow-md">
-                  <p className="font-bold text-gray-800 flex items-center gap-3">
-                    <Info className="h-6 w-6 text-furgocasa-orange" />
-                    {t("¡No te preocupes! Es muy fácil.")}
-                  </p>
-                  <p className="mt-2 text-gray-600">
-                    {t("Para ayudarte hemos creado esta sección donde te explicamos al detalle como funcionan cada uno de los equipamientos que lleva instalada tu camper.")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Panel de Control - Modernizado */}
-        <section className="py-24 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <div className="flex items-center gap-6 mb-12 justify-center md:justify-start">
-                <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center shadow-lg text-furgocasa-orange">
-                  <Gauge className="h-10 w-10" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
-                  {t("El panel de control")}
-                </h2>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-8">
-                <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
-                  <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                    <span className="w-2 h-2 bg-furgocasa-blue rounded-full"></span>
-                    {t("Funciones principales")}
-                  </h3>
-                  <ul className="space-y-4">
-                    {["Encender el automático de la electricidad","Encender la bomba de aguas limpias","Verificar el estado de carga de las baterías","Verificar la cantidad restante de aguas limpias","Comprobar si el deposito de aguas sucias esta lleno","Encender la iluminación exterior (según modelo)"
-                    ].map((item, i) => (
-                      <li key={i} className="flex items-start gap-3 text-gray-600">
-                        <ArrowRight className="h-5 w-5 text-furgocasa-orange flex-shrink-0 mt-0.5" />
-                        <span>{t(item)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="bg-blue-600 text-white rounded-3xl p-8 shadow-lg relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2"></div>
-                  <h3 className="text-xl font-bold mb-6 flex items-center gap-2 relative z-10">
-                    <Info className="h-6 w-6 text-blue-200" />
-                    {t("Funcionamiento")}
-                  </h3>
-                  <div className="space-y-6 relative z-10 text-blue-100">
-                    <p>
-                      <strong className="text-white block mb-1">{t("Botones de verificación:")}</strong>
-                      {t("Presiona el botón correspondiente para ver los niveles de batería o agua en la barra de estado.")}
-                    </p>
-                    <p>
-                      <strong className="text-white block mb-1">{t("Alerta de aguas grises:")}</strong>
-                      {t("El icono parpadea cuando el depósito supera el 75% de capacidad. ¡Es hora de vaciar!")}
-                    </p>
-                    <p>
-                      <strong className="text-white block mb-1">{t("Activación de servicios:")}</strong>
-                      {t("Los botones de electricidad y bomba de agua tienen un piloto indicador de encendido/apagado.")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Electricidad - Modernizado */}
-        <section className="py-24 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <div className="flex items-center gap-6 mb-12 justify-center md:justify-start">
-                <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center shadow-md text-furgocasa-blue">
-                  <Zap className="h-10 w-10" />
-                </div>
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
-                  {t("Electricidad")}
-                </h2>
-              </div>
-
-              <div className="bg-gray-50 rounded-3xl p-8 md:p-12 shadow-inner border border-gray-100 mb-12">
-                <p className="text-gray-600 text-lg mb-8 text-center max-w-3xl mx-auto">
-                  {t("Las camper llevan dos sistemas eléctricos independientes. Puedes comprobar la carga de ambos desde el panel de control.")}
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-8">
-                  <div className="bg-white rounded-2xl p-8 shadow-sm border-t-4 border-furgocasa-blue hover:shadow-md transition-shadow">
-                    <h3 className="font-bold text-xl text-gray-900 mb-4 text-center">
-                      {t("Sistema del Vehículo")}
-                    </h3>
-                    <p className="text-gray-600 text-center">
-                      {t("Exclusivo para el motor y elementos del salpicadero (radio, mechero cabina). Funciona como un coche normal.")}
-                    </p>
-                  </div>
-                  <div className="bg-white rounded-2xl p-8 shadow-sm border-t-4 border-furgocasa-orange hover:shadow-md transition-shadow">
-                    <h3 className="font-bold text-xl text-gray-900 mb-4 text-center">
-                      {t("Sistema de la Vivienda")}
-                    </h3>
-                    <p className="text-gray-600 text-center">
-                      {t("Alimenta luces, nevera, calefacción, bomba de agua y enchufes traseros. Funciona con batería auxiliar de 12v.")}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 flex items-start gap-4">
-                <Info className="h-8 w-8 text-yellow-600 flex-shrink-0" />
-                <div>
-                  <h3 className="font-bold text-yellow-900 text-lg mb-2">{t("Gestión de la energía")}</h3>
-                  <p className="text-yellow-800 text-sm leading-relaxed mb-4">
-                    {t("Las baterías se cargan al conducir o enchufando la camper a 220v (camping/área). Algunas tienen placas solares de apoyo.")}
-                  </p>
-                  <p className="text-yellow-800 text-sm leading-relaxed font-bold">
-                    {t("Recomendación: Aprovecha los momentos de conducción o conexión a 220v para cargar tus dispositivos más potentes.")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Gas y Calefacción - Grid Modernizado */}
-        <section className="py-24 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
-              {/* Gas */}
-              <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600">
-                    <Flame className="h-8 w-8" />
-                  </div>
-                  <h2 className="text-2xl font-heading font-bold text-gray-900">{t("Gas Propano")}</h2>
-                </div>
-                
-                <p className="text-gray-600 mb-6">
-                  {t("Alimenta la cocina, calefacción y agua caliente. Las botellas están en el maletero trasero.")}
-                </p>
-
-                <div className="bg-red-50 rounded-xl p-6 border border-red-100">
-                  <h4 className="font-bold text-red-800 mb-2 flex items-center gap-2">
-                    <AlertTriangle className="h-5 w-5" />
-                    {t("Seguridad")}
-                  </h4>
-                  <p className="text-red-700 text-sm">
-                    {t("Cierra siempre las botellas durante el viaje. Ábrelas solo cuando estés parado y vayas a usar los servicios.")}
-                  </p>
-                </div>
-              </div>
-
-              {/* Calefacción */}
-              <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100">
-                <div className="flex items-center gap-4 mb-8">
-                  <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center text-red-600">
-                    <Thermometer className="h-8 w-8" />
-                  </div>
-                  <h2 className="text-2xl font-heading font-bold text-gray-900">{t("Climatización")}</h2>
-                </div>
-
-                <p className="text-gray-600 mb-6">
-                  {t("Controlada desde su propio panel digital. Funciona a gas o gasoil (según modelo) y requiere electricidad para los ventiladores.")}
-                </p>
-
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                    {t("Abrir gas antes de encender")}
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                    {t("Subir temperatura progresivamente")}
-                  </li>
-                  <li className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                    {t("Ventilar para evitar condensación")}
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Depósitos de Agua - Modernizado */}
-        <section className="py-24 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <div className="inline-block p-4 bg-blue-50 rounded-full mb-4">
-                <Droplets className="h-10 w-10 text-furgocasa-blue" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
-                {t("Gestión de Aguas")}
-              </h2>
-              <p className="text-gray-600">
-                {t("Todo lo que necesitas saber sobre los 3 tipos de agua en tu camper")}
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-              {/* Limpias */}
-              <div className="bg-blue-50/50 rounded-3xl p-8 border border-blue-100 hover:border-blue-300 transition-colors">
-                <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">💧</span> {t("Aguas Limpias")}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t("Depósito de 100-120L para grifos y ducha. Llenar solo con agua potable en áreas habilitadas.")}
-                </p>
-                <div className="bg-white p-4 rounded-xl shadow-sm text-xs text-gray-500">
-                  <strong>{t("Ojo:")}</strong> {t("Nunca introducir combustible u otros líquidos. Dañaría todo el sistema.")}
-                </div>
-              </div>
-
-              {/* Grises */}
-              <div className="bg-gray-100 rounded-3xl p-8 border border-gray-200 hover:border-gray-400 transition-colors">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🚿</span> {t("Aguas Grises")}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  {t("Recoge desagües de ducha y fregadero. Vaciar cuando el piloto del panel parpadee (75%).")}
-                </p>
-                <div className="bg-white p-4 rounded-xl shadow-sm text-xs text-gray-500">
-                  <strong>{t("Vaciado:")}</strong> {t("Solo en rejillas de áreas de autocaravanas. Nunca en la naturaleza.")}
-                </div>
-              </div>
-
-              {/* Negras */}
-              <div className="bg-gray-800 text-white rounded-3xl p-8 shadow-xl hover:bg-gray-900 transition-colors">
-                <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                  <span className="text-2xl">🚽</span> {t("Aguas Negras (WC)")}
-                </h3>
-                <p className="text-sm text-gray-300 mb-4">
-                  {t("Depósito extraíble (cassette). Usar siempre con producto químico azul/verde para descomponer y evitar olores.")}
-                </p>
-                <div className="bg-gray-700 p-4 rounded-xl shadow-sm text-xs text-gray-300 border border-gray-600">
-                  <strong>{t("Importante:")}</strong> {t("Abrir válvula antes de usar. Cerrar después. Vaciar solo en puntos autorizados.")}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Problemas Olores - Modernizado */}
-        <section className="py-24 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100">
-              <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-8 flex items-center gap-3">
-                <span className="p-2 bg-green-100 rounded-lg text-green-600"><Zap className="h-6 w-6" /></span>
-                {t("Tips para evitar olores")}
-              </h2>
-              
-              <div className="grid md:grid-cols-2 gap-8">
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-3 text-lg">{t("En el fregadero")}</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-4 rounded-xl">
-                    {t("Evita verter restos de comida, café o aceite. Intenta que caiga solo agua con jabón. Los restos orgánicos se descomponen y huelen.")}
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-bold text-gray-900 mb-3 text-lg">{t("En el baño")}</h4>
-                  <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-4 rounded-xl">
-                    {t("Usa siempre el químico adecuado y en la cantidad correcta. En verano, con el calor, vacía el cassette con más frecuencia, aunque no esté lleno.")}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Final - Modernizado */}
-        <section className="py-24 bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark relative overflow-hidden text-center">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-furgocasa-orange/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
-
-          <div className="container mx-auto px-4 relative z-10">
-            <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">
-              {t("¿Listo para ponerlo en práctica?")}
-            </h2>
-            <p className="text-blue-100 mb-10 text-xl max-w-2xl mx-auto font-light">
-              {t("Ahora que conoces los secretos, ¡es hora de reservar tu compañera de viaje!")}
-            </p>
-            <div className="flex flex-wrap justify-center gap-6">
-              <LocalizedLink href="/vehiculos" className="bg-furgocasa-orange text-white font-bold py-4 px-10 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
-                {t("Ver vehículos disponibles")}
-              </LocalizedLink>
-              <LocalizedLink href="/video-tutoriales" className="bg-white/10 backdrop-blur-md text-white border border-white/20 font-bold py-4 px-10 rounded-xl hover:bg-white/20 transition-all">
-                {t("Ver video tutoriales")}
-              </LocalizedLink>
-            </div>
-          </div>
-        </section>
-      </main>
-</>
-  );
+  return <GuiaCamperClient />;
 }
