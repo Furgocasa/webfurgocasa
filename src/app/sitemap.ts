@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
+import { i18n, type Locale } from '@/lib/i18n/config';
+import { getTranslatedRoute } from '@/lib/route-translations';
 
 /**
  * SITEMAP SEO MULTIIDIOMA - MODELO CORRECTO
@@ -7,14 +9,16 @@ import { createClient } from '@supabase/supabase-js';
  * 
  * ⚠️ IMPORTANTE - NO CAMBIAR ESTA CONFIGURACIÓN ⚠️
  * 
- * Este sitemap genera URLs CON prefijo de idioma para TODOS los idiomas,
- * incluyendo español (/es/).
+ * Este sitemap genera URLs CON prefijo de idioma para TODOS los idiomas:
+ * - Español (/es/)
+ * - Inglés (/en/)
+ * - Francés (/fr/)
+ * - Alemán (/de/)
  * 
- * ¿Por qué /es/ es obligatorio?
- * 1. El sitio anterior en Joomla usaba /es/ y Google ya tiene indexadas esas URLs
- * 2. Cambiar las URLs perdería todo el posicionamiento SEO acumulado
- * 3. Es el modelo correcto para SEO multiidioma (cada idioma con su prefijo)
- * 4. Permite usar hreflang correctamente para conectar versiones de idioma
+ * ¿Por qué incluir todos los idiomas?
+ * 1. Permite que clientes internacionales encuentren el sitio en su idioma
+ * 2. Mejora el SEO internacional (Google indexa todas las versiones)
+ * 3. Cada URL tiene hreflang alternates para conectar versiones de idioma
  * 
  * Estructura correcta:
  * - Español:  https://www.furgocasa.com/es/blog/rutas
@@ -26,6 +30,9 @@ import { createClient } from '@supabase/supabase-js';
  * 
  * Documentación completa: /SEO-MULTIIDIOMA-MODELO.md
  */
+
+// Idiomas soportados
+const locales: Locale[] = i18n.locales as unknown as Locale[];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Usar cliente público para sitemap generation
@@ -116,24 +123,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = [];
 
   /**
-   * Añade una entrada al sitemap con URL canónica EN ESPAÑOL con prefijo /es/
+   * Añade entradas al sitemap para TODOS los idiomas
    * 
-   * ⚠️ IMPORTANTE: Todas las URLs deben llevar /es/ para mantener compatibilidad
-   * con las URLs indexadas del sitio anterior en Joomla.
+   * Genera una URL por cada idioma (es, en, fr, de) con sus respectivos
+   * hreflang alternates para SEO internacional.
    * 
-   * @param path - Ruta sin prefijo de idioma (ej: '/blog/rutas')
+   * @param path - Ruta en español sin prefijo de idioma (ej: '/blog/rutas')
    * @param options - Opciones de sitemap (lastModified, changeFrequency, priority)
    */
   const addEntry = (
     path: string,
     options: Pick<MetadataRoute.Sitemap[number], 'lastModified' | 'changeFrequency' | 'priority'> = {}
   ) => {
-    // ✅ SIEMPRE añadir /es/ para mantener URLs canónicas con prefijo de idioma
-    entries.push({
-      url: `${baseUrl}/es${path}`,
-      lastModified: options.lastModified || now,
-      changeFrequency: options.changeFrequency,
-      priority: options.priority,
+    // Generar alternates para hreflang (todas las versiones de idioma)
+    const alternates: Record<string, string> = {};
+    locales.forEach((locale) => {
+      const translatedPath = getTranslatedRoute(`/es${path}`, locale);
+      alternates[locale] = `${baseUrl}${translatedPath}`;
+    });
+    // x-default apunta a español
+    alternates['x-default'] = `${baseUrl}/es${path}`;
+
+    // Añadir una entrada por cada idioma
+    locales.forEach((locale) => {
+      const translatedPath = getTranslatedRoute(`/es${path}`, locale);
+      entries.push({
+        url: `${baseUrl}${translatedPath}`,
+        lastModified: options.lastModified || now,
+        changeFrequency: options.changeFrequency,
+        priority: options.priority,
+        alternates: {
+          languages: alternates,
+        },
+      });
     });
   };
 
