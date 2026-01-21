@@ -1,5 +1,7 @@
-import { Metadata } from "next";
+'use client';
+
 import Link from "next/link";
+import { useEffect } from "react";
 import { 
   Home, 
   Car, 
@@ -13,14 +15,8 @@ import {
   Mountain
 } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Página no encontrada | Furgocasa",
-  description: "Lo sentimos, la página que buscas no existe. Descubre nuestras campers y autocaravanas en alquiler.",
-  robots: {
-    index: false,
-    follow: true,
-  },
-};
+// Metadata para SEO (debe estar en componente Server)
+// Se configura en layout.tsx o mediante generateMetadata
 
 // Componente de vehículo animado SVG
 function AnimatedVan() {
@@ -120,6 +116,36 @@ function QuickLinkCard({
 }
 
 export default function NotFound() {
+  // Registrar el error 404 en Google Analytics
+  useEffect(() => {
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      const url = window.location.href;
+      const path = window.location.pathname;
+      const search = window.location.search;
+      const referrer = document.referrer;
+
+      console.log('[Analytics] Registrando error 404:', path);
+
+      // Enviar evento personalizado de 404
+      (window as any).gtag('event', 'page_not_found', {
+        page_location: url,
+        page_path: path,
+        page_search: search,
+        page_referrer: referrer,
+        event_category: 'Error',
+        event_label: '404 - Page Not Found',
+        non_interaction: false
+      });
+
+      // También enviar como excepción para tener doble tracking
+      (window as any).gtag('event', 'exception', {
+        description: `404: ${path}${search}`,
+        fatal: false,
+        page_location: url
+      });
+    }
+  }, []);
+
   const quickLinks: Array<{
     href: string;
     icon: React.ComponentType<{ className?: string }>;
