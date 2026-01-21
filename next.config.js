@@ -348,6 +348,43 @@ const nextConfig = {
       { source: '/de/wohnmobile-zu-verkaufen-:location', destination: '/venta-autocaravanas-camper-:location' },
 
       // ============================================
+      // ESPAÑOL (ES) - Rutas CON PREFIJO /es/ (CRÍTICO PARA SEO)
+      // ============================================
+      { source: '/es', destination: '/' },
+      { source: '/es/reservar', destination: '/reservar' },
+      { source: '/es/reservar/:path*', destination: '/reservar/:path*' },
+      { source: '/es/vehiculos', destination: '/vehiculos' },
+      { source: '/es/vehiculos/:slug', destination: '/vehiculos/:slug' },
+      { source: '/es/tarifas', destination: '/tarifas' },
+      { source: '/es/contacto', destination: '/contacto' },
+      { source: '/es/ofertas', destination: '/ofertas' },
+      { source: '/es/ventas', destination: '/ventas' },
+      { source: '/es/ventas/:slug', destination: '/ventas/:slug' },
+      { source: '/es/buscar', destination: '/buscar' },
+      { source: '/es/blog', destination: '/blog' },
+      { source: '/es/blog/:path*', destination: '/blog/:path*' },
+      { source: '/es/quienes-somos', destination: '/quienes-somos' },
+      { source: '/es/guia-camper', destination: '/guia-camper' },
+      { source: '/es/inteligencia-artificial', destination: '/inteligencia-artificial' },
+      { source: '/es/mapa-areas', destination: '/mapa-areas' },
+      { source: '/es/parking-murcia', destination: '/parking-murcia' },
+      { source: '/es/video-tutoriales', destination: '/video-tutoriales' },
+      { source: '/es/clientes-vip', destination: '/clientes-vip' },
+      { source: '/es/documentacion-alquiler', destination: '/documentacion-alquiler' },
+      { source: '/es/como-funciona', destination: '/como-funciona' },
+      { source: '/es/como-reservar-fin-semana', destination: '/como-reservar-fin-semana' },
+      { source: '/es/aviso-legal', destination: '/aviso-legal' },
+      { source: '/es/privacidad', destination: '/privacidad' },
+      { source: '/es/faqs', destination: '/faqs' },
+      { source: '/es/faqs/:slug', destination: '/faqs/:slug' },
+      { source: '/es/pago/exito', destination: '/pago/exito' },
+      { source: '/es/pago/error', destination: '/pago/error' },
+      // SEO Location ES
+      { source: '/es/alquiler-autocaravanas-campervans-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
+      { source: '/es/venta-autocaravanas-camper-:location', destination: '/venta-autocaravanas-camper-:location' },
+      { source: '/es/alquiler-motorhome-europa-desde-espana', destination: '/alquiler-motorhome-europa-desde-espana' },
+
+      // ============================================
       // SIN PREFIJO - Rutas traducidas (compatibilidad)
       // ============================================
       // EN
@@ -397,25 +434,6 @@ const nextConfig = {
         destination: 'https://www.furgocasa.com/:path*',
         permanent: true,
       },
-
-      // ============================================
-      // ESPAÑOL /es/ - Redirigir a raíz (idioma por defecto)
-      // ============================================
-      { source: '/es', destination: '/', permanent: true },
-      { source: '/es/blog/:path*', destination: '/blog/:path*', permanent: true },
-      { source: '/es/vehiculos/:path*', destination: '/vehiculos/:path*', permanent: true },
-      { source: '/es/ventas/:path*', destination: '/ventas/:path*', permanent: true },
-      { source: '/es/reservar/:path*', destination: '/reservar/:path*', permanent: true },
-      { source: '/es/tarifas', destination: '/tarifas', permanent: true },
-      { source: '/es/contacto', destination: '/contacto', permanent: true },
-      { source: '/es/ofertas', destination: '/ofertas', permanent: true },
-      { source: '/es/faqs/:path*', destination: '/faqs/:path*', permanent: true },
-      { source: '/es/quienes-somos', destination: '/quienes-somos', permanent: true },
-      { source: '/es/guia-camper', destination: '/guia-camper', permanent: true },
-      { source: '/es/documentacion-alquiler', destination: '/documentacion-alquiler', permanent: true },
-      { source: '/es/como-funciona', destination: '/como-funciona', permanent: true },
-      { source: '/es/alquiler-autocaravanas-campervans-:loc', destination: '/alquiler-autocaravanas-campervans-:loc', permanent: true },
-      { source: '/es/venta-autocaravanas-camper-:loc', destination: '/venta-autocaravanas-camper-:loc', permanent: true },
 
       // ============================================
       // REDIRECCIONES URLs ANTIGUAS DE JOOMLA
