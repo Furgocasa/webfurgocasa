@@ -298,8 +298,9 @@ export default function InformesClient({
       if (revenueMode === 'creation') {
         // Modo "creación de pedidos": ingresos del mes en que se creó/confirmó la reserva
         const monthBookings = filteredBookings.filter(b => {
-          const pickupDate = parseISO(b.pickup_date);
-          return isWithinInterval(pickupDate, { start: monthStart, end: monthEnd });
+          // Usar created_at como fecha de creación del pedido
+          const createdDate = b.created_at ? parseISO(b.created_at) : parseISO(b.pickup_date);
+          return isWithinInterval(createdDate, { start: monthStart, end: monthEnd });
         });
         
         ingresos = monthBookings.reduce((sum, b) => sum + (b.total_price || 0), 0);
