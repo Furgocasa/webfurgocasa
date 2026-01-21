@@ -56,9 +56,10 @@ const statusLabels: Record<string, string> = {
   repaired: 'Reparado',
 };
 
-// Componente SVG simplificado para el PDF
+// Componente SVG simplificado para el PDF - Solo daños activos (no reparados)
 function VehicleSVGForPDF({ viewType, damages }: { viewType: ViewType; damages: VehicleDamage[] }) {
-  const viewDamages = damages.filter(d => d.view_type === viewType);
+  // Excluir daños reparados del PDF - solo mostrar daños activos
+  const viewDamages = damages.filter(d => d.view_type === viewType && d.status !== 'repaired');
   
   const renderDamageMarkers = () => {
     return viewDamages.map((damage) => (
@@ -188,8 +189,10 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
   const exteriorViews: ViewType[] = ['front', 'back', 'left', 'right', 'top'];
   const interiorViews: ViewType[] = ['interior_main', 'interior_rear'];
   
-  const exteriorDamages = damages.filter(d => d.damage_type === 'exterior');
-  const interiorDamages = damages.filter(d => d.damage_type === 'interior');
+  // Solo daños activos (excluir reparados) para el PDF que firma el cliente
+  const activeDamages = damages.filter(d => d.status !== 'repaired');
+  const exteriorDamages = activeDamages.filter(d => d.damage_type === 'exterior');
+  const interiorDamages = activeDamages.filter(d => d.damage_type === 'interior');
   const today = new Date().toLocaleDateString('es-ES', { 
     day: '2-digit', 
     month: '2-digit', 
@@ -303,8 +306,8 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             </div>
             <div className="mt-3 pt-3 border-t border-gray-300 grid grid-cols-3 gap-2 text-center">
               <div>
-                <p className="text-2xl font-bold text-gray-900">{damages.length}</p>
-                <p className="text-xs text-gray-500">Total Daños</p>
+                <p className="text-2xl font-bold text-gray-900">{activeDamages.length}</p>
+                <p className="text-xs text-gray-500">Daños Actuales</p>
               </div>
               <div>
                 <p className="text-2xl font-bold text-orange-600">{exteriorDamages.length}</p>
@@ -356,8 +359,8 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             <h3 className="text-lg font-bold text-gray-800 border-b border-gray-300 pb-1 mb-3">
               DETALLE DE DAÑOS
             </h3>
-            {damages.length === 0 ? (
-              <p className="text-center text-gray-500 py-4">No hay daños registrados</p>
+            {activeDamages.length === 0 ? (
+              <p className="text-center text-gray-500 py-4">No hay daños activos registrados</p>
             ) : (
               <table className="w-full text-sm">
                 <thead>
@@ -370,7 +373,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {damages.map((damage, index) => (
+                  {activeDamages.map((damage, index) => (
                     <tr key={damage.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
                       <td className="px-2 py-1 font-mono font-bold">{damage.damage_number || '?'}</td>
                       <td className="px-2 py-1">{damage.description}</td>
@@ -394,9 +397,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                       </td>
                       <td className="px-2 py-1">
                         <span className={`px-1.5 py-0.5 rounded text-xs ${
-                          damage.status === 'repaired' 
-                            ? 'bg-green-100 text-green-700' 
-                            : damage.status === 'in_progress'
+                          damage.status === 'in_progress'
                               ? 'bg-yellow-100 text-yellow-700'
                               : 'bg-red-100 text-red-700'
                         }`}>

@@ -137,10 +137,10 @@ export default function VehicleDamageDetailPage() {
     loadData();
   }, [loadData]);
 
-  // Filter damages by current view
+  // Filter damages by current view - EXCLUIR reparados de los marcadores visuales
   const currentViewDamages = useMemo(() => {
     return damages
-      .filter(d => d.view_type === activeView)
+      .filter(d => d.view_type === activeView && d.status !== 'repaired') // Solo daños activos
       .map(d => ({
         id: d.id,
         damage_number: d.damage_number || 0,
@@ -152,21 +152,27 @@ export default function VehicleDamageDetailPage() {
       }));
   }, [damages, activeView]);
 
-  // Stats
+  // Daños activos (no reparados) para contar en las pestañas
+  const activeDamages = useMemo(() => {
+    return damages.filter(d => d.status !== 'repaired');
+  }, [damages]);
+
+  // Stats - Pestañas muestran solo daños activos, historial muestra reparados
   const stats = useMemo(() => {
-    const exteriorDamages = damages.filter(d => d.damage_type === 'exterior');
-    const interiorDamages = damages.filter(d => d.damage_type === 'interior');
+    const activeExterior = activeDamages.filter(d => d.damage_type === 'exterior');
+    const activeInterior = activeDamages.filter(d => d.damage_type === 'interior');
     const pending = damages.filter(d => d.status === 'pending' || d.status === 'in_progress');
     const repaired = damages.filter(d => d.status === 'repaired');
     
     return {
       total: damages.length,
-      exterior: exteriorDamages.length,
-      interior: interiorDamages.length,
+      active: activeDamages.length,
+      exterior: activeExterior.length,  // Solo activos en pestañas
+      interior: activeInterior.length,  // Solo activos en pestañas
       pending: pending.length,
       repaired: repaired.length,
     };
-  }, [damages]);
+  }, [damages, activeDamages]);
 
   // Handle add damage click on plan
   const handleAddDamage = useCallback((x: number, y: number) => {
