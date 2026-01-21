@@ -7,6 +7,7 @@ import Image from"next/image";
 import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
 import { translateServer } from"@/lib/i18n/server-translation";
 import type { Locale } from"@/lib/i18n/config";
+import { headers } from "next/headers";
 
 // ⚡ Server-side Supabase client - Server Component por defecto (SEO optimizado)
 const supabase = createClient(
@@ -86,7 +87,41 @@ function extractCitySlug(locationParam: string | undefined): string {
 }
 
 /**
- * Detecta el idioma basándose en el formato de la URL de ubicación
+ * Detecta el idioma basándose en los headers del middleware
+ * El middleware pasa x-detected-locale y x-original-pathname
+ */
+async function detectLocaleFromRequest(): Promise<Locale> {
+  const headersList = await headers();
+  
+  // ✅ PRIMERO: Usar el idioma detectado por el middleware (más confiable)
+  const detectedLocale = headersList.get('x-detected-locale');
+  if (detectedLocale && ['es', 'en', 'fr', 'de'].includes(detectedLocale)) {
+    return detectedLocale as Locale;
+  }
+  
+  // ✅ SEGUNDO: Detectar desde el pathname original
+  const originalPathname = headersList.get('x-original-pathname') || '';
+  if (originalPathname) {
+    const match = originalPathname.match(/^\/(es|en|fr|de)\//);
+    if (match) {
+      return match[1] as Locale;
+    }
+  }
+  
+  // ✅ TERCERO: Fallback al referer
+  const referer = headersList.get('referer') || '';
+  if (referer) {
+    const match = referer.match(/\/(es|en|fr|de)\//);
+    if (match) {
+      return match[1] as Locale;
+    }
+  }
+  
+  return 'es'; // Default: español
+}
+
+/**
+ * Detecta el idioma basándose en el formato de la URL de ubicación (fallback)
  */
 function detectLocaleFromLocationParam(locationParam: string | undefined): Locale {
   if (!locationParam) return 'es';
@@ -346,8 +381,8 @@ export default async function SaleLocationPage({
 }) {
   const { location: locationParam } = await params;
   
-  // ✅ Detectar idioma desde el formato de la URL
-  const locale = detectLocaleFromLocationParam(locationParam);
+  // ✅ Detectar idioma desde los headers del middleware (más confiable que el param)
+  const locale = await detectLocaleFromRequest();
   const t = (key: string) => translateServer(key, locale);
   
   const [locationData, vehicles] = await Promise.all([

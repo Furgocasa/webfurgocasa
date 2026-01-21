@@ -6,6 +6,8 @@ import dynamic from "next/dynamic";
 import supabase from "@/lib/supabase/client";
 import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { ImageGalleryManager, type GalleryImage } from "@/components/media/image-gallery-manager";
+import { EquipmentIcon } from "@/components/vehicle/equipment-display";
 
 const TinyEditor = dynamic(
   () => import("@/components/admin/tiny-editor").then((mod) => mod.TinyEditor),
@@ -26,6 +28,16 @@ interface Extra {
   price_type: string;
 }
 
+interface Equipment {
+  id: string;
+  name: string;
+  slug: string;
+  icon: string;
+  category: string;
+  is_standard: boolean;
+  is_active: boolean;
+}
+
 interface Category {
   id: string;
   name: string;
@@ -37,8 +49,11 @@ export default function NuevoVehiculoPage() {
   const [loading, setLoading] = useState(false);
   const [extras, setExtras] = useState<Extra[]>([]);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
+  const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [internalCode, setInternalCode] = useState("");
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
   const [formData, setFormData] = useState({
@@ -114,6 +129,24 @@ export default function NuevoVehiculoPage() {
       } else {
         console.warn('No extras found or empty result');
       }
+
+      // Cargar equipamiento
+      const { data: equipmentData, error: equipmentError } = await supabase
+        .from('equipment')
+        .select('id, name, slug, icon, category, is_standard, is_active')
+        .eq('is_active', true)
+        .order('category')
+        .order('sort_order');
+      
+      if (equipmentError) {
+        console.error('Error loading equipment:', equipmentError);
+        console.error('Error details:', JSON.stringify(equipmentError, null, 2));
+      } else if (equipmentData) {
+        console.log('Equipment loaded:', equipmentData);
+        setEquipmentList(equipmentData);
+      } else {
+        console.warn('No equipment found or empty result');
+      }
     };
 
     loadInitialData();
@@ -180,7 +213,41 @@ export default function NuevoVehiculoPage() {
 
         if (extrasError) {
           console.error('Error adding extras:', extrasError);
-          // No lanzamos error, solo lo registramos
+        }
+      }
+
+      // Insertar las imágenes de la galería
+      if (data && galleryImages.length > 0) {
+        const imagesToInsert = galleryImages.map((img) => ({
+          vehicle_id: data.id,
+          image_url: img.image_url,
+          alt_text: img.alt_text || '',
+          sort_order: img.sort_order,
+          is_primary: img.is_primary,
+        }));
+
+        const { error: imagesError } = await supabase
+          .from('vehicle_images')
+          .insert(imagesToInsert);
+
+        if (imagesError) {
+          console.error('Error adding images:', imagesError);
+        }
+      }
+
+      // Insertar equipamientos seleccionados
+      if (data && selectedEquipment.length > 0) {
+        const equipmentToInsert = selectedEquipment.map(equipmentId => ({
+          vehicle_id: data.id,
+          equipment_id: equipmentId
+        }));
+
+        const { error: equipmentError } = await supabase
+          .from('vehicle_equipment')
+          .insert(equipmentToInsert);
+
+        if (equipmentError) {
+          console.error('Error adding equipment:', equipmentError);
         }
       }
 
@@ -198,19 +265,20 @@ export default function NuevoVehiculoPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link 
-          href="/administrator/vehiculos" 
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Link>
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Nuevo Vehículo</h1>
-          <p className="text-gray-600 mt-1">Añade un nuevo vehículo a tu flota</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Link 
+            href="/administrator/vehiculos" 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Nuevo Vehículo</h1>
+            <p className="text-gray-600 mt-1">Añade un nuevo vehículo a tu flota</p>
+          </div>
         </div>
-      </div>
 
       {message && (
         <div className={`p-4 rounded-lg flex items-center gap-3 ${
@@ -382,6 +450,17 @@ export default function NuevoVehiculoPage() {
           </div>
         </div>
 
+        {/* Galería de Imágenes */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <ImageGalleryManager
+            images={galleryImages}
+            onChange={setGalleryImages}
+            maxImages={20}
+            bucket="vehicles"
+            suggestedFolder={internalCode}
+          />
+        </div>
+
         {/* Especificaciones */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Especificaciones</h2>
@@ -515,34 +594,104 @@ export default function NuevoVehiculoPage() {
           </div>
         </div>
 
-        {/* Equipamiento */}
+        {/* Equipamiento Dinámico */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Equipamiento</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Equipamiento</h2>
+          <p className="text-sm text-gray-600 mb-6">
+            Selecciona el equipamiento que tiene este vehículo
+          </p>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {[
-              { key: 'has_kitchen', label: 'Cocina' },
-              { key: 'has_bathroom', label: 'Baño' },
-              { key: 'has_ac', label: 'Aire acondicionado' },
-              { key: 'has_heating', label: 'Calefacción' },
-              { key: 'has_solar_panel', label: 'Panel solar' },
-              { key: 'has_awning', label: 'Toldo' },
-            ].map(item => (
-              <div key={item.key} className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id={item.key}
-                  checked={formData[item.key as keyof typeof formData] as boolean}
-                  onChange={(e) => setFormData(prev => ({ ...prev, [item.key]: e.target.checked }))}
-                  className="w-4 h-4 text-furgocasa-orange focus:ring-furgocasa-orange border-gray-300 rounded"
-                />
-                <label htmlFor={item.key} className="text-sm text-gray-700">
-                  {item.label}
-                </label>
+          {equipmentList.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>No hay equipamientos configurados.</p>
+              <Link href="/administrator/equipamiento" className="text-furgocasa-orange hover:underline mt-2 inline-block">
+                Ir a configurar equipamientos →
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {/* Agrupar por categoría */}
+              {['confort', 'energia', 'exterior', 'multimedia', 'seguridad', 'agua', 'general'].map(category => {
+                const categoryEquipment = equipmentList.filter(eq => eq.category === category);
+                if (categoryEquipment.length === 0) return null;
+                
+                const categoryNames: Record<string, string> = {
+                  confort: 'Confort',
+                  energia: 'Energía',
+                  exterior: 'Exterior',
+                  multimedia: 'Multimedia',
+                  seguridad: 'Conducción y Seguridad',
+                  agua: 'Agua',
+                  general: 'Otros',
+                };
+
+                const categoryColors: Record<string, string> = {
+                  confort: 'border-blue-200 bg-blue-50',
+                  energia: 'border-yellow-200 bg-yellow-50',
+                  exterior: 'border-green-200 bg-green-50',
+                  multimedia: 'border-purple-200 bg-purple-50',
+                  seguridad: 'border-red-200 bg-red-50',
+                  agua: 'border-cyan-200 bg-cyan-50',
+                  general: 'border-gray-200 bg-gray-50',
+                };
+
+                return (
+                  <div key={category}>
+                    <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-3">
+                      {categoryNames[category]}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {categoryEquipment.map(eq => (
+                        <div 
+                          key={eq.id} 
+                          className={`flex items-center gap-3 p-3 border rounded-lg transition-colors cursor-pointer ${
+                            selectedEquipment.includes(eq.id) 
+                              ? categoryColors[category]
+                              : 'border-gray-200 hover:bg-gray-50'
+                          }`}
+                          onClick={() => {
+                            if (selectedEquipment.includes(eq.id)) {
+                              setSelectedEquipment(prev => prev.filter(id => id !== eq.id));
+                            } else {
+                              setSelectedEquipment(prev => [...prev, eq.id]);
+                            }
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedEquipment.includes(eq.id)}
+                            onChange={() => {}}
+                            className="w-4 h-4 text-furgocasa-orange focus:ring-furgocasa-orange border-gray-300 rounded"
+                          />
+                          <EquipmentIcon iconName={eq.icon} className="h-5 w-5 text-gray-600" />
+                          <span className="font-medium text-gray-900 flex-1">{eq.name}</span>
+                          {eq.is_standard && (
+                            <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full">
+                              Estándar
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {/* Contador */}
+              <div className="pt-4 border-t border-gray-200 text-sm text-gray-500">
+                {selectedEquipment.length} equipamientos seleccionados
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
+
+        {/* Equipamiento Legacy (oculto pero funcional para compatibilidad) */}
+        <input type="hidden" value={formData.has_kitchen ? '1' : '0'} />
+        <input type="hidden" value={formData.has_bathroom ? '1' : '0'} />
+        <input type="hidden" value={formData.has_ac ? '1' : '0'} />
+        <input type="hidden" value={formData.has_heating ? '1' : '0'} />
+        <input type="hidden" value={formData.has_solar_panel ? '1' : '0'} />
+        <input type="hidden" value={formData.has_awning ? '1' : '0'} />
 
         {/* Extras Disponibles */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -713,6 +862,7 @@ export default function NuevoVehiculoPage() {
           </Link>
         </div>
       </form>
+      </div>
     </div>
   );
 }

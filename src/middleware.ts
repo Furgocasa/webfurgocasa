@@ -280,8 +280,12 @@ export async function middleware(request: NextRequest) {
       // Reescribir la URL internamente
       request.nextUrl.pathname = spanishPath;
       
-      // ✅ OPTIMIZADO: Sin llamadas a Supabase = navegación instantánea
-      return NextResponse.rewrite(request.nextUrl);
+      // ✅ PASAR EL IDIOMA DETECTADO como header para que las páginas puedan usarlo
+      const response = NextResponse.rewrite(request.nextUrl);
+      response.headers.set('x-detected-locale', locale);
+      response.headers.set('x-original-pathname', pathname);
+      
+      return response;
       
     } else {
       // No tiene locale, redirigir añadiendo el locale por defecto

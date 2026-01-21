@@ -5469,7 +5469,25 @@ function generateTextHash(text: string): string {
  * Convierte las traducciones estáticas al formato del caché
  */
 export function getPreloadCache() {
-  const cache: any = {};
+  const cache: any = {  "Encuentra tu autocaravana perfecta para": {
+    es: "Encuentra tu autocaravana perfecta para",
+    en: "Find your perfect motorhome for",
+    fr: "Trouvez votre camping-car parfait pour",
+    de: "Finden Sie Ihr perfektes Wohnmobil fur"
+  },
+  "y su increíble litoral. Entrega desde Murcia a solo": {
+    es: "y su increible litoral. Entrega desde Murcia a solo",
+    en: "and its incredible coastline. Delivery from Murcia just",
+    fr: "et son incroyable littoral. Livraison depuis Murcie a seulement",
+    de: "und seine unglaubliche Kuste. Lieferung von Murcia nur"
+  },
+  "km": {
+    es: "km",
+    en: "km",
+    fr: "km",
+    de: "km"
+  },
+};
   
   Object.entries(staticTranslations).forEach(([text, translations]) => {
     // Genera una clave hash compatible con Unicode
