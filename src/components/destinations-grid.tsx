@@ -12,13 +12,45 @@ interface Destination {
   image?: string;
 }
 
+const SUPABASE_STORAGE_URL = 'https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/locations';
+
 const FEATURED_DESTINATIONS: Destination[] = [
-  { name: "ALICANTE", region: "Comunidad Valenciana", slug: "alicante" },
-  { name: "ALBACETE", region: "Castilla-La Mancha", slug: "albacete" },
-  { name: "ALMERIA", region: "Andalucía", slug: "almeria" },
-  { name: "CARTAGENA", region: "Región de Murcia", slug: "cartagena" },
-  { name: "MURCIA", region: "Región de Murcia", slug: "murcia" },
-  { name: "VALENCIA", region: "Comunidad Valenciana", slug: "valencia" },
+  { 
+    name: "ALICANTE", 
+    region: "Comunidad Valenciana", 
+    slug: "alicante",
+    image: `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_alicante.webp`
+  },
+  { 
+    name: "ALBACETE", 
+    region: "Castilla-La Mancha", 
+    slug: "albacete",
+    image: `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_albacete.webp`
+  },
+  { 
+    name: "ALMERIA", 
+    region: "Andalucía", 
+    slug: "almeria",
+    image: `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_almeria.webp`
+  },
+  { 
+    name: "CARTAGENA", 
+    region: "Región de Murcia", 
+    slug: "cartagena",
+    image: `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_cartagena.webp`
+  },
+  { 
+    name: "MURCIA", 
+    region: "Región de Murcia", 
+    slug: "murcia",
+    image: `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_murcia.webp`
+  },
+  { 
+    name: "VALENCIA", 
+    region: "Comunidad Valenciana", 
+    slug: "valencia",
+    image: `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_valencia.webp`
+  },
 ];
 
 interface DestinationsGridProps {

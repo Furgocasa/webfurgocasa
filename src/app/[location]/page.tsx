@@ -3,11 +3,11 @@ import { notFound } from"next/navigation";
 import { createClient } from"@supabase/supabase-js";
 import { SearchWidget } from"@/components/booking/search-widget";
 import { DestinationsGrid } from"@/components/destinations-grid";
-import { HeroSlider } from"@/components/hero-slider";
 import { BlogArticleLink } from"@/components/blog/blog-article-link";
 import { LocalizedLink } from"@/components/localized-link";
 import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
 import { translateServer, getLocaleFromPath } from"@/lib/i18n/server-translation";
+import Image from"next/image";
 import { 
   CheckCircle,
   Package,
@@ -623,16 +623,41 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
   // Determinar si tiene oficina física
   const hasOffice = locationData.name === 'Murcia' || locationData.name === 'Madrid';
 
+  // Función para obtener imagen de hero según la ciudad
+  const getLocationHeroImage = (cityName: string): string => {
+    const SUPABASE_STORAGE_URL = 'https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/locations';
+    
+    // Normalizar nombre de ciudad para buscar la imagen
+    const normalizedCity = cityName
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // Eliminar acentos
+      .replace(/\s+/g, '_'); // Reemplazar espacios por guiones bajos
+    
+    // Construir URL de la imagen
+    const imageUrl = `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_${normalizedCity}.webp`;
+    
+    return imageUrl;
+  };
+
+  const heroImage = getLocationHeroImage(locationData.name);
+
   return (
     <>
-{/* Hero Section - CON SLIDER DE IMÁGENES - Sin espacio entre header y slider */}
+{/* Hero Section - IMAGEN FIJA SEGÚN LOCALIZACIÓN */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center overflow-hidden">
-        {/* Background slider - ABSOLUTE PARA OCUPAR TODO EL FONDO */}
+        {/* Background image - Imagen fija específica para cada ciudad */}
         <div className="absolute inset-0 w-full h-full">
-          <HeroSlider 
-            images={["/images/slides/hero-01.webp","/images/slides/hero-02.webp","/images/slides/hero-03.webp","/images/slides/hero-04.webp","/images/slides/hero-05.webp",
-            ]}
+          <Image
+            src={heroImage}
+            alt={`Alquiler de autocaravanas en ${locationData.name}`}
+            fill
+            priority
+            className="object-cover"
+            quality={90}
           />
+          {/* Overlay gradient */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
         </div>
         
         {/* Content - RELATIVE Z-10 PARA ESTAR ENCIMA */}

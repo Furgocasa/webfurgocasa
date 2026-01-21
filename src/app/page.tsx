@@ -108,7 +108,13 @@ export default async function HomePage() {
         <section className="relative h-screen min-h-[600px] flex items-center justify-center">
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <HeroSlider 
-              images={["/images/slides/hero-01.webp","/images/slides/hero-02.webp","/images/slides/hero-03.webp","/images/slides/hero-04.webp","/images/slides/hero-05.webp",
+              images={[
+                "/images/slides/hero-01.webp",
+                "/images/slides/hero-05.webp",
+                "/images/slides/hero-11.webp",
+                "/images/slides/hero-13.webp",
+                "/images/slides/hero-15.webp",
+                "/images/slides/hero-17.webp",
               ]}
             />
           </div>

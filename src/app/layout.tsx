@@ -49,7 +49,20 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Furgocasa" }],
   creator: "Furgocasa",
-  // Favicon: Next.js detecta automáticamente icon.png y apple-icon.png en src/app/
+  // Configuración explícita de iconos para indexación correcta en Google
+  icons: {
+    icon: [
+      { url: '/icon.png', type: 'image/png', sizes: '192x192' },
+      { url: '/favicon.ico', sizes: 'any' }, // Fallback para navegadores legacy y Google
+    ],
+    apple: '/apple-icon.png',
+    other: [
+      {
+        rel: 'apple-touch-icon-precomposed',
+        url: '/apple-icon.png',
+      },
+    ],
+  },
   // Manifest para PWA
   manifest: "/manifest.json",
   openGraph: {
