@@ -1338,12 +1338,19 @@ export type Database = {
       }
       vehicle_damages: {
         Row: {
+          booking_id: string | null
           created_at: string | null
+          damage_number: number | null
+          damage_type: string | null
           description: string
           id: string
           images: Json | null
+          is_pre_existing: boolean | null
           location: string | null
           notes: string | null
+          photo_urls: Json | null
+          position_x: number | null
+          position_y: number | null
           repair_cost: number | null
           repaired_date: string | null
           reported_by: string | null
@@ -1352,14 +1359,22 @@ export type Database = {
           status: string | null
           updated_at: string | null
           vehicle_id: string
+          view_type: string | null
         }
         Insert: {
+          booking_id?: string | null
           created_at?: string | null
+          damage_number?: number | null
+          damage_type?: string | null
           description: string
           id?: string
           images?: Json | null
+          is_pre_existing?: boolean | null
           location?: string | null
           notes?: string | null
+          photo_urls?: Json | null
+          position_x?: number | null
+          position_y?: number | null
           repair_cost?: number | null
           repaired_date?: string | null
           reported_by?: string | null
@@ -1368,14 +1383,22 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           vehicle_id: string
+          view_type?: string | null
         }
         Update: {
+          booking_id?: string | null
           created_at?: string | null
+          damage_number?: number | null
+          damage_type?: string | null
           description?: string
           id?: string
           images?: Json | null
+          is_pre_existing?: boolean | null
           location?: string | null
           notes?: string | null
+          photo_urls?: Json | null
+          position_x?: number | null
+          position_y?: number | null
           repair_cost?: number | null
           repaired_date?: string | null
           reported_by?: string | null
@@ -1384,6 +1407,7 @@ export type Database = {
           status?: string | null
           updated_at?: string | null
           vehicle_id?: string
+          view_type?: string | null
         }
         Relationships: [
           {

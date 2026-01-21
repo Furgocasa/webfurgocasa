@@ -23,6 +23,7 @@ import {
   ChevronRight,
   X,
   Wrench,
+  AlertTriangle,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
 import type { Admin } from "@/types/blog";
@@ -37,6 +38,7 @@ interface NavItem {
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/administrator", icon: LayoutDashboard },
   { name: "Vehículos", href: "/administrator/vehiculos", icon: Car },
+  { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
   { name: "Reservas", href: "/administrator/reservas", icon: Calendar },
   { name: "Calendario", href: "/administrator/calendario", icon: Calendar },
   { name: "Clientes", href: "/administrator/clientes", icon: Users },

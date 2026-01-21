@@ -1,0 +1,736 @@
+"use client";
+
+import { useState, useEffect, useMemo, useCallback } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
+import { 
+  ArrowLeft, 
+  Plus, 
+  Save, 
+  X, 
+  Trash2, 
+  Edit2,
+  Car,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Loader2,
+  Camera,
+  RefreshCw
+} from "lucide-react";
+import { VehicleDamagePlan, type DamageMark } from "@/components/admin/vehicle-damage-plan";
+import { createClient } from "@/lib/supabase/client";
+
+interface VehicleDamage {
+  id: string;
+  damage_number: number | null;
+  description: string;
+  damage_type: string | null;
+  view_type: string | null;
+  position_x: number | null;
+  position_y: number | null;
+  status: string | null;
+  severity: string | null;
+  notes: string | null;
+  repair_cost: number | null;
+  reported_date: string | null;
+  repaired_date: string | null;
+  photo_urls: string[] | null;
+  created_at: string | null;
+}
+
+interface Vehicle {
+  id: string;
+  name: string;
+  brand: string | null;
+  model: string | null;
+  internal_code: string | null;
+  main_image_url: string | null;
+}
+
+type ViewType = 'front' | 'back' | 'left' | 'right' | 'top' | 'interior_main' | 'interior_rear';
+
+const viewTypes: { id: ViewType; label: string; category: 'exterior' | 'interior' }[] = [
+  { id: 'front', label: 'Frontal', category: 'exterior' },
+  { id: 'back', label: 'Trasera', category: 'exterior' },
+  { id: 'left', label: 'Lateral Izq.', category: 'exterior' },
+  { id: 'right', label: 'Lateral Der.', category: 'exterior' },
+  { id: 'top', label: 'Superior', category: 'exterior' },
+  { id: 'interior_main', label: 'Interior Principal', category: 'interior' },
+  { id: 'interior_rear', label: 'Interior Trasero', category: 'interior' },
+];
+
+const severityOptions = [
+  { value: 'minor', label: 'Menor', color: 'text-yellow-600 bg-yellow-100' },
+  { value: 'moderate', label: 'Moderado', color: 'text-orange-600 bg-orange-100' },
+  { value: 'severe', label: 'Severo', color: 'text-red-600 bg-red-100' },
+];
+
+const statusOptions = [
+  { value: 'pending', label: 'Pendiente', color: 'text-red-600 bg-red-100' },
+  { value: 'in_progress', label: 'En reparación', color: 'text-yellow-600 bg-yellow-100' },
+  { value: 'repaired', label: 'Reparado', color: 'text-green-600 bg-green-100' },
+];
+
+export default function VehicleDamageDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const vehicleId = params.id as string;
+
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [damages, setDamages] = useState<VehicleDamage[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // UI State
+  const [activeTab, setActiveTab] = useState<'exterior' | 'interior'>('exterior');
+  const [activeView, setActiveView] = useState<ViewType>('front');
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedDamage, setSelectedDamage] = useState<VehicleDamage | null>(null);
+  const [showDamageForm, setShowDamageForm] = useState(false);
+
+  // New damage form
+  const [newDamagePosition, setNewDamagePosition] = useState<{ x: number; y: number } | null>(null);
+  const [formData, setFormData] = useState({
+    description: '',
+    severity: 'minor',
+    status: 'pending',
+    notes: '',
+    repair_cost: '',
+    reported_date: new Date().toISOString().split('T')[0],
+  });
+
+  // Load vehicle and damages
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    const supabase = createClient();
+
+    try {
+      // Load vehicle
+      const { data: vehicleData, error: vehicleError } = await supabase
+        .from('vehicles')
+        .select('id, name, brand, model, internal_code, main_image_url')
+        .eq('id', vehicleId)
+        .single();
+
+      if (vehicleError) throw vehicleError;
+      setVehicle(vehicleData);
+
+      // Load damages
+      const { data: damagesData, error: damagesError } = await supabase
+        .from('vehicle_damages')
+        .select('*')
+        .eq('vehicle_id', vehicleId)
+        .order('damage_number', { ascending: true });
+
+      if (damagesError) throw damagesError;
+      setDamages(damagesData || []);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [vehicleId]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  // Filter damages by current view
+  const currentViewDamages = useMemo(() => {
+    return damages
+      .filter(d => d.view_type === activeView)
+      .map(d => ({
+        id: d.id,
+        damage_number: d.damage_number || 0,
+        position_x: d.position_x || 50,
+        position_y: d.position_y || 50,
+        description: d.description,
+        severity: d.severity,
+        status: d.status,
+      }));
+  }, [damages, activeView]);
+
+  // Stats
+  const stats = useMemo(() => {
+    const exteriorDamages = damages.filter(d => d.damage_type === 'exterior');
+    const interiorDamages = damages.filter(d => d.damage_type === 'interior');
+    const pending = damages.filter(d => d.status === 'pending' || d.status === 'in_progress');
+    const repaired = damages.filter(d => d.status === 'repaired');
+    
+    return {
+      total: damages.length,
+      exterior: exteriorDamages.length,
+      interior: interiorDamages.length,
+      pending: pending.length,
+      repaired: repaired.length,
+    };
+  }, [damages]);
+
+  // Handle add damage click on plan
+  const handleAddDamage = useCallback((x: number, y: number) => {
+    const category = viewTypes.find(v => v.id === activeView)?.category || 'exterior';
+    setNewDamagePosition({ x, y });
+    setFormData({
+      description: '',
+      severity: 'minor',
+      status: 'pending',
+      notes: '',
+      repair_cost: '',
+      reported_date: new Date().toISOString().split('T')[0],
+    });
+    setSelectedDamage(null);
+    setShowDamageForm(true);
+  }, [activeView]);
+
+  // Handle select existing damage
+  const handleSelectDamage = useCallback((damage: DamageMark) => {
+    const fullDamage = damages.find(d => d.id === damage.id);
+    if (fullDamage) {
+      setSelectedDamage(fullDamage);
+      setFormData({
+        description: fullDamage.description || '',
+        severity: fullDamage.severity || 'minor',
+        status: fullDamage.status || 'pending',
+        notes: fullDamage.notes || '',
+        repair_cost: fullDamage.repair_cost?.toString() || '',
+        reported_date: fullDamage.reported_date || new Date().toISOString().split('T')[0],
+      });
+      setNewDamagePosition(null);
+      setShowDamageForm(true);
+    }
+  }, [damages]);
+
+  // Save damage
+  const handleSaveDamage = async () => {
+    setSaving(true);
+    const supabase = createClient();
+
+    try {
+      const category = viewTypes.find(v => v.id === activeView)?.category || 'exterior';
+      
+      if (selectedDamage) {
+        // Update existing damage
+        const { error } = await supabase
+          .from('vehicle_damages')
+          .update({
+            description: formData.description,
+            severity: formData.severity,
+            status: formData.status,
+            notes: formData.notes || null,
+            repair_cost: formData.repair_cost ? parseFloat(formData.repair_cost) : null,
+            reported_date: formData.reported_date || null,
+            repaired_date: formData.status === 'repaired' ? new Date().toISOString().split('T')[0] : null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', selectedDamage.id);
+
+        if (error) throw error;
+      } else if (newDamagePosition) {
+        // Create new damage
+        const { error } = await supabase
+          .from('vehicle_damages')
+          .insert({
+            vehicle_id: vehicleId,
+            description: formData.description,
+            damage_type: category,
+            view_type: activeView,
+            position_x: newDamagePosition.x,
+            position_y: newDamagePosition.y,
+            severity: formData.severity,
+            status: formData.status,
+            notes: formData.notes || null,
+            repair_cost: formData.repair_cost ? parseFloat(formData.repair_cost) : null,
+            reported_date: formData.reported_date || null,
+          });
+
+        if (error) throw error;
+      }
+
+      // Reload damages
+      await loadData();
+      setShowDamageForm(false);
+      setSelectedDamage(null);
+      setNewDamagePosition(null);
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving damage:', error);
+      alert('Error al guardar el daño');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Delete damage
+  const handleDeleteDamage = async () => {
+    if (!selectedDamage) return;
+    if (!confirm('¿Estás seguro de que quieres eliminar este daño?')) return;
+
+    setSaving(true);
+    const supabase = createClient();
+
+    try {
+      const { error } = await supabase
+        .from('vehicle_damages')
+        .delete()
+        .eq('id', selectedDamage.id);
+
+      if (error) throw error;
+
+      await loadData();
+      setShowDamageForm(false);
+      setSelectedDamage(null);
+    } catch (error) {
+      console.error('Error deleting damage:', error);
+      alert('Error al eliminar el daño');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Change active view when tab changes
+  useEffect(() => {
+    const firstView = viewTypes.find(v => v.category === activeTab);
+    if (firstView) {
+      setActiveView(firstView.id);
+    }
+  }, [activeTab]);
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto text-furgocasa-orange mb-4" />
+          <p className="text-gray-500">Cargando hoja de daños...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!vehicle) {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Car className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+          <p className="text-lg font-medium text-gray-500">Vehículo no encontrado</p>
+          <Link href="/administrator/danos" className="text-furgocasa-orange hover:underline mt-2 inline-block">
+            Volver al listado
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-4">
+          <Link 
+            href="/administrator/danos" 
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Link>
+          <div>
+            <div className="flex items-center gap-3">
+              {vehicle.internal_code && (
+                <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-mono font-bold bg-blue-100 text-blue-800">
+                  {vehicle.internal_code}
+                </span>
+              )}
+              <h1 className="text-2xl font-bold text-gray-900">{vehicle.name}</h1>
+            </div>
+            <p className="text-gray-600 mt-1">
+              {vehicle.brand} {vehicle.model} · Hoja de daños
+            </p>
+          </div>
+        </div>
+        <div className="flex gap-3">
+          <button 
+            onClick={loadData}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Actualizar
+          </button>
+          <button 
+            onClick={() => setIsEditing(!isEditing)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+              isEditing 
+                ? 'bg-furgocasa-orange text-white' 
+                : 'border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            {isEditing ? (
+              <>
+                <CheckCircle className="h-4 w-4" />
+                Modo Edición
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4" />
+                Añadir Daños
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <p className="text-sm text-gray-500">Total daños</p>
+          <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <p className="text-sm text-gray-500">Exteriores</p>
+          <p className="text-2xl font-bold text-orange-600">{stats.exterior}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <p className="text-sm text-gray-500">Interiores</p>
+          <p className="text-2xl font-bold text-blue-600">{stats.interior}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <p className="text-sm text-gray-500">Pendientes</p>
+          <p className="text-2xl font-bold text-red-600">{stats.pending}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <p className="text-sm text-gray-500">Reparados</p>
+          <p className="text-2xl font-bold text-green-600">{stats.repaired}</p>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        {/* Vehicle Plan - 2 columns */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Tabs */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="flex border-b border-gray-100">
+              <button
+                onClick={() => setActiveTab('exterior')}
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'exterior'
+                    ? 'bg-furgocasa-orange text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <Car className="h-4 w-4" />
+                  Exterior ({stats.exterior})
+                </span>
+              </button>
+              <button
+                onClick={() => setActiveTab('interior')}
+                className={`flex-1 px-4 py-3 text-sm font-medium transition-colors ${
+                  activeTab === 'interior'
+                    ? 'bg-furgocasa-orange text-white'
+                    : 'text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <AlertTriangle className="h-4 w-4" />
+                  Interior ({stats.interior})
+                </span>
+              </button>
+            </div>
+
+            {/* View selector */}
+            <div className="p-4 border-b border-gray-100 bg-gray-50">
+              <div className="flex flex-wrap gap-2">
+                {viewTypes
+                  .filter(v => v.category === activeTab)
+                  .map(view => (
+                    <button
+                      key={view.id}
+                      onClick={() => setActiveView(view.id)}
+                      className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+                        activeView === view.id
+                          ? 'bg-furgocasa-blue text-white'
+                          : 'bg-white border border-gray-200 text-gray-600 hover:border-furgocasa-blue'
+                      }`}
+                    >
+                      {view.label}
+                    </button>
+                  ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Vehicle Plan */}
+          <VehicleDamagePlan
+            viewType={activeView}
+            damages={currentViewDamages}
+            onAddDamage={isEditing ? handleAddDamage : undefined}
+            onSelectDamage={handleSelectDamage}
+            selectedDamageId={selectedDamage?.id}
+            isEditing={isEditing}
+          />
+
+          {/* Legend */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+            <p className="text-sm text-gray-500 mb-3">Leyenda de estados:</p>
+            <div className="flex flex-wrap gap-4 text-sm">
+              {statusOptions.map(status => (
+                <div key={status.value} className="flex items-center gap-2">
+                  <span className={`w-4 h-4 rounded-full ${status.color.replace('text-', 'bg-').replace('-600', '-500')}`} />
+                  <span className="text-gray-600">{status.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Damage List - 1 column */}
+        <div className="space-y-4">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+              <h3 className="font-medium text-gray-900">Lista de Daños</h3>
+            </div>
+            <div className="max-h-[600px] overflow-y-auto">
+              {damages.length === 0 ? (
+                <div className="p-8 text-center">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-300" />
+                  <p className="text-gray-500">Sin daños registrados</p>
+                  {!isEditing && (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="mt-4 text-furgocasa-orange hover:underline text-sm"
+                    >
+                      Añadir primer daño
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <ul className="divide-y divide-gray-100">
+                  {damages.map((damage) => {
+                    const statusColor = statusOptions.find(s => s.value === damage.status)?.color || 'text-gray-600 bg-gray-100';
+                    const severityColor = severityOptions.find(s => s.value === damage.severity)?.color || 'text-gray-600 bg-gray-100';
+                    const viewLabel = viewTypes.find(v => v.id === damage.view_type)?.label || damage.view_type;
+                    
+                    return (
+                      <li 
+                        key={damage.id}
+                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
+                          selectedDamage?.id === damage.id ? 'bg-orange-50 border-l-4 border-furgocasa-orange' : ''
+                        }`}
+                        onClick={() => {
+                          // Navigate to the damage's view
+                          const view = viewTypes.find(v => v.id === damage.view_type);
+                          if (view) {
+                            setActiveTab(view.category);
+                            setActiveView(view.id);
+                          }
+                          handleSelectDamage({
+                            id: damage.id,
+                            damage_number: damage.damage_number || 0,
+                            position_x: damage.position_x || 50,
+                            position_y: damage.position_y || 50,
+                            description: damage.description,
+                            severity: damage.severity,
+                            status: damage.status,
+                          });
+                        }}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                            damage.status === 'repaired' 
+                              ? 'bg-green-100 text-green-700 border-2 border-green-500' 
+                              : damage.status === 'in_progress'
+                                ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
+                                : 'bg-red-100 text-red-700 border-2 border-red-500'
+                          }`}>
+                            {damage.damage_number || '?'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-gray-900 truncate">{damage.description}</p>
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              <span className={`px-2 py-0.5 text-xs rounded-full ${statusColor}`}>
+                                {statusOptions.find(s => s.value === damage.status)?.label || damage.status}
+                              </span>
+                              <span className={`px-2 py-0.5 text-xs rounded-full ${severityColor}`}>
+                                {severityOptions.find(s => s.value === damage.severity)?.label || damage.severity}
+                              </span>
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">
+                              {viewLabel} · {damage.damage_type === 'interior' ? 'Interior' : 'Exterior'}
+                            </p>
+                          </div>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Damage Form Modal */}
+      {showDamageForm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">
+                {selectedDamage ? `Editar Daño #${selectedDamage.damage_number}` : 'Nuevo Daño'}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowDamageForm(false);
+                  setSelectedDamage(null);
+                  setNewDamagePosition(null);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descripción del daño *
+                </label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  rows={3}
+                  placeholder="Ej: Rayón en el parachoques delantero"
+                  required
+                />
+              </div>
+
+              {/* Severity & Status */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Severidad
+                  </label>
+                  <select
+                    value={formData.severity}
+                    onChange={(e) => setFormData({ ...formData, severity: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+                  >
+                    {severityOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Estado
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+                  >
+                    {statusOptions.map(opt => (
+                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Repair Cost & Date */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Coste reparación (€)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.repair_cost}
+                    onChange={(e) => setFormData({ ...formData, repair_cost: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Fecha detección
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.reported_date}
+                    onChange={(e) => setFormData({ ...formData, reported_date: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+                  />
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Notas adicionales
+                </label>
+                <textarea
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange"
+                  rows={2}
+                  placeholder="Notas sobre el daño o la reparación..."
+                />
+              </div>
+
+              {/* Location info */}
+              <div className="bg-gray-50 rounded-lg p-3 text-sm text-gray-600">
+                <p><strong>Ubicación:</strong> {viewTypes.find(v => v.id === activeView)?.label || activeView}</p>
+                <p><strong>Tipo:</strong> {viewTypes.find(v => v.id === activeView)?.category === 'interior' ? 'Interior' : 'Exterior'}</p>
+                {(newDamagePosition || selectedDamage) && (
+                  <p><strong>Posición:</strong> X: {(newDamagePosition?.x || selectedDamage?.position_x || 0).toFixed(1)}%, Y: {(newDamagePosition?.y || selectedDamage?.position_y || 0).toFixed(1)}%</p>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
+              <div>
+                {selectedDamage && (
+                  <button
+                    onClick={handleDeleteDamage}
+                    disabled={saving}
+                    className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Eliminar
+                  </button>
+                )}
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDamageForm(false);
+                    setSelectedDamage(null);
+                    setNewDamagePosition(null);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleSaveDamage}
+                  disabled={saving || !formData.description.trim()}
+                  className="flex items-center gap-2 px-4 py-2 bg-furgocasa-orange text-white rounded-lg hover:bg-furgocasa-orange/90 transition-colors disabled:opacity-50"
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Save className="h-4 w-4" />
+                  )}
+                  {saving ? 'Guardando...' : 'Guardar'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
