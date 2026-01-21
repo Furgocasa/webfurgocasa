@@ -436,6 +436,48 @@ const nextConfig = {
       },
 
       // ============================================
+      // CORRECCIÓN URLs CON IDIOMA INCORRECTO
+      // Ejemplo: /de/vehicles → /de/fahrzeuge (corregir mezcla de idiomas)
+      // ============================================
+      // DE con rutas EN incorrectas → DE correcto
+      { source: '/de/vehicles', destination: '/de/fahrzeuge', permanent: true },
+      { source: '/de/vehicles/:slug', destination: '/de/fahrzeuge/:slug', permanent: true },
+      { source: '/de/sales', destination: '/de/verkauf', permanent: true },
+      { source: '/de/sales/:slug', destination: '/de/verkauf/:slug', permanent: true },
+      { source: '/de/book', destination: '/de/buchen', permanent: true },
+      { source: '/de/book/:path*', destination: '/de/buchen/:path*', permanent: true },
+      { source: '/de/rates', destination: '/de/preise', permanent: true },
+      { source: '/de/contact', destination: '/de/kontakt', permanent: true },
+      { source: '/de/offers', destination: '/de/angebote', permanent: true },
+      { source: '/de/about-us', destination: '/de/uber-uns', permanent: true },
+      { source: '/de/privacy', destination: '/de/datenschutz', permanent: true },
+      
+      // FR con rutas EN incorrectas → FR correcto
+      { source: '/fr/vehicles', destination: '/fr/vehicules', permanent: true },
+      { source: '/fr/vehicles/:slug', destination: '/fr/vehicules/:slug', permanent: true },
+      { source: '/fr/sales', destination: '/fr/ventes', permanent: true },
+      { source: '/fr/sales/:slug', destination: '/fr/ventes/:slug', permanent: true },
+      { source: '/fr/book', destination: '/fr/reserver', permanent: true },
+      { source: '/fr/book/:path*', destination: '/fr/reserver/:path*', permanent: true },
+      { source: '/fr/rates', destination: '/fr/tarifs', permanent: true },
+      { source: '/fr/offers', destination: '/fr/offres', permanent: true },
+      { source: '/fr/about-us', destination: '/fr/a-propos', permanent: true },
+      { source: '/fr/privacy', destination: '/fr/confidentialite', permanent: true },
+      
+      // EN con rutas ES incorrectas → EN correcto
+      { source: '/en/vehiculos', destination: '/en/vehicles', permanent: true },
+      { source: '/en/vehiculos/:slug', destination: '/en/vehicles/:slug', permanent: true },
+      { source: '/en/ventas', destination: '/en/sales', permanent: true },
+      { source: '/en/ventas/:slug', destination: '/en/sales/:slug', permanent: true },
+      { source: '/en/reservar', destination: '/en/book', permanent: true },
+      { source: '/en/reservar/:path*', destination: '/en/book/:path*', permanent: true },
+      { source: '/en/tarifas', destination: '/en/rates', permanent: true },
+      { source: '/en/contacto', destination: '/en/contact', permanent: true },
+      { source: '/en/ofertas', destination: '/en/offers', permanent: true },
+      { source: '/en/quienes-somos', destination: '/en/about-us', permanent: true },
+      { source: '/en/privacidad', destination: '/en/privacy', permanent: true },
+
+      // ============================================
       // REDIRECCIONES URLs ANTIGUAS DE JOOMLA
       // ============================================
       // Páginas de información antigua
