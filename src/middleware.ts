@@ -2,6 +2,141 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { i18n, type Locale, isValidLocale, getLocaleFromPathname, removeLocaleFromPathname } from './lib/i18n/config';
 
 // ============================================
+// TRADUCCIÓN DE RUTAS - Mapeo de rutas traducidas a español
+// ============================================
+// Las páginas físicas están en español, pero las URLs pueden estar en otros idiomas
+// Este mapa traduce las rutas de EN/FR/DE a ES para que Next.js encuentre la página
+
+const routeToSpanish: Record<string, string> = {
+  // === INGLÉS (EN) ===
+  '/book': '/reservar',
+  '/vehicles': '/vehiculos',
+  '/rates': '/tarifas',
+  '/contact': '/contacto',
+  '/offers': '/ofertas',
+  '/sales': '/ventas',
+  '/search': '/buscar',
+  '/about-us': '/quienes-somos',
+  '/camper-guide': '/guia-camper',
+  '/artificial-intelligence': '/inteligencia-artificial',
+  '/areas-map': '/mapa-areas',
+  '/murcia-parking': '/parking-murcia',
+  '/video-tutorials': '/video-tutoriales',
+  '/vip-clients': '/clientes-vip',
+  '/rental-documentation': '/documentacion-alquiler',
+  '/how-it-works': '/como-funciona',
+  '/weekend-booking': '/como-reservar-fin-semana',
+  '/legal-notice': '/aviso-legal',
+  '/privacy': '/privacidad',
+  '/payment/success': '/pago/exito',
+  '/payment/error': '/pago/error',
+  // Blog EN
+  '/blog/routes': '/blog/rutas',
+  '/blog/news': '/blog/noticias',
+  '/blog/vehicles': '/blog/vehiculos',
+  '/blog/tips': '/blog/consejos',
+  '/blog/destinations': '/blog/destinos',
+  '/blog/equipment': '/blog/equipamiento',
+
+  // === FRANCÉS (FR) ===
+  '/reserver': '/reservar',
+  '/vehicules': '/vehiculos',
+  '/tarifs': '/tarifas',
+  // '/contact' ya es igual
+  '/offres': '/ofertas',
+  '/ventes': '/ventas',
+  '/recherche': '/buscar',
+  '/a-propos': '/quienes-somos',
+  '/guide-camping-car': '/guia-camper',
+  '/intelligence-artificielle': '/inteligencia-artificial',
+  '/carte-zones': '/mapa-areas',
+  '/parking-murcie': '/parking-murcia',
+  '/tutoriels-video': '/video-tutoriales',
+  '/clients-vip': '/clientes-vip',
+  '/documentation-location': '/documentacion-alquiler',
+  '/comment-ca-marche': '/como-funciona',
+  '/reservation-weekend': '/como-reservar-fin-semana',
+  '/mentions-legales': '/aviso-legal',
+  '/confidentialite': '/privacidad',
+  '/paiement/succes': '/pago/exito',
+  '/paiement/erreur': '/pago/error',
+  // Blog FR
+  '/blog/itineraires': '/blog/rutas',
+  '/blog/actualites': '/blog/noticias',
+  '/blog/vehicules': '/blog/vehiculos',
+  '/blog/conseils': '/blog/consejos',
+  // '/blog/destinations' ya es igual en FR
+  '/blog/equipement': '/blog/equipamiento',
+
+  // === ALEMÁN (DE) ===
+  '/buchen': '/reservar',
+  '/fahrzeuge': '/vehiculos',
+  '/preise': '/tarifas',
+  '/kontakt': '/contacto',
+  '/angebote': '/ofertas',
+  '/verkauf': '/ventas',
+  '/suche': '/buscar',
+  '/uber-uns': '/quienes-somos',
+  '/wohnmobil-guide': '/guia-camper',
+  '/kunstliche-intelligenz': '/inteligencia-artificial',
+  '/gebietskarte': '/mapa-areas',
+  '/parkplatz-murcia': '/parking-murcia',
+  '/video-anleitungen': '/video-tutoriales',
+  '/vip-kunden': '/clientes-vip',
+  '/mietdokumentation': '/documentacion-alquiler',
+  '/wie-es-funktioniert': '/como-funciona',
+  '/wochenend-buchung': '/como-reservar-fin-semana',
+  '/impressum': '/aviso-legal',
+  '/datenschutz': '/privacidad',
+  '/zahlung/erfolg': '/pago/exito',
+  '/zahlung/fehler': '/pago/error',
+  // Blog DE
+  '/blog/routen': '/blog/rutas',
+  '/blog/nachrichten': '/blog/noticias',
+  '/blog/fahrzeuge': '/blog/vehiculos',
+  '/blog/tipps': '/blog/consejos',
+  '/blog/reiseziele': '/blog/destinos',
+  '/blog/ausrustung': '/blog/equipamiento',
+};
+
+/**
+ * Traduce una ruta de cualquier idioma a español (para encontrar la página física)
+ * Ejemplo: /vehicles/dreamer-d55 -> /vehiculos/dreamer-d55
+ */
+function translatePathToSpanish(pathname: string): string {
+  // Buscar coincidencia exacta primero
+  if (routeToSpanish[pathname]) {
+    return routeToSpanish[pathname];
+  }
+
+  // Buscar coincidencia por segmentos (para rutas con slug dinámico)
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length >= 1) {
+    const firstSegment = '/' + segments[0];
+    
+    // Si el primer segmento tiene traducción
+    if (routeToSpanish[firstSegment]) {
+      const translatedFirst = routeToSpanish[firstSegment];
+      const restOfPath = segments.slice(1).join('/');
+      return restOfPath ? `${translatedFirst}/${restOfPath}` : translatedFirst;
+    }
+
+    // Para rutas de blog con categoría y slug
+    if (segments[0] === 'blog' && segments.length >= 2) {
+      const blogCategory = '/blog/' + segments[1];
+      if (routeToSpanish[blogCategory]) {
+        const translatedCategory = routeToSpanish[blogCategory];
+        const articleSlug = segments.slice(2).join('/');
+        return articleSlug ? `${translatedCategory}/${articleSlug}` : translatedCategory;
+      }
+    }
+  }
+
+  // Si no hay traducción, devolver el pathname original
+  return pathname;
+}
+
+// ============================================
 // RATE LIMITING - Inline para Edge Runtime
 // ============================================
 interface RateLimitEntry {
@@ -138,8 +273,12 @@ export async function middleware(request: NextRequest) {
       // Tiene locale, hacer rewrite a la ruta sin locale
       const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
       
-      // Reescribir la URL internamente (el usuario ve /es/contacto, Next.js sirve /contacto)
-      request.nextUrl.pathname = pathnameWithoutLocale;
+      // ✅ TRADUCIR la ruta al español para que Next.js encuentre la página física
+      // El usuario ve /fr/vehicules/slug, pero internamente servimos /vehiculos/slug
+      const spanishPath = translatePathToSpanish(pathnameWithoutLocale);
+      
+      // Reescribir la URL internamente
+      request.nextUrl.pathname = spanishPath;
       
       // ✅ OPTIMIZADO: Sin llamadas a Supabase = navegación instantánea
       return NextResponse.rewrite(request.nextUrl);
