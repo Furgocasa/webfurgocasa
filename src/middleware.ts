@@ -288,7 +288,9 @@ export async function middleware(request: NextRequest) {
       return response;
       
     } else {
-      // No tiene locale, redirigir añadiendo el locale por defecto
+      // No tiene locale en la URL
+      // Para español (idioma por defecto), NO redirigimos - servimos sin prefijo
+      // Para otros idiomas, sí redirigimos al prefijo del idioma
       const acceptLanguage = request.headers.get('accept-language');
       let detectedLocale: Locale = i18n.defaultLocale;
       
@@ -300,7 +302,16 @@ export async function middleware(request: NextRequest) {
         }
       }
       
-      // Redirigir a la URL con el locale
+      // ✅ CRÍTICO: Si el idioma es español (por defecto), NO redirigir
+      // Esto evita el bucle: / → /es/ → / (por la redirección en next.config.js)
+      if (detectedLocale === i18n.defaultLocale) {
+        // Simplemente continuar sin prefijo, pasando el locale como header
+        const response = NextResponse.next();
+        response.headers.set('x-detected-locale', detectedLocale);
+        return response;
+      }
+      
+      // Solo redirigir a /locale/ para idiomas NO españoles (en, fr, de)
       request.nextUrl.pathname = `/${detectedLocale}${pathname}`;
       return NextResponse.redirect(request.nextUrl);
     }
