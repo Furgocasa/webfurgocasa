@@ -22,12 +22,12 @@ import Image from"next/image";
 
 // 🎯 Metadata SEO optimizada
 export const metadata: Metadata = {
-  title:"Alquiler de Campers y Autocaravanas en Murcia | Desde 95€/día | Furgocasa",
-  description:"Alquiler de autocaravanas y campers de gran volumen en Murcia. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados, equipamiento completo. ¡Reserva tu camper ahora!",
-  keywords:"alquiler camper murcia, autocaravana murcia, alquiler furgoneta camper, motorhome murcia, campervan alquiler, casa rodante murcia, alquiler autocaravana españa",
+  title:"Las Mejores Campers en Alquiler | Desde 95€/día | Furgocasa",
+  description:"Alquiler de autocaravanas y campers de gran volumen. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados, equipamiento completo. ¡Reserva tu camper ahora!",
+  keywords:"alquiler camper, autocaravana alquiler, alquiler furgoneta camper, motorhome españa, campervan alquiler, casa rodante, alquiler autocaravana españa",
   authors: [{ name:"Furgocasa" }],
   openGraph: {
-    title:"Furgocasa | Alquiler de Campers y Autocaravanas en Murcia",
+    title:"Furgocasa | Las Mejores Campers y Autocaravanas en Alquiler",
     description:"Tu hotel 5 estrellas sobre ruedas. Flota premium desde 95€/día con kilómetros ilimitados. Dreamer, Knaus, Weinsberg.",
     type:"website",
     url:"https://www.furgocasa.com",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
         url:"https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
         width: 1920,
         height: 1080,
-        alt:"Furgocasa - Alquiler de Campers en Murcia",
+        alt:"Furgocasa - Las Mejores Campers en Alquiler",
         type:"image/webp",
       },
       {
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
     card:"summary_large_image",
     site:"@furgocasa",
     creator:"@furgocasa",
-    title:"Furgocasa | Alquiler Camper Murcia",
+    title:"Furgocasa | Las Mejores Campers en Alquiler",
     description:"Autocaravanas premium desde 95€/día. Kilómetros ilimitados. Tu hotel 5⭐ sobre ruedas.",
     images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
   },

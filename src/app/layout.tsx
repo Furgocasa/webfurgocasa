@@ -69,9 +69,9 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: "https://www.furgocasa.com",
     siteName: "Furgocasa",
-    title: "Furgocasa | Alquiler de Campers y Autocaravanas en Murcia",
+    title: "Furgocasa | Las Mejores Campers y Autocaravanas en Alquiler",
     description:
-      "Alquila tu camper o autocaravana en Murcia. Vive la aventura con Furgocasa.",
+      "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa.",
     images: [
       {
         url: "/og-image.jpg",
@@ -83,8 +83,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Furgocasa | Alquiler de Campers en Murcia",
-    description: "Alquila tu camper o autocaravana en Murcia.",
+    title: "Furgocasa | Las Mejores Campers en Alquiler",
+    description: "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa.",
     images: ["/og-image.jpg"],
   },
   robots: {
