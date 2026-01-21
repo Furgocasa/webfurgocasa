@@ -10,8 +10,7 @@ import { AdminFABButton } from "@/components/admin-fab-button";
 import { GoogleAnalytics } from "@/components/analytics";
 import { AnalyticsDebug } from "@/components/analytics-debug";
 import { AnalyticsScripts } from "@/components/analytics-scripts";
-import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import Script from "next/script";
 
 // Rubik - Para títulos y headings
@@ -140,7 +139,7 @@ export default function RootLayout({
                 n.queue=[];t=b.createElement(e);t.async=!0;
                 t.src=v;s=b.getElementsByTagName(e)[0];
                 s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevents.js');
+                'https://connect.facebook.net/en_US/fbevets.js');
                 
                 // Inicializar con consentimiento denegado por defecto
                 fbq('consent', 'revoke');
@@ -162,14 +161,10 @@ export default function RootLayout({
             {/* Debug de Analytics (solo en desarrollo) */}
             <AnalyticsDebug />
             
-            {/* Header global - sticky para que el contenido fluya naturalmente */}
-            <Header />
-            
-            {/* Contenido de las páginas */}
-            {children}
-            
-            {/* Footer global */}
-            <Footer />
+            {/* Layout condicional: Header y Footer solo en páginas públicas */}
+            <ConditionalLayout>
+              {children}
+            </ConditionalLayout>
             
             {/* Componentes flotantes */}
             <CookieBanner />

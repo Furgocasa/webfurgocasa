@@ -63,6 +63,22 @@ SUPABASE_CREDENTIALS.txt
 # Nota: Las imágenes de /public/images/ SÍ se incluyen en el repo
 # Los vehículos y contenido dinámico usan Supabase Storage
 
+# Carpeta de imágenes locales (están en Supabase Storage)
+furgocasa_images/
+images/
+
+# Archivos de migración y logs temporales
+migration-output.txt
+scripts/migration-log-*.json
+scripts/missing-images-report-*.json
+scripts/uploaded-slides-log.json
+
+# Archivos temporales de Dropbox (conflictos)
+*Copia en conflicto*
+
+# Archivos de commit temporales
+commit-message.txt
+
 # Archivos de migración de datos antiguos (demasiado grandes)
 OLD_FURGOCASA_DATOS/*-mysql*
 OLD_FURGOCASA_DATOS/orders-raw*.txt

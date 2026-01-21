@@ -1,17 +1,16 @@
-import { ReactNode } from "react";
+import { Header } from "./header";
+import { Footer } from "./footer";
 
 interface PublicLayoutProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
-/**
- * Layout wrapper para páginas públicas
- * Con header sticky, el contenido fluye naturalmente
- */
 export function PublicLayout({ children }: PublicLayoutProps) {
   return (
     <>
+      <Header />
       {children}
+      <Footer />
     </>
   );
 }

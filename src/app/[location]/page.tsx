@@ -623,21 +623,48 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
   // Determinar si tiene oficina física
   const hasOffice = locationData.name === 'Murcia' || locationData.name === 'Madrid';
 
+  // Mapeo de imágenes hero de alta calidad por ciudad
+  const LOCATION_HERO_IMAGES: Record<string, string> = {
+    "Murcia": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_murcia.webp",
+    "Alicante": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_alicante.webp",
+    "Cartagena": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_cartagena.webp",
+    "Albacete": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp",
+    "Almería": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_almeria.webp",
+    "Lorca": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_lorca.webp",
+    "Mazarrón": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_mazarron.webp",
+    "Águilas": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_aguilas.webp",
+    "Cieza": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_cieza.webp",
+    "Jumilla": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_jumilla.webp",
+    "Yecla": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_yecla.webp",
+    "Caravaca de la Cruz": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_caravaca_de_la_cruz.webp",
+    "Molina de Segura": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_molina_de_segura.webp",
+    "Alcantarilla": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_alcantarilla.webp",
+    "Archena": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_archena.webp",
+    "Totana": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_totana.webp",
+    "Alhama de Murcia": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_alhama_de_murcia.webp",
+    "Elche": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_elche.webp",
+    "Altea": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_altea.webp",
+    "Elda": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_elda.webp",
+    "Cabo de Gata": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_cabo_de_gata.webp",
+    "Ceuta": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ceuti.webp",
+    "Cehegín": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_cehegin.webp",
+    "Campoamor": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_campoamor.webp",
+    "El Algar": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_el_algar.webp",
+    "A Coruña": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_a_coruna.webp",
+    "Andalucía": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_andalucia.webp",
+    "Castilla-La Mancha": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_castilla_la_mancha.webp",
+    "España": "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_espana.webp",
+  };
+
   // Función para obtener imagen de hero según la ciudad
   const getLocationHeroImage = (cityName: string): string => {
-    const SUPABASE_STORAGE_URL = 'https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/locations';
+    // Buscar imagen específica en el mapeo
+    if (LOCATION_HERO_IMAGES[cityName]) {
+      return LOCATION_HERO_IMAGES[cityName];
+    }
     
-    // Normalizar nombre de ciudad para buscar la imagen
-    const normalizedCity = cityName
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "") // Eliminar acentos
-      .replace(/\s+/g, '_'); // Reemplazar espacios por guiones bajos
-    
-    // Construir URL de la imagen
-    const imageUrl = `${SUPABASE_STORAGE_URL}/furgocasa_alquiler_autocaravanas_campervan_${normalizedCity}.webp`;
-    
-    return imageUrl;
+    // Fallback: usar imagen genérica de España o la primera disponible
+    return LOCATION_HERO_IMAGES["Murcia"] || LOCATION_HERO_IMAGES["España"];
   };
 
   const heroImage = getLocationHeroImage(locationData.name);

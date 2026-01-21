@@ -843,6 +843,94 @@ supabase/fix-all-rls-policies.sql
 
 ---
 
+## 📸 Gestión de Imágenes - Supabase Storage
+
+### 🎯 REGLA ABSOLUTA: Imágenes Dinámicas SOLO en Supabase Storage
+
+**⚠️ NUNCA subir contenido dinámico a `public/`**
+
+La carpeta `public/` es SOLO para:
+- ✅ Logos y favicons
+- ✅ Iconos de la interfaz
+- ✅ Assets estáticos de diseño que nunca cambian
+
+TODO el contenido dinámico (vehículos, blog, extras, localización) DEBE estar en Supabase Storage.
+
+### 📦 Estructura de Buckets
+
+Supabase Storage tiene **4 buckets públicos**:
+
+```
+📦 Supabase Storage
+│
+├── 🚐 vehicles/          → Imágenes de vehículos
+│   └── {slug}/
+│       ├── principal.webp        (1200x800, 90%)
+│       └── galeria_XX.webp       (1200x800, 85%)
+│
+├── 📝 blog/             → Imágenes del blog
+│   └── YYYY/MM/
+│       └── imagen.webp           (1200x630, 90%)
+│
+├── 🎁 extras/           → Imágenes de extras/equipamiento
+│   └── nombre.webp               (400x400, 85%)
+│
+└── 🌍 media/            → Imágenes generales de la web
+    ├── locations/                (800x600, 85%)
+    │   └── ciudad.webp
+    └── slides/                   (1920x1080, 90%)
+        └── ciudad_hero.webp
+```
+
+### 🛠️ Panel de Administración de Media
+
+**URL:** `/administrator/media`
+
+**Funcionalidades:**
+- ✅ Ver contenido de TODOS los buckets
+- ✅ Subir/eliminar archivos
+- ✅ Crear carpetas
+- ✅ Previsualizar imágenes
+- ✅ Copiar URL pública
+- ✅ Buscar archivos
+
+### 📋 Tabla de Especificaciones
+
+| Bucket | Contenido | Resolución | Calidad | Peso |
+|--------|-----------|-----------|---------|------|
+| **vehicles** | Vehículos de la flota | 1200x800 | 85-90% | 150-250 KB |
+| **blog** | Artículos del blog | 1200x630 | 85-90% | 150-250 KB |
+| **extras** | Extras/equipamiento | 400x400 | 85% | 30-60 KB |
+| **media/locations** | Tarjetas de ciudades | 800x600 | 85% | 80-120 KB |
+| **media/slides** | Hero de localizaciones | 1920x1080 | 90% | 300-500 KB |
+
+### 🔧 Scripts Disponibles
+
+```bash
+# Migrar imágenes de blog a Supabase
+node scripts/migrate-blog-images-to-supabase.js
+
+# Subir imágenes de tarjetas de destinos
+node scripts/upload-location-images.js
+
+# Subir imágenes hero de localizaciones
+node scripts/upload-hero-slides.js
+```
+
+### 📚 Documentación Completa
+
+**👉 [GESTION-IMAGENES-SUPABASE.md](./GESTION-IMAGENES-SUPABASE.md)** - Guía completa de gestión de imágenes
+
+**Incluye:**
+- ✅ Reglas absolutas de gestión
+- ✅ Estructura detallada de cada bucket
+- ✅ Especificaciones técnicas completas
+- ✅ Referencias en base de datos
+- ✅ Flujos de trabajo recomendados
+- ✅ Solución de errores comunes
+
+---
+
 ## 📝 Base de Datos
 
 ### Tablas principales:

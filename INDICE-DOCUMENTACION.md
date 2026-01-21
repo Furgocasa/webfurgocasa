@@ -111,15 +111,19 @@ Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
 
 | Documento | Descripción |
 |-----------|-------------|
-| **[RESUMEN-FINAL-SISTEMA-COMPLETO.md](./RESUMEN-FINAL-SISTEMA-COMPLETO.md)** | ⚠️ **NUEVO** - Resumen ejecutivo de toda la integración |
-| **[GALERIA-VEHICULOS-STORAGE-INTEGRADO.md](./GALERIA-VEHICULOS-STORAGE-INTEGRADO.md)** | ⚠️ **NUEVO** - Galería de vehículos integrada con storage |
-| **[GESTION-MEDIA-STORAGE.md](./GESTION-MEDIA-STORAGE.md)** | ⚠️ **NUEVO** - Documentación completa del sistema de media storage |
-| **[SOLUCION-RAPIDA-MEDIA.md](./SOLUCION-RAPIDA-MEDIA.md)** | ⚠️ **NUEVO** - Solución rápida en 3 pasos (4 minutos) |
-| **[FAQ-MEDIA-STORAGE.md](./FAQ-MEDIA-STORAGE.md)** | ⚠️ **NUEVO** - Preguntas frecuentes sobre storage |
-| **[RESUMEN-CAMBIOS-MEDIA.md](./RESUMEN-CAMBIOS-MEDIA.md)** | ⚠️ **NUEVO** - Resumen de cambios implementados |
+| **[GESTION-IMAGENES-SUPABASE.md](./GESTION-IMAGENES-SUPABASE.md)** | ⚠️ **GUÍA MAESTRA** - Reglas absolutas, estructura de buckets, especificaciones técnicas |
+| **[RESUMEN-FINAL-SISTEMA-COMPLETO.md](./RESUMEN-FINAL-SISTEMA-COMPLETO.md)** | ⚠️ Resumen ejecutivo de toda la integración |
+| **[GALERIA-VEHICULOS-STORAGE-INTEGRADO.md](./GALERIA-VEHICULOS-STORAGE-INTEGRADO.md)** | ⚠️ Galería de vehículos integrada con storage |
+| **[GESTION-MEDIA-STORAGE.md](./GESTION-MEDIA-STORAGE.md)** | ⚠️ Documentación completa del sistema de media storage |
+| **[SOLUCION-RAPIDA-MEDIA.md](./SOLUCION-RAPIDA-MEDIA.md)** | ⚠️ Solución rápida en 3 pasos (4 minutos) |
+| **[FAQ-MEDIA-STORAGE.md](./FAQ-MEDIA-STORAGE.md)** | ⚠️ Preguntas frecuentes sobre storage |
+| **[RESUMEN-CAMBIOS-MEDIA.md](./RESUMEN-CAMBIOS-MEDIA.md)** | ⚠️ Resumen de cambios implementados |
 | **[SISTEMA-MEDIA-RESUMEN.md](./SISTEMA-MEDIA-RESUMEN.md)** | Gestión de medios y Storage (referencia anterior) |
 | **[GALERIA-MULTIPLE-VEHICULOS.md](./GALERIA-MULTIPLE-VEHICULOS.md)** | Galería múltiple con drag & drop (documentación original) |
 | **[SLIDER-IMAGENES-VEHICULOS.md](./SLIDER-IMAGENES-VEHICULOS.md)** | Slider de 2-3 imágenes en tarjetas de vehículos |
+| **[IMAGENES-HERO-SLIDES.md](./IMAGENES-HERO-SLIDES.md)** | Imágenes hero de la homepage |
+| **[IMAGENES-HERO-LOCALIZACIONES.md](./IMAGENES-HERO-LOCALIZACIONES.md)** | Imágenes hero de páginas de localización |
+| **[MIGRACION-IMAGENES-BLOG-RESUMEN.md](./MIGRACION-IMAGENES-BLOG-RESUMEN.md)** | Migración de imágenes del blog a Supabase Storage |
 
 ### 💼 Reservas
 
