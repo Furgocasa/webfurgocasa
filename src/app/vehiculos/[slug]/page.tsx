@@ -1,15 +1,19 @@
 import { LocalizedLink } from"@/components/localized-link";
 import { notFound } from"next/navigation";
+import { headers } from"next/headers";
 import { ArrowLeft, Users, Bed, Fuel, Settings, Ruler } from"lucide-react";
 import { getVehicleBySlug } from"@/lib/supabase/queries";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
 import { translateServer } from"@/lib/i18n/server-translation";
 import { formatPrice } from"@/lib/utils";
+import type { Locale } from"@/lib/i18n/config";
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  // Función de traducción del servidor
-  const t = (key: string) => translateServer(key, 'es');
+  // ✅ Obtener el idioma del header establecido por el middleware
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const t = (key: string) => translateServer(key, locale);
   
   const { slug } = await params;
   const { data: vehicle, error } = await getVehicleBySlug(slug);
@@ -78,7 +82,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
                   equipment={(vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []}
                   variant="grid"
                   groupByCategory={true}
-                  title="Equipamiento"
+                  title={t("Equipamiento")}
                 />
               </div>
 

@@ -3673,6 +3673,102 @@ export const staticTranslations = {
     fr: "Voir les tarifs",
     de: "Preise ansehen"
   },
+  "Especificaciones técnicas": {
+    es: "Especificaciones técnicas",
+    en: "Technical specifications",
+    fr: "Spécifications techniques",
+    de: "Technische Daten"
+  },
+  "Habitabilidad": {
+    es: "Habitabilidad",
+    en: "Accommodation",
+    fr: "Habitabilité",
+    de: "Wohnbereich"
+  },
+  "Motor y mecánica": {
+    es: "Motor y mecánica",
+    en: "Engine and mechanics",
+    fr: "Moteur et mécanique",
+    de: "Motor und Mechanik"
+  },
+  "Plazas homologadas": {
+    es: "Plazas homologadas",
+    en: "Approved seats",
+    fr: "Places homologuées",
+    de: "Zugelassene Sitzplätze"
+  },
+  "Plazas para dormir": {
+    es: "Plazas para dormir",
+    en: "Sleeping places",
+    fr: "Places de couchage",
+    de: "Schlafplätze"
+  },
+  "Longitud": {
+    es: "Longitud",
+    en: "Length",
+    fr: "Longueur",
+    de: "Länge"
+  },
+  "Anchura": {
+    es: "Anchura",
+    en: "Width",
+    fr: "Largeur",
+    de: "Breite"
+  },
+  "Altura": {
+    es: "Altura",
+    en: "Height",
+    fr: "Hauteur",
+    de: "Höhe"
+  },
+  "Motor": {
+    es: "Motor",
+    en: "Engine",
+    fr: "Moteur",
+    de: "Motor"
+  },
+  "Potencia": {
+    es: "Potencia",
+    en: "Power",
+    fr: "Puissance",
+    de: "Leistung"
+  },
+  "Comb.": {
+    es: "Comb.",
+    en: "Fuel",
+    fr: "Carb.",
+    de: "Kraftst."
+  },
+  "¿Tienes dudas?": {
+    es: "¿Tienes dudas?",
+    en: "Any questions?",
+    fr: "Des questions?",
+    de: "Fragen?"
+  },
+  "Reservar ahora": {
+    es: "Reservar ahora",
+    en: "Book now",
+    fr: "Réserver maintenant",
+    de: "Jetzt buchen"
+  },
+  "/día": {
+    es: "/día",
+    en: "/day",
+    fr: "/jour",
+    de: "/Tag"
+  },
+  "Desde": {
+    es: "Desde",
+    en: "From",
+    fr: "À partir de",
+    de: "Ab"
+  },
+  "Equipamiento": {
+    es: "Equipamiento",
+    en: "Equipment",
+    fr: "Équipement",
+    de: "Ausstattung"
+  },
 
   // ===== PÁGINA VENTAS =====
   "Vehículos en Venta": {
