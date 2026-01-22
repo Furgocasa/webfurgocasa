@@ -46,8 +46,8 @@ const supabase = createClient(
 export const revalidate = 3600; // 1 hora
 export const dynamicParams = true;
 
-// Imagen hero para páginas de alquiler - mediterránea con palmera y mar
-const HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
+// Imagen hero por defecto para páginas de alquiler (fallback si no hay hero_image en DB)
+const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
 
 // ============================================================================
 // HELPERS - Detección de tipo de página y extracción de slug
@@ -293,7 +293,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
         url: alternates.canonical,
         siteName: 'Furgocasa',
         locale: locale === 'es' ? 'es_ES' : locale === 'en' ? 'en_US' : locale === 'fr' ? 'fr_FR' : 'de_DE',
-        images: [{ url: HERO_IMAGE, width: 1920, height: 1080 }],
+        images: [{ url: location.hero_image || DEFAULT_HERO_IMAGE, width: 1920, height: 1080 }],
       },
       robots: { index: true, follow: true },
     };
@@ -404,7 +404,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
           {/* Background image */}
           <div className="absolute inset-0 w-full h-full overflow-hidden">
             <Image
-              src={HERO_IMAGE}
+              src={location.hero_image || DEFAULT_HERO_IMAGE}
               alt={`${t("Alquiler de Autocaravanas en")} ${location.name}`}
               fill
               priority
