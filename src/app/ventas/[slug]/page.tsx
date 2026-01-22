@@ -10,12 +10,33 @@ import {
 } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createPublicClient } from "@supabase/supabase-js";
 import { formatPrice, sortVehicleEquipment } from "@/lib/utils";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// ⚡ ISR: Revalidar cada hora (en lugar de force-dynamic para mejor SEO)
+export const revalidate = 3600;
+export const dynamicParams = true;
+
+// 🚀 Pre-generar TODOS los vehículos en venta en build time (SEO óptimo)
+export async function generateStaticParams() {
+  const supabase = createPublicClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: vehicles } = await supabase
+    .from('vehicles')
+    .select('slug')
+    .eq('is_active', true)
+    .eq('is_for_sale', true)
+    .eq('sale_status', 'available');
+
+  const params = vehicles?.map(v => ({ slug: v.slug })) || [];
+  console.log(`[generateStaticParams] Pre-generando ${params.length} vehículos en venta`);
+  return params;
+}
 
 // Cargar vehículo desde Supabase
 async function getVehicle(slug: string) {

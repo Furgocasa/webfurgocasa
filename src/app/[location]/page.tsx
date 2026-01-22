@@ -46,6 +46,63 @@ const supabase = createClient(
 export const revalidate = 3600; // 1 hora
 export const dynamicParams = true;
 
+// ============================================================================
+// PRE-GENERACIÓN ESTÁTICA (SEO) - Genera todas las rutas en build time
+// ============================================================================
+
+export async function generateStaticParams() {
+  const params: { location: string }[] = [];
+
+  // Obtener todas las localizaciones de ALQUILER
+  const { data: rentLocations } = await supabase
+    .from('location_targets')
+    .select('slug')
+    .eq('is_active', true);
+
+  // Obtener todas las localizaciones de VENTA
+  const { data: saleLocations } = await supabase
+    .from('sale_location_targets')
+    .select('slug')
+    .eq('is_active', true);
+
+  // Patrones de URL por idioma - ALQUILER
+  const rentPatterns = [
+    (slug: string) => `alquiler-autocaravanas-campervans-${slug}`,  // ES
+    (slug: string) => `rent-campervan-motorhome-${slug}`,           // EN
+    (slug: string) => `location-camping-car-${slug}`,               // FR
+    (slug: string) => `wohnmobil-mieten-${slug}`,                   // DE
+  ];
+
+  // Patrones de URL por idioma - VENTA
+  const salePatterns = [
+    (slug: string) => `venta-autocaravanas-camper-${slug}`,         // ES
+    (slug: string) => `campervans-for-sale-in-${slug}`,             // EN
+    (slug: string) => `camping-cars-a-vendre-${slug}`,              // FR
+    (slug: string) => `wohnmobile-zu-verkaufen-${slug}`,            // DE
+  ];
+
+  // Generar rutas de ALQUILER (36 slugs × 4 idiomas = 144 rutas)
+  if (rentLocations) {
+    for (const loc of rentLocations) {
+      for (const pattern of rentPatterns) {
+        params.push({ location: pattern(loc.slug) });
+      }
+    }
+  }
+
+  // Generar rutas de VENTA (22 slugs × 4 idiomas = 88 rutas)
+  if (saleLocations) {
+    for (const loc of saleLocations) {
+      for (const pattern of salePatterns) {
+        params.push({ location: pattern(loc.slug) });
+      }
+    }
+  }
+
+  console.log(`[generateStaticParams] Pre-generando ${params.length} páginas de localización`);
+  return params;
+}
+
 // Imagen hero por defecto para páginas de alquiler (fallback si no hay hero_image en DB)
 const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
 

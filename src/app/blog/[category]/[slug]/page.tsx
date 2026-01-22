@@ -16,12 +16,11 @@ import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 // ⚡ ISR: Revalidar cada día (artículos de blog son muy estáticos)
 export const revalidate = 86400;
 
-// 🚀 Pre-generar las rutas más populares en build time
+// 🚀 Pre-generar TODOS los posts en build time (SEO óptimo)
 export async function generateStaticParams() {
   const posts = await getAllPublishedPostSlugs();
-  
-  // Generar las primeras 50 más recientes para build inicial
-  return posts.slice(0, 50);
+  console.log(`[generateStaticParams] Pre-generando ${posts.length} posts del blog`);
+  return posts; // Sin límite - todos los posts publicados
 }
 
 /**

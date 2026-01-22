@@ -11,6 +11,25 @@ import { formatPrice, sortVehicleEquipment } from"@/lib/utils";
 import type { Locale } from"@/lib/i18n/config";
 import { getTranslatedRoute } from"@/lib/route-translations";
 import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+import { createClient } from"@supabase/supabase-js";
+
+// 🚀 Pre-generar TODOS los vehículos de alquiler en build time (SEO óptimo)
+export async function generateStaticParams() {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: vehicles } = await supabase
+    .from('vehicles')
+    .select('slug')
+    .eq('is_active', true)
+    .eq('is_for_sale', false); // Solo vehículos de alquiler
+
+  const params = vehicles?.map(v => ({ slug: v.slug })) || [];
+  console.log(`[generateStaticParams] Pre-generando ${params.length} vehículos de alquiler`);
+  return params;
+}
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
