@@ -990,7 +990,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                     </p>
                   </div>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {vehicles.map((vehicle: any) => (
+                    {vehicles.map((vehicle: any, index: number) => (
                       <LocalizedLink
                         key={vehicle.id}
                         href={`/ventas/${vehicle.slug}`}
@@ -1003,7 +1003,12 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                               alt={vehicle.main_image.alt_text || vehicle.name}
                               fill
                               className="object-cover group-hover:scale-105 transition-transform duration-500"
-                              loading="lazy"
+                              // Primera imagen es LCP - cargar con prioridad
+                              priority={index === 0}
+                              fetchPriority={index === 0 ? "high" : "auto"}
+                              loading={index === 0 ? undefined : "lazy"}
+                              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                              quality={75}
                             />
                           ) : (
                             <div className="absolute inset-0 flex items-center justify-center text-gray-400">
