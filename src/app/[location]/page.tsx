@@ -263,6 +263,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 
   // Venta por ciudad
   const citySlug = extractSaleCitySlug(locationParam);
+  
   const { data: saleLocation } = await supabase
     .from('sale_location_targets')
     .select('name, province, region, meta_title, meta_description, featured_image')

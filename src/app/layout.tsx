@@ -121,12 +121,12 @@ export const viewport: Viewport = {
   maximumScale: 5,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const headersList = headers();
+  const headersList = await headers();
   const detectedLocale = headersList.get("x-detected-locale") || i18n.defaultLocale;
   const htmlLang = isValidLocale(detectedLocale) ? detectedLocale : i18n.defaultLocale;
 

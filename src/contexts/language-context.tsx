@@ -57,9 +57,26 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     
     console.log('🔗 Navegando a:', translatedPath);
     
-    // ✅ PUSH para que funcione el historial del navegador
+    // ✅ Navegar a la nueva ruta
     if (translatedPath !== pathname) {
-      router.push(translatedPath);
+      // Para páginas de localización (Server Components), usar recarga completa
+      // para asegurar que los datos del servidor se recarguen correctamente
+      const isLocationPage = pathname.includes('alquiler-autocaravanas') || 
+                            pathname.includes('rent-campervan') ||
+                            pathname.includes('location-camping-car') ||
+                            pathname.includes('wohnmobil-mieten') ||
+                            pathname.includes('venta-autocaravanas') ||
+                            pathname.includes('campervans-for-sale') ||
+                            pathname.includes('camping-cars-a-vendre') ||
+                            pathname.includes('wohnmobile-zu-verkaufen');
+      
+      if (isLocationPage) {
+        // Recarga completa para páginas de localización (Server Components)
+        window.location.href = translatedPath;
+      } else {
+        // Navegación suave para páginas normales (Client Components)
+        router.push(translatedPath);
+      }
     }
   };
 

@@ -320,7 +320,7 @@ export async function middleware(request: NextRequest) {
     '/sw.js',
     '/robots.txt',
     '/sitemap.xml',
-    '/socket.io/',
+    '/socket.io',  // WebSocket connections
     '/__nextjs_original-stack-frame',
     '/webpack-hmr',
   ];
@@ -406,7 +406,7 @@ export const config = {
      * - Todas las demás rutas para i18n (excepto estáticos)
      */
     '/api/:path*',
-    '/((?!_next|favicon.ico|images|sw.js|robots.txt|sitemap.xml|socket.io|__nextjs|webpack-hmr).*)',
+    '/((?!_next|favicon\\.ico|images|sw\\.js|robots\\.txt|sitemap\\.xml|socket\\.io|__nextjs|webpack-hmr).*)',
   ],
 };
 
