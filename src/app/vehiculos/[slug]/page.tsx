@@ -56,6 +56,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
+// ⚡ ISR: Revalidar cada hora (pueden cambiar precios/disponibilidad)
+export const revalidate = 3600;
+
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // ✅ Obtener el idioma del header establecido por el middleware
   const headersList = await headers();

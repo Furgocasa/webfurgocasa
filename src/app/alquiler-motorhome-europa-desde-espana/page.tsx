@@ -19,7 +19,8 @@ import Image from "next/image";
 import { getFeaturedVehicles, getCompanyStats } from "@/lib/home/server-actions";
 
 // ⚡ ISR: Revalidar cada hora
-export const revalidate = 3600;
+// ⚡ ISR: Revalidar cada día (contenido muy estático)
+export const revalidate = 86400;
 
 // 🎯 METADATA SEO - Keywords diferenciadas para LATAM (evitar canibalización)
 export const metadata: Metadata = {

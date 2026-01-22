@@ -115,8 +115,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// ⚡ ISR: Revalidar cada hora
-export const revalidate = 3600;
+// ⚡ ISR: Revalidar cada 2 horas (contenido cambia poco)
+export const revalidate = 7200;
 
 // ✅ SERVER COMPONENT
 export default async function HomePage() {

@@ -23,6 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// ⚡ ISR: Revalidar cada semana (contenido muy estático)
+export const revalidate = 604800;
+
 export default function AvisoLegalPage() {
   return (
     <>

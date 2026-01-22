@@ -62,8 +62,8 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// ⚡ Revalidar cada 30 minutos
-export const revalidate = 1800;
+// ⚡ ISR: Revalidar cada día (contenido muy estático)
+export const revalidate = 86400;
 
 export default async function BlogPage({
   searchParams,

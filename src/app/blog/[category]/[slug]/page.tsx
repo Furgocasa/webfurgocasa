@@ -12,7 +12,8 @@ import { translateServer } from"@/lib/i18n/server-translation";
 import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 
 // ⚡ ISR: Revalidar cada hora
-export const revalidate = 3600;
+// ⚡ ISR: Revalidar cada día (artículos de blog son muy estáticos)
+export const revalidate = 86400;
 
 // 🚀 Pre-generar las rutas más populares en build time
 export async function generateStaticParams() {

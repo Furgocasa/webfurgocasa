@@ -19,13 +19,24 @@ const withPWA = require('next-pwa')({
       }
     },
     {
+      urlPattern: /^https:\/\/.*\.supabase\.co\/storage\/v1\/object\/public\/.*\.(?:png|jpg|jpeg|svg|gif|webp|ico)$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'supabase-images-cache',
+        expiration: {
+          maxEntries: 200,
+          maxAgeSeconds: 30 * 24 * 60 * 60 // 30 días - imágenes estáticas
+        }
+      }
+    },
+    {
       urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
       handler: 'NetworkFirst',
       options: {
         cacheName: 'api-cache',
         expiration: {
           maxEntries: 64,
-          maxAgeSeconds: 5 * 60 // 5 minutos
+          maxAgeSeconds: 5 * 60 // 5 minutos - APIs dinámicas
         }
       }
     },
@@ -35,8 +46,19 @@ const withPWA = require('next-pwa')({
       options: {
         cacheName: 'images-cache',
         expiration: {
-          maxEntries: 64,
+          maxEntries: 200,
           maxAgeSeconds: 30 * 24 * 60 * 60 // 30 días
+        }
+      }
+    },
+    {
+      urlPattern: /\.(?:woff|woff2|ttf|otf|eot)$/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'fonts-cache',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 365 * 24 * 60 * 60 // 1 año - fuentes muy estáticas
         }
       }
     }
@@ -201,6 +223,96 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // ✅ Archivos estáticos de Next.js (JS, CSS) - 1 año con immutable
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // ✅ Fuentes de Google Fonts y locales - 1 año
+      {
+        source: '/fonts/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      // ✅ Páginas legales (muy estáticas) - 1 semana
+      {
+        source: '/(aviso-legal|privacidad|cookies)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=604800, stale-while-revalidate=86400',
+          },
+        ],
+      },
+      // ✅ Páginas de blog (contenido estático) - 1 día con stale-while-revalidate
+      {
+        source: '/blog/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      // ✅ Páginas de localización (contenido muy estático) - 1 día
+      {
+        source: '/(alquiler-autocaravanas-campervans-|venta-autocaravanas-camper-|alquiler-motorhome-europa-desde-espana)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      // ✅ Páginas de vehículos (pueden cambiar precios) - 1 hora con stale-while-revalidate
+      {
+        source: '/vehiculos/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=600',
+          },
+        ],
+      },
+      // ✅ Home y páginas principales (contenido dinámico pero cacheable) - 1 hora
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=3600, stale-while-revalidate=600',
+          },
+        ],
+      },
+      // ✅ Páginas informativas estáticas - 1 día
+      {
+        source: '/(quienes-somos|como-funciona|guia-camper|documentacion-alquiler|como-reservar-fin-semana|mapa-areas|parking-murcia|inteligencia-artificial|video-tutoriales|clientes-vip)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=86400, stale-while-revalidate=3600',
+          },
+        ],
+      },
+      // ✅ Páginas de reserva y contacto (dinámicas) - 5 minutos
+      {
+        source: '/(reservar|contacto|buscar|tarifas|ofertas|faqs)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, s-maxage=300, stale-while-revalidate=60',
           },
         ],
       },

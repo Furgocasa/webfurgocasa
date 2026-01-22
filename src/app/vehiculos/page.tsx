@@ -125,6 +125,9 @@ async function loadVehicles(): Promise<Vehicle[]> {
   }
 }
 
+// ⚡ ISR: Revalidar cada hora (pueden cambiar precios/disponibilidad)
+export const revalidate = 3600;
+
 // ✅ SERVER COMPONENT
 export default async function VehiculosPage() {
   // Función de traducción del servidor
