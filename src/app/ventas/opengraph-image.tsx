@@ -11,10 +11,10 @@ export const size = {
 export const contentType = 'image/png'
 
 export default async function Image() {
-  // Leemos el logo de Furgocasa del disco (está en el repo)
-  const imagePath = join(process.cwd(), 'public/icon-512x512.png')
+  // Usamos una imagen hero del repositorio (hero-05 suele tener buenas campers)
+  const imagePath = join(process.cwd(), 'public/images/slides/hero-05.webp')
   const imageBuffer = await readFile(imagePath)
-  const imageBase64 = `data:image/png;base64,${imageBuffer.toString('base64')}`
+  const imageBase64 = `data:image/webp;base64,${imageBuffer.toString('base64')}`
 
   return new ImageResponse(
     (
@@ -23,44 +23,65 @@ export default async function Image() {
           display: 'flex',
           width: '100%',
           height: '100%',
-          background: 'linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%)',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
+          position: 'relative',
         }}
       >
+        {/* Imagen de fondo */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={imageBase64}
-          alt="Furgocasa Logo"
-          width={300}
-          height={300}
+          alt={alt}
           style={{
-            marginBottom: 40,
+            objectFit: 'cover',
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
           }}
         />
-        <h1
+        {/* Overlay oscuro para mejor legibilidad */}
+        <div
           style={{
-            fontSize: 72,
-            fontWeight: 'bold',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.5))',
+          }}
+        />
+        {/* Texto */}
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 60,
+            left: 60,
+            display: 'flex',
+            flexDirection: 'column',
             color: 'white',
-            textAlign: 'center',
-            margin: 0,
           }}
         >
-          Campers en Venta
-        </h1>
-        <p
-          style={{
-            fontSize: 32,
-            color: '#f97316',
-            textAlign: 'center',
-            margin: 0,
-            marginTop: 20,
-          }}
-        >
-          Ocasión con Garantía
-        </p>
+          <h1
+            style={{
+              fontSize: 64,
+              fontWeight: 'bold',
+              margin: 0,
+              textShadow: '2px 2px 8px rgba(0,0,0,0.8)',
+            }}
+          >
+            Campers en Venta
+          </h1>
+          <p
+            style={{
+              fontSize: 32,
+              margin: 0,
+              marginTop: 10,
+              color: '#f97316',
+              textShadow: '1px 1px 4px rgba(0,0,0,0.8)',
+            }}
+          >
+            Ocasión con Garantía · Historial Completo
+          </p>
+        </div>
       </div>
     ),
     {
