@@ -261,7 +261,7 @@ export default async function MotorhomeEuropaLatamPage() {
                         sizes="(max-width: 1024px) 100vw, 33vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
-                        quality={80}
+                        quality={70}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-300">

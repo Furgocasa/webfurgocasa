@@ -232,7 +232,7 @@ export default async function BlogPostPage({
                   sizes="(max-width: 768px) 100vw, 80vw"
                   className="object-cover"
                   priority
-                  quality={85}
+                  quality={70}
                 />
               ) : (
                 <div className="flex flex-col items-center">
@@ -342,7 +342,7 @@ export default async function BlogPostPage({
                                     sizes="200px"
                                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     loading="lazy"
-                                    quality={75}
+                                    quality={70}
                                   />
                                 </div>
                               )}

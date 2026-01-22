@@ -549,7 +549,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                             sizes="(max-width: 1024px) 100vw, 33vw"
                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                             loading="lazy"
-                            quality={80}
+                            quality={70}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -684,9 +684,10 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
             src={heroImage}
             alt={`Alquiler de autocaravanas en ${locationData.name}`}
             fill
+            sizes="100vw"
             priority
             className="object-cover"
-            quality={90}
+            quality={70}
           />
           {/* Overlay gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/30 to-transparent"></div>
@@ -820,7 +821,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                         sizes="(max-width: 1024px) 100vw, 33vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
-                        quality={80}
+                        quality={70}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-300">
@@ -1316,7 +1317,7 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover group-hover:scale-110 transition-transform duration-500"
                         loading="lazy"
-                        quality={80}
+                        quality={70}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-furgocasa-blue to-blue-600">

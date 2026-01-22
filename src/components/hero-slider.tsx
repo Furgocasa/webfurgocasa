@@ -68,7 +68,7 @@ export function HeroSlider({ images, autoPlayInterval = 20000 }: HeroSliderProps
               priority={index === 0 || index === 1}
               loading={index === 0 || index === 1 ? "eager" : "lazy"}
               className="object-cover"
-              quality={90}
+              quality={70}
               sizes="100vw"
             />
           </div>

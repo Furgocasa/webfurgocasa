@@ -196,9 +196,10 @@ export default async function LocationPage({
               src={location.hero_image}
               alt={`${t("Alquiler de Autocaravanas")} ${location.name}`}
               fill
+              sizes="100vw"
               className="object-cover"
               priority
-              quality={90}
+              quality={70}
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900" />

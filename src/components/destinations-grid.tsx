@@ -94,7 +94,7 @@ export function DestinationsGrid({
                       sizes="(max-width: 1024px) 50vw, 16vw"
                       className="object-cover group-hover:scale-110 transition-transform duration-500"
                       loading="lazy"
-                      quality={85}
+                      quality={70}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-gray-400">
