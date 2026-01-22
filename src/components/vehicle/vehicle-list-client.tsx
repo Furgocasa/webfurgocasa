@@ -238,7 +238,7 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                     images={vehicle.images || (vehicle.main_image?.image_url ? [vehicle.main_image.image_url] : [])}
                     alt={vehicle.name}
                     autoPlay={true}
-                    interval={4000}
+                    interval={10000}
                   />
                 </div>
               </LocalizedLink>
