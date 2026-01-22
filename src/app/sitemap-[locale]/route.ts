@@ -43,12 +43,14 @@ export function generateStaticParams() {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ locale: string }> }
+  { params }: { params: Promise<{ locale: string }> | { locale: string } }
 ) {
-  const { locale } = await params;
+  // Manejar tanto Promise como objeto directo (para build estático)
+  const paramsResolved = params instanceof Promise ? await params : params;
+  const locale = paramsResolved?.locale;
   
   // Validar que el locale sea válido
-  if (!LOCALES.includes(locale as Locale)) {
+  if (!locale || !LOCALES.includes(locale as Locale)) {
     return new NextResponse('Not Found', { status: 404 });
   }
 

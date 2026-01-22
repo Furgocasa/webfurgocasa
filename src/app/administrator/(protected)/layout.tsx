@@ -5,9 +5,10 @@ import { AdminAuthProvider } from "@/contexts/admin-auth-context";
 import { QueryProvider } from "@/providers/query-provider";
 import type { Metadata, Viewport } from "next";
 
-// ✅ OPTIMIZACIÓN: Usar 'auto' en lugar de 'force-dynamic' permite mejor caching
-export const dynamic = "auto";
-export const revalidate = 1800; // Revalidar cada 30 minutos como máximo (datos cambian poco)
+// ✅ CRÍTICO: Forzar renderizado dinámico porque usa cookies para autenticación
+// No puede pre-renderizarse durante el build
+export const dynamic = "force-dynamic";
+export const revalidate = 0; // No cachear páginas de administrador (siempre dinámicas)
 
 // ✅ PWA: Metadatos específicos para el panel de administrador
 // ⚠️ CRÍTICO: robots noindex para NUNCA indexar páginas de admin
