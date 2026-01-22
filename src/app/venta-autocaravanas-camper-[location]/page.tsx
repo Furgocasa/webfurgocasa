@@ -170,10 +170,9 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ location: string }>;
+  params: { location: string };
 }): Promise<Metadata> {
-  const { location: param } = await params;
-  const slug = extractSlug(param);
+  const slug = extractSlug(params.location);
 
   if (!slug) {
     return { title: "Ubicación no especificada", robots: { index: false, follow: false } };
@@ -222,10 +221,9 @@ export async function generateMetadata({
 export default async function SaleLocationPage({
   params,
 }: {
-  params: Promise<{ location: string }>;
+  params: { location: string };
 }) {
-  const { location: param } = await params;
-  const slug = extractSlug(param);
+  const slug = extractSlug(params.location);
 
   const [location, vehicles] = await Promise.all([
     getLocation(slug),
