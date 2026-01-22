@@ -1,10 +1,10 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.8-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.9-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0.8 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 1.0.9 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
 > **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
 
@@ -12,38 +12,55 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## 🔧 ÚLTIMA ACTUALIZACIÓN: Fix Crítico Búsqueda y SEO (v1.0.8)
+## 🚀 ÚLTIMA ACTUALIZACIÓN: Mejoras SEO Masivas (v1.0.9)
 
-**22 Enero 2026** - Correcciones críticas en producción
+**22 Enero 2026** - Mejoras críticas de SEO y páginas de localización
 
-### 🚨 Fix Crítico: Página de Búsqueda
+### 🎯 Resumen de Mejoras
 
-La página `/buscar` dejó de funcionar tras la auditoría SEO. **Causa**: Al separar componentes client/server, se simplificaron incorrectamente las props del `VehicleCard`.
+| Mejora | Descripción | Impacto SEO |
+|--------|-------------|-------------|
+| **Pre-generación estática** | ~320 páginas pre-generadas en build | ⚡⚡⚡ Crítico |
+| **Títulos páginas venta** | Meta títulos cargados desde DB | ⚡⚡ Alto |
+| **Traducciones venta FR/DE** | UI traducida en todos los idiomas | ⚡⚡ Alto |
+| **Hero image por localización** | Imagen personalizada desde Supabase | ⚡ Medio |
 
-### ✅ Cambios Implementados
+### ✅ Pre-generación Estática (`generateStaticParams`)
 
-- **VehicleCard** - Restauradas props `pricing` y `searchParams` completas
-- **SearchSummary** - Restaurado fondo azul y todas las props (ya no muestra "NaN días")
-- **CSP actualizado** - Añadidos dominios de Google Analytics (analytics.google.com, googleads, doubleclick)
-- **iOS Safari** - Fix ancho de campos de fecha en formulario de reserva
+**TODAS** las páginas dinámicas importantes ahora se pre-generan en build:
 
-### ⚠️ Lección Aprendida
+| Página | Páginas Pre-generadas |
+|--------|----------------------|
+| **Localizaciones** (alquiler + venta × 4 idiomas) | **~232** |
+| **Blog** (todos los posts) | **~50+** |
+| **Vehículos alquiler** | **~15** |
+| **Vehículos venta** | **~20** |
+| **TOTAL** | **~320 páginas** |
 
-Al refactorizar código para SEO, **copiar exactamente** - no simplificar ni "mejorar" durante la refactorización.
+**Beneficios**:
+- ⚡ Google indexa más rápido
+- ⚡ TTFB mínimo (CDN/cache)
+- ⚡ Core Web Vitals perfectos
+- ⚡ Crawl budget optimizado
 
-**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.8
+### ✅ Imagen Hero Personalizada por Localización
+
+Cada página de localización puede tener su propia imagen hero:
+- 18 localizaciones con imagen específica
+- 18 con imagen mediterránea por defecto
+- Configuración desde `location_targets.hero_image` en Supabase
+
+**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.9
 
 ---
 
-## 🎨 Versión 1.0.5: Unificación Visualización Vehículos
+## 🔧 Versión 1.0.8: Fix Crítico Búsqueda y SEO
 
-**20 Enero 2026**
+**22 Enero 2026**
 
-- **Imágenes de vehículos** visibles en página Home
-- **Diseño consistente** entre Home y páginas de localización
-- **Mejor SEO** con título optimizado
-
-**Commits**: `8abeff6`, `024abf9`, `805ada1`
+- **VehicleCard** - Restauradas props `pricing` y `searchParams`
+- **SearchSummary** - Fondo azul y cálculo de días funcionando
+- **CSP actualizado** - Dominios Google Analytics añadidos
 
 ---
 
@@ -1177,6 +1194,15 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 ## 📜 Historial de Versiones
 
+### v1.0.9 (22 Enero 2026) - Mejoras SEO Masivas 🚀
+- 🔥 **SEO CRÍTICO**: Pre-generación estática de ~320 páginas con `generateStaticParams`
+- ✅ Localizaciones: 232 rutas pre-generadas (alquiler + venta × 4 idiomas)
+- ✅ Blog: Todos los posts pre-generados (sin límite)
+- ✅ Vehículos venta: Cambio de `force-dynamic` a ISR
+- ✅ Títulos páginas venta: Meta títulos desde Supabase
+- ✅ Traducciones páginas venta: FR/DE completas
+- ✅ Hero image por localización: Imagen personalizada desde `location_targets.hero_image`
+
 ### v1.0.8 (22 Enero 2026) - Fix Crítico Búsqueda y SEO
 - 🔴 **FIX CRÍTICO**: Página `/buscar` restaurada (VehicleCard props incorrectas)
 - ✅ SearchSummary con fondo azul y cálculo de días
@@ -1213,7 +1239,7 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 1.0.8 - Fix Crítico Búsqueda y SEO  
+**Versión**: 1.0.9 - Mejoras SEO Masivas + Páginas Localización  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
 **Última actualización**: 22 de Enero 2026  

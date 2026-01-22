@@ -4,6 +4,113 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🚀 [1.0.9] - 22 de Enero 2026 - **Mejoras SEO Masivas + Páginas de Localización**
+
+### 🎯 **RESUMEN DE MEJORAS**
+
+Esta versión incluye mejoras críticas de SEO y funcionalidad para las páginas de localización (alquiler y venta).
+
+---
+
+### ✅ **CAMBIOS IMPLEMENTADOS**
+
+#### 1. **Fix Títulos Páginas de Venta** (`b2efcf2`)
+
+**Problema**: Las páginas de venta mostraban "Ubicación no encontrada" en el título del navegador.
+
+**Solución**:
+- Añadido `getTranslatedContent()` para `sale_location_targets`
+- Traducciones aplicadas a `h1_title`, `intro_text`, `meta_title`
+- Títulos ahora cargan correctamente desde Supabase
+
+#### 2. **Traducciones Páginas de Venta FR/DE** (`b2efcf2`)
+
+Añadidas traducciones faltantes en `translations-preload.ts`:
+
+| Español | Francés | Alemán |
+|---------|---------|--------|
+| Venta de Autocaravanas en | Camping-cars à vendre à | Wohnmobile zu verkaufen in |
+| ¿Buscas una autocaravana en | Vous cherchez un camping-car à | Suchen Sie ein Wohnmobil in |
+| vehículos disponibles en | véhicules disponibles à | Fahrzeuge verfügbar in |
+| Compra tu autocaravana... | Achetez votre camping-car... | Kaufen Sie Ihr Wohnmobil... |
+
+#### 3. **Imagen Hero Personalizada por Localización** (`438d2c9`)
+
+**Nueva funcionalidad**: Cada página de localización puede tener su propia imagen hero.
+
+**Implementación**:
+- Nueva columna `hero_image` en tabla `location_targets`
+- 18 localizaciones con imagen específica (Murcia, Cartagena, Alicante, etc.)
+- 18 localizaciones con imagen mediterránea por defecto
+- Imágenes cargadas desde Supabase Storage (`media/slides/`)
+
+**SQL ejecutado**:
+```sql
+ALTER TABLE location_targets ADD COLUMN hero_image TEXT;
+```
+
+#### 4. **Pre-generación Estática SEO** (`94065fc`) 🔥 **CRÍTICO**
+
+**Problema**: Las páginas dinámicas no se pre-generaban en build, afectando SEO.
+
+**Solución**: Añadido `generateStaticParams` a TODAS las páginas dinámicas importantes:
+
+| Página | Antes | Ahora | Páginas Pre-generadas |
+|--------|-------|-------|----------------------|
+| **Localizaciones** | ISR sin pre-gen | ISR + generateStaticParams | **~232** |
+| **Blog** | Solo 50 posts | Todos los posts | **~50+** |
+| **Vehículos alquiler** | ISR sin pre-gen | ISR + generateStaticParams | **~15** |
+| **Vehículos venta** | `force-dynamic` 🔴 | ISR + generateStaticParams ✅ | **~20** |
+
+**Archivos modificados**:
+- `src/app/[location]/page.tsx` - 232 rutas (alquiler+venta × 4 idiomas)
+- `src/app/blog/[category]/[slug]/page.tsx` - Todos los posts
+- `src/app/vehiculos/[slug]/page.tsx` - Vehículos de alquiler
+- `src/app/ventas/[slug]/page.tsx` - Cambio de force-dynamic a ISR
+
+**Beneficios SEO**:
+- ⚡ Google indexa páginas más rápido
+- ⚡ TTFB mínimo (páginas en CDN)
+- ⚡ Core Web Vitals perfectos
+- ⚡ Crawl budget optimizado
+
+---
+
+### 📊 **RESUMEN DE COMMITS**
+
+```
+94065fc feat(seo): pre-generar paginas estaticas con generateStaticParams
+438d2c9 feat: cargar hero_image desde location_targets
+2fc1266 feat: cambiar hero image a foto mediterranea con palmera y mar
+b2efcf2 fix: añadir traducciones para paginas de venta (FR/DE) y getTranslatedContent
+f41d6f4 feat: añadir contenido unico de ubicacion (atracciones, areas, rutas, gastronomia)
+29eb3ed fix: rediseñar paginas alquiler similar a home con imagen hero fija
+b06e348 fix: consolidar rutas location con sistema de traducciones completo
+```
+
+---
+
+### 🗄️ **CAMBIOS EN BASE DE DATOS**
+
+```sql
+-- Nueva columna para imagen hero por localización
+ALTER TABLE location_targets ADD COLUMN hero_image TEXT;
+```
+
+---
+
+### 📁 **ARCHIVOS MODIFICADOS**
+
+```
+src/app/[location]/page.tsx           # +60 líneas (generateStaticParams + hero_image)
+src/app/blog/[category]/[slug]/page.tsx  # Eliminar límite de 50 posts
+src/app/vehiculos/[slug]/page.tsx     # +20 líneas (generateStaticParams)
+src/app/ventas/[slug]/page.tsx        # Cambio force-dynamic → ISR + generateStaticParams
+src/lib/translations-preload.ts       # +30 líneas traducciones venta FR/DE
+```
+
+---
+
 ## 🔧 [1.0.8] - 22 de Enero 2026 - **Fix Crítico Búsqueda y SEO Metadata**
 
 ### 🚨 **FIX CRÍTICO: Página de Búsqueda Rota**
