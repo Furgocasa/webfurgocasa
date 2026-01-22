@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2, RefreshCw } from "lucide-react";
+import { Plus, Search, Eye, Edit, Calendar, Download, Mail, CheckCircle, Clock, XCircle, AlertCircle, Trash2, ArrowUpDown, ArrowUp, ArrowDown, Loader2, RefreshCw, Link2, Check } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAllDataCached } from "@/hooks/use-all-data-cached";
 import { formatPrice } from "@/lib/utils";
@@ -85,6 +85,9 @@ export default function BookingsPage() {
   // Estados para búsqueda y filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  
+  // Estado para feedback visual al copiar URL
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Paginación frontend
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -199,6 +202,27 @@ export default function BookingsPage() {
     } catch (err: any) {
       console.error('Error deleting booking:', err);
       alert('Error al eliminar la reserva: ' + err.message);
+    }
+  };
+
+  // Copiar ID de la reserva al clipboard
+  const copyBookingId = async (bookingId: string) => {
+    try {
+      await navigator.clipboard.writeText(bookingId);
+      setCopiedId(bookingId);
+      // Resetear el estado después de 2 segundos
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Error al copiar ID:', err);
+      // Fallback para navegadores que no soportan clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = bookingId;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedId(bookingId);
+      setTimeout(() => setCopiedId(null), 2000);
     }
   };
 
@@ -688,6 +712,21 @@ export default function BookingsPage() {
                           >
                             <Eye className="h-3.5 w-3.5" />
                           </Link>
+                          <button 
+                            onClick={() => copyBookingId(booking.id)}
+                            className={`p-1.5 rounded transition-colors ${
+                              copiedId === booking.id 
+                                ? 'text-green-600 bg-green-50' 
+                                : 'text-gray-400 hover:text-purple-600 hover:bg-purple-50'
+                            }`}
+                            title="Copiar ID de reserva"
+                          >
+                            {copiedId === booking.id ? (
+                              <Check className="h-3.5 w-3.5" />
+                            ) : (
+                              <Link2 className="h-3.5 w-3.5" />
+                            )}
+                          </button>
                           <button 
                             className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors" 
                             title="Enviar email"
