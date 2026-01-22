@@ -2,7 +2,8 @@
 
 **Fecha**: 22 de enero de 2026  
 **Problema**: Google Analytics estaba registrando tráfico en páginas del panel de administrador  
-**Estado**: ✅ Resuelto con múltiples capas de protección
+**Estado**: ✅ Resuelto con múltiples capas de protección + middleware fix  
+**Commits**: `1f82115`, `d1e6096`, `e33c27a`
 
 ## Problema Identificado
 
@@ -18,7 +19,52 @@ Los scripts de Google Analytics se estaban cargando en **todas las páginas** de
    - El `useEffect` se ejecutaba después del primer render
 3. No había protección adicional en los layouts de administrador
 
-## Solución Implementada - Triple Capa de Protección
+## Solución Implementada - Arquitectura Completa
+
+### 0. ⚠️ CRÍTICO: Middleware - Primera Línea de Defensa
+
+**Archivo**: `src/middleware.ts`
+
+**Problema detectado**:
+- Las rutas con prefijo de idioma (`/es/administrator`, `/en/administrator`) no eran detectadas como admin
+- Los checks `pathname.startsWith('/administrator')` fallaban con `/es/administrator`
+- Las 3 capas de protección NO funcionaban si la URL tenía prefijo i18n
+- `/administrator` (sin subrutas) causaba loop infinito de redirects
+
+**Solución implementada**:
+
+```typescript
+// 1. EXCLUIR admin de i18n (evita que se procesen como rutas públicas)
+const shouldSkip = skipLocaleFor.some(path => pathname.startsWith(path)) ||
+                   pathname === '/administrator' || pathname.startsWith('/administrator/') ||
+                   pathname === '/admin' || pathname.startsWith('/admin/');
+
+// 2. REDIRIGIR rutas admin con idioma a versión sin idioma (301 redirect)
+const locale = getLocaleFromPathname(pathname);
+if (locale && (pathname.startsWith(`/${locale}/administrator`) || pathname.startsWith(`/${locale}/admin`))) {
+  const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
+  request.nextUrl.pathname = pathnameWithoutLocale;
+  return NextResponse.redirect(request.nextUrl, { status: 301 });
+}
+```
+
+**Qué hace**:
+- **Excluye** `/administrator` y `/administrator/*` del procesamiento i18n
+- **Redirige** `/es/administrator` → `/administrator` (301 permanente)
+- **Previene** loop infinito en ruta raíz `/administrator`
+- **Garantiza** que pathname siempre sea sin idioma antes de llegar a componentes
+
+**Resultado**:
+```
+/es/administrator → 301 → /administrator ✅
+/en/administrator/reservas → 301 → /administrator/reservas ✅
+/administrator → Sin cambios (no loop) ✅
+/administrator/calendario → Sin cambios ✅
+```
+
+**Beneficio**: Ahora las 3 capas siguientes funcionan correctamente porque pathname siempre es `/administrator/*` (sin prefijo de idioma).
+
+---
 
 ### 1. ✅ Optimización del Componente `AnalyticsScripts`
 
@@ -98,6 +144,14 @@ export default function AdministratorRootLayout({ children }) {
 
 ### Capas de Protección Implementadas
 
+#### Capa 0: Middleware (Primera Línea)
+**Archivo**: `src/middleware.ts`
+- Detecta rutas admin con idioma (`/es/administrator`)
+- Redirige a versión sin idioma (`/administrator`) con 301
+- Excluye rutas admin del sistema i18n
+- Previene loop infinito en `/administrator`
+- Garantiza pathname consistente para capas siguientes
+
 #### Capa 1: Prevención de Carga de Scripts
 **Componente**: `AnalyticsScripts`
 - Calcula con `useMemo` si es página admin (inmediato)
@@ -162,16 +216,26 @@ export default function AdministratorRootLayout({ children }) {
 
 ### ✅ Archivos Modificados
 
-1. **`src/components/analytics-scripts.tsx`**
+1. **`src/middleware.ts`** - **CRÍTICO**
+   - Añadida exclusión explícita de admin del sistema i18n
+   - Implementado redirect 301 de rutas admin con idioma
+   - Prevenido loop infinito en `/administrator`
+
+2. **`src/components/analytics-scripts.tsx`**
    - Añadido `useMemo` para cálculo inmediato
    - Mejorado `useState` inicial
    - Doble protección con mensajes mejorados
 
-2. **`src/app/administrator/layout.tsx`**
+3. **`src/app/administrator/layout.tsx`**
    - Integrado `<AnalyticsBlocker />`
 
-3. **`FIX-ANALYTICS-ADMIN-EXCLUSION.md`**
-   - Documentación actualizada
+4. **Documentación**
+   - `FIX-ANALYTICS-ADMIN-EXCLUSION.md` (este archivo)
+   - `FIX-CRITICO-ADMIN-I18N-ANALYTICS.md`
+   - `FIX-LOOP-ADMINISTRATOR.md`
+   - `RESUMEN-FIX-ANALYTICS-ADMIN.md`
+   - `ARQUITECTURA-ANALYTICS-EXCLUSION.md`
+   - `GUIA-TESTING-ANALYTICS-EXCLUSION.md`
 
 ### ✅ Archivos Sin Cambios (ya correctos)
 
@@ -184,14 +248,20 @@ export default function AdministratorRootLayout({ children }) {
 
 ### Prueba Manual Rápida
 
-1. **Abrir DevTools → Console**
-2. **Navegar a `/administrator/login`**
+1. **Probar redirect de URLs con idioma**
+   - Ir a: `https://www.furgocasa.com/es/administrator`
+   - **Debe redirigir a**: `https://www.furgocasa.com/administrator` (301)
+   - URL en barra debe ser **sin `/es/`**
+
+2. **Abrir DevTools → Console**
+
+3. **Navegar a `/administrator/login`**
    - Buscar: `[AnalyticsBlocker] 🛡️ Bloqueador de Analytics montado`
    - Ejecutar en consola: `window.gtag` → debe ser `undefined` o función vacía
    - Ejecutar en consola: `window.dataLayer` → debe ser `undefined` o bloqueado
    - Network tab: NO debe haber peticiones a `googletagmanager.com`
 
-3. **Navegar a `/` (home pública)**
+4. **Navegar a `/` (home pública)**
    - Buscar: `[Analytics] ✅ Ruta pública detectada`
    - Ejecutar en consola: `window.gtag` → debe ser `function`
    - Ejecutar en consola: `window.dataLayer` → debe ser `array`
@@ -222,15 +292,18 @@ if (window.gtag) {
 }
 ```
 
-## Beneficios de la Triple Capa
+## Beneficios de la Arquitectura Completa
 
-1. ✅ **Capa 1 (Scripts)**: Prevención primaria - scripts ni siquiera se cargan
-2. ✅ **Capa 2 (Blocker)**: Firewall activo - bloquea si algo se cuela
-3. ✅ **Capa 3 (Tracking)**: Última defensa - no envía datos aunque exista gtag
-4. ✅ **Mejor Performance**: Menos JavaScript en páginas admin
-5. ✅ **Datos Limpios**: Analytics solo registra tráfico real de usuarios
-6. ✅ **Privacidad Total**: Administradores completamente no trackeados
-7. ✅ **Debugging Claro**: Mensajes en consola muy explícitos
+1. ✅ **Capa 0 (Middleware)**: Primera línea - normaliza URLs admin sin i18n
+2. ✅ **Capa 1 (Scripts)**: Prevención primaria - scripts ni siquiera se cargan
+3. ✅ **Capa 2 (Blocker)**: Firewall activo - bloquea si algo se cuela
+4. ✅ **Capa 3 (Tracking)**: Última defensa - no envía datos aunque exista gtag
+5. ✅ **Mejor Performance**: Menos JavaScript en páginas admin
+6. ✅ **Datos Limpios**: Analytics solo registra tráfico real de usuarios
+7. ✅ **Privacidad Total**: Administradores completamente no trackeados
+8. ✅ **Debugging Claro**: Mensajes en consola muy explícitos
+9. ✅ **URLs Consistentes**: Admin siempre sin prefijo de idioma
+10. ✅ **Sin Loops**: No hay redirects infinitos
 
 ## Casos Edge Cubiertos
 
@@ -240,6 +313,9 @@ if (window.gtag) {
 ✅ **Recarga de página en admin** (F5)
 ✅ **Scripts cargados desde caché**
 ✅ **Extensiones del navegador que inyectan gtag**
+✅ **URLs con prefijo de idioma** (`/es/administrator`, `/en/administrator`)
+✅ **Ruta raíz admin** (`/administrator` sin subrutas - sin loop)
+✅ **Redirects 301** (permanentes, SEO-friendly)
 
 ## ⚠️ IMPORTANTE: Despliegue y Verificación
 
@@ -275,7 +351,19 @@ Si después de esta implementación **aún detectas tráfico admin en Analytics*
 
 ---
 
-**Implementado por**: Claude (Cursor AI)  
+## 📚 Documentos Relacionados
+
+- `FIX-CRITICO-ADMIN-I18N-ANALYTICS.md` - Problema de prefijos i18n
+- `FIX-LOOP-ADMINISTRATOR.md` - Problema de loop infinito
+- `RESUMEN-FIX-ANALYTICS-ADMIN.md` - Resumen ejecutivo
+- `ARQUITECTURA-ANALYTICS-EXCLUSION.md` - Arquitectura visual
+- `GUIA-TESTING-ANALYTICS-EXCLUSION.md` - Guía de pruebas
+- `ELIMINACION-CARPETA-ADMIN-LEGACY.md` - Eliminación de `/admin` duplicado
+
+---
+
+**Implementado por**: Claude Sonnet 4.5 (Cursor AI)  
 **Fecha**: 22 de enero de 2026  
-**Versión**: 2.0 - Triple Capa de Protección  
-**Estado**: ✅ Listo para despliegue y testing exhaustivo
+**Versión**: 3.0 - Arquitectura Completa con Middleware  
+**Commits**: `1f82115`, `d1e6096`, `e33c27a`  
+**Estado**: ✅ Resuelto y desplegado en producción

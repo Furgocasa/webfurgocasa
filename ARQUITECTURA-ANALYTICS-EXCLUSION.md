@@ -1,9 +1,23 @@
-# 🏗️ Arquitectura de Triple Capa - Exclusión de Analytics en Admin
+# 🏗️ Arquitectura de 4 Capas - Exclusión de Analytics en Admin
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                     USUARIO NAVEGA A PÁGINA                      │
 └────────────────────────┬────────────────────────────────────────┘
+                         │
+                         ▼
+┌────────────────────────────────────────────────────────────────┐
+│  CAPA 0: MIDDLEWARE (Primera Línea)                            │
+│  ═══════════════════════════════════                           │
+│  src/middleware.ts                                              │
+│  ─────────────────────                                         │
+│  • Detecta /es/administrator, /en/administrator                │
+│  • Redirect 301 → /administrator (sin idioma)                  │
+│  • Excluye /administrator y /administrator/* de i18n           │
+│  • Previene loop infinito en /administrator                    │
+│                                                                 │
+│  ✅ GARANTÍA: pathname siempre sin idioma                       │
+└────────────────────────┬───────────────────────────────────────┘
                          │
                          ▼
           ┌──────────────────────────────┐
@@ -86,6 +100,15 @@
 
 ## 📂 Ubicación de Componentes
 
+### Capa 0: Middleware (Normalización)
+```
+📁 src/middleware.ts
+   └─ Ejecutado: En cada request (antes de routing)
+   └─ Tipo: Edge Function
+   └─ Acción: Redirect 301 + Exclusión i18n
+   └─ Prioridad: CRÍTICA (primera línea)
+```
+
 ### Capa 1: Prevención de Carga
 ```
 📁 src/components/analytics-scripts.tsx
@@ -115,9 +138,29 @@
 ## 🛠️ Flujo de Decisión
 
 ```
-INICIO
+INICIO: Usuario navega
   ↓
-Usuario navega → pathname detectado
+CAPA 0: MIDDLEWARE (src/middleware.ts)
+  ↓
+  ¿pathname tiene prefijo de idioma + admin?
+  ├─ SÍ (/es/administrator, /en/admin, etc.)
+  │   ↓
+  │   Redirect 301: /es/administrator → /administrator
+  │   ↓
+  │   pathname se normaliza (sin idioma)
+  │   ↓
+  └─ NO → Continuar
+  
+  ¿pathname === '/administrator' o startsWith('/administrator/')?
+  ├─ SÍ
+  │   ↓
+  │   shouldSkip = true → Excluir de i18n
+  │   ↓
+  │   NO hay redirects adicionales (evita loop)
+  │   ↓
+  └─ NO → Procesamiento i18n normal
+
+pathname detectado (ya normalizado)
   ↓
   ¿pathname.startsWith('/administrator') || pathname.startsWith('/admin')?
   ├─ SÍ → Es Admin
@@ -163,6 +206,15 @@ Usuario navega → pathname detectado
 
 ## 🔍 Puntos de Verificación
 
+### Test Middleware (Capa 0)
+
+| Check | Input | Output | Verificar con |
+|-------|-------|--------|---------------|
+| Redirect i18n | `/es/administrator` | `301 → /administrator` | DevTools Network tab |
+| Redirect i18n | `/en/administrator/reservas` | `301 → /administrator/reservas` | URL en barra |
+| Sin loop | `/administrator` | `200 OK` (sin redirects) | DevTools Network tab |
+| Exclusión i18n | `/administrator/login` | Sin añadir idioma | URL permanece igual |
+
 ### En Admin (`/administrator/*`)
 
 | Check | Debe ser | Verificar con |
@@ -187,23 +239,32 @@ Usuario navega → pathname detectado
 
 ## 🎯 Ventajas de la Arquitectura
 
-1. **Redundancia**: Si una capa falla, las otras protegen
-2. **Performance**: Capa 1 evita descargar scripts innecesarios
-3. **Seguridad**: Capa 2 bloquea tracking aunque scripts se carguen
-4. **Fiabilidad**: Capa 3 previene pageviews aunque gtag exista
-5. **Debugging**: Cada capa emite logs claros en consola
-6. **Escalabilidad**: Fácil añadir más capas si es necesario
+1. **Capa 0 (Middleware)**: Normaliza URLs antes de routing, evita loops y garantiza consistencia
+2. **Redundancia**: Si una capa falla, las otras protegen
+3. **Performance**: Capa 1 evita descargar scripts innecesarios
+4. **Seguridad**: Capa 2 bloquea tracking aunque scripts se carguen
+5. **Fiabilidad**: Capa 3 previene pageviews aunque gtag exista
+6. **Debugging**: Cada capa emite logs claros en consola
+7. **Escalabilidad**: Fácil añadir más capas si es necesario
+8. **SEO-friendly**: Redirects 301 permanentes
+9. **URLs limpias**: Admin siempre sin prefijo de idioma
+10. **Sin loops**: Protección contra redirects infinitos
 
 ---
 
 ## 📚 Documentos Relacionados
 
 - `FIX-ANALYTICS-ADMIN-EXCLUSION.md` - Documentación técnica completa
+- `FIX-CRITICO-ADMIN-I18N-ANALYTICS.md` - Problema de URLs con idioma
+- `FIX-LOOP-ADMINISTRATOR.md` - Problema de loop infinito
 - `RESUMEN-FIX-ANALYTICS-ADMIN.md` - Resumen ejecutivo
+- `GUIA-TESTING-ANALYTICS-EXCLUSION.md` - Guía de testing
 - `scripts/verify-analytics-exclusion.js` - Script de verificación
 
 ---
 
-**Diseño**: Triple Capa de Defensa en Profundidad  
-**Patrón**: Defense in Depth + Fail-Safe  
-**Implementado**: 22 de enero de 2026
+**Diseño**: Arquitectura de 4 Capas (Defense in Depth + Fail-Safe + Normalization)  
+**Patrón**: Middleware-First + Defense in Depth  
+**Implementado**: 22 de enero de 2026  
+**Commits**: `1f82115`, `d1e6096`, `e33c27a`  
+**Versión**: 3.0

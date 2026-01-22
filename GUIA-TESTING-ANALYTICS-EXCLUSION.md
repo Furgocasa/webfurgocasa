@@ -1,17 +1,84 @@
 # 🧪 Guía de Testing - Exclusión de Analytics en Admin
 
-**Versión**: 2.0 - Triple Capa  
+**Versión**: 3.0 - Arquitectura Completa (4 Capas)  
 **Fecha**: 22 de enero de 2026  
-**Tiempo estimado**: 10-15 minutos
+**Tiempo estimado**: 12-18 minutos
 
 ---
 
 ## 📋 Pre-requisitos
 
-- [ ] Código desplegado en producción o desarrollo
+- [ ] Código desplegado en producción o desarrollo (commits: `1f82115`, `d1e6096`, `e33c27a`)
 - [ ] Acceso a Google Analytics Real-Time
 - [ ] Navegador con DevTools (Chrome/Edge recomendado)
 - [ ] Credenciales de administrador para `/administrator/login`
+
+---
+
+## 🚨 TEST 0: Verificación de Middleware (3 min) ⭐ NUEVO
+
+### Objetivo
+Confirmar que el middleware redirige correctamente URLs con idioma y previene loops.
+
+### Pasos
+
+1. **Abrir navegador en modo incógnito** (Ctrl+Shift+N)
+
+2. **Abrir DevTools** (F12)
+   - Ir a pestaña **Network**
+   - Marcar "Preserve log" ✅
+
+3. **Test A: Redirect con idioma**
+   - Escribir en barra: `https://www.furgocasa.com/es/administrator`
+   - Presionar Enter
+   
+   **Verificar en Network**:
+   ```
+   ✅ Status: 301 (Moved Permanently)
+   ✅ Location header: /administrator
+   ✅ URL final en barra: https://www.furgocasa.com/administrator
+   ```
+
+4. **Test B: Redirect con idioma + subruta**
+   - Limpiar Network log
+   - Escribir: `https://www.furgocasa.com/en/administrator/reservas`
+   - Presionar Enter
+   
+   **Verificar en Network**:
+   ```
+   ✅ Status: 301
+   ✅ URL final: /administrator/reservas (sin /en/)
+   ```
+
+5. **Test C: Ruta raíz sin loop**
+   - Limpiar Network log
+   - Escribir: `https://www.furgocasa.com/administrator`
+   - Presionar Enter
+   
+   **Verificar en Network**:
+   ```
+   ✅ Status: 200 OK (NO 301, NO 302)
+   ✅ Solo 1 request (no loop)
+   ✅ URL permanece: /administrator
+   ```
+
+6. **Test D: Subruta sin redirect**
+   - Limpiar Network log
+   - Escribir: `https://www.furgocasa.com/administrator/login`
+   - Presionar Enter
+   
+   **Verificar en Network**:
+   ```
+   ✅ Status: 200 OK
+   ✅ Sin redirects
+   ✅ URL permanece: /administrator/login
+   ```
+
+### ✅ Resultado Test 0
+- [ ] /es/administrator redirige a /administrator (301)
+- [ ] /en/administrator/reservas redirige correctamente (301)
+- [ ] /administrator NO hace loop (200 OK)
+- [ ] /administrator/login carga directamente (200 OK)
 
 ---
 
@@ -278,6 +345,8 @@ Si todos los tests anteriores pasaron:
 ```
 🎉 ¡ÉXITO TOTAL!
 
+✅ Middleware redirige URLs con idioma correctamente (301)
+✅ Middleware previene loop infinito en /administrator
 ✅ Analytics bloqueado en todas las páginas admin
 ✅ Analytics funcionando en todas las páginas públicas
 ✅ Navegación entre admin y público funciona correctamente
@@ -287,11 +356,29 @@ Si todos los tests anteriores pasaron:
 🎯 El sistema está funcionando perfectamente.
 📊 Los datos de Analytics estarán limpios.
 🛡️ Los administradores no serán trackeados.
+🔗 Las URLs admin son consistentes (sin i18n).
 ```
 
 ---
 
 ### ⚠️ Si Algún Test Falló
+
+#### Problema: Redirects no funcionan (Test 0)
+
+**Verificar**:
+1. ¿El código del middleware se desplegó? (commit `e33c27a`)
+2. ¿Se completó el build en Vercel?
+3. ¿Limpiaste caché del navegador?
+
+**Acciones**:
+```bash
+# Verificar commit del middleware
+git log -1 --oneline src/middleware.ts
+# Debe mostrar: e33c27a fix: resolver loop infinito
+
+# Ver el código del middleware
+git show e33c27a:src/middleware.ts | grep -A 10 "shouldSkip"
+```
 
 #### Problema: Analytics se carga en admin
 
@@ -359,12 +446,15 @@ npm run build
 
 Marcar cuando hayas completado:
 
+- [ ] Test 0: Middleware redirects ⭐ (NUEVO)
 - [ ] Test 1: Páginas públicas ✅
 - [ ] Test 2: Páginas admin ⛔
 - [ ] Test 3: Navegación admin 🔄
 - [ ] Test 4: Vuelta a público 🔙
 - [ ] Test 5: Script automático 🤖
 - [ ] Google Analytics limpio 📊
+- [ ] URLs admin sin idioma 🌐
+- [ ] No hay loops infinitos ♾️
 - [ ] Documentación leída 📖
 
 ---
@@ -372,13 +462,17 @@ Marcar cuando hayas completado:
 ## 📚 Documentos Relacionados
 
 - `FIX-ANALYTICS-ADMIN-EXCLUSION.md` - Documentación técnica
+- `FIX-CRITICO-ADMIN-I18N-ANALYTICS.md` - Problema de URLs con idioma
+- `FIX-LOOP-ADMINISTRATOR.md` - Problema de loop infinito
 - `RESUMEN-FIX-ANALYTICS-ADMIN.md` - Resumen ejecutivo
 - `ARQUITECTURA-ANALYTICS-EXCLUSION.md` - Arquitectura visual
 - `scripts/verify-analytics-exclusion.js` - Script de verificación
 
 ---
 
-**Tiempo total estimado**: 10-15 minutos  
-**Complejidad**: Baja  
+**Tiempo total estimado**: 12-18 minutos  
+**Complejidad**: Media  
 **Requisitos**: Navegador moderno + Acceso admin  
-**Última actualización**: 22 de enero de 2026
+**Última actualización**: 22 de enero de 2026  
+**Versión**: 3.0 - Arquitectura Completa (4 Capas)  
+**Commits**: `1f82115`, `d1e6096`, `e33c27a`
