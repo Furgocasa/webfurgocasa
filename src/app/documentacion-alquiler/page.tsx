@@ -44,7 +44,7 @@ const documents = [
 const requiredDocs = [
   "DNI o Pasaporte en vigor de todos los conductores",
   "Carnet de conducir B con mínimo 2 años de antigüedad",
-  "Tarjeta de crédito (no débito) a nombre del conductor principal",
+  "Justificante de transferencia de la fianza (1.000€)",
   "Confirmación de la reserva (enviada por email)",
 ];
 
@@ -165,11 +165,12 @@ export default function DocumentacionAlquilerPage() {
                   con suficiente antelación.
                 </p>
 
-                <h3>¿Qué pasa si no tengo tarjeta de crédito?</h3>
+                <h3>¿Cómo se paga la fianza?</h3>
                 <p>
-                  La tarjeta de crédito es imprescindible para la retención de la fianza. Las
-                  tarjetas de débito no permiten realizar retenciones. Si no dispones de tarjeta de
-                  crédito, contáctanos para buscar una solución alternativa.
+                  La fianza de 1.000€ se abona mediante <strong>transferencia bancaria</strong>, 
+                  máximo 72 horas antes del inicio del alquiler. Debes enviar el justificante de 
+                  transferencia y certificado de titularidad de la cuenta. El titular debe coincidir 
+                  con el arrendatario.
                 </p>
 
                 <h3>¿Puedo añadir un segundo conductor?</h3>
