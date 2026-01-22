@@ -172,15 +172,22 @@ export async function generateMetadata({
 }: {
   params: { location: string };
 }): Promise<Metadata> {
+  // DEBUG: Log para ver qué llega
+  console.log('[generateMetadata] params.location:', params.location);
+  
   const slug = extractSlug(params.location);
+  console.log('[generateMetadata] slug extraído:', slug);
 
   if (!slug) {
+    console.log('[generateMetadata] ERROR: slug vacío');
     return { title: "Ubicación no especificada", robots: { index: false, follow: false } };
   }
 
   const location = await getLocation(slug);
+  console.log('[generateMetadata] location encontrada:', location ? location.name : 'NULL');
 
   if (!location) {
+    console.log('[generateMetadata] ERROR: ubicación no encontrada para slug:', slug);
     return { title: "Ubicación no encontrada", robots: { index: false, follow: false } };
   }
 
