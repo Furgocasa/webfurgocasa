@@ -3,11 +3,11 @@ import { IAClient } from "./ia-client";
 
 // 🎯 SEO Metadata - Único y optimizado para /inteligencia-artificial
 export const metadata: Metadata = {
-  title: "Inteligencia Artificial para Viajeros Camper | Furgocasa",
+  title: "Inteligencia Artificial para Viajeros Camper",
   description: "Descubre nuestras herramientas de IA para planificar tu viaje en camper. Chatbot inteligente 24/7 y planificador de rutas con inteligencia artificial.",
   keywords: "inteligencia artificial camper, chatbot autocaravana, planificador rutas ia, asistente virtual camper, tecnología viaje camper",
   openGraph: {
-    title: "Inteligencia Artificial para Viajeros Camper | Furgocasa",
+    title: "Inteligencia Artificial para Viajeros Camper",
     description: "Chatbot IA y planificador de rutas inteligente para tu viaje en camper.",
     type: "website",
     url: "https://www.furgocasa.com/es/inteligencia-artificial",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Inteligencia Artificial para Viajeros Camper | Furgocasa",
+    title: "Inteligencia Artificial para Viajeros Camper",
     description: "Chatbot IA y planificador de rutas inteligente.",
   },
   alternates: {

@@ -53,7 +53,7 @@ export async function generateMetadata(
 
   if (!vehicle) {
     return {
-      title: "Vehículo no encontrado | Furgocasa",
+      title: "Vehículo no encontrado",
     };
   }
 
@@ -72,7 +72,7 @@ export async function generateMetadata(
     }
   }
 
-  const title = `${vehicle.name} en Venta | Furgocasa`;
+  const title = `${vehicle.name} en Venta`;
   const description = `Compra este ${vehicle.name} (${vehicle.year}) por ${formatPrice(vehicle.sale_price)}. ${vehicle.mileage.toLocaleString()} km, ${vehicle.seats} plazas. Garantía y revisión completa incluida.`;
 
   return {

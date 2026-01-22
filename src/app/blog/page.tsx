@@ -9,30 +9,30 @@ import { translateServer } from"@/lib/i18n/server-translation";
 import type { Locale } from"@/lib/i18n/config";
 
 const BLOG_METADATA: Metadata = {
-  title:"Blog de Viajes en Camper y Autocaravanas | Consejos, Rutas y Destinos | Furgocasa",
-  description:"Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente.",
-  keywords:"blog camper, viajes autocaravana, rutas camper españa, consejos autocaravana, destinos camper, alquiler campers murcia, camping autocaravana, vida en camper",
-  authors: [{ name:"Furgocasa" }],
+  title: "Blog de Viajes en Camper",
+  description: "Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente.",
+  keywords: "blog camper, viajes autocaravana, rutas camper españa, consejos autocaravana, destinos camper, alquiler campers murcia, camping autocaravana, vida en camper",
+  authors: [{ name: "Furgocasa" }],
   openGraph: {
-    title:"Blog de Viajes en Camper | Furgocasa",
-    description:"Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España.",
-    type:"website",
-    siteName:"Furgocasa",
+    title: "Blog de Viajes en Camper",
+    description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España.",
+    type: "website",
+    siteName: "Furgocasa",
     images: [
       {
-        url:"https://www.furgocasa.com/og-blog.jpg",
+        url: "https://www.furgocasa.com/og-blog.jpg",
         width: 1200,
         height: 630,
-        alt:"Blog de Viajes en Camper - Furgocasa",
+        alt: "Blog de Viajes en Camper - Furgocasa",
       },
     ],
   },
   twitter: {
-    card:"summary_large_image",
-    title:"Blog de Viajes en Camper | Furgocasa",
-    description:"Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana",
+    card: "summary_large_image",
+    title: "Blog de Viajes en Camper",
+    description: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana",
     images: ["https://www.furgocasa.com/og-blog.jpg"],
-    creator:"@furgocasa",
+    creator: "@furgocasa",
   },
   robots: {
     index: true,

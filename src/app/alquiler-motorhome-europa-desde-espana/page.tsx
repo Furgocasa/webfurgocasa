@@ -24,12 +24,12 @@ export const revalidate = 86400;
 
 // 🎯 METADATA SEO - Keywords diferenciadas para LATAM (evitar canibalización)
 export const metadata: Metadata = {
-  title: "Alquiler Motorhome Europa desde España | Casa Rodante para Viajeros LATAM | Furgocasa",
+  title: "Alquiler Motorhome Europa para Viajeros LATAM",
   description: "¿Venís desde Argentina, México, Chile o Colombia? Alquilá tu motorhome en España y recorré toda Europa en casa rodante. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español. ¡Arrancá tu aventura!",
   keywords: "alquiler motorhome europa, casa rodante europa, motorhome para viajar por europa, renta casa rodante españa, alquiler motorhome viajeros latinoamericanos, casa rodante desde españa recorrer europa, motorhome argentina españa, motorhome mexico europa, campervan latinoamerica europa",
   authors: [{ name: "Furgocasa" }],
   openGraph: {
-    title: "Alquiler Motorhome Europa desde España | Viajeros LATAM | Furgocasa",
+    title: "Alquiler Motorhome Europa para Viajeros LATAM",
     description: "Tu aventura europea comienza en España. Casa rodante con kilómetros ilimitados para recorrer Francia, Italia, Portugal y más. Asistencia en español 24/7.",
     type: "website",
     url: "https://www.furgocasa.com/alquiler-motorhome-europa-desde-espana",
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     site: "@furgocasa",
     creator: "@furgocasa",
-    title: "Alquiler Motorhome Europa | Viajeros LATAM | €95/día",
+    title: "Alquiler Motorhome Europa para Viajeros LATAM",
     description: "Tu casa rodante te espera en España para recorrer toda Europa. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español.",
     images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
   },

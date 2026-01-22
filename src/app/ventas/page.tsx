@@ -14,11 +14,11 @@ const supabase = createClient(
 
 // 🎯 SEO Metadata - Único y optimizado para /ventas
 const VENTAS_METADATA: Metadata = {
-  title: "Autocaravanas y Campers en Venta | Ocasión y Segunda Mano | Furgocasa",
+  title: "Autocaravanas y Campers en Venta",
   description: "Compra tu autocaravana o camper de ocasión en Furgocasa. Vehículos de nuestra flota, revisados con garantía. Historial completo conocido. Financiación disponible.",
   keywords: "comprar autocaravana, camper segunda mano, venta autocaravana ocasión, camper usado, comprar camper murcia, autocaravana ocasión garantía",
   openGraph: {
-    title: "Autocaravanas y Campers en Venta | Furgocasa",
+    title: "Autocaravanas y Campers en Venta",
     description: "Vehículos de nuestra flota, revisados con garantía. Historial completo conocido.",
     type: "website",
     siteName: "Furgocasa",
@@ -26,7 +26,7 @@ const VENTAS_METADATA: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Autocaravanas y Campers en Venta | Furgocasa",
+    title: "Autocaravanas y Campers en Venta",
     description: "Vehículos revisados con garantía. Historial completo.",
   },
   robots: {

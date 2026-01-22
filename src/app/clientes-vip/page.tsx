@@ -3,11 +3,11 @@ import { ClientesVipClient } from "./clientes-vip-client";
 
 // 🎯 SEO Metadata - Único y optimizado para /clientes-vip
 export const metadata: Metadata = {
-  title: "Programa Clientes VIP | Beneficios Exclusivos | Furgocasa",
+  title: "Programa Clientes VIP",
   description: "Únete al programa VIP de Furgocasa y disfruta de 10% de descuento permanente, prioridad en reservas, extras gratuitos y late check-out. Beneficios exclusivos para clientes fieles.",
   keywords: "clientes vip furgocasa, programa fidelidad camper, descuentos clientes frecuentes, beneficios vip autocaravana",
   openGraph: {
-    title: "Programa Clientes VIP | Furgocasa",
+    title: "Programa Clientes VIP",
     description: "Beneficios exclusivos para clientes frecuentes: 10% descuento, prioridad en reservas y extras gratuitos.",
     type: "website",
     url: "https://www.furgocasa.com/es/clientes-vip",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Programa Clientes VIP | Furgocasa",
+    title: "Programa Clientes VIP",
     description: "Beneficios exclusivos para clientes frecuentes.",
   },
   alternates: {

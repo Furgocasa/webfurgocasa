@@ -6,11 +6,11 @@ import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /ofertas
 const OFERTAS_METADATA: Metadata = {
-  title: "Ofertas y Descuentos en Alquiler de Campers | Furgocasa",
+  title: "Ofertas y Descuentos en Alquiler de Campers",
   description: "Aprovecha nuestras ofertas especiales en alquiler de autocaravanas. Descuentos de temporada, códigos promocionales y precios especiales para tu próxima aventura camper.",
   keywords: "ofertas alquiler camper, descuentos autocaravana, promociones furgocasa, alquiler camper barato, ofertas última hora camper",
   openGraph: {
-    title: "Ofertas en Alquiler de Campers | Furgocasa",
+    title: "Ofertas y Descuentos en Alquiler de Campers",
     description: "Descuentos especiales en alquiler de autocaravanas. ¡Aprovecha nuestras promociones de temporada!",
     type: "website",
     siteName: "Furgocasa",
@@ -18,7 +18,7 @@ const OFERTAS_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Ofertas en Alquiler de Campers | Furgocasa",
+    title: "Ofertas y Descuentos en Alquiler de Campers",
     description: "Descuentos especiales en alquiler de autocaravanas.",
   },
   robots: {

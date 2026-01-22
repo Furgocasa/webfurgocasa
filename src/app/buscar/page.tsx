@@ -3,7 +3,7 @@ import { BuscarClient } from "./buscar-client";
 
 // 🎯 SEO Metadata - Único y optimizado para /buscar
 export const metadata: Metadata = {
-  title: "Buscar Disponibilidad de Campers | Furgocasa",
+  title: "Buscar Disponibilidad de Campers",
   description: "Busca y compara la disponibilidad de campers y autocaravanas para tus fechas de viaje. Reserva online tu camper ideal con Furgocasa.",
   keywords: "buscar camper disponible, disponibilidad autocaravana, reservar camper fechas, buscar alquiler camper",
   robots: {

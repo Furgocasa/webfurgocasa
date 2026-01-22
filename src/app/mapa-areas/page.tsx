@@ -3,8 +3,8 @@ import { MapPin, Wifi, Droplets, Plug, Trash2, ShowerHead, ExternalLink, Sparkle
 import { translateServer } from"@/lib/i18n/server-translation";
 
 export const metadata: Metadata = {
-  title:"Mapa de Áreas para Autocaravanas | Furgocasa Campervans",
-  description:"Encuentra las mejores áreas de servicio y pernocta para autocaravanas y campers en España. Mapa interactivo con servicios, valoraciones y fotos.",
+  title: "Mapa de Áreas para Autocaravanas",
+  description: "Encuentra las mejores áreas de servicio y pernocta para autocaravanas y campers en España. Mapa interactivo con servicios, valoraciones y fotos.",
 };
 
 // TODO: Integrar con API de áreas o base de datos propia

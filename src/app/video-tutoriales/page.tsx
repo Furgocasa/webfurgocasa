@@ -3,11 +3,11 @@ import { VideoTutorialesClient } from "./video-tutoriales-client";
 
 // 🎯 SEO Metadata - Único y optimizado para /video-tutoriales
 export const metadata: Metadata = {
-  title: "Video Tutoriales del Camper | Aprende a Usar tu Autocaravana | Furgocasa",
+  title: "Video Tutoriales del Camper",
   description: "Videos tutoriales sobre el funcionamiento de tu camper de alquiler. Panel de control, agua, electricidad, calefacción, nevera y más sistemas explicados paso a paso.",
   keywords: "video tutorial camper, como usar autocaravana, tutorial panel control camper, videos furgocasa, aprender usar camper",
   openGraph: {
-    title: "Video Tutoriales del Camper | Furgocasa",
+    title: "Video Tutoriales del Camper",
     description: "Aprende a usar tu camper de alquiler con nuestros videos tutoriales.",
     type: "website",
     url: "https://www.furgocasa.com/es/video-tutoriales",
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Video Tutoriales del Camper | Furgocasa",
+    title: "Video Tutoriales del Camper",
     description: "Aprende a usar tu camper de alquiler.",
   },
   alternates: {

@@ -4750,8 +4750,8 @@ export const staticTranslations = {
   "Visitar": {
     es: "Visitar",
     en: "Visit",
-    fr: "Visit",
-    de: "Visit"
+    fr: "Visiter",
+    de: "Besuchen"
   },
   "en Autocaravana Camper": {
     es: "en Autocaravana Camper",
@@ -6182,6 +6182,322 @@ export const staticTranslations = {
     en: "Home",
     fr: "Accueil",
     de: "Startseite"
+  },
+  
+  // ========================================
+  // TRADUCCIONES PARA PÁGINAS DE LOCALIZACIÓN
+  // ========================================
+  "Qué ver y hacer en": {
+    es: "Qué ver y hacer en",
+    en: "What to see and do in",
+    fr: "Que voir et faire à",
+    de: "Was man sehen und tun kann in"
+  },
+  "Áreas de autocaravanas cerca de": {
+    es: "Áreas de autocaravanas cerca de",
+    en: "Motorhome areas near",
+    fr: "Aires de camping-car près de",
+    de: "Wohnmobilstellplätze in der Nähe von"
+  },
+  "Rutas en camper desde": {
+    es: "Rutas en camper desde",
+    en: "Camper routes from",
+    fr: "Itinéraires en camping-car depuis",
+    de: "Wohnmobil-Routen von"
+  },
+  "Dificultad": {
+    es: "Dificultad",
+    en: "Difficulty",
+    fr: "Difficulté",
+    de: "Schwierigkeit"
+  },
+  "en Autocaravana Camper": {
+    es: "en Autocaravana Camper",
+    en: "by Campervan",
+    fr: "en Camping-car",
+    de: "mit dem Wohnmobil"
+  },
+  "viajando en camper": {
+    es: "viajando en camper",
+    en: "traveling by camper",
+    fr: "en voyageant en camping-car",
+    de: "mit dem Wohnmobil reisend"
+  },
+  "Descubre todo lo que puedes hacer y ver en": {
+    es: "Descubre todo lo que puedes hacer y ver en",
+    en: "Discover everything you can do and see in",
+    fr: "Découvrez tout ce que vous pouvez faire et voir à",
+    de: "Entdecken Sie alles, was Sie sehen und tun können in"
+  },
+  "ALQUILER MOTORHOME": {
+    es: "ALQUILER MOTORHOME",
+    en: "MOTORHOME RENTAL",
+    fr: "LOCATION CAMPING-CAR",
+    de: "WOHNMOBIL MIETEN"
+  },
+  "Casas Rodantes en": {
+    es: "Casas Rodantes en",
+    en: "RVs in",
+    fr: "Camping-cars à",
+    de: "Wohnmobile in"
+  },
+  "¿Qué es un Motorhome?": {
+    es: "¿Qué es un Motorhome?",
+    en: "What is a Motorhome?",
+    fr: "Qu'est-ce qu'un camping-car ?",
+    de: "Was ist ein Wohnmobil?"
+  },
+  "son términos que se refieren al mismo tipo de vehículo: una furgoneta camper totalmente equipada para viajar con autonomía total.": {
+    es: "son términos que se refieren al mismo tipo de vehículo: una furgoneta camper totalmente equipada para viajar con autonomía total.",
+    en: "are terms that refer to the same type of vehicle: a fully equipped campervan for traveling with total autonomy.",
+    fr: "sont des termes qui désignent le même type de véhicule : un van aménagé entièrement équipé pour voyager en toute autonomie.",
+    de: "sind Begriffe, die sich auf denselben Fahrzeugtyp beziehen: ein voll ausgestatteter Campervan für das Reisen mit völliger Autonomie."
+  },
+  "En Latinoamérica también se conocen como": {
+    es: "En Latinoamérica también se conocen como",
+    en: "In Latin America they are also known as",
+    fr: "En Amérique latine, on les appelle aussi",
+    de: "In Lateinamerika sind sie auch bekannt als"
+  },
+  "casas rodantes": {
+    es: "casas rodantes",
+    en: "mobile homes",
+    fr: "maisons mobiles",
+    de: "Wohnwagen"
+  },
+  "o": {
+    es: "o",
+    en: "or",
+    fr: "ou",
+    de: "oder"
+  },
+  "casas móviles": {
+    es: "casas móviles",
+    en: "motor homes",
+    fr: "camping-cars",
+    de: "Wohnmobile"
+  },
+  "En Furgocasa, nos especializamos en el alquiler de estos vehículos de gran volumen, perfectos para familias y parejas que buscan la máxima comodidad.": {
+    es: "En Furgocasa, nos especializamos en el alquiler de estos vehículos de gran volumen, perfectos para familias y parejas que buscan la máxima comodidad.",
+    en: "At Furgocasa, we specialize in renting these large-volume vehicles, perfect for families and couples seeking maximum comfort.",
+    fr: "Chez Furgocasa, nous sommes spécialisés dans la location de ces véhicules grand volume, parfaits pour les familles et les couples recherchant un confort maximal.",
+    de: "Bei Furgocasa sind wir auf die Vermietung dieser großvolumigen Fahrzeuge spezialisiert, perfekt für Familien und Paare, die maximalen Komfort suchen."
+  },
+  "Descuento Especial LATAM": {
+    es: "Descuento Especial LATAM",
+    en: "Special LATAM Discount",
+    fr: "Réduction Spéciale LATAM",
+    de: "Spezieller LATAM-Rabatt"
+  },
+  "¿Vienes desde Latinoamérica?": {
+    es: "¿Vienes desde Latinoamérica?",
+    en: "Coming from Latin America?",
+    fr: "Vous venez d'Amérique latine ?",
+    de: "Kommen Sie aus Lateinamerika?"
+  },
+  "Obtén un descuento especial en el alquiler de tu motorhome / casa rodante. Contáctanos y menciona tu país de origen para recibir una oferta personalizada.": {
+    es: "Obtén un descuento especial en el alquiler de tu motorhome / casa rodante. Contáctanos y menciona tu país de origen para recibir una oferta personalizada.",
+    en: "Get a special discount on your motorhome rental. Contact us and mention your country of origin to receive a personalized offer.",
+    fr: "Bénéficiez d'une réduction spéciale sur la location de votre camping-car. Contactez-nous et mentionnez votre pays d'origine pour recevoir une offre personnalisée.",
+    de: "Erhalten Sie einen Sonderrabatt auf Ihre Wohnmobil-Miete. Kontaktieren Sie uns und nennen Sie Ihr Herkunftsland, um ein personalisiertes Angebot zu erhalten."
+  },
+  "¿Cómo se llama en tu país?": {
+    es: "¿Cómo se llama en tu país?",
+    en: "What is it called in your country?",
+    fr: "Comment l'appelle-t-on dans votre pays ?",
+    de: "Wie heißt es in Ihrem Land?"
+  },
+  "Nuestras Motorhomes en": {
+    es: "Nuestras Motorhomes en",
+    en: "Our Motorhomes in",
+    fr: "Nos camping-cars à",
+    de: "Unsere Wohnmobile in"
+  },
+  "Gran volumen:": {
+    es: "Gran volumen:",
+    en: "Large volume:",
+    fr: "Grand volume :",
+    de: "Großes Volumen:"
+  },
+  "Vehículos espaciosos de hasta 6 metros": {
+    es: "Vehículos espaciosos de hasta 6 metros",
+    en: "Spacious vehicles up to 6 meters",
+    fr: "Véhicules spacieux jusqu'à 6 mètres",
+    de: "Geräumige Fahrzeuge bis zu 6 Metern"
+  },
+  "Totalmente equipadas:": {
+    es: "Totalmente equipadas:",
+    en: "Fully equipped:",
+    fr: "Entièrement équipés :",
+    de: "Voll ausgestattet:"
+  },
+  "Cocina, baño, camas, calefacción": {
+    es: "Cocina, baño, camas, calefacción",
+    en: "Kitchen, bathroom, beds, heating",
+    fr: "Cuisine, salle de bain, lits, chauffage",
+    de: "Küche, Bad, Betten, Heizung"
+  },
+  "Desde 95€/día:": {
+    es: "Desde 95€/día:",
+    en: "From €95/day:",
+    fr: "À partir de 95€/jour :",
+    de: "Ab 95€/Tag:"
+  },
+  "La mejor relación calidad-precio": {
+    es: "La mejor relación calidad-precio",
+    en: "The best value for money",
+    fr: "Le meilleur rapport qualité-prix",
+    de: "Das beste Preis-Leistungs-Verhältnis"
+  },
+  "Ver todas las Motorhomes disponibles": {
+    es: "Ver todas las Motorhomes disponibles",
+    en: "See all available Motorhomes",
+    fr: "Voir tous les camping-cars disponibles",
+    de: "Alle verfügbaren Wohnmobile anzeigen"
+  },
+  "en autocaravana": {
+    es: "en autocaravana",
+    en: "by motorhome",
+    fr: "en camping-car",
+    de: "mit dem Wohnmobil"
+  },
+  "Explora los principales atractivos turísticos, monumentos históricos, museos y espacios naturales que hacen de": {
+    es: "Explora los principales atractivos turísticos, monumentos históricos, museos y espacios naturales que hacen de",
+    en: "Explore the main tourist attractions, historical monuments, museums and natural spaces that make",
+    fr: "Explorez les principales attractions touristiques, monuments historiques, musées et espaces naturels qui font de",
+    de: "Erkunden Sie die wichtigsten Sehenswürdigkeiten, historischen Denkmäler, Museen und Naturräume, die"
+  },
+  "un destino único.": {
+    es: "un destino único.",
+    en: "a unique destination.",
+    fr: "une destination unique.",
+    de: "ein einzigartiges Reiseziel machen."
+  },
+  "Áreas de autocaravanas y servicios": {
+    es: "Áreas de autocaravanas y servicios",
+    en: "Motorhome areas and services",
+    fr: "Aires de camping-car et services",
+    de: "Wohnmobilstellplätze und Dienstleistungen"
+  },
+  "La zona cuenta con diversas áreas de servicio para autocaravanas, zonas de pernocta y campings bien equipados.": {
+    es: "La zona cuenta con diversas áreas de servicio para autocaravanas, zonas de pernocta y campings bien equipados.",
+    en: "The area has various service areas for motorhomes, overnight parking areas and well-equipped campsites.",
+    fr: "La zone dispose de plusieurs aires de services pour camping-cars, zones de stationnement de nuit et campings bien équipés.",
+    de: "Die Gegend verfügt über verschiedene Servicegebiete für Wohnmobile, Übernachtungsparkplätze und gut ausgestattete Campingplätze."
+  },
+  "Gastronomía local de": {
+    es: "Gastronomía local de",
+    en: "Local gastronomy of",
+    fr: "Gastronomie locale de",
+    de: "Lokale Gastronomie von"
+  },
+  "Disfruta de la rica gastronomía de": {
+    es: "Disfruta de la rica gastronomía de",
+    en: "Enjoy the rich gastronomy of",
+    fr: "Profitez de la riche gastronomie de",
+    de: "Genießen Sie die reiche Gastronomie von"
+  },
+  "con productos frescos y platos tradicionales que no te puedes perder.": {
+    es: "con productos frescos y platos tradicionales que no te puedes perder.",
+    en: "with fresh products and traditional dishes you can't miss.",
+    fr: "avec des produits frais et des plats traditionnels à ne pas manquer.",
+    de: "mit frischen Produkten und traditionellen Gerichten, die Sie nicht verpassen dürfen."
+  },
+  "Rutas en camper por": {
+    es: "Rutas en camper por",
+    en: "Camper routes through",
+    fr: "Itinéraires en camping-car à",
+    de: "Wohnmobil-Routen durch"
+  },
+  "Descubre rutas de senderismo, parques naturales y paisajes espectaculares en los alrededores de": {
+    es: "Descubre rutas de senderismo, parques naturales y paisajes espectaculares en los alrededores de",
+    en: "Discover hiking trails, natural parks and spectacular landscapes around",
+    fr: "Découvrez des sentiers de randonnée, des parcs naturels et des paysages spectaculaires autour de",
+    de: "Entdecken Sie Wanderwege, Naturparks und spektakuläre Landschaften in der Umgebung von"
+  },
+  "Alquiler de autocaravanas con Furgocasa": {
+    es: "Alquiler de autocaravanas con Furgocasa",
+    en: "Motorhome rental with Furgocasa",
+    fr: "Location de camping-car avec Furgocasa",
+    de: "Wohnmobilvermietung mit Furgocasa"
+  },
+  "Viajar en una": {
+    es: "Viajar en una",
+    en: "Traveling in a",
+    fr: "Voyager en",
+    de: "Reisen in einem"
+  },
+  "autocaravana camper de alquiler": {
+    es: "autocaravana camper de alquiler",
+    en: "rental campervan",
+    fr: "camping-car de location",
+    de: "gemieteten Wohnmobil"
+  },
+  "con Furgocasa te brinda la libertad total de explorar": {
+    es: "con Furgocasa te brinda la libertad total de explorar",
+    en: "with Furgocasa gives you the total freedom to explore",
+    fr: "avec Furgocasa vous offre la liberté totale d'explorer",
+    de: "mit Furgocasa gibt Ihnen die völlige Freiheit zu erkunden"
+  },
+  "y sus alrededores a tu propio ritmo. Nuestra flota de": {
+    es: "y sus alrededores a tu propio ritmo. Nuestra flota de",
+    en: "and its surroundings at your own pace. Our fleet of",
+    fr: "et ses environs à votre rythme. Notre flotte de",
+    de: "und seine Umgebung in Ihrem eigenen Tempo. Unsere Flotte von"
+  },
+  "campers": {
+    es: "campers",
+    en: "campers",
+    fr: "camping-cars",
+    de: "Wohnmobilen"
+  },
+  "está equipada con todas las comodidades: cocinas completas, camas confortables, baño y todo lo necesario para que tu viaje sea inolvidable.": {
+    es: "está equipada con todas las comodidades: cocinas completas, camas confortables, baño y todo lo necesario para que tu viaje sea inolvidable.",
+    en: "is equipped with all the amenities: complete kitchens, comfortable beds, bathroom and everything you need to make your trip unforgettable.",
+    fr: "est équipée de tout le confort : cuisines complètes, lits confortables, salle de bain et tout ce dont vous avez besoin pour rendre votre voyage inoubliable.",
+    de: "ist mit allen Annehmlichkeiten ausgestattet: komplette Küchen, komfortable Betten, Badezimmer und alles, was Sie brauchen, um Ihre Reise unvergesslich zu machen."
+  },
+  "en alquileres de 1, 2 o 3 semanas.": {
+    es: "en alquileres de 1, 2 o 3 semanas.",
+    en: "on 1, 2 or 3 week rentals.",
+    fr: "sur les locations de 1, 2 ou 3 semaines.",
+    de: "bei 1, 2 oder 3 Wochen Mieten."
+  },
+  "Extras y accesorios": {
+    es: "Extras y accesorios",
+    en: "Extras and accessories",
+    fr: "Extras et accessoires",
+    de: "Extras und Zubehör"
+  },
+  "Qué está incluido en el precio y qué tiene coste adicional": {
+    es: "Qué está incluido en el precio y qué tiene coste adicional",
+    en: "What's included in the price and what has an additional cost",
+    fr: "Ce qui est inclus dans le prix et ce qui a un coût supplémentaire",
+    de: "Was im Preis enthalten ist und was Zusatzkosten hat"
+  },
+  "Incluido sin coste": {
+    es: "Incluido sin coste",
+    en: "Included at no cost",
+    fr: "Inclus sans frais",
+    de: "Ohne Aufpreis enthalten"
+  },
+  "Extras opcionales": {
+    es: "Extras opcionales",
+    en: "Optional extras",
+    fr: "Options supplémentaires",
+    de: "Optionale Extras"
+  },
+  "Principales destinos para visitar en campervan": {
+    es: "Principales destinos para visitar en campervan",
+    en: "Top destinations to visit by campervan",
+    fr: "Principales destinations à visiter en camping-car",
+    de: "Top-Reiseziele für Wohnmobilreisen"
+  },
+  "Resuelve tus dudas sobre el alquiler de autocaravanas en": {
+    es: "Resuelve tus dudas sobre el alquiler de autocaravanas en",
+    en: "Get answers about motorhome rental in",
+    fr: "Obtenez des réponses sur la location de camping-car à",
+    de: "Erhalten Sie Antworten zur Wohnmobilvermietung in"
   },
 };
 

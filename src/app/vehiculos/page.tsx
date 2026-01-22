@@ -43,22 +43,22 @@ interface Vehicle {
 
 const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; keywords: string }> = {
   es: {
-    title: "Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
+    title: "Alquiler de Autocaravanas y Campers",
     description: "Descubre nuestra flota de autocaravanas y campers de gran volumen. Vehículos de 2 y 4 plazas, totalmente equipados. Desde 95€/día con kilómetros ilimitados.",
     keywords: "alquiler autocaravanas, alquiler campers, furgonetas camper, motorhomes alquiler, weinsberg, dreamer, knaus",
   },
   en: {
-    title: "Motorhome & Campervan Rentals | Furgocasa Campervans",
+    title: "Motorhome & Campervan Rentals",
     description: "Explore our motorhome and campervan fleet. Fully equipped vehicles from 95€/day with unlimited mileage.",
     keywords: "motorhome rental, campervan rental, camper vans, motorhome hire, furgocasa",
   },
   fr: {
-    title: "Location de Camping-Cars et Vans | Furgocasa",
+    title: "Location de Camping-Cars et Vans",
     description: "Découvrez notre flotte de camping-cars et vans aménagés. Véhicules équipés dès 95€/jour avec kilomètres illimités.",
     keywords: "location camping-car, location van, camping-cars, vans aménagés, furgocasa",
   },
   de: {
-    title: "Wohnmobil & Camper mieten | Furgocasa",
+    title: "Wohnmobil & Camper mieten",
     description: "Entdecke unsere Wohnmobil- und Camperflotte. Voll ausgestattet ab 95€/Tag mit unbegrenzten Kilometern.",
     keywords: "wohnmobil mieten, camper mieten, wohnmobilvermietung, campervan, furgocasa",
   },

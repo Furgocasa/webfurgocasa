@@ -219,6 +219,124 @@ export async function hasTranslation(
 }
 
 /**
+ * Obtiene un campo JSONB traducido de Supabase
+ * El campo se almacena como JSON serializado en translated_text
+ * Si el idioma es español o no hay traducción, devuelve el JSON original
+ */
+export async function getTranslatedJsonField<T>(
+  sourceTable: string,
+  sourceId: string,
+  sourceField: string,
+  locale: Locale,
+  originalJson: T | null
+): Promise<T | null> {
+  // Si es español, devolver original
+  if (locale === 'es' || !locale) {
+    return originalJson;
+  }
+
+  // Si no hay JSON original, devolver null
+  if (!originalJson) {
+    return null;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    
+    const { data, error } = await supabase
+      .from('content_translations')
+      .select('translated_text')
+      .eq('source_table', sourceTable)
+      .eq('source_id', sourceId)
+      .eq('source_field', sourceField)
+      .eq('locale', locale)
+      .single();
+
+    if (error || !data || !data.translated_text) {
+      // Si no hay traducción, devolver original
+      return originalJson;
+    }
+
+    // Parsear el JSON traducido
+    try {
+      return JSON.parse(data.translated_text) as T;
+    } catch {
+      // Si falla el parseo, devolver original
+      console.error('[getTranslatedJsonField] Error parsing JSON:', data.translated_text);
+      return originalJson;
+    }
+  } catch (error) {
+    console.error('[getTranslatedJsonField] Error:', error);
+    return originalJson;
+  }
+}
+
+/**
+ * Obtiene las traducciones de content_sections reconstruyendo el objeto desde subcampos
+ * Las traducciones se guardan como campos separados: content_sections.introduction, content_sections.attractions, etc.
+ * Esta función las combina en un objeto content_sections completo
+ */
+export async function getTranslatedContentSections<T extends Record<string, unknown>>(
+  sourceTable: string,
+  sourceId: string,
+  locale: Locale,
+  originalContentSections: T | null
+): Promise<T | null> {
+  // Si es español, devolver original
+  if (locale === 'es' || !locale) {
+    return originalContentSections;
+  }
+
+  // Si no hay content_sections original, devolver null
+  if (!originalContentSections) {
+    return null;
+  }
+
+  try {
+    const supabase = getSupabaseClient();
+    
+    // Buscar todas las traducciones que empiezan con 'content_sections.'
+    const { data: translations, error } = await supabase
+      .from('content_translations')
+      .select('source_field, translated_text')
+      .eq('source_table', sourceTable)
+      .eq('source_id', sourceId)
+      .eq('locale', locale)
+      .like('source_field', 'content_sections.%');
+
+    if (error || !translations || translations.length === 0) {
+      // Si no hay traducciones, devolver original
+      return originalContentSections;
+    }
+
+    // Crear copia del contenido original
+    const result = { ...originalContentSections } as Record<string, unknown>;
+
+    // Aplicar traducciones a cada subcampo
+    translations.forEach((t: TranslationRecord) => {
+      // Extraer el nombre del subcampo (ej: 'content_sections.introduction' -> 'introduction')
+      const subField = t.source_field.replace('content_sections.', '');
+      
+      if (subField && t.translated_text) {
+        // Intentar parsear como JSON si es un array/objeto (attractions, routes, parking_areas)
+        try {
+          const parsed = JSON.parse(t.translated_text);
+          result[subField] = parsed;
+        } catch {
+          // Si no es JSON válido, usar como string (introduction, gastronomy, practical_tips)
+          result[subField] = t.translated_text;
+        }
+      }
+    });
+
+    return result as T;
+  } catch (error) {
+    console.error('[getTranslatedContentSections] Error:', error);
+    return originalContentSections;
+  }
+}
+
+/**
  * Obtiene el estado de traducción de un registro
  * Útil para mostrar indicadores en el admin
  */

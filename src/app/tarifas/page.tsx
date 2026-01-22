@@ -6,11 +6,11 @@ import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /tarifas
 const TARIFAS_METADATA: Metadata = {
-  title: "Tarifas y Precios de Alquiler de Campers 2026 | Furgocasa",
+  title: "Tarifas y Precios de Alquiler de Campers 2026",
   description: "Consulta las tarifas de alquiler de campers y autocaravanas en Furgocasa. Precios desde 95€/día según temporada. Descuentos por larga estancia y kilómetros ilimitados incluidos.",
   keywords: "tarifas alquiler camper, precios autocaravana, alquiler camper murcia precios, tarifas furgocasa, coste alquiler autocaravana",
   openGraph: {
-    title: "Tarifas de Alquiler de Campers | Furgocasa",
+    title: "Tarifas y Precios de Alquiler de Campers",
     description: "Precios transparentes desde 95€/día. Descuentos hasta -30% por larga estancia. Kilómetros ilimitados incluidos.",
     type: "website",
     siteName: "Furgocasa",
@@ -18,7 +18,7 @@ const TARIFAS_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Tarifas de Alquiler de Campers | Furgocasa",
+    title: "Tarifas y Precios de Alquiler de Campers",
     description: "Precios desde 95€/día. Descuentos hasta -30% por larga estancia.",
   },
   robots: {

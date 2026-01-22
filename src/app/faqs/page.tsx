@@ -6,11 +6,11 @@ import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /faqs
 const FAQS_METADATA: Metadata = {
-  title: "Preguntas Frecuentes sobre Alquiler de Campers | Furgocasa",
+  title: "Preguntas Frecuentes sobre Alquiler de Campers",
   description: "Resuelve tus dudas sobre el alquiler de autocaravanas en Furgocasa. Requisitos, seguros, kilómetros, mascotas, recogida y devolución. Todo lo que necesitas saber.",
   keywords: "preguntas frecuentes alquiler camper, dudas autocaravana, requisitos alquiler camper, faqs furgocasa, información alquiler autocaravana",
   openGraph: {
-    title: "Preguntas Frecuentes | Furgocasa Campervans",
+    title: "Preguntas Frecuentes sobre Alquiler de Campers",
     description: "Resuelve todas tus dudas sobre el alquiler de autocaravanas. Requisitos, seguros, mascotas y más.",
     type: "website",
     siteName: "Furgocasa",
@@ -18,7 +18,7 @@ const FAQS_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Preguntas Frecuentes | Furgocasa Campervans",
+    title: "Preguntas Frecuentes sobre Alquiler de Campers",
     description: "Resuelve tus dudas sobre el alquiler de autocaravanas.",
   },
   robots: {

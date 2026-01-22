@@ -1,8 +1,8 @@
 import { FileText, Download, Eye, CheckCircle, AlertCircle } from"lucide-react";
 
 export const metadata = {
-  title:"Documentación de Alquiler | Furgocasa Campervans",
-  description:"Descarga toda la documentación necesaria para tu alquiler de camper: contrato, condiciones generales, checklist de entrega y más.",
+  title: "Documentación de Alquiler",
+  description: "Descarga toda la documentación necesaria para tu alquiler de camper: contrato, condiciones generales, checklist de entrega y más.",
 };
 
 const documents = [

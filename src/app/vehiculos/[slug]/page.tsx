@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const path = `/vehiculos/${slug}`;
   // ✅ Canonical autorreferenciado usando helper centralizado
   const alternates = buildCanonicalAlternates(path, locale);
-  const title = `${vehicle.name} | Furgocasa`;
+  const title = vehicle.name;
   const description = vehicle.short_description
     || `Alquiler de ${vehicle.name} en Furgocasa. Vehículo totalmente equipado desde ${formatPrice(vehicle.base_price_per_day)}/día.`;
 

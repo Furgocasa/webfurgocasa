@@ -2,8 +2,8 @@ import Link from"next/link";
 import { Play, Car, ArrowRight, Calendar, Gauge, Euro } from"lucide-react";
 
 export const metadata = {
-  title:"Videos de Campers en Venta | Furgocasa Campervans",
-  description:"Mira los videos de nuestras campers y autocaravanas en venta. Recorrido completo interior y exterior de cada vehículo.",
+  title: "Videos de Campers en Venta",
+  description: "Mira los videos de nuestras campers y autocaravanas en venta. Recorrido completo interior y exterior de cada vehículo.",
 };
 
 // TODO: Cargar desde Supabase/YouTube API

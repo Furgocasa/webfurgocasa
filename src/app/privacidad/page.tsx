@@ -4,7 +4,7 @@ import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 import type { Locale } from"@/lib/i18n/config";
 
 const PRIVACIDAD_METADATA: Metadata = {
-  title:"Política de Privacidad y Protección de Datos | Furgocasa",
+  title: "Política de Privacidad",
   description:"Política de privacidad y protección de datos de Furgocasa S.L. Información sobre cómo tratamos y protegemos tus datos personales según RGPD.",
   keywords:"politica privacidad furgocasa, proteccion datos, rgpd, lopd, privacidad datos personales",
   robots: {

@@ -54,12 +54,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const alternates = buildCanonicalAlternates('/', locale);
   
   return {
-    title: `${t("Las Mejores Campers en Alquiler")} | ${t("Desde 95€/día")} | Furgocasa`,
+    title: `${t("Las Mejores Campers en Alquiler")} - ${t("Desde 95€/día")}`,
     description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
     keywords:"alquiler camper, autocaravana alquiler, alquiler furgoneta camper, motorhome españa, campervan alquiler, casa rodante, alquiler autocaravana españa",
     authors: [{ name:"Furgocasa" }],
     openGraph: {
-      title: `Furgocasa | ${t("Las Mejores Campers en Alquiler")}`,
+      title: `${t("Las Mejores Campers en Alquiler")}`,
       description: `${t("Tu hotel 5 estrellas sobre ruedas")}. ${t("Flota premium desde 95€/día con kilómetros ilimitados")}. Dreamer, Knaus, Weinsberg.`,
       type:"website",
       url: alternates.canonical,
@@ -93,7 +93,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card:"summary_large_image",
       site:"@furgocasa",
       creator:"@furgocasa",
-      title: `Furgocasa | ${t("Las Mejores Campers en Alquiler")}`,
+      title: `${t("Las Mejores Campers en Alquiler")}`,
       description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Kilómetros ilimitados, equipamiento completo")}.`,
       images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
     },

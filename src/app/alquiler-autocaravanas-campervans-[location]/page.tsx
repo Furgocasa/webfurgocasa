@@ -50,8 +50,8 @@ export async function generateMetadata({
 
   if (!location) {
     return {
-      title:"Ubicación no encontrada | Furgocasa",
-      description:"La ubicación que buscas no existe."
+      title: "Ubicación no encontrada",
+      description: "La ubicación que buscas no existe."
     };
   }
 
@@ -76,12 +76,12 @@ export async function generateMetadata({
   };
   
   return {
-    title: location.meta_title || `${t("Alquiler de Campers en")} ${location.name} | ${t("Desde 95€/día")} | Furgocasa`,
+    title: location.meta_title || `${t("Alquiler de Campers en")} ${location.name}`,
     description: location.meta_description || `${t("Alquiler de autocaravanas y campers cerca de")} ${location.name}, ${location.province}. ${distanceInfo}. ${t("Flota premium con kilómetros ilimitados")}. ${t("¡Reserva ahora!")}`,
     keywords: `alquiler camper ${location.name}, autocaravana ${location.name}, motorhome ${location.province}, alquiler furgoneta camper ${location.region}, casa rodante ${location.name}`,
     authors: [{ name:"Furgocasa" }],
     openGraph: {
-      title: `${t("Alquiler de Autocaravanas")} ${t("en")} ${location.name} | Furgocasa`,
+      title: `${t("Alquiler de Autocaravanas")} ${t("en")} ${location.name}`,
       description: `${t("Alquiler de autocaravanas y campers cerca de")} ${location.name}. ${distanceInfo ? distanceInfo + '.' : ''} ${t("Flota premium desde 95€/día con kilómetros ilimitados")}.`,
       type:"website",
       url: alternates.canonical,

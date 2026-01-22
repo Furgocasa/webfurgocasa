@@ -152,7 +152,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   // Validación: si no hay locationParam, devolver metadata por defecto
   if (!locationParam) {
     return {
-      title: 'Ubicación no especificada | Furgocasa Campervans',
+      title: 'Ubicación no especificada',
       description: 'La ubicación solicitada no está disponible.',
       robots: {
         index: false,
@@ -166,7 +166,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   // Si después de extraer el slug está vacío, también retornar
   if (!citySlug) {
     return {
-      title: 'Ubicación no encontrada | Furgocasa Campervans',
+      title: 'Ubicación no encontrada',
       description: 'La ubicación solicitada no está disponible.',
       robots: {
         index: false,
@@ -184,7 +184,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 
   if (!location) {
     return {
-      title: 'Ubicación no encontrada | Furgocasa Campervans',
+      title: 'Ubicación no encontrada',
       description: 'La ubicación solicitada no está disponible.',
       robots: {
         index: false,
@@ -209,7 +209,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 
   return {
     // ✅ TÍTULO SEO optimizado (50-60 caracteres)
-    title: location.meta_title || `Venta de Autocaravanas en ${location.name} | Furgocasa`,
+    title: location.meta_title || `Venta de Autocaravanas en ${location.name}`,
     
     // ✅ DESCRIPCIÓN SEO (150-160 caracteres)
     description: location.meta_description || `Compra tu autocaravana o camper en ${location.name}, ${location.province}. Vehículos premium con garantía, financiación disponible. Entrega cerca de ti.`,
@@ -252,7 +252,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
       card: 'summary_large_image',
       site: '@furgocasa',
       creator: '@furgocasa',
-      title: `Autocaravanas en Venta ${location.name} | Furgocasa`,
+      title: `Autocaravanas en Venta en ${location.name}`,
       description: `Compra tu autocaravana en ${location.name}. Vehículos premium, garantía y financiación.`,
       images: [ogImage],
     },

@@ -57,11 +57,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 
   return {
-    title: `${meta.name} | Blog de Viajes en Camper | Furgocasa`,
+    title: `${meta.name} - Blog Camper`,
     description: meta.description,
     keywords: `blog camper ${category}, artículos ${category}, viajes camper, furgocasa blog`,
     openGraph: {
-      title: `${meta.name} | Blog Furgocasa`,
+      title: `${meta.name} - Blog Camper`,
       description: meta.description,
       type: "website",
       url: alternates.canonical,
@@ -70,7 +70,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary",
-      title: `${meta.name} | Blog Furgocasa`,
+      title: `${meta.name} - Blog Camper`,
       description: meta.description,
     },
     alternates,

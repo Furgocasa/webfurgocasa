@@ -9,6 +9,7 @@ import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
 import { translateServer, getLocaleFromPath } from"@/lib/i18n/server-translation";
 import { getTranslatedRoute } from"@/lib/route-translations";
 import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+import { getTranslatedContent, getTranslatedContentSections, getTranslatedRecords, type Locale } from"@/lib/translations/get-translations";
 import Image from"next/image";
 import { 
   CheckCircle,
@@ -243,16 +244,16 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 
     if (!location) {
       return {
-        title: t('Ubicación no encontrada | Furgocasa Campervans'),
+        title: t('Ubicación no encontrada'),
         description: t('La ubicación solicitada no está disponible.'),
       };
     }
 
     return {
-      title: location.meta_title || `${t('Alquiler de Autocaravanas en')} ${location.name} ${t('| Furgocasa Campervans')}`,
+      title: location.meta_title || `${t('Alquiler de Autocaravanas en')} ${location.name}`,
       description: location.meta_description || `${t('Alquila tu autocaravana camper en')} ${location.name}, ${location.province}. ${t('Las mejores campers de gran volumen. Reserva online con Furgocasa.')}`,
       openGraph: {
-        title: location.meta_title || `${t('Alquiler de Autocaravanas en')} ${location.name} ${t('| Furgocasa Campervans')}`,
+        title: location.meta_title || `${t('Alquiler de Autocaravanas en')} ${location.name}`,
         description: location.meta_description || `${t('Alquila tu autocaravana camper en')} ${location.name}`,
         type: 'website',
         locale: locale === 'es' ? 'es_ES' : locale === 'en' ? 'en_US' : locale === 'fr' ? 'fr_FR' : 'de_DE',
@@ -271,7 +272,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
 
   if (!saleLocation) {
     return {
-      title: t('Ubicación no encontrada | Furgocasa Campervans'),
+      title: t('Ubicación no encontrada'),
       description: t('La ubicación solicitada no está disponible.'),
       robots: { index: false, follow: false },
     };
@@ -284,7 +285,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   const ogImage = saleLocation.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
 
   return {
-    title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name} ${t('| Furgocasa')}`,
+    title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name}`,
     description: saleLocation.meta_description || `${t('Compra tu autocaravana o camper en')} ${saleLocation.name}, ${saleLocation.province}. ${t('Vehículos premium con garantía y financiación. Entrega cerca de ti.')}`,
     openGraph: {
       title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name}`,
@@ -615,18 +616,69 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
   }
   
   // ✅ Cargar TODOS los datos en paralelo en el servidor
-  const [locationData, featuredVehicles, blogArticles] = await Promise.all([
+  const [locationDataRaw, featuredVehiclesRaw, blogArticlesRaw] = await Promise.all([
     loadRentalLocationData(locationParam),
     loadFeaturedVehicles(),
     loadBlogArticles(),
   ]);
 
-  if (!locationData) {
+  if (!locationDataRaw) {
     notFound(); // ✅ Usar notFound() de Next.js para un manejo correcto de 404
   }
 
+  // 🌐 APLICAR TRADUCCIONES desde content_translations
+  // Traducir campos de texto simples
+  const translatedTextFields = await getTranslatedContent(
+    'location_targets',
+    locationDataRaw.id,
+    ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
+    locale,
+    {
+      name: locationDataRaw.name,
+      h1_title: locationDataRaw.h1_title,
+      meta_title: locationDataRaw.meta_title,
+      meta_description: locationDataRaw.meta_description,
+      intro_text: locationDataRaw.intro_text,
+    }
+  );
+
+  // Traducir campo JSONB content_sections (reconstruyendo desde subcampos)
+  const translatedContentSections = await getTranslatedContentSections(
+    'location_targets',
+    locationDataRaw.id,
+    locale,
+    locationDataRaw.content_sections
+  );
+
+  // Combinar datos originales con traducciones
+  const locationData: LocationData = {
+    ...locationDataRaw,
+    name: translatedTextFields.name || locationDataRaw.name,
+    h1_title: translatedTextFields.h1_title || locationDataRaw.h1_title,
+    meta_title: translatedTextFields.meta_title || locationDataRaw.meta_title,
+    meta_description: translatedTextFields.meta_description || locationDataRaw.meta_description,
+    intro_text: translatedTextFields.intro_text || locationDataRaw.intro_text,
+    content_sections: translatedContentSections || locationDataRaw.content_sections,
+  };
+
+  // 🌐 Aplicar traducciones a vehículos destacados
+  const featuredVehicles = await getTranslatedRecords(
+    'vehicles',
+    featuredVehiclesRaw,
+    ['name', 'short_description'],
+    locale
+  );
+
+  // 🌐 Aplicar traducciones a posts del blog
+  const blogArticles = await getTranslatedRecords(
+    'posts',
+    blogArticlesRaw,
+    ['title', 'excerpt'],
+    locale
+  );
+
   // Determinar si tiene oficina física
-  const hasOffice = locationData.name === 'Murcia' || locationData.name === 'Madrid';
+  const hasOffice = locationDataRaw.name === 'Murcia' || locationDataRaw.name === 'Madrid';
 
   // Mapeo de imágenes hero de alta calidad por ciudad
   const LOCATION_HERO_IMAGES: Record<string, string> = {

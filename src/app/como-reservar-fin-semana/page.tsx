@@ -2,8 +2,8 @@ import { LocalizedLink } from"@/components/localized-link";
 import { Calendar, Clock, CheckCircle, ArrowRight, AlertCircle, Phone, Euro } from"lucide-react";
 
 export const metadata = {
-  title:"Cómo reservar un fin de semana | Furgocasa Campervans",
-  description:"Guía completa para alquilar una camper de fin de semana. Horarios, precios y condiciones especiales para escapadas cortas.",
+  title: "Cómo Reservar un Fin de Semana",
+  description: "Guía completa para alquilar una camper de fin de semana. Horarios, precios y condiciones especiales para escapadas cortas.",
 };
 
 const steps = [

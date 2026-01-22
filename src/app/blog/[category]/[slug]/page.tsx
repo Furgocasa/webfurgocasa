@@ -41,8 +41,8 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title:"Artículo no encontrado | Furgocasa",
-      description:"El artículo que buscas no existe o ha sido eliminado."
+      title: "Artículo no encontrado",
+      description: "El artículo que buscas no existe o ha sido eliminado."
     };
   }
 
@@ -50,7 +50,7 @@ export async function generateMetadata({
   const alternates = buildCanonicalAlternates(`/blog/${params.category}/${params.slug}`, locale);
   
   return {
-    title: post.meta_title || `${post.title} | Furgocasa Blog`,
+    title: post.meta_title || post.title,
     description: post.meta_description || post.excerpt || post.title,
     authors: [{ name:"Furgocasa" }],
     keywords: post.tags?.map(tag => tag.name).join(","),
