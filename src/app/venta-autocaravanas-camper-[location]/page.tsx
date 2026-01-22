@@ -186,7 +186,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   // NOTA: La tabla sale_location_targets NO tiene columna featured_image
   const { data: location, error } = await supabase
     .from('sale_location_targets')
-    .select('name, province, region, meta_title, meta_description, lat, lng')
+    .select('name, province, region, meta_title, meta_description')
     .eq('slug', citySlug)
     .eq('is_active', true)
     .single();
