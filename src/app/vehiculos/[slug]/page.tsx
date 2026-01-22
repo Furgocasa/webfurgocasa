@@ -7,7 +7,7 @@ import { getVehicleBySlug } from"@/lib/supabase/queries";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
 import { translateServer } from"@/lib/i18n/server-translation";
-import { formatPrice } from"@/lib/utils";
+import { formatPrice, sortVehicleEquipment } from"@/lib/utils";
 import type { Locale } from"@/lib/i18n/config";
 import { getTranslatedRoute } from"@/lib/route-translations";
 import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
@@ -129,7 +129,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
               {/* Equipamiento dinámico */}
               <div className="bg-white rounded-xl md:rounded-2xl shadow-sm p-4 md:p-6">
                 <VehicleEquipmentDisplay
-                  equipment={(vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []}
+                  equipment={sortVehicleEquipment((vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || [])}
                   variant="grid"
                   groupByCategory={true}
                   title={t("Equipamiento")}

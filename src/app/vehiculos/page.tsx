@@ -6,6 +6,7 @@ import { LocalizedLink } from"@/components/localized-link";
 import { Car } from"lucide-react";
 import { translateServer } from"@/lib/i18n/server-translation";
 import { generateMultilingualMetadata } from"@/lib/seo/multilingual-metadata";
+import { sortVehicleEquipment } from "@/lib/utils";
 import type { Locale } from"@/lib/i18n/config";
 
 // ✅ Supabase cliente servidor
@@ -113,7 +114,7 @@ async function loadVehicles(): Promise<Vehicle[]> {
         ...vehicle,
         main_image: mainImage,
         images: imageUrls,
-        vehicle_equipment: (vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []
+        vehicle_equipment: sortVehicleEquipment((vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || [])
       };
     }) || [];
 

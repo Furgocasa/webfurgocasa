@@ -8,7 +8,7 @@ import {
 } from"lucide-react";
 import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
 import { createClient } from"@/lib/supabase/server";
-import { formatPrice } from"@/lib/utils";
+import { formatPrice, sortVehicleEquipment } from"@/lib/utils";
 
 export const dynamic ="force-dynamic";
 export const revalidate = 0;
@@ -179,7 +179,7 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
               {(vehicle as any).vehicle_equipment && (vehicle as any).vehicle_equipment.length > 0 && (
                 <div className="bg-white rounded-xl md:rounded-2xl shadow-sm p-4 md:p-6">
                   <VehicleEquipmentDisplay
-                    equipment={(vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []}
+                    equipment={sortVehicleEquipment((vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || [])}
                     variant="grid"
                     groupByCategory={true}
                     title="Equipamiento"

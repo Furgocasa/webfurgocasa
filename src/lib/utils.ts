@@ -315,3 +315,42 @@ export function calculateSeasonalSurcharge(avgPricePerDay: number, pricingDays: 
   const basePricePerDay = pricingDays >= 21 ? 65 : pricingDays >= 14 ? 75 : pricingDays >= 7 ? 85 : 95;
   return Math.round((avgPricePerDay - basePricePerDay) * 100) / 100;
 }
+
+/**
+ * Sort vehicle equipment by category and sort_order
+ * Matches the order in the admin panel
+ */
+export function sortVehicleEquipment(equipment: any[]) {
+  const categoryOrder: Record<string, number> = {
+    'confort': 1,
+    'energia': 2,
+    'exterior': 3,
+    'multimedia': 4,
+    'seguridad': 5,
+    'agua': 6,
+    'general': 7
+  };
+
+  return [...equipment].sort((a, b) => {
+    // 1. Sort by category
+    const catA = categoryOrder[a.category] || 99;
+    const catB = categoryOrder[b.category] || 99;
+    
+    if (catA !== catB) {
+      return catA - catB;
+    }
+    
+    // 2. Sort by sort_order (if available)
+    // Some equipment might not have sort_order set, treat as 0 or max?
+    // In admin panel it uses sort_order which defaults to something.
+    const orderA = a.sort_order !== undefined && a.sort_order !== null ? a.sort_order : 0;
+    const orderB = b.sort_order !== undefined && b.sort_order !== null ? b.sort_order : 0;
+    
+    if (orderA !== orderB) {
+      return orderA - orderB;
+    }
+    
+    // 3. Sort by name
+    return (a.name || '').localeCompare(b.name || '');
+  });
+}

@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { VentasClient } from "./ventas-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { sortVehicleEquipment } from "@/lib/utils";
 import type { Locale } from "@/lib/i18n/config";
 
 // ✅ Supabase cliente servidor (igual que /vehiculos)
@@ -105,9 +106,9 @@ async function loadVehiclesForSale() {
         category: Array.isArray(vehicle.category) ? vehicle.category[0] : vehicle.category,
         main_image: sortedImages.find((img: any) => img.is_primary) || sortedImages[0],
         sale_highlights: vehicle.sale_highlights || [],
-        vehicle_equipment: ((vehicle as any).vehicle_equipment || [])
+        vehicle_equipment: sortVehicleEquipment(((vehicle as any).vehicle_equipment || [])
           .map((ve: any) => ve?.equipment)
-          .filter((eq: any) => eq != null)
+          .filter((eq: any) => eq != null))
       };
     });
 
