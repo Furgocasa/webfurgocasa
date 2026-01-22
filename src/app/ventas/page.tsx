@@ -1,8 +1,11 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { VentasClient } from "./ventas-client";
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /ventas
-export const metadata: Metadata = {
+const VENTAS_METADATA: Metadata = {
   title: "Autocaravanas y Campers en Venta | Ocasión y Segunda Mano | Furgocasa",
   description: "Compra tu autocaravana o camper de ocasión en Furgocasa. Vehículos de nuestra flota, revisados con garantía. Historial completo conocido. Financiación disponible.",
   keywords: "comprar autocaravana, camper segunda mano, venta autocaravana ocasión, camper usado, comprar camper murcia, autocaravana ocasión garantía",
@@ -10,7 +13,6 @@ export const metadata: Metadata = {
     title: "Autocaravanas y Campers en Venta | Furgocasa",
     description: "Vehículos de nuestra flota, revisados con garantía. Historial completo conocido.",
     type: "website",
-    url: "https://www.furgocasa.com/es/ventas",
     siteName: "Furgocasa",
     locale: "es_ES",
   },
@@ -18,16 +20,6 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Autocaravanas y Campers en Venta | Furgocasa",
     description: "Vehículos revisados con garantía. Historial completo.",
-  },
-  alternates: {
-    canonical: "https://www.furgocasa.com/es/ventas",
-    languages: {
-      'es': 'https://www.furgocasa.com/es/ventas',
-      'en': 'https://www.furgocasa.com/en/ventas',
-      'fr': 'https://www.furgocasa.com/fr/ventas',
-      'de': 'https://www.furgocasa.com/de/ventas',
-      'x-default': 'https://www.furgocasa.com/es/ventas',
-    },
   },
   robots: {
     index: true,
@@ -41,6 +33,21 @@ export const metadata: Metadata = {
     },
   },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates('/ventas', locale);
+
+  return {
+    ...VENTAS_METADATA,
+    alternates,
+    openGraph: {
+      ...(VENTAS_METADATA.openGraph || {}),
+      url: alternates.canonical,
+    },
+  };
+}
 
 export default function VentasPage() {
   return <VentasClient />;

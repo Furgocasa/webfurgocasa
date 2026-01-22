@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Rubik, Amiko } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -12,6 +13,7 @@ import { AnalyticsDebug } from "@/components/analytics-debug";
 import { AnalyticsScripts } from "@/components/analytics-scripts";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import Script from "next/script";
+import { i18n, isValidLocale } from "@/lib/i18n/config";
 
 // Rubik - Para títulos y headings
 const rubik = Rubik({ 
@@ -29,8 +31,10 @@ const amiko = Amiko({
   display: "swap",
 });
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.furgocasa.com";
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "https://www.furgocasa.com"),
+  metadataBase: new URL(baseUrl),
   title: {
     default: "Furgocasa Campervans | Alquiler de Campers y Autocaravanas en Murcia",
     template: "%s | Furgocasa",
@@ -67,7 +71,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "es_ES",
-    url: "https://www.furgocasa.com",
+    url: baseUrl,
     siteName: "Furgocasa",
     title: "Furgocasa | Las Mejores Campers y Autocaravanas en Alquiler",
     description:
@@ -122,8 +126,12 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = headers();
+  const detectedLocale = headersList.get("x-detected-locale") || i18n.defaultLocale;
+  const htmlLang = isValidLocale(detectedLocale) ? detectedLocale : i18n.defaultLocale;
+
   return (
-    <html lang="es" suppressHydrationWarning>
+    <html lang={htmlLang} suppressHydrationWarning>
       <head>
         {/* Facebook Pixel - Solo si está configurado */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (

@@ -1,8 +1,11 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { FaqsClient } from "./faqs-client";
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /faqs
-export const metadata: Metadata = {
+const FAQS_METADATA: Metadata = {
   title: "Preguntas Frecuentes sobre Alquiler de Campers | Furgocasa",
   description: "Resuelve tus dudas sobre el alquiler de autocaravanas en Furgocasa. Requisitos, seguros, kilómetros, mascotas, recogida y devolución. Todo lo que necesitas saber.",
   keywords: "preguntas frecuentes alquiler camper, dudas autocaravana, requisitos alquiler camper, faqs furgocasa, información alquiler autocaravana",
@@ -10,7 +13,6 @@ export const metadata: Metadata = {
     title: "Preguntas Frecuentes | Furgocasa Campervans",
     description: "Resuelve todas tus dudas sobre el alquiler de autocaravanas. Requisitos, seguros, mascotas y más.",
     type: "website",
-    url: "https://www.furgocasa.com/es/faqs",
     siteName: "Furgocasa",
     locale: "es_ES",
   },
@@ -18,16 +20,6 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Preguntas Frecuentes | Furgocasa Campervans",
     description: "Resuelve tus dudas sobre el alquiler de autocaravanas.",
-  },
-  alternates: {
-    canonical: "https://www.furgocasa.com/es/faqs",
-    languages: {
-      'es': 'https://www.furgocasa.com/es/faqs',
-      'en': 'https://www.furgocasa.com/en/faqs',
-      'fr': 'https://www.furgocasa.com/fr/faqs',
-      'de': 'https://www.furgocasa.com/de/faqs',
-      'x-default': 'https://www.furgocasa.com/es/faqs',
-    },
   },
   robots: {
     index: true,
@@ -41,6 +33,21 @@ export const metadata: Metadata = {
     },
   },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates('/faqs', locale);
+
+  return {
+    ...FAQS_METADATA,
+    alternates,
+    openGraph: {
+      ...(FAQS_METADATA.openGraph || {}),
+      url: alternates.canonical,
+    },
+  };
+}
 
 export default function FaqsPage() {
   return <FaqsClient />;

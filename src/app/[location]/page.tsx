@@ -7,6 +7,8 @@ import { BlogArticleLink } from"@/components/blog/blog-article-link";
 import { LocalizedLink } from"@/components/localized-link";
 import { SaleLocationJsonLd } from"@/components/locations/sale-location-jsonld";
 import { translateServer, getLocaleFromPath } from"@/lib/i18n/server-translation";
+import { getTranslatedRoute } from"@/lib/route-translations";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 import Image from"next/image";
 import { 
   CheckCircle,
@@ -275,8 +277,10 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.furgocasa.com';
-  const pageUrl = `${baseUrl}/es/venta-autocaravanas-camper-${citySlug}`;
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
+  const baseUrl = 'https://www.furgocasa.com';
+  const path = `/venta-autocaravanas-camper-${citySlug}`;
+  const alternates = buildCanonicalAlternates(path, locale);
   const ogImage = saleLocation.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
 
   return {
@@ -286,7 +290,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
       title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name}`,
       description: saleLocation.meta_description || `${t('Compra tu autocaravana en')} ${saleLocation.name}. ${t('Vehículos premium con garantía.')}`,
       type: 'website',
-      url: pageUrl,
+      url: alternates.canonical,
       siteName: 'Furgocasa - Venta de Autocaravanas',
       images: [
         {
@@ -300,9 +304,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
       locale: locale === 'es' ? 'es_ES' : locale === 'en' ? 'en_US' : locale === 'fr' ? 'fr_FR' : 'de_DE',
       countryName: 'España',
     },
-    alternates: {
-      canonical: pageUrl,
-    },
+    alternates,
     robots: {
       index: true,
       follow: true,

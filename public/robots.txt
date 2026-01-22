@@ -21,10 +21,24 @@ Disallow: /de/administrator/
 # ⚠️ BLOQUEADO: Páginas de búsqueda (contenido dinámico, sin valor SEO)
 Disallow: /buscar
 Disallow: /*/buscar
+Disallow: /search
+Disallow: /*/search
+Disallow: /recherche
+Disallow: /*/recherche
+Disallow: /suche
+Disallow: /*/suche
 
 # ⚠️ BLOQUEADO: Páginas de pago (privadas, transaccionales)
 Disallow: /pago/
 Disallow: /*/pago/
+Disallow: /checkout/
+Disallow: /*/checkout/
+Disallow: /gracias/
+Disallow: /*/gracias/
+Disallow: /preview/
+Disallow: /*/preview/
+Disallow: /draft/
+Disallow: /*/draft/
 
 # ⚠️ BLOQUEADO: API endpoints
 Disallow: /api/

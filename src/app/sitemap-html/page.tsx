@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:"Mapa del sitio en HTML con todas las URLs públicas.",
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||"https://www.furgocasa.com";
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL ||"https://www.furgocasa.com";
 
 type CategoryRow = {
   slug: string;

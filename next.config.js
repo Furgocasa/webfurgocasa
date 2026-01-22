@@ -194,6 +194,16 @@ const nextConfig = {
           },
         ],
       },
+      // Headers de caché para imágenes optimizadas de Next.js (proxies de Supabase)
+      {
+        source: '/_next/image',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
     ];
   },
   async rewrites() {

@@ -9,6 +9,7 @@ import { ShareButtons } from"@/components/blog/share-buttons";
 import { BlogPostJsonLd } from"@/components/blog/blog-post-jsonld";
 import { getTranslatedContent, type Locale } from"@/lib/translations/get-translations";
 import { translateServer } from"@/lib/i18n/server-translation";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 
 // ⚡ ISR: Revalidar cada hora
 export const revalidate = 3600;
@@ -32,6 +33,8 @@ export async function generateMetadata({
 }: { 
   params: { category: string; slug: string } 
 }): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const post = await getPostBySlug(params.slug, params.category);
 
   if (!post) {
@@ -41,9 +44,8 @@ export async function generateMetadata({
     };
   }
 
-  // ⚠️ IMPORTANTE: URLs canónicas SIEMPRE con www y prefijo /es/
-  const baseUrl = 'https://www.furgocasa.com';
-  const esUrl = `${baseUrl}/es/blog/${params.category}/${params.slug}`;
+  // ✅ Canonical autorreferenciado: ruta sin prefijo de idioma (el helper lo añade)
+  const alternates = buildCanonicalAlternates(`/blog/${params.category}/${params.slug}`, locale);
   
   return {
     title: post.meta_title || `${post.title} | Furgocasa Blog`,
@@ -54,7 +56,7 @@ export async function generateMetadata({
       title: post.title,
       description: post.excerpt || post.meta_description ||"",
       type:"article",
-      url: esUrl,
+      url: alternates.canonical,
       images: post.featured_image ? [
         {
           url: post.featured_image,
@@ -76,14 +78,7 @@ export async function generateMetadata({
       images: post.featured_image ? [post.featured_image] : [],
       creator:"@furgocasa",
     },
-    alternates: {
-      canonical: esUrl,
-      languages: {
-        'es': esUrl,
-        // TODO: Cuando se traduzcan los artículos, añadir URLs en otros idiomas
-        'x-default': esUrl,
-      },
-    },
+    alternates,
     robots: {
       index: true,
       follow: true,

@@ -1,8 +1,11 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { OfertasClient } from "./ofertas-client";
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /ofertas
-export const metadata: Metadata = {
+const OFERTAS_METADATA: Metadata = {
   title: "Ofertas y Descuentos en Alquiler de Campers | Furgocasa",
   description: "Aprovecha nuestras ofertas especiales en alquiler de autocaravanas. Descuentos de temporada, códigos promocionales y precios especiales para tu próxima aventura camper.",
   keywords: "ofertas alquiler camper, descuentos autocaravana, promociones furgocasa, alquiler camper barato, ofertas última hora camper",
@@ -10,7 +13,6 @@ export const metadata: Metadata = {
     title: "Ofertas en Alquiler de Campers | Furgocasa",
     description: "Descuentos especiales en alquiler de autocaravanas. ¡Aprovecha nuestras promociones de temporada!",
     type: "website",
-    url: "https://www.furgocasa.com/es/ofertas",
     siteName: "Furgocasa",
     locale: "es_ES",
   },
@@ -18,16 +20,6 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Ofertas en Alquiler de Campers | Furgocasa",
     description: "Descuentos especiales en alquiler de autocaravanas.",
-  },
-  alternates: {
-    canonical: "https://www.furgocasa.com/es/ofertas",
-    languages: {
-      'es': 'https://www.furgocasa.com/es/ofertas',
-      'en': 'https://www.furgocasa.com/en/ofertas',
-      'fr': 'https://www.furgocasa.com/fr/ofertas',
-      'de': 'https://www.furgocasa.com/de/ofertas',
-      'x-default': 'https://www.furgocasa.com/es/ofertas',
-    },
   },
   robots: {
     index: true,
@@ -41,6 +33,21 @@ export const metadata: Metadata = {
     },
   },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates('/ofertas', locale);
+
+  return {
+    ...OFERTAS_METADATA,
+    alternates,
+    openGraph: {
+      ...(OFERTAS_METADATA.openGraph || {}),
+      url: alternates.canonical,
+    },
+  };
+}
 
 export default function OfertasPage() {
   return <OfertasClient />;

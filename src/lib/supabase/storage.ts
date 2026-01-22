@@ -150,10 +150,11 @@ export async function uploadFile(
       : `${timestamp}-${randomString}.${extension}`;
 
     // Subir archivo
+    // Cache-Control: 30 días (2592000 segundos) para imágenes estáticas
     const { data, error } = await supabaseClient.storage
       .from(bucket)
       .upload(fileName, fileToUpload, {
-        cacheControl: '3600',
+        cacheControl: '2592000',
         upsert: false,
       });
 

@@ -14,6 +14,8 @@ import { LocalizedLink } from"@/components/localized-link";
 import { translateServer } from"@/lib/i18n/server-translation";
 import { getTranslatedContent } from"@/lib/translations/get-translations";
 import type { Locale } from"@/lib/i18n/config";
+import { getTranslatedRoute } from"@/lib/route-translations";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 import { 
   MapPin, 
   Clock, 
@@ -59,8 +61,11 @@ export async function generateMetadata({
   const t = (key: string) => translateServer(key, locale);
 
   const distanceInfo = formatDistanceInfo(location);
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
   const baseUrl = 'https://www.furgocasa.com';
-  const url = `${baseUrl}/${locale}/alquiler-autocaravanas-campervans-${location.slug}`;
+  const path = `/alquiler-autocaravanas-campervans-${location.slug}`;
+  // ✅ Canonical autorreferenciado usando helper centralizado
+  const alternates = buildCanonicalAlternates(path, locale);
   
   // Locale para OpenGraph
   const ogLocales: Record<string, string> = {
@@ -79,7 +84,7 @@ export async function generateMetadata({
       title: `${t("Alquiler de Autocaravanas")} ${t("en")} ${location.name} | Furgocasa`,
       description: `${t("Alquiler de autocaravanas y campers cerca de")} ${location.name}. ${distanceInfo ? distanceInfo + '.' : ''} ${t("Flota premium desde 95€/día con kilómetros ilimitados")}.`,
       type:"website",
-      url: url,
+      url: alternates.canonical,
       siteName: t("Furgocasa - Alquiler de Autocaravanas"),
       images: [
         {
@@ -107,16 +112,7 @@ export async function generateMetadata({
       description: `${t("Alquiler de autocaravanas y campers cerca de")} ${location.name}. ${t("Kilómetros ilimitados, equipamiento completo")}.`,
       images: [location.hero_image ||"https://www.furgocasa.com/images/slides/hero-01.webp"],
     },
-    alternates: {
-      canonical: url,
-      languages: {
-        'es': `${baseUrl}/es/alquiler-autocaravanas-campervans-${location.slug}`,
-        'en': `${baseUrl}/en/alquiler-autocaravanas-campervans-${location.slug}`,
-        'fr': `${baseUrl}/fr/alquiler-autocaravanas-campervans-${location.slug}`,
-        'de': `${baseUrl}/de/alquiler-autocaravanas-campervans-${location.slug}`,
-        'x-default': `${baseUrl}/es/alquiler-autocaravanas-campervans-${location.slug}`,
-      },
-    },
+    alternates,
     robots: {
       index: true,
       follow: true,

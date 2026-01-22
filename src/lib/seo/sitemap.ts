@@ -1,59 +1,119 @@
-import { MetadataRoute } from 'next';
 import { createClient } from '@supabase/supabase-js';
-import { i18n, type Locale } from '@/lib/i18n/config';
 import { getTranslatedRoute } from '@/lib/route-translations';
+import type { Locale } from '@/lib/i18n/config';
 
-/**
- * SITEMAP SEO MULTIIDIOMA - MODELO CORRECTO
- * ==========================================
- * 
- * ⚠️ IMPORTANTE - NO CAMBIAR ESTA CONFIGURACIÓN ⚠️
- * 
- * Este sitemap genera URLs CON prefijo de idioma para TODOS los idiomas:
- * - Español (/es/)
- * - Inglés (/en/)
- * - Francés (/fr/)
- * - Alemán (/de/)
- * 
- * ¿Por qué incluir todos los idiomas?
- * 1. Permite que clientes internacionales encuentren el sitio en su idioma
- * 2. Mejora el SEO internacional (Google indexa todas las versiones)
- * 3. Cada URL tiene hreflang alternates para conectar versiones de idioma
- * 
- * Estructura correcta:
- * - Español:  https://www.furgocasa.com/es/blog/rutas
- * - Inglés:   https://www.furgocasa.com/en/blog/routes
- * - Francés:  https://www.furgocasa.com/fr/blog/itineraires
- * - Alemán:   https://www.furgocasa.com/de/blog/routen
- * 
- * Las URLs SIN prefijo de idioma se redirigen automáticamente a /es/ vía middleware.
- * 
- * Documentación completa: /SEO-MULTIIDIOMA-MODELO.md
- */
+type SitemapEntry = {
+  path: string;
+  lastModified?: string | Date;
+  changeFrequency?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
+  priority?: number;
+};
 
-// Idiomas soportados
-const locales: Locale[] = i18n.locales as unknown as Locale[];
+type CategoryRow = { slug: string; name?: string | null };
+type PostRow = {
+  slug: string;
+  updated_at?: string | null;
+  published_at?: string | null;
+  category?: CategoryRow | CategoryRow[] | null;
+};
+type VehicleRow = { slug: string; updated_at?: string | null };
+type LocationRow = { slug: string; updated_at?: string | null };
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Usar cliente público para sitemap generation
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL
+  || process.env.NEXT_PUBLIC_APP_URL
+  || 'https://www.furgocasa.com';
+
+const LOCALES: Locale[] = ['es', 'en', 'fr', 'de'];
+
+function escapeXml(value: string) {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
+}
+
+function normalizeDate(dateValue?: string | Date) {
+  if (!dateValue) return new Date().toISOString();
+  const date = typeof dateValue === 'string' ? new Date(dateValue) : dateValue;
+  return date.toISOString();
+}
+
+export function buildLocalizedUrl(path: string, locale: Locale) {
+  return `${BASE_URL}${getTranslatedRoute(path, locale)}`;
+}
+
+export function buildAlternateLinks(path: string) {
+  const links = LOCALES.map((locale) => ({
+    locale,
+    url: buildLocalizedUrl(path, locale),
+  }));
+
+  links.push({
+    locale: 'x-default' as const,
+    url: buildLocalizedUrl(path, 'es'),
+  });
+
+  return links;
+}
+
+export function buildSitemapXml(entries: SitemapEntry[], locale: Locale) {
+  const urls = entries.map((entry) => {
+    const loc = buildLocalizedUrl(entry.path, locale);
+    const alternates = buildAlternateLinks(entry.path)
+      .map((alt) => `    <xhtml:link rel="alternate" hreflang="${alt.locale}" href="${escapeXml(alt.url)}" />`)
+      .join('\n');
+
+    const lastMod = normalizeDate(entry.lastModified);
+    const changefreq = entry.changeFrequency ? `    <changefreq>${entry.changeFrequency}</changefreq>\n` : '';
+    const priority = typeof entry.priority === 'number'
+      ? `    <priority>${entry.priority.toFixed(1)}</priority>\n`
+      : '';
+
+    return [
+      '  <url>',
+      `    <loc>${escapeXml(loc)}</loc>`,
+      alternates,
+      `    <lastmod>${lastMod}</lastmod>`,
+      changefreq + priority,
+      '  </url>',
+    ].filter(Boolean).join('\n');
+  }).join('\n');
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+    '        xmlns:xhtml="http://www.w3.org/1999/xhtml">',
+    urls,
+    '</urlset>',
+  ].join('\n');
+}
+
+export function buildSitemapIndexXml(paths: string[]) {
+  const now = new Date().toISOString();
+  const items = paths.map((path) => (
+    [
+      '  <sitemap>',
+      `    <loc>${escapeXml(`${BASE_URL}${path}`)}</loc>`,
+      `    <lastmod>${now}</lastmod>`,
+      '  </sitemap>',
+    ].join('\n')
+  )).join('\n');
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    items,
+    '</sitemapindex>',
+  ].join('\n');
+}
+
+export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-  
-  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica
-  const baseUrl = 'https://www.furgocasa.com';
-  const now = new Date();
-  
-  type CategoryRow = { slug: string; name?: string | null };
-  type PostRow = {
-    slug: string;
-    updated_at?: string | null;
-    published_at?: string | null;
-    category?: CategoryRow | CategoryRow[] | null;
-  };
-  type VehicleRow = { slug: string; updated_at?: string | null };
-  type LocationRow = { slug: string; updated_at?: string | null };
 
   const [
     { data: posts },
@@ -100,7 +160,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq('is_active', true)
       .order('display_order', { ascending: true })
       .then(result => {
-        // Si la tabla no existe aún, devolver array vacío sin fallar
         if (result.error) {
           console.warn('[sitemap] sale_location_targets not found:', result.error.message);
           return { data: null, error: result.error };
@@ -120,53 +179,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.warn('[sitemap] Skipping sale location pages - table not ready yet');
   }
 
-  const entries: MetadataRoute.Sitemap = [];
+  const entries: SitemapEntry[] = [];
+  const now = new Date();
 
-  /**
-   * Añade entradas al sitemap para TODOS los idiomas
-   * 
-   * Genera una URL por cada idioma (es, en, fr, de) con sus respectivos
-   * hreflang alternates para SEO internacional.
-   * 
-   * @param path - Ruta en español sin prefijo de idioma (ej: '/blog/rutas')
-   * @param options - Opciones de sitemap (lastModified, changeFrequency, priority)
-   */
-  const addEntry = (
-    path: string,
-    options: Pick<MetadataRoute.Sitemap[number], 'lastModified' | 'changeFrequency' | 'priority'> = {}
-  ) => {
-    // Generar alternates para hreflang (todas las versiones de idioma)
-    const alternates: Record<string, string> = {};
-    locales.forEach((locale) => {
-      const translatedPath = getTranslatedRoute(`/es${path}`, locale);
-      alternates[locale] = `${baseUrl}${translatedPath}`;
-    });
-    // x-default apunta a español
-    alternates['x-default'] = `${baseUrl}/es${path}`;
-
-    // Añadir una entrada por cada idioma
-    locales.forEach((locale) => {
-      const translatedPath = getTranslatedRoute(`/es${path}`, locale);
-      entries.push({
-        url: `${baseUrl}${translatedPath}`,
-        lastModified: options.lastModified || now,
-        changeFrequency: options.changeFrequency,
-        priority: options.priority,
-        alternates: {
-          languages: alternates,
-        },
-      });
-    });
-  };
-
-  const staticPages: Array<{ path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]['changeFrequency'] }> = [
+  const staticPages: Array<{ path: string; priority: number; changeFrequency: SitemapEntry['changeFrequency'] }> = [
     { path: '/', priority: 1.0, changeFrequency: 'daily' },
     { path: '/blog', priority: 0.9, changeFrequency: 'daily' },
     { path: '/vehiculos', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/ventas', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/tarifas', priority: 0.8, changeFrequency: 'monthly' },
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
-    // /buscar NO se incluye - está bloqueada en robots.txt
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/como-funciona', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
@@ -184,10 +206,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/aviso-legal', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/privacidad', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
-    // NOTA: Las páginas de pago (/pago/exito, /pago/error, /pago/cancelado) 
-    // NO se incluyen porque tienen noindex y están bloqueadas en robots.txt
     { path: '/sitemap-html', priority: 0.2, changeFrequency: 'monthly' },
   ];
+
+  staticPages.forEach((page) => {
+    entries.push({
+      path: page.path,
+      priority: page.priority,
+      changeFrequency: page.changeFrequency,
+      lastModified: now,
+    });
+  });
 
   const faqPages = [
     'edad-minima-alquiler',
@@ -202,72 +231,66 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'funcionamiento-camper',
   ];
 
-  // Páginas estáticas - URLs canónicas en español CON /es/
-  staticPages.forEach((page) => {
-    addEntry(page.path, {
-      priority: page.priority,
-      changeFrequency: page.changeFrequency,
-    });
-  });
-
-  // Páginas de FAQ
   faqPages.forEach((slug) => {
-    addEntry(`/faqs/${slug}`, {
+    entries.push({
+      path: `/faqs/${slug}`,
       priority: 0.4,
       changeFrequency: 'monthly',
+      lastModified: now,
     });
   });
 
-  // Categorías del blog
   categoryList.forEach((category) => {
-    addEntry(`/blog/${category.slug}`, {
+    entries.push({
+      path: `/blog/${category.slug}`,
       priority: 0.7,
       changeFrequency: 'daily',
+      lastModified: now,
     });
   });
 
-  // Artículos del blog
   postList.forEach((post) => {
     const categorySlug = Array.isArray(post.category)
       ? post.category[0]?.slug || 'general'
       : post.category?.slug || 'general';
-    addEntry(`/blog/${categorySlug}/${post.slug}`, {
+    entries.push({
+      path: `/blog/${categorySlug}/${post.slug}`,
       priority: 0.8,
       changeFrequency: 'weekly',
       lastModified: post.updated_at || post.published_at || now,
     });
   });
 
-  // Vehículos en alquiler
   rentList.forEach((vehicle) => {
-    addEntry(`/vehiculos/${vehicle.slug}`, {
+    entries.push({
+      path: `/vehiculos/${vehicle.slug}`,
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: vehicle.updated_at || now,
     });
   });
 
-  // Vehículos en venta
   saleList.forEach((vehicle) => {
-    addEntry(`/ventas/${vehicle.slug}`, {
+    entries.push({
+      path: `/ventas/${vehicle.slug}`,
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: vehicle.updated_at || now,
     });
   });
 
-  // Páginas de localización - Alquiler
   locationList.forEach((location) => {
-    addEntry(`/alquiler-autocaravanas-campervans-${location.slug}`, {
+    entries.push({
+      path: `/alquiler-autocaravanas-campervans-${location.slug}`,
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,
     });
   });
 
-  // Páginas de localización - Venta
   saleLocationList.forEach((location) => {
-    addEntry(`/venta-autocaravanas-camper-${location.slug}`, {
+    entries.push({
+      path: `/venta-autocaravanas-camper-${location.slug}`,
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,

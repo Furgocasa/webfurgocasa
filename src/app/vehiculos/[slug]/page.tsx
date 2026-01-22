@@ -1,3 +1,4 @@
+import { Metadata } from"next";
 import { LocalizedLink } from"@/components/localized-link";
 import { notFound } from"next/navigation";
 import { headers } from"next/headers";
@@ -8,6 +9,52 @@ import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
 import { translateServer } from"@/lib/i18n/server-translation";
 import { formatPrice } from"@/lib/utils";
 import type { Locale } from"@/lib/i18n/config";
+import { getTranslatedRoute } from"@/lib/route-translations";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const { data: vehicle } = await getVehicleBySlug(slug);
+
+  if (!vehicle) {
+    return {};
+  }
+
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
+  const path = `/vehiculos/${slug}`;
+  // ✅ Canonical autorreferenciado usando helper centralizado
+  const alternates = buildCanonicalAlternates(path, locale);
+  const title = `${vehicle.name} | Furgocasa`;
+  const description = vehicle.short_description
+    || `Alquiler de ${vehicle.name} en Furgocasa. Vehículo totalmente equipado desde ${formatPrice(vehicle.base_price_per_day)}/día.`;
+
+  const firstImage = (vehicle as any)?.images?.[0]?.image_url;
+  const images = firstImage
+    ? [{ url: firstImage, alt: (vehicle as any)?.images?.[0]?.alt_text || vehicle.name }]
+    : [];
+
+  return {
+    title,
+    description,
+    alternates,
+    openGraph: {
+      title,
+      description,
+      url: alternates.canonical,
+      type: 'website',
+      images,
+      locale: `${locale}_${locale.toUpperCase()}`,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: images.length ? [images[0].url] : undefined,
+    },
+  };
+}
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // ✅ Obtener el idioma del header establecido por el middleware

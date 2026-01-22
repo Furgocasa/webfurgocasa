@@ -1,5 +1,9 @@
 import { Metadata } from"next";
-export const metadata: Metadata = {
+import { headers } from"next/headers";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+import type { Locale } from"@/lib/i18n/config";
+
+const PRIVACIDAD_METADATA: Metadata = {
   title:"Política de Privacidad y Protección de Datos | Furgocasa",
   description:"Política de privacidad y protección de datos de Furgocasa S.L. Información sobre cómo tratamos y protegemos tus datos personales según RGPD.",
   keywords:"politica privacidad furgocasa, proteccion datos, rgpd, lopd, privacidad datos personales",
@@ -7,10 +11,18 @@ export const metadata: Metadata = {
     index: true,
     follow: false,
   },
-  alternates: {
-    canonical:"https://www.furgocasa.com/privacidad",
-  },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates('/privacidad', locale);
+
+  return {
+    ...PRIVACIDAD_METADATA,
+    alternates,
+  };
+}
 
 export default function PrivacidadPage() {
   return (

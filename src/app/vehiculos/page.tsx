@@ -1,9 +1,12 @@
 import { Metadata } from"next";
+import { headers } from"next/headers";
 import { createClient } from"@supabase/supabase-js";
 import { VehicleListClient } from"@/components/vehicle/vehicle-list-client";
 import { LocalizedLink } from"@/components/localized-link";
 import { Car } from"lucide-react";
 import { translateServer } from"@/lib/i18n/server-translation";
+import { generateMultilingualMetadata } from"@/lib/seo/multilingual-metadata";
+import type { Locale } from"@/lib/i18n/config";
 
 // ✅ Supabase cliente servidor
 const supabase = createClient(
@@ -37,18 +40,35 @@ interface Vehicle {
   vehicle_equipment?: any[];
 }
 
-// ✅ METADATOS SEO
-export const metadata: Metadata = {
-  title:"Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
-  description:"Descubre nuestra flota de autocaravanas y campers de gran volumen. Vehículos de 2 y 4 plazas, totalmente equipados. Desde 95€/día con kilómetros ilimitados.",
-  keywords:"alquiler autocaravanas, alquiler campers, furgonetas camper, motorhomes alquiler, weinsberg, dreamer, knaus",
-  openGraph: {
-    title:"Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
-    description:"Nuestra flota de autocaravanas campers de gran volumen. Totalmente equipadas desde 95€/día.",
-    type:"website",
-    locale:"es_ES",
+const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; keywords: string }> = {
+  es: {
+    title: "Alquiler de Autocaravanas y Campers | Furgocasa Campervans",
+    description: "Descubre nuestra flota de autocaravanas y campers de gran volumen. Vehículos de 2 y 4 plazas, totalmente equipados. Desde 95€/día con kilómetros ilimitados.",
+    keywords: "alquiler autocaravanas, alquiler campers, furgonetas camper, motorhomes alquiler, weinsberg, dreamer, knaus",
+  },
+  en: {
+    title: "Motorhome & Campervan Rentals | Furgocasa Campervans",
+    description: "Explore our motorhome and campervan fleet. Fully equipped vehicles from 95€/day with unlimited mileage.",
+    keywords: "motorhome rental, campervan rental, camper vans, motorhome hire, furgocasa",
+  },
+  fr: {
+    title: "Location de Camping-Cars et Vans | Furgocasa",
+    description: "Découvrez notre flotte de camping-cars et vans aménagés. Véhicules équipés dès 95€/jour avec kilomètres illimités.",
+    keywords: "location camping-car, location van, camping-cars, vans aménagés, furgocasa",
+  },
+  de: {
+    title: "Wohnmobil & Camper mieten | Furgocasa",
+    description: "Entdecke unsere Wohnmobil- und Camperflotte. Voll ausgestattet ab 95€/Tag mit unbegrenzten Kilometern.",
+    keywords: "wohnmobil mieten, camper mieten, wohnmobilvermietung, campervan, furgocasa",
   },
 };
+
+// ✅ METADATOS SEO con canonical + hreflang
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  return generateMultilingualMetadata('/vehiculos', locale, VEHICULOS_METADATA);
+}
 
 // ✅ Cargar vehículos en el servidor
 async function loadVehicles(): Promise<Vehicle[]> {

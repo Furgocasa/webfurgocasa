@@ -9,6 +9,8 @@ import { translateServer } from"@/lib/i18n/server-translation";
 import { getTranslatedContent } from"@/lib/translations/get-translations";
 import type { Locale } from"@/lib/i18n/config";
 import { headers } from "next/headers";
+import { getTranslatedRoute } from"@/lib/route-translations";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 
 // ⚡ Server-side Supabase client - Server Component por defecto (SEO optimizado)
 const supabase = createClient(
@@ -191,9 +193,19 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     };
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.furgocasa.com';
-  const pageUrl = `${baseUrl}/es/venta-autocaravanas-camper-${citySlug}`;
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
+  const baseUrl = 'https://www.furgocasa.com';
+  const locale = await detectLocaleFromRequest();
+  const path = `/venta-autocaravanas-camper-${citySlug}`;
+  // ✅ Canonical autorreferenciado usando helper centralizado
+  const alternates = buildCanonicalAlternates(path, locale);
   const ogImage = location.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
+  const ogLocales: Record<string, string> = {
+    es: 'es_ES',
+    en: 'en_US',
+    fr: 'fr_FR',
+    de: 'de_DE'
+  };
 
   return {
     // ✅ TÍTULO SEO optimizado (50-60 caracteres)
@@ -213,7 +225,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
       title: location.meta_title || `Venta de Autocaravanas en ${location.name}`,
       description: location.meta_description || `Compra tu autocaravana en ${location.name}. Vehículos premium con garantía.`,
       type: 'website',
-      url: pageUrl,
+      url: alternates.canonical,
       siteName: 'Furgocasa - Venta de Autocaravanas',
       images: [
         {
@@ -231,7 +243,7 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
           type: 'image/webp',
         },
       ],
-      locale: 'es_ES',
+      locale: ogLocales[locale] || 'es_ES',
       countryName: 'España',
     },
     
@@ -245,16 +257,8 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
       images: [ogImage],
     },
     
-    // ✅ URL CANÓNICA (evita duplicados)
-    alternates: {
-      canonical: pageUrl,
-      languages: {
-        'es-ES': pageUrl,
-        'en-US': pageUrl.replace('/es/', '/en/').replace('venta-autocaravanas-camper', 'campervans-for-sale-in'),
-        'fr-FR': pageUrl.replace('/es/', '/fr/').replace('venta-autocaravanas-camper', 'camping-cars-a-vendre'),
-        'de-DE': pageUrl.replace('/es/', '/de/').replace('venta-autocaravanas-camper', 'wohnmobile-zu-verkaufen'),
-      },
-    },
+    // ✅ URL CANÓNICA (evita duplicados) - Canonical autorreferenciado
+    alternates,
     
     // ✅ ROBOTS: indexar y seguir (páginas públicas)
     robots: {

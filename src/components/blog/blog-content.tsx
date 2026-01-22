@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server";
 import { BlogListClient } from "./blog-list-client";
 import { cache } from "react";
+import { headers } from "next/headers";
+import { getTranslatedRecords, type Locale } from "@/lib/translations/get-translations";
 
 interface Category {
   id: string;
@@ -168,22 +170,41 @@ export async function BlogContent({
   const categorySlug = searchParams.category;
   const searchQuery = searchParams.q;
 
+  // ✅ Obtener el idioma del header establecido por el middleware
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+
   const { posts, categories, totalCount, featuredPosts } = await getBlogData(
     page, 
     categorySlug, 
     searchQuery
   );
 
+  // 🌐 TRADUCIR los posts usando las traducciones de Supabase
+  const translatedPosts = await getTranslatedRecords(
+    'posts',
+    posts,
+    ['title', 'excerpt'],
+    locale
+  );
+
+  const translatedFeaturedPosts = await getTranslatedRecords(
+    'posts',
+    featuredPosts,
+    ['title', 'excerpt'],
+    locale
+  );
+
   const totalPages = Math.ceil(totalCount / POSTS_PER_PAGE);
 
   return (
     <BlogListClient 
-      initialPosts={posts}
+      initialPosts={translatedPosts}
       categories={categories}
       currentPage={page}
       totalPages={totalPages}
       totalCount={totalCount}
-      featuredPosts={featuredPosts}
+      featuredPosts={translatedFeaturedPosts}
       selectedCategory={categorySlug}
       searchQuery={searchQuery}
     />

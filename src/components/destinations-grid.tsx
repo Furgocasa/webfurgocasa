@@ -4,6 +4,7 @@ import { LocalizedLink } from "@/components/localized-link";
 import { MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { getTranslatedRoute } from "@/lib/route-translations";
+import Image from "next/image";
 
 interface Destination {
   name: string;
@@ -86,10 +87,14 @@ export function DestinationsGrid({
               >
                 <div className="bg-gray-200 h-32 lg:h-40 rounded-lg mb-3 flex items-center justify-center overflow-hidden relative group-hover:shadow-xl transition-all duration-300">
                   {destination.image ? (
-                    <img 
+                    <Image 
                       src={destination.image} 
                       alt={destination.name}
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      fill
+                      sizes="(max-width: 1024px) 50vw, 16vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      loading="lazy"
+                      quality={85}
                     />
                   ) : (
                     <div className="flex flex-col items-center justify-center text-gray-400">

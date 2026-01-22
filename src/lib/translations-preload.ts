@@ -4452,14 +4452,20 @@ export const staticTranslations = {
   "Blog de viajes en camper": {
     es: "Blog de viajes en camper",
     en: "Camper travel blog",
-    fr: "Camper travel blog",
-    de: "Camper travel blog"
+    fr: "Blog de voyage en camping-car",
+    de: "Camper Reiseblog"
   },
   "Consejos, rutas y experiencias para inspirar tu próxima aventura": {
     es: "Consejos, rutas y experiencias para inspirar tu próxima aventura",
     en: "Tips, routes and experiences to inspire your next adventure",
-    fr: "Tips, routes and experiences to inspire your next adventure",
-    de: "Tips, routes and experiences to inspire your next adventure"
+    fr: "Conseils, itinéraires et expériences pour inspirer votre prochaine aventure",
+    de: "Tipps, Routen und Erfahrungen für Ihr nächstes Abenteuer"
+  },
+  "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana": {
+    es: "Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana",
+    en: "Tips, routes and experiences to inspire your next motorhome adventure",
+    fr: "Conseils, itinéraires et expériences pour inspirer votre prochaine aventure en camping-car",
+    de: "Tipps, Routen und Erfahrungen für Ihr nächstes Wohnmobil-Abenteuer"
   },
   "Leer más": {
     es: "Leer más",

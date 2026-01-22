@@ -1,15 +1,27 @@
 import { Metadata } from"next";
-export const metadata: Metadata = {
+import { headers } from"next/headers";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+import type { Locale } from"@/lib/i18n/config";
+
+const AVISO_METADATA: Metadata = {
   title:"Aviso Legal | Furgocasa Campervans - Alquiler de Autocaravanas Murcia",
   description:"Aviso legal y términos de uso de Furgocasa S.L. Información legal sobre el alquiler de autocaravanas y campers en Murcia.",
   robots: {
     index: true,
     follow: false, // No seguir enlaces en páginas legales
   },
-  alternates: {
-    canonical:"https://www.furgocasa.com/aviso-legal",
-  },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates('/aviso-legal', locale);
+
+  return {
+    ...AVISO_METADATA,
+    alternates,
+  };
+}
 
 export default function AvisoLegalPage() {
   return (

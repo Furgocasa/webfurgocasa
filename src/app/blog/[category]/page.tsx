@@ -1,5 +1,8 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { BlogCategoryClient } from "./blog-category-client";
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import type { Locale } from "@/lib/i18n/config";
 
 // Mapeo de categorías a nombres y descripciones
 const categoryMeta: Record<string, { name: string; description: string }> = {
@@ -36,9 +39,21 @@ type Props = {
 // 🎯 SEO Metadata dinámico para /blog/[category]
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const meta = categoryMeta[category] || {
     name: category.charAt(0).toUpperCase() + category.slice(1),
     description: `Artículos sobre ${category} en el blog de Furgocasa. Consejos, guías y experiencias de viaje en camper.`,
+  };
+
+  // ✅ Canonical autorreferenciado: ruta sin prefijo de idioma (el helper lo añade)
+  const alternates = buildCanonicalAlternates(`/blog/${category}`, locale);
+
+  const ogLocales: Record<Locale, string> = {
+    es: "es_ES",
+    en: "en_US",
+    fr: "fr_FR",
+    de: "de_DE",
   };
 
   return {
@@ -49,25 +64,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: `${meta.name} | Blog Furgocasa`,
       description: meta.description,
       type: "website",
-      url: `https://www.furgocasa.com/es/blog/${category}`,
+      url: alternates.canonical,
       siteName: "Furgocasa",
-      locale: "es_ES",
+      locale: ogLocales[locale] || "es_ES",
     },
     twitter: {
       card: "summary",
       title: `${meta.name} | Blog Furgocasa`,
       description: meta.description,
     },
-    alternates: {
-      canonical: `https://www.furgocasa.com/es/blog/${category}`,
-      languages: {
-        'es': `https://www.furgocasa.com/es/blog/${category}`,
-        'en': `https://www.furgocasa.com/en/blog/${category}`,
-        'fr': `https://www.furgocasa.com/fr/blog/${category}`,
-        'de': `https://www.furgocasa.com/de/blog/${category}`,
-        'x-default': `https://www.furgocasa.com/es/blog/${category}`,
-      },
-    },
+    alternates,
     robots: {
       index: true,
       follow: true,

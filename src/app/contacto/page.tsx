@@ -1,11 +1,14 @@
 import { Metadata } from"next";
+import { headers } from"next/headers";
 import { LocalizedLink } from"@/components/localized-link";
 import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from"lucide-react";
 import { translateServer } from"@/lib/i18n/server-translation";
 import { ContactPageJsonLd } from"@/components/static-pages/jsonld";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+import type { Locale } from"@/lib/i18n/config";
 
 // 🎯 Metadata SEO optimizada
-export const metadata: Metadata = {
+const CONTACT_METADATA: Metadata = {
   title:"Contacto | Furgocasa - Alquiler de Autocaravanas en Murcia",
   description:"Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com. Lunes a Viernes 09:00-18:00.",
   keywords:"contacto furgocasa, telefono furgocasa murcia, email furgocasa, direccion furgocasa, horario furgocasa, alquiler autocaravanas murcia contacto",
@@ -14,7 +17,7 @@ export const metadata: Metadata = {
     title:"Contacto | Furgocasa Campervans",
     description:"Contáctanos para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61.",
     type:"website",
-    url:"https://www.furgocasa.com/contacto",
+    url:"https://www.furgocasa.com/es/contacto",
     siteName:"Furgocasa",
     locale:"es_ES",
   },
@@ -22,9 +25,6 @@ export const metadata: Metadata = {
     card:"summary",
     title:"Contacto | Furgocasa",
     description:"Teléfono: 868 36 41 61 | Email: info@furgocasa.com",
-  },
-  alternates: {
-    canonical:"https://www.furgocasa.com/contacto",
   },
   robots: {
     index: true,
@@ -38,6 +38,21 @@ export const metadata: Metadata = {
     },
   },
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates('/contacto', locale);
+
+  return {
+    ...CONTACT_METADATA,
+    alternates,
+    openGraph: {
+      ...(CONTACT_METADATA.openGraph || {}),
+      url: alternates.canonical,
+    },
+  };
+}
 
 // ✅ Server Component
 export default function ContactoPage() {

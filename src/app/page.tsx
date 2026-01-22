@@ -7,6 +7,7 @@ import { BlogArticleLink } from"@/components/blog/blog-article-link";
 import { LocalizedLink } from"@/components/localized-link";
 import { translateServer } from"@/lib/i18n/server-translation";
 import type { Locale } from"@/lib/i18n/config";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 import { 
   MessageSquare,
   Map,
@@ -38,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const t = (key: string) => translateServer(key, locale);
   
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
   const baseUrl = 'https://www.furgocasa.com';
   
   // Locale para OpenGraph
@@ -48,6 +50,9 @@ export async function generateMetadata(): Promise<Metadata> {
     de: 'de_DE'
   };
   
+  // ✅ Canonical autorreferenciado: usar buildCanonicalAlternates para consistencia
+  const alternates = buildCanonicalAlternates('/', locale);
+  
   return {
     title: `${t("Las Mejores Campers en Alquiler")} | ${t("Desde 95€/día")} | Furgocasa`,
     description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
@@ -57,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `Furgocasa | ${t("Las Mejores Campers en Alquiler")}`,
       description: `${t("Tu hotel 5 estrellas sobre ruedas")}. ${t("Flota premium desde 95€/día con kilómetros ilimitados")}. Dreamer, Knaus, Weinsberg.`,
       type:"website",
-      url: `${baseUrl}/${locale}`,
+      url: alternates.canonical,
       siteName: t("Furgocasa - Alquiler de Autocaravanas"),
       images: [
         {
@@ -92,16 +97,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Kilómetros ilimitados, equipamiento completo")}.`,
       images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
     },
-    alternates: {
-      canonical: `${baseUrl}/${locale}`,
-      languages: {
-        'es': `${baseUrl}/es`,
-        'en': `${baseUrl}/en`,
-        'fr': `${baseUrl}/fr`,
-        'de': `${baseUrl}/de`,
-        'x-default': `${baseUrl}/es`,
-      },
-    },
+    alternates,
     robots: {
       index: true,
       follow: true,
@@ -257,10 +253,14 @@ export default async function HomePage() {
                   <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
                     <div className="h-56 lg:h-64 bg-gray-200 relative overflow-hidden">
                       {vehicle.main_image ? (
-                        <img
+                        <Image
                           src={vehicle.main_image}
                           alt={vehicle.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 33vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                          quality={85}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center bg-gray-300">

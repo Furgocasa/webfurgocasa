@@ -18,7 +18,8 @@ export function generateMultilingualMetadata(
     de: { title: string; description: string; keywords?: string };
   }
 ): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.furgocasa.com';
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
+  const baseUrl = 'https://www.furgocasa.com';
   const locales: Locale[] = ['es', 'en', 'fr', 'de'];
   
   // Generar alternates para hreflang
@@ -67,7 +68,8 @@ export function generateSimpleMultilingualMetadata(
   title: string,
   description: string
 ): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.furgocasa.com';
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
+  const baseUrl = 'https://www.furgocasa.com';
   const locales: Locale[] = ['es', 'en', 'fr', 'de'];
   
   // Generar alternates para hreflang
@@ -95,5 +97,48 @@ export function generateSimpleMultilingualMetadata(
       locale: `${currentLang}_${currentLang.toUpperCase()}`,
       type: 'website',
     },
+  };
+}
+
+/**
+ * Genera alternates correctos (canonical + hreflang) para una ruta
+ * 
+ * ⚠️ IMPORTANTE - Mejores prácticas de canonical:
+ * 1. Canonical autorreferenciado: cada página apunta a sí misma
+ * 2. Canonical absoluto: siempre URLs completas con https://www
+ * 3. Sin parámetros de query: las URLs con ? deben canonicalizar a la versión sin parámetros
+ * 4. Coherente con sitemap: las URLs deben coincidir exactamente con el sitemap
+ * 
+ * @param path - Ruta SIN prefijo de idioma y SIN parámetros de query (ej: "/blog/rutas")
+ * @param currentLang - Idioma actual de la página
+ * @returns Objeto con canonical (URL absoluta) y languages (hreflang alternates)
+ */
+export function buildCanonicalAlternates(path: string, currentLang: Locale) {
+  // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
+  const baseUrl = 'https://www.furgocasa.com';
+  const locales: Locale[] = ['es', 'en', 'fr', 'de'];
+  const languages: Record<string, string> = {};
+
+  // Remover parámetros de query y hash si existen (canonical siempre sin parámetros)
+  const cleanPath = path.split('?')[0].split('#')[0];
+  
+  // Remover prefijo de idioma si existe (el helper lo añadirá correctamente)
+  const pathWithoutLocale = cleanPath.replace(/^\/(es|en|fr|de)/, '') || '/';
+  
+  // Generar alternates para hreflang (todas las versiones de idioma)
+  locales.forEach((locale) => {
+    const translatedPath = getTranslatedRoute(pathWithoutLocale, locale);
+    languages[locale] = `${baseUrl}${translatedPath}`;
+  });
+  
+  // x-default siempre apunta a español
+  languages['x-default'] = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, 'es')}`;
+
+  // Canonical autorreferenciado: apunta a la URL actual del idioma actual
+  const canonicalUrl = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, currentLang)}`;
+
+  return {
+    canonical: canonicalUrl,
+    languages,
   };
 }

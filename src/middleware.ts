@@ -304,6 +304,13 @@ export async function middleware(request: NextRequest) {
     // API sin rate limit específico, continuar
     return NextResponse.next();
   }
+
+  // ✅ Normalizar URLs legacy con index.php (SEO)
+  if (pathname.startsWith('/index.php')) {
+    const normalizedPath = pathname.replace(/^\/index\.php/, '') || '/';
+    request.nextUrl.pathname = normalizedPath || '/';
+    return NextResponse.redirect(request.nextUrl, { status: 301 });
+  }
   
   // Excluir rutas especiales que no necesitan procesamiento de locale
   const skipLocaleFor = [
@@ -368,7 +375,7 @@ export async function middleware(request: NextRequest) {
       
       // Redirigir a la URL con el locale (incluido /es/ para SEO)
       request.nextUrl.pathname = `/${detectedLocale}${pathname}`;
-      return NextResponse.redirect(request.nextUrl);
+      return NextResponse.redirect(request.nextUrl, { status: 301 });
     }
   }
 

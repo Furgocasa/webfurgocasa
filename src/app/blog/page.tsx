@@ -1,14 +1,14 @@
 import { Suspense } from"react";
 import { Metadata } from"next";
+import { headers } from"next/headers";
 import { BlogContent } from"@/components/blog/blog-content";
 import { BlogSkeleton } from"@/components/blog/blog-skeleton";
 import { BookOpen } from"lucide-react";
+import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+import { translateServer } from"@/lib/i18n/server-translation";
+import type { Locale } from"@/lib/i18n/config";
 
-/**
- * SEO MULTIIDIOMA - Modelo correcto con prefijo /es/
- * Ver /SEO-MULTIIDIOMA-MODELO.md para documentación completa
- */
-export const metadata: Metadata = {
+const BLOG_METADATA: Metadata = {
   title:"Blog de Viajes en Camper y Autocaravanas | Consejos, Rutas y Destinos | Furgocasa",
   description:"Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente.",
   keywords:"blog camper, viajes autocaravana, rutas camper españa, consejos autocaravana, destinos camper, alquiler campers murcia, camping autocaravana, vida en camper",
@@ -17,7 +17,6 @@ export const metadata: Metadata = {
     title:"Blog de Viajes en Camper | Furgocasa",
     description:"Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España.",
     type:"website",
-    url:"https://www.furgocasa.com/es/blog",
     siteName:"Furgocasa",
     images: [
       {
@@ -35,16 +34,6 @@ export const metadata: Metadata = {
     images: ["https://www.furgocasa.com/og-blog.jpg"],
     creator:"@furgocasa",
   },
-  alternates: {
-    canonical:"https://www.furgocasa.com/es/blog",
-    languages: {
-      'es': 'https://www.furgocasa.com/es/blog',
-      'en': 'https://www.furgocasa.com/en/blog',
-      'fr': 'https://www.furgocasa.com/fr/blog',
-      'de': 'https://www.furgocasa.com/de/blog',
-      'x-default': 'https://www.furgocasa.com/es/blog',
-    },
-  },
   robots: {
     index: true,
     follow: true,
@@ -58,14 +47,34 @@ export const metadata: Metadata = {
   },
 };
 
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates('/blog', locale);
+
+  return {
+    ...BLOG_METADATA,
+    alternates,
+    openGraph: {
+      ...(BLOG_METADATA.openGraph || {}),
+      url: alternates.canonical,
+    },
+  };
+}
+
 // ⚡ Revalidar cada 30 minutos
 export const revalidate = 1800;
 
-export default function BlogPage({
+export default async function BlogPage({
   searchParams,
 }: {
   searchParams: { page?: string; category?: string; q?: string };
 }) {
+  // ✅ Obtener el idioma del header establecido por el middleware
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const t = (key: string) => translateServer(key, locale);
+
   return (
     <>
 <main className="min-h-screen bg-gray-50">
@@ -79,11 +88,11 @@ export default function BlogPage({
             <div className="flex items-center justify-center gap-4 mb-6">
               <BookOpen className="h-12 w-12 text-white" />
               <h1 className="text-4xl md:text-6xl font-heading font-bold text-white">
-                Blog de Viajes en Camper
+                {t("Blog de Viajes en Camper")}
               </h1>
             </div>
             <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed">
-              Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana
+              {t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana")}
             </p>
           </div>
         </section>
@@ -101,10 +110,10 @@ export default function BlogPage({
         <section className="py-16 bg-gradient-to-r from-furgocasa-blue to-furgocasa-blue-dark">
           <div className="container mx-auto px-4 text-center">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-6">
-              ¿Quieres más consejos sobre viajes en camper?
+              {t("¿Quieres más consejos sobre viajes en camper?")}
             </h2>
             <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              Síguenos en nuestras redes sociales y no te pierdas ningún artículo
+              {t("Síguenos en nuestras redes sociales y no te pierdas ningún artículo")}
             </p>
             <div className="flex gap-4 justify-center">
               <a
@@ -113,7 +122,7 @@ export default function BlogPage({
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-heading font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg"
               >
-                Síguenos en Facebook
+                {t("Síguenos en Facebook")}
               </a>
             </div>
           </div>
