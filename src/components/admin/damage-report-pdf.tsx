@@ -92,11 +92,12 @@ function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: Vehi
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '9px',
+            fontSize: '10px',
             fontWeight: 'bold',
             color: damage.status === 'repaired' ? '#166534' : damage.status === 'in_progress' ? '#854d0e' : '#dc2626',
             zIndex: 10,
-            lineHeight: '1',
+            lineHeight: '20px',
+            textAlign: 'center',
           }}
         >
           {damage.damage_number || '?'}
@@ -276,13 +277,13 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                         <tr>
                           <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'top' }}>
                             <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Izquierdo</div>
+                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Lateral Izquierdo</div>
                               <VehicleImage viewType="left" damages={activeDamages} />
                             </div>
                           </td>
                           <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'top' }}>
                             <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Derecho</div>
+                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Lateral Derecho</div>
                               <VehicleImage viewType="right" damages={activeDamages} />
                             </div>
                           </td>
@@ -293,7 +294,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                     {/* Fila 3: Superior (centrado) */}
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <div style={{ width: '60%', border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                        <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Superior</div>
+                        <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Superior</div>
                         <VehicleImage viewType="top" damages={activeDamages} />
                       </div>
                     </div>
