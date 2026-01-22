@@ -44,99 +44,33 @@ const statusColors: Record<string, { fill: string; stroke: string }> = {
   repaired: { fill: '#f0fdf4', stroke: '#22c55e' },
 };
 
-// SVG del vehículo para cada vista
-function VehicleSVG({ viewType }: { viewType: string }) {
+// Imágenes del vehículo para cada vista exterior
+const vehicleImages: Record<string, string> = {
+  front: '/vehicle-views/front.png',
+  back: '/vehicle-views/back.png',
+  left: '/vehicle-views/left.png',
+  right: '/vehicle-views/right.png',
+  top: '/vehicle-views/top.png',
+};
+
+// Componente de imagen o SVG del vehículo para cada vista
+function VehicleView({ viewType }: { viewType: string }) {
+  // Vistas exteriores usan imágenes PNG
+  if (vehicleImages[viewType]) {
+    return (
+      <div className="w-full h-full flex items-center justify-center p-4">
+        <img 
+          src={vehicleImages[viewType]} 
+          alt={viewLabels[viewType]}
+          className="max-w-full max-h-full object-contain"
+          draggable={false}
+        />
+      </div>
+    );
+  }
+
+  // Vistas interiores usan SVGs
   switch (viewType) {
-    case 'front':
-      return (
-        <svg viewBox="0 0 200 150" className="w-full h-full">
-          {/* Carrocería frontal */}
-          <rect x="30" y="40" width="140" height="90" rx="10" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="2" />
-          {/* Parabrisas */}
-          <path d="M50 45 L150 45 L145 75 L55 75 Z" fill="#bfdbfe" stroke="#60a5fa" strokeWidth="1.5" />
-          {/* Faros */}
-          <ellipse cx="50" cy="100" rx="15" ry="10" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
-          <ellipse cx="150" cy="100" rx="15" ry="10" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1.5" />
-          {/* Parrilla */}
-          <rect x="70" y="85" width="60" height="25" rx="3" fill="#374151" stroke="#1f2937" strokeWidth="1" />
-          {/* Matrícula */}
-          <rect x="75" y="115" width="50" height="12" rx="2" fill="white" stroke="#6b7280" strokeWidth="1" />
-          {/* Espejos */}
-          <rect x="15" y="55" width="12" height="8" rx="2" fill="#9ca3af" stroke="#6b7280" strokeWidth="1" />
-          <rect x="173" y="55" width="12" height="8" rx="2" fill="#9ca3af" stroke="#6b7280" strokeWidth="1" />
-        </svg>
-      );
-    
-    case 'back':
-      return (
-        <svg viewBox="0 0 200 150" className="w-full h-full">
-          {/* Carrocería trasera */}
-          <rect x="30" y="20" width="140" height="110" rx="10" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="2" />
-          {/* Puertas traseras */}
-          <line x1="100" y1="25" x2="100" y2="110" stroke="#9ca3af" strokeWidth="1.5" />
-          {/* Ventanas traseras */}
-          <rect x="40" y="30" width="55" height="40" rx="3" fill="#bfdbfe" stroke="#60a5fa" strokeWidth="1.5" />
-          <rect x="105" y="30" width="55" height="40" rx="3" fill="#bfdbfe" stroke="#60a5fa" strokeWidth="1.5" />
-          {/* Luces traseras */}
-          <rect x="35" y="85" width="20" height="30" rx="3" fill="#fecaca" stroke="#ef4444" strokeWidth="1.5" />
-          <rect x="145" y="85" width="20" height="30" rx="3" fill="#fecaca" stroke="#ef4444" strokeWidth="1.5" />
-          {/* Matrícula */}
-          <rect x="75" y="95" width="50" height="12" rx="2" fill="white" stroke="#6b7280" strokeWidth="1" />
-          {/* Paragolpes */}
-          <rect x="35" y="120" width="130" height="8" rx="2" fill="#6b7280" stroke="#4b5563" strokeWidth="1" />
-        </svg>
-      );
-    
-    case 'left':
-    case 'right':
-      const isRight = viewType === 'right';
-      return (
-        <svg viewBox="0 0 300 120" className="w-full h-full" style={{ transform: isRight ? 'scaleX(-1)' : 'none' }}>
-          {/* Carrocería principal */}
-          <path 
-            d="M20 80 L20 50 Q20 30 40 30 L80 30 Q100 30 110 20 L180 20 Q200 20 210 30 L260 30 Q280 30 280 50 L280 80 Q280 90 270 90 L30 90 Q20 90 20 80 Z" 
-            fill="#e5e7eb" 
-            stroke="#9ca3af" 
-            strokeWidth="2" 
-          />
-          {/* Ventanas */}
-          <path d="M85 35 L115 25 L175 25 L175 55 L85 55 Z" fill="#bfdbfe" stroke="#60a5fa" strokeWidth="1.5" />
-          <rect x="180" y="35" width="50" height="20" rx="2" fill="#bfdbfe" stroke="#60a5fa" strokeWidth="1.5" />
-          {/* Puerta corredera */}
-          <rect x="120" y="55" width="70" height="30" rx="0" fill="none" stroke="#9ca3af" strokeWidth="1" strokeDasharray="3,3" />
-          {/* Manilla puerta */}
-          <rect x="185" y="65" width="12" height="4" rx="1" fill="#6b7280" />
-          {/* Ruedas */}
-          <circle cx="70" cy="90" r="20" fill="#374151" stroke="#1f2937" strokeWidth="2" />
-          <circle cx="70" cy="90" r="12" fill="#6b7280" />
-          <circle cx="230" cy="90" r="20" fill="#374151" stroke="#1f2937" strokeWidth="2" />
-          <circle cx="230" cy="90" r="12" fill="#6b7280" />
-          {/* Faro delantero */}
-          <ellipse cx="30" cy="55" rx="8" ry="12" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1" />
-          {/* Luz trasera */}
-          <rect x="272" y="45" width="6" height="20" rx="2" fill="#fecaca" stroke="#ef4444" strokeWidth="1" />
-        </svg>
-      );
-    
-    case 'top':
-      return (
-        <svg viewBox="0 0 100 250" className="w-full h-full">
-          {/* Carrocería vista superior */}
-          <rect x="15" y="20" width="70" height="210" rx="15" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="2" />
-          {/* Techo solar / claraboya */}
-          <rect x="30" y="60" width="40" height="50" rx="5" fill="#bfdbfe" stroke="#60a5fa" strokeWidth="1.5" />
-          {/* Zona delantera */}
-          <path d="M20 30 Q50 15 80 30" fill="none" stroke="#9ca3af" strokeWidth="1.5" />
-          {/* Espejos */}
-          <rect x="5" y="45" width="10" height="5" rx="1" fill="#9ca3af" stroke="#6b7280" strokeWidth="1" />
-          <rect x="85" y="45" width="10" height="5" rx="1" fill="#9ca3af" stroke="#6b7280" strokeWidth="1" />
-          {/* Linea central */}
-          <line x1="50" y1="120" x2="50" y2="220" stroke="#d1d5db" strokeWidth="1" strokeDasharray="5,5" />
-          {/* Área de equipaje superior */}
-          <rect x="25" y="130" width="50" height="80" rx="3" fill="none" stroke="#9ca3af" strokeWidth="1" strokeDasharray="3,3" />
-        </svg>
-      );
-    
     case 'interior_main':
       return (
         <svg viewBox="0 0 250 180" className="w-full h-full">
@@ -246,8 +180,8 @@ export function VehicleDamagePlan({
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Vehicle SVG */}
-        <VehicleSVG viewType={viewType} />
+        {/* Vehicle image/SVG */}
+        <VehicleView viewType={viewType} />
 
         {/* Damage markers */}
         {damages.map((damage) => {
