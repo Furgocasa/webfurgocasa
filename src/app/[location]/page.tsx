@@ -278,6 +278,13 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     };
   }
 
+  const title =
+    saleLocation.meta_title?.trim() ||
+    `${t('Venta de Autocaravanas en')} ${saleLocation.name}`;
+  const description =
+    saleLocation.meta_description?.trim() ||
+    `${t('Compra tu autocaravana o camper en')} ${saleLocation.name}, ${saleLocation.province}. ${t('Vehículos premium con garantía y financiación. Entrega cerca de ti.')}`;
+
   // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
   const baseUrl = 'https://www.furgocasa.com';
   const path = `/venta-autocaravanas-camper-${citySlug}`;
@@ -285,11 +292,12 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   const ogImage = saleLocation.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
 
   return {
-    title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name}`,
-    description: saleLocation.meta_description || `${t('Compra tu autocaravana o camper en')} ${saleLocation.name}, ${saleLocation.province}. ${t('Vehículos premium con garantía y financiación. Entrega cerca de ti.')}`,
+    title,
+    description,
     openGraph: {
-      title: saleLocation.meta_title || `${t('Venta de Autocaravanas en')} ${saleLocation.name}`,
-      description: saleLocation.meta_description || `${t('Compra tu autocaravana en')} ${saleLocation.name}. ${t('Vehículos premium con garantía.')}`,
+      title,
+      description: saleLocation.meta_description?.trim() ||
+        `${t('Compra tu autocaravana en')} ${saleLocation.name}. ${t('Vehículos premium con garantía.')}`,
       type: 'website',
       url: alternates.canonical,
       siteName: 'Furgocasa - Venta de Autocaravanas',

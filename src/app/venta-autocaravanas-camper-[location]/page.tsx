@@ -174,21 +174,24 @@ export async function generateMetadata({
   params: { location: string };
 }): Promise<Metadata> {
   // IGUAL QUE ALQUILER: params.location directamente (sin Promise)
-  console.log('[generateMetadata VENTA] params.location:', params.location);
-  
   const slug = extractSlug(params.location);
-  console.log('[generateMetadata VENTA] slug extraído:', slug);
 
   if (!slug) {
     return { title: "Ubicación no especificada", robots: { index: false, follow: false } };
   }
 
   const location = await getLocation(slug);
-  console.log('[generateMetadata VENTA] location:', location ? location.name : 'NULL');
 
   if (!location) {
     return { title: "Ubicación no encontrada", robots: { index: false, follow: false } };
   }
+
+  const title =
+    location.meta_title?.trim() ||
+    `Venta de Autocaravanas en ${location.name}`;
+  const description =
+    location.meta_description?.trim() ||
+    `Compra tu autocaravana o camper en ${location.name}, ${location.province}. Vehículos con garantía y financiación.`;
 
   const baseUrl = "https://www.furgocasa.com";
   const locale = await getLocale();
@@ -196,15 +199,15 @@ export async function generateMetadata({
   const alternates = buildCanonicalAlternates(path, locale as any);
 
   return {
-    title: location.meta_title,
-    description: location.meta_description,
+    title,
+    description,
     keywords: `venta autocaravanas ${location.name}, comprar camper ${location.name}, autocaravana ocasión ${location.province}, camper segunda mano ${location.region}`,
     authors: [{ name: "Furgocasa" }],
     alternates,
     robots: { index: true, follow: true },
     openGraph: {
-      title: location.meta_title,
-      description: location.meta_description,
+      title,
+      description,
       type: "website",
       url: `${baseUrl}/${locale}${path}`,
       siteName: "Furgocasa",
@@ -213,8 +216,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: location.meta_title,
-      description: location.meta_description,
+      title,
+      description,
       images: [`${baseUrl}/images/slides/hero-01.webp`],
     },
   };
