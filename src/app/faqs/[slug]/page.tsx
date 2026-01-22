@@ -1,6 +1,7 @@
 import { LocalizedLink } from"@/components/localized-link";
 import { notFound } from"next/navigation";
 import { ArrowLeft, ChevronRight } from"lucide-react";
+import { Metadata } from "next";
 
 // TODO: Cargar desde base de datos o CMS
 const faqs: Record<string, { question: string; answer: string; category: string; related: string[] }> = {"edad-minima-alquiler": {
@@ -90,6 +91,38 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     related: []
   },
 };
+
+// ✅ Generar metadata dinámica para cada FAQ
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const faq = faqs[slug];
+
+  if (!faq) {
+    return {
+      title: "Pregunta no encontrada",
+      description: "La pregunta frecuente que buscas no existe.",
+      robots: { index: false, follow: false }
+    };
+  }
+
+  // Extraer texto limpio de la respuesta HTML
+  const cleanAnswer = faq.answer.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 155);
+
+  return {
+    title: faq.question,
+    description: cleanAnswer + '...',
+    keywords: `${faq.question}, faq camper, preguntas autocaravana, ${faq.category}`,
+    openGraph: {
+      title: faq.question,
+      description: cleanAnswer,
+      type: 'article',
+    },
+    robots: {
+      index: true,
+      follow: true
+    }
+  };
+}
 
 export default async function FaqDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;

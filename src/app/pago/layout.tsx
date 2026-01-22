@@ -2,6 +2,8 @@ import { Metadata } from 'next'
 
 // Todas las páginas de pago no deben indexarse
 export const metadata: Metadata = {
+  title: "Procesando pago",
+  description: "Página de procesamiento de pago para reservas de autocaravanas",
   robots: {
     index: false,
     follow: false,
