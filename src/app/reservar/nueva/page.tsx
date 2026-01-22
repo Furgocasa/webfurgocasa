@@ -495,7 +495,7 @@ function NuevaReservaContent() {
                         required
                         value={customerDateOfBirth}
                         onChange={(e) => setCustomerDateOfBirth(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent appearance-none bg-white min-w-0"
                         max={new Date().toISOString().split('T')[0]}
                       />
                     </div>
@@ -621,7 +621,7 @@ function NuevaReservaContent() {
                           required
                           value={customerDriverLicenseExpiry}
                           onChange={(e) => setCustomerDriverLicenseExpiry(e.target.value)}
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent appearance-none bg-white min-w-0"
                           min={new Date().toISOString().split('T')[0]}
                         />
                       </div>
