@@ -329,6 +329,16 @@ export async function middleware(request: NextRequest) {
 
   const shouldSkip = skipLocaleFor.some(path => pathname.startsWith(path));
   
+  // ⚠️ CRÍTICO: Redirigir /es/administrator → /administrator (admin NO tiene i18n)
+  // El área de administrador NUNCA debe tener prefijo de idioma
+  const locale = getLocaleFromPathname(pathname);
+  if (locale && (pathname.startsWith(`/${locale}/administrator`) || pathname.startsWith(`/${locale}/admin`))) {
+    // Remover el prefijo de idioma del área admin
+    const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
+    request.nextUrl.pathname = pathnameWithoutLocale;
+    return NextResponse.redirect(request.nextUrl, { status: 301 });
+  }
+  
   if (!shouldSkip) {
     // Verificar si el pathname ya tiene un locale válido
     const locale = getLocaleFromPathname(pathname);
