@@ -4,6 +4,154 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔧 [1.0.8] - 22 de Enero 2026 - **Fix Crítico Búsqueda y SEO Metadata**
+
+### 🚨 **FIX CRÍTICO: Página de Búsqueda Rota**
+
+La página `/buscar` dejó de funcionar completamente mostrando error "Cannot read properties of undefined (reading 'pickup_date')".
+
+---
+
+### 🎯 **CAUSA RAÍZ DEL PROBLEMA**
+
+Durante la **auditoría SEO de metatítulos** (commit `8fb822e`), se refactorizaron 13 páginas para separar componentes client de metadatos server. Al crear `buscar-client.tsx`, se simplificó **incorrectamente** la llamada al componente `VehicleCard`:
+
+```tsx
+// ❌ CÓDIGO INCORRECTO (creado en refactorización SEO)
+<VehicleCard
+  key={vehicle.id}
+  vehicle={vehicle}
+  pickupDate={searchParams.get("pickup_date") || ""}  // ❌ Prop inexistente
+  dropoffDate={searchParams.get("dropoff_date") || ""} // ❌ Prop inexistente
+/>
+
+// ✅ CÓDIGO CORRECTO (cómo estaba el original)
+<VehicleCard
+  key={vehicle.id}
+  vehicle={vehicle}
+  pricing={vehicle.pricing}
+  searchParams={{
+    pickup_date: "...",
+    dropoff_date: "...",
+    pickup_time: "...",
+    dropoff_time: "...",
+    pickup_location: "...",
+    dropoff_location: "...",
+  }}
+/>
+```
+
+**Lección aprendida**: Al refactorizar para SEO, verificar que los componentes mantienen exactamente las mismas props.
+
+---
+
+### 🔧 **CAMBIOS IMPLEMENTADOS**
+
+#### 1. Fix VehicleCard Props (`e339603`)
+**Archivo**: `src/app/buscar/buscar-client.tsx`
+
+- ✅ Restaurado `pricing={vehicle.pricing}`
+- ✅ Restaurado `searchParams` con objeto completo (6 propiedades)
+- ✅ La búsqueda de vehículos vuelve a funcionar
+
+#### 2. Restauración SearchSummary Completo (`49350c3`)
+**Archivo**: `src/app/buscar/buscar-client.tsx`
+
+**Problema**: El componente `SearchSummary` mostraba "NaN días" y no tenía fondo azul.
+
+**Causa**: Faltaban props obligatorias (`pickupTime`, `dropoffTime`, `pickupLocation`, `dropoffLocation`).
+
+```tsx
+// ❌ ANTES (incompleto)
+<SearchSummary
+  pickupDate={...}
+  dropoffDate={...}
+  vehicleCount={...}  // ❌ Esta prop ni existe!
+/>
+
+// ✅ AHORA (completo)
+<div className="bg-furgocasa-blue py-6 -mx-4 px-4 mb-8 rounded-xl">
+  <SearchSummary
+    pickupDate={...}
+    dropoffDate={...}
+    pickupTime={...}
+    dropoffTime={...}
+    pickupLocation={...}
+    dropoffLocation={...}
+  />
+</div>
+```
+
+- ✅ Fondo azul restaurado (`bg-furgocasa-blue`)
+- ✅ Cálculo de días funcionando (ya no muestra "NaN días")
+- ✅ Ubicación y horas visibles
+
+#### 3. Actualización Content Security Policy (`e339603`)
+**Archivo**: `next.config.js`
+
+Añadidos dominios de Google Analytics que estaban siendo bloqueados:
+
+```js
+// connect-src
++ https://*.analytics.google.com
++ https://www.google.com
++ https://googleads.g.doubleclick.net
+
+// script-src
++ https://googleads.g.doubleclick.net
++ https://www.googleadservices.com
+
+// img-src
++ https://www.google.com
++ https://googleads.g.doubleclick.net
+
+// frame-src
++ https://www.googletagmanager.com
++ https://td.doubleclick.net
+```
+
+- ✅ Google Analytics funciona sin errores CSP
+- ✅ Tracking de conversiones operativo
+
+#### 4. Fix Campos Fecha iOS Safari (`b004966`)
+**Archivo**: `src/app/reservar/nueva/page.tsx`
+
+**Problema**: Los inputs `type="date"` (Fecha de nacimiento, Fecha de caducidad) se veían más anchos que otros campos en iPhone.
+
+**Solución**: Añadidas clases CSS para controlar el ancho:
+
+```tsx
+className="... min-w-0 max-w-full box-border"
+```
+
+- ✅ Campos de fecha con ancho correcto en iOS
+- ✅ Mantiene el estilo nativo gris (indica desplegable)
+
+---
+
+### 📊 **ARCHIVOS MODIFICADOS**
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/app/buscar/buscar-client.tsx` | Fix VehicleCard props + SearchSummary completo |
+| `next.config.js` | CSP actualizado para Google Analytics |
+| `src/app/reservar/nueva/page.tsx` | Fix ancho campos fecha iOS |
+
+---
+
+### ⚠️ **LECCIÓN IMPORTANTE**
+
+**Al refactorizar código para SEO (separar client/server):**
+
+1. ✅ Copiar el código EXACTAMENTE como está
+2. ✅ Verificar que todas las props se mantienen
+3. ✅ Probar la funcionalidad después del cambio
+4. ❌ NO simplificar ni "mejorar" el código durante la refactorización
+
+**El commit `8fb822e` modificó 27 archivos (+3810/-3906 líneas). Un error de transcripción en una de esas páginas rompió la funcionalidad de búsqueda.**
+
+---
+
 ## 🎨 [1.0.7] - 21 de Enero 2026 - **Layout Condicional y Limpieza Admin**
 
 ### ✅ **Layout Condicional para Admin vs Público**

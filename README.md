@@ -1,10 +1,10 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.6-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.8-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 
-**🎉 VERSIÓN 1.0.6 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 1.0.8 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
 > **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
 
@@ -12,34 +12,26 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## 🏗️ ÚLTIMA ACTUALIZACIÓN: Refactorización Layout Global (v1.0.6)
+## 🔧 ÚLTIMA ACTUALIZACIÓN: Fix Crítico Búsqueda y SEO (v1.0.8)
 
-**20 Enero 2026** - Arquitectura mejorada en producción
+**22 Enero 2026** - Correcciones críticas en producción
 
-### ✅ Cambios Arquitectónicos
+### 🚨 Fix Crítico: Página de Búsqueda
 
-- **Header/Footer global** en `layout.tsx` (ya no en cada página)
-- **Header sticky** en lugar de fixed (mejor UX)
-- **40+ páginas limpiadas** - eliminados imports duplicados
-- **UX mejorada** en páginas de reserva con barra flotante móvil
+La página `/buscar` dejó de funcionar tras la auditoría SEO. **Causa**: Al separar componentes client/server, se simplificaron incorrectamente las props del `VehicleCard`.
 
-### 🎯 Beneficios
+### ✅ Cambios Implementados
 
-| Antes | Ahora |
-|-------|-------|
-| Header/Footer en cada página | Header/Footer en layout.tsx |
-| `position: fixed` + padding compensatorio | `position: sticky` natural |
-| Barras sticky feas en reserva | Barra flotante elegante en móvil |
-| 40+ imports duplicados | 0 imports duplicados |
+- **VehicleCard** - Restauradas props `pricing` y `searchParams` completas
+- **SearchSummary** - Restaurado fondo azul y todas las props (ya no muestra "NaN días")
+- **CSP actualizado** - Añadidos dominios de Google Analytics (analytics.google.com, googleads, doubleclick)
+- **iOS Safari** - Fix ancho de campos de fecha en formulario de reserva
 
-### 📱 Nueva UX Móvil (Reservas)
+### ⚠️ Lección Aprendida
 
-- Barra flotante fija en la parte inferior
-- Precio total siempre visible
-- Se actualiza en tiempo real al añadir extras
-- Botón CTA prominente
+Al refactorizar código para SEO, **copiar exactamente** - no simplificar ni "mejorar" durante la refactorización.
 
-**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.6
+**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.8
 
 ---
 
@@ -1155,23 +1147,25 @@ SELECT * FROM supabase/fix-all-rls-policies.sql
 
 | Área | Estado | Última Verificación |
 |------|--------|---------------------|
-| Sitio público | ✅ | 20 Enero 2026 |
-| Sistema de reservas | ✅ | 20 Enero 2026 |
-| Dashboard admin | ✅ | 20 Enero 2026 |
-| Gestión vehículos | ✅ | 20 Enero 2026 |
-| Gestión reservas | ✅ | 20 Enero 2026 |
-| Gestión clientes | ✅ | 20 Enero 2026 |
-| Gestión pagos | ✅ | 20 Enero 2026 |
-| Extras | ✅ | 20 Enero 2026 |
-| Equipamiento | ✅ | 20 Enero 2026 |
-| Temporadas | ✅ | 20 Enero 2026 |
-| Ubicaciones | ✅ | 20 Enero 2026 |
-| Calendario | ✅ | 20 Enero 2026 |
-| Pagos Redsys | ✅ | 19 Enero 2026 |
-| Pagos Stripe | ✅ | 19 Enero 2026 |
-| Blog/CMS | ✅ | 18 Enero 2026 |
-| i18n (ES/EN/FR/DE) | ✅ | 17 Enero 2026 |
-| PWA Admin | ✅ | 16 Enero 2026 |
+| Sitio público | ✅ | 22 Enero 2026 |
+| **Búsqueda de vehículos** | ✅ | 22 Enero 2026 |
+| Sistema de reservas | ✅ | 22 Enero 2026 |
+| Dashboard admin | ✅ | 22 Enero 2026 |
+| Gestión vehículos | ✅ | 22 Enero 2026 |
+| Gestión reservas | ✅ | 22 Enero 2026 |
+| Gestión clientes | ✅ | 22 Enero 2026 |
+| Gestión pagos | ✅ | 22 Enero 2026 |
+| Extras | ✅ | 22 Enero 2026 |
+| Equipamiento | ✅ | 22 Enero 2026 |
+| Temporadas | ✅ | 22 Enero 2026 |
+| Ubicaciones | ✅ | 22 Enero 2026 |
+| Calendario | ✅ | 22 Enero 2026 |
+| Pagos Redsys | ✅ | 22 Enero 2026 |
+| Pagos Stripe | ✅ | 22 Enero 2026 |
+| Blog/CMS | ✅ | 22 Enero 2026 |
+| i18n (ES/EN/FR/DE) | ✅ | 22 Enero 2026 |
+| PWA Admin | ✅ | 22 Enero 2026 |
+| Google Analytics | ✅ | 22 Enero 2026 |
 
 ---
 
@@ -1183,26 +1177,32 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 ## 📜 Historial de Versiones
 
+### v1.0.8 (22 Enero 2026) - Fix Crítico Búsqueda y SEO
+- 🔴 **FIX CRÍTICO**: Página `/buscar` restaurada (VehicleCard props incorrectas)
+- ✅ SearchSummary con fondo azul y cálculo de días
+- ✅ CSP actualizado para Google Analytics
+- ✅ Campos de fecha iOS Safari con ancho correcto
+
+### v1.0.7 (21 Enero 2026) - Layout Condicional
+- ✅ ConditionalLayout para admin vs público
+- ✅ Imágenes hero migradas a Supabase Storage
+- ✅ Eliminado PublicLayout duplicado
+
+### v1.0.6 (20 Enero 2026) - Refactorización Layout
+- ✅ Header/Footer global en layout.tsx
+- ✅ Header sticky en lugar de fixed
+- ✅ 40+ páginas limpiadas
+
+### v1.0.5 (20 Enero 2026) - Unificación Vehículos Home
+- ✅ Imágenes funcionando en Home
+- ✅ Diseño consistente toda la web
+
 ### v1.0.4 (20 Enero 2026) - Fix Crítico Autenticación
 - 🔴 **FIX CRÍTICO**: Eliminado singleton en cliente Supabase
 - ✅ Todas las secciones del administrador funcionando
-- ✅ Meta Pixel carga condicional
-- ✅ Calendario con carga en lotes
-- ✅ Validaciones de null mejoradas
 
 ### v1.0.3 (19 Enero 2026) - Sistema Dual de Pagos
-- ✅ Integración completa de Stripe
-- ✅ Selector de método de pago
-- ✅ Webhooks de ambas pasarelas
-
-### v1.0.2 (18 Enero 2026) - Optimización UX
-- ✅ Sticky headers en proceso de reserva
-- ✅ Fix AbortError loops
-- ✅ Carga optimizada de vehículos
-
-### v1.0.1 (17 Enero 2026) - Correcciones Post-Deploy
-- ✅ URLs localizadas funcionando
-- ✅ Extras y precios corregidos
+- ✅ Integración completa de Stripe + Redsys
 
 ### v1.0.0 (16 Enero 2026) - Deploy Inicial
 - ✅ Primera versión en producción
@@ -1213,10 +1213,10 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 1.0.4 - Fix Crítico Autenticación  
+**Versión**: 1.0.8 - Fix Crítico Búsqueda y SEO  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 20 de Enero 2026  
+**Última actualización**: 22 de Enero 2026  
 
 ---
 

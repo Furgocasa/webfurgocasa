@@ -1,37 +1,35 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.5 ✅ PRODUCCIÓN - UNIFICACIÓN VEHÍCULOS HOME  
+**Versión**: 1.0.8 ✅ PRODUCCIÓN - FIX CRÍTICO BÚSQUEDA Y SEO  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 20 de Enero, 2026
+**Última actualización**: 22 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
 
 ---
 
-## 🎨 VERSIÓN 1.0.5 - UNIFICACIÓN VISUALIZACIÓN VEHÍCULOS
+## 🔧 VERSIÓN 1.0.8 - FIX CRÍTICO BÚSQUEDA Y SEO
 
-**✅ ESTADO: TOTALMENTE FUNCIONAL** - Vehículos ahora visibles y consistentes en toda la web.
+**✅ ESTADO: TOTALMENTE FUNCIONAL** - Página de búsqueda y Analytics restaurados.
 
-**PROBLEMA RESUELTO**: Las imágenes de vehículos NO se mostraban en la página Home, mientras que en páginas de localización SÍ funcionaban. **AHORA FUNCIONA EN TODAS**.
+**PROBLEMA RESUELTO**: La página `/buscar` dejó de funcionar tras la auditoría SEO de metatítulos. Al separar componentes client/server, se simplificaron incorrectamente las props del `VehicleCard`. **AHORA FUNCIONA CORRECTAMENTE**.
 
 Ver **[CHANGELOG.md](./CHANGELOG.md)** para:
-- 🎨 **v1.0.5 (ACTUAL)**: Unificación visualización vehículos Home
+- 🔧 **v1.0.8 (ACTUAL)**: Fix crítico búsqueda + CSP Google Analytics
+- 🎨 **v1.0.7**: Layout condicional admin vs público
+- 🏗️ **v1.0.6**: Refactorización layout global
+- 🎨 **v1.0.5**: Unificación visualización vehículos Home
 - 🔴 **v1.0.4**: Fix crítico sistema autenticación - Eliminado singleton
 - ✅ **v1.0.3**: Sistema dual de pagos (Redsys + Stripe)
-- ✅ **v1.0.2**: Estabilización completa, fixes críticos de producción
-- ✅ **v1.0.1**: Mejoras del proceso de reserva
-- ✅ **v1.0.0**: Problemas resueltos para deploy en Vercel
 
-### 🎯 Highlights v1.0.5:
-- ✅ **Imágenes funcionando en Home**: Renderizado directo con `<img>` tag
-- ✅ **Diseño consistente**: Home y localizaciones usan misma estructura
-- ✅ **Código unificado**: Función `getFeaturedVehicles()` idéntica a localizaciones
-- ✅ **SEO mejorado**: Título optimizado "LAS MEJORES CAMPER VANS EN ALQUILER"
-- ✅ **Mismos vehículos**: 3 vehículos destacados consistentes en toda la web
+### 🎯 Highlights v1.0.8:
+- ✅ **VehicleCard restaurado**: Props `pricing` y `searchParams` correctas
+- ✅ **SearchSummary completo**: Fondo azul, cálculo de días funcional
+- ✅ **CSP actualizado**: Google Analytics sin errores de bloqueo
+- ✅ **iOS Safari fix**: Campos de fecha con ancho correcto en formulario de reserva
 
-**📚 Documentación nueva**:
-- **[SOLUCION-VEHICULOS-HOME.md](./SOLUCION-VEHICULOS-HOME.md)** - Documentación completa del problema y solución
-- **[PROBLEMA-VEHICULOS-HOME.md](./PROBLEMA-VEHICULOS-HOME.md)** - Actualizado con solución final
+### ⚠️ Lección Aprendida:
+Al refactorizar código para SEO (separar client/server), **copiar exactamente** el código original. No simplificar ni "mejorar" durante la refactorización.
 
 ---
 
@@ -436,6 +434,6 @@ Estos documentos ya NO existen (fueron eliminados):
 ---
 
 **Total de documentos activos**: 30 archivos .md en raíz + subdirectorios  
-**Última actualización crítica**: Sistema Completo de Media y Galería Integrado (21 Enero 2026)  
-**Última actualización anterior**: Sistema de Gestión de Media Storage (21 Enero 2026)  
+**Última actualización crítica**: Fix Búsqueda y CSP Google Analytics (22 Enero 2026)  
+**Última actualización anterior**: Sistema Completo de Media y Galería Integrado (21 Enero 2026)  
 **Última limpieza de obsoletos**: 20 Enero 2026
