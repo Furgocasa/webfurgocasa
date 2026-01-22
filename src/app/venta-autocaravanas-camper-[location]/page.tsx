@@ -285,8 +285,9 @@ export async function generateStaticParams() {
 
     // ⚡ Generar rutas en español (las otras versiones se manejan por middleware)
     // Next.js pre-generará estas páginas en build time para SEO óptimo
+    // ⚠️ CRÍTICO: Solo devolver el slug, NO el prefijo (la carpeta ya lo tiene)
     return locations.map((loc) => ({
-      location: `venta-autocaravanas-camper-${loc.slug}`
+      location: loc.slug
     }));
   } catch (error) {
     console.error('[generateStaticParams] Error loading sale locations:', error);
