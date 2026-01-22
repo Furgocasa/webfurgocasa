@@ -118,12 +118,23 @@ function SearchResultsContent() {
 
   return (
     <div>
-      <div className="mb-6">
+      {/* Search Summary con fondo azul */}
+      <div className="bg-furgocasa-blue py-6 -mx-4 px-4 mb-8 rounded-xl">
         <SearchSummary
           pickupDate={searchParams.get("pickup_date") || ""}
           dropoffDate={searchParams.get("dropoff_date") || ""}
-          vehicleCount={filteredVehicles.length}
+          pickupTime={searchParams.get("pickup_time") || "10:00"}
+          dropoffTime={searchParams.get("dropoff_time") || "10:00"}
+          pickupLocation={searchParams.get("pickup_location") || ""}
+          dropoffLocation={searchParams.get("dropoff_location") || ""}
         />
+      </div>
+
+      {/* Contador de resultados */}
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-gray-900">
+          {filteredVehicles.length} {t("vehículo")}{filteredVehicles.length !== 1 ? "s" : ""} {t("disponible")}{filteredVehicles.length !== 1 ? "s" : ""}
+        </h2>
       </div>
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
