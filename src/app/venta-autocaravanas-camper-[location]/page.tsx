@@ -65,6 +65,7 @@ interface VehicleForSale {
 
 /**
  * Extrae el slug de la ciudad del parámetro de la URL multi-idioma
+ * Maneja tanto "granada" como "venta-autocaravanas-camper-granada"
  */
 function extractCitySlug(locationParam: string | undefined): string {
   // Si locationParam es undefined o vacío, devolver string vacío
@@ -85,10 +86,11 @@ function extractCitySlug(locationParam: string | undefined): string {
   for (const pattern of patterns) {
     const match = cleaned.match(pattern);
     if (match && match[1]) {
-      return match[1];
+      return match[1].trim();
     }
   }
 
+  // Si no coincide con ningún patrón, asumir que ya es el slug directo
   return cleaned;
 }
 
@@ -164,10 +166,12 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     };
   }
 
+  // Extraer el slug: puede venir como "granada" o "venta-autocaravanas-camper-granada"
   const citySlug = extractCitySlug(locationParam);
   
   // Si después de extraer el slug está vacío, también retornar
   if (!citySlug) {
+    console.error('[generateMetadata] citySlug vacío después de extraer de:', locationParam);
     return {
       title: 'Ubicación no encontrada',
       description: 'La ubicación solicitada no está disponible.',
@@ -178,14 +182,26 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
     };
   }
   
-  const { data: location } = await supabase
+  // Buscar la ubicación directamente con el slug (igual que en páginas de alquiler)
+  const { data: location, error } = await supabase
     .from('sale_location_targets')
     .select('name, province, region, meta_title, meta_description, featured_image, lat, lng')
     .eq('slug', citySlug)
     .eq('is_active', true)
     .single();
 
-  if (!location) {
+  if (error || !location) {
+    // Log detallado para debugging
+    console.error('[generateMetadata] Error buscando ubicación:', {
+      citySlug,
+      locationParam,
+      error: error?.message,
+      errorCode: error?.code,
+      errorDetails: error?.details,
+      found: !!location,
+      // Verificar si existe algún registro con slug similar
+      query: `SELECT slug FROM sale_location_targets WHERE slug LIKE '%${citySlug}%' LIMIT 5`
+    });
     return {
       title: 'Ubicación no encontrada',
       description: 'La ubicación solicitada no está disponible.',
@@ -195,6 +211,13 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
       },
     };
   }
+  
+  // Log exitoso para verificar que se encontró
+  console.log('[generateMetadata] Ubicación encontrada:', {
+    slug: citySlug,
+    name: location.name,
+    meta_title: location.meta_title
+  });
 
   // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
   const baseUrl = 'https://www.furgocasa.com';
@@ -321,10 +344,12 @@ async function loadSaleLocationData(locationParam: string | undefined): Promise<
   
   // Si el citySlug está vacío después de extraer, retornar null
   if (!citySlug) {
+    console.error('[loadSaleLocationData] citySlug vacío después de extraer de:', locationParam);
     return null;
   }
   
-  const { data, error } = await supabase
+  // Intentar buscar la ubicación con el slug exacto
+  let { data, error } = await supabase
     .from('sale_location_targets')
     .select(`
       *,
@@ -337,9 +362,39 @@ async function loadSaleLocationData(locationParam: string | undefined): Promise<
     `)
     .eq('slug', citySlug)
     .eq('is_active', true)
-    .single();
+    .maybeSingle();
+  
+  // Si no se encuentra, intentar con búsqueda case-insensitive (por si hay problemas de formato)
+  if (!data && !error) {
+    const { data: dataAlt } = await supabase
+      .from('sale_location_targets')
+      .select(`
+        *,
+        nearest_location:locations!nearest_location_id(
+          id,
+          name,
+          city,
+          address
+        )
+      `)
+      .ilike('slug', citySlug)
+      .eq('is_active', true)
+      .maybeSingle();
+    
+    if (dataAlt) {
+      data = dataAlt;
+      error = null;
+    }
+  }
   
   if (error || !data) {
+    console.error('[loadSaleLocationData] Error buscando ubicación:', {
+      citySlug,
+      locationParam,
+      error: error?.message,
+      found: !!data,
+      errorCode: error?.code
+    });
     return null;
   }
   
