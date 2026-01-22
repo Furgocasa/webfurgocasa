@@ -6499,6 +6499,218 @@ export const staticTranslations = {
     fr: "Obtenez des réponses sur la location de camping-car à",
     de: "Erhalten Sie Antworten zur Wohnmobilvermietung in"
   },
+
+  // ====== PÁGINA DE VENTAS ======
+  "Oportunidades únicas": {
+    es: "Oportunidades únicas",
+    en: "Unique opportunities",
+    fr: "Opportunités uniques",
+    de: "Einzigartige Gelegenheiten"
+  },
+  "Campers y Autocaravanas en Venta": {
+    es: "Campers y Autocaravanas en Venta",
+    en: "Campers and Motorhomes for Sale",
+    fr: "Camping-cars et Fourgons à Vendre",
+    de: "Camper und Wohnmobile zum Verkauf"
+  },
+  "Vehículos de nuestra flota de alquiler, revisados y garantizados. Conocemos su historial completo.": {
+    es: "Vehículos de nuestra flota de alquiler, revisados y garantizados. Conocemos su historial completo.",
+    en: "Vehicles from our rental fleet, inspected and guaranteed. We know their complete history.",
+    fr: "Véhicules de notre flotte de location, révisés et garantis. Nous connaissons leur historique complet.",
+    de: "Fahrzeuge aus unserer Mietflotte, geprüft und garantiert. Wir kennen ihre vollständige Geschichte."
+  },
+  "Historial conocido": {
+    es: "Historial conocido",
+    en: "Known history",
+    fr: "Historique connu",
+    de: "Bekannte Historie"
+  },
+  "Mantenimientos al día": {
+    es: "Mantenimientos al día",
+    en: "Up-to-date maintenance",
+    fr: "Entretien à jour",
+    de: "Aktuelle Wartung"
+  },
+  "Garantía incluida": {
+    es: "Garantía incluida",
+    en: "Warranty included",
+    fr: "Garantie incluse",
+    de: "Garantie inklusive"
+  },
+  "Todas las categorías": {
+    es: "Todas las categorías",
+    en: "All categories",
+    fr: "Toutes les catégories",
+    de: "Alle Kategorien"
+  },
+  "Cualquier precio": {
+    es: "Cualquier precio",
+    en: "Any price",
+    fr: "Tout prix",
+    de: "Jeder Preis"
+  },
+  "Hasta 40.000 €": {
+    es: "Hasta 40.000 €",
+    en: "Up to €40,000",
+    fr: "Jusqu'à 40 000 €",
+    de: "Bis 40.000 €"
+  },
+  "Más de 60.000 €": {
+    es: "Más de 60.000 €",
+    en: "Over €60,000",
+    fr: "Plus de 60 000 €",
+    de: "Über 60.000 €"
+  },
+  "Cualquier km": {
+    es: "Cualquier km",
+    en: "Any mileage",
+    fr: "Tout kilométrage",
+    de: "Jede Laufleistung"
+  },
+  "Hasta 30.000 km": {
+    es: "Hasta 30.000 km",
+    en: "Up to 30,000 km",
+    fr: "Jusqu'à 30 000 km",
+    de: "Bis 30.000 km"
+  },
+  "Más de 60.000 km": {
+    es: "Más de 60.000 km",
+    en: "Over 60,000 km",
+    fr: "Plus de 60 000 km",
+    de: "Über 60.000 km"
+  },
+  "Contacta con nosotros si buscas algo específico": {
+    es: "Contacta con nosotros si buscas algo específico",
+    en: "Contact us if you're looking for something specific",
+    fr: "Contactez-nous si vous cherchez quelque chose de spécifique",
+    de: "Kontaktieren Sie uns, wenn Sie etwas Bestimmtes suchen"
+  },
+  "vehículos disponibles": {
+    es: "vehículos disponibles",
+    en: "vehicles available",
+    fr: "véhicules disponibles",
+    de: "Fahrzeuge verfügbar"
+  },
+  "Ordenar por: Más recientes": {
+    es: "Ordenar por: Más recientes",
+    en: "Sort by: Most recent",
+    fr: "Trier par : Plus récents",
+    de: "Sortieren nach: Neueste"
+  },
+  "Precio: menor a mayor": {
+    es: "Precio: menor a mayor",
+    en: "Price: low to high",
+    fr: "Prix : croissant",
+    de: "Preis: aufsteigend"
+  },
+  "Precio: mayor a menor": {
+    es: "Precio: mayor a menor",
+    en: "Price: high to low",
+    fr: "Prix : décroissant",
+    de: "Preis: absteigend"
+  },
+  "Kilometraje: menor a mayor": {
+    es: "Kilometraje: menor a mayor",
+    en: "Mileage: low to high",
+    fr: "Kilométrage : croissant",
+    de: "Kilometerstand: aufsteigend"
+  },
+  "plazas día": {
+    es: "plazas día",
+    en: "day seats",
+    fr: "places jour",
+    de: "Tagessitze"
+  },
+  "plazas noche": {
+    es: "plazas noche",
+    en: "sleeping spots",
+    fr: "couchages",
+    de: "Schlafplätze"
+  },
+  "Precio": {
+    es: "Precio",
+    en: "Price",
+    fr: "Prix",
+    de: "Preis"
+  },
+  "¿No encuentras lo que buscas?": {
+    es: "¿No encuentras lo que buscas?",
+    en: "Can't find what you're looking for?",
+    fr: "Vous ne trouvez pas ce que vous cherchez ?",
+    de: "Nicht gefunden, was Sie suchen?"
+  },
+  "Contáctanos y te ayudamos a encontrar el camper perfecto para ti. También aceptamos vehículos a cuenta.": {
+    es: "Contáctanos y te ayudamos a encontrar el camper perfecto para ti. También aceptamos vehículos a cuenta.",
+    en: "Contact us and we'll help you find the perfect camper for you. We also accept trade-ins.",
+    fr: "Contactez-nous et nous vous aiderons à trouver le camping-car parfait pour vous. Nous acceptons également les reprises.",
+    de: "Kontaktieren Sie uns und wir helfen Ihnen, den perfekten Camper zu finden. Wir akzeptieren auch Inzahlungnahmen."
+  },
+  "Llámanos": {
+    es: "Llámanos",
+    en: "Call us",
+    fr: "Appelez-nous",
+    de: "Rufen Sie uns an"
+  },
+  "Escríbenos": {
+    es: "Escríbenos",
+    en: "Write to us",
+    fr: "Écrivez-nous",
+    de: "Schreiben Sie uns"
+  },
+  "Historial completo": {
+    es: "Historial completo",
+    en: "Complete history",
+    fr: "Historique complet",
+    de: "Vollständige Historie"
+  },
+  "Conocemos cada kilómetro de nuestros vehículos. Te entregamos el historial de mantenimientos completo.": {
+    es: "Conocemos cada kilómetro de nuestros vehículos. Te entregamos el historial de mantenimientos completo.",
+    en: "We know every kilometer of our vehicles. We provide you with the complete maintenance history.",
+    fr: "Nous connaissons chaque kilomètre de nos véhicules. Nous vous fournissons l'historique complet des entretiens.",
+    de: "Wir kennen jeden Kilometer unserer Fahrzeuge. Wir liefern Ihnen die vollständige Wartungshistorie."
+  },
+  "Financiación disponible": {
+    es: "Financiación disponible",
+    en: "Financing available",
+    fr: "Financement disponible",
+    de: "Finanzierung verfügbar"
+  },
+  "Te ayudamos con la financiación. Hasta 120 meses sin entrada con las mejores condiciones.": {
+    es: "Te ayudamos con la financiación. Hasta 120 meses sin entrada con las mejores condiciones.",
+    en: "We help you with financing. Up to 120 months with no down payment and the best conditions.",
+    fr: "Nous vous aidons avec le financement. Jusqu'à 120 mois sans apport avec les meilleures conditions.",
+    de: "Wir helfen Ihnen bei der Finanzierung. Bis zu 120 Monate ohne Anzahlung zu besten Konditionen."
+  },
+  "Prueba sin compromiso": {
+    es: "Prueba sin compromiso",
+    en: "Test without commitment",
+    fr: "Essai sans engagement",
+    de: "Probefahrt ohne Verpflichtung"
+  },
+  "Ven a verlo y pruébalo. Te lo enseñamos sin ningún compromiso en nuestras instalaciones.": {
+    es: "Ven a verlo y pruébalo. Te lo enseñamos sin ningún compromiso en nuestras instalaciones.",
+    en: "Come see it and try it. We'll show it to you with no obligation at our facilities.",
+    fr: "Venez le voir et l'essayer. Nous vous le montrons sans aucun engagement dans nos locaux.",
+    de: "Kommen Sie vorbei und testen Sie es. Wir zeigen es Ihnen unverbindlich in unseren Räumlichkeiten."
+  },
+  "No se encontraron vehículos": {
+    es: "No se encontraron vehículos",
+    en: "No vehicles found",
+    fr: "Aucun véhicule trouvé",
+    de: "Keine Fahrzeuge gefunden"
+  },
+  "Prueba con otros criterios de búsqueda": {
+    es: "Prueba con otros criterios de búsqueda",
+    en: "Try different search criteria",
+    fr: "Essayez d'autres critères de recherche",
+    de: "Versuchen Sie andere Suchkriterien"
+  },
+  "No hay vehículos en venta": {
+    es: "No hay vehículos en venta",
+    en: "No vehicles for sale",
+    fr: "Aucun véhicule à vendre",
+    de: "Keine Fahrzeuge zum Verkauf"
+  },
 };
 
 /**
