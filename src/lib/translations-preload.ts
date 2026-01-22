@@ -6779,6 +6779,12 @@ export const staticTranslations = {
     fr: "Téléchargez la documentation de cette page et envoyez-la nous par email",
     de: "Laden Sie die Dokumentation dieser Seite herunter und senden Sie sie uns per E-Mail"
   },
+  "Descarga la documentación de esta página, fírmala y envíanosla por email": {
+    es: "Descarga la documentación de esta página, fírmala y envíanosla por email",
+    en: "Download the documentation from this page, sign it and send it to us by email",
+    fr: "Téléchargez la documentation de cette page, signez-la et envoyez-la nous par email",
+    de: "Laden Sie die Dokumentation dieser Seite herunter, unterschreiben Sie sie und senden Sie sie uns per E-Mail"
+  },
   "Paga la fianza": {
     es: "Paga la fianza",
     en: "Pay the deposit",

@@ -36,7 +36,7 @@ export default function DocumentacionClient() {
 
   const pasosConfirmacion = [
     { paso: "1", titulo: t("Envía tu documentación"), descripcion: t("DNI/Pasaporte y carnet de conducir (foto o escaneo)") },
-    { paso: "2", titulo: t("Firma y envía el contrato"), descripcion: t("Descarga la documentación de esta página y envíanosla por email") },
+    { paso: "2", titulo: t("Firma y envía el contrato"), descripcion: t("Descarga la documentación de esta página, fírmala y envíanosla por email") },
     { paso: "3", titulo: t("Paga la fianza"), descripcion: t("Transferencia de 1.000€ (máx. 72h antes del inicio)") },
     { paso: "4", titulo: t("Recibe confirmación"), descripcion: t("Te confirmaremos la cita de recogida por email") },
   ];
