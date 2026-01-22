@@ -320,14 +320,15 @@ export async function middleware(request: NextRequest) {
     '/sw.js',
     '/robots.txt',
     '/sitemap.xml',
-    '/administrator/',
-    '/admin/',
     '/socket.io/',
     '/__nextjs_original-stack-frame',
     '/webpack-hmr',
   ];
 
-  const shouldSkip = skipLocaleFor.some(path => pathname.startsWith(path));
+  // ⚠️ CRÍTICO: Admin NO debe tener i18n - excluir tanto /administrator como /administrator/*
+  const shouldSkip = skipLocaleFor.some(path => pathname.startsWith(path)) ||
+                     pathname === '/administrator' || pathname.startsWith('/administrator/') ||
+                     pathname === '/admin' || pathname.startsWith('/admin/');
   
   // ⚠️ CRÍTICO: Redirigir /es/administrator → /administrator (admin NO tiene i18n)
   // El área de administrador NUNCA debe tener prefijo de idioma
