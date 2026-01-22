@@ -450,8 +450,19 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
     const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
     const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
 
+    // Preload de imagen hero para LCP óptimo
+    const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
+
     return (
       <>
+        {/* Preload imagen LCP para descubrimiento temprano */}
+        <link
+          rel="preload"
+          as="image"
+          href={heroImageUrl}
+          fetchPriority="high"
+        />
+        
         <LocalBusinessJsonLd location={location as any} />
         
         {/* ============================================================ */}
@@ -465,9 +476,12 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
               alt={`${t("Alquiler de Autocaravanas en")} ${location.name}`}
               fill
               priority
-              quality={85}
-              className="object-cover"
+              fetchPriority="high"
+              quality={75}
               sizes="100vw"
+              placeholder="blur"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMEAQUBAAAAAAAAAAAAAQIDBAAFBhEhBxITMUFR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQEAAwEBAAAAAAAAAAAAAAABAAIRA0H/2gAMAwEAAhEDEEQA/wCc4llF3yC4tQLi+h6KhPehpCANuqOgSfnAGh+1oOF4bay2G4aUqUVrCe9Z5JJPJJpSqOw7JP/Z"
+              className="object-cover"
             />
             <div className="absolute inset-0 bg-black/40" />
           </div>
