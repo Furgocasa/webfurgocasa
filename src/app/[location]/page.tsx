@@ -374,11 +374,17 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
       }
     );
 
+    // Traducir content_sections (contenido único de la ubicación)
+    const translatedSections = await getTranslatedContentSections(
+      'location_targets', locationRaw.id, locale, locationRaw.content_sections
+    );
+
     const location = {
       ...locationRaw,
       name: translatedFields.name || locationRaw.name,
       h1_title: translatedFields.h1_title || locationRaw.h1_title,
       intro_text: translatedFields.intro_text || locationRaw.intro_text,
+      content_sections: translatedSections || locationRaw.content_sections,
     };
 
     const vehiclesRaw = await getRentVehicles();
@@ -540,9 +546,143 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
         </section>
 
         {/* ============================================================ */}
+        {/* SECCIÓN: Contenido único de la ubicación (generado por IA) */}
+        {/* ============================================================ */}
+        {location.content_sections && (
+          <section className="py-16 lg:py-24 bg-white">
+            <div className="container mx-auto px-4">
+              <div className="max-w-6xl mx-auto">
+                <div className="text-center mb-12">
+                  <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+                    {t("Visitar")} {location.name} {t("en Autocaravana Camper")}
+                  </h2>
+                  <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+                    {t("Descubre todo lo que puedes hacer y ver en")} {location.name} {t("viajando en camper")}
+                  </p>
+                </div>
+
+                <div className="text-gray-700 leading-relaxed space-y-8">
+                  {/* Introducción */}
+                  {location.content_sections.introduction && (
+                    <div 
+                      className="text-base lg:text-lg leading-relaxed prose prose-lg max-w-none"
+                      dangerouslySetInnerHTML={{ __html: location.content_sections.introduction }}
+                    />
+                  )}
+
+                  {/* Atracciones turísticas */}
+                  {location.content_sections.attractions && location.content_sections.attractions.length > 0 && (
+                    <div className="mt-12">
+                      <h3 className="text-2xl lg:text-3xl font-heading font-bold text-furgocasa-blue mb-6">
+                        {t("Qué ver y hacer en")} {location.name}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {location.content_sections.attractions.map((attraction: any, idx: number) => (
+                          <div key={idx} className="bg-blue-50 p-6 rounded-xl border-l-4 border-furgocasa-blue">
+                            <h4 className="text-lg font-bold text-furgocasa-blue mb-3">{attraction.title}</h4>
+                            <div 
+                              className="text-gray-700 text-sm"
+                              dangerouslySetInnerHTML={{ __html: attraction.description }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Áreas de pernocta */}
+                  {location.content_sections.parking_areas && location.content_sections.parking_areas.length > 0 && (
+                    <div className="mt-12">
+                      <h3 className="text-2xl lg:text-3xl font-heading font-bold text-furgocasa-orange mb-6">
+                        {t("Áreas de autocaravanas cerca de")} {location.name}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {location.content_sections.parking_areas.map((area: any, idx: number) => (
+                          <div key={idx} className="bg-orange-50 p-6 rounded-xl border-l-4 border-furgocasa-orange">
+                            <h4 className="text-lg font-bold text-furgocasa-orange mb-2">{area.name}</h4>
+                            <p className="text-xs text-gray-500 mb-3">📍 {area.approximate_location}</p>
+                            <div 
+                              className="text-gray-700 text-sm mb-3"
+                              dangerouslySetInnerHTML={{ __html: area.description }}
+                            />
+                            {area.services && area.services.length > 0 && (
+                              <div className="flex flex-wrap gap-2 mt-3">
+                                {area.services.map((service: string, sidx: number) => (
+                                  <span key={sidx} className="bg-white px-2 py-1 rounded text-xs text-gray-600">
+                                    {service}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Rutas recomendadas */}
+                  {location.content_sections.routes && location.content_sections.routes.length > 0 && (
+                    <div className="mt-12">
+                      <h3 className="text-2xl lg:text-3xl font-heading font-bold text-purple-700 mb-6">
+                        {t("Rutas en camper desde")} {location.name}
+                      </h3>
+                      <div className="space-y-6">
+                        {location.content_sections.routes.map((route: any, idx: number) => (
+                          <div key={idx} className="bg-purple-50 p-6 rounded-xl border-l-4 border-purple-600">
+                            <div className="flex justify-between items-start mb-3">
+                              <h4 className="text-lg font-bold text-purple-700">{route.title}</h4>
+                              <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                {route.duration}
+                              </span>
+                            </div>
+                            <div 
+                              className="text-gray-700 text-sm"
+                              dangerouslySetInnerHTML={{ __html: route.description }}
+                            />
+                            <p className="text-xs text-gray-500 mt-2">
+                              {t("Dificultad")}: <span className="font-semibold">{route.difficulty}</span>
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Gastronomía */}
+                  {location.content_sections.gastronomy && (
+                    <div className="mt-12 bg-green-50 p-8 rounded-2xl border-l-4 border-green-600">
+                      <h3 className="text-2xl font-heading font-bold text-green-700 mb-4">
+                        🍽️ {t("Gastronomía local de")} {location.province || location.name}
+                      </h3>
+                      <div 
+                        className="text-gray-700"
+                        dangerouslySetInnerHTML={{ __html: location.content_sections.gastronomy }}
+                      />
+                    </div>
+                  )}
+
+                  {/* Consejos prácticos */}
+                  {location.content_sections.practical_tips && (
+                    <div className="mt-12 bg-gradient-to-r from-furgocasa-blue to-blue-600 text-white p-8 rounded-2xl">
+                      <h3 className="text-2xl font-heading font-bold mb-4">
+                        💡 {t("Consejos prácticos para tu viaje")}
+                      </h3>
+                      <div 
+                        className="[&_h2]:text-white [&_h3]:text-white [&_p]:text-white/90 [&_li]:text-white/90"
+                        dangerouslySetInnerHTML={{ __html: location.content_sections.practical_tips }}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ============================================================ */}
         {/* SECCIÓN: Precios (igual que HOME) */}
         {/* ============================================================ */}
-        <section className="py-16 lg:py-24 bg-white">
+        <section className="py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
