@@ -6711,6 +6711,248 @@ export const staticTranslations = {
     fr: "Aucun véhicule à vendre",
     de: "Keine Fahrzeuge zum Verkauf"
   },
+
+  // ===== DOCUMENTACIÓN ALQUILER =====
+  "Acceso exclusivo para clientes": {
+    es: "Acceso exclusivo para clientes",
+    en: "Exclusive access for customers",
+    fr: "Accès exclusif pour les clients",
+    de: "Exklusiver Zugang für Kunden"
+  },
+  "Documentación de tu Alquiler": {
+    es: "Documentación de tu Alquiler",
+    en: "Your Rental Documentation",
+    fr: "Documentation de votre location",
+    de: "Ihre Mietdokumentation"
+  },
+  "Descarga, firma y envía los documentos por email para confirmar tu reserva": {
+    es: "Descarga, firma y envía los documentos por email para confirmar tu reserva",
+    en: "Download, sign and send the documents by email to confirm your booking",
+    fr: "Téléchargez, signez et envoyez les documents par email pour confirmer votre réservation",
+    de: "Laden Sie die Dokumente herunter, unterschreiben Sie sie und senden Sie sie per E-Mail, um Ihre Buchung zu bestätigen"
+  },
+  "Pasos para confirmar tu reserva": {
+    es: "Pasos para confirmar tu reserva",
+    en: "Steps to confirm your booking",
+    fr: "Étapes pour confirmer votre réservation",
+    de: "Schritte zur Bestätigung Ihrer Buchung"
+  },
+  "La cita de recogida se confirmará una vez completados estos pasos:": {
+    es: "La cita de recogida se confirmará una vez completados estos pasos:",
+    en: "The pickup appointment will be confirmed once these steps are completed:",
+    fr: "Le rendez-vous de prise en charge sera confirmé une fois ces étapes terminées :",
+    de: "Der Abholtermin wird bestätigt, sobald diese Schritte abgeschlossen sind:"
+  },
+  "Envía tu documentación": {
+    es: "Envía tu documentación",
+    en: "Send your documentation",
+    fr: "Envoyez votre documentation",
+    de: "Senden Sie Ihre Dokumentation"
+  },
+  "DNI/Pasaporte y carnet de conducir (foto o escaneo)": {
+    es: "DNI/Pasaporte y carnet de conducir (foto o escaneo)",
+    en: "ID/Passport and driving license (photo or scan)",
+    fr: "Pièce d'identité/Passeport et permis de conduire (photo ou scan)",
+    de: "Ausweis/Reisepass und Führerschein (Foto oder Scan)"
+  },
+  "Firma el contrato": {
+    es: "Firma el contrato",
+    en: "Sign the contract",
+    fr: "Signez le contrat",
+    de: "Unterschreiben Sie den Vertrag"
+  },
+  "Descarga, firma y envía los documentos de esta página": {
+    es: "Descarga, firma y envía los documentos de esta página",
+    en: "Download, sign and send the documents from this page",
+    fr: "Téléchargez, signez et envoyez les documents de cette page",
+    de: "Laden Sie die Dokumente dieser Seite herunter, unterschreiben Sie sie und senden Sie sie"
+  },
+  "Paga la fianza": {
+    es: "Paga la fianza",
+    en: "Pay the deposit",
+    fr: "Payez la caution",
+    de: "Zahlen Sie die Kaution"
+  },
+  "Transferencia de 1.000€ (máx. 72h antes del inicio)": {
+    es: "Transferencia de 1.000€ (máx. 72h antes del inicio)",
+    en: "Bank transfer of €1,000 (max. 72h before start)",
+    fr: "Virement de 1 000€ (max. 72h avant le début)",
+    de: "Überweisung von 1.000€ (max. 72h vor Beginn)"
+  },
+  "Recibe confirmación": {
+    es: "Recibe confirmación",
+    en: "Receive confirmation",
+    fr: "Recevez la confirmation",
+    de: "Erhalten Sie die Bestätigung"
+  },
+  "Te confirmaremos la cita de recogida por email": {
+    es: "Te confirmaremos la cita de recogida por email",
+    en: "We will confirm the pickup appointment by email",
+    fr: "Nous confirmerons le rendez-vous de prise en charge par email",
+    de: "Wir bestätigen den Abholtermin per E-Mail"
+  },
+  "Email para enviar documentación:": {
+    es: "Email para enviar documentación:",
+    en: "Email to send documentation:",
+    fr: "Email pour envoyer la documentation :",
+    de: "E-Mail zum Senden der Dokumentation:"
+  },
+  "El día de la recogida": {
+    es: "El día de la recogida",
+    en: "On pickup day",
+    fr: "Le jour de la prise en charge",
+    de: "Am Abholtag"
+  },
+  "Documentos que debes traer físicamente:": {
+    es: "Documentos que debes traer físicamente:",
+    en: "Documents you must bring physically:",
+    fr: "Documents que vous devez apporter physiquement :",
+    de: "Dokumente, die Sie physisch mitbringen müssen:"
+  },
+  "DNI o Pasaporte en vigor de todos los conductores": {
+    es: "DNI o Pasaporte en vigor de todos los conductores",
+    en: "Valid ID or Passport of all drivers",
+    fr: "Pièce d'identité ou passeport valide de tous les conducteurs",
+    de: "Gültiger Ausweis oder Reisepass aller Fahrer"
+  },
+  "Carnet de conducir B con mínimo 2 años de antigüedad": {
+    es: "Carnet de conducir B con mínimo 2 años de antigüedad",
+    en: "Class B driving license with at least 2 years of experience",
+    fr: "Permis de conduire B avec au moins 2 ans d'ancienneté",
+    de: "Führerschein Klasse B mit mindestens 2 Jahren Erfahrung"
+  },
+  "El resto de documentación ya la habrás enviado previamente por email.": {
+    es: "El resto de documentación ya la habrás enviado previamente por email.",
+    en: "The rest of the documentation you will have already sent by email.",
+    fr: "Le reste de la documentation aura déjà été envoyé par email.",
+    de: "Die restliche Dokumentation haben Sie bereits per E-Mail gesendet."
+  },
+  "Documentación del Contrato": {
+    es: "Documentación del Contrato",
+    en: "Contract Documentation",
+    fr: "Documentation du contrat",
+    de: "Vertragsdokumentation"
+  },
+  "Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a": {
+    es: "Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a",
+    en: "Please read these documents carefully, sign them and send them by email to",
+    fr: "Veuillez lire attentivement ces documents, les signer et les envoyer par email à",
+    de: "Bitte lesen Sie diese Dokumente sorgfältig, unterschreiben Sie sie und senden Sie sie per E-Mail an"
+  },
+  "Condiciones del Alquiler Detalladas": {
+    es: "Condiciones del Alquiler Detalladas",
+    en: "Detailed Rental Conditions",
+    fr: "Conditions de location détaillées",
+    de: "Detaillierte Mietbedingungen"
+  },
+  "Documento completo con todas las condiciones del servicio de alquiler, incluyendo derechos, obligaciones, política de cancelación, seguros y más. Lectura obligatoria antes de la recogida.": {
+    es: "Documento completo con todas las condiciones del servicio de alquiler, incluyendo derechos, obligaciones, política de cancelación, seguros y más. Lectura obligatoria antes de la recogida.",
+    en: "Complete document with all rental service conditions, including rights, obligations, cancellation policy, insurance and more. Required reading before pickup.",
+    fr: "Document complet avec toutes les conditions du service de location, y compris les droits, obligations, politique d'annulation, assurances et plus. Lecture obligatoire avant la prise en charge.",
+    de: "Vollständiges Dokument mit allen Mietbedingungen, einschließlich Rechte, Pflichten, Stornierungsbedingungen, Versicherungen und mehr. Pflichtlektüre vor der Abholung."
+  },
+  "Anexo de Protección de Datos": {
+    es: "Anexo de Protección de Datos",
+    en: "Data Protection Annex",
+    fr: "Annexe sur la protection des données",
+    de: "Datenschutzanhang"
+  },
+  "Información sobre el tratamiento de tus datos personales conforme al RGPD. Incluye tus derechos y cómo ejercerlos.": {
+    es: "Información sobre el tratamiento de tus datos personales conforme al RGPD. Incluye tus derechos y cómo ejercerlos.",
+    en: "Information about the processing of your personal data in accordance with GDPR. Includes your rights and how to exercise them.",
+    fr: "Informations sur le traitement de vos données personnelles conformément au RGPD. Inclut vos droits et comment les exercer.",
+    de: "Informationen über die Verarbeitung Ihrer personenbezogenen Daten gemäß DSGVO. Enthält Ihre Rechte und wie Sie diese ausüben können."
+  },
+  "Lectura obligatoria": {
+    es: "Lectura obligatoria",
+    en: "Required reading",
+    fr: "Lecture obligatoire",
+    de: "Pflichtlektüre"
+  },
+  "Ver documento": {
+    es: "Ver documento",
+    en: "View document",
+    fr: "Voir le document",
+    de: "Dokument ansehen"
+  },
+  "Descargar PDF": {
+    es: "Descargar PDF",
+    en: "Download PDF",
+    fr: "Télécharger PDF",
+    de: "PDF herunterladen"
+  },
+  "Preguntas frecuentes": {
+    es: "Preguntas frecuentes",
+    en: "Frequently asked questions",
+    fr: "Questions fréquentes",
+    de: "Häufig gestellte Fragen"
+  },
+  "¿Cuándo firmo el contrato?": {
+    es: "¿Cuándo firmo el contrato?",
+    en: "When do I sign the contract?",
+    fr: "Quand dois-je signer le contrat ?",
+    de: "Wann unterschreibe ich den Vertrag?"
+  },
+  "El contrato debe firmarse antes del comienzo del alquiler y enviarse por email a Furgocasa. La confirmación de la cita de recogida se realizará una vez recibida la documentación firmada. Te recomendamos leerlo detenidamente y enviarlo con suficiente antelación.": {
+    es: "El contrato debe firmarse antes del comienzo del alquiler y enviarse por email a Furgocasa. La confirmación de la cita de recogida se realizará una vez recibida la documentación firmada. Te recomendamos leerlo detenidamente y enviarlo con suficiente antelación.",
+    en: "The contract must be signed before the rental begins and sent by email to Furgocasa. The pickup appointment will be confirmed once the signed documentation is received. We recommend reading it carefully and sending it well in advance.",
+    fr: "Le contrat doit être signé avant le début de la location et envoyé par email à Furgocasa. Le rendez-vous de prise en charge sera confirmé une fois la documentation signée reçue. Nous vous recommandons de le lire attentivement et de l'envoyer suffisamment à l'avance.",
+    de: "Der Vertrag muss vor Mietbeginn unterschrieben und per E-Mail an Furgocasa gesendet werden. Der Abholtermin wird bestätigt, sobald die unterschriebene Dokumentation eingegangen ist. Wir empfehlen, ihn sorgfältig zu lesen und rechtzeitig zu senden."
+  },
+  "¿Cómo se paga la fianza?": {
+    es: "¿Cómo se paga la fianza?",
+    en: "How is the deposit paid?",
+    fr: "Comment payer la caution ?",
+    de: "Wie wird die Kaution bezahlt?"
+  },
+  "La fianza de 1.000€ se abona mediante transferencia bancaria, máximo 72 horas antes del inicio del alquiler. Debes enviar el justificante de transferencia y certificado de titularidad de la cuenta. El titular debe coincidir con el arrendatario.": {
+    es: "La fianza de 1.000€ se abona mediante transferencia bancaria, máximo 72 horas antes del inicio del alquiler. Debes enviar el justificante de transferencia y certificado de titularidad de la cuenta. El titular debe coincidir con el arrendatario.",
+    en: "The €1,000 deposit is paid by bank transfer, maximum 72 hours before the rental starts. You must send the transfer receipt and account ownership certificate. The account holder must match the tenant.",
+    fr: "La caution de 1 000€ est payée par virement bancaire, maximum 72 heures avant le début de la location. Vous devez envoyer le justificatif de virement et le certificat de titularité du compte. Le titulaire doit correspondre au locataire.",
+    de: "Die Kaution von 1.000€ wird per Banküberweisung bezahlt, maximal 72 Stunden vor Mietbeginn. Sie müssen den Überweisungsbeleg und die Kontoinhaberschaftsbescheinigung senden. Der Kontoinhaber muss mit dem Mieter übereinstimmen."
+  },
+  "¿Puedo añadir un segundo conductor?": {
+    es: "¿Puedo añadir un segundo conductor?",
+    en: "Can I add a second driver?",
+    fr: "Puis-je ajouter un deuxième conducteur ?",
+    de: "Kann ich einen zweiten Fahrer hinzufügen?"
+  },
+  "Sí, el segundo conductor está incluido en el precio. Solo necesitamos su DNI y carnet de conducir enviados por email antes del alquiler.": {
+    es: "Sí, el segundo conductor está incluido en el precio. Solo necesitamos su DNI y carnet de conducir enviados por email antes del alquiler.",
+    en: "Yes, the second driver is included in the price. We only need their ID and driving license sent by email before the rental.",
+    fr: "Oui, le deuxième conducteur est inclus dans le prix. Nous avons seulement besoin de sa pièce d'identité et de son permis de conduire envoyés par email avant la location.",
+    de: "Ja, der zweite Fahrer ist im Preis inbegriffen. Wir benötigen nur seinen Ausweis und Führerschein per E-Mail vor der Anmietung."
+  },
+  "¿Cómo envío la documentación?": {
+    es: "¿Cómo envío la documentación?",
+    en: "How do I send the documentation?",
+    fr: "Comment envoyer la documentation ?",
+    de: "Wie sende ich die Dokumentation?"
+  },
+  "Puedes enviarnos los documentos por email a info@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).": {
+    es: "Puedes enviarnos los documentos por email a info@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).",
+    en: "You can send us the documents by email to info@furgocasa.com. We accept scanned images or legible photos of the documents (ID, driving license, signed contract, deposit receipt).",
+    fr: "Vous pouvez nous envoyer les documents par email à info@furgocasa.com. Nous acceptons les images scannées ou les photos lisibles des documents (pièce d'identité, permis de conduire, contrat signé, justificatif de caution).",
+    de: "Sie können uns die Dokumente per E-Mail an info@furgocasa.com senden. Wir akzeptieren gescannte Bilder oder lesbare Fotos der Dokumente (Ausweis, Führerschein, unterschriebener Vertrag, Kautionsbeleg)."
+  },
+  "¿Tienes dudas sobre la documentación?": {
+    es: "¿Tienes dudas sobre la documentación?",
+    en: "Do you have questions about the documentation?",
+    fr: "Avez-vous des questions sur la documentation ?",
+    de: "Haben Sie Fragen zur Dokumentation?"
+  },
+  "Estamos aquí para ayudarte": {
+    es: "Estamos aquí para ayudarte",
+    en: "We are here to help you",
+    fr: "Nous sommes là pour vous aider",
+    de: "Wir sind hier, um Ihnen zu helfen"
+  },
+  "Llamar": {
+    es: "Llamar",
+    en: "Call",
+    fr: "Appeler",
+    de: "Anrufen"
+  },
 };
 
 /**
