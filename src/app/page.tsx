@@ -54,7 +54,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const alternates = buildCanonicalAlternates('/', locale);
   
   return {
-    title: `${t("Las Mejores Campers en Alquiler")} - ${t("Desde 95€/día")}`,
+    // ✅ Título sin " - Furgocasa" (el template del layout.tsx lo añade automáticamente)
+    title: `${t("Las Mejores Campers en Alquiler")}`,
     description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
     keywords:"alquiler camper, autocaravana alquiler, alquiler furgoneta camper, motorhome españa, campervan alquiler, casa rodante, alquiler autocaravana españa",
     authors: [{ name:"Furgocasa" }],
