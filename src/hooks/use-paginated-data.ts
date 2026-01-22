@@ -144,7 +144,17 @@ export function usePaginatedData<T = any>({
 /**
  * Hook más simple para datos con filtros pero sin paginación infinita
  * Útil cuando quieres cargar todo de una vez pero con caché
+ * ✅ Mantiene datos anteriores mientras recarga
  */
+
+// Clase personalizada para errores de abort
+class CachedDataAbortError extends Error {
+  name = 'CachedDataAbortError';
+  constructor() {
+    super('Query aborted');
+  }
+}
+
 export function useCachedData<T = any>({
   queryKey,
   queryFn,
@@ -161,31 +171,23 @@ export function useCachedData<T = any>({
   const query = useInfiniteQuery({
     queryKey,
     queryFn: async ({ signal }) => {
-      try {
-        const data = await queryFn();
-        
-        // Verificar si la petición fue abortada
-        if (signal?.aborted) {
-          console.log('[useCachedData] Request aborted');
-          return { data: [], count: 0, nextPage: undefined };
-        }
-        
-        return {
-          data: Array.isArray(data) ? data : [data],
-          count: Array.isArray(data) ? data.length : 1,
-          nextPage: undefined,
-        };
-      } catch (error: any) {
-        // Ignorar errores de abort
-        if (error?.name === 'AbortError' || 
-            error?.message?.includes('aborted') || 
-            error?.message?.includes('signal') ||
-            signal?.aborted) {
-          console.log('[useCachedData] Request aborted, ignoring error');
-          return { data: [], count: 0, nextPage: undefined };
-        }
-        throw error;
+      // Si ya está abortado antes de empezar, throw para mantener datos anteriores
+      if (signal?.aborted) {
+        throw new CachedDataAbortError();
       }
+      
+      const data = await queryFn();
+      
+      // Verificar si la petición fue abortada DESPUÉS de la llamada
+      if (signal?.aborted) {
+        throw new CachedDataAbortError();
+      }
+      
+      return {
+        data: Array.isArray(data) ? data : [data],
+        count: Array.isArray(data) ? data.length : 1,
+        nextPage: undefined,
+      };
     },
     getNextPageParam: () => undefined,
     initialPageParam: 0,
@@ -194,7 +196,9 @@ export function useCachedData<T = any>({
     gcTime: staleTime * 2,
     retry: (failureCount, error: any) => {
       // No reintentar errores de abort
-      if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+      if (error?.name === 'CachedDataAbortError' ||
+          error?.name === 'AbortError' || 
+          error?.message?.includes('aborted')) {
         return false;
       }
       return failureCount < 2;
@@ -210,7 +214,12 @@ export function useCachedData<T = any>({
   return {
     data: Array.isArray(allData) ? allData[0] : allData,
     loading: query.isLoading,
-    error: query.error ? (query.error as any).message : null,
+    // No mostrar errores de abort como errores reales
+    error: query.error && 
+           (query.error as any).name !== 'CachedDataAbortError' &&
+           (query.error as any).name !== 'AbortError'
+      ? (query.error as any).message 
+      : null,
     refetch,
   };
 }

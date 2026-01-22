@@ -3,9 +3,10 @@
  * - Carga todos los registros de una vez (sin paginación "Cargar más")
  * - Usa React Query para caché inteligente
  * - Tiempos de caché configurables por tabla
+ * - Mantiene datos anteriores mientras recarga (placeholderData)
  */
 
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient, keepPreviousData } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
 
 interface UseAllDataCachedOptions {
@@ -45,6 +46,14 @@ const DEFAULT_STALE_TIMES: Record<string, number> = {
   default: 1000 * 60 * 15,
 };
 
+// Clase personalizada para errores de abort que no deben logearse
+class AbortedQueryError extends Error {
+  name = 'AbortedQueryError';
+  constructor(table: string) {
+    super(`Query aborted for ${table}`);
+  }
+}
+
 export function useAllDataCached<T = any>({
   queryKey,
   table,
@@ -62,68 +71,70 @@ export function useAllDataCached<T = any>({
   const query = useQuery({
     queryKey: [...queryKey, filters, orderBy],
     queryFn: async ({ signal }) => {
-      console.log(`[useAllDataCached] Cargando ${table}...`);
+      // Si ya está abortado antes de empezar, throw para mantener datos anteriores
+      if (signal?.aborted) {
+        throw new AbortedQueryError(table);
+      }
       
-      try {
-        const supabase = createClient();
-        
-        let queryBuilder = supabase
-          .from(table)
-          .select(select, { count: 'exact' });
+      const supabase = createClient();
+      
+      let queryBuilder = supabase
+        .from(table)
+        .select(select, { count: 'exact' });
 
-        // Aplicar filtros
-        Object.entries(filters).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
-            queryBuilder = queryBuilder.eq(key, value);
-          }
-        });
-
-        // Ordenamiento
-        queryBuilder = queryBuilder.order(orderBy.column, { 
-          ascending: orderBy.ascending ?? false 
-        });
-
-        const { data, error, count } = await queryBuilder;
-
-        // Verificar si la petición fue abortada
-        if (signal?.aborted) {
-          console.log(`[useAllDataCached] Request aborted for ${table}`);
-          return { data: [] as T[], count: 0 };
+      // Aplicar filtros
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          queryBuilder = queryBuilder.eq(key, value);
         }
+      });
 
-        if (error) {
-          console.error(`[useAllDataCached] Error en ${table}:`, error);
-          throw error;
-        }
+      // Ordenamiento
+      queryBuilder = queryBuilder.order(orderBy.column, { 
+        ascending: orderBy.ascending ?? false 
+      });
 
-        console.log(`[useAllDataCached] ${table}: ${data?.length || 0} registros cargados`);
+      const { data, error, count } = await queryBuilder;
 
-        return {
-          data: (data || []) as T[],
-          count: count || 0,
-        };
-      } catch (error: any) {
-        // Ignorar errores de abort - no son errores reales
-        if (error?.name === 'AbortError' || 
-            error?.message?.includes('aborted') || 
-            error?.message?.includes('signal') ||
-            signal?.aborted) {
-          console.log(`[useAllDataCached] Request aborted for ${table}, ignoring error`);
-          return { data: [] as T[], count: 0 };
-        }
+      // Verificar si la petición fue abortada DESPUÉS de la llamada
+      // En este caso, throw para que React Query mantenga los datos anteriores
+      if (signal?.aborted) {
+        throw new AbortedQueryError(table);
+      }
+
+      if (error) {
+        console.error(`[useAllDataCached] Error en ${table}:`, error);
         throw error;
       }
+
+      console.log(`[useAllDataCached] ${table}: ${data?.length || 0} registros cargados`);
+
+      return {
+        data: (data || []) as T[],
+        count: count || 0,
+      };
     },
     enabled,
     staleTime: resolvedStaleTime,
     gcTime: resolvedStaleTime * 2, // Mantener en memoria el doble de tiempo
     refetchOnWindowFocus: false,
+    // ✅ CRÍTICO: Mantener datos anteriores mientras se recarga
+    placeholderData: keepPreviousData,
+    // ✅ No reintentar errores de abort
     retry: (failureCount, error: any) => {
-      // No reintentar errores de abort
-      if (error?.name === 'AbortError' || error?.message?.includes('aborted')) {
+      if (error?.name === 'AbortedQueryError' || 
+          error?.name === 'AbortError' || 
+          error?.message?.includes('aborted')) {
         return false;
       }
       return failureCount < 2;
+    },
+    // ✅ No mostrar errores de abort en la UI
+    throwOnError: (error: any) => {
+      // Solo propagar errores reales, no aborts
+      return error?.name !== 'AbortedQueryError' && 
+             error?.name !== 'AbortError' &&
+             !error?.message?.includes('aborted');
     },
   });
 
@@ -133,13 +144,21 @@ export function useAllDataCached<T = any>({
     queryClient.invalidateQueries({ queryKey });
   };
 
+  // ✅ Detectar si estamos mostrando datos placeholder (anteriores)
+  const isPlaceholderData = query.isPlaceholderData;
+
   return {
     data: query.data?.data || [],
     totalCount: query.data?.count || 0,
     loading: query.isLoading,
-    error: query.error ? (query.error as any).message : null,
+    // No mostrar errores de abort como errores reales
+    error: query.error && 
+           (query.error as any).name !== 'AbortedQueryError' &&
+           (query.error as any).name !== 'AbortError' 
+      ? (query.error as any).message 
+      : null,
     refetch,
-    isRefetching: query.isRefetching,
+    isRefetching: query.isRefetching || isPlaceholderData,
     // Información del caché
     dataUpdatedAt: query.dataUpdatedAt,
     staleTime: resolvedStaleTime,
