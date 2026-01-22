@@ -4,6 +4,92 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🚀 [1.0.10] - 23 de Enero 2026 - **Optimización Rendimiento + PageSpeed 98**
+
+### 🎯 **RESUMEN DE MEJORAS**
+
+Optimización masiva de rendimiento que logra **98/100 en escritorio** y **90/100 en móvil** en Google PageSpeed.
+
+---
+
+### ✅ **CAMBIOS IMPLEMENTADOS**
+
+#### 1. **Optimización de Imágenes Hero** (`ae33849`)
+
+Todas las imágenes hero reducidas drásticamente:
+
+| Imagen | Antes | Después | Ahorro |
+|--------|-------|---------|--------|
+| hero-location-mediterraneo | 531 KB | 58 KB | **-89%** |
+| murcia | 434 KB | 95 KB | **-78%** |
+| cartagena | 555 KB | 112 KB | **-80%** |
+| alicante | 520 KB | 114 KB | **-78%** |
+
+#### 2. **Preconnect y DNS-Prefetch** (`b334d3c`)
+
+```html
+<link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
+<link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+```
+
+#### 3. **Configuración Next.js Optimizada** (`b334d3c`)
+
+```js
+images: {
+  formats: ['image/avif', 'image/webp'],
+  minimumCacheTTL: 31536000, // 1 año
+},
+experimental: {
+  optimizeCss: true,
+},
+compress: true,
+generateEtags: true,
+```
+
+#### 4. **Optimización LCP Primera Imagen Venta** (`6ff6d18`)
+
+```tsx
+<Image
+  priority={index === 0}
+  fetchPriority={index === 0 ? "high" : "auto"}
+  loading={index === 0 ? undefined : "lazy"}
+/>
+```
+
+---
+
+### 📊 **RESULTADOS PAGESPEED**
+
+#### Escritorio (Cartagena)
+| Métrica | Valor | Estado |
+|---------|-------|--------|
+| **Rendimiento** | **98** | ✅ |
+| FCP | 0.3s | ✅ |
+| LCP | 0.7s | ✅ |
+| CLS | 0 | ✅ |
+
+#### Móvil (Cartagena)
+| Métrica | Valor | Estado |
+|---------|-------|--------|
+| **Rendimiento** | **90** | ✅ |
+| FCP | 1.2s | ✅ |
+| LCP | 3.5s | ⚠️ |
+| CLS | 0 | ✅ |
+
+---
+
+### 📁 **ARCHIVOS MODIFICADOS**
+
+```
+src/app/layout.tsx                  # Preconnect links
+src/app/[location]/page.tsx         # Image optimization
+next.config.js                      # AVIF, optimizeCss, compress
+package.json                        # +critters dependency
+```
+
+---
+
 ## 🚀 [1.0.9] - 22 de Enero 2026 - **Mejoras SEO Masivas + Páginas de Localización**
 
 ### 🎯 **RESUMEN DE MEJORAS**

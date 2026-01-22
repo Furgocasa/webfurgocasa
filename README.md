@@ -1,66 +1,68 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.9-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.10-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
+[![PageSpeed](https://img.shields.io/badge/PageSpeed-98%2F100-brightgreen.svg)](https://pagespeed.web.dev/)
 
-**🎉 VERSIÓN 1.0.9 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 1.0.10 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
-> **✅ ESTADO: TOTALMENTE FUNCIONAL** - Todas las características críticas operativas y probadas en producción.
+> **✅ ESTADO: TOTALMENTE FUNCIONAL** - PageSpeed **98/100** escritorio, **90/100** móvil
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
 ---
 
-## 🚀 ÚLTIMA ACTUALIZACIÓN: Mejoras SEO Masivas (v1.0.9)
+## 🚀 ÚLTIMA ACTUALIZACIÓN: Optimización Rendimiento (v1.0.10)
 
-**22 Enero 2026** - Mejoras críticas de SEO y páginas de localización
+**23 Enero 2026** - Optimización masiva de rendimiento
 
-### 🎯 Resumen de Mejoras
+### 📊 Resultados PageSpeed Insights
 
-| Mejora | Descripción | Impacto SEO |
-|--------|-------------|-------------|
-| **Pre-generación estática** | ~320 páginas pre-generadas en build | ⚡⚡⚡ Crítico |
-| **Títulos páginas venta** | Meta títulos cargados desde DB | ⚡⚡ Alto |
-| **Traducciones venta FR/DE** | UI traducida en todos los idiomas | ⚡⚡ Alto |
-| **Hero image por localización** | Imagen personalizada desde Supabase | ⚡ Medio |
+| Dispositivo | Rendimiento | FCP | LCP | CLS |
+|-------------|-------------|-----|-----|-----|
+| **Escritorio** | **98** ✅ | 0.3s | 0.7s | 0 |
+| **Móvil** | **90** ✅ | 1.2s | 3.5s | 0 |
 
-### ✅ Pre-generación Estática (`generateStaticParams`)
+### 🎯 Optimizaciones Implementadas
 
-**TODAS** las páginas dinámicas importantes ahora se pre-generan en build:
+| Optimización | Antes | Después | Mejora |
+|--------------|-------|---------|--------|
+| **Imágenes hero** | 400-530 KB | 50-120 KB | **-80%** |
+| **Formato** | WebP | AVIF/WebP | Mejor compresión |
+| **Preconnect** | No | Sí | -200ms conexión |
+| **CSS crítico** | No | Sí (critters) | FCP más rápido |
+| **Pre-generación** | No | ~320 páginas | SEO boost |
 
-| Página | Páginas Pre-generadas |
-|--------|----------------------|
-| **Localizaciones** (alquiler + venta × 4 idiomas) | **~232** |
-| **Blog** (todos los posts) | **~50+** |
-| **Vehículos alquiler** | **~15** |
-| **Vehículos venta** | **~20** |
-| **TOTAL** | **~320 páginas** |
+### ✅ Configuración Aplicada
 
-**Beneficios**:
-- ⚡ Google indexa más rápido
-- ⚡ TTFB mínimo (CDN/cache)
-- ⚡ Core Web Vitals perfectos
-- ⚡ Crawl budget optimizado
+```js
+// next.config.js
+images: {
+  formats: ['image/avif', 'image/webp'],
+  minimumCacheTTL: 31536000,
+},
+experimental: { optimizeCss: true },
+compress: true,
+```
 
-### ✅ Imagen Hero Personalizada por Localización
+```html
+<!-- layout.tsx -->
+<link rel="preconnect" href="https://supabase.co" />
+<link rel="dns-prefetch" href="https://supabase.co" />
+```
 
-Cada página de localización puede tener su propia imagen hero:
-- 18 localizaciones con imagen específica
-- 18 con imagen mediterránea por defecto
-- Configuración desde `location_targets.hero_image` en Supabase
-
-**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.9
+**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.10
 
 ---
 
-## 🔧 Versión 1.0.8: Fix Crítico Búsqueda y SEO
+## 🎨 Versión 1.0.9: Mejoras SEO Masivas
 
 **22 Enero 2026**
 
-- **VehicleCard** - Restauradas props `pricing` y `searchParams`
-- **SearchSummary** - Fondo azul y cálculo de días funcionando
-- **CSP actualizado** - Dominios Google Analytics añadidos
+- **Pre-generación estática** - ~320 páginas con `generateStaticParams`
+- **Hero image por localización** - Imagen personalizada desde Supabase
+- **Traducciones páginas venta** - FR/DE completas
 
 ---
 
@@ -1194,6 +1196,14 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 ## 📜 Historial de Versiones
 
+### v1.0.10 (23 Enero 2026) - Optimización Rendimiento 🔥
+- 🔥 **PageSpeed 98/100** en escritorio, **90/100** en móvil
+- ✅ Imágenes hero optimizadas: 530KB → 58KB (-89%)
+- ✅ Formato AVIF/WebP con caché 1 año
+- ✅ Preconnect a Supabase y Google Fonts
+- ✅ CSS crítico inline con `critters`
+- ✅ Compresión Gzip/Brotli habilitada
+
 ### v1.0.9 (22 Enero 2026) - Mejoras SEO Masivas 🚀
 - 🔥 **SEO CRÍTICO**: Pre-generación estática de ~320 páginas con `generateStaticParams`
 - ✅ Localizaciones: 232 rutas pre-generadas (alquiler + venta × 4 idiomas)
@@ -1239,10 +1249,11 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 1.0.9 - Mejoras SEO Masivas + Páginas Localización  
+**Versión**: 1.0.10 - Optimización Rendimiento (PageSpeed 98/100)  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 22 de Enero 2026  
+**PageSpeed**: 98/100 escritorio | 90/100 móvil  
+**Última actualización**: 23 de Enero 2026  
 
 ---
 
