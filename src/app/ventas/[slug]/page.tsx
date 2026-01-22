@@ -1,16 +1,17 @@
-import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
-import Link from"next/link";
-import { notFound } from"next/navigation";
+import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Metadata, ResolvingMetadata } from "next";
 import { 
   ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Bed, 
   CheckCircle, Phone, Mail, MapPin, Shield, Wrench, Ruler,
   Share2, Heart
-} from"lucide-react";
-import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
-import { createClient } from"@/lib/supabase/server";
-import { formatPrice, sortVehicleEquipment } from"@/lib/utils";
+} from "lucide-react";
+import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
+import { createClient } from "@/lib/supabase/server";
+import { formatPrice, sortVehicleEquipment } from "@/lib/utils";
 
-export const dynamic ="force-dynamic";
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 // Cargar vehículo desde Supabase
@@ -40,6 +41,66 @@ async function getVehicle(slug: string) {
   }
 
   return vehicle;
+}
+
+// 🎯 Generar Metadatos Dinámicos para SEO y OpenGraph
+export async function generateMetadata(
+  { params }: { params: Promise<{ slug: string }> },
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const { slug } = await params;
+  const vehicle = await getVehicle(slug);
+
+  if (!vehicle) {
+    return {
+      title: "Vehículo no encontrado | Furgocasa",
+    };
+  }
+
+  // Imagen principal
+  let ogImage = "/icon-512x512.png";
+  if (vehicle.images && vehicle.images.length > 0) {
+    const mainImage = vehicle.images.find((img: any) => img.is_primary) || 
+                      vehicle.images.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))[0];
+    
+    if (mainImage) {
+        if (mainImage.image_url) {
+            ogImage = mainImage.image_url;
+        } else if (mainImage.storage_path) {
+            ogImage = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vehicles/${mainImage.storage_path}`;
+        }
+    }
+  }
+
+  const title = `${vehicle.name} en Venta | Furgocasa`;
+  const description = `Compra este ${vehicle.name} (${vehicle.year}) por ${formatPrice(vehicle.sale_price)}. ${vehicle.mileage.toLocaleString()} km, ${vehicle.seats} plazas. Garantía y revisión completa incluida.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: vehicle.name,
+        },
+      ],
+      type: "article",
+      publishedTime: vehicle.created_at,
+      section: "Vehículos en Venta",
+      tags: ["camper", "autocaravana", "venta", vehicle.brand, vehicle.model],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
 }
 
 const conditionLabels: Record<string, { label: string; color: string }> = {
