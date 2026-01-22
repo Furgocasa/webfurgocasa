@@ -170,12 +170,15 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { location: string };
+  params: Promise<{ location: string }>;
 }): Promise<Metadata> {
-  // DEBUG: Log para ver qué llega
-  console.log('[generateMetadata] params.location:', params.location);
+  // Next.js 15: params es Promise, hay que hacer await
+  const resolvedParams = await params;
   
-  const slug = extractSlug(params.location);
+  // DEBUG: Log para ver qué llega
+  console.log('[generateMetadata] params resueltos:', JSON.stringify(resolvedParams));
+  
+  const slug = extractSlug(resolvedParams.location);
   console.log('[generateMetadata] slug extraído:', slug);
 
   if (!slug) {
@@ -228,9 +231,11 @@ export async function generateMetadata({
 export default async function SaleLocationPage({
   params,
 }: {
-  params: { location: string };
+  params: Promise<{ location: string }>;
 }) {
-  const slug = extractSlug(params.location);
+  // Next.js 15: params es Promise
+  const resolvedParams = await params;
+  const slug = extractSlug(resolvedParams.location);
 
   const [location, vehicles] = await Promise.all([
     getLocation(slug),
