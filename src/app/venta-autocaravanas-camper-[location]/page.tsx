@@ -160,7 +160,8 @@ export async function generateStaticParams() {
     .eq("is_active", true);
 
   if (!data) return [];
-  return data.map((loc) => ({ location: loc.slug }));
+  // Devolver el formato completo como hace alquiler
+  return data.map((loc) => ({ location: `venta-autocaravanas-camper-${loc.slug}` }));
 }
 
 // ============================================================================
@@ -170,27 +171,22 @@ export async function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ location: string }>;
+  params: { location: string };
 }): Promise<Metadata> {
-  // Next.js 15: params es Promise, hay que hacer await
-  const resolvedParams = await params;
+  // IGUAL QUE ALQUILER: params.location directamente (sin Promise)
+  console.log('[generateMetadata VENTA] params.location:', params.location);
   
-  // DEBUG: Log para ver qué llega
-  console.log('[generateMetadata] params resueltos:', JSON.stringify(resolvedParams));
-  
-  const slug = extractSlug(resolvedParams.location);
-  console.log('[generateMetadata] slug extraído:', slug);
+  const slug = extractSlug(params.location);
+  console.log('[generateMetadata VENTA] slug extraído:', slug);
 
   if (!slug) {
-    console.log('[generateMetadata] ERROR: slug vacío');
     return { title: "Ubicación no especificada", robots: { index: false, follow: false } };
   }
 
   const location = await getLocation(slug);
-  console.log('[generateMetadata] location encontrada:', location ? location.name : 'NULL');
+  console.log('[generateMetadata VENTA] location:', location ? location.name : 'NULL');
 
   if (!location) {
-    console.log('[generateMetadata] ERROR: ubicación no encontrada para slug:', slug);
     return { title: "Ubicación no encontrada", robots: { index: false, follow: false } };
   }
 
@@ -231,11 +227,10 @@ export async function generateMetadata({
 export default async function SaleLocationPage({
   params,
 }: {
-  params: Promise<{ location: string }>;
+  params: { location: string };
 }) {
-  // Next.js 15: params es Promise
-  const resolvedParams = await params;
-  const slug = extractSlug(resolvedParams.location);
+  // IGUAL QUE ALQUILER: params.location directamente
+  const slug = extractSlug(params.location);
 
   const [location, vehicles] = await Promise.all([
     getLocation(slug),
