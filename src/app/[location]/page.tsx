@@ -292,10 +292,14 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   const ogImage = saleLocation.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
 
   return {
-    title,
+    title: {
+      absolute: title, // ✅ Forzar título absoluto para evitar templates
+    },
     description,
     openGraph: {
-      title,
+      title: {
+        absolute: title,
+      },
       description: saleLocation.meta_description?.trim() ||
         `${t('Compra tu autocaravana en')} ${saleLocation.name}. ${t('Vehículos premium con garantía.')}`,
       type: 'website',
