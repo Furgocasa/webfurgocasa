@@ -14,7 +14,8 @@ import {
   Mail,
   MapPin,
   Tag,
-  ArrowRight
+  ArrowRight,
+  Settings
 } from "lucide-react";
 import { useState } from "react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
@@ -312,22 +313,26 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
                     </div>
 
                     {/* Specs */}
-                    <div className="grid grid-cols-2 gap-3 mb-4 text-sm">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4 text-sm">
                       <div className="flex items-center gap-2 text-gray-600">
-                        <Gauge className="h-4 w-4" />
-                        <span>{formatMileage(vehicle.mileage)}</span>
+                        <Gauge className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{formatMileage(vehicle.mileage)}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
-                        <Fuel className="h-4 w-4" />
-                        <span>{vehicle.fuel_type}</span>
+                        <Fuel className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{vehicle.fuel_type}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
-                        <Users className="h-4 w-4" />
-                        <span>{vehicle.seats} {t("plazas día")}</span>
+                        <Settings className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{vehicle.transmission}</span>
                       </div>
                       <div className="flex items-center gap-2 text-gray-600">
-                        <Bed className="h-4 w-4" />
-                        <span>{vehicle.beds} {t("plazas noche")}</span>
+                        <Users className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{vehicle.seats} {t("plazas día")}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Bed className="h-4 w-4 flex-shrink-0" />
+                        <span className="truncate">{vehicle.beds} {t("plazas noche")}</span>
                       </div>
                     </div>
 
