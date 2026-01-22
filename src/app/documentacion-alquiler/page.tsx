@@ -179,10 +179,11 @@ export default function DocumentacionAlquilerPage() {
                   carnet de conducir el día de la recogida.
                 </p>
 
-                <h3>¿Los documentos deben ser originales?</h3>
+                <h3>¿Cómo envío la documentación?</h3>
                 <p>
-                  Sí, necesitamos los documentos originales físicos. No se aceptan copias ni
-                  fotografías.
+                  Puedes enviarnos los documentos por email a <strong>info@furgocasa.com</strong>. 
+                  Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, 
+                  carnet de conducir, contrato firmado, justificante de fianza).
                 </p>
               </div>
             </div>
