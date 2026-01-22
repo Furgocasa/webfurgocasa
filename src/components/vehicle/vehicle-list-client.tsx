@@ -255,18 +255,22 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                 </LocalizedLink>
 
                 {/* Especificaciones principales */}
-                <div className="flex items-center gap-4 mb-4 text-sm text-gray-600">
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-sm text-gray-600">
                   <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
+                    <Users className="h-4 w-4 flex-shrink-0" />
                     <span>{vehicle.seats} {t("plazas")}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Bed className="h-4 w-4" />
+                    <Bed className="h-4 w-4 flex-shrink-0" />
                     <span>{vehicle.beds} {t("camas")}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Fuel className="h-4 w-4" />
+                    <Fuel className="h-4 w-4 flex-shrink-0" />
                     <span>{vehicle.fuel_type}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Settings className="h-4 w-4 flex-shrink-0" />
+                    <span>{vehicle.transmission === 'automatic' ? t('Automática') : t('Manual')}</span>
                   </div>
                 </div>
 
