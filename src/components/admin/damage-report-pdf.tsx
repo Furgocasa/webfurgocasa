@@ -232,122 +232,138 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             </table>
           </div>
 
-          {/* DAÑO EXTERIOR */}
-          <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px', marginBottom: '10px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
-              DAÑO EXTERIOR ({exteriorDamages.length})
-            </div>
-            
-            {/* Fila 1: Frontal | Trasera */}
-            {/* Ajuste: ancho 35% para que no sean gigantes, centradas en su celda */}
-            <table style={{ width: '100%', marginBottom: '10px' }}>
-              <tbody>
-                <tr>
-                  <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'middle', textAlign: 'center' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Frontal</div>
-                      <div style={{ width: '60%', margin: '0 auto' }}> {/* Contenedor para limitar tamaño */}
-                        <VehicleImage viewType="front" damages={activeDamages} />
+          {/* LAYOUT DOS COLUMNAS: Imágenes (60%) + Detalles (40%) */}
+          <table style={{ width: '100%', marginBottom: '10px' }}>
+            <tbody>
+              <tr>
+                {/* COLUMNA IZQUIERDA: IMÁGENES DE VEHÍCULOS */}
+                <td style={{ width: '58%', verticalAlign: 'top', paddingRight: '8px' }}>
+                  
+                  {/* DAÑO EXTERIOR */}
+                  <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px', marginBottom: '10px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
+                      DAÑO EXTERIOR ({exteriorDamages.length})
+                    </div>
+                    
+                    {/* Fila 1: Frontal | Trasera */}
+                    <table style={{ width: '100%', marginBottom: '10px' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'middle', textAlign: 'center' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
+                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Frontal</div>
+                              <div style={{ width: '60%', margin: '0 auto' }}>
+                                <VehicleImage viewType="front" damages={activeDamages} />
+                              </div>
+                            </div>
+                          </td>
+                          <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'middle', textAlign: 'center' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
+                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Trasera</div>
+                              <div style={{ width: '60%', margin: '0 auto' }}>
+                                <VehicleImage viewType="back" damages={activeDamages} />
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    {/* Fila 2: Lateral Izq | Lateral Der */}
+                    <table style={{ width: '100%', marginBottom: '10px' }}>
+                      <tbody>
+                        <tr>
+                          <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'top' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
+                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Izquierdo</div>
+                              <VehicleImage viewType="left" damages={activeDamages} />
+                            </div>
+                          </td>
+                          <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'top' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
+                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Derecho</div>
+                              <VehicleImage viewType="right" damages={activeDamages} />
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+
+                    {/* Fila 3: Superior (centrado) */}
+                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                      <div style={{ width: '60%', border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
+                        <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Superior</div>
+                        <VehicleImage viewType="top" damages={activeDamages} />
                       </div>
                     </div>
-                  </td>
-                  <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'middle', textAlign: 'center' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Trasera</div>
-                      <div style={{ width: '60%', margin: '0 auto' }}> {/* Contenedor para limitar tamaño */}
-                        <VehicleImage viewType="back" damages={activeDamages} />
+                  </div>
+
+                  {/* DAÑO INTERIOR */}
+                  <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
+                      DAÑO INTERIOR ({interiorDamages.length})
+                    </div>
+                    <VehicleImage viewType="interior" damages={activeDamages} />
+                  </div>
+
+                </td>
+
+                {/* COLUMNA DERECHA: DETALLES DE DAÑOS */}
+                <td style={{ width: '42%', verticalAlign: 'top', paddingLeft: '8px' }}>
+                  {activeDamages.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
+                        DETALLE DE DAÑOS
                       </div>
+                      <table style={{ width: '100%', fontSize: '8px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#f3f4f6' }}>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>#</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Descripción</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Ubicación</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Severidad</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {activeDamages.map((damage, i) => (
+                            <tr key={damage.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : '#f9fafb' }}>
+                              <td style={{ padding: '2px 3px', fontWeight: 'bold', fontSize: '8px' }}>{damage.damage_number || '?'}</td>
+                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{damage.description}</td>
+                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{viewLabels[damage.view_type || '']}</td>
+                              <td style={{ padding: '2px 3px' }}>
+                                <span style={{
+                                  padding: '1px 2px',
+                                  borderRadius: '2px',
+                                  fontSize: '6px',
+                                  backgroundColor: damage.severity === 'severe' ? '#fee2e2' : damage.severity === 'moderate' ? '#ffedd5' : '#fef9c3',
+                                  color: damage.severity === 'severe' ? '#b91c1c' : damage.severity === 'moderate' ? '#c2410c' : '#a16207',
+                                }}>
+                                  {severityLabels[damage.severity || '']}
+                                </span>
+                              </td>
+                              <td style={{ padding: '2px 3px' }}>
+                                <span style={{
+                                  padding: '1px 2px',
+                                  borderRadius: '2px',
+                                  fontSize: '6px',
+                                  backgroundColor: damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
+                                  color: damage.status === 'in_progress' ? '#a16207' : '#b91c1c',
+                                }}>
+                                  {statusLabels[damage.status || '']}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                  )}
+                </td>
 
-            {/* Fila 2: Lateral Izq | Lateral Der */}
-            <table style={{ width: '100%', marginBottom: '10px' }}>
-              <tbody>
-                <tr>
-                  <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'top' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Izquierdo</div>
-                      <VehicleImage viewType="left" damages={activeDamages} />
-                    </div>
-                  </td>
-                  <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'top' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Derecho</div>
-                      <VehicleImage viewType="right" damages={activeDamages} />
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-
-            {/* Fila 3: Superior (centrado) */}
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: '60%', border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Superior</div>
-                <VehicleImage viewType="top" damages={activeDamages} />
-              </div>
-            </div>
-          </div>
-
-          {/* DAÑO INTERIOR */}
-          <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px', marginBottom: '10px' }}>
-            <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
-              DAÑO INTERIOR ({interiorDamages.length})
-            </div>
-            <VehicleImage viewType="interior" damages={activeDamages} />
-          </div>
-
-          {/* DETALLE DE DAÑOS */}
-          {activeDamages.length > 0 && (
-            <div style={{ marginBottom: '10px' }}>
-              <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '4px' }}>DETALLE DE DAÑOS</div>
-              <table style={{ width: '100%', fontSize: '9px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
-                <thead>
-                  <tr style={{ backgroundColor: '#f3f4f6' }}>
-                    <th style={{ padding: '4px', textAlign: 'left', borderBottom: '1px solid #d1d5db' }}>#</th>
-                    <th style={{ padding: '4px', textAlign: 'left', borderBottom: '1px solid #d1d5db' }}>Descripción</th>
-                    <th style={{ padding: '4px', textAlign: 'left', borderBottom: '1px solid #d1d5db' }}>Ubicación</th>
-                    <th style={{ padding: '4px', textAlign: 'left', borderBottom: '1px solid #d1d5db' }}>Severidad</th>
-                    <th style={{ padding: '4px', textAlign: 'left', borderBottom: '1px solid #d1d5db' }}>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {activeDamages.map((damage, i) => (
-                    <tr key={damage.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : '#f9fafb' }}>
-                      <td style={{ padding: '3px 4px', fontWeight: 'bold' }}>{damage.damage_number || '?'}</td>
-                      <td style={{ padding: '3px 4px' }}>{damage.description}</td>
-                      <td style={{ padding: '3px 4px' }}>{viewLabels[damage.view_type || '']}</td>
-                      <td style={{ padding: '3px 4px' }}>
-                        <span style={{
-                          padding: '1px 3px',
-                          borderRadius: '2px',
-                          fontSize: '8px',
-                          backgroundColor: damage.severity === 'severe' ? '#fee2e2' : damage.severity === 'moderate' ? '#ffedd5' : '#fef9c3',
-                          color: damage.severity === 'severe' ? '#b91c1c' : damage.severity === 'moderate' ? '#c2410c' : '#a16207',
-                        }}>
-                          {severityLabels[damage.severity || '']}
-                        </span>
-                      </td>
-                      <td style={{ padding: '3px 4px' }}>
-                        <span style={{
-                          padding: '1px 3px',
-                          borderRadius: '2px',
-                          fontSize: '8px',
-                          backgroundColor: damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
-                          color: damage.status === 'in_progress' ? '#a16207' : '#b91c1c',
-                        }}>
-                          {statusLabels[damage.status || '']}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+              </tr>
+            </tbody>
+          </table>
 
           {/* LEYENDA */}
           <div style={{ backgroundColor: '#f9fafb', padding: '6px', borderRadius: '3px', marginBottom: '10px', fontSize: '9px' }}>
