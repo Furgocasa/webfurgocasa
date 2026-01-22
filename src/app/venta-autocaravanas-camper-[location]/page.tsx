@@ -18,8 +18,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// 🔄 ISR: Revalidar cada 24 horas
-export const revalidate = 86400;
+// 🔄 ISR: Revalidar cada hora (forzar regeneración de metadata)
+export const revalidate = 3600;
 
 // ✅ Permitir generación dinámica de páginas no pre-renderizadas
 export const dynamicParams = true;
