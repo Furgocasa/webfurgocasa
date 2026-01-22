@@ -133,6 +133,12 @@ export default async function RootLayout({
   return (
     <html lang={htmlLang} suppressHydrationWarning>
       <head>
+        {/* ⚡ Optimización LCP/FCP: Preconnect a dominios críticos */}
+        <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
         {/* Facebook Pixel - Solo si está configurado */}
         {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
           <Script

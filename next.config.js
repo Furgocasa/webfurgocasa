@@ -98,7 +98,15 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb',
     },
+    // ⚡ Optimizaciones de rendimiento
+    optimizeCss: true, // Optimizar CSS crítico
   },
+  // ⚡ Comprimir respuestas
+  compress: true,
+  // ⚡ Generar ETags para mejor caché
+  generateEtags: true,
+  // ⚡ Minimizar output en producción
+  productionBrowserSourceMaps: false,
   // ✅ Optimizar webpack y HMR para reducir polling
   webpack: (config, { dev, isServer }) => {
     if (dev && !isServer) {
