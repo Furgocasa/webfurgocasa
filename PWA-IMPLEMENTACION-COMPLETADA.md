@@ -179,7 +179,7 @@ runtimeCaching: [
 ## 🎯 Próximos Pasos (Opcional)
 
 ### Mejoras Futuras
-- [ ] Generar iconos optimizados para todos los tamaños
+- [x] Generar iconos optimizados para todos los tamaños ✅ **Completado 22/01/2026**
 - [ ] Implementar notificaciones push
 - [ ] Añadir sincronización en background
 - [ ] Modo offline completo con IndexedDB
@@ -220,4 +220,16 @@ La PWA del administrador está completamente implementada y lista para usar. Los
 
 **Fecha de implementación**: 20 de Enero, 2026  
 **Versión**: 1.0.0 PWA Admin  
+**Última actualización de iconos**: 22 de Enero, 2026 ✅  
 **Estado**: ✅ Completado
+
+## 📝 Actualizaciones
+
+### 22/01/2026 - Actualización de Iconos
+- ✅ Generados todos los iconos PWA desde el logo oficial de Furgocasa
+- ✅ Actualizado `admin-manifest.json` con nuevos iconos
+- ✅ Script automatizado `scripts/generate-pwa-icons.js` creado
+- ✅ 12 archivos de iconos generados (72×72 hasta 512×512)
+- ✅ Build exitoso verificado
+
+Ver detalles completos en: [ACTUALIZACION-ICONOS-PWA.md](./ACTUALIZACION-ICONOS-PWA.md)
