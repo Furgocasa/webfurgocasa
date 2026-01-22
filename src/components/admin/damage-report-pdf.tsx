@@ -241,44 +241,77 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             </div>
           </div>
 
-          {/* Exterior Damages - Layout mejorado */}
-          <div className="mb-6">
+          {/* Exterior Damages - Layout respetando proporciones */}
+          <div className="mb-4">
             <h3 className="text-lg font-bold text-gray-800 border-b border-gray-300 pb-1 mb-3">
               DAÑOS EXTERIORES ({exteriorDamages.length})
             </h3>
-            {/* Fila superior: Frontal, Trasera, Superior */}
-            <div className="grid grid-cols-3 gap-3 mb-3">
-              {['front', 'back', 'top'].map(view => (
-                <div key={view} className="border border-gray-200 rounded p-2">
-                  <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels[view]}</p>
-                  <div className="h-32 flex items-center justify-center">
-                    <VehicleImageForPDF viewType={view as ViewType} damages={activeDamages} />
+            
+            {/* Fila 1: Frontal, Trasera y Superior (imágenes verticales/cuadradas) */}
+            <div className="flex gap-2 mb-2">
+              {/* Frontal - vertical */}
+              <div className="flex-1 border border-gray-200 rounded p-1">
+                <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels['front']}</p>
+                <div className="relative" style={{ paddingBottom: '75%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <VehicleImageForPDF viewType="front" damages={activeDamages} />
                   </div>
                 </div>
-              ))}
+              </div>
+              {/* Trasera - vertical */}
+              <div className="flex-1 border border-gray-200 rounded p-1">
+                <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels['back']}</p>
+                <div className="relative" style={{ paddingBottom: '75%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <VehicleImageForPDF viewType="back" damages={activeDamages} />
+                  </div>
+                </div>
+              </div>
+              {/* Superior - cuadrada con perspectiva */}
+              <div className="flex-1 border border-gray-200 rounded p-1">
+                <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels['top']}</p>
+                <div className="relative" style={{ paddingBottom: '75%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <VehicleImageForPDF viewType="top" damages={activeDamages} />
+                  </div>
+                </div>
+              </div>
             </div>
-            {/* Fila inferior: Laterales más anchos */}
-            <div className="grid grid-cols-2 gap-3">
-              {['left', 'right'].map(view => (
-                <div key={view} className="border border-gray-200 rounded p-2">
-                  <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels[view]}</p>
-                  <div className="h-28 flex items-center justify-center">
-                    <VehicleImageForPDF viewType={view as ViewType} damages={activeDamages} />
+            
+            {/* Fila 2: Laterales (imágenes muy horizontales) */}
+            <div className="space-y-2">
+              {/* Lateral Izquierdo */}
+              <div className="border border-gray-200 rounded p-1">
+                <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels['left']}</p>
+                <div className="relative" style={{ paddingBottom: '35%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <VehicleImageForPDF viewType="left" damages={activeDamages} />
                   </div>
                 </div>
-              ))}
+              </div>
+              {/* Lateral Derecho */}
+              <div className="border border-gray-200 rounded p-1">
+                <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels['right']}</p>
+                <div className="relative" style={{ paddingBottom: '35%' }}>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <VehicleImageForPDF viewType="right" damages={activeDamages} />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Interior Damages - Una sola imagen */}
-          <div className="mb-6">
+          {/* Interior Damages */}
+          <div className="mb-4">
             <h3 className="text-lg font-bold text-gray-800 border-b border-gray-300 pb-1 mb-3">
               DAÑOS INTERIORES ({interiorDamages.length})
             </h3>
-            <div className="border border-gray-200 rounded p-3">
-              <p className="text-xs font-medium text-gray-600 text-center mb-2">Plano Interior</p>
-              <div className="h-44 flex items-center justify-center">
-                <VehicleImageForPDF viewType="interior" damages={activeDamages} />
+            <div className="border border-gray-200 rounded p-2">
+              <p className="text-xs font-medium text-gray-600 text-center mb-1">Plano Interior</p>
+              <div className="relative" style={{ paddingBottom: '50%' }}>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <VehicleImageForPDF viewType="interior" damages={activeDamages} />
+                </div>
               </div>
             </div>
           </div>
