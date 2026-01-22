@@ -6761,11 +6761,23 @@ export const staticTranslations = {
     fr: "Signez le contrat",
     de: "Unterschreiben Sie den Vertrag"
   },
+  "Firma y envía el contrato": {
+    es: "Firma y envía el contrato",
+    en: "Sign and send the contract",
+    fr: "Signez et envoyez le contrat",
+    de: "Unterschreiben und senden Sie den Vertrag"
+  },
   "Descarga, firma y envía los documentos de esta página": {
     es: "Descarga, firma y envía los documentos de esta página",
     en: "Download, sign and send the documents from this page",
     fr: "Téléchargez, signez et envoyez les documents de cette page",
     de: "Laden Sie die Dokumente dieser Seite herunter, unterschreiben Sie sie und senden Sie sie"
+  },
+  "Descarga la documentación de esta página y envíanosla por email": {
+    es: "Descarga la documentación de esta página y envíanosla por email",
+    en: "Download the documentation from this page and send it to us by email",
+    fr: "Téléchargez la documentation de cette page et envoyez-la nous par email",
+    de: "Laden Sie die Dokumentation dieser Seite herunter und senden Sie sie uns per E-Mail"
   },
   "Paga la fianza": {
     es: "Paga la fianza",
