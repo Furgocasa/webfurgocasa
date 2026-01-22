@@ -6929,11 +6929,11 @@ export const staticTranslations = {
     fr: "Comment envoyer la documentation ?",
     de: "Wie sende ich die Dokumentation?"
   },
-  "Puedes enviarnos los documentos por email a info@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).": {
-    es: "Puedes enviarnos los documentos por email a info@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).",
-    en: "You can send us the documents by email to info@furgocasa.com. We accept scanned images or legible photos of the documents (ID, driving license, signed contract, deposit receipt).",
-    fr: "Vous pouvez nous envoyer les documents par email à info@furgocasa.com. Nous acceptons les images scannées ou les photos lisibles des documents (pièce d'identité, permis de conduire, contrat signé, justificatif de caution).",
-    de: "Sie können uns die Dokumente per E-Mail an info@furgocasa.com senden. Wir akzeptieren gescannte Bilder oder lesbare Fotos der Dokumente (Ausweis, Führerschein, unterschriebener Vertrag, Kautionsbeleg)."
+  "Puedes enviarnos los documentos por email a reservas@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).": {
+    es: "Puedes enviarnos los documentos por email a reservas@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).",
+    en: "You can send us the documents by email to reservas@furgocasa.com. We accept scanned images or legible photos of the documents (ID, driving license, signed contract, deposit receipt).",
+    fr: "Vous pouvez nous envoyer les documents par email à reservas@furgocasa.com. Nous acceptons les images scannées ou les photos lisibles des documents (pièce d'identité, permis de conduire, contrat signé, justificatif de caution).",
+    de: "Sie können uns die Dokumente per E-Mail an reservas@furgocasa.com senden. Wir akzeptieren gescannte Bilder oder lesbare Fotos der Dokumente (Ausweis, Führerschein, unterschriebener Vertrag, Kautionsbeleg)."
   },
   "¿Tienes dudas sobre la documentación?": {
     es: "¿Tienes dudas sobre la documentación?",

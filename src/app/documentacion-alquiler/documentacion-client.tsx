@@ -82,7 +82,7 @@ export default function DocumentacionClient() {
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
             <p className="text-blue-800">
               <strong>{t("Email para enviar documentación:")}</strong>{" "}
-              <a href="mailto:info@furgocasa.com" className="text-furgocasa-blue hover:underline">info@furgocasa.com</a>
+              <a href="mailto:reservas@furgocasa.com" className="text-furgocasa-blue hover:underline">reservas@furgocasa.com</a>
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function DocumentacionClient() {
             {t("Documentación del Contrato")}
           </h2>
           <p className="text-gray-600 mb-8">
-            {t("Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a")} <strong>info@furgocasa.com</strong>
+            {t("Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a")} <strong>reservas@furgocasa.com</strong>
           </p>
 
           <div className="grid lg:grid-cols-2 gap-8">
@@ -196,7 +196,7 @@ export default function DocumentacionClient() {
 
               <h3>{t("¿Cómo envío la documentación?")}</h3>
               <p>
-                {t("Puedes enviarnos los documentos por email a info@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).")}
+                {t("Puedes enviarnos los documentos por email a reservas@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).")}
               </p>
             </div>
           </div>
