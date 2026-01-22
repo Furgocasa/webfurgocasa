@@ -72,11 +72,24 @@ function extractCitySlug(locationParam: string | undefined): string {
     return '';
   }
 
-  // CRÍTICO: El parámetro [location] en Next.js ya contiene solo el slug de la ciudad
-  // Ejemplo: URL /venta-autocaravanas-camper-alicante → params.location = "alicante"
-  // Por tanto, NO necesitamos extraer nada, ya viene limpio
-  
-  return locationParam;
+  const cleaned = locationParam.trim().toLowerCase();
+
+  // Soportar prefijos completos (por seguridad, igual que en alquiler)
+  const patterns = [
+    /^venta-autocaravanas-camper-(.+)$/i,
+    /^campervans-for-sale-in-(.+)$/i,
+    /^camping-cars-a-vendre-(.+)$/i,
+    /^wohnmobile-zu-verkaufen-(.+)$/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = cleaned.match(pattern);
+    if (match && match[1]) {
+      return match[1];
+    }
+  }
+
+  return cleaned;
 }
 
 /**
