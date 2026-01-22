@@ -84,18 +84,19 @@ function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: Vehi
             left: `${damage.position_x || 50}%`,
             top: `${damage.position_y || 50}%`,
             transform: 'translate(-50%, -50%)',
-            width: '18px',
-            height: '18px',
+            width: '20px',
+            height: '20px',
             borderRadius: '50%',
             backgroundColor: damage.status === 'repaired' ? '#dcfce7' : damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
             border: `2px solid ${damage.status === 'repaired' ? '#22c55e' : damage.status === 'in_progress' ? '#eab308' : '#ef4444'}`,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            fontSize: '8px',
+            fontSize: '9px',
             fontWeight: 'bold',
             color: damage.status === 'repaired' ? '#166534' : damage.status === 'in_progress' ? '#854d0e' : '#dc2626',
             zIndex: 10,
+            lineHeight: '1',
           }}
         >
           {damage.damage_number || '?'}
@@ -176,7 +177,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
 
       {/* PDF Content */}
       <div style={{ position: 'fixed', left: '-9999px', top: 0 }}>
-        <div ref={reportRef} style={{ width: '794px', padding: '20px', backgroundColor: '#fff', fontFamily: 'Arial, sans-serif' }}>
+        <div ref={reportRef} style={{ width: '794px', padding: '12px 16px', backgroundColor: '#fff', fontFamily: 'Arial, sans-serif' }}>
           
           {/* HEADER */}
           <table style={{ width: '100%', marginBottom: '12px' }}>
@@ -386,7 +387,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
               <tbody>
                 <tr>
                   <td style={{ width: '50%', paddingRight: '10px', verticalAlign: 'top' }}>
-                    <div style={{ fontSize: '8px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>ENTREGA DEL VEHÍCULO</div>
+                    <div style={{ fontSize: '8px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>ENTREGA DEL VEHÍCULO <span style={{ fontWeight: 'normal' }}>(A rellenar por cliente)</span></div>
                     <table style={{ width: '100%', fontSize: '8px' }}>
                       <tbody>
                         <tr>
@@ -409,13 +410,13 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                       <div style={{ color: '#6b7280' }}>DNI/Pasaporte:</div>
                       <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
                     </div>
-                    <div style={{ marginTop: '6px', fontSize: '8px' }}>
-                      <div style={{ color: '#6b7280' }}>Firma cliente:</div>
+                    <div style={{ marginTop: '8px', fontSize: '8px' }}>
+                      <div style={{ color: '#6b7280', marginBottom: '4px' }}>Firma cliente:</div>
                       <div style={{ border: '1px solid #9ca3af', height: '35px', borderRadius: '2px' }}></div>
                     </div>
                   </td>
                   <td style={{ width: '50%', paddingLeft: '10px', verticalAlign: 'top' }}>
-                    <div style={{ fontSize: '8px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>DEVOLUCIÓN DEL VEHÍCULO</div>
+                    <div style={{ fontSize: '8px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>DEVOLUCIÓN DEL VEHÍCULO <span style={{ fontWeight: 'normal' }}>(A rellenar por trabajador)</span></div>
                     <table style={{ width: '100%', fontSize: '8px' }}>
                       <tbody>
                         <tr>
@@ -438,8 +439,8 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                       <div style={{ color: '#6b7280' }}>Km llegada:</div>
                       <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
                     </div>
-                    <div style={{ marginTop: '6px', fontSize: '8px' }}>
-                      <div style={{ color: '#6b7280' }}>Firma trabajador:</div>
+                    <div style={{ marginTop: '8px', fontSize: '8px' }}>
+                      <div style={{ color: '#6b7280', marginBottom: '4px' }}>Firma trabajador:</div>
                       <div style={{ border: '1px solid #9ca3af', height: '35px', borderRadius: '2px' }}></div>
                     </div>
                   </td>
