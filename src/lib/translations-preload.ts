@@ -5282,8 +5282,38 @@ export const staticTranslations = {
   "Venta de Autocaravanas en": {
     es: "Venta de Autocaravanas en",
     en: "Motorhomes for Sale in",
-    fr: "Motorhomes for Sale in",
-    de: "Motorhomes for Sale in"
+    fr: "Camping-cars à vendre à",
+    de: "Wohnmobile zu verkaufen in"
+  },
+  "¿Buscas una autocaravana en": {
+    es: "¿Buscas una autocaravana en",
+    en: "Looking for a motorhome in",
+    fr: "Vous cherchez un camping-car à",
+    de: "Suchen Sie ein Wohnmobil in"
+  },
+  "Contáctanos y te ayudamos a encontrar el camper perfecto": {
+    es: "Contáctanos y te ayudamos a encontrar el camper perfecto",
+    en: "Contact us and we will help you find the perfect camper",
+    fr: "Contactez-nous et nous vous aiderons à trouver le camping-car parfait",
+    de: "Kontaktieren Sie uns und wir helfen Ihnen, den perfekten Camper zu finden"
+  },
+  "vehículos disponibles en": {
+    es: "vehículos disponibles en",
+    en: "vehicles available in",
+    fr: "véhicules disponibles à",
+    de: "Fahrzeuge verfügbar in"
+  },
+  "Compra tu autocaravana o camper en": {
+    es: "Compra tu autocaravana o camper en",
+    en: "Buy your motorhome or camper in",
+    fr: "Achetez votre camping-car à",
+    de: "Kaufen Sie Ihr Wohnmobil in"
+  },
+  "Vehículos con garantía y financiación": {
+    es: "Vehículos con garantía y financiación",
+    en: "Vehicles with warranty and financing",
+    fr: "Véhicules avec garantie et financement",
+    de: "Fahrzeuge mit Garantie und Finanzierung"
   },
   "| Furgocasa": {
     es: "| Furgocasa",

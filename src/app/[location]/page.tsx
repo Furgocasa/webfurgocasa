@@ -831,11 +831,32 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
   // ============================================================================
   if (kind === "sale") {
     const slug = extractSaleSlug(locationParam);
-    const location = await getSaleLocation(slug);
+    const locationRaw = await getSaleLocation(slug);
 
-    if (!location) {
+    if (!locationRaw) {
       notFound();
     }
+
+    // Aplicar traducciones desde Supabase para sale_location_targets
+    const translatedFields = await getTranslatedContent(
+      'sale_location_targets', locationRaw.id,
+      ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
+      locale,
+      {
+        name: locationRaw.name,
+        h1_title: locationRaw.h1_title,
+        meta_title: locationRaw.meta_title,
+        meta_description: locationRaw.meta_description,
+        intro_text: locationRaw.intro_text,
+      }
+    );
+
+    const location = {
+      ...locationRaw,
+      name: translatedFields.name || locationRaw.name,
+      h1_title: translatedFields.h1_title || locationRaw.h1_title,
+      intro_text: translatedFields.intro_text || locationRaw.intro_text,
+    };
 
     const vehicles = await getSaleVehicles();
     const distanceText = location.distance_km && location.travel_time_minutes
