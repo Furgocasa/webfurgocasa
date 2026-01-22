@@ -13,7 +13,7 @@ interface DamageMark {
 }
 
 interface VehicleDamagePlanProps {
-  viewType: 'front' | 'back' | 'left' | 'right' | 'top' | 'interior_main' | 'interior_rear';
+  viewType: 'front' | 'back' | 'left' | 'right' | 'top' | 'interior';
   damages: DamageMark[];
   onAddDamage?: (x: number, y: number) => void;
   onSelectDamage?: (damage: DamageMark) => void;
@@ -28,8 +28,7 @@ const viewLabels: Record<string, string> = {
   left: 'Lateral Izquierdo',
   right: 'Lateral Derecho',
   top: 'Vista Superior',
-  interior_main: 'Interior Principal',
-  interior_rear: 'Interior Trasero',
+  interior: 'Interior',
 };
 
 const severityColors: Record<string, string> = {
@@ -44,83 +43,32 @@ const statusColors: Record<string, { fill: string; stroke: string }> = {
   repaired: { fill: '#f0fdf4', stroke: '#22c55e' },
 };
 
-// Imágenes del vehículo para cada vista exterior
+// Imágenes del vehículo para cada vista
 const vehicleImages: Record<string, string> = {
   front: '/vehicle-views/front.png',
   back: '/vehicle-views/back.png',
   left: '/vehicle-views/left.png',
   right: '/vehicle-views/right.png',
   top: '/vehicle-views/top.png',
+  interior: '/vehicle-views/interior.png',
 };
 
-// Componente de imagen o SVG del vehículo para cada vista
+// Componente de imagen del vehículo para cada vista
 function VehicleView({ viewType }: { viewType: string }) {
-  // Vistas exteriores usan imágenes PNG
-  if (vehicleImages[viewType]) {
-    return (
-      <div className="w-full h-full flex items-center justify-center p-4">
-        <img 
-          src={vehicleImages[viewType]} 
-          alt={viewLabels[viewType]}
-          className="max-w-full max-h-full object-contain"
-          draggable={false}
-        />
-      </div>
-    );
-  }
+  const imageSrc = vehicleImages[viewType];
+  
+  if (!imageSrc) return null;
 
-  // Vistas interiores usan SVGs
-  switch (viewType) {
-    case 'interior_main':
-      return (
-        <svg viewBox="0 0 250 180" className="w-full h-full">
-          {/* Contorno interior */}
-          <rect x="10" y="10" width="230" height="160" rx="5" fill="#f9fafb" stroke="#d1d5db" strokeWidth="2" />
-          {/* Cabina conductor */}
-          <rect x="20" y="20" width="80" height="70" rx="3" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="1.5" />
-          <text x="60" y="60" textAnchor="middle" fontSize="10" fill="#6b7280">Cabina</text>
-          {/* Asientos delanteros */}
-          <rect x="25" y="75" width="30" height="10" rx="2" fill="#9ca3af" />
-          <rect x="65" y="75" width="30" height="10" rx="2" fill="#9ca3af" />
-          {/* Zona living */}
-          <rect x="110" y="20" width="120" height="70" rx="3" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1" />
-          <text x="170" y="55" textAnchor="middle" fontSize="10" fill="#92400e">Zona Living</text>
-          {/* Cocina */}
-          <rect x="110" y="100" width="60" height="60" rx="3" fill="#dcfce7" stroke="#22c55e" strokeWidth="1" />
-          <text x="140" y="135" textAnchor="middle" fontSize="10" fill="#166534">Cocina</text>
-          {/* Baño */}
-          <rect x="180" y="100" width="50" height="60" rx="3" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1" />
-          <text x="205" y="135" textAnchor="middle" fontSize="10" fill="#1e40af">Baño</text>
-          {/* Mesa */}
-          <rect x="130" y="35" width="40" height="25" rx="2" fill="#a1a1aa" stroke="#71717a" strokeWidth="1" />
-        </svg>
-      );
-    
-    case 'interior_rear':
-      return (
-        <svg viewBox="0 0 250 180" className="w-full h-full">
-          {/* Contorno interior */}
-          <rect x="10" y="10" width="230" height="160" rx="5" fill="#f9fafb" stroke="#d1d5db" strokeWidth="2" />
-          {/* Zona de camas */}
-          <rect x="20" y="20" width="210" height="80" rx="3" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1" />
-          <text x="125" y="65" textAnchor="middle" fontSize="12" fill="#92400e">Zona de Camas</text>
-          {/* Cama principal */}
-          <rect x="30" y="30" width="190" height="60" rx="5" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="1.5" />
-          <text x="125" y="65" textAnchor="middle" fontSize="10" fill="#6b7280">Cama</text>
-          {/* Armarios laterales */}
-          <rect x="20" y="110" width="50" height="50" rx="3" fill="#e0e7ff" stroke="#6366f1" strokeWidth="1" />
-          <text x="45" y="140" textAnchor="middle" fontSize="8" fill="#4338ca">Armario</text>
-          <rect x="180" y="110" width="50" height="50" rx="3" fill="#e0e7ff" stroke="#6366f1" strokeWidth="1" />
-          <text x="205" y="140" textAnchor="middle" fontSize="8" fill="#4338ca">Armario</text>
-          {/* Zona central */}
-          <rect x="80" y="110" width="90" height="50" rx="3" fill="#f3f4f6" stroke="#d1d5db" strokeWidth="1" />
-          <text x="125" y="140" textAnchor="middle" fontSize="9" fill="#6b7280">Paso</text>
-        </svg>
-      );
-    
-    default:
-      return null;
-  }
+  return (
+    <div className="w-full h-full flex items-center justify-center p-4">
+      <img 
+        src={imageSrc} 
+        alt={viewLabels[viewType]}
+        className="max-w-full max-h-full object-contain"
+        draggable={false}
+      />
+    </div>
+  );
 }
 
 export function VehicleDamagePlan({

@@ -32,7 +32,7 @@ interface DamageReportPDFProps {
   damages: VehicleDamage[];
 }
 
-type ViewType = 'front' | 'back' | 'left' | 'right' | 'top' | 'interior_main' | 'interior_rear';
+type ViewType = 'front' | 'back' | 'left' | 'right' | 'top' | 'interior';
 
 const viewLabels: Record<string, string> = {
   front: 'Frontal',
@@ -40,8 +40,7 @@ const viewLabels: Record<string, string> = {
   left: 'Lateral Izq.',
   right: 'Lateral Der.',
   top: 'Superior',
-  interior_main: 'Interior Principal',
-  interior_rear: 'Interior Trasero',
+  interior: 'Interior',
 };
 
 const severityLabels: Record<string, string> = {
@@ -147,34 +146,18 @@ function VehicleSVGForPDF({ viewType, damages }: { viewType: ViewType; damages: 
         </svg>
       );
     
-    case 'interior_main':
+    case 'interior':
       return (
-        <svg viewBox="0 0 250 180" className="w-full h-full">
-          <rect x="10" y="10" width="230" height="160" rx="5" fill="#f9fafb" stroke="#d1d5db" strokeWidth="2" />
-          <rect x="20" y="20" width="80" height="70" rx="3" fill="#e5e7eb" stroke="#9ca3af" strokeWidth="1.5" />
-          <text x="60" y="60" textAnchor="middle" fontSize="10" fill="#6b7280">Cabina</text>
-          <rect x="110" y="20" width="120" height="70" rx="3" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1" />
-          <text x="170" y="55" textAnchor="middle" fontSize="10" fill="#92400e">Zona Living</text>
-          <rect x="110" y="100" width="60" height="60" rx="3" fill="#dcfce7" stroke="#22c55e" strokeWidth="1" />
-          <text x="140" y="135" textAnchor="middle" fontSize="10" fill="#166534">Cocina</text>
-          <rect x="180" y="100" width="50" height="60" rx="3" fill="#dbeafe" stroke="#3b82f6" strokeWidth="1" />
-          <text x="205" y="135" textAnchor="middle" fontSize="10" fill="#1e40af">Baño</text>
-          {renderDamageMarkers()}
-        </svg>
-      );
-    
-    case 'interior_rear':
-      return (
-        <svg viewBox="0 0 250 180" className="w-full h-full">
-          <rect x="10" y="10" width="230" height="160" rx="5" fill="#f9fafb" stroke="#d1d5db" strokeWidth="2" />
-          <rect x="20" y="20" width="210" height="80" rx="3" fill="#fef3c7" stroke="#f59e0b" strokeWidth="1" />
-          <text x="125" y="65" textAnchor="middle" fontSize="12" fill="#92400e">Zona de Camas</text>
-          <rect x="20" y="110" width="50" height="50" rx="3" fill="#e0e7ff" stroke="#6366f1" strokeWidth="1" />
-          <text x="45" y="140" textAnchor="middle" fontSize="8" fill="#4338ca">Armario</text>
-          <rect x="180" y="110" width="50" height="50" rx="3" fill="#e0e7ff" stroke="#6366f1" strokeWidth="1" />
-          <text x="205" y="140" textAnchor="middle" fontSize="8" fill="#4338ca">Armario</text>
-          {renderDamageMarkers()}
-        </svg>
+        <div className="w-full h-full relative">
+          <img 
+            src="/vehicle-views/interior.png" 
+            alt="Interior"
+            className="w-full h-full object-contain"
+          />
+          <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+            {renderDamageMarkers()}
+          </svg>
+        </div>
       );
     
     default:
@@ -187,7 +170,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
   const [generating, setGenerating] = useState(false);
 
   const exteriorViews: ViewType[] = ['front', 'back', 'left', 'right', 'top'];
-  const interiorViews: ViewType[] = ['interior_main', 'interior_rear'];
+  const interiorViews: ViewType[] = ['interior'];
   
   // Solo daños activos (excluir reparados) para el PDF que firma el cliente
   const activeDamages = damages.filter(d => d.status !== 'repaired');
@@ -342,11 +325,11 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             <h3 className="text-lg font-bold text-gray-800 border-b border-gray-300 pb-1 mb-3">
               DAÑOS INTERIORES ({interiorDamages.length})
             </h3>
-            <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="mb-4">
               {interiorViews.map(view => (
                 <div key={view} className="border border-gray-200 rounded p-2">
                   <p className="text-xs font-medium text-gray-600 text-center mb-1">{viewLabels[view]}</p>
-                  <div className="h-28 flex items-center justify-center">
+                  <div className="h-40 flex items-center justify-center">
                     <VehicleSVGForPDF viewType={view} damages={activeDamages} />
                   </div>
                 </div>

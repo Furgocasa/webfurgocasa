@@ -49,7 +49,7 @@ interface Vehicle {
   main_image_url: string | null;
 }
 
-type ViewType = 'front' | 'back' | 'left' | 'right' | 'top' | 'interior_main' | 'interior_rear';
+type ViewType = 'front' | 'back' | 'left' | 'right' | 'top' | 'interior';
 
 const viewTypes: { id: ViewType; label: string; category: 'exterior' | 'interior' }[] = [
   { id: 'front', label: 'Frontal', category: 'exterior' },
@@ -57,8 +57,7 @@ const viewTypes: { id: ViewType; label: string; category: 'exterior' | 'interior
   { id: 'left', label: 'Lateral Izq.', category: 'exterior' },
   { id: 'right', label: 'Lateral Der.', category: 'exterior' },
   { id: 'top', label: 'Superior', category: 'exterior' },
-  { id: 'interior_main', label: 'Interior Principal', category: 'interior' },
-  { id: 'interior_rear', label: 'Interior Trasero', category: 'interior' },
+  { id: 'interior', label: 'Interior', category: 'interior' },
 ];
 
 const severityOptions = [
