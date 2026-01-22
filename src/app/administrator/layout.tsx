@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { AnalyticsBlocker } from "@/components/admin/analytics-blocker";
 
 /**
  * Layout raíz para todas las páginas de administrador
  * 
  * ⚠️ CRÍTICO: Este layout aplica noindex a TODAS las páginas de admin
  * Las páginas de administrador NUNCA deben indexarse en buscadores
+ * 
+ * ⛔ BLOQUEADOR DE ANALYTICS: AnalyticsBlocker previene cualquier tracking
  */
 
 export const metadata: Metadata = {
@@ -29,5 +32,11 @@ export default function AdministratorRootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <>
+      {/* ⛔ CRÍTICO: Bloqueador de Analytics - Previene tracking en admin */}
+      <AnalyticsBlocker />
+      {children}
+    </>
+  );
 }

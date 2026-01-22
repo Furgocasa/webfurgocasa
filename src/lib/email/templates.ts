@@ -604,7 +604,7 @@ export function getCompanyNotificationTemplate(
       </div>
 
       <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.furgocasa.com/admin/reservas" class="button">
+        <a href="https://www.furgocasa.com/administrator/reservas" class="button">
           Ver en el panel de administración
         </a>
       </div>

@@ -2,7 +2,7 @@
 
 import Script from 'next/script';
 import { usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 
 /**
  * Componente que carga los scripts de Google Analytics
@@ -10,23 +10,26 @@ import { useEffect, useState } from 'react';
  */
 export function AnalyticsScripts() {
   const pathname = usePathname();
-  const [shouldLoadAnalytics, setShouldLoadAnalytics] = useState(false);
-
-  useEffect(() => {
-    // Verificar si estamos en una página de administrador
-    const isAdminPage = pathname?.startsWith('/administrator') || pathname?.startsWith('/admin');
-    
-    if (isAdminPage) {
-      console.log('[Analytics] Ruta de administrador detectada. Scripts de Analytics NO se cargarán.');
-      setShouldLoadAnalytics(false);
-    } else {
-      console.log('[Analytics] Ruta pública detectada. Cargando scripts de Analytics...');
-      setShouldLoadAnalytics(true);
-    }
+  
+  // ✅ CRÍTICO: Calcular inmediatamente si es página admin (sin esperar useEffect)
+  const isAdminPage = useMemo(() => {
+    return pathname?.startsWith('/administrator') || pathname?.startsWith('/admin');
   }, [pathname]);
 
+  const [shouldLoadAnalytics, setShouldLoadAnalytics] = useState(!isAdminPage);
+
+  useEffect(() => {
+    if (isAdminPage) {
+      console.log('[Analytics] ⛔ Ruta de administrador detectada. Scripts de Analytics NO se cargarán.');
+      setShouldLoadAnalytics(false);
+    } else {
+      console.log('[Analytics] ✅ Ruta pública detectada. Cargando scripts de Analytics...');
+      setShouldLoadAnalytics(true);
+    }
+  }, [isAdminPage]);
+
   // NO renderizar nada si estamos en páginas de administrador
-  if (!shouldLoadAnalytics) {
+  if (isAdminPage || !shouldLoadAnalytics) {
     return null;
   }
 
