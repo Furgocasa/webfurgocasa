@@ -38,7 +38,7 @@ interface SaleLocationData {
   distance_km: number | null;
   travel_time_minutes: number | null;
   hero_image?: string | null;
-  featured_image?: string | null;
+  // NOTA: La tabla NO tiene columna featured_image
   nearest_location: {
     id: string;
     name: string;
@@ -183,9 +183,10 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   }
   
   // Buscar la ubicación directamente con el slug (igual que en páginas de alquiler)
+  // NOTA: La tabla sale_location_targets NO tiene columna featured_image
   const { data: location, error } = await supabase
     .from('sale_location_targets')
-    .select('name, province, region, meta_title, meta_description, featured_image, lat, lng')
+    .select('name, province, region, meta_title, meta_description, lat, lng')
     .eq('slug', citySlug)
     .eq('is_active', true)
     .single();
@@ -225,7 +226,8 @@ export async function generateMetadata({ params }: { params: Promise<{ location:
   const path = `/venta-autocaravanas-camper-${citySlug}`;
   // ✅ Canonical autorreferenciado usando helper centralizado
   const alternates = buildCanonicalAlternates(path, locale);
-  const ogImage = location.featured_image || `${baseUrl}/images/slides/hero-01.webp`;
+  // NOTA: La tabla sale_location_targets NO tiene columna featured_image, usar imagen por defecto
+  const ogImage = `${baseUrl}/images/slides/hero-01.webp`;
   const ogLocales: Record<string, string> = {
     es: 'es_ES',
     en: 'en_US',
