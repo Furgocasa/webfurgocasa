@@ -47,27 +47,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const alternates = buildCanonicalAlternates('/ventas', locale);
 
-  // Imagen atractiva para OpenGraph (slide hero)
-  const ogImageUrl = "https://www.furgocasa.com/images/slides/hero-11.webp";
-
   return {
     ...VENTAS_METADATA,
     alternates,
     openGraph: {
       ...(VENTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
-      images: [
-        {
-          url: ogImageUrl,
-          width: 1200,
-          height: 630,
-          alt: "Furgocasa - Campers y Autocaravanas en Venta",
-        },
-      ],
-    },
-    twitter: {
-      ...(VENTAS_METADATA.twitter || {}),
-      images: [ogImageUrl],
     },
   };
 }

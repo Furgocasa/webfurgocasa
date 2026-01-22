@@ -2,6 +2,7 @@ import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata, ResolvingMetadata } from "next";
+import { headers } from "next/headers";
 import { 
   ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Bed, 
   CheckCircle, Phone, Mail, MapPin, Shield, Wrench, Ruler,
@@ -10,6 +11,8 @@ import {
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { createClient } from "@/lib/supabase/server";
 import { formatPrice, sortVehicleEquipment } from "@/lib/utils";
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import type { Locale } from "@/lib/i18n/config";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -53,9 +56,14 @@ export async function generateMetadata(
 
   if (!vehicle) {
     return {
-      title: "Vehículo no encontrado",
+      title: "Vehículo no encontrado | Furgocasa",
     };
   }
+
+  // Obtener locale y generar canónicas
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const alternates = buildCanonicalAlternates(`/ventas/${slug}`, locale);
 
   // Imagen principal
   let ogImage = "/icon-512x512.png";
@@ -72,15 +80,17 @@ export async function generateMetadata(
     }
   }
 
-  const title = `${vehicle.name} en Venta`;
+  const title = `${vehicle.name} en Venta | Furgocasa`;
   const description = `Compra este ${vehicle.name} (${vehicle.year}) por ${formatPrice(vehicle.sale_price)}. ${vehicle.mileage.toLocaleString()} km, ${vehicle.seats} plazas. Garantía y revisión completa incluida.`;
 
   return {
     title,
     description,
+    alternates,
     openGraph: {
       title,
       description,
+      url: alternates.canonical,
       images: [
         {
           url: ogImage,
