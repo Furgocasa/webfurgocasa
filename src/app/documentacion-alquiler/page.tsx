@@ -64,7 +64,7 @@ export default function DocumentacionAlquilerPage() {
               Documentación de tu Alquiler
             </h1>
             <p className="text-xl text-white/80 max-w-2xl mx-auto">
-              Consulta, descarga y firma los documentos necesarios para completar tu reserva
+              Descarga, firma y envía los documentos por email para confirmar tu reserva
             </p>
           </div>
         </section>
@@ -101,7 +101,7 @@ export default function DocumentacionAlquilerPage() {
               Documentación del Contrato
             </h2>
             <p className="text-gray-600 mb-8">
-              Por favor, lee detenidamente estos documentos antes de la recogida del vehículo.
+              Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a <strong>info@furgocasa.com</strong> antes de la fecha de recogida.
             </p>
 
             <div className="grid lg:grid-cols-2 gap-8">
@@ -159,9 +159,10 @@ export default function DocumentacionAlquilerPage() {
               <div className="prose prose-gray max-w-none">
                 <h3>¿Cuándo firmo el contrato?</h3>
                 <p>
-                  El contrato se firma en el momento de la recogida del vehículo, una vez verificada
-                  toda la documentación. Te recomendamos leerlo con antelación para resolver
-                  cualquier duda.
+                  El contrato debe firmarse <strong>antes del comienzo del alquiler</strong> y enviarse 
+                  por email a Furgocasa. La confirmación de la cita de recogida se realizará una vez 
+                  recibida la documentación firmada. Te recomendamos leerlo detenidamente y enviarlo 
+                  con suficiente antelación.
                 </p>
 
                 <h3>¿Qué pasa si no tengo tarjeta de crédito?</h3>
