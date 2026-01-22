@@ -47,44 +47,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const alternates = buildCanonicalAlternates('/ventas', locale);
 
-  // Imagen por defecto (logo o imagen genérica si no hay vehículos)
-  let ogImageUrl = "/icon-512x512.png";
-
-  try {
-    // Intentar obtener la imagen principal del primer vehículo en venta
-    const { data: vehicle } = await supabase
-      .from('vehicles')
-      .select(`
-        vehicle_images (
-          image_url,
-          storage_path,
-          is_primary,
-          sort_order
-        )
-      `)
-      .eq('is_for_sale', true)
-      .eq('sale_status', 'available')
-      .order('created_at', { ascending: false })
-      .limit(1)
-      .single();
-
-    if (vehicle?.vehicle_images?.length) {
-      // Encontrar la imagen principal o la primera disponible
-      const images = vehicle.vehicle_images as any[];
-      const mainImage = images.find((img: any) => img.is_primary) || 
-                        images.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0))[0];
-      
-      if (mainImage) {
-        if (mainImage.image_url) {
-          ogImageUrl = mainImage.image_url;
-        } else if (mainImage.storage_path) {
-          ogImageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/vehicles/${mainImage.storage_path}`;
-        }
-      }
-    }
-  } catch (error) {
-    console.error('[Ventas Metadata] Error fetching OG image:', error);
-  }
+  // Imagen atractiva para OpenGraph (slide hero)
+  const ogImageUrl = "https://www.furgocasa.com/images/slides/hero-11.webp";
 
   return {
     ...VENTAS_METADATA,
