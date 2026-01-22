@@ -183,12 +183,12 @@ console.log('   generateStaticParams devuelve: { location: "murcia" }');
 console.log('   ✅ CORRECTO: El nombre coincide');
 
 // ===================================================================
-// 5. SIMULAR LA CONSULTA EXACTA DE generateMetadata
+// 5. SIMULAR LA CONSULTA EXACTA DE generateMetadata (CORREGIDA)
 // ===================================================================
-console.log('\n📋 PASO 5: Simulando generateMetadata para VENTA\n');
+console.log('\n📋 PASO 5: Simulando generateMetadata para VENTA (Consulta CORREGIDA)\n');
 
 // Simular cómo llega el parámetro y qué se busca
-const testParams = ['granada', 'albacete', 'elche'];
+const testParams = ['granada', 'albacete', 'elche', 'denia'];
 
 for (const locationParam of testParams) {
   console.log(`--- Probando con locationParam = "${locationParam}" ---`);
@@ -197,21 +197,21 @@ for (const locationParam of testParams) {
   const citySlug = extractCitySlug(locationParam);
   console.log(`   1. extractCitySlug("${locationParam}") => "${citySlug}"`);
   
-  // Buscar en base de datos
+  // Buscar en base de datos (SIN featured_image, como en el código corregido)
   const { data, error } = await supabase
     .from('sale_location_targets')
-    .select('name, province, region, meta_title, meta_description, featured_image, lat, lng')
+    .select('name, province, region, meta_title, meta_description, lat, lng')
     .eq('slug', citySlug)
     .eq('is_active', true)
     .single();
   
   if (data) {
     console.log(`   2. ✅ ENCONTRADO: "${data.meta_title}"`);
-    console.log(`   3. Título que se usaría: "${data.meta_title || `Venta de Autocaravanas en ${data.name}`}"`);
+    console.log(`   3. Título final: "${data.meta_title || `Venta de Autocaravanas en ${data.name}`}"`);
   } else {
     console.log(`   2. ❌ NO ENCONTRADO`);
     console.log(`   3. Error: ${error?.message}`);
-    console.log(`   4. Título que se usaría: "Ubicación no encontrada"`);
+    console.log(`   4. Título fallback: "Ubicación no encontrada"`);
   }
   console.log('');
 }

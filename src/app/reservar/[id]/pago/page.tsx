@@ -50,6 +50,11 @@ export default function PagoPage() {
   const [error, setError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'redsys' | 'stripe'>('stripe'); // Stripe por defecto, Redsys temporalmente deshabilitado
 
+  // Actualizar título del navegador
+  useEffect(() => {
+    document.title = 'Pago de reserva - Furgocasa';
+  }, []);
+
   useEffect(() => {
     if (bookingId) {
       loadBooking();

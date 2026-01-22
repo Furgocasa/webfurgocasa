@@ -60,6 +60,11 @@ export default function ConfirmacionPage() {
     holder: 'FURGOCASA SL',
   };
 
+  // Actualizar título del navegador
+  useEffect(() => {
+    document.title = 'Confirmación de reserva - Furgocasa';
+  }, []);
+
   useEffect(() => {
     if (bookingId) {
       loadBooking();

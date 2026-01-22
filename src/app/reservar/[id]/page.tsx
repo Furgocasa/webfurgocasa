@@ -160,6 +160,15 @@ export default function ReservaPage() {
     }
   }, [bookingId]);
 
+  // Actualizar título del navegador
+  useEffect(() => {
+    if (booking) {
+      document.title = `Reserva ${booking.booking_number} - Furgocasa`;
+    } else {
+      document.title = 'Detalle de reserva - Furgocasa';
+    }
+  }, [booking]);
+
   const loadBooking = async () => {
     try {
       setLoading(true);
