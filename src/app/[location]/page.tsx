@@ -46,8 +46,8 @@ const supabase = createClient(
 export const revalidate = 3600; // 1 hora
 export const dynamicParams = true;
 
-// Imagen hero para páginas de alquiler (la mejor del bucket)
-const HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp";
+// Imagen hero para páginas de alquiler - mediterránea con palmera y mar
+const HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
 
 // ============================================================================
 // HELPERS - Detección de tipo de página y extracción de slug
