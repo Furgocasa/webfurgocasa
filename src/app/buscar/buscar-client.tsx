@@ -106,6 +106,16 @@ function SearchResultsContent() {
     );
   }
 
+  // Construir objeto searchParams para VehicleCard (espera snake_case)
+  const vehicleSearchParams = {
+    pickup_date: searchParams.get("pickup_date") || "",
+    dropoff_date: searchParams.get("dropoff_date") || "",
+    pickup_time: searchParams.get("pickup_time") || "10:00",
+    dropoff_time: searchParams.get("dropoff_time") || "10:00",
+    pickup_location: searchParams.get("pickup_location") || "murcia",
+    dropoff_location: searchParams.get("dropoff_location") || searchParams.get("pickup_location") || "murcia",
+  };
+
   return (
     <div>
       <div className="mb-6">
@@ -121,8 +131,8 @@ function SearchResultsContent() {
           <VehicleCard
             key={vehicle.id}
             vehicle={vehicle}
-            pickupDate={searchParams.get("pickup_date") || ""}
-            dropoffDate={searchParams.get("dropoff_date") || ""}
+            pricing={vehicle.pricing}
+            searchParams={vehicleSearchParams}
           />
         ))}
       </div>
