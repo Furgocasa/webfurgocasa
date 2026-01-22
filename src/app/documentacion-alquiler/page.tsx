@@ -110,8 +110,7 @@ export default function DocumentacionAlquilerPage() {
                   key={doc.id}
                   className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100"
                 >
-                  {/* Header del documento */}
-                  <div className="p-6 border-b border-gray-100">
+                  <div className="p-6">
                     <div className="flex items-start justify-between mb-4">
                       <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
                         <doc.icon className="h-7 w-7 text-red-600" />
@@ -123,40 +122,28 @@ export default function DocumentacionAlquilerPage() {
                       )}
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-2">{doc.title}</h3>
-                    <p className="text-gray-600 text-sm">{doc.description}</p>
-                  </div>
-
-                  {/* Preview del PDF */}
-                  <div className="bg-gray-100 h-[400px] relative">
-                    <iframe
-                      src={`${doc.url}#toolbar=0&navpanes=0`}
-                      className="w-full h-full"
-                      title={doc.title}
-                    />
-                  </div>
-
-                  {/* Acciones */}
-                  <div className="p-4 bg-gray-50 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">PDF • {doc.size}</span>
-                    <div className="flex gap-2">
+                    <p className="text-gray-600 text-sm mb-6">{doc.description}</p>
+                    
+                    <div className="flex flex-col sm:flex-row gap-3">
                       <a
                         href={doc.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-colors"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors"
                       >
-                        <Eye className="h-4 w-4" />
-                        Ver completo
+                        <Eye className="h-5 w-5" />
+                        Ver documento
                       </a>
                       <a
                         href={doc.url}
                         download={doc.filename}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-white bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors"
                       >
-                        <Download className="h-4 w-4" />
-                        Descargar
+                        <Download className="h-5 w-5" />
+                        Descargar PDF
                       </a>
                     </div>
+                    <p className="text-xs text-gray-400 mt-3">PDF • {doc.size}</p>
                   </div>
                 </div>
               ))}
