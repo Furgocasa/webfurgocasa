@@ -65,15 +65,16 @@ const vehicleImages: Record<string, string> = {
 };
 
 // Componente de imagen con marcadores
+// IMPORTANTE: height: auto para mantener la proporción de la imagen
 function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: VehicleDamage[] }) {
   const viewDamages = damages.filter(d => d.view_type === viewType);
   
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div style={{ position: 'relative', width: '100%' }}>
       <img 
         src={vehicleImages[viewType]} 
         alt={viewLabels[viewType]}
-        style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+        style={{ width: '100%', height: 'auto', display: 'block' }}
       />
       {viewDamages.map((damage) => (
         <div
@@ -94,6 +95,7 @@ function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: Vehi
             fontSize: '8px',
             fontWeight: 'bold',
             color: damage.status === 'repaired' ? '#166534' : damage.status === 'in_progress' ? '#854d0e' : '#dc2626',
+            zIndex: 10,
           }}
         >
           {damage.damage_number || '?'}
@@ -237,21 +239,22 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             </div>
             
             {/* Fila 1: Frontal | Trasera */}
-            <table style={{ width: '100%', marginBottom: '6px' }}>
+            {/* Ajuste: ancho 35% para que no sean gigantes, centradas en su celda */}
+            <table style={{ width: '100%', marginBottom: '10px' }}>
               <tbody>
                 <tr>
-                  <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'top' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Frontal</div>
-                      <div style={{ height: '110px' }}>
+                  <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'middle', textAlign: 'center' }}>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
+                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Frontal</div>
+                      <div style={{ width: '60%', margin: '0 auto' }}> {/* Contenedor para limitar tamaño */}
                         <VehicleImage viewType="front" damages={activeDamages} />
                       </div>
                     </div>
                   </td>
-                  <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'top' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px', textAlign: 'center' }}>
-                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Trasera</div>
-                      <div style={{ height: '110px' }}>
+                  <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'middle', textAlign: 'center' }}>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
+                      <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Trasera</div>
+                      <div style={{ width: '60%', margin: '0 auto' }}> {/* Contenedor para limitar tamaño */}
                         <VehicleImage viewType="back" damages={activeDamages} />
                       </div>
                     </div>
@@ -261,23 +264,19 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             </table>
 
             {/* Fila 2: Lateral Izq | Lateral Der */}
-            <table style={{ width: '100%', marginBottom: '6px' }}>
+            <table style={{ width: '100%', marginBottom: '10px' }}>
               <tbody>
                 <tr>
                   <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'top' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px', textAlign: 'center' }}>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                       <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Izquierdo</div>
-                      <div style={{ height: '65px' }}>
-                        <VehicleImage viewType="left" damages={activeDamages} />
-                      </div>
+                      <VehicleImage viewType="left" damages={activeDamages} />
                     </div>
                   </td>
                   <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'top' }}>
-                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px', textAlign: 'center' }}>
+                    <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                       <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Lateral Derecho</div>
-                      <div style={{ height: '65px' }}>
-                        <VehicleImage viewType="right" damages={activeDamages} />
-                      </div>
+                      <VehicleImage viewType="right" damages={activeDamages} />
                     </div>
                   </td>
                 </tr>
@@ -286,11 +285,9 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
 
             {/* Fila 3: Superior (centrado) */}
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <div style={{ width: '50%', border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px', textAlign: 'center' }}>
+              <div style={{ width: '60%', border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                 <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px' }}>Superior</div>
-                <div style={{ height: '90px' }}>
-                  <VehicleImage viewType="top" damages={activeDamages} />
-                </div>
+                <VehicleImage viewType="top" damages={activeDamages} />
               </div>
             </div>
           </div>
@@ -300,9 +297,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
               DAÑO INTERIOR ({interiorDamages.length})
             </div>
-            <div style={{ height: '90px' }}>
-              <VehicleImage viewType="interior" damages={activeDamages} />
-            </div>
+            <VehicleImage viewType="interior" damages={activeDamages} />
           </div>
 
           {/* DETALLE DE DAÑOS */}
