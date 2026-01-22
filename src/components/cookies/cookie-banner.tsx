@@ -10,13 +10,17 @@ export function CookieBanner() {
   if (!showBanner) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-200 shadow-lg md:p-6">
+    <div 
+      className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-200 shadow-lg md:p-6"
+      role="region"
+      aria-label="Banner de consentimiento de cookies"
+    >
       <div className="container mx-auto max-w-6xl">
         <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
           {/* Icono y texto */}
           <div className="flex-1">
             <div className="flex items-start gap-3">
-              <Cookie className="h-8 w-8 text-furgocasa-orange flex-shrink-0 mt-1" />
+              <Cookie className="h-8 w-8 text-furgocasa-orange flex-shrink-0 mt-1" aria-hidden="true" />
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
                   Utilizamos cookies
@@ -113,19 +117,25 @@ export function CookieSettingsModal() {
   ];
 
   return (
-    <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/50">
+    <div 
+      className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/50"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cookie-settings-title"
+    >
       <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
-            <Cookie className="h-8 w-8 text-furgocasa-orange" />
-            <h2 className="text-xl font-bold text-gray-900">Configuración de cookies</h2>
+            <Cookie className="h-8 w-8 text-furgocasa-orange" aria-hidden="true" />
+            <h2 id="cookie-settings-title" className="text-xl font-bold text-gray-900">Configuración de cookies</h2>
           </div>
           <button
             onClick={closeSettings}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Cerrar configuración de cookies"
           >
-            <X className="h-5 w-5" />
+            <X className="h-5 w-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -151,12 +161,13 @@ export function CookieSettingsModal() {
                     className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       cookie.enabled ? "bg-furgocasa-orange text-white" : "bg-gray-200 text-gray-500"
                     }`}
+                    aria-hidden="true"
                   >
-                    <cookie.icon className="h-5 w-5" />
+                    <cookie.icon className="h-5 w-5" aria-hidden="true" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="font-semibold text-gray-900">{cookie.name}</h3>
+                      <h3 className="font-semibold text-gray-900" id={`cookie-${cookie.id}-label`}>{cookie.name}</h3>
                       {cookie.required ? (
                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
                           Siempre activas
@@ -170,12 +181,14 @@ export function CookieSettingsModal() {
                               updatePreferences({ [cookie.id]: e.target.checked })
                             }
                             className="sr-only peer"
+                            aria-labelledby={`cookie-${cookie.id}-label`}
+                            aria-describedby={`cookie-${cookie.id}-desc`}
                           />
                           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-furgocasa-orange/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-furgocasa-orange"></div>
                         </label>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600">{cookie.description}</p>
+                    <p className="text-sm text-gray-600" id={`cookie-${cookie.id}-desc`}>{cookie.description}</p>
                   </div>
                 </div>
               </div>
@@ -226,8 +239,9 @@ export function CookieSettingsButton() {
     <button
       onClick={openSettings}
       className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-1"
+      aria-label="Abrir configuración de cookies"
     >
-      <Cookie className="h-4 w-4" />
+      <Cookie className="h-4 w-4" aria-hidden="true" />
       Configurar cookies
     </button>
   );
