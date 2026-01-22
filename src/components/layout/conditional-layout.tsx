@@ -20,8 +20,14 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {/* Skip link para navegación con teclado */}
+      <a href="#main-content" className="skip-link">
+        Saltar al contenido principal
+      </a>
       <Header />
-      {children}
+      <main id="main-content" role="main">
+        {children}
+      </main>
       <Footer />
     </>
   );

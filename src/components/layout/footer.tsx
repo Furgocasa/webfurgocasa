@@ -48,24 +48,27 @@ export function Footer() {
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-furgocasa-orange transition-all duration-200 hover:scale-110"
+                aria-label="Síguenos en Facebook"
               >
-                <Facebook className="h-5 w-5" />
+                <Facebook className="h-5 w-5" aria-hidden="true" />
               </a>
               <a 
                 href="https://instagram.com/furgocasa" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-furgocasa-orange transition-all duration-200 hover:scale-110"
+                aria-label="Síguenos en Instagram"
               >
-                <Instagram className="h-5 w-5" />
+                <Instagram className="h-5 w-5" aria-hidden="true" />
               </a>
               <a 
                 href="https://youtube.com/furgocasa" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-furgocasa-orange transition-all duration-200 hover:scale-110"
+                aria-label="Suscríbete a nuestro canal de YouTube"
               >
-                <Youtube className="h-5 w-5" />
+                <Youtube className="h-5 w-5" aria-hidden="true" />
               </a>
             </div>
           </div>
@@ -117,8 +120,9 @@ export function Footer() {
                 <button 
                   onClick={openCookieSettings}
                   className="text-gray-300 hover:text-furgocasa-orange transition-all duration-200 text-sm flex items-center gap-2 hover:translate-x-1"
+                  aria-label={t("Abrir configuración de cookies")}
                 >
-                  <Cookie className="h-4 w-4" />
+                  <Cookie className="h-4 w-4" aria-hidden="true" />
                   {t("Configurar cookies")}
                 </button>
               </li>
@@ -130,7 +134,7 @@ export function Footer() {
             <h3 className="text-lg font-heading font-bold mb-5 text-white">{t("Contacto")}</h3>
             <ul className="space-y-4">
               <li className="flex items-start gap-3 group">
-                <MapPin className="h-5 w-5 text-furgocasa-orange flex-shrink-0 mt-1 group-hover:scale-110 transition-transform duration-200" />
+                <MapPin className="h-5 w-5 text-furgocasa-orange flex-shrink-0 mt-1 group-hover:scale-110 transition-transform duration-200" aria-hidden="true" />
                 <span className="text-gray-300 text-sm leading-relaxed">
                   Avenida Puente Tocinos, 4<br />
                   30007 Casillas - Murcia
@@ -140,8 +144,9 @@ export function Footer() {
                 <a 
                   href="tel:+34868364161" 
                   className="flex items-center gap-3 text-gray-300 hover:text-furgocasa-orange transition-all duration-200 group"
+                  aria-label="Llamar al 868 36 41 61"
                 >
-                  <Phone className="h-5 w-5 text-furgocasa-orange group-hover:scale-110 transition-transform duration-200" />
+                  <Phone className="h-5 w-5 text-furgocasa-orange group-hover:scale-110 transition-transform duration-200" aria-hidden="true" />
                   <span className="text-sm">868 36 41 61</span>
                 </a>
               </li>
@@ -149,8 +154,9 @@ export function Footer() {
                 <a 
                   href="mailto:info@furgocasa.com" 
                   className="flex items-center gap-3 text-gray-300 hover:text-furgocasa-orange transition-all duration-200 group"
+                  aria-label="Enviar email a info@furgocasa.com"
                 >
-                  <Mail className="h-5 w-5 text-furgocasa-orange group-hover:scale-110 transition-transform duration-200" />
+                  <Mail className="h-5 w-5 text-furgocasa-orange group-hover:scale-110 transition-transform duration-200" aria-hidden="true" />
                   <span className="text-sm">info@furgocasa.com</span>
                 </a>
               </li>

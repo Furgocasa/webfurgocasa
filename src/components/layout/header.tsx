@@ -58,12 +58,21 @@ export function Header() {
       <div className="bg-gradient-to-r from-furgocasa-blue to-furgocasa-blue-dark text-white py-2.5">
         <div className="container mx-auto px-4 flex justify-between items-center text-sm">
           <div className="flex items-center gap-4 lg:gap-6">
-            <a href="tel:+34868364161" className="flex items-center gap-2 hover:text-furgocasa-orange transition-colors duration-200 font-medium">
-              <Phone className="h-4 w-4" />
+            <a 
+              href="tel:+34868364161" 
+              className="flex items-center gap-2 hover:text-furgocasa-orange transition-colors duration-200 font-medium"
+              aria-label="Llamar al 868 36 41 61"
+            >
+              <Phone className="h-4 w-4" aria-hidden="true" />
               <span className="hidden lg:inline">868 36 41 61</span>
+              <span className="lg:hidden sr-only">868 36 41 61</span>
             </a>
-            <a href="mailto:info@furgocasa.com" className="hidden lg:flex items-center gap-2 hover:text-furgocasa-orange transition-colors duration-200 font-medium">
-              <Mail className="h-4 w-4" />
+            <a 
+              href="mailto:info@furgocasa.com" 
+              className="hidden lg:flex items-center gap-2 hover:text-furgocasa-orange transition-colors duration-200 font-medium"
+              aria-label="Enviar email a info@furgocasa.com"
+            >
+              <Mail className="h-4 w-4" aria-hidden="true" />
               info@furgocasa.com
             </a>
           </div>

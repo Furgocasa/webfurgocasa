@@ -1,6 +1,7 @@
 import { Metadata } from"next";
 import { notFound } from"next/navigation";
 import { headers } from"next/headers";
+import Image from"next/image";
 import { LocalizedLink } from"@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from"lucide-react";
 import { getPostBySlug, getRelatedPosts, incrementPostViews, getAllPublishedPostSlugs } from"@/lib/blog/server-actions";
@@ -222,14 +223,16 @@ export default async function BlogPostPage({
         {/* Featured Image */}
         <div className="container mx-auto px-4 -mt-16 relative z-20">
           <div className="max-w-5xl mx-auto">
-            <div className="h-64 md:h-[500px] bg-gray-200 rounded-3xl shadow-2xl flex items-center justify-center text-gray-400 overflow-hidden border-4 border-white">
+            <div className="h-64 md:h-[500px] bg-gray-200 rounded-3xl shadow-2xl flex items-center justify-center text-gray-400 overflow-hidden border-4 border-white relative">
               {post.featured_image ? (
-                <img 
+                <Image 
                   src={post.featured_image} 
                   alt={translatedPost.title || ''} 
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                  fetchPriority="high"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 80vw"
+                  className="object-cover"
+                  priority
+                  quality={85}
                 />
               ) : (
                 <div className="flex flex-col items-center">
@@ -331,12 +334,15 @@ export default async function BlogPostPage({
                               className="block group"
                             >
                               {related.featured_image && (
-                                <div className="h-24 rounded-lg overflow-hidden mb-3">
-                                  <img 
+                                <div className="h-24 rounded-lg overflow-hidden mb-3 relative">
+                                  <Image 
                                     src={related.featured_image} 
                                     alt={related.title}
-                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                    fill
+                                    sizes="200px"
+                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                                     loading="lazy"
+                                    quality={75}
                                   />
                                 </div>
                               )}

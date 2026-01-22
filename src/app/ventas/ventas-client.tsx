@@ -1,5 +1,6 @@
 "use client";
 
+import Image from"next/image";
 import { useLanguage } from"@/contexts/language-context";
 import { LocalizedLink } from"@/components/localized-link";
 import { 
@@ -408,10 +409,14 @@ export function VentasClient() {
                   {/* Imagen */}
                   <div className="relative h-56 bg-gray-200">
                     {vehicle.main_image ? (
-                      <img 
+                      <Image 
                         src={vehicle.main_image.image_url} 
                         alt={vehicle.main_image.alt_text || vehicle.name}
-                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        loading="lazy"
+                        quality={80}
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-gray-400">

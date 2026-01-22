@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, Suspense } from "react";
+import Image from "next/image";
 import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, Clock, ArrowRight, BookOpen, Search, Mail, Tag, ArrowLeft, Filter } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
@@ -267,10 +268,14 @@ function BlogCategoryContent() {
                   <LocalizedLink href={`/blog/${categorySlug}/${post.slug}`} className="flex flex-col h-full">
                     <div className="h-56 bg-gray-100 relative flex items-center justify-center overflow-hidden">
                       {post.featured_image ? (
-                        <img 
+                        <Image 
                           src={post.featured_image} 
                           alt={post.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                          quality={80}
                         />
                       ) : (
                         <BookOpen className="h-12 w-12 text-gray-300 group-hover:scale-110 transition-transform duration-500" />

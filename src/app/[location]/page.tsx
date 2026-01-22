@@ -542,11 +542,14 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                     >
                       <div className="aspect-[4/3] relative bg-gray-200 overflow-hidden">
                         {vehicle.main_image ? (
-                          <img
+                          <Image
                             src={vehicle.main_image}
                             alt={`${vehicle.brand} ${vehicle.model} ${vehicle.year} - ${t("Venta en")} ${saleLocationData.name}`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            fill
+                            sizes="(max-width: 1024px) 100vw, 33vw"
+                            className="object-cover group-hover:scale-105 transition-transform duration-300"
                             loading="lazy"
+                            quality={80}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
@@ -810,10 +813,14 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                 <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
                   <div className="h-56 lg:h-64 bg-gray-200 relative overflow-hidden">
                     {vehicle.main_image ? (
-                      <img
+                      <Image
                         src={vehicle.main_image}
                         alt={vehicle.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        quality={80}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-300">
@@ -1302,10 +1309,14 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
                 >
                   <div className="h-48 lg:h-56 bg-gray-200 relative overflow-hidden">
                     {article.featured_image ? (
-                      <img
+                      <Image
                         src={article.featured_image}
                         alt={article.title}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        quality={80}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-furgocasa-blue to-blue-600">

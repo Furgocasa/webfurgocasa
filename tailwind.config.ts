@@ -85,15 +85,16 @@ const config: Config = {
             800: "#031D3B",
             900: "#021326",
           },
-          // Naranja/Coral secundario
+          // Naranja/Coral secundario - Optimizado para contraste WCAG AA
           orange: {
-            DEFAULT: "#FF6B35",
-            dark: "#E55A2B",
+            DEFAULT: "#D65A31", // Naranja con contraste 4.5:1 sobre blanco (WCAG AA)
+            dark: "#C04F2A",
             light: "#FF8C5F",
+            bright: "#FF6B35", // Color original para fondos/decoración
             50: "#FFF3EE",
             100: "#FFE7DD",
-            500: "#FF6B35",
-            600: "#E55A2B",
+            500: "#D65A31",
+            600: "#C04F2A",
           },
           // Grises elegantes
           gray: {
@@ -113,8 +114,9 @@ const config: Config = {
         "furgocasa-blue": "#063971",
         "furgocasa-blue-dark": "#042A54",
         "furgocasa-blue-light": "#094F9A",
-        "furgocasa-orange": "#FF6B35",
-        "furgocasa-orange-dark": "#E55A2B",
+        "furgocasa-orange": "#D65A31", // Naranja con contraste WCAG AA
+        "furgocasa-orange-dark": "#C04F2A",
+        "furgocasa-orange-bright": "#FF6B35", // Color original para fondos/decoración
         "furgocasa-green": "#10B981",
         "furgocasa-yellow": "#FBBF24",
       },

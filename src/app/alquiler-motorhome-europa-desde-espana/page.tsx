@@ -254,10 +254,14 @@ export default async function MotorhomeEuropaLatamPage() {
                 <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
                   <div className="h-56 lg:h-64 bg-gray-200 relative overflow-hidden">
                     {vehicle.main_image ? (
-                      <img
+                      <Image
                         src={vehicle.main_image}
                         alt={`Motorhome ${vehicle.name} para alquilar`}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                        quality={80}
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center bg-gray-300">

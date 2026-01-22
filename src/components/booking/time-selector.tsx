@@ -15,6 +15,8 @@ interface TimeSelectorProps {
   onChange: (value: string) => void;
   minTime?: string;
   maxTime?: string;
+  label?: string;
+  id?: string;
 }
 
 export function TimeSelector({
@@ -22,17 +24,26 @@ export function TimeSelector({
   onChange,
   minTime = "08:00",
   maxTime = "20:00",
+  label = "Seleccionar hora",
+  id,
 }: TimeSelectorProps) {
   // Filter time slots based on min/max
   const availableSlots = TIME_SLOTS.filter((time) => {
     return time >= minTime && time <= maxTime;
   });
 
+  const selectId = id || `time-selector-${Math.random().toString(36).substr(2, 9)}`;
+
   return (
     <div className="relative">
+      <label htmlFor={selectId} className="sr-only">
+        {label}
+      </label>
       <select
+        id={selectId}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        aria-label={label}
         className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-1 focus:ring-furgocasa-blue focus:border-furgocasa-blue transition-colors appearance-none cursor-pointer"
       >
         {availableSlots.map((time) => (
@@ -41,7 +52,7 @@ export function TimeSelector({
           </option>
         ))}
       </select>
-      <Clock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" />
+      <Clock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" aria-hidden="true" />
     </div>
   );
 }
