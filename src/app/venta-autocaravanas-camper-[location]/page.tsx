@@ -31,7 +31,7 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export const revalidate = 3600;
+export const revalidate = 30; // 30 segundos para testing, luego subir a 3600
 export const dynamicParams = true;
 
 // ============================================================================
