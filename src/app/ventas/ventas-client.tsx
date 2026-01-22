@@ -1,11 +1,10 @@
 "use client";
 
-import Image from"next/image";
-import { useLanguage } from"@/contexts/language-context";
-import { LocalizedLink } from"@/components/localized-link";
+import Image from "next/image";
+import { useLanguage } from "@/contexts/language-context";
+import { LocalizedLink } from "@/components/localized-link";
 import { 
   Car, 
-  Calendar, 
   Gauge, 
   Fuel, 
   Users, 
@@ -15,12 +14,10 @@ import {
   Mail,
   MapPin,
   Tag,
-  ArrowRight,
-  Loader2
-} from"lucide-react";
-import { useState, useEffect } from"react";
-import { supabase } from"@/lib/supabase/client";
-import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
+  ArrowRight
+} from "lucide-react";
+import { useState } from "react";
+import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 
 interface VehicleForSale {
   id: string;
@@ -53,6 +50,7 @@ interface VehicleForSale {
     image_url: string;
     alt_text: string;
   };
+  vehicle_equipment?: any[];
 }
 
 interface VehicleCategory {
@@ -61,33 +59,25 @@ interface VehicleCategory {
   slug: string;
 }
 
-// Mover las etiquetas de condición a componente T para traducción
-function getConditionLabel(condition: string): { label: string; color: string } {
-  const labels: Record<string, { label: string; color: string }> = {
-    new: { label:"Nuevo", color:"bg-green-100 text-green-700" },
-    like_new: { label:"Como nuevo", color:"bg-emerald-100 text-emerald-700" },
-    excellent: { label:"Excelente", color:"bg-blue-100 text-blue-700" },
-    good: { label:"Buen estado", color:"bg-yellow-100 text-yellow-700" },
-    fair: { label:"Aceptable", color:"bg-orange-100 text-orange-700" },
-  };
-  return labels[condition] || labels.good;
+interface VentasClientProps {
+  initialVehicles: VehicleForSale[];
+  initialCategories: VehicleCategory[];
 }
 
 function formatPrice(price: number): string {
-  return price.toLocaleString("es-ES") +" €";
+  return price.toLocaleString("es-ES") + " €";
 }
 
 function formatMileage(km: number): string {
-  return km.toLocaleString("es-ES") +" km";
+  return km.toLocaleString("es-ES") + " km";
 }
 
-export function VentasClient() {
+export function VentasClient({ initialVehicles, initialCategories }: VentasClientProps) {
   const { t } = useLanguage();
-  const [vehiclesForSale, setVehiclesForSale] = useState<VehicleForSale[]>([]);
-  const [categories, setCategories] = useState<VehicleCategory[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  
+  // Los datos vienen del servidor, no necesitamos cargarlos
+  const vehiclesForSale = initialVehicles;
+  const categories = initialCategories;
   
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
@@ -95,119 +85,6 @@ export function VentasClient() {
   const [priceFilter, setPriceFilter] = useState('');
   const [kmFilter, setKmFilter] = useState('');
   const [sortBy, setSortBy] = useState('price-asc');
-
-  useEffect(() => {
-    // Delay inicial y retry automático
-    const timer = setTimeout(() => {
-      loadData();
-    }, 200);
-    
-    return () => clearTimeout(timer);
-  }, []);
-
-  const loadData = async (isRetry = false) => {
-    try {
-      if (!isRetry) {
-        setLoading(true);
-        setError(null);
-      }
-
-      console.log(`[Ventas] ${isRetry ? 'Retry' : 'Loading'} data... (attempt ${retryCount + 1}/4)`);
-      
-      // Cargar categorías
-      const { data: categoriesData } = await supabase
-        .from('vehicle_categories')
-        .select('id, name, slug')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true });
-      
-      if (categoriesData) {
-        setCategories(categoriesData);
-      }
-
-      // Cargar vehículos
-      const { data, error: vehiclesError } = await supabase
-        .from('vehicles')
-        .select(`
-          *,
-          category:vehicle_categories(*),
-          vehicle_images:vehicle_images(*),
-          vehicle_equipment(
-            id,
-            equipment(*)
-          )
-        `)
-        .eq('is_for_sale', true)
-        .eq('sale_status', 'available')
-        .order('created_at', { ascending: false });
-
-      if (vehiclesError) {
-        console.error('[Ventas] Error loading vehicles:', vehiclesError);
-        throw vehiclesError;
-      }
-
-      // Los datos ya vienen filtrados desde la BD
-      const availableVehicles = data || [];
-
-      console.log('[Ventas] Available vehicles for sale:', availableVehicles.length);
-
-      // Transformar datos
-      const vehiclesData = availableVehicles.map(vehicle => ({
-        ...vehicle,
-        category: Array.isArray(vehicle.category) ? vehicle.category[0] : vehicle.category,
-        main_image: Array.isArray(vehicle.vehicle_images) && vehicle.vehicle_images.length > 0 
-          ? vehicle.vehicle_images.find((img: any) => img.is_primary) || vehicle.vehicle_images[0]
-          : undefined,
-        sale_highlights: vehicle.sale_highlights || [],
-        vehicle_equipment: ((vehicle as any).vehicle_equipment || [])
-          .map((ve: any) => ve?.equipment)
-          .filter((eq: any) => eq != null) || []
-      }));
-
-      console.log('[Ventas] Processed vehicles:', vehiclesData.length);
-      setVehiclesForSale(vehiclesData as VehicleForSale[]);
-      
-      // Reset retry count on success
-      setRetryCount(0);
-      
-    } catch (err: any) {
-      // Manejo especial para AbortError
-      const isAbortError = err.name === 'AbortError' || 
-                          err.message?.includes('AbortError') || 
-                          err.message?.includes('signal is aborted');
-      
-      if (isAbortError) {
-        // NO reintentar AbortError - significa que la request fue cancelada intencionalmente
-        console.warn('[Ventas] AbortError detected - request was cancelled by navigation/user');
-        setError('La carga fue cancelada. Por favor, recarga la página.');
-        setLoading(false);
-        return;
-      }
-      
-      console.error('[Ventas] Error:', err);
-      
-      const errorMsg = err.message || err.toString() || 'Error al cargar vehículos';
-      
-      // Retry automático SOLO para errores de red (máximo 1 intento adicional)
-      if (retryCount < 1) {
-        const delay = 2000; // 2 segundos
-        console.log(`[Ventas] Retrying in ${delay}ms... (attempt ${retryCount + 1}/1)`);
-        setRetryCount(prev => prev + 1);
-        
-        setTimeout(() => {
-          loadData(true);
-        }, delay);
-      } else {
-        console.error('[Ventas] Max retry attempts reached (1/1)');
-        setError(errorMsg);
-        setLoading(false);
-      }
-    } finally {
-      if (!isRetry) {
-        setLoading(false);
-      }
-    }
-  };
 
   // Filtrado y ordenamiento
   const filteredAndSortedVehicles = vehiclesForSale
@@ -348,15 +225,8 @@ export function VentasClient() {
         {/* Vehículos */}
         <section className="py-12">
           <div className="container mx-auto px-4">
-            {/* Loading State */}
-            {loading && (
-              <div className="flex flex-col items-center justify-center py-20">
-                <Loader2 className="h-12 w-12 text-furgocasa-orange animate-spin mb-4" />
-                <p className="text-gray-600 text-lg">{t("Cargando vehículos en venta...")}</p>
-              </div>
-            )}
-
-            {!loading && filteredAndSortedVehicles.length === 0 && (
+            {/* Empty State */}
+            {filteredAndSortedVehicles.length === 0 && (
               <div className="flex flex-col items-center justify-center py-20">
                 <Car className="h-20 w-20 text-gray-300 mb-4" />
                 <h3 className="text-2xl font-bold text-gray-700 mb-2">
@@ -376,7 +246,7 @@ export function VentasClient() {
             )}
 
             {/* Vehicle List */}
-            {!loading && filteredAndSortedVehicles.length > 0 && (
+            {filteredAndSortedVehicles.length > 0 && (
               <>
                 <div className="flex justify-between items-center mb-8">
                   <p className="text-gray-600">
@@ -464,9 +334,7 @@ export function VentasClient() {
                     {/* Equipamiento */}
                     <div className="mb-4">
                       <VehicleEquipmentDisplay
-                        equipment={((vehicle as any).vehicle_equipment || [])
-                          .map((ve: any) => ve?.equipment)
-                          .filter((eq: any) => eq != null)}
+                        equipment={vehicle.vehicle_equipment || []}
                         variant="icons"
                         maxVisible={6}
                       />
