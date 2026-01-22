@@ -104,8 +104,8 @@ export async function generateStaticParams() {
 }
 
 // Imagen hero por defecto para páginas de alquiler (fallback si no hay hero_image en DB)
-// Versión optimizada: 1200px, 65% quality, ~58KB (antes 531KB)
-const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo-optimized.webp";
+// Next.js Image optimiza automáticamente a AVIF/WebP según next.config.js
+const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
 
 // ============================================================================
 // HELPERS - Detección de tipo de página y extracción de slug
