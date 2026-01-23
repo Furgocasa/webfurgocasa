@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, TrendingDown, Loader2 } from "lucide-react";
+import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, TrendingDown, Loader2, Users, Bed } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -12,6 +12,11 @@ interface LastMinuteOffer {
   vehicle_name: string;
   vehicle_slug: string;
   vehicle_image_url: string | null;
+  vehicle_brand: string;
+  vehicle_model: string;
+  vehicle_seats: number;
+  vehicle_beds: number;
+  vehicle_internal_code: string;
   offer_start_date: string;
   offer_end_date: string;
   offer_days: number;
@@ -433,9 +438,26 @@ export function OfertasClient() {
                       {/* Contenido */}
                       <div className="md:w-2/3 p-6 flex flex-col justify-between">
                         <div>
-                          <h4 className="text-xl font-heading font-bold text-gray-900 mb-2">
+                          <h4 className="text-xl font-heading font-bold text-gray-900 mb-1">
                             {offer.vehicle_name}
                           </h4>
+                          <p className="text-sm text-gray-500 mb-3">
+                            {offer.vehicle_brand} {offer.vehicle_model}
+                          </p>
+                          
+                          {/* Características del vehículo */}
+                          <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-3">
+                            <span className="flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-full text-furgocasa-blue">
+                              <Users className="w-4 h-4" />
+                              {offer.vehicle_seats} {t("plazas")}
+                            </span>
+                            <span className="flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-full text-furgocasa-blue">
+                              <Bed className="w-4 h-4" />
+                              {offer.vehicle_beds} {t("camas")}
+                            </span>
+                          </div>
+                          
+                          {/* Fechas y duración */}
                           <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
                             <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full">
                               <Calendar className="w-4 h-4 text-furgocasa-blue" />
