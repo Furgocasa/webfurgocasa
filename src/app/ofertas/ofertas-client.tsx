@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile } from "lucide-react";
+import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useState } from "react";
 
@@ -156,6 +156,93 @@ export function OfertasClient() {
               <p className="text-yellow-100 text-lg">
                 <strong className="text-white">{t("Condiciones:")}</strong> {t("Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.")}
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cómo usar el cupón */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="text-center mb-12">
+              <span className="inline-block px-4 py-1.5 bg-furgocasa-blue/10 text-furgocasa-blue rounded-full text-sm font-bold tracking-wider uppercase mb-4">
+                {t("Fácil y rápido")}
+              </span>
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
+                {t("¿Cómo usar tu código de descuento?")}
+              </h2>
+            </div>
+
+            <div className="grid md:grid-cols-4 gap-6">
+              {/* Paso 1 */}
+              <div className="relative">
+                <div className="bg-gray-50 rounded-2xl p-6 text-center h-full border border-gray-100 hover:border-furgocasa-blue/30 hover:shadow-lg transition-all">
+                  <div className="w-12 h-12 bg-furgocasa-blue text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                    1
+                  </div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Copy className="w-5 h-5 text-furgocasa-blue" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">{t("Copia el código")}</h3>
+                  <p className="text-sm text-gray-600">{t("Haz clic en el código de arriba para copiarlo")}</p>
+                </div>
+                <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-gray-300 text-2xl z-10">→</div>
+              </div>
+
+              {/* Paso 2 */}
+              <div className="relative">
+                <div className="bg-gray-50 rounded-2xl p-6 text-center h-full border border-gray-100 hover:border-furgocasa-blue/30 hover:shadow-lg transition-all">
+                  <div className="w-12 h-12 bg-furgocasa-blue text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                    2
+                  </div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Calendar className="w-5 h-5 text-furgocasa-blue" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">{t("Elige fechas")}</h3>
+                  <p className="text-sm text-gray-600">{t("Selecciona vehículo y fechas (mín. 10 días)")}</p>
+                </div>
+                <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-gray-300 text-2xl z-10">→</div>
+              </div>
+
+              {/* Paso 3 */}
+              <div className="relative">
+                <div className="bg-gray-50 rounded-2xl p-6 text-center h-full border border-gray-100 hover:border-furgocasa-blue/30 hover:shadow-lg transition-all">
+                  <div className="w-12 h-12 bg-furgocasa-blue text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                    3
+                  </div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <Ticket className="w-5 h-5 text-furgocasa-blue" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">{t("Aplica el cupón")}</h3>
+                  <p className="text-sm text-gray-600">{t("En el paso de confirmación, pega el código")}</p>
+                </div>
+                <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-gray-300 text-2xl z-10">→</div>
+              </div>
+
+              {/* Paso 4 */}
+              <div className="relative">
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-6 text-center h-full border border-green-200 hover:shadow-lg transition-all">
+                  <div className="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                    <Check className="w-6 h-6" />
+                  </div>
+                  <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                    <PartyPopper className="w-5 h-5 text-green-600" />
+                  </div>
+                  <h3 className="font-bold text-gray-900 mb-2">{t("¡Descuento aplicado!")}</h3>
+                  <p className="text-sm text-gray-600">{t("Verás el -15% reflejado en tu precio final")}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 text-center">
+              <LocalizedLink
+                href="/reservar"
+                className="inline-flex items-center gap-3 bg-furgocasa-blue hover:bg-furgocasa-blue-dark text-white font-bold py-4 px-8 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+              >
+                <Ticket className="w-5 h-5" />
+                {t("Empezar reserva con descuento")}
+              </LocalizedLink>
             </div>
           </div>
         </div>
