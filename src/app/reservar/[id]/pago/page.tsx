@@ -48,7 +48,7 @@ export default function PagoPage() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'redsys' | 'stripe'>('stripe'); // Stripe por defecto, Redsys temporalmente deshabilitado
+  const [paymentMethod, setPaymentMethod] = useState<'redsys' | 'stripe'>('redsys'); // Redsys habilitado
 
   // Actualizar título del navegador
   useEffect(() => {
@@ -118,6 +118,10 @@ export default function PagoPage() {
   const amountToPay = paymentInfo.isPending50 ? paymentInfo.secondPayment : paymentInfo.firstPayment;
 
   const handlePayment = async (paymentType:"deposit" |"full" ="deposit") => {
+    console.log("\n" + "=".repeat(80));
+    console.log("💳 FRONTEND - INICIANDO PROCESO DE PAGO");
+    console.log("=".repeat(80));
+    
     setProcessing(true);
     setError(null);
 
@@ -127,9 +131,20 @@ export default function PagoPage() {
       if (paymentType ==="full") {
         amount = booking!.total_price - (booking!.amount_paid || 0);
       }
+      
+      console.log("📊 [1/5] Información del pago:", {
+        bookingId: params.id,
+        bookingNumber: booking?.booking_number,
+        amount,
+        amountFormatted: formatPrice(amount),
+        paymentType,
+        paymentMethod,
+        timestamp: new Date().toISOString(),
+      });
 
       if (paymentMethod === 'stripe') {
         // === FLUJO DE STRIPE ===
+        console.log("🟣 [2/5] Método seleccionado: STRIPE");
         const response = await fetch('/api/stripe/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -146,10 +161,14 @@ export default function PagoPage() {
           throw new Error(data.error || 'Error al iniciar el pago');
         }
 
-        console.log('✅ Stripe Checkout iniciado:', data.sessionId);
+        console.log('✅ [3/5] Stripe Checkout iniciado:', data.sessionId);
+        console.log('🔗 [4/5] Redirigiendo a Stripe...');
 
         // Redirigir a Stripe Checkout
         if (data.url) {
+          console.log("=".repeat(80));
+          console.log("✅ FRONTEND - REDIRIGIENDO A STRIPE");
+          console.log("=".repeat(80) + "\n");
           window.location.href = data.url;
         } else {
           throw new Error('No se recibió URL de Stripe');
@@ -157,6 +176,9 @@ export default function PagoPage() {
 
       } else {
         // === FLUJO DE REDSYS ===
+        console.log("🔴 [2/5] Método seleccionado: REDSYS");
+        console.log("📡 [2/5] Llamando a /api/redsys/initiate...");
+        
         const response = await fetch('/api/redsys/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -167,64 +189,103 @@ export default function PagoPage() {
           }),
         });
 
+        console.log("📥 [3/5] Respuesta del servidor recibida");
         const data = await response.json();
 
         if (!data.success) {
+          console.error("❌ ERROR: El servidor devolvió error:", data.error);
           throw new Error(data.error || 'Error al iniciar el pago');
         }
 
         // 🔍 LOG: Ver la respuesta del backend
-        console.log('📥 Respuesta del backend:', {
+        console.log('✅ [3/5] Respuesta exitosa del backend:');
+        console.log({
           success: data.success,
           redsysUrl: data.redsysUrl,
+          orderNumber: data.orderNumber,
           hasFormData: !!data.formData,
           formDataKeys: data.formData ? Object.keys(data.formData) : [],
         });
 
         // 🔍 LOG: Decodificar los parámetros para verificar
         if (data.formData?.Ds_MerchantParameters) {
+          console.log("🔍 [3/5] Decodificando parámetros recibidos...");
           try {
             const decoded = JSON.parse(atob(data.formData.Ds_MerchantParameters));
-            console.log('🔍 Parámetros en frontend:', {
-              amount: decoded.DS_MERCHANT_AMOUNT,
-              order: decoded.DS_MERCHANT_ORDER,
-              terminal: decoded.DS_MERCHANT_TERMINAL,
+            console.log('📋 [3/5] Parámetros Redsys (decodificados):');
+            console.log(JSON.stringify(decoded, null, 2));
+            
+            // Validaciones visuales
+            console.log("🔍 [3/5] Validaciones de parámetros:");
+            console.log({
+              amountCorrecto: decoded.DS_MERCHANT_AMOUNT === String(Math.round(amount * 100)),
+              amountEnviado: decoded.DS_MERCHANT_AMOUNT,
+              amountEsperado: String(Math.round(amount * 100)),
+              orderNumber: decoded.DS_MERCHANT_ORDER,
+              orderLength: decoded.DS_MERCHANT_ORDER?.length,
               merchantCode: decoded.DS_MERCHANT_MERCHANTCODE,
+              terminal: decoded.DS_MERCHANT_TERMINAL,
+              tieneURLs: !!(decoded.DS_MERCHANT_URLOK && decoded.DS_MERCHANT_URLKO && decoded.DS_MERCHANT_MERCHANTURL),
             });
           } catch (e) {
-            console.error('Error decodificando parámetros en frontend:', e);
+            console.error('❌ ERROR decodificando parámetros en frontend:', e);
           }
         }
 
         // Crear formulario oculto y enviarlo a Redsys
+        console.log("📝 [4/5] Creando formulario para enviar a Redsys...");
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = data.redsysUrl;
+        form.target = '_self'; // Asegurarnos de que se abre en la misma ventana
 
         // Añadir campos ocultos con los parámetros de Redsys
+        let fieldCount = 0;
         Object.entries(data.formData).forEach(([key, value]) => {
           const input = document.createElement('input');
           input.type = 'hidden';
           input.name = key;
           input.value = value as string;
           form.appendChild(input);
+          fieldCount++;
           
           // 🔍 LOG: Ver qué se está añadiendo al formulario
-          console.log(`📝 Campo añadido: ${key} = ${value?.toString().substring(0, 50)}...`);
+          const displayValue = value?.toString().substring(0, 80);
+          console.log(`  ✓ ${key}: ${displayValue}${value && value.toString().length > 80 ? '...' : ''}`);
         });
 
         // 🔍 LOG: Ver el formulario completo antes de enviarlo
-        console.log('📤 Enviando formulario a:', form.action);
-        console.log('📤 Método:', form.method);
-        console.log('📤 Número de campos:', form.elements.length);
+        console.log("📤 [5/5] Formulario creado con éxito:");
+        console.log({
+          action: form.action,
+          method: form.method,
+          target: form.target,
+          numberOfFields: fieldCount,
+        });
 
         // Añadir formulario al DOM y enviarlo
+        console.log("🚀 [5/5] Enviando formulario a Redsys...");
+        console.log("=".repeat(80));
+        console.log("✅ FRONTEND - REDIRIGIENDO A REDSYS");
+        console.log("=".repeat(80) + "\n");
+        
         document.body.appendChild(form);
+        
+        // Log antes de submit
+        console.log("⏳ Ejecutando form.submit()...");
         form.submit();
+        console.log("✅ form.submit() ejecutado");
       }
       
     } catch (error: any) {
-      console.error('Error processing payment:', error);
+      console.error("\n" + "=".repeat(80));
+      console.error("❌ ERROR EN PROCESO DE PAGO (FRONTEND)");
+      console.error("=".repeat(80));
+      console.error('Error:', error);
+      console.error('Mensaje:', error.message);
+      console.error('Stack:', error.stack);
+      console.error("=".repeat(80) + "\n");
+      
       setError(error.message || 'Error al procesar el pago');
       setProcessing(false);
     }
@@ -408,32 +469,36 @@ export default function PagoPage() {
                 {t("Selecciona el método de pago")}
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Redsys - TEMPORALMENTE DESHABILITADO */}
-                <div className="relative">
-                  <button
-                    disabled
-                    className="w-full p-4 border-2 rounded-lg transition-all border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
-                      </div>
-                      <div className="text-left flex-1">
-                        <p className="font-semibold text-gray-500">Redsys</p>
-                        <p className="text-xs text-gray-400">Pasarela bancaria española</p>
-                      </div>
-                      <img 
-                        src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Redsys.jpg" 
-                        alt="Redsys" 
-                        className="h-5 object-contain opacity-50"
-                      />
+                {/* Redsys - HABILITADO */}
+                <button
+                  onClick={() => setPaymentMethod('redsys')}
+                  className={`p-4 border-2 rounded-lg transition-all ${
+                    paymentMethod === 'redsys'
+                      ? 'border-furgocasa-orange bg-orange-50'
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === 'redsys' ? 'border-furgocasa-orange' : 'border-gray-300'
+                    }`}>
+                      {paymentMethod === 'redsys' && (
+                        <div className="w-3 h-3 rounded-full bg-furgocasa-orange"></div>
+                      )}
                     </div>
-                  </button>
-                  <div className="absolute top-2 right-2 bg-blue-500 text-white text-xs px-2 py-1 rounded-full">
-                    {t("Próximamente")}
+                    <div className="text-left flex-1">
+                      <p className="font-semibold text-gray-900">Redsys</p>
+                      <p className="text-xs text-gray-500">Pasarela bancaria española</p>
+                    </div>
+                    <img 
+                      src="https://upload.wikimedia.org/wikipedia/commons/c/ca/Redsys.jpg" 
+                      alt="Redsys" 
+                      className="h-5 object-contain"
+                    />
                   </div>
-                </div>
+                </button>
 
-                {/* Stripe - ACTIVO */}
+                {/* Stripe */}
                 <button
                   onClick={() => setPaymentMethod('stripe')}
                   className={`p-4 border-2 rounded-lg transition-all ${

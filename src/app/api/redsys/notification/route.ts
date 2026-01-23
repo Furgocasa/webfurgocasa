@@ -9,6 +9,10 @@ import { validateSignature, decodeParams, getPaymentStatus, getResponseMessage }
  * Esta es la confirmación OFICIAL del pago
  */
 export async function POST(request: NextRequest) {
+  console.log("\n" + "=".repeat(80));
+  console.log("📨 REDSYS NOTIFICATION - RECIBIENDO NOTIFICACIÓN DE REDSYS");
+  console.log("=".repeat(80));
+  
   try {
     // Redsys envía datos como form-urlencoded
     const formData = await request.formData();
@@ -16,15 +20,49 @@ export async function POST(request: NextRequest) {
     const Ds_MerchantParameters = formData.get("Ds_MerchantParameters") as string;
     const Ds_Signature = formData.get("Ds_Signature") as string;
 
-    console.log("📥 Notificación Redsys recibida");
+    console.log("📥 [1/7] Datos recibidos de Redsys:");
+    console.log({
+      hasSignatureVersion: !!Ds_SignatureVersion,
+      signatureVersion: Ds_SignatureVersion,
+      hasParameters: !!Ds_MerchantParameters,
+      parametersLength: Ds_MerchantParameters?.length || 0,
+      hasSignature: !!Ds_Signature,
+      signatureLength: Ds_Signature?.length || 0,
+      signature: Ds_Signature,
+      timestamp: new Date().toISOString(),
+    });
 
     // 1. Validar que tenemos los datos necesarios
     if (!Ds_MerchantParameters || !Ds_Signature) {
-      console.error("❌ Faltan parámetros en la notificación");
+      console.error("❌ ERROR: Faltan parámetros en la notificación");
+      console.error({
+        hasParameters: !!Ds_MerchantParameters,
+        hasSignature: !!Ds_Signature,
+      });
       return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
     }
+    console.log("✅ [1/7] Parámetros básicos presentes");
 
-    // 2. Validar la firma
+    // 2. Decodificar parámetros ANTES de validar firma (para logging)
+    console.log("🔍 [2/7] Decodificando parámetros...");
+    let params;
+    try {
+      params = decodeParams(Ds_MerchantParameters);
+      console.log("✅ [2/7] Parámetros decodificados:");
+      console.log(JSON.stringify(params, null, 2));
+    } catch (decodeError) {
+      console.error("❌ ERROR al decodificar parámetros:", decodeError);
+      return NextResponse.json({ error: "Invalid parameters format" }, { status: 400 });
+    }
+
+    // 3. Validar la firma
+    console.log("🔐 [3/7] Validando firma HMAC-SHA256...");
+    console.log({
+      orderNumber: params.Ds_Order,
+      secretKeyPresent: !!process.env.REDSYS_SECRET_KEY,
+      secretKeyLength: process.env.REDSYS_SECRET_KEY?.length || 0,
+    });
+    
     const isValid = validateSignature(
       Ds_MerchantParameters,
       Ds_Signature,
@@ -32,27 +70,47 @@ export async function POST(request: NextRequest) {
     );
 
     if (!isValid) {
-      console.error("❌ Firma inválida en notificación de Redsys");
+      console.error("❌ ERROR: Firma inválida en notificación de Redsys");
+      console.error({
+        receivedSignature: Ds_Signature,
+        merchantParameters: Ds_MerchantParameters,
+        orderNumber: params.Ds_Order,
+      });
       return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
     }
+    console.log("✅ [3/7] Firma validada correctamente");
 
-    // 3. Decodificar parámetros
-    const params = decodeParams(Ds_MerchantParameters);
-
-    console.log("✅ Notificación validada:", {
+    console.log("📊 [3/7] Datos de la transacción:");
+    console.log({
       order: params.Ds_Order,
       response: params.Ds_Response,
+      responseDescription: getResponseMessage(params.Ds_Response || "9999"),
       amount: params.Ds_Amount,
-      type: params.Ds_TransactionType,
+      amountInEuros: params.Ds_Amount ? (parseInt(params.Ds_Amount) / 100).toFixed(2) + "€" : "N/A",
+      currency: params.Ds_Currency,
+      transactionType: params.Ds_TransactionType,
+      authorisationCode: params.Ds_AuthorisationCode,
+      date: params.Ds_Date,
+      hour: params.Ds_Hour,
+      merchantData: params.Ds_MerchantData,
     });
 
     // 4. Determinar estado del pago
+    console.log("🔍 [4/7] Determinando estado del pago...");
     const status = getPaymentStatus(params.Ds_Response || "9999");
     const responseMessage = getResponseMessage(params.Ds_Response || "9999");
+    
+    console.log("📋 [4/7] Estado del pago:", {
+      responseCode: params.Ds_Response,
+      status: status,
+      message: responseMessage,
+      isAuthorized: status === "authorized",
+    });
 
     const supabase = createAdminClient();
 
     // 5. Actualizar el pago en la base de datos
+    console.log("💾 [5/7] Actualizando registro de pago en BD...");
     const { data: payment, error: paymentError } = await supabase
       .from("payments")
       .update({
@@ -70,32 +128,54 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (paymentError) {
-      console.error("Error actualizando pago:", paymentError);
+      console.error("❌ ERROR actualizando pago:", paymentError);
+      console.error("Detalles:", JSON.stringify(paymentError, null, 2));
       // Aún así respondemos OK a Redsys
+    } else {
+      console.log("✅ [5/7] Pago actualizado correctamente");
+      console.log({
+        paymentId: payment?.id,
+        bookingId: payment?.booking_id,
+        orderNumber: payment?.order_number,
+        amount: payment?.amount,
+        status: payment?.status,
+      });
     }
 
     // 6. Si el pago fue autorizado, actualizar la reserva
     if (status === "authorized" && payment) {
+      console.log("💰 [6/7] Pago AUTORIZADO - Actualizando reserva...");
+      
       // Obtener datos adicionales si existen
       let merchantData: { bookingId?: string; paymentType?: string } = {};
       if (params.Ds_MerchantData) {
         try {
           merchantData = JSON.parse(params.Ds_MerchantData);
+          console.log("📦 MerchantData:", merchantData);
         } catch (e) {
           console.error("Error parseando merchantData:", e);
         }
       }
 
       // Obtener la reserva actual para calcular el nuevo amount_paid
+      console.log("🔍 [6/7] Obteniendo datos actuales de la reserva...");
       const { data: currentBooking, error: fetchError } = await supabase
         .from("bookings")
-        .select("total_price, amount_paid")
+        .select("total_price, amount_paid, booking_number")
         .eq("id", payment.booking_id)
         .single();
 
       if (fetchError) {
-        console.error("Error obteniendo reserva:", fetchError);
+        console.error("❌ ERROR obteniendo reserva:", fetchError);
       } else {
+        console.log("📊 [6/7] Datos actuales de la reserva:");
+        console.log({
+          bookingNumber: currentBooking.booking_number,
+          totalPrice: currentBooking.total_price,
+          amountPaid: currentBooking.amount_paid,
+          paymentAmount: payment.amount,
+        });
+        
         // Calcular nuevo amount_paid
         const currentPaid = currentBooking.amount_paid || 0;
         const newPaid = currentPaid + payment.amount;
@@ -111,7 +191,17 @@ export async function POST(request: NextRequest) {
           newPaymentStatus = "pending";
         }
 
+        console.log("🧮 [6/7] Cálculos:");
+        console.log({
+          currentPaid,
+          newPaid,
+          totalPrice,
+          newPaymentStatus,
+          percentage: ((newPaid / totalPrice) * 100).toFixed(2) + "%",
+        });
+
         // Actualizar estado de la reserva
+        console.log("💾 [6/7] Actualizando estado de la reserva...");
         const { error: bookingError } = await supabase
           .from("bookings")
           .update({
@@ -123,11 +213,19 @@ export async function POST(request: NextRequest) {
           .eq("id", payment.booking_id);
 
         if (bookingError) {
-          console.error("Error actualizando reserva:", bookingError);
+          console.error("❌ ERROR actualizando reserva:", bookingError);
+          console.error("Detalles:", JSON.stringify(bookingError, null, 2));
         } else {
-          console.log(`✅ Reserva actualizada: amount_paid=${newPaid}, payment_status=${newPaymentStatus}`);
+          console.log(`✅ [6/7] Reserva actualizada exitosamente`);
+          console.log({
+            bookingId: payment.booking_id,
+            amountPaid: newPaid,
+            paymentStatus: newPaymentStatus,
+            status: "confirmed",
+          });
           
           // Enviar email de confirmación según el estado del pago
+          console.log("📧 [7/7] Preparando envío de email...");
           try {
             // Determinar si es el primer pago o el segundo
             const isFirstPayment = currentPaid === 0;
@@ -141,6 +239,13 @@ export async function POST(request: NextRequest) {
               emailType = isFirstPayment ? 'first_payment' : 'second_payment';
             }
             
+            console.log("📧 [7/7] Tipo de email a enviar:", {
+              emailType,
+              isFirstPayment,
+              isSecondPayment,
+              isFullPayment,
+            });
+            
             // Enviar email de forma asíncrona (no bloqueante)
             fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/bookings/send-email`, {
               method: 'POST',
@@ -150,22 +255,37 @@ export async function POST(request: NextRequest) {
                 bookingId: payment.booking_id,
               }),
             }).catch(emailError => {
-              console.error('Error enviando email de confirmación:', emailError);
+              console.error('❌ Error enviando email de confirmación:', emailError);
             });
             
-            console.log(`📧 Enviando email de tipo: ${emailType}`);
+            console.log(`✅ [7/7] Email programado para envío`);
           } catch (emailError) {
-            console.error('Error al intentar enviar email:', emailError);
+            console.error('❌ Error al intentar enviar email:', emailError);
             // No bloqueamos el proceso si falla el email
           }
         }
       }
+    } else {
+      console.log("⚠️ [6/7] Pago NO autorizado o sin datos de pago");
+      console.log({
+        status,
+        hasPayment: !!payment,
+        responseCode: params.Ds_Response,
+      });
     }
 
     // 7. Responder a Redsys con OK
+    console.log("=".repeat(80));
+    console.log("✅ REDSYS NOTIFICATION - PROCESO COMPLETADO");
+    console.log("=".repeat(80) + "\n");
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error procesando notificación Redsys:", error);
+    console.error("\n" + "=".repeat(80));
+    console.error("❌ ERROR CRÍTICO EN REDSYS NOTIFICATION");
+    console.error("=".repeat(80));
+    console.error("Error:", error);
+    console.error("Stack:", error instanceof Error ? error.stack : 'No stack available');
+    console.error("=".repeat(80) + "\n");
     // Importante: devolver 200 para que Redsys no reintente
     return NextResponse.json({ error: "Processing error" }, { status: 200 });
   }
