@@ -31,6 +31,19 @@ export const routeTranslations = {
     fr: "/reserver/nouvelle", 
     de: "/buchen/neu" 
   },
+  // Segmentos individuales para rutas dinámicas (ej: /reservar/{id}/vehiculo)
+  "/vehiculo": { 
+    es: "/vehiculo", 
+    en: "/vehicle", 
+    fr: "/vehicule", 
+    de: "/fahrzeug" 
+  },
+  "/nueva": { 
+    es: "/nueva", 
+    en: "/new", 
+    fr: "/nouvelle", 
+    de: "/neu" 
+  },
   "/buscar": { 
     es: "/buscar", 
     en: "/search", 

@@ -12,6 +12,8 @@ const routeToSpanish: Record<string, string> = {
   '/book': '/reservar',
   '/book/vehicle': '/reservar/vehiculo',
   '/book/new': '/reservar/nueva',
+  '/vehicle': '/vehiculo',    // Segmento individual
+  '/new': '/nueva',           // Segmento individual
   '/payment': '/pago',        // Para rutas como /book/{id}/payment
   '/confirmation': '/confirmacion', // Para rutas como /book/{id}/confirmation
   '/vehicles': '/vehiculos',
@@ -46,6 +48,8 @@ const routeToSpanish: Record<string, string> = {
   '/reserver': '/reservar',
   '/reserver/vehicule': '/reservar/vehiculo',
   '/reserver/nouvelle': '/reservar/nueva',
+  '/vehicule': '/vehiculo',    // Segmento individual FR
+  '/nouvelle': '/nueva',       // Segmento individual FR
   '/paiement': '/pago',        // Para rutas como /reserver/{id}/paiement
   // '/confirmation' ya es igual en FR
   '/vehicules': '/vehiculos',
@@ -80,6 +84,8 @@ const routeToSpanish: Record<string, string> = {
   '/buchen': '/reservar',
   '/buchen/fahrzeug': '/reservar/vehiculo',
   '/buchen/neu': '/reservar/nueva',
+  '/fahrzeug': '/vehiculo',     // Segmento individual DE
+  '/neu': '/nueva',             // Segmento individual DE
   '/zahlung': '/pago',          // Para rutas como /buchen/{id}/zahlung
   '/bestaetigung': '/confirmacion', // Para rutas como /buchen/{id}/bestaetigung
   '/fahrzeuge': '/vehiculos',
@@ -178,6 +184,11 @@ const routesByLocale: Record<string, Record<Locale, string>> = {
   '/reservar': { es: '/reservar', en: '/book', fr: '/reserver', de: '/buchen' },
   '/reservar/vehiculo': { es: '/reservar/vehiculo', en: '/book/vehicle', fr: '/reserver/vehicule', de: '/buchen/fahrzeug' },
   '/reservar/nueva': { es: '/reservar/nueva', en: '/book/new', fr: '/reserver/nouvelle', de: '/buchen/neu' },
+  // Segmentos individuales
+  '/vehiculo': { es: '/vehiculo', en: '/vehicle', fr: '/vehicule', de: '/fahrzeug' },
+  '/nueva': { es: '/nueva', en: '/new', fr: '/nouvelle', de: '/neu' },
+  '/pago': { es: '/pago', en: '/payment', fr: '/paiement', de: '/zahlung' },
+  '/confirmacion': { es: '/confirmacion', en: '/confirmation', fr: '/confirmation', de: '/bestaetigung' },
   '/buscar': { es: '/buscar', en: '/search', fr: '/recherche', de: '/suche' },
   '/tarifas': { es: '/tarifas', en: '/rates', fr: '/tarifs', de: '/preise' },
   '/contacto': { es: '/contacto', en: '/contact', fr: '/contact', de: '/kontakt' },
@@ -190,43 +201,61 @@ const routesByLocale: Record<string, Record<Locale, string>> = {
  * Obtiene la URL correcta según el idioma detectado
  * Si la URL usa segmentos de otro idioma, devuelve la URL corregida
  * Ejemplo: /de/vehicles/slug → /de/fahrzeuge/slug
+ * Ejemplo: /fr/reserver/vehiculo → /fr/reserver/vehicule
  */
 function getCorrectUrlForLocale(pathname: string, locale: Locale): string | null {
   const segments = pathname.split('/').filter(Boolean);
   if (segments.length < 1) return null;
   
-  const firstSegment = '/' + segments[0];
+  let needsRedirect = false;
+  const correctedSegments: string[] = [];
   
-  // Buscar qué ruta española corresponde a este segmento
-  let spanishRoute: string | null = null;
-  
-  // Primero verificar si es una ruta española directa
-  if (routesByLocale[firstSegment]) {
-    spanishRoute = firstSegment;
-  } else {
-    // Buscar en las traducciones
-    for (const [esRoute, translations] of Object.entries(routesByLocale)) {
-      for (const [lang, translation] of Object.entries(translations)) {
-        if (translation === firstSegment) {
-          spanishRoute = esRoute;
-          break;
+  for (const segment of segments) {
+    const segmentAsPath = '/' + segment;
+    
+    // Buscar qué ruta española corresponde a este segmento
+    let spanishRoute: string | null = null;
+    
+    // Primero verificar si es una ruta española directa
+    if (routesByLocale[segmentAsPath]) {
+      spanishRoute = segmentAsPath;
+    } else {
+      // Buscar en las traducciones de otros idiomas
+      for (const [esRoute, translations] of Object.entries(routesByLocale)) {
+        // Solo buscar en rutas de un segmento
+        if (esRoute.split('/').filter(Boolean).length !== 1) continue;
+        
+        for (const [, translation] of Object.entries(translations)) {
+          if (translation === segmentAsPath) {
+            spanishRoute = esRoute;
+            break;
+          }
         }
+        if (spanishRoute) break;
       }
-      if (spanishRoute) break;
+    }
+    
+    if (spanishRoute && routesByLocale[spanishRoute]) {
+      // Este segmento tiene traducción
+      const correctSegment = routesByLocale[spanishRoute][locale];
+      const correctSegmentClean = correctSegment.substring(1); // Sin la barra inicial
+      
+      if (segment !== correctSegmentClean) {
+        // El segmento no es correcto para este idioma
+        needsRedirect = true;
+        correctedSegments.push(correctSegmentClean);
+      } else {
+        correctedSegments.push(segment);
+      }
+    } else {
+      // No tiene traducción conocida (ej: IDs, slugs dinámicos)
+      correctedSegments.push(segment);
     }
   }
   
-  if (!spanishRoute || !routesByLocale[spanishRoute]) return null;
+  if (!needsRedirect) return null;
   
-  // Obtener la traducción correcta para el locale actual
-  const correctSegment = routesByLocale[spanishRoute][locale];
-  
-  // Si el segmento ya es correcto, no hay que redirigir
-  if (firstSegment === correctSegment) return null;
-  
-  // Construir la URL correcta
-  const restOfPath = segments.slice(1).join('/');
-  return restOfPath ? `${correctSegment}/${restOfPath}` : correctSegment;
+  return '/' + correctedSegments.join('/');
 }
 
 // ============================================
