@@ -14,7 +14,7 @@ export async function GET(
   try {
     const { id } = await params;
 
-    // Obtener la oferta con datos del vehículo
+    // Obtener la oferta con datos del vehículo y ubicaciones
     const { data: offer, error } = await supabase
       .from('last_minute_offers')
       .select(`
@@ -23,6 +23,12 @@ export async function GET(
           id, name, slug, brand, model, seats, beds, 
           base_price_per_day, internal_code,
           images:vehicle_images(image_url, is_primary, sort_order)
+        ),
+        pickup_location:locations!last_minute_offers_pickup_location_id_fkey(
+          id, name, address, extra_fee
+        ),
+        dropoff_location:locations!last_minute_offers_dropoff_location_id_fkey(
+          id, name, address, extra_fee
         )
       `)
       .eq('id', id)

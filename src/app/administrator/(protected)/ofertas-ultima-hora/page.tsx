@@ -19,8 +19,10 @@ import {
   ChevronDown,
   ChevronUp,
   Database,
-  Info
+  Info,
+  MapPin
 } from "lucide-react";
+import { supabase } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
 
 interface DetectedGap {
@@ -55,6 +57,8 @@ interface LastMinuteOffer {
   detected_at: string;
   published_at: string | null;
   reserved_at: string | null;
+  pickup_location_id?: string;
+  dropoff_location_id?: string;
   vehicle?: {
     name: string;
     internal_code: string;
@@ -62,11 +66,18 @@ interface LastMinuteOffer {
   };
 }
 
+interface Location {
+  id: string;
+  name: string;
+  slug: string;
+}
+
 export default function OfertasUltimaHoraPage() {
   const [loading, setLoading] = useState(false);
   const [detecting, setDetecting] = useState(false);
   const [detectedGaps, setDetectedGaps] = useState<DetectedGap[]>([]);
   const [offers, setOffers] = useState<LastMinuteOffer[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [expandedGap, setExpandedGap] = useState<string | null>(null);
@@ -79,11 +90,30 @@ export default function OfertasUltimaHoraPage() {
     endDate: string;
     discount: number;
     notes: string;
+    locationId: string;
   } | null>(null);
 
   useEffect(() => {
     loadOffers();
+    loadLocations();
   }, []);
+
+  const loadLocations = async () => {
+    try {
+      const { data } = await supabase
+        .from('locations')
+        .select('id, name, slug')
+        .eq('is_active', true)
+        .eq('is_pickup', true)
+        .order('sort_order');
+      
+      if (data) {
+        setLocations(data);
+      }
+    } catch (error) {
+      console.error('Error loading locations:', error);
+    }
+  };
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
@@ -146,12 +176,15 @@ export default function OfertasUltimaHoraPage() {
   };
 
   const openEditGap = (gap: DetectedGap) => {
+    // Por defecto seleccionar Murcia
+    const defaultLocation = locations.find(l => l.slug === 'murcia') || locations[0];
     setEditingGap({
       gap,
       startDate: gap.gap_start_date,
       endDate: gap.gap_end_date,
       discount: 15,
-      notes: ''
+      notes: '',
+      locationId: defaultLocation?.id || ''
     });
   };
 
@@ -173,6 +206,8 @@ export default function OfertasUltimaHoraPage() {
           previous_booking_id: editingGap.gap.previous_booking_id,
           next_booking_id: editingGap.gap.next_booking_id,
           admin_notes: editingGap.notes || null,
+          pickup_location_id: editingGap.locationId,
+          dropoff_location_id: editingGap.locationId, // Mismo lugar para recogida y devolución
           status: 'published',
           published_at: new Date().toISOString()
         })
@@ -447,6 +482,28 @@ export default function OfertasUltimaHoraPage() {
                     -{editingGap.discount}%
                   </span>
                 </div>
+              </div>
+
+              {/* Ubicación */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-furgocasa-blue" />
+                  Ubicación de recogida/devolución
+                </label>
+                <select
+                  value={editingGap.locationId}
+                  onChange={(e) => setEditingGap({ ...editingGap, locationId: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                >
+                  {locations.map(loc => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  Esta será la ubicación fija de la oferta (el cliente no podrá cambiarla)
+                </p>
               </div>
 
               {/* Resumen de precio */}

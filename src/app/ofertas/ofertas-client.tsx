@@ -26,6 +26,12 @@ interface LastMinuteOffer {
   total_original_price: number;
   total_final_price: number;
   savings: number;
+  pickup_location_id: string;
+  pickup_location_name: string;
+  pickup_location_address: string;
+  dropoff_location_id: string;
+  dropoff_location_name: string;
+  dropoff_location_address: string;
 }
 
 export function OfertasClient() {
@@ -479,6 +485,13 @@ export function OfertasClient() {
                               <Bed className="w-4 h-4" />
                               {offer.vehicle_beds} {t("camas")}
                             </span>
+                            {/* Ubicación */}
+                            {offer.pickup_location_name && (
+                              <span className="flex items-center gap-1.5 bg-green-50 px-3 py-1 rounded-full text-green-700">
+                                <Map className="w-4 h-4" />
+                                {offer.pickup_location_name}
+                              </span>
+                            )}
                           </div>
                           
                           {/* Fechas y duración */}

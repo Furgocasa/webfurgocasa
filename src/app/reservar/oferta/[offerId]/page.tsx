@@ -22,6 +22,8 @@ interface OfferData {
   original_price_per_day: number;
   discount_percentage: number;
   final_price_per_day: number;
+  pickup_location_id: string;
+  dropoff_location_id: string;
   vehicle: {
     id: string;
     name: string;
@@ -38,13 +40,18 @@ interface OfferData {
       sort_order: number;
     }>;
   };
-}
-
-interface LocationData {
-  id: string;
-  name: string;
-  address: string;
-  extra_fee: number;
+  pickup_location: {
+    id: string;
+    name: string;
+    address: string;
+    extra_fee: number;
+  } | null;
+  dropoff_location: {
+    id: string;
+    name: string;
+    address: string;
+    extra_fee: number;
+  } | null;
 }
 
 interface ExtraData {
@@ -76,7 +83,6 @@ export default function ReservarOfertaPage({
   const router = useRouter();
   
   const [offer, setOffer] = useState<OfferData | null>(null);
-  const [locations, setLocations] = useState<LocationData[]>([]);
   const [extras, setExtras] = useState<ExtraData[]>([]);
   const [selectedExtras, setSelectedExtras] = useState<SelectedExtra[]>([]);
   
@@ -123,20 +129,12 @@ export default function ReservarOfertaPage({
       
       setOffer(offerData.offer);
 
-      // Cargar ubicaciones
-      const { data: locationsData } = await supabase
-        .from('locations')
-        .select('id, name, address, extra_fee')
-        .eq('is_active', true)
-        .eq('is_pickup', true)
-        .order('sort_order');
-      
-      if (locationsData) {
-        setLocations(locationsData);
-        if (locationsData.length > 0) {
-          setPickupLocationId(locationsData[0].id);
-          setDropoffLocationId(locationsData[0].id);
-        }
+      // Las ubicaciones vienen de la oferta (son fijas, no modificables)
+      if (offerData.offer.pickup_location) {
+        setPickupLocationId(offerData.offer.pickup_location_id);
+      }
+      if (offerData.offer.dropoff_location) {
+        setDropoffLocationId(offerData.offer.dropoff_location_id);
       }
 
       // Cargar extras
@@ -190,9 +188,10 @@ export default function ReservarOfertaPage({
   };
 
   const calculateLocationFee = () => {
-    const pickup = locations.find(l => l.id === pickupLocationId);
-    const dropoff = locations.find(l => l.id === dropoffLocationId);
-    return (pickup?.extra_fee || 0) + (dropoff?.extra_fee || 0);
+    if (!offer) return 0;
+    const pickupFee = offer.pickup_location?.extra_fee || 0;
+    const dropoffFee = offer.dropoff_location?.extra_fee || 0;
+    return pickupFee + dropoffFee;
   };
 
   const basePrice = offer ? offer.final_price_per_day * offer.offer_days : 0;
@@ -418,30 +417,36 @@ export default function ReservarOfertaPage({
               </div>
             </div>
 
-            {/* Ubicaciones */}
+            {/* Ubicación y Horarios - Ubicación FIJA de la oferta */}
             <div className="bg-white rounded-2xl shadow-sm p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-furgocasa-blue" />
-                {t("Ubicaciones")}
+                {t("Ubicación y Horarios")}
               </h2>
               
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("Lugar de recogida")}
-                  </label>
-                  <select
-                    value={pickupLocationId}
-                    onChange={(e) => setPickupLocationId(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
-                  >
-                    {locations.map(loc => (
-                      <option key={loc.id} value={loc.id}>
-                        {loc.name} {loc.extra_fee > 0 && `(+${formatPrice(loc.extra_fee)})`}
-                      </option>
-                    ))}
-                  </select>
+              {/* Ubicación fija - no modificable */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Lock className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">
+                    {t("Ubicación incluida en la oferta")}
+                  </span>
                 </div>
+                <div className="flex items-start gap-3">
+                  <MapPin className="w-5 h-5 text-green-600 mt-0.5" />
+                  <div>
+                    <p className="font-bold text-gray-900">
+                      {offer?.pickup_location?.name || 'Murcia'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {offer?.pickup_location?.address || ''}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Solo horarios editables */}
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t("Hora de recogida")}
@@ -453,22 +458,6 @@ export default function ReservarOfertaPage({
                   >
                     {Array.from({ length: 11 }, (_, i) => i + 9).map(hour => (
                       <option key={hour} value={`${hour}:00`}>{hour}:00</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("Lugar de devolución")}
-                  </label>
-                  <select
-                    value={dropoffLocationId}
-                    onChange={(e) => setDropoffLocationId(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
-                  >
-                    {locations.map(loc => (
-                      <option key={loc.id} value={loc.id}>
-                        {loc.name} {loc.extra_fee > 0 && `(+${formatPrice(loc.extra_fee)})`}
-                      </option>
                     ))}
                   </select>
                 </div>
