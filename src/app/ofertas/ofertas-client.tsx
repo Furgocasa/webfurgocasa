@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper } from "lucide-react";
+import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useState } from "react";
 
@@ -47,31 +47,86 @@ export function OfertasClient() {
         </div>
       </section>
 
-      {/* Intro Section */}
-      <section className="py-24 bg-white relative">
+      {/* Intro - Dos tipos de ofertas */}
+      <section className="py-20 bg-white relative">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto space-y-8 text-gray-600 text-lg leading-relaxed bg-gray-50 p-10 md:p-14 rounded-[2.5rem] shadow-sm border border-gray-100">
-            <h2 className="text-2xl md:text-3xl font-heading font-bold text-furgocasa-blue mb-8 text-center">
-              {t("Alquiler de furgonetas camper baratas")}
-            </h2>
-            <p>
-              {t("Con el objetivo de aumentar la ocupación y lograr que todos los clientes que desean viajar en una de nuestras campers puedan hacerlo aprovechando los huecos que se generan como consecuencia de la aplicación de los periodos mínimos de alquiler creamos esta sección.")}
-            </p>
-            <div className="flex items-start gap-4 p-6 bg-blue-50 rounded-2xl border border-blue-100">
-              <Tag className="h-6 w-6 text-furgocasa-blue flex-shrink-0 mt-1" />
-              <p className="font-medium text-furgocasa-blue-dark">
-                {t("En ella iremos mostrando distintas OFERTAS DE ULTIMA HORA para los periodos que se queden libres entre alquileres.")}
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-2xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
+                {t("Dos formas de ahorrar en tu alquiler")}
+              </h2>
+              <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+                {t("En FURGOCASA queremos que todos puedan disfrutar de la aventura camper. Por eso ofrecemos dos tipos de ofertas:")}
               </p>
             </div>
-            <p>
-              {t("Esta es una sección dinámica, que iremos cambiando regularmente, así que te recomendamos visitarla de vez en cuando y buscar tu oportunidad.")}
-            </p>
-            <p className="font-bold text-gray-800 text-xl text-center">
-              {t("Si las fechas te encajan podrás disfrutar de tu alquiler con IMPORTANTES DESCUENTOS.")}
-            </p>
-            <p className="text-sm text-gray-400 italic text-center pt-4">
-              {t("* Las ofertas de esta sección no son acumulables con otras promociones.")}
-            </p>
+
+            <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+              {/* Tipo 1: Cupones de Temporada */}
+              <div className="bg-gradient-to-br from-furgocasa-blue/5 to-furgocasa-blue/10 rounded-3xl p-8 border border-furgocasa-blue/20 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 bg-furgocasa-blue rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <Ticket className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-heading font-bold text-gray-900">{t("Cupones de Temporada")}</h3>
+                    <p className="text-sm text-furgocasa-blue font-medium">{t("Códigos promocionales")}</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  {t("Promociones especiales con códigos de descuento que se aplican durante el proceso de reserva. Pueden ser de temporada (ej: invierno, Black Friday) o personalizados.")}
+                </p>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Percent className="w-4 h-4" />
+                  <span>{t("Descuento sobre el precio total")}</span>
+                </div>
+              </div>
+
+              {/* Tipo 2: Ofertas de Última Hora */}
+              <div className="bg-gradient-to-br from-furgocasa-orange/5 to-furgocasa-orange/10 rounded-3xl p-8 border border-furgocasa-orange/20 hover:shadow-lg transition-all">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-14 h-14 bg-furgocasa-orange rounded-2xl flex items-center justify-center flex-shrink-0">
+                    <CalendarClock className="w-7 h-7 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-heading font-bold text-gray-900">{t("Ofertas de Última Hora")}</h3>
+                    <p className="text-sm text-furgocasa-orange font-medium">{t("Huecos entre reservas")}</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 mb-4">
+                  {t("En temporada alta, cuando hay periodos mínimos de alquiler (ej: 7 días en verano), pueden quedar pequeños huecos entre reservas que ofrecemos con descuentos especiales.")}
+                </p>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <Clock className="w-4 h-4" />
+                  <span>{t("Fechas específicas con precio reducido")}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-10 bg-gray-50 rounded-2xl p-6 border border-gray-200">
+              <div className="flex items-start gap-4">
+                <AlertCircle className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-500">
+                  <p className="mb-2">
+                    <strong className="text-gray-700">{t("Esta página se actualiza regularmente.")}</strong> {t("Te recomendamos visitarla de vez en cuando para encontrar tu oportunidad.")}
+                  </p>
+                  <p className="italic">
+                    {t("* Las ofertas de esta sección no son acumulables entre sí.")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECCIÓN 1: CUPONES DE TEMPORADA */}
+      <section className="py-6 bg-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-3">
+            <Ticket className="w-5 h-5 text-furgocasa-blue" />
+            <h2 className="text-lg md:text-xl font-heading font-bold text-gray-700 uppercase tracking-wider">
+              {t("Cupones de Temporada Activos")}
+            </h2>
           </div>
         </div>
       </section>
@@ -88,7 +143,7 @@ export function OfertasClient() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-10 md:mb-16">
             <span className="inline-block px-4 md:px-6 py-1.5 md:py-2 bg-white/10 backdrop-blur-md rounded-full text-xs md:text-sm font-bold tracking-wider md:tracking-widest uppercase mb-4 md:mb-6 border border-white/20">
-              {t("Promoción Especial")}
+              {t("Cupón de Temporada")}
             </span>
             <h2 className="text-3xl md:text-8xl font-heading font-bold text-white mb-2 md:mb-4 tracking-tight drop-shadow-2xl">
               {t("INVIERNO MÁGICO")}
@@ -243,6 +298,80 @@ export function OfertasClient() {
                 <Ticket className="w-5 h-5" />
                 {t("Empezar reserva con descuento")}
               </LocalizedLink>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECCIÓN 2: OFERTAS DE ÚLTIMA HORA */}
+      <section className="py-6 bg-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="flex items-center justify-center gap-3">
+            <CalendarClock className="w-5 h-5 text-furgocasa-orange" />
+            <h2 className="text-lg md:text-xl font-heading font-bold text-gray-700 uppercase tracking-wider">
+              {t("Ofertas de Última Hora")}
+            </h2>
+          </div>
+        </div>
+      </section>
+
+      {/* Ofertas de Última Hora - Contenido */}
+      <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            {/* Explicación */}
+            <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100 mb-8">
+              <div className="flex flex-col md:flex-row items-start gap-6">
+                <div className="w-16 h-16 bg-furgocasa-orange/10 rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <CalendarClock className="w-8 h-8 text-furgocasa-orange" />
+                </div>
+                <div>
+                  <h3 className="text-xl md:text-2xl font-heading font-bold text-gray-900 mb-4">
+                    {t("¿Qué son las Ofertas de Última Hora?")}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {t("En temporada alta (verano, Semana Santa...) aplicamos periodos mínimos de alquiler (por ejemplo, 7 días en agosto). Esto puede generar pequeños huecos entre reservas que no cumplen el mínimo.")}
+                  </p>
+                  <div className="bg-furgocasa-orange/5 rounded-xl p-4 border border-furgocasa-orange/20">
+                    <p className="text-gray-700 font-medium flex items-start gap-2">
+                      <span className="text-lg">💡</span>
+                      <span>{t("Ejemplo: Si un alquiler termina el 15 de agosto y el siguiente empieza el 20, esos 5 días no se pueden alquilar normalmente. ¡Pero los ofrecemos con descuento especial!")}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Estado actual - Sin ofertas */}
+            <div className="bg-gray-50 rounded-3xl p-10 md:p-14 text-center border-2 border-dashed border-gray-200">
+              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Calendar className="w-10 h-10 text-gray-400" />
+              </div>
+              <h4 className="text-xl font-heading font-bold text-gray-700 mb-3">
+                {t("No hay ofertas de última hora disponibles")}
+              </h4>
+              <p className="text-gray-500 max-w-md mx-auto mb-6">
+                {t("Actualmente no tenemos huecos disponibles entre reservas. Esta sección se actualiza regularmente, ¡vuelve a visitarnos pronto!")}
+              </p>
+              <div className="inline-flex items-center gap-2 text-sm text-furgocasa-blue font-medium">
+                <Clock className="w-4 h-4" />
+                {t("Las ofertas de última hora suelen aparecer en temporada alta")}
+              </div>
+            </div>
+
+            {/* Tip de notificación */}
+            <div className="mt-8 bg-blue-50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-4">
+              <div className="w-12 h-12 bg-furgocasa-blue rounded-xl flex items-center justify-center flex-shrink-0">
+                <Mail className="w-6 h-6 text-white" />
+              </div>
+              <div className="text-center md:text-left">
+                <p className="text-gray-700 font-medium">
+                  {t("¿Quieres que te avisemos cuando haya ofertas?")}
+                </p>
+                <p className="text-gray-500 text-sm">
+                  {t("Escríbenos a")} <a href="mailto:info@furgocasa.com" className="text-furgocasa-blue hover:underline">info@furgocasa.com</a> {t("y te incluiremos en nuestra lista de alertas.")}
+                </p>
+              </div>
             </div>
           </div>
         </div>
