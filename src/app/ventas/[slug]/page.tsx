@@ -9,7 +9,6 @@ import {
   Share2, Heart
 } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
-import { createClient } from "@/lib/supabase/server";
 import { createClient as createPublicClient } from "@supabase/supabase-js";
 import { formatPrice, sortVehicleEquipment } from "@/lib/utils";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
@@ -38,9 +37,12 @@ export async function generateStaticParams() {
   return params;
 }
 
-// Cargar vehículo desde Supabase
+// Cargar vehículo desde Supabase (usando cliente público para evitar error 500)
 async function getVehicle(slug: string) {
-  const supabase = await createClient();
+  const supabase = createPublicClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
   
   const { data: vehicle, error } = await supabase
     .from('vehicles')
