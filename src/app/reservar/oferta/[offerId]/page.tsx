@@ -504,10 +504,8 @@ export default function ReservarOfertaPage({
             {/* Extras - Igual que en /reservar/vehiculo */}
             {extras.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Tag className="w-5 h-5 text-furgocasa-blue" />
-                  {t("Extras opcionales")}
-                </h2>
+                <h2 className="text-xl font-bold text-gray-900 mb-2">{t("Extras disponibles")}</h2>
+                <p className="text-sm text-gray-600 mb-6">{t("Personaliza tu experiencia")}</p>
                 
                 <div className="space-y-3">
                   {extras.map(extra => {
@@ -547,7 +545,7 @@ export default function ReservarOfertaPage({
 
                         <div className="flex items-center gap-3 ml-4">
                           {maxQuantity > 1 ? (
-                            // Selector de cantidad múltiple
+                            // Selector de cantidad múltiple (igual que /reservar/vehiculo)
                             quantity > 0 ? (
                               <>
                                 <button
@@ -557,12 +555,18 @@ export default function ReservarOfertaPage({
                                 >
                                   <Minus className="h-4 w-4" />
                                 </button>
-                                <span className="w-8 text-center font-semibold">{quantity}</span>
+                                <span className="font-bold text-gray-900 min-w-[20px] text-center">
+                                  {quantity}
+                                </span>
                                 <button
                                   type="button"
                                   onClick={() => addExtra(extra)}
                                   disabled={quantity >= maxQuantity}
-                                  className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-300 hover:border-furgocasa-orange hover:text-furgocasa-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors ${
+                                    quantity >= maxQuantity
+                                      ? 'border-gray-300 text-gray-300 cursor-not-allowed'
+                                      : 'border-furgocasa-orange bg-furgocasa-orange text-white hover:bg-orange-600'
+                                  }`}
                                 >
                                   <Plus className="h-4 w-4" />
                                 </button>
@@ -571,31 +575,24 @@ export default function ReservarOfertaPage({
                               <button
                                 type="button"
                                 onClick={() => addExtra(extra)}
-                                className="px-4 py-2 text-sm font-medium text-furgocasa-blue border-2 border-furgocasa-blue rounded-lg hover:bg-furgocasa-blue hover:text-white transition-colors"
+                                className="px-4 py-2 bg-furgocasa-blue text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                               >
                                 {t("Añadir")}
                               </button>
                             )
                           ) : (
-                            // Toggle simple para cantidad 1
-                            quantity > 0 ? (
-                              <button
-                                type="button"
-                                onClick={() => removeExtra(extra.id)}
-                                className="px-4 py-2 text-sm font-medium text-white bg-furgocasa-blue rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
-                              >
-                                <CheckCircle className="h-4 w-4" />
-                                {t("Añadido")}
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => addExtra(extra)}
-                                className="px-4 py-2 text-sm font-medium text-furgocasa-blue border-2 border-furgocasa-blue rounded-lg hover:bg-furgocasa-blue hover:text-white transition-colors"
-                              >
-                                {t("Añadir")}
-                              </button>
-                            )
+                            // Selección única (igual que /reservar/vehiculo)
+                            <button
+                              type="button"
+                              onClick={() => quantity > 0 ? removeExtra(extra.id) : addExtra(extra)}
+                              className={`px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                                quantity > 0
+                                  ? 'bg-furgocasa-orange text-white hover:bg-orange-600'
+                                  : 'bg-furgocasa-blue text-white hover:bg-blue-700'
+                              }`}
+                            >
+                              {quantity > 0 ? t("Añadido") : t("Añadir")}
+                            </button>
                           )}
                         </div>
                       </div>
