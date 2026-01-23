@@ -9,7 +9,8 @@ import {
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
   FileText, Package
 } from"lucide-react";
-import Link from"next/link";
+import { LocalizedLink } from"@/components/localized-link";
+import { getTranslatedRoute } from"@/lib/route-translations";
 
 // Función para normalizar códigos de país a nombres completos
 const getCountryName = (countryCode: string | null | undefined): string => {
@@ -145,7 +146,7 @@ const statusConfig: Record<string, { bg: string; text: string; label: string; ic
 };
 
 export default function ReservaPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const params = useParams();
   const bookingId = params.id as string;
@@ -225,9 +226,9 @@ export default function ReservaPage() {
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
             <p className="text-gray-600 mb-4">{error || t("Reserva no encontrada")}</p>
-            <Link href="/" className="text-furgocasa-orange hover:underline">
+            <LocalizedLink href="/" className="text-furgocasa-orange hover:underline">
               {t("Volver al inicio")}
-            </Link>
+            </LocalizedLink>
           </div>
         </div>
 </>
@@ -262,13 +263,13 @@ export default function ReservaPage() {
         <div className="container mx-auto px-4 max-w-5xl">
           {/* Breadcrumb */}
           <div className="mb-8">
-            <Link 
+            <LocalizedLink 
               href="/"
               className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange transition-colors"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t("Volver al inicio")}
-            </Link>
+            </LocalizedLink>
           </div>
 
           {/* Header */}
@@ -318,7 +319,7 @@ export default function ReservaPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => router.push(`/reservar/${bookingId}/pago?amount=${firstPayment.toFixed(2)}`)}
+                    onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingId}/pago?amount=${firstPayment.toFixed(2)}`, language))}
                     className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center gap-2"
                   >
                     <CreditCard className="h-5 w-5" />
@@ -376,7 +377,7 @@ export default function ReservaPage() {
                   
                   {/* Botón siempre visible */}
                   <button
-                    onClick={() => router.push(`/reservar/${bookingId}/pago?amount=${pendingAmount.toFixed(2)}`)}
+                    onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingId}/pago?amount=${pendingAmount.toFixed(2)}`, language))}
                     className={`w-full sm:w-auto font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base ${
                       secondPaymentDue 
                         ? 'bg-red-600 text-white hover:bg-red-700' 
@@ -814,7 +815,7 @@ export default function ReservaPage() {
               <div className="pt-4 border-t border-gray-200">
                 <p className="text-xs text-gray-500">
                   {t("Asegúrate de incluir tu número de reserva")} ({booking.booking_number}) {t("en tu mensaje para que podamos ayudarte más rápidamente.")}<br/>
-                  {t("Consulta nuestra")} <Link href="/tarifas" className="text-furgocasa-blue hover:underline">{t("política de cancelación")}</Link> {t("para más información.")}
+                  {t("Consulta nuestra")} <LocalizedLink href="/tarifas" className="text-furgocasa-blue hover:underline">{t("política de cancelación")}</LocalizedLink> {t("para más información.")}
                 </p>
               </div>
             </div>

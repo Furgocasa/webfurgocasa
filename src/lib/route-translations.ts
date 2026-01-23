@@ -19,6 +19,24 @@ export const routeTranslations = {
     fr: "/reserver", 
     de: "/buchen" 
   },
+  "/reservar/vehiculo": { 
+    es: "/reservar/vehiculo", 
+    en: "/book/vehicle", 
+    fr: "/reserver/vehicule", 
+    de: "/buchen/fahrzeug" 
+  },
+  "/reservar/nueva": { 
+    es: "/reservar/nueva", 
+    en: "/book/new", 
+    fr: "/reserver/nouvelle", 
+    de: "/buchen/neu" 
+  },
+  "/buscar": { 
+    es: "/buscar", 
+    en: "/search", 
+    fr: "/recherche", 
+    de: "/suche" 
+  },
   "/vehiculos": { 
     es: "/vehiculos", 
     en: "/vehicles", 
@@ -188,14 +206,6 @@ export const routeTranslations = {
     de: "/cookies" 
   },
   
-  // Búsqueda
-  "/buscar": { 
-    es: "/buscar", 
-    en: "/search", 
-    fr: "/recherche", 
-    de: "/suche" 
-  },
-  
   // Páginas de pago
   "/pago/exito": {
     es: "/pago/exito",
@@ -208,6 +218,19 @@ export const routeTranslations = {
     en: "/payment/error",
     fr: "/paiement/erreur",
     de: "/zahlung/fehler"
+  },
+  // Segmentos individuales para rutas dinámicas con ID (ej: /reservar/{id}/pago)
+  "/pago": {
+    es: "/pago",
+    en: "/payment",
+    fr: "/paiement",
+    de: "/zahlung"
+  },
+  "/confirmacion": {
+    es: "/confirmacion",
+    en: "/confirmation",
+    fr: "/confirmation",
+    de: "/bestaetigung"
   },
   
   // Páginas de localización SEO (patrón base dinámico)
@@ -307,17 +330,24 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
           const translatedBase = routeTranslations["/venta-autocaravanas-camper"][targetLang];
           translatedPath = `${translatedBase}-${location}`;
         } else {
-          // Si es una ruta dinámica normal, traducir la parte base
+          // Si es una ruta dinámica normal, traducir TODOS los segmentos traducibles
           const pathSegments = cleanPath.split('/').filter(Boolean);
           if (pathSegments.length > 0) {
-            const baseRoute = '/' + pathSegments[0];
-            if (routeTranslations[baseRoute as keyof typeof routeTranslations]) {
-              const translatedBase = routeTranslations[baseRoute as keyof typeof routeTranslations][targetLang];
-              const restOfPath = pathSegments.slice(1);
-              translatedPath = restOfPath.length > 0 
-                ? `${translatedBase}/${restOfPath.join('/')}` 
-                : translatedBase;
+            const translatedSegments: string[] = [];
+            
+            for (const segment of pathSegments) {
+              const segmentAsRoute = '/' + segment;
+              // Intentar traducir cada segmento individual
+              if (routeTranslations[segmentAsRoute as keyof typeof routeTranslations]) {
+                const translated = routeTranslations[segmentAsRoute as keyof typeof routeTranslations][targetLang];
+                translatedSegments.push(translated.substring(1)); // Sin la barra inicial
+              } else {
+                // Si no tiene traducción, mantener el segmento original (ej: IDs, slugs)
+                translatedSegments.push(segment);
+              }
             }
+            
+            translatedPath = '/' + translatedSegments.join('/');
           }
         }
       }

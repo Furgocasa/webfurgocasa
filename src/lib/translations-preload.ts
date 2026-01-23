@@ -180,6 +180,42 @@ export const staticTranslations = {
     fr: "Recherche en cours...",
     de: "Suche läuft..."
   },
+  "Resultados de búsqueda": {
+    es: "Resultados de búsqueda",
+    en: "Search Results",
+    fr: "Résultats de recherche",
+    de: "Suchergebnisse"
+  },
+  "Buscando vehículos disponibles...": {
+    es: "Buscando vehículos disponibles...",
+    en: "Searching for available vehicles...",
+    fr: "Recherche de véhicules disponibles...",
+    de: "Suche nach verfügbaren Fahrzeugen..."
+  },
+  "Error al buscar disponibilidad": {
+    es: "Error al buscar disponibilidad",
+    en: "Error searching availability",
+    fr: "Erreur lors de la recherche de disponibilité",
+    de: "Fehler bei der Suche nach Verfügbarkeit"
+  },
+  "Prueba con otras fechas": {
+    es: "Prueba con otras fechas",
+    en: "Try different dates",
+    fr: "Essayez avec d'autres dates",
+    de: "Versuchen Sie andere Daten"
+  },
+  "vehículo": {
+    es: "vehículo",
+    en: "vehicle",
+    fr: "véhicule",
+    de: "Fahrzeug"
+  },
+  "disponible": {
+    es: "disponible",
+    en: "available",
+    fr: "disponible",
+    de: "verfügbar"
+  },
   
   // Locations
   "MURCIA (SEDE)": {

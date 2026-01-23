@@ -10,6 +10,10 @@ import { i18n, type Locale, isValidLocale, getLocaleFromPathname, removeLocaleFr
 const routeToSpanish: Record<string, string> = {
   // === INGLÉS (EN) ===
   '/book': '/reservar',
+  '/book/vehicle': '/reservar/vehiculo',
+  '/book/new': '/reservar/nueva',
+  '/payment': '/pago',        // Para rutas como /book/{id}/payment
+  '/confirmation': '/confirmacion', // Para rutas como /book/{id}/confirmation
   '/vehicles': '/vehiculos',
   '/rates': '/tarifas',
   '/contact': '/contacto',
@@ -40,6 +44,10 @@ const routeToSpanish: Record<string, string> = {
 
   // === FRANCÉS (FR) ===
   '/reserver': '/reservar',
+  '/reserver/vehicule': '/reservar/vehiculo',
+  '/reserver/nouvelle': '/reservar/nueva',
+  '/paiement': '/pago',        // Para rutas como /reserver/{id}/paiement
+  // '/confirmation' ya es igual en FR
   '/vehicules': '/vehiculos',
   '/tarifs': '/tarifas',
   // '/contact' ya es igual
@@ -70,6 +78,10 @@ const routeToSpanish: Record<string, string> = {
 
   // === ALEMÁN (DE) ===
   '/buchen': '/reservar',
+  '/buchen/fahrzeug': '/reservar/vehiculo',
+  '/buchen/neu': '/reservar/nueva',
+  '/zahlung': '/pago',          // Para rutas como /buchen/{id}/zahlung
+  '/bestaetigung': '/confirmacion', // Para rutas como /buchen/{id}/bestaetigung
   '/fahrzeuge': '/vehiculos',
   '/preise': '/tarifas',
   '/kontakt': '/contacto',
@@ -102,6 +114,7 @@ const routeToSpanish: Record<string, string> = {
 /**
  * Traduce una ruta de cualquier idioma a español (para encontrar la página física)
  * Ejemplo: /vehicles/dreamer-d55 -> /vehiculos/dreamer-d55
+ * Ejemplo con ID: /book/abc123/payment -> /reservar/abc123/pago
  */
 function translatePathToSpanish(pathname: string): string {
   // Buscar coincidencia exacta primero
@@ -117,8 +130,28 @@ function translatePathToSpanish(pathname: string): string {
     // Si el primer segmento tiene traducción
     if (routeToSpanish[firstSegment]) {
       const translatedFirst = routeToSpanish[firstSegment];
-      const restOfPath = segments.slice(1).join('/');
-      return restOfPath ? `${translatedFirst}/${restOfPath}` : translatedFirst;
+      
+      // Si hay más segmentos, también intentar traducirlos
+      if (segments.length > 1) {
+        const translatedSegments = [translatedFirst.substring(1)]; // Sin la barra inicial
+        
+        for (let i = 1; i < segments.length; i++) {
+          const segment = segments[i];
+          const segmentAsPath = '/' + segment;
+          
+          // Intentar traducir cada segmento individual
+          if (routeToSpanish[segmentAsPath]) {
+            translatedSegments.push(routeToSpanish[segmentAsPath].substring(1));
+          } else {
+            // Si no tiene traducción, mantener el segmento original (ej: IDs)
+            translatedSegments.push(segment);
+          }
+        }
+        
+        return '/' + translatedSegments.join('/');
+      }
+      
+      return translatedFirst;
     }
 
     // Para rutas de blog con categoría y slug
@@ -143,6 +176,9 @@ function translatePathToSpanish(pathname: string): string {
 const routesByLocale: Record<string, Record<Locale, string>> = {
   '/vehiculos': { es: '/vehiculos', en: '/vehicles', fr: '/vehicules', de: '/fahrzeuge' },
   '/reservar': { es: '/reservar', en: '/book', fr: '/reserver', de: '/buchen' },
+  '/reservar/vehiculo': { es: '/reservar/vehiculo', en: '/book/vehicle', fr: '/reserver/vehicule', de: '/buchen/fahrzeug' },
+  '/reservar/nueva': { es: '/reservar/nueva', en: '/book/new', fr: '/reserver/nouvelle', de: '/buchen/neu' },
+  '/buscar': { es: '/buscar', en: '/search', fr: '/recherche', de: '/suche' },
   '/tarifas': { es: '/tarifas', en: '/rates', fr: '/tarifs', de: '/preise' },
   '/contacto': { es: '/contacto', en: '/contact', fr: '/contact', de: '/kontakt' },
   '/ofertas': { es: '/ofertas', en: '/offers', fr: '/offres', de: '/angebote' },

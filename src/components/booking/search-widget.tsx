@@ -10,10 +10,11 @@ import { LocationSelector } from "./location-selector";
 import { TimeSelector } from "./time-selector";
 import { useLanguage } from "@/contexts/language-context";
 import { calculateRentalDays } from "@/lib/utils";
+import { getTranslatedRoute } from "@/lib/route-translations";
 
 export function SearchWidget() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
   // Form state
@@ -91,7 +92,12 @@ export function SearchWidget() {
       dropoff_location: selectedLocation, // Siempre la misma que recogida
     });
 
-    router.push(`/buscar?${params.toString()}`);
+    // Usar ruta traducida según el idioma actual
+    // ⚠️ IMPORTANTE: Usar window.location.href en lugar de router.push
+    // para garantizar que los query params se preserven correctamente
+    // ya que hay colisión entre middleware y rewrites de next.config.js
+    const searchPath = getTranslatedRoute(`/buscar?${params.toString()}`, language);
+    window.location.href = searchPath;
   };
 
   return (

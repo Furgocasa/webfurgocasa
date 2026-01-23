@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { LocalizedLink } from "@/components/localized-link";
 import { 
   Users, 
   Bed, 
@@ -67,7 +67,7 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
   return (
     <div className="card-vehicle group">
       {/* Image - Clicable */}
-      <Link href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
+      <LocalizedLink href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -88,14 +88,14 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
             {vehicle.category.name}
           </span>
         )}
-      </Link>
+      </LocalizedLink>
 
       {/* Content */}
       <div className="p-5">
         {/* Title - Clicable */}
-        <Link href={reservationUrl}>
+        <LocalizedLink href={reservationUrl}>
           <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-furgocasa-orange transition-colors cursor-pointer">{vehicle.name}</h3>
-        </Link>
+        </LocalizedLink>
 
         {/* Short description */}
         {vehicle.short_description && (
@@ -182,17 +182,17 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
               </p>
             </div>
 
-            <Link
+            <LocalizedLink
               href={reservationUrl}
               className="flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
               {t("Reservar")}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </LocalizedLink>
           </div>
           
           {/* Info sobre descuentos disponibles - SIEMPRE VISIBLE */}
-          <Link 
+          <LocalizedLink 
             href="/tarifas#descuentos" 
             className="flex items-center gap-2 px-3 py-2.5 mt-3 bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 hover:shadow-md rounded-lg transition-all group/discount"
           >
@@ -206,7 +206,7 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
               </p>
             </div>
             <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 text-green-600 opacity-0 group-hover/discount:opacity-100 group-hover/discount:translate-x-0.5 transition-all" />
-          </Link>
+          </LocalizedLink>
         </div>
       </div>
     </div>

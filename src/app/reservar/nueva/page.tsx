@@ -17,10 +17,11 @@ import {
   Calendar, MapPin, User, Mail, Phone, 
   CreditCard, AlertCircle, Loader2, FileText, Users, Bed
 } from "lucide-react";
-import Link from "next/link";
+import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
 import { useSeasonalPricing } from "@/hooks/use-seasonal-pricing";
+import { getTranslatedRoute } from "@/lib/route-translations";
 
 interface VehicleData {
   id: string;
@@ -51,7 +52,7 @@ interface SelectedExtra {
 }
 
 function NuevaReservaContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -346,8 +347,9 @@ function NuevaReservaContent() {
         // No bloqueamos el proceso si falla el email
       }
 
-      // Step 7: Redirect to booking detail page
-      router.push(`/reservar/${booking.id}`);
+      // Step 7: Redirect to booking detail page (con ruta traducida)
+      const bookingDetailPath = getTranslatedRoute(`/reservar/${booking.id}`, language);
+      router.push(bookingDetailPath);
       
     } catch (error: any) {
       console.error('Error creating booking:', error);

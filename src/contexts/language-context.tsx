@@ -52,13 +52,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       localStorage.setItem('language', lang);
     }
     
-    // Traducir la URL actual al nuevo idioma
-    const translatedPath = getTranslatedRoute(pathname, lang);
+    // ✅ CRÍTICO: Obtener query params y hash de la URL actual
+    // pathname solo contiene la ruta, NO los query params
+    const queryString = typeof window !== 'undefined' ? window.location.search : '';
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
     
-    console.log('🔗 Navegando a:', translatedPath);
+    // Traducir la URL actual al nuevo idioma (incluyendo query params)
+    const fullPathWithParams = pathname + queryString + hash;
+    const translatedPath = getTranslatedRoute(fullPathWithParams, lang);
+    
+    console.log('🔗 Navegando a:', translatedPath, '(original:', fullPathWithParams, ')');
     
     // ✅ Navegar a la nueva ruta
-    if (translatedPath !== pathname) {
+    if (translatedPath !== fullPathWithParams) {
       // Para páginas de localización (Server Components), usar recarga completa
       // para asegurar que los datos del servidor se recarguen correctamente
       const isLocationPage = pathname.includes('alquiler-autocaravanas') || 
@@ -70,8 +76,19 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
                             pathname.includes('camping-cars-a-vendre') ||
                             pathname.includes('wohnmobile-zu-verkaufen');
       
-      if (isLocationPage) {
-        // Recarga completa para páginas de localización (Server Components)
+      // También usar recarga completa para páginas del flujo de reserva
+      // para asegurar que los datos se carguen correctamente
+      const isBookingPage = pathname.includes('reservar') || 
+                           pathname.includes('book') ||
+                           pathname.includes('reserver') ||
+                           pathname.includes('buchen') ||
+                           pathname.includes('buscar') ||
+                           pathname.includes('search') ||
+                           pathname.includes('recherche') ||
+                           pathname.includes('suche');
+      
+      if (isLocationPage || isBookingPage) {
+        // Recarga completa para preservar query params y recargar datos del servidor
         window.location.href = translatedPath;
       } else {
         // Navegación suave para páginas normales (Client Components)

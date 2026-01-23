@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from"react";
 import { useLanguage } from"@/contexts/language-context";
+import { getTranslatedRoute } from"@/lib/route-translations";
 import { useRouter, useSearchParams } from"next/navigation";
 
 function LoadingState() {
@@ -16,7 +17,7 @@ import {
   ArrowLeft, Calendar, MapPin, Users, Bed, Fuel, Settings, 
   ArrowRight, Plus, Minus, AlertCircle, Loader2, Ruler, Car, Info
 } from"lucide-react";
-import Link from"next/link";
+import { LocalizedLink } from"@/components/localized-link";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
 import { formatPrice } from"@/lib/utils";
@@ -42,7 +43,7 @@ interface SelectedExtra {
 }
 
 function ReservarVehiculoContent() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -257,7 +258,9 @@ function ReservarVehiculoContent() {
       params.append(`extra_${index}_quantity`, item.quantity.toString());
     });
 
-    router.push(`/reservar/nueva?${params.toString()}`);
+    // Usar ruta traducida según el idioma actual
+    const newBookingPath = getTranslatedRoute(`/reservar/nueva?${params.toString()}`, language);
+    router.push(newBookingPath);
   };
 
   if (loading) {
@@ -281,12 +284,12 @@ function ReservarVehiculoContent() {
             <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Error")}</h2>
             <p className="text-gray-600 mb-4">{error || t("Vehículo no encontrado")}</p>
-            <Link 
+            <LocalizedLink 
               href="/reservar"
               className="inline-block bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors"
             >
               {t("Volver a buscar")}
-            </Link>
+            </LocalizedLink>
           </div>
         </div>
 </>
@@ -302,13 +305,13 @@ function ReservarVehiculoContent() {
         <div className="container mx-auto px-4 max-w-7xl">
           {/* Link Volver - Simple y elegante */}
           <div className="mb-4">
-            <Link 
+            <LocalizedLink 
               href={`/buscar?${searchParams.toString()}`}
               className="inline-flex items-center text-sm text-gray-600 hover:text-furgocasa-orange transition-colors group"
             >
               <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform" />
               {t("Volver a la búsqueda")}
-            </Link>
+            </LocalizedLink>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
