@@ -83,9 +83,14 @@ export async function generateMetadata(
     };
   }
 
-  // Obtener locale y generar canónicas
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  // Obtener locale y generar canónicas (con fallback para build estático)
+  let locale: Locale = 'es';
+  try {
+    const headersList = await headers();
+    locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  } catch {
+    locale = 'es';
+  }
   const alternates = buildCanonicalAlternates(`/ventas/${slug}`, locale);
 
   // Imagen principal

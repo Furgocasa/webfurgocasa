@@ -363,3 +363,99 @@ html, body {
   top: 0;
 }
 
+/* =========================================
+   BLOG CONTENT - RESPONSIVE MÓVIL
+   Asegurar que todo el contenido del blog
+   respete el ancho de pantalla en móvil
+   ========================================= */
+
+/* Contenido del blog - prevenir desbordamiento */
+.prose {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Imágenes dentro del contenido del blog */
+.prose img {
+  max-width: 100% !important;
+  height: auto !important;
+  display: block;
+}
+
+/* Iframes (videos embebidos, mapas, etc.) */
+.prose iframe {
+  max-width: 100% !important;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  height: auto;
+}
+
+/* Videos embebidos */
+.prose video {
+  max-width: 100% !important;
+  height: auto !important;
+}
+
+/* Tablas - scroll horizontal si son muy anchas */
+.prose table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Código - scroll horizontal */
+.prose pre {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Código inline - permitir ruptura */
+.prose code {
+  word-break: break-word;
+}
+
+/* URLs largas */
+.prose a {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Figuras/captions */
+.prose figure {
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Bloques de cita */
+.prose blockquote {
+  max-width: 100%;
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* Listas - ajustar indentación en móvil */
+@media (max-width: 640px) {
+  .prose ul,
+  .prose ol {
+    padding-left: 1.25rem;
+  }
+
+  /* Reducir márgenes de headings en móvil */
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Párrafos más compactos en móvil */
+  .prose p {
+    margin-bottom: 1rem;
+  }
+}
+

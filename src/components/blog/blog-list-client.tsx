@@ -236,14 +236,14 @@ export function BlogListClient({
 
         {/* Posts destacados */}
         {featuredPosts.length > 0 && (
-          <div className="mb-16">
-            <div className="flex items-center gap-3 mb-2">
-              <Sparkles className="h-8 w-8 text-furgocasa-orange" />
-              <h2 className="text-3xl font-heading font-bold text-gray-900">
+          <div className="mb-12 md:mb-16">
+            <div className="flex items-center gap-2 md:gap-3 mb-2">
+              <Sparkles className="h-6 w-6 md:h-8 md:w-8 text-furgocasa-orange flex-shrink-0" />
+              <h2 className="text-xl md:text-3xl font-heading font-bold text-gray-900">
                 {t("Artículos Destacados")}
               </h2>
             </div>
-            <p className="text-gray-600 mb-8">{t("Los mejores artículos seleccionados para ti")}</p>
+            <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8">{t("Los mejores artículos seleccionados para ti")}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {featuredPosts.map((post) => {
                 const categorySlug = post.category?.slug || 'general';

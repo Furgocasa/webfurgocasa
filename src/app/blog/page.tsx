@@ -85,13 +85,13 @@ export default async function BlogPage({
           }}></div>
           
           <div className="container mx-auto px-4 text-center relative z-10">
-            <div className="flex items-center justify-center gap-4 mb-6">
-              <BookOpen className="h-12 w-12 text-white" />
-              <h1 className="text-4xl md:text-6xl font-heading font-bold text-white">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-3 md:gap-4 mb-4 md:mb-6">
+              <BookOpen className="h-8 w-8 md:h-12 md:w-12 text-white" />
+              <h1 className="text-2xl md:text-4xl lg:text-6xl font-heading font-bold text-white">
                 {t("Blog de Viajes en Camper")}
               </h1>
             </div>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed">
+            <p className="text-base md:text-xl lg:text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed px-2">
               {t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana")}
             </p>
           </div>
@@ -107,12 +107,12 @@ export default async function BlogPage({
         </section>
 
         {/* Newsletter CTA */}
-        <section className="py-16 bg-gradient-to-r from-furgocasa-blue to-furgocasa-blue-dark">
+        <section className="py-12 md:py-16 bg-gradient-to-r from-furgocasa-blue to-furgocasa-blue-dark">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-white mb-6">
+            <h2 className="text-xl md:text-3xl lg:text-4xl font-heading font-bold text-white mb-4 md:mb-6 px-2">
               {t("¿Quieres más consejos sobre viajes en camper?")}
             </h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            <p className="text-sm md:text-xl text-blue-100 mb-6 md:mb-8 max-w-2xl mx-auto px-2">
               {t("Síguenos en nuestras redes sociales y no te pierdas ningún artículo")}
             </p>
             <div className="flex gap-4 justify-center">
@@ -120,7 +120,7 @@ export default async function BlogPage({
                 href="https://www.facebook.com/furgocasa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-heading font-bold px-8 py-4 rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg"
+                className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-heading font-bold px-6 md:px-8 py-3 md:py-4 rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg text-sm md:text-base"
               >
                 {t("Síguenos en Facebook")}
               </a>

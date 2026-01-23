@@ -302,16 +302,16 @@ export default async function BlogPostPage({
                 )}
 
                 {/* CTA */}
-                <div className="mt-16 bg-furgocasa-blue rounded-3xl p-8 md:p-12 text-white text-center relative overflow-hidden">
+                <div className="mt-10 md:mt-16 bg-furgocasa-blue rounded-2xl md:rounded-3xl p-6 md:p-12 text-white text-center relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
                   <div className="relative z-10">
-                    <h3 className="text-3xl font-heading font-bold mb-4">¿Te ha inspirado este artículo?</h3>
-                    <p className="text-blue-100 mb-8 text-lg">
+                    <h3 className="text-xl md:text-3xl font-heading font-bold mb-3 md:mb-4">¿Te ha inspirado este artículo?</h3>
+                    <p className="text-blue-100 mb-6 md:mb-8 text-sm md:text-lg">
                       Haz realidad tu viaje. Reserva tu camper y empieza a explorar estos destinos increíbles.
                     </p>
                     <LocalizedLink
                       href="/reservar"
-                      className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold py-4 px-8 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                      className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold py-3 md:py-4 px-6 md:px-8 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 text-sm md:text-base"
                     >
                       Ver disponibilidad y precios
                     </LocalizedLink>

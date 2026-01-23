@@ -35,8 +35,17 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  
+  // Intentar obtener locale de headers, con fallback a 'es'
+  let locale: Locale = 'es';
+  try {
+    const headersList = await headers();
+    locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  } catch {
+    // Durante build estático, headers() puede fallar
+    locale = 'es';
+  }
+  
   const { data: vehicle } = await getVehicleBySlug(slug);
 
   if (!vehicle) {
@@ -84,8 +93,14 @@ export const dynamicParams = true;
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // ✅ Obtener el idioma del header establecido por el middleware
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  let locale: Locale = 'es';
+  try {
+    const headersList = await headers();
+    locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  } catch {
+    // Durante build estático, headers() puede fallar
+    locale = 'es';
+  }
   const t = (key: string) => translateServer(key, locale);
   
   const { slug } = await params;
