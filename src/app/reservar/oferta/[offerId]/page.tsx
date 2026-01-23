@@ -106,6 +106,8 @@ export default function ReservarOfertaPage({
   const [customerCity, setCustomerCity] = useState("");
   const [customerPostalCode, setCustomerPostalCode] = useState("");
   const [customerCountry, setCustomerCountry] = useState("España");
+  const [customerDriverLicense, setCustomerDriverLicense] = useState("");
+  const [customerDriverLicenseExpiry, setCustomerDriverLicenseExpiry] = useState("");
   const [notes, setNotes] = useState("");
   const [acceptTerms, setAcceptTerms] = useState(false);
 
@@ -249,7 +251,9 @@ export default function ReservarOfertaPage({
             address: customerAddress || null,
             city: customerCity || null,
             postal_code: customerPostalCode || null,
-            country: customerCountry
+            country: customerCountry,
+            driver_license: customerDriverLicense || null,
+            driver_license_expiry: customerDriverLicenseExpiry || null
           },
           // Extras seleccionados
           extras: selectedExtras.map(extra => ({
@@ -652,6 +656,35 @@ export default function ReservarOfertaPage({
                     className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
                   />
                 </div>
+                
+                {/* Carnet de conducir */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t("Nº Carnet de conducir")} *
+                  </label>
+                  <input
+                    type="text"
+                    value={customerDriverLicense}
+                    onChange={(e) => setCustomerDriverLicense(e.target.value)}
+                    required
+                    placeholder="123456789"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t("Fecha caducidad carnet")} *
+                  </label>
+                  <input
+                    type="date"
+                    value={customerDriverLicenseExpiry}
+                    onChange={(e) => setCustomerDriverLicenseExpiry(e.target.value)}
+                    required
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  />
+                </div>
+                
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t("Notas o peticiones especiales")}
