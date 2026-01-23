@@ -24,6 +24,7 @@ import {
   X,
   Wrench,
   AlertTriangle,
+  Tag,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
 import type { Admin } from "@/types/blog";
@@ -47,6 +48,7 @@ const navigation: NavItem[] = [
   { name: "Equipamiento", href: "/administrator/equipamiento", icon: Wrench },
   { name: "Ubicaciones", href: "/administrator/ubicaciones", icon: MapPin },
   { name: "Temporadas", href: "/administrator/temporadas", icon: Sun },
+  { name: "Cupones", href: "/administrator/cupones", icon: Tag },
   {
     name: "Blog",
     href: "/administrator/blog",

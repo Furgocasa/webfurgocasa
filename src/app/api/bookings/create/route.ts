@@ -26,6 +26,10 @@ const bookingSchema = z.object({
   customer_name: z.string().min(2).max(200),
   customer_email: z.string().email().max(255),
   notes: z.string().max(2000).optional().nullable(),
+  // Campos de cupón (opcionales)
+  coupon_id: z.string().uuid().optional().nullable(),
+  coupon_code: z.string().max(50).optional().nullable(),
+  coupon_discount: z.number().nonnegative().optional(),
 });
 
 const extraSchema = z.object({
@@ -133,6 +137,25 @@ export async function POST(request: Request) {
           console.error("Error updating customer stats:", statsError);
         }
       }
+    }
+
+    // Registrar uso del cupón si se aplicó uno
+    if (booking.coupon_id && booking.coupon_discount && booking.coupon_discount > 0) {
+      // Incrementar contador de usos
+      await supabase.rpc('increment_coupon_uses', { coupon_id: booking.coupon_id });
+      
+      // Registrar en historial de uso
+      const originalAmount = booking.total_price + booking.coupon_discount;
+      await supabase
+        .from("coupon_usage")
+        .insert({
+          coupon_id: booking.coupon_id,
+          booking_id: createdBooking.id,
+          customer_id: booking.customer_id,
+          discount_amount: booking.coupon_discount,
+          original_amount: originalAmount,
+          final_amount: booking.total_price,
+        });
     }
 
     return NextResponse.json({ booking: createdBooking }, { status: 201 });

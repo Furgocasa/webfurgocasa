@@ -15,7 +15,7 @@ function LoadingState() {
 import { supabase } from "@/lib/supabase/client";
 import { 
   Calendar, MapPin, User, Mail, Phone, 
-  CreditCard, AlertCircle, Loader2, FileText, Users, Bed
+  CreditCard, AlertCircle, Loader2, FileText, Users, Bed, Tag, CheckCircle, X
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
@@ -51,6 +51,15 @@ interface SelectedExtra {
   price_per_rental: number;
 }
 
+interface AppliedCoupon {
+  id: string;
+  code: string;
+  name: string;
+  discount_type: 'percentage' | 'fixed';
+  discount_value: number;
+  discount_amount: number;
+}
+
 function NuevaReservaContent() {
   const { t, language } = useLanguage();
   const router = useRouter();
@@ -72,6 +81,12 @@ function NuevaReservaContent() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Estado para cupones
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState<string | null>(null);
 
   // Form state
   const [customerName, setCustomerName] = useState("");
@@ -104,7 +119,9 @@ function NuevaReservaContent() {
     return sum + (price * extra.quantity);
   }, 0);
   
-  const totalPrice = basePrice + extrasPrice;
+  const subtotalBeforeCoupon = basePrice + extrasPrice;
+  const couponDiscount = appliedCoupon?.discount_amount || 0;
+  const totalPrice = subtotalBeforeCoupon - couponDiscount;
 
   useEffect(() => {
     if (!vehicleId || !pickupDate || !dropoffDate) {
@@ -188,6 +205,53 @@ function NuevaReservaContent() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Función para aplicar cupón
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponError(t("Introduce un código de cupón"));
+      return;
+    }
+
+    try {
+      setCouponLoading(true);
+      setCouponError(null);
+
+      const response = await fetch('/api/coupons/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          pickup_date: pickupDate,
+          dropoff_date: dropoffDate,
+          rental_amount: subtotalBeforeCoupon,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.valid && data.coupon) {
+        setAppliedCoupon(data.coupon);
+        setCouponError(null);
+        setCouponCode(""); // Limpiar input
+      } else {
+        setCouponError(data.error || t("Cupón no válido"));
+        setAppliedCoupon(null);
+      }
+    } catch (error) {
+      console.error('Error validating coupon:', error);
+      setCouponError(t("Error al validar el cupón"));
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  // Función para quitar cupón
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError(null);
+    setCouponCode("");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -316,6 +380,10 @@ function NuevaReservaContent() {
             customer_name: customerName,
             customer_email: customerEmail,
             notes: notes,
+            // Datos del cupón (si se aplicó)
+            coupon_id: appliedCoupon?.id || null,
+            coupon_code: appliedCoupon?.code || null,
+            coupon_discount: appliedCoupon?.discount_amount || 0,
           },
           extras: bookingExtrasData,
           customerStats: {
@@ -644,6 +712,80 @@ function NuevaReservaContent() {
                       placeholder={t("¿Algo que debamos saber?")}
                     />
                   </div>
+
+                  {/* Coupon Section */}
+                  <div className="pt-4 border-t border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                      <Tag className="h-5 w-5 text-furgocasa-blue" />
+                      {t("¿Tienes un cupón de descuento?")}
+                    </h3>
+                    
+                    {appliedCoupon ? (
+                      // Cupón aplicado
+                      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <div>
+                              <p className="font-semibold text-green-800">
+                                {t("Cupón aplicado")}: {appliedCoupon.code}
+                              </p>
+                              <p className="text-sm text-green-600">
+                                {appliedCoupon.discount_type === 'percentage' 
+                                  ? `${appliedCoupon.discount_value}% ${t("de descuento")}`
+                                  : `${formatPrice(appliedCoupon.discount_value)} ${t("de descuento")}`
+                                }
+                                {' '}- {t("Ahorras")} {formatPrice(appliedCoupon.discount_amount)}
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleRemoveCoupon}
+                            className="p-2 text-green-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            title={t("Quitar cupón")}
+                          >
+                            <X className="h-5 w-5" />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      // Formulario para introducir cupón
+                      <div className="space-y-3">
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            value={couponCode}
+                            onChange={(e) => {
+                              setCouponCode(e.target.value.toUpperCase());
+                              setCouponError(null);
+                            }}
+                            placeholder={t("Introduce tu código")}
+                            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent uppercase"
+                            disabled={couponLoading}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleApplyCoupon}
+                            disabled={couponLoading || !couponCode.trim()}
+                            className="px-6 py-3 bg-furgocasa-blue text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                          >
+                            {couponLoading ? (
+                              <Loader2 className="h-5 w-5 animate-spin" />
+                            ) : (
+                              t("Aplicar")
+                            )}
+                          </button>
+                        </div>
+                        {couponError && (
+                          <p className="text-sm text-red-600 flex items-center gap-2">
+                            <AlertCircle className="h-4 w-4" />
+                            {couponError}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Submit Button */}
@@ -782,12 +924,28 @@ function NuevaReservaContent() {
                         </div>
                       );
                     })}
+
+                    {/* Descuento de cupón */}
+                    {appliedCoupon && (
+                      <div className="flex justify-between text-sm text-green-600 pt-2 border-t border-gray-100">
+                        <span className="flex items-center gap-1">
+                          <Tag className="h-4 w-4" />
+                          {t("Cupón")} {appliedCoupon.code}
+                        </span>
+                        <span className="font-semibold">-{formatPrice(appliedCoupon.discount_amount)}</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-700 font-medium">{t("Total")}</span>
-                      <span className="text-3xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
+                      <div className="text-right">
+                        {appliedCoupon && (
+                          <p className="text-sm text-gray-400 line-through">{formatPrice(subtotalBeforeCoupon)}</p>
+                        )}
+                        <span className="text-3xl font-bold text-furgocasa-orange">{formatPrice(totalPrice)}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
