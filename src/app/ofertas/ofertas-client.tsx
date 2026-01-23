@@ -64,11 +64,12 @@ export function OfertasClient() {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'es-ES', {
+    // Siempre formato español: 1.234,56 € (separador miles: punto, decimales: coma)
+    return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency: 'EUR',
       minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      maximumFractionDigits: 2
     }).format(price);
   };
 
