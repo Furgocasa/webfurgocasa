@@ -43,13 +43,26 @@ export function AdminAuthProvider({
     }, 5 * 60 * 1000); // 5 minutos
 
     // Listener para cambios de autenticación (logout, etc)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+    // ⚠️ IMPORTANTE: No reaccionar inmediatamente a eventos para evitar problemas con múltiples pestañas
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Solo reaccionar a SIGNED_OUT si realmente no hay sesión
       if (event === 'SIGNED_OUT') {
-        setAdmin(null);
-        router.push('/administrator/login');
-      } else if (event === 'SIGNED_IN') {
-        await refreshAuth();
+        // Verificar que realmente no hay sesión antes de cerrar
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setAdmin(null);
+          // Solo redirigir si estamos en una página protegida
+          if (pathname?.startsWith('/administrator') && !pathname?.includes('/login')) {
+            router.push('/administrator/login');
+          }
+        }
+      } else if (event === 'SIGNED_IN' && session) {
+        // Solo refrescar si no tenemos admin o si el user_id cambió
+        if (!admin) {
+          await refreshAuth();
+        }
       }
+      // Ignorar TOKEN_REFRESHED y otros eventos para evitar problemas entre pestañas
     });
 
     return () => {
