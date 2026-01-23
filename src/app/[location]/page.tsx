@@ -30,7 +30,9 @@ import {
   Shield,
   Calendar,
   MessageSquare,
-  Map
+  Map,
+  Gift,
+  ExternalLink
 } from "lucide-react";
 import Image from "next/image";
 
@@ -521,6 +523,74 @@ export default async function LocationPage({ params }: { params: Promise<{ locat
             </div>
           </div>
         </section>
+
+        {/* ============================================================ */}
+        {/* BANNER: Descuento LATAM (solo para página de España) */}
+        {/* ============================================================ */}
+        {location.slug === 'espana' && (
+          <section className="py-8 lg:py-12 bg-gradient-to-r from-furgocasa-orange via-orange-500 to-furgocasa-orange">
+            <div className="container mx-auto px-4">
+              <div className="max-w-5xl mx-auto">
+                <div className="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-6 lg:p-10 border-4 border-white">
+                  <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-8">
+                    {/* Icono y título */}
+                    <div className="flex-shrink-0">
+                      <div className="bg-gradient-to-br from-furgocasa-orange to-orange-600 rounded-full p-4 lg:p-6 shadow-lg">
+                        <Gift className="h-8 w-8 lg:h-12 lg:w-12 text-white" />
+                      </div>
+                    </div>
+                    
+                    {/* Contenido */}
+                    <div className="flex-1 text-center lg:text-left">
+                      <h3 className="text-2xl lg:text-4xl font-heading font-bold text-gray-900 mb-2 lg:mb-3">
+                        {t("Descuento Especial para Viajeros de Latinoamérica")}
+                      </h3>
+                      <p className="text-lg lg:text-xl text-gray-700 mb-4 lg:mb-5 leading-relaxed">
+                        {t("Si venís desde Argentina, México, Chile, Colombia o cualquier país de Latinoamérica, obtené un")}{' '}
+                        <span className="text-furgocasa-orange font-bold text-2xl lg:text-3xl">-15%</span>{' '}
+                        {t("de descuento en alquileres de mínimo 2 semanas en temporada baja y media.")}
+                      </p>
+                      <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3">
+                        <LocalizedLink
+                          href="/blog/noticias/visitas-espana-o-la-ue-desde-america-latina-alquila-tu-mortohome-con-un-15-de-descuento"
+                          className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold px-6 py-3 rounded-xl hover:bg-orange-600 transition-all shadow-lg text-base lg:text-lg group"
+                        >
+                          {t("Ver detalles de la oferta")}
+                          <ExternalLink className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                        </LocalizedLink>
+                        <LocalizedLink
+                          href="/reservar"
+                          className="inline-flex items-center gap-2 bg-white text-furgocasa-orange border-2 border-furgocasa-orange font-bold px-6 py-3 rounded-xl hover:bg-furgocasa-orange hover:text-white transition-all text-base lg:text-lg"
+                        >
+                          {t("Reservar ahora")}
+                          <ArrowRight className="h-4 w-4" />
+                        </LocalizedLink>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Información adicional */}
+                  <div className="mt-6 pt-6 border-t border-gray-200">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                      <div className="flex items-center justify-center gap-2 text-gray-700">
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                        <span className="text-sm lg:text-base">{t("Mínimo 2 semanas")}</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-gray-700">
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                        <span className="text-sm lg:text-base">{t("Temp. Baja y Media")}</span>
+                      </div>
+                      <div className="flex items-center justify-center gap-2 text-gray-700">
+                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                        <span className="text-sm lg:text-base">{t("Acreditación con billetes")}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* ============================================================ */}
         {/* SECCIÓN: Flota de vehículos (similar a HOME) */}

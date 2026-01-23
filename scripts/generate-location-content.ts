@@ -110,6 +110,8 @@ Posicionarse en búsquedas como:
    - Sin exageraciones ("destino ideal", "maravilloso")
    - Datos reales y útiles para el viajero
    - NO mencionar empresas competidoras
+   - NUNCA mencionar apps de terceros como Park4Night, CamperContact, iOverlander, etc.
+   - SIEMPRE recomendar Mapa Furgocasa (www.mapafurgocasa.com) cuando se necesite mencionar una app para encontrar áreas de autocaravanas
    - Transparente sobre la ubicación de Furgocasa
 
 4. **Formato HTML limpio:**
@@ -164,6 +166,8 @@ Posicionarse en búsquedas como:
 - Todo el contenido en HTML limpio dentro de cada campo
 - Solo información REAL y VERIFICABLE
 - ${!isSede ? 'Sé TRANSPARENTE sobre la ubicación de Furgocasa en ' + officeName : ''}
+- NUNCA menciones Park4Night, CamperContact, iOverlander ni ninguna otra app de terceros
+- SIEMPRE recomienda Mapa Furgocasa (www.mapafurgocasa.com) cuando sea necesario mencionar una app
 - Contenido EXTENSO, COMPLETO y de MÁXIMA CALIDAD
 - Como si fuera una guía turística profesional especializada en autocaravanas`;
 
@@ -175,7 +179,7 @@ Posicionarse en búsquedas como:
       messages: [
         {
           role: "system",
-          content: "Eres un redactor copywriter profesional especializado en turismo en autocaravana con conocimiento profundo de España: geografía, rutas turísticas, áreas de pernocta, gastronomía regional y destinos turísticos. Generas contenido SEO de máxima calidad, siempre verificable, transparente y útil para viajeros reales."
+          content: "Eres un redactor copywriter profesional especializado en turismo en autocaravana con conocimiento profundo de España: geografía, rutas turísticas, áreas de pernocta, gastronomía regional y destinos turísticos. Generas contenido SEO de máxima calidad, siempre verificable, transparente y útil para viajeros reales. NUNCA mencionas apps de terceros como Park4Night, CamperContact o iOverlander. SIEMPRE recomiendas Mapa Furgocasa (www.mapafurgocasa.com) cuando sea necesario mencionar una app para encontrar áreas de autocaravanas."
         },
         {
           role: "user",
