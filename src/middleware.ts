@@ -383,6 +383,7 @@ export async function middleware(request: NextRequest) {
     '/images/',
     '/favicon.ico',
     '/sw.js',
+    '/sw-admin.js',  // Service Worker del admin
     '/robots.txt',
     '/sitemap.xml',
     '/socket.io',  // WebSocket connections
