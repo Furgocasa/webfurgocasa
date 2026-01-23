@@ -3,8 +3,15 @@
  * Funciones helper para consultas comunes
  */
 
-import { supabase } from './client';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createClient } from './server';
+
+// Cliente público para queries de datos públicos (sin cookies)
+// Funciona tanto en servidor como en cliente
+const supabase = createSupabaseClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 // ==============================================
 // VEHÍCULOS
