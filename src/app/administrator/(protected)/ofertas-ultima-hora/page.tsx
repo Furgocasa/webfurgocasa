@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { 
   Search, 
   Calendar, 
@@ -18,7 +17,9 @@ import {
   CalendarClock,
   TrendingDown,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Database,
+  Info
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 
@@ -69,6 +70,7 @@ export default function OfertasUltimaHoraPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [expandedGap, setExpandedGap] = useState<string | null>(null);
+  const [tableExists, setTableExists] = useState(true);
   
   // Estado para edición de oferta antes de publicar
   const [editingGap, setEditingGap] = useState<{
@@ -91,20 +93,21 @@ export default function OfertasUltimaHoraPage() {
   const loadOffers = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('last_minute_offers')
-        .select(`
-          *,
-          vehicle:vehicles(name, internal_code, slug)
-        `)
-        .order('detected_at', { ascending: false });
-
-      if (error) throw error;
-      setOffers(data || []);
+      const response = await fetch('/api/admin/last-minute-offers');
+      const result = await response.json();
+      
+      if (result.error) {
+        console.log('Error cargando ofertas:', result.error);
+        setTableExists(false);
+        setOffers([]);
+        return;
+      }
+      
+      setTableExists(true);
+      setOffers(result.offers || []);
     } catch (error) {
       console.error('Error loading offers:', error);
-      showMessage('error', 'Error al cargar ofertas');
+      setTableExists(false);
     } finally {
       setLoading(false);
     }
@@ -113,13 +116,20 @@ export default function OfertasUltimaHoraPage() {
   const detectGaps = async () => {
     setDetecting(true);
     try {
-      const supabase = createClient();
-      const { data, error } = await supabase.rpc('detect_booking_gaps');
+      const response = await fetch('/api/admin/last-minute-offers/detect');
+      const result = await response.json();
       
-      if (error) throw error;
+      if (result.error) {
+        if (result.needsSetup) {
+          showMessage('error', 'Debes ejecutar los SQL primero (07 y 08) en Supabase para crear las funciones.');
+        } else {
+          showMessage('error', result.error);
+        }
+        return;
+      }
       
       // Filtrar los que ya existen
-      const newGaps = (data || []).filter((g: DetectedGap) => !g.already_exists);
+      const newGaps = (result.gaps || []).filter((g: DetectedGap) => !g.already_exists);
       setDetectedGaps(newGaps);
       
       if (newGaps.length === 0) {
@@ -149,12 +159,10 @@ export default function OfertasUltimaHoraPage() {
     if (!editingGap) return;
     
     try {
-      const supabase = createClient();
-      
-      // Primero crear la oferta en estado 'detected'
-      const { data: newOffer, error: insertError } = await supabase
-        .from('last_minute_offers')
-        .insert({
+      const response = await fetch('/api/admin/last-minute-offers', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           vehicle_id: editingGap.gap.vehicle_id,
           detected_start_date: editingGap.gap.gap_start_date,
           detected_end_date: editingGap.gap.gap_end_date,
@@ -168,10 +176,10 @@ export default function OfertasUltimaHoraPage() {
           status: 'published',
           published_at: new Date().toISOString()
         })
-        .select()
-        .single();
-
-      if (insertError) throw insertError;
+      });
+      
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
 
       showMessage('success', 'Oferta publicada correctamente');
       setEditingGap(null);
@@ -195,16 +203,14 @@ export default function OfertasUltimaHoraPage() {
 
   const updateOfferStatus = async (offerId: string, newStatus: string) => {
     try {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('last_minute_offers')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', offerId);
-
-      if (error) throw error;
+      const response = await fetch('/api/admin/last-minute-offers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: offerId, status: newStatus })
+      });
+      
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
       
       showMessage('success', `Estado actualizado a ${newStatus}`);
       loadOffers();
