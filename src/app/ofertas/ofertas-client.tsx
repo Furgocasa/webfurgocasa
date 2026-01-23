@@ -469,9 +469,9 @@ export function OfertasClient() {
                             </div>
                           </div>
 
-                          {/* Botón reservar */}
+                          {/* Botón reservar - va a página especial de oferta */}
                           <LocalizedLink
-                            href={`/reservar?vehiculo=${offer.vehicle_slug}&pickup=${offer.offer_start_date}&dropoff=${offer.offer_end_date}`}
+                            href={`/reservar/oferta/${offer.id}`}
                             className="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
                           >
                             <CalendarClock className="w-5 h-5" />
