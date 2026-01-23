@@ -1,6 +1,12 @@
 /**
  * Queries reutilizables de Supabase
  * Funciones helper para consultas comunes
+ * 
+ * IMPORTANTE: Para datos públicos (vehículos, categorías, etc.) usar el cliente
+ * público `supabase` definido abajo. NO usar createClient() de ./server ya que
+ * usa cookies y falla en generateMetadata de Next.js 15.
+ * 
+ * @updated 2026-01-23 - Fix error 500 en páginas de vehículos
  */
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
@@ -8,6 +14,7 @@ import { createClient } from './server';
 
 // Cliente público para queries de datos públicos (sin cookies)
 // Funciona tanto en servidor como en cliente
+// ⚠️ CRÍTICO: Usar este cliente para vehículos, categorías, etc.
 const supabase = createSupabaseClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
