@@ -13,25 +13,21 @@ import { getTranslatedRoute } from"@/lib/route-translations";
 import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
 import { createClient } from"@supabase/supabase-js";
 
-// 🚀 Pre-generar TODOS los vehículos de alquiler en build time (SEO óptimo)
-export async function generateStaticParams() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  // Incluir todos los vehículos activos que estén disponibles para alquiler
-  // (pueden estar también en venta simultáneamente)
-  const { data: vehicles } = await supabase
-    .from('vehicles')
-    .select('slug')
-    .eq('is_active', true)
-    .eq('is_for_rent', true);
-
-  const params = vehicles?.map(v => ({ slug: v.slug })) || [];
-  console.log(`[generateStaticParams] Pre-generando ${params.length} vehículos de alquiler`);
-  return params;
-}
+// 🚀 DESHABILITADO TEMPORALMENTE - Renderizado dinámico para debug
+// export async function generateStaticParams() {
+//   const supabase = createClient(
+//     process.env.NEXT_PUBLIC_SUPABASE_URL!,
+//     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+//   );
+//   const { data: vehicles } = await supabase
+//     .from('vehicles')
+//     .select('slug')
+//     .eq('is_active', true)
+//     .eq('is_for_rent', true);
+//   const params = vehicles?.map(v => ({ slug: v.slug })) || [];
+//   console.log(`[generateStaticParams] Pre-generando ${params.length} vehículos de alquiler`);
+//   return params;
+// }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -86,10 +82,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-// ⚡ ISR: Revalidar cada hora (pueden cambiar precios/disponibilidad)
-export const revalidate = 3600;
-// ✅ Permitir generar páginas on-demand para slugs no pre-generados
-export const dynamicParams = true;
+// ⚡ Forzar renderizado dinámico para evitar problemas de caché
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   // ✅ Obtener el idioma del header establecido por el middleware
