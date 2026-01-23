@@ -381,12 +381,20 @@ export async function middleware(request: NextRequest) {
   const skipLocaleFor = [
     '/_next/',
     '/images/',
-    '/favicon.ico',
+    '/favicon',
     '/sw.js',
     '/sw-admin.js',  // Service Worker del admin
+    '/workbox-',     // Archivos workbox generados por next-pwa
     '/robots.txt',
     '/sitemap.xml',
-    '/socket.io',  // WebSocket connections
+    '/manifest.json',
+    '/admin-manifest.json',
+    '/icon-',        // Iconos PWA
+    '/icon.png',
+    '/apple-icon',
+    '/opengraph-image',
+    '/documentos/',
+    '/socket.io',    // WebSocket connections
     '/__nextjs_original-stack-frame',
     '/webpack-hmr',
   ];

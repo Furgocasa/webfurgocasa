@@ -250,33 +250,36 @@ export default async function BlogPostPage({
               <ShareButtons shareUrl={url} title={post.title} />
 
               {/* Content */}
-              <article className="lg:col-span-8">
+              <article className="lg:col-span-8 overflow-x-hidden">
                 {/* Excerpt */}
                 {post.excerpt && (
-                  <p className="text-xl text-gray-600 leading-relaxed mb-8 font-medium border-l-4 border-furgocasa-orange pl-6">
+                  <p className="text-base md:text-xl text-gray-600 leading-relaxed mb-6 md:mb-8 font-medium border-l-4 border-furgocasa-orange pl-4 md:pl-6">
                     {post.excerpt}
                   </p>
                 )}
 
                 {/* Main Content */}
                 <div
-                  className="prose prose-lg max-w-none 
-                    prose-headings:font-heading prose-headings:font-bold prose-headings:text-gray-900 
-                    prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:leading-tight
-                    prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-4 prose-h3:leading-tight
-                    prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-3
-                    prose-p:text-gray-700 prose-p:text-lg prose-p:leading-relaxed prose-p:mb-6
-                    prose-a:text-furgocasa-orange prose-a:font-semibold prose-a:no-underline hover:prose-a:underline
+                  className="prose prose-sm md:prose-lg max-w-none overflow-x-hidden break-words
+                    prose-headings:font-heading prose-headings:font-bold prose-headings:text-gray-900 prose-headings:break-words
+                    prose-h2:text-xl prose-h2:md:text-3xl prose-h2:mt-8 prose-h2:md:mt-12 prose-h2:mb-4 prose-h2:md:mb-6 prose-h2:leading-tight
+                    prose-h3:text-lg prose-h3:md:text-2xl prose-h3:mt-6 prose-h3:md:mt-8 prose-h3:mb-3 prose-h3:md:mb-4 prose-h3:leading-tight
+                    prose-h4:text-base prose-h4:md:text-xl prose-h4:mt-4 prose-h4:md:mt-6 prose-h4:mb-2 prose-h4:md:mb-3
+                    prose-p:text-gray-700 prose-p:text-base prose-p:md:text-lg prose-p:leading-relaxed prose-p:mb-4 prose-p:md:mb-6
+                    prose-a:text-furgocasa-orange prose-a:font-semibold prose-a:no-underline prose-a:break-words hover:prose-a:underline
                     prose-strong:text-gray-900 prose-strong:font-bold
                     prose-em:text-gray-700 prose-em:italic
-                    prose-ul:my-6 prose-ul:space-y-2
-                    prose-ol:my-6 prose-ol:space-y-2
-                    prose-li:text-gray-700 prose-li:text-lg prose-li:leading-relaxed
-                    prose-blockquote:border-l-4 prose-blockquote:border-furgocasa-orange prose-blockquote:pl-6 prose-blockquote:py-2 prose-blockquote:italic prose-blockquote:text-gray-600
-                    prose-img:rounded-2xl prose-img:shadow-lg prose-img:my-8
-                    prose-hr:my-12 prose-hr:border-gray-200
-                    prose-code:text-furgocasa-blue prose-code:bg-gray-100 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-base
-                   prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-xl prose-pre:p-6 prose-pre:my-8"
+                    prose-ul:my-4 prose-ul:md:my-6 prose-ul:space-y-2 prose-ul:pl-4 prose-ul:md:pl-6
+                    prose-ol:my-4 prose-ol:md:my-6 prose-ol:space-y-2 prose-ol:pl-4 prose-ol:md:pl-6
+                    prose-li:text-gray-700 prose-li:text-base prose-li:md:text-lg prose-li:leading-relaxed
+                    prose-blockquote:border-l-4 prose-blockquote:border-furgocasa-orange prose-blockquote:pl-4 prose-blockquote:md:pl-6 prose-blockquote:py-2 prose-blockquote:italic prose-blockquote:text-gray-600 prose-blockquote:text-sm prose-blockquote:md:text-base
+                    prose-img:rounded-xl prose-img:md:rounded-2xl prose-img:shadow-lg prose-img:my-6 prose-img:md:my-8 prose-img:max-w-full prose-img:h-auto
+                    prose-hr:my-8 prose-hr:md:my-12 prose-hr:border-gray-200
+                    prose-code:text-furgocasa-blue prose-code:bg-gray-100 prose-code:px-1 prose-code:md:px-2 prose-code:py-0.5 prose-code:md:py-1 prose-code:rounded prose-code:text-sm prose-code:md:text-base prose-code:break-words
+                    prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-lg prose-pre:md:rounded-xl prose-pre:p-3 prose-pre:md:p-6 prose-pre:my-6 prose-pre:md:my-8 prose-pre:overflow-x-auto prose-pre:text-xs prose-pre:md:text-sm
+                    prose-table:overflow-x-auto prose-table:block prose-table:max-w-full
+                    prose-figure:max-w-full prose-figure:my-4 prose-figure:md:my-6
+                    [&>*]:max-w-full [&_iframe]:max-w-full [&_iframe]:w-full [&_video]:max-w-full [&_video]:w-full"
                   dangerouslySetInnerHTML={{ __html: translatedPost.content || '' }}
                 />
 
