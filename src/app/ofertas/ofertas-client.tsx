@@ -65,12 +65,14 @@ export function OfertasClient() {
 
   const formatPrice = (price: number) => {
     // Siempre formato español: 1.234,56 € (separador miles: punto, decimales: coma)
+    const numPrice = typeof price === 'string' ? parseFloat(price) : price;
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
       currency: 'EUR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2
-    }).format(price);
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+      useGrouping: true
+    }).format(numPrice);
   };
 
   const handleCopyCode = () => {
