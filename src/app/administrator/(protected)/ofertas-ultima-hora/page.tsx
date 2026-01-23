@@ -20,7 +20,9 @@ import {
   ChevronUp,
   Database,
   Info,
-  MapPin
+  MapPin,
+  Pencil,
+  Trash2
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
@@ -83,7 +85,7 @@ export default function OfertasUltimaHoraPage() {
   const [expandedGap, setExpandedGap] = useState<string | null>(null);
   const [tableExists, setTableExists] = useState(true);
   
-  // Estado para edición de oferta antes de publicar
+  // Estado para edición de oferta antes de publicar (nueva)
   const [editingGap, setEditingGap] = useState<{
     gap: DetectedGap;
     startDate: string;
@@ -92,6 +94,19 @@ export default function OfertasUltimaHoraPage() {
     notes: string;
     locationId: string;
   } | null>(null);
+
+  // Estado para editar oferta existente
+  const [editingOffer, setEditingOffer] = useState<{
+    offer: LastMinuteOffer;
+    startDate: string;
+    endDate: string;
+    discount: number;
+    notes: string;
+    locationId: string;
+  } | null>(null);
+
+  // Estado para confirmar borrado
+  const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null);
 
   useEffect(() => {
     loadOffers();
@@ -252,6 +267,73 @@ export default function OfertasUltimaHoraPage() {
     } catch (error) {
       console.error('Error updating status:', error);
       showMessage('error', 'Error al actualizar estado');
+    }
+  };
+
+  // Abrir modal de edición de oferta existente
+  const openEditOffer = (offer: LastMinuteOffer) => {
+    const defaultLocation = locations.find(l => l.id === offer.pickup_location_id) || 
+                           locations.find(l => l.slug === 'murcia') || 
+                           locations[0];
+    setEditingOffer({
+      offer,
+      startDate: offer.offer_start_date,
+      endDate: offer.offer_end_date,
+      discount: offer.discount_percentage,
+      notes: offer.admin_notes || '',
+      locationId: defaultLocation?.id || ''
+    });
+  };
+
+  // Guardar cambios en oferta existente
+  const saveOfferChanges = async () => {
+    if (!editingOffer) return;
+    
+    try {
+      const response = await fetch('/api/admin/last-minute-offers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editingOffer.offer.id,
+          offer_start_date: editingOffer.startDate,
+          offer_end_date: editingOffer.endDate,
+          discount_percentage: editingOffer.discount,
+          admin_notes: editingOffer.notes || null,
+          pickup_location_id: editingOffer.locationId,
+          dropoff_location_id: editingOffer.locationId
+        })
+      });
+      
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      
+      showMessage('success', 'Oferta actualizada correctamente');
+      setEditingOffer(null);
+      loadOffers();
+    } catch (error) {
+      console.error('Error updating offer:', error);
+      showMessage('error', 'Error al actualizar la oferta');
+    }
+  };
+
+  // Borrar oferta
+  const deleteOffer = async (offerId: string) => {
+    try {
+      const response = await fetch('/api/admin/last-minute-offers', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: offerId })
+      });
+      
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      
+      showMessage('success', 'Oferta eliminada correctamente');
+      setDeletingOfferId(null);
+      loadOffers();
+    } catch (error) {
+      console.error('Error deleting offer:', error);
+      showMessage('error', 'Error al eliminar la oferta');
     }
   };
 
@@ -645,17 +727,29 @@ export default function OfertasUltimaHoraPage() {
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    {offer.status === 'published' && (
-                      <>
-                        <button
-                          onClick={() => updateOfferStatus(offer.id, 'expired')}
-                          className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                          title="Marcar como expirada"
-                        >
-                          <EyeOff className="h-4 w-4" />
-                        </button>
-                      </>
+                    {/* Editar */}
+                    {(offer.status === 'published' || offer.status === 'detected') && (
+                      <button
+                        onClick={() => openEditOffer(offer)}
+                        className="px-3 py-1.5 text-sm text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
+                        title="Editar oferta"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
                     )}
+                    
+                    {/* Ocultar/Expirar */}
+                    {offer.status === 'published' && (
+                      <button
+                        onClick={() => updateOfferStatus(offer.id, 'expired')}
+                        className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                        title="Marcar como expirada (ocultar)"
+                      >
+                        <EyeOff className="h-4 w-4" />
+                      </button>
+                    )}
+                    
+                    {/* Publicar si está ignorada */}
                     {offer.status === 'ignored' && (
                       <button
                         onClick={() => updateOfferStatus(offer.id, 'published')}
@@ -664,6 +758,15 @@ export default function OfertasUltimaHoraPage() {
                         Publicar
                       </button>
                     )}
+                    
+                    {/* Borrar */}
+                    <button
+                      onClick={() => setDeletingOfferId(offer.id)}
+                      className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Eliminar oferta"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
                   </div>
                 </div>
               </div>
@@ -671,6 +774,154 @@ export default function OfertasUltimaHoraPage() {
           </div>
         )}
       </div>
+
+      {/* Modal para editar oferta existente */}
+      {editingOffer && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Editar Oferta</h3>
+            
+            <div className="space-y-4">
+              {/* Info del vehículo */}
+              <div className="bg-gray-50 rounded-lg p-3">
+                <p className="text-sm text-gray-500">Vehículo</p>
+                <p className="font-medium text-gray-900">{editingOffer.offer.vehicle?.name}</p>
+              </div>
+
+              {/* Fechas de oferta */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Fecha inicio
+                  </label>
+                  <input
+                    type="date"
+                    value={editingOffer.startDate}
+                    onChange={(e) => setEditingOffer({ ...editingOffer, startDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Fecha fin
+                  </label>
+                  <input
+                    type="date"
+                    value={editingOffer.endDate}
+                    onChange={(e) => setEditingOffer({ ...editingOffer, endDate: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Descuento */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Descuento (%)
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="5"
+                    max="50"
+                    step="5"
+                    value={editingOffer.discount}
+                    onChange={(e) => setEditingOffer({ ...editingOffer, discount: parseInt(e.target.value) })}
+                    className="flex-1"
+                  />
+                  <span className="w-16 text-center font-bold text-furgocasa-orange text-lg">
+                    -{editingOffer.discount}%
+                  </span>
+                </div>
+              </div>
+
+              {/* Ubicación */}
+              <div>
+                <label className="text-sm font-medium text-gray-700 mb-1 flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-furgocasa-blue" />
+                  Ubicación
+                </label>
+                <select
+                  value={editingOffer.locationId}
+                  onChange={(e) => setEditingOffer({ ...editingOffer, locationId: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                >
+                  {locations.map(loc => (
+                    <option key={loc.id} value={loc.id}>
+                      {loc.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Notas */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Notas (opcional)
+                </label>
+                <textarea
+                  value={editingOffer.notes}
+                  onChange={(e) => setEditingOffer({ ...editingOffer, notes: e.target.value })}
+                  placeholder="Notas internas..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  rows={2}
+                />
+              </div>
+            </div>
+
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setEditingOffer(null)}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={saveOfferChanges}
+                className="px-6 py-2 bg-furgocasa-blue text-white rounded-lg hover:bg-furgocasa-blue-dark transition-colors font-medium"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de confirmación para borrar */}
+      {deletingOfferId && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Eliminar Oferta</h3>
+                <p className="text-sm text-gray-500">Esta acción no se puede deshacer</p>
+              </div>
+            </div>
+            
+            <p className="text-gray-600 mb-6">
+              ¿Estás seguro de que quieres eliminar esta oferta? Se eliminará permanentemente de la base de datos.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setDeletingOfferId(null)}
+                className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => deleteOffer(deletingOfferId)}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

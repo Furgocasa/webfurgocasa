@@ -98,3 +98,34 @@ export async function PATCH(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+// DELETE - Eliminar oferta
+export async function DELETE(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { id } = body;
+
+    if (!id) {
+      return NextResponse.json({ error: 'ID requerido' }, { status: 400 });
+    }
+
+    const { error } = await supabase
+      .from('last_minute_offers')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error deleting offer:', error);
+      return NextResponse.json({ 
+        error: error.message 
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error in DELETE offer:', error);
+    return NextResponse.json({ 
+      error: 'Error interno del servidor' 
+    }, { status: 500 });
+  }
+}
