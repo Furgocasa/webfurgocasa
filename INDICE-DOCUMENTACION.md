@@ -1,10 +1,38 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.11 ✅ PRODUCCIÓN - FIX CRÍTICO ERROR 500 VEHÍCULOS  
+**Versión**: 1.0.12 ✅ PRODUCCIÓN - SISTEMA DE CUPONES DE DESCUENTO  
 **URL**: https://www.furgocasa.com  
 **Última actualización**: 23 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🎟️ VERSIÓN 1.0.12 - SISTEMA DE CUPONES DE DESCUENTO
+
+**✅ ESTADO: TOTALMENTE FUNCIONAL** - Sistema completo de cupones implementado.
+
+**NUEVA FUNCIONALIDAD**: Cupones de descuento para el proceso de reserva.
+- **gift**: Un solo uso, personalizados (ej: `RAMON20`)
+- **permanent**: Múltiples usos, promociones (ej: `INV2026`)
+
+Ver **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** para detalles completos.
+
+### 🎯 Highlights v1.0.12:
+- ✅ **Panel Admin**: Nueva sección `/administrator/cupones`
+- ✅ **Validación en tiempo real**: API `/api/coupons/validate`
+- ✅ **Integración reservas**: Campo de cupón en `/reservar/nueva`
+- ✅ **Cupón INV2026 activo**: 15% descuento, mín 10 días, hasta 20 marzo
+
+### 📦 SQL a ejecutar:
+```
+01-create-coupons-table.sql
+02-create-coupon-usage-table.sql
+03-add-coupon-columns-to-bookings.sql
+04-create-coupon-validation-function.sql
+05-setup-coupon-rls-policies.sql
+06-insert-sample-coupons.sql
+```
 
 ---
 
@@ -88,6 +116,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo de reservas | Antes de tocar /reservar/** |
+| **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** | 🎟️ Sistema de cupones de descuento | Antes de tocar cupones o `/reservar/nueva` |
 | **[GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)** | Sistema de traducción dual | Cuando uses `t()` |
 | **[CHECKLIST-PRE-COMMIT.md](./CHECKLIST-PRE-COMMIT.md)** | Verificación pre-commit | Antes de cada commit |
 

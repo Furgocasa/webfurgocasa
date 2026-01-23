@@ -4,6 +4,103 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🎟️ [1.0.12] - 23 de Enero 2026 - **Sistema de Cupones de Descuento**
+
+### 🎯 **NUEVA FUNCIONALIDAD**
+
+Sistema completo de cupones de descuento para el proceso de reserva.
+
+---
+
+### ✅ **CAMBIOS IMPLEMENTADOS**
+
+#### 1. **Tipos de Cupones**
+
+| Tipo | Descripción | Ejemplo |
+|------|-------------|---------|
+| **gift** | Un solo uso, personalizado | `RAMON20` |
+| **permanent** | Múltiples usos, promociones | `INV2026` |
+
+#### 2. **Base de Datos** (6 archivos SQL)
+
+- `coupons` - Tabla principal de cupones
+- `coupon_usage` - Historial de uso
+- Columnas `coupon_id`, `coupon_code`, `coupon_discount` en `bookings`
+- Función `increment_coupon_uses` para contador
+- Políticas RLS de seguridad
+
+#### 3. **API de Validación**
+
+```typescript
+POST /api/coupons/validate
+{
+  "code": "INV2026",
+  "pickup_date": "2026-02-01",
+  "dropoff_date": "2026-02-12",
+  "rental_amount": 1800
+}
+```
+
+#### 4. **Integración en Reservas**
+
+- Campo de cupón en `/reservar/nueva`
+- Validación en tiempo real
+- Descuento visible en resumen de precio
+- Cupón guardado al crear reserva
+
+#### 5. **Panel de Administración**
+
+Nueva sección `/administrator/cupones` con:
+- Crear/editar cupones
+- Activar/desactivar
+- Ver estadísticas de uso
+- Filtrar por tipo
+
+---
+
+### 📝 **ARCHIVOS CREADOS**
+
+| Archivo | Descripción |
+|---------|-------------|
+| `src/app/api/coupons/validate/route.ts` | API validación |
+| `src/app/administrator/(protected)/cupones/page.tsx` | Panel admin |
+| `supabase/01-create-coupons-table.sql` | Tabla coupons |
+| `supabase/02-create-coupon-usage-table.sql` | Tabla usage |
+| `supabase/03-add-coupon-columns-to-bookings.sql` | Columnas bookings |
+| `supabase/04-create-coupon-validation-function.sql` | Funciones SQL |
+| `supabase/05-setup-coupon-rls-policies.sql` | Políticas RLS |
+| `supabase/06-insert-sample-coupons.sql` | Cupón INV2026 |
+| `SISTEMA-CUPONES.md` | Documentación completa |
+
+---
+
+### 🎫 **CUPÓN ACTIVO: INV2026**
+
+| Campo | Valor |
+|-------|-------|
+| Código | `INV2026` |
+| Descuento | **15%** |
+| Mínimo días | 10 |
+| Válido | 5 enero - 20 marzo 2026 |
+
+**Visible en**: https://www.furgocasa.com/es/ofertas
+
+---
+
+### 📦 **SQL A EJECUTAR**
+
+Ejecutar en Supabase en este orden:
+1. `01-create-coupons-table.sql`
+2. `02-create-coupon-usage-table.sql`
+3. `03-add-coupon-columns-to-bookings.sql`
+4. `04-create-coupon-validation-function.sql`
+5. `05-setup-coupon-rls-policies.sql`
+6. `06-insert-sample-coupons.sql`
+
+**Documentación**: Ver `SISTEMA-CUPONES.md` para detalles completos.
+
+---
+
 ## 🔴 [1.0.11] - 23 de Enero 2026 - **FIX CRÍTICO: Error 500 en Páginas de Vehículos**
 
 ### 🚨 **PROBLEMA RESUELTO**

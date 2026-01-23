@@ -25,9 +25,13 @@ supabase/
 
 #### **👥 Clientes y Reservas**
 - `customers` - Datos de clientes
-- `bookings` - Reservas de alquiler
+- `bookings` - Reservas de alquiler (incluye `coupon_id`, `coupon_code`, `coupon_discount`)
 - `booking_extras` - Extras contratados en cada reserva
 - `payments` - Pagos y transacciones
+
+#### **🎟️ Cupones de Descuento**
+- `coupons` - Cupones de descuento (gift/permanent)
+- `coupon_usage` - Historial de uso de cupones
 
 #### **🏪 Catálogo**
 - `locations` - Puntos de recogida/entrega
@@ -109,6 +113,32 @@ La tabla `posts` maneja ambos tipos de contenido con el campo `post_type`:
 - Precio base por día en `vehicles.base_price_per_day`
 - Modificadores de temporada en `seasons.price_modifier`
 - Opcionalmente, precios específicos en `vehicle_prices`
+
+### **Sistema de Cupones de Descuento**
+
+Dos tipos de cupones:
+- **gift**: Un solo uso, personalizados (`RAMON20`)
+- **permanent**: Múltiples usos, promociones (`INV2026`, `BLACK2026`)
+
+```sql
+-- Validaciones automáticas:
+-- - Fechas de validez (valid_from, valid_until)
+-- - Días mínimos de alquiler (min_rental_days)
+-- - Importe mínimo (min_rental_amount)
+-- - Límite de usos (max_uses para gift)
+
+-- Descuentos:
+-- - percentage: Porcentaje sobre el total
+-- - fixed: Cantidad fija en euros
+```
+
+**SQL de instalación** (ejecutar en orden):
+1. `01-create-coupons-table.sql`
+2. `02-create-coupon-usage-table.sql`
+3. `03-add-coupon-columns-to-bookings.sql`
+4. `04-create-coupon-validation-function.sql`
+5. `05-setup-coupon-rls-policies.sql`
+6. `06-insert-sample-coupons.sql` (cupón INV2026)
 
 ## 🔐 Seguridad (RLS)
 
@@ -215,8 +245,8 @@ Para modificar el esquema:
 
 ---
 
-**Última actualización**: Enero 2025  
-**Versión del esquema**: 1.0
+**Última actualización**: Enero 2026  
+**Versión del esquema**: 1.1 (Sistema de Cupones añadido)
 
 
 
