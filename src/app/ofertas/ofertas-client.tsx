@@ -1,13 +1,65 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent } from "lucide-react";
+import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, TrendingDown, Loader2 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Image from "next/image";
+
+interface LastMinuteOffer {
+  id: string;
+  vehicle_id: string;
+  vehicle_name: string;
+  vehicle_slug: string;
+  vehicle_image_url: string | null;
+  offer_start_date: string;
+  offer_end_date: string;
+  offer_days: number;
+  original_price_per_day: number;
+  discount_percentage: number;
+  final_price_per_day: number;
+  total_original_price: number;
+  total_final_price: number;
+  savings: number;
+}
 
 export function OfertasClient() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [copied, setCopied] = useState(false);
+  const [lastMinuteOffers, setLastMinuteOffers] = useState<LastMinuteOffer[]>([]);
+  const [loadingOffers, setLoadingOffers] = useState(true);
+
+  useEffect(() => {
+    fetchLastMinuteOffers();
+  }, []);
+
+  const fetchLastMinuteOffers = async () => {
+    try {
+      const response = await fetch('/api/offers/last-minute');
+      const data = await response.json();
+      setLastMinuteOffers(data.offers || []);
+    } catch (error) {
+      console.error('Error fetching last minute offers:', error);
+    } finally {
+      setLoadingOffers(false);
+    }
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES', {
+      day: 'numeric',
+      month: 'short'
+    });
+  };
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat(locale === 'en' ? 'en-US' : 'es-ES', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(price);
+  };
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText("INV2026");
@@ -342,22 +394,112 @@ export function OfertasClient() {
               </div>
             </div>
 
-            {/* Estado actual - Sin ofertas */}
-            <div className="bg-gray-50 rounded-3xl p-10 md:p-14 text-center border-2 border-dashed border-gray-200">
-              <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Calendar className="w-10 h-10 text-gray-400" />
+            {/* Ofertas disponibles o mensaje de no disponible */}
+            {loadingOffers ? (
+              <div className="bg-gray-50 rounded-3xl p-10 md:p-14 text-center border border-gray-200">
+                <Loader2 className="w-10 h-10 text-furgocasa-orange animate-spin mx-auto mb-4" />
+                <p className="text-gray-500">{t("Cargando ofertas...")}</p>
               </div>
-              <h4 className="text-xl font-heading font-bold text-gray-700 mb-3">
-                {t("No hay ofertas de última hora disponibles")}
-              </h4>
-              <p className="text-gray-500 max-w-md mx-auto mb-6">
-                {t("Actualmente no tenemos huecos disponibles entre reservas. Esta sección se actualiza regularmente, ¡vuelve a visitarnos pronto!")}
-              </p>
-              <div className="inline-flex items-center gap-2 text-sm text-furgocasa-blue font-medium">
-                <Clock className="w-4 h-4" />
-                {t("Las ofertas de última hora suelen aparecer en temporada alta")}
+            ) : lastMinuteOffers.length > 0 ? (
+              <div className="space-y-4">
+                {lastMinuteOffers.map((offer) => (
+                  <div 
+                    key={offer.id}
+                    className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition-all group"
+                  >
+                    <div className="flex flex-col md:flex-row">
+                      {/* Imagen del vehículo */}
+                      <div className="md:w-1/3 relative">
+                        <div className="aspect-[4/3] md:aspect-auto md:h-full relative bg-gray-100">
+                          {offer.vehicle_image_url ? (
+                            <Image
+                              src={offer.vehicle_image_url}
+                              alt={offer.vehicle_name}
+                              fill
+                              className="object-cover group-hover:scale-105 transition-transform duration-500"
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Truck className="w-16 h-16 text-gray-300" />
+                            </div>
+                          )}
+                          {/* Badge de descuento */}
+                          <div className="absolute top-4 left-4 bg-furgocasa-orange text-white px-3 py-1.5 rounded-full font-bold text-sm shadow-lg">
+                            -{offer.discount_percentage}%
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Contenido */}
+                      <div className="md:w-2/3 p-6 flex flex-col justify-between">
+                        <div>
+                          <h4 className="text-xl font-heading font-bold text-gray-900 mb-2">
+                            {offer.vehicle_name}
+                          </h4>
+                          <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
+                            <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full">
+                              <Calendar className="w-4 h-4 text-furgocasa-blue" />
+                              {formatDate(offer.offer_start_date)} - {formatDate(offer.offer_end_date)}
+                            </span>
+                            <span className="flex items-center gap-1.5 bg-furgocasa-orange/10 px-3 py-1 rounded-full text-furgocasa-orange font-medium">
+                              <Clock className="w-4 h-4" />
+                              {offer.offer_days} {t("días")}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+                          {/* Precios */}
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-gray-400 line-through text-sm">
+                                {formatPrice(offer.total_original_price)}
+                              </span>
+                              <span className="text-green-600 text-xs font-medium bg-green-50 px-2 py-0.5 rounded">
+                                {t("Ahorras")} {formatPrice(offer.savings)}
+                              </span>
+                            </div>
+                            <div className="flex items-baseline gap-2">
+                              <span className="text-3xl font-bold text-gray-900">
+                                {formatPrice(offer.total_final_price)}
+                              </span>
+                              <span className="text-gray-500 text-sm">
+                                ({formatPrice(offer.final_price_per_day)}/{t("día")})
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Botón reservar */}
+                          <LocalizedLink
+                            href={`/reservar?vehiculo=${offer.vehicle_slug}&pickup=${offer.offer_start_date}&dropoff=${offer.offer_end_date}`}
+                            className="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
+                          >
+                            <CalendarClock className="w-5 h-5" />
+                            {t("Reservar ahora")}
+                          </LocalizedLink>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              <div className="bg-gray-50 rounded-3xl p-10 md:p-14 text-center border-2 border-dashed border-gray-200">
+                <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Calendar className="w-10 h-10 text-gray-400" />
+                </div>
+                <h4 className="text-xl font-heading font-bold text-gray-700 mb-3">
+                  {t("No hay ofertas de última hora disponibles")}
+                </h4>
+                <p className="text-gray-500 max-w-md mx-auto mb-6">
+                  {t("Actualmente no tenemos huecos disponibles entre reservas. Esta sección se actualiza regularmente, ¡vuelve a visitarnos pronto!")}
+                </p>
+                <div className="inline-flex items-center gap-2 text-sm text-furgocasa-blue font-medium">
+                  <Clock className="w-4 h-4" />
+                  {t("Las ofertas de última hora suelen aparecer en temporada alta")}
+                </div>
+              </div>
+            )}
 
             {/* Tip de notificación */}
             <div className="mt-8 bg-blue-50 rounded-2xl p-6 flex flex-col md:flex-row items-center gap-4">

@@ -49,7 +49,7 @@ BEGIN
     murcia_location_id,
     0, -- No aplica distancia para país completo
     0,
-    'Alquiler de Autocaravanas y Motorhomes en España para Viajeros de Latinoamérica | Furgocasa',
+    'Alquiler de Autocaravanas y Motorhomes en España para Viajeros de Latinoamérica',
     'Alquila tu autocaravana o motorhome en España y explora toda Europa. Ideal para viajeros de Argentina, México, Chile, Colombia y otros países de Latinoamérica. Vehículos premium con kilómetros ilimitados.',
     'Alquiler de Autocaravanas y Motorhomes en España (Casas Rodantes)',
     40.4637, -- Coordenadas geográficas del centro de España
