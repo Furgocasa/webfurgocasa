@@ -58,10 +58,10 @@ export async function getAvailableVehicles() {
 
 /**
  * Obtener un vehículo por slug (Server-side)
+ * Usa el cliente público (anon) ya que los vehículos son datos públicos
  */
 export async function getVehicleBySlug(slug: string) {
-  const supabaseServer = await createClient();
-  const { data, error } = await supabaseServer
+  const { data, error } = await supabase
     .from('vehicles')
     .select(`
       *,
