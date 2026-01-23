@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase/client";
 import { 
   Calendar, MapPin, User, Mail, Phone, 
   CreditCard, AlertCircle, Loader2, FileText, Users, Bed, 
-  Tag, CheckCircle, Clock, Percent, Lock, ArrowLeft
+  Tag, CheckCircle, Clock, Percent, Lock, ArrowLeft, Plus, Minus
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
@@ -58,19 +58,16 @@ interface ExtraData {
   id: string;
   name: string;
   description: string;
-  price_per_day: number;
-  price_per_rental: number;
-  price_type: string;
+  price_per_day: number | null;
+  price_per_unit: number | null;
+  price_type: 'per_day' | 'per_unit';
   max_quantity: number;
   icon: string;
 }
 
 interface SelectedExtra {
-  id: string;
-  name: string;
+  extra: ExtraData;
   quantity: number;
-  price_per_day: number;
-  price_per_rental: number;
 }
 
 export default function ReservarOfertaPage({ 
@@ -158,34 +155,48 @@ export default function ReservarOfertaPage({
     }
   };
 
-  const toggleExtra = (extra: ExtraData) => {
-    const existing = selectedExtras.find(e => e.id === extra.id);
+  // Funciones para manejar extras (igual que en /reservar/vehiculo)
+  const addExtra = (extra: ExtraData) => {
+    const existing = selectedExtras.find(item => item.extra.id === extra.id);
     if (existing) {
-      setSelectedExtras(selectedExtras.filter(e => e.id !== extra.id));
+      if (existing.quantity < (extra.max_quantity || 1)) {
+        setSelectedExtras(selectedExtras.map(item =>
+          item.extra.id === extra.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        ));
+      }
     } else {
-      setSelectedExtras([...selectedExtras, {
-        id: extra.id,
-        name: extra.name,
-        quantity: 1,
-        price_per_day: extra.price_per_day || 0,
-        price_per_rental: extra.price_per_rental || 0
-      }]);
+      setSelectedExtras([...selectedExtras, { extra, quantity: 1 }]);
     }
   };
 
-  const updateExtraQuantity = (extraId: string, quantity: number) => {
-    setSelectedExtras(selectedExtras.map(e => 
-      e.id === extraId ? { ...e, quantity: Math.max(1, quantity) } : e
-    ));
+  const removeExtra = (extraId: string) => {
+    const existing = selectedExtras.find(item => item.extra.id === extraId);
+    if (existing) {
+      if (existing.quantity > 1) {
+        setSelectedExtras(selectedExtras.map(item =>
+          item.extra.id === extraId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        ));
+      } else {
+        setSelectedExtras(selectedExtras.filter(item => item.extra.id !== extraId));
+      }
+    }
   };
 
   // Cálculos de precio
   const calculateExtrasPrice = () => {
     if (!offer) return 0;
-    return selectedExtras.reduce((total, extra) => {
-      const perDay = extra.price_per_day * extra.quantity * offer.offer_days;
-      const perRental = extra.price_per_rental * extra.quantity;
-      return total + perDay + perRental;
+    return selectedExtras.reduce((total, item) => {
+      let price = 0;
+      if (item.extra.price_type === 'per_unit') {
+        price = item.extra.price_per_unit || 0;
+      } else {
+        price = (item.extra.price_per_day || 0) * offer.offer_days;
+      }
+      return total + (price * item.quantity);
     }, 0);
   };
 
@@ -256,14 +267,22 @@ export default function ReservarOfertaPage({
             driver_license_expiry: customerDriverLicenseExpiry || null
           },
           // Extras seleccionados
-          extras: selectedExtras.map(extra => ({
-            extra_id: extra.id,
-            quantity: extra.quantity,
-            price_per_day: extra.price_per_day,
-            price_per_rental: extra.price_per_rental,
-            total_price: (extra.price_per_day * extra.quantity * offer.offer_days) + 
-                        (extra.price_per_rental * extra.quantity)
-          })),
+          extras: selectedExtras.map(item => {
+            let totalPrice = 0;
+            if (item.extra.price_type === 'per_unit') {
+              totalPrice = (item.extra.price_per_unit || 0) * item.quantity;
+            } else {
+              totalPrice = (item.extra.price_per_day || 0) * item.quantity * offer.offer_days;
+            }
+            return {
+              extra_id: item.extra.id,
+              quantity: item.quantity,
+              price_per_day: item.extra.price_per_day || 0,
+              price_per_unit: item.extra.price_per_unit || 0,
+              price_type: item.extra.price_type,
+              total_price: totalPrice
+            };
+          }),
           // Referencia a la oferta
           last_minute_offer_id: offer.id,
           discount_applied: savings,
@@ -482,7 +501,7 @@ export default function ReservarOfertaPage({
               </div>
             </div>
 
-            {/* Extras */}
+            {/* Extras - Igual que en /reservar/vehiculo */}
             {extras.length > 0 && (
               <div className="bg-white rounded-2xl shadow-sm p-6">
                 <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
@@ -490,54 +509,95 @@ export default function ReservarOfertaPage({
                   {t("Extras opcionales")}
                 </h2>
                 
-                <div className="grid md:grid-cols-2 gap-3">
+                <div className="space-y-3">
                   {extras.map(extra => {
-                    const isSelected = selectedExtras.some(e => e.id === extra.id);
-                    const selected = selectedExtras.find(e => e.id === extra.id);
-                    const price = extra.price_per_day > 0 
-                      ? `${formatPrice(extra.price_per_day)}/${t("día")}`
-                      : formatPrice(extra.price_per_rental);
+                    const selected = selectedExtras.find(item => item.extra.id === extra.id);
+                    const quantity = selected?.quantity || 0;
+                    const maxQuantity = extra.max_quantity || 1;
                     
+                    // Calcular precio según el tipo
+                    let priceDisplay = '';
+                    if (extra.price_type === 'per_unit') {
+                      const price = extra.price_per_unit || 0;
+                      priceDisplay = `${formatPrice(price)} / ${t("unidad")}`;
+                    } else {
+                      const price = extra.price_per_day || 0;
+                      priceDisplay = `${formatPrice(price)} / ${t("día")}`;
+                    }
+
                     return (
                       <div 
                         key={extra.id}
-                        className={`p-4 rounded-xl border-2 cursor-pointer transition-all ${
-                          isSelected 
-                            ? 'border-furgocasa-blue bg-blue-50' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                        onClick={() => toggleExtra(extra)}
+                        className="flex items-center justify-between p-4 border border-gray-200 rounded-xl hover:border-furgocasa-blue transition-colors"
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <p className="font-medium text-gray-900">{extra.name}</p>
-                            <p className="text-sm text-furgocasa-blue font-medium">{price}</p>
-                          </div>
-                          <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                            isSelected ? 'bg-furgocasa-blue border-furgocasa-blue' : 'border-gray-300'
-                          }`}>
-                            {isSelected && <CheckCircle className="w-4 h-4 text-white" />}
-                          </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-gray-900">{extra.name}</p>
+                          {extra.description && (
+                            <p className="text-sm text-gray-600 mt-1">{extra.description}</p>
+                          )}
+                          <p className="text-sm font-medium text-furgocasa-orange mt-2">
+                            {priceDisplay}
+                            {maxQuantity > 1 && (
+                              <span className="text-xs text-gray-500 ml-2">
+                                (Máx: {maxQuantity})
+                              </span>
+                            )}
+                          </p>
                         </div>
-                        {isSelected && extra.max_quantity > 1 && (
-                          <div className="mt-3 flex items-center gap-2" onClick={e => e.stopPropagation()}>
-                            <button
-                              type="button"
-                              onClick={() => updateExtraQuantity(extra.id, (selected?.quantity || 1) - 1)}
-                              className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center hover:bg-gray-300"
-                            >
-                              -
-                            </button>
-                            <span className="w-8 text-center font-medium">{selected?.quantity || 1}</span>
-                            <button
-                              type="button"
-                              onClick={() => updateExtraQuantity(extra.id, (selected?.quantity || 1) + 1)}
-                              className="w-8 h-8 rounded-lg bg-gray-200 flex items-center justify-center hover:bg-gray-300"
-                            >
-                              +
-                            </button>
-                          </div>
-                        )}
+
+                        <div className="flex items-center gap-3 ml-4">
+                          {maxQuantity > 1 ? (
+                            // Selector de cantidad múltiple
+                            quantity > 0 ? (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => removeExtra(extra.id)}
+                                  className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-300 hover:border-furgocasa-orange hover:text-furgocasa-orange transition-colors"
+                                >
+                                  <Minus className="h-4 w-4" />
+                                </button>
+                                <span className="w-8 text-center font-semibold">{quantity}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => addExtra(extra)}
+                                  disabled={quantity >= maxQuantity}
+                                  className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-300 hover:border-furgocasa-orange hover:text-furgocasa-orange transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  <Plus className="h-4 w-4" />
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => addExtra(extra)}
+                                className="px-4 py-2 text-sm font-medium text-furgocasa-blue border-2 border-furgocasa-blue rounded-lg hover:bg-furgocasa-blue hover:text-white transition-colors"
+                              >
+                                {t("Añadir")}
+                              </button>
+                            )
+                          ) : (
+                            // Toggle simple para cantidad 1
+                            quantity > 0 ? (
+                              <button
+                                type="button"
+                                onClick={() => removeExtra(extra.id)}
+                                className="px-4 py-2 text-sm font-medium text-white bg-furgocasa-blue rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                                {t("Añadido")}
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => addExtra(extra)}
+                                className="px-4 py-2 text-sm font-medium text-furgocasa-blue border-2 border-furgocasa-blue rounded-lg hover:bg-furgocasa-blue hover:text-white transition-colors"
+                              >
+                                {t("Añadir")}
+                              </button>
+                            )
+                          )}
+                        </div>
                       </div>
                     );
                   })}
