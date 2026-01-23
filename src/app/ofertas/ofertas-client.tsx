@@ -118,45 +118,69 @@ export function OfertasClient() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 md:gap-8">
-              {/* Tipo 1: Cupones de Temporada */}
-              <div className="bg-gradient-to-br from-furgocasa-blue/5 to-furgocasa-blue/10 rounded-3xl p-8 border border-furgocasa-blue/20 hover:shadow-lg transition-all">
+              {/* Tipo 1: Cupones de Temporada - Enlace ancla */}
+              <a 
+                href="#cupones"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('cupones')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-gradient-to-br from-furgocasa-blue/5 to-furgocasa-blue/10 rounded-3xl p-8 border border-furgocasa-blue/20 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer group"
+              >
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-furgocasa-blue rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-14 h-14 bg-furgocasa-blue rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     <Ticket className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-heading font-bold text-gray-900">{t("Cupones de Temporada")}</h3>
+                    <h3 className="text-xl font-heading font-bold text-gray-900 group-hover:text-furgocasa-blue transition-colors">{t("Cupones de Temporada")}</h3>
                     <p className="text-sm text-furgocasa-blue font-medium">{t("Códigos promocionales")}</p>
                   </div>
                 </div>
                 <p className="text-gray-600 mb-4">
                   {t("Promociones especiales con códigos de descuento que se aplican durante el proceso de reserva. Pueden ser de temporada (ej: invierno, Black Friday) o personalizados.")}
                 </p>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Percent className="w-4 h-4" />
-                  <span>{t("Descuento sobre el precio total")}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Percent className="w-4 h-4" />
+                    <span>{t("Descuento sobre el precio total")}</span>
+                  </div>
+                  <span className="text-furgocasa-blue font-medium text-sm group-hover:translate-x-1 transition-transform">
+                    {t("Ver")} →
+                  </span>
                 </div>
-              </div>
+              </a>
 
-              {/* Tipo 2: Ofertas de Última Hora */}
-              <div className="bg-gradient-to-br from-furgocasa-orange/5 to-furgocasa-orange/10 rounded-3xl p-8 border border-furgocasa-orange/20 hover:shadow-lg transition-all">
+              {/* Tipo 2: Ofertas de Última Hora - Enlace ancla */}
+              <a 
+                href="#ultima-hora"
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.getElementById('ultima-hora')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-gradient-to-br from-furgocasa-orange/5 to-furgocasa-orange/10 rounded-3xl p-8 border border-furgocasa-orange/20 hover:shadow-xl hover:scale-[1.02] transition-all cursor-pointer group"
+              >
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="w-14 h-14 bg-furgocasa-orange rounded-2xl flex items-center justify-center flex-shrink-0">
+                  <div className="w-14 h-14 bg-furgocasa-orange rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
                     <CalendarClock className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-heading font-bold text-gray-900">{t("Ofertas de Última Hora")}</h3>
+                    <h3 className="text-xl font-heading font-bold text-gray-900 group-hover:text-furgocasa-orange transition-colors">{t("Ofertas de Última Hora")}</h3>
                     <p className="text-sm text-furgocasa-orange font-medium">{t("Huecos entre reservas")}</p>
                   </div>
                 </div>
                 <p className="text-gray-600 mb-4">
                   {t("En temporada alta, cuando hay periodos mínimos de alquiler (ej: 7 días en verano), pueden quedar pequeños huecos entre reservas que ofrecemos con descuentos especiales.")}
                 </p>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Clock className="w-4 h-4" />
-                  <span>{t("Fechas específicas con precio reducido")}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Clock className="w-4 h-4" />
+                    <span>{t("Fechas específicas con precio reducido")}</span>
+                  </div>
+                  <span className="text-furgocasa-orange font-medium text-sm group-hover:translate-x-1 transition-transform">
+                    {t("Ver")} →
+                  </span>
                 </div>
-              </div>
+              </a>
             </div>
 
             <div className="mt-10 bg-gray-50 rounded-2xl p-6 border border-gray-200">
@@ -177,7 +201,7 @@ export function OfertasClient() {
       </section>
 
       {/* SECCIÓN 1: CUPONES DE TEMPORADA */}
-      <section className="py-6 bg-gray-100">
+      <section id="cupones" className="py-6 bg-gray-100 scroll-mt-20">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-3">
             <Ticket className="w-5 h-5 text-furgocasa-blue" />
@@ -361,7 +385,7 @@ export function OfertasClient() {
       </section>
 
       {/* SECCIÓN 2: OFERTAS DE ÚLTIMA HORA */}
-      <section className="py-6 bg-gray-100">
+      <section id="ultima-hora" className="py-6 bg-gray-100 scroll-mt-20">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center gap-3">
             <CalendarClock className="w-5 h-5 text-furgocasa-orange" />
