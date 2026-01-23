@@ -295,6 +295,912 @@ export const staticTranslations = {
     de: "Tag"
   },
   
+  // ===========================================
+  // PÁGINAS DE RESERVA - /reservar/*
+  // ===========================================
+  
+  // Loading & Error states
+  "Cargando vehículo...": {
+    es: "Cargando vehículo...",
+    en: "Loading vehicle...",
+    fr: "Chargement du véhicule...",
+    de: "Fahrzeug wird geladen..."
+  },
+  "Cargando información...": {
+    es: "Cargando información...",
+    en: "Loading information...",
+    fr: "Chargement des informations...",
+    de: "Informationen werden geladen..."
+  },
+  "Cargando información de la reserva...": {
+    es: "Cargando información de la reserva...",
+    en: "Loading booking information...",
+    fr: "Chargement des informations de réservation...",
+    de: "Buchungsinformationen werden geladen..."
+  },
+  "Error": {
+    es: "Error",
+    en: "Error",
+    fr: "Erreur",
+    de: "Fehler"
+  },
+  "Vehículo no encontrado": {
+    es: "Vehículo no encontrado",
+    en: "Vehicle not found",
+    fr: "Véhicule non trouvé",
+    de: "Fahrzeug nicht gefunden"
+  },
+  "Reserva no encontrada": {
+    es: "Reserva no encontrada",
+    en: "Booking not found",
+    fr: "Réservation non trouvée",
+    de: "Buchung nicht gefunden"
+  },
+  "Volver a buscar": {
+    es: "Volver a buscar",
+    en: "Search again",
+    fr: "Rechercher à nouveau",
+    de: "Erneut suchen"
+  },
+  "Volver a la búsqueda": {
+    es: "Volver a la búsqueda",
+    en: "Back to search",
+    fr: "Retour à la recherche",
+    de: "Zurück zur Suche"
+  },
+  "Volver al inicio": {
+    es: "Volver al inicio",
+    en: "Back to home",
+    fr: "Retour à l'accueil",
+    de: "Zurück zur Startseite"
+  },
+  "Volver atrás": {
+    es: "Volver atrás",
+    en: "Go back",
+    fr: "Retour",
+    de: "Zurück"
+  },
+  
+  // Vehicle details
+  "Descripción": {
+    es: "Descripción",
+    en: "Description",
+    fr: "Description",
+    de: "Beschreibung"
+  },
+  "Equipamiento": {
+    es: "Equipamiento",
+    en: "Equipment",
+    fr: "Équipement",
+    de: "Ausstattung"
+  },
+  "Especificaciones técnicas": {
+    es: "Especificaciones técnicas",
+    en: "Technical specifications",
+    fr: "Spécifications techniques",
+    de: "Technische Daten"
+  },
+  "Habitabilidad": {
+    es: "Habitabilidad",
+    en: "Living space",
+    fr: "Habitabilité",
+    de: "Wohnbereich"
+  },
+  "Plazas": {
+    es: "Plazas",
+    en: "Seats",
+    fr: "Places",
+    de: "Sitze"
+  },
+  "plazas": {
+    es: "plazas",
+    en: "seats",
+    fr: "places",
+    de: "Sitze"
+  },
+  "Camas": {
+    es: "Camas",
+    en: "Beds",
+    fr: "Lits",
+    de: "Betten"
+  },
+  "camas": {
+    es: "camas",
+    en: "beds",
+    fr: "lits",
+    de: "Betten"
+  },
+  "Combustible": {
+    es: "Combustible",
+    en: "Fuel",
+    fr: "Carburant",
+    de: "Kraftstoff"
+  },
+  "Comb.": {
+    es: "Comb.",
+    en: "Fuel",
+    fr: "Carb.",
+    de: "Kraftst."
+  },
+  "Cambio": {
+    es: "Cambio",
+    en: "Transmission",
+    fr: "Transmission",
+    de: "Getriebe"
+  },
+  "Motor": {
+    es: "Motor",
+    en: "Engine",
+    fr: "Moteur",
+    de: "Motor"
+  },
+  "Dimensiones": {
+    es: "Dimensiones",
+    en: "Dimensions",
+    fr: "Dimensions",
+    de: "Abmessungen"
+  },
+  "Longitud": {
+    es: "Longitud",
+    en: "Length",
+    fr: "Longueur",
+    de: "Länge"
+  },
+  "Largo": {
+    es: "Largo",
+    en: "Length",
+    fr: "Longueur",
+    de: "Länge"
+  },
+  "Ancho": {
+    es: "Ancho",
+    en: "Width",
+    fr: "Largeur",
+    de: "Breite"
+  },
+  "Alto": {
+    es: "Alto",
+    en: "Height",
+    fr: "Hauteur",
+    de: "Höhe"
+  },
+  
+  // Extras
+  "Extras disponibles": {
+    es: "Extras disponibles",
+    en: "Available extras",
+    fr: "Extras disponibles",
+    de: "Verfügbare Extras"
+  },
+  "Personaliza tu experiencia": {
+    es: "Personaliza tu experiencia",
+    en: "Customize your experience",
+    fr: "Personnalisez votre expérience",
+    de: "Personalisieren Sie Ihr Erlebnis"
+  },
+  "Extras": {
+    es: "Extras",
+    en: "Extras",
+    fr: "Extras",
+    de: "Extras"
+  },
+  "extras más": {
+    es: "extras más",
+    en: "more extras",
+    fr: "extras supplémentaires",
+    de: "weitere Extras"
+  },
+  "Añadir": {
+    es: "Añadir",
+    en: "Add",
+    fr: "Ajouter",
+    de: "Hinzufügen"
+  },
+  "Añadido": {
+    es: "Añadido",
+    en: "Added",
+    fr: "Ajouté",
+    de: "Hinzugefügt"
+  },
+  "unidad": {
+    es: "unidad",
+    en: "unit",
+    fr: "unité",
+    de: "Einheit"
+  },
+  
+  // Summary & Pricing
+  "Resumen": {
+    es: "Resumen",
+    en: "Summary",
+    fr: "Résumé",
+    de: "Zusammenfassung"
+  },
+  "Recogida": {
+    es: "Recogida",
+    en: "Pick-up",
+    fr: "Prise en charge",
+    de: "Abholung"
+  },
+  "Devolución": {
+    es: "Devolución",
+    en: "Return",
+    fr: "Retour",
+    de: "Rückgabe"
+  },
+  "Ubicación": {
+    es: "Ubicación",
+    en: "Location",
+    fr: "Emplacement",
+    de: "Standort"
+  },
+  "Alquiler": {
+    es: "Alquiler",
+    en: "Rental",
+    fr: "Location",
+    de: "Miete"
+  },
+  "Total": {
+    es: "Total",
+    en: "Total",
+    fr: "Total",
+    de: "Gesamt"
+  },
+  "Precio especial 2 días": {
+    es: "Precio especial 2 días",
+    en: "Special 2-day price",
+    fr: "Prix spécial 2 jours",
+    de: "Sonderpreis 2 Tage"
+  },
+  "Alquileres de 2 días se cobran como 3 días": {
+    es: "Alquileres de 2 días se cobran como 3 días",
+    en: "2-day rentals are charged as 3 days",
+    fr: "Les locations de 2 jours sont facturées comme 3 jours",
+    de: "2-Tage-Mieten werden als 3 Tage berechnet"
+  },
+  "Continuar con la reserva": {
+    es: "Continuar con la reserva",
+    en: "Continue with booking",
+    fr: "Continuer la réservation",
+    de: "Mit Buchung fortfahren"
+  },
+  "Continuar": {
+    es: "Continuar",
+    en: "Continue",
+    fr: "Continuer",
+    de: "Weiter"
+  },
+  
+  // New booking form
+  "Completa tu reserva": {
+    es: "Completa tu reserva",
+    en: "Complete your booking",
+    fr: "Complétez votre réservation",
+    de: "Vervollständigen Sie Ihre Buchung"
+  },
+  "Solo necesitamos algunos datos para confirmar tu reserva": {
+    es: "Solo necesitamos algunos datos para confirmar tu reserva",
+    en: "We just need some details to confirm your booking",
+    fr: "Nous avons juste besoin de quelques informations pour confirmer votre réservation",
+    de: "Wir benötigen nur einige Angaben, um Ihre Buchung zu bestätigen"
+  },
+  "Tus datos": {
+    es: "Tus datos",
+    en: "Your details",
+    fr: "Vos informations",
+    de: "Ihre Daten"
+  },
+  "Nombre completo": {
+    es: "Nombre completo",
+    en: "Full name",
+    fr: "Nom complet",
+    de: "Vollständiger Name"
+  },
+  "Tu nombre completo": {
+    es: "Tu nombre completo",
+    en: "Your full name",
+    fr: "Votre nom complet",
+    de: "Ihr vollständiger Name"
+  },
+  "Email": {
+    es: "Email",
+    en: "Email",
+    fr: "Email",
+    de: "E-Mail"
+  },
+  "Teléfono": {
+    es: "Teléfono",
+    en: "Phone",
+    fr: "Téléphone",
+    de: "Telefon"
+  },
+  "DNI/NIE": {
+    es: "DNI/NIE",
+    en: "ID/Passport",
+    fr: "CNI/Passeport",
+    de: "Ausweis/Pass"
+  },
+  "DNI - ID nº": {
+    es: "DNI - ID nº",
+    en: "ID/Passport No.",
+    fr: "N° CNI/Passeport",
+    de: "Ausweis-Nr."
+  },
+  "Fecha de nacimiento": {
+    es: "Fecha de nacimiento",
+    en: "Date of birth",
+    fr: "Date de naissance",
+    de: "Geburtsdatum"
+  },
+  "Dirección": {
+    es: "Dirección",
+    en: "Address",
+    fr: "Adresse",
+    de: "Adresse"
+  },
+  "Calle, número, piso...": {
+    es: "Calle, número, piso...",
+    en: "Street, number, floor...",
+    fr: "Rue, numéro, étage...",
+    de: "Straße, Hausnummer, Stock..."
+  },
+  "Ciudad": {
+    es: "Ciudad",
+    en: "City",
+    fr: "Ville",
+    de: "Stadt"
+  },
+  "Tu ciudad": {
+    es: "Tu ciudad",
+    en: "Your city",
+    fr: "Votre ville",
+    de: "Ihre Stadt"
+  },
+  "Código Postal": {
+    es: "Código Postal",
+    en: "Postal Code",
+    fr: "Code Postal",
+    de: "Postleitzahl"
+  },
+  "País": {
+    es: "País",
+    en: "Country",
+    fr: "Pays",
+    de: "Land"
+  },
+  "Datos del carnet de conducir": {
+    es: "Datos del carnet de conducir",
+    en: "Driver's license details",
+    fr: "Détails du permis de conduire",
+    de: "Führerscheindaten"
+  },
+  "Número de carnet": {
+    es: "Número de carnet",
+    en: "License number",
+    fr: "Numéro de permis",
+    de: "Führerscheinnummer"
+  },
+  "Fecha de caducidad": {
+    es: "Fecha de caducidad",
+    en: "Expiry date",
+    fr: "Date d'expiration",
+    de: "Ablaufdatum"
+  },
+  "Notas adicionales": {
+    es: "Notas adicionales",
+    en: "Additional notes",
+    fr: "Notes supplémentaires",
+    de: "Zusätzliche Hinweise"
+  },
+  "opcional": {
+    es: "opcional",
+    en: "optional",
+    fr: "facultatif",
+    de: "optional"
+  },
+  "¿Algo que debamos saber?": {
+    es: "¿Algo que debamos saber?",
+    en: "Anything we should know?",
+    fr: "Quelque chose que nous devrions savoir ?",
+    de: "Gibt es etwas, das wir wissen sollten?"
+  },
+  "Creando reserva...": {
+    es: "Creando reserva...",
+    en: "Creating booking...",
+    fr: "Création de la réservation...",
+    de: "Buchung wird erstellt..."
+  },
+  "Creando...": {
+    es: "Creando...",
+    en: "Creating...",
+    fr: "Création...",
+    de: "Wird erstellt..."
+  },
+  "Crear reserva": {
+    es: "Crear reserva",
+    en: "Create booking",
+    fr: "Créer la réservation",
+    de: "Buchung erstellen"
+  },
+  
+  // Booking detail page
+  "Reserva": {
+    es: "Reserva",
+    en: "Booking",
+    fr: "Réservation",
+    de: "Buchung"
+  },
+  "Número de confirmación": {
+    es: "Número de confirmación",
+    en: "Confirmation number",
+    fr: "Numéro de confirmation",
+    de: "Bestätigungsnummer"
+  },
+  "Reserva creada el": {
+    es: "Reserva creada el",
+    en: "Booking created on",
+    fr: "Réservation créée le",
+    de: "Buchung erstellt am"
+  },
+  "Tu vehículo": {
+    es: "Tu vehículo",
+    en: "Your vehicle",
+    fr: "Votre véhicule",
+    de: "Ihr Fahrzeug"
+  },
+  "Vehículo": {
+    es: "Vehículo",
+    en: "Vehicle",
+    fr: "Véhicule",
+    de: "Fahrzeug"
+  },
+  "Fechas": {
+    es: "Fechas",
+    en: "Dates",
+    fr: "Dates",
+    de: "Daten"
+  },
+  "Duración": {
+    es: "Duración",
+    en: "Duration",
+    fr: "Durée",
+    de: "Dauer"
+  },
+  "Punto de recogida": {
+    es: "Punto de recogida",
+    en: "Pick-up point",
+    fr: "Point de prise en charge",
+    de: "Abholort"
+  },
+  "Punto de devolución": {
+    es: "Punto de devolución",
+    en: "Return point",
+    fr: "Point de retour",
+    de: "Rückgabeort"
+  },
+  "Recogida en": {
+    es: "Recogida en",
+    en: "Pick-up at",
+    fr: "Prise en charge à",
+    de: "Abholung bei"
+  },
+  "Devolución en": {
+    es: "Devolución en",
+    en: "Return at",
+    fr: "Retour à",
+    de: "Rückgabe bei"
+  },
+  "Extras incluidos": {
+    es: "Extras incluidos",
+    en: "Included extras",
+    fr: "Extras inclus",
+    de: "Enthaltene Extras"
+  },
+  "Cantidad": {
+    es: "Cantidad",
+    en: "Quantity",
+    fr: "Quantité",
+    de: "Menge"
+  },
+  
+  // Driver data
+  "Datos del conductor principal": {
+    es: "Datos del conductor principal",
+    en: "Main driver details",
+    fr: "Données du conducteur principal",
+    de: "Daten des Hauptfahrers"
+  },
+  "Nombre del conductor principal": {
+    es: "Nombre del conductor principal",
+    en: "Main driver's name",
+    fr: "Nom du conducteur principal",
+    de: "Name des Hauptfahrers"
+  },
+  "Apellidos del conductor principal": {
+    es: "Apellidos del conductor principal",
+    en: "Main driver's surname",
+    fr: "Nom de famille du conducteur principal",
+    de: "Nachname des Hauptfahrers"
+  },
+  "Dirección del conductor principal": {
+    es: "Dirección del conductor principal",
+    en: "Main driver's address",
+    fr: "Adresse du conducteur principal",
+    de: "Adresse des Hauptfahrers"
+  },
+  "Código postal del conductor principal": {
+    es: "Código postal del conductor principal",
+    en: "Main driver's postal code",
+    fr: "Code postal du conducteur principal",
+    de: "Postleitzahl des Hauptfahrers"
+  },
+  "Municipio del conductor principal": {
+    es: "Municipio del conductor principal",
+    en: "Main driver's city",
+    fr: "Commune du conducteur principal",
+    de: "Stadt des Hauptfahrers"
+  },
+  "País del conductor principal": {
+    es: "País del conductor principal",
+    en: "Main driver's country",
+    fr: "Pays du conducteur principal",
+    de: "Land des Hauptfahrers"
+  },
+  "Edad del conductor principal": {
+    es: "Edad del conductor principal",
+    en: "Main driver's age",
+    fr: "Âge du conducteur principal",
+    de: "Alter des Hauptfahrers"
+  },
+  "Fecha de caducidad carnet conducir del conductor principal": {
+    es: "Fecha de caducidad carnet conducir del conductor principal",
+    en: "Main driver's license expiry date",
+    fr: "Date d'expiration du permis du conducteur principal",
+    de: "Ablaufdatum Führerschein des Hauptfahrers"
+  },
+  "e-Mail": {
+    es: "e-Mail",
+    en: "e-Mail",
+    fr: "e-Mail",
+    de: "E-Mail"
+  },
+  "Comentarios": {
+    es: "Comentarios",
+    en: "Comments",
+    fr: "Commentaires",
+    de: "Kommentare"
+  },
+  
+  // Payment
+  "Primer pago (50%)": {
+    es: "Primer pago (50%)",
+    en: "First payment (50%)",
+    fr: "Premier paiement (50%)",
+    de: "Erste Zahlung (50%)"
+  },
+  "Primer pago": {
+    es: "Primer pago",
+    en: "First payment",
+    fr: "Premier paiement",
+    de: "Erste Zahlung"
+  },
+  "Segundo pago": {
+    es: "Segundo pago",
+    en: "Second payment",
+    fr: "Deuxième paiement",
+    de: "Zweite Zahlung"
+  },
+  "Para confirmar tu reserva, necesitamos el pago del 50% del total.": {
+    es: "Para confirmar tu reserva, necesitamos el pago del 50% del total.",
+    en: "To confirm your booking, we need 50% of the total payment.",
+    fr: "Pour confirmer votre réservation, nous avons besoin du paiement de 50% du total.",
+    de: "Um Ihre Buchung zu bestätigen, benötigen wir 50% der Gesamtzahlung."
+  },
+  "Pago inicial": {
+    es: "Pago inicial",
+    en: "Initial payment",
+    fr: "Paiement initial",
+    de: "Anzahlung"
+  },
+  "El segundo pago": {
+    es: "El segundo pago",
+    en: "The second payment",
+    fr: "Le deuxième paiement",
+    de: "Die zweite Zahlung"
+  },
+  "se realizará máximo 15 días antes del inicio del alquiler": {
+    es: "se realizará máximo 15 días antes del inicio del alquiler",
+    en: "will be made at least 15 days before the rental starts",
+    fr: "sera effectué au maximum 15 jours avant le début de la location",
+    de: "muss spätestens 15 Tage vor Mietbeginn erfolgen"
+  },
+  "Pagar": {
+    es: "Pagar",
+    en: "Pay",
+    fr: "Payer",
+    de: "Bezahlen"
+  },
+  "y confirmar": {
+    es: "y confirmar",
+    en: "and confirm",
+    fr: "et confirmer",
+    de: "und bestätigen"
+  },
+  "⚠️ Segundo pago urgente": {
+    es: "⚠️ Segundo pago urgente",
+    en: "⚠️ Urgent second payment",
+    fr: "⚠️ Deuxième paiement urgent",
+    de: "⚠️ Dringende zweite Zahlung"
+  },
+  "Primer pago completado ✓": {
+    es: "Primer pago completado ✓",
+    en: "First payment completed ✓",
+    fr: "Premier paiement effectué ✓",
+    de: "Erste Zahlung abgeschlossen ✓"
+  },
+  "¡Atención!": {
+    es: "¡Atención!",
+    en: "Attention!",
+    fr: "Attention !",
+    de: "Achtung!"
+  },
+  "Faltan": {
+    es: "Faltan",
+    en: "Only",
+    fr: "Il reste",
+    de: "Nur noch"
+  },
+  "días para el inicio del alquiler. El segundo pago debe realizarse como máximo 15 días antes.": {
+    es: "días para el inicio del alquiler. El segundo pago debe realizarse como máximo 15 días antes.",
+    en: "days until rental starts. Second payment must be made at least 15 days before.",
+    fr: "jours avant le début de la location. Le deuxième paiement doit être effectué au maximum 15 jours avant.",
+    de: "Tage bis zum Mietbeginn. Die zweite Zahlung muss spätestens 15 Tage vorher erfolgen."
+  },
+  "Has pagado": {
+    es: "Has pagado",
+    en: "You have paid",
+    fr: "Vous avez payé",
+    de: "Sie haben bezahlt"
+  },
+  "Puedes realizar el segundo pago cuando quieras.": {
+    es: "Puedes realizar el segundo pago cuando quieras.",
+    en: "You can make the second payment whenever you want.",
+    fr: "Vous pouvez effectuer le deuxième paiement quand vous le souhaitez.",
+    de: "Sie können die zweite Zahlung jederzeit leisten."
+  },
+  "Total de la reserva": {
+    es: "Total de la reserva",
+    en: "Booking total",
+    fr: "Total de la réservation",
+    de: "Buchungssumme"
+  },
+  "Ya pagado": {
+    es: "Ya pagado",
+    en: "Already paid",
+    fr: "Déjà payé",
+    de: "Bereits bezahlt"
+  },
+  "Pendiente": {
+    es: "Pendiente",
+    en: "Pending",
+    fr: "En attente",
+    de: "Ausstehend"
+  },
+  "Pagar ahora": {
+    es: "Pagar ahora",
+    en: "Pay now",
+    fr: "Payer maintenant",
+    de: "Jetzt bezahlen"
+  },
+  "Realizar segundo pago": {
+    es: "Realizar segundo pago",
+    en: "Make second payment",
+    fr: "Effectuer le deuxième paiement",
+    de: "Zweite Zahlung leisten"
+  },
+  "Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler": {
+    es: "Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler",
+    en: "Remember: second payment must be completed at least 15 days before rental starts",
+    fr: "Rappel : le deuxième paiement doit être effectué au maximum 15 jours avant le début de la location",
+    de: "Zur Erinnerung: Die zweite Zahlung muss spätestens 15 Tage vor Mietbeginn erfolgen"
+  },
+  "¡Pago completado!": {
+    es: "¡Pago completado!",
+    en: "Payment completed!",
+    fr: "Paiement effectué !",
+    de: "Zahlung abgeschlossen!"
+  },
+  "Has completado el pago total de la reserva. ¡Todo listo para tu aventura!": {
+    es: "Has completado el pago total de la reserva. ¡Todo listo para tu aventura!",
+    en: "You have completed the full payment. Everything is ready for your adventure!",
+    fr: "Vous avez effectué le paiement total de la réservation. Tout est prêt pour votre aventure !",
+    de: "Sie haben die vollständige Zahlung abgeschlossen. Alles ist bereit für Ihr Abenteuer!"
+  },
+  "Total pagado": {
+    es: "Total pagado",
+    en: "Total paid",
+    fr: "Total payé",
+    de: "Gesamt bezahlt"
+  },
+  "Resumen de pago": {
+    es: "Resumen de pago",
+    en: "Payment summary",
+    fr: "Résumé du paiement",
+    de: "Zahlungsübersicht"
+  },
+  "Comisión de entrega/recogida": {
+    es: "Comisión de entrega/recogida",
+    en: "Delivery/pickup fee",
+    fr: "Frais de livraison/prise en charge",
+    de: "Liefer-/Abholgebühr"
+  },
+  "Descuento": {
+    es: "Descuento",
+    en: "Discount",
+    fr: "Réduction",
+    de: "Rabatt"
+  },
+  "Fianza": {
+    es: "Fianza",
+    en: "Deposit",
+    fr: "Caution",
+    de: "Kaution"
+  },
+  "La fianza se devuelve al finalizar el alquiler si no hay daños": {
+    es: "La fianza se devuelve al finalizar el alquiler si no hay daños",
+    en: "The deposit is refunded at the end of the rental if there is no damage",
+    fr: "La caution est remboursée à la fin de la location s'il n'y a pas de dommages",
+    de: "Die Kaution wird am Ende der Miete zurückerstattet, wenn keine Schäden vorliegen"
+  },
+  "Pagado completamente": {
+    es: "Pagado completamente",
+    en: "Fully paid",
+    fr: "Entièrement payé",
+    de: "Vollständig bezahlt"
+  },
+  
+  // Help & Cancellation
+  "¿Necesitas ayuda?": {
+    es: "¿Necesitas ayuda?",
+    en: "Need help?",
+    fr: "Besoin d'aide ?",
+    de: "Brauchen Sie Hilfe?"
+  },
+  "Si tienes alguna duda sobre tu reserva, no dudes en contactarnos.": {
+    es: "Si tienes alguna duda sobre tu reserva, no dudes en contactarnos.",
+    en: "If you have any questions about your booking, don't hesitate to contact us.",
+    fr: "Si vous avez des questions sur votre réservation, n'hésitez pas à nous contacter.",
+    de: "Wenn Sie Fragen zu Ihrer Buchung haben, zögern Sie nicht, uns zu kontaktieren."
+  },
+  "Solicitud de cancelación / modificación": {
+    es: "Solicitud de cancelación / modificación",
+    en: "Cancellation / modification request",
+    fr: "Demande d'annulation / modification",
+    de: "Stornierung / Änderungsanfrage"
+  },
+  "Si deseas cancelar o modificar tu reserva, por favor contáctanos directamente. Te responderemos lo antes posible.": {
+    es: "Si deseas cancelar o modificar tu reserva, por favor contáctanos directamente. Te responderemos lo antes posible.",
+    en: "If you wish to cancel or modify your booking, please contact us directly. We will respond as soon as possible.",
+    fr: "Si vous souhaitez annuler ou modifier votre réservation, veuillez nous contacter directement. Nous vous répondrons dans les plus brefs délais.",
+    de: "Wenn Sie Ihre Buchung stornieren oder ändern möchten, kontaktieren Sie uns bitte direkt. Wir werden so schnell wie möglich antworten."
+  },
+  "Asegúrate de incluir tu número de reserva": {
+    es: "Asegúrate de incluir tu número de reserva",
+    en: "Make sure to include your booking number",
+    fr: "Assurez-vous d'inclure votre numéro de réservation",
+    de: "Vergessen Sie nicht, Ihre Buchungsnummer anzugeben"
+  },
+  "en tu mensaje para que podamos ayudarte más rápidamente.": {
+    es: "en tu mensaje para que podamos ayudarte más rápidamente.",
+    en: "in your message so we can help you faster.",
+    fr: "dans votre message pour que nous puissions vous aider plus rapidement.",
+    de: "in Ihrer Nachricht, damit wir Ihnen schneller helfen können."
+  },
+  "Consulta nuestra": {
+    es: "Consulta nuestra",
+    en: "Check our",
+    fr: "Consultez notre",
+    de: "Lesen Sie unsere"
+  },
+  "política de cancelación": {
+    es: "política de cancelación",
+    en: "cancellation policy",
+    fr: "politique d'annulation",
+    de: "Stornierungsbedingungen"
+  },
+  "para más información.": {
+    es: "para más información.",
+    en: "for more information.",
+    fr: "pour plus d'informations.",
+    de: "für weitere Informationen."
+  },
+  
+  // Confirmation page
+  "¡Reserva creada correctamente!": {
+    es: "¡Reserva creada correctamente!",
+    en: "Booking created successfully!",
+    fr: "Réservation créée avec succès !",
+    de: "Buchung erfolgreich erstellt!"
+  },
+  "Número de reserva": {
+    es: "Número de reserva",
+    en: "Booking number",
+    fr: "Numéro de réservation",
+    de: "Buchungsnummer"
+  },
+  "Pendiente de transferencia": {
+    es: "Pendiente de transferencia",
+    en: "Pending transfer",
+    fr: "Virement en attente",
+    de: "Überweisung ausstehend"
+  },
+  "Instrucciones de pago": {
+    es: "Instrucciones de pago",
+    en: "Payment instructions",
+    fr: "Instructions de paiement",
+    de: "Zahlungsanweisungen"
+  },
+  "Para confirmar tu reserva, realiza una transferencia bancaria por el importe total a la cuenta indicada. Una vez recibido el pago, confirmaremos tu reserva por email.": {
+    es: "Para confirmar tu reserva, realiza una transferencia bancaria por el importe total a la cuenta indicada. Una vez recibido el pago, confirmaremos tu reserva por email.",
+    en: "To confirm your booking, make a bank transfer for the total amount to the account indicated. Once payment is received, we will confirm your booking by email.",
+    fr: "Pour confirmer votre réservation, effectuez un virement bancaire du montant total sur le compte indiqué. Une fois le paiement reçu, nous confirmerons votre réservation par email.",
+    de: "Um Ihre Buchung zu bestätigen, überweisen Sie den Gesamtbetrag auf das angegebene Konto. Nach Erhalt der Zahlung bestätigen wir Ihre Buchung per E-Mail."
+  },
+  "Banco": {
+    es: "Banco",
+    en: "Bank",
+    fr: "Banque",
+    de: "Bank"
+  },
+  "Copiado": {
+    es: "Copiado",
+    en: "Copied",
+    fr: "Copié",
+    de: "Kopiert"
+  },
+  "Copiar": {
+    es: "Copiar",
+    en: "Copy",
+    fr: "Copier",
+    de: "Kopieren"
+  },
+  "Beneficiario": {
+    es: "Beneficiario",
+    en: "Beneficiary",
+    fr: "Bénéficiaire",
+    de: "Begünstigter"
+  },
+  "Concepto": {
+    es: "Concepto",
+    en: "Reference",
+    fr: "Référence",
+    de: "Verwendungszweck"
+  },
+  "Importe a transferir": {
+    es: "Importe a transferir",
+    en: "Amount to transfer",
+    fr: "Montant à transférer",
+    de: "Zu überweisender Betrag"
+  },
+  "Importante": {
+    es: "Importante",
+    en: "Important",
+    fr: "Important",
+    de: "Wichtig"
+  },
+  "Asegúrate de incluir el número de reserva en el concepto de la transferencia para que podamos identificar tu pago correctamente.": {
+    es: "Asegúrate de incluir el número de reserva en el concepto de la transferencia para que podamos identificar tu pago correctamente.",
+    en: "Make sure to include the booking number in the transfer reference so we can identify your payment correctly.",
+    fr: "Assurez-vous d'inclure le numéro de réservation dans la référence du virement pour que nous puissions identifier votre paiement correctement.",
+    de: "Geben Sie unbedingt die Buchungsnummer im Verwendungszweck der Überweisung an, damit wir Ihre Zahlung korrekt zuordnen können."
+  },
+  "Resumen de la reserva": {
+    es: "Resumen de la reserva",
+    en: "Booking summary",
+    fr: "Résumé de la réservation",
+    de: "Buchungsübersicht"
+  },
+  
   // Footer
   "Tu empresa de confianza para el alquiler de campers y autocaravanas en la Región de Murcia.": {
     es: "Tu empresa de confianza para el alquiler de campers y autocaravanas en la Región de Murcia.",
