@@ -4,6 +4,74 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔴 [1.0.11] - 23 de Enero 2026 - **FIX CRÍTICO: Error 500 en Páginas de Vehículos**
+
+### 🚨 **PROBLEMA RESUELTO**
+
+Las páginas de detalle de vehículos (`/vehiculos/[slug]` y `/ventas/[slug]`) devolvían error 500 en producción.
+
+---
+
+### ✅ **CAMBIOS IMPLEMENTADOS**
+
+#### 1. **Cliente Supabase Universal** (`2478d07`)
+
+Corregido el cliente de Supabase en `queries.ts` para usar `@supabase/supabase-js` en lugar de `createBrowserClient` que solo funciona en el navegador.
+
+```typescript
+// ✅ Cliente universal que funciona en servidor y cliente
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+
+const supabase = createSupabaseClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+```
+
+#### 2. **Renderizado Dinámico Forzado** (`07b0026`)
+
+Páginas de detalle ahora usan renderizado 100% dinámico para evitar problemas de caché/ISR:
+
+```typescript
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+```
+
+#### 3. **Try-catch para headers()** (`dfe7b04`)
+
+Manejo de errores cuando `headers()` no está disponible durante generación estática.
+
+#### 4. **Middleware Actualizado** (`99017d9`)
+
+Exclusiones añadidas para archivos estáticos:
+- `/sw-admin.js`
+- `/workbox-*`
+- `/manifest.json`
+- `/icon-*`
+
+---
+
+### 📝 **ARCHIVOS MODIFICADOS**
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/lib/supabase/queries.ts` | Cliente universal |
+| `src/app/vehiculos/[slug]/page.tsx` | force-dynamic |
+| `src/app/ventas/[slug]/page.tsx` | force-dynamic |
+| `src/middleware.ts` | Exclusiones estáticos |
+
+---
+
+### 🎯 **RESULTADO**
+
+- ✅ `/es/vehiculos/[slug]` - Funciona
+- ✅ `/es/ventas/[slug]` - Funciona
+- ✅ Service Worker sin errores
+
+**Documentación:** Ver `FIX-ERROR-500-VEHICULOS.md` para detalles completos.
+
+---
+
 ## 🚀 [1.0.10] - 23 de Enero 2026 - **Optimización Rendimiento + PageSpeed 98**
 
 ### 🎯 **RESUMEN DE MEJORAS**

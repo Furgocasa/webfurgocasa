@@ -1,10 +1,33 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.8 ✅ PRODUCCIÓN - FIX CRÍTICO BÚSQUEDA Y SEO  
+**Versión**: 1.0.11 ✅ PRODUCCIÓN - FIX CRÍTICO ERROR 500 VEHÍCULOS  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 22 de Enero, 2026
+**Última actualización**: 23 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🔴 VERSIÓN 1.0.11 - FIX CRÍTICO ERROR 500 VEHÍCULOS
+
+**✅ ESTADO: TOTALMENTE FUNCIONAL** - Páginas de detalle de vehículos restauradas.
+
+**PROBLEMA RESUELTO**: Las páginas `/vehiculos/[slug]` y `/ventas/[slug]` devolvían error 500. Múltiples causas: cliente Supabase incorrecto, problemas de ISR/caché, headers() fallando.
+
+**SOLUCIÓN**: Renderizado 100% dinámico + cliente Supabase universal.
+
+Ver **[FIX-ERROR-500-VEHICULOS.md](./FIX-ERROR-500-VEHICULOS.md)** para detalles completos.
+
+### 🎯 Highlights v1.0.11:
+- ✅ **Cliente Supabase universal**: `@supabase/supabase-js` en lugar de `createBrowserClient`
+- ✅ **Renderizado dinámico**: `force-dynamic` para evitar problemas de caché
+- ✅ **Middleware actualizado**: Exclusiones para sw-admin.js, workbox, manifests
+- ✅ **Try-catch headers()**: Fallback cuando no está disponible
+
+### ⚠️ Lección Aprendida:
+- **NO usar `createBrowserClient`** en Server Components
+- **Páginas con middleware i18n** funcionan mejor con `force-dynamic`
+- **Service Workers no toleran redirecciones** - excluir del middleware
 
 ---
 
@@ -57,10 +80,10 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | Documento | Descripción | Cuándo leer |
 |-----------|-------------|-------------|
 | **[README.md](./README.md)** | Punto de entrada principal, arquitectura completa | **SIEMPRE PRIMERO** |
-| **[CHANGELOG.md](./CHANGELOG.md)** | Historial versiones, problemas deploy, **v1.0.4 FIX CRÍTICO** | Al debuggear o deployar |
+| **[CHANGELOG.md](./CHANGELOG.md)** | Historial versiones, **v1.0.11 FIX ERROR 500** | Al debuggear o deployar |
+| **[FIX-ERROR-500-VEHICULOS.md](./FIX-ERROR-500-VEHICULOS.md)** | 🔴 **FIX CRÍTICO** - Error 500 páginas vehículos | Si falla `/vehiculos/[slug]` o `/ventas/[slug]` |
 | **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** | ⚠️ **INCLUYE REGLAS DE SUPABASE CLIENT** | Antes de tocar CUALQUIER código |
 | **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** | ⚠️ **REGLAS OBLIGATORIAS** - Queries a Supabase | ANTES de hacer ANY query |
-| **[CHANGELOG.md](./CHANGELOG.md)** | Fix crítico autenticación v1.0.4 | Ver qué se rompió y cómo se arregló |
 | **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** | Schema real con campos exactos | Al consultar tablas |
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
