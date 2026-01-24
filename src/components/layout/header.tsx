@@ -19,6 +19,25 @@ export function Header() {
   const handleLanguageChange = (lang: 'es' | 'en' | 'fr' | 'de') => {
     setLanguage(lang);
     setLanguageDropdownOpen(false);
+    
+    // Si estamos en una ruta funcional (sin idioma), redirigir a la home del nuevo idioma
+    const functionalRoutes = ['/reservar', '/pago', '/vehiculos/', '/ventas/', '/faqs/', '/administrator'];
+    const isFunctionalRoute = functionalRoutes.some(route => pathname.startsWith(route));
+    
+    if (isFunctionalRoute) {
+      // Redirigir a la home del nuevo idioma
+      window.location.href = `/${lang}`;
+    } else {
+      // Para rutas con idioma, intentar cambiar el locale en la URL
+      const currentLocale = pathname.split('/')[1];
+      if (['es', 'en', 'fr', 'de'].includes(currentLocale)) {
+        const newPath = pathname.replace(`/${currentLocale}`, `/${lang}`);
+        window.location.href = newPath;
+      } else {
+        // Si no hay locale en la URL, ir a la home del nuevo idioma
+        window.location.href = `/${lang}`;
+      }
+    }
   };
 
   const languages = {
