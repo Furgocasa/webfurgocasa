@@ -246,16 +246,14 @@ export const routeTranslations = {
     de: "/bestaetigung"
   },
   
-  // Páginas de localización SEO (patrón base dinámico)
-  // El patrón completo sería: /es/alquiler-autocaravanas-campervans-{location}
+  // Páginas de localización SEO - Alquiler (estructura: /{locale}/alquiler-autocaravanas-campervans/{location})
   "/alquiler-autocaravanas-campervans": { 
     es: "/alquiler-autocaravanas-campervans", 
     en: "/rent-campervan-motorhome", 
     fr: "/location-camping-car", 
     de: "/wohnmobil-mieten" 
   },
-  // Páginas de venta por localización (patrón base dinámico)
-  // El patrón completo sería: /es/venta-autocaravanas-camper-{location}
+  // Páginas de localización SEO - Venta (estructura: /{locale}/venta-autocaravanas-camper/{location})
   "/venta-autocaravanas-camper": { 
     es: "/venta-autocaravanas-camper", 
     en: "/campervans-for-sale-in", 
@@ -267,7 +265,7 @@ export const routeTranslations = {
 /**
  * Obtiene la ruta traducida con prefijo de idioma
  * Ejemplo: /es/contacto -> /en/contact
- * Ejemplo dinámico: /es/alquiler-autocaravanas-campervans-murcia -> /en/rent-campervan-motorhome-murcia
+ * Ejemplo localización: /es/alquiler-autocaravanas-campervans/murcia -> /en/rent-campervan-motorhome/murcia
  * Ejemplo blog categoría: /es/blog/rutas -> /en/blog/routes
  * Ejemplo blog artículo: /es/blog/rutas/mi-articulo -> /en/blog/routes/mi-articulo
  */
@@ -325,23 +323,23 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
     if (routeTranslations[cleanPath as keyof typeof routeTranslations]) {
       translatedPath = routeTranslations[cleanPath as keyof typeof routeTranslations][targetLang];
     } else {
-      // Manejar rutas dinámicas de localización (pattern: /alquiler-autocaravanas-campervans-{location})
-      const locationPattern = /^\/(alquiler-autocaravanas-campervans|rent-campervan-motorhome|location-camping-car|wohnmobil-mieten)-(.+)$/;
+      // Manejar rutas dinámicas de localización - NUEVO formato con barra: /alquiler-autocaravanas-campervans/{location}
+      const locationPattern = /^\/(alquiler-autocaravanas-campervans|rent-campervan-motorhome|location-camping-car|wohnmobil-mieten)\/(.+)$/;
       const locationMatch = cleanPath.match(locationPattern);
       
       if (locationMatch) {
         const [, basePattern, location] = locationMatch;
         const translatedBase = routeTranslations["/alquiler-autocaravanas-campervans"][targetLang];
-        translatedPath = `${translatedBase}-${location}`;
+        translatedPath = `${translatedBase}/${location}`;
       } else {
-        // Manejar rutas dinámicas de venta por localización (pattern: /venta-autocaravanas-camper-{location})
-        const saleLocationPattern = /^\/(venta-autocaravanas-camper|campervans-for-sale-in|camping-cars-a-vendre|wohnmobile-zu-verkaufen)-(.+)$/;
+        // Manejar rutas dinámicas de venta por localización - NUEVO formato: /venta-autocaravanas-camper/{location}
+        const saleLocationPattern = /^\/(venta-autocaravanas-camper|campervans-for-sale-in|camping-cars-a-vendre|wohnmobile-zu-verkaufen)\/(.+)$/;
         const saleLocationMatch = cleanPath.match(saleLocationPattern);
         
         if (saleLocationMatch) {
           const [, basePattern, location] = saleLocationMatch;
           const translatedBase = routeTranslations["/venta-autocaravanas-camper"][targetLang];
-          translatedPath = `${translatedBase}-${location}`;
+          translatedPath = `${translatedBase}/${location}`;
         } else {
           // Si es una ruta dinámica normal, traducir TODOS los segmentos traducibles
           const pathSegments = cleanPath.split('/').filter(Boolean);

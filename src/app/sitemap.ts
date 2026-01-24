@@ -251,18 +251,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  // Páginas de localización - Alquiler
+  // Páginas de localización - Alquiler (formato: /alquiler-autocaravanas-campervans/{slug})
   locationList.forEach((location) => {
-    addEntry(`/alquiler-autocaravanas-campervans-${location.slug}`, {
+    addEntry(`/alquiler-autocaravanas-campervans/${location.slug}`, {
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,
     });
   });
 
-  // Páginas de localización - Venta
+  // Páginas de localización - Venta (formato: /venta-autocaravanas-camper/{slug})
   saleLocationList.forEach((location) => {
-    addEntry(`/venta-autocaravanas-camper-${location.slug}`, {
+    addEntry(`/venta-autocaravanas-camper/${location.slug}`, {
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,
