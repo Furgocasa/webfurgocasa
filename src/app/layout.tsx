@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { Rubik, Amiko } from "next/font/google";
+// TEMPORAL: Comentado por error de Google Fonts
+// import { Rubik, Amiko } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
@@ -15,21 +16,22 @@ import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import Script from "next/script";
 import { i18n, isValidLocale } from "@/lib/i18n/config";
 
+// TEMPORAL: Usar fuentes del sistema hasta resolver problema de Google Fonts
 // Rubik - Para títulos y headings
-const rubik = Rubik({ 
-  subsets: ["latin"],
-  variable: "--font-rubik",
-  weight: ["300", "400", "500", "600", "700", "800"],
-  display: "swap",
-});
+// const rubik = Rubik({ 
+//   subsets: ["latin"],
+//   variable: "--font-rubik",
+//   weight: ["300", "400", "500", "600", "700", "800"],
+//   display: "swap",
+// });
 
 // Amiko - Para cuerpo de texto
-const amiko = Amiko({ 
-  subsets: ["latin"],
-  variable: "--font-amiko",
-  weight: ["400", "600", "700"],
-  display: "swap",
-});
+// const amiko = Amiko({ 
+//   subsets: ["latin"],
+//   variable: "--font-amiko",
+//   weight: ["400", "600", "700"],
+//   display: "swap",
+// });
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.furgocasa.com";
 
@@ -164,7 +166,8 @@ export default async function RootLayout({
           />
         )}
       </head>
-      <body className={`${rubik.variable} ${amiko.variable} font-sans`}>
+      <body className="font-sans">
+        {/* TEMPORAL: Comentado ${rubik.variable} ${amiko.variable} hasta resolver Google Fonts */}
         <Providers>
           <CookieProvider>
             {/* Scripts de Google Analytics - Solo se cargan en páginas públicas */}
