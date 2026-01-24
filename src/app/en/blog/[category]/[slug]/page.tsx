@@ -4,9 +4,10 @@ import Image from "next/image";
 import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
 import { getPostBySlug, getRelatedPosts, incrementPostViews, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
-import { getCategoryName } from "@/lib/blog-translations";
+import { getCategoryName, getAllPostSlugTranslations } from "@/lib/blog-translations";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
+import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, type Locale } from "@/lib/translations/get-translations";
 import { translateServer } from "@/lib/i18n/server-translation";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
@@ -166,8 +167,16 @@ export default async function LocaleBlogPostPage({
   // ⚠️ URL canónica con el idioma actual
   const url = `https://www.furgocasa.com/${locale}/blog/${category}/${slug}`;
 
+  // 🌐 Obtener slugs traducidos para el cambio de idioma dinámico
+  const blogRouteData = await getAllPostSlugTranslations(
+    post.id,
+    post.slug,
+    post.category?.slug || category
+  );
+
   return (
     <>
+      <BlogRouteDataProvider data={blogRouteData} />
       <BlogPostJsonLd post={post} url={url} />
       <main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero */}

@@ -266,3 +266,80 @@ export function getPostSlugInSpanish(slug: string, currentLang: Locale): string 
   // La búsqueda real se hace en getPostBySlug con content_translations
   return slug;
 }
+
+/**
+ * Tipo para los datos de rutas de blog que se inyectan en el HTML
+ */
+export interface BlogRouteData {
+  postId: string;
+  slugs: Record<Locale, string>;
+  category: Record<Locale, string>;
+}
+
+/**
+ * Obtiene TODOS los slugs traducidos de un post para todos los idiomas
+ * Usado para inyectar en la página y permitir cambio de idioma dinámico
+ * @param postId - El ID del post
+ * @param esSlug - El slug en español
+ * @param categorySlug - El slug de la categoría en español
+ * @returns Objeto con slugs y categorías para todos los idiomas
+ */
+export async function getAllPostSlugTranslations(
+  postId: string,
+  esSlug: string,
+  categorySlug: string
+): Promise<BlogRouteData> {
+  const locales: Locale[] = ['es', 'en', 'fr', 'de'];
+  const slugs: Record<Locale, string> = { es: esSlug, en: esSlug, fr: esSlug, de: esSlug };
+  const category: Record<Locale, string> = { 
+    es: categorySlug, 
+    en: categorySlug, 
+    fr: categorySlug, 
+    de: categorySlug 
+  };
+  
+  try {
+    // Importar dinámicamente para Server Components
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    // 1. Buscar slug_en en la tabla posts
+    const { data: post } = await supabase
+      .from('posts')
+      .select('slug_en')
+      .eq('id', postId)
+      .single();
+    
+    if (post?.slug_en) {
+      slugs.en = post.slug_en;
+    }
+    
+    // 2. Buscar slugs traducidos en content_translations
+    const { data: translations } = await supabase
+      .from('content_translations')
+      .select('locale, translated_text')
+      .eq('source_table', 'posts')
+      .eq('source_id', postId)
+      .eq('source_field', 'slug');
+    
+    if (translations) {
+      for (const t of translations) {
+        if (t.locale && t.translated_text) {
+          slugs[t.locale as Locale] = t.translated_text;
+        }
+      }
+    }
+    
+    // 3. Traducir categorías (estas son estáticas)
+    for (const locale of locales) {
+      category[locale] = translateCategorySlug(categorySlug, locale);
+    }
+    
+  } catch (error) {
+    console.error('[getAllPostSlugTranslations] Error:', error);
+  }
+  
+  return { postId, slugs, category };
+}

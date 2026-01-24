@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { preloadTranslations } from '@/lib/translation-service';
 import { getPreloadCache, staticTranslations } from '@/lib/translations-preload';
 import { getTranslatedRoute, getLanguageFromRoute } from '@/lib/route-translations';
+import { getBlogRouteData } from '@/components/blog/blog-route-data';
 import type { Locale } from '@/lib/i18n/config';
 
 interface LanguageContextType {
@@ -57,14 +58,30 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const queryString = typeof window !== 'undefined' ? window.location.search : '';
     const hash = typeof window !== 'undefined' ? window.location.hash : '';
     
-    // Traducir la URL actual al nuevo idioma (incluyendo query params)
-    const fullPathWithParams = pathname + queryString + hash;
-    const translatedPath = getTranslatedRoute(fullPathWithParams, lang);
+    // ✅ BLOG: Comprobar si estamos en una página de blog con datos de rutas
+    const blogRouteData = getBlogRouteData();
+    const isBlogArticlePage = pathname.includes('/blog/') && 
+                              pathname.split('/').length >= 5; // /es/blog/category/slug
     
-    console.log('🔗 Navegando a:', translatedPath, '(original:', fullPathWithParams, ')');
+    let translatedPath: string;
+    
+    if (isBlogArticlePage && blogRouteData) {
+      // 🎯 BLOG DINÁMICO: Usar los slugs traducidos desde Supabase
+      const translatedSlug = blogRouteData.slugs[lang] || blogRouteData.slugs.es;
+      const translatedCategory = blogRouteData.category[lang] || blogRouteData.category.es;
+      translatedPath = `/${lang}/blog/${translatedCategory}/${translatedSlug}${queryString}${hash}`;
+      console.log('📚 Blog: usando slugs traducidos:', { translatedSlug, translatedCategory });
+    } else {
+      // Traducir la URL actual al nuevo idioma (incluyendo query params)
+      const fullPathWithParams = pathname + queryString + hash;
+      translatedPath = getTranslatedRoute(fullPathWithParams, lang);
+    }
+    
+    console.log('🔗 Navegando a:', translatedPath, '(original:', pathname, ')');
     
     // ✅ Navegar a la nueva ruta
-    if (translatedPath !== fullPathWithParams) {
+    const originalPath = pathname + queryString + hash;
+    if (translatedPath !== originalPath) {
       // Para páginas de localización (Server Components), usar recarga completa
       // para asegurar que los datos del servidor se recarguen correctamente
       const isLocationPage = pathname.includes('alquiler-autocaravanas') || 
@@ -87,7 +104,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
                            pathname.includes('recherche') ||
                            pathname.includes('suche');
       
-      if (isLocationPage || isBookingPage) {
+      if (isLocationPage || isBookingPage || isBlogArticlePage) {
         // Recarga completa para preservar query params y recargar datos del servidor
         window.location.href = translatedPath;
       } else {
