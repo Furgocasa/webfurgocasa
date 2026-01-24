@@ -336,86 +336,49 @@ const nextConfig = {
   async rewrites() {
     return [
       // ============================================
-      // ⚠️ IMPORTANTE: La mayoría de rewrites fueron ELIMINADOS
+      // ⚠️ ARQUITECTURA FIJA POR IDIOMA (/es/, /en/, /fr/, /de/)
       // ============================================
-      // Razón: Arquitectura [locale] física maneja automáticamente:
-      // - /en/blog → src/app/[locale]/blog
-      // - /fr/contacto → src/app/[locale]/contacto
-      // - etc.
-      //
-      // Solo mantenemos rewrites para rutas que AÚN NO están en [locale]:
-      // - /reservar/:id/* (flujo reserva con ID)
-      // - /pago/* (flujo de pago)
-      // - /vehiculos/:slug (páginas individuales)
-      // - /ventas/:slug (páginas individuales)
-      // - /faqs/:slug (FAQ individual)
+      // Las páginas ahora están físicamente separadas por idioma.
+      // Solo mantenemos rewrites para rutas que NO están en la estructura de idiomas:
+      // - /reservar/:id/* (flujo reserva con ID - sin idioma)
+      // - /pago/* (flujo de pago - sin idioma)
+      // - /vehiculos/:slug (páginas individuales - sin idioma)
+      // - /ventas/:slug (páginas individuales - sin idioma)
+      // - /faqs/:slug (FAQ individual - sin idioma)
       // ============================================
 
       // ============================================
-      // INGLÉS (EN) - Solo rutas especiales
+      // RUTAS FUNCIONALES (sin idioma)
       // ============================================
+      // Estas rutas traducidas apuntan a las funcionales en español
+      
+      // RESERVAR (booking flow)
       { source: '/en/book/:path*', destination: '/reservar/:path*' },
-      { source: '/en/vehicles/:slug', destination: '/vehiculos/:slug' },
-      { source: '/en/sales/:slug', destination: '/ventas/:slug' },
-      { source: '/en/faqs/:slug', destination: '/faqs/:slug' },
+      { source: '/fr/reserver/:path*', destination: '/reservar/:path*' },
+      { source: '/de/buchen/:path*', destination: '/reservar/:path*' },
+      
+      // PAGO (payment flow)
       { source: '/en/payment/success', destination: '/pago/exito' },
       { source: '/en/payment/error', destination: '/pago/error' },
-      // SEO Location EN
-      { source: '/en/rent-campervan-motorhome-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
-      { source: '/en/campervans-for-sale-in-:location', destination: '/venta-autocaravanas-camper-:location' },
-
-      // ============================================
-      // FRANCÉS (FR) - Solo rutas especiales
-      // ============================================
-      { source: '/fr/reserver/:path*', destination: '/reservar/:path*' },
-      { source: '/fr/vehicules/:slug', destination: '/vehiculos/:slug' },
-      { source: '/fr/ventes/:slug', destination: '/ventas/:slug' },
-      { source: '/fr/faqs/:slug', destination: '/faqs/:slug' },
       { source: '/fr/paiement/succes', destination: '/pago/exito' },
       { source: '/fr/paiement/erreur', destination: '/pago/error' },
-      // SEO Location FR
-      { source: '/fr/location-camping-car-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
-      { source: '/fr/camping-cars-a-vendre-:location', destination: '/venta-autocaravanas-camper-:location' },
-
-      // ============================================
-      // ALEMÁN (DE) - Solo rutas especiales
-      // ============================================
-      { source: '/de/buchen/:path*', destination: '/reservar/:path*' },
-      { source: '/de/fahrzeuge/:slug', destination: '/vehiculos/:slug' },
-      { source: '/de/verkauf/:slug', destination: '/ventas/:slug' },
-      { source: '/de/faqs/:slug', destination: '/faqs/:slug' },
       { source: '/de/zahlung/erfolg', destination: '/pago/exito' },
       { source: '/de/zahlung/fehler', destination: '/pago/error' },
-      // SEO Location DE
-      { source: '/de/wohnmobil-mieten-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
-      { source: '/de/wohnmobile-zu-verkaufen-:location', destination: '/venta-autocaravanas-camper-:location' },
-
-      // ============================================
-      // ESPAÑOL (ES) - Solo rutas especiales
-      // ============================================
-      { source: '/es/reservar/:path*', destination: '/reservar/:path*' },
-      { source: '/es/vehiculos/:slug', destination: '/vehiculos/:slug' },
-      { source: '/es/ventas/:slug', destination: '/ventas/:slug' },
-      { source: '/es/faqs/:slug', destination: '/faqs/:slug' },
-      { source: '/es/pago/exito', destination: '/pago/exito' },
-      { source: '/es/pago/error', destination: '/pago/error' },
-      // SEO Location ES
-      { source: '/es/alquiler-autocaravanas-campervans-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
-      { source: '/es/venta-autocaravanas-camper-:location', destination: '/venta-autocaravanas-camper-:location' },
-      { source: '/es/alquiler-motorhome-europa-desde-espana', destination: '/alquiler-motorhome-europa-desde-espana' },
-
-      // ============================================
-      // SIN PREFIJO - Compatibilidad legacy (mínimos necesarios)
-      // ============================================
-      { source: '/book/:path*', destination: '/reservar/:path*' },
-      { source: '/vehicles/:slug', destination: '/vehiculos/:slug' },
-      { source: '/sales/:slug', destination: '/ventas/:slug' },
-      { source: '/rent-campervan-motorhome-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
-      { source: '/campervans-for-sale-in-:location', destination: '/venta-autocaravanas-camper-:location' },
-      { source: '/location-camping-car-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
-      { source: '/camping-cars-a-vendre-:location', destination: '/venta-autocaravanas-camper-:location' },
-      { source: '/wohnmobil-mieten-:location', destination: '/alquiler-autocaravanas-campervans-:location' },
-      { source: '/wohnmobile-zu-verkaufen-:location', destination: '/venta-autocaravanas-camper-:location' },
+      
+      // VEHÍCULOS INDIVIDUALES (dinámico por slug)
+      { source: '/en/vehicles/:slug', destination: '/vehiculos/:slug' },
+      { source: '/fr/vehicules/:slug', destination: '/vehiculos/:slug' },
+      { source: '/de/fahrzeuge/:slug', destination: '/vehiculos/:slug' },
+      
+      // VENTAS INDIVIDUALES (dinámico por slug)
+      { source: '/en/sales/:slug', destination: '/ventas/:slug' },
+      { source: '/fr/ventes/:slug', destination: '/ventas/:slug' },
+      { source: '/de/verkauf/:slug', destination: '/ventas/:slug' },
+      
+      // FAQs INDIVIDUALES (dinámico por slug)
+      { source: '/en/faqs/:slug', destination: '/faqs/:slug' },
+      { source: '/fr/faqs/:slug', destination: '/faqs/:slug' },
+      { source: '/de/faqs/:slug', destination: '/faqs/:slug' },
     ];
   },
   async redirects() {
