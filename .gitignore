@@ -65,7 +65,10 @@ SUPABASE_CREDENTIALS.txt
 
 # Carpeta de imágenes locales (están en Supabase Storage)
 furgocasa_images/
-images/
+/images/
+
+# Incluir public/images en el repo
+!public/images/
 
 # Archivos de migración y logs temporales
 migration-output.txt
