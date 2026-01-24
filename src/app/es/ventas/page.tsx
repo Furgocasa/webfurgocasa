@@ -1,12 +1,10 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { VentasClient } from "./ventas-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { sortVehicleEquipment } from "@/lib/utils";
-import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
-
-interface PageProps {}
 
 // ✅ Supabase cliente servidor (igual que /vehiculos)
 const supabase = createClient(
@@ -44,10 +42,9 @@ const VENTAS_METADATA: Metadata = {
   },
 };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const locale: Locale = 'es'; // Locale fijo
-  
-  const t = (key: string) => translateServer(key, locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const alternates = buildCanonicalAlternates('/ventas', locale);
 
   return {
@@ -127,7 +124,7 @@ async function loadVehiclesForSale() {
 export const revalidate = 3600;
 
 // ✅ SERVER COMPONENT - Carga datos y los pasa al cliente
-export default async function LocaleVentasPage({ params }: PageProps) {
+export default async function VentasPage() {
   const { vehicles, categories } = await loadVehiclesForSale();
   
   return <VentasClient initialVehicles={vehicles} initialCategories={categories} />;

@@ -1,24 +1,13 @@
-import { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
-import { VehicleListClient } from "@/components/vehicle/vehicle-list-client";
-import { LocalizedLink } from "@/components/localized-link";
-import { Car } from "lucide-react";
-import { translateServer } from "@/lib/i18n/server-translation";
-import { generateMultilingualMetadata } from "@/lib/seo/multilingual-metadata";
+import { Metadata } from"next";
+import { headers } from"next/headers";
+import { createClient } from"@supabase/supabase-js";
+import { VehicleListClient } from"@/components/vehicle/vehicle-list-client";
+import { LocalizedLink } from"@/components/localized-link";
+import { Car } from"lucide-react";
+import { translateServer } from"@/lib/i18n/server-translation";
+import { generateMultilingualMetadata } from"@/lib/seo/multilingual-metadata";
 import { sortVehicleEquipment } from "@/lib/utils";
-import type { Locale } from "@/lib/i18n/config";
-import { getTranslatedRecords } from "@/lib/translations/get-translations";
-
-/**
- * 🎯 VEHÍCULOS MULTIIDIOMA - Nueva arquitectura [locale]
- * ======================================================
- * 
- * Página de listado de vehículos con soporte multiidioma físico.
- * - /es/vehiculos → Contenido español
- * - /en/vehicles → Contenido inglés
- * - /fr/vehicules → Contenido francés
- * - /de/fahrzeuge → Contenido alemán
- */
+import type { Locale } from"@/lib/i18n/config";
 
 // ✅ Supabase cliente servidor
 const supabase = createClient(
@@ -52,9 +41,6 @@ interface Vehicle {
   vehicle_equipment?: any[];
 }
 
-interface VehiclesPageProps {
-}
-
 const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; keywords: string }> = {
   es: {
     title: "Alquiler de Autocaravanas y Campers",
@@ -80,8 +66,8 @@ const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; k
 
 // ✅ METADATOS SEO con canonical + hreflang
 export async function generateMetadata(): Promise<Metadata> {
-  const locale: Locale = 'de'; // Locale fijo
-  
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   return generateMultilingualMetadata('/vehiculos', locale, VEHICULOS_METADATA);
 }
 
@@ -101,7 +87,7 @@ async function loadVehicles(): Promise<Vehicle[]> {
         )
       `)
       .eq('is_for_rent', true)
-      .neq('status', 'inactive')
+      .neq('status', 'inactive') // Excluir inactivos
       .order('internal_code');
 
     if (error) {
@@ -144,27 +130,16 @@ async function loadVehicles(): Promise<Vehicle[]> {
 export const revalidate = 3600;
 
 // ✅ SERVER COMPONENT
-export default async function LocaleVehiculosPage() {
-  const locale: Locale = 'de'; // Locale fijo
-  
-  
+export default async function VehiculosPage() {
   // Función de traducción del servidor
-  const t = (key: string) => translateServer(key, locale);
+  const t = (key: string) => translateServer(key, 'es');
   
   // Cargar todos los vehículos en el servidor
-  const vehiclesRaw = await loadVehicles();
-  
-  // Traducir vehículos según el idioma
-  const vehicles = await getTranslatedRecords(
-    'vehicles',
-    vehiclesRaw,
-    ['name', 'short_description'],
-    locale
-  );
+  const vehicles = await loadVehicles();
 
   return (
     <>
-      <main className="min-h-screen bg-gray-50">
+<main className="min-h-screen bg-gray-50">
         {/* Hero Section - SEO Content */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16 md:py-20 relative overflow-hidden">
           <div className="absolute inset-0 opacity-10" style={{
@@ -213,6 +188,6 @@ export default async function LocaleVehiculosPage() {
           </div>
         </section>
       </main>
-    </>
+</>
   );
 }

@@ -1,10 +1,8 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { FaqsClient } from "./faqs-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
-import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
-
-interface PageProps {}
 
 // 🎯 SEO Metadata - Único y optimizado para /faqs
 const FAQS_METADATA: Metadata = {
@@ -36,10 +34,9 @@ const FAQS_METADATA: Metadata = {
   },
 };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const locale: Locale = 'en'; // Locale fijo
-  
-  const t = (key: string) => translateServer(key, locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const alternates = buildCanonicalAlternates('/faqs', locale);
 
   return {
@@ -52,6 +49,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function LocaleFaqsPage({ params }: PageProps) {
+export default function FaqsPage() {
   return <FaqsClient />;
 }

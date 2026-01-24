@@ -136,11 +136,6 @@ export async function middleware(request: NextRequest) {
     '/socket.io',
     '/__nextjs_original-stack-frame',
     '/webpack-hmr',
-    '/reservar',      // ✅ Flujo de reserva (funcional, sin idioma)
-    '/pago',          // ✅ Flujo de pago (funcional, sin idioma)
-    '/vehiculos/',    // ✅ Páginas individuales de vehículos
-    '/ventas/',       // ✅ Páginas individuales de ventas
-    '/faqs/',         // ✅ FAQs individuales
   ];
 
   // ⚠️ CRÍTICO: Admin NO debe tener i18n

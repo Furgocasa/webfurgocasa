@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { LocalizedLink } from "@/components/localized-link";
 import { 
   Users, 
@@ -44,7 +43,7 @@ interface VehicleCardProps {
 }
 
 export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   // Construir parámetros para ver detalle del vehículo y seleccionar extras
   const bookingParams = new URLSearchParams({
@@ -57,8 +56,16 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
     dropoff_location: searchParams.dropoff_location,
   });
 
+  // Traducir ruta según idioma
+  const bookingPaths: Record<string, string> = {
+    es: '/reservar/vehiculo',
+    en: '/book/vehicle',
+    fr: '/reserver/vehicule',
+    de: '/buchen/fahrzeug'
+  };
+  
   // URL a la página de detalle del vehículo con selección de extras
-  const reservationUrl = `/reservar/vehiculo?${bookingParams.toString()}`;
+  const reservationUrl = `${bookingPaths[language]}?${bookingParams.toString()}`;
 
   // Get main image - Supabase usa image_url, is_primary, alt_text
   const mainImage = vehicle.images?.find((img: any) => img.is_primary || img.is_main) || vehicle.images?.[0];
@@ -68,7 +75,7 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
   return (
     <div className="card-vehicle group">
       {/* Image - Clicable */}
-      <Link href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
+      <LocalizedLink href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -89,14 +96,14 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
             {vehicle.category.name}
           </span>
         )}
-      </Link>
+      </LocalizedLink>
 
       {/* Content */}
       <div className="p-5">
         {/* Title - Clicable */}
-        <Link href={reservationUrl}>
+        <LocalizedLink href={reservationUrl}>
           <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-furgocasa-orange transition-colors cursor-pointer">{vehicle.name}</h3>
-        </Link>
+        </LocalizedLink>
 
         {/* Short description */}
         {vehicle.short_description && (
@@ -183,13 +190,13 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
               </p>
             </div>
 
-            <Link
+            <LocalizedLink
               href={reservationUrl}
               className="flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
               {t("Reservar")}
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </LocalizedLink>
           </div>
           
           {/* Info sobre descuentos disponibles - SIEMPRE VISIBLE */}

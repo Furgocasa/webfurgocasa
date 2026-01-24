@@ -1,10 +1,8 @@
 import { Metadata } from "next";
+import { headers } from "next/headers";
 import { ReservarClient } from "./reservar-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
-import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
-
-interface PageProps {}
 
 // 🎯 SEO Metadata - Único y optimizado para /reservar
 const RESERVAR_METADATA: Metadata = {
@@ -15,6 +13,7 @@ const RESERVAR_METADATA: Metadata = {
     title: "Reservar Camper Online",
     description: "Reserva tu camper en pocos pasos. Recogida en Murcia o Madrid.",
     type: "website",
+    url: "https://www.furgocasa.com/es/reservar",
     siteName: "Furgocasa",
     locale: "es_ES",
   },
@@ -36,10 +35,9 @@ const RESERVAR_METADATA: Metadata = {
   },
 };
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const locale: Locale = 'de'; // Locale fijo
-  
-  const t = (key: string) => translateServer(key, locale);
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
   const alternates = buildCanonicalAlternates('/reservar', locale);
 
   return {
@@ -52,6 +50,6 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function LocaleReservarPage({ params }: PageProps) {
+export default function ReservarPage() {
   return <ReservarClient />;
 }
