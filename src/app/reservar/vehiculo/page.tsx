@@ -258,9 +258,8 @@ function ReservarVehiculoContent() {
       params.append(`extra_${index}_quantity`, item.quantity.toString());
     });
 
-    // Usar ruta traducida según el idioma actual
-    const newBookingPath = getTranslatedRoute(`/reservar/nueva?${params.toString()}`, language);
-    router.push(newBookingPath);
+    // Ruta funcional sin prefijo de idioma
+    router.push(`/reservar/nueva?${params.toString()}`);
   };
 
   if (loading) {
