@@ -36,10 +36,14 @@ interface DetectedGap {
   gap_days: number;
   season_name: string;
   season_min_days: number;
-  season_price_per_day: number;
+  season_price_per_day: number; // Precio de la temporada (puede no incluir descuento por duración)
   previous_booking_id: string;
   next_booking_id: string;
   already_exists: boolean;
+  // Precios reales calculados (igual que búsqueda)
+  real_price_per_day?: number;
+  real_total_price?: number;
+  duration_discount?: number;
 }
 
 interface LastMinuteOffer {
@@ -93,6 +97,9 @@ export default function OfertasUltimaHoraPage() {
     discount: number;
     notes: string;
     locationId: string;
+    // Precio real calculado (mismo que búsqueda)
+    realPricePerDay: number;
+    realTotalPrice: number;
   } | null>(null);
 
   // Estado para editar oferta existente
@@ -175,12 +182,40 @@ export default function OfertasUltimaHoraPage() {
       
       // Filtrar los que ya existen
       const newGaps = (result.gaps || []).filter((g: DetectedGap) => !g.already_exists);
-      setDetectedGaps(newGaps);
       
-      if (newGaps.length === 0) {
+      // Calcular precio real para cada hueco (igual que la búsqueda)
+      const gapsWithRealPrices = await Promise.all(
+        newGaps.map(async (gap: DetectedGap) => {
+          try {
+            const priceRes = await fetch('/api/pricing/calculate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                pickup_date: gap.gap_start_date,
+                dropoff_date: gap.gap_end_date
+              })
+            });
+            const priceData = await priceRes.json();
+            if (!priceRes.ok) return gap;
+            
+            return {
+              ...gap,
+              real_price_per_day: priceData.real_price_per_day,
+              real_total_price: priceData.real_total_price,
+              duration_discount: priceData.duration_discount_percentage
+            };
+          } catch {
+            return gap;
+          }
+        })
+      );
+      
+      setDetectedGaps(gapsWithRealPrices);
+      
+      if (gapsWithRealPrices.length === 0) {
         showMessage('success', 'No se encontraron nuevos huecos entre reservas');
       } else {
-        showMessage('success', `Se encontraron ${newGaps.length} huecos potenciales`);
+        showMessage('success', `Se encontraron ${gapsWithRealPrices.length} huecos potenciales`);
       }
     } catch (error) {
       console.error('Error detecting gaps:', error);
@@ -190,19 +225,79 @@ export default function OfertasUltimaHoraPage() {
     }
   };
 
-  const openEditGap = (gap: DetectedGap) => {
+  const openEditGap = async (gap: DetectedGap) => {
     // Por defecto seleccionar Murcia
     const defaultLocation = locations.find(l => l.slug === 'murcia') || locations[0];
+    
+    // Usar precio real ya calculado o calcularlo ahora
+    let realPricePerDay = gap.real_price_per_day || gap.season_price_per_day;
+    let realTotalPrice = gap.real_total_price || (gap.season_price_per_day * gap.gap_days);
+    
+    // Si no tenemos precio real, calcularlo
+    if (!gap.real_price_per_day) {
+      try {
+        const priceRes = await fetch('/api/pricing/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pickup_date: gap.gap_start_date,
+            dropoff_date: gap.gap_end_date
+          })
+        });
+        const priceData = await priceRes.json();
+        if (priceRes.ok) {
+          realPricePerDay = priceData.real_price_per_day;
+          realTotalPrice = priceData.real_total_price;
+        }
+      } catch (e) {
+        console.error('Error calculating price:', e);
+      }
+    }
+    
     setEditingGap({
       gap,
       startDate: gap.gap_start_date,
       endDate: gap.gap_end_date,
       discount: 15,
       notes: '',
-      locationId: defaultLocation?.id || ''
+      locationId: defaultLocation?.id || '',
+      realPricePerDay,
+      realTotalPrice
     });
   };
 
+  // Recalcular precio cuando cambian las fechas de la oferta
+  const recalculateOfferPrice = async (startDate: string, endDate: string) => {
+    if (!editingGap) return;
+    
+    try {
+      const priceRes = await fetch('/api/pricing/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickup_date: startDate,
+          dropoff_date: endDate
+        })
+      });
+      const priceData = await priceRes.json();
+      if (priceRes.ok) {
+        setEditingGap(prev => prev ? {
+          ...prev,
+          startDate,
+          endDate,
+          realPricePerDay: priceData.real_price_per_day,
+          realTotalPrice: priceData.real_total_price
+        } : null);
+        return;
+      }
+    } catch (e) {
+      console.error('Error recalculating price:', e);
+    }
+    
+    // Si falla, solo actualizar fechas
+    setEditingGap(prev => prev ? { ...prev, startDate, endDate } : null);
+  };
+  
   const publishOffer = async () => {
     if (!editingGap) return;
     
@@ -216,13 +311,14 @@ export default function OfertasUltimaHoraPage() {
           detected_end_date: editingGap.gap.gap_end_date,
           offer_start_date: editingGap.startDate,
           offer_end_date: editingGap.endDate,
-          original_price_per_day: editingGap.gap.season_price_per_day,
+          // IMPORTANTE: Usar el precio REAL (con descuentos por duración aplicados)
+          original_price_per_day: editingGap.realPricePerDay,
           discount_percentage: editingGap.discount,
           previous_booking_id: editingGap.gap.previous_booking_id,
           next_booking_id: editingGap.gap.next_booking_id,
           admin_notes: editingGap.notes || null,
           pickup_location_id: editingGap.locationId,
-          dropoff_location_id: editingGap.locationId, // Mismo lugar para recogida y devolución
+          dropoff_location_id: editingGap.locationId,
           status: 'published',
           published_at: new Date().toISOString()
         })
@@ -466,11 +562,17 @@ export default function OfertasUltimaHoraPage() {
                       </span>
                       <span className="flex items-center gap-1">
                         <Euro className="h-4 w-4" />
-                        {formatPrice(gap.season_price_per_day)}/día
+                        {formatPrice(gap.real_price_per_day || gap.season_price_per_day)}/día
+                        {gap.duration_discount && gap.duration_discount > 0 && (
+                          <span className="text-xs text-green-600 ml-1">(-{gap.duration_discount}% duración)</span>
+                        )}
                       </span>
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
-                      {gap.season_name} (mínimo {gap.season_min_days} días)
+                      {gap.season_name} (mínimo {gap.season_min_days} días) 
+                      {gap.real_total_price && (
+                        <span className="ml-2">• Total normal: {formatPrice(gap.real_total_price)}</span>
+                      )}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -526,7 +628,7 @@ export default function OfertasUltimaHoraPage() {
                     value={editingGap.startDate}
                     min={editingGap.gap.gap_start_date}
                     max={editingGap.endDate}
-                    onChange={(e) => setEditingGap({ ...editingGap, startDate: e.target.value })}
+                    onChange={(e) => recalculateOfferPrice(e.target.value, editingGap.endDate)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
                   />
                 </div>
@@ -539,7 +641,7 @@ export default function OfertasUltimaHoraPage() {
                     value={editingGap.endDate}
                     min={editingGap.startDate}
                     max={editingGap.gap.gap_end_date}
-                    onChange={(e) => setEditingGap({ ...editingGap, endDate: e.target.value })}
+                    onChange={(e) => recalculateOfferPrice(editingGap.startDate, e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
                   />
                 </div>
@@ -588,18 +690,22 @@ export default function OfertasUltimaHoraPage() {
                 </p>
               </div>
 
-              {/* Resumen de precio */}
+              {/* Resumen de precio - Usa precio REAL (igual que búsqueda) */}
               <div className="bg-green-50 rounded-lg p-4">
+                <p className="text-xs text-green-600 mb-2 flex items-center gap-1">
+                  <Info className="w-3 h-3" />
+                  Precio real (con descuentos por duración aplicados)
+                </p>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600">Precio normal:</span>
+                  <span className="text-gray-600">Precio búsqueda normal:</span>
                   <span className="text-gray-500 line-through">
-                    {formatPrice(editingGap.gap.season_price_per_day)}/día
+                    {formatPrice(editingGap.realPricePerDay)}/día
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-green-700 font-medium">Precio oferta:</span>
+                  <span className="text-green-700 font-medium">Precio oferta (-{editingGap.discount}%):</span>
                   <span className="text-green-700 font-bold text-lg">
-                    {formatPrice(editingGap.gap.season_price_per_day * (100 - editingGap.discount) / 100)}/día
+                    {formatPrice(editingGap.realPricePerDay * (100 - editingGap.discount) / 100)}/día
                   </span>
                 </div>
                 <div className="border-t border-green-200 mt-3 pt-3">
@@ -609,7 +715,7 @@ export default function OfertasUltimaHoraPage() {
                     </span>
                     <span className="text-green-800 font-bold text-xl">
                       {formatPrice(
-                        editingGap.gap.season_price_per_day * 
+                        editingGap.realPricePerDay * 
                         (100 - editingGap.discount) / 100 * 
                         Math.ceil((new Date(editingGap.endDate).getTime() - new Date(editingGap.startDate).getTime()) / (1000 * 60 * 60 * 24))
                       )}

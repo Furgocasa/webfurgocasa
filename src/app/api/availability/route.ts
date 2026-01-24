@@ -5,6 +5,7 @@ import {
   calculatePricingDays, 
   calculateSeasonalPrice, 
   calculateSeasonalSurcharge,
+  calculateDurationDiscount,
   Season 
 } from "@/lib/utils";
 
@@ -140,19 +141,12 @@ export async function GET(request: NextRequest) {
     // Calcular sobrecoste promedio respecto a temporada baja
     const seasonalAddition = calculateSeasonalSurcharge(finalPricePerDay, pricingDays);
 
-    // Calcular el precio original de la temporada actual (sin descuento por duración)
-    // Este es el precio para < 7 días en la temporada dominante
-    const dominantSeason = seasons.find(s => s.name === priceResult.dominantSeason);
-    const originalSeasonPricePerDay = dominantSeason?.price_less_than_week ?? 95; // 95 si es temporada baja
+    // Calcular descuento por duración CORRECTAMENTE:
+    // Compara precio sin descuento (price_less_than_week de cada día) vs precio con descuento
+    const durationDiscountInfo = calculateDurationDiscount(pickupDate, pricingDays, seasons);
 
     // Calcular precios
     const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
-      const totalPrice = priceResult.total;
-
-      // Calcular descuento comparando con el precio de la temporada actual para < 7 días
-      const savings = originalSeasonPricePerDay - finalPricePerDay;
-      const discountPercentage = savings > 0 ? Math.round((savings / originalSeasonPricePerDay) * 100) : 0;
-
       return {
         ...vehicle,
         pricing: {
@@ -160,14 +154,14 @@ export async function GET(request: NextRequest) {
           pricingDays, // Días usados para calcular el precio
           hasTwoDayPricing, // Flag para mostrar aviso
           pricePerDay: Math.round(finalPricePerDay * 100) / 100,
-          originalPricePerDay: originalSeasonPricePerDay, // Precio de la temporada para < 7 días
-          totalPrice: Math.round(totalPrice * 100) / 100,
-          originalTotalPrice: Math.round(originalSeasonPricePerDay * pricingDays * 100) / 100,
+          originalPricePerDay: durationDiscountInfo.originalPricePerDay, // Precio promedio sin descuento por duración
+          totalPrice: Math.round(priceResult.total * 100) / 100,
+          originalTotalPrice: Math.round(durationDiscountInfo.originalTotal * 100) / 100,
           season: priceResult.dominantSeason,
           seasonBreakdown: priceResult.seasonBreakdown,
           seasonalAddition: seasonalAddition,
-          durationDiscount: discountPercentage,
-          hasDurationDiscount: discountPercentage > 0,
+          durationDiscount: durationDiscountInfo.discountPercentage,
+          hasDurationDiscount: durationDiscountInfo.discountPercentage > 0,
         },
       };
     });

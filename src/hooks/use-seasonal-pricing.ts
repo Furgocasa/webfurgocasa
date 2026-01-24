@@ -7,6 +7,7 @@ import {
   calculatePricingDays,
   calculateSeasonalPrice,
   calculateSeasonalSurcharge,
+  calculateDurationDiscount,
   Season,
   PricingResult,
   PRECIO_TEMPORADA_BAJA
@@ -139,14 +140,9 @@ export function useSeasonalPricing({
     // Calcular sobrecoste respecto a temporada baja
     const seasonalAddition = calculateSeasonalSurcharge(priceResult.avgPricePerDay, pricingDays);
     
-    // Precio original de la temporada actual (sin descuento por duración)
-    // Este es el precio para < 7 días en la temporada dominante
-    const dominantSeason = seasons.find(s => s.name === priceResult.dominantSeason);
-    const originalSeasonPricePerDay = dominantSeason?.price_less_than_week ?? PRECIO_TEMPORADA_BAJA.price_less_than_week;
-    
-    // Calcular descuento comparando con el precio de la temporada actual para < 7 días
-    const savings = originalSeasonPricePerDay - priceResult.avgPricePerDay;
-    const discountPercentage = savings > 0 ? Math.round((savings / originalSeasonPricePerDay) * 100) : 0;
+    // Calcular descuento por duración CORRECTAMENTE:
+    // Compara precio sin descuento (price_less_than_week de cada día) vs precio con descuento
+    const durationDiscountInfo = calculateDurationDiscount(pickupDate, pricingDays, seasons);
 
     return {
       days,
@@ -154,14 +150,14 @@ export function useSeasonalPricing({
       hasTwoDayPricing,
       pricePerDay: priceResult.avgPricePerDay,
       totalPrice: priceResult.total,
-      originalPricePerDay: originalSeasonPricePerDay, // Precio de la temporada para < 7 días
-      originalTotalPrice: originalSeasonPricePerDay * pricingDays,
+      originalPricePerDay: durationDiscountInfo.originalPricePerDay, // Precio promedio sin descuento por duración
+      originalTotalPrice: durationDiscountInfo.originalTotal,
       season: priceResult.dominantSeason,
       seasonBreakdown: priceResult.seasonBreakdown,
       seasonalAddition,
       minDays: priceResult.minDays,
-      hasDurationDiscount: discountPercentage > 0,
-      durationDiscount: discountPercentage,
+      hasDurationDiscount: durationDiscountInfo.discountPercentage > 0,
+      durationDiscount: durationDiscountInfo.discountPercentage,
     };
   }, [pickupDate, dropoffDate, pickupTime, dropoffTime, seasons]);
 

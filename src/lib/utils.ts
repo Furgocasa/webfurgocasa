@@ -309,6 +309,72 @@ export function calculateSeasonalPrice(
 }
 
 /**
+ * Calcula el precio SIN descuento por duración (usando price_less_than_week de cada día)
+ * Esto se usa para calcular el descuento real por duración
+ * 
+ * @param pickupDate - Fecha de inicio
+ * @param pricingDays - Días a calcular
+ * @param seasons - Temporadas activas
+ * @returns Total y promedio sin descuento por duración
+ */
+export function calculatePriceWithoutDurationDiscount(
+  pickupDate: string,
+  pricingDays: number,
+  seasons: Season[]
+): { total: number; avgPricePerDay: number } {
+  let total = 0;
+  const startDate = new Date(pickupDate);
+  
+  for (let i = 0; i < pricingDays; i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+    const dateStr = currentDate.toISOString().split('T')[0];
+    
+    const season = getSeasonForDate(dateStr, seasons);
+    // Siempre usar price_less_than_week (sin descuento por duración)
+    const priceForDay = season?.price_less_than_week ?? PRECIO_TEMPORADA_BAJA.price_less_than_week;
+    total += priceForDay;
+  }
+  
+  return {
+    total: Math.round(total * 100) / 100,
+    avgPricePerDay: Math.round((total / pricingDays) * 100) / 100
+  };
+}
+
+/**
+ * Calcula el descuento por duración comparando:
+ * - Precio sin descuento (price_less_than_week de cada día)
+ * - Precio con descuento (según tramo de duración de cada día)
+ * 
+ * @returns Porcentaje de descuento (0 si no hay descuento)
+ */
+export function calculateDurationDiscount(
+  pickupDate: string,
+  pricingDays: number,
+  seasons: Season[]
+): { discountPercentage: number; originalTotal: number; discountedTotal: number; originalPricePerDay: number } {
+  // Precio SIN descuento por duración
+  const withoutDiscount = calculatePriceWithoutDurationDiscount(pickupDate, pricingDays, seasons);
+  
+  // Precio CON descuento por duración
+  const withDiscount = calculateSeasonalPrice(pickupDate, pricingDays, seasons);
+  
+  // Calcular descuento
+  const savings = withoutDiscount.total - withDiscount.total;
+  const discountPercentage = savings > 0 
+    ? Math.round((savings / withoutDiscount.total) * 100) 
+    : 0;
+  
+  return {
+    discountPercentage,
+    originalTotal: withoutDiscount.total,
+    discountedTotal: withDiscount.total,
+    originalPricePerDay: withoutDiscount.avgPricePerDay
+  };
+}
+
+/**
  * Calcula el sobrecoste promedio respecto a temporada baja
  */
 export function calculateSeasonalSurcharge(avgPricePerDay: number, pricingDays: number): number {
