@@ -225,7 +225,7 @@ export default async function LocationPage({ params }: PageProps) {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src={heroImageUrl}
-            alt={location.h1_title || `${t("Alquiler de Autocaravanas en")} ${location.name}`}
+            alt={location.h1_title || `${t("Alquiler de Autocaravanas (motorhomes) en")} ${location.name}`}
             fill
             priority
             fetchPriority="high"
@@ -288,10 +288,10 @@ export default async function LocationPage({ params }: PageProps) {
         <section className="py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
-              {/* H2 siempre "ALQUILER CAMPER {ciudad}" */}
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
+              {/* H1 siempre "ALQUILER CAMPER {ciudad}" */}
+              <h1 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
                 {t("ALQUILER CAMPER")} {location.name.toUpperCase()}
-              </h2>
+              </h1>
 
               {/* Texto fijo */}
               <p className="text-xl text-gray-600 mb-8">
