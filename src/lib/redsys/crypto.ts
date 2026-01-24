@@ -2,6 +2,9 @@ import crypto from "crypto";
 
 /**
  * Cifra los datos usando 3DES con la clave del comercio
+ * 
+ * IMPORTANTE: Trabaja con Buffers y convierte a base64 al final.
+ * NO concatenar strings base64 porque produce resultados incorrectos.
  */
 export function encrypt3DES(data: string, key: string): string {
   const keyBuffer = Buffer.from(key, "base64");
@@ -10,10 +13,13 @@ export function encrypt3DES(data: string, key: string): string {
   const cipher = crypto.createCipheriv("des-ede3-cbc", keyBuffer, iv);
   cipher.setAutoPadding(true);
 
-  let encrypted = cipher.update(data, "utf8", "base64");
-  encrypted += cipher.final("base64");
+  // Trabajar con Buffers y concatenar ANTES de convertir a base64
+  const encrypted = Buffer.concat([
+    cipher.update(data, "utf8"),
+    cipher.final()
+  ]);
 
-  return encrypted;
+  return encrypted.toString("base64");
 }
 
 /**
@@ -26,10 +32,13 @@ export function decrypt3DES(data: string, key: string): string {
   const decipher = crypto.createDecipheriv("des-ede3-cbc", keyBuffer, iv);
   decipher.setAutoPadding(true);
 
-  let decrypted = decipher.update(data, "base64", "utf8");
-  decrypted += decipher.final("utf8");
+  // Trabajar con Buffers
+  const decrypted = Buffer.concat([
+    decipher.update(data, "base64"),
+    decipher.final()
+  ]);
 
-  return decrypted;
+  return decrypted.toString("utf8");
 }
 
 /**
