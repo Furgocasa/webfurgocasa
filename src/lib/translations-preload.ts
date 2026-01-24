@@ -465,6 +465,146 @@ export const staticTranslations = {
     de: "Höhe"
   },
   
+  // Búsqueda y reservas - VehicleCard
+  "Reservar": {
+    es: "Reservar",
+    en: "Book",
+    fr: "Réserver",
+    de: "Buchen"
+  },
+  "Buscando vehículos disponibles...": {
+    es: "Buscando vehículos disponibles...",
+    en: "Searching available vehicles...",
+    fr: "Recherche des véhicules disponibles...",
+    de: "Suche verfügbare Fahrzeuge..."
+  },
+  "Error al buscar disponibilidad": {
+    es: "Error al buscar disponibilidad",
+    en: "Error searching availability",
+    fr: "Erreur lors de la recherche de disponibilité",
+    de: "Fehler bei der Verfügbarkeitssuche"
+  },
+  "plazas día": {
+    es: "plazas día",
+    en: "day seats",
+    fr: "places jour",
+    de: "Tagessitze"
+  },
+  "plazas noche": {
+    es: "plazas noche",
+    en: "night beds",
+    fr: "couchages",
+    de: "Schlafplätze"
+  },
+  "Precio especial 2 días": {
+    es: "Precio especial 2 días",
+    en: "Special 2-day price",
+    fr: "Prix spécial 2 jours",
+    de: "Sonderpreis 2 Tage"
+  },
+  "Alquileres de 2 días se cobran como 3 días (mismo precio)": {
+    es: "Alquileres de 2 días se cobran como 3 días (mismo precio)",
+    en: "2-day rentals are charged as 3 days (same price)",
+    fr: "Les locations de 2 jours sont facturées comme 3 jours (même prix)",
+    de: "2-Tage-Mieten werden wie 3 Tage berechnet (gleicher Preis)"
+  },
+  "Descuento aplicado": {
+    es: "Descuento aplicado",
+    en: "Discount applied",
+    fr: "Remise appliquée",
+    de: "Rabatt angewendet"
+  },
+  "/día": {
+    es: "/día",
+    en: "/day",
+    fr: "/jour",
+    de: "/Tag"
+  },
+  "días": {
+    es: "días",
+    en: "days",
+    fr: "jours",
+    de: "Tage"
+  },
+  "Descuentos por duración": {
+    es: "Descuentos por duración",
+    en: "Duration discounts",
+    fr: "Remises sur la durée",
+    de: "Dauerrabatte"
+  },
+  "No hay vehículos disponibles": {
+    es: "No hay vehículos disponibles",
+    en: "No vehicles available",
+    fr: "Aucun véhicule disponible",
+    de: "Keine Fahrzeuge verfügbar"
+  },
+  "Resultados de búsqueda": {
+    es: "Resultados de búsqueda",
+    en: "Search results",
+    fr: "Résultats de recherche",
+    de: "Suchergebnisse"
+  },
+  "vehículos encontrados": {
+    es: "vehículos encontrados",
+    en: "vehicles found",
+    fr: "véhicules trouvés",
+    de: "Fahrzeuge gefunden"
+  },
+  "Filtrar por": {
+    es: "Filtrar por",
+    en: "Filter by",
+    fr: "Filtrer par",
+    de: "Filtern nach"
+  },
+  "Ordenar por": {
+    es: "Ordenar por",
+    en: "Sort by",
+    fr: "Trier par",
+    de: "Sortieren nach"
+  },
+  "Recomendados": {
+    es: "Recomendados",
+    en: "Recommended",
+    fr: "Recommandés",
+    de: "Empfohlen"
+  },
+  "Precio: menor a mayor": {
+    es: "Precio: menor a mayor",
+    en: "Price: low to high",
+    fr: "Prix: croissant",
+    de: "Preis: aufsteigend"
+  },
+  "Precio: mayor a menor": {
+    es: "Precio: mayor a menor",
+    en: "Price: high to low",
+    fr: "Prix: décroissant",
+    de: "Preis: absteigend"
+  },
+  "Capacidad": {
+    es: "Capacidad",
+    en: "Capacity",
+    fr: "Capacité",
+    de: "Kapazität"
+  },
+  "Todos": {
+    es: "Todos",
+    en: "All",
+    fr: "Tous",
+    de: "Alle"
+  },
+  "Manual": {
+    es: "Manual",
+    en: "Manual",
+    fr: "Manuelle",
+    de: "Manuell"
+  },
+  "Automático": {
+    es: "Automático",
+    en: "Automatic",
+    fr: "Automatique",
+    de: "Automatik"
+  },
+  
   // Extras
   "Extras disponibles": {
     es: "Extras disponibles",
