@@ -8,8 +8,8 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const COMO_RESERVAR_FIN_SEMANA_METADATA: Metadata = {
-  title: "Cómo Reservar un Fin de Semana",
-  description: "Guía completa para alquilar una camper de fin de semana. Horarios, precios y condiciones especiales para escapadas cortas.",
+  title: "Comment Réserver un Week-end",
+  description: "Guide complet pour louer un camping-car pour le week-end. Horaires, prix et conditions spéciales pour les escapades courtes.",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -28,10 +28,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const steps = [
-  { step:"1", title:"Elige tu fecha", desc:"Selecciona el viernes de recogida en nuestro calendario", icon: Calendar },
-  { step:"2", title:"Selecciona el vehículo", desc:"Elige entre los campers disponibles para esas fechas", icon: CheckCircle },
-  { step:"3", title:"Añade extras", desc:"Sillas, mesa, kit de playa... lo que necesites", icon: CheckCircle },
-  { step:"4", title:"Confirma y paga", desc:"Solo el 30% de señal. El resto a la recogida", icon: Euro },
+  { step:"1", title:"Choisissez votre date", desc:"Sélectionnez le vendredi de récupération dans notre calendrier", icon: Calendar },
+  { step:"2", title:"Sélectionnez le véhicule", desc:"Choisissez parmi les camping-cars disponibles pour ces dates", icon: CheckCircle },
+  { step:"3", title:"Ajoutez des extras", desc:"Chaises, table, kit plage... ce dont vous avez besoin", icon: CheckCircle },
+  { step:"4", title:"Confirmez et payez", desc:"Seulement 30% d'acompte. Le reste à la récupération", icon: Euro },
 ];
 
 export default async function LocaleComoReservarFinSemanaPage({ params }: PageProps) {

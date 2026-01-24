@@ -10,28 +10,28 @@ export function FaqsClient() {
 
   const faqs = [
     {
-      question: "Requisitos para alquilar una camper",
-      answer: "Para alquilar una de nuestras campers es necesario tener al menos 25 años y 2 años de antigüedad en el carnet de conducir tipo B. Además, se requiere una fianza de 600€ que se devuelve al finalizar el alquiler si todo está correcto."
+      question: "Anforderungen für die Wohnmobil-Miete",
+      answer: "Um eines unserer Wohnmobile zu mieten, müssen Sie mindestens 25 Jahre alt sein und einen Führerschein der Klasse B mit mindestens 2 Jahren Erfahrung haben. Außerdem ist eine Kaution von 600€ erforderlich, die nach Beendigung der Miete zurückerstattet wird, wenn alles in Ordnung ist."
     },
     {
-      question: "¿Qué incluye el precio del alquiler?",
-      answer: "El precio incluye kilometraje ilimitado (para alquileres de más de 7 días), seguro a todo riesgo con franquicia, asistencia en carretera 24h, menaje de cocina completo, kit de limpieza, calzos niveladores, cable de conexión eléctrica y manguera de agua."
+      question: "Was ist im Mietpreis enthalten?",
+      answer: "Der Preis beinhaltet unbegrenzte Kilometer (für Mieten von mehr als 7 Tagen), Vollkaskoversicherung mit Selbstbeteiligung, 24-Stunden-Pannenhilfe, vollständiges Küchengeschirr, Reinigungsset, Nivellierklötze, Stromanschlusskabel und Wasserschlauch."
     },
     {
-      question: "¿Puedo viajar con mi mascota?",
-      answer: "¡Sí! En Furgocasa somos pet-friendly. Puedes viajar con tu mascota abonando un suplemento de limpieza extra. Solo pedimos que nos avises al hacer la reserva y que cuides el interior del vehículo."
+      question: "Kann ich mit meinem Haustier reisen?",
+      answer: "Ja! Bei Furgocasa sind wir haustierfreundlich. Sie können mit Ihrem Haustier reisen, indem Sie einen zusätzlichen Reinigungszuschlag zahlen. Wir bitten Sie nur, uns bei der Buchung zu informieren und das Fahrzeuginnere zu pflegen."
     },
     {
-      question: "¿Dónde puedo recoger y devolver la camper?",
-      answer: "Nuestra base principal está en Murcia. Las entregas y devoluciones se realizan en nuestras instalaciones. Ofrecemos servicio de transfer al aeropuerto o estación de tren bajo petición y con coste adicional."
+      question: "Wo kann ich das Wohnmobil abholen und zurückgeben?",
+      answer: "Unsere Hauptbasis befindet sich in Murcia. Die Übergaben und Rückgaben erfolgen in unseren Einrichtungen. Wir bieten auf Anfrage und gegen zusätzliche Gebühr einen Transfer-Service zum Flughafen oder Bahnhof an."
     },
     {
-      question: "¿Qué pasa si tengo una avería durante el viaje?",
-      answer: "Contamos con asistencia en carretera 24/7 en toda Europa. Además, dispones de nuestro teléfono de soporte técnico y el chat de IA para resolver dudas menores o guiarte en caso de incidencia."
+      question: "Was passiert, wenn ich während der Reise eine Panne habe?",
+      answer: "Wir bieten 24/7 Pannenhilfe in ganz Europa. Außerdem haben Sie unsere technische Support-Telefonnummer und den KI-Chat zur Verfügung, um kleinere Fragen zu klären oder Sie bei Vorfällen zu führen."
     },
     {
-      question: "¿Hay límite de kilómetros?",
-      answer: "Para alquileres de 7 días o más, el kilometraje es ilimitado. Para alquileres más cortos, incluimos 300km por día. El exceso se cobra a 0,25€/km."
+      question: "Gibt es ein Kilometerlimit?",
+      answer: "Für Mieten von 7 Tagen oder mehr ist die Kilometerleistung unbegrenzt. Für kürzere Mieten sind 300 km pro Tag enthalten. Überschreitungen werden mit 0,25€/km berechnet."
     }
   ];
 

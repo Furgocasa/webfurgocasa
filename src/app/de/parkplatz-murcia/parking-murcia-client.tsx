@@ -9,43 +9,43 @@ export function ParkingMurciaClient() {
   const features = [
     { 
       icon: Key, 
-      title: "Acceso Libre", 
-      description: "Accede a nuestras instalaciones en cualquier momento, sin restricciones horarias."
+      title: "Freier Zugang", 
+      description: "Zugang zu unseren Einrichtungen jederzeit, ohne zeitliche Einschränkungen."
     },
     { 
       icon: Camera, 
-      title: "Video Vigilancia", 
-      description: "Contamos con un sistema de videovigilancia para garantizar la seguridad de las instalaciones."
+      title: "Videoüberwachung", 
+      description: "Wir verfügen über ein Videoüberwachungssystem zur Gewährleistung der Sicherheit der Einrichtungen."
     },
     { 
       icon: Maximize, 
-      title: "Plazas Grandes", 
-      description: "Ofrecemos plazas amplias para facilitar la maniobrabilidad de tu autocaravana."
+      title: "Große Stellplätze", 
+      description: "Wir bieten geräumige Stellplätze für einfaches Manövrieren Ihres Wohnmobils."
     },
     { 
       icon: FileCheck, 
-      title: "Licencia de Actividad", 
-      description: "Operamos con todas las licencias y permisos necesarios, asegurando un servicio profesional."
+      title: "Betriebsgenehmigung", 
+      description: "Wir arbeiten mit allen erforderlichen Lizenzen und Genehmigungen für einen professionellen Service."
     },
     { 
       icon: Shield, 
-      title: "Cobertura de Seguro", 
-      description: "Tu vehículo estará protegido bajo nuestra póliza de seguro mientras permanezca aquí."
+      title: "Versicherungsschutz", 
+      description: "Ihr Fahrzeug ist durch unsere Versicherungspolice geschützt, solange es hier steht."
     },
     { 
       icon: Plug, 
-      title: "Plazas con Electricidad", 
-      description: "Disponemos de plazas equipadas con suministro eléctrico para mantener tus baterías."
+      title: "Stellplätze mit Strom", 
+      description: "Wir haben Stellplätze mit Stromversorgung, um Ihre Batterien aufzuladen."
     },
     { 
       icon: Droplets, 
-      title: "Zona de Aguas", 
-      description: "Zona habilitada para el abastecimiento de agua potable y vaciado de grises."
+      title: "Wasserzone", 
+      description: "Bereich für Frischwasserversorgung und Grauwasserentsorgung."
     },
     { 
       icon: Scale, 
-      title: "Vaciado WC químico", 
-      description: "Punto específico para el vaciado seguro y limpio de los depósitos de tu WC químico."
+      title: "Chemie-WC Entleerung", 
+      description: "Spezieller Punkt für die sichere und saubere Entleerung Ihrer Chemie-WC-Tanks."
     },
   ];
 

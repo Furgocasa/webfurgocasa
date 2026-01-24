@@ -10,8 +10,8 @@ interface PageProps {}
 export const revalidate = 86400;
 
 const SITEMAP_HTML_METADATA: Metadata = {
-  title: "Sitemap HTML",
-  description: "Mapa del sitio en HTML con todas las URLs públicas.",
+  title: "Plan du Site HTML",
+  description: "Plan du site en HTML avec toutes les URLs publiques.",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

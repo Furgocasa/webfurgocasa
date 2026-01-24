@@ -8,8 +8,8 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const COMO_RESERVAR_FIN_SEMANA_METADATA: Metadata = {
-  title: "Cómo Reservar un Fin de Semana",
-  description: "Guía completa para alquilar una camper de fin de semana. Horarios, precios y condiciones especiales para escapadas cortas.",
+  title: "How to Book a Weekend",
+  description: "Complete guide to rent a camper for the weekend. Schedules, prices and special conditions for short getaways.",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -28,10 +28,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const steps = [
-  { step:"1", title:"Elige tu fecha", desc:"Selecciona el viernes de recogida en nuestro calendario", icon: Calendar },
-  { step:"2", title:"Selecciona el vehículo", desc:"Elige entre los campers disponibles para esas fechas", icon: CheckCircle },
-  { step:"3", title:"Añade extras", desc:"Sillas, mesa, kit de playa... lo que necesites", icon: CheckCircle },
-  { step:"4", title:"Confirma y paga", desc:"Solo el 30% de señal. El resto a la recogida", icon: Euro },
+  { step:"1", title:"Choose your date", desc:"Select the Friday pick-up date in our calendar", icon: Calendar },
+  { step:"2", title:"Select the vehicle", desc:"Choose from the available campers for those dates", icon: CheckCircle },
+  { step:"3", title:"Add extras", desc:"Chairs, table, beach kit... whatever you need", icon: CheckCircle },
+  { step:"4", title:"Confirm and pay", desc:"Only 30% deposit. The rest on pick-up", icon: Euro },
 ];
 
 export default async function LocaleComoReservarFinSemanaPage({ params }: PageProps) {
@@ -45,8 +45,8 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
             <Calendar className="h-16 w-16 text-furgocasa-orange mx-auto mb-4" />
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">¿Cómo reservar un fin de semana?</h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">Escapadas cortas a partir de 2 noches. Perfecto para probar la experiencia camper.</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">How to book a weekend?</h1>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">Short getaways from 2 nights. Perfect to try the camper experience.</p>
           </div>
         </section>
 
@@ -54,22 +54,22 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
         <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
             <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center flex items-center justify-center gap-2">
-              <Clock className="h-7 w-7 text-furgocasa-orange" />Horarios de fin de semana
+              <Clock className="h-7 w-7 text-furgocasa-orange" />Weekend Schedule
             </h2>
             <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
               <div className="bg-green-50 border border-green-200 rounded-xl p-6">
-                <h3 className="font-bold text-green-800 mb-4">Recogida - VIERNES</h3>
+                <h3 className="font-bold text-green-800 mb-4">Pick-up - FRIDAY</h3>
                 <div className="space-y-2 text-green-700">
-                  <p className="flex items-center gap-2"><Clock className="h-4 w-4" />De 17:00 a 19:00</p>
-                  <p className="text-sm">Te esperamos para entregarte el camper totalmente preparado y explicarte su funcionamiento.</p>
+                  <p className="flex items-center gap-2"><Clock className="h-4 w-4" />From 5:00 PM to 7:00 PM</p>
+                  <p className="text-sm">We will be waiting to hand over the fully prepared camper and explain how it works.</p>
                 </div>
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-                <h3 className="font-bold text-blue-800 mb-4">Devolución - DOMINGO o LUNES</h3>
+                <h3 className="font-bold text-blue-800 mb-4">Return - SUNDAY or MONDAY</h3>
                 <div className="space-y-2 text-blue-700">
-                  <p className="flex items-center gap-2"><Clock className="h-4 w-4" />Domingo antes de las 20:00</p>
-                  <p className="flex items-center gap-2"><Clock className="h-4 w-4" />Lunes antes de las 10:00</p>
-                  <p className="text-sm">Elige la opción que mejor te convenga. La devolución el lunes cuenta como día extra.</p>
+                  <p className="flex items-center gap-2"><Clock className="h-4 w-4" />Sunday before 8:00 PM</p>
+                  <p className="flex items-center gap-2"><Clock className="h-4 w-4" />Monday before 10:00 AM</p>
+                  <p className="text-sm">Choose the option that suits you best. Monday return counts as an extra day.</p>
                 </div>
               </div>
             </div>
@@ -79,7 +79,7 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
         {/* Pasos */}
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Cómo reservar paso a paso</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">How to book step by step</h2>
             <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
               {steps.map((item) => (
                 <div key={item.step} className="text-center">
@@ -91,7 +91,7 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
             </div>
             <div className="text-center mt-8">
               <LocalizedLink href={`/${locale}/reservar`} className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-semibold py-3 px-8 rounded-lg hover:bg-furgocasa-orange-dark transition-colors">
-                Reservar ahora<ArrowRight className="h-5 w-5" />
+                Book now<ArrowRight className="h-5 w-5" />
               </LocalizedLink>
             </div>
           </div>
@@ -100,25 +100,25 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
         {/* Precios */}
         <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Precios de fin de semana</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Weekend prices</h2>
             <div className="max-w-2xl mx-auto">
               <div className="bg-gray-50 rounded-xl p-6 mb-6">
                 <div className="flex items-center justify-between mb-4">
-                  <span className="font-bold text-gray-900">2 noches (Viernes - Domingo)</span>
-                  <span className="text-2xl font-bold text-furgocasa-orange">Desde 220€</span>
+                  <span className="font-bold text-gray-900">2 nights (Friday - Sunday)</span>
+                  <span className="text-2xl font-bold text-furgocasa-orange">From €220</span>
                 </div>
                 <div className="flex items-center justify-between mb-4">
-                  <span className="font-bold text-gray-900">3 noches (Viernes - Lunes)</span>
-                  <span className="text-2xl font-bold text-furgocasa-orange">Desde 300€</span>
+                  <span className="font-bold text-gray-900">3 nights (Friday - Monday)</span>
+                  <span className="text-2xl font-bold text-furgocasa-orange">From €300</span>
                 </div>
-                <p className="text-sm text-gray-500">* Precios orientativos. Varían según vehículo y temporada.</p>
+                <p className="text-sm text-gray-500">* Approximate prices. Vary by vehicle and season.</p>
               </div>
               <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="h-5 w-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-yellow-700">
-                    <p className="font-semibold mb-1">Importante</p>
-                    <p>En temporada alta (julio, agosto, puentes festivos) el alquiler mínimo puede ser de 7 días. Consulta disponibilidad.</p>
+                    <p className="font-semibold mb-1">Important</p>
+                    <p>During high season (July, August, bank holidays) the minimum rental may be 7 days. Check availability.</p>
                   </div>
                 </div>
               </div>
@@ -129,9 +129,9 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
         {/* Incluido */}
         <section className="py-12 bg-gray-50">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">¿Qué incluye?</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">What&apos;s included?</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
-              {["Seguro a todo riesgo","Asistencia en carretera 24h","Kilómetros ilimitados","Kit de cocina completo","Ropa de cama y toallas","Sillas y mesa de camping","Depósito de agua lleno","Bombona de gas","Segundo conductor",
+              {["Full insurance coverage","24h roadside assistance","Unlimited kilometers","Complete kitchen kit","Bedding and towels","Camping chairs and table","Full water tank","Gas bottle","Second driver",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2 bg-white p-3 rounded-lg">
                   <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
@@ -145,13 +145,13 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
         {/* FAQ */}
         <section className="py-12 bg-white">
           <div className="container mx-auto px-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Preguntas frecuentes</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Frequently asked questions</h2>
             <div className="max-w-2xl mx-auto space-y-4">
               {[
-                { q:"¿Puedo recoger el sábado por la mañana?", a:"Sí, pero en ese caso la devolución sería el lunes antes de las 10:00 para completar las 2 noches mínimas." },
-                { q:"¿Hay algún recargo por fin de semana?", a:"No, el precio por día es el mismo. Solo aplicamos las tarifas de temporada correspondientes." },
-                { q:"¿Puedo alargar el alquiler si me gusta?", a:"Sí, si el vehículo está disponible puedes alargar tu estancia. Avísanos con la mayor antelación posible." },
-                { q:"¿Y si llueve todo el fin de semana?", a:"Las condiciones meteorológicas no son motivo de cancelación. Pero recuerda que una camper es genial también con lluvia." },
+                { q:"Can I pick up on Saturday morning?", a:"Yes, but in that case the return would be Monday before 10:00 AM to complete the minimum 2 nights." },
+                { q:"Is there any weekend surcharge?", a:"No, the price per day is the same. We only apply the corresponding seasonal rates." },
+                { q:"Can I extend the rental if I like it?", a:"Yes, if the vehicle is available you can extend your stay. Let us know as soon as possible." },
+                { q:"What if it rains all weekend?", a:"Weather conditions are not a reason for cancellation. But remember that a camper is great even in the rain." },
               ].map((faq, i) => (
                 <div key={i} className="bg-gray-50 rounded-xl p-6">
                   <h3 className="font-bold text-gray-900 mb-2">{faq.q}</h3>
@@ -160,7 +160,7 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
               ))}
             </div>
             <div className="text-center mt-6">
-              <LocalizedLink href={`/${locale}/faqs`} className="text-furgocasa-orange hover:underline">Ver todas las FAQs →</LocalizedLink>
+              <LocalizedLink href={`/${locale}/faqs`} className="text-furgocasa-orange hover:underline">View all FAQs →</LocalizedLink>
             </div>
           </div>
         </section>
@@ -168,14 +168,14 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
         {/* CTA */}
         <section className="py-16 bg-furgocasa-blue">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl font-bold text-white mb-4">¿Listo para tu escapada?</h2>
-            <p className="text-white/80 mb-8">Reserva ahora y empieza a planear tu aventura de fin de semana</p>
+            <h2 className="text-3xl font-bold text-white mb-4">Ready for your getaway?</h2>
+            <p className="text-white/80 mb-8">Book now and start planning your weekend adventure</p>
             <div className="flex flex-wrap justify-center gap-4">
               <LocalizedLink href={`/${locale}/reservar`} className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-semibold py-3 px-8 rounded-lg hover:bg-furgocasa-orange-dark transition-colors">
-                Reservar fin de semana<ArrowRight className="h-5 w-5" />
+                Book weekend<ArrowRight className="h-5 w-5" />
               </LocalizedLink>
               <a href="tel:+34968000000" className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors">
-                <Phone className="h-5 w-5" />Llamar
+                <Phone className="h-5 w-5" />Call us
               </a>
             </div>
           </div>

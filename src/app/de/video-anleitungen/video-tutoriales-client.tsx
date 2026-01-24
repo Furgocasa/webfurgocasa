@@ -6,39 +6,39 @@ import { useLanguage } from "@/contexts/language-context";
 
 const videoTutorials = [
   {
-    title: "Panel de Control",
+    title: "Bedienfeld",
     youtubeId: "PANEL_CONTROL_ID",
-    description: "Aprende a usar el panel de control de tu camper"
+    description: "Lernen Sie, das Bedienfeld Ihres Wohnmobils zu benutzen"
   },
   {
-    title: "Depósitos de agua",
+    title: "Wassertanks",
     youtubeId: "DEPOSITOS_AGUA_ID",
-    description: "Cómo funcionan los depósitos de agua limpia y residual"
+    description: "Wie die Frisch- und Abwassertanks funktionieren"
   },
   {
-    title: "Sistemas eléctricos",
+    title: "Elektrische Systeme",
     youtubeId: "SISTEMAS_ELECTRICOS_ID",
-    description: "Todo sobre el sistema eléctrico de la camper"
+    description: "Alles über das elektrische System des Wohnmobils"
   },
   {
-    title: "Calefacción y agua caliente",
+    title: "Heizung und Warmwasser",
     youtubeId: "CALEFACCION_ID",
-    description: "Uso de la calefacción y el sistema de agua caliente"
+    description: "Nutzung der Heizung und des Warmwassersystems"
   },
   {
-    title: "Ventanas, cubre soles y mosquiteras",
+    title: "Fenster, Sonnenschutz und Moskitonetze",
     youtubeId: "VENTANAS_ID",
-    description: "Manejo de ventanas, cortinas y mosquiteras"
+    description: "Bedienung von Fenstern, Vorhängen und Moskitonetzen"
   },
   {
-    title: "Escalón exterior",
+    title: "Außenstufe",
     youtubeId: "ESCALON_ID",
-    description: "Uso correcto del escalón exterior"
+    description: "Richtige Verwendung der Außenstufe"
   },
   {
-    title: "Nevera y congelador",
+    title: "Kühlschrank und Gefrierfach",
     youtubeId: "NEVERA_ID",
-    description: "Funcionamiento de la nevera y congelador"
+    description: "Funktionsweise von Kühlschrank und Gefrierfach"
   },
 ];
 

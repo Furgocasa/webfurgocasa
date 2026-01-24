@@ -6,13 +6,13 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /buscar
+// 🎯 SEO Metadata - Unique and optimized for /search
 const BUSCAR_METADATA: Metadata = {
-  title: "Buscar Disponibilidad de Campers",
-  description: "Busca y compara la disponibilidad de campers y autocaravanas para tus fechas de viaje. Reserva online tu camper ideal con Furgocasa.",
-  keywords: "buscar camper disponible, disponibilidad autocaravana, reservar camper fechas, buscar alquiler camper",
+  title: "Search Campervan Availability",
+  description: "Search and compare campervan and motorhome availability for your travel dates. Book your ideal campervan online with Furgocasa.",
+  keywords: "search available campervan, motorhome availability, book camper dates, find camper rental",
   robots: {
-    index: false, // Página de resultados de búsqueda, no indexar
+    index: false, // Search results page, do not index
     follow: true,
   },
 };

@@ -36,11 +36,11 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Alquiler de Campers y Autocaravanas en Murcia - Furgocasa",
+    default: "Alquiler de Campers y Autocaravanas en España - Furgocasa",
     template: "%s - Furgocasa",
   },
   description:
-    "Alquila tu camper o autocaravana en Murcia. Vive la aventura con Furgocasa. Flota de vehículos equipados para tus vacaciones.",
+    "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa. Flota premium de vehículos equipados para tus vacaciones.",
   keywords: [
     "alquiler camper",
     "alquiler autocaravana",
@@ -73,7 +73,7 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: baseUrl,
     siteName: "Furgocasa",
-    title: "Alquiler de Campers y Autocaravanas en Murcia - Furgocasa",
+    title: "Alquiler de Campers y Autocaravanas en España - Furgocasa",
     description:
       "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa.",
     images: [

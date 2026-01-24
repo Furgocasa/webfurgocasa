@@ -5,16 +5,16 @@ import { LocalizedLink } from "@/components/localized-link";
 import { Crown, Percent, Gift, Calendar, Star, CheckCircle, ArrowRight } from "lucide-react";
 
 const benefits = [
-  { icon: Percent, title: "10% de descuento permanente", description: "En todos tus alquileres, sin códigos ni condiciones" },
-  { icon: Calendar, title: "Prioridad en reservas", description: "Acceso anticipado a fechas de alta demanda" },
-  { icon: Gift, title: "Extras gratuitos", description: "Sillas de camping, nevera portátil y kit de playa incluidos" },
-  { icon: Star, title: "Late check-out gratuito", description: "Devuelve hasta las 14:00 sin coste adicional" },
+  { icon: Percent, title: "10% Dauerrabatt", description: "Auf alle Ihre Mieten, ohne Codes oder Bedingungen" },
+  { icon: Calendar, title: "Buchungspriorität", description: "Frühzeitiger Zugang zu stark nachgefragten Terminen" },
+  { icon: Gift, title: "Kostenlose Extras", description: "Campingstühle, tragbare Kühlbox und Strand-Kit inklusive" },
+  { icon: Star, title: "Kostenloser Late Check-out", description: "Rückgabe bis 14:00 Uhr ohne Aufpreis" },
 ];
 
 const howToJoin = [
-  { step: "1", title: "Alquila con nosotros", description: "Completa tu primer alquiler con Furgocasa" },
-  { step: "2", title: "Acumula días", description: "Por cada 10 días de alquiler, entras en el programa VIP" },
-  { step: "3", title: "Disfruta los beneficios", description: "Automáticamente en tu siguiente reserva" },
+  { step: "1", title: "Mieten Sie bei uns", description: "Schließen Sie Ihre erste Miete bei Furgocasa ab" },
+  { step: "2", title: "Sammeln Sie Tage", description: "Für alle 10 Miettage werden Sie VIP-Mitglied" },
+  { step: "3", title: "Genießen Sie die Vorteile", description: "Automatisch bei Ihrer nächsten Buchung" },
 ];
 
 export function ClientesVipClient() {

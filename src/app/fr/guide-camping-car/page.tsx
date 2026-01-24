@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /guia-camper
+// 🎯 SEO Metadata - Unique et optimisé pour /guide-camping-car
 const GUIA_CAMPER_METADATA: Metadata = {
-  title: "Guía Completa del Camper",
-  description: "Aprende a usar tu camper de alquiler: panel de control, depósitos de agua, electricidad, calefacción, gas y más. Guía práctica para principiantes y expertos.",
-  keywords: "guía camper, cómo usar autocaravana, manual camper, funcionamiento camper, electricidad autocaravana, agua camper, calefacción camper",
+  title: "Guide Complet du Camping-Car",
+  description: "Apprenez à utiliser votre camping-car de location : panneau de contrôle, réservoirs d'eau, électricité, chauffage, gaz et plus. Guide pratique pour débutants et experts.",
+  keywords: "guide camping-car, comment utiliser van, manuel camping-car, fonctionnement camping-car, électricité van, eau camping-car, chauffage camping-car",
   openGraph: {
-    title: "Guía Completa del Camper",
-    description: "Todo lo que necesitas saber sobre el funcionamiento de tu camper de alquiler.",
+    title: "Guide Complet du Camping-Car",
+    description: "Tout ce que vous devez savoir sur le fonctionnement de votre camping-car de location.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "fr_FR",
   },
   twitter: {
     card: "summary",
-    title: "Guía Completa del Camper",
-    description: "Aprende a usar tu camper de alquiler.",
+    title: "Guide Complet du Camping-Car",
+    description: "Apprenez à utiliser votre camping-car de location.",
   },
   robots: {
     index: true,

@@ -14,31 +14,31 @@ function LoadingState() {
 import { XCircle, RefreshCw, Phone, Mail, HelpCircle } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
 
-// Códigos de error comunes de Redsys y sus mensajes amigables
+// Häufige Redsys-Fehlercodes und ihre freundlichen Meldungen
 const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {"0101": {
-    title:"Tarjeta caducada",
-    description:"La tarjeta que has utilizado ha caducado. Por favor, utiliza otra tarjeta válida.",
+    title:"Karte abgelaufen",
+    description:"Die verwendete Karte ist abgelaufen. Bitte verwenden Sie eine andere gültige Karte.",
   },"0102": {
-    title:"Tarjeta bloqueada",
-    description:"Tu tarjeta está temporalmente bloqueada. Contacta con tu banco para más información.",
+    title:"Karte gesperrt",
+    description:"Ihre Karte ist vorübergehend gesperrt. Kontaktieren Sie Ihre Bank für weitere Informationen.",
   },"0116": {
-    title:"Fondos insuficientes",
-    description:"No hay saldo suficiente en la tarjeta para completar la operación.",
+    title:"Unzureichendes Guthaben",
+    description:"Das Guthaben auf der Karte reicht nicht aus, um die Transaktion abzuschließen.",
   },"0129": {
-    title:"CVV incorrecto",
-    description:"El código de seguridad (CVV) introducido no es correcto. Verifica el número de 3 dígitos del reverso de tu tarjeta.",
+    title:"CVV falsch",
+    description:"Der eingegebene Sicherheitscode (CVV) ist nicht korrekt. Überprüfen Sie die 3-stellige Nummer auf der Rückseite Ihrer Karte.",
   },"0184": {
-    title:"Error de autenticación",
-    description:"No se ha podido verificar tu identidad. Asegúrate de completar correctamente la autenticación 3D Secure.",
+    title:"Authentifizierungsfehler",
+    description:"Ihre Identität konnte nicht überprüft werden. Stellen Sie sicher, dass Sie die 3D Secure-Authentifizierung korrekt abschließen.",
   },"0190": {
-    title:"Pago denegado",
-    description:"El banco ha denegado la operación. Contacta con tu entidad bancaria para más información.",
+    title:"Zahlung abgelehnt",
+    description:"Die Bank hat die Transaktion abgelehnt. Kontaktieren Sie Ihre Bank für weitere Informationen.",
   },"9915": {
-    title:"Pago cancelado",
-    description:"Has cancelado el proceso de pago. Si fue un error, puedes volver a intentarlo.",
+    title:"Zahlung abgebrochen",
+    description:"Sie haben den Zahlungsvorgang abgebrochen. Falls es ein Fehler war, können Sie es erneut versuchen.",
   },"default": {
-    title:"Error en el pago",
-    description:"Ha ocurrido un error durante el proceso de pago. Por favor, inténtalo de nuevo.",
+    title:"Zahlungsfehler",
+    description:"Während des Zahlungsvorgangs ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
   },
 };
 

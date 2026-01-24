@@ -10,8 +10,13 @@ const PRIVACIDAD_METADATA: Metadata = {
   description: "Política de privacidad y protección de datos de Furgocasa S.L. Información sobre cómo tratamos y protegemos tus datos personales según RGPD.",
   keywords: "politica privacidad furgocasa, proteccion datos, rgpd, lopd, privacidad datos personales",
   robots: {
-    index: true,
+    index: false,
     follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
   },
 };
 

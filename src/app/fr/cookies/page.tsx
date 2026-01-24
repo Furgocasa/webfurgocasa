@@ -6,14 +6,19 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /cookies
+// 🎯 SEO Metadata - Page légale NON indexable
 const COOKIES_METADATA: Metadata = {
-  title: "Política de Cookies",
-  description: "Información sobre las cookies que utilizamos en furgocasa.com. Tipos de cookies, finalidad y cómo gestionar tus preferencias de privacidad.",
-  keywords: "política cookies furgocasa, cookies web, gestión cookies, privacidad furgocasa",
+  title: "Politique de Cookies",
+  description: "Informations sur les cookies que nous utilisons sur furgocasa.com. Types de cookies, finalité et gestion de vos préférences de confidentialité.",
+  keywords: "politique cookies furgocasa, cookies web, gestion cookies, confidentialité furgocasa",
   robots: {
-    index: true,
+    index: false,
     follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
   },
 };
 

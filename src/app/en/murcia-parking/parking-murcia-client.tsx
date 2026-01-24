@@ -9,43 +9,43 @@ export function ParkingMurciaClient() {
   const features = [
     { 
       icon: Key, 
-      title: "Acceso Libre", 
-      description: "Accede a nuestras instalaciones en cualquier momento, sin restricciones horarias."
+      title: "Free Access", 
+      description: "Access our facilities at any time, without time restrictions."
     },
     { 
       icon: Camera, 
-      title: "Video Vigilancia", 
-      description: "Contamos con un sistema de videovigilancia para garantizar la seguridad de las instalaciones."
+      title: "Video Surveillance", 
+      description: "We have a video surveillance system to guarantee the security of the facilities."
     },
     { 
       icon: Maximize, 
-      title: "Plazas Grandes", 
-      description: "Ofrecemos plazas amplias para facilitar la maniobrabilidad de tu autocaravana."
+      title: "Large Spaces", 
+      description: "We offer large spaces to facilitate the maneuverability of your motorhome."
     },
     { 
       icon: FileCheck, 
-      title: "Licencia de Actividad", 
-      description: "Operamos con todas las licencias y permisos necesarios, asegurando un servicio profesional."
+      title: "Activity License", 
+      description: "We operate with all the necessary licenses and permits, ensuring professional service."
     },
     { 
       icon: Shield, 
-      title: "Cobertura de Seguro", 
-      description: "Tu vehículo estará protegido bajo nuestra póliza de seguro mientras permanezca aquí."
+      title: "Insurance Coverage", 
+      description: "Your vehicle will be protected under our insurance policy while it remains here."
     },
     { 
       icon: Plug, 
-      title: "Plazas con Electricidad", 
-      description: "Disponemos de plazas equipadas con suministro eléctrico para mantener tus baterías."
+      title: "Electric Hookup Spaces", 
+      description: "We have spaces equipped with electrical supply to keep your batteries charged."
     },
     { 
       icon: Droplets, 
-      title: "Zona de Aguas", 
-      description: "Zona habilitada para el abastecimiento de agua potable y vaciado de grises."
+      title: "Water Area", 
+      description: "Area equipped for fresh water supply and grey water disposal."
     },
     { 
       icon: Scale, 
-      title: "Vaciado WC químico", 
-      description: "Punto específico para el vaciado seguro y limpio de los depósitos de tu WC químico."
+      title: "Chemical Toilet Disposal", 
+      description: "Specific point for safe and clean disposal of your chemical toilet tanks."
     },
   ];
 

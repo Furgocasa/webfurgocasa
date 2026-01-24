@@ -1,26 +1,25 @@
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { ReservarClient } from "./reservar-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
-// 🎯 SEO Metadata - Único y optimizado para /reservar
+// 🎯 SEO Metadata - Único y optimizado para /buchen
 const RESERVAR_METADATA: Metadata = {
-  title: "Reservar Camper Online",
-  description: "Reserva tu camper o autocaravana online en pocos pasos. Selecciona fechas, elige vehículo y completa tu reserva. Recogida en Murcia o Madrid.",
-  keywords: "reservar camper online, reserva autocaravana, alquilar camper murcia, reserva online furgocasa",
+  title: "Wohnmobil online buchen",
+  description: "Buchen Sie Ihr Wohnmobil oder Camper online in wenigen Schritten. Wählen Sie Daten, wählen Sie ein Fahrzeug und vervollständigen Sie Ihre Buchung. Abholung in Murcia oder Madrid.",
+  keywords: "wohnmobil online buchen, wohnmobil reservieren, wohnmobil mieten murcia, online buchen furgocasa",
   openGraph: {
-    title: "Reservar Camper Online",
-    description: "Reserva tu camper en pocos pasos. Recogida en Murcia o Madrid.",
+    title: "Wohnmobil online buchen",
+    description: "Buchen Sie Ihr Wohnmobil in wenigen Schritten. Abholung in Murcia oder Madrid.",
     type: "website",
-    url: "https://www.furgocasa.com/es/reservar",
+    url: "https://www.furgocasa.com/de/buchen",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "de_DE",
   },
   twitter: {
     card: "summary",
-    title: "Reservar Camper Online",
-    description: "Reserva tu camper en pocos pasos.",
+    title: "Wohnmobil online buchen",
+    description: "Buchen Sie Ihr Wohnmobil in wenigen Schritten.",
   },
   robots: {
     index: true,
@@ -36,9 +35,8 @@ const RESERVAR_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
-  const alternates = buildCanonicalAlternates('/reservar', locale);
+  const locale: Locale = 'de'; // Locale fijo
+  const alternates = buildCanonicalAlternates('/buchen', locale);
 
   return {
     ...RESERVAR_METADATA,

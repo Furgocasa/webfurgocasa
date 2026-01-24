@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /video-tutoriales
+// 🎯 SEO Metadata - Unique et optimisé pour /tutoriels-video
 const VIDEO_TUTORIALES_METADATA: Metadata = {
-  title: "Video Tutoriales del Camper",
-  description: "Videos tutoriales sobre el funcionamiento de tu camper de alquiler. Panel de control, agua, electricidad, calefacción, nevera y más sistemas explicados paso a paso.",
-  keywords: "video tutorial camper, como usar autocaravana, tutorial panel control camper, videos furgocasa, aprender usar camper",
+  title: "Tutoriels Vidéo Camping-Car",
+  description: "Vidéos tutoriels sur le fonctionnement de votre camping-car de location. Panneau de contrôle, eau, électricité, chauffage, réfrigérateur et plus de systèmes expliqués étape par étape.",
+  keywords: "tutoriel vidéo camping-car, comment utiliser van, tutoriel panneau contrôle camping-car, vidéos furgocasa, apprendre utiliser camping-car",
   openGraph: {
-    title: "Video Tutoriales del Camper",
-    description: "Aprende a usar tu camper de alquiler con nuestros videos tutoriales.",
+    title: "Tutoriels Vidéo Camping-Car",
+    description: "Apprenez à utiliser votre camping-car de location avec nos tutoriels vidéo.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "fr_FR",
   },
   twitter: {
     card: "summary",
-    title: "Video Tutoriales del Camper",
-    description: "Aprende a usar tu camper de alquiler.",
+    title: "Tutoriels Vidéo Camping-Car",
+    description: "Apprenez à utiliser votre camping-car de location.",
   },
   robots: {
     index: true,

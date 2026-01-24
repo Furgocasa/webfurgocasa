@@ -14,31 +14,31 @@ function LoadingState() {
 import { XCircle, RefreshCw, Phone, Mail, HelpCircle } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
 
-// Códigos de error comunes de Redsys y sus mensajes amigables
+// Common Redsys error codes and their friendly messages
 const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {"0101": {
-    title:"Tarjeta caducada",
-    description:"La tarjeta que has utilizado ha caducado. Por favor, utiliza otra tarjeta válida.",
+    title:"Card expired",
+    description:"The card you used has expired. Please use another valid card.",
   },"0102": {
-    title:"Tarjeta bloqueada",
-    description:"Tu tarjeta está temporalmente bloqueada. Contacta con tu banco para más información.",
+    title:"Card blocked",
+    description:"Your card is temporarily blocked. Contact your bank for more information.",
   },"0116": {
-    title:"Fondos insuficientes",
-    description:"No hay saldo suficiente en la tarjeta para completar la operación.",
+    title:"Insufficient funds",
+    description:"There is not enough balance on the card to complete the transaction.",
   },"0129": {
-    title:"CVV incorrecto",
-    description:"El código de seguridad (CVV) introducido no es correcto. Verifica el número de 3 dígitos del reverso de tu tarjeta.",
+    title:"Incorrect CVV",
+    description:"The security code (CVV) entered is not correct. Check the 3-digit number on the back of your card.",
   },"0184": {
-    title:"Error de autenticación",
-    description:"No se ha podido verificar tu identidad. Asegúrate de completar correctamente la autenticación 3D Secure.",
+    title:"Authentication error",
+    description:"Your identity could not be verified. Make sure to complete 3D Secure authentication correctly.",
   },"0190": {
-    title:"Pago denegado",
-    description:"El banco ha denegado la operación. Contacta con tu entidad bancaria para más información.",
+    title:"Payment declined",
+    description:"The bank has declined the transaction. Contact your bank for more information.",
   },"9915": {
-    title:"Pago cancelado",
-    description:"Has cancelado el proceso de pago. Si fue un error, puedes volver a intentarlo.",
+    title:"Payment cancelled",
+    description:"You have cancelled the payment process. If it was a mistake, you can try again.",
   },"default": {
-    title:"Error en el pago",
-    description:"Ha ocurrido un error durante el proceso de pago. Por favor, inténtalo de nuevo.",
+    title:"Payment error",
+    description:"An error occurred during the payment process. Please try again.",
   },
 };
 

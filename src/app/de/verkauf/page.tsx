@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { VentasClient } from "./ventas-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
@@ -12,22 +11,22 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// 🎯 SEO Metadata - Único y optimizado para /ventas
+// 🎯 SEO Metadata - Único y optimizado para /verkauf
 const VENTAS_METADATA: Metadata = {
-  title: "Autocaravanas y Campers en Venta",
-  description: "Compra tu autocaravana o camper de ocasión en Furgocasa. Vehículos de nuestra flota, revisados con garantía. Historial completo conocido. Financiación disponible.",
-  keywords: "comprar autocaravana, camper segunda mano, venta autocaravana ocasión, camper usado, comprar camper murcia, autocaravana ocasión garantía",
+  title: "Wohnmobile und Campers zu verkaufen",
+  description: "Kaufen Sie Ihr Wohnmobil oder Camper von Furgocasa. Fahrzeuge aus unserer Flotte, geprüft mit Garantie. Vollständige Historie bekannt. Finanzierung verfügbar.",
+  keywords: "wohnmobil kaufen, camper gebraucht, wohnmobil verkauf, gebrauchter camper, wohnmobil kaufen murcia, wohnmobil garantie",
   openGraph: {
-    title: "Autocaravanas y Campers en Venta",
-    description: "Vehículos de nuestra flota, revisados con garantía. Historial completo conocido.",
+    title: "Wohnmobile und Campers zu verkaufen",
+    description: "Fahrzeuge aus unserer Flotte, geprüft mit Garantie. Vollständige Historie bekannt.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "de_DE",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Autocaravanas y Campers en Venta",
-    description: "Vehículos revisados con garantía. Historial completo.",
+    title: "Wohnmobile und Campers zu verkaufen",
+    description: "Fahrzeuge geprüft mit Garantie. Vollständige Historie.",
   },
   robots: {
     index: true,
@@ -43,9 +42,8 @@ const VENTAS_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
-  const alternates = buildCanonicalAlternates('/ventas', locale);
+  const locale: Locale = 'de'; // Locale fijo
+  const alternates = buildCanonicalAlternates('/verkauf', locale);
 
   return {
     ...VENTAS_METADATA,

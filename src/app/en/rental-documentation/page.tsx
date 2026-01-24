@@ -6,10 +6,10 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// Página SECRETA - No indexar, no seguir
+// SECRET Page - Do not index, do not follow
 const DOCUMENTACION_METADATA: Metadata = {
-  title: "Documentación de Alquiler - Cliente",
-  description: "Acceso exclusivo para clientes. Consulta, descarga y firma los documentos de tu alquiler.",
+  title: "Rental Documentation - Client",
+  description: "Exclusive access for clients. View, download and sign your rental documents.",
   robots: {
     index: false,
     follow: false,

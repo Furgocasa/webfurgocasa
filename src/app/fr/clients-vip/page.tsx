@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /clientes-vip
+// 🎯 SEO Metadata - Unique et optimisé pour /clients-vip
 const CLIENTES_VIP_METADATA: Metadata = {
-  title: "Programa Clientes VIP",
-  description: "Únete al programa VIP de Furgocasa y disfruta de 10% de descuento permanente, prioridad en reservas, extras gratuitos y late check-out. Beneficios exclusivos para clientes fieles.",
-  keywords: "clientes vip furgocasa, programa fidelidad camper, descuentos clientes frecuentes, beneficios vip autocaravana",
+  title: "Programme Clients VIP",
+  description: "Rejoignez le programme VIP de Furgocasa et profitez de 10% de réduction permanente, priorité de réservation, extras gratuits et late check-out. Avantages exclusifs pour les clients fidèles.",
+  keywords: "clients vip furgocasa, programme fidélité camping-car, réductions clients fréquents, avantages vip van",
   openGraph: {
-    title: "Programa Clientes VIP",
-    description: "Beneficios exclusivos para clientes frecuentes: 10% descuento, prioridad en reservas y extras gratuitos.",
+    title: "Programme Clients VIP",
+    description: "Avantages exclusifs pour les clients fréquents : 10% réduction, priorité de réservation et extras gratuits.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "fr_FR",
   },
   twitter: {
     card: "summary",
-    title: "Programa Clientes VIP",
-    description: "Beneficios exclusivos para clientes frecuentes.",
+    title: "Programme Clients VIP",
+    description: "Avantages exclusifs pour les clients fréquents.",
   },
   robots: {
     index: true,

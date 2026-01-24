@@ -6,13 +6,13 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /buscar
+// 🎯 SEO Metadata - Einzigartig und optimiert für /suche
 const BUSCAR_METADATA: Metadata = {
-  title: "Buscar Disponibilidad de Campers",
-  description: "Busca y compara la disponibilidad de campers y autocaravanas para tus fechas de viaje. Reserva online tu camper ideal con Furgocasa.",
-  keywords: "buscar camper disponible, disponibilidad autocaravana, reservar camper fechas, buscar alquiler camper",
+  title: "Wohnmobil-Verfügbarkeit suchen",
+  description: "Suchen und vergleichen Sie die Verfügbarkeit von Wohnmobilen und Campern für Ihre Reisedaten. Buchen Sie Ihr ideales Wohnmobil online bei Furgocasa.",
+  keywords: "verfügbares wohnmobil suchen, wohnmobil verfügbarkeit, wohnmobil für datum buchen, wohnmobil miete suchen",
   robots: {
-    index: false, // Página de resultados de búsqueda, no indexar
+    index: false, // Suchergebnisseite, nicht indexieren
     follow: true,
   },
 };

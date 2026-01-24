@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /guia-camper
+// 🎯 SEO Metadata - Einzigartig und optimiert für /wohnmobil-guide
 const GUIA_CAMPER_METADATA: Metadata = {
-  title: "Guía Completa del Camper",
-  description: "Aprende a usar tu camper de alquiler: panel de control, depósitos de agua, electricidad, calefacción, gas y más. Guía práctica para principiantes y expertos.",
-  keywords: "guía camper, cómo usar autocaravana, manual camper, funcionamiento camper, electricidad autocaravana, agua camper, calefacción camper",
+  title: "Kompletter Wohnmobil-Ratgeber",
+  description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen: Bedienfeld, Wassertanks, Elektrik, Heizung, Gas und mehr. Praktischer Ratgeber für Anfänger und Experten.",
+  keywords: "wohnmobil ratgeber, wie benutzt man wohnmobil, wohnmobil handbuch, wohnmobil funktionsweise, wohnmobil elektrik, wohnmobil wasser, wohnmobil heizung",
   openGraph: {
-    title: "Guía Completa del Camper",
-    description: "Todo lo que necesitas saber sobre el funcionamiento de tu camper de alquiler.",
+    title: "Kompletter Wohnmobil-Ratgeber",
+    description: "Alles, was Sie über die Funktionsweise Ihres Miet-Wohnmobils wissen müssen.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "de_DE",
   },
   twitter: {
     card: "summary",
-    title: "Guía Completa del Camper",
-    description: "Aprende a usar tu camper de alquiler.",
+    title: "Kompletter Wohnmobil-Ratgeber",
+    description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen.",
   },
   robots: {
     index: true,

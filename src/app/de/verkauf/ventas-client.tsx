@@ -176,7 +176,7 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
               <div className="flex-1 w-full md:w-auto">
                 <input
                   type="text"
-                  placeholder="Buscar por marca, modelo..."
+                  placeholder={t("Suche nach Marke, Modell...")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
@@ -190,7 +190,7 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
                   onChange={(e) => setCategoryFilter(e.target.value)}
                   className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="">{t("Todas las categorías")}</option>
+                  <option value="">{t("Alle Kategorien")}</option>
                   {categories.map(cat => (
                     <option key={cat.id} value={cat.slug}>
                       {cat.name}
@@ -204,20 +204,20 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
                 onChange={(e) => setPriceFilter(e.target.value)}
                 className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg"
               >
-                <option value="">{t("Cualquier precio")}</option>
-                <option value="0-40000">{t("Hasta 40.000 €")}</option>
+                <option value="">{t("Jeder Preis")}</option>
+                <option value="0-40000">{t("Bis 40.000 €")}</option>
                 <option value="40000-60000">40.000 - 60.000 €</option>
-                <option value="60000+">{t("Más de 60.000 €")}</option>
+                <option value="60000+">{t("Mehr als 60.000 €")}</option>
               </select>
               <select 
                 value={kmFilter}
                 onChange={(e) => setKmFilter(e.target.value)}
                 className="w-full md:w-auto px-4 py-2 border border-gray-300 rounded-lg"
               >
-                <option value="">{t("Cualquier km")}</option>
-                <option value="0-30000">{t("Hasta 30.000 km")}</option>
+                <option value="">{t("Jede Kilometerleistung")}</option>
+                <option value="0-30000">{t("Bis 30.000 km")}</option>
                 <option value="30000-60000">30.000 - 60.000 km</option>
-                <option value="60000+">{t("Más de 60.000 km")}</option>
+                <option value="60000+">{t("Mehr als 60.000 km")}</option>
               </select>
             </div>
           </div>
@@ -254,7 +254,7 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
                     <span className="font-semibold text-gray-900">{filteredAndSortedVehicles.length}</span> {t("vehículos disponibles")}
                     {(searchTerm || categoryFilter || priceFilter || kmFilter) && (
                       <span className="text-sm ml-2 text-gray-500">
-                        ({vehiclesForSale.length} total)
+                        ({vehiclesForSale.length} {t("total")})
                       </span>
                     )}
                   </p>

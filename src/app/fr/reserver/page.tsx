@@ -4,23 +4,23 @@ import { ReservarClient } from "./reservar-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
-// 🎯 SEO Metadata - Único y optimizado para /reservar
+// 🎯 SEO Metadata - Unique et optimisé pour /reserver
 const RESERVAR_METADATA: Metadata = {
-  title: "Reservar Camper Online",
-  description: "Reserva tu camper o autocaravana online en pocos pasos. Selecciona fechas, elige vehículo y completa tu reserva. Recogida en Murcia o Madrid.",
-  keywords: "reservar camper online, reserva autocaravana, alquilar camper murcia, reserva online furgocasa",
+  title: "Réserver Camping-Car en Ligne",
+  description: "Réservez votre camping-car ou van en ligne en quelques étapes. Sélectionnez les dates, choisissez le véhicule et complétez votre réservation. Récupération à Murcie ou Madrid.",
+  keywords: "réserver camping-car en ligne, réservation van, louer camping-car murcie, réservation en ligne furgocasa",
   openGraph: {
-    title: "Reservar Camper Online",
-    description: "Reserva tu camper en pocos pasos. Recogida en Murcia o Madrid.",
+    title: "Réserver Camping-Car en Ligne",
+    description: "Réservez votre camping-car en quelques étapes. Récupération à Murcie ou Madrid.",
     type: "website",
-    url: "https://www.furgocasa.com/es/reservar",
+    url: "https://www.furgocasa.com/fr/reserver",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "fr_FR",
   },
   twitter: {
     card: "summary",
-    title: "Reservar Camper Online",
-    description: "Reserva tu camper en pocos pasos.",
+    title: "Réserver Camping-Car en Ligne",
+    description: "Réservez votre camping-car en quelques étapes.",
   },
   robots: {
     index: true,

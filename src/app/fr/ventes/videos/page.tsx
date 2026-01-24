@@ -2,11 +2,11 @@ import Link from"next/link";
 import { Play, Car, ArrowRight, Calendar, Gauge, Euro } from"lucide-react";
 
 export const metadata = {
-  title: "Videos de Campers en Venta",
-  description: "Mira los videos de nuestras campers y autocaravanas en venta. Recorrido completo interior y exterior de cada vehículo.",
+  title: "Vidéos de Camping-Cars à Vendre",
+  description: "Regardez les vidéos de nos camping-cars et vans à vendre. Visite complète intérieure et extérieure de chaque véhicule.",
 };
 
-// TODO: Cargar desde Supabase/YouTube API
+// TODO: Charger depuis Supabase/YouTube API
 const videos = [
   {
     id:"1",
@@ -17,7 +17,7 @@ const videos = [
     price: 72000,
     mileage: 45000,
     year: 2021,
-    description:"Recorrido completo por este California Ocean en estado impecable. Un solo propietario.",
+    description:"Visite complète de ce California Ocean en parfait état. Un seul propriétaire.",
     duration:"12:34",
   },
   {
@@ -29,7 +29,7 @@ const videos = [
     price: 58000,
     mileage: 28000,
     year: 2022,
-    description:"Tour por el Nugget prácticamente nuevo. Garantía oficial Ford hasta 2025.",
+    description:"Tour du Nugget pratiquement neuf. Garantie officielle Ford jusqu'en 2025.",
     duration:"10:45",
   },
   {
@@ -41,7 +41,7 @@ const videos = [
     price: 52000,
     mileage: 62000,
     year: 2020,
-    description:"Autocaravana perfilada muy completa. Ideal para familias.",
+    description:"Camping-car profilé très complet. Idéal pour les familles.",
     duration:"15:20",
   },
 ];
@@ -53,8 +53,8 @@ export default function VideosVentasPage() {
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
             <Play className="h-16 w-16 text-furgocasa-orange mx-auto mb-4" />
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Videos de Campers en Venta</h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">Descubre cada detalle de nuestros vehículos antes de visitarnos</p>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Vidéos de Camping-Cars à Vendre</h1>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">Découvrez chaque détail de nos véhicules avant de nous rendre visite</p>
           </div>
         </section>
 
@@ -106,7 +106,7 @@ export default function VideosVentasPage() {
                         href={`/ventas/${video.slug}`}
                         className="flex items-center gap-1 text-sm font-medium text-furgocasa-orange hover:underline"
                       >
-                        Ver ficha<ArrowRight className="h-4 w-4" />
+                        Voir fiche<ArrowRight className="h-4 w-4" />
                       </Link>
                     </div>
                   </div>
@@ -119,32 +119,32 @@ export default function VideosVentasPage() {
         {/* Info */}
         <section className="py-12 bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">¿Por qué videos?</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Pourquoi des vidéos ?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto mb-8">
-              Queremos que conozcas cada vehículo como si lo tuvieras delante. En nuestros videos te mostramos 
-              el interior, exterior, equipamiento y estado real de cada camper en venta.
+              Nous voulons que vous connaissiez chaque véhicule comme si vous l&apos;aviez devant vous. Dans nos vidéos nous vous montrons 
+              l&apos;intérieur, l&apos;extérieur, l&apos;équipement et l&apos;état réel de chaque camping-car à vendre.
             </p>
             <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
               <div className="p-4">
                 <div className="w-12 h-12 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Play className="h-6 w-6 text-furgocasa-orange" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">Recorrido completo</h3>
-                <p className="text-gray-600 text-sm">Interior y exterior sin filtros</p>
+                <h3 className="font-bold text-gray-900 mb-1">Visite complète</h3>
+                <p className="text-gray-600 text-sm">Intérieur et extérieur sans filtre</p>
               </div>
               <div className="p-4">
                 <div className="w-12 h-12 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Car className="h-6 w-6 text-furgocasa-orange" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">Estado real</h3>
-                <p className="text-gray-600 text-sm">Mostramos cualquier detalle</p>
+                <h3 className="font-bold text-gray-900 mb-1">État réel</h3>
+                <p className="text-gray-600 text-sm">Nous montrons chaque détail</p>
               </div>
               <div className="p-4">
                 <div className="w-12 h-12 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
                   <Gauge className="h-6 w-6 text-furgocasa-orange" />
                 </div>
-                <h3 className="font-bold text-gray-900 mb-1">Funcionamiento</h3>
-                <p className="text-gray-600 text-sm">Probamos todos los sistemas</p>
+                <h3 className="font-bold text-gray-900 mb-1">Fonctionnement</h3>
+                <p className="text-gray-600 text-sm">Nous testons tous les systèmes</p>
               </div>
             </div>
           </div>
@@ -153,14 +153,14 @@ export default function VideosVentasPage() {
         {/* CTA */}
         <section className="py-12 bg-furgocasa-orange">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">¿Te interesa alguno?</h2>
-            <p className="text-white/90 mb-6">Ven a verlo en persona y pruébalo sin compromiso</p>
+            <h2 className="text-2xl font-bold text-white mb-4">L&apos;un d&apos;eux vous intéresse ?</h2>
+            <p className="text-white/90 mb-6">Venez le voir en personne et essayez-le sans engagement</p>
             <div className="flex flex-wrap justify-center gap-4">
-              <Link href="/ventas" className="inline-flex items-center gap-2 bg-white text-furgocasa-orange font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors">
-                Ver todos los vehículos
+              <Link href="/fr/ventes" className="inline-flex items-center gap-2 bg-white text-furgocasa-orange font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors">
+                Voir tous les véhicules
               </Link>
-              <Link href="/contacto" className="inline-flex items-center gap-2 bg-furgocasa-blue text-white font-semibold py-3 px-6 rounded-lg hover:bg-furgocasa-blue-dark transition-colors">
-                Contactar
+              <Link href="/fr/contact" className="inline-flex items-center gap-2 bg-furgocasa-blue text-white font-semibold py-3 px-6 rounded-lg hover:bg-furgocasa-blue-dark transition-colors">
+                Contacter
               </Link>
             </div>
           </div>

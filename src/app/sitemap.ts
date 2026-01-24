@@ -178,10 +178,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/como-reservar-fin-semana', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/inteligencia-artificial', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/video-tutoriales', priority: 0.5, changeFrequency: 'monthly' },
-    { path: '/aviso-legal', priority: 0.3, changeFrequency: 'yearly' },
-    { path: '/privacidad', priority: 0.3, changeFrequency: 'yearly' },
-    { path: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/sitemap-html', priority: 0.2, changeFrequency: 'monthly' },
+    // NOTA: Páginas legales (/aviso-legal, /privacidad, /cookies) excluidas del sitemap - tienen noindex
   ];
 
   const faqPages = [

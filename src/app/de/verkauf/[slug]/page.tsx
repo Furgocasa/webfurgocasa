@@ -2,7 +2,6 @@ import { VehicleGallery } from "@/components/vehicle/vehicle-gallery";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata, ResolvingMetadata } from "next";
-import { headers } from "next/headers";
 import { 
   ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Bed, 
   CheckCircle, Phone, Mail, MapPin, Shield, Wrench, Ruler,
@@ -81,15 +80,9 @@ export async function generateMetadata(
     };
   }
 
-  // Obtener locale y generar canónicas (con fallback para build estático)
-  let locale: Locale = 'es';
-  try {
-    const headersList = await headers();
-    locale = (headersList.get('x-detected-locale') || 'es') as Locale;
-  } catch {
-    locale = 'es';
-  }
-  const alternates = buildCanonicalAlternates(`/ventas/${slug}`, locale);
+  // Locale fijo para /de/
+  const locale: Locale = 'de';
+  const alternates = buildCanonicalAlternates(`/verkauf/${slug}`, locale);
 
   // Imagen principal
   let ogImage = "/icon-512x512.png";

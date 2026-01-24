@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /inteligencia-artificial
+// 🎯 SEO Metadata - Unique and optimized for /artificial-intelligence
 const IA_METADATA: Metadata = {
-  title: "Inteligencia Artificial para Viajeros Camper",
-  description: "Descubre nuestras herramientas de IA para planificar tu viaje en camper. Chatbot inteligente 24/7 y planificador de rutas con inteligencia artificial.",
-  keywords: "inteligencia artificial camper, chatbot autocaravana, planificador rutas ia, asistente virtual camper, tecnología viaje camper",
+  title: "Artificial Intelligence for Camper Travelers",
+  description: "Discover our AI tools to plan your camper trip. 24/7 intelligent chatbot and AI-powered route planner.",
+  keywords: "artificial intelligence camper, motorhome chatbot, ai route planner, virtual camper assistant, camper travel technology",
   openGraph: {
-    title: "Inteligencia Artificial para Viajeros Camper",
-    description: "Chatbot IA y planificador de rutas inteligente para tu viaje en camper.",
+    title: "Artificial Intelligence for Camper Travelers",
+    description: "AI chatbot and intelligent route planner for your camper trip.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "en_GB",
   },
   twitter: {
     card: "summary",
-    title: "Inteligencia Artificial para Viajeros Camper",
-    description: "Chatbot IA y planificador de rutas inteligente.",
+    title: "Artificial Intelligence for Camper Travelers",
+    description: "AI chatbot and intelligent route planner.",
   },
   robots: {
     index: true,

@@ -12,22 +12,22 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-// 🎯 SEO Metadata - Único y optimizado para /ventas
+// 🎯 SEO Metadata - Unique and optimized for /sales
 const VENTAS_METADATA: Metadata = {
-  title: "Autocaravanas y Campers en Venta",
-  description: "Compra tu autocaravana o camper de ocasión en Furgocasa. Vehículos de nuestra flota, revisados con garantía. Historial completo conocido. Financiación disponible.",
-  keywords: "comprar autocaravana, camper segunda mano, venta autocaravana ocasión, camper usado, comprar camper murcia, autocaravana ocasión garantía",
+  title: "Motorhomes and Campervans for Sale",
+  description: "Buy your second-hand motorhome or campervan at Furgocasa. Fleet vehicles, inspected with warranty. Full history known. Financing available.",
+  keywords: "buy motorhome, used campervan, second-hand motorhome, used camper, buy campervan spain, motorhome warranty",
   openGraph: {
-    title: "Autocaravanas y Campers en Venta",
-    description: "Vehículos de nuestra flota, revisados con garantía. Historial completo conocido.",
+    title: "Motorhomes and Campervans for Sale",
+    description: "Fleet vehicles, inspected with warranty. Full history known.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "en_GB",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Autocaravanas y Campers en Venta",
-    description: "Vehículos revisados con garantía. Historial completo.",
+    title: "Motorhomes and Campervans for Sale",
+    description: "Inspected vehicles with warranty. Full history.",
   },
   robots: {
     index: true,

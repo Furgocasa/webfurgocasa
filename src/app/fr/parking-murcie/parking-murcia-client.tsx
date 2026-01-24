@@ -9,43 +9,43 @@ export function ParkingMurciaClient() {
   const features = [
     { 
       icon: Key, 
-      title: "Acceso Libre", 
-      description: "Accede a nuestras instalaciones en cualquier momento, sin restricciones horarias."
+      title: "Accès Libre", 
+      description: "Accédez à nos installations à tout moment, sans restrictions horaires."
     },
     { 
       icon: Camera, 
-      title: "Video Vigilancia", 
-      description: "Contamos con un sistema de videovigilancia para garantizar la seguridad de las instalaciones."
+      title: "Vidéosurveillance", 
+      description: "Nous disposons d'un système de vidéosurveillance pour garantir la sécurité des installations."
     },
     { 
       icon: Maximize, 
-      title: "Plazas Grandes", 
-      description: "Ofrecemos plazas amplias para facilitar la maniobrabilidad de tu autocaravana."
+      title: "Grandes Places", 
+      description: "Nous offrons des places larges pour faciliter la manœuvrabilité de votre camping-car."
     },
     { 
       icon: FileCheck, 
-      title: "Licencia de Actividad", 
-      description: "Operamos con todas las licencias y permisos necesarios, asegurando un servicio profesional."
+      title: "Licence d'Activité", 
+      description: "Nous opérons avec toutes les licences et permis nécessaires, assurant un service professionnel."
     },
     { 
       icon: Shield, 
-      title: "Cobertura de Seguro", 
-      description: "Tu vehículo estará protegido bajo nuestra póliza de seguro mientras permanezca aquí."
+      title: "Couverture d'Assurance", 
+      description: "Votre véhicule sera protégé par notre police d'assurance pendant son séjour ici."
     },
     { 
       icon: Plug, 
-      title: "Plazas con Electricidad", 
-      description: "Disponemos de plazas equipadas con suministro eléctrico para mantener tus baterías."
+      title: "Places avec Électricité", 
+      description: "Nous disposons de places équipées d'alimentation électrique pour maintenir vos batteries."
     },
     { 
       icon: Droplets, 
-      title: "Zona de Aguas", 
-      description: "Zona habilitada para el abastecimiento de agua potable y vaciado de grises."
+      title: "Zone d'Eau", 
+      description: "Zone équipée pour l'approvisionnement en eau potable et la vidange des eaux grises."
     },
     { 
       icon: Scale, 
-      title: "Vaciado WC químico", 
-      description: "Punto específico para el vaciado seguro y limpio de los depósitos de tu WC químico."
+      title: "Vidange WC chimique", 
+      description: "Point spécifique pour la vidange sûre et propre des réservoirs de votre WC chimique."
     },
   ];
 

@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /parking-murcia
+// 🎯 SEO Metadata - Einzigartig und optimiert für /parkplatz-murcia
 const PARKING_MURCIA_METADATA: Metadata = {
-  title: "Parking para Autocaravanas en Murcia",
-  description: "Parking vigilado para autocaravanas y campers en Murcia. Acceso 24h, videovigilancia, electricidad, zona de aguas y vaciado WC químico. Desde 10€/día.",
-  keywords: "parking autocaravanas murcia, guardar camper murcia, parking caravanas murcia, estacionamiento autocaravana, parking seguro camper",
+  title: "Wohnmobil-Parkplatz in Murcia",
+  description: "Bewachter Parkplatz für Wohnmobile und Camper in Murcia. 24h Zugang, Videoüberwachung, Strom, Wasserzone und Chemie-WC Entleerung. Ab 10€/Tag.",
+  keywords: "wohnmobil parkplatz murcia, camper abstellen murcia, wohnwagen parkplatz murcia, wohnmobil stellplatz, sicherer camper parkplatz",
   openGraph: {
-    title: "Parking para Autocaravanas en Murcia",
-    description: "Parking vigilado 24h para tu autocaravana en Murcia. Servicios de agua, electricidad y vaciado.",
+    title: "Wohnmobil-Parkplatz in Murcia",
+    description: "24h bewachter Parkplatz für Ihr Wohnmobil in Murcia. Wasser, Strom und Entsorgung.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "de_DE",
   },
   twitter: {
     card: "summary",
-    title: "Parking para Autocaravanas en Murcia",
-    description: "Parking vigilado 24h para tu autocaravana en Murcia.",
+    title: "Wohnmobil-Parkplatz in Murcia",
+    description: "24h bewachter Parkplatz für Ihr Wohnmobil in Murcia.",
   },
   robots: {
     index: true,

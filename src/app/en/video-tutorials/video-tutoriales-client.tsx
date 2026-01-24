@@ -6,39 +6,39 @@ import { useLanguage } from "@/contexts/language-context";
 
 const videoTutorials = [
   {
-    title: "Panel de Control",
+    title: "Control Panel",
     youtubeId: "PANEL_CONTROL_ID",
-    description: "Aprende a usar el panel de control de tu camper"
+    description: "Learn how to use your camper's control panel"
   },
   {
-    title: "Depósitos de agua",
+    title: "Water Tanks",
     youtubeId: "DEPOSITOS_AGUA_ID",
-    description: "Cómo funcionan los depósitos de agua limpia y residual"
+    description: "How the fresh and waste water tanks work"
   },
   {
-    title: "Sistemas eléctricos",
+    title: "Electrical Systems",
     youtubeId: "SISTEMAS_ELECTRICOS_ID",
-    description: "Todo sobre el sistema eléctrico de la camper"
+    description: "Everything about the camper's electrical system"
   },
   {
-    title: "Calefacción y agua caliente",
+    title: "Heating and Hot Water",
     youtubeId: "CALEFACCION_ID",
-    description: "Uso de la calefacción y el sistema de agua caliente"
+    description: "Using the heating and hot water system"
   },
   {
-    title: "Ventanas, cubre soles y mosquiteras",
+    title: "Windows, Sunshades and Mosquito Nets",
     youtubeId: "VENTANAS_ID",
-    description: "Manejo de ventanas, cortinas y mosquiteras"
+    description: "Operating windows, blinds and mosquito nets"
   },
   {
-    title: "Escalón exterior",
+    title: "Exterior Step",
     youtubeId: "ESCALON_ID",
-    description: "Uso correcto del escalón exterior"
+    description: "Correct use of the exterior step"
   },
   {
-    title: "Nevera y congelador",
+    title: "Fridge and Freezer",
     youtubeId: "NEVERA_ID",
-    description: "Funcionamiento de la nevera y congelador"
+    description: "How the fridge and freezer work"
   },
 ];
 

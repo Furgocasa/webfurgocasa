@@ -1,25 +1,24 @@
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { FaqsClient } from "./faqs-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /faqs
 const FAQS_METADATA: Metadata = {
-  title: "Preguntas Frecuentes sobre Alquiler de Campers",
-  description: "Resuelve tus dudas sobre el alquiler de autocaravanas en Furgocasa. Requisitos, seguros, kilómetros, mascotas, recogida y devolución. Todo lo que necesitas saber.",
-  keywords: "preguntas frecuentes alquiler camper, dudas autocaravana, requisitos alquiler camper, faqs furgocasa, información alquiler autocaravana",
+  title: "Häufig gestellte Fragen zum Wohnmobil-Verleih",
+  description: "Lösen Sie Ihre Fragen zum Wohnmobil-Verleih bei Furgocasa. Anforderungen, Versicherungen, Kilometer, Haustiere, Abholung und Rückgabe. Alles, was Sie wissen müssen.",
+  keywords: "häufige fragen wohnmobil mieten, fragen wohnmobil, anforderungen wohnmobil mieten, faqs furgocasa, informationen wohnmobil mieten",
   openGraph: {
-    title: "Preguntas Frecuentes sobre Alquiler de Campers",
-    description: "Resuelve todas tus dudas sobre el alquiler de autocaravanas. Requisitos, seguros, mascotas y más.",
+    title: "Häufig gestellte Fragen zum Wohnmobil-Verleih",
+    description: "Lösen Sie alle Ihre Fragen zum Wohnmobil-Verleih. Anforderungen, Versicherungen, Haustiere und mehr.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "de_DE",
   },
   twitter: {
     card: "summary",
-    title: "Preguntas Frecuentes sobre Alquiler de Campers",
-    description: "Resuelve tus dudas sobre el alquiler de autocaravanas.",
+    title: "Häufig gestellte Fragen zum Wohnmobil-Verleih",
+    description: "Lösen Sie Ihre Fragen zum Wohnmobil-Verleih.",
   },
   robots: {
     index: true,
@@ -35,8 +34,7 @@ const FAQS_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const locale: Locale = 'de'; // Locale fijo
   const alternates = buildCanonicalAlternates('/faqs', locale);
 
   return {

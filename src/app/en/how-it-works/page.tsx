@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   
   
   return {
-    title: "Redirección",
+    title: "Redirect",
     robots: { index: false, follow: false }
   };
 }

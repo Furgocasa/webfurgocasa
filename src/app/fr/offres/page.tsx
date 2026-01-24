@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /ofertas
+// 🎯 SEO Metadata - Unique et optimisé pour /offres
 const OFERTAS_METADATA: Metadata = {
-  title: "Ofertas y Descuentos en Alquiler de Campers",
-  description: "Aprovecha nuestras ofertas especiales en alquiler de autocaravanas. Descuentos de temporada, códigos promocionales y precios especiales para tu próxima aventura camper.",
-  keywords: "ofertas alquiler camper, descuentos autocaravana, promociones furgocasa, alquiler camper barato, ofertas última hora camper",
+  title: "Offres et Réductions Location Camping-Cars",
+  description: "Profitez de nos offres spéciales de location de camping-cars. Réductions saisonnières, codes promo et prix spéciaux pour votre prochaine aventure camping-car.",
+  keywords: "offres location camping-car, réductions van, promotions furgocasa, location camping-car pas cher, offres dernière minute",
   openGraph: {
-    title: "Ofertas y Descuentos en Alquiler de Campers",
-    description: "Descuentos especiales en alquiler de autocaravanas. ¡Aprovecha nuestras promociones de temporada!",
+    title: "Offres et Réductions Location Camping-Cars",
+    description: "Réductions spéciales sur la location de camping-cars. Profitez de nos promotions saisonnières !",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "fr_FR",
   },
   twitter: {
     card: "summary",
-    title: "Ofertas y Descuentos en Alquiler de Campers",
-    description: "Descuentos especiales en alquiler de autocaravanas.",
+    title: "Offres et Réductions Location Camping-Cars",
+    description: "Réductions spéciales sur la location de camping-cars.",
   },
   robots: {
     index: true,

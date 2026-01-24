@@ -6,39 +6,39 @@ import { useLanguage } from "@/contexts/language-context";
 
 const videoTutorials = [
   {
-    title: "Panel de Control",
+    title: "Panneau de Contrôle",
     youtubeId: "PANEL_CONTROL_ID",
-    description: "Aprende a usar el panel de control de tu camper"
+    description: "Apprenez à utiliser le panneau de contrôle de votre camping-car"
   },
   {
-    title: "Depósitos de agua",
+    title: "Réservoirs d'eau",
     youtubeId: "DEPOSITOS_AGUA_ID",
-    description: "Cómo funcionan los depósitos de agua limpia y residual"
+    description: "Comment fonctionnent les réservoirs d'eau propre et usée"
   },
   {
-    title: "Sistemas eléctricos",
+    title: "Systèmes électriques",
     youtubeId: "SISTEMAS_ELECTRICOS_ID",
-    description: "Todo sobre el sistema eléctrico de la camper"
+    description: "Tout sur le système électrique du camping-car"
   },
   {
-    title: "Calefacción y agua caliente",
+    title: "Chauffage et eau chaude",
     youtubeId: "CALEFACCION_ID",
-    description: "Uso de la calefacción y el sistema de agua caliente"
+    description: "Utilisation du chauffage et du système d'eau chaude"
   },
   {
-    title: "Ventanas, cubre soles y mosquiteras",
+    title: "Fenêtres, pare-soleil et moustiquaires",
     youtubeId: "VENTANAS_ID",
-    description: "Manejo de ventanas, cortinas y mosquiteras"
+    description: "Manipulation des fenêtres, rideaux et moustiquaires"
   },
   {
-    title: "Escalón exterior",
+    title: "Marche extérieure",
     youtubeId: "ESCALON_ID",
-    description: "Uso correcto del escalón exterior"
+    description: "Utilisation correcte de la marche extérieure"
   },
   {
-    title: "Nevera y congelador",
+    title: "Réfrigérateur et congélateur",
     youtubeId: "NEVERA_ID",
-    description: "Funcionamiento de la nevera y congelador"
+    description: "Fonctionnement du réfrigérateur et congélateur"
   },
 ];
 

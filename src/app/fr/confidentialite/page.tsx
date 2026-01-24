@@ -6,12 +6,17 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const PRIVACIDAD_METADATA: Metadata = {
-  title: "Política de Privacidad",
-  description: "Política de privacidad y protección de datos de Furgocasa S.L. Información sobre cómo tratamos y protegemos tus datos personales según RGPD.",
-  keywords: "politica privacidad furgocasa, proteccion datos, rgpd, lopd, privacidad datos personales",
+  title: "Politique de Confidentialité",
+  description: "Politique de confidentialité et protection des données de Furgocasa S.L. Informations sur le traitement de vos données personnelles selon le RGPD.",
+  keywords: "politique confidentialité furgocasa, protection données, rgpd, vie privée",
   robots: {
-    index: true,
+    index: false,
     follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
   },
 };
 

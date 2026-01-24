@@ -8,8 +8,8 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const COMO_RESERVAR_FIN_SEMANA_METADATA: Metadata = {
-  title: "Cómo Reservar un Fin de Semana",
-  description: "Guía completa para alquilar una camper de fin de semana. Horarios, precios y condiciones especiales para escapadas cortas.",
+  title: "So buchen Sie ein Wochenende",
+  description: "Komplette Anleitung zum Mieten eines Wohnmobils für das Wochenende. Zeiten, Preise und Sonderbedingungen für Kurztrips.",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -28,10 +28,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 const steps = [
-  { step:"1", title:"Elige tu fecha", desc:"Selecciona el viernes de recogida en nuestro calendario", icon: Calendar },
-  { step:"2", title:"Selecciona el vehículo", desc:"Elige entre los campers disponibles para esas fechas", icon: CheckCircle },
-  { step:"3", title:"Añade extras", desc:"Sillas, mesa, kit de playa... lo que necesites", icon: CheckCircle },
-  { step:"4", title:"Confirma y paga", desc:"Solo el 30% de señal. El resto a la recogida", icon: Euro },
+  { step:"1", title:"Wählen Sie Ihr Datum", desc:"Wählen Sie den Abholfreitag in unserem Kalender", icon: Calendar },
+  { step:"2", title:"Wählen Sie das Fahrzeug", desc:"Wählen Sie aus den verfügbaren Wohnmobilen für diese Daten", icon: CheckCircle },
+  { step:"3", title:"Extras hinzufügen", desc:"Stühle, Tisch, Strand-Kit... was Sie brauchen", icon: CheckCircle },
+  { step:"4", title:"Bestätigen und bezahlen", desc:"Nur 30% Anzahlung. Der Rest bei Abholung", icon: Euro },
 ];
 
 export default async function LocaleComoReservarFinSemanaPage({ params }: PageProps) {

@@ -1,9 +1,9 @@
 import { Metadata } from 'next'
 
-// Página de pago de reserva - no indexar
+// Buchungszahlungsseite - nicht indexieren
 export const metadata: Metadata = {
-  title: "Pago de reserva",
-  description: "Completar el pago de tu reserva de autocaravana",
+  title: "Buchungszahlung",
+  description: "Schließen Sie die Zahlung Ihrer Wohnmobil-Buchung ab",
   robots: {
     index: false,
     follow: false,

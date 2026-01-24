@@ -6,11 +6,16 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const AVISO_METADATA: Metadata = {
-  title: "Aviso Legal",
-  description: "Aviso legal y términos de uso de Furgocasa S.L. Información legal sobre el alquiler de autocaravanas y campers en Murcia.",
+  title: "Impressum",
+  description: "Impressum und Nutzungsbedingungen von Furgocasa S.L. Rechtliche Informationen zur Wohnmobilvermietung.",
   robots: {
-    index: true,
-    follow: false, // No seguir enlaces en páginas legales
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+    },
   },
 };
 
@@ -34,56 +39,56 @@ export default async function LocaleAvisoLegalPage({ params }: PageProps) {
 <main className="min-h-screen bg-gray-50">
         <section className="bg-furgocasa-blue py-12">
           <div className="container mx-auto px-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-white">Aviso Legal</h1>
+            <h1 className="text-3xl md:text-4xl font-bold text-white">Impressum</h1>
           </div>
         </section>
 
         <section className="py-12">
           <div className="container mx-auto px-4">
             <div className="bg-white rounded-xl shadow-sm p-8 max-w-4xl mx-auto prose prose-gray max-w-none">
-              <p className="text-gray-500">Última actualización: Enero 2024</p>
+              <p className="text-gray-500">Letzte Aktualisierung: Januar 2024</p>
 
-              <h2>1. Datos identificativos</h2>
-              <p>En cumplimiento con el deber de información recogido en artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico, a continuación se reflejan los siguientes datos:</p>
+              <h2>1. Identifikationsdaten</h2>
+              <p>In Erfüllung der Informationspflicht gemäß Artikel 10 des Gesetzes 34/2002 vom 11. Juli über Dienste der Informationsgesellschaft und elektronischen Handel werden nachstehend folgende Daten angegeben:</p>
               <ul>
-                <li><strong>Denominación social:</strong> FURGOCASA S.L.</li>
+                <li><strong>Firmenname:</strong> FURGOCASA S.L.</li>
                 <li><strong>CIF:</strong> B-XXXXXXXX</li>
-                <li><strong>Domicilio social:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
-                <li><strong>Correo electrónico:</strong> info@furgocasa.com</li>
-                <li><strong>Teléfono:</strong> +34 968 000 000</li>
-                <li><strong>Inscripción:</strong> Registro Mercantil de Murcia, Tomo XXX, Folio XXX, Hoja MU-XXXXX</li>
+                <li><strong>Geschäftssitz:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
+                <li><strong>E-Mail:</strong> info@furgocasa.com</li>
+                <li><strong>Telefon:</strong> +34 968 000 000</li>
+                <li><strong>Eintragung:</strong> Handelsregister von Murcia, Band XXX, Blatt XXX, Seite MU-XXXXX</li>
               </ul>
 
-              <h2>2. Objeto</h2>
-              <p>El presente aviso legal regula el uso del sitio web www.furgocasa.com, del que es titular FURGOCASA S.L. La navegación por el sitio web atribuye la condición de usuario del mismo e implica la aceptación plena y sin reservas de todas y cada una de las disposiciones incluidas en este Aviso Legal.</p>
+              <h2>2. Zweck</h2>
+              <p>Diese rechtliche Hinweise regeln die Nutzung der Website www.furgocasa.com, deren Inhaber FURGOCASA S.L. ist. Das Surfen auf der Website verleiht dem Nutzer den Status eines Benutzers und impliziert die vollständige und vorbehaltlose Annahme aller Bestimmungen, die in diesen rechtlichen Hinweisen enthalten sind.</p>
 
-              <h2>3. Condiciones de uso</h2>
-              <p>El usuario se compromete a hacer un uso adecuado de los contenidos y servicios que FURGOCASA ofrece a través de su portal y con carácter enunciativo pero no limitativo, a no emplearlos para:</p>
+              <h2>3. Nutzungsbedingungen</h2>
+              <p>Der Benutzer verpflichtet sich, die Inhalte und Dienstleistungen, die FURGOCASA über sein Portal anbietet, ordnungsgemäß zu nutzen, und zwar beispielhaft, aber nicht abschließend, sie nicht zu verwenden für:</p>
               <ul>
-                <li>Incurrir en actividades ilícitas, ilegales o contrarias a la buena fe y al orden público</li>
-                <li>Provocar daños en los sistemas físicos y lógicos de FURGOCASA, de sus proveedores o de terceras personas</li>
-                <li>Introducir o difundir virus informáticos o cualesquiera otros sistemas físicos o lógicos que sean susceptibles de provocar daños</li>
-                <li>Intentar acceder, utilizar y/o manipular los datos de FURGOCASA, terceros proveedores y otros usuarios</li>
+                <li>Begehung rechtswidriger, illegaler oder gegen Treu und Glauben und die öffentliche Ordnung verstoßender Handlungen</li>
+                <li>Verursachung von Schäden an den physischen und logischen Systemen von FURGOCASA, seinen Anbietern oder Dritten</li>
+                <li>Einführung oder Verbreitung von Computerviren oder anderen physischen oder logischen Systemen, die Schäden verursachen können</li>
+                <li>Versuch, auf Daten von FURGOCASA, Drittanbietern und anderen Benutzern zuzugreifen, sie zu verwenden und/oder zu manipulieren</li>
               </ul>
 
-              <h2>4. Propiedad intelectual e industrial</h2>
-              <p>FURGOCASA por sí misma o como cesionaria, es titular de todos los derechos de propiedad intelectual e industrial de su página web, así como de los elementos contenidos en la misma (a título enunciativo, imágenes, sonido, audio, vídeo, software o textos; marcas o logotipos, combinaciones de colores, estructura y diseño, selección de materiales usados, programas de ordenador necesarios para su funcionamiento, acceso y uso, etc.).</p>
-              <p>Todos los derechos reservados. En virtud de lo dispuesto en los artículos 8 y 32.1, párrafo segundo, de la Ley de Propiedad Intelectual, quedan expresamente prohibidas la reproducción, la distribución y la comunicación pública de la totalidad o parte de los contenidos de esta página web, con fines comerciales, en cualquier soporte y por cualquier medio técnico, sin la autorización de FURGOCASA.</p>
+              <h2>4. Geistiges und gewerbliches Eigentum</h2>
+              <p>FURGOCASA ist selbst oder als Zessionarin Inhaberin aller Rechte des geistigen und gewerblichen Eigentums an ihrer Website sowie der darin enthaltenen Elemente (beispielhaft: Bilder, Ton, Audio, Video, Software oder Texte; Marken oder Logos, Farbkombinationen, Struktur und Design, Auswahl der verwendeten Materialien, Computerprogramme, die für ihren Betrieb, Zugang und Nutzung erforderlich sind, usw.).</p>
+              <p>Alle Rechte vorbehalten. Gemäß den Bestimmungen der Artikel 8 und 32.1 Absatz 2 des Gesetzes über geistiges Eigentum sind die Vervielfältigung, Verbreitung und öffentliche Mitteilung der Gesamtheit oder eines Teils der Inhalte dieser Website zu kommerziellen Zwecken auf jedem Medium und mit jedem technischen Mittel ohne Genehmigung von FURGOCASA ausdrücklich untersagt.</p>
 
-              <h2>5. Exclusión de garantías y responsabilidad</h2>
-              <p>FURGOCASA no se hace responsable, en ningún caso, de los daños y perjuicios de cualquier naturaleza que pudieran ocasionar, a título enunciativo: errores u omisiones en los contenidos, falta de disponibilidad del portal o la transmisión de virus o programas maliciosos o lesivos en los contenidos, a pesar de haber adoptado todas las medidas tecnológicas necesarias para evitarlo.</p>
+              <h2>5. Haftungsausschluss</h2>
+              <p>FURGOCASA übernimmt in keinem Fall die Verantwortung für Schäden jeglicher Art, die beispielhaft verursacht werden könnten durch: Fehler oder Auslassungen in den Inhalten, Nichtverfügbarkeit des Portals oder die Übertragung von Viren oder bösartigen oder schädlichen Programmen in den Inhalten, trotz der Annahme aller notwendigen technischen Maßnahmen, um dies zu vermeiden.</p>
 
-              <h2>6. Modificaciones</h2>
-              <p>FURGOCASA se reserva el derecho de efectuar sin previo aviso las modificaciones que considere oportunas en su portal, pudiendo cambiar, suprimir o añadir tanto los contenidos y servicios que se presten a través de la misma como la forma en la que éstos aparezcan presentados o localizados en su portal.</p>
+              <h2>6. Änderungen</h2>
+              <p>FURGOCASA behält sich das Recht vor, ohne vorherige Ankündigung die Änderungen vorzunehmen, die es für angemessen hält, an seinem Portal, wobei es sowohl die Inhalte und Dienstleistungen, die über dieses Portal angeboten werden, ändern, löschen oder hinzufügen kann, als auch die Art und Weise, wie diese präsentiert oder lokalisiert werden.</p>
 
-              <h2>7. Enlaces</h2>
-              <p>En el caso de que en el sitio web se dispusiesen enlaces o hipervínculos hacia otros sitios de Internet, FURGOCASA no ejercerá ningún tipo de control sobre dichos sitios y contenidos. En ningún caso FURGOCASA asumirá responsabilidad alguna por los contenidos de algún enlace perteneciente a un sitio web ajeno.</p>
+              <h2>7. Links</h2>
+              <p>Falls auf der Website Links oder Hyperlinks zu anderen Websites im Internet vorhanden sind, übt FURGOCASA keine Kontrolle über diese Websites und Inhalte aus. In keinem Fall übernimmt FURGOCASA die Verantwortung für die Inhalte eines Links, der zu einer fremden Website gehört.</p>
 
-              <h2>8. Derecho de exclusión</h2>
-              <p>FURGOCASA se reserva el derecho a denegar o retirar el acceso a portal y/o los servicios ofrecidos sin necesidad de preaviso, a instancia propia o de un tercero, a aquellos usuarios que incumplan las presentes Condiciones Generales de Uso.</p>
+              <h2>8. Ausschlussrecht</h2>
+              <p>FURGOCASA behält sich das Recht vor, den Zugang zum Portal und/oder den angebotenen Dienstleistungen ohne Vorankündigung zu verweigern oder zurückzuziehen, auf eigene Initiative oder auf Initiative eines Dritten, für Benutzer, die diese Allgemeinen Nutzungsbedingungen nicht einhalten.</p>
 
-              <h2>9. Legislación aplicable y jurisdicción</h2>
-              <p>La relación entre FURGOCASA y el usuario se regirá por la normativa española vigente y cualquier controversia se someterá a los Juzgados y Tribunales de la ciudad de Murcia.</p>
+              <h2>9. Anwendbares Recht und Gerichtsstand</h2>
+              <p>Die Beziehung zwischen FURGOCASA und dem Benutzer wird durch die geltende spanische Gesetzgebung geregelt, und jede Streitigkeit wird den Gerichten und Tribunalen der Stadt Murcia unterworfen.</p>
             </div>
           </div>
         </section>

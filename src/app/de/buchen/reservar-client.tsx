@@ -13,9 +13,9 @@ const locations = [
     address: "Avenida Puente Tocinos, 4",
     city: "30007 Casillas, Murcia",
     phone: "+34 868 364 161",
-    hours: "Lunes a Viernes: 10:00 - 14:00 | 17:00 - 19:30",
-    description: "Nuestra sede central con toda la flota disponible",
-    features: ["Flota completa", "Parking gratuito clientes", "A 15 min de la estación de tren"],
+    hours: "Montag bis Freitag: 10:00 - 14:00 | 17:00 - 19:30",
+    description: "Unser Hauptsitz mit der gesamten verfügbaren Flotte",
+    features: ["Vollständige Flotte", "Kostenloses Parken für Kunden", "15 Min vom Bahnhof"],
     image: "/images/locations/murcia.jpg",
     available: true,
   },
@@ -23,12 +23,12 @@ const locations = [
     id: "madrid",
     name: "Madrid",
     slug: "madrid",
-    address: "Servicio de entrega y recogida",
+    address: "Liefer- und Abholservice",
     city: "Madrid",
     phone: "+34 868 364 161",
-    hours: "Lunes a Viernes: 10:00 - 14:00 | 17:00 - 19:30",
-    description: "Punto de entrega y recogida en Madrid disponible",
-    features: ["Entrega personalizada", "Cerca del aeropuerto", "Servicio premium"],
+    hours: "Montag bis Freitag: 10:00 - 14:00 | 17:00 - 19:30",
+    description: "Liefer- und Abholpunkt in Madrid verfügbar",
+    features: ["Personalisierte Lieferung", "Nah am Flughafen", "Premium-Service"],
     image: "/images/locations/madrid.jpg",
     available: true,
   },
@@ -116,10 +116,10 @@ export function ReservarClient() {
           
           <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             {[
-              { icon: Calendar, title: "1. Elige fechas", desc: "Selecciona tus fechas de viaje" },
-              { icon: Car, title: "2. Elige camper", desc: "Compara y selecciona tu vehículo" },
-              { icon: CreditCard, title: "3. Paga señal", desc: "Solo el 30% para confirmar" },
-              { icon: CheckCircle, title: "4. ¡A viajar!", desc: "Recoge tu camper y disfruta" },
+              { icon: Calendar, title: "1. Daten wählen", desc: "Wählen Sie Ihre Reisedaten" },
+              { icon: Car, title: "2. Wohnmobil wählen", desc: "Vergleichen und wählen Sie Ihr Fahrzeug" },
+              { icon: CreditCard, title: "3. Anzahlung zahlen", desc: "Nur 30% zur Bestätigung" },
+              { icon: CheckCircle, title: "4. Auf die Reise!", desc: "Holen Sie Ihr Wohnmobil ab und genießen Sie" },
             ].map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">

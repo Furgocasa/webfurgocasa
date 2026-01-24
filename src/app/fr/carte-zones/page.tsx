@@ -7,8 +7,8 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const MAPA_AREAS_METADATA: Metadata = {
-  title: "Mapa de Áreas para Autocaravanas",
-  description: "Encuentra las mejores áreas de servicio y pernocta para autocaravanas y campers en España. Mapa interactivo con servicios, valoraciones y fotos.",
+  title: "Carte des Aires Camping-Cars",
+  description: "Trouvez les meilleures aires de service et de stationnement pour camping-cars et vans en Espagne. Carte interactive avec services, avis et photos.",
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

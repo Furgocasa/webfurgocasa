@@ -1,7 +1,6 @@
 import { Metadata } from"next";
 import { LocalizedLink } from"@/components/localized-link";
 import { notFound } from"next/navigation";
-import { headers } from"next/headers";
 import { ArrowLeft, Users, Bed, Fuel, Settings, Ruler } from"lucide-react";
 import { getVehicleBySlug } from"@/lib/supabase/queries";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
@@ -32,15 +31,8 @@ import { createClient } from"@supabase/supabase-js";
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   
-  // Intentar obtener locale de headers, con fallback a 'es'
-  let locale: Locale = 'es';
-  try {
-    const headersList = await headers();
-    locale = (headersList.get('x-detected-locale') || 'es') as Locale;
-  } catch {
-    // Durante build estático, headers() puede fallar
-    locale = 'es';
-  }
+  // Locale fijo para /de/
+  const locale: Locale = 'de';
   
   const { data: vehicle } = await getVehicleBySlug(slug);
 
@@ -49,7 +41,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
-  const path = `/vehiculos/${slug}`;
+  const path = `/fahrzeuge/${slug}`;
   // ✅ Canonical autorreferenciado usando helper centralizado
   const alternates = buildCanonicalAlternates(path, locale);
   const title = vehicle.name;
@@ -87,15 +79,8 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function VehicleDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  // ✅ Obtener el idioma del header establecido por el middleware
-  let locale: Locale = 'es';
-  try {
-    const headersList = await headers();
-    locale = (headersList.get('x-detected-locale') || 'es') as Locale;
-  } catch {
-    // Durante build estático, headers() puede fallar
-    locale = 'es';
-  }
+  // Locale fijo para /de/
+  const locale: Locale = 'de';
   const t = (key: string) => translateServer(key, locale);
   
   const { slug } = await params;

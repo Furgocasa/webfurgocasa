@@ -1,5 +1,4 @@
 import { Metadata } from"next";
-import { headers } from"next/headers";
 import { createClient } from"@supabase/supabase-js";
 import { VehicleListClient } from"@/components/vehicle/vehicle-list-client";
 import { LocalizedLink } from"@/components/localized-link";
@@ -66,9 +65,8 @@ const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; k
 
 // ✅ METADATOS SEO con canonical + hreflang
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
-  return generateMultilingualMetadata('/vehiculos', locale, VEHICULOS_METADATA);
+  const locale: Locale = 'de'; // Locale fijo
+  return generateMultilingualMetadata('/fahrzeuge', locale, VEHICULOS_METADATA);
 }
 
 // ✅ Cargar vehículos en el servidor
@@ -131,8 +129,9 @@ export const revalidate = 3600;
 
 // ✅ SERVER COMPONENT
 export default async function VehiculosPage() {
+  const locale: Locale = 'de'; // Locale fijo
   // Función de traducción del servidor
-  const t = (key: string) => translateServer(key, 'es');
+  const t = (key: string) => translateServer(key, locale);
   
   // Cargar todos los vehículos en el servidor
   const vehicles = await loadVehicles();

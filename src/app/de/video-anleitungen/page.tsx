@@ -6,22 +6,22 @@ import type { Locale } from "@/lib/i18n/config";
 
 interface PageProps {}
 
-// 🎯 SEO Metadata - Único y optimizado para /video-tutoriales
+// 🎯 SEO Metadata - Einzigartig und optimiert für /video-anleitungen
 const VIDEO_TUTORIALES_METADATA: Metadata = {
-  title: "Video Tutoriales del Camper",
-  description: "Videos tutoriales sobre el funcionamiento de tu camper de alquiler. Panel de control, agua, electricidad, calefacción, nevera y más sistemas explicados paso a paso.",
-  keywords: "video tutorial camper, como usar autocaravana, tutorial panel control camper, videos furgocasa, aprender usar camper",
+  title: "Video-Anleitungen Wohnmobil",
+  description: "Video-Anleitungen zur Bedienung Ihres Miet-Wohnmobils. Bedienfeld, Wasser, Elektrik, Heizung, Kühlschrank und mehr Systeme Schritt für Schritt erklärt.",
+  keywords: "video anleitung wohnmobil, wie benutzt man wohnmobil, tutorial bedienfeld wohnmobil, videos furgocasa, wohnmobil benutzen lernen",
   openGraph: {
-    title: "Video Tutoriales del Camper",
-    description: "Aprende a usar tu camper de alquiler con nuestros videos tutoriales.",
+    title: "Video-Anleitungen Wohnmobil",
+    description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen mit unseren Video-Anleitungen.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "de_DE",
   },
   twitter: {
     card: "summary",
-    title: "Video Tutoriales del Camper",
-    description: "Aprende a usar tu camper de alquiler.",
+    title: "Video-Anleitungen Wohnmobil",
+    description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen.",
   },
   robots: {
     index: true,

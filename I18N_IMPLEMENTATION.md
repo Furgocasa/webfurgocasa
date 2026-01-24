@@ -344,6 +344,71 @@ Mapeo de rutas entre idiomas para navegación y SEO.
 
 ---
 
+## ✅ Estado de Traducción de Metadatos y Contenido (Enero 2026)
+
+### Inglés (`/en/`) - COMPLETADO
+| Página | Estado |
+|--------|--------|
+| `/en/vehicles` | ✅ Traducido |
+| `/en/sales` + `/en/sales/videos` | ✅ Traducido |
+| `/en/video-tutorials` | ✅ Traducido |
+| `/en/vip-clients` | ✅ Traducido |
+| `/en/weekend-booking` | ✅ Traducido |
+| `/en/murcia-parking` | ✅ Traducido |
+| `/en/payment/error` | ✅ Traducido |
+| `/en/offers` | ✅ Traducido |
+| `/en/rental-documentation` | ✅ Traducido |
+| `/en/areas-map` | ✅ Traducido |
+| `/en/book` | ✅ Traducido |
+| `/en/search` | ✅ Traducido |
+| `/en/sitemap-html` | ✅ Traducido |
+| `/en/faqs` | ✅ Traducido |
+| `/en/camper-guide` | ✅ Traducido |
+| `/en/artificial-intelligence` | ✅ Traducido |
+| `/en/cookies`, `/en/privacy`, `/en/legal-notice` | ✅ noindex + Traducido |
+
+### Francés (`/fr/`) - COMPLETADO
+| Página | Estado |
+|--------|--------|
+| `/fr/ventes` + `/fr/ventes/videos` | ✅ Traducido |
+| `/fr/tutoriels-video` | ✅ Traducido |
+| `/fr/clients-vip` | ✅ Traducido |
+| `/fr/reservation-weekend` | ✅ Traducido |
+| `/fr/parking-murcie` | ✅ Traducido |
+| `/fr/paiement/error` | ✅ Traducido |
+| `/fr/offres` | ✅ Traducido |
+| `/fr/documentation-location` | ✅ Traducido |
+| `/fr/carte-zones` | ✅ Traducido |
+| `/fr/reserver` | ✅ Traducido |
+| `/fr/recherche` | ✅ Traducido |
+| `/fr/sitemap-html` | ✅ Traducido |
+| `/fr/faqs` | ✅ Traducido |
+| `/fr/guide-camping-car` | ✅ Traducido |
+| `/fr/intelligence-artificielle` | ✅ Traducido |
+| `/fr/cookies`, `/fr/confidentialite`, `/fr/mentions-legales` | ✅ noindex + Traducido |
+
+### Alemán (`/de/`) - COMPLETADO
+| Página | Estado |
+|--------|--------|
+| `/de/verkauf` + `/de/verkauf/videos` | ✅ Traducido |
+| `/de/video-anleitungen` | ✅ Traducido |
+| `/de/vip-kunden` | ✅ Traducido |
+| `/de/wochenend-buchung` | ✅ Traducido |
+| `/de/parkplatz-murcia` | ✅ Traducido |
+| `/de/zahlung/error` | ✅ Traducido |
+| `/de/angebote` | ✅ Traducido |
+| `/de/mietdokumentation` | ✅ Traducido |
+| `/de/gebietskarte` | ✅ Traducido |
+| `/de/buchen` | ✅ Traducido |
+| `/de/suche` | ✅ Traducido |
+| `/de/sitemap-html` | ✅ Traducido |
+| `/de/faqs` | ✅ Traducido |
+| `/de/wohnmobil-guide` | ✅ Traducido |
+| `/de/kunstliche-intelligenz` | ✅ Traducido |
+| `/de/cookies`, `/de/datenschutz`, `/de/impressum` | ✅ noindex + Traducido |
+
+---
+
 ## 📚 Documentación Relacionada
 
 - **[MIGRACION-CARPETAS-FIJAS-COMPLETADA.md](./MIGRACION-CARPETAS-FIJAS-COMPLETADA.md)** - Historial de migración
@@ -356,5 +421,5 @@ Mapeo de rutas entre idiomas para navegación y SEO.
 **✅ Sistema i18n con carpetas fijas por idioma - Producción estable**
 
 Desarrollado para: Furgocasa  
-Versión: 4.0.0  
-Fecha: Enero 2026
+Versión: 4.1.0  
+Fecha: 24 Enero 2026

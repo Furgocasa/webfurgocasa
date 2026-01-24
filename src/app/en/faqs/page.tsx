@@ -4,22 +4,22 @@ import { FaqsClient } from "./faqs-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
-// 🎯 SEO Metadata - Único y optimizado para /faqs
+// 🎯 SEO Metadata - Unique and optimized for /faqs
 const FAQS_METADATA: Metadata = {
-  title: "Preguntas Frecuentes sobre Alquiler de Campers",
-  description: "Resuelve tus dudas sobre el alquiler de autocaravanas en Furgocasa. Requisitos, seguros, kilómetros, mascotas, recogida y devolución. Todo lo que necesitas saber.",
-  keywords: "preguntas frecuentes alquiler camper, dudas autocaravana, requisitos alquiler camper, faqs furgocasa, información alquiler autocaravana",
+  title: "Frequently Asked Questions about Campervan Rental",
+  description: "Get answers to your questions about motorhome rental at Furgocasa. Requirements, insurance, mileage, pets, pick-up and return. Everything you need to know.",
+  keywords: "campervan rental faq, motorhome questions, camper rental requirements, furgocasa faqs, motorhome rental information",
   openGraph: {
-    title: "Preguntas Frecuentes sobre Alquiler de Campers",
-    description: "Resuelve todas tus dudas sobre el alquiler de autocaravanas. Requisitos, seguros, mascotas y más.",
+    title: "Frequently Asked Questions about Campervan Rental",
+    description: "Get all your questions about motorhome rental answered. Requirements, insurance, pets and more.",
     type: "website",
     siteName: "Furgocasa",
-    locale: "es_ES",
+    locale: "en_GB",
   },
   twitter: {
     card: "summary",
-    title: "Preguntas Frecuentes sobre Alquiler de Campers",
-    description: "Resuelve tus dudas sobre el alquiler de autocaravanas.",
+    title: "Frequently Asked Questions about Campervan Rental",
+    description: "Get your questions about motorhome rental answered.",
   },
   robots: {
     index: true,
