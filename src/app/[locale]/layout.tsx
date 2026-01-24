@@ -17,9 +17,9 @@ import { i18n, type Locale, isValidLocale } from '@/lib/i18n/config';
 
 interface LocaleLayoutProps {
   children: React.ReactNode;
-  params: {
+  params: Promise<{
     locale: string;
-  };
+  }>;
 }
 
 export async function generateStaticParams() {
@@ -29,8 +29,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function LocaleLayout({ children, params }: LocaleLayoutProps) {
-  const { locale } = params;
+export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
+  const { locale } = await params;
   
   // Validar que el locale sea válido
   if (!isValidLocale(locale)) {
