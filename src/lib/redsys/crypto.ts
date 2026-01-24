@@ -1,13 +1,44 @@
 import crypto from "crypto";
 
 /**
+ * ╔══════════════════════════════════════════════════════════════════════════════╗
+ * ║                    ⚠️  ARCHIVO CRÍTICO - NO MODIFICAR  ⚠️                      ║
+ * ╠══════════════════════════════════════════════════════════════════════════════╣
+ * ║  Este archivo contiene la implementación de firma criptográfica para Redsys  ║
+ * ║  que FUNCIONA CORRECTAMENTE desde el 24/01/2026.                             ║
+ * ║                                                                              ║
+ * ║  ÚLTIMA VERIFICACIÓN EXITOSA: 24/01/2026 11:27                               ║
+ * ║  - Pedido: 260124102740                                                      ║
+ * ║  - Importe: 142,50€                                                          ║
+ * ║  - Comercio: 347036410                                                       ║
+ * ║  - Terminal: 001                                                             ║
+ * ║                                                                              ║
+ * ║  ⛔ PROHIBIDO CAMBIAR:                                                        ║
+ * ║  - El tipo de padding (DEBE ser zero padding manual)                         ║
+ * ║  - setAutoPadding(false) - NO CAMBIAR A true                                 ║
+ * ║  - El tipo de retorno de encrypt3DES (DEBE ser Buffer, NO string)            ║
+ * ║  - La forma de usar derivedKey en HMAC (directo como Buffer)                 ║
+ * ║                                                                              ║
+ * ║  Commit de referencia: 3cf6b28 (24/01/2026 10:44)                            ║
+ * ╚══════════════════════════════════════════════════════════════════════════════╝
+ */
+
+/**
  * Cifra los datos usando 3DES con la clave del comercio
  * 
- * IMPORTANTE según documentación oficial de Redsys:
- * - 3DES en modo CBC
- * - IV = 8 bytes de ceros
- * - SIN padding automático (usamos zero padding manual)
+ * ⚠️ CONFIGURACIÓN CRÍTICA QUE FUNCIONA - NO MODIFICAR:
+ * - Algoritmo: des-ede3-cbc (Triple DES en modo CBC)
+ * - IV: 8 bytes de ceros (Buffer.alloc(8, 0))
+ * - Padding: ZERO PADDING MANUAL (NO PKCS#7)
+ * - setAutoPadding: FALSE (desactivado)
+ * - Retorno: Buffer (NO string base64)
  * - La clave viene en Base64 y debe decodificarse a 24 bytes
+ * 
+ * ❌ CAMBIOS QUE ROMPEN LA FIRMA:
+ * - Usar setAutoPadding(true) → produce firma inválida
+ * - Devolver string base64 en vez de Buffer → produce firma inválida
+ * - Usar PKCS#7 padding → produce firma inválida
+ * - Convertir a base64 y luego a Buffer → produce firma inválida
  */
 export function encrypt3DES(data: string, key: string): Buffer {
   const keyBuffer = Buffer.from(key, "base64");
@@ -65,10 +96,17 @@ export function decrypt3DES(data: Buffer, key: string): string {
 /**
  * Genera la firma HMAC_SHA256_V1 para Redsys
  * 
- * Proceso según documentación oficial:
- * 1. Cifrar el número de pedido con 3DES usando la clave secreta → clave derivada
- * 2. Calcular HMAC-SHA256 de los parámetros Base64 usando la clave derivada
- * 3. Codificar el resultado en Base64
+ * ⚠️ PROCESO CRÍTICO QUE FUNCIONA - NO MODIFICAR:
+ * 
+ * 1. Cifrar orderNumber con 3DES usando secretKey → derivedKey (Buffer)
+ * 2. Usar derivedKey DIRECTAMENTE como Buffer para HMAC (NO convertir a base64)
+ * 3. HMAC-SHA256 de merchantParameters con derivedKey
+ * 4. Resultado en Base64
+ * 
+ * ❌ CAMBIOS QUE ROMPEN LA FIRMA:
+ * - Convertir derivedKey a base64 y luego a Buffer → INCORRECTO
+ * - Usar derivedKey como string → INCORRECTO
+ * - Cambiar el orden de operaciones → INCORRECTO
  */
 export function createSignature(
   merchantParameters: string,

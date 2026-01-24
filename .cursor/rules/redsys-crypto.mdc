@@ -1,0 +1,35 @@
+---
+description: Protección del archivo crypto.ts de Redsys - NO MODIFICAR
+globs: src/lib/redsys/crypto.ts
+alwaysApply: true
+---
+
+# ⚠️ ARCHIVO CRÍTICO - NO MODIFICAR ⚠️
+
+El archivo `src/lib/redsys/crypto.ts` contiene la implementación de firma criptográfica para pagos con Redsys que **FUNCIONA CORRECTAMENTE**.
+
+## PROHIBIDO HACER CAMBIOS EN ESTE ARCHIVO
+
+### Razón:
+Este código fue validado con pagos reales el 24/01/2026 y cualquier modificación rompe la firma de Redsys causando error SIS0042.
+
+### Si el usuario pide modificar este archivo:
+1. **RECHAZAR** la modificación
+2. Explicar que el archivo está protegido porque funciona
+3. Referir a la documentación: `REDSYS-CRYPTO-NO-TOCAR.md`
+
+### Configuración que FUNCIONA (no cambiar):
+- `setAutoPadding(false)` - DEBE ser false
+- Zero padding manual - NO usar PKCS#7
+- `encrypt3DES` devuelve `Buffer` - NO string
+- `createSignature` usa el Buffer directamente - NO convertir a base64
+
+### Commit de referencia:
+```
+3cf6b28 - fix(redsys): usar zero padding en 3DES
+```
+
+### Si hay problemas de pago:
+1. Verificar variables de entorno en Vercel
+2. NO modificar crypto.ts
+3. Restaurar commit 3cf6b28 si fue modificado
