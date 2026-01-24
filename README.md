@@ -494,7 +494,7 @@ src/lib/supabase/
 | **Vehículos** | `/administrator/vehiculos` | ✅ | `usePaginatedData` | CRUD completo |
 | **Reservas** | `/administrator/reservas` | ✅ | `useAllDataProgressive` | Con filtros |
 | **Clientes** | `/administrator/clientes` | ✅ | `usePaginatedData` | Con búsqueda |
-| **Pagos** | `/administrator/pagos` | ✅ | `usePaginatedData` | Lectura |
+| **Gestión pagos** | `/administrator/pagos` | ✅ | `usePaginatedData` | Lectura + Edición manual |
 | **Extras** | `/administrator/extras` | ✅ | `useAdminData` | CRUD inline |
 | **Equipamiento** | `/administrator/equipamiento` | ✅ | `useAdminData` | CRUD inline |
 | **Temporadas** | `/administrator/temporadas` | ✅ | `useAdminData` | Por año |
@@ -836,21 +836,80 @@ supabase/fix-all-rls-policies.sql
 
 ---
 
-## 💳 Sistema de Pago Fraccionado 50%-50%
+## 💳 Sistema de Pagos Completo (v2.0)
 
-### Política de pago:
-1. **Primera mitad (50%)**: Al confirmar reserva
-2. **Segunda mitad (50%)**: Hasta 15 días antes del alquiler
+**Estado:** ✅ COMPLETAMENTE OPERATIVO  
+**Última actualización:** 24/01/2026
 
-### Métodos de pago:
+### 🎯 Funcionalidades
 
-**Redsys** (Principal - 0.3%):
-- TPV Español homologado
-- Configuración en `REDSYS-CONFIGURACION.md`
+✅ **Pagos en línea** - Redsys (sin comisión) + Stripe (+2%)  
+✅ **Pago fraccionado** - 50% al reservar, 50% antes del alquiler  
+✅ **Gestión manual** - Transferencias, efectivo, bizum desde admin  
+✅ **Fallback automático** - Si notificación falla, se procesa en `/pago/exito`  
+✅ **Emails automatizados** - Confirmación al cliente + admin  
 
-**Stripe** (Alternativo - 1.4% + 0.25€):
-- Pasarela internacional
-- Configuración en `STRIPE-CONFIGURACION.md`
+### 📚 Documentación Completa
+
+| Documento | Contenido |
+|-----------|-----------|
+| **[SISTEMA-PAGOS.md](./SISTEMA-PAGOS.md)** | 📖 Guía completa del sistema |
+| **[REDSYS-FUNCIONANDO.md](./REDSYS-FUNCIONANDO.md)** | ✅ Estado y configuración Redsys |
+| **[REDSYS-CRYPTO-NO-TOCAR.md](./REDSYS-CRYPTO-NO-TOCAR.md)** | ⛔ Firma criptográfica protegida |
+
+### Métodos de Pago
+
+**1. Redsys** (Recomendado - Sin comisión)
+- TPV bancario español
+- Visa, Mastercard, American Express
+- Procesamiento inmediato
+
+**2. Stripe** (+2% comisión)
+- Pagos internacionales
+- Apple Pay / Google Pay
+- UI muestra desglose de precio
+
+**3. Gestión Manual** (Admin)
+- Transferencia bancaria
+- Efectivo
+- Bizum
+- Admin marca como completado → Confirma reserva + envía email
+
+### Arquitectura
+
+```
+Usuario → Pago exitoso → Redsys notifica servidor
+                              ↓
+                    ❌ Si notificación falla
+                              ↓
+            Frontend detecta pago pending en /pago/exito
+                              ↓
+            Fallback automático procesa el pago
+                              ↓
+        Payment: completed | Booking: confirmed | Email: ✉️
+```
+
+**Archivos críticos (⛔ NO TOCAR):**
+- `src/lib/redsys/crypto.ts` - Firma HMAC-SHA256
+- `src/lib/redsys/params.ts` - Parámetros comercio
+- `src/app/api/redsys/notification/route.ts` - Notificación servidor
+- `src/app/api/redsys/verify-payment/route.ts` - Fallback
+- `src/app/pago/exito/page.tsx` - Página éxito con fallback
+
+### Gestión Manual desde Admin
+
+**URL:** `/administrator/pagos/[id]`
+
+**Flujo:**
+1. Cliente contacta: "Hice transferencia"
+2. Admin busca pago pendiente
+3. Clic en ojo 👁️ → Detalle
+4. Cambiar método: "Transferencia"
+5. Cambiar estado: "Completado"
+6. Guardar → **Automáticamente:**
+   - ✅ Confirma reserva
+   - ✅ Envía email al cliente
+   - ✅ Registra en notas
 
 ---
 
@@ -1058,10 +1117,12 @@ NEXT_PUBLIC_GA_ID (opcional)
 - **GALERIA-MULTIPLE-VEHICULOS.md** - Galería de vehículos
 
 #### Pagos
-- **METODOS-PAGO-RESUMEN.md** - Resumen sistema dual
-- **REDSYS-CONFIGURACION.md** - Configuración Redsys
-- **STRIPE-CONFIGURACION.md** - Configuración Stripe
-- **STRIPE-VERCEL-PRODUCCION.md** - Deploy Stripe
+- **[SISTEMA-PAGOS.md](./SISTEMA-PAGOS.md)** - Sistema completo v2.0
+- **[REDSYS-FUNCIONANDO.md](./REDSYS-FUNCIONANDO.md)** - Estado Redsys
+- **[REDSYS-CRYPTO-NO-TOCAR.md](./REDSYS-CRYPTO-NO-TOCAR.md)** - Firma protegida
+- **REDSYS-CONFIGURACION.md** - Configuración Redsys (legacy)
+- **STRIPE-CONFIGURACION.md** - Configuración Stripe (legacy)
+- **STRIPE-VERCEL-PRODUCCION.md** - Deploy Stripe (legacy)
 
 #### Admin y Optimización
 - **ADMIN_SETUP.md** - Setup administrador

@@ -4,6 +4,212 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🎟️ [2.0.0] - 24 de Enero 2026 - **Sistema de Pagos Completo v2.0**
+
+### 🎯 **SISTEMA DE PAGOS COMPLETAMENTE OPERATIVO**
+
+Sistema de pagos robusto con múltiples capas de seguridad y gestión manual desde admin.
+
+---
+
+### ✅ **CAMBIOS IMPLEMENTADOS**
+
+#### 1. **Sistema de Fallback Automático**
+
+**Problema resuelto:** Notificación servidor-a-servidor de Redsys puede fallar
+
+**Solución:**
+- Fallback agresivo en `/pago/exito`
+- Si `payment.status === "pending"` → activa automáticamente
+- Principio: Redsys SOLO redirige a URLOK si pago autorizado
+- Llama a `/api/redsys/verify-payment` con todos los logs
+
+```typescript
+// src/app/pago/exito/page.tsx
+const shouldTriggerFallback = data.status === "pending";
+```
+
+#### 2. **Gestión Manual de Pagos** 🆕
+
+**Nueva funcionalidad:** Admin puede editar pagos manualmente
+
+- **Página:** `/administrator/pagos/[id]`
+- **Editar:** Método de pago (tarjeta, transferencia, efectivo, bizum)
+- **Cambiar estado:** pending → completed
+- **Resultado automático:**
+  - ✅ Actualiza reserva a "confirmed"
+  - ✅ Incrementa `amount_paid`
+  - ✅ Envía email de confirmación
+  - ✅ Registra en notas con timestamp
+
+**API:** `POST /api/payments/update-manual`
+- Logs numerados (1/7 hasta 7/7)
+- Validaciones de seguridad
+- Dispara mismo flujo que pago automático
+
+**Caso de uso:**
+```
+Cliente: "Prefiero pagar por transferencia"
+        ↓
+Admin → Pagos → Ver detalle (ojo 👁️)
+        ↓
+Cambiar método: Transferencia
+Cambiar estado: Completado
+        ↓
+Sistema automáticamente confirma + envía email
+```
+
+#### 3. **Comisión Stripe (2%)**
+
+**Implementado:** Comisión del 2% SOLO en Stripe (Redsys sin comisión)
+
+- UI muestra desglose del precio
+- Cálculo automático en frontend
+- Badge "Recomendado" en Redsys
+- Mensaje claro "+2% comisión" en Stripe
+
+```typescript
+// Ejemplo: Reserva de 142,50€
+Redsys:  142,50€ (sin comisión)
+Stripe:  145,35€ (+2,85€ comisión)
+```
+
+#### 4. **Fix Crítico: Emails de Confirmación**
+
+**Problema:** Emails no se enviaban tras pagos exitosos
+
+**Causa:** Handler verificaba `status === "authorized"` pero devolvíamos `"completed"`
+
+**Solución:**
+```typescript
+// src/app/api/redsys/notification/route.ts
+if (status === "completed" && payment) { // Antes: "authorized"
+  // Actualizar reserva + enviar email
+}
+```
+
+#### 5. **Logs Extensos y Numerados**
+
+**Mejora:** Todos los endpoints tienen logs numerados para debugging
+
+**verify-payment:**
+```
+🔄 [1/8] Datos recibidos
+🔍 [2/8] Buscando pago
+💾 [3/8] Pago ya procesado
+💾 [4/8] Actualizando pago
+💾 [5/8] Actualizando reserva
+📧 [6/8] Enviando email
+✅ [8/8] PROCESO COMPLETADO
+```
+
+**notification:**
+```
+📨 [1/7] Parámetros recibidos
+[...]
+📧 [7/7] Email enviado
+```
+
+**pago/exito:**
+```
+[PAGO-EXITO] === INICIANDO loadPaymentInfo ===
+[PAGO-EXITO] 🔍 TODOS los parámetros URL
+[PAGO-EXITO] ⚠️ EVALUANDO FALLBACK AGRESIVO
+```
+
+#### 6. **Herramientas de Diagnóstico** 🔍
+
+**Página de Test:** `/pago/test`
+- Captura TODOS los datos que envía Redsys
+- Muestra URL completa, query params, POST data
+- Decodifica `Ds_MerchantParameters`
+- Copia JSON completo
+
+**API de Test:** `/api/redsys/test-urls`
+- Muestra URLs configuradas
+- Instrucciones de uso
+
+#### 7. **Documentación Completa**
+
+- **SISTEMA-PAGOS.md** - Guía completa del sistema v2.0
+- **REDSYS-FUNCIONANDO.md** - Estado y configuración actualizada
+- **REDSYS-CRYPTO-NO-TOCAR.md** - Protección de firma (sin cambios)
+
+#### 8. **Generación Robusta de Order Numbers**
+
+**Evolución:**
+
+```
+YYMMDDHHMMSS (v1) → Colisiones en mismo segundo
+      ↓
+YYMMDDHHMM + 2 random (v2) → Mejor pero limitado
+      ↓
+YYMM + 4 random + HHMM (v3 - ACTUAL) → 10,000 combinaciones/min
+```
+
+**Formato final:**
+```
+260142781530
+├─┬─┘└──┬──┘└─┬─┘
+  │    │     └─ Hora:Minuto (1530 = 15:30)
+  │    └─────── Random 4 dígitos (4278)
+  └──────────── Año:Mes (2601 = Enero 2026)
+```
+
+---
+
+### 🔧 **ARCHIVOS MODIFICADOS**
+
+#### Frontend
+- `src/app/pago/exito/page.tsx` - Fallback agresivo + logs
+- `src/app/reservar/[id]/pago/page.tsx` - Comisión Stripe + logs
+- `src/app/administrator/(protected)/pagos/[id]/page.tsx` - Nueva página detalle 🆕
+
+#### Backend - APIs
+- `src/app/api/redsys/verify-payment/route.ts` - Logs extensos + leniencia
+- `src/app/api/redsys/notification/route.ts` - Fix `completed` vs `authorized`
+- `src/app/api/payments/update-manual/route.ts` - Nueva API gestión manual 🆕
+- `src/app/api/payments/by-order/route.ts` - Lookup sin RLS
+- `src/app/api/redsys/test-urls/route.ts` - Nueva herramienta diagnóstico 🆕
+
+#### Herramientas
+- `src/app/pago/test/page.tsx` - Nueva página test 🆕
+
+#### Utilidades
+- `src/lib/utils.ts` - `generateOrderNumber()` v3 (4 dígitos random)
+- `src/lib/redsys/types.ts` - `getPaymentStatus()` devuelve `"completed"`
+
+#### Documentación
+- `SISTEMA-PAGOS.md` - Nueva guía completa 🆕
+- `REDSYS-FUNCIONANDO.md` - Actualizada v2.0
+- `README.md` - Sección pagos actualizada
+
+---
+
+### 📊 **ESTADO FINAL**
+
+✅ **Pagos Redsys:** Funcionando perfectamente  
+✅ **Pagos Stripe:** Funcionando con comisión 2%  
+✅ **Fallback:** Activado y probado  
+✅ **Gestión manual:** Completamente operativa  
+✅ **Emails:** Enviándose correctamente  
+✅ **Admin panel:** Gestión completa de pagos  
+
+**Verificado en producción:** 24/01/2026
+
+---
+
+### 🚀 **PRÓXIMAS MEJORAS** (Opcionales)
+
+- [ ] Botón "Reenviar email" en detalle de pago
+- [ ] Histórico de cambios en payments
+- [ ] Dashboard de conversión de pagos
+- [ ] Exportar pagos a CSV/Excel
+- [ ] Webhooks para integraciones externas
+- [ ] Reembolsos automatizados
+
+---
+
 ## 🎟️ [1.0.12] - 23 de Enero 2026 - **Sistema de Cupones de Descuento**
 
 ### 🎯 **NUEVA FUNCIONALIDAD**
