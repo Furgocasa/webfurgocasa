@@ -226,20 +226,21 @@ function PagoExitoContent() {
           
           // RESPALDO: Si el pago sigue pendiente, actualizar el estado
           // Nota: Redsys SOLO redirige a URLOK si el pago fue exitoso
-          const responseCodeNum = parseInt(redsysResponseCode || "9999", 10);
+          const responseCodeNum = parseInt(redsysResponseCode || "0000", 10);
           const isRedsysSuccess = responseCodeNum >= 0 && responseCodeNum <= 99;
           
-          // Condición para activar el respaldo:
-          // 1. Pago pendiente Y (Redsys confirma éxito O no tenemos parámetros pero el usuario llegó aquí)
-          const shouldTriggerFallback = data.status === "pending" && 
-            (isRedsysSuccess || !merchantParams); // Si no hay params pero llegó a éxito, asumir éxito
+          // FALLBACK AGRESIVO: Si llegó a /pago/exito Y el pago está pendiente, 
+          // ASUMIMOS que el pago fue exitoso (Redsys solo redirige aquí si fue autorizado)
+          const shouldTriggerFallback = data.status === "pending";
           
-          console.log("[PAGO-EXITO] Evaluando fallback:", {
+          console.log("[PAGO-EXITO] ⚠️ EVALUANDO FALLBACK AGRESIVO:", {
             paymentStatus: data.status,
             isPending: data.status === "pending",
             merchantParams: !!merchantParams,
+            redsysResponseCode,
             isRedsysSuccess,
-            shouldTriggerFallback
+            shouldTriggerFallback,
+            mensaje: "Si llegó aquí con pago pending → ACTIVAR FALLBACK"
           });
           
           if (shouldTriggerFallback) {

@@ -13,12 +13,13 @@ export async function POST(request: NextRequest) {
   console.log("\n" + "=".repeat(80));
   console.log("🔄 REDSYS VERIFY-PAYMENT - VERIFICACIÓN DE RESPALDO");
   console.log("=".repeat(80));
+  console.log("⏰ Timestamp:", new Date().toISOString());
   
   try {
     const body = await request.json();
     const { orderNumber, responseCode, authCode, merchantParams, fromSuccessPage } = body;
     
-    console.log("📥 Datos recibidos:", {
+    console.log("📥 [1/8] Datos recibidos:", {
       orderNumber,
       responseCode,
       authCode,
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
     
     // Buscar el pago por order_number
-    console.log("🔍 Buscando pago con order_number:", orderNumber);
+    console.log("🔍 [2/8] Buscando pago con order_number:", orderNumber);
     const { data: payment, error: paymentFetchError } = await supabase
       .from("payments")
       .select("*, booking:bookings(total_price, amount_paid, booking_number)")
@@ -77,20 +78,25 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (paymentFetchError || !payment) {
-      console.error("❌ Pago no encontrado:", paymentFetchError);
-      return NextResponse.json({ error: "Payment not found" }, { status: 404 });
+      console.error("❌ [2/8] Pago no encontrado:", {
+        orderNumber,
+        error: paymentFetchError,
+        errorDetails: JSON.stringify(paymentFetchError, null, 2)
+      });
+      return NextResponse.json({ error: "Payment not found", orderNumber }, { status: 404 });
     }
     
-    console.log("📊 Pago encontrado:", {
+    console.log("📊 [2/8] Pago encontrado:", {
       paymentId: payment.id,
       bookingId: payment.booking_id,
       currentStatus: payment.status,
       amount: payment.amount,
+      orderNumber: payment.order_number,
     });
     
     // Solo procesar si el pago está pendiente
     if (payment.status !== "pending") {
-      console.log("ℹ️ Pago ya procesado, status:", payment.status);
+      console.log("ℹ️ [3/8] Pago ya procesado, status:", payment.status);
       return NextResponse.json({ 
         success: true, 
         message: "Payment already processed",
@@ -99,10 +105,17 @@ export async function POST(request: NextRequest) {
     }
     
     // Actualizar el pago a completed
-    console.log("💾 Actualizando pago a 'completed'...");
+    console.log("💾 [4/8] Actualizando pago a 'completed'...");
     const notesText = fromSuccessPage 
       ? `Actualizado via respaldo en página de éxito (${new Date().toISOString()})`
       : `Actualizado via verify-payment API (${new Date().toISOString()})`;
+    
+    console.log("💾 [4/8] Datos a actualizar:", {
+      status: "completed",
+      response_code: responseCode || "0000",
+      authorization_code: authCode || "FALLBACK",
+      notes: notesText,
+    });
     
     const { error: paymentError } = await supabase
       .from("payments")
@@ -116,10 +129,14 @@ export async function POST(request: NextRequest) {
       .eq("id", payment.id);
     
     if (paymentError) {
-      console.error("❌ Error actualizando pago:", paymentError);
-      return NextResponse.json({ error: "Failed to update payment" }, { status: 500 });
+      console.error("❌ [4/8] Error actualizando pago:", {
+        error: paymentError,
+        errorDetails: JSON.stringify(paymentError, null, 2),
+        paymentId: payment.id,
+      });
+      return NextResponse.json({ error: "Failed to update payment", details: paymentError }, { status: 500 });
     }
-    console.log("✅ Pago actualizado correctamente");
+    console.log("✅ [4/8] Pago actualizado correctamente a 'completed'");
     
     // Actualizar la reserva
     const booking = payment.booking as any;
@@ -137,12 +154,14 @@ export async function POST(request: NextRequest) {
         newPaymentStatus = "pending";
       }
       
-      console.log("💾 Actualizando reserva:", {
+      console.log("💾 [5/8] Actualizando reserva:", {
         bookingId: payment.booking_id,
         currentPaid,
+        paymentAmount: payment.amount,
         newPaid,
         totalPrice,
         newPaymentStatus,
+        newStatus: "confirmed",
       });
       
       const { error: bookingError } = await supabase
@@ -156,17 +175,31 @@ export async function POST(request: NextRequest) {
         .eq("id", payment.booking_id);
       
       if (bookingError) {
-        console.error("❌ Error actualizando reserva:", bookingError);
+        console.error("❌ [5/8] Error actualizando reserva:", {
+          error: bookingError,
+          errorDetails: JSON.stringify(bookingError, null, 2),
+          bookingId: payment.booking_id,
+        });
       } else {
-        console.log("✅ Reserva actualizada correctamente");
+        console.log("✅ [5/8] Reserva actualizada correctamente");
         
         // Enviar email de confirmación
-        console.log("📧 Enviando email de confirmación...");
+        console.log("📧 [6/8] Enviando email de confirmación...");
         const isFirstPayment = currentPaid === 0;
         const emailType = isFirstPayment ? 'first_payment' : 'second_payment';
         
+        console.log("📧 [6/8] Tipo de email:", {
+          isFirstPayment,
+          emailType,
+          currentPaid,
+          newPaid,
+        });
+        
         try {
-          await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/bookings/send-email`, {
+          const emailUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/bookings/send-email`;
+          console.log("📧 [6/8] Llamando a:", emailUrl);
+          
+          const emailResponse = await fetch(emailUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -174,21 +207,38 @@ export async function POST(request: NextRequest) {
               bookingId: payment.booking_id,
             }),
           });
-          console.log("✅ Email de confirmación enviado");
+          
+          console.log("📧 [6/8] Respuesta email:", {
+            status: emailResponse.status,
+            statusText: emailResponse.statusText,
+            ok: emailResponse.ok,
+          });
+          
+          if (!emailResponse.ok) {
+            const errorText = await emailResponse.text();
+            console.error("❌ [6/8] Error en respuesta email:", errorText);
+          } else {
+            console.log("✅ [6/8] Email de confirmación enviado correctamente");
+          }
         } catch (emailError) {
-          console.error("❌ Error enviando email:", emailError);
+          console.error("❌ [6/8] Error enviando email:", {
+            error: emailError,
+            message: emailError instanceof Error ? emailError.message : String(emailError),
+          });
           // No bloqueamos el proceso
         }
       }
     }
     
     console.log("=".repeat(80));
-    console.log("✅ REDSYS VERIFY-PAYMENT - PROCESO COMPLETADO");
+    console.log("✅ [8/8] REDSYS VERIFY-PAYMENT - PROCESO COMPLETADO EXITOSAMENTE");
     console.log("=".repeat(80) + "\n");
     
     return NextResponse.json({ 
       success: true, 
-      message: "Payment verified and updated successfully" 
+      message: "Payment verified and updated successfully",
+      paymentId: payment.id,
+      bookingId: payment.booking_id,
     });
     
   } catch (error) {
