@@ -255,10 +255,10 @@ export default async function LocaleBlogPostPage({
         )}
 
         {/* Content */}
-        <article className="container mx-auto px-4 py-16 max-w-4xl">
-          <div className="flex flex-col lg:flex-row gap-12">
+        <article className="container mx-auto px-4 py-16 max-w-6xl">
+          <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
             {/* Main Content */}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0 lg:max-w-3xl">
               {translatedPost.excerpt && (
                 <p className="text-xl text-gray-600 leading-relaxed mb-8 font-medium italic border-l-4 border-furgocasa-orange pl-6 bg-gray-50 py-4 rounded-r-lg">
                   {translatedPost.excerpt}
