@@ -115,17 +115,7 @@ export default function PagoPage() {
   };
 
   const paymentInfo = calculatePaymentAmounts();
-  const baseAmountToPay = paymentInfo.isPending50 ? paymentInfo.secondPayment : paymentInfo.firstPayment;
-  
-  // Comisión del 2% para Stripe
-  const STRIPE_FEE_PERCENT = 0.02;
-  const stripeFee = paymentMethod === 'stripe' ? baseAmountToPay * STRIPE_FEE_PERCENT : 0;
-  const amountToPay = baseAmountToPay + stripeFee;
-  
-  // Para pago completo
-  const fullBaseAmount = booking ? booking.total_price - (booking.amount_paid || 0) : 0;
-  const fullStripeFee = paymentMethod === 'stripe' ? fullBaseAmount * STRIPE_FEE_PERCENT : 0;
-  const fullAmountToPay = fullBaseAmount + fullStripeFee;
+  const amountToPay = paymentInfo.isPending50 ? paymentInfo.secondPayment : paymentInfo.firstPayment;
 
   const handlePayment = async (paymentType:"deposit" |"full" ="deposit") => {
     console.log("\n" + "=".repeat(80));
@@ -136,12 +126,10 @@ export default function PagoPage() {
     setError(null);
 
     try {
-      // Determinar el monto a cobrar (incluyendo comisión de Stripe si aplica)
+      // Determinar el monto a cobrar
       let amount = amountToPay;
-      let baseAmount = baseAmountToPay;
-      if (paymentType === "full") {
-        amount = fullAmountToPay;
-        baseAmount = fullBaseAmount;
+      if (paymentType ==="full") {
+        amount = booking!.total_price - (booking!.amount_paid || 0);
       }
       
       console.log("📊 [1/5] Información del pago:", {
@@ -157,21 +145,13 @@ export default function PagoPage() {
       if (paymentMethod === 'stripe') {
         // === FLUJO DE STRIPE ===
         console.log("🟣 [2/5] Método seleccionado: STRIPE");
-        const feeAmount = amount - baseAmount; // Comisión del 2%
-        console.log("💰 Comisión Stripe:", {
-          baseAmount,
-          feeAmount,
-          totalAmount: amount,
-        });
         const response = await fetch('/api/stripe/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
             bookingId: params.id,
-            amount, // Total a cobrar (con comisión)
-            baseAmount, // Monto base (sin comisión) para registrar en la reserva
-            feeAmount, // Comisión para información
-            paymentType: paymentType === "full" ? "full" : "deposit",
+            amount,
+            paymentType: paymentType ==="full" ?"full" :"deposit",
           }),
         });
 
@@ -496,19 +476,15 @@ export default function PagoPage() {
                 {t("Selecciona el método de pago")}
               </label>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Redsys - RECOMENDADO */}
+                {/* Redsys - HABILITADO */}
                 <button
                   onClick={() => setPaymentMethod('redsys')}
-                  className={`p-4 border-2 rounded-lg transition-all relative ${
+                  className={`p-4 border-2 rounded-lg transition-all ${
                     paymentMethod === 'redsys'
                       ? 'border-furgocasa-orange bg-orange-50'
                       : 'border-gray-200 bg-white hover:border-gray-300'
                   }`}
                 >
-                  {/* Badge Recomendado */}
-                  <span className="absolute -top-2 left-4 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded">
-                    {t("Recomendado")}
-                  </span>
                   <div className="flex items-center gap-3">
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                       paymentMethod === 'redsys' ? 'border-furgocasa-orange' : 'border-gray-300'
@@ -519,8 +495,7 @@ export default function PagoPage() {
                     </div>
                     <div className="text-left flex-1">
                       <p className="font-semibold text-gray-900">Redsys</p>
-                      <p className="text-xs text-gray-500">{t("Pasarela bancaria española")}</p>
-                      <p className="text-xs text-green-600 font-medium">{t("Sin comisión")}</p>
+                      <p className="text-xs text-gray-500">Pasarela bancaria española</p>
                     </div>
                     <img 
                       src="/images/redsys.png" 
@@ -530,10 +505,10 @@ export default function PagoPage() {
                   </div>
                 </button>
 
-                {/* Stripe - Con comisión */}
+                {/* Stripe */}
                 <button
                   onClick={() => setPaymentMethod('stripe')}
-                  className={`p-4 border-2 rounded-lg transition-all relative ${
+                  className={`p-4 border-2 rounded-lg transition-all ${
                     paymentMethod === 'stripe'
                       ? 'border-furgocasa-orange bg-orange-50'
                       : 'border-gray-200 bg-white hover:border-gray-300'
@@ -549,8 +524,7 @@ export default function PagoPage() {
                     </div>
                     <div className="text-left flex-1">
                       <p className="font-semibold text-gray-900">Stripe</p>
-                      <p className="text-xs text-gray-500">{t("Pago internacional / Apple Pay")}</p>
-                      <p className="text-xs text-amber-600 font-medium">+2% {t("comisión de gestión")}</p>
+                      <p className="text-xs text-gray-500">Pago internacional seguro</p>
                     </div>
                     <svg className="h-6" viewBox="0 0 60 25" xmlns="http://www.w3.org/2000/svg">
                       <path fill="#635bff" d="M59.64 14.28h-8.06c.19 1.93 1.6 2.55 3.2 2.55 1.64 0 2.96-.37 4.05-.95v3.32a8.33 8.33 0 0 1-4.56 1.1c-4.01 0-6.83-2.5-6.83-7.48 0-4.19 2.39-7.52 6.3-7.52 3.92 0 5.96 3.28 5.96 7.5 0 .4-.04 1.26-.06 1.48zm-5.92-5.62c-1.03 0-2.17.73-2.17 2.58h4.25c0-1.85-1.07-2.58-2.08-2.58zM40.95 20.3c-1.44 0-2.32-.6-2.9-1.04l-.02 4.63-4.12.87V5.57h3.76l.08 1.02a4.7 4.7 0 0 1 3.23-1.29c2.9 0 5.62 2.6 5.62 7.4 0 5.23-2.7 7.6-5.65 7.6zM40 8.95c-.95 0-1.54.34-1.97.81l.02 6.12c.4.44.98.78 1.95.78 1.52 0 2.54-1.65 2.54-3.87 0-2.15-1.04-3.84-2.54-3.84zM28.24 5.57h4.13v14.44h-4.13V5.57zm0-4.7L32.37 0v3.36l-4.13.88V.88zm-4.32 9.35v9.79H19.8V5.57h3.7l.12 1.22c1-1.77 3.07-1.41 3.62-1.22v3.79c-.52-.17-2.29-.43-3.32.86zm-8.55 4.72c0 2.43 2.6 1.68 3.12 1.46v3.36c-.55.3-1.54.54-2.89.54a4.15 4.15 0 0 1-4.27-4.24l.01-13.17 4.02-.86v3.54h3.14V9.1h-3.13v5.85zm-4.91.7c0 2.97-2.31 4.66-5.73 4.66a11.2 11.2 0 0 1-4.46-.93v-3.93c1.38.75 3.1 1.31 4.46 1.31.92 0 1.53-.24 1.53-1C6.26 13.77 0 14.51 0 9.95 0 7.04 2.28 5.3 5.62 5.3c1.36 0 2.72.2 4.09.75v3.88a9.23 9.23 0 0 0-4.1-1.06c-.86 0-1.44.25-1.44.93 0 1.85 6.29.97 6.29 5.88z"/>
@@ -558,27 +532,6 @@ export default function PagoPage() {
                   </div>
                 </button>
               </div>
-              
-              {/* Desglose de precio con Stripe */}
-              {paymentMethod === 'stripe' && (
-                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <p className="text-sm font-medium text-amber-800 mb-2">{t("Desglose del pago con Stripe")}:</p>
-                  <div className="space-y-1 text-sm text-amber-700">
-                    <div className="flex justify-between">
-                      <span>{t("Importe base")}</span>
-                      <span>{formatPrice(baseAmountToPay)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{t("Comisión de gestión")} (2%)</span>
-                      <span>+{formatPrice(stripeFee)}</span>
-                    </div>
-                    <div className="flex justify-between font-bold pt-1 border-t border-amber-300">
-                      <span>{t("Total a pagar")}</span>
-                      <span>{formatPrice(amountToPay)}</span>
-                    </div>
-                  </div>
-                </div>
-              )}
             </div>
             
             {/* Política de pagos 50%-50% */}
@@ -641,10 +594,7 @@ export default function PagoPage() {
                   className="w-full bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-semibold py-4 px-6 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <CreditCard className="h-5 w-5" />
-                  {t("Pagar total ahora")} - {formatPrice(fullAmountToPay)}
-                  {paymentMethod === 'stripe' && (
-                    <span className="text-xs text-amber-600 ml-1">({t("incl.")} 2%)</span>
-                  )}
+                  {t("Pagar total ahora")} - {formatPrice(booking.total_price)}
                 </button>
               )}
             </div>
