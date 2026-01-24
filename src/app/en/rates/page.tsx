@@ -16,7 +16,6 @@ import type { Locale } from "@/lib/i18n/config";
  */
 
 interface TarifasPageProps {
-  ;
 }
 
 export async function generateMetadata(): Promise<Metadata> {

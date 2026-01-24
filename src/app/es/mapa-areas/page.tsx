@@ -4,9 +4,7 @@ import { translateServer } from "@/lib/i18n/server-translation";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
-interface PageProps {
-  ;
-}
+interface PageProps {}
 
 const MAPA_AREAS_METADATA: Metadata = {
   title: "Mapa de Áreas para Autocaravanas",

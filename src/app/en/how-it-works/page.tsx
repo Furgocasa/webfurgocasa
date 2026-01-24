@@ -3,9 +3,7 @@ import { Metadata } from 'next';
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 
-interface PageProps {
-  ;
-}
+interface PageProps {}
 
 // Metadata para evitar indexación temporal durante la redirección
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

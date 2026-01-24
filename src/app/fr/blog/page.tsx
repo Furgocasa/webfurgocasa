@@ -21,7 +21,6 @@ import type { Locale } from "@/lib/i18n/config";
  */
 
 interface BlogPageProps {
-  ;
   searchParams: { page?: string; category?: string; q?: string };
 }
 

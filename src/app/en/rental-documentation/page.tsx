@@ -4,9 +4,7 @@ import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 
-interface PageProps {
-  ;
-}
+interface PageProps {}
 
 // Página SECRETA - No indexar, no seguir
 const DOCUMENTACION_METADATA: Metadata = {

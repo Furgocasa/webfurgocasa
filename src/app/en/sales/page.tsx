@@ -6,9 +6,7 @@ import { sortVehicleEquipment } from "@/lib/utils";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 
-interface PageProps {
-  ;
-}
+interface PageProps {}
 
 // ✅ Supabase cliente servidor (igual que /vehiculos)
 const supabase = createClient(

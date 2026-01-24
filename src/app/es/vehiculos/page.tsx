@@ -53,7 +53,6 @@ interface Vehicle {
 }
 
 interface VehiclesPageProps {
-  ;
 }
 
 const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; keywords: string }> = {

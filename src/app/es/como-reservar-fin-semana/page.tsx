@@ -5,9 +5,7 @@ import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 
-interface PageProps {
-  ;
-}
+interface PageProps {}
 
 const COMO_RESERVAR_FIN_SEMANA_METADATA: Metadata = {
   title: "Cómo Reservar un Fin de Semana",
