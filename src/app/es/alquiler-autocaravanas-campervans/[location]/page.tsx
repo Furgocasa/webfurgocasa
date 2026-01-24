@@ -210,6 +210,14 @@ export default async function LocationPage({ params }: PageProps) {
 
   const vehicles = await getTranslatedRecords('vehicles', vehiclesRaw, ['name', 'short_description'], locale);
 
+  const location = {
+    ...locationRaw,
+    name: translatedFields.name || locationRaw.name,
+    h1_title: translatedFields.h1_title || locationRaw.h1_title,
+    intro_text: translatedFields.intro_text || locationRaw.intro_text,
+    content_sections: translatedSections || locationRaw.content_sections,
+  };
+
   const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
@@ -220,8 +228,8 @@ export default async function LocationPage({ params }: PageProps) {
       <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       
-      {/* Preload crítico del H1 y fuentes para FCP */}
-      <link rel="preload" href="/fonts/rubik.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      {/* Preload crítico de la imagen Hero para LCP */}
+      <link rel="preload" as="image" href={heroImageUrl} fetchPriority="high" />
       
       <LocalBusinessJsonLd location={location as any} />
       
