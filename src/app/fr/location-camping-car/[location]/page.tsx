@@ -15,11 +15,17 @@ import {
   Calendar,
   Users,
   Package,
-  MessageSquare
+  MessageSquare,
+  Bot,
+  Map,
+  HelpCircle,
+  BookOpen
 } from "lucide-react";
 import Image from "next/image";
 import { LocationTourismContent } from "@/components/locations/location-tourism-content";
 import { DestinationsGrid } from "@/components/destinations-grid";
+import { BlogArticleLink } from "@/components/blog/blog-article-link";
+import { getLatestBlogArticles } from "@/lib/home/server-actions";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -189,6 +195,9 @@ export default async function LocationPage({ params }: PageProps) {
 
   const vehiclesRaw = await getRentVehicles();
   const vehicles = await getTranslatedRecords('vehicles', vehiclesRaw, ['name', 'short_description'], locale);
+
+  // Obtenir les articles du blog
+  const blogArticles = await getLatestBlogArticles(3);
 
   const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
@@ -401,6 +410,150 @@ export default async function LocationPage({ params }: PageProps) {
 
       {/* PRINCIPALES DESTINATIONS - Composant DestinationsGrid */}
       <DestinationsGrid />
+
+      {/* SERVICES - Identique à Home */}
+      <section className="py-16 lg:py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+              Services qui vous simplifient la vie
+            </h2>
+            <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+              Tout ce dont vous avez besoin pour profiter de votre expérience camping-car
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
+            {[
+              {
+                icon: Bot,
+                title: "Intelligence Artificielle",
+                desc: "Planifiez votre itinéraire parfait avec l'IA",
+                link: "/intelligence-artificielle",
+                color: "from-purple-50 to-purple-100 border-purple-300"
+              },
+              {
+                icon: Map,
+                title: "Carte des aires",
+                desc: "Trouvez des aires de camping-car",
+                link: "/carte-aires",
+                color: "from-blue-50 to-blue-100 border-blue-300"
+              },
+              {
+                icon: Calendar,
+                title: "Parking MURCIA",
+                desc: "Gardez votre camping-car en sécurité",
+                link: "/parking-murcia",
+                color: "from-green-50 to-green-100 border-green-300"
+              },
+              {
+                icon: HelpCircle,
+                title: "FAQs",
+                desc: "Résolvez tous vos doutes",
+                link: "/faqs",
+                color: "from-orange-50 to-orange-100 border-orange-300"
+              },
+            ].map((service, index) => (
+              <LocalizedLink
+                key={index}
+                href={service.link}
+                className={`bg-gradient-to-br ${service.color} border-2 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group`}
+              >
+                <service.icon className="h-12 w-12 text-gray-700 mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-gray-700">
+                  {service.desc}
+                </p>
+              </LocalizedLink>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* BLOG - Identique à Home */}
+      {blogArticles.length > 0 && (
+        <section className="py-16 lg:py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12 lg:mb-16">
+              <div className="flex items-center justify-center gap-3 mb-4">
+                <BookOpen className="h-8 w-8 text-furgocasa-blue" />
+                <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+                  Blog de voyage en camping-car
+                </h2>
+              </div>
+              <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+                Conseils, itinéraires et expériences pour inspirer votre prochaine aventure
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+              {blogArticles.map((article) => (
+                <BlogArticleLink
+                  key={article.id}
+                  categorySlug={article.category?.slug}
+                  slug={article.slug}
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                >
+                  <div className="h-48 lg:h-56 bg-gray-200 relative overflow-hidden">
+                    {article.featured_image ? (
+                      <Image
+                        src={article.featured_image}
+                        alt={article.title}
+                        fill
+                        className="object-cover group-hover:scale-110 transition-transform duration-500"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-furgocasa-blue to-blue-600">
+                        <BookOpen className="h-16 w-16 text-white/50" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    {article.category && (
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-furgocasa-orange text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                          {article.category.name}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="p-6">
+                    <h3 className="text-lg lg:text-xl font-heading font-bold text-gray-900 mb-3 group-hover:text-furgocasa-blue transition-colors line-clamp-2">
+                      {article.title}
+                    </h3>
+                    {article.excerpt && (
+                      <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.excerpt}</p>
+                    )}
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      {article.published_at && (
+                        <time dateTime={article.published_at}>
+                          {new Date(article.published_at).toLocaleDateString('fr-FR')}
+                        </time>
+                      )}
+                      <span className="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">
+                        Lire plus →
+                      </span>
+                    </div>
+                  </div>
+                </BlogArticleLink>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <LocalizedLink
+                href="/blog"
+                className="inline-flex items-center gap-2 bg-furgocasa-blue text-white px-8 py-4 rounded-xl font-bold uppercase tracking-wider hover:bg-furgocasa-blue-dark transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 duration-300"
+              >
+                <BookOpen className="h-5 w-5" />
+                Voir plus d&apos;articles
+              </LocalizedLink>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* PICKUP POINT */}
       {location.nearest_location && (
