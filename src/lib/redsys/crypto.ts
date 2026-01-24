@@ -3,81 +3,103 @@ import crypto from "crypto";
 /**
  * Cifra los datos usando 3DES con la clave del comercio
  * 
- * IMPORTANTE: Trabaja con Buffers y convierte a base64 al final.
- * NO concatenar strings base64 porque produce resultados incorrectos.
+ * IMPORTANTE según documentación oficial de Redsys:
+ * - 3DES en modo CBC
+ * - IV = 8 bytes de ceros
+ * - SIN padding automático (usamos zero padding manual)
+ * - La clave viene en Base64 y debe decodificarse a 24 bytes
  */
-export function encrypt3DES(data: string, key: string): string {
+export function encrypt3DES(data: string, key: string): Buffer {
   const keyBuffer = Buffer.from(key, "base64");
   const iv = Buffer.alloc(8, 0);
 
-  const cipher = crypto.createCipheriv("des-ede3-cbc", keyBuffer, iv);
-  cipher.setAutoPadding(true);
+  // Verificar longitud de clave (debe ser 24 bytes para 3DES)
+  if (keyBuffer.length !== 24) {
+    console.error("❌ [3DES] Clave incorrecta: debe ser 24 bytes, tiene:", keyBuffer.length);
+  }
 
-  // Trabajar con Buffers y concatenar ANTES de convertir a base64
+  // Zero padding: rellenar con ceros hasta múltiplo de 8
+  const dataBuffer = Buffer.from(data, "utf8");
+  const paddingLength = 8 - (dataBuffer.length % 8);
+  const paddedData = Buffer.concat([
+    dataBuffer,
+    Buffer.alloc(paddingLength === 8 ? 0 : paddingLength, 0)
+  ]);
+
+  const cipher = crypto.createCipheriv("des-ede3-cbc", keyBuffer, iv);
+  cipher.setAutoPadding(false); // Desactivar padding automático
+
+  // Cifrar y devolver como Buffer (no como base64)
   const encrypted = Buffer.concat([
-    cipher.update(data, "utf8"),
+    cipher.update(paddedData),
     cipher.final()
   ]);
 
-  return encrypted.toString("base64");
+  return encrypted;
 }
 
 /**
- * Descifra los datos usando 3DES
+ * Descifra los datos usando 3DES (con zero padding)
  */
-export function decrypt3DES(data: string, key: string): string {
+export function decrypt3DES(data: Buffer, key: string): string {
   const keyBuffer = Buffer.from(key, "base64");
   const iv = Buffer.alloc(8, 0);
 
   const decipher = crypto.createDecipheriv("des-ede3-cbc", keyBuffer, iv);
-  decipher.setAutoPadding(true);
+  decipher.setAutoPadding(false);
 
-  // Trabajar con Buffers
   const decrypted = Buffer.concat([
-    decipher.update(data, "base64"),
+    decipher.update(data),
     decipher.final()
   ]);
 
-  return decrypted.toString("utf8");
+  // Eliminar zero padding
+  let endIndex = decrypted.length;
+  while (endIndex > 0 && decrypted[endIndex - 1] === 0) {
+    endIndex--;
+  }
+
+  return decrypted.slice(0, endIndex).toString("utf8");
 }
 
 /**
- * Genera la firma SHA-256 MAC para Redsys
+ * Genera la firma HMAC_SHA256_V1 para Redsys
+ * 
+ * Proceso según documentación oficial:
+ * 1. Cifrar el número de pedido con 3DES usando la clave secreta → clave derivada
+ * 2. Calcular HMAC-SHA256 de los parámetros Base64 usando la clave derivada
+ * 3. Codificar el resultado en Base64
  */
 export function createSignature(
   merchantParameters: string,
   secretKey: string,
   orderNumber: string
 ): string {
-  console.log("🔐 [CRYPTO] Generando firma Redsys...");
+  console.log("🔐 [CRYPTO] Generando firma Redsys HMAC_SHA256_V1...");
   console.log("🔐 [CRYPTO] Order number:", orderNumber);
-  console.log("🔐 [CRYPTO] Order number length:", orderNumber.length);
   console.log("🔐 [CRYPTO] Secret key length (base64):", secretKey.length);
   
-  // Verificar que la clave secreta sea válida base64
+  // Verificar que la clave secreta sea válida
   const secretKeyBuffer = Buffer.from(secretKey, "base64");
-  console.log("🔐 [CRYPTO] Secret key decoded length (bytes):", secretKeyBuffer.length);
+  console.log("🔐 [CRYPTO] Secret key decoded (bytes):", secretKeyBuffer.length);
   
   if (secretKeyBuffer.length !== 24) {
-    console.error("❌ [CRYPTO] ERROR: La clave secreta debe ser de 24 bytes para 3DES, tiene:", secretKeyBuffer.length);
+    console.error("❌ [CRYPTO] ERROR: Clave secreta debe ser 24 bytes, tiene:", secretKeyBuffer.length);
   }
   
   // 1. Derivar clave específica para este pedido usando 3DES
-  const derivedKeyBase64 = encrypt3DES(orderNumber, secretKey);
-  console.log("🔐 [CRYPTO] Derived key (base64):", derivedKeyBase64);
-  
-  // 2. Convertir la clave derivada de base64 a Buffer
-  const derivedKeyBuffer = Buffer.from(derivedKeyBase64, "base64");
-  console.log("🔐 [CRYPTO] Derived key length (bytes):", derivedKeyBuffer.length);
+  // encrypt3DES ahora devuelve un Buffer directamente
+  const derivedKey = encrypt3DES(orderNumber, secretKey);
+  console.log("🔐 [CRYPTO] Derived key length (bytes):", derivedKey.length);
+  console.log("🔐 [CRYPTO] Derived key (hex):", derivedKey.toString("hex"));
 
-  // 3. Crear HMAC SHA256 con la clave derivada (en bytes, no base64)
-  const hmac = crypto.createHmac("sha256", derivedKeyBuffer);
+  // 2. Crear HMAC SHA256 con la clave derivada
+  const hmac = crypto.createHmac("sha256", derivedKey);
   hmac.update(merchantParameters);
 
-  // 4. Devolver en base64
+  // 3. Devolver en base64
   const signature = hmac.digest("base64");
   console.log("🔐 [CRYPTO] Signature generated:", signature);
-  console.log("🔐 [CRYPTO] Signature length:", signature.length);
   
   return signature;
 }
