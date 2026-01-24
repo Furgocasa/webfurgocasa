@@ -334,30 +334,14 @@ const nextConfig = {
     ];
   },
   async rewrites() {
-    return [
-      // ============================================
-      // REWRITES PARA URLs SEO CON GUIÓN → RUTAS CON BARRA
-      // ============================================
-      // Las URLs públicas usan guión para SEO: /es/alquiler-autocaravanas-campervans-murcia
-      // Las carpetas físicas usan barra: /es/alquiler-autocaravanas-campervans/[location]
-      // ============================================
-
-      // ES - Español
-      { source: '/es/alquiler-autocaravanas-campervans-:location', destination: '/es/alquiler-autocaravanas-campervans/:location' },
-      { source: '/es/venta-autocaravanas-camper-:location', destination: '/es/venta-autocaravanas-camper/:location' },
-
-      // EN - English
-      { source: '/en/rent-campervan-motorhome-:location', destination: '/en/rent-campervan-motorhome/:location' },
-      { source: '/en/campervans-for-sale-in-:location', destination: '/en/campervans-for-sale-in/:location' },
-
-      // FR - Français
-      { source: '/fr/location-camping-car-:location', destination: '/fr/location-camping-car/:location' },
-      { source: '/fr/camping-cars-a-vendre-:location', destination: '/fr/camping-cars-a-vendre/:location' },
-
-      // DE - Deutsch
-      { source: '/de/wohnmobil-mieten-:location', destination: '/de/wohnmobil-mieten/:location' },
-      { source: '/de/wohnmobile-zu-verkaufen-:location', destination: '/de/wohnmobile-zu-verkaufen/:location' },
-    ];
+    // ============================================
+    // REWRITES - VACÍO (Todos convertidos a redirects 301)
+    // ============================================
+    // Los rewrites antiguos para URLs con guión han sido
+    // convertidos a redirects 301 para mejor SEO.
+    // Google actualizará su índice a las URLs con barra.
+    // ============================================
+    return [];
   },
   async redirects() {
     // ================================================================
@@ -391,12 +375,49 @@ const nextConfig = {
       },
 
       // ================================================================
-      // GRUPO 2: CORRECCIÓN IDIOMA CRUZADO (TEMPORAL)
+      // GRUPO 2: MIGRACIÓN URLs LOCALIZACIÓN (ANTIGUO → NUEVO FORMATO)
+      // ================================================================
+      // Propósito: Redirigir URLs antiguas de localización al formato correcto
+      // Formato antiguo: /en/alquiler-autocaravanas-campervans-murcia (slug ES en cualquier idioma)
+      // Formato nuevo: /en/rent-campervan-motorhome/murcia (slug traducido + barra)
+      // Mantener: PERMANENTE - Google tiene indexadas las URLs antiguas
+      // ================================================================
+      
+      // ── ALQUILER ES: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/es/alquiler-autocaravanas-campervans-:location', destination: '/es/alquiler-autocaravanas-campervans/:location', permanent: true },
+      // ── ALQUILER EN: Slug español → Slug inglés correcto ──
+      { source: '/en/alquiler-autocaravanas-campervans-:location', destination: '/en/rent-campervan-motorhome/:location', permanent: true },
+      // ── ALQUILER EN: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/en/rent-campervan-motorhome-:location', destination: '/en/rent-campervan-motorhome/:location', permanent: true },
+      // ── ALQUILER FR: Slug español → Slug francés correcto ──
+      { source: '/fr/alquiler-autocaravanas-campervans-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      // ── ALQUILER FR: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/fr/location-camping-car-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      // ── ALQUILER DE: Slug español → Slug alemán correcto ──
+      { source: '/de/alquiler-autocaravanas-campervans-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      // ── ALQUILER DE: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/de/wohnmobil-mieten-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      
+      // ── VENTA ES: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/es/venta-autocaravanas-camper-:location', destination: '/es/venta-autocaravanas-camper/:location', permanent: true },
+      // ── VENTA EN: Slug español → Slug inglés correcto ──
+      { source: '/en/venta-autocaravanas-camper-:location', destination: '/en/campervans-for-sale-in/:location', permanent: true },
+      // ── VENTA EN: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/en/campervans-for-sale-in-:location', destination: '/en/campervans-for-sale-in/:location', permanent: true },
+      // ── VENTA FR: Slug español → Slug francés correcto ──
+      { source: '/fr/venta-autocaravanas-camper-:location', destination: '/fr/camping-cars-a-vendre/:location', permanent: true },
+      // ── VENTA FR: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/fr/camping-cars-a-vendre-:location', destination: '/fr/camping-cars-a-vendre/:location', permanent: true },
+      // ── VENTA DE: Slug español → Slug alemán correcto ──
+      { source: '/de/venta-autocaravanas-camper-:location', destination: '/de/wohnmobile-zu-verkaufen/:location', permanent: true },
+      // ── VENTA DE: Formato antiguo (guión) → Formato nuevo (barra) ──
+      { source: '/de/wohnmobile-zu-verkaufen-:location', destination: '/de/wohnmobile-zu-verkaufen/:location', permanent: true },
+
+      // ================================================================
+      // GRUPO 3: CORRECCIÓN IDIOMA CRUZADO (RUTAS GENERALES)
       // ================================================================
       // Propósito: Corregir URLs mal formadas (ej: /de/vehicles → /de/fahrzeuge)
-      // Mantener: TEMPORAL - Eliminar cuando migremos a arquitectura [locale]
-      // Causa raíz: Sistema de rewrites permite URLs incorrectas
-      // TODO Fase 3: Eliminar estos cuando tengamos [locale] físico
+      // Mantener: PERMANENTE - Mejora consistencia de URLs por idioma
       // ================================================================
       
       // ── Alemán (DE): Corregir rutas EN → DE ──
