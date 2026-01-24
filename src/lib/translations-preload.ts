@@ -8183,6 +8183,430 @@ export function getPreloadCache() {
     fr: "km",
     de: "km"
   },
+
+  // ========================================
+  // PÁGINA DE OFERTAS - TRADUCCIONES COMPLETAS
+  // ========================================
+  "Consulta nuestras OFERTAS especiales y viaja barato": {
+    es: "Consulta nuestras OFERTAS especiales y viaja barato",
+    en: "Check our special OFFERS and travel cheap",
+    fr: "Consultez nos OFFRES spéciales et voyagez à petit prix",
+    de: "Schauen Sie sich unsere ANGEBOTE an und reisen Sie günstig"
+  },
+  "Dos formas de ahorrar en tu alquiler": {
+    es: "Dos formas de ahorrar en tu alquiler",
+    en: "Two ways to save on your rental",
+    fr: "Deux façons d'économiser sur votre location",
+    de: "Zwei Möglichkeiten bei Ihrer Miete zu sparen"
+  },
+  "En FURGOCASA queremos que todos puedan disfrutar de la aventura camper. Por eso ofrecemos dos tipos de ofertas:": {
+    es: "En FURGOCASA queremos que todos puedan disfrutar de la aventura camper. Por eso ofrecemos dos tipos de ofertas:",
+    en: "At FURGOCASA we want everyone to enjoy the camper adventure. That's why we offer two types of deals:",
+    fr: "Chez FURGOCASA nous voulons que tout le monde puisse profiter de l'aventure camping-car. C'est pourquoi nous proposons deux types d'offres:",
+    de: "Bei FURGOCASA möchten wir, dass jeder das Camper-Abenteuer genießen kann. Deshalb bieten wir zwei Arten von Angeboten:"
+  },
+  "Cupones de Temporada": {
+    es: "Cupones de Temporada",
+    en: "Seasonal Coupons",
+    fr: "Coupons Saisonniers",
+    de: "Saisonale Gutscheine"
+  },
+  "Códigos promocionales": {
+    es: "Códigos promocionales",
+    en: "Promotional codes",
+    fr: "Codes promotionnels",
+    de: "Aktionscodes"
+  },
+  "Promociones especiales con códigos de descuento que se aplican durante el proceso de reserva. Pueden ser de temporada (ej: invierno, Black Friday) o personalizados.": {
+    es: "Promociones especiales con códigos de descuento que se aplican durante el proceso de reserva. Pueden ser de temporada (ej: invierno, Black Friday) o personalizados.",
+    en: "Special promotions with discount codes that are applied during the booking process. They can be seasonal (e.g. winter, Black Friday) or customized.",
+    fr: "Promotions spéciales avec codes de réduction applicables pendant le processus de réservation. Ils peuvent être saisonniers (ex: hiver, Black Friday) ou personnalisés.",
+    de: "Sonderaktionen mit Rabattcodes, die während des Buchungsprozesses angewendet werden. Sie können saisonal (z.B. Winter, Black Friday) oder individuell sein."
+  },
+  "Descuento sobre el precio total": {
+    es: "Descuento sobre el precio total",
+    en: "Discount on total price",
+    fr: "Réduction sur le prix total",
+    de: "Rabatt auf den Gesamtpreis"
+  },
+  "Ver": {
+    es: "Ver",
+    en: "View",
+    fr: "Voir",
+    de: "Ansehen"
+  },
+  "Ofertas de Última Hora": {
+    es: "Ofertas de Última Hora",
+    en: "Last Minute Offers",
+    fr: "Offres de Dernière Minute",
+    de: "Last-Minute-Angebote"
+  },
+  "Huecos entre reservas": {
+    es: "Huecos entre reservas",
+    en: "Gaps between bookings",
+    fr: "Créneaux entre réservations",
+    de: "Lücken zwischen Buchungen"
+  },
+  "En temporada alta, cuando hay periodos mínimos de alquiler (ej: 7 días en verano), pueden quedar pequeños huecos entre reservas que ofrecemos con descuentos especiales.": {
+    es: "En temporada alta, cuando hay periodos mínimos de alquiler (ej: 7 días en verano), pueden quedar pequeños huecos entre reservas que ofrecemos con descuentos especiales.",
+    en: "During high season, when there are minimum rental periods (e.g. 7 days in summer), small gaps may remain between bookings that we offer with special discounts.",
+    fr: "En haute saison, lorsqu'il y a des périodes de location minimum (ex: 7 jours en été), de petits créneaux peuvent rester entre les réservations que nous proposons avec des réductions spéciales.",
+    de: "In der Hochsaison, wenn es Mindestmietzeiten gibt (z.B. 7 Tage im Sommer), können kleine Lücken zwischen Buchungen entstehen, die wir mit Sonderrabatten anbieten."
+  },
+  "Fechas específicas con precio reducido": {
+    es: "Fechas específicas con precio reducido",
+    en: "Specific dates with reduced price",
+    fr: "Dates spécifiques à prix réduit",
+    de: "Bestimmte Daten zu reduzierten Preisen"
+  },
+  "Esta página se actualiza regularmente.": {
+    es: "Esta página se actualiza regularmente.",
+    en: "This page is updated regularly.",
+    fr: "Cette page est mise à jour régulièrement.",
+    de: "Diese Seite wird regelmäßig aktualisiert."
+  },
+  "Te recomendamos visitarla de vez en cuando para encontrar tu oportunidad.": {
+    es: "Te recomendamos visitarla de vez en cuando para encontrar tu oportunidad.",
+    en: "We recommend visiting it from time to time to find your opportunity.",
+    fr: "Nous vous recommandons de la visiter de temps en temps pour trouver votre opportunité.",
+    de: "Wir empfehlen Ihnen, sie von Zeit zu Zeit zu besuchen, um Ihre Gelegenheit zu finden."
+  },
+  "* Las ofertas de esta sección no son acumulables entre sí.": {
+    es: "* Las ofertas de esta sección no son acumulables entre sí.",
+    en: "* Offers in this section cannot be combined with each other.",
+    fr: "* Les offres de cette section ne sont pas cumulables entre elles.",
+    de: "* Die Angebote in diesem Bereich sind nicht miteinander kombinierbar."
+  },
+  "Cupones de Temporada Activos": {
+    es: "Cupones de Temporada Activos",
+    en: "Active Seasonal Coupons",
+    fr: "Coupons Saisonniers Actifs",
+    de: "Aktive Saisonale Gutscheine"
+  },
+  "Cupón de Temporada": {
+    es: "Cupón de Temporada",
+    en: "Seasonal Coupon",
+    fr: "Coupon Saisonnier",
+    de: "Saisonaler Gutschein"
+  },
+  "INVIERNO MÁGICO": {
+    es: "INVIERNO MÁGICO",
+    en: "MAGICAL WINTER",
+    fr: "HIVER MAGIQUE",
+    de: "MAGISCHER WINTER"
+  },
+  "¡TU AVENTURA INVERNAL!": {
+    es: "¡TU AVENTURA INVERNAL!",
+    en: "YOUR WINTER ADVENTURE!",
+    fr: "VOTRE AVENTURE HIVERNALE!",
+    de: "IHR WINTERABENTEUER!"
+  },
+  "¡Descubre el invierno con FURGOCASA! Viaja con libertad en nuestras camper vans totalmente equipadas. Del norte nevado al sur más cálido, ¡tú decides el camino!": {
+    es: "¡Descubre el invierno con FURGOCASA! Viaja con libertad en nuestras camper vans totalmente equipadas. Del norte nevado al sur más cálido, ¡tú decides el camino!",
+    en: "Discover winter with FURGOCASA! Travel freely in our fully equipped camper vans. From the snowy north to the warmest south, you decide the way!",
+    fr: "Découvrez l'hiver avec FURGOCASA! Voyagez librement dans nos camping-cars entièrement équipés. Du nord enneigé au sud le plus chaud, vous décidez du chemin!",
+    de: "Entdecken Sie den Winter mit FURGOCASA! Reisen Sie frei in unseren voll ausgestatteten Campervans. Vom verschneiten Norden bis zum wärmsten Süden, Sie entscheiden den Weg!"
+  },
+  "Descuento Invierno": {
+    es: "Descuento Invierno",
+    en: "Winter Discount",
+    fr: "Réduction Hiver",
+    de: "Winterrabatt"
+  },
+  "En TODAS nuestras campers": {
+    es: "En TODAS nuestras campers",
+    en: "On ALL our campers",
+    fr: "Sur TOUS nos camping-cars",
+    de: "Auf ALLE unsere Camper"
+  },
+  "¡ALQUILA MÍNIMO 10 DÍAS!": {
+    es: "¡ALQUILA MÍNIMO 10 DÍAS!",
+    en: "RENT MINIMUM 10 DAYS!",
+    fr: "LOUEZ MINIMUM 10 JOURS!",
+    de: "MIETEN SIE MINDESTENS 10 TAGE!"
+  },
+  "CÓDIGO PROMOCIONAL": {
+    es: "CÓDIGO PROMOCIONAL",
+    en: "PROMOTIONAL CODE",
+    fr: "CODE PROMOTIONNEL",
+    de: "AKTIONSCODE"
+  },
+  "¡Copiado al portapapeles!": {
+    es: "¡Copiado al portapapeles!",
+    en: "Copied to clipboard!",
+    fr: "Copié dans le presse-papiers!",
+    de: "In die Zwischenablage kopiert!"
+  },
+  "Haz clic para copiar el código": {
+    es: "Haz clic para copiar el código",
+    en: "Click to copy the code",
+    fr: "Cliquez pour copier le code",
+    de: "Klicken Sie, um den Code zu kopieren"
+  },
+  "CANJEAR AHORA": {
+    es: "CANJEAR AHORA",
+    en: "REDEEM NOW",
+    fr: "UTILISER MAINTENANT",
+    de: "JETZT EINLÖSEN"
+  },
+  "Condiciones:": {
+    es: "Condiciones:",
+    en: "Conditions:",
+    fr: "Conditions:",
+    de: "Bedingungen:"
+  },
+  "Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.": {
+    es: "Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.",
+    en: "Minimum booking of 10 days to get 15% discount. Promotion valid from January 5th until the beginning of spring 2026.",
+    fr: "Réservation minimum de 10 jours pour obtenir 15% de réduction. Promotion valable du 5 janvier jusqu'au début du printemps 2026.",
+    de: "Mindestbuchung von 10 Tagen für 15% Rabatt. Aktion gültig vom 5. Januar bis zum Frühlingsanfang 2026."
+  },
+  "Fácil y rápido": {
+    es: "Fácil y rápido",
+    en: "Easy and fast",
+    fr: "Facile et rapide",
+    de: "Einfach und schnell"
+  },
+  "¿Cómo usar tu código de descuento?": {
+    es: "¿Cómo usar tu código de descuento?",
+    en: "How to use your discount code?",
+    fr: "Comment utiliser votre code de réduction?",
+    de: "Wie benutzt man Ihren Rabattcode?"
+  },
+  "Copia el código": {
+    es: "Copia el código",
+    en: "Copy the code",
+    fr: "Copiez le code",
+    de: "Kopieren Sie den Code"
+  },
+  "Haz clic en el código de arriba para copiarlo": {
+    es: "Haz clic en el código de arriba para copiarlo",
+    en: "Click on the code above to copy it",
+    fr: "Cliquez sur le code ci-dessus pour le copier",
+    de: "Klicken Sie auf den obigen Code, um ihn zu kopieren"
+  },
+  "Elige fechas": {
+    es: "Elige fechas",
+    en: "Choose dates",
+    fr: "Choisissez les dates",
+    de: "Wählen Sie Daten"
+  },
+  "Selecciona vehículo y fechas (mín. 10 días)": {
+    es: "Selecciona vehículo y fechas (mín. 10 días)",
+    en: "Select vehicle and dates (min. 10 days)",
+    fr: "Sélectionnez véhicule et dates (min. 10 jours)",
+    de: "Wählen Sie Fahrzeug und Daten (min. 10 Tage)"
+  },
+  "Aplica el cupón": {
+    es: "Aplica el cupón",
+    en: "Apply the coupon",
+    fr: "Appliquez le coupon",
+    de: "Wenden Sie den Gutschein an"
+  },
+  "En el paso de confirmación, pega el código": {
+    es: "En el paso de confirmación, pega el código",
+    en: "In the confirmation step, paste the code",
+    fr: "À l'étape de confirmation, collez le code",
+    de: "Im Bestätigungsschritt fügen Sie den Code ein"
+  },
+  "¡Descuento aplicado!": {
+    es: "¡Descuento aplicado!",
+    en: "Discount applied!",
+    fr: "Réduction appliquée!",
+    de: "Rabatt angewendet!"
+  },
+  "Verás el -15% reflejado en tu precio final": {
+    es: "Verás el -15% reflejado en tu precio final",
+    en: "You will see the -15% reflected in your final price",
+    fr: "Vous verrez les -15% reflétés dans votre prix final",
+    de: "Sie werden die -15% in Ihrem Endpreis sehen"
+  },
+  "Empezar reserva con descuento": {
+    es: "Empezar reserva con descuento",
+    en: "Start booking with discount",
+    fr: "Commencer la réservation avec réduction",
+    de: "Buchung mit Rabatt starten"
+  },
+  "¿Qué son las Ofertas de Última Hora?": {
+    es: "¿Qué son las Ofertas de Última Hora?",
+    en: "What are Last Minute Offers?",
+    fr: "Que sont les Offres de Dernière Minute?",
+    de: "Was sind Last-Minute-Angebote?"
+  },
+  "En temporada alta (verano, Semana Santa...) aplicamos periodos mínimos de alquiler (por ejemplo, 7 días en agosto). Esto puede generar pequeños huecos entre reservas que no cumplen el mínimo.": {
+    es: "En temporada alta (verano, Semana Santa...) aplicamos periodos mínimos de alquiler (por ejemplo, 7 días en agosto). Esto puede generar pequeños huecos entre reservas que no cumplen el mínimo.",
+    en: "During high season (summer, Easter...) we apply minimum rental periods (for example, 7 days in August). This can generate small gaps between bookings that don't meet the minimum.",
+    fr: "En haute saison (été, Pâques...) nous appliquons des périodes de location minimum (par exemple, 7 jours en août). Cela peut générer de petits créneaux entre les réservations qui ne respectent pas le minimum.",
+    de: "In der Hochsaison (Sommer, Ostern...) wenden wir Mindestmietzeiten an (z.B. 7 Tage im August). Dies kann kleine Lücken zwischen Buchungen erzeugen, die das Minimum nicht erfüllen."
+  },
+  "Ejemplo: Si un alquiler termina el 15 de agosto y el siguiente empieza el 20, esos 5 días no se pueden alquilar normalmente. ¡Pero los ofrecemos con descuento especial!": {
+    es: "Ejemplo: Si un alquiler termina el 15 de agosto y el siguiente empieza el 20, esos 5 días no se pueden alquilar normalmente. ¡Pero los ofrecemos con descuento especial!",
+    en: "Example: If a rental ends on August 15th and the next one starts on the 20th, those 5 days cannot be rented normally. But we offer them with a special discount!",
+    fr: "Exemple: Si une location se termine le 15 août et que la suivante commence le 20, ces 5 jours ne peuvent pas être loués normalement. Mais nous les proposons avec une réduction spéciale!",
+    de: "Beispiel: Wenn eine Miete am 15. August endet und die nächste am 20. beginnt, können diese 5 Tage nicht normal vermietet werden. Aber wir bieten sie mit einem Sonderrabatt an!"
+  },
+  "Cargando ofertas...": {
+    es: "Cargando ofertas...",
+    en: "Loading offers...",
+    fr: "Chargement des offres...",
+    de: "Angebote werden geladen..."
+  },
+  "plazas": {
+    es: "plazas",
+    en: "seats",
+    fr: "places",
+    de: "Sitze"
+  },
+  "camas": {
+    es: "camas",
+    en: "beds",
+    fr: "lits",
+    de: "Betten"
+  },
+  "días": {
+    es: "días",
+    en: "days",
+    fr: "jours",
+    de: "Tage"
+  },
+  "día": {
+    es: "día",
+    en: "day",
+    fr: "jour",
+    de: "Tag"
+  },
+  "Ahorras": {
+    es: "Ahorras",
+    en: "You save",
+    fr: "Vous économisez",
+    de: "Sie sparen"
+  },
+  "Reservar ahora": {
+    es: "Reservar ahora",
+    en: "Book now",
+    fr: "Réserver maintenant",
+    de: "Jetzt buchen"
+  },
+  "No hay ofertas de última hora disponibles": {
+    es: "No hay ofertas de última hora disponibles",
+    en: "No last minute offers available",
+    fr: "Pas d'offres de dernière minute disponibles",
+    de: "Keine Last-Minute-Angebote verfügbar"
+  },
+  "Actualmente no tenemos huecos disponibles entre reservas. Esta sección se actualiza regularmente, ¡vuelve a visitarnos pronto!": {
+    es: "Actualmente no tenemos huecos disponibles entre reservas. Esta sección se actualiza regularmente, ¡vuelve a visitarnos pronto!",
+    en: "We currently don't have any gaps available between bookings. This section is updated regularly, come back soon!",
+    fr: "Nous n'avons actuellement pas de créneaux disponibles entre les réservations. Cette section est mise à jour régulièrement, revenez bientôt!",
+    de: "Wir haben derzeit keine Lücken zwischen Buchungen verfügbar. Dieser Bereich wird regelmäßig aktualisiert, besuchen Sie uns bald wieder!"
+  },
+  "Las ofertas de última hora suelen aparecer en temporada alta": {
+    es: "Las ofertas de última hora suelen aparecer en temporada alta",
+    en: "Last minute offers usually appear in high season",
+    fr: "Les offres de dernière minute apparaissent généralement en haute saison",
+    de: "Last-Minute-Angebote erscheinen in der Regel in der Hochsaison"
+  },
+  "¿Quieres que te avisemos cuando haya ofertas?": {
+    es: "¿Quieres que te avisemos cuando haya ofertas?",
+    en: "Do you want us to notify you when there are offers?",
+    fr: "Voulez-vous que nous vous avertissions quand il y a des offres?",
+    de: "Möchten Sie benachrichtigt werden, wenn es Angebote gibt?"
+  },
+  "Escríbenos a": {
+    es: "Escríbenos a",
+    en: "Write to us at",
+    fr: "Écrivez-nous à",
+    de: "Schreiben Sie uns an"
+  },
+  "y te incluiremos en nuestra lista de alertas.": {
+    es: "y te incluiremos en nuestra lista de alertas.",
+    en: "and we will add you to our alerts list.",
+    fr: "et nous vous ajouterons à notre liste d'alertes.",
+    de: "und wir fügen Sie zu unserer Benachrichtigungsliste hinzu."
+  },
+  "¿POR QUÉ ELEGIR FURGOCASA?": {
+    es: "¿POR QUÉ ELEGIR FURGOCASA?",
+    en: "WHY CHOOSE FURGOCASA?",
+    fr: "POURQUOI CHOISIR FURGOCASA?",
+    de: "WARUM FURGOCASA WÄHLEN?"
+  },
+  "Flota Moderna": {
+    es: "Flota Moderna",
+    en: "Modern Fleet",
+    fr: "Flotte Moderne",
+    de: "Moderne Flotte"
+  },
+  "Autocaravanas nuevas y totalmente equipadas para tu comodidad": {
+    es: "Autocaravanas nuevas y totalmente equipadas para tu comodidad",
+    en: "New and fully equipped motorhomes for your comfort",
+    fr: "Camping-cars neufs et entièrement équipés pour votre confort",
+    de: "Neue und voll ausgestattete Wohnmobile für Ihren Komfort"
+  },
+  "Calefacción Total": {
+    es: "Calefacción Total",
+    en: "Full Heating",
+    fr: "Chauffage Complet",
+    de: "Vollheizung"
+  },
+  "Disfruta del invierno con calefacción estacionaria en todas las campers": {
+    es: "Disfruta del invierno con calefacción estacionaria en todas las campers",
+    en: "Enjoy winter with stationary heating in all campers",
+    fr: "Profitez de l'hiver avec chauffage stationnaire dans tous les camping-cars",
+    de: "Genießen Sie den Winter mit Standheizung in allen Campern"
+  },
+  "Libertad Total": {
+    es: "Libertad Total",
+    en: "Total Freedom",
+    fr: "Liberté Totale",
+    de: "Totale Freiheit"
+  },
+  "Viaja a tu ritmo. Norte, sur, playa, montaña... ¡Tú decides!": {
+    es: "Viaja a tu ritmo. Norte, sur, playa, montaña... ¡Tú decides!",
+    en: "Travel at your own pace. North, south, beach, mountain... You decide!",
+    fr: "Voyagez à votre rythme. Nord, sud, plage, montagne... Vous décidez!",
+    de: "Reisen Sie in Ihrem eigenen Tempo. Norden, Süden, Strand, Berge... Sie entscheiden!"
+  },
+  "Asistencia 24/7": {
+    es: "Asistencia 24/7",
+    en: "24/7 Support",
+    fr: "Assistance 24/7",
+    de: "24/7 Unterstützung"
+  },
+  "Soporte técnico siempre disponible durante todo tu viaje": {
+    es: "Soporte técnico siempre disponible durante todo tu viaje",
+    en: "Technical support always available throughout your trip",
+    fr: "Support technique toujours disponible pendant tout votre voyage",
+    de: "Technischer Support während Ihrer gesamten Reise immer verfügbar"
+  },
+  "Sin Sorpresas": {
+    es: "Sin Sorpresas",
+    en: "No Surprises",
+    fr: "Sans Surprises",
+    de: "Keine Überraschungen"
+  },
+  "Precio final transparente. Todo incluido desde el principio": {
+    es: "Precio final transparente. Todo incluido desde el principio",
+    en: "Transparent final price. Everything included from the start",
+    fr: "Prix final transparent. Tout compris dès le départ",
+    de: "Transparenter Endpreis. Alles von Anfang an inklusive"
+  },
+  "Experiencia Única": {
+    es: "Experiencia Única",
+    en: "Unique Experience",
+    fr: "Expérience Unique",
+    de: "Einzigartiges Erlebnis"
+  },
+  "Vive momentos inolvidables. Este será TU mejor invierno": {
+    es: "Vive momentos inolvidables. Este será TU mejor invierno",
+    en: "Live unforgettable moments. This will be YOUR best winter",
+    fr: "Vivez des moments inoubliables. Ce sera VOTRE meilleur hiver",
+    de: "Erleben Sie unvergessliche Momente. Dies wird IHR bester Winter"
+  },
+  "¡EMPEZAR AHORA!": {
+    es: "¡EMPEZAR AHORA!",
+    en: "START NOW!",
+    fr: "COMMENCER MAINTENANT!",
+    de: "JETZT STARTEN!"
+  },
 };
   
   Object.entries(staticTranslations).forEach(([text, translations]) => {
