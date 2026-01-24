@@ -209,35 +209,20 @@ export async function translatePostSlugAsync(
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // Para inglés, buscar en el campo slug_en de la tabla posts
-    if (targetLang === 'en') {
-      const { data: post } = await supabase
-        .from('posts')
-        .select('slug_en')
-        .eq('id', postId)
-        .single();
-      
-      if (post?.slug_en) {
-        // Guardar en cache
-        registerPostSlugTranslation(esSlug, { en: post.slug_en });
-        return post.slug_en;
-      }
-    }
+    // Mapeo de idioma a columna
+    const slugColumn = targetLang === 'en' ? 'slug_en' : targetLang === 'fr' ? 'slug_fr' : 'slug_de';
     
-    // Para FR/DE, buscar en content_translations
-    const { data: translation } = await supabase
-      .from('content_translations')
-      .select('translated_text')
-      .eq('source_table', 'posts')
-      .eq('source_id', postId)
-      .eq('source_field', 'slug')
-      .eq('locale', targetLang)
+    // Buscar en la tabla posts directamente
+    const { data: post } = await supabase
+      .from('posts')
+      .select(slugColumn)
+      .eq('id', postId)
       .single();
     
-    if (translation?.translated_text) {
+    if (post && post[slugColumn]) {
       // Guardar en cache
-      registerPostSlugTranslation(esSlug, { [targetLang]: translation.translated_text });
-      return translation.translated_text;
+      registerPostSlugTranslation(esSlug, { [targetLang]: post[slugColumn] });
+      return post[slugColumn];
     }
   } catch (error) {
     console.error('[translatePostSlugAsync] Error:', error);
@@ -305,34 +290,20 @@ export async function getAllPostSlugTranslations(
     const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
     const supabase = createClient(supabaseUrl, supabaseKey);
     
-    // 1. Buscar slug_en en la tabla posts
+    // 1. Buscar slugs traducidos directamente en la tabla posts
     const { data: post } = await supabase
       .from('posts')
-      .select('slug_en')
+      .select('slug_en, slug_fr, slug_de')
       .eq('id', postId)
       .single();
     
-    if (post?.slug_en) {
-      slugs.en = post.slug_en;
+    if (post) {
+      if (post.slug_en) slugs.en = post.slug_en;
+      if (post.slug_fr) slugs.fr = post.slug_fr;
+      if (post.slug_de) slugs.de = post.slug_de;
     }
     
-    // 2. Buscar slugs traducidos en content_translations
-    const { data: translations } = await supabase
-      .from('content_translations')
-      .select('locale, translated_text')
-      .eq('source_table', 'posts')
-      .eq('source_id', postId)
-      .eq('source_field', 'slug');
-    
-    if (translations) {
-      for (const t of translations) {
-        if (t.locale && t.translated_text) {
-          slugs[t.locale as Locale] = t.translated_text;
-        }
-      }
-    }
-    
-    // 3. Traducir categorías (estas son estáticas)
+    // 2. Traducir categorías (estas son estáticas)
     for (const locale of locales) {
       category[locale] = translateCategorySlug(categorySlug, locale);
     }
