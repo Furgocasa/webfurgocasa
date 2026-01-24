@@ -40,18 +40,37 @@ export function createSignature(
   secretKey: string,
   orderNumber: string
 ): string {
+  console.log("🔐 [CRYPTO] Generando firma Redsys...");
+  console.log("🔐 [CRYPTO] Order number:", orderNumber);
+  console.log("🔐 [CRYPTO] Order number length:", orderNumber.length);
+  console.log("🔐 [CRYPTO] Secret key length (base64):", secretKey.length);
+  
+  // Verificar que la clave secreta sea válida base64
+  const secretKeyBuffer = Buffer.from(secretKey, "base64");
+  console.log("🔐 [CRYPTO] Secret key decoded length (bytes):", secretKeyBuffer.length);
+  
+  if (secretKeyBuffer.length !== 24) {
+    console.error("❌ [CRYPTO] ERROR: La clave secreta debe ser de 24 bytes para 3DES, tiene:", secretKeyBuffer.length);
+  }
+  
   // 1. Derivar clave específica para este pedido usando 3DES
   const derivedKeyBase64 = encrypt3DES(orderNumber, secretKey);
+  console.log("🔐 [CRYPTO] Derived key (base64):", derivedKeyBase64);
   
   // 2. Convertir la clave derivada de base64 a Buffer
   const derivedKeyBuffer = Buffer.from(derivedKeyBase64, "base64");
+  console.log("🔐 [CRYPTO] Derived key length (bytes):", derivedKeyBuffer.length);
 
   // 3. Crear HMAC SHA256 con la clave derivada (en bytes, no base64)
   const hmac = crypto.createHmac("sha256", derivedKeyBuffer);
   hmac.update(merchantParameters);
 
   // 4. Devolver en base64
-  return hmac.digest("base64");
+  const signature = hmac.digest("base64");
+  console.log("🔐 [CRYPTO] Signature generated:", signature);
+  console.log("🔐 [CRYPTO] Signature length:", signature.length);
+  
+  return signature;
 }
 
 /**

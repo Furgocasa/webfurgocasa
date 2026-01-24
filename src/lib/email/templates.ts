@@ -2,7 +2,7 @@
  * Plantilla base para todos los emails
  * Diseño basado en tablas para máxima compatibilidad con Outlook y otros clientes
  */
-export function getEmailBaseTemplate(content: string): string {
+export function getEmailBaseTemplate(content: string, preheader: string = ''): string {
   return `
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -26,6 +26,14 @@ export function getEmailBaseTemplate(content: string): string {
   <![endif]-->
 </head>
 <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, Helvetica, sans-serif;">
+  <!-- Preheader oculto para vista previa en clientes de correo -->
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
+    ${preheader}
+  </div>
+  <!-- Espaciado extra para asegurar que el preheader no se mezcle -->
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
+    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
+  </div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f4f5;">
     <tr>
       <td align="center" style="padding: 20px 10px;">
@@ -419,7 +427,8 @@ export function getBookingCreatedTemplate(data: BookingEmailData): string {
     </tr>
   `;
   
-  return getEmailBaseTemplate(content);
+  const preheader = `Reserva ${data.bookingNumber} pendiente de pago. ${data.vehicleName} del ${formatDate(data.pickupDate)} al ${formatDate(data.dropoffDate)}.`;
+  return getEmailBaseTemplate(content, preheader);
 }
 
 /**
@@ -526,7 +535,8 @@ export function getFirstPaymentConfirmedTemplate(data: BookingEmailData): string
     </tr>
   `;
   
-  return getEmailBaseTemplate(content);
+  const preheader = `¡Reserva ${data.bookingNumber} confirmada! Pago recibido. ${data.vehicleName} del ${formatDate(data.pickupDate)} al ${formatDate(data.dropoffDate)}.`;
+  return getEmailBaseTemplate(content, preheader);
 }
 
 /**
@@ -633,7 +643,8 @@ export function getSecondPaymentConfirmedTemplate(data: BookingEmailData): strin
     </tr>
   `;
   
-  return getEmailBaseTemplate(content);
+  const preheader = `¡Pago completo! Reserva ${data.bookingNumber} lista. ${data.vehicleName} del ${formatDate(data.pickupDate)} al ${formatDate(data.dropoffDate)}.`;
+  return getEmailBaseTemplate(content, preheader);
 }
 
 /**
