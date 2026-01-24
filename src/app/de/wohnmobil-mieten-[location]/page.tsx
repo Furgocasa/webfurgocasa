@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 import { SearchWidget } from "@/components/booking/search-widget";
 import { LocalBusinessJsonLd } from "@/components/locations/local-business-jsonld";
@@ -46,90 +45,18 @@ const supabase = createClient(
 );
 
 export const revalidate = 3600; // 1 hora
-export const dynamic = 'force-dynamic'; // Necesario para acceder a headers()
 
 // ============================================================================
 // NOTA: Esta página usa rutas dinámicas de Next.js
 // El parámetro [location] se extrae directamente de la URL
+// Locale: DE (Deutsch) | Kind: rent (Mieten)
 // ============================================================================
 
 // Imagen hero por defecto para páginas de alquiler (fallback si no hay hero_image en DB)
 // Next.js Image optimiza automáticamente a AVIF/WebP según next.config.js
 const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
 
-// ============================================================================
-// HELPERS - Detección de tipo de página y extracción de slug
-// ============================================================================
-
-type PageKind = "rent" | "sale" | "unknown";
-
-function getPageKind(locationParam: string): PageKind {
-  // Patrones de ALQUILER (todos los idiomas)
-  if (
-    /^alquiler-autocaravanas-campervans-/.test(locationParam) ||
-    /^rent-campervan-motorhome-/.test(locationParam) ||
-    /^location-camping-car-/.test(locationParam) ||
-    /^wohnmobil-mieten-/.test(locationParam)
-  ) {
-    return "rent";
-  }
-
-  // Patrones de VENTA (todos los idiomas)
-  if (
-    /^venta-autocaravanas-camper-/.test(locationParam) ||
-    /^campervans-for-sale-in-/.test(locationParam) ||
-    /^camping-cars-a-vendre-/.test(locationParam) ||
-    /^wohnmobile-zu-verkaufen-/.test(locationParam)
-  ) {
-    return "sale";
-  }
-
-  return "unknown";
-}
-
-function extractRentSlug(locationParam: string): string {
-  const patterns = [
-    /^alquiler-autocaravanas-campervans-(.+)$/,
-    /^rent-campervan-motorhome-(.+)$/,
-    /^location-camping-car-(.+)$/,
-    /^wohnmobil-mieten-(.+)$/,
-  ];
-  
-  for (const pattern of patterns) {
-    const match = locationParam.match(pattern);
-    if (match) return match[1];
-  }
-  return locationParam;
-}
-
-function extractSaleSlug(locationParam: string): string {
-  const patterns = [
-    /^venta-autocaravanas-camper-(.+)$/,
-    /^campervans-for-sale-in-(.+)$/,
-    /^camping-cars-a-vendre-(.+)$/,
-    /^wohnmobile-zu-verkaufen-(.+)$/,
-  ];
-  
-  for (const pattern of patterns) {
-    const match = locationParam.match(pattern);
-    if (match) return match[1];
-  }
-  return locationParam;
-}
-
-function detectLocale(locationParam: string): Locale {
-  if (/^rent-campervan-motorhome-/.test(locationParam) || /^campervans-for-sale-in-/.test(locationParam)) return 'en';
-  if (/^location-camping-car-/.test(locationParam) || /^camping-cars-a-vendre-/.test(locationParam)) return 'fr';
-  if (/^wohnmobil-mieten-/.test(locationParam) || /^wohnmobile-zu-verkaufen-/.test(locationParam)) return 'de';
-  return 'es';
-}
-
-async function getLocaleFromHeaders(): Promise<Locale> {
-  const headersList = await headers();
-  const locale = headersList.get('x-detected-locale');
-  if (locale === 'en' || locale === 'fr' || locale === 'de') return locale;
-  return 'es';
-}
+type PageKind = "rent" | "sale";
 
 // ============================================================================
 // DATOS - Alquiler
@@ -195,7 +122,7 @@ async function getRentVehicles() {
 }
 
 // ============================================================================
-// DATOS - Venta
+// DATOS - Venta (no usadas en esta página de alquiler, pero se mantienen por estructura)
 // ============================================================================
 
 interface SaleLocation {
@@ -269,50 +196,43 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const locale: Locale = 'de';
   const kind: PageKind = 'rent';
   const t = (key: string) => translateServer(key, locale);
-  const baseUrl = 'https://www.furgocasa.com';
 
-  if (kind === "rent") {
-    // El slug ya viene de params.location
-    const location = await getRentLocation(slug);
+  const location = await getRentLocation(slug);
 
-    if (!location) {
-      return { title: t("Ubicación no encontrada"), robots: { index: false, follow: false } };
-    }
+  if (!location) {
+    return { title: t("Standort nicht gefunden"), robots: { index: false, follow: false } };
+  }
 
-    // Aplicar traducciones desde Supabase
-    const translated = await getTranslatedContent(
-      'location_targets', location.id,
-      ['name', 'meta_title', 'meta_description'],
-      locale,
-      { name: location.name, meta_title: location.meta_title, meta_description: location.meta_description }
-    );
+  // Aplicar traducciones desde Supabase
+  const translated = await getTranslatedContent(
+    'location_targets', location.id,
+    ['name', 'meta_title', 'meta_description'],
+    locale,
+    { name: location.name, meta_title: location.meta_title, meta_description: location.meta_description }
+  );
 
-    const title = translated.meta_title || location.meta_title || `${t("Alquiler de Autocaravanas en")} ${translated.name || location.name}`;
-    const description = translated.meta_description || location.meta_description || 
-      `${t("Alquila tu autocaravana camper en")} ${translated.name || location.name}. ${t("Flota premium con kilómetros ilimitados")}.`;
+  const title = translated.meta_title || location.meta_title || `${t("Wohnmobilvermietung in")} ${translated.name || location.name}`;
+  const description = translated.meta_description || location.meta_description || 
+    `${t("Mieten Sie Ihr Wohnmobil in")} ${translated.name || location.name}. ${t("Premium-Flotte mit unbegrenzten Kilometern")}.`;
 
-    const path = `/alquiler-autocaravanas-campervans-${slug}`;
-    const alternates = buildCanonicalAlternates(path, locale);
+  const path = `/wohnmobil-mieten-${slug}`;
+  const alternates = buildCanonicalAlternates(path, locale);
 
-    return {
+  return {
+    title,
+    description,
+    alternates,
+    openGraph: {
       title,
       description,
-      alternates,
-      openGraph: {
-        title,
-        description,
-        type: 'website',
-        url: alternates.canonical,
-        siteName: 'Furgocasa',
-        locale: locale === 'es' ? 'es_ES' : locale === 'en' ? 'en_US' : locale === 'fr' ? 'fr_FR' : 'de_DE',
-        images: [{ url: location.hero_image || DEFAULT_HERO_IMAGE, width: 1920, height: 1080 }],
-      },
-      robots: { index: true, follow: true },
-    };
-  }
-
-
-  return { title: "Página no encontrada", robots: { index: false, follow: false } };
+      type: 'website',
+      url: alternates.canonical,
+      siteName: 'Furgocasa',
+      locale: 'de_DE',
+      images: [{ url: location.hero_image || DEFAULT_HERO_IMAGE, width: 1920, height: 1080 }],
+    },
+    robots: { index: true, follow: true },
+  };
 }
 
 // ============================================================================
@@ -325,72 +245,268 @@ export default async function LocationPage({ params }: PageProps) {
   const kind: PageKind = 'rent';
   const t = (key: string) => translateServer(key, locale);
 
-  // ============================================================================
-  // RENDERIZAR PÁGINA DE ALQUILER (Similar a HOME)
-  // ============================================================================
-  if (kind === "rent") {
-    // El slug ya viene de params.location
-    const locationRaw = await getRentLocation(slug);
+  const locationRaw = await getRentLocation(slug);
 
-    if (!locationRaw) {
-      notFound();
-    }
-
-    // Aplicar traducciones desde Supabase
-    const translatedFields = await getTranslatedContent(
-      'location_targets', locationRaw.id,
-      ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
-      locale,
-      {
-        name: locationRaw.name,
-        h1_title: locationRaw.h1_title,
-        meta_title: locationRaw.meta_title,
-        meta_description: locationRaw.meta_description,
-        intro_text: locationRaw.intro_text,
-      }
-    );
-
-    // Traducir content_sections (contenido único de la ubicación)
-    const translatedSections = await getTranslatedContentSections(
-      'location_targets', locationRaw.id, locale, locationRaw.content_sections
-    );
-
-    const location = {
-      ...locationRaw,
-      name: translatedFields.name || locationRaw.name,
-      h1_title: translatedFields.h1_title || locationRaw.h1_title,
-      intro_text: translatedFields.intro_text || locationRaw.intro_text,
-      content_sections: translatedSections || locationRaw.content_sections,
-    };
-
-    const vehiclesRaw = await getRentVehicles();
-    const vehicles = await getTranslatedRecords('vehicles', vehiclesRaw, ['name', 'short_description'], locale);
-
-    const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
-    const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
-
-    // Preload de imagen hero para LCP óptimo
-    const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
-
-    return (
-      <>
-        {/* Preload imagen LCP para descubrimiento temprano */}
-        <link
-          rel="preload"
-          as="image"
-          href={heroImageUrl}
-          fetchPriority="high"
-        />
-        
-        <LocalBusinessJsonLd location={location as any} />
-        
-        {/* La misma implementación de la página de alquiler que antes... */}
-        {/* [RESTO DEL CONTENIDO ORIGINAL] */}
-      </>
-    );
+  if (!locationRaw) {
+    notFound();
   }
 
-  // [RESTO DE LA IMPLEMENTACIÓN PARA "sale"...]
-  
-  notFound();
+  // Aplicar traducciones desde Supabase
+  const translatedFields = await getTranslatedContent(
+    'location_targets', locationRaw.id,
+    ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
+    locale,
+    {
+      name: locationRaw.name,
+      h1_title: locationRaw.h1_title,
+      meta_title: locationRaw.meta_title,
+      meta_description: locationRaw.meta_description,
+      intro_text: locationRaw.intro_text,
+    }
+  );
+
+  // Traducir content_sections (contenido único de la ubicación)
+  const translatedSections = await getTranslatedContentSections(
+    'location_targets', locationRaw.id, locale, locationRaw.content_sections
+  );
+
+  const location = {
+    ...locationRaw,
+    name: translatedFields.name || locationRaw.name,
+    h1_title: translatedFields.h1_title || locationRaw.h1_title,
+    intro_text: translatedFields.intro_text || locationRaw.intro_text,
+    content_sections: translatedSections || locationRaw.content_sections,
+  };
+
+  const vehiclesRaw = await getRentVehicles();
+  const vehicles = await getTranslatedRecords('vehicles', vehiclesRaw, ['name', 'short_description'], locale);
+
+  const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
+  const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
+
+  // Preload de imagen hero para LCP óptimo
+  const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
+
+  return (
+    <>
+      {/* Preload imagen LCP para descubrimiento temprano */}
+      <link
+        rel="preload"
+        as="image"
+        href={heroImageUrl}
+        fetchPriority="high"
+      />
+      
+      <LocalBusinessJsonLd location={location as any} />
+      
+      {/* Hero Section */}
+      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40 z-10" />
+        <Image
+          src={heroImageUrl}
+          alt={location.h1_title || `${t("Wohnmobilvermietung in")} ${location.name}`}
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        
+        <div className="relative z-20 container mx-auto px-4 text-center text-white">
+          <h1 className="text-4xl lg:text-6xl font-heading font-bold mb-6 drop-shadow-lg">
+            {location.h1_title || `${t("Wohnmobilvermietung in")} ${location.name}`}
+          </h1>
+          {location.intro_text && (
+            <p className="text-xl lg:text-2xl mb-8 max-w-3xl mx-auto drop-shadow-md">
+              {location.intro_text}
+            </p>
+          )}
+          
+          {!hasOffice && location.distance_km && (
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full text-gray-900 font-medium shadow-lg">
+              <MapPin className="h-5 w-5 text-furgocasa-blue" />
+              <span>
+                {t("Bei")} {location.distance_km} km {t("von unserem Büro")} ({driveHours}h {t("ca.")})
+              </span>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Widget de búsqueda */}
+      <section className="py-8 bg-white shadow-md -mt-20 relative z-30">
+        <div className="container mx-auto px-4">
+          <SearchWidget defaultLocation={slug} />
+        </div>
+      </section>
+
+      {/* Información de la ubicación */}
+      {location.nearest_location && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+              <div className="flex items-start gap-4 mb-6">
+                <MapPin className="h-8 w-8 text-furgocasa-blue flex-shrink-0 mt-1" />
+                <div>
+                  <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
+                    {t("Nächster Abholpunkt")}
+                  </h2>
+                  <h3 className="text-xl font-semibold text-furgocasa-blue mb-2">
+                    {location.nearest_location.name}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {location.nearest_location.address}
+                  </p>
+                  {location.distance_km && (
+                    <p className="text-gray-700">
+                      <span className="font-semibold">{t("Entfernung")}:</span> {location.distance_km} km 
+                      {location.travel_time_minutes && ` (${Math.round(location.travel_time_minutes / 60)}h ${t("ca.")})`}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-2 text-green-700 bg-green-50 px-4 py-3 rounded-lg">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">
+                  {t("Abholung und Rückgabe an diesem Standort verfügbar")}
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Contenido específico de la ubicación */}
+      {location.content_sections && location.content_sections.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto prose prose-lg">
+              {location.content_sections.map((section: any, index: number) => (
+                <div key={index} className="mb-8">
+                  {section.title && (
+                    <h2 className="text-3xl font-heading font-bold text-gray-900 mb-4">
+                      {section.title}
+                    </h2>
+                  )}
+                  {section.content && (
+                    <div 
+                      className="text-gray-700 leading-relaxed"
+                      dangerouslySetInnerHTML={{ __html: section.content }}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Vehículos destacados */}
+      {vehicles.length > 0 && (
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4">
+                {t("Unsere verfügbaren Wohnmobile")}
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                {t("Premium-Flotte mit unbegrenzten Kilometern")}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+              {vehicles.map((vehicle: any) => (
+                <LocalizedLink
+                  key={vehicle.id}
+                  href={`/fahrzeuge/${vehicle.slug}`}
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
+                >
+                  <div className="relative h-64 bg-gray-200">
+                    {vehicle.main_image && (
+                      <Image
+                        src={vehicle.main_image}
+                        alt={vehicle.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
+                      {vehicle.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-4">
+                      {vehicle.brand} {vehicle.model}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className="text-furgocasa-blue font-bold">
+                        {t("Details anzeigen")}
+                      </span>
+                      <ArrowRight className="h-5 w-5 text-furgocasa-blue group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </LocalizedLink>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <LocalizedLink
+                href="/fahrzeuge"
+                className="inline-flex items-center gap-2 bg-furgocasa-blue text-white px-8 py-4 rounded-full font-bold hover:bg-furgocasa-blue-dark transition-colors text-lg"
+              >
+                {t("Gesamte Flotte anzeigen")}
+                <ArrowRight className="h-5 w-5" />
+              </LocalizedLink>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Servicios y ventajas */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4">
+              {t("Warum bei Furgocasa mieten?")}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {[
+              { icon: Shield, title: t("Vollkaskoversicherung"), desc: t("Reisen Sie beruhigt") },
+              { icon: CheckCircle, title: t("Unbegrenzte km"), desc: t("Keine Entfernungsbegrenzung") },
+              { icon: Calendar, title: t("Flexibilität"), desc: t("Abholung wo Sie möchten") },
+              { icon: Phone, title: t("24/7 Unterstützung"), desc: t("Immer verfügbar") },
+            ].map((service, index) => (
+              <div key={index} className="bg-gray-50 p-6 rounded-xl text-center">
+                <service.icon className="h-12 w-12 text-furgocasa-blue mx-auto mb-4" />
+                <h3 className="font-heading font-bold text-gray-900 mb-2">{service.title}</h3>
+                <p className="text-gray-600 text-sm">{service.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-16 bg-furgocasa-blue text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-6">
+            {t("Bereit für Ihr Abenteuer?")}
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+            {t("Buchen Sie jetzt Ihr Wohnmobil und beginnen Sie mit der Planung Ihrer nächsten Reise")}
+          </p>
+          <LocalizedLink
+            href="/fahrzeuge"
+            className="inline-flex items-center gap-2 bg-white text-furgocasa-blue px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors text-lg"
+          >
+            {t("Verfügbare Fahrzeuge anzeigen")}
+            <ArrowRight className="h-5 w-5" />
+          </LocalizedLink>
+        </div>
+      </section>
+    </>
+  );
 }
