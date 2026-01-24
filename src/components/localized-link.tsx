@@ -31,6 +31,17 @@ export function LocalizedLink({ href, className, children, onClick, target, rel 
     );
   }
   
+  // ✅ CASO ESPECIAL: Home page
+  // Asegurar que / siempre vaya a /{locale}/
+  if (href === '/' || href === '') {
+    const homeHref = `/${language}/`;
+    return (
+      <Link href={homeHref} className={className} onClick={onClick} target={target} rel={rel}>
+        {children}
+      </Link>
+    );
+  }
+  
   // Añadir el idioma a rutas internas
   const localizedHref = getTranslatedRoute(href, language);
   
