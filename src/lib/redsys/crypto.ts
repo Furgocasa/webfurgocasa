@@ -91,35 +91,49 @@ export function createSignature(
 
 /**
  * Valida la firma recibida de Redsys
+ * 
+ * IMPORTANTE: Redsys envía la firma en URL-safe base64 (con - y _)
+ * pero nosotros generamos en base64 estándar (con + y /)
  */
 export function validateSignature(
   merchantParameters: string,
   signature: string,
   secretKey: string
 ): boolean {
+  console.log("🔐 [VALIDATE] Iniciando validación de firma...");
+  console.log("🔐 [VALIDATE] Signature recibida:", signature);
+  
   // Decodificar parámetros para obtener el número de pedido
   const params = JSON.parse(
     Buffer.from(merchantParameters, "base64").toString("utf8")
   );
   const orderNumber = params.Ds_Order;
+  console.log("🔐 [VALIDATE] Order number extraído:", orderNumber);
 
-  // Generar firma esperada
-  const expectedSignature = createSignature(
-    merchantParameters,
-    secretKey,
-    orderNumber
-  );
-
-  // Comparar firmas (URL-safe base64)
-  const normalizedExpected = expectedSignature
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  // Generar firma esperada (sin los logs de createSignature)
+  const secretKeyBuffer = Buffer.from(secretKey, "base64");
+  const derivedKey = encrypt3DES(orderNumber, secretKey);
+  const hmac = crypto.createHmac("sha256", derivedKey);
+  hmac.update(merchantParameters);
+  const expectedSignature = hmac.digest("base64");
   
-  const normalizedReceived = signature
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/, "");
+  console.log("🔐 [VALIDATE] Signature esperada:", expectedSignature);
+
+  // Normalizar ambas firmas a formato comparable
+  // Redsys usa URL-safe base64: + -> -, / -> _, sin padding =
+  const normalizeSignature = (sig: string) => {
+    return sig
+      .replace(/\+/g, "-")
+      .replace(/\//g, "_")
+      .replace(/=+$/, "");
+  };
+  
+  const normalizedExpected = normalizeSignature(expectedSignature);
+  const normalizedReceived = normalizeSignature(signature);
+  
+  console.log("🔐 [VALIDATE] Expected (normalized):", normalizedExpected);
+  console.log("🔐 [VALIDATE] Received (normalized):", normalizedReceived);
+  console.log("🔐 [VALIDATE] Match:", normalizedExpected === normalizedReceived);
 
   return normalizedExpected === normalizedReceived;
 }
