@@ -1,318 +1,289 @@
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Reserva Creada - Furgocasa</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-    }
-    .header {
-      background: linear-gradient(135deg, #063971 0%, #042a52 100%);
-      padding: 40px 20px;
-      text-align: center;
-    }
-    .header h1 {
-      color: #ffffff;
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .booking-number {
-      background-color: #fef3c7;
-      border-left: 4px solid #063971;
-      padding: 15px 20px;
-      margin: 20px 0;
-    }
-    .booking-number strong {
-      color: #063971;
-      font-size: 18px;
-    }
-    .detail-box {
-      background-color: #f9fafb;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 15px 0;
-    }
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-    .detail-label {
-      color: #6b7280;
-      font-size: 14px;
-    }
-    .detail-value {
-      color: #111827;
-      font-weight: 600;
-      font-size: 14px;
-    }
-    .total-box {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: white;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 20px 0;
-      text-align: center;
-    }
-    .total-box .label {
-      font-size: 14px;
-      opacity: 0.9;
-      margin-bottom: 5px;
-    }
-    .total-box .amount {
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .button {
-      display: inline-block;
-      background-color: #063971;
-      color: white !important;
-      padding: 14px 28px;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 600;
-      margin: 20px 0;
-      text-align: center;
-    }
-    .footer {
-      background-color: #f9fafb;
-      padding: 30px;
-      text-align: center;
-      color: #6b7280;
-      font-size: 14px;
-    }
-    .footer a {
-      color: #063971;
-      text-decoration: none;
-    }
-    .warning-box {
-      background-color: #fef3c7;
-      border-left: 4px solid #f59e0b;
-      padding: 15px 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .success-box {
-      background-color: #d1fae5;
-      border-left: 4px solid #10b981;
-      padding: 15px 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    @media only screen and (max-width: 600px) {
-      .content {
-        padding: 30px 20px;
-      }
-      .detail-row {
-        flex-direction: column;
-        gap: 5px;
-      }
-    }
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Furgocasa - Reserva Pendiente</title>
+  <!--[if mso]>
+  <style type="text/css">
+    table {border-collapse:collapse;border-spacing:0;margin:0;}
+    div, td {padding:0;}
+    div {margin:0 !important;}
   </style>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <a href="https://www.furgocasa.com" style="display: inline-block;">
-        <img src="https://www.furgocasa.com/images/brand/LOGO%20BLANCO.png" alt="Furgocasa" style="max-width: 200px; height: auto;" />
-      </a>
-    </div>
-    
-    <div class="content">
-      <h2 style="color: #111827; margin-top: 0;">¡Reserva creada correctamente!</h2>
-      
-      <p>Hola <strong>Juan García López</strong>,</p>
-      
-      <p>Hemos recibido tu solicitud de reserva. Tu reserva ha sido creada con éxito y está <strong>pendiente de confirmación</strong>.</p>
-      
-      <div class="booking-number">
-        <div style="font-size: 14px; color: #92400e; margin-bottom: 5px;">Número de reserva:</div>
-        <strong>FG20260215-001</strong>
-      </div>
-
-      <div class="warning-box">
-        <strong>⏳ Pendiente de pago</strong>
-        <p style="margin: 10px 0 0 0;">Para confirmar tu reserva, debes realizar el pago. Te recordamos que puedes pagar el 50% ahora y el resto máximo 15 días antes del inicio del alquiler.</p>
-      </div>
-
-      <!-- VEHÍCULO -->
-      <h3 style="color: #111827;">🚐 Vehículo</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Vehículo:</span>
-          <span class="detail-value">FC01 - Camper California Ocean</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Modelo:</span>
-          <span class="detail-value">Volkswagen California Ocean</span>
-        </div>
-      </div>
-
-      <!-- DATOS DEL CLIENTE -->
-      <h3 style="color: #111827;">👤 Datos del conductor principal</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Nombre:</span>
-          <span class="detail-value">Juan</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Apellidos:</span>
-          <span class="detail-value">García López</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">DNI / ID:</span>
-          <span class="detail-value">12345678A</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Dirección:</span>
-          <span class="detail-value">Calle Mayor 123, 2ºB</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Código postal:</span>
-          <span class="detail-value">30001</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Ciudad:</span>
-          <span class="detail-value">Murcia</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">País:</span>
-          <span class="detail-value">España</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Edad:</span>
-          <span class="detail-value">35 años</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Caducidad carnet:</span>
-          <span class="detail-value">15/06/2030</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Teléfono:</span>
-          <span class="detail-value">+34 612 345 678</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Email:</span>
-          <span class="detail-value">juan.garcia@email.com</span>
-        </div>
-      </div>
-
-      <!-- FECHAS -->
-      <h3 style="color: #111827;">📅 Fechas</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Recogida:</span>
-          <span class="detail-value">sábado, 15 de febrero de 2026 - 10:00</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Devolución:</span>
-          <span class="detail-value">sábado, 22 de febrero de 2026 - 10:00</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Duración:</span>
-          <span class="detail-value">7 días</span>
-        </div>
-      </div>
-
-      <!-- UBICACIONES -->
-      <h3 style="color: #111827;">📍 Ubicaciones</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Recogida en:</span>
-          <span class="detail-value">Murcia - Base Principal</span>
-        </div>
-        <div style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">Polígono Industrial Oeste, Parcela 45, 30169 San Ginés, Murcia</div>
-        <div class="detail-row">
-          <span class="detail-label">Devolución en:</span>
-          <span class="detail-value">Murcia - Base Principal</span>
-        </div>
-        <div style="font-size: 12px; color: #6b7280;">Polígono Industrial Oeste, Parcela 45, 30169 San Ginés, Murcia</div>
-      </div>
-
-      <!-- EXTRAS -->
-      <h3 style="color: #111827;">📦 Extras incluidos</h3>
-      <div class="detail-box">
-        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
-          <div><strong>Sillas de camping</strong> <span style="color: #6b7280; font-size: 12px;">x2</span></div>
-          <span style="font-weight: 600; color: #063971;">30,00 €</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-          <div><strong>Segundo conductor</strong> <span style="color: #6b7280; font-size: 12px;">x1</span></div>
-          <span style="font-weight: 600; color: #063971;">45,00 €</span>
-        </div>
-      </div>
-
-      <!-- PRECIOS -->
-      <h3 style="color: #111827;">💰 Desglose de precios</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Alquiler (7 días):</span>
-          <span class="detail-value">840,00 €</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Extras:</span>
-          <span class="detail-value">75,00 €</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Fianza (se devuelve):</span>
-          <span class="detail-value">1.000,00 €</span>
-        </div>
-        <div class="detail-row" style="border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: 10px;">
-          <span class="detail-label"><strong>TOTAL:</strong></span>
-          <span class="detail-value" style="font-size: 18px; color: #063971;">915,00 €</span>
-        </div>
-      </div>
-
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.furgocasa.com/reservar/FG20260215-001" class="button">
-          Ver mi reserva y proceder al pago
-        </a>
-      </div>
-
-      <div class="warning-box">
-        <strong>💡 Importante:</strong>
-        <ul style="margin: 10px 0; padding-left: 20px;">
-          <li>Tu reserva estará <strong>en espera hasta recibir el pago</strong></li>
-          <li>Puedes pagar el <strong>50% ahora</strong> y el resto máximo 15 días antes del inicio</li>
-          <li>O puedes pagar el <strong>100% ahora</strong> si lo prefieres</li>
-        </ul>
-      </div>
-
-      <p>Si tienes alguna duda o necesitas ayuda, no dudes en contactarnos.</p>
-      
-      <p>¡Gracias por confiar en Furgocasa!</p>
-    </div>
-    
-    <div class="footer">
-      <p><strong>Furgocasa - Alquiler de Campers</strong></p>
-      <p>
-        📞 <a href="tel:+34868364161">+34 868 364 161</a><br>
-        📧 <a href="mailto:info@furgocasa.com">info@furgocasa.com</a><br>
-        🌐 <a href="https://www.furgocasa.com">www.furgocasa.com</a>
-      </p>
-      <p style="margin-top: 20px; font-size: 12px; color: #9ca3af;">
-        Este correo ha sido enviado automáticamente. Por favor, no respondas a este email.<br>
-        Si tienes alguna consulta, contacta con nosotros en info@furgocasa.com
-      </p>
-    </div>
-  </div>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f4f5;">
+    <tr>
+      <td align="center" style="padding: 20px 10px;">
+        <!-- Container -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; max-width: 600px;">
+          <!-- Header con logo negro sobre fondo blanco (máxima compatibilidad) -->
+          <tr>
+            <td align="center" style="background-color: #ffffff; padding: 25px 20px; border-bottom: 4px solid #063971;">
+              <a href="https://www.furgocasa.com" style="text-decoration: none;">
+                <img src="https://www.furgocasa.com/images/brand/LOGO%20NEGRO_vf.png" alt="Furgocasa" width="200" style="display: block; max-width: 200px; height: auto;" />
+              </a>
+            </td>
+          </tr>
+          
+          <!-- Contenido principal -->
+          <tr>
+            <td style="padding: 30px 20px 20px 20px;">
+              <h2 style="margin: 0 0 15px 0; color: #111827; font-size: 20px;">¡Reserva creada correctamente!</h2>
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">Hola <strong>Juan</strong>,</p>
+              <p style="margin: 0; font-size: 14px; color: #374151;">Hemos recibido tu solicitud de reserva. Tu reserva está <strong>pendiente de confirmación</strong>.</p>
+            </td>
+          </tr>
+          
+          <!-- Número de reserva -->
+          <tr>
+            <td style="padding: 0 20px 15px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #063971;">
+                <tr>
+                  <td style="padding: 15px;">
+                    <p style="margin: 0 0 5px 0; font-size: 12px; color: #6b7280;">Número de reserva:</p>
+                    <p style="margin: 0; font-size: 18px; font-weight: bold; color: #063971;">FU0018</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Alerta pendiente de pago -->
+          <tr>
+            <td style="padding: 15px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fef3c7; border-left: 4px solid #f59e0b;">
+                <tr>
+                  <td style="padding: 15px;">
+                    <p style="margin: 0 0 5px 0; font-weight: bold; color: #111827;">⏳ Pendiente de pago</p>
+                    <p style="margin: 0; font-size: 13px; color: #374151;">Para confirmar tu reserva, realiza el pago. Puedes pagar el 50% ahora y el resto máximo 15 días antes.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Sección: Vehículo -->
+          <tr>
+            <td style="padding: 25px 20px 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">🚐 Vehículo</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb;">
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Vehículo</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">FU0018 - Camper XL Deluxe</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Marca / Modelo</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Fiat Ducato 2023</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Sección: Conductor principal -->
+          <tr>
+            <td style="padding: 25px 20px 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">👤 Conductor principal</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb;">
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Nombre</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Juan</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Apellidos</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">García López</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">DNI / ID</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">12345678A</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Dirección</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Calle Mayor 123</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Ciudad</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Madrid</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Teléfono</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">+34 612 345 678</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Email</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">juan.garcia@email.com</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Sección: Fechas -->
+          <tr>
+            <td style="padding: 25px 20px 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">📅 Fechas</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb;">
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Recogida</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Sábado, 22 de marzo de 2026 - 10:00</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Devolución</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Jueves, 27 de marzo de 2026 - 18:00</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Duración</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">5 días</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Sección: Ubicación -->
+          <tr>
+            <td style="padding: 25px 20px 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">📍 Ubicación</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb;">
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Punto de recogida</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Murcia</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Dirección</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">Avenida Puente Tocinos, 4, 30007 Casillas - Murcia</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Sección: Resumen de precios -->
+          <tr>
+            <td style="padding: 25px 20px 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">💰 Resumen de precios</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 10px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb;">
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Alquiler (5 días)</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">505,00 €</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Fianza (se devuelve)</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">1.000,00 €</td>
+                </tr>
+                <tr>
+                  <td style="padding: 12px 0 8px 0; font-size: 14px; font-weight: bold; color: #111827; border-top: 2px solid #063971;">TOTAL</td>
+                  <td style="padding: 12px 0 8px 0; font-size: 18px; font-weight: bold; color: #063971; text-align: right; border-top: 2px solid #063971;">505,00 €</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">Pendiente</td>
+                  <td style="padding: 8px 0; font-size: 13px; color: #dc2626; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">505,00 €</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Botón CTA -->
+          <tr>
+            <td align="center" style="padding: 25px 20px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="background-color: #063971; padding: 14px 30px;">
+                    <a href="https://www.furgocasa.com/reservar/123" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 14px;">Ver mi reserva y proceder al pago</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Alerta importante -->
+          <tr>
+            <td style="padding: 15px 20px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fef3c7; border-left: 4px solid #f59e0b;">
+                <tr>
+                  <td style="padding: 15px;">
+                    <p style="margin: 0 0 5px 0; font-weight: bold; color: #111827;">💡 Importante</p>
+                    <p style="margin: 0; font-size: 13px; color: #374151;">Tu reserva estará en espera hasta recibir el pago. Puedes pagar el 50% ahora y el resto máximo 15 días antes del inicio.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          
+          <!-- Despedida -->
+          <tr>
+            <td style="padding: 15px 20px 30px 20px;">
+              <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">Si tienes alguna duda, no dudes en contactarnos.</p>
+              <p style="margin: 0; font-size: 14px; color: #374151;">¡Gracias por confiar en Furgocasa!</p>
+            </td>
+          </tr>
+          
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f4f4f5; padding: 30px 20px; text-align: center;">
+              <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold; color: #374151;">Furgocasa - Alquiler de Campers</p>
+              <p style="margin: 0 0 5px 0; font-size: 13px; color: #6b7280;">
+                Tel: <a href="tel:+34868364161" style="color: #063971; text-decoration: none;">+34 868 364 161</a>
+              </p>
+              <p style="margin: 0 0 5px 0; font-size: 13px; color: #6b7280;">
+                Email: <a href="mailto:reservas@furgocasa.com" style="color: #063971; text-decoration: none;">reservas@furgocasa.com</a>
+              </p>
+              <p style="margin: 0 0 15px 0; font-size: 13px; color: #6b7280;">
+                Web: <a href="https://www.furgocasa.com" style="color: #063971; text-decoration: none;">www.furgocasa.com</a>
+              </p>
+              <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                Este correo ha sido enviado automáticamente.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>

@@ -1,178 +1,68 @@
 /**
  * Plantilla base para todos los emails
+ * Diseño basado en tablas para máxima compatibilidad con Outlook y otros clientes
  */
 export function getEmailBaseTemplate(content: string): string {
   return `
-<!DOCTYPE html>
-<html lang="es">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Furgocasa</title>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-      background-color: #f5f5f5;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      background-color: #ffffff;
-    }
-    .header {
-      background: linear-gradient(135deg, #063971 0%, #042a52 100%);
-      padding: 40px 20px;
-      text-align: center;
-    }
-    .header h1 {
-      color: #ffffff;
-      margin: 0;
-      font-size: 28px;
-      font-weight: 700;
-    }
-    .content {
-      padding: 40px 30px;
-    }
-    .booking-number {
-      background-color: #fef3c7;
-      border-left: 4px solid #063971;
-      padding: 15px 20px;
-      margin: 20px 0;
-    }
-    .booking-number strong {
-      color: #063971;
-      font-size: 18px;
-    }
-    .detail-box {
-      background-color: #f9fafb;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 15px 0;
-    }
-    .detail-row {
-      display: flex;
-      justify-content: space-between;
-      padding: 8px 0;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .detail-row:last-child {
-      border-bottom: none;
-    }
-    .detail-label {
-      color: #6b7280;
-      font-size: 13px;
-    }
-    .detail-value {
-      color: #111827;
-      font-weight: 600;
-      font-size: 13px;
-      text-align: right;
-    }
-    .section-title {
-      color: #111827;
-      font-size: 16px;
-      font-weight: 700;
-      margin: 25px 0 10px 0;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #063971;
-    }
-    .total-box {
-      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
-      color: white;
-      border-radius: 8px;
-      padding: 20px;
-      margin: 20px 0;
-      text-align: center;
-    }
-    .total-box .label {
-      font-size: 14px;
-      opacity: 0.9;
-      margin-bottom: 5px;
-    }
-    .total-box .amount {
-      font-size: 32px;
-      font-weight: 700;
-    }
-    .button {
-      display: inline-block;
-      background-color: #063971;
-      color: white !important;
-      padding: 14px 28px;
-      text-decoration: none;
-      border-radius: 8px;
-      font-weight: 600;
-      margin: 20px 0;
-      text-align: center;
-    }
-    .footer {
-      background-color: #f9fafb;
-      padding: 30px;
-      text-align: center;
-      color: #6b7280;
-      font-size: 14px;
-    }
-    .footer a {
-      color: #063971;
-      text-decoration: none;
-    }
-    .warning-box {
-      background-color: #fef3c7;
-      border-left: 4px solid #f59e0b;
-      padding: 15px 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .success-box {
-      background-color: #d1fae5;
-      border-left: 4px solid #10b981;
-      padding: 15px 20px;
-      margin: 20px 0;
-      border-radius: 4px;
-    }
-    .extra-item {
-      background-color: #f0f9ff;
-      padding: 10px 15px;
-      margin: 8px 0;
-      border-radius: 6px;
-      border-left: 3px solid #3b82f6;
-    }
-    @media only screen and (max-width: 600px) {
-      .content {
-        padding: 30px 20px;
-      }
-      .detail-row {
-        flex-direction: column;
-        gap: 3px;
-      }
-      .detail-value {
-        text-align: left;
-      }
-    }
+  <!--[if mso]>
+  <style type="text/css">
+    table {border-collapse:collapse;border-spacing:0;margin:0;}
+    div, td {padding:0;}
+    div {margin:0 !important;}
   </style>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <a href="https://www.furgocasa.com" style="display: inline-block;">
-        <img src="https://www.furgocasa.com/images/brand/LOGO%20BLANCO.png" alt="Furgocasa" style="max-width: 200px; height: auto;" />
-      </a>
-    </div>
-    ${content}
-    <div class="footer">
-      <p><strong>Furgocasa - Alquiler de Campers</strong></p>
-      <p>
-        📞 <a href="tel:+34868364161">+34 868 364 161</a><br>
-        📧 <a href="mailto:reservas@furgocasa.com">reservas@furgocasa.com</a><br>
-        🌐 <a href="https://www.furgocasa.com">www.furgocasa.com</a>
-      </p>
-      <p style="margin-top: 20px; font-size: 12px; color: #9ca3af;">
-        Este correo ha sido enviado automáticamente.<br>
-        Si tienes alguna consulta, contacta con nosotros en reservas@furgocasa.com
-      </p>
-    </div>
-  </div>
+<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, Helvetica, sans-serif;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f4f5;">
+    <tr>
+      <td align="center" style="padding: 20px 10px;">
+        <!-- Container -->
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; max-width: 600px;">
+          <!-- Header con logo negro sobre fondo blanco (máxima compatibilidad) -->
+          <tr>
+            <td align="center" style="background-color: #ffffff; padding: 25px 20px; border-bottom: 4px solid #063971;">
+              <a href="https://www.furgocasa.com" style="text-decoration: none;">
+                <img src="https://www.furgocasa.com/images/brand/LOGO%20NEGRO_vf.png" alt="Furgocasa" width="200" style="display: block; max-width: 200px; height: auto;" />
+              </a>
+            </td>
+          </tr>
+          <!-- Content -->
+          ${content}
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #f4f4f5; padding: 30px 20px; text-align: center;">
+              <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold; color: #374151;">Furgocasa - Alquiler de Campers</p>
+              <p style="margin: 0 0 5px 0; font-size: 13px; color: #6b7280;">
+                Tel: <a href="tel:+34868364161" style="color: #063971; text-decoration: none;">+34 868 364 161</a>
+              </p>
+              <p style="margin: 0 0 5px 0; font-size: 13px; color: #6b7280;">
+                Email: <a href="mailto:reservas@furgocasa.com" style="color: #063971; text-decoration: none;">reservas@furgocasa.com</a>
+              </p>
+              <p style="margin: 0 0 15px 0; font-size: 13px; color: #6b7280;">
+                Web: <a href="https://www.furgocasa.com" style="color: #063971; text-decoration: none;">www.furgocasa.com</a>
+              </p>
+              <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+                Este correo ha sido enviado automáticamente.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>
   `.trim();
@@ -268,340 +158,265 @@ export interface BookingEmailData {
 }
 
 /**
- * Genera la sección de datos del cliente
+ * Genera una fila de tabla para detalles (compatible con Outlook)
+ */
+function tableRow(label: string, value: string, valueColor?: string): string {
+  const colorStyle = valueColor ? `color: ${valueColor};` : '';
+  return `
+    <tr>
+      <td style="padding: 8px 0; font-size: 13px; color: #6b7280; border-bottom: 1px solid #e5e7eb;">${label}</td>
+      <td style="padding: 8px 0; font-size: 13px; color: #111827; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb; ${colorStyle}">${value}</td>
+    </tr>
+  `;
+}
+
+/**
+ * Genera la sección de datos del cliente (tabla HTML)
  */
 function getCustomerSection(data: BookingEmailData): string {
   const rows: string[] = [];
   
   if (data.customerFirstName) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Nombre:</span>
-        <span class="detail-value">${data.customerFirstName}</span>
-      </div>
-    `);
+    rows.push(tableRow('Nombre', data.customerFirstName));
   }
-  
   if (data.customerLastName) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Apellidos:</span>
-        <span class="detail-value">${data.customerLastName}</span>
-      </div>
-    `);
+    rows.push(tableRow('Apellidos', data.customerLastName));
   }
-  
   if (!data.customerFirstName && data.customerName) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Nombre completo:</span>
-        <span class="detail-value">${data.customerName}</span>
-      </div>
-    `);
+    rows.push(tableRow('Nombre completo', data.customerName));
   }
-  
   if (data.customerDni) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">DNI / ID:</span>
-        <span class="detail-value">${data.customerDni}</span>
-      </div>
-    `);
+    rows.push(tableRow('DNI / ID', data.customerDni));
   }
-  
   if (data.customerAddress) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Dirección:</span>
-        <span class="detail-value">${data.customerAddress}</span>
-      </div>
-    `);
+    rows.push(tableRow('Dirección', data.customerAddress));
   }
-  
   if (data.customerPostalCode) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Código postal:</span>
-        <span class="detail-value">${data.customerPostalCode}</span>
-      </div>
-    `);
+    rows.push(tableRow('Código postal', data.customerPostalCode));
   }
-  
   if (data.customerCity) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Ciudad:</span>
-        <span class="detail-value">${data.customerCity}</span>
-      </div>
-    `);
+    rows.push(tableRow('Ciudad', data.customerCity));
   }
-  
   if (data.customerCountry) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">País:</span>
-        <span class="detail-value">${data.customerCountry}</span>
-      </div>
-    `);
+    rows.push(tableRow('País', data.customerCountry));
   }
-  
   if (data.customerAge) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Edad:</span>
-        <span class="detail-value">${data.customerAge} años</span>
-      </div>
-    `);
+    rows.push(tableRow('Edad', `${data.customerAge} años`));
   }
-  
   if (data.customerDriverLicenseExpiry) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Caducidad carnet:</span>
-        <span class="detail-value">${new Date(data.customerDriverLicenseExpiry).toLocaleDateString('es-ES')}</span>
-      </div>
-    `);
+    rows.push(tableRow('Caducidad carnet', new Date(data.customerDriverLicenseExpiry).toLocaleDateString('es-ES')));
   }
-  
   if (data.customerPhone) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Teléfono:</span>
-        <span class="detail-value">${data.customerPhone}</span>
-      </div>
-    `);
+    rows.push(tableRow('Teléfono', data.customerPhone));
   }
-  
   if (data.customerEmail) {
-    rows.push(`
-      <div class="detail-row">
-        <span class="detail-label">Email:</span>
-        <span class="detail-value">${data.customerEmail}</span>
-      </div>
-    `);
+    rows.push(tableRow('Email', data.customerEmail));
   }
   
   return rows.join('');
 }
 
 /**
- * Genera la sección de extras
+ * Genera la sección de extras (tabla HTML)
  */
 function getExtrasSection(extras: BookingExtra[]): string {
   if (!extras || extras.length === 0) return '';
   
-  const items = extras.map(extra => `
-    <div class="extra-item">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-          <strong>${extra.name}</strong>
-          <span style="color: #6b7280; font-size: 12px; margin-left: 8px;">x${extra.quantity}</span>
-        </div>
-        <span style="font-weight: 600; color: #063971;">${formatPrice(extra.totalPrice)}</span>
-      </div>
-    </div>
+  const rows = extras.map(extra => `
+    <tr>
+      <td style="padding: 8px 0; font-size: 13px; color: #111827; border-bottom: 1px solid #e5e7eb;">
+        <strong>${extra.name}</strong> <span style="color: #6b7280;">(x${extra.quantity})</span>
+      </td>
+      <td style="padding: 8px 0; font-size: 13px; color: #063971; font-weight: 600; text-align: right; border-bottom: 1px solid #e5e7eb;">${formatPrice(extra.totalPrice)}</td>
+    </tr>
   `).join('');
   
-  return `
-    <h3 class="section-title">📦 Extras incluidos</h3>
-    ${items}
-  `;
+  return rows;
 }
 
 /**
- * Genera la sección de precios
+ * Genera la sección de precios (tabla HTML)
  */
 function getPriceSection(data: BookingEmailData): string {
-  let rows = `
-    <div class="detail-row">
-      <span class="detail-label">Alquiler (${data.days} días):</span>
-      <span class="detail-value">${formatPrice(data.basePrice)}</span>
-    </div>
-  `;
+  let rows = tableRow(`Alquiler (${data.days} días)`, formatPrice(data.basePrice));
   
   if (data.extrasPrice > 0) {
-    rows += `
-      <div class="detail-row">
-        <span class="detail-label">Extras:</span>
-        <span class="detail-value">${formatPrice(data.extrasPrice)}</span>
-      </div>
-    `;
+    rows += tableRow('Extras', formatPrice(data.extrasPrice));
   }
-  
   if (data.locationFee && data.locationFee > 0) {
-    rows += `
-      <div class="detail-row">
-        <span class="detail-label">Comisión entrega/recogida:</span>
-        <span class="detail-value">${formatPrice(data.locationFee)}</span>
-      </div>
-    `;
+    rows += tableRow('Comisión entrega/recogida', formatPrice(data.locationFee));
   }
-  
   if (data.discount && data.discount > 0) {
-    rows += `
-      <div class="detail-row">
-        <span class="detail-label">Descuento:</span>
-        <span class="detail-value" style="color: #10b981;">-${formatPrice(data.discount)}</span>
-      </div>
-    `;
+    rows += tableRow('Descuento', `-${formatPrice(data.discount)}`, '#10b981');
   }
+  rows += tableRow('Fianza (se devuelve)', formatPrice(data.depositAmount || 1000));
   
+  // Total con estilo especial
   rows += `
-    <div class="detail-row">
-      <span class="detail-label">Fianza (se devuelve):</span>
-      <span class="detail-value">${formatPrice(data.depositAmount || 1000)}</span>
-    </div>
-  `;
-  
-  rows += `
-    <div class="detail-row" style="border-top: 2px solid #e5e7eb; padding-top: 12px; margin-top: 8px;">
-      <span class="detail-label"><strong>TOTAL:</strong></span>
-      <span class="detail-value" style="font-size: 18px; color: #063971;">${formatPrice(data.totalPrice)}</span>
-    </div>
+    <tr>
+      <td style="padding: 12px 0 8px 0; font-size: 14px; font-weight: bold; color: #111827; border-top: 2px solid #063971;">TOTAL</td>
+      <td style="padding: 12px 0 8px 0; font-size: 18px; font-weight: bold; color: #063971; text-align: right; border-top: 2px solid #063971;">${formatPrice(data.totalPrice)}</td>
+    </tr>
   `;
   
   if (data.amountPaid !== undefined && data.amountPaid > 0) {
-    rows += `
-      <div class="detail-row">
-        <span class="detail-label">Pagado:</span>
-        <span class="detail-value" style="color: #10b981;">${formatPrice(data.amountPaid)}</span>
-      </div>
-    `;
+    rows += tableRow('Pagado', formatPrice(data.amountPaid), '#10b981');
   }
-  
   if (data.pendingAmount !== undefined && data.pendingAmount > 0) {
-    rows += `
-      <div class="detail-row">
-        <span class="detail-label">Pendiente:</span>
-        <span class="detail-value" style="color: #063971;">${formatPrice(data.pendingAmount)}</span>
-      </div>
-    `;
+    rows += tableRow('Pendiente', formatPrice(data.pendingAmount), '#dc2626');
   }
   
   return rows;
 }
 
 /**
+ * Genera una sección con título (compatible con Outlook)
+ */
+function sectionTitle(title: string): string {
+  return `
+    <tr>
+      <td style="padding: 25px 20px 10px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">${title}</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+/**
+ * Genera una tabla de detalles (compatible con Outlook)
+ */
+function detailsTable(rows: string): string {
+  return `
+    <tr>
+      <td style="padding: 10px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb;">
+          ${rows}
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+/**
+ * Genera un botón CTA (compatible con Outlook)
+ */
+function ctaButton(text: string, url: string): string {
+  return `
+    <tr>
+      <td align="center" style="padding: 25px 20px;">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="background-color: #063971; padding: 14px 30px;">
+              <a href="${url}" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 14px;">${text}</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+/**
+ * Genera un aviso/alerta (compatible con Outlook)
+ */
+function alertBox(title: string, content: string, bgColor: string = '#fef3c7', borderColor: string = '#f59e0b'): string {
+  return `
+    <tr>
+      <td style="padding: 15px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: ${bgColor}; border-left: 4px solid ${borderColor};">
+          <tr>
+            <td style="padding: 15px;">
+              <p style="margin: 0 0 5px 0; font-weight: bold; color: #111827;">${title}</p>
+              <p style="margin: 0; font-size: 13px; color: #374151;">${content}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  `;
+}
+
+/**
  * EMAIL 1: Reserva creada (pendiente de pago)
  */
 export function getBookingCreatedTemplate(data: BookingEmailData): string {
+  const vehicleInfo = data.vehicleInternalCode ? `${data.vehicleInternalCode} - ${data.vehicleName}` : data.vehicleName;
+  const modelInfo = data.vehicleBrand && data.vehicleModel ? `${data.vehicleBrand} ${data.vehicleModel}` : '';
+  
   const content = `
-    <div class="content">
-      <h2 style="color: #111827; margin-top: 0;">¡Reserva creada correctamente!</h2>
-      
-      <p>Hola <strong>${data.customerFirstName || data.customerName}</strong>,</p>
-      
-      <p>Hemos recibido tu solicitud de reserva. Tu reserva ha sido creada con éxito y está <strong>pendiente de confirmación</strong>.</p>
-      
-      <div class="booking-number">
-        <div style="font-size: 14px; color: #92400e; margin-bottom: 5px;">Número de reserva:</div>
-        <strong>${data.bookingNumber}</strong>
-      </div>
-
-      <div class="warning-box">
-        <strong>⏳ Pendiente de pago</strong>
-        <p style="margin: 10px 0 0 0;">Para confirmar tu reserva, debes realizar el pago. Puedes pagar el 50% ahora y el resto máximo 15 días antes del inicio del alquiler.</p>
-      </div>
-
-      <!-- VEHÍCULO -->
-      <h3 class="section-title">🚐 Vehículo</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Vehículo:</span>
-          <span class="detail-value">${data.vehicleInternalCode ? data.vehicleInternalCode + ' - ' : ''}${data.vehicleName}</span>
-        </div>
-        ${data.vehicleBrand && data.vehicleModel ? `
-        <div class="detail-row">
-          <span class="detail-label">Marca / Modelo:</span>
-          <span class="detail-value">${data.vehicleBrand} ${data.vehicleModel}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- CONDUCTOR PRINCIPAL -->
-      <h3 class="section-title">👤 Datos del conductor principal</h3>
-      <div class="detail-box">
-        ${getCustomerSection(data)}
-        ${data.notes ? `
-        <div class="detail-row">
-          <span class="detail-label">Comentarios:</span>
-          <span class="detail-value">${data.notes}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- FECHAS -->
-      <h3 class="section-title">📅 Fechas</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Recogida:</span>
-          <span class="detail-value">${formatDate(data.pickupDate)} - ${data.pickupTime}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Devolución:</span>
-          <span class="detail-value">${formatDate(data.dropoffDate)} - ${data.dropoffTime}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Duración:</span>
-          <span class="detail-value">${data.days} ${data.days === 1 ? 'día' : 'días'}</span>
-        </div>
-      </div>
-
-      <!-- UBICACIÓN -->
-      <h3 class="section-title">📍 Ubicación</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Punto de recogida:</span>
-          <span class="detail-value">${data.pickupLocation}</span>
-        </div>
-        ${data.pickupLocationAddress ? `
-        <div class="detail-row">
-          <span class="detail-label">Dirección:</span>
-          <span class="detail-value">${data.pickupLocationAddress}</span>
-        </div>
-        ` : ''}
-        ${data.pickupLocation !== data.dropoffLocation ? `
-        <div class="detail-row">
-          <span class="detail-label">Punto de devolución:</span>
-          <span class="detail-value">${data.dropoffLocation}</span>
-        </div>
-        ${data.dropoffLocationAddress ? `
-        <div class="detail-row">
-          <span class="detail-label">Dirección devolución:</span>
-          <span class="detail-value">${data.dropoffLocationAddress}</span>
-        </div>
-        ` : ''}
-        ` : ''}
-      </div>
-
-      <!-- EXTRAS -->
-      ${getExtrasSection(data.extras || [])}
-
-      <!-- RESUMEN DE PRECIOS -->
-      <h3 class="section-title">💰 Resumen de precios</h3>
-      <div class="detail-box">
-        ${getPriceSection(data)}
-      </div>
-
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.furgocasa.com/reservar/${data.bookingId}" class="button">
-          Ver mi reserva y proceder al pago
-        </a>
-      </div>
-
-      <div class="warning-box">
-        <strong>💡 Importante:</strong>
-        <ul style="margin: 10px 0; padding-left: 20px;">
-          <li>Tu reserva estará <strong>en espera hasta recibir el pago</strong></li>
-          <li>Puedes pagar el <strong>50% ahora</strong> y el resto máximo 15 días antes del inicio</li>
-          <li>O puedes pagar el <strong>100% ahora</strong> si lo prefieres</li>
-        </ul>
-      </div>
-
-      <p>Si tienes alguna duda o necesitas ayuda, no dudes en contactarnos.</p>
-      
-      <p>¡Gracias por confiar en Furgocasa!</p>
-    </div>
+    <!-- Contenido principal -->
+    <tr>
+      <td style="padding: 30px 20px 20px 20px;">
+        <h2 style="margin: 0 0 15px 0; color: #111827; font-size: 20px;">¡Reserva creada correctamente!</h2>
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">Hola <strong>${data.customerFirstName || data.customerName}</strong>,</p>
+        <p style="margin: 0; font-size: 14px; color: #374151;">Hemos recibido tu solicitud de reserva. Tu reserva está <strong>pendiente de confirmación</strong>.</p>
+      </td>
+    </tr>
+    
+    <!-- Número de reserva -->
+    <tr>
+      <td style="padding: 0 20px 15px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #063971;">
+          <tr>
+            <td style="padding: 15px;">
+              <p style="margin: 0 0 5px 0; font-size: 12px; color: #6b7280;">Número de reserva:</p>
+              <p style="margin: 0; font-size: 18px; font-weight: bold; color: #063971;">${data.bookingNumber}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+    ${alertBox('⏳ Pendiente de pago', 'Para confirmar tu reserva, realiza el pago. Puedes pagar el 50% ahora y el resto máximo 15 días antes.')}
+    
+    ${sectionTitle('🚐 Vehículo')}
+    ${detailsTable(`
+      ${tableRow('Vehículo', vehicleInfo)}
+      ${modelInfo ? tableRow('Marca / Modelo', modelInfo) : ''}
+    `)}
+    
+    ${sectionTitle('👤 Conductor principal')}
+    ${detailsTable(`
+      ${getCustomerSection(data)}
+      ${data.notes ? tableRow('Comentarios', data.notes) : ''}
+    `)}
+    
+    ${sectionTitle('📅 Fechas')}
+    ${detailsTable(`
+      ${tableRow('Recogida', `${formatDate(data.pickupDate)} - ${data.pickupTime}`)}
+      ${tableRow('Devolución', `${formatDate(data.dropoffDate)} - ${data.dropoffTime}`)}
+      ${tableRow('Duración', `${data.days} ${data.days === 1 ? 'día' : 'días'}`)}
+    `)}
+    
+    ${sectionTitle('📍 Ubicación')}
+    ${detailsTable(`
+      ${tableRow('Punto de recogida', data.pickupLocation)}
+      ${data.pickupLocationAddress ? tableRow('Dirección', data.pickupLocationAddress) : ''}
+      ${data.pickupLocation !== data.dropoffLocation ? tableRow('Punto de devolución', data.dropoffLocation) : ''}
+    `)}
+    
+    ${data.extras && data.extras.length > 0 ? `
+      ${sectionTitle('📦 Extras incluidos')}
+      ${detailsTable(getExtrasSection(data.extras))}
+    ` : ''}
+    
+    ${sectionTitle('💰 Resumen de precios')}
+    ${detailsTable(getPriceSection(data))}
+    
+    ${ctaButton('Ver mi reserva y proceder al pago', `https://www.furgocasa.com/reservar/${data.bookingId}`)}
+    
+    ${alertBox('💡 Importante', 'Tu reserva estará en espera hasta recibir el pago. Puedes pagar el 50% ahora y el resto máximo 15 días antes del inicio.')}
+    
+    <tr>
+      <td style="padding: 15px 20px 30px 20px;">
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">Si tienes alguna duda, no dudes en contactarnos.</p>
+        <p style="margin: 0; font-size: 14px; color: #374151;">¡Gracias por confiar en Furgocasa!</p>
+      </td>
+    </tr>
   `;
   
   return getEmailBaseTemplate(content);
@@ -613,145 +428,102 @@ export function getBookingCreatedTemplate(data: BookingEmailData): string {
 export function getFirstPaymentConfirmedTemplate(data: BookingEmailData): string {
   const isPaidInFull = (data.amountPaid || 0) >= data.totalPrice;
   const pendingAmount = data.totalPrice - (data.amountPaid || 0);
+  const vehicleInfo = data.vehicleInternalCode ? `${data.vehicleInternalCode} - ${data.vehicleName}` : data.vehicleName;
+  const modelInfo = data.vehicleBrand && data.vehicleModel ? `${data.vehicleBrand} ${data.vehicleModel}` : '';
   
   const content = `
-    <div class="content">
-      <h2 style="color: #10b981; margin-top: 0;">✅ ¡Pago recibido y reserva confirmada!</h2>
-      
-      <p>Hola <strong>${data.customerFirstName || data.customerName}</strong>,</p>
-      
-      <p>¡Excelentes noticias! Hemos recibido tu pago y tu reserva ha sido <strong>confirmada</strong>.</p>
-      
-      <div class="booking-number">
-        <div style="font-size: 14px; color: #92400e; margin-bottom: 5px;">Número de reserva:</div>
-        <strong>${data.bookingNumber}</strong>
-      </div>
-
-      <div class="success-box">
-        <strong>✅ Reserva confirmada</strong>
-        <p style="margin: 10px 0 0 0;">Tu reserva está confirmada. ${isPaidInFull ? '¡Has completado el pago total!' : 'Has pagado el 50% inicial.'}</p>
-      </div>
-
-      <!-- VEHÍCULO -->
-      <h3 class="section-title">🚐 Vehículo</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Vehículo:</span>
-          <span class="detail-value">${data.vehicleInternalCode ? data.vehicleInternalCode + ' - ' : ''}${data.vehicleName}</span>
-        </div>
-        ${data.vehicleBrand && data.vehicleModel ? `
-        <div class="detail-row">
-          <span class="detail-label">Marca / Modelo:</span>
-          <span class="detail-value">${data.vehicleBrand} ${data.vehicleModel}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- CONDUCTOR PRINCIPAL -->
-      <h3 class="section-title">👤 Datos del conductor principal</h3>
-      <div class="detail-box">
-        ${getCustomerSection(data)}
-        ${data.notes ? `
-        <div class="detail-row">
-          <span class="detail-label">Comentarios:</span>
-          <span class="detail-value">${data.notes}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- FECHAS -->
-      <h3 class="section-title">📅 Fechas</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Recogida:</span>
-          <span class="detail-value">${formatDate(data.pickupDate)} - ${data.pickupTime}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Devolución:</span>
-          <span class="detail-value">${formatDate(data.dropoffDate)} - ${data.dropoffTime}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Duración:</span>
-          <span class="detail-value">${data.days} ${data.days === 1 ? 'día' : 'días'}</span>
-        </div>
-      </div>
-
-      <!-- UBICACIÓN -->
-      <h3 class="section-title">📍 Ubicación</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Punto de recogida:</span>
-          <span class="detail-value">${data.pickupLocation}</span>
-        </div>
-        ${data.pickupLocationAddress ? `
-        <div class="detail-row">
-          <span class="detail-label">Dirección:</span>
-          <span class="detail-value">${data.pickupLocationAddress}</span>
-        </div>
-        ` : ''}
-        ${data.pickupLocation !== data.dropoffLocation ? `
-        <div class="detail-row">
-          <span class="detail-label">Punto de devolución:</span>
-          <span class="detail-value">${data.dropoffLocation}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- EXTRAS -->
-      ${getExtrasSection(data.extras || [])}
-
-      <!-- RESUMEN DE PRECIOS -->
-      <h3 class="section-title">💰 Resumen de precios</h3>
-      <div class="detail-box">
-        ${getPriceSection(data)}
-      </div>
-
-      ${!isPaidInFull ? `
-      <div class="warning-box">
-        <strong>📅 Segundo pago:</strong>
-        <p style="margin: 10px 0 0 0;">Recuerda que debes completar el pago restante de <strong>${formatPrice(pendingAmount)}</strong> como máximo 15 días antes de la fecha de recogida.</p>
-      </div>
-      ` : `
-      <div class="success-box">
-        <strong>🎉 ¡Pago completado!</strong>
-        <p style="margin: 10px 0 0 0;">Has pagado el total de la reserva. Todo está listo para tu aventura.</p>
-      </div>
-      `}
-
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.furgocasa.com/reservar/${data.bookingId}" class="button">
-          Ver detalles de mi reserva
-        </a>
-      </div>
-
-      <h3 class="section-title">📋 Próximos pasos</h3>
-      <ol style="line-height: 1.8;">
-        ${!isPaidInFull ? '<li>Completa el <strong>segundo pago</strong> máximo 15 días antes del inicio</li>' : ''}
-        <li>Descarga, firma y envía la <strong>documentación</strong> desde <a href="https://www.furgocasa.com/documentacion-alquiler" style="color: #063971;">furgocasa.com/documentacion-alquiler</a></li>
-        <li>Realiza la <strong>transferencia de la fianza</strong> (${formatPrice(data.depositAmount || 1000)}) máximo 72h antes del inicio</li>
-        <li>El día de la recogida, trae tu DNI/Pasaporte y carnet de conducir B</li>
-        <li>¡Disfruta de tu aventura!</li>
-      </ol>
-
-      <div class="detail-box">
-        <div style="margin-bottom: 15px;">
-          <strong>💳 Fianza (${formatPrice(data.depositAmount || 1000)}):</strong>
-          <p style="margin: 10px 0 0 0;">La fianza se abona mediante <strong>transferencia bancaria</strong> máximo 72 horas antes del inicio. Debes enviar el justificante y certificado de titularidad de la cuenta (el titular debe coincidir con el arrendatario). Se devuelve en 10 días laborables tras la devolución.</p>
-        </div>
-        
-        <div>
-          <strong>📋 Documentación necesaria el día de recogida:</strong>
-          <ul style="margin: 10px 0; padding-left: 20px;">
-            <li>DNI o Pasaporte en vigor de todos los conductores</li>
-            <li>Carnet de conducir B con mínimo 2 años de antigüedad</li>
-          </ul>
-        </div>
-      </div>
-
-      <p>Si tienes alguna pregunta, estamos a tu disposición.</p>
-      
-      <p>¡Nos vemos pronto!</p>
-    </div>
+    <!-- Contenido principal -->
+    <tr>
+      <td style="padding: 30px 20px 20px 20px;">
+        <h2 style="margin: 0 0 15px 0; color: #10b981; font-size: 20px;">✅ ¡Pago recibido y reserva confirmada!</h2>
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">Hola <strong>${data.customerFirstName || data.customerName}</strong>,</p>
+        <p style="margin: 0; font-size: 14px; color: #374151;">¡Excelentes noticias! Hemos recibido tu pago y tu reserva ha sido <strong>confirmada</strong>.</p>
+      </td>
+    </tr>
+    
+    <!-- Número de reserva -->
+    <tr>
+      <td style="padding: 0 20px 15px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #063971;">
+          <tr>
+            <td style="padding: 15px;">
+              <p style="margin: 0 0 5px 0; font-size: 12px; color: #6b7280;">Número de reserva:</p>
+              <p style="margin: 0; font-size: 18px; font-weight: bold; color: #063971;">${data.bookingNumber}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+    ${alertBox('✅ Reserva confirmada', isPaidInFull ? '¡Has completado el pago total!' : 'Has pagado el 50% inicial.', '#d1fae5', '#10b981')}
+    
+    ${sectionTitle('🚐 Vehículo')}
+    ${detailsTable(`
+      ${tableRow('Vehículo', vehicleInfo)}
+      ${modelInfo ? tableRow('Marca / Modelo', modelInfo) : ''}
+    `)}
+    
+    ${sectionTitle('👤 Conductor principal')}
+    ${detailsTable(`
+      ${getCustomerSection(data)}
+      ${data.notes ? tableRow('Comentarios', data.notes) : ''}
+    `)}
+    
+    ${sectionTitle('📅 Fechas')}
+    ${detailsTable(`
+      ${tableRow('Recogida', `${formatDate(data.pickupDate)} - ${data.pickupTime}`)}
+      ${tableRow('Devolución', `${formatDate(data.dropoffDate)} - ${data.dropoffTime}`)}
+      ${tableRow('Duración', `${data.days} ${data.days === 1 ? 'día' : 'días'}`)}
+    `)}
+    
+    ${sectionTitle('📍 Ubicación')}
+    ${detailsTable(`
+      ${tableRow('Punto de recogida', data.pickupLocation)}
+      ${data.pickupLocationAddress ? tableRow('Dirección', data.pickupLocationAddress) : ''}
+      ${data.pickupLocation !== data.dropoffLocation ? tableRow('Punto de devolución', data.dropoffLocation) : ''}
+    `)}
+    
+    ${data.extras && data.extras.length > 0 ? `
+      ${sectionTitle('📦 Extras incluidos')}
+      ${detailsTable(getExtrasSection(data.extras))}
+    ` : ''}
+    
+    ${sectionTitle('💰 Resumen de precios')}
+    ${detailsTable(getPriceSection(data))}
+    
+    ${!isPaidInFull ? 
+      alertBox('📅 Segundo pago', `Recuerda completar el pago restante de ${formatPrice(pendingAmount)} máximo 15 días antes de la recogida.`) :
+      alertBox('🎉 ¡Pago completado!', 'Has pagado el total de la reserva. Todo está listo para tu aventura.', '#d1fae5', '#10b981')
+    }
+    
+    ${ctaButton('Ver detalles de mi reserva', `https://www.furgocasa.com/reservar/${data.bookingId}`)}
+    
+    ${sectionTitle('📋 Próximos pasos')}
+    <tr>
+      <td style="padding: 10px 20px;">
+        <ol style="margin: 0; padding-left: 20px; font-size: 13px; color: #374151; line-height: 1.8;">
+          ${!isPaidInFull ? '<li>Completa el <strong>segundo pago</strong> máximo 15 días antes del inicio</li>' : ''}
+          <li>Descarga y firma la <strong>documentación</strong> desde <a href="https://www.furgocasa.com/documentacion-alquiler" style="color: #063971;">furgocasa.com/documentacion-alquiler</a></li>
+          <li>Realiza la <strong>transferencia de la fianza</strong> (${formatPrice(data.depositAmount || 1000)}) máximo 72h antes</li>
+          <li>El día de la recogida, trae tu DNI/Pasaporte y carnet de conducir B</li>
+          <li>¡Disfruta de tu aventura!</li>
+        </ol>
+      </td>
+    </tr>
+    
+    ${sectionTitle('💳 Fianza')}
+    <tr>
+      <td style="padding: 10px 20px;">
+        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;">La fianza de <strong>${formatPrice(data.depositAmount || 1000)}</strong> se abona mediante <strong>transferencia bancaria</strong> máximo 72 horas antes del inicio. Debes enviar el justificante y certificado de titularidad (el titular debe coincidir con el arrendatario).</p>
+        <p style="margin: 0; font-size: 13px; color: #374151;"><strong>Documentación necesaria:</strong> DNI/Pasaporte y carnet de conducir B (mín. 2 años) de todos los conductores.</p>
+      </td>
+    </tr>
+    
+    <tr>
+      <td style="padding: 20px 20px 30px 20px;">
+        <p style="margin: 0; font-size: 14px; color: #374151;">Si tienes alguna pregunta, estamos a tu disposición. ¡Nos vemos pronto!</p>
+      </td>
+    </tr>
   `;
   
   return getEmailBaseTemplate(content);
@@ -761,146 +533,104 @@ export function getFirstPaymentConfirmedTemplate(data: BookingEmailData): string
  * EMAIL 3: Segundo pago confirmado
  */
 export function getSecondPaymentConfirmedTemplate(data: BookingEmailData): string {
+  const vehicleInfo = data.vehicleInternalCode ? `${data.vehicleInternalCode} - ${data.vehicleName}` : data.vehicleName;
+  const modelInfo = data.vehicleBrand && data.vehicleModel ? `${data.vehicleBrand} ${data.vehicleModel}` : '';
+  
   const content = `
-    <div class="content">
-      <h2 style="color: #10b981; margin-top: 0;">🎉 ¡Pago completo recibido!</h2>
-      
-      <p>Hola <strong>${data.customerFirstName || data.customerName}</strong>,</p>
-      
-      <p>¡Perfecto! Hemos recibido tu segundo pago. Tu reserva está <strong>completamente pagada</strong>.</p>
-      
-      <div class="booking-number">
-        <div style="font-size: 14px; color: #92400e; margin-bottom: 5px;">Número de reserva:</div>
-        <strong>${data.bookingNumber}</strong>
-      </div>
-
-      <div class="success-box">
-        <strong>✅ Pago completo recibido</strong>
-        <p style="margin: 10px 0 0 0;">Has completado el pago total de tu reserva. ¡Todo listo para tu aventura!</p>
-      </div>
-
-      <!-- VEHÍCULO -->
-      <h3 class="section-title">🚐 Vehículo</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Vehículo:</span>
-          <span class="detail-value">${data.vehicleInternalCode ? data.vehicleInternalCode + ' - ' : ''}${data.vehicleName}</span>
-        </div>
-        ${data.vehicleBrand && data.vehicleModel ? `
-        <div class="detail-row">
-          <span class="detail-label">Marca / Modelo:</span>
-          <span class="detail-value">${data.vehicleBrand} ${data.vehicleModel}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- CONDUCTOR PRINCIPAL -->
-      <h3 class="section-title">👤 Datos del conductor principal</h3>
-      <div class="detail-box">
-        ${getCustomerSection(data)}
-        ${data.notes ? `
-        <div class="detail-row">
-          <span class="detail-label">Comentarios:</span>
-          <span class="detail-value">${data.notes}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- FECHAS -->
-      <h3 class="section-title">📅 Fechas</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Recogida:</span>
-          <span class="detail-value">${formatDate(data.pickupDate)} - ${data.pickupTime}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Devolución:</span>
-          <span class="detail-value">${formatDate(data.dropoffDate)} - ${data.dropoffTime}</span>
-        </div>
-        <div class="detail-row">
-          <span class="detail-label">Duración:</span>
-          <span class="detail-value">${data.days} ${data.days === 1 ? 'día' : 'días'}</span>
-        </div>
-      </div>
-
-      <!-- UBICACIÓN -->
-      <h3 class="section-title">📍 Ubicación</h3>
-      <div class="detail-box">
-        <div class="detail-row">
-          <span class="detail-label">Punto de recogida:</span>
-          <span class="detail-value">${data.pickupLocation}</span>
-        </div>
-        ${data.pickupLocationAddress ? `
-        <div class="detail-row">
-          <span class="detail-label">Dirección:</span>
-          <span class="detail-value">${data.pickupLocationAddress}</span>
-        </div>
-        ` : ''}
-        ${data.pickupLocation !== data.dropoffLocation ? `
-        <div class="detail-row">
-          <span class="detail-label">Punto de devolución:</span>
-          <span class="detail-value">${data.dropoffLocation}</span>
-        </div>
-        ` : ''}
-      </div>
-
-      <!-- EXTRAS -->
-      ${getExtrasSection(data.extras || [])}
-
-      <!-- RESUMEN DE PRECIOS -->
-      <h3 class="section-title">💰 Resumen de precios</h3>
-      <div class="detail-box">
-        ${getPriceSection(data)}
-      </div>
-
-      <div class="total-box">
-        <div class="label">Total pagado</div>
-        <div class="amount">${formatPrice(data.totalPrice)}</div>
-        <div style="margin-top: 10px; font-size: 14px;">✓ Pago completado</div>
-      </div>
-
-      <div style="text-align: center; margin: 30px 0;">
-        <a href="https://www.furgocasa.com/reservar/${data.bookingId}" class="button">
-          Ver mi reserva
-        </a>
-      </div>
-
-      <!-- PREPARATIVOS -->
-      <h3 class="section-title">📋 Preparativos para el día de recogida</h3>
-      <div class="detail-box">
-        <div style="margin-bottom: 15px;">
-          <strong>Documentación necesaria:</strong>
-          <ul style="margin: 10px 0; padding-left: 20px;">
-            <li>DNI o Pasaporte en vigor de todos los conductores</li>
-            <li>Carnet de conducir B con mínimo 2 años de antigüedad</li>
-          </ul>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-          <strong>🕐 Horario:</strong>
-          <p style="margin: 10px 0 0 0;">Por favor, llega puntual a las <strong>${data.pickupTime}</strong> a <strong>${data.pickupLocation}</strong>.</p>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-          <strong>💳 Fianza (${formatPrice(data.depositAmount || 1000)}):</strong>
-          <p style="margin: 10px 0 0 0;">Recuerda que la fianza se abona mediante <strong>transferencia bancaria</strong> máximo 72 horas antes del inicio. Debes enviar el justificante y certificado de titularidad de la cuenta (el titular debe coincidir con el arrendatario).</p>
-        </div>
-
-        <div>
-          <strong>📄 Documentación:</strong>
-          <p style="margin: 10px 0 0 0;">Descarga, firma y envía el contrato y condiciones desde <a href="https://www.furgocasa.com/documentacion-alquiler" style="color: #063971;">furgocasa.com/documentacion-alquiler</a></p>
-        </div>
-      </div>
-
-      <div class="warning-box">
-        <strong>💡 Recordatorio importante:</strong>
-        <p style="margin: 10px 0 0 0;">Si necesitas modificar tu reserva o tienes alguna pregunta, contacta con nosotros lo antes posible.</p>
-      </div>
-
-      <p>¡Estamos deseando verte y que disfrutes de tu aventura en camper!</p>
-      
-      <p>Un saludo,<br>El equipo de Furgocasa</p>
-    </div>
+    <!-- Contenido principal -->
+    <tr>
+      <td style="padding: 30px 20px 20px 20px;">
+        <h2 style="margin: 0 0 15px 0; color: #10b981; font-size: 20px;">🎉 ¡Pago completo recibido!</h2>
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">Hola <strong>${data.customerFirstName || data.customerName}</strong>,</p>
+        <p style="margin: 0; font-size: 14px; color: #374151;">¡Perfecto! Hemos recibido tu segundo pago. Tu reserva está <strong>completamente pagada</strong>.</p>
+      </td>
+    </tr>
+    
+    <!-- Número de reserva -->
+    <tr>
+      <td style="padding: 0 20px 15px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #063971;">
+          <tr>
+            <td style="padding: 15px;">
+              <p style="margin: 0 0 5px 0; font-size: 12px; color: #6b7280;">Número de reserva:</p>
+              <p style="margin: 0; font-size: 18px; font-weight: bold; color: #063971;">${data.bookingNumber}</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+    ${alertBox('✅ Pago completo recibido', '¡Has completado el pago total! Todo listo para tu aventura.', '#d1fae5', '#10b981')}
+    
+    <!-- Total pagado destacado -->
+    <tr>
+      <td style="padding: 15px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #063971;">
+          <tr>
+            <td align="center" style="padding: 20px;">
+              <p style="margin: 0 0 5px 0; font-size: 12px; color: #ffffff; opacity: 0.9;">Total pagado</p>
+              <p style="margin: 0; font-size: 28px; font-weight: bold; color: #ffffff;">${formatPrice(data.totalPrice)}</p>
+              <p style="margin: 10px 0 0 0; font-size: 13px; color: #ffffff;">✓ Pago completado</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    
+    ${sectionTitle('🚐 Vehículo')}
+    ${detailsTable(`
+      ${tableRow('Vehículo', vehicleInfo)}
+      ${modelInfo ? tableRow('Marca / Modelo', modelInfo) : ''}
+    `)}
+    
+    ${sectionTitle('👤 Conductor principal')}
+    ${detailsTable(`
+      ${getCustomerSection(data)}
+      ${data.notes ? tableRow('Comentarios', data.notes) : ''}
+    `)}
+    
+    ${sectionTitle('📅 Fechas')}
+    ${detailsTable(`
+      ${tableRow('Recogida', `${formatDate(data.pickupDate)} - ${data.pickupTime}`)}
+      ${tableRow('Devolución', `${formatDate(data.dropoffDate)} - ${data.dropoffTime}`)}
+      ${tableRow('Duración', `${data.days} ${data.days === 1 ? 'día' : 'días'}`)}
+    `)}
+    
+    ${sectionTitle('📍 Ubicación')}
+    ${detailsTable(`
+      ${tableRow('Punto de recogida', data.pickupLocation)}
+      ${data.pickupLocationAddress ? tableRow('Dirección', data.pickupLocationAddress) : ''}
+      ${data.pickupLocation !== data.dropoffLocation ? tableRow('Punto de devolución', data.dropoffLocation) : ''}
+    `)}
+    
+    ${data.extras && data.extras.length > 0 ? `
+      ${sectionTitle('📦 Extras incluidos')}
+      ${detailsTable(getExtrasSection(data.extras))}
+    ` : ''}
+    
+    ${sectionTitle('💰 Resumen de precios')}
+    ${detailsTable(getPriceSection(data))}
+    
+    ${ctaButton('Ver mi reserva', `https://www.furgocasa.com/reservar/${data.bookingId}`)}
+    
+    ${sectionTitle('📋 Preparativos para la recogida')}
+    <tr>
+      <td style="padding: 10px 20px;">
+        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;"><strong>🕐 Cita:</strong> ${formatDate(data.pickupDate)} a las ${data.pickupTime} en ${data.pickupLocation}</p>
+        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;"><strong>📋 Documentación:</strong> DNI/Pasaporte y carnet B (mín. 2 años) de todos los conductores.</p>
+        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;"><strong>💳 Fianza:</strong> ${formatPrice(data.depositAmount || 1000)} por transferencia máximo 72h antes. Envía justificante + certificado titularidad.</p>
+        <p style="margin: 0; font-size: 13px; color: #374151;"><strong>📄 Contrato:</strong> Descarga y firma desde <a href="https://www.furgocasa.com/documentacion-alquiler" style="color: #063971;">furgocasa.com/documentacion-alquiler</a></p>
+      </td>
+    </tr>
+    
+    ${alertBox('💡 Recordatorio', 'Si necesitas modificar tu reserva o tienes alguna pregunta, contacta con nosotros lo antes posible.')}
+    
+    <tr>
+      <td style="padding: 20px 20px 30px 20px;">
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">¡Estamos deseando verte y que disfrutes de tu aventura en camper!</p>
+        <p style="margin: 0; font-size: 14px; color: #374151;">Un saludo,<br><strong>El equipo de Furgocasa</strong></p>
+      </td>
+    </tr>
   `;
   
   return getEmailBaseTemplate(content);

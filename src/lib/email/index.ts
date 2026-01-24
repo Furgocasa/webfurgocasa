@@ -26,10 +26,14 @@ function getSubjectInfo(bookingData: BookingEmailData): string {
   const parts = [];
   if (bookingData.vehicleInternalCode) parts.push(bookingData.vehicleInternalCode);
   if (bookingData.pickupDate) parts.push(formatShortDate(bookingData.pickupDate));
-  if (bookingData.customerFirstName) {
+  
+  // Nombre completo (nombre + apellidos)
+  if (bookingData.customerFirstName && bookingData.customerLastName) {
+    parts.push(`${bookingData.customerFirstName} ${bookingData.customerLastName}`);
+  } else if (bookingData.customerFirstName) {
     parts.push(bookingData.customerFirstName);
   } else if (bookingData.customerName) {
-    parts.push(bookingData.customerName.split(' ')[0]); // Solo primer nombre
+    parts.push(bookingData.customerName);
   }
   return parts.join(' - ');
 }
