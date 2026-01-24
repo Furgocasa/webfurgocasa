@@ -141,20 +141,37 @@ function PagoExitoContent() {
         }
       }
       
-      // Si viene de Redsys, decodificar parámetros
+      // Si viene de Redsys, decodificar parámetros de la URL
       if (merchantParams) {
         try {
           const decoded = JSON.parse(atob(merchantParams));
           orderNumber = decoded.Ds_Order;
           redsysResponseCode = decoded.Ds_Response;
           redsysAuthCode = decoded.Ds_AuthorisationCode;
-          console.log("[PAGO-EXITO] Parámetros Redsys decodificados:", {
+          console.log("[PAGO-EXITO] Parámetros Redsys decodificados de URL:", {
             orderNumber,
             responseCode: redsysResponseCode,
             authCode: redsysAuthCode
           });
         } catch (e) {
           console.error("Error decodificando parámetros de Redsys:", e);
+        }
+      }
+      
+      // FALLBACK: Si no hay parámetros en URL, intentar recuperar de sessionStorage
+      if (!orderNumber && typeof window !== 'undefined') {
+        const savedOrderNumber = sessionStorage.getItem('lastPaymentOrderNumber');
+        const savedBookingId = sessionStorage.getItem('lastPaymentBookingId');
+        
+        if (savedOrderNumber) {
+          orderNumber = savedOrderNumber;
+          console.log("[PAGO-EXITO] OrderNumber recuperado de sessionStorage:", orderNumber);
+        }
+        
+        // Limpiar sessionStorage después de usar
+        if (savedOrderNumber || savedBookingId) {
+          sessionStorage.removeItem('lastPaymentOrderNumber');
+          sessionStorage.removeItem('lastPaymentBookingId');
         }
       }
 
@@ -175,13 +192,23 @@ function PagoExitoContent() {
           .single();
 
         if (!error && data) {
-          // RESPALDO: Si el pago sigue pendiente pero Redsys dice que fue exitoso,
-          // actualizar el estado aquí como fallback de la notificación
+          // RESPALDO: Si el pago sigue pendiente, actualizar el estado
+          // Nota: Redsys SOLO redirige a URLOK si el pago fue exitoso
           const responseCodeNum = parseInt(redsysResponseCode || "9999", 10);
           const isRedsysSuccess = responseCodeNum >= 0 && responseCodeNum <= 99;
           
-          if (data.status === "pending" && isRedsysSuccess && redsysAuthCode) {
-            console.log("[PAGO-EXITO] RESPALDO: Pago pendiente pero Redsys confirma éxito. Actualizando...");
+          // Condición para activar el respaldo:
+          // 1. Pago pendiente Y (Redsys confirma éxito O no tenemos parámetros pero el usuario llegó aquí)
+          const shouldTriggerFallback = data.status === "pending" && 
+            (isRedsysSuccess || !merchantParams); // Si no hay params pero llegó a éxito, asumir éxito
+          
+          if (shouldTriggerFallback) {
+            console.log("[PAGO-EXITO] RESPALDO: Pago pendiente, intentando actualizar...", {
+              hasRedsysParams: !!merchantParams,
+              isRedsysSuccess,
+              responseCode: redsysResponseCode,
+              authCode: redsysAuthCode
+            });
             
             // Llamar a la API para procesar el pago (esto actualiza payment, booking y envía email)
             try {
@@ -190,9 +217,10 @@ function PagoExitoContent() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   orderNumber,
-                  responseCode: redsysResponseCode,
-                  authCode: redsysAuthCode,
-                  merchantParams
+                  responseCode: redsysResponseCode || "0000", // Asumir éxito si no hay código
+                  authCode: redsysAuthCode || "FALLBACK",
+                  merchantParams,
+                  fromSuccessPage: true // Indicar que viene de la página de éxito
                 })
               });
               

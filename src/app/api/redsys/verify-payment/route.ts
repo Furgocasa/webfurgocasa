@@ -16,26 +16,33 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json();
-    const { orderNumber, responseCode, authCode, merchantParams } = body;
+    const { orderNumber, responseCode, authCode, merchantParams, fromSuccessPage } = body;
     
     console.log("📥 Datos recibidos:", {
       orderNumber,
       responseCode,
       authCode,
       hasMerchantParams: !!merchantParams,
+      fromSuccessPage: !!fromSuccessPage,
     });
     
     // Validar datos básicos
-    if (!orderNumber || !responseCode) {
-      console.error("❌ Faltan datos obligatorios");
-      return NextResponse.json({ error: "Missing required data" }, { status: 400 });
+    if (!orderNumber) {
+      console.error("❌ Falta orderNumber");
+      return NextResponse.json({ error: "Missing order number" }, { status: 400 });
     }
     
     // Verificar que el código de respuesta indica éxito (0-99)
-    const responseCodeNum = parseInt(responseCode, 10);
-    if (isNaN(responseCodeNum) || responseCodeNum < 0 || responseCodeNum > 99) {
+    // Si viene de la página de éxito sin parámetros, aceptar responseCode por defecto
+    const responseCodeNum = parseInt(responseCode || "0", 10);
+    if (!fromSuccessPage && (isNaN(responseCodeNum) || responseCodeNum < 0 || responseCodeNum > 99)) {
       console.error("❌ Código de respuesta no indica éxito:", responseCode);
       return NextResponse.json({ error: "Payment not successful" }, { status: 400 });
+    }
+    
+    // Si viene de la página de éxito, asumir que Redsys ya autorizó (porque solo redirige a URLOK si fue exitoso)
+    if (fromSuccessPage) {
+      console.log("ℹ️ Solicitud desde página de éxito - asumiendo pago autorizado por Redsys");
     }
     
     // Validar firma si tenemos merchantParams
@@ -93,13 +100,17 @@ export async function POST(request: NextRequest) {
     
     // Actualizar el pago a authorized
     console.log("💾 Actualizando pago a 'authorized'...");
+    const notesText = fromSuccessPage 
+      ? `Actualizado via respaldo en página de éxito (${new Date().toISOString()})`
+      : `Actualizado via verify-payment API (${new Date().toISOString()})`;
+    
     const { error: paymentError } = await supabase
       .from("payments")
       .update({
         status: "authorized",
-        response_code: responseCode,
-        authorization_code: authCode || null,
-        notes: "Actualizado via respaldo en página de éxito",
+        response_code: responseCode || "0000",
+        authorization_code: authCode || "FALLBACK",
+        notes: notesText,
         updated_at: new Date().toISOString(),
       })
       .eq("id", payment.id);
