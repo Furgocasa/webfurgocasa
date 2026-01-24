@@ -38,7 +38,6 @@ const MOTORHOME_EUROPA_METADATA: Metadata = {
     title: "Alquiler Motorhome Europa para Viajeros LATAM",
     description: "Tu aventura europea comienza en España. Casa rodante con kilómetros ilimitados para recorrer Francia, Italia, Portugal y más. Asistencia en español 24/7.",
     type: "website",
-    url: "https://www.furgocasa.com/alquiler-motorhome-europa-desde-espana",
     siteName: "Furgocasa - Alquiler de Motorhomes",
     images: [
       {
@@ -59,9 +58,6 @@ const MOTORHOME_EUROPA_METADATA: Metadata = {
     title: "Alquiler Motorhome Europa para Viajeros LATAM",
     description: "Tu casa rodante te espera en España para recorrer toda Europa. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español.",
     images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
-  },
-  alternates: {
-    canonical: "https://www.furgocasa.com/alquiler-motorhome-europa-desde-espana",
   },
   robots: {
     index: true,
