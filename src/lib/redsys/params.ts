@@ -110,14 +110,39 @@ export function decodeParams(merchantParameters: string): RedsysResponse {
 export function getRedsysConfig(): RedsysConfig {
   // El terminal puede venir como "001" o "1"
   const terminal = process.env.REDSYS_TERMINAL || "1";
+  const merchantCode = process.env.REDSYS_MERCHANT_CODE || "";
+  const secretKey = process.env.REDSYS_SECRET_KEY || "";
   
   // Soportar tanto NEXT_PUBLIC_URL como NEXT_PUBLIC_APP_URL
   const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   
+  // 🔍 LOG: Verificar variables de entorno (sin revelar datos sensibles completos)
+  console.log("🔧 [CONFIG] Variables de entorno Redsys:");
+  console.log("🔧 [CONFIG] REDSYS_MERCHANT_CODE:", merchantCode);
+  console.log("🔧 [CONFIG] REDSYS_TERMINAL:", terminal);
+  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY presente:", !!secretKey);
+  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY longitud:", secretKey.length);
+  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY primeros 4 chars:", secretKey.slice(0, 4) + "...");
+  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY últimos 4 chars:", "..." + secretKey.slice(-4));
+  console.log("🔧 [CONFIG] REDSYS_ENVIRONMENT:", process.env.REDSYS_ENVIRONMENT);
+  console.log("🔧 [CONFIG] Base URL:", baseUrl);
+  
+  // Verificar que la clave secreta sea válida para 3DES (debe decodificarse a 24 bytes)
+  try {
+    const keyBuffer = Buffer.from(secretKey, "base64");
+    console.log("🔧 [CONFIG] Secret key decoded bytes:", keyBuffer.length);
+    if (keyBuffer.length !== 24) {
+      console.error("❌ [CONFIG] ERROR: La clave secreta debe decodificarse a 24 bytes para 3DES!");
+      console.error("❌ [CONFIG] Bytes actuales:", keyBuffer.length);
+    }
+  } catch (e) {
+    console.error("❌ [CONFIG] ERROR decodificando secret key:", e);
+  }
+  
   return {
-    merchantCode: process.env.REDSYS_MERCHANT_CODE!,
-    terminal: terminal,
-    secretKey: process.env.REDSYS_SECRET_KEY!,
+    merchantCode,
+    terminal,
+    secretKey,
     urlOk: `${baseUrl}/pago/exito`,
     urlKo: `${baseUrl}/pago/error`,
     notificationUrl: `${baseUrl}/api/redsys/notification`,
