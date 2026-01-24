@@ -2405,8 +2405,8 @@ export const staticTranslations = {
   "¿Listo para tu aventura?": {
     es: "¿Listo para tu aventura?",
     en: "Ready for your adventure?",
-    fr: "Ready for your adventure?",
-    de: "Ready for your adventure?"
+    fr: "Prêt pour votre aventure ?",
+    de: "Bereit für Ihr Abenteuer?"
   },
   "Para cualquier aclaración en relación a lo dispuesto en esta sección, no dude en contactar con nosotros. Estaremos encantados de ayudar.": {
     es: "Para cualquier aclaración en relación a lo dispuesto en esta sección, no dude en contactar con nosotros. Estaremos encantados de ayudar.",
@@ -7294,6 +7294,52 @@ export const staticTranslations = {
     en: "Home",
     fr: "Accueil",
     de: "Startseite"
+  },
+  
+  // ========================================
+  // TRADUCCIONES PARA BLOG
+  // ========================================
+  "Compartir artículo": {
+    es: "Compartir artículo",
+    en: "Share article",
+    fr: "Partager l'article",
+    de: "Artikel teilen"
+  },
+  "Ver más en": {
+    es: "Ver más en",
+    en: "See more in",
+    fr: "Voir plus dans",
+    de: "Mehr sehen in"
+  },
+  "min de lectura": {
+    es: "min de lectura",
+    en: "min read",
+    fr: "min de lecture",
+    de: "Min. Lesezeit"
+  },
+  "vistas": {
+    es: "vistas",
+    en: "views",
+    fr: "vues",
+    de: "Ansichten"
+  },
+  "Etiquetas": {
+    es: "Etiquetas",
+    en: "Tags",
+    fr: "Étiquettes",
+    de: "Tags"
+  },
+  "Descubre nuestra flota de campers y comienza tu viaje": {
+    es: "Descubre nuestra flota de campers y comienza tu viaje",
+    en: "Discover our fleet of campers and start your journey",
+    fr: "Découvrez notre flotte de camping-cars et commencez votre voyage",
+    de: "Entdecken Sie unsere Wohnmobil-Flotte und starten Sie Ihre Reise"
+  },
+  "Ver vehículos": {
+    es: "Ver vehículos",
+    en: "View vehicles",
+    fr: "Voir les véhicules",
+    de: "Fahrzeuge ansehen"
   },
   
   // ========================================
