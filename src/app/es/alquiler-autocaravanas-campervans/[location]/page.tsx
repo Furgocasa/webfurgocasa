@@ -11,21 +11,16 @@ import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { 
   MapPin, 
   CheckCircle, 
-  ArrowRight,
   Shield,
   Calendar,
-  Phone,
   Users,
   Package,
   MessageSquare,
-  Map,
-  Compass,
-  Bed,
-  Utensils,
-  Camera,
-  Star
+  Map
 } from "lucide-react";
 import Image from "next/image";
+import { LocationTourismContent } from "@/components/locations/location-tourism-content";
+import { DestinationsGrid } from "@/components/destinations-grid";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -152,7 +147,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const description = translated.meta_description || location.meta_description || 
     `${t("Alquila tu autocaravana camper en")} ${translated.name || location.name}. ${t("Flota premium con kilómetros ilimitados")}.`;
 
-  const path = `/alquiler-autocaravanas-campervans-${slug}`;
+  const path = `/alquiler-autocaravanas-campervans/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale);
 
   return {
@@ -225,136 +220,102 @@ export default async function LocationPage({ params }: PageProps) {
       <LocalBusinessJsonLd location={location as any} />
       
       {/* ================================================================== */}
-      {/* HERO SECTION - Similar a Home */}
+      {/* HERO SECTION - Textos dinámicos desde BD */}
       {/* ================================================================== */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/50 z-10" />
-        <Image
-          src={heroImageUrl}
-          alt={location.h1_title || `${t("Alquiler de autocaravanas en")} ${location.name}`}
-          fill
-          priority
-          className="object-cover"
-          sizes="100vw"
-        />
+        <div className="absolute inset-0 w-full h-full overflow-hidden">
+          <Image
+            src={heroImageUrl}
+            alt={location.h1_title || `${t("Alquiler de Autocaravanas en")} ${location.name}`}
+            fill
+            priority
+            fetchPriority="high"
+            quality={75}
+            sizes="100vw"
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMEAQUBAAAAAAAAAAAAAQIDBAAFBhEhBxITMUFR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQEAAwEBAAAAAAAAAAAAAAABAAIRA0H/2gAMAwEAAhEDEQA/AMc4llF3yC4tQLi+h6KhPehpCANuqOgSfnAGh+1oOF4bay2G4aUqUVrCe9Z5JJPJJpSqOw7JP/Z"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-black/40" />
+        </div>
         
-        <div className="relative z-20 container mx-auto px-4 text-center">
-          <div className="max-w-5xl mx-auto space-y-4">
-            {/* Badge de ubicación */}
-            <div className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider mb-4">
-              <MapPin className="h-4 w-4" />
-              {location.province}, {location.region}
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}>
-              {location.h1_title || `${t("Alquiler de Autocaravanas en")} ${location.name}`}
+        <div className="relative z-10 container mx-auto px-4 text-center">
+          <div className="max-w-6xl mx-auto space-y-3">
+            {/* H1 dinámico desde BD (h1_title) o fallback */}
+            <h1 
+              className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
+              style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
+            >
+              {location.h1_title || `${t("Alquiler Camper")} ${location.name}`}
             </h1>
             
-            <div className="w-24 h-1 bg-furgocasa-orange mx-auto my-4"></div>
+            <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
-            {location.intro_text && (
-              <p className="text-xl lg:text-2xl text-white/95 leading-relaxed max-w-3xl mx-auto" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-                {location.intro_text}
-              </p>
-            )}
+            {/* Tu hotel */}
+            <p 
+              className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-white/95 leading-tight" 
+              style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}
+            >
+              {t("Tu hotel")}
+            </p>
             
-            {/* Distancia (si no es oficina) */}
-            {!hasOffice && location.distance_km && (
-              <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full text-gray-900 font-medium shadow-lg mt-6">
-                <Compass className="h-5 w-5 text-furgocasa-blue" />
-                <span>{t("A")} {location.distance_km} km {t("de nuestra oficina")} ({driveHours}h {t("aprox")})</span>
-              </div>
-            )}
+            {/* Estrellas */}
+            <div className="flex items-center justify-center gap-1" style={{ marginBottom: '0.5rem' }}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span key={star} className="text-yellow-400 text-3xl md:text-4xl">★</span>
+              ))}
+            </div>
+            
+            {/* Sobre ruedas */}
+            <p 
+              className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-6" 
+              style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
+            >
+              {t("sobre ruedas")}
+            </p>
+            
+            {/* Intro text dinámico desde BD o fallback */}
+            <p 
+              className="text-sm md:text-base lg:text-lg text-white/85 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" 
+              style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
+            >
+              {location.intro_text || t("Las mejores furgonetas campers de gran volumen en alquiler")}
+            </p>
           </div>
 
           {/* Widget de búsqueda integrado en hero */}
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget defaultLocation={slug} />
+            <SearchWidget />
           </div>
         </div>
       </section>
 
       {/* ================================================================== */}
-      {/* CONTENIDO ÚNICO DE LA CIUDAD - Turismo, dónde dormir, etc. */}
-      {/* ================================================================== */}
-      {location.content_sections && location.content_sections.length > 0 && (
-        <section className="py-16 lg:py-24 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="text-center mb-12">
-              <span className="inline-block px-4 py-2 bg-furgocasa-blue/10 text-furgocasa-blue rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
-                {t("DESCUBRE")} {location.name.toUpperCase()}
-              </span>
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
-                {t("Todo lo que necesitas saber")}
-              </h2>
-            </div>
-
-            <div className="max-w-5xl mx-auto">
-              {location.content_sections.map((section: any, index: number) => {
-                // Iconos según el tipo de contenido
-                const getIcon = (title: string) => {
-                  const lower = title?.toLowerCase() || '';
-                  if (lower.includes('dormir') || lower.includes('pernoctar') || lower.includes('aparcar')) return Bed;
-                  if (lower.includes('comer') || lower.includes('gastronomía') || lower.includes('restaurante')) return Utensils;
-                  if (lower.includes('ver') || lower.includes('visitar') || lower.includes('turismo')) return Camera;
-                  if (lower.includes('ruta') || lower.includes('itinerario')) return Map;
-                  return Star;
-                };
-                const Icon = getIcon(section.title);
-                
-                return (
-                  <div 
-                    key={index} 
-                    className={`mb-12 ${index % 2 === 0 ? '' : ''}`}
-                  >
-                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 lg:p-10 shadow-lg border border-gray-100">
-                      <div className="flex items-start gap-4 mb-6">
-                        <div className="bg-furgocasa-orange/10 p-3 rounded-xl">
-                          <Icon className="h-8 w-8 text-furgocasa-orange" />
-                        </div>
-                        {section.title && (
-                          <h3 className="text-2xl lg:text-3xl font-heading font-bold text-gray-900">
-                            {section.title}
-                          </h3>
-                        )}
-                      </div>
-                      {section.content && (
-                        <div 
-                          className="prose prose-lg max-w-none text-gray-700 leading-relaxed
-                            prose-headings:font-heading prose-headings:text-gray-900
-                            prose-a:text-furgocasa-blue prose-a:no-underline hover:prose-a:underline
-                            prose-strong:text-gray-900
-                            prose-ul:list-disc prose-ul:pl-6
-                            prose-li:marker:text-furgocasa-orange"
-                          dangerouslySetInnerHTML={{ __html: section.content }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* ================================================================== */}
-      {/* VEHÍCULOS DISPONIBLES - Similar a Home */}
+      {/* VEHÍCULOS DISPONIBLES - Textos dinámicos desde BD */}
       {/* ================================================================== */}
       {vehicles.length > 0 && (
         <section className="py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 uppercase tracking-wide">
-                {t("CAMPERS DISPONIBLES PARA")} {location.name.toUpperCase()}
+              {/* H2 dinámico desde BD (h1_title) en mayúsculas o fallback */}
+              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
+                {location.h1_title?.toUpperCase() || `${t("ALQUILER CAMPER")} ${location.name.toUpperCase()}`}
               </h2>
+
+              {/* Intro text dinámico desde BD */}
+              <p className="text-xl text-gray-600 mb-8">
+                {location.intro_text || `${t("Tu punto de partida perfecto para explorar")} ${location.name} ${t("en camper")}.`}
+              </p>
 
               <div className="text-center max-w-3xl mx-auto">
                 <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
                   {t("Flota de vehículos de máxima calidad")}
                 </h3>
+                <p className="text-base lg:text-lg text-gray-700 leading-relaxed mb-3">
+                  <strong>{t("FURGOCASA:")}</strong> {t("estamos especializados en el alquiler de vehículos campers van de gran volumen.")}
+                </p>
                 <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
-                  {t("Recoge tu camper y empieza tu aventura por")} {location.name} {t("y alrededores")}.
+                  {t("Contamos con los mejores modelos de furgonetas campers del mercado.")}
                 </p>
               </div>
             </div>
@@ -409,7 +370,16 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* ================================================================== */}
-      {/* PRECIOS - Similar a Home */}
+      {/* CONTENIDO TURÍSTICO DE LA CIUDAD - Idéntico a producción */}
+      {/* ================================================================== */}
+      <LocationTourismContent 
+        locationName={location.name}
+        contentSections={location.content_sections}
+        locale="es"
+      />
+
+      {/* ================================================================== */}
+      {/* PRECIOS - Idéntico a producción */}
       {/* ================================================================== */}
       <section className="py-16 lg:py-24 bg-white">
         <div className="container mx-auto px-4">
@@ -460,6 +430,27 @@ export default async function LocationPage({ params }: PageProps) {
               {t("Ver todas las tarifas")} <span className="text-xl">→</span>
             </LocalizedLink>
           </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* DESTINOS PRINCIPALES - Idéntico a producción */}
+      {/* ================================================================== */}
+      <section className="py-16 lg:py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 lg:mb-16">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Map className="h-8 w-8 text-furgocasa-blue" />
+              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+                {t("Principales destinos para visitar en Campervan")}
+              </h2>
+            </div>
+            <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+              {t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}
+            </p>
+          </div>
+          
+          <DestinationsGrid />
         </div>
       </section>
 
