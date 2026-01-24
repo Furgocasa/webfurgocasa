@@ -139,13 +139,14 @@ export function getCategoryName(esSlug: string, targetLang: Locale): string {
 }
 
 /**
- * Almacenamiento temporal de traducciones de slugs de artículos
+ * Cache de traducciones de slugs de artículos
+ * Se carga dinámicamente desde Supabase cuando es necesario
  * Formato: { "slug-en-espanol": { en: "slug-in-english", fr: "slug-en-francais", ... } }
  */
-const postSlugTranslations: Record<string, Partial<Record<Locale, string>>> = {};
+const postSlugTranslationsCache: Record<string, Partial<Record<Locale, string>>> = {};
 
 /**
- * Registra una traducción de slug de artículo
+ * Registra una traducción de slug de artículo en el cache
  * @param esSlug - El slug en español (el que está en la BD)
  * @param translations - Las traducciones a otros idiomas
  */
@@ -153,14 +154,16 @@ export function registerPostSlugTranslation(
   esSlug: string,
   translations: Partial<Record<Locale, string>>
 ) {
-  postSlugTranslations[esSlug] = {
-    ...postSlugTranslations[esSlug],
+  postSlugTranslationsCache[esSlug] = {
+    ...postSlugTranslationsCache[esSlug],
     ...translations,
   };
 }
 
 /**
  * Obtiene el slug traducido de un artículo
+ * Busca primero en el cache local, luego en la tabla posts (slug_en), 
+ * y finalmente en content_translations
  * @param esSlug - El slug en español
  * @param targetLang - El idioma destino
  * @returns El slug traducido o el original si no hay traducción
@@ -168,13 +171,78 @@ export function registerPostSlugTranslation(
 export function translatePostSlug(esSlug: string, targetLang: Locale): string {
   if (targetLang === 'es') return esSlug;
   
-  const translations = postSlugTranslations[esSlug];
-  
-  if (translations && translations[targetLang]) {
-    return translations[targetLang];
+  // Buscar en cache local primero
+  const cachedTranslations = postSlugTranslationsCache[esSlug];
+  if (cachedTranslations && cachedTranslations[targetLang]) {
+    return cachedTranslations[targetLang]!;
   }
   
-  // Si no hay traducción, devolver el original
+  // Si no hay traducción en cache, devolver el original
+  // La traducción real se obtiene en el servidor desde Supabase
+  return esSlug;
+}
+
+/**
+ * Versión asíncrona que busca en Supabase si no está en cache
+ * Usar esta versión en Server Components
+ */
+export async function translatePostSlugAsync(
+  esSlug: string, 
+  targetLang: Locale,
+  postId?: string
+): Promise<string> {
+  if (targetLang === 'es') return esSlug;
+  
+  // Buscar en cache local primero
+  const cachedTranslations = postSlugTranslationsCache[esSlug];
+  if (cachedTranslations && cachedTranslations[targetLang]) {
+    return cachedTranslations[targetLang]!;
+  }
+  
+  // Si no tenemos postId, no podemos buscar en Supabase
+  if (!postId) return esSlug;
+  
+  try {
+    // Importar dinámicamente para evitar problemas de cliente/servidor
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    
+    // Para inglés, buscar en el campo slug_en de la tabla posts
+    if (targetLang === 'en') {
+      const { data: post } = await supabase
+        .from('posts')
+        .select('slug_en')
+        .eq('id', postId)
+        .single();
+      
+      if (post?.slug_en) {
+        // Guardar en cache
+        registerPostSlugTranslation(esSlug, { en: post.slug_en });
+        return post.slug_en;
+      }
+    }
+    
+    // Para FR/DE, buscar en content_translations
+    const { data: translation } = await supabase
+      .from('content_translations')
+      .select('translated_text')
+      .eq('source_table', 'posts')
+      .eq('source_id', postId)
+      .eq('source_field', 'slug')
+      .eq('locale', targetLang)
+      .single();
+    
+    if (translation?.translated_text) {
+      // Guardar en cache
+      registerPostSlugTranslation(esSlug, { [targetLang]: translation.translated_text });
+      return translation.translated_text;
+    }
+  } catch (error) {
+    console.error('[translatePostSlugAsync] Error:', error);
+  }
+  
   return esSlug;
 }
 
@@ -187,12 +255,14 @@ export function translatePostSlug(esSlug: string, targetLang: Locale): string {
 export function getPostSlugInSpanish(slug: string, currentLang: Locale): string {
   if (currentLang === 'es') return slug;
   
-  // Buscar en todas las traducciones
-  for (const [esSlug, translations] of Object.entries(postSlugTranslations)) {
+  // Buscar en cache local
+  for (const [esSlug, translations] of Object.entries(postSlugTranslationsCache)) {
     if (translations[currentLang] === slug) {
       return esSlug;
     }
   }
   
+  // Si no está en cache, devolver el original
+  // La búsqueda real se hace en getPostBySlug con content_translations
   return slug;
 }

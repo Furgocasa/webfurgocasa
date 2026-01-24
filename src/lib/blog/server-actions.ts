@@ -49,34 +49,121 @@ export interface RelatedPost {
 }
 
 // ⚡ Cache para optimización
-export const getPostBySlug = cache(async (slug: string, categorySlug?: string): Promise<Post | null> => {
+// Ahora busca por slug original, slug_en, o slug traducido en content_translations
+export const getPostBySlug = cache(async (slug: string, categorySlug?: string, locale?: string): Promise<Post | null> => {
   const supabase = await createClient();
 
-  const { data: postData, error } = await supabase
+  // Query base para seleccionar el post
+  const postQuery = `
+    id,
+    title,
+    title_en,
+    slug,
+    slug_en,
+    excerpt,
+    excerpt_en,
+    content,
+    content_en,
+    featured_image,
+    published_at,
+    updated_at,
+    reading_time,
+    views,
+    meta_title,
+    meta_description,
+    category_id,
+    category:content_categories(id, name, slug, description)
+  `;
+
+  // 1. Primero intentar buscar por slug original (español)
+  let { data: postData, error } = await supabase
     .from("posts")
-    .select(`
-      id,
-      title,
-      title_en,
-      slug,
-      slug_en,
-      excerpt,
-      excerpt_en,
-      content,
-      content_en,
-      featured_image,
-      published_at,
-      updated_at,
-      reading_time,
-      views,
-      meta_title,
-      meta_description,
-      category_id,
-      category:content_categories(id, name, slug, description)
-    `)
+    .select(postQuery)
     .eq("status", "published")
     .eq("slug", slug)
     .single();
+
+  // 2. Si no encuentra y es inglés, buscar por slug_en
+  if ((error || !postData) && locale === 'en') {
+    const { data: postBySlugEn, error: errorEn } = await supabase
+      .from("posts")
+      .select(postQuery)
+      .eq("status", "published")
+      .eq("slug_en", slug)
+      .single();
+    
+    if (!errorEn && postBySlugEn) {
+      postData = postBySlugEn;
+      error = null;
+    }
+  }
+
+  // 3. Si no encuentra y es FR/DE, buscar en content_translations
+  if ((error || !postData) && locale && ['fr', 'de'].includes(locale)) {
+    // Buscar el post_id que tenga este slug traducido
+    const { data: translationData } = await supabase
+      .from("content_translations")
+      .select("source_id")
+      .eq("source_table", "posts")
+      .eq("source_field", "slug")
+      .eq("locale", locale)
+      .eq("translated_text", slug)
+      .single();
+
+    if (translationData?.source_id) {
+      // Encontramos el post por slug traducido, ahora cargarlo
+      const { data: postByTranslatedSlug, error: errorTranslated } = await supabase
+        .from("posts")
+        .select(postQuery)
+        .eq("status", "published")
+        .eq("id", translationData.source_id)
+        .single();
+
+      if (!errorTranslated && postByTranslatedSlug) {
+        postData = postByTranslatedSlug;
+        error = null;
+      }
+    }
+  }
+
+  // 4. Si aún no encuentra y NO pasaron locale, intentar buscar en todos los slugs traducidos
+  if ((error || !postData) && !locale) {
+    // Buscar primero en slug_en
+    const { data: postBySlugEn } = await supabase
+      .from("posts")
+      .select(postQuery)
+      .eq("status", "published")
+      .eq("slug_en", slug)
+      .single();
+
+    if (postBySlugEn) {
+      postData = postBySlugEn;
+      error = null;
+    } else {
+      // Buscar en content_translations (FR, DE)
+      const { data: translationData } = await supabase
+        .from("content_translations")
+        .select("source_id")
+        .eq("source_table", "posts")
+        .eq("source_field", "slug")
+        .eq("translated_text", slug)
+        .single();
+
+      if (translationData?.source_id) {
+        const { data: postByTranslatedSlug } = await supabase
+          .from("posts")
+          .select(postQuery)
+          .eq("status", "published")
+          .eq("id", translationData.source_id)
+          .single();
+
+        if (postByTranslatedSlug) {
+          postData = postByTranslatedSlug;
+          error = null;
+        }
+      }
+    }
+  }
 
   if (error || !postData) {
     return null;
