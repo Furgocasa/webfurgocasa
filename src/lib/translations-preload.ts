@@ -4475,66 +4475,6 @@ export const staticTranslations = {
     fr: "Recommended",
     de: "Recommended"
   },
-  "Recomendado": {
-    es: "Recomendado",
-    en: "Recommended",
-    fr: "Recommandé",
-    de: "Empfohlen"
-  },
-  "Sin comisión": {
-    es: "Sin comisión",
-    en: "No fee",
-    fr: "Sans commission",
-    de: "Ohne Gebühr"
-  },
-  "Pasarela bancaria española": {
-    es: "Pasarela bancaria española",
-    en: "Spanish bank gateway",
-    fr: "Passerelle bancaire espagnole",
-    de: "Spanisches Bankgateway"
-  },
-  "Pago internacional / Apple Pay": {
-    es: "Pago internacional / Apple Pay",
-    en: "International payment / Apple Pay",
-    fr: "Paiement international / Apple Pay",
-    de: "Internationale Zahlung / Apple Pay"
-  },
-  "comisión de gestión": {
-    es: "comisión de gestión",
-    en: "processing fee",
-    fr: "frais de gestion",
-    de: "Bearbeitungsgebühr"
-  },
-  "Desglose del pago con Stripe": {
-    es: "Desglose del pago con Stripe",
-    en: "Stripe payment breakdown",
-    fr: "Détail du paiement Stripe",
-    de: "Stripe-Zahlungsaufschlüsselung"
-  },
-  "Importe base": {
-    es: "Importe base",
-    en: "Base amount",
-    fr: "Montant de base",
-    de: "Grundbetrag"
-  },
-  "Comisión de gestión": {
-    es: "Comisión de gestión",
-    en: "Processing fee",
-    fr: "Frais de gestion",
-    de: "Bearbeitungsgebühr"
-  },
-  "Total a pagar": {
-    es: "Total a pagar",
-    en: "Total to pay",
-    fr: "Total à payer",
-    de: "Gesamtbetrag"
-  },
-  "incl.": {
-    es: "incl.",
-    en: "incl.",
-    fr: "incl.",
-    de: "inkl."
-  },
   "Precio: menor a mayor": {
     es: "Precio: menor a mayor",
     en: "Price: low to high",
