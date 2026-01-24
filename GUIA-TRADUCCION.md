@@ -210,4 +210,45 @@ const t = (key: string) => translateServer(key, 'es');
 
 ---
 
-**Última actualización**: 8 de Enero, 2026
+## 🔄 Sistema de Cambio de Idioma (Language Switcher)
+
+### Blog: Slugs Traducidos Dinámicos
+
+Los artículos del blog tienen slugs traducidos almacenados en Supabase (`content_translations`).
+
+**Cómo funciona:**
+1. La página del blog carga `getAllPostSlugTranslations()` del servidor
+2. `BlogRouteDataProvider` inyecta los slugs traducidos en el DOM
+3. El `language-context.tsx` detecta que es una página de blog
+4. Usa los slugs traducidos para construir la URL al cambiar idioma
+
+**Archivos:**
+- `src/lib/blog-translations.ts` → Funciones de traducción de slugs
+- `src/components/blog/blog-route-data.tsx` → Provider para inyectar datos
+- `src/app/{es,en,fr,de}/blog/[category]/[slug]/page.tsx` → Páginas que usan el provider
+
+### Localizaciones: Slugs Estáticos
+
+Las páginas de alquiler/venta por ciudad usan el mismo slug en todos los idiomas (ej: "murcia", "madrid").
+
+**¿Por qué?**
+- Son nombres de ciudades españolas (~50 ciudades)
+- Los nombres son prácticamente iguales en todos los idiomas
+- Menos complejidad de mantener
+
+**Archivos:**
+- `src/lib/route-translations.ts` → Traducciones estáticas de rutas
+- `next.config.js` → Redirecciones 301
+
+### Páginas Transaccionales
+
+El cambio de idioma está **deshabilitado** en páginas transaccionales para evitar problemas:
+- `/buscar`, `/search`, `/suche`, `/recherche`
+- `/reservar`, `/book`, `/buchen`, `/reserver`
+- `/pago`, `/payment`, `/paiement`, `/zahlung`
+
+**Implementación:** `isTransactionalPage()` en `language-context.tsx`
+
+---
+
+**Última actualización**: 24 de Enero, 2026

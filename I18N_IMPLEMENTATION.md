@@ -1,7 +1,7 @@
 # Arquitectura de Internacionalización (i18n) - Carpetas Fijas por Idioma
 
 > **Última actualización**: 24 Enero 2026  
-> **Versión**: 4.0.0  
+> **Versión**: 4.1.0  
 > **Estado**: ✅ Producción
 
 ## 📋 Resumen
@@ -109,6 +109,64 @@ Las páginas de localización usan rutas dinámicas con `[location]`:
 - `/en/rent-campervan-motorhome/madrid`
 - `/fr/location-camping-car/barcelone`
 - `/de/wohnmobil-mieten/valencia`
+
+---
+
+## 🔄 Sistema de Cambio de Idioma (Language Switcher)
+
+El sistema de cambio de idioma funciona de dos formas según el tipo de contenido:
+
+### 1. Blog: Slugs Traducidos Dinámicos (desde Supabase)
+
+Los artículos del blog tienen slugs traducidos almacenados en la base de datos (`content_translations`).
+Cuando el usuario cambia de idioma en un artículo, el sistema:
+
+1. Lee los slugs traducidos inyectados en la página (`BlogRouteDataProvider`)
+2. Construye la URL con el slug traducido correspondiente
+3. Navega a la nueva URL
+
+**Ejemplo:**
+```
+/es/blog/rutas/cabo-de-palos-en-autocaravana
+      ↓ Cambio a inglés
+/en/blog/routes/cabo-de-palos-in-a-campervan-discover-its-lighthouse-and-pirate-history
+```
+
+**Archivos involucrados:**
+- `src/lib/blog-translations.ts` → `getAllPostSlugTranslations()`
+- `src/components/blog/blog-route-data.tsx` → `BlogRouteDataProvider`
+- `src/contexts/language-context.tsx` → Detecta blog y usa slugs dinámicos
+
+### 2. Localizaciones: Slugs Estáticos (ciudades españolas)
+
+Las páginas de localización (alquiler/venta por ciudad) usan el mismo slug en todos los idiomas
+porque son nombres de ciudades españolas que no cambian significativamente.
+
+**Ejemplo:**
+```
+/es/alquiler-autocaravanas-campervans/murcia
+/en/rent-campervan-motorhome/murcia        ← Mismo slug "murcia"
+/fr/location-camping-car/murcia
+/de/wohnmobil-mieten/murcia
+```
+
+**¿Por qué estático?**
+- Son nombres propios de ciudades españolas (~50 ciudades)
+- Los nombres son prácticamente iguales en todos los idiomas
+- Menos complejidad de mantener
+- Bueno para SEO: usuarios buscan "campervan Murcia" no "campervan Murcie"
+
+**Archivos involucrados:**
+- `src/lib/route-translations.ts` → `getTranslatedRoute()`
+- `next.config.js` → Redirecciones 301 para URLs legacy
+
+### Resumen
+
+| Tipo de Contenido | Sistema de Slugs | Razón |
+|-------------------|------------------|-------|
+| **Blog** | Dinámico (Supabase) | 204+ posts, títulos traducidos, URLs SEO-friendly |
+| **Localizaciones** | Estático | ~50 ciudades, nombres propios iguales en todos los idiomas |
+| **Páginas estáticas** | Estático (route-translations.ts) | Rutas fijas, pocas páginas |
 
 ---
 

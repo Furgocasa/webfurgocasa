@@ -4,6 +4,66 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🌍 [4.1.0] - 24 de Enero 2026 - **SISTEMA DE CAMBIO DE IDIOMA MEJORADO**
+
+### 🎯 **Cambio de Idioma Dinámico para Blog**
+
+**Fecha**: 24 de Enero 2026  
+**Estado**: ✅ **COMPLETADO**
+
+### ✨ Nuevas Funcionalidades
+
+#### Blog: Slugs Traducidos Dinámicos
+- ✅ **612 slugs de blog generados** (204 posts × 3 idiomas: EN, FR, DE)
+- ✅ `getAllPostSlugTranslations()` obtiene todos los slugs traducidos desde Supabase
+- ✅ `BlogRouteDataProvider` inyecta slugs traducidos en páginas de blog
+- ✅ `language-context.tsx` detecta blog y usa slugs dinámicos
+- ✅ Script `scripts/generate-blog-slug-translations.ts` genera slugs automáticamente
+
+#### Localizaciones: Sistema Estático Mantenido
+- ✅ ~50 ciudades españolas mantienen slugs estáticos
+- ✅ Mismo slug en todos los idiomas (ej: `/murcia`, `/madrid`)
+- ✅ Redirecciones 301 para URLs legacy
+
+#### Páginas Transaccionales
+- ✅ Cambio de idioma deshabilitado en `/buscar`, `/reservar`, `/pago`
+- ✅ `isTransactionalPage()` en header para detectar
+
+#### Traducciones VehicleCard
+- ✅ Botón "Reservar" traducido: Book / Réserver / Buchen
+- ✅ 140+ traducciones añadidas para página de búsqueda
+
+### 📁 Archivos Modificados
+
+| Archivo | Cambio |
+|---------|--------|
+| `src/lib/blog-translations.ts` | + `getAllPostSlugTranslations()`, `BlogRouteData` type |
+| `src/components/blog/blog-route-data.tsx` | Nuevo: Provider para inyectar datos |
+| `src/contexts/language-context.tsx` | + Detección de blog y uso de slugs dinámicos |
+| `src/app/{es,en,fr,de}/blog/[category]/[slug]/page.tsx` | + `BlogRouteDataProvider` |
+| `src/lib/translations-preload.ts` | + 140 traducciones VehicleCard/búsqueda |
+| `scripts/generate-blog-slug-translations.ts` | Nuevo: Genera slugs traducidos |
+
+### 📊 Estadísticas
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SLUGS GENERADOS:                    612
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Posts procesados:                204
+✅ Idiomas:                         3 (EN, FR, DE)
+✅ Slugs por post:                  3
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+### 📚 Documentación
+
+- `I18N_IMPLEMENTATION.md` - Actualizado con sistema de cambio de idioma
+- `GUIA-TRADUCCION.md` - Actualizado con sección de Language Switcher
+- `README.md` - Actualizado versión y changelog
+
+---
+
 ## 🎉 [3.0.0] - 24 de Enero 2026 - **MIGRACIÓN COMPLETA A ARQUITECTURA [locale]**
 
 ### 🏆 **HITO MAYOR: Arquitectura Multiidioma Física Completada**

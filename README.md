@@ -1,6 +1,6 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.0.0-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.1.0-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-98%2F100-brightgreen.svg)](https://pagespeed.web.dev/)
@@ -426,7 +426,12 @@ export default function VehiculosAdminPage() {
 
 **❌ NUNCA usar `useLanguage()` en Server Components** - Causa errores de hidratación
 
-**📖 Ver:** `REGLAS-ARQUITECTURA-NEXTJS.md` y `GUIA-TRADUCCION.md`
+**Sistema de Cambio de Idioma:**
+- **Blog**: Slugs traducidos dinámicos desde Supabase (`content_translations`)
+- **Localizaciones (ciudades)**: Slugs estáticos (mismo nombre en todos los idiomas)
+- **Páginas transaccionales**: Cambio de idioma deshabilitado
+
+**📖 Ver:** `REGLAS-ARQUITECTURA-NEXTJS.md`, `GUIA-TRADUCCION.md` y `I18N_IMPLEMENTATION.md`
 
 #### 5️⃣ **FLUJO DE RESERVA - SAGRADO** ⚠️ **CRÍTICO**
 
@@ -1498,6 +1503,15 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 ## 📜 Historial de Versiones
 
+### v4.1.0 (24 Enero 2026) - Sistema de Cambio de Idioma Mejorado 🌍
+- 🌐 **Blog**: Cambio de idioma con slugs traducidos dinámicos desde Supabase
+- 📝 **612 slugs de blog generados** (204 posts × 3 idiomas: EN, FR, DE)
+- ✅ **BlogRouteDataProvider**: Inyecta slugs traducidos en páginas de blog
+- ✅ **Localizaciones**: Mantienen slugs estáticos (ciudades españolas)
+- ✅ **Páginas transaccionales**: Cambio de idioma deshabilitado
+- ✅ **Traducciones VehicleCard**: Botón "Reservar" traducido en página de búsqueda
+- 📚 Documentación: `I18N_IMPLEMENTATION.md`, `GUIA-TRADUCCION.md`
+
 ### v4.0.0 (24 Enero 2026) - Arquitectura Carpetas Fijas 🏗️
 - 🏗️ **ARQUITECTURA NUEVA**: Migración completa a carpetas fijas por idioma
 - ✅ **116 páginas migradas**: 108 estáticas + 8 dinámicas `[location]`
@@ -1581,7 +1595,7 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 4.0.0 - Arquitectura Carpetas Fijas por Idioma  
+**Versión**: 4.1.0 - Sistema de Cambio de Idioma Mejorado  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
 **PageSpeed**: 98/100 escritorio | 90/100 móvil  
