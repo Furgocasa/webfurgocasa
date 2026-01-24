@@ -448,12 +448,13 @@ export async function middleware(request: NextRequest) {
         pathnameWithoutLocale.match(/^\/wohnmobile-zu-verkaufen-/);
       
       if (isLocationPage) {
-        // Páginas de localización: hacer rewrite al path sin locale
-        const spanishPath = translatePathToSpanish(pathnameWithoutLocale);
-        request.nextUrl.pathname = spanishPath;
+        // Páginas de localización: hacer rewrite a la ruta fija /location-target
+        // Next.js servirá desde src/app/(location-pages)/location-target/page.tsx
+        request.nextUrl.pathname = '/location-target';
         const response = NextResponse.rewrite(request.nextUrl);
         response.headers.set('x-detected-locale', locale);
         response.headers.set('x-original-pathname', pathname);
+        response.headers.set('x-location-param', pathnameWithoutLocale);
         return response;
       }
       
@@ -466,7 +467,8 @@ export async function middleware(request: NextRequest) {
       return response;
       
     } else {
-      // No tiene locale en la URL, redirigir añadiendo el locale detectado
+      // ⚠️ CRÍTICO: No tiene locale en la URL - SIEMPRE redirigir con prefijo /es/ para SEO
+      // Esto preserva las URLs indexadas en Google que incluyen /es/
       const acceptLanguage = request.headers.get('accept-language');
       let detectedLocale: Locale = i18n.defaultLocale;
       
@@ -478,7 +480,12 @@ export async function middleware(request: NextRequest) {
         }
       }
       
-      // Redirigir a la URL con el locale (incluido /es/ para SEO)
+      // ✅ IMPORTANTE: Redirigir SIEMPRE con prefijo de locale, incluido /es/
+      // Esto asegura que todas las URLs tengan el formato:
+      // - /es/vehiculos (español)
+      // - /en/vehicles (inglés)
+      // - /fr/vehicules (francés)
+      // - /de/fahrzeuge (alemán)
       request.nextUrl.pathname = `/${detectedLocale}${pathname}`;
       return NextResponse.redirect(request.nextUrl, { status: 301 });
     }
