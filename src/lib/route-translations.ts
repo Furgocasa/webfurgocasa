@@ -263,8 +263,36 @@ export const routeTranslations = {
 } as const;
 
 /**
+ * Busca una ruta en routeTranslations de forma BIDIRECCIONAL
+ * Dado un path en CUALQUIER idioma, encuentra la traducción al idioma destino
+ * Ejemplo: /fahrzeuge (alemán) -> busca en todas las traducciones -> devuelve /vehiculos (español)
+ */
+function findRouteTranslation(pathSegment: string, targetLang: Locale): string | null {
+  const segmentWithSlash = pathSegment.startsWith('/') ? pathSegment : '/' + pathSegment;
+  
+  // Primero intentar coincidencia directa con las claves (rutas en español)
+  if (routeTranslations[segmentWithSlash as keyof typeof routeTranslations]) {
+    return routeTranslations[segmentWithSlash as keyof typeof routeTranslations][targetLang];
+  }
+  
+  // Si no coincide con las claves, buscar en todos los valores de todas las traducciones
+  for (const [esRoute, translations] of Object.entries(routeTranslations)) {
+    // Verificar si el segmento coincide con alguna traducción (en, fr, de)
+    for (const [lang, translatedRoute] of Object.entries(translations)) {
+      if (translatedRoute === segmentWithSlash) {
+        // Encontrado! Devolver la traducción al idioma destino
+        return translations[targetLang as keyof typeof translations];
+      }
+    }
+  }
+  
+  return null;
+}
+
+/**
  * Obtiene la ruta traducida con prefijo de idioma
  * Ejemplo: /es/contacto -> /en/contact
+ * Ejemplo: /de/fahrzeuge -> /es/vehiculos (búsqueda bidireccional)
  * Ejemplo localización: /es/alquiler-autocaravanas-campervans/murcia -> /en/rent-campervan-motorhome/murcia
  * Ejemplo blog categoría: /es/blog/rutas -> /en/blog/routes
  * Ejemplo blog artículo: /es/blog/rutas/mi-articulo -> /en/blog/routes/mi-articulo
@@ -319,9 +347,10 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
       translatedPath = `/blog/${translatedCategory}`;
     }
   } else {
-    // Intentar coincidencia exacta
-    if (routeTranslations[cleanPath as keyof typeof routeTranslations]) {
-      translatedPath = routeTranslations[cleanPath as keyof typeof routeTranslations][targetLang];
+    // Intentar coincidencia exacta BIDIRECCIONAL (funciona desde cualquier idioma)
+    const exactTranslation = findRouteTranslation(cleanPath, targetLang);
+    if (exactTranslation) {
+      translatedPath = exactTranslation;
     } else {
       // Manejar rutas dinámicas de localización - NUEVO formato con barra: /alquiler-autocaravanas-campervans/{location}
       const locationPattern = /^\/(alquiler-autocaravanas-campervans|rent-campervan-motorhome|location-camping-car|wohnmobil-mieten)\/(.+)$/;
@@ -361,17 +390,17 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
           const translatedBase = routeTranslations["/venta-autocaravanas-camper"][targetLang];
           translatedPath = `${translatedBase}/${location}`;
         } else {
-          // Si es una ruta dinámica normal, traducir TODOS los segmentos traducibles
+          // Si es una ruta dinámica normal, traducir TODOS los segmentos BIDIRECCIONALMENTE
           const pathSegments = cleanPath.split('/').filter(Boolean);
           if (pathSegments.length > 0) {
             const translatedSegments: string[] = [];
             
             for (const segment of pathSegments) {
-              const segmentAsRoute = '/' + segment;
-              // Intentar traducir cada segmento individual
-              if (routeTranslations[segmentAsRoute as keyof typeof routeTranslations]) {
-                const translated = routeTranslations[segmentAsRoute as keyof typeof routeTranslations][targetLang];
-                translatedSegments.push(translated.substring(1)); // Sin la barra inicial
+              // Usar búsqueda bidireccional para cada segmento
+              const translatedSegment = findRouteTranslation(segment, targetLang);
+              if (translatedSegment) {
+                // Quitar la barra inicial del resultado
+                translatedSegments.push(translatedSegment.substring(1));
               } else {
                 // Si no tiene traducción, mantener el segmento original (ej: IDs, slugs)
                 translatedSegments.push(segment);
