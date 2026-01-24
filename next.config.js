@@ -336,22 +336,27 @@ const nextConfig = {
   async rewrites() {
     return [
       // ============================================
-      // ⚠️ ARQUITECTURA FIJA POR IDIOMA (/es/, /en/, /fr/, /de/)
+      // REWRITES PARA URLs SEO CON GUIÓN → RUTAS CON BARRA
       // ============================================
-      // Las páginas ahora están físicamente separadas por idioma.
-      // NO necesitan rewrites porque son carpetas físicas con [location]
+      // Las URLs públicas usan guión para SEO: /es/alquiler-autocaravanas-campervans-murcia
+      // Las carpetas físicas usan barra: /es/alquiler-autocaravanas-campervans/[location]
       // ============================================
 
-      // ============================================
-      // RUTAS FUNCIONALES - AHORA SON CARPETAS FÍSICAS POR LOCALE
-      // ============================================
-      // Ya NO necesitan rewrites porque existen físicamente:
-      // - /es/reservar/, /en/book/, /fr/reserver/, /de/buchen/
-      // - /es/pago/, /en/payment/, /fr/paiement/, /de/zahlung/
-      // - /es/vehiculos/, /en/vehicles/, /fr/vehicules/, /de/fahrzeuge/
-      // - /es/ventas/, /en/sales/, /fr/ventes/, /de/verkaufe/
-      // - /es/faqs/, /en/faqs/, /fr/faqs/ (DE no tiene)
-      // ============================================
+      // ES - Español
+      { source: '/es/alquiler-autocaravanas-campervans-:location', destination: '/es/alquiler-autocaravanas-campervans/:location' },
+      { source: '/es/venta-autocaravanas-camper-:location', destination: '/es/venta-autocaravanas-camper/:location' },
+
+      // EN - English
+      { source: '/en/rent-campervan-motorhome-:location', destination: '/en/rent-campervan-motorhome/:location' },
+      { source: '/en/campervans-for-sale-in-:location', destination: '/en/campervans-for-sale-in/:location' },
+
+      // FR - Français
+      { source: '/fr/location-camping-car-:location', destination: '/fr/location-camping-car/:location' },
+      { source: '/fr/camping-cars-a-vendre-:location', destination: '/fr/camping-cars-a-vendre/:location' },
+
+      // DE - Deutsch
+      { source: '/de/wohnmobil-mieten-:location', destination: '/de/wohnmobil-mieten/:location' },
+      { source: '/de/wohnmobile-zu-verkaufen-:location', destination: '/de/wohnmobile-zu-verkaufen/:location' },
     ];
   },
   async redirects() {
