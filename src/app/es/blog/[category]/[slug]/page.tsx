@@ -25,8 +25,11 @@ import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
  */
 
 interface BlogPostPageProps {
-  params: Promise<{ locale: string; category: string; slug: string }>;
+  params: Promise<{ category: string; slug: string }>;
 }
+
+// Locale fijo para esta carpeta /es/
+const LOCALE: Locale = 'es';
 
 // ⚡ ISR: Revalidar cada día (artículos de blog son muy estáticos)
 export const revalidate = 86400;
@@ -44,8 +47,8 @@ export async function generateStaticParams() {
 export async function generateMetadata({ 
   params 
 }: BlogPostPageProps): Promise<Metadata> {
-  const { locale: localeStr, category, slug } = await params;
-  const locale = localeStr as Locale;
+  const { category, slug } = await params;
+  const locale = LOCALE;
   const post = await getPostBySlug(slug, category, locale);
 
   if (!post) {
@@ -120,10 +123,10 @@ function formatDate(date: string, locale: Locale) {
 export default async function LocaleBlogPostPage({ 
   params 
 }: BlogPostPageProps) {
-  const { locale: localeStr, category, slug } = await params;
-  const locale = localeStr as Locale;
+  const { category, slug } = await params;
+  const locale = LOCALE;
   
-  // Obtener post desde el servidor
+  // Obtener post desde el servidor (locale fijo 'es' para esta carpeta)
   const post = await getPostBySlug(slug, category, locale);
 
   if (!post) {
