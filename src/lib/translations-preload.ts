@@ -8607,6 +8607,776 @@ export function getPreloadCache() {
     fr: "COMMENCER MAINTENANT!",
     de: "JETZT STARTEN!"
   },
+
+  // ========================================
+  // PÁGINA PARKING MURCIA
+  // ========================================
+  "Parking para Autocaravanas": {
+    es: "Parking para Autocaravanas",
+    en: "Motorhome Parking",
+    fr: "Parking pour Camping-cars",
+    de: "Wohnmobil-Parkplatz"
+  },
+  "Guarda tu autocaravana en un lugar seguro en Murcia": {
+    es: "Guarda tu autocaravana en un lugar seguro en Murcia",
+    en: "Store your motorhome in a safe place in Murcia",
+    fr: "Gardez votre camping-car dans un endroit sûr à Murcie",
+    de: "Bewahren Sie Ihr Wohnmobil an einem sicheren Ort in Murcia auf"
+  },
+  "Servicios incluidos": {
+    es: "Servicios incluidos",
+    en: "Services included",
+    fr: "Services inclus",
+    de: "Enthaltene Dienstleistungen"
+  },
+  "Tarifas": {
+    es: "Tarifas",
+    en: "Rates",
+    fr: "Tarifs",
+    de: "Preise"
+  },
+  "Día": {
+    es: "Día",
+    en: "Day",
+    fr: "Jour",
+    de: "Tag"
+  },
+  "IVA incluido": {
+    es: "IVA incluido",
+    en: "VAT included",
+    fr: "TVA incluse",
+    de: "MwSt. inbegriffen"
+  },
+  "Semana": {
+    es: "Semana",
+    en: "Week",
+    fr: "Semaine",
+    de: "Woche"
+  },
+  "Mes": {
+    es: "Mes",
+    en: "Month",
+    fr: "Mois",
+    de: "Monat"
+  },
+  "¿Necesitas una plaza?": {
+    es: "¿Necesitas una plaza?",
+    en: "Need a parking space?",
+    fr: "Besoin d'une place?",
+    de: "Brauchen Sie einen Stellplatz?"
+  },
+  "Contacta con nosotros para reservar tu plaza": {
+    es: "Contacta con nosotros para reservar tu plaza",
+    en: "Contact us to reserve your space",
+    fr: "Contactez-nous pour réserver votre place",
+    de: "Kontaktieren Sie uns, um Ihren Platz zu reservieren"
+  },
+
+  // ========================================
+  // PÁGINA CLIENTES VIP
+  // ========================================
+  "Clientes VIP Furgocasa": {
+    es: "Clientes VIP Furgocasa",
+    en: "Furgocasa VIP Clients",
+    fr: "Clients VIP Furgocasa",
+    de: "Furgocasa VIP-Kunden"
+  },
+  "Nuestros clientes más fieles merecen un trato especial. Descubre todas las ventajas de ser VIP.": {
+    es: "Nuestros clientes más fieles merecen un trato especial. Descubre todas las ventajas de ser VIP.",
+    en: "Our most loyal customers deserve special treatment. Discover all the benefits of being VIP.",
+    fr: "Nos clients les plus fidèles méritent un traitement spécial. Découvrez tous les avantages d'être VIP.",
+    de: "Unsere treuesten Kunden verdienen eine besondere Behandlung. Entdecken Sie alle Vorteile, VIP zu sein."
+  },
+  "Beneficios exclusivos": {
+    es: "Beneficios exclusivos",
+    en: "Exclusive benefits",
+    fr: "Avantages exclusifs",
+    de: "Exklusive Vorteile"
+  },
+  "Y además...": {
+    es: "Y además...",
+    en: "And also...",
+    fr: "Et aussi...",
+    de: "Und außerdem..."
+  },
+  "¿Cómo me hago VIP?": {
+    es: "¿Cómo me hago VIP?",
+    en: "How do I become VIP?",
+    fr: "Comment devenir VIP?",
+    de: "Wie werde ich VIP?"
+  },
+  "¿Ya eres cliente?": {
+    es: "¿Ya eres cliente?",
+    en: "Already a customer?",
+    fr: "Déjà client?",
+    de: "Schon Kunde?"
+  },
+  "Comprueba si ya cumples los requisitos para ser VIP": {
+    es: "Comprueba si ya cumples los requisitos para ser VIP",
+    en: "Check if you already meet the requirements to be VIP",
+    fr: "Vérifiez si vous remplissez déjà les conditions pour être VIP",
+    de: "Prüfen Sie, ob Sie bereits die Voraussetzungen für VIP erfüllen"
+  },
+
+  // ========================================
+  // PÁGINA VIDEO TUTORIALES
+  // ========================================
+  "Video Tutoriales": {
+    es: "Video Tutoriales",
+    en: "Video Tutorials",
+    fr: "Tutoriels Vidéo",
+    de: "Video-Tutorials"
+  },
+  "Aprende a usar tu camper de alquiler con nuestros videos explicativos": {
+    es: "Aprende a usar tu camper de alquiler con nuestros videos explicativos",
+    en: "Learn how to use your rental camper with our explanatory videos",
+    fr: "Apprenez à utiliser votre camping-car de location avec nos vidéos explicatives",
+    de: "Lernen Sie mit unseren Erklärvideos, wie Sie Ihren Miet-Camper benutzen"
+  },
+  "¿Prefieres leer la guía?": {
+    es: "¿Prefieres leer la guía?",
+    en: "Prefer to read the guide?",
+    fr: "Vous préférez lire le guide?",
+    de: "Möchten Sie lieber den Leitfaden lesen?"
+  },
+  "Consulta nuestra guía escrita con todos los detalles": {
+    es: "Consulta nuestra guía escrita con todos los detalles",
+    en: "Check our written guide with all the details",
+    fr: "Consultez notre guide écrit avec tous les détails",
+    de: "Lesen Sie unseren schriftlichen Leitfaden mit allen Details"
+  },
+  "Ver Guía Camper": {
+    es: "Ver Guía Camper",
+    en: "View Camper Guide",
+    fr: "Voir le Guide Camping-car",
+    de: "Camper-Leitfaden ansehen"
+  },
+
+  // ========================================
+  // PÁGINA BÚSQUEDA
+  // ========================================
+  "Buscando vehículos disponibles...": {
+    es: "Buscando vehículos disponibles...",
+    en: "Searching for available vehicles...",
+    fr: "Recherche de véhicules disponibles...",
+    de: "Suche nach verfügbaren Fahrzeugen..."
+  },
+  "Error al buscar disponibilidad": {
+    es: "Error al buscar disponibilidad",
+    en: "Error searching availability",
+    fr: "Erreur lors de la recherche de disponibilité",
+    de: "Fehler bei der Suche nach Verfügbarkeit"
+  },
+  "No hay vehículos disponibles": {
+    es: "No hay vehículos disponibles",
+    en: "No vehicles available",
+    fr: "Pas de véhicules disponibles",
+    de: "Keine Fahrzeuge verfügbar"
+  },
+  "Prueba con otras fechas": {
+    es: "Prueba con otras fechas",
+    en: "Try other dates",
+    fr: "Essayez d'autres dates",
+    de: "Versuchen Sie andere Daten"
+  },
+  "vehículo": {
+    es: "vehículo",
+    en: "vehicle",
+    fr: "véhicule",
+    de: "Fahrzeug"
+  },
+  "disponible": {
+    es: "disponible",
+    en: "available",
+    fr: "disponible",
+    de: "verfügbar"
+  },
+  "Resultados de búsqueda": {
+    es: "Resultados de búsqueda",
+    en: "Search results",
+    fr: "Résultats de recherche",
+    de: "Suchergebnisse"
+  },
+
+  // ========================================
+  // PÁGINA VENTAS
+  // ========================================
+  "Oportunidades únicas": {
+    es: "Oportunidades únicas",
+    en: "Unique opportunities",
+    fr: "Opportunités uniques",
+    de: "Einzigartige Möglichkeiten"
+  },
+  "Campers y Autocaravanas en Venta": {
+    es: "Campers y Autocaravanas en Venta",
+    en: "Campers and Motorhomes for Sale",
+    fr: "Camping-cars et Fourgons à Vendre",
+    de: "Camper und Wohnmobile zu Verkaufen"
+  },
+  "Vehículos de nuestra flota de alquiler, revisados y garantizados. Conocemos su historial completo.": {
+    es: "Vehículos de nuestra flota de alquiler, revisados y garantizados. Conocemos su historial completo.",
+    en: "Vehicles from our rental fleet, inspected and guaranteed. We know their complete history.",
+    fr: "Véhicules de notre flotte de location, inspectés et garantis. Nous connaissons leur historique complet.",
+    de: "Fahrzeuge aus unserer Mietflotte, geprüft und garantiert. Wir kennen ihre komplette Historie."
+  },
+  "Historial conocido": {
+    es: "Historial conocido",
+    en: "Known history",
+    fr: "Historique connu",
+    de: "Bekannte Geschichte"
+  },
+  "Mantenimientos al día": {
+    es: "Mantenimientos al día",
+    en: "Up-to-date maintenance",
+    fr: "Entretien à jour",
+    de: "Wartung auf dem neuesten Stand"
+  },
+  "Garantía incluida": {
+    es: "Garantía incluida",
+    en: "Warranty included",
+    fr: "Garantie incluse",
+    de: "Garantie inklusive"
+  },
+  "Todas las categorías": {
+    es: "Todas las categorías",
+    en: "All categories",
+    fr: "Toutes les catégories",
+    de: "Alle Kategorien"
+  },
+  "Cualquier precio": {
+    es: "Cualquier precio",
+    en: "Any price",
+    fr: "Tous les prix",
+    de: "Beliebiger Preis"
+  },
+  "Hasta 40.000 €": {
+    es: "Hasta 40.000 €",
+    en: "Up to €40,000",
+    fr: "Jusqu'à 40 000 €",
+    de: "Bis zu 40.000 €"
+  },
+  "Más de 60.000 €": {
+    es: "Más de 60.000 €",
+    en: "More than €60,000",
+    fr: "Plus de 60 000 €",
+    de: "Mehr als 60.000 €"
+  },
+  "Cualquier km": {
+    es: "Cualquier km",
+    en: "Any km",
+    fr: "Tous les km",
+    de: "Beliebige km"
+  },
+  "Hasta 30.000 km": {
+    es: "Hasta 30.000 km",
+    en: "Up to 30,000 km",
+    fr: "Jusqu'à 30 000 km",
+    de: "Bis zu 30.000 km"
+  },
+  "Más de 60.000 km": {
+    es: "Más de 60.000 km",
+    en: "More than 60,000 km",
+    fr: "Plus de 60 000 km",
+    de: "Mehr als 60.000 km"
+  },
+  "No se encontraron vehículos": {
+    es: "No se encontraron vehículos",
+    en: "No vehicles found",
+    fr: "Aucun véhicule trouvé",
+    de: "Keine Fahrzeuge gefunden"
+  },
+  "No hay vehículos en venta": {
+    es: "No hay vehículos en venta",
+    en: "No vehicles for sale",
+    fr: "Pas de véhicules à vendre",
+    de: "Keine Fahrzeuge zum Verkauf"
+  },
+  "Prueba con otros criterios de búsqueda": {
+    es: "Prueba con otros criterios de búsqueda",
+    en: "Try other search criteria",
+    fr: "Essayez d'autres critères de recherche",
+    de: "Versuchen Sie andere Suchkriterien"
+  },
+  "En este momento no tenemos vehículos disponibles para la venta": {
+    es: "En este momento no tenemos vehículos disponibles para la venta",
+    en: "We currently have no vehicles available for sale",
+    fr: "Nous n'avons actuellement aucun véhicule disponible à la vente",
+    de: "Wir haben derzeit keine Fahrzeuge zum Verkauf verfügbar"
+  },
+  "Contacta con nosotros si buscas algo específico": {
+    es: "Contacta con nosotros si buscas algo específico",
+    en: "Contact us if you're looking for something specific",
+    fr: "Contactez-nous si vous cherchez quelque chose de spécifique",
+    de: "Kontaktieren Sie uns, wenn Sie etwas Bestimmtes suchen"
+  },
+  "vehículos disponibles": {
+    es: "vehículos disponibles",
+    en: "vehicles available",
+    fr: "véhicules disponibles",
+    de: "verfügbare Fahrzeuge"
+  },
+  "Ordenar por: Más recientes": {
+    es: "Ordenar por: Más recientes",
+    en: "Sort by: Most recent",
+    fr: "Trier par: Plus récents",
+    de: "Sortieren nach: Neueste"
+  },
+  "Precio: menor a mayor": {
+    es: "Precio: menor a mayor",
+    en: "Price: low to high",
+    fr: "Prix: du moins cher au plus cher",
+    de: "Preis: aufsteigend"
+  },
+  "Precio: mayor a menor": {
+    es: "Precio: mayor a menor",
+    en: "Price: high to low",
+    fr: "Prix: du plus cher au moins cher",
+    de: "Preis: absteigend"
+  },
+  "Kilometraje: menor a mayor": {
+    es: "Kilometraje: menor a mayor",
+    en: "Mileage: low to high",
+    fr: "Kilométrage: du moins au plus",
+    de: "Kilometerstand: aufsteigend"
+  },
+  "plazas día": {
+    es: "plazas día",
+    en: "day seats",
+    fr: "places jour",
+    de: "Tagessitze"
+  },
+  "plazas noche": {
+    es: "plazas noche",
+    en: "night beds",
+    fr: "couchages",
+    de: "Schlafplätze"
+  },
+  "Precio": {
+    es: "Precio",
+    en: "Price",
+    fr: "Prix",
+    de: "Preis"
+  },
+  "Ver detalles": {
+    es: "Ver detalles",
+    en: "View details",
+    fr: "Voir les détails",
+    de: "Details ansehen"
+  },
+  "¿No encuentras lo que buscas?": {
+    es: "¿No encuentras lo que buscas?",
+    en: "Can't find what you're looking for?",
+    fr: "Vous ne trouvez pas ce que vous cherchez?",
+    de: "Finden Sie nicht, was Sie suchen?"
+  },
+  "Contáctanos y te ayudamos a encontrar el camper perfecto para ti. También aceptamos vehículos a cuenta.": {
+    es: "Contáctanos y te ayudamos a encontrar el camper perfecto para ti. También aceptamos vehículos a cuenta.",
+    en: "Contact us and we'll help you find the perfect camper for you. We also accept trade-ins.",
+    fr: "Contactez-nous et nous vous aiderons à trouver le camping-car parfait pour vous. Nous acceptons également les reprises.",
+    de: "Kontaktieren Sie uns und wir helfen Ihnen, den perfekten Camper für Sie zu finden. Wir nehmen auch Fahrzeuge in Zahlung."
+  },
+  "Llámanos": {
+    es: "Llámanos",
+    en: "Call us",
+    fr: "Appelez-nous",
+    de: "Rufen Sie uns an"
+  },
+  "Escríbenos": {
+    es: "Escríbenos",
+    en: "Write to us",
+    fr: "Écrivez-nous",
+    de: "Schreiben Sie uns"
+  },
+  "Historial completo": {
+    es: "Historial completo",
+    en: "Complete history",
+    fr: "Historique complet",
+    de: "Vollständige Historie"
+  },
+  "Conocemos cada kilómetro de nuestros vehículos. Te entregamos el historial de mantenimientos completo.": {
+    es: "Conocemos cada kilómetro de nuestros vehículos. Te entregamos el historial de mantenimientos completo.",
+    en: "We know every kilometer of our vehicles. We provide you with the complete maintenance history.",
+    fr: "Nous connaissons chaque kilomètre de nos véhicules. Nous vous fournissons l'historique complet des entretiens.",
+    de: "Wir kennen jeden Kilometer unserer Fahrzeuge. Wir liefern Ihnen die vollständige Wartungshistorie."
+  },
+  "Financiación disponible": {
+    es: "Financiación disponible",
+    en: "Financing available",
+    fr: "Financement disponible",
+    de: "Finanzierung verfügbar"
+  },
+  "Te ayudamos con la financiación. Hasta 120 meses sin entrada con las mejores condiciones.": {
+    es: "Te ayudamos con la financiación. Hasta 120 meses sin entrada con las mejores condiciones.",
+    en: "We help you with financing. Up to 120 months with no down payment and the best conditions.",
+    fr: "Nous vous aidons avec le financement. Jusqu'à 120 mois sans apport avec les meilleures conditions.",
+    de: "Wir helfen Ihnen bei der Finanzierung. Bis zu 120 Monate ohne Anzahlung mit den besten Konditionen."
+  },
+  "Prueba sin compromiso": {
+    es: "Prueba sin compromiso",
+    en: "Test drive without commitment",
+    fr: "Essai sans engagement",
+    de: "Probefahrt ohne Verpflichtung"
+  },
+  "Ven a verlo y pruébalo. Te lo enseñamos sin ningún compromiso en nuestras instalaciones.": {
+    es: "Ven a verlo y pruébalo. Te lo enseñamos sin ningún compromiso en nuestras instalaciones.",
+    en: "Come see it and try it. We'll show it to you with no commitment at our facilities.",
+    fr: "Venez le voir et l'essayer. Nous vous le montrons sans engagement dans nos installations.",
+    de: "Kommen Sie vorbei und probieren Sie es aus. Wir zeigen es Ihnen unverbindlich in unseren Räumlichkeiten."
+  },
+
+  // ========================================
+  // PÁGINA DOCUMENTACIÓN ALQUILER
+  // ========================================
+  "DNI o Pasaporte en vigor de todos los conductores": {
+    es: "DNI o Pasaporte en vigor de todos los conductores",
+    en: "Valid ID or Passport of all drivers",
+    fr: "Carte d'identité ou passeport valide de tous les conducteurs",
+    de: "Gültiger Ausweis oder Reisepass aller Fahrer"
+  },
+  "Carnet de conducir B con mínimo 2 años de antigüedad": {
+    es: "Carnet de conducir B con mínimo 2 años de antigüedad",
+    en: "Class B driving license with at least 2 years experience",
+    fr: "Permis de conduire B avec au moins 2 ans d'ancienneté",
+    de: "Führerschein Klasse B mit mindestens 2 Jahren Erfahrung"
+  },
+  "Envía tu documentación": {
+    es: "Envía tu documentación",
+    en: "Send your documentation",
+    fr: "Envoyez votre documentation",
+    de: "Senden Sie Ihre Dokumentation"
+  },
+  "DNI/Pasaporte y carnet de conducir (foto o escaneo)": {
+    es: "DNI/Pasaporte y carnet de conducir (foto o escaneo)",
+    en: "ID/Passport and driving license (photo or scan)",
+    fr: "Carte d'identité/Passeport et permis de conduire (photo ou scan)",
+    de: "Ausweis/Reisepass und Führerschein (Foto oder Scan)"
+  },
+  "Firma y envía el contrato": {
+    es: "Firma y envía el contrato",
+    en: "Sign and send the contract",
+    fr: "Signez et envoyez le contrat",
+    de: "Unterschreiben und senden Sie den Vertrag"
+  },
+  "Descarga la documentación de esta página, fírmala y envíanosla por email": {
+    es: "Descarga la documentación de esta página, fírmala y envíanosla por email",
+    en: "Download the documentation from this page, sign it and send it to us by email",
+    fr: "Téléchargez la documentation de cette page, signez-la et envoyez-la nous par email",
+    de: "Laden Sie die Dokumentation von dieser Seite herunter, unterschreiben Sie sie und senden Sie sie uns per E-Mail"
+  },
+  "Paga la fianza": {
+    es: "Paga la fianza",
+    en: "Pay the deposit",
+    fr: "Payez la caution",
+    de: "Zahlen Sie die Kaution"
+  },
+  "Transferencia de 1.000€ (máx. 72h antes del inicio)": {
+    es: "Transferencia de 1.000€ (máx. 72h antes del inicio)",
+    en: "Transfer of €1,000 (max. 72h before start)",
+    fr: "Virement de 1 000€ (max. 72h avant le début)",
+    de: "Überweisung von 1.000€ (max. 72h vor Beginn)"
+  },
+  "Recibe confirmación": {
+    es: "Recibe confirmación",
+    en: "Receive confirmation",
+    fr: "Recevez la confirmation",
+    de: "Erhalten Sie die Bestätigung"
+  },
+  "Te confirmaremos la cita de recogida por email": {
+    es: "Te confirmaremos la cita de recogida por email",
+    en: "We will confirm the pickup appointment by email",
+    fr: "Nous vous confirmerons le rendez-vous de prise en charge par email",
+    de: "Wir bestätigen Ihnen den Abholtermin per E-Mail"
+  },
+  "Acceso exclusivo para clientes": {
+    es: "Acceso exclusivo para clientes",
+    en: "Exclusive access for customers",
+    fr: "Accès exclusif pour les clients",
+    de: "Exklusiver Zugang für Kunden"
+  },
+  "Documentación de tu Alquiler": {
+    es: "Documentación de tu Alquiler",
+    en: "Your Rental Documentation",
+    fr: "Documentation de votre Location",
+    de: "Ihre Mietdokumentation"
+  },
+  "Descarga, firma y envía los documentos por email para confirmar tu reserva": {
+    es: "Descarga, firma y envía los documentos por email para confirmar tu reserva",
+    en: "Download, sign and send the documents by email to confirm your booking",
+    fr: "Téléchargez, signez et envoyez les documents par email pour confirmer votre réservation",
+    de: "Laden Sie herunter, unterschreiben Sie und senden Sie die Dokumente per E-Mail, um Ihre Buchung zu bestätigen"
+  },
+  "Pasos para confirmar tu reserva": {
+    es: "Pasos para confirmar tu reserva",
+    en: "Steps to confirm your booking",
+    fr: "Étapes pour confirmer votre réservation",
+    de: "Schritte zur Bestätigung Ihrer Buchung"
+  },
+  "La cita de recogida se confirmará una vez completados estos pasos:": {
+    es: "La cita de recogida se confirmará una vez completados estos pasos:",
+    en: "The pickup appointment will be confirmed once these steps are completed:",
+    fr: "Le rendez-vous de prise en charge sera confirmé une fois ces étapes complétées:",
+    de: "Der Abholtermin wird bestätigt, sobald diese Schritte abgeschlossen sind:"
+  },
+  "Email para enviar documentación:": {
+    es: "Email para enviar documentación:",
+    en: "Email to send documentation:",
+    fr: "Email pour envoyer la documentation:",
+    de: "E-Mail zum Senden der Dokumentation:"
+  },
+  "El día de la recogida": {
+    es: "El día de la recogida",
+    en: "On pickup day",
+    fr: "Le jour de la prise en charge",
+    de: "Am Abholtag"
+  },
+  "Documentos que debes traer físicamente:": {
+    es: "Documentos que debes traer físicamente:",
+    en: "Documents you must bring physically:",
+    fr: "Documents que vous devez apporter physiquement:",
+    de: "Dokumente, die Sie physisch mitbringen müssen:"
+  },
+  "El resto de documentación ya la habrás enviado previamente por email.": {
+    es: "El resto de documentación ya la habrás enviado previamente por email.",
+    en: "The rest of the documentation you will have already sent previously by email.",
+    fr: "Le reste de la documentation aura déjà été envoyé préalablement par email.",
+    de: "Die restliche Dokumentation haben Sie bereits vorher per E-Mail gesendet."
+  },
+  "Documentación del Contrato": {
+    es: "Documentación del Contrato",
+    en: "Contract Documentation",
+    fr: "Documentation du Contrat",
+    de: "Vertragsdokumentation"
+  },
+  "Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a": {
+    es: "Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a",
+    en: "Please read these documents carefully, sign them and send them by email to",
+    fr: "Veuillez lire attentivement ces documents, les signer et les envoyer par email à",
+    de: "Bitte lesen Sie diese Dokumente sorgfältig, unterschreiben Sie sie und senden Sie sie per E-Mail an"
+  },
+  "Lectura obligatoria": {
+    es: "Lectura obligatoria",
+    en: "Required reading",
+    fr: "Lecture obligatoire",
+    de: "Pflichtlektüre"
+  },
+  "Ver documento": {
+    es: "Ver documento",
+    en: "View document",
+    fr: "Voir le document",
+    de: "Dokument ansehen"
+  },
+  "Descargar PDF": {
+    es: "Descargar PDF",
+    en: "Download PDF",
+    fr: "Télécharger PDF",
+    de: "PDF herunterladen"
+  },
+  "Preguntas frecuentes": {
+    es: "Preguntas frecuentes",
+    en: "Frequently asked questions",
+    fr: "Questions fréquentes",
+    de: "Häufig gestellte Fragen"
+  },
+  "¿Cuándo firmo el contrato?": {
+    es: "¿Cuándo firmo el contrato?",
+    en: "When do I sign the contract?",
+    fr: "Quand dois-je signer le contrat?",
+    de: "Wann unterschreibe ich den Vertrag?"
+  },
+  "El contrato debe firmarse antes del comienzo del alquiler y enviarse por email a Furgocasa. La confirmación de la cita de recogida se realizará una vez recibida la documentación firmada. Te recomendamos leerlo detenidamente y enviarlo con suficiente antelación.": {
+    es: "El contrato debe firmarse antes del comienzo del alquiler y enviarse por email a Furgocasa. La confirmación de la cita de recogida se realizará una vez recibida la documentación firmada. Te recomendamos leerlo detenidamente y enviarlo con suficiente antelación.",
+    en: "The contract must be signed before the start of the rental and sent by email to Furgocasa. The pickup appointment confirmation will be made once the signed documentation is received. We recommend reading it carefully and sending it well in advance.",
+    fr: "Le contrat doit être signé avant le début de la location et envoyé par email à Furgocasa. La confirmation du rendez-vous de prise en charge sera effectuée une fois la documentation signée reçue. Nous vous recommandons de le lire attentivement et de l'envoyer suffisamment à l'avance.",
+    de: "Der Vertrag muss vor Beginn der Miete unterschrieben und per E-Mail an Furgocasa gesendet werden. Die Bestätigung des Abholtermins erfolgt nach Erhalt der unterschriebenen Dokumentation. Wir empfehlen, ihn sorgfältig zu lesen und rechtzeitig zu senden."
+  },
+  "¿Cómo se paga la fianza?": {
+    es: "¿Cómo se paga la fianza?",
+    en: "How is the deposit paid?",
+    fr: "Comment payer la caution?",
+    de: "Wie wird die Kaution bezahlt?"
+  },
+  "La fianza de 1.000€ se abona mediante transferencia bancaria, máximo 72 horas antes del inicio del alquiler. Debes enviar el justificante de transferencia y certificado de titularidad de la cuenta. El titular debe coincidir con el arrendatario.": {
+    es: "La fianza de 1.000€ se abona mediante transferencia bancaria, máximo 72 horas antes del inicio del alquiler. Debes enviar el justificante de transferencia y certificado de titularidad de la cuenta. El titular debe coincidir con el arrendatario.",
+    en: "The €1,000 deposit is paid by bank transfer, maximum 72 hours before the start of the rental. You must send the transfer receipt and account ownership certificate. The holder must match the tenant.",
+    fr: "La caution de 1 000€ est payée par virement bancaire, maximum 72 heures avant le début de la location. Vous devez envoyer le justificatif de virement et le certificat de titularité du compte. Le titulaire doit correspondre au locataire.",
+    de: "Die Kaution von 1.000€ wird per Banküberweisung bezahlt, maximal 72 Stunden vor Mietbeginn. Sie müssen den Überweisungsbeleg und die Kontoinhaber-Bescheinigung senden. Der Inhaber muss mit dem Mieter übereinstimmen."
+  },
+  "¿Puedo añadir un segundo conductor?": {
+    es: "¿Puedo añadir un segundo conductor?",
+    en: "Can I add a second driver?",
+    fr: "Puis-je ajouter un second conducteur?",
+    de: "Kann ich einen zweiten Fahrer hinzufügen?"
+  },
+  "Sí, el segundo conductor está incluido en el precio. Solo necesitamos su DNI y carnet de conducir enviados por email antes del alquiler.": {
+    es: "Sí, el segundo conductor está incluido en el precio. Solo necesitamos su DNI y carnet de conducir enviados por email antes del alquiler.",
+    en: "Yes, the second driver is included in the price. We only need their ID and driving license sent by email before the rental.",
+    fr: "Oui, le second conducteur est inclus dans le prix. Nous avons seulement besoin de sa carte d'identité et de son permis de conduire envoyés par email avant la location.",
+    de: "Ja, der zweite Fahrer ist im Preis inbegriffen. Wir benötigen nur seinen Ausweis und Führerschein per E-Mail vor der Miete."
+  },
+  "¿Cómo envío la documentación?": {
+    es: "¿Cómo envío la documentación?",
+    en: "How do I send the documentation?",
+    fr: "Comment envoyer la documentation?",
+    de: "Wie sende ich die Dokumentation?"
+  },
+  "Puedes enviarnos los documentos por email a reservas@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).": {
+    es: "Puedes enviarnos los documentos por email a reservas@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).",
+    en: "You can send us the documents by email to reservas@furgocasa.com. We accept scanned images or legible photographs of the documents (ID, driving license, signed contract, deposit receipt).",
+    fr: "Vous pouvez nous envoyer les documents par email à reservas@furgocasa.com. Nous acceptons les images scannées ou les photographies lisibles des documents (carte d'identité, permis de conduire, contrat signé, justificatif de caution).",
+    de: "Sie können uns die Dokumente per E-Mail an reservas@furgocasa.com senden. Wir akzeptieren gescannte Bilder oder lesbare Fotos der Dokumente (Ausweis, Führerschein, unterschriebener Vertrag, Kautionsbeleg)."
+  },
+  "¿Tienes dudas sobre la documentación?": {
+    es: "¿Tienes dudas sobre la documentación?",
+    en: "Have questions about the documentation?",
+    fr: "Des questions sur la documentation?",
+    de: "Haben Sie Fragen zur Dokumentation?"
+  },
+  "Estamos aquí para ayudarte": {
+    es: "Estamos aquí para ayudarte",
+    en: "We're here to help you",
+    fr: "Nous sommes là pour vous aider",
+    de: "Wir sind hier, um Ihnen zu helfen"
+  },
+  "Llamar": {
+    es: "Llamar",
+    en: "Call",
+    fr: "Appeler",
+    de: "Anrufen"
+  },
+
+  // ========================================
+  // PÁGINA TARIFAS
+  // ========================================
+  "Tarifas y Condiciones": {
+    es: "Tarifas y Condiciones",
+    en: "Rates and Conditions",
+    fr: "Tarifs et Conditions",
+    de: "Preise und Bedingungen"
+  },
+  "Información clara y transparente sobre precios, requisitos y condiciones de alquiler de nuestras autocaravanas": {
+    es: "Información clara y transparente sobre precios, requisitos y condiciones de alquiler de nuestras autocaravanas",
+    en: "Clear and transparent information about prices, requirements and rental conditions for our motorhomes",
+    fr: "Informations claires et transparentes sur les prix, les exigences et les conditions de location de nos camping-cars",
+    de: "Klare und transparente Informationen über Preise, Anforderungen und Mietbedingungen für unsere Wohnmobile"
+  },
+  "Precios de alquiler": {
+    es: "Precios de alquiler",
+    en: "Rental prices",
+    fr: "Prix de location",
+    de: "Mietpreise"
+  },
+  "Tarifas orientativas por día según temporada": {
+    es: "Tarifas orientativas por día según temporada",
+    en: "Indicative rates per day by season",
+    fr: "Tarifs indicatifs par jour selon la saison",
+    de: "Richtpreise pro Tag nach Saison"
+  },
+  "Nota importante:": {
+    es: "Nota importante:",
+    en: "Important note:",
+    fr: "Note importante:",
+    de: "Wichtiger Hinweis:"
+  },
+  "Estos precios son orientativos y pueden variar hasta un ±20% en función de la demanda. Para conocer el precio exacto de tus fechas, realiza una búsqueda en nuestro buscador.": {
+    es: "Estos precios son orientativos y pueden variar hasta un ±20% en función de la demanda. Para conocer el precio exacto de tus fechas, realiza una búsqueda en nuestro buscador.",
+    en: "These prices are indicative and may vary up to ±20% depending on demand. To find out the exact price for your dates, search in our booking system.",
+    fr: "Ces prix sont indicatifs et peuvent varier jusqu'à ±20% en fonction de la demande. Pour connaître le prix exact pour vos dates, effectuez une recherche dans notre système de réservation.",
+    de: "Diese Preise sind Richtwerte und können je nach Nachfrage um bis zu ±20% variieren. Um den genauen Preis für Ihre Daten zu erfahren, suchen Sie in unserem Buchungssystem."
+  },
+  "Temporada": {
+    es: "Temporada",
+    en: "Season",
+    fr: "Saison",
+    de: "Saison"
+  },
+  "Menos de una semana": {
+    es: "Menos de una semana",
+    en: "Less than a week",
+    fr: "Moins d'une semaine",
+    de: "Weniger als eine Woche"
+  },
+  "Al menos una semana": {
+    es: "Al menos una semana",
+    en: "At least one week",
+    fr: "Au moins une semaine",
+    de: "Mindestens eine Woche"
+  },
+  "Al menos dos semanas": {
+    es: "Al menos dos semanas",
+    en: "At least two weeks",
+    fr: "Au moins deux semaines",
+    de: "Mindestens zwei Wochen"
+  },
+  "Al menos 3 semanas": {
+    es: "Al menos 3 semanas",
+    en: "At least 3 weeks",
+    fr: "Au moins 3 semaines",
+    de: "Mindestens 3 Wochen"
+  },
+  "Para cualquier aclaración en relación a lo dispuesto en esta sección, no dude en contactar con nosotros.": {
+    es: "Para cualquier aclaración en relación a lo dispuesto en esta sección, no dude en contactar con nosotros.",
+    en: "For any clarification regarding the provisions in this section, please don't hesitate to contact us.",
+    fr: "Pour toute clarification concernant les dispositions de cette section, n'hésitez pas à nous contacter.",
+    de: "Für Klärungen bezüglich der Bestimmungen in diesem Abschnitt zögern Sie nicht, uns zu kontaktieren."
+  },
+
+  // ========================================
+  // TEXTOS COMUNES ADICIONALES
+  // ========================================
+  "Buscar en esta categoría...": {
+    es: "Buscar en esta categoría...",
+    en: "Search in this category...",
+    fr: "Rechercher dans cette catégorie...",
+    de: "In dieser Kategorie suchen..."
+  },
+  "No hay artículos": {
+    es: "No hay artículos",
+    en: "No articles",
+    fr: "Pas d'articles",
+    de: "Keine Artikel"
+  },
+  "No se encontraron artículos con tu búsqueda": {
+    es: "No se encontraron artículos con tu búsqueda",
+    en: "No articles found with your search",
+    fr: "Aucun article trouvé avec votre recherche",
+    de: "Keine Artikel mit Ihrer Suche gefunden"
+  },
+  "Aún no hay artículos en esta categoría": {
+    es: "Aún no hay artículos en esta categoría",
+    en: "No articles yet in this category",
+    fr: "Pas encore d'articles dans cette catégorie",
+    de: "Noch keine Artikel in dieser Kategorie"
+  },
+  "Ver todos los artículos": {
+    es: "Ver todos los artículos",
+    en: "View all articles",
+    fr: "Voir tous les articles",
+    de: "Alle Artikel ansehen"
+  },
+  "Leer artículo": {
+    es: "Leer artículo",
+    en: "Read article",
+    fr: "Lire l'article",
+    de: "Artikel lesen"
+  },
+  "¿Te gustan nuestros artículos?": {
+    es: "¿Te gustan nuestros artículos?",
+    en: "Do you like our articles?",
+    fr: "Vous aimez nos articles?",
+    de: "Gefallen Ihnen unsere Artikel?"
+  },
+  "Suscríbete a nuestra newsletter y recibe los mejores contenidos directamente en tu email.": {
+    es: "Suscríbete a nuestra newsletter y recibe los mejores contenidos directamente en tu email.",
+    en: "Subscribe to our newsletter and receive the best content directly in your email.",
+    fr: "Abonnez-vous à notre newsletter et recevez les meilleurs contenus directement dans votre email.",
+    de: "Abonnieren Sie unseren Newsletter und erhalten Sie die besten Inhalte direkt in Ihrer E-Mail."
+  },
+  "Suscribirse": {
+    es: "Suscribirse",
+    en: "Subscribe",
+    fr: "S'abonner",
+    de: "Abonnieren"
+  },
 };
   
   Object.entries(staticTranslations).forEach(([text, translations]) => {
