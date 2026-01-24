@@ -10,17 +10,26 @@ import { generateOrderNumber } from "@/lib/utils";
  * 
  * Body:
  * - bookingId: ID de la reserva
- * - amount: Monto a cobrar (en euros)
+ * - amount: Monto total a cobrar (incluyendo comisión del 2%)
+ * - baseAmount: Monto base sin comisión (para registrar en la reserva)
+ * - feeAmount: Comisión de gestión (2%)
  * - paymentType: "deposit" | "full"
  */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { bookingId, amount, paymentType = "full" } = body;
+    const { bookingId, amount, baseAmount, feeAmount = 0, paymentType = "full" } = body;
+    
+    // El baseAmount es lo que realmente se acredita a la reserva
+    // El amount total es lo que se cobra al cliente (incluye comisión)
+    const amountForBooking = baseAmount || amount; // Fallback si no viene baseAmount
 
     console.log("📥 Stripe Initiate - Datos recibidos:", {
       bookingId,
       amount,
+      baseAmount,
+      feeAmount,
+      amountForBooking,
       paymentType,
     });
 
@@ -81,15 +90,19 @@ export async function POST(request: NextRequest) {
     });
 
     // Registrar el pago en la base de datos como pendiente
+    // IMPORTANTE: amount es el monto BASE que se acredita a la reserva (sin comisión)
+    // La comisión se cobra al cliente pero NO se suma al amount_paid de la reserva
     const { error: paymentError } = await supabase.from("payments").insert({
       booking_id: bookingId,
       order_number: orderNumber,
-      amount,
+      amount: amountForBooking, // Monto base sin comisión
       status: "pending",
       payment_type: paymentType,
       payment_method: "stripe",
       stripe_session_id: session.id,
-      notes: `Sesión Stripe: ${session.id}`,
+      notes: feeAmount > 0 
+        ? `Sesión Stripe: ${session.id} | Total cobrado: ${amount}€ (Base: ${amountForBooking}€ + Comisión: ${feeAmount.toFixed(2)}€)`
+        : `Sesión Stripe: ${session.id}`,
     });
 
     if (paymentError) {
