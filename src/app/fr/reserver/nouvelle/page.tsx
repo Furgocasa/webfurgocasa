@@ -966,15 +966,12 @@ function NuevaReservaContent() {
                 <span>{formatPrice(basePrice)}</span>
               </div>
               {selectedExtras.slice(0, 2).map((extra) => {
-                let price = 0;
-                if (extra.extra.price_type === 'per_unit') {
-                  price = (extra.extra.price_per_unit || 0);
-                } else {
-                  price = (extra.extra.price_per_day || 0) * days;
-                }
+                const price = extra.price_per_rental > 0 
+                  ? extra.price_per_rental 
+                  : extra.price_per_day * pricingDays;
                 return (
-                  <div key={extra.extra.id} className="flex justify-between text-xs text-gray-500">
-                    <span>{extra.extra.name} {extra.quantity > 1 && `×${extra.quantity}`}</span>
+                  <div key={extra.id} className="flex justify-between text-xs text-gray-500">
+                    <span>{extra.name} {extra.quantity > 1 && `×${extra.quantity}`}</span>
                     <span>+{formatPrice(price * extra.quantity)}</span>
                   </div>
                 );
