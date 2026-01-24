@@ -118,12 +118,11 @@ export function calculatePricingDays(actualDays: number): number {
  * - Los 4 PRIMEROS caracteres DEBEN ser NUMÉRICOS obligatoriamente
  * - Longitud total: 4-12 caracteres alfanuméricos
  * 
- * Formato: YYMM + XX (random) + DDHHMM (12 caracteres total)
- * Ejemplo: 260142241530 (año 26, mes 01, random 42, día 24, hora 15:30)
+ * Formato: YYMM + XXXX (4 random) + HHMM (12 caracteres total)
+ * Ejemplo: 260142781530 (año 26, mes 01, random 4278, hora 15:30)
  * 
- * Los 2 dígitos aleatorios van DESPUÉS de YYMM (obligatorio numérico)
- * pero ANTES del resto, para que si algo se trunca, se mantengan.
- * Evita colisiones si dos pagos se inician en el mismo minuto.
+ * Los 4 dígitos aleatorios (0000-9999) dan 10,000 combinaciones por minuto,
+ * haciendo prácticamente imposible una colisión accidental.
  */
 export function generateOrderNumber(prefix?: string): string {
   const now = new Date();
@@ -133,26 +132,25 @@ export function generateOrderNumber(prefix?: string): string {
     now.getFullYear().toString().slice(-2) + // YY (últimos 2 dígitos del año)
     (now.getMonth() + 1).toString().padStart(2, "0"); // MM
   
-  // 2 dígitos aleatorios para evitar colisiones (00-99)
-  // Van justo después de YYMM para preservarse si hay truncamiento
-  const random = Math.floor(Math.random() * 100).toString().padStart(2, "0");
+  // 4 dígitos aleatorios para evitar colisiones (0000-9999)
+  // Esto da 10,000 combinaciones por minuto - prácticamente imposible colisionar
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
   
-  // Día y hora
-  const dayTime = 
-    now.getDate().toString().padStart(2, "0") + // DD
+  // Solo hora y minutos (sin día para dejar espacio al random más grande)
+  const time = 
     now.getHours().toString().padStart(2, "0") + // HH
     now.getMinutes().toString().padStart(2, "0"); // MM
   
   if (prefix) {
-    // Formato: YYMM + random + prefix + DDHH (máximo 12 caracteres)
-    // Ejemplo: 260142FC2415
-    const orderNumber = yearMonth + random + prefix + dayTime.slice(0, 4);
+    // Formato: YYMM + random + prefix (máximo 12 caracteres)
+    // Ejemplo: 26014278FC
+    const orderNumber = yearMonth + random + prefix;
     return orderNumber.slice(0, 12);
   }
   
-  // Sin prefix: YYMM + random + DDHHMM (12 caracteres)
-  // Ejemplo: 260142241530
-  return yearMonth + random + dayTime;
+  // Sin prefix: YYMM + random + HHMM (12 caracteres)
+  // Ejemplo: 260142781530
+  return yearMonth + random + time;
 }
 
 /**
