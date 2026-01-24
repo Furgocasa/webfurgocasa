@@ -58,6 +58,23 @@ export function Header() {
     return pathname.startsWith(href);
   };
 
+  // Detectar si estamos en una página transaccional donde NO se debe cambiar de idioma
+  // (para evitar perder búsquedas, reservas en progreso, etc.)
+  const isTransactionalPage = () => {
+    const transactionalPaths = [
+      // Búsqueda
+      '/buscar', '/search', '/suche', '/recherche',
+      // Reservar (cualquier subruta)
+      '/reservar', '/book', '/buchen', '/reserver',
+      // Pago
+      '/pago', '/payment', '/paiement', '/zahlung',
+    ];
+    return transactionalPaths.some(p => pathname.includes(p));
+  };
+
+  // Mostrar selector de idiomas solo en páginas no transaccionales
+  const showLanguageSelector = !isTransactionalPage();
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-[1000] w-full">
       {/* Top bar - Optimizado para mobile/tablet */}
@@ -83,7 +100,8 @@ export function Header() {
             </a>
           </div>
           <div className="flex items-center gap-4">
-            {/* Language Selector - Mejorado para mobile/tablet */}
+            {/* Language Selector - Solo visible en páginas no transaccionales */}
+            {showLanguageSelector ? (
             <div className="relative">
               <button
                 onClick={() => setLanguageDropdownOpen(!languageDropdownOpen)}
@@ -150,6 +168,14 @@ export function Header() {
                 </>
               )}
             </div>
+            ) : (
+              // En páginas transaccionales, solo mostrar el idioma actual sin opción de cambiar
+              <div className="flex items-center gap-2 py-1 px-2 opacity-60 cursor-not-allowed" title="Cambio de idioma no disponible durante el proceso de reserva">
+                <Globe className="h-4 w-4" />
+                <span className="hidden lg:inline font-medium">{languages[currentLanguage].name}</span>
+                <span className="lg:hidden">{languages[currentLanguage].flag}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>
