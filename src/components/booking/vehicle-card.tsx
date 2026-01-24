@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { LocalizedLink } from "@/components/localized-link";
 import { 
   Users, 
@@ -67,7 +68,7 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
   return (
     <div className="card-vehicle group">
       {/* Image - Clicable */}
-      <LocalizedLink href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
+      <Link href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -88,14 +89,14 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
             {vehicle.category.name}
           </span>
         )}
-      </LocalizedLink>
+      </Link>
 
       {/* Content */}
       <div className="p-5">
         {/* Title - Clicable */}
-        <LocalizedLink href={reservationUrl}>
+        <Link href={reservationUrl}>
           <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-furgocasa-orange transition-colors cursor-pointer">{vehicle.name}</h3>
-        </LocalizedLink>
+        </Link>
 
         {/* Short description */}
         {vehicle.short_description && (
@@ -182,13 +183,13 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
               </p>
             </div>
 
-            <LocalizedLink
+            <Link
               href={reservationUrl}
               className="flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
               {t("Reservar")}
               <ArrowRight className="h-4 w-4" />
-            </LocalizedLink>
+            </Link>
           </div>
           
           {/* Info sobre descuentos disponibles - SIEMPRE VISIBLE */}
