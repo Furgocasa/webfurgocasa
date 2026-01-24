@@ -57,8 +57,14 @@ const categoryDescriptions: Record<string, string> = {
   equipamiento: "Todo sobre accesorios, equipamiento y gadgets para tu camper.",
 };
 
-function formatDate(date: string) {
-  return new Date(date).toLocaleDateString("es-ES", {
+function formatDate(date: string, locale: string) {
+  const localeMap: Record<string, string> = {
+    es: "es-ES",
+    en: "en-US",
+    fr: "fr-FR",
+    de: "de-DE",
+  };
+  return new Date(date).toLocaleDateString(localeMap[locale] || "en-US", {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -166,7 +172,7 @@ function BlogCategoryContent() {
         <div className="container mx-auto px-4 relative z-10">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-2 text-white/70 text-sm mb-8">
-            <LocalizedLink href="/" className="hover:text-white transition-colors">Inicio</LocalizedLink>
+            <LocalizedLink href="/" className="hover:text-white transition-colors">{t("Inicio")}</LocalizedLink>
             <span>/</span>
             <LocalizedLink href="/blog" className="hover:text-white transition-colors">Blog</LocalizedLink>
             <span>/</span>
@@ -175,7 +181,7 @@ function BlogCategoryContent() {
 
           <div className="text-center">
             <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur rounded-full text-xs font-bold text-white uppercase tracking-wider mb-6">
-              {totalPosts} {totalPosts === 1 ? "artículo" : "artículos"}
+              {totalPosts} {totalPosts === 1 ? t("artículo") : t("artículos")}
             </span>
             <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6">
               {categoryName}
@@ -290,7 +296,7 @@ function BlogCategoryContent() {
                           <>
                             <span className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" /> 
-                              {formatDate(post.published_at)}
+                              {formatDate(post.published_at, language)}
                             </span>
                             <span>•</span>
                           </>

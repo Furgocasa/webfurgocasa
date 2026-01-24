@@ -7341,6 +7341,18 @@ export const staticTranslations = {
     fr: "Voir les véhicules",
     de: "Fahrzeuge ansehen"
   },
+  "artículo": {
+    es: "artículo",
+    en: "article",
+    fr: "article",
+    de: "Artikel"
+  },
+  "artículos": {
+    es: "artículos",
+    en: "articles",
+    fr: "articles",
+    de: "Artikel"
+  },
   
   // ========================================
   // TRADUCCIONES PARA PÁGINAS DE LOCALIZACIÓN
