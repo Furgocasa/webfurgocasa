@@ -339,46 +339,19 @@ const nextConfig = {
       // ⚠️ ARQUITECTURA FIJA POR IDIOMA (/es/, /en/, /fr/, /de/)
       // ============================================
       // Las páginas ahora están físicamente separadas por idioma.
-      // Solo mantenemos rewrites para rutas que NO están en la estructura de idiomas:
-      // - /reservar/:id/* (flujo reserva con ID - sin idioma)
-      // - /pago/* (flujo de pago - sin idioma)
-      // - /vehiculos/:slug (páginas individuales - sin idioma)
-      // - /ventas/:slug (páginas individuales - sin idioma)
-      // - /faqs/:slug (FAQ individual - sin idioma)
+      // NO necesitan rewrites porque son carpetas físicas con [location]
       // ============================================
 
       // ============================================
-      // RUTAS FUNCIONALES (sin idioma)
+      // RUTAS FUNCIONALES - AHORA SON CARPETAS FÍSICAS POR LOCALE
       // ============================================
-      // Estas rutas traducidas apuntan a las funcionales en español
-      
-      // RESERVAR (booking flow)
-      { source: '/en/book/:path*', destination: '/reservar/:path*' },
-      { source: '/fr/reserver/:path*', destination: '/reservar/:path*' },
-      { source: '/de/buchen/:path*', destination: '/reservar/:path*' },
-      
-      // PAGO (payment flow)
-      { source: '/en/payment/success', destination: '/pago/exito' },
-      { source: '/en/payment/error', destination: '/pago/error' },
-      { source: '/fr/paiement/succes', destination: '/pago/exito' },
-      { source: '/fr/paiement/erreur', destination: '/pago/error' },
-      { source: '/de/zahlung/erfolg', destination: '/pago/exito' },
-      { source: '/de/zahlung/fehler', destination: '/pago/error' },
-      
-      // VEHÍCULOS INDIVIDUALES (dinámico por slug)
-      { source: '/en/vehicles/:slug', destination: '/vehiculos/:slug' },
-      { source: '/fr/vehicules/:slug', destination: '/vehiculos/:slug' },
-      { source: '/de/fahrzeuge/:slug', destination: '/vehiculos/:slug' },
-      
-      // VENTAS INDIVIDUALES (dinámico por slug)
-      { source: '/en/sales/:slug', destination: '/ventas/:slug' },
-      { source: '/fr/ventes/:slug', destination: '/ventas/:slug' },
-      { source: '/de/verkauf/:slug', destination: '/ventas/:slug' },
-      
-      // FAQs INDIVIDUALES (dinámico por slug)
-      { source: '/en/faqs/:slug', destination: '/faqs/:slug' },
-      { source: '/fr/faqs/:slug', destination: '/faqs/:slug' },
-      { source: '/de/faqs/:slug', destination: '/faqs/:slug' },
+      // Ya NO necesitan rewrites porque existen físicamente:
+      // - /es/reservar/, /en/book/, /fr/reserver/, /de/buchen/
+      // - /es/pago/, /en/payment/, /fr/paiement/, /de/zahlung/
+      // - /es/vehiculos/, /en/vehicles/, /fr/vehicules/, /de/fahrzeuge/
+      // - /es/ventas/, /en/sales/, /fr/ventes/, /de/verkaufe/
+      // - /es/faqs/, /en/faqs/, /fr/faqs/ (DE no tiene)
+      // ============================================
     ];
   },
   async redirects() {
