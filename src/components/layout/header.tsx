@@ -6,6 +6,7 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X, Phone, Mail, ChevronDown, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { getTranslatedRoute } from "@/lib/route-translations";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -20,29 +21,13 @@ export function Header() {
     setLanguage(lang);
     setLanguageDropdownOpen(false);
     
-    // Detectar si estamos en una ruta funcional (NO tiene prefijo de idioma)
-    const pathSegments = pathname.split('/').filter(Boolean);
-    const firstSegment = pathSegments[0];
-    
-    // Lista de rutas funcionales que NO deben tener prefijo de idioma
-    const functionalRoutes = ['reservar', 'pago', 'vehiculos', 'ventas', 'faqs', 'administrator'];
-    const isFunctionalRoute = functionalRoutes.includes(firstSegment);
-    
-    // Si estamos en una ruta funcional, redirigir a la home del nuevo idioma
-    if (isFunctionalRoute) {
-      window.location.href = `/${lang}`;
-      return;
-    }
-    
-    // Para rutas de contenido con idioma, cambiar el locale en la URL
-    const currentLocale = pathname.split('/')[1];
-    if (['es', 'en', 'fr', 'de'].includes(currentLocale)) {
-      const newPath = pathname.replace(`/${currentLocale}`, `/${lang}`);
-      window.location.href = newPath;
-    } else {
-      // Si no hay locale en la URL, ir a la home del nuevo idioma
-      window.location.href = `/${lang}`;
-    }
+    // Usar getTranslatedRoute para traducir correctamente la ruta actual
+    // Esto maneja automáticamente:
+    // - /es/reservar/vehiculo → /fr/reserver/vehicule
+    // - /es/blog/rutas → /en/blog/routes
+    // - /es/contacto → /de/kontakt
+    const translatedPath = getTranslatedRoute(pathname, lang);
+    window.location.href = translatedPath;
   };
 
   const languages = {
