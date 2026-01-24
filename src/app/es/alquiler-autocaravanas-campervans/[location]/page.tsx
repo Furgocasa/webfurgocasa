@@ -15,8 +15,7 @@ import {
   Calendar,
   Users,
   Package,
-  MessageSquare,
-  Map
+  MessageSquare
 } from "lucide-react";
 import Image from "next/image";
 import { LocationTourismContent } from "@/components/locations/location-tourism-content";
@@ -426,25 +425,9 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* DESTINOS PRINCIPALES - Idéntico a producción */}
+      {/* DESTINOS PRINCIPALES - Componente DestinationsGrid */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-12 lg:mb-16">
-            <div className="flex items-center justify-center gap-3 mb-4">
-              <Map className="h-8 w-8 text-furgocasa-blue" />
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
-                {t("Principales destinos para visitar en Campervan")}
-              </h2>
-            </div>
-            <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-              {t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}
-            </p>
-          </div>
-          
-          <DestinationsGrid />
-        </div>
-      </section>
+      <DestinationsGrid />
 
       {/* ================================================================== */}
       {/* PUNTO DE RECOGIDA */}
