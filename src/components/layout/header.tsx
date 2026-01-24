@@ -20,23 +20,82 @@ export function Header() {
     setLanguage(lang);
     setLanguageDropdownOpen(false);
     
-    // Si estamos en una ruta funcional (sin idioma), redirigir a la home del nuevo idioma
-    const functionalRoutes = ['/reservar', '/pago', '/vehiculos/', '/ventas/', '/faqs/', '/administrator'];
-    const isFunctionalRoute = functionalRoutes.some(route => pathname.startsWith(route));
-    
-    if (isFunctionalRoute) {
-      // Redirigir a la home del nuevo idioma
-      window.location.href = `/${lang}`;
-    } else {
-      // Para rutas con idioma, intentar cambiar el locale en la URL
-      const currentLocale = pathname.split('/')[1];
-      if (['es', 'en', 'fr', 'de'].includes(currentLocale)) {
-        const newPath = pathname.replace(`/${currentLocale}`, `/${lang}`);
-        window.location.href = newPath;
-      } else {
-        // Si no hay locale en la URL, ir a la home del nuevo idioma
-        window.location.href = `/${lang}`;
+    // Mapa de traducciones de rutas funcionales
+    const functionalRouteMap: Record<string, Record<string, string>> = {
+      '/reservar': {
+        es: '/reservar',
+        en: '/en/book',
+        fr: '/fr/reserver',
+        de: '/de/buchen'
+      },
+      '/pago': {
+        es: '/pago',
+        en: '/en/payment',
+        fr: '/fr/paiement',
+        de: '/de/zahlung'
       }
+    };
+    
+    // Detectar si estamos en una ruta funcional y traducirla
+    const pathSegments = pathname.split('/').filter(Boolean);
+    const firstSegment = `/${pathSegments[0]}`;
+    
+    // Verificar si es una ruta con idioma primero (ej: /en/book)
+    if (['es', 'en', 'fr', 'de'].includes(pathSegments[0])) {
+      // Detectar la ruta funcional después del idioma
+      const routeAfterLocale = `/${pathSegments.slice(1).join('/')}`;
+      
+      // Mapear /book → /reservar, /reserver → /reservar, /buchen → /reservar
+      const routeBaseMap: Record<string, string> = {
+        '/book': '/reservar',
+        '/reserver': '/reservar',
+        '/buchen': '/reservar',
+        '/payment': '/pago',
+        '/paiement': '/pago',
+        '/zahlung': '/pago'
+      };
+      
+      // Encontrar la base de la ruta
+      let baseRoute = '/reservar'; // default
+      for (const [key, value] of Object.entries(routeBaseMap)) {
+        if (routeAfterLocale.startsWith(key)) {
+          baseRoute = value;
+          break;
+        }
+      }
+      
+      // Obtener el resto de la ruta (ej: /[id], /vehiculo, etc)
+      const pathAfterRoute = routeAfterLocale.replace(baseRoute, '').replace('/book', '').replace('/reserver', '').replace('/buchen', '').replace('/payment', '').replace('/paiement', '').replace('/zahlung', '');
+      
+      // Construir la nueva URL en el idioma seleccionado
+      const newBaseRoute = functionalRouteMap[baseRoute]?.[lang] || baseRoute;
+      window.location.href = newBaseRoute + pathAfterRoute;
+      return;
+    }
+    
+    // Si estamos en una ruta funcional sin idioma (ej: /reservar/...)
+    if (pathname.startsWith('/reservar')) {
+      const pathAfterReservar = pathname.replace('/reservar', '');
+      const newRoute = functionalRouteMap['/reservar'][lang];
+      window.location.href = newRoute + pathAfterReservar;
+      return;
+    }
+    
+    if (pathname.startsWith('/pago')) {
+      const pathAfterPago = pathname.replace('/pago', '');
+      const newRoute = functionalRouteMap['/pago'][lang];
+      window.location.href = newRoute + pathAfterPago;
+      return;
+    }
+    
+    // Para rutas de contenido con idioma, cambiar el locale en la URL
+    const currentLocale = pathname.split('/')[1];
+    if (['es', 'en', 'fr', 'de'].includes(currentLocale)) {
+      const newPath = pathname.replace(`/${currentLocale}`, `/${lang}`);
+      window.location.href = newPath;
+    } else {
+      // Si no hay locale en la URL, ir a la home del nuevo idioma
+      window.location.href = `/${lang}`;
     }
   };
 
