@@ -32,9 +32,9 @@ export function LocalizedLink({ href, className, children, onClick, target, rel 
   }
   
   // ✅ CASO ESPECIAL: Home page
-  // Asegurar que / siempre vaya a /{locale}/
+  // Asegurar que / siempre vaya a /{locale} (SIN trailing slash)
   if (href === '/' || href === '') {
-    const homeHref = `/${language}/`;
+    const homeHref = `/${language}`;
     return (
       <Link href={homeHref} className={className} onClick={onClick} target={target} rel={rel}>
         {children}

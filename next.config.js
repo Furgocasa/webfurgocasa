@@ -67,10 +67,6 @@ const withPWA = require('next-pwa')({
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // ✅ CRÍTICO PARA [locale]: Forzar trailing slash en todas las URLs
-  // Esto asegura que /en → /en/ automáticamente (sin redirect manual)
-  trailingSlash: true,
-  
   // ⚠️ Deshabilitar React Strict Mode temporalmente para evitar AbortErrors
   // React 18 Strict Mode desmonta y remonta componentes en desarrollo
   // causando que Supabase cancele peticiones
