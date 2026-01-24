@@ -3,10 +3,10 @@ import crypto from "crypto";
 /**
  * Cifra los datos usando 3DES con la clave del comercio
  * 
- * IMPORTANTE según documentación oficial de Redsys:
- * - 3DES en modo CBC
+ * Según documentación oficial de Redsys y bibliotecas oficiales PHP/Java:
+ * - 3DES en modo CBC (des-ede3-cbc)
  * - IV = 8 bytes de ceros
- * - SIN padding automático (usamos zero padding manual)
+ * - Padding PKCS#7 (el default de Node.js)
  * - La clave viene en Base64 y debe decodificarse a 24 bytes
  */
 export function encrypt3DES(data: string, key: string): Buffer {
@@ -18,20 +18,11 @@ export function encrypt3DES(data: string, key: string): Buffer {
     console.error("❌ [3DES] Clave incorrecta: debe ser 24 bytes, tiene:", keyBuffer.length);
   }
 
-  // Zero padding: rellenar con ceros hasta múltiplo de 8
-  const dataBuffer = Buffer.from(data, "utf8");
-  const paddingLength = 8 - (dataBuffer.length % 8);
-  const paddedData = Buffer.concat([
-    dataBuffer,
-    Buffer.alloc(paddingLength === 8 ? 0 : paddingLength, 0)
-  ]);
-
   const cipher = crypto.createCipheriv("des-ede3-cbc", keyBuffer, iv);
-  cipher.setAutoPadding(false); // Desactivar padding automático
+  // Usar padding automático PKCS#7 (default de Node.js)
 
-  // Cifrar y devolver como Buffer (no como base64)
   const encrypted = Buffer.concat([
-    cipher.update(paddedData),
+    cipher.update(data, "utf8"),
     cipher.final()
   ]);
 
@@ -39,27 +30,21 @@ export function encrypt3DES(data: string, key: string): Buffer {
 }
 
 /**
- * Descifra los datos usando 3DES (con zero padding)
+ * Descifra los datos usando 3DES (con padding PKCS#7)
  */
 export function decrypt3DES(data: Buffer, key: string): string {
   const keyBuffer = Buffer.from(key, "base64");
   const iv = Buffer.alloc(8, 0);
 
   const decipher = crypto.createDecipheriv("des-ede3-cbc", keyBuffer, iv);
-  decipher.setAutoPadding(false);
+  // Usar padding automático PKCS#7
 
   const decrypted = Buffer.concat([
     decipher.update(data),
     decipher.final()
   ]);
 
-  // Eliminar zero padding
-  let endIndex = decrypted.length;
-  while (endIndex > 0 && decrypted[endIndex - 1] === 0) {
-    endIndex--;
-  }
-
-  return decrypted.slice(0, endIndex).toString("utf8");
+  return decrypted.toString("utf8");
 }
 
 /**
