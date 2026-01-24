@@ -85,10 +85,10 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
           "@type": "Offer",
           "itemOffered": {
             "@type": "Vehicle",
-            "@type": "Car",
-            "vehicleType": "Motorhome",
+            "vehicleModelDate": "2020",
             "name": "Autocaravana Premium",
-            "description": "Autocaravanas y campers de alta gama de marcas como Weinsberg, Knaus, Adria, Dethleffs"
+            "description": "Autocaravanas y campers de alta gama de marcas como Weinsberg, Knaus, Adria, Dethleffs",
+            "bodyType": "Motorhome"
           },
           "price": "49900",
           "priceCurrency": "EUR",

@@ -79,9 +79,13 @@ export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
         {
           "@type": "Offer",
           "itemOffered": {
-            "@type": "Product",
-            "name": "Camper Van de Gran Volumen",
-            "description": "Furgonetas campers de 4-6 plazas con baño, cocina y calefacción"
+            "@type": "Service",
+            "name": "Alquiler de Camper Van de Gran Volumen",
+            "description": "Servicio de alquiler de furgonetas campers de 4-6 plazas con baño, cocina y calefacción. Kilómetros ilimitados incluidos.",
+            "provider": {
+              "@type": "Organization",
+              "name": "Furgocasa"
+            }
           },
           "price": "95",
           "priceCurrency": "EUR",
