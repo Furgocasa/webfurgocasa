@@ -180,21 +180,48 @@ function translatePathToSpanish(pathname: string): string {
 // ============================================
 // Mapeo de rutas españolas a sus traducciones en cada idioma
 const routesByLocale: Record<string, Record<Locale, string>> = {
+  // Rutas principales
   '/vehiculos': { es: '/vehiculos', en: '/vehicles', fr: '/vehicules', de: '/fahrzeuge' },
   '/reservar': { es: '/reservar', en: '/book', fr: '/reserver', de: '/buchen' },
-  '/reservar/vehiculo': { es: '/reservar/vehiculo', en: '/book/vehicle', fr: '/reserver/vehicule', de: '/buchen/fahrzeug' },
-  '/reservar/nueva': { es: '/reservar/nueva', en: '/book/new', fr: '/reserver/nouvelle', de: '/buchen/neu' },
-  // Segmentos individuales
-  '/vehiculo': { es: '/vehiculo', en: '/vehicle', fr: '/vehicule', de: '/fahrzeug' },
-  '/nueva': { es: '/nueva', en: '/new', fr: '/nouvelle', de: '/neu' },
-  '/pago': { es: '/pago', en: '/payment', fr: '/paiement', de: '/zahlung' },
-  '/confirmacion': { es: '/confirmacion', en: '/confirmation', fr: '/confirmation', de: '/bestaetigung' },
-  '/buscar': { es: '/buscar', en: '/search', fr: '/recherche', de: '/suche' },
   '/tarifas': { es: '/tarifas', en: '/rates', fr: '/tarifs', de: '/preise' },
   '/contacto': { es: '/contacto', en: '/contact', fr: '/contact', de: '/kontakt' },
   '/ofertas': { es: '/ofertas', en: '/offers', fr: '/offres', de: '/angebote' },
   '/ventas': { es: '/ventas', en: '/sales', fr: '/ventes', de: '/verkauf' },
+  '/buscar': { es: '/buscar', en: '/search', fr: '/recherche', de: '/suche' },
   '/blog': { es: '/blog', en: '/blog', fr: '/blog', de: '/blog' },
+  
+  // Páginas informativas
+  '/quienes-somos': { es: '/quienes-somos', en: '/about-us', fr: '/a-propos', de: '/uber-uns' },
+  '/guia-camper': { es: '/guia-camper', en: '/camper-guide', fr: '/guide-camping-car', de: '/wohnmobil-guide' },
+  '/inteligencia-artificial': { es: '/inteligencia-artificial', en: '/artificial-intelligence', fr: '/intelligence-artificielle', de: '/kunstliche-intelligenz' },
+  '/mapa-areas': { es: '/mapa-areas', en: '/areas-map', fr: '/carte-zones', de: '/gebietskarte' },
+  '/parking-murcia': { es: '/parking-murcia', en: '/murcia-parking', fr: '/parking-murcie', de: '/parkplatz-murcia' },
+  '/video-tutoriales': { es: '/video-tutoriales', en: '/video-tutorials', fr: '/tutoriels-video', de: '/video-anleitungen' },
+  '/clientes-vip': { es: '/clientes-vip', en: '/vip-clients', fr: '/clients-vip', de: '/vip-kunden' },
+  '/documentacion-alquiler': { es: '/documentacion-alquiler', en: '/rental-documentation', fr: '/documentation-location', de: '/mietdokumentation' },
+  '/como-funciona': { es: '/como-funciona', en: '/how-it-works', fr: '/comment-ca-marche', de: '/wie-es-funktioniert' },
+  '/como-reservar-fin-semana': { es: '/como-reservar-fin-semana', en: '/weekend-booking', fr: '/reservation-weekend', de: '/wochenend-buchung' },
+  '/aviso-legal': { es: '/aviso-legal', en: '/legal-notice', fr: '/mentions-legales', de: '/impressum' },
+  '/privacidad': { es: '/privacidad', en: '/privacy', fr: '/confidentialite', de: '/datenschutz' },
+  '/cookies': { es: '/cookies', en: '/cookies', fr: '/cookies', de: '/cookies' },
+  '/faqs': { es: '/faqs', en: '/faqs', fr: '/faqs', de: '/faqs' },
+  '/sitemap-html': { es: '/sitemap-html', en: '/sitemap-html', fr: '/sitemap-html', de: '/sitemap-html' },
+  '/publicaciones': { es: '/publicaciones', en: '/publications', fr: '/publications', de: '/publikationen' },
+  '/alquiler-motorhome-europa-desde-espana': { es: '/alquiler-motorhome-europa-desde-espana', en: '/alquiler-motorhome-europa-desde-espana', fr: '/alquiler-motorhome-europa-desde-espana', de: '/alquiler-motorhome-europa-desde-espana' },
+  
+  // Segmentos individuales para rutas compuestas
+  '/vehiculo': { es: '/vehiculo', en: '/vehicle', fr: '/vehicule', de: '/fahrzeug' },
+  '/nueva': { es: '/nueva', en: '/new', fr: '/nouvelle', de: '/neu' },
+  '/pago': { es: '/pago', en: '/payment', fr: '/paiement', de: '/zahlung' },
+  '/confirmacion': { es: '/confirmacion', en: '/confirmation', fr: '/confirmation', de: '/bestaetigung' },
+  
+  // Categorías de blog
+  '/blog/rutas': { es: '/blog/rutas', en: '/blog/routes', fr: '/blog/itineraires', de: '/blog/routen' },
+  '/blog/noticias': { es: '/blog/noticias', en: '/blog/news', fr: '/blog/actualites', de: '/blog/nachrichten' },
+  '/blog/vehiculos': { es: '/blog/vehiculos', en: '/blog/vehicles', fr: '/blog/vehicules', de: '/blog/fahrzeuge' },
+  '/blog/consejos': { es: '/blog/consejos', en: '/blog/tips', fr: '/blog/conseils', de: '/blog/tipps' },
+  '/blog/destinos': { es: '/blog/destinos', en: '/blog/destinations', fr: '/blog/destinations', de: '/blog/reiseziele' },
+  '/blog/equipamiento': { es: '/blog/equipamiento', en: '/blog/equipment', fr: '/blog/equipement', de: '/blog/ausrustung' },
 };
 
 /**
