@@ -18,24 +18,10 @@ import { LocalizedLink } from"@/components/localized-link";
 
 /**
  * Componente para mostrar cuando no tenemos datos del pago
- * Intenta recuperar el bookingId de sessionStorage
+ * NO limpia sessionStorage - eso se hace en el componente principal
  */
-function PaymentSuccessGeneric() {
+function PaymentSuccessGeneric({ bookingId }: { bookingId?: string | null }) {
   const { t } = useLanguage();
-  const [bookingId, setBookingId] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Intentar recuperar bookingId de sessionStorage
-    if (typeof window !== 'undefined') {
-      const savedBookingId = sessionStorage.getItem('lastPaymentBookingId');
-      if (savedBookingId) {
-        setBookingId(savedBookingId);
-        // Limpiar después de usar
-        sessionStorage.removeItem('lastPaymentBookingId');
-        sessionStorage.removeItem('lastPaymentOrderNumber');
-      }
-    }
-  }, []);
 
   return (
     <div className="text-center">
@@ -98,6 +84,7 @@ function PagoExitoContent() {
   const router = useRouter();
   const [payment, setPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fallbackBookingId, setFallbackBookingId] = useState<string | null>(null);
 
   useEffect(() => {
     // Redsys puede enviar el Ds_MerchantParameters en la URL de retorno
@@ -106,6 +93,8 @@ function PagoExitoContent() {
   }, []);
 
   const loadPaymentInfo = async () => {
+    console.log("[PAGO-EXITO] === INICIANDO loadPaymentInfo ===");
+    
     try {
       setLoading(true);
 
@@ -115,9 +104,15 @@ function PagoExitoContent() {
       // Redsys: Ds_MerchantParameters en la URL
       const merchantParams = searchParams.get("Ds_MerchantParameters");
       
+      console.log("[PAGO-EXITO] Parámetros de URL:", {
+        stripeSessionId: !!stripeSessionId,
+        merchantParams: !!merchantParams
+      });
+      
       let orderNumber: string | null = null;
       let redsysResponseCode: string | null = null;
       let redsysAuthCode: string | null = null;
+      let savedBookingId: string | null = null;
       
       // Si viene de Stripe, buscar por stripe_session_id
       if (stripeSessionId) {
@@ -160,23 +155,38 @@ function PagoExitoContent() {
       
       // FALLBACK: Si no hay parámetros en URL, intentar recuperar de sessionStorage
       if (!orderNumber && typeof window !== 'undefined') {
-        const savedOrderNumber = sessionStorage.getItem('lastPaymentOrderNumber');
-        const savedBookingId = sessionStorage.getItem('lastPaymentBookingId');
+        const savedOrderNumberFromStorage = sessionStorage.getItem('lastPaymentOrderNumber');
+        savedBookingId = sessionStorage.getItem('lastPaymentBookingId');
         
-        if (savedOrderNumber) {
-          orderNumber = savedOrderNumber;
+        console.log("[PAGO-EXITO] SessionStorage valores:", {
+          savedOrderNumber: savedOrderNumberFromStorage,
+          savedBookingId: savedBookingId
+        });
+        
+        if (savedOrderNumberFromStorage) {
+          orderNumber = savedOrderNumberFromStorage;
           console.log("[PAGO-EXITO] OrderNumber recuperado de sessionStorage:", orderNumber);
         }
         
+        // Guardar bookingId para fallback visual
+        if (savedBookingId) {
+          setFallbackBookingId(savedBookingId);
+        }
+        
         // Limpiar sessionStorage después de usar
-        if (savedOrderNumber || savedBookingId) {
+        if (savedOrderNumberFromStorage || savedBookingId) {
           sessionStorage.removeItem('lastPaymentOrderNumber');
           sessionStorage.removeItem('lastPaymentBookingId');
+          console.log("[PAGO-EXITO] SessionStorage limpiado");
         }
       }
 
+      console.log("[PAGO-EXITO] OrderNumber final antes de buscar:", orderNumber);
+
       // Si tenemos el número de pedido (Redsys), buscar ese pago específico
       if (orderNumber) {
+        console.log("[PAGO-EXITO] Buscando pago con orderNumber:", orderNumber);
+        
         const { data, error } = await supabase
           .from("payments")
           .select(`
@@ -191,7 +201,18 @@ function PagoExitoContent() {
           .eq("order_number", orderNumber)
           .single();
 
+        if (error) {
+          console.error("[PAGO-EXITO] Error buscando pago:", error);
+        }
+        
         if (!error && data) {
+          console.log("[PAGO-EXITO] Pago encontrado:", {
+            paymentId: data.id,
+            status: data.status,
+            amount: data.amount,
+            bookingId: data.booking_id
+          });
+          
           // RESPALDO: Si el pago sigue pendiente, actualizar el estado
           // Nota: Redsys SOLO redirige a URLOK si el pago fue exitoso
           const responseCodeNum = parseInt(redsysResponseCode || "9999", 10);
@@ -202,30 +223,39 @@ function PagoExitoContent() {
           const shouldTriggerFallback = data.status === "pending" && 
             (isRedsysSuccess || !merchantParams); // Si no hay params pero llegó a éxito, asumir éxito
           
+          console.log("[PAGO-EXITO] Evaluando fallback:", {
+            paymentStatus: data.status,
+            isPending: data.status === "pending",
+            merchantParams: !!merchantParams,
+            isRedsysSuccess,
+            shouldTriggerFallback
+          });
+          
           if (shouldTriggerFallback) {
-            console.log("[PAGO-EXITO] RESPALDO: Pago pendiente, intentando actualizar...", {
-              hasRedsysParams: !!merchantParams,
-              isRedsysSuccess,
-              responseCode: redsysResponseCode,
-              authCode: redsysAuthCode
-            });
+            console.log("[PAGO-EXITO] RESPALDO: Activando fallback para actualizar pago...");
             
             // Llamar a la API para procesar el pago (esto actualiza payment, booking y envía email)
             try {
+              const requestBody = {
+                orderNumber,
+                responseCode: redsysResponseCode || "0000", // Asumir éxito si no hay código
+                authCode: redsysAuthCode || "FALLBACK",
+                merchantParams,
+                fromSuccessPage: true // Indicar que viene de la página de éxito
+              };
+              console.log("[PAGO-EXITO] Llamando a /api/redsys/verify-payment con:", requestBody);
+              
               const response = await fetch("/api/redsys/verify-payment", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  orderNumber,
-                  responseCode: redsysResponseCode || "0000", // Asumir éxito si no hay código
-                  authCode: redsysAuthCode || "FALLBACK",
-                  merchantParams,
-                  fromSuccessPage: true // Indicar que viene de la página de éxito
-                })
+                body: JSON.stringify(requestBody)
               });
               
+              console.log("[PAGO-EXITO] Respuesta de verify-payment:", response.status, response.statusText);
+              
               if (response.ok) {
-                console.log("[PAGO-EXITO] Pago actualizado correctamente via respaldo");
+                const responseData = await response.json();
+                console.log("[PAGO-EXITO] Pago actualizado correctamente via respaldo:", responseData);
                 // Recargar los datos actualizados
                 const { data: updatedData } = await supabase
                   .from("payments")
@@ -414,8 +444,8 @@ function PagoExitoContent() {
                   </div>
                 </>
               ) : (
-                // Sin datos de pago específicos - intentar recuperar de sessionStorage
-                <PaymentSuccessGeneric />
+                // Sin datos de pago específicos - usar bookingId de fallback
+                <PaymentSuccessGeneric bookingId={fallbackBookingId} />
               )}
             </div>
           </div>
