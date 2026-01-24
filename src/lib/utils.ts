@@ -118,8 +118,11 @@ export function calculatePricingDays(actualDays: number): number {
  * - Los 4 PRIMEROS caracteres DEBEN ser NUMÉRICOS obligatoriamente
  * - Longitud total: 4-12 caracteres alfanuméricos
  * 
- * Formato: YYMM + prefix + DDHHMM (12 caracteres total)
- * Ejemplo: 2601FC241509 (año 26, mes 01, prefix FC, día 24, hora 15:09)
+ * Formato: YYMMDDHHMM + 2 dígitos aleatorios (12 caracteres total)
+ * Ejemplo: 260124153042 (año 26, mes 01, día 24, hora 15:30, random 42)
+ * 
+ * Los 2 dígitos aleatorios evitan colisiones si dos pagos se inician
+ * en el mismo minuto (probabilidad de colisión: 1/100 por minuto)
  */
 export function generateOrderNumber(prefix?: string): string {
   const now = new Date();
@@ -129,22 +132,25 @@ export function generateOrderNumber(prefix?: string): string {
     now.getFullYear().toString().slice(-2) + // YY (últimos 2 dígitos del año)
     (now.getMonth() + 1).toString().padStart(2, "0"); // MM
   
-  // Resto del timestamp
+  // Día y hora (sin segundos para dejar espacio a random)
   const dayTime = 
     now.getDate().toString().padStart(2, "0") + // DD
     now.getHours().toString().padStart(2, "0") + // HH
-    now.getMinutes().toString().padStart(2, "0") + // MM
-    now.getSeconds().toString().padStart(2, "0"); // SS
+    now.getMinutes().toString().padStart(2, "0"); // MM
+  
+  // 2 dígitos aleatorios para evitar colisiones (00-99)
+  const random = Math.floor(Math.random() * 100).toString().padStart(2, "0");
   
   if (prefix) {
-    // Formato: YYMM + prefix + DDHHMM (máximo 12 caracteres)
-    // Ejemplo: 2601FC241509
-    const orderNumber = yearMonth + prefix + dayTime;
+    // Formato: YYMM + prefix + DDHH + random (máximo 12 caracteres)
+    // Ejemplo: 2601FC241542
+    const orderNumber = yearMonth + prefix + dayTime.slice(0, 4) + random;
     return orderNumber.slice(0, 12);
   }
   
-  // Sin prefix: YYMMDDHHMM (10 caracteres)
-  return (yearMonth + dayTime).slice(0, 12);
+  // Sin prefix: YYMMDDHHMM + random (12 caracteres)
+  // Ejemplo: 260124153042
+  return yearMonth + dayTime + random;
 }
 
 /**
