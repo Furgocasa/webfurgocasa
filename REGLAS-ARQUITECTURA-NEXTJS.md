@@ -114,7 +114,7 @@ Estas páginas **NUNCA, JAMÁS, BAJO NINGUNA CIRCUNSTANCIA** deben tener `"use c
 - `/faqs` (FAQs)
 - `/quienes-somos` (Quiénes somos)
 - `/mapa-areas` (Mapa de áreas)
-- `/[location]` (Páginas de localización)
+- `/es/alquiler-autocaravanas-campervans/[location]` y equivalentes (Páginas de localización por idioma)
 
 **Consecuencias de violar esto:**
 - ❌ Google NO indexa el contenido

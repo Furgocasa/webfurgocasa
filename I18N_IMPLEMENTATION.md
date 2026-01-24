@@ -1,192 +1,302 @@
-# Implementación de Internacionalización (i18n) con Prefijos de Idioma en URLs
+# Arquitectura de Internacionalización (i18n) - Carpetas Fijas por Idioma
+
+> **Última actualización**: 24 Enero 2026  
+> **Versión**: 4.0.0  
+> **Estado**: ✅ Producción
 
 ## 📋 Resumen
 
-Se ha implementado un sistema completo de internacionalización que añade prefijos de idioma a todas las URLs para preservar el SEO y el posicionamiento existente.
-
-## 🌍 Idiomas Soportados
-
-- **🇪🇸 Español (es)** - Idioma por defecto
-- **🇬🇧 Inglés (en)**
-- **🇫🇷 Francés (fr)**
-- **🇩🇪 Alemán (de)**
-
-## 🔗 Estructura de URLs
-
-### Antes
-```
-https://furgocasa.com/contacto
-https://furgocasa.com/vehiculos
-https://furgocasa.com/blog
-```
-
-### Ahora
-```
-https://furgocasa.com/es/contacto   (Español)
-https://furgocasa.com/en/contact    (Inglés)
-https://furgocasa.com/fr/contact    (Francés)
-https://furgocasa.com/de/kontakt    (Alemán)
-```
-
-## ✅ Características Implementadas
-
-### 1. **Middleware Inteligente** (`src/middleware.ts`)
-- ✅ Detecta automáticamente el idioma del navegador del usuario
-- ✅ Redirige URLs sin prefijo de idioma a `/es/` por defecto
-- ✅ Respeta las rutas de API, assets estáticos e imágenes
-- ✅ Mantiene la autenticación de Supabase funcionando correctamente
-
-### 2. **Configuración i18n Centralizada** (`src/lib/i18n/config.ts`)
-- ✅ Configuración de idiomas disponibles
-- ✅ Nombres y banderas de cada idioma
-- ✅ Utilidades para detectar y manipular locales en URLs
-- ✅ Funciones helper para añadir/remover prefijos de idioma
-
-### 3. **Traducciones de Rutas Expandidas** (`src/lib/route-translations.ts`)
-- ✅ Mapeo completo de rutas para 4 idiomas
-- ✅ Traducciones de URLs SEO-friendly
-- ✅ Ejemplos:
-  - `/es/vehiculos` → `/en/vehicles` → `/fr/vehicules` → `/de/fahrzeuge`
-  - `/es/tarifas` → `/en/rates` → `/fr/tarifs` → `/de/preise`
-  - `/es/contacto` → `/en/contact` → `/fr/contact` → `/de/kontakt`
-
-### 4. **Context de Idioma Actualizado** (`src/contexts/language-context.tsx`)
-- ✅ Prioriza el idioma detectado en la URL
-- ✅ Guarda preferencia del usuario en localStorage
-- ✅ Cambia automáticamente la URL al cambiar de idioma
-- ✅ Sincroniza el idioma con la URL en todo momento
-
-### 5. **Selector de Idiomas en Headers**
-- ✅ Dropdown con 4 idiomas (banderas + nombres)
-- ✅ Indica visualmente el idioma activo
-- ✅ Al seleccionar un idioma, cambia la URL automáticamente
-- ✅ Diseño elegante y responsive
-
-## 🚀 Funcionamiento
-
-### Flujo de Usuario
-
-1. **Usuario visita** `https://furgocasa.com/`
-   - El middleware detecta que no hay prefijo de idioma
-   - Detecta el idioma del navegador (ej: francés)
-   - Redirige a `https://furgocasa.com/fr/`
-
-2. **Usuario navega a** `/fr/vehicules`
-   - La página se muestra en francés
-   - El selector muestra "Français 🇫🇷" como activo
-
-3. **Usuario cambia a inglés** desde el selector
-   - JavaScript detecta el cambio
-   - Traduce la ruta: `/fr/vehicules` → `/en/vehicles`
-   - Navega automáticamente a `/en/vehicles`
-   - La página se recarga en inglés
-
-### Preservación del SEO
-
-```
-URL antigua:  https://furgocasa.com/contacto
-URL nueva:    https://furgocasa.com/es/contacto
-```
-
-**Ventajas:**
-- ✅ Mantiene la estructura de URLs posicionadas
-- ✅ Solo añade el prefijo `/es/` al inicio
-- ✅ Google reconoce las URLs con prefijos de idioma
-- ✅ No requiere redirecciones 301
-- ✅ Mejora el SEO multiidioma con `hreflang`
-
-## 📝 Rutas Traducidas Completas
-
-| Página | ES | EN | FR | DE |
-|--------|----|----|----|----|
-| Inicio | `/es/` | `/en/` | `/fr/` | `/de/` |
-| Reservar | `/es/reservar` | `/en/book` | `/fr/reserver` | `/de/buchen` |
-| Vehículos | `/es/vehiculos` | `/en/vehicles` | `/fr/vehicules` | `/de/fahrzeuge` |
-| Tarifas | `/es/tarifas` | `/en/rates` | `/fr/tarifs` | `/de/preise` |
-| Contacto | `/es/contacto` | `/en/contact` | `/fr/contact` | `/de/kontakt` |
-| Ofertas | `/es/ofertas` | `/en/offers` | `/fr/offres` | `/de/angebote` |
-| Blog | `/es/blog` | `/en/blog` | `/fr/blog` | `/de/blog` |
-| Quiénes somos | `/es/quienes-somos` | `/en/about-us` | `/fr/a-propos` | `/de/uber-uns` |
-| Guía Camper | `/es/guia-camper` | `/en/camper-guide` | `/fr/guide-camping-car` | `/de/wohnmobil-guide` |
-| IA | `/es/inteligencia-artificial` | `/en/artificial-intelligence` | `/fr/intelligence-artificielle` | `/de/kunstliche-intelligenz` |
-| FAQs | `/es/faqs` | `/en/faqs` | `/fr/faqs` | `/de/faqs` |
-| Aviso Legal | `/es/aviso-legal` | `/en/legal-notice` | `/fr/mentions-legales` | `/de/impressum` |
-| Privacidad | `/es/privacidad` | `/en/privacy` | `/fr/confidentialite` | `/de/datenschutz` |
-| Cookies | `/es/cookies` | `/en/cookies` | `/fr/cookies` | `/de/cookies` |
-
-## 🔧 Archivos Modificados
-
-1. **`src/lib/i18n/config.ts`** (NUEVO)
-   - Configuración centralizada de i18n
-
-2. **`src/lib/route-translations.ts`**
-   - Expandido de 2 a 4 idiomas
-   - Nuevas funciones para manejar prefijos
-
-3. **`src/contexts/language-context.tsx`**
-   - Actualizado para usar `Locale` type
-   - Prioriza URL sobre localStorage
-   - Cambio automático de URL al cambiar idioma
-
-4. **`src/middleware.ts`**
-   - Añade detección y redirección de idioma
-   - Mantiene autenticación de Supabase
-   - Excluye rutas especiales (API, assets)
-
-5. **`src/components/layout/header.tsx`**
-   - Selector de 4 idiomas
-   - Manejo de cambio de URL
-
-6. **`src/components/layout/header-new.tsx`**
-   - Mismo selector de 4 idiomas
-
-## 🧪 Pruebas Recomendadas
-
-1. **Navegación básica:**
-   - Ir a `http://localhost:3000/` → Debe redirigir a `/es/`
-   - Cambiar idioma a inglés → URL cambia a `/en/`
-
-2. **Traducción de rutas:**
-   - Desde `/es/contacto`, cambiar a inglés → `/en/contact`
-   - Desde `/en/vehicles`, cambiar a francés → `/fr/vehicules`
-
-3. **Persistencia:**
-   - Cambiar a alemán, refrescar → Debe mantener `/de/`
-   - Abrir en nueva pestaña → Debe respetar localStorage
-
-4. **SEO:**
-   - Verificar que cada página tiene `<html lang="es|en|fr|de">`
-   - Añadir tags `<link rel="alternate" hreflang="..." />` en el futuro
-
-## 📌 Próximos Pasos Recomendados
-
-1. **Añadir meta tags hreflang** en `<head>` para SEO:
-```html
-<link rel="alternate" hreflang="es" href="https://furgocasa.com/es/contacto" />
-<link rel="alternate" hreflang="en" href="https://furgocasa.com/en/contact" />
-<link rel="alternate" hreflang="fr" href="https://furgocasa.com/fr/contact" />
-<link rel="alternate" hreflang="de" href="https://furgocasa.com/de/kontakt" />
-```
-
-2. **Generar sitemap multiidioma** con todas las URLs
-
-3. **Actualizar Google Search Console** con las nuevas URLs
-
-4. **Traducir contenido estático** de francés y alemán
-
-5. **Añadir detección geográfica** opcional (redirigir según país)
-
-## ⚠️ Notas Importantes
-
-- Las URLs antiguas **SIN** prefijo ahora redirigen automáticamente a `/es/`
-- El idioma por defecto es **español** (`es`)
-- La traducción de contenidos se mantiene con el sistema existente (`<T>` component)
-- Las rutas de administrador (`/administrator`) NO tienen prefijos de idioma
+El sitio web de Furgocasa utiliza una arquitectura de **carpetas físicas por idioma**. Cada idioma tiene su propia carpeta con sus propias páginas, lo que garantiza SEO óptimo y contenido genuino en cada idioma.
 
 ---
 
-**✅ Sistema i18n con URLs localizadas implementado exitosamente**
+## 🌍 Idiomas Soportados
+
+| Idioma | Código | Carpeta | Estado |
+|--------|--------|---------|--------|
+| 🇪🇸 Español | `es` | `/es/` | ✅ Principal |
+| 🇬🇧 Inglés | `en` | `/en/` | ✅ Activo |
+| 🇫🇷 Francés | `fr` | `/fr/` | ✅ Activo |
+| 🇩🇪 Alemán | `de` | `/de/` | ✅ Activo |
+
+---
+
+## 🏗️ Arquitectura de Carpetas
+
+### Estructura Principal
+
+```
+src/app/
+├── es/                                    # 🇪🇸 ESPAÑOL
+│   ├── page.tsx                           # Home ES
+│   ├── alquiler-autocaravanas-campervans/
+│   │   └── [location]/page.tsx            # Páginas de localización alquiler
+│   ├── venta-autocaravanas-camper/
+│   │   └── [location]/page.tsx            # Páginas de localización venta
+│   ├── vehiculos/page.tsx                 # Listado vehículos
+│   ├── ventas/page.tsx                    # Listado ventas
+│   ├── blog/                              # Blog completo
+│   │   ├── page.tsx
+│   │   ├── [category]/page.tsx
+│   │   └── [category]/[slug]/page.tsx
+│   ├── contacto/page.tsx
+│   ├── tarifas/page.tsx
+│   ├── ofertas/page.tsx
+│   ├── quienes-somos/page.tsx
+│   ├── como-funciona/page.tsx
+│   ├── guia-camper/page.tsx
+│   ├── faqs/page.tsx
+│   ├── mapa-areas/page.tsx
+│   ├── parking-murcia/page.tsx
+│   ├── inteligencia-artificial/page.tsx
+│   └── [...más páginas...]
+│
+├── en/                                    # 🇬🇧 INGLÉS
+│   ├── page.tsx                           # Home EN
+│   ├── rent-campervan-motorhome/
+│   │   └── [location]/page.tsx            # Rent location pages
+│   ├── campervans-for-sale-in/
+│   │   └── [location]/page.tsx            # Sale location pages
+│   ├── vehicles/page.tsx
+│   ├── sales/page.tsx
+│   ├── blog/
+│   ├── contact/page.tsx
+│   ├── rates/page.tsx
+│   ├── offers/page.tsx
+│   ├── about-us/page.tsx
+│   └── [...más páginas...]
+│
+├── fr/                                    # 🇫🇷 FRANCÉS
+│   ├── page.tsx                           # Home FR
+│   ├── location-camping-car/
+│   │   └── [location]/page.tsx
+│   ├── camping-cars-a-vendre/
+│   │   └── [location]/page.tsx
+│   ├── vehicules/page.tsx
+│   ├── ventes/page.tsx
+│   ├── blog/
+│   ├── contact/page.tsx
+│   ├── tarifs/page.tsx
+│   └── [...más páginas...]
+│
+└── de/                                    # 🇩🇪 ALEMÁN
+    ├── page.tsx                           # Home DE
+    ├── wohnmobil-mieten/
+    │   └── [location]/page.tsx
+    ├── wohnmobile-zu-verkaufen/
+    │   └── [location]/page.tsx
+    ├── fahrzeuge/page.tsx
+    ├── verkauf/page.tsx
+    ├── blog/
+    ├── kontakt/page.tsx
+    ├── preise/page.tsx
+    └── [...más páginas...]
+```
+
+### Páginas de Localización ([location])
+
+Las páginas de localización usan rutas dinámicas con `[location]`:
+
+| Idioma | Alquiler | Venta |
+|--------|----------|-------|
+| ES | `/es/alquiler-autocaravanas-campervans/[location]` | `/es/venta-autocaravanas-camper/[location]` |
+| EN | `/en/rent-campervan-motorhome/[location]` | `/en/campervans-for-sale-in/[location]` |
+| FR | `/fr/location-camping-car/[location]` | `/fr/camping-cars-a-vendre/[location]` |
+| DE | `/de/wohnmobil-mieten/[location]` | `/de/wohnmobile-zu-verkaufen/[location]` |
+
+**Ejemplos de URLs**:
+- `/es/alquiler-autocaravanas-campervans/murcia`
+- `/en/rent-campervan-motorhome/madrid`
+- `/fr/location-camping-car/barcelone`
+- `/de/wohnmobil-mieten/valencia`
+
+---
+
+## 🔧 Sistema de Traducciones
+
+### Para Server Components (páginas públicas)
+
+```typescript
+import { translateServer } from "@/lib/i18n/server-translation";
+
+// El locale está fijo en cada carpeta de idioma
+const locale = 'es'; // O 'en', 'fr', 'de' según la carpeta
+const t = (key: string) => translateServer(key, locale);
+
+export default function MiPagina() {
+  return <h1>{t("Mi título")}</h1>;
+}
+```
+
+### Para Client Components (interactivos)
+
+```typescript
+"use client";
+import { useLanguage } from "@/contexts/language-context";
+
+export function MiComponente() {
+  const { t, locale } = useLanguage();
+  return <div>{t("Mi texto")}</div>;
+}
+```
+
+### Traducciones desde Base de Datos (Supabase)
+
+```typescript
+import { getTranslatedContent, getTranslatedRecords } from "@/lib/translations/get-translations";
+
+// Para un registro específico
+const translatedFields = await getTranslatedContent(
+  'location_targets',  // tabla
+  locationId,          // ID del registro
+  ['name', 'h1_title', 'intro_text'],  // campos a traducir
+  locale,              // 'es', 'en', 'fr', 'de'
+  { name: originalName, ... }  // valores originales como fallback
+);
+
+// Para múltiples registros
+const translatedVehicles = await getTranslatedRecords(
+  'vehicles',
+  vehiclesRaw,
+  ['name', 'short_description'],
+  locale
+);
+```
+
+---
+
+## 🔗 URLs y Rutas
+
+### Tabla de Rutas por Idioma
+
+| Página | ES | EN | FR | DE |
+|--------|----|----|----|----|
+| Home | `/es/` | `/en/` | `/fr/` | `/de/` |
+| Vehículos | `/es/vehiculos` | `/en/vehicles` | `/fr/vehicules` | `/de/fahrzeuge` |
+| Ventas | `/es/ventas` | `/en/sales` | `/fr/ventes` | `/de/verkauf` |
+| Blog | `/es/blog` | `/en/blog` | `/fr/blog` | `/de/blog` |
+| Contacto | `/es/contacto` | `/en/contact` | `/fr/contact` | `/de/kontakt` |
+| Tarifas | `/es/tarifas` | `/en/rates` | `/fr/tarifs` | `/de/preise` |
+| Ofertas | `/es/ofertas` | `/en/offers` | `/fr/offres` | `/de/angebote` |
+| Quiénes somos | `/es/quienes-somos` | `/en/about-us` | `/fr/a-propos` | `/de/uber-uns` |
+| FAQs | `/es/faqs` | `/en/faqs` | `/fr/faqs` | `/de/faqs` |
+| Mapa áreas | `/es/mapa-areas` | `/en/areas-map` | `/fr/carte-zones` | `/de/gebietskarte` |
+
+### Componente LocalizedLink
+
+Para navegación entre páginas respetando el idioma actual:
+
+```typescript
+import { LocalizedLink } from "@/components/localized-link";
+
+// Automáticamente añade el prefijo de idioma correcto
+<LocalizedLink href="/vehiculos">Ver vehículos</LocalizedLink>
+// Renderiza: /es/vehiculos, /en/vehicles, /fr/vehicules, /de/fahrzeuge
+```
+
+---
+
+## 📄 SEO y Metadata
+
+### Canonical y Alternates
+
+Cada página debe tener canonical y hreflang correctos:
+
+```typescript
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const path = `/alquiler-autocaravanas-campervans/${slug}`;
+  const alternates = buildCanonicalAlternates(path, 'es');
+  
+  return {
+    title: "...",
+    description: "...",
+    alternates, // Incluye canonical y hreflang automáticos
+  };
+}
+```
+
+### Resultado generado
+
+```html
+<link rel="canonical" href="https://www.furgocasa.com/es/alquiler-autocaravanas-campervans/murcia" />
+<link rel="alternate" hreflang="es" href="https://www.furgocasa.com/es/alquiler-autocaravanas-campervans/murcia" />
+<link rel="alternate" hreflang="en" href="https://www.furgocasa.com/en/rent-campervan-motorhome/murcia" />
+<link rel="alternate" hreflang="fr" href="https://www.furgocasa.com/fr/location-camping-car/murcia" />
+<link rel="alternate" hreflang="de" href="https://www.furgocasa.com/de/wohnmobil-mieten/murcia" />
+```
+
+---
+
+## 🛡️ Reglas Críticas
+
+### ✅ CORRECTO
+
+1. **Cada idioma tiene su carpeta física** (`/es/`, `/en/`, `/fr/`, `/de/`)
+2. **El locale está fijo en cada página** (no se detecta dinámicamente)
+3. **Usar translateServer() en Server Components**
+4. **Usar useLanguage() solo en Client Components**
+5. **Las traducciones vienen de Supabase** (tabla `content_translations`)
+
+### ❌ PROHIBIDO
+
+1. **NO usar `[locale]` dinámico** - Cada idioma tiene su carpeta
+2. **NO usar useLanguage() en Server Components** - Causa errores de hidratación
+3. **NO mezclar idiomas en una misma página** - Cada carpeta = un idioma
+4. **NO hacer rewrites para traducciones** - Las carpetas son físicas
+
+---
+
+## 🧩 Archivos de Configuración
+
+### `src/lib/i18n/config.ts`
+
+```typescript
+export const locales = ['es', 'en', 'fr', 'de'] as const;
+export type Locale = typeof locales[number];
+export const defaultLocale: Locale = 'es';
+
+export const localeNames: Record<Locale, string> = {
+  es: 'Español',
+  en: 'English',
+  fr: 'Français',
+  de: 'Deutsch',
+};
+```
+
+### `src/lib/route-translations.ts`
+
+Mapeo de rutas entre idiomas para navegación y SEO.
+
+### `src/middleware.ts`
+
+- Detecta idioma del navegador para redirección inicial
+- Redirige URLs sin prefijo a `/es/` por defecto
+- NO hace rewrites para traducciones (las carpetas son físicas)
+
+---
+
+## 📊 Estadísticas
+
+- **Páginas por idioma**: ~30 páginas estáticas + páginas dinámicas [location]
+- **Total páginas**: ~120 páginas (30 × 4 idiomas)
+- **Páginas [location]**: ~58 ciudades × 2 tipos × 4 idiomas = ~464 páginas
+- **Total estimado**: ~580 páginas
+
+---
+
+## 📚 Documentación Relacionada
+
+- **[MIGRACION-CARPETAS-FIJAS-COMPLETADA.md](./MIGRACION-CARPETAS-FIJAS-COMPLETADA.md)** - Historial de migración
+- **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** - Reglas de arquitectura
+- **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)** - Normas SEO
+- **[GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)** - Guía de traducción
+
+---
+
+**✅ Sistema i18n con carpetas fijas por idioma - Producción estable**
 
 Desarrollado para: Furgocasa  
+Versión: 4.0.0  
 Fecha: Enero 2026
-

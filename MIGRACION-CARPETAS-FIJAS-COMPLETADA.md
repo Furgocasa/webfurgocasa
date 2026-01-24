@@ -37,8 +37,10 @@ Migración completa de la arquitectura dinámica `[locale]` a una arquitectura d
 ```
 src/app/
 ├── es/                          # 🇪🇸 ESPAÑOL (27 carpetas)
-│   ├── alquiler-autocaravanas-campervans-[location]/
-│   ├── venta-autocaravanas-camper-[location]/
+│   ├── alquiler-autocaravanas-campervans/
+│   │   └── [location]/page.tsx  # Páginas dinámicas por ciudad
+│   ├── venta-autocaravanas-camper/
+│   │   └── [location]/page.tsx  # Páginas dinámicas por ciudad
 │   ├── blog/
 │   ├── contacto/
 │   ├── vehiculos/
@@ -66,8 +68,10 @@ src/app/
 │   └── alquiler-motorhome-europa-desde-espana/
 │
 ├── en/                          # 🇬🇧 INGLÉS (27 carpetas)
-│   ├── rent-campervan-motorhome-[location]/
-│   ├── campervans-for-sale-in-[location]/
+│   ├── rent-campervan-motorhome/
+│   │   └── [location]/page.tsx
+│   ├── campervans-for-sale-in/
+│   │   └── [location]/page.tsx
 │   ├── blog/
 │   ├── contact/
 │   ├── vehicles/
@@ -95,8 +99,10 @@ src/app/
 │   └── alquiler-motorhome-europa-desde-espana/
 │
 ├── fr/                          # 🇫🇷 FRANCÉS (27 carpetas)
-│   ├── location-camping-car-[location]/
-│   ├── camping-cars-a-vendre-[location]/
+│   ├── location-camping-car/
+│   │   └── [location]/page.tsx
+│   ├── camping-cars-a-vendre/
+│   │   └── [location]/page.tsx
 │   ├── blog/
 │   ├── contact/
 │   ├── vehicules/
@@ -124,8 +130,10 @@ src/app/
 │   └── alquiler-motorhome-europa-desde-espana/
 │
 └── de/                          # 🇩🇪 ALEMÁN (27 carpetas)
-    ├── wohnmobil-mieten-[location]/
-    ├── wohnmobile-zu-verkaufen-[location]/
+    ├── wohnmobil-mieten/
+    │   └── [location]/page.tsx
+    ├── wohnmobile-zu-verkaufen/
+    │   └── [location]/page.tsx
     ├── blog/
     ├── kontakt/
     ├── fahrzeuge/
@@ -184,14 +192,14 @@ src/app/
 
 ### 3. Páginas `[location]` dinámicas
 **Nuevas 8 páginas creadas**:
-- `es/alquiler-autocaravanas-campervans-[location]/page.tsx`
-- `es/venta-autocaravanas-camper-[location]/page.tsx`
-- `en/rent-campervan-motorhome-[location]/page.tsx`
-- `en/campervans-for-sale-in-[location]/page.tsx`
-- `fr/location-camping-car-[location]/page.tsx`
-- `fr/camping-cars-a-vendre-[location]/page.tsx`
-- `de/wohnmobil-mieten-[location]/page.tsx`
-- `de/wohnmobile-zu-verkaufen-[location]/page.tsx`
+- `es/alquiler-autocaravanas-campervans/[location]/page.tsx`
+- `es/venta-autocaravanas-camper/[location]/page.tsx`
+- `en/rent-campervan-motorhome/[location]/page.tsx`
+- `en/campervans-for-sale-in/[location]/page.tsx`
+- `fr/location-camping-car/[location]/page.tsx`
+- `fr/camping-cars-a-vendre/[location]/page.tsx`
+- `de/wohnmobil-mieten/[location]/page.tsx`
+- `de/wohnmobile-zu-verkaufen/[location]/page.tsx`
 
 **Adaptaciones realizadas**:
 - ✅ Eliminado `export const dynamic = 'force-dynamic';`

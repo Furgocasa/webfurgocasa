@@ -74,27 +74,35 @@ Código eliminado:                    -8,419 líneas (neto)
 ```
 src/app/
 ├── es/                                    # 🇪🇸 ESPAÑOL
-│   ├── alquiler-autocaravanas-campervans-[location]/
-│   ├── venta-autocaravanas-camper-[location]/
+│   ├── alquiler-autocaravanas-campervans/
+│   │   └── [location]/page.tsx            # Páginas dinámicas por ciudad
+│   ├── venta-autocaravanas-camper/
+│   │   └── [location]/page.tsx
 │   ├── blog/ (listado, categorías, artículos)
 │   ├── contacto/, vehiculos/, tarifas/
 │   └── [22 páginas más...]
 │
 ├── en/                                    # 🇬🇧 INGLÉS
-│   ├── rent-campervan-motorhome-[location]/
-│   ├── campervans-for-sale-in-[location]/
+│   ├── rent-campervan-motorhome/
+│   │   └── [location]/page.tsx
+│   ├── campervans-for-sale-in/
+│   │   └── [location]/page.tsx
 │   ├── blog/, contact/, vehicles/, rates/
 │   └── [22 páginas más...]
 │
 ├── fr/                                    # 🇫🇷 FRANCÉS
-│   ├── location-camping-car-[location]/
-│   ├── camping-cars-a-vendre-[location]/
+│   ├── location-camping-car/
+│   │   └── [location]/page.tsx
+│   ├── camping-cars-a-vendre/
+│   │   └── [location]/page.tsx
 │   ├── blog/, contact/, vehicules/, tarifs/
 │   └── [22 páginas más...]
 │
 └── de/                                    # 🇩🇪 ALEMÁN
-    ├── wohnmobil-mieten-[location]/
-    ├── wohnmobile-zu-verkaufen-[location]/
+    ├── wohnmobil-mieten/
+    │   └── [location]/page.tsx
+    ├── wohnmobile-zu-verkaufen/
+    │   └── [location]/page.tsx
     ├── blog/, kontakt/, fahrzeuge/, preise/
     └── [22 páginas más...]
 ```
@@ -888,8 +896,10 @@ src/
 │   ├── es/                              # 🇪🇸 ESPAÑOL (27 carpetas)
 │   │   ├── layout.tsx                   # Layout español
 │   │   ├── page.tsx                     # Home ES
-│   │   ├── alquiler-autocaravanas-campervans-[location]/
-│   │   ├── venta-autocaravanas-camper-[location]/
+│   │   ├── alquiler-autocaravanas-campervans/
+│   │   │   └── [location]/page.tsx      # Páginas dinámicas alquiler
+│   │   ├── venta-autocaravanas-camper/
+│   │   │   └── [location]/page.tsx      # Páginas dinámicas venta
 │   │   ├── blog/                        # Blog ES
 │   │   ├── contacto/                    # Contacto ES
 │   │   ├── vehiculos/                   # Vehículos ES
@@ -899,8 +909,10 @@ src/
 │   ├── en/                              # 🇬🇧 INGLÉS (27 carpetas)
 │   │   ├── layout.tsx                   # Layout inglés
 │   │   ├── page.tsx                     # Home EN
-│   │   ├── rent-campervan-motorhome-[location]/
-│   │   ├── campervans-for-sale-in-[location]/
+│   │   ├── rent-campervan-motorhome/
+│   │   │   └── [location]/page.tsx
+│   │   ├── campervans-for-sale-in/
+│   │   │   └── [location]/page.tsx
 │   │   ├── blog/                        # Blog EN
 │   │   ├── contact/                     # Contact EN
 │   │   ├── vehicles/                    # Vehicles EN
@@ -910,8 +922,10 @@ src/
 │   ├── fr/                              # 🇫🇷 FRANCÉS (27 carpetas)
 │   │   ├── layout.tsx                   # Layout francés
 │   │   ├── page.tsx                     # Home FR
-│   │   ├── location-camping-car-[location]/
-│   │   ├── camping-cars-a-vendre-[location]/
+│   │   ├── location-camping-car/
+│   │   │   └── [location]/page.tsx
+│   │   ├── camping-cars-a-vendre/
+│   │   │   └── [location]/page.tsx
 │   │   ├── blog/                        # Blog FR
 │   │   ├── contact/                     # Contact FR
 │   │   ├── vehicules/                   # Véhicules FR
@@ -921,8 +935,10 @@ src/
 │   ├── de/                              # 🇩🇪 ALEMÁN (27 carpetas)
 │   │   ├── layout.tsx                   # Layout alemán
 │   │   ├── page.tsx                     # Home DE
-│   │   ├── wohnmobil-mieten-[location]/
-│   │   ├── wohnmobile-zu-verkaufen-[location]/
+│   │   ├── wohnmobil-mieten/
+│   │   │   └── [location]/page.tsx
+│   │   ├── wohnmobile-zu-verkaufen/
+│   │   │   └── [location]/page.tsx
 │   │   ├── blog/                        # Blog DE
 │   │   ├── kontakt/                     # Kontakt DE
 │   │   ├── fahrzeuge/                   # Fahrzeuge DE
