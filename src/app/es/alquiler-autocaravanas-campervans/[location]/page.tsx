@@ -14,7 +14,16 @@ import {
   ArrowRight,
   Shield,
   Calendar,
-  Phone
+  Phone,
+  Users,
+  Package,
+  MessageSquare,
+  Map,
+  Compass,
+  Bed,
+  Utensils,
+  Camera,
+  Star
 } from "lucide-react";
 import Image from "next/image";
 
@@ -164,7 +173,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 // ============================================================================
-// PÁGINA PRINCIPAL
+// PÁGINA PRINCIPAL - DISEÑO SIMILAR A HOME
 // ============================================================================
 
 export default async function LocationPage({ params }: PageProps) {
@@ -215,9 +224,11 @@ export default async function LocationPage({ params }: PageProps) {
       <link rel="preload" as="image" href={heroImageUrl} fetchPriority="high" />
       <LocalBusinessJsonLd location={location as any} />
       
-      {/* Hero Section */}
-      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center">
-        <div className="absolute inset-0 bg-black/40 z-10" />
+      {/* ================================================================== */}
+      {/* HERO SECTION - Similar a Home */}
+      {/* ================================================================== */}
+      <section className="relative h-screen min-h-[600px] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/50 z-10" />
         <Image
           src={heroImageUrl}
           alt={location.h1_title || `${t("Alquiler de autocaravanas en")} ${location.name}`}
@@ -227,200 +238,348 @@ export default async function LocationPage({ params }: PageProps) {
           sizes="100vw"
         />
         
-        <div className="relative z-20 container mx-auto px-4 text-center text-white">
-          <h1 className="text-4xl lg:text-6xl font-heading font-bold mb-6 drop-shadow-lg">
-            {location.h1_title || `${t("Alquiler de Autocaravanas en")} ${location.name}`}
-          </h1>
-          {location.intro_text && (
-            <p className="text-xl lg:text-2xl mb-8 max-w-3xl mx-auto drop-shadow-md">
-              {location.intro_text}
-            </p>
-          )}
-          
-          {!hasOffice && location.distance_km && (
-            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full text-gray-900 font-medium shadow-lg">
-              <MapPin className="h-5 w-5 text-furgocasa-blue" />
-              <span>
-                {t("A")} {location.distance_km} km {t("de nuestra oficina")} ({driveHours}h {t("aprox")})
-              </span>
+        <div className="relative z-20 container mx-auto px-4 text-center">
+          <div className="max-w-5xl mx-auto space-y-4">
+            {/* Badge de ubicación */}
+            <div className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider mb-4">
+              <MapPin className="h-4 w-4" />
+              {location.province}, {location.region}
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* Widget de búsqueda */}
-      <section className="py-8 bg-white shadow-md -mt-20 relative z-30">
-        <div className="container mx-auto px-4">
-          <SearchWidget defaultLocation={slug} />
-        </div>
-      </section>
-
-      {/* Información de la ubicación */}
-      {location.nearest_location && (
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
-              <div className="flex items-start gap-4 mb-6">
-                <MapPin className="h-8 w-8 text-furgocasa-blue flex-shrink-0 mt-1" />
-                <div>
-                  <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
-                    {t("Punto de recogida más cercano")}
-                  </h2>
-                  <h3 className="text-xl font-semibold text-furgocasa-blue mb-2">
-                    {location.nearest_location.name}
-                  </h3>
-                  <p className="text-gray-600 mb-4">
-                    {location.nearest_location.address}
-                  </p>
-                  {location.distance_km && (
-                    <p className="text-gray-700">
-                      <span className="font-semibold">{t("Distancia")}:</span> {location.distance_km} km 
-                      {location.travel_time_minutes && ` (${Math.round(location.travel_time_minutes / 60)}h ${t("aprox")})`}
-                    </p>
-                  )}
-                </div>
+            
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}>
+              {location.h1_title || `${t("Alquiler de Autocaravanas en")} ${location.name}`}
+            </h1>
+            
+            <div className="w-24 h-1 bg-furgocasa-orange mx-auto my-4"></div>
+            
+            {location.intro_text && (
+              <p className="text-xl lg:text-2xl text-white/95 leading-relaxed max-w-3xl mx-auto" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
+                {location.intro_text}
+              </p>
+            )}
+            
+            {/* Distancia (si no es oficina) */}
+            {!hasOffice && location.distance_km && (
+              <div className="inline-flex items-center gap-2 bg-white/95 backdrop-blur-sm px-6 py-3 rounded-full text-gray-900 font-medium shadow-lg mt-6">
+                <Compass className="h-5 w-5 text-furgocasa-blue" />
+                <span>{t("A")} {location.distance_km} km {t("de nuestra oficina")} ({driveHours}h {t("aprox")})</span>
               </div>
-              
-              <div className="flex items-center gap-2 text-green-700 bg-green-50 px-4 py-3 rounded-lg">
-                <CheckCircle className="h-5 w-5" />
-                <span className="font-medium">
-                  {t("Entrega y recogida disponible en esta ubicación")}
-                </span>
-              </div>
-            </div>
+            )}
           </div>
-        </section>
-      )}
 
-      {/* Contenido específico de la ubicación */}
+          {/* Widget de búsqueda integrado en hero */}
+          <div className="max-w-5xl mx-auto mt-10">
+            <SearchWidget defaultLocation={slug} />
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* CONTENIDO ÚNICO DE LA CIUDAD - Turismo, dónde dormir, etc. */}
+      {/* ================================================================== */}
       {location.content_sections && location.content_sections.length > 0 && (
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto prose prose-lg">
-              {location.content_sections.map((section: any, index: number) => (
-                <div key={index} className="mb-8">
-                  {section.title && (
-                    <h2 className="text-3xl font-heading font-bold text-gray-900 mb-4">
-                      {section.title}
-                    </h2>
-                  )}
-                  {section.content && (
-                    <div 
-                      className="text-gray-700 leading-relaxed"
-                      dangerouslySetInnerHTML={{ __html: section.content }}
-                    />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* Vehículos destacados */}
-      {vehicles.length > 0 && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 lg:py-24 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-              <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4">
-                {t("Nuestras autocaravanas disponibles")}
+              <span className="inline-block px-4 py-2 bg-furgocasa-blue/10 text-furgocasa-blue rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+                {t("DESCUBRE")} {location.name.toUpperCase()}
+              </span>
+              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+                {t("Todo lo que necesitas saber")}
               </h2>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                {t("Flota premium con kilómetros ilimitados")}
-              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-              {vehicles.map((vehicle: any) => (
-                <LocalizedLink
-                  key={vehicle.id}
-                  href={`/vehiculos/${vehicle.slug}`}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300"
-                >
-                  <div className="relative h-64 bg-gray-200">
-                    {vehicle.main_image && (
-                      <Image
-                        src={vehicle.main_image}
-                        alt={vehicle.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
-                      {vehicle.name}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-4">
-                      {vehicle.brand} {vehicle.model}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-furgocasa-blue font-bold">
-                        {t("Ver detalles")}
-                      </span>
-                      <ArrowRight className="h-5 w-5 text-furgocasa-blue group-hover:translate-x-1 transition-transform" />
+            <div className="max-w-5xl mx-auto">
+              {location.content_sections.map((section: any, index: number) => {
+                // Iconos según el tipo de contenido
+                const getIcon = (title: string) => {
+                  const lower = title?.toLowerCase() || '';
+                  if (lower.includes('dormir') || lower.includes('pernoctar') || lower.includes('aparcar')) return Bed;
+                  if (lower.includes('comer') || lower.includes('gastronomía') || lower.includes('restaurante')) return Utensils;
+                  if (lower.includes('ver') || lower.includes('visitar') || lower.includes('turismo')) return Camera;
+                  if (lower.includes('ruta') || lower.includes('itinerario')) return Map;
+                  return Star;
+                };
+                const Icon = getIcon(section.title);
+                
+                return (
+                  <div 
+                    key={index} 
+                    className={`mb-12 ${index % 2 === 0 ? '' : ''}`}
+                  >
+                    <div className="bg-gradient-to-br from-gray-50 to-white rounded-2xl p-8 lg:p-10 shadow-lg border border-gray-100">
+                      <div className="flex items-start gap-4 mb-6">
+                        <div className="bg-furgocasa-orange/10 p-3 rounded-xl">
+                          <Icon className="h-8 w-8 text-furgocasa-orange" />
+                        </div>
+                        {section.title && (
+                          <h3 className="text-2xl lg:text-3xl font-heading font-bold text-gray-900">
+                            {section.title}
+                          </h3>
+                        )}
+                      </div>
+                      {section.content && (
+                        <div 
+                          className="prose prose-lg max-w-none text-gray-700 leading-relaxed
+                            prose-headings:font-heading prose-headings:text-gray-900
+                            prose-a:text-furgocasa-blue prose-a:no-underline hover:prose-a:underline
+                            prose-strong:text-gray-900
+                            prose-ul:list-disc prose-ul:pl-6
+                            prose-li:marker:text-furgocasa-orange"
+                          dangerouslySetInnerHTML={{ __html: section.content }}
+                        />
+                      )}
                     </div>
                   </div>
-                </LocalizedLink>
-              ))}
-            </div>
-
-            <div className="text-center mt-12">
-              <LocalizedLink
-                href="/vehiculos"
-                className="inline-flex items-center gap-2 bg-furgocasa-blue text-white px-8 py-4 rounded-full font-bold hover:bg-furgocasa-blue-dark transition-colors text-lg"
-              >
-                {t("Ver toda la flota")}
-                <ArrowRight className="h-5 w-5" />
-              </LocalizedLink>
+                );
+              })}
             </div>
           </div>
         </section>
       )}
 
-      {/* Servicios y ventajas */}
-      <section className="py-16 bg-white">
+      {/* ================================================================== */}
+      {/* VEHÍCULOS DISPONIBLES - Similar a Home */}
+      {/* ================================================================== */}
+      {vehicles.length > 0 && (
+        <section className="py-16 lg:py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
+              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 uppercase tracking-wide">
+                {t("CAMPERS DISPONIBLES PARA")} {location.name.toUpperCase()}
+              </h2>
+
+              <div className="text-center max-w-3xl mx-auto">
+                <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
+                  {t("Flota de vehículos de máxima calidad")}
+                </h3>
+                <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
+                  {t("Recoge tu camper y empieza tu aventura por")} {location.name} {t("y alrededores")}.
+                </p>
+              </div>
+            </div>
+
+            {/* Grid de vehículos - Igual que home */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+              {vehicles.map((vehicle: any) => (
+                <div
+                  key={vehicle.id}
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                >
+                  <LocalizedLink href={`/vehiculos/${vehicle.slug}`} className="block">
+                    <div className="h-56 lg:h-64 bg-gray-200 relative overflow-hidden">
+                      {vehicle.main_image ? (
+                        <Image
+                          src={vehicle.main_image}
+                          alt={vehicle.name}
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 33vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                          <Package className="h-16 w-16 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    </div>
+                  </LocalizedLink>
+                  
+                  <div className="p-6 lg:p-8 text-center">
+                    <LocalizedLink href={`/vehiculos/${vehicle.slug}`}>
+                      <h4 className="text-xl lg:text-2xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
+                        {vehicle.name}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-4">{vehicle.brand} {vehicle.model}</p>
+                    </LocalizedLink>
+                    
+                    <LocalizedLink
+                      href="/vehiculos"
+                      className="inline-flex items-center gap-2 text-furgocasa-orange font-bold uppercase tracking-wider hover:text-furgocasa-orange-dark transition-colors text-sm"
+                    >
+                      {t("Ver más campers")} <span className="text-xl">→</span>
+                    </LocalizedLink>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================================================================== */}
+      {/* PRECIOS - Similar a Home */}
+      {/* ================================================================== */}
+      <section className="py-16 lg:py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4">
-              {t("¿Por qué alquilar con Furgocasa?")}
+          <div className="text-center mb-12 lg:mb-16">
+            <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+              {t("LA MEJOR RELACIÓN CALIDAD PRECIO")}
+            </span>
+            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+              {t("Nuestras autocaravanas desde")}
             </h2>
+            <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
+              {t("PAGA el 50% al realizar la RESERVA y la mitad restante 15 días antes.")}
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto mb-12 lg:mb-16">
             {[
-              { icon: Shield, title: t("Seguro todo riesgo"), desc: t("Viaja con tranquilidad") },
-              { icon: CheckCircle, title: t("Km ilimitados"), desc: t("Sin límites de distancia") },
-              { icon: Calendar, title: t("Flexibilidad"), desc: t("Recogida donde prefieras") },
-              { icon: Phone, title: t("Asistencia 24/7"), desc: t("Siempre disponibles") },
-            ].map((service, index) => (
-              <div key={index} className="bg-gray-50 p-6 rounded-xl text-center">
-                <service.icon className="h-12 w-12 text-furgocasa-blue mx-auto mb-4" />
-                <h3 className="font-heading font-bold text-gray-900 mb-2">{service.title}</h3>
-                <p className="text-gray-600 text-sm">{service.desc}</p>
+              { seasonKey: "TEMPORADA BAJA", price: "95", color: "text-furgocasa-blue", border: "border-furgocasa-blue" },
+              { seasonKey: "Temporada Media", price: "125", color: "text-furgocasa-orange", border: "border-furgocasa-orange" },
+              { seasonKey: "Temporada Alta", price: "155", color: "text-red-500", border: "border-red-500" },
+            ].map((pricing, index) => (
+              <div
+                key={index}
+                className={`bg-white rounded-2xl shadow-xl p-8 lg:p-10 text-center border-t-8 ${pricing.border} transform hover:scale-105 transition-transform duration-300`}
+              >
+                <h3 className="text-base lg:text-lg font-heading font-bold text-gray-500 mb-4 lg:mb-6 uppercase tracking-wider">
+                  {t(pricing.seasonKey)}
+                </h3>
+                <div className="flex items-baseline justify-center gap-2 mb-2">
+                  <span className={`text-5xl lg:text-6xl font-heading font-bold ${pricing.color}`}>{pricing.price}€</span>
+                  <span className="text-lg lg:text-xl text-gray-400 font-medium">{t("/ día")}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center max-w-3xl mx-auto bg-gray-50 p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
+            <p className="text-lg lg:text-xl font-medium text-gray-700">
+              {t("Descuentos de hasta el")} <span className="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% y -30%</span> {t("en alquileres de 1, 2 o 3 semanas")}.
+            </p>
+          </div>
+
+          <div className="text-center mt-12">
+            <LocalizedLink
+              href="/tarifas"
+              className="inline-flex items-center gap-2 text-furgocasa-blue font-bold uppercase tracking-wider hover:text-furgocasa-blue-dark transition-colors"
+            >
+              {t("Ver todas las tarifas")} <span className="text-xl">→</span>
+            </LocalizedLink>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* PUNTO DE RECOGIDA */}
+      {/* ================================================================== */}
+      {location.nearest_location && (
+        <section className="py-16 lg:py-24 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900">
+                  {t("Punto de recogida para")} {location.name}
+                </h2>
+              </div>
+              
+              <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10 border border-gray-100">
+                <div className="flex flex-col md:flex-row items-start gap-6">
+                  <div className="bg-furgocasa-blue/10 p-4 rounded-2xl">
+                    <MapPin className="h-12 w-12 text-furgocasa-blue" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-2xl font-heading font-bold text-furgocasa-blue mb-2">
+                      {location.nearest_location.name}
+                    </h3>
+                    <p className="text-gray-600 text-lg mb-4">
+                      {location.nearest_location.address}
+                    </p>
+                    {location.distance_km && (
+                      <div className="flex items-center gap-4 text-gray-700">
+                        <span className="bg-gray-100 px-4 py-2 rounded-lg">
+                          <strong>{location.distance_km} km</strong> {t("de distancia")}
+                        </span>
+                        {location.travel_time_minutes && (
+                          <span className="bg-gray-100 px-4 py-2 rounded-lg">
+                            <strong>{Math.round(location.travel_time_minutes / 60)}h</strong> {t("en coche")}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="mt-6 flex items-center gap-2 text-green-700 bg-green-50 px-6 py-4 rounded-xl">
+                  <CheckCircle className="h-6 w-6" />
+                  <span className="font-medium text-lg">
+                    {t("Entrega y recogida disponible en")} {location.name}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ================================================================== */}
+      {/* POR QUÉ ELEGIR FURGOCASA - Similar a Home */}
+      {/* ================================================================== */}
+      <section className="py-16 lg:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 lg:mb-16">
+            <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
+              {t("¿Por qué alquilar con Furgocasa?")}
+            </h2>
+            <p className="text-lg lg:text-xl text-blue-100 max-w-3xl mx-auto">
+              {t("La tranquilidad de viajar con los mejores")}
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+            {[
+              { icon: CheckCircle, titleKey: "Kilómetros Ilimitados", descKey: "Viaja sin límites por España y Europa" },
+              { icon: Users, titleKey: "Atención Personalizada", descKey: "Te acompañamos antes, durante y después del viaje" },
+              { icon: Shield, titleKey: "Flota Premium", descKey: "Vehículos modernos y perfectamente equipados" },
+              { icon: Package, titleKey: "Todo Incluido", descKey: "Cocina completa, ropa de cama, kit de camping" },
+              { icon: Calendar, titleKey: "Cancelación flexible", descKey: "Cancela hasta 60 días antes sin coste" },
+              { icon: MessageSquare, titleKey: "Atención 24/7", descKey: "Te acompañamos durante todo el viaje" },
+            ].map((benefit, index) => (
+              <div
+                key={index}
+                className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all duration-300"
+              >
+                <benefit.icon className="h-12 w-12 text-furgocasa-orange mb-4" />
+                <h3 className="text-lg font-heading font-bold mb-2">
+                  {t(benefit.titleKey)}
+                </h3>
+                <p className="text-sm text-blue-100">
+                  {t(benefit.descKey)}
+                </p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Final */}
-      <section className="py-16 bg-furgocasa-blue text-white">
+      {/* ================================================================== */}
+      {/* CTA FINAL - Similar a Home */}
+      {/* ================================================================== */}
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-6">
-            {t("¿Listo para tu aventura?")}
+          <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
+            {t("¿Listo para descubrir")} {location.name}?
           </h2>
-          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-            {t("Reserva ahora tu autocaravana y comienza a planificar tu próximo viaje")}
+          <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+            {t("Reserva tu camper ahora y comienza a planear tu viaje inolvidable")}
           </p>
-          <LocalizedLink
-            href="/vehiculos"
-            className="inline-flex items-center gap-2 bg-white text-furgocasa-blue px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors text-lg"
-          >
-            {t("Ver vehículos disponibles")}
-            <ArrowRight className="h-5 w-5" />
-          </LocalizedLink>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <LocalizedLink
+              href="/reservar"
+              className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg text-lg"
+            >
+              {t("Reservar ahora")}
+            </LocalizedLink>
+            <LocalizedLink
+              href="/contacto"
+              className="inline-flex items-center gap-2 bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-blue hover:text-white transition-all text-lg"
+            >
+              {t("Contactar")}
+            </LocalizedLink>
+          </div>
         </div>
       </section>
     </>
