@@ -555,23 +555,10 @@ const nextConfig = {
     ];
   },
   async redirects() {
-    // ================================================================
-    // REDIRECCIONES 301 - OPTIMIZADO 24/01/2026
-    // ================================================================
-    // Documentación: Ver ANALISIS-NEXTCONFIG-OPTIMIZATION.md
-    // Total: ~35 redirects (optimizado desde 50)
-    // 
-    // IMPORTANTE: Estas redirecciones son PERMANENTES (301)
-    // Solo modificar si estás 100% seguro del impacto SEO
-    // ================================================================
-    
     return [
-      // ================================================================
-      // GRUPO 1: NORMALIZACIÓN DE DOMINIO (CRÍTICO)
-      // ================================================================
-      // Propósito: Forzar www.furgocasa.com como URL canónica
-      // Mantener: PERMANENTE - Crítico para SEO
-      // Impacto: Evita contenido duplicado en Google
+      // ============================================
+      // REDIRECCIONES CANÓNICAS - CRÍTICO PARA SEO
+      // ============================================
       {
         source: '/:path*',
         has: [{ type: 'host', value: 'furgocasa.com' }],
@@ -585,16 +572,11 @@ const nextConfig = {
         permanent: true,
       },
 
-      // ================================================================
-      // GRUPO 2: CORRECCIÓN IDIOMA CRUZADO (TEMPORAL)
-      // ================================================================
-      // Propósito: Corregir URLs mal formadas (ej: /de/vehicles → /de/fahrzeuge)
-      // Mantener: TEMPORAL - Eliminar cuando migremos a arquitectura [locale]
-      // Causa raíz: Sistema de rewrites permite URLs incorrectas
-      // TODO Fase 3: Eliminar estos cuando tengamos [locale] físico
-      // ================================================================
-      
-      // ── Alemán (DE): Corregir rutas EN → DE ──
+      // ============================================
+      // CORRECCIÓN URLs CON IDIOMA INCORRECTO
+      // Ejemplo: /de/vehicles → /de/fahrzeuge (corregir mezcla de idiomas)
+      // ============================================
+      // DE con rutas EN incorrectas → DE correcto
       { source: '/de/vehicles', destination: '/de/fahrzeuge', permanent: true },
       { source: '/de/vehicles/:slug', destination: '/de/fahrzeuge/:slug', permanent: true },
       { source: '/de/sales', destination: '/de/verkauf', permanent: true },
@@ -607,7 +589,7 @@ const nextConfig = {
       { source: '/de/about-us', destination: '/de/uber-uns', permanent: true },
       { source: '/de/privacy', destination: '/de/datenschutz', permanent: true },
       
-      // ── Francés (FR): Corregir rutas EN → FR ──
+      // FR con rutas EN incorrectas → FR correcto
       { source: '/fr/vehicles', destination: '/fr/vehicules', permanent: true },
       { source: '/fr/vehicles/:slug', destination: '/fr/vehicules/:slug', permanent: true },
       { source: '/fr/sales', destination: '/fr/ventes', permanent: true },
@@ -619,7 +601,7 @@ const nextConfig = {
       { source: '/fr/about-us', destination: '/fr/a-propos', permanent: true },
       { source: '/fr/privacy', destination: '/fr/confidentialite', permanent: true },
       
-      // ── Inglés (EN): Corregir rutas ES → EN ──
+      // EN con rutas ES incorrectas → EN correcto
       { source: '/en/vehiculos', destination: '/en/vehicles', permanent: true },
       { source: '/en/vehiculos/:slug', destination: '/en/vehicles/:slug', permanent: true },
       { source: '/en/ventas', destination: '/en/sales', permanent: true },
@@ -632,73 +614,57 @@ const nextConfig = {
       { source: '/en/quienes-somos', destination: '/en/about-us', permanent: true },
       { source: '/en/privacidad', destination: '/en/privacy', permanent: true },
 
-      // ================================================================
-      // GRUPO 3: URLS LEGACY DE JOOMLA (PERMANENTE)
-      // ================================================================
-      // Propósito: Redirigir URLs antiguas del sitio Joomla
-      // Mantener: PERMANENTE - Hay enlaces externos que apuntan aquí
-      // Fecha migración: 2024
-      // Enlaces detectados: Google Search Console + backlinks
-      // ================================================================
+      // ============================================
+      // REDIRECCIONES URLs ANTIGUAS DE JOOMLA
+      // ============================================
+      // Páginas de información antigua
+      { source: '/es/inicio/quienes-somos', destination: '/quienes-somos', permanent: true },
+      { source: '/inicio/quienes-somos', destination: '/quienes-somos', permanent: true },
+      { source: '/es/como-funciona-mi-camper-de-alquiler', destination: '/como-funciona', permanent: true },
+      { source: '/como-funciona-mi-camper-de-alquiler', destination: '/como-funciona', permanent: true },
+      { source: '/es/tarifas-y-condiciones', destination: '/tarifas', permanent: true },
+      { source: '/tarifas-y-condiciones', destination: '/tarifas', permanent: true },
       
-      // ── Páginas de información antigua ──
-      // Joomla usaba /inicio/ en las rutas, ahora eliminamos ese nivel
-      { source: '/es/inicio/quienes-somos', destination: '/es/quienes-somos', permanent: true },
-      { source: '/inicio/quienes-somos', destination: '/es/quienes-somos', permanent: true },
-      { source: '/es/como-funciona-mi-camper-de-alquiler', destination: '/es/como-funciona', permanent: true },
-      { source: '/como-funciona-mi-camper-de-alquiler', destination: '/es/como-funciona', permanent: true },
-      { source: '/es/tarifas-y-condiciones', destination: '/es/tarifas', permanent: true },
-      { source: '/tarifas-y-condiciones', destination: '/es/tarifas', permanent: true },
+      // Tags de Joomla → Blog
+      { source: '/es/component/tags/tag/:tag', destination: '/blog', permanent: true },
+      { source: '/component/tags/tag/:tag', destination: '/blog', permanent: true },
       
-      // ── Tags de Joomla → Blog ──
-      { source: '/es/component/tags/tag/:tag', destination: '/es/blog', permanent: true },
-      { source: '/component/tags/tag/:tag', destination: '/es/blog', permanent: true },
-      
-      // ── index.php → Home ──
+      // index.php → Home
       { source: '/es/index.php/:path*', destination: '/', permanent: true },
       { source: '/index.php/:path*', destination: '/', permanent: true },
 
-      // ================================================================
-      // GRUPO 4: TÉRMINOS ALTERNATIVOS (PERMANENTE)
-      // ================================================================
-      // Propósito: Usuarios buscan con diferentes términos
-      // Ejemplo: "casas rodantes" en lugar de "motorhome" (común en LATAM)
-      // Mantener: PERMANENTE - Mejora UX y captura tráfico orgánico
-      // ================================================================
+      // ============================================
+      // REDIRECCIONES de términos alternativos ES
+      // ============================================
+      // "casas rodantes" y "motorhome" → rutas correctas
+      { source: '/es/alquiler-casas-rodantes-europa', destination: '/alquiler-motorhome-europa-desde-espana', permanent: true },
+      { source: '/alquiler-casas-rodantes-europa', destination: '/alquiler-motorhome-europa-desde-espana', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-espana', destination: '/', permanent: true },
+      { source: '/alquiler-casas-rodantes-espana', destination: '/', permanent: true },
+      { source: '/es/alquiler-motorhome-espana', destination: '/', permanent: true },
+      { source: '/alquiler-motorhome-espana', destination: '/', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/alquiler-casas-rodantes-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/es/alquiler-motorhome-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/alquiler-motorhome-madrid', destination: '/alquiler-autocaravanas-campervans-madrid', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-murcia', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/alquiler-casas-rodantes-murcia', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-alicante', destination: '/alquiler-autocaravanas-campervans-alicante', permanent: true },
+      { source: '/alquiler-casas-rodantes-alicante', destination: '/alquiler-autocaravanas-campervans-alicante', permanent: true },
       
-      // ── "casas rodantes" y "motorhome" (términos LATAM) → rutas correctas ──
-      { source: '/es/alquiler-casas-rodantes-europa', destination: '/es/alquiler-motorhome-europa-desde-espana', permanent: true },
-      { source: '/alquiler-casas-rodantes-europa', destination: '/es/alquiler-motorhome-europa-desde-espana', permanent: true },
-      { source: '/es/alquiler-casas-rodantes-espana', destination: '/es/', permanent: true },
-      { source: '/alquiler-casas-rodantes-espana', destination: '/es/', permanent: true },
-      { source: '/es/alquiler-motorhome-espana', destination: '/es/', permanent: true },
-      { source: '/alquiler-motorhome-espana', destination: '/es/', permanent: true },
-      { source: '/es/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/es/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/es/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/es/alquiler-casas-rodantes-alicante', destination: '/es/alquiler-autocaravanas-campervans-alicante', permanent: true },
-      { source: '/alquiler-casas-rodantes-alicante', destination: '/es/alquiler-autocaravanas-campervans-alicante', permanent: true },
-      
-      // ── Ciudades sin página propia → página más cercana ──
-      // Propósito: Evitar 404s, ofrecer alternativa geográficamente cercana
-      { source: '/es/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/es/alquiler-autocaravanas-campervans-benalmadena', destination: '/es/alquiler-autocaravanas-campervans-malaga', permanent: true },
-      { source: '/alquiler-autocaravanas-campervans-benalmadena', destination: '/es/alquiler-autocaravanas-campervans-malaga', permanent: true },
+      // Ciudades sin página propia → página más cercana
+      { source: '/es/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/alquiler-autocaravanas-campervans-murcia', permanent: true },
+      { source: '/es/alquiler-autocaravanas-campervans-benalmadena', destination: '/alquiler-autocaravanas-campervans-malaga', permanent: true },
+      { source: '/alquiler-autocaravanas-campervans-benalmadena', destination: '/alquiler-autocaravanas-campervans-malaga', permanent: true },
 
-      // ================================================================
-      // GRUPO 5: CAMBIO DE NOMENCLATURA (PERMANENTE)
-      // ================================================================
-      // Propósito: "Publicaciones" fue renombrado a "Blog"
-      // Mantener: PERMANENTE - Más claro y estándar internacional
-      // ================================================================
-      { source: '/publicaciones', destination: '/es/blog', permanent: true },
-      { source: '/publicaciones/:slug', destination: '/es/blog/:slug', permanent: true },
-      { source: '/publications', destination: '/en/blog', permanent: true },
-      { source: '/publications/:slug', destination: '/en/blog/:slug', permanent: true },
+      // ============================================
+      // REDIRECCIONES DE CONTENIDO ANTIGUO
+      // ============================================
+      { source: '/publicaciones', destination: '/blog', permanent: true },
+      { source: '/publicaciones/:slug', destination: '/blog/:slug', permanent: true },
+      { source: '/publications', destination: '/blog', permanent: true },
+      { source: '/publications/:slug', destination: '/blog/:slug', permanent: true },
     ];
   },
 };

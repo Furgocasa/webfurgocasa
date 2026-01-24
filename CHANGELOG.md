@@ -4,6 +4,345 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🚀 [2.1.0] - 24 de Enero 2026 - **OPTIMIZACIÓN SEO: URLs Multiidioma Fase 1-2**
+
+### 📊 **AUDITORÍA SEO COMPLETADA**
+
+**Fecha**: 24 de Enero 2026  
+**Gravedad**: ⚠️ **IMPORTANTE** - Mejora arquitectura SEO multiidioma  
+**Documentación**: 
+- `AUDITORIA-SEO-URLS-MULTIIDIOMA.md` - Auditoría completa
+- `PLAN-ACCION-SEO-URLS-MULTIIDIOMA.md` - Plan de 5 fases
+- `ANALISIS-NEXTCONFIG-OPTIMIZATION.md` - Análisis técnico
+
+---
+
+### ✅ **FASE 1: CORRECCIONES INMEDIATAS (COMPLETADA)**
+
+**Duración**: 30 minutos  
+**Riesgo**: ⚠️ Bajo
+
+#### Cambios implementados:
+
+1. **Eliminado robots.txt duplicado** 
+   - ❌ Eliminado: `public/robots.txt` (estático, no utilizado)
+   - ✅ Mantener: `src/app/robots.ts` (dinámico, Next.js correcto)
+   - **Beneficio**: Sin conflictos entre archivos
+
+2. **Script de validación de URLs**
+   - ✅ Creado: `scripts/validate-urls.js`
+   - ✅ Valida 30+ URLs críticas
+   - ✅ Prueba redirecciones 301
+   - ✅ Detecta URLs legacy y idioma cruzado
+   - **Uso**: `npm run validate:urls`
+
+3. **Nuevos comandos NPM**
+   ```bash
+   npm run validate:urls           # Validar producción
+   npm run validate:urls:local     # Validar local
+   npm run validate:urls:staging   # Validar staging
+   npm run validate:urls:verbose   # Modo verbose
+   ```
+
+**Archivos**:
+- ❌ Eliminado: `public/robots.txt`
+- ✅ Creado: `scripts/validate-urls.js`
+- ✅ Creado: `FASE-1-COMPLETADA.md`
+- ✅ Modificado: `package.json`
+
+---
+
+### ✅ **FASE 2: LIMPIEZA Y OPTIMIZACIÓN (COMPLETADA)**
+
+**Duración**: 2 horas  
+**Riesgo**: ⚠️ Medio
+
+#### Cambios implementados:
+
+1. **Optimización next.config.js**
+   - ✅ Backup creado: `next.config.js.backup-20260124`
+   - ✅ Reorganizadas redirecciones por grupos lógicos
+   - ✅ Añadida documentación completa en código
+   - ✅ Comentarios explicativos en cada sección
+
+2. **Grupos de redirecciones optimizados**:
+   - **GRUPO 1**: Normalización dominio (furgocasa.com → www.furgocasa.com)
+   - **GRUPO 2**: Corrección idioma cruzado (temporal, eliminar en Fase 3)
+   - **GRUPO 3**: URLs legacy Joomla (permanente, hay backlinks)
+   - **GRUPO 4**: Términos alternativos (casas rodantes, motorhome)
+   - **GRUPO 5**: Cambio nomenclatura (publicaciones → blog)
+
+3. **Mejoras en mantenibilidad**:
+   - ✅ Cada grupo con propósito claro
+   - ✅ Marcados cuáles son temporales vs permanentes
+   - ✅ Documentado por qué existe cada redirección
+   - ✅ TODOs para Fase 3 (migración [locale])
+
+**Archivos**:
+- ✅ Creado: `next.config.js.backup-20260124`
+- ✅ Modificado: `next.config.js` (documentación mejorada)
+- ✅ Creado: `ANALISIS-NEXTCONFIG-OPTIMIZATION.md`
+
+---
+
+### 📊 **IMPACTO DE OPTIMIZACIONES**
+
+| Métrica | Antes | Después Fase 2 | Objetivo Fase 3 |
+|---------|-------|----------------|------------------|
+| Redirects organizadas | No | ✅ Sí | ✅ Sí |
+| Documentación inline | Poca | ✅ Completa | ✅ Completa |
+| Grupos lógicos | No | ✅ 5 grupos | ✅ 3 grupos |
+| TODOs para migración | No | ✅ Sí | ✅ Completados |
+| Backup disponible | No | ✅ Sí | ✅ Sí |
+
+---
+
+### 🎯 **PROBLEMAS IDENTIFICADOS**
+
+La auditoría SEO detectó:
+
+1. **❌ Arquitectura de rewrites incorrecta**
+   - URLs `/en/vehicles` sirven contenido español
+   - Señales contradictorias a Google
+   - **Solución**: Fase 3 - Migrar a arquitectura `[locale]`
+
+2. **⚠️ Redirecciones idioma cruzado necesarias**
+   - `/de/vehicles` → `/de/fahrzeuge`
+   - **Causa**: Sistema de rewrites permite URLs incorrectas
+   - **Solución**: Fase 3 - Eliminar rewrites, usar rutas físicas
+
+3. **⚠️ URLs legacy aún activas**
+   - `/es/inicio/quienes-somos` (Joomla antiguo)
+   - **Estado**: Redirigidas correctamente ✅
+   - **Mantener**: Permanente (hay backlinks externos)
+
+---
+
+### 📝 **PRÓXIMAS FASES**
+
+- ⏳ **FASE 3**: Migración a arquitectura `[locale]` (1-2 semanas)
+- ⏳ **FASE 4**: Testing y validación (3-4 días)
+- ⏳ **FASE 5**: Deploy y monitoreo (continuo)
+
+**Documentación completa**: Ver `PLAN-ACCION-SEO-URLS-MULTIIDIOMA.md`
+
+---
+
+## 🔧 [2.0.1] - 24 de Enero 2026 - **FIX CRÍTICO: Schema.org en Google Search Console**
+
+### 🚨 **PROBLEMA CRÍTICO RESUELTO**
+
+**Síntomas**:
+- ❌ Google Search Console reportaba error en "Fragmentos de productos"
+- ❌ Páginas afectadas: Home, Locations (Alquiler), Locations (Venta)
+- ❌ Error: "Se ha detectado 1 elemento no válido. Debe especificarse 'offers', 'review' o 'aggregateRating'"
+
+**Fecha de detección**: 24 de Enero 2026  
+**Gravedad**: 🔴 **CRÍTICA** - Afecta indexación SEO en Google
+
+---
+
+### 🔍 **CAUSA RAÍZ IDENTIFICADA**
+
+#### 1. **Páginas de Alquiler - Schema Incorrecto**
+
+**Problema**: Las páginas de localización de alquiler usaban `@type: "Product"` dentro de `hasOfferCatalog`, lo cual es incorrecto para un **servicio de alquiler**.
+
+**Causa**: Una empresa de alquiler de campers ofrece **servicios**, no **productos** para venta.
+
+```typescript
+// ❌ CÓDIGO INCORRECTO (antes)
+"itemOffered": {
+  "@type": "Product",  // ❌ Incorrecto para un SERVICIO
+  "name": "Camper Van de Gran Volumen",
+  "description": "Furgonetas campers de 4-6 plazas..."
+}
+```
+
+**Por qué fallaba**:
+- Schema.org exige que `@type: "Product"` tenga obligatoriamente:
+  - `offers` con precio, O
+  - `review` / `aggregateRating`
+- Un servicio de alquiler NO es un producto, es un `Service`
+- Los servicios requieren `provider` en lugar de `offers`
+
+#### 2. **Páginas de Venta - Schema Duplicado**
+
+**Problema**: Las páginas de venta de vehículos tenían un `@type` duplicado en el objeto `itemOffered`.
+
+```typescript
+// ❌ CÓDIGO INCORRECTO (antes)
+"itemOffered": {
+  "@type": "Vehicle",
+  "@type": "Car",  // ❌ Doble @type es inválido en JSON-LD
+  "vehicleType": "Motorhome",
+  "name": "Autocaravana Premium"
+}
+```
+
+---
+
+### ✅ **SOLUCIÓN APLICADA**
+
+#### 1. **Fix Páginas de Alquiler** (`local-business-jsonld.tsx`)
+
+**Cambio**: `@type: "Product"` → `@type: "Service"`
+
+```typescript
+// ✅ CÓDIGO CORRECTO (ahora)
+"itemOffered": {
+  "@type": "Service",  // ✅ Correcto para ALQUILER
+  "name": "Alquiler de Camper Van de Gran Volumen",
+  "description": "Servicio de alquiler de furgonetas campers de 4-6 plazas con baño, cocina y calefacción. Kilómetros ilimitados incluidos.",
+  "provider": {
+    "@type": "Organization",
+    "name": "Furgocasa"
+  }
+}
+```
+
+**Por qué funciona ahora**:
+- `Service` es el tipo correcto para alquiler
+- Incluye `provider` (requerido para servicios)
+- Google Search Console valida correctamente
+
+#### 2. **Fix Páginas de Venta** (`sale-location-jsonld.tsx`)
+
+**Cambio**: Eliminado `@type` duplicado, añadidas propiedades específicas
+
+```typescript
+// ✅ CÓDIGO CORRECTO (ahora)
+"itemOffered": {
+  "@type": "Vehicle",  // ✅ Solo un @type
+  "vehicleModelDate": "2020",
+  "name": "Autocaravana Premium",
+  "description": "Autocaravanas y campers de alta gama de marcas como Weinsberg, Knaus, Adria, Dethleffs",
+  "bodyType": "Motorhome"
+}
+```
+
+**Por qué funciona ahora**:
+- Solo un `@type` (válido en JSON-LD)
+- Propiedades específicas de vehículos añadidas
+- Google ya validaba correctamente (confirmado por usuario)
+
+---
+
+### 🎯 **DIFERENCIA CLAVE: Product vs Service vs Vehicle**
+
+| Tipo | Cuándo usar | Requiere | Ejemplo |
+|------|-------------|----------|---------|
+| **Service** | Alquiler, servicios, suscripciones | `provider` | Alquiler de camper |
+| **Product** | Venta de productos físicos | `offers` con precio O `review`/`aggregateRating` | Tienda online |
+| **Vehicle** | Vehículos en venta | Propiedades del vehículo (`bodyType`, `vehicleModelDate`) | Venta de autocaravana |
+
+---
+
+### 🔧 **ARCHIVOS MODIFICADOS**
+
+#### **1. Componente JSON-LD de Alquiler**
+- **`src/components/locations/local-business-jsonld.tsx`** ⚠️ **CRÍTICO**
+  - ❌ Eliminado: `@type: "Product"`
+  - ✅ Añadido: `@type: "Service"` + `provider`
+  - ✅ Mejoradas descripciones de servicios
+
+#### **2. Componente JSON-LD de Venta**
+- **`src/components/locations/sale-location-jsonld.tsx`**
+  - ❌ Eliminado: `@type: "Car"` duplicado
+  - ✅ Mejorado: `Vehicle` con propiedades específicas
+  - ✅ Añadido: `vehicleModelDate`, `bodyType`
+
+#### **3. Documentación**
+- **`FIX-SCHEMA-PRODUCTO-GOOGLE.md`** - Nueva guía completa 🆕
+- **`README.md`** - Actualizado con v2.0.1
+- **`CHANGELOG.md`** - Este documento
+
+---
+
+### 📊 **PÁGINAS AFECTADAS (Ahora Corregidas)**
+
+**Páginas de Alquiler** (~116 URLs):
+- ✅ `/es/alquiler-autocaravanas-campervans-murcia`
+- ✅ `/es/alquiler-autocaravanas-campervans-valencia`
+- ✅ `/es/alquiler-autocaravanas-campervans-alicante`
+- ✅ `/es/alquiler-autocaravanas-campervans-madrid`
+- ✅ ... (todas las localizaciones × 4 idiomas)
+
+**Páginas de Venta** (~116 URLs):
+- ✅ `/es/venta-autocaravanas-camper-murcia`
+- ✅ `/es/venta-autocaravanas-camper-valencia`
+- ✅ `/es/venta-autocaravanas-camper-alicante`
+- ✅ `/es/venta-autocaravanas-camper-madrid`
+- ✅ ... (todas las localizaciones × 4 idiomas)
+
+**Total páginas corregidas**: ~232 URLs
+
+---
+
+### 🚀 **PRÓXIMOS PASOS**
+
+1. **Deploy automático** ✅ - Vercel despliega automáticamente
+2. **Esperar rastreo de Google** ⏳ - Google tardará 2-7 días en volver a rastrear
+3. **Validar en Search Console** 📊:
+   - Ir a: https://search.google.com/search-console
+   - Inspeccionar URL de ejemplo
+   - Verificar que el error desaparece
+4. **Monitorear indexación** 👀 - Revisar que todas las páginas se indexan correctamente
+
+---
+
+### 🔍 **HERRAMIENTAS DE VALIDACIÓN**
+
+Puedes validar el schema manualmente en:
+
+- **Google Rich Results Test**: https://search.google.com/test/rich-results
+- **Schema.org Validator**: https://validator.schema.org/
+- **Google Search Console**: https://search.google.com/search-console
+
+**Cómo probar**:
+1. Visitar una URL de producción (ej: `https://www.furgocasa.com/es/alquiler-autocaravanas-campervans-murcia`)
+2. Ver código fuente → Buscar `<script type="application/ld+json">`
+3. Copiar JSON-LD completo
+4. Pegar en validador
+5. ✅ Debe mostrar "Valid" sin errores
+
+---
+
+### ⚠️ **LECCIÓN APRENDIDA**
+
+**NO asumir tipos de Schema.org sin validar el contexto del negocio**:
+
+1. ✅ Empresa de **alquiler** → `Service`
+2. ✅ Empresa de **venta** de vehículos → `Vehicle` (dentro de `AutoDealer`)
+3. ✅ Catálogo de **productos** de tienda online → `Product`
+
+**Cada tipo tiene requisitos específicos en Schema.org que Google valida estrictamente.**
+
+---
+
+### 📝 **COMMITS DEL FIX**
+
+```
+[hash] fix(seo): corregir Schema.org Product a Service en páginas de alquiler
+[hash] fix(seo): eliminar @type duplicado en schema de venta
+[hash] docs: añadir FIX-SCHEMA-PRODUCTO-GOOGLE.md
+[hash] docs: actualizar README y CHANGELOG con v2.0.1
+```
+
+---
+
+### ✅ **RESULTADO FINAL**
+
+- ✅ **Páginas de alquiler**: Schema `Service` correcto
+- ✅ **Páginas de venta**: Schema `Vehicle` correcto
+- ✅ **Validación Google**: Sin errores en Rich Results Test
+- ✅ **Search Console**: Errores se resolverán en próximo rastreo
+- ✅ **SEO**: Mejora en indexación y rich snippets
+
+**Verificado manualmente**: 24/01/2026
+
+---
+
 ## 🎟️ [2.0.0] - 24 de Enero 2026 - **Sistema de Pagos Completo v2.0**
 
 ### 🎯 **SISTEMA DE PAGOS COMPLETAMENTE OPERATIVO**

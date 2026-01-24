@@ -419,7 +419,7 @@ export async function middleware(request: NextRequest) {
     const locale = getLocaleFromPathname(pathname);
     
     if (locale) {
-      // Tiene locale, hacer rewrite a la ruta sin locale
+      // Tiene locale en la URL
       const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
       
       // ✅ VERIFICAR si la URL usa los segmentos correctos para el idioma
@@ -431,15 +431,35 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(request.nextUrl, { status: 301 });
       }
       
-      // ✅ TRADUCIR la ruta al español para que Next.js encuentre la página física
-      // El usuario ve /fr/vehicules/slug, pero internamente servimos /vehiculos/slug
-      const spanishPath = translatePathToSpanish(pathnameWithoutLocale);
+      // ✅ NUEVA ARQUITECTURA: Páginas con [locale] físico
+      // Para estas páginas, simplemente pasar el locale como header sin rewrite
+      // Next.js las manejará con la carpeta [locale]/
       
-      // Reescribir la URL internamente
-      request.nextUrl.pathname = spanishPath;
+      // ⚠️ EXCEPCIÓN: Páginas de localización (alquiler/venta) que usan patrón especial
+      // Estas NO usan [locale], siguen con su propio sistema de detección
+      const isLocationPage = 
+        pathnameWithoutLocale.match(/^\/alquiler-autocaravanas-campervans-/) ||
+        pathnameWithoutLocale.match(/^\/rent-campervan-motorhome-/) ||
+        pathnameWithoutLocale.match(/^\/location-camping-car-/) ||
+        pathnameWithoutLocale.match(/^\/wohnmobil-mieten-/) ||
+        pathnameWithoutLocale.match(/^\/venta-autocaravanas-camper-/) ||
+        pathnameWithoutLocale.match(/^\/campervans-for-sale-in-/) ||
+        pathnameWithoutLocale.match(/^\/camping-cars-a-vendre-/) ||
+        pathnameWithoutLocale.match(/^\/wohnmobile-zu-verkaufen-/);
       
-      // ✅ PASAR EL IDIOMA DETECTADO como header para que las páginas puedan usarlo
-      const response = NextResponse.rewrite(request.nextUrl);
+      if (isLocationPage) {
+        // Páginas de localización: hacer rewrite al path sin locale
+        const spanishPath = translatePathToSpanish(pathnameWithoutLocale);
+        request.nextUrl.pathname = spanishPath;
+        const response = NextResponse.rewrite(request.nextUrl);
+        response.headers.set('x-detected-locale', locale);
+        response.headers.set('x-original-pathname', pathname);
+        return response;
+      }
+      
+      // Para el resto de páginas: dejar que Next.js maneje [locale] naturalmente
+      // Solo pasamos el locale como header para componentes que lo necesiten
+      const response = NextResponse.next();
       response.headers.set('x-detected-locale', locale);
       response.headers.set('x-original-pathname', pathname);
       

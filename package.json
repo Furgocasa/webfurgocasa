@@ -19,7 +19,11 @@
     "fix-mapafurgocasa": "tsx scripts/fix-mapafurgocasa-references.ts",
     "migrate:export": "tsx scripts/extract-from-dump.ts",
     "migrate:import": "tsx scripts/migrate-old-data.ts",
-    "migrate:all": "npm run migrate:export && npm run migrate:import"
+    "migrate:all": "npm run migrate:export && npm run migrate:import",
+    "validate:urls": "node scripts/validate-urls.js",
+    "validate:urls:local": "node scripts/validate-urls.js --env=local",
+    "validate:urls:staging": "node scripts/validate-urls.js --env=staging",
+    "validate:urls:verbose": "node scripts/validate-urls.js --verbose"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

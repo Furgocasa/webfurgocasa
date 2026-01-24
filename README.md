@@ -1,21 +1,103 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-1.0.10-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-2.1.0-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-98%2F100-brightgreen.svg)](https://pagespeed.web.dev/)
+[![SEO](https://img.shields.io/badge/SEO-Optimizado-brightgreen.svg)](./AUDITORIA-SEO-URLS-MULTIIDIOMA.md)
 
-**🎉 VERSIÓN 1.0.10 EN PRODUCCIÓN** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 2.1.0 EN DESARROLLO** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
-> **✅ ESTADO: TOTALMENTE FUNCIONAL** - PageSpeed **98/100** escritorio, **90/100** móvil
+> **✅ ESTADO: OPTIMIZACIÓN SEO EN PROGRESO** - Fases 1-2 completadas | PageSpeed **98/100** escritorio, **90/100** móvil
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
 ---
 
-## 🚀 ÚLTIMA ACTUALIZACIÓN: Optimización Rendimiento (v1.0.10)
+## 🚀 ÚLTIMA ACTUALIZACIÓN: Optimización SEO URLs Multiidioma (v2.1.0)
 
-**23 Enero 2026** - Optimización masiva de rendimiento
+**24 Enero 2026** - Fases 1-2 completadas: Auditoría, correcciones y optimización
+
+### ✅ Optimización SEO - Fase 1-2 Completadas
+
+**Contexto**: Auditoría SEO realizada por ChatGPT 5.2 detectó problemas críticos en arquitectura de URLs multiidioma.
+
+**Problemas identificados**:
+- ❌ URLs `/en/vehicles` sirviendo contenido español (señales contradictorias)
+- ⚠️ Sistema de rewrites complejo (220 reglas)
+- ⚠️ Robots.txt duplicado (conflicto)
+- ⚠️ Sin herramientas de validación automatizada
+
+**Fases completadas**:
+
+#### FASE 1: Correcciones Inmediatas ✅
+- ✅ Eliminado `public/robots.txt` duplicado
+- ✅ Creado script de validación (`npm run validate:urls`)
+- ✅ Validación de 30+ URLs críticas automatizada
+- ✅ 4 nuevos comandos NPM para testing
+
+#### FASE 2: Limpieza y Optimización ✅
+- ✅ Reorganizadas redirecciones en 5 grupos lógicos
+- ✅ Documentación completa inline en `next.config.js`
+- ✅ Backup de seguridad creado
+- ✅ TODOs marcados para Fase 3 (migración [locale])
+
+**Archivos modificados**:
+- `next.config.js` - Documentación mejorada
+- `package.json` - Scripts de validación
+- `scripts/validate-urls.js` - Nuevo script
+
+**Documentación generada**:
+- [AUDITORIA-SEO-URLS-MULTIIDIOMA.md](./AUDITORIA-SEO-URLS-MULTIIDIOMA.md) - Auditoría completa (606 líneas)
+- [PLAN-ACCION-SEO-URLS-MULTIIDIOMA.md](./PLAN-ACCION-SEO-URLS-MULTIIDIOMA.md) - Plan de 5 fases (402 líneas)
+- [RESUMEN-FASES-1-2-COMPLETADAS.md](./RESUMEN-FASES-1-2-COMPLETADAS.md) - Resumen ejecutivo
+- [ANALISIS-NEXTCONFIG-OPTIMIZATION.md](./ANALISIS-NEXTCONFIG-OPTIMIZATION.md) - Análisis técnico
+
+**Próximas fases**:
+- ⏳ **FASE 3**: Migración a arquitectura `[locale]` (1-2 semanas)
+- ⏳ **FASE 4**: Testing y validación (3-4 días)
+- ⏳ **FASE 5**: Deploy y monitoreo (continuo)
+
+**ROI esperado**: +20-30% tráfico orgánico en 6 meses
+
+**Comandos disponibles**:
+```bash
+npm run validate:urls         # Validar URLs en producción
+npm run validate:urls:local   # Validar en local
+npm run validate:urls:staging # Validar en staging
+npm run validate:urls:verbose # Modo detallado
+```
+
+**Documentación completa**: Ver [PLAN-ACCION-SEO-URLS-MULTIIDIOMA.md](./PLAN-ACCION-SEO-URLS-MULTIIDIOMA.md)
+
+---
+
+## 🔧 Fix Crítico Schema.org (v2.0.1)
+
+**24 Enero 2026** - Corregidos errores de Schema.org en Google Search Console
+
+**Problema**: Google Search Console reportaba errores en "Fragmentos de productos" en páginas críticas (Home, Locations, Alquiler).
+
+**Error**: "Se ha detectado 1 elemento no válido. Debe especificarse 'offers', 'review' o 'aggregateRating'"
+
+**Solución implementada**:
+
+1. **Páginas de Alquiler**: Cambio de `@type: "Product"` a `@type: "Service"` (correcto para servicios de alquiler)
+2. **Páginas de Venta**: Corrección de `@type` duplicado en `Vehicle` schema
+
+**Archivos corregidos**:
+- `src/components/locations/local-business-jsonld.tsx` - Schema de alquiler
+- `src/components/locations/sale-location-jsonld.tsx` - Schema de venta
+
+**Resultado**: ✅ Esquemas validados correctamente, errores de Search Console resueltos
+
+**Documentación completa**: [FIX-SCHEMA-PRODUCTO-GOOGLE.md](./FIX-SCHEMA-PRODUCTO-GOOGLE.md) | [CHANGELOG.md](./CHANGELOG.md) → v2.0.1
+
+---
+
+## 🚀 Versión 1.0.10: Optimización Rendimiento
+
+**23 Enero 2026** - PageSpeed **98/100** escritorio, **90/100** móvil
 
 ### 📊 Resultados PageSpeed Insights
 
@@ -33,26 +115,6 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 | **Preconnect** | No | Sí | -200ms conexión |
 | **CSS crítico** | No | Sí (critters) | FCP más rápido |
 | **Pre-generación** | No | ~320 páginas | SEO boost |
-
-### ✅ Configuración Aplicada
-
-```js
-// next.config.js
-images: {
-  formats: ['image/avif', 'image/webp'],
-  minimumCacheTTL: 31536000,
-},
-experimental: { optimizeCss: true },
-compress: true,
-```
-
-```html
-<!-- layout.tsx -->
-<link rel="preconnect" href="https://supabase.co" />
-<link rel="dns-prefetch" href="https://supabase.co" />
-```
-
-**Documentación completa**: [CHANGELOG.md](./CHANGELOG.md) → v1.0.10
 
 ---
 
@@ -1257,6 +1319,21 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 ## 📜 Historial de Versiones
 
+### v2.0.1 (24 Enero 2026) - Fix Crítico Schema.org 🔧
+- 🔴 **FIX CRÍTICO**: Errores de Schema.org en Google Search Console
+- ✅ Páginas de alquiler: Cambio de `Product` a `Service`
+- ✅ Páginas de venta: Corrección de `Vehicle` schema
+- ✅ Validación correcta en Google Rich Results Test
+- 📚 Documentación: `FIX-SCHEMA-PRODUCTO-GOOGLE.md`
+
+### v2.0.0 (24 Enero 2026) - Sistema de Pagos Completo 💳
+- ✅ Pagos Redsys + Stripe completamente operativos
+- ✅ Fallback automático si notificación falla
+- ✅ Gestión manual de pagos desde admin
+- ✅ Comisión 2% solo en Stripe (Redsys sin comisión)
+- ✅ Emails de confirmación automáticos
+- 📚 Documentación: `SISTEMA-PAGOS.md`, `REDSYS-FUNCIONANDO.md`
+
 ### v1.0.10 (23 Enero 2026) - Optimización Rendimiento 🔥
 - 🔥 **PageSpeed 98/100** en escritorio, **90/100** en móvil
 - ✅ Imágenes hero optimizadas: 530KB → 58KB (-89%)
@@ -1310,11 +1387,11 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 1.0.10 - Optimización Rendimiento (PageSpeed 98/100)  
+**Versión**: 2.0.1 - Fix Schema.org + Sistema de Pagos Completo  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
 **PageSpeed**: 98/100 escritorio | 90/100 móvil  
-**Última actualización**: 23 de Enero 2026  
+**Última actualización**: 24 de Enero 2026  
 
 ---
 
