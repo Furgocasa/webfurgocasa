@@ -187,36 +187,28 @@ export default async function LocationPage({ params }: PageProps) {
     notFound();
   }
 
-  const translatedFields = await getTranslatedContent(
-    'location_targets', locationRaw.id,
-    ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
-    locale,
-    {
-      name: locationRaw.name,
-      h1_title: locationRaw.h1_title,
-      meta_title: locationRaw.meta_title,
-      meta_description: locationRaw.meta_description,
-      intro_text: locationRaw.intro_text,
-    }
-  );
+  // Paralelizar consultas de traducción y datos adicionales para mejorar TTFB
+  const [translatedFields, translatedSections, vehiclesRaw, blogArticles] = await Promise.all([
+    getTranslatedContent(
+      'location_targets', locationRaw.id,
+      ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
+      locale,
+      {
+        name: locationRaw.name,
+        h1_title: locationRaw.h1_title,
+        meta_title: locationRaw.meta_title,
+        meta_description: locationRaw.meta_description,
+        intro_text: locationRaw.intro_text,
+      }
+    ),
+    getTranslatedContentSections(
+      'location_targets', locationRaw.id, locale, locationRaw.content_sections
+    ),
+    getRentVehicles(),
+    getLatestBlogArticles(3)
+  ]);
 
-  const translatedSections = await getTranslatedContentSections(
-    'location_targets', locationRaw.id, locale, locationRaw.content_sections
-  );
-
-  const location = {
-    ...locationRaw,
-    name: translatedFields.name || locationRaw.name,
-    h1_title: translatedFields.h1_title || locationRaw.h1_title,
-    intro_text: translatedFields.intro_text || locationRaw.intro_text,
-    content_sections: translatedSections || locationRaw.content_sections,
-  };
-
-  const vehiclesRaw = await getRentVehicles();
   const vehicles = await getTranslatedRecords('vehicles', vehiclesRaw, ['name', 'short_description'], locale);
-
-  // Obtener artículos del blog
-  const blogArticles = await getLatestBlogArticles(3);
 
   const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
@@ -227,6 +219,10 @@ export default async function LocationPage({ params }: PageProps) {
       {/* Preconnect para acelerar carga de imágenes desde Supabase Storage */}
       <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
+      
+      {/* Preload crítico del H1 y fuentes para FCP */}
+      <link rel="preload" href="/fonts/rubik.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      
       <LocalBusinessJsonLd location={location as any} />
       
       {/* ================================================================== */}
@@ -240,10 +236,8 @@ export default async function LocationPage({ params }: PageProps) {
             fill
             priority
             fetchPriority="high"
-            quality={60}
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
-            placeholder="blur"
-            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMEAQUBAAAAAAAAAAAAAQIDBAAFBhEhBxITMUFR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQEAAwEBAAAAAAAAAAAAAAABAAIRA0H/2gAMAwEAAhEDEQA/AMc4llF3yC4tQLi+h6KhPehpCANuqOgSfnAGh+1oOF4bay2G4aUqUVrCe9Z5JJPJJpSqOw7JP/Z"
+            quality={50}
+            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1920px"
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/40" />
