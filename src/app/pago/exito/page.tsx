@@ -15,6 +15,7 @@ import { supabase } from"@/lib/supabase/client";
 import { formatPrice } from"@/lib/utils";
 import { CheckCircle, Calendar, Car, MapPin, Download, Mail } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
+import Link from"next/link";
 
 /**
  * Componente para mostrar cuando no tenemos datos del pago
@@ -30,12 +31,12 @@ function PaymentSuccessGeneric({ bookingId }: { bookingId?: string | null }) {
       </p>
       <div className="space-y-3">
         {bookingId && (
-          <LocalizedLink
+          <Link
             href={`/reservar/${bookingId}`}
             className="block w-full bg-furgocasa-blue text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
           >
             {t("Ver mi reserva")}
-          </LocalizedLink>
+          </Link>
         )}
         <LocalizedLink
           href="/"
@@ -468,12 +469,12 @@ function PagoExitoContent() {
                       <strong>{payment.booking.customer_email}</strong>
                     </div>
 
-                    <LocalizedLink
+                    <Link
                       href={`/reservar/${payment.booking.id}`}
                       className="block w-full bg-furgocasa-blue text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-center"
                     >
                       {t("Ver mi reserva")}
-                    </LocalizedLink>
+                    </Link>
 
                     <LocalizedLink
                       href="/"
