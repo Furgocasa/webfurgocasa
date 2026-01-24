@@ -20,6 +20,8 @@ export interface Post {
   title_en: string | null;
   slug: string;
   slug_en: string | null;
+  slug_fr: string | null;
+  slug_de: string | null;
   excerpt: string | null;
   excerpt_en: string | null;
   content: string;
@@ -42,6 +44,8 @@ export interface RelatedPost {
   title_en: string | null;
   slug: string;
   slug_en: string | null;
+  slug_fr: string | null;
+  slug_de: string | null;
   featured_image: string | null;
   published_at: string | null;
   reading_time: number;
@@ -60,6 +64,8 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
     title_en,
     slug,
     slug_en,
+    slug_fr,
+    slug_de,
     excerpt,
     excerpt_en,
     content,
@@ -83,84 +89,66 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
     .eq("slug", slug)
     .single();
 
-  // 2. Si no encuentra y es inglés, buscar por slug_en
-  if ((error || !postData) && locale === 'en') {
-    const { data: postBySlugEn, error: errorEn } = await supabase
-      .from("posts")
-      .select(postQuery)
-      .eq("status", "published")
-      .eq("slug_en", slug)
-      .single();
+  // 2. Si no encuentra, buscar por slug traducido según el locale
+  if ((error || !postData) && locale) {
+    const slugField = locale === 'en' ? 'slug_en' : locale === 'fr' ? 'slug_fr' : locale === 'de' ? 'slug_de' : null;
     
-    if (!errorEn && postBySlugEn) {
-      postData = postBySlugEn;
-      error = null;
-    }
-  }
-
-  // 3. Si no encuentra y es FR/DE, buscar en content_translations
-  if ((error || !postData) && locale && ['fr', 'de'].includes(locale)) {
-    // Buscar el post_id que tenga este slug traducido
-    const { data: translationData } = await supabase
-      .from("content_translations")
-      .select("source_id")
-      .eq("source_table", "posts")
-      .eq("source_field", "slug")
-      .eq("locale", locale)
-      .eq("translated_text", slug)
-      .single();
-
-    if (translationData?.source_id) {
-      // Encontramos el post por slug traducido, ahora cargarlo
+    if (slugField) {
       const { data: postByTranslatedSlug, error: errorTranslated } = await supabase
         .from("posts")
         .select(postQuery)
         .eq("status", "published")
-        .eq("id", translationData.source_id)
+        .eq(slugField, slug)
         .single();
-
+      
       if (!errorTranslated && postByTranslatedSlug) {
         postData = postByTranslatedSlug;
         error = null;
       }
     }
-  }
-
-  // 4. Si aún no encuentra y NO pasaron locale, intentar buscar en todos los slugs traducidos
-  if ((error || !postData) && !locale) {
-    // Buscar primero en slug_en
-    const { data: postBySlugEn } = await supabase
-      .from("posts")
-      .select(postQuery)
-      .eq("status", "published")
-      .eq("slug_en", slug)
-      .single();
-
-    if (postBySlugEn) {
-      postData = postBySlugEn;
-      error = null;
-    } else {
-      // Buscar en content_translations (FR, DE)
+    
+    // Fallback: buscar en content_translations si no hay slug_xx en la tabla
+    if ((error || !postData) && ['fr', 'de'].includes(locale)) {
       const { data: translationData } = await supabase
         .from("content_translations")
         .select("source_id")
         .eq("source_table", "posts")
         .eq("source_field", "slug")
+        .eq("locale", locale)
         .eq("translated_text", slug)
         .single();
 
       if (translationData?.source_id) {
-        const { data: postByTranslatedSlug } = await supabase
+        const { data: postByTranslatedSlug, error: errorTranslated } = await supabase
           .from("posts")
           .select(postQuery)
           .eq("status", "published")
           .eq("id", translationData.source_id)
           .single();
 
-        if (postByTranslatedSlug) {
+        if (!errorTranslated && postByTranslatedSlug) {
           postData = postByTranslatedSlug;
           error = null;
         }
+      }
+    }
+  }
+
+  // 3. Si aún no encuentra y NO pasaron locale, intentar buscar en todos los slugs traducidos
+  if ((error || !postData) && !locale) {
+    // Buscar en slug_en, slug_fr, slug_de
+    for (const slugField of ['slug_en', 'slug_fr', 'slug_de']) {
+      const { data: postByTranslatedSlug } = await supabase
+        .from("posts")
+        .select(postQuery)
+        .eq("status", "published")
+        .eq(slugField, slug)
+        .single();
+
+      if (postByTranslatedSlug) {
+        postData = postByTranslatedSlug;
+        error = null;
+        break;
       }
     }
   }
@@ -198,7 +186,9 @@ export const getRelatedPosts = cache(async (categoryId: string, currentPostId: s
       title, 
       title_en, 
       slug, 
-      slug_en, 
+      slug_en,
+      slug_fr,
+      slug_de, 
       featured_image, 
       published_at, 
       reading_time,
