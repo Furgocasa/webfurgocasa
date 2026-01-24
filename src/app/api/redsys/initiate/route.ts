@@ -94,8 +94,9 @@ export async function POST(request: NextRequest) {
     });
 
     // Generar número de pedido único para Redsys
+    // IMPORTANTE: Sin prefijo - solo números para cumplir con Redsys
     console.log("🎲 [3/8] Generando número de pedido único...");
-    const orderNumber = generateOrderNumber("FC");
+    const orderNumber = generateOrderNumber(); // Sin prefijo - solo números
     console.log("✅ [3/8] Número de pedido generado:", orderNumber);
 
     // Descripción del producto
