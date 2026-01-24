@@ -137,39 +137,52 @@ export async function POST(request: NextRequest) {
     console.log("📋 [5/8] Tipo de pago:", paymentType === "preauth" ? "Pre-autorización" : "Pago normal");
     
     let formData;
-    if (paymentType === "preauth") {
-      // Pre-autorización para fianza
-      console.log("🔐 [5/8] Creando formulario de pre-autorización...");
-      formData = createPreAuthFormData(
-        {
-          amount,
-          orderNumber,
-          productDescription: `Fianza - ${description}`,
-          customerEmail: booking.customer_email,
-          merchantData: {
-            bookingId,
-            bookingNumber: booking.booking_number,
-            paymentType,
+    try {
+      if (paymentType === "preauth") {
+        // Pre-autorización para fianza
+        console.log("🔐 [5/8] Creando formulario de pre-autorización...");
+        formData = createPreAuthFormData(
+          {
+            amount,
+            orderNumber,
+            productDescription: `Fianza - ${description}`,
+            customerEmail: booking.customer_email,
+            merchantData: {
+              bookingId,
+              bookingNumber: booking.booking_number,
+              paymentType,
+            },
           },
-        },
-        config
-      );
-    } else {
-      // Pago normal
-      console.log("💳 [5/8] Creando formulario de pago normal...");
-      formData = createPaymentFormData(
-        {
-          amount,
-          orderNumber,
-          productDescription: description,
-          customerEmail: booking.customer_email,
-          merchantData: {
-            bookingId,
-            bookingNumber: booking.booking_number,
-            paymentType,
+          config
+        );
+      } else {
+        // Pago normal
+        console.log("💳 [5/8] Creando formulario de pago normal...");
+        formData = createPaymentFormData(
+          {
+            amount,
+            orderNumber,
+            productDescription: description,
+            customerEmail: booking.customer_email,
+            merchantData: {
+              bookingId,
+              bookingNumber: booking.booking_number,
+              paymentType,
+            },
           },
+          config
+        );
+      }
+    } catch (cryptoError) {
+      console.error("❌ ERROR CRÍTICO en generación de firma/parámetros:");
+      console.error("Error:", cryptoError);
+      console.error("Stack:", cryptoError instanceof Error ? cryptoError.stack : 'No stack');
+      return NextResponse.json(
+        { 
+          error: "Error al generar firma de pago",
+          details: cryptoError instanceof Error ? cryptoError.message : 'Error desconocido'
         },
-        config
+        { status: 500 }
       );
     }
 
@@ -218,6 +231,15 @@ export async function POST(request: NextRequest) {
 
     // Registrar el pago en la base de datos como pendiente
     console.log("💾 [6/8] Registrando pago en la base de datos...");
+    console.log("💾 [6/8] Datos a insertar:", {
+      booking_id: bookingId,
+      order_number: orderNumber,
+      amount,
+      status: "pending",
+      payment_type: paymentType === "preauth" ? "deposit" : paymentType,
+      payment_method: "redsys",
+    });
+    
     const { error: paymentError } = await supabase.from("payments").insert({
       booking_id: bookingId,
       order_number: orderNumber,
@@ -229,9 +251,19 @@ export async function POST(request: NextRequest) {
 
     if (paymentError) {
       console.error("❌ ERROR creando registro de pago:", paymentError);
-      console.error("Detalles del error:", JSON.stringify(paymentError, null, 2));
+      console.error("❌ Código de error:", paymentError.code);
+      console.error("❌ Mensaje:", paymentError.message);
+      console.error("❌ Detalles:", paymentError.details);
+      console.error("❌ Hint:", paymentError.hint);
+      console.error("❌ JSON completo:", JSON.stringify(paymentError, null, 2));
+      
+      // Devolver error más descriptivo
       return NextResponse.json(
-        { error: "Error al procesar el pago" },
+        { 
+          error: "Error al procesar el pago",
+          details: paymentError.message,
+          code: paymentError.code
+        },
         { status: 500 }
       );
     }
