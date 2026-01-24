@@ -241,10 +241,10 @@ export default async function LocationPage({ params }: PageProps) {
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3">
-            {/* H1 dinámico desde BD (h1_title) o fallback */}
+            {/* H1 dinámico desde BD (h1_title) o fallback - tamaño reducido */}
             <h1 
-              className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
-              style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
+              className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
+              style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}
             >
               {location.h1_title || `${t("Alquiler Camper")} ${location.name}`}
             </h1>
@@ -272,14 +272,6 @@ export default async function LocationPage({ params }: PageProps) {
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
             >
               {t("sobre ruedas")}
-            </p>
-            
-            {/* Intro text dinámico desde BD o fallback */}
-            <p 
-              className="text-sm md:text-base lg:text-lg text-white/85 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" 
-              style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
-            >
-              {location.intro_text || t("Las mejores furgonetas campers de gran volumen en alquiler")}
             </p>
           </div>
 
