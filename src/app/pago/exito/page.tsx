@@ -116,6 +116,8 @@ function PagoExitoContent() {
       const merchantParams = searchParams.get("Ds_MerchantParameters");
       
       let orderNumber: string | null = null;
+      let redsysResponseCode: string | null = null;
+      let redsysAuthCode: string | null = null;
       
       // Si viene de Stripe, buscar por stripe_session_id
       if (stripeSessionId) {
@@ -144,6 +146,13 @@ function PagoExitoContent() {
         try {
           const decoded = JSON.parse(atob(merchantParams));
           orderNumber = decoded.Ds_Order;
+          redsysResponseCode = decoded.Ds_Response;
+          redsysAuthCode = decoded.Ds_AuthorisationCode;
+          console.log("[PAGO-EXITO] Parámetros Redsys decodificados:", {
+            orderNumber,
+            responseCode: redsysResponseCode,
+            authCode: redsysAuthCode
+          });
         } catch (e) {
           console.error("Error decodificando parámetros de Redsys:", e);
         }
@@ -166,6 +175,56 @@ function PagoExitoContent() {
           .single();
 
         if (!error && data) {
+          // RESPALDO: Si el pago sigue pendiente pero Redsys dice que fue exitoso,
+          // actualizar el estado aquí como fallback de la notificación
+          const responseCodeNum = parseInt(redsysResponseCode || "9999", 10);
+          const isRedsysSuccess = responseCodeNum >= 0 && responseCodeNum <= 99;
+          
+          if (data.status === "pending" && isRedsysSuccess && redsysAuthCode) {
+            console.log("[PAGO-EXITO] RESPALDO: Pago pendiente pero Redsys confirma éxito. Actualizando...");
+            
+            // Llamar a la API para procesar el pago (esto actualiza payment, booking y envía email)
+            try {
+              const response = await fetch("/api/redsys/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  orderNumber,
+                  responseCode: redsysResponseCode,
+                  authCode: redsysAuthCode,
+                  merchantParams
+                })
+              });
+              
+              if (response.ok) {
+                console.log("[PAGO-EXITO] Pago actualizado correctamente via respaldo");
+                // Recargar los datos actualizados
+                const { data: updatedData } = await supabase
+                  .from("payments")
+                  .select(`
+                    *,
+                    booking:bookings(
+                      *,
+                      vehicle:vehicles(name, brand, model),
+                      pickup_location:locations!pickup_location_id(name),
+                      dropoff_location:locations!dropoff_location_id(name)
+                    )
+                  `)
+                  .eq("order_number", orderNumber)
+                  .single();
+                
+                if (updatedData) {
+                  setPayment(updatedData as any);
+                  return;
+                }
+              } else {
+                console.error("[PAGO-EXITO] Error en respaldo:", await response.text());
+              }
+            } catch (verifyError) {
+              console.error("[PAGO-EXITO] Error llamando a verify-payment:", verifyError);
+            }
+          }
+          
           setPayment(data as any);
         }
       }
