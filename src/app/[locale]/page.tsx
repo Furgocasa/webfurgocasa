@@ -126,6 +126,16 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
 // ⚡ ISR: Revalidar cada 2 horas (contenido cambia poco)
 export const revalidate = 7200;
 
+// ✅ Pre-generar páginas estáticas para todos los locales
+export async function generateStaticParams() {
+  return [
+    { locale: 'es' },
+    { locale: 'en' },
+    { locale: 'fr' },
+    { locale: 'de' },
+  ];
+}
+
 // ✅ SERVER COMPONENT
 export default async function LocaleHomePage({ params }: HomePageProps) {
   const { locale: localeStr } = await params;
