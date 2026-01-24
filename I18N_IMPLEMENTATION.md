@@ -409,6 +409,74 @@ Mapeo de rutas entre idiomas para navegación y SEO.
 
 ---
 
+## 📝 Blog con Slugs Multiidioma (NUEVO - Enero 2026)
+
+### Estructura de URLs del Blog
+
+El blog ahora soporta **slugs traducidos** para cada idioma:
+
+| Idioma | URL Ejemplo |
+|--------|-------------|
+| 🇪🇸 ES | `/es/blog/noticias/mi-articulo-en-espanol` |
+| 🇬🇧 EN | `/en/blog/news/my-article-in-english` |
+| 🇫🇷 FR | `/fr/blog/actualites/mon-article-en-francais` |
+| 🇩🇪 DE | `/de/blog/nachrichten/mein-artikel-auf-deutsch` |
+
+### Base de Datos (Supabase)
+
+La tabla `posts` tiene columnas para slugs traducidos:
+
+```sql
+-- Columnas en tabla posts
+slug       VARCHAR(300)  -- Slug principal (español)
+slug_en    VARCHAR(300)  -- Slug en inglés
+slug_fr    VARCHAR(300)  -- Slug en francés  
+slug_de    VARCHAR(300)  -- Slug en alemán
+```
+
+### Generación Automática de Slugs
+
+Script para generar slugs traducidos desde títulos:
+
+```bash
+npx tsx scripts/generate-blog-slug-translations.ts
+```
+
+El script:
+1. Lee los títulos traducidos de cada post
+2. Genera slugs URL-friendly (sin acentos, minúsculas, guiones)
+3. Actualiza las columnas `slug_en`, `slug_fr`, `slug_de`
+
+### Language Switcher para Blog
+
+El selector de idioma detecta automáticamente las páginas del blog y navega al slug traducido correcto:
+
+```typescript
+// En LanguageContext
+if (isBlogArticlePage) {
+  const translatedSlug = blogRouteData.slugs[newLang] || currentSlug;
+  const translatedCategory = blogRouteData.categories[newLang] || currentCategory;
+  window.location.href = `/${newLang}/blog/${translatedCategory}/${translatedSlug}`;
+}
+```
+
+### Traducciones Estáticas (Client Components)
+
+Las traducciones de UI están en `src/lib/translations-preload.ts`:
+
+```typescript
+// Ejemplo de uso en componentes cliente
+const { t } = useLanguage();
+
+// Automáticamente traduce según el idioma actual
+<h1>{t("Dos formas de ahorrar en tu alquiler")}</h1>
+// EN: "Two ways to save on your rental"
+// FR: "Deux façons d'économiser sur votre location"
+// DE: "Zwei Möglichkeiten bei Ihrer Miete zu sparen"
+```
+
+---
+
 ## 📚 Documentación Relacionada
 
 - **[MIGRACION-CARPETAS-FIJAS-COMPLETADA.md](./MIGRACION-CARPETAS-FIJAS-COMPLETADA.md)** - Historial de migración
@@ -421,5 +489,5 @@ Mapeo de rutas entre idiomas para navegación y SEO.
 **✅ Sistema i18n con carpetas fijas por idioma - Producción estable**
 
 Desarrollado para: Furgocasa  
-Versión: 4.1.0  
+Versión: 4.2.0  
 Fecha: 24 Enero 2026

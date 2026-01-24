@@ -4,6 +4,79 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🌍 [4.2.0] - 24 de Enero 2026 - **Sistema Multiidioma Completo para Blog**
+
+### ✨ **NUEVAS FUNCIONALIDADES**
+
+#### 1. Slugs Traducidos en Posts del Blog
+
+Los artículos del blog ahora tienen URLs completamente traducidas:
+
+| Idioma | Ejemplo de URL |
+|--------|----------------|
+| 🇪🇸 ES | `/es/blog/noticias/mi-articulo` |
+| 🇬🇧 EN | `/en/blog/news/my-article` |
+| 🇫🇷 FR | `/fr/blog/actualites/mon-article` |
+| 🇩🇪 DE | `/de/blog/nachrichten/mein-artikel` |
+
+**Implementación:**
+- Nuevas columnas en tabla `posts`: `slug_en`, `slug_fr`, `slug_de`
+- Script de generación automática: `scripts/generate-blog-slug-translations.ts`
+- 600 slugs traducidos generados (200 posts × 3 idiomas)
+
+#### 2. Language Switcher Inteligente para Blog
+
+El selector de idioma detecta páginas de artículos del blog y navega correctamente:
+- Detecta si está en `/[locale]/blog/[category]/[slug]`
+- Obtiene los slugs traducidos del post actual
+- Navega a la URL correcta en el nuevo idioma
+
+#### 3. Traducciones de UI Completas
+
+Añadidas +400 traducciones para páginas:
+- Página de Ofertas (`/offers`, `/offres`, `/angebote`)
+- Listado de Blog y categorías
+- Parking Murcia
+- Video Tutoriales
+- Clientes VIP
+- Búsqueda
+- Documentación de Alquiler
+
+---
+
+### 📁 **ARCHIVOS MODIFICADOS**
+
+| Archivo | Cambio |
+|---------|--------|
+| `supabase/add-translated-slugs-to-posts.sql` | Migración DB |
+| `src/lib/blog/server-actions.ts` | Soporte slug multiidioma |
+| `src/lib/blog-translations.ts` | Helpers de traducción |
+| `src/lib/translations-preload.ts` | +400 traducciones UI |
+| `src/contexts/language-context.tsx` | Language switcher blog |
+| `src/components/blog/blog-route-data.tsx` | Inyección datos blog |
+| `scripts/generate-blog-slug-translations.ts` | Script generación |
+
+---
+
+### 🔧 **FIX: Ubicación Traducciones**
+
+**Problema detectado**: Las traducciones estaban en `getPreloadCache()` en lugar de `staticTranslations`.
+
+**Causa**: El contexto de idioma usa `staticTranslations` directamente para `t()`.
+
+**Solución**: Movidas todas las traducciones al objeto `staticTranslations` correcto.
+
+---
+
+### 📊 **ESTADÍSTICAS**
+
+- ✅ 200 posts con slugs traducidos
+- ✅ 600 slugs generados (EN/FR/DE)
+- ✅ +400 traducciones de UI añadidas
+- ✅ 815 líneas de código duplicado eliminadas
+
+---
+
 ## 🔧 [4.1.1] - 25 de Enero 2026 - **FIX CRÍTICO: Barra Móvil Reservas con Extras**
 
 ### 🚨 **PROBLEMA CRÍTICO RESUELTO**

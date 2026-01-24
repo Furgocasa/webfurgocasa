@@ -212,9 +212,17 @@ const t = (key: string) => translateServer(key, 'es');
 
 ## 🔄 Sistema de Cambio de Idioma (Language Switcher)
 
-### Blog: Slugs Traducidos Dinámicos
+### Blog: Slugs Traducidos en Base de Datos
 
-Los artículos del blog tienen slugs traducidos almacenados en Supabase (`content_translations`).
+Los artículos del blog tienen slugs traducidos almacenados **directamente en la tabla `posts`**:
+
+```sql
+-- Columnas en Supabase
+posts.slug      -- Slug español (principal)
+posts.slug_en   -- Slug inglés
+posts.slug_fr   -- Slug francés
+posts.slug_de   -- Slug alemán
+```
 
 **Cómo funciona:**
 1. La página del blog carga `getAllPostSlugTranslations()` del servidor
@@ -226,6 +234,7 @@ Los artículos del blog tienen slugs traducidos almacenados en Supabase (`conten
 - `src/lib/blog-translations.ts` → Funciones de traducción de slugs
 - `src/components/blog/blog-route-data.tsx` → Provider para inyectar datos
 - `src/app/{es,en,fr,de}/blog/[category]/[slug]/page.tsx` → Páginas que usan el provider
+- `scripts/generate-blog-slug-translations.ts` → Genera slugs desde títulos traducidos
 
 ### Localizaciones: Slugs Estáticos
 
@@ -248,6 +257,63 @@ El cambio de idioma está **deshabilitado** en páginas transaccionales para evi
 - `/pago`, `/payment`, `/paiement`, `/zahlung`
 
 **Implementación:** `isTransactionalPage()` en `language-context.tsx`
+
+---
+
+## ➕ Añadir Nuevas Traducciones
+
+### Ubicación
+
+Todas las traducciones de UI están en:
+```
+src/lib/translations-preload.ts
+```
+
+### Formato
+
+```typescript
+// Dentro del objeto staticTranslations
+"Texto en español": {
+  es: "Texto en español",
+  en: "Text in English",
+  fr: "Texte en français",
+  de: "Text auf Deutsch"
+},
+```
+
+### ⚠️ IMPORTANTE: Ubicación Correcta
+
+Las traducciones **DEBEN** estar dentro del objeto `staticTranslations`, NO dentro de `getPreloadCache()`:
+
+```typescript
+// ✅ CORRECTO - Dentro de staticTranslations
+export const staticTranslations = {
+  "Mi texto": {
+    es: "Mi texto",
+    en: "My text",
+    ...
+  },
+  // ... más traducciones
+};  // <-- Las traducciones van ANTES de este cierre
+
+// ❌ INCORRECTO - Dentro de getPreloadCache()
+export function getPreloadCache() {
+  const cache = {
+    // NO AÑADIR TRADUCCIONES AQUÍ
+  };
+}
+```
+
+### Verificar Traducciones
+
+Para verificar que una traducción existe:
+
+```typescript
+// En el navegador (consola)
+import { staticTranslations } from '@/lib/translations-preload';
+console.log(staticTranslations["Mi texto"]); 
+// Debe mostrar { es: "...", en: "...", fr: "...", de: "..." }
+```
 
 ---
 

@@ -1,14 +1,15 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.1.1-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.2.0-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-98%2F100-brightgreen.svg)](https://pagespeed.web.dev/)
 [![SEO](https://img.shields.io/badge/SEO-100%25_Optimizado-brightgreen.svg)](./MIGRACION-CARPETAS-FIJAS-COMPLETADA.md)
+[![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./I18N_IMPLEMENTATION.md)
 
-**🎉 VERSIÓN 4.0.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 4.2.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
-> **✅ ESTADO: ARQUITECTURA CARPETAS FIJAS 100% COMPLETADA** - 116 páginas migradas | PageSpeed **98/100** escritorio, **90/100** móvil
+> **✅ ESTADO: SISTEMA MULTIIDIOMA COMPLETO** - 116 páginas | 4 idiomas | Blog con slugs traducidos | PageSpeed **98/100**
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
@@ -125,18 +126,51 @@ src/app/
 1. **[MIGRACION-CARPETAS-FIJAS-COMPLETADA.md](./MIGRACION-CARPETAS-FIJAS-COMPLETADA.md)** - Informe completo de la migración
 2. **[CHANGELOG.md](./CHANGELOG.md)** - Historial de cambios v4.0.0
 
-### 🚀 Próximos Pasos
+### 🚀 Estado Actual (v4.2.0)
 
 1. ✅ Arquitectura carpetas fijas implementada
 2. ✅ 116 páginas migradas y funcionando
 3. ✅ Middleware y rewrites simplificados
-4. ✅ Commit y push completados
-5. ⏳ Testing en desarrollo (`npm run dev`)
-6. ⏳ Verificar compilación (`npm run build`)
-7. ⏳ Deploy a producción (Vercel)
-8. ⏳ Monitoreo SEO (Google Search Console, Analytics)
+4. ✅ **Blog con slugs multiidioma** (200 posts × 4 idiomas)
+5. ✅ **+400 traducciones de UI** para todas las páginas
+6. ✅ **Language switcher inteligente** para blog
+7. ✅ Deploy a producción (Vercel)
 
 **ROI esperado**: +20-50% tráfico orgánico internacional en 3-6 meses
+
+---
+
+## 🌍 Sistema de Blog Multiidioma (v4.2.0)
+
+**24 Enero 2026** - Blog con URLs completamente traducidas
+
+### URLs de Artículos por Idioma
+
+| Idioma | URL Ejemplo |
+|--------|-------------|
+| 🇪🇸 ES | `/es/blog/noticias/mi-articulo-espanol` |
+| 🇬🇧 EN | `/en/blog/news/my-english-article` |
+| 🇫🇷 FR | `/fr/blog/actualites/mon-article-francais` |
+| 🇩🇪 DE | `/de/blog/nachrichten/mein-deutscher-artikel` |
+
+### Implementación
+
+- **Base de datos**: Columnas `slug_en`, `slug_fr`, `slug_de` en tabla `posts`
+- **Generación automática**: Script `scripts/generate-blog-slug-translations.ts`
+- **Language switcher**: Detecta páginas de blog y navega al slug correcto
+
+### Traducciones de UI
+
+El archivo `src/lib/translations-preload.ts` contiene **8,500+ líneas** de traducciones para:
+- Página de Ofertas
+- Listado de Blog
+- Parking Murcia
+- Video Tutoriales
+- Clientes VIP
+- Búsqueda y Filtros
+- Documentación de Alquiler
+
+**Documentación**: [I18N_IMPLEMENTATION.md](./I18N_IMPLEMENTATION.md) | [GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)
 
 ---
 
