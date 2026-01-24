@@ -98,8 +98,8 @@ export async function POST(request: NextRequest) {
       });
     }
     
-    // Actualizar el pago a authorized
-    console.log("💾 Actualizando pago a 'authorized'...");
+    // Actualizar el pago a completed
+    console.log("💾 Actualizando pago a 'completed'...");
     const notesText = fromSuccessPage 
       ? `Actualizado via respaldo en página de éxito (${new Date().toISOString()})`
       : `Actualizado via verify-payment API (${new Date().toISOString()})`;
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     const { error: paymentError } = await supabase
       .from("payments")
       .update({
-        status: "authorized",
+        status: "completed",
         response_code: responseCode || "0000",
         authorization_code: authCode || "FALLBACK",
         notes: notesText,

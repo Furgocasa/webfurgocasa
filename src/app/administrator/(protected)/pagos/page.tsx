@@ -27,7 +27,10 @@ interface Payment {
 const statusConfig: Record<string, { icon: typeof CheckCircle; bg: string; text: string; label: string }> = {
   pending: { icon: Clock, bg: "bg-yellow-100", text: "text-yellow-700", label: "Pendiente" },
   completed: { icon: CheckCircle, bg: "bg-green-100", text: "text-green-700", label: "Completado" },
+  authorized: { icon: CheckCircle, bg: "bg-green-100", text: "text-green-700", label: "Completado" }, // Alias para pagos antiguos
   failed: { icon: XCircle, bg: "bg-red-100", text: "text-red-700", label: "Fallido" },
+  error: { icon: XCircle, bg: "bg-red-100", text: "text-red-700", label: "Fallido" }, // Alias
+  cancelled: { icon: XCircle, bg: "bg-orange-100", text: "text-orange-700", label: "Cancelado" },
   refunded: { icon: AlertCircle, bg: "bg-gray-100", text: "text-gray-700", label: "Reembolsado" },
 };
 
@@ -112,17 +115,21 @@ export default function PagosPage() {
   const paymentsList = filteredPayments;
   const allPayments = payments || [];
   
+  // Considerar "authorized" como "completed" para compatibilidad con pagos antiguos
+  const isCompleted = (status: string | null) => status === 'completed' || status === 'authorized';
+  const isFailed = (status: string | null) => status === 'failed' || status === 'error';
+  
   const totalAmount = allPayments
-    .filter(p => p.status === 'completed')
+    .filter(p => isCompleted(p.status))
     .reduce((sum, p) => sum + (p.amount || 0), 0);
   
   const pendingAmount = allPayments
     .filter(p => p.status === 'pending')
     .reduce((sum, p) => sum + (p.amount || 0), 0);
 
-  const completedCount = allPayments.filter(p => p.status === 'completed').length;
+  const completedCount = allPayments.filter(p => isCompleted(p.status)).length;
   const pendingCount = allPayments.filter(p => p.status === 'pending').length;
-  const failedCount = allPayments.filter(p => p.status === 'failed').length;
+  const failedCount = allPayments.filter(p => isFailed(p.status)).length;
 
   if (loading && paymentsList.length === 0) {
     return (
