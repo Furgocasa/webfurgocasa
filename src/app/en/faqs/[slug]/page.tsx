@@ -3,6 +3,14 @@ import { notFound } from"next/navigation";
 import { ArrowLeft, ChevronRight } from"lucide-react";
 import { Metadata } from "next";
 
+export const revalidate = 3600; // 1 hora
+
+// Generar rutas estáticas para todas las FAQs
+export async function generateStaticParams() {
+  const slugs = Object.keys(faqs);
+  return slugs.map((slug) => ({ slug }));
+}
+
 // TODO: Cargar desde base de datos o CMS
 const faqs: Record<string, { question: string; answer: string; category: string; related: string[] }> = {"edad-minima-alquiler": {
     question:"¿A partir de qué edad puedo alquilar una camper?",
