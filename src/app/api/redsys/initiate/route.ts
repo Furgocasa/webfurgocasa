@@ -201,7 +201,8 @@ export async function POST(request: NextRequest) {
         conversionCorrecta: decodedParams.DS_MERCHANT_AMOUNT === String(Math.round(amount * 100)),
         orderNumber: decodedParams.DS_MERCHANT_ORDER,
         orderLength: decodedParams.DS_MERCHANT_ORDER?.length,
-        orderFormatCorrecto: /^[0-9]{4}[a-zA-Z0-9]{8}$/.test(decodedParams.DS_MERCHANT_ORDER),
+        // Formato: 4 números iniciales + hasta 8 alfanuméricos (total 4-12 chars)
+        orderFormatCorrecto: /^[0-9]{4}[a-zA-Z0-9]{0,8}$/.test(decodedParams.DS_MERCHANT_ORDER),
         terminal: decodedParams.DS_MERCHANT_TERMINAL,
         merchantCode: decodedParams.DS_MERCHANT_MERCHANTCODE,
         currency: decodedParams.DS_MERCHANT_CURRENCY,

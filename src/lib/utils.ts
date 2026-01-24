@@ -113,28 +113,38 @@ export function calculatePricingDays(actualDays: number): number {
 
 /**
  * Generate order number for Redsys
- * Format: 4-12 alphanumeric characters, must be unique
- * Uses: YYMMDDHHMMSSmmm (year 2 digits + timestamp + milliseconds)
+ * 
+ * IMPORTANTE: Según la documentación oficial de Redsys:
+ * - Los 4 PRIMEROS caracteres DEBEN ser NUMÉRICOS obligatoriamente
+ * - Longitud total: 4-12 caracteres alfanuméricos
+ * 
+ * Formato: YYMM + prefix + DDHHMM (12 caracteres total)
+ * Ejemplo: 2601FC241509 (año 26, mes 01, prefix FC, día 24, hora 15:09)
  */
 export function generateOrderNumber(prefix?: string): string {
   const now = new Date();
-  const timestamp = 
+  
+  // Primeros 4 caracteres DEBEN ser numéricos (YYMM)
+  const yearMonth = 
     now.getFullYear().toString().slice(-2) + // YY (últimos 2 dígitos del año)
-    (now.getMonth() + 1).toString().padStart(2, "0") + // MM
+    (now.getMonth() + 1).toString().padStart(2, "0"); // MM
+  
+  // Resto del timestamp
+  const dayTime = 
     now.getDate().toString().padStart(2, "0") + // DD
     now.getHours().toString().padStart(2, "0") + // HH
     now.getMinutes().toString().padStart(2, "0") + // MM
-    now.getSeconds().toString().padStart(2, "0") + // SS
-    now.getMilliseconds().toString().padStart(3, "0").slice(0, 2); // mmm (2 dígitos)
+    now.getSeconds().toString().padStart(2, "0"); // SS
   
-  // Sin prefix: 14 caracteres → cortamos a 12
-  // Con prefix "FC": FC + 10 caracteres del timestamp = 12 total
   if (prefix) {
-    // Prefix + timestamp, cortado a 12 caracteres total
-    return (prefix + timestamp).slice(0, 12);
+    // Formato: YYMM + prefix + DDHHMM (máximo 12 caracteres)
+    // Ejemplo: 2601FC241509
+    const orderNumber = yearMonth + prefix + dayTime;
+    return orderNumber.slice(0, 12);
   }
   
-  return timestamp.slice(0, 12);
+  // Sin prefix: YYMMDDHHMM (10 caracteres)
+  return (yearMonth + dayTime).slice(0, 12);
 }
 
 /**
