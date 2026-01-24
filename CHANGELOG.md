@@ -4,6 +4,93 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔧 [4.1.1] - 25 de Enero 2026 - **FIX CRÍTICO: Barra Móvil Reservas con Extras**
+
+### 🚨 **PROBLEMA CRÍTICO RESUELTO**
+
+**Síntomas**:
+- ❌ Error JavaScript al añadir extras en página `/reservar/nueva`
+- ❌ `TypeError: Cannot read properties of undefined (reading 'price_type')`
+- ❌ Página fallaba al intentar mostrar extras en barra flotante móvil
+
+**Fecha de detección**: 25 de Enero 2026  
+**Gravedad**: 🔴 **CRÍTICA** - Proceso de reserva bloqueado en móvil cuando hay extras
+
+---
+
+### 🔍 **CAUSA RAÍZ IDENTIFICADA**
+
+La barra flotante móvil (visible en dispositivos móviles/tablets) accedía incorrectamente a propiedades de los extras seleccionados:
+
+```typescript
+// ❌ CÓDIGO INCORRECTO (accedía a estructura anidada inexistente)
+{selectedExtras.slice(0, 2).map((extra) => {
+  if (extra.extra.price_type === 'per_unit') {  // ❌ extra.extra no existe
+    price = extra.extra.price_per_unit;
+  }
+  return <div key={extra.extra.id}>...</div>;   // ❌ extra.extra no existe
+})}
+```
+
+**Por qué fallaba**:
+- La interfaz `SelectedExtra` define una estructura plana: `{ id, name, quantity, price_per_day, price_per_rental }`
+- El código intentaba acceder a `extra.extra.property` cuando debería ser `extra.property`
+- Esto causaba `undefined` y el error de `price_type`
+
+---
+
+### ✅ **SOLUCIÓN APLICADA**
+
+Corregido el código para usar la estructura correcta (misma lógica que el sidebar de escritorio):
+
+```typescript
+// ✅ CÓDIGO CORRECTO (estructura plana)
+{selectedExtras.slice(0, 2).map((extra) => {
+  const price = extra.price_per_rental > 0 
+    ? extra.price_per_rental 
+    : extra.price_per_day * pricingDays;
+  return (
+    <div key={extra.id}>
+      <span>{extra.name} {extra.quantity > 1 && `×${extra.quantity}`}</span>
+      <span>+{formatPrice(price * extra.quantity)}</span>
+    </div>
+  );
+})}
+```
+
+---
+
+### 📁 **ARCHIVOS CORREGIDOS**
+
+| Archivo | Idioma | Estado |
+|---------|--------|--------|
+| `src/app/es/reservar/nueva/page.tsx` | 🇪🇸 Español | ✅ Corregido |
+| `src/app/en/book/new/page.tsx` | 🇬🇧 Inglés | ✅ Corregido |
+| `src/app/fr/reserver/nouvelle/page.tsx` | 🇫🇷 Francés | ✅ Corregido |
+| `src/app/de/buchen/neu/page.tsx` | 🇩🇪 Alemán | ✅ Corregido |
+
+**Total**: 4 archivos corregidos (1 por idioma)
+
+---
+
+### 🎯 **RESULTADO**
+
+- ✅ Extras se muestran correctamente en barra flotante móvil
+- ✅ Precios calculados correctamente
+- ✅ Sin errores JavaScript
+- ✅ Proceso de reserva funciona en todos los dispositivos
+- ✅ Todos los idiomas corregidos
+
+---
+
+### 📝 **COMMIT**
+
+```
+9c8825e - fix(reservas): corregir error en barra móvil al mostrar extras
+```
+
+---
+
 ## 🌍 [4.1.0] - 24 de Enero 2026 - **SISTEMA DE CAMBIO DE IDIOMA MEJORADO**
 
 ### 🎯 **Cambio de Idioma Dinámico para Blog**

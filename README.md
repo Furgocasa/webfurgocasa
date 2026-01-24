@@ -1,6 +1,6 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.1.0-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.1.1-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-98%2F100-brightgreen.svg)](https://pagespeed.web.dev/)
@@ -1503,6 +1503,11 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 ## 📜 Historial de Versiones
 
+### v4.1.1 (25 Enero 2026) - Fix Crítico Barra Móvil Reservas 🔧
+- 🔴 **FIX CRÍTICO**: Error `price_type` en barra flotante móvil con extras
+- ✅ Corregido acceso a propiedades de extras en 4 idiomas (ES/EN/FR/DE)
+- ✅ Proceso de reserva funciona correctamente en móvil con extras
+
 ### v4.1.0 (24 Enero 2026) - Sistema de Cambio de Idioma Mejorado 🌍
 - 🌐 **Blog**: Cambio de idioma con slugs traducidos dinámicos desde Supabase
 - 📝 **612 slugs de blog generados** (204 posts × 3 idiomas: EN, FR, DE)
@@ -1595,11 +1600,11 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 4.1.0 - Sistema de Cambio de Idioma Mejorado  
+**Versión**: 4.1.1 - Fix Crítico Barra Móvil Reservas  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
 **PageSpeed**: 98/100 escritorio | 90/100 móvil  
-**Última actualización**: 24 de Enero 2026  
+**Última actualización**: 25 de Enero 2026  
 
 ---
 
