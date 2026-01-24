@@ -378,9 +378,9 @@ export default async function LocationPage({ params }: PageProps) {
       />
 
       {/* ================================================================== */}
-      {/* PRECIOS - Idéntico a producción */}
+      {/* PRECIOS - Fondo gris claro */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
