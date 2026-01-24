@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { validateSignature, decodeParams, getPaymentStatus, getResponseMessage } from "@/lib/redsys";
+import { 
+  sendFirstPaymentConfirmedEmail, 
+  sendSecondPaymentConfirmedEmail,
+  getBookingDataForEmail 
+} from "@/lib/email";
 
 /**
  * POST /api/redsys/notification
@@ -229,36 +234,51 @@ export async function POST(request: NextRequest) {
           try {
             // Determinar si es el primer pago o el segundo
             const isFirstPayment = currentPaid === 0;
-            const isSecondPayment = !isFirstPayment && newPaid < totalPrice;
             const isFullPayment = newPaid >= totalPrice;
             
-            let emailType: 'first_payment' | 'second_payment' = 'first_payment';
-            
-            if (isSecondPayment || isFullPayment) {
-              // Si ya había un pago previo, este es el segundo pago
-              emailType = isFirstPayment ? 'first_payment' : 'second_payment';
-            }
-            
-            console.log("📧 [7/7] Tipo de email a enviar:", {
-              emailType,
+            console.log("📧 [7/7] Tipo de pago:", {
               isFirstPayment,
-              isSecondPayment,
               isFullPayment,
+              currentPaid,
+              newPaid,
+              totalPrice,
             });
             
-            // Enviar email de forma asíncrona (no bloqueante)
-            fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/bookings/send-email`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                type: emailType,
-                bookingId: payment.booking_id,
-              }),
-            }).catch(emailError => {
-              console.error('❌ Error enviando email de confirmación:', emailError);
-            });
+            // Obtener datos de la reserva para el email
+            const bookingData = await getBookingDataForEmail(payment.booking_id, supabase);
             
-            console.log(`✅ [7/7] Email programado para envío`);
+            if (bookingData) {
+              // Obtener email del cliente
+              const { data: booking } = await supabase
+                .from("bookings")
+                .select("customer_email")
+                .eq("id", payment.booking_id)
+                .single();
+              
+              const customerEmail = booking?.customer_email;
+              
+              if (customerEmail) {
+                // Actualizar los datos de pago en bookingData
+                bookingData.amountPaid = newPaid;
+                bookingData.pendingAmount = totalPrice - newPaid;
+                
+                if (isFirstPayment) {
+                  // Primer pago (ya sea 50% o 100%)
+                  console.log("📧 [7/7] Enviando email de PRIMER PAGO a:", customerEmail);
+                  const result = await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
+                  console.log("📧 [7/7] Resultado envío email primer pago:", result);
+                } else {
+                  // Segundo pago
+                  console.log("📧 [7/7] Enviando email de SEGUNDO PAGO a:", customerEmail);
+                  const result = await sendSecondPaymentConfirmedEmail(customerEmail, bookingData);
+                  console.log("📧 [7/7] Resultado envío email segundo pago:", result);
+                }
+              } else {
+                console.error("❌ [7/7] No se encontró email del cliente para booking:", payment.booking_id);
+              }
+            } else {
+              console.error("❌ [7/7] No se pudieron obtener datos de la reserva para email");
+            }
           } catch (emailError) {
             console.error('❌ Error al intentar enviar email:', emailError);
             // No bloqueamos el proceso si falla el email
