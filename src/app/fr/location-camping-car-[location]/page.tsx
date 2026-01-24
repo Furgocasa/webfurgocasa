@@ -49,9 +49,8 @@ export const revalidate = 3600; // 1 hora
 export const dynamic = 'force-dynamic'; // Necesario para acceder a headers()
 
 // ============================================================================
-// NOTA: Esta página se sirve via rewrite desde el middleware
-// Las URLs como /es/alquiler-autocaravanas-campervans-madrid se reescriben a /location-target
-// El parámetro de localización viene en el header 'x-location-param'
+// NOTA: Esta página usa rutas dinámicas de Next.js
+// El parámetro [location] se extrae directamente de la URL
 // ============================================================================
 
 // Imagen hero por defecto para páginas de alquiler (fallback si no hay hero_image en DB)
@@ -268,11 +267,12 @@ interface PageProps {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { location: slug } = await params;
   const locale: Locale = 'fr';
+  const kind: PageKind = 'rent';
   const t = (key: string) => translateServer(key, locale);
   const baseUrl = 'https://www.furgocasa.com';
 
   if (kind === "rent") {
-    const slug = extractRentSlug(locationParam);
+    // El slug ya viene de params.location
     const location = await getRentLocation(slug);
 
     if (!location) {
@@ -322,13 +322,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LocationPage({ params }: PageProps) {
   const { location: slug } = await params;
   const locale: Locale = 'fr';
+  const kind: PageKind = 'rent';
   const t = (key: string) => translateServer(key, locale);
 
   // ============================================================================
   // RENDERIZAR PÁGINA DE ALQUILER (Similar a HOME)
   // ============================================================================
   if (kind === "rent") {
-    const slug = extractRentSlug(locationParam);
+    // El slug ya viene de params.location
     const locationRaw = await getRentLocation(slug);
 
     if (!locationRaw) {
