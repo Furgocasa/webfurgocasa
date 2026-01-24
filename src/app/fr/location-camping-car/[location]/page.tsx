@@ -219,12 +219,12 @@ export default async function LocationPage({ params }: PageProps) {
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3">
-            {/* H1 dynamique depuis la BD (h1_title) ou fallback - taille réduite */}
+            {/* H1 - Format fixe: Location de Camping-car (Autocaravane) à {ville} */}
             <h1 
               className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}
             >
-              {location.h1_title || `Location Camping-car ${location.name}`}
+              Location de Camping-car (Autocaravane) à {location.name}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
@@ -243,10 +243,18 @@ export default async function LocationPage({ params }: PageProps) {
             </div>
             
             <p 
-              className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-6" 
+              className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-4" 
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
             >
               sur roues
+            </p>
+            
+            {/* Sous-titre */}
+            <p 
+              className="text-sm md:text-base lg:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" 
+              style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
+            >
+              Les meilleurs camping-cars grand volume en location
             </p>
           </div>
 
