@@ -431,16 +431,6 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(request.nextUrl, { status: 301 });
       }
       
-      // ✅ CRÍTICO: Si es solo el locale sin ruta (ej: /en, /es, /de)
-      // redirigir con trailing slash para que Next.js encuentre la página
-      // IMPORTANTE: Esto va después de correctPath para evitar conflictos
-      if (pathnameWithoutLocale === '' || pathnameWithoutLocale === '/') {
-        if (!pathname.endsWith('/')) {
-          request.nextUrl.pathname = pathname + '/';
-          return NextResponse.redirect(request.nextUrl, { status: 301 });
-        }
-      }
-      
       // ✅ NUEVA ARQUITECTURA: Páginas con [locale] físico
       // Para estas páginas, simplemente pasar el locale como header sin rewrite
       // Next.js las manejará con la carpeta [locale]/
