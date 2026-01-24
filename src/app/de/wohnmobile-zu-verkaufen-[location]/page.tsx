@@ -1,38 +1,23 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
-import { SearchWidget } from "@/components/booking/search-widget";
-import { LocalBusinessJsonLd } from "@/components/locations/local-business-jsonld";
 import { SaleLocationJsonLd } from "@/components/locations/sale-location-jsonld";
-import { DestinationsGrid } from "@/components/destinations-grid";
 import { LocalizedLink } from "@/components/localized-link";
 import { translateServer } from "@/lib/i18n/server-translation";
-import { getTranslatedContent, getTranslatedContentSections, getTranslatedRecords } from "@/lib/translations/get-translations";
+import { getTranslatedContent } from "@/lib/translations/get-translations";
 import type { Locale } from "@/lib/i18n/config";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
-import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { sortVehicleEquipment } from "@/lib/utils";
 import { 
   MapPin, 
   CheckCircle, 
   Car,
-  Users, 
-  Bed,
-  Package,
-  Phone,
-  Mail,
-  Gauge,
-  Fuel,
-  Settings,
-  Tag,
   ArrowRight,
   Shield,
-  Calendar,
-  MessageSquare,
-  Map,
-  Gift,
-  ExternalLink
+  Euro,
+  FileCheck,
+  Phone,
+  Tag
 } from "lucide-react";
 import Image from "next/image";
 
@@ -46,153 +31,16 @@ const supabase = createClient(
 );
 
 export const revalidate = 3600; // 1 hora
-export const dynamic = 'force-dynamic'; // Necesario para acceder a headers()
 
 // ============================================================================
 // NOTA: Esta página usa rutas dinámicas de Next.js
 // El parámetro [location] se extrae directamente de la URL
+// Locale: DE (Deutsch) | Kind: sale (Verkauf)
 // ============================================================================
 
-// Imagen hero por defecto para páginas de alquiler (fallback si no hay hero_image en DB)
-// Next.js Image optimiza automáticamente a AVIF/WebP según next.config.js
-const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
+const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-01.webp";
 
-// ============================================================================
-// HELPERS - Detección de tipo de página y extracción de slug
-// ============================================================================
-
-type PageKind = "rent" | "sale" | "unknown";
-
-function getPageKind(locationParam: string): PageKind {
-  // Patrones de ALQUILER (todos los idiomas)
-  if (
-    /^alquiler-autocaravanas-campervans-/.test(locationParam) ||
-    /^rent-campervan-motorhome-/.test(locationParam) ||
-    /^location-camping-car-/.test(locationParam) ||
-    /^wohnmobil-mieten-/.test(locationParam)
-  ) {
-    return "rent";
-  }
-
-  // Patrones de VENTA (todos los idiomas)
-  if (
-    /^venta-autocaravanas-camper-/.test(locationParam) ||
-    /^campervans-for-sale-in-/.test(locationParam) ||
-    /^camping-cars-a-vendre-/.test(locationParam) ||
-    /^wohnmobile-zu-verkaufen-/.test(locationParam)
-  ) {
-    return "sale";
-  }
-
-  return "unknown";
-}
-
-function extractRentSlug(locationParam: string): string {
-  const patterns = [
-    /^alquiler-autocaravanas-campervans-(.+)$/,
-    /^rent-campervan-motorhome-(.+)$/,
-    /^location-camping-car-(.+)$/,
-    /^wohnmobil-mieten-(.+)$/,
-  ];
-  
-  for (const pattern of patterns) {
-    const match = locationParam.match(pattern);
-    if (match) return match[1];
-  }
-  return locationParam;
-}
-
-function extractSaleSlug(locationParam: string): string {
-  const patterns = [
-    /^venta-autocaravanas-camper-(.+)$/,
-    /^campervans-for-sale-in-(.+)$/,
-    /^camping-cars-a-vendre-(.+)$/,
-    /^wohnmobile-zu-verkaufen-(.+)$/,
-  ];
-  
-  for (const pattern of patterns) {
-    const match = locationParam.match(pattern);
-    if (match) return match[1];
-  }
-  return locationParam;
-}
-
-function detectLocale(locationParam: string): Locale {
-  if (/^rent-campervan-motorhome-/.test(locationParam) || /^campervans-for-sale-in-/.test(locationParam)) return 'en';
-  if (/^location-camping-car-/.test(locationParam) || /^camping-cars-a-vendre-/.test(locationParam)) return 'fr';
-  if (/^wohnmobil-mieten-/.test(locationParam) || /^wohnmobile-zu-verkaufen-/.test(locationParam)) return 'de';
-  return 'es';
-}
-
-async function getLocaleFromHeaders(): Promise<Locale> {
-  const headersList = await headers();
-  const locale = headersList.get('x-detected-locale');
-  if (locale === 'en' || locale === 'fr' || locale === 'de') return locale;
-  return 'es';
-}
-
-// ============================================================================
-// DATOS - Alquiler
-// ============================================================================
-
-interface RentLocation {
-  id: string;
-  slug: string;
-  name: string;
-  province: string;
-  region: string;
-  meta_title: string | null;
-  meta_description: string | null;
-  h1_title: string | null;
-  intro_text: string | null;
-  hero_image: string | null;
-  content_sections: any;
-  distance_km: number | null;
-  travel_time_minutes: number | null;
-  nearest_location: {
-    id: string;
-    name: string;
-    city: string;
-    address: string;
-  } | null;
-}
-
-async function getRentLocation(slug: string): Promise<RentLocation | null> {
-  const { data, error } = await supabase
-    .from('location_targets')
-    .select(`
-      *,
-      nearest_location:locations!nearest_location_id(id, name, city, address)
-    `)
-    .eq('slug', slug)
-    .eq('is_active', true)
-    .single();
-
-  if (error || !data) return null;
-  return data as RentLocation;
-}
-
-async function getRentVehicles() {
-  const { data } = await supabase
-    .from('vehicles')
-    .select(`*, images:vehicle_images(*)`)
-    .eq('is_for_rent', true)
-    .order('internal_code', { ascending: true })
-    .limit(3);
-
-  return (data || []).map((v: any) => {
-    const primary = v.images?.find((i: any) => i.is_primary);
-    const first = v.images?.[0];
-    return {
-      id: v.id,
-      name: v.name,
-      slug: v.slug,
-      brand: v.brand,
-      model: v.model,
-      main_image: primary?.image_url || first?.image_url || null,
-    };
-  });
-}
+type PageKind = "rent" | "sale";
 
 // ============================================================================
 // DATOS - Venta
@@ -269,59 +117,283 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const locale: Locale = 'de';
   const kind: PageKind = 'sale';
   const t = (key: string) => translateServer(key, locale);
-  const baseUrl = 'https://www.furgocasa.com';
-
 
-  if (kind === "sale") {
-    // El slug ya viene de params.location
-    const location = await getSaleLocation(slug);
+  const location = await getSaleLocation(slug);
 
-    if (!location) {
-      return { title: t("Ubicación no encontrada"), robots: { index: false, follow: false } };
-    }
-
-    const title = location.meta_title?.trim() || `${t("Venta de Autocaravanas en")} ${location.name}`;
-    const description = location.meta_description?.trim() || 
-      `${t("Compra tu autocaravana o camper en")} ${location.name}. ${t("Vehículos con garantía y financiación")}.`;
-
-    const path = `/venta-autocaravanas-camper-${slug}`;
-    const alternates = buildCanonicalAlternates(path, locale);
-
-    return {
-      title: { absolute: title },
-      description,
-      alternates,
-      openGraph: {
-        title: { absolute: title },
-        description,
-        type: 'website',
-        url: alternates.canonical,
-        siteName: 'Furgocasa',
-        locale: locale === 'es' ? 'es_ES' : locale === 'en' ? 'en_US' : locale === 'fr' ? 'fr_FR' : 'de_DE',
-        images: [{ url: `${baseUrl}/images/slides/hero-01.webp`, width: 1200, height: 630 }],
-      },
-      robots: { index: true, follow: true },
-    };
+  if (!location) {
+    return { title: t("Standort nicht gefunden"), robots: { index: false, follow: false } };
   }
 
-  return { title: "Página no encontrada", robots: { index: false, follow: false } };
+  const title = location.meta_title?.trim() || `${t("Wohnmobile zu verkaufen in")} ${location.name}`;
+  const description = location.meta_description?.trim() || 
+    `${t("Kaufen Sie Ihr Wohnmobil in")} ${location.name}. ${t("Fahrzeuge mit Garantie und Finanzierung")}.`;
+
+  const path = `/wohnmobile-zu-verkaufen-${slug}`;
+  const alternates = buildCanonicalAlternates(path, locale);
+
+  return {
+    title: { absolute: title },
+    description,
+    alternates,
+    openGraph: {
+      title: { absolute: title },
+      description,
+      type: 'website',
+      url: alternates.canonical,
+      siteName: 'Furgocasa',
+      locale: 'de_DE',
+      images: [{ url: DEFAULT_HERO_IMAGE, width: 1200, height: 630 }],
+    },
+    robots: { index: true, follow: true },
+  };
 }
 
 // ============================================================================
 // PÁGINA PRINCIPAL
 // ============================================================================
 
-export default async function LocationPage({ params }: PageProps) {
+export default async function SaleLocationPage({ params }: PageProps) {
   const { location: slug } = await params;
   const locale: Locale = 'de';
   const kind: PageKind = 'sale';
   const t = (key: string) => translateServer(key, locale);
 
-  // ============================================================================
-  // RENDERIZAR PÁGINA DE ALQUILER (Similar a HOME)
-  // ============================================================================
+  const locationRaw = await getSaleLocation(slug);
 
-  // [RESTO DE LA IMPLEMENTACIÓN PARA "sale"...]
-  
-  notFound();
+  if (!locationRaw) {
+    notFound();
+  }
+
+  // Aplicar traducciones desde Supabase
+  const translatedFields = await getTranslatedContent(
+    'sale_location_targets', locationRaw.id,
+    ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
+    locale,
+    {
+      name: locationRaw.name,
+      h1_title: locationRaw.h1_title,
+      meta_title: locationRaw.meta_title,
+      meta_description: locationRaw.meta_description,
+      intro_text: locationRaw.intro_text,
+    }
+  );
+
+  const location = {
+    ...locationRaw,
+    name: translatedFields.name || locationRaw.name,
+    h1_title: translatedFields.h1_title || locationRaw.h1_title,
+    intro_text: translatedFields.intro_text || locationRaw.intro_text,
+  };
+
+  const vehicles = await getSaleVehicles();
+  const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
+
+  return (
+    <>
+      <SaleLocationJsonLd location={location} vehicles={vehicles} />
+      
+      {/* Hero Section */}
+      <section className="relative h-[60vh] min-h-[500px] flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/40 z-10" />
+        <Image
+          src={DEFAULT_HERO_IMAGE}
+          alt={location.h1_title || `${t("Wohnmobile zu verkaufen in")} ${location.name}`}
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        
+        <div className="relative z-20 container mx-auto px-4 text-center text-white">
+          <h1 className="text-4xl lg:text-6xl font-heading font-bold mb-6 drop-shadow-lg">
+            {location.h1_title || `${t("Wohnmobile zu verkaufen in")} ${location.name}`}
+          </h1>
+          {location.intro_text && (
+            <p className="text-xl lg:text-2xl mb-8 max-w-3xl mx-auto drop-shadow-md">
+              {location.intro_text}
+            </p>
+          )}
+          
+          {location.distance_km && (
+            <div className="inline-flex items-center gap-2 bg-white/90 backdrop-blur-sm px-6 py-3 rounded-full text-gray-900 font-medium shadow-lg">
+              <MapPin className="h-5 w-5 text-furgocasa-blue" />
+              <span>
+                {t("Bei")} {location.distance_km} km {t("von unserem Büro")} ({driveHours}h {t("ca.")})
+              </span>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Información de la ubicación */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+            <div className="flex items-start gap-4 mb-6">
+              <MapPin className="h-8 w-8 text-furgocasa-blue flex-shrink-0 mt-1" />
+              <div>
+                <h2 className="text-2xl font-heading font-bold text-gray-900 mb-2">
+                  {t("Wohnmobile zu verkaufen in")} {location.name}
+                </h2>
+                <p className="text-gray-600 mb-4">
+                  {location.province && location.region && (
+                    <span>{location.province}, {location.region}</span>
+                  )}
+                </p>
+                {location.distance_km && (
+                  <p className="text-gray-700">
+                    <span className="font-semibold">{t("Entfernung von Murcia")}:</span> {location.distance_km} km 
+                    {location.travel_time_minutes && ` (${Math.round(location.travel_time_minutes / 60)}h ${t("ca.")})`}
+                  </p>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-2 text-green-700 bg-green-50 px-4 py-3 rounded-lg">
+              <CheckCircle className="h-5 w-5" />
+              <span className="font-medium">
+                {t("Lieferung an diesem Standort verfügbar")}
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Vehículos en venta */}
+      {vehicles.length > 0 && (
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4">
+                {t("Wohnmobile zu verkaufen")}
+              </h2>
+              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+                {t("Fahrzeuge mit Garantie und Finanzierungsmöglichkeiten")}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+              {vehicles.map((vehicle: any) => (
+                <LocalizedLink
+                  key={vehicle.id}
+                  href={`/verkaufe/${vehicle.slug}`}
+                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-200"
+                >
+                  <div className="relative h-64 bg-gray-200">
+                    {vehicle.main_image?.image_url && (
+                      <Image
+                        src={vehicle.main_image.image_url}
+                        alt={vehicle.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    )}
+                    {vehicle.sale_status === 'available' && (
+                      <div className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        {t("Verfügbar")}
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
+                      {vehicle.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm mb-3">
+                      {vehicle.brand} {vehicle.model} • {vehicle.year}
+                    </p>
+                    
+                    {/* Características destacadas */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {vehicle.sleeps && (
+                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          {vehicle.sleeps} {t("Schlafplätze")}
+                        </span>
+                      )}
+                      {vehicle.kilometers && (
+                        <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                          {vehicle.kilometers.toLocaleString()} km
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Precio */}
+                    {vehicle.sale_price && (
+                      <div className="mb-4">
+                        <span className="text-3xl font-heading font-bold text-furgocasa-blue">
+                          {vehicle.sale_price.toLocaleString()}€
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                      <span className="text-furgocasa-blue font-bold">
+                        {t("Details anzeigen")}
+                      </span>
+                      <ArrowRight className="h-5 w-5 text-furgocasa-blue group-hover:translate-x-1 transition-transform" />
+                    </div>
+                  </div>
+                </LocalizedLink>
+              ))}
+            </div>
+
+            <div className="text-center mt-12">
+              <LocalizedLink
+                href="/verkaufe"
+                className="inline-flex items-center gap-2 bg-furgocasa-blue text-white px-8 py-4 rounded-full font-bold hover:bg-furgocasa-blue-dark transition-colors text-lg"
+              >
+                {t("Alle Fahrzeuge zum Verkauf anzeigen")}
+                <ArrowRight className="h-5 w-5" />
+              </LocalizedLink>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Ventajas de comprar con Furgocasa */}
+      <section className="py-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4">
+              {t("Warum bei Furgocasa kaufen?")}
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+            {[
+              { icon: Shield, title: t("Garantie inklusive"), desc: t("Alle unsere Fahrzeuge mit Garantie") },
+              { icon: Euro, title: t("Finanzierung"), desc: t("Flexible Zahlungsoptionen") },
+              { icon: FileCheck, title: t("Vollständige Inspektion"), desc: t("Geprüfte und zertifizierte Fahrzeuge") },
+              { icon: Phone, title: t("Beratung"), desc: t("Wir helfen Ihnen bei der Auswahl") },
+            ].map((service, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl text-center shadow-md hover:shadow-lg transition-shadow">
+                <service.icon className="h-12 w-12 text-furgocasa-blue mx-auto mb-4" />
+                <h3 className="font-heading font-bold text-gray-900 mb-2">{service.title}</h3>
+                <p className="text-gray-600 text-sm">{service.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-16 bg-furgocasa-blue text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-6">
+            {t("Suchen Sie Ihr ideales Wohnmobil?")}
+          </h2>
+          <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
+            {t("Kontaktieren Sie uns und wir helfen Ihnen, das perfekte Fahrzeug für Sie zu finden")}
+          </p>
+          <LocalizedLink
+            href="/verkaufe"
+            className="inline-flex items-center gap-2 bg-white text-furgocasa-blue px-8 py-4 rounded-full font-bold hover:bg-gray-100 transition-colors text-lg"
+          >
+            {t("Alle Fahrzeuge anzeigen")}
+            <ArrowRight className="h-5 w-5" />
+          </LocalizedLink>
+        </div>
+      </section>
+    </>
+  );
 }
