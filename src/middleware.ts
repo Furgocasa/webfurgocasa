@@ -422,6 +422,15 @@ export async function middleware(request: NextRequest) {
       // Tiene locale en la URL
       const pathnameWithoutLocale = removeLocaleFromPathname(pathname);
       
+      // ✅ CRÍTICO: Si es solo el locale sin ruta (ej: /en, /es, /de)
+      // redirigir con trailing slash para que Next.js encuentre la página
+      if (pathnameWithoutLocale === '' || pathnameWithoutLocale === '/') {
+        if (!pathname.endsWith('/')) {
+          request.nextUrl.pathname = pathname + '/';
+          return NextResponse.redirect(request.nextUrl, { status: 301 });
+        }
+      }
+      
       // ✅ VERIFICAR si la URL usa los segmentos correctos para el idioma
       // Si no, redirigir a la URL correcta (ej: /de/vehicles/slug → /de/fahrzeuge/slug)
       const correctPath = getCorrectUrlForLocale(pathnameWithoutLocale, locale);
