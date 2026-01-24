@@ -289,7 +289,13 @@ Estas rutas **NO tienen prefijo de idioma** porque son funcionales (no de conten
 
 ### Rutas Funcionales
 ```
-/reservar/:id/*          → Flujo de reserva (funcional, no contenido)
+/reservar/:path*         → Flujo de reserva (funcional, no contenido)
+  ├── /reservar          → Búsqueda inicial
+  ├── /reservar/vehiculo → Selección de vehículo + extras
+  ├── /reservar/nueva    → Formulario de datos cliente
+  ├── /reservar/[id]     → Ver reserva
+  └── /reservar/[id]/pago → Pasarela de pago
+
 /pago/exito              → Confirmación de pago
 /pago/error              → Error de pago
 /vehiculos/:slug         → Página individual de vehículo (dinámico por slug)
@@ -298,11 +304,37 @@ Estas rutas **NO tienen prefijo de idioma** porque son funcionales (no de conten
 /administrator           → Panel de administración
 ```
 
-### Posible Futuro Trabajo
-Las siguientes carpetas en la raíz de `/app/` podrían migrar a la estructura de idiomas en el futuro:
-- `/app/faqs/` → Migrar a `/es/faqs/`, `/en/faqs/`, etc.
-- `/app/vehiculos/` → Ya está en cada idioma, eliminar raíz
-- `/app/ventas/` → Ya está en cada idioma, eliminar raíz
+### ✅ DECISIÓN ARQUITECTÓNICA: Rewrites para Rutas Funcionales
+
+**Decisión**: Mantener rutas funcionales SIN idioma físico, usando rewrites para traducir URLs.
+
+**Justificación**:
+1. **Son flujos funcionales, no contenido**: No necesitan SEO per se
+2. **Rewrites funcionan perfectamente**: URLs se ven traducidas para el usuario
+3. **Mantenibilidad**: Un solo código en lugar de 4x duplicado
+4. **Patrón común**: Stripe usa `/checkout`, Amazon usa `/cart` (sin idioma)
+5. **Puede migrarse después**: No es urgente, podemos hacerlo si es necesario
+
+**Rewrites configurados** (en `next.config.js`):
+- 🇬🇧 `/en/book/:path*` → `/reservar/:path*`
+- 🇫🇷 `/fr/reserver/:path*` → `/reservar/:path*`
+- 🇩🇪 `/de/buchen/:path*` → `/reservar/:path*`
+- 🇪🇸 `/es/reservar/:path*` → `/reservar/:path*`
+
+**URLs resultantes**:
+- 🇪🇸 `https://furgocasa.com/reservar/vehiculo` (física)
+- 🇬🇧 `https://furgocasa.com/en/book/vehicle` (rewrite)
+- 🇫🇷 `https://furgocasa.com/fr/reserver/vehicule` (rewrite)
+- 🇩🇪 `https://furgocasa.com/de/buchen/fahrzeug` (rewrite)
+
+### Rutas en Raíz que DEBEN quedarse sin idioma
+Las siguientes carpetas en la raíz de `/app/` están correctamente posicionadas:
+- ✅ `/app/reservar/` - Flujo funcional (con rewrites)
+- ✅ `/app/pago/` - Flujo funcional (con rewrites)
+- ✅ `/app/vehiculos/[slug]/` - Páginas dinámicas individuales
+- ✅ `/app/ventas/[slug]/` - Páginas dinámicas individuales
+- ✅ `/app/faqs/[slug]/` - FAQs dinámicas individuales
+- ✅ `/app/administrator/` - Panel admin (sin idioma)
 
 ---
 
