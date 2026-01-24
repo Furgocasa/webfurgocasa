@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { 
-  ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Mail, Phone, Package
+  ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Mail, Phone, Package, Send
 } from "lucide-react";
 import Link from "next/link";
 import { calculateRentalDays, formatPrice } from "@/lib/utils";
@@ -106,7 +106,9 @@ export default function EditarReservaPage() {
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [originalStatus, setOriginalStatus] = useState<string>('pending');
   
   const [bookingNumber, setBookingNumber] = useState('');
   const [customerId, setCustomerId] = useState<string>('');
@@ -282,6 +284,9 @@ export default function EditarReservaPage() {
         notes: booking.notes || '',
         admin_notes: booking.admin_notes || '',
       });
+
+      // Guardar el estado original para detectar cambios
+      setOriginalStatus(booking.status ?? 'pending');
 
       // Convertir extras existentes a formato del estado
       const extrasMap: Record<string, number> = {};
@@ -511,17 +516,32 @@ export default function EditarReservaPage() {
         }
       }
 
-      setMessage({ type: 'success', text: 'Reserva actualizada correctamente' });
+      // Verificar si el estado cambió para sugerir enviar email
+      const statusChanged = originalStatus !== formData.status;
+      const becameConfirmed = statusChanged && formData.status === 'confirmed';
       
-      // Recargar los datos para verificar que se guardaron
-      await loadData();
-      
-      // Dar un momento para que el usuario vea el mensaje de éxito
-      setTimeout(() => {
-        router.push(`/administrator/reservas/${bookingId}`);
-        // Forzar recarga de la página de detalle
-        router.refresh();
-      }, 1500);
+      if (becameConfirmed) {
+        setMessage({ 
+          type: 'success', 
+          text: '✅ Reserva actualizada y confirmada.\n\n¿Quieres enviar el email de confirmación al cliente? Usa los botones de arriba para enviar el email correspondiente.' 
+        });
+        // Actualizar el estado original
+        setOriginalStatus(formData.status);
+        // No redirigir automáticamente para que pueda enviar el email
+        await loadData();
+      } else {
+        setMessage({ type: 'success', text: 'Reserva actualizada correctamente' });
+        
+        // Recargar los datos para verificar que se guardaron
+        await loadData();
+        
+        // Dar un momento para que el usuario vea el mensaje de éxito
+        setTimeout(() => {
+          router.push(`/administrator/reservas/${bookingId}`);
+          // Forzar recarga de la página de detalle
+          router.refresh();
+        }, 1500);
+      }
 
     } catch (error: any) {
       console.error('Error updating booking:', error);
@@ -560,6 +580,46 @@ export default function EditarReservaPage() {
       console.error('Error deleting booking:', error);
       setMessage({ type: 'error', text: error.message || 'Error al eliminar la reserva' });
       setSaving(false);
+    }
+  };
+
+  // Función para enviar email manualmente
+  const handleSendEmail = async (emailType: 'booking_created' | 'first_payment' | 'second_payment') => {
+    const emailLabels = {
+      booking_created: 'Reserva creada',
+      first_payment: 'Primer pago confirmado',
+      second_payment: 'Pago completo',
+    };
+
+    if (!confirm(`¿Enviar email de "${emailLabels[emailType]}" al cliente y a reservas@furgocasa.com?`)) {
+      return;
+    }
+
+    try {
+      setSendingEmail(true);
+      setMessage(null);
+
+      const response = await fetch('/api/bookings/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: emailType,
+          bookingId: bookingId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Error al enviar el email');
+      }
+
+      setMessage({ type: 'success', text: `✅ Email de "${emailLabels[emailType]}" enviado correctamente` });
+    } catch (error: any) {
+      console.error('Error sending email:', error);
+      setMessage({ type: 'error', text: error.message || 'Error al enviar el email' });
+    } finally {
+      setSendingEmail(false);
     }
   };
 
@@ -609,9 +669,48 @@ export default function EditarReservaPage() {
           ) : (
             <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
           )}
-          <p>{message.text}</p>
+          <p className="whitespace-pre-wrap">{message.text}</p>
         </div>
       )}
+
+      {/* Acciones de Email */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <div className="flex items-center gap-2 text-blue-800">
+            <Send className="h-5 w-5" />
+            <span className="font-medium">Enviar email al cliente:</span>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => handleSendEmail('booking_created')}
+              disabled={sendingEmail}
+              className="px-3 py-1.5 text-sm bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors disabled:opacity-50"
+            >
+              {sendingEmail ? '...' : '📝 Reserva creada'}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSendEmail('first_payment')}
+              disabled={sendingEmail}
+              className="px-3 py-1.5 text-sm bg-white border border-green-300 text-green-700 rounded-lg hover:bg-green-100 transition-colors disabled:opacity-50"
+            >
+              {sendingEmail ? '...' : '✅ Primer pago'}
+            </button>
+            <button
+              type="button"
+              onClick={() => handleSendEmail('second_payment')}
+              disabled={sendingEmail}
+              className="px-3 py-1.5 text-sm bg-white border border-emerald-300 text-emerald-700 rounded-lg hover:bg-emerald-100 transition-colors disabled:opacity-50"
+            >
+              {sendingEmail ? '...' : '🎉 Pago completo'}
+            </button>
+          </div>
+        </div>
+        <p className="text-xs text-blue-600 mt-2">
+          El email se enviará al cliente ({formData.customer_email}) y a reservas@furgocasa.com
+        </p>
+      </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">

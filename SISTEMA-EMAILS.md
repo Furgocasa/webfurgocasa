@@ -4,6 +4,8 @@
 
 Este documento describe el sistema completo de envío de correos electrónicos implementado en la aplicación Furgocasa. El sistema envía notificaciones automáticas tanto a los clientes como a la empresa en los momentos clave del proceso de reserva.
 
+**Tecnología:** SMTP via Nodemailer (compatible con OVH y cualquier servidor SMTP)
+
 ## 🎯 Momentos de Envío
 
 ### 1. Reserva Creada (Pendiente de Pago)
@@ -11,9 +13,9 @@ Este documento describe el sistema completo de envío de correos electrónicos i
 
 **Quién recibe:**
 - ✉️ **Cliente:** Email con detalles de la reserva y enlace para proceder al pago
-- ✉️ **Empresa (info@furgocasa.com):** Notificación de nueva reserva pendiente
+- ✉️ **Empresa (reservas@furgocasa.com):** Notificación de nueva reserva pendiente
 
-**Archivo:** `src/app/reservar/nueva/page.tsx` (línea ~353)
+**Archivo:** `src/app/reservar/nueva/page.tsx`
 
 ### 2. Primer Pago Confirmado
 **Cuándo:** Cuando Redsys notifica que se ha completado el primer pago (puede ser 50% o 100%).
@@ -22,7 +24,7 @@ Este documento describe el sistema completo de envío de correos electrónicos i
 - ✉️ **Cliente:** Confirmación de pago y reserva confirmada
 - ✉️ **Empresa:** Notificación de pago recibido
 
-**Archivo:** `src/app/api/redsys/notification/route.ts` (línea ~132)
+**Archivo:** `src/app/api/redsys/notification/route.ts`
 
 ### 3. Segundo Pago Confirmado
 **Cuándo:** Cuando el cliente completa el pago del 50% restante.
@@ -31,7 +33,7 @@ Este documento describe el sistema completo de envío de correos electrónicos i
 - ✉️ **Cliente:** Confirmación de pago completo con recordatorios para el día de recogida
 - ✉️ **Empresa:** Notificación de pago completo
 
-**Archivo:** `src/app/api/redsys/notification/route.ts` (línea ~132)
+**Archivo:** `src/app/api/redsys/notification/route.ts`
 
 ## 📁 Estructura de Archivos
 
@@ -40,47 +42,66 @@ src/
 ├── lib/
 │   └── email/
 │       ├── index.ts              # Funciones principales de envío
-│       ├── resend-client.ts      # Cliente de Resend
+│       ├── smtp-client.ts        # Cliente SMTP (Nodemailer)
 │       └── templates.ts          # Plantillas HTML de emails
 └── app/
     └── api/
-        └── bookings/
-            └── send-email/
-                └── route.ts      # API endpoint para envío de emails
+        ├── bookings/
+        │   └── send-email/
+        │       └── route.ts      # API endpoint para envío de emails
+        └── test-email/
+            └── route.ts          # Endpoint de prueba SMTP
 ```
 
 ## 🔧 Configuración
 
 ### Variables de Entorno Requeridas
 
-Añade las siguientes variables a tu archivo `.env`:
+Añade las siguientes variables a tu archivo `.env.local`:
 
 ```env
-# Resend API
-RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxx
-RESEND_FROM_EMAIL=noreply@furgocasa.com
+# ==========================================
+# SMTP (OVH u otro proveedor)
+# ==========================================
+SMTP_HOST=ssl0.ovh.net
+SMTP_PORT=465
+SMTP_USER=reservas@furgocasa.com
+SMTP_PASSWORD=tu-contraseña-del-buzon
+
+# Email remitente
+SMTP_FROM_EMAIL=reservas@furgocasa.com
+SMTP_FROM_NAME=Furgocasa
 
 # Email de la empresa (para recibir notificaciones)
-COMPANY_EMAIL=info@furgocasa.com
+COMPANY_EMAIL=reservas@furgocasa.com
 
 # URL de la aplicación (para producción)
 NEXT_PUBLIC_APP_URL=https://furgocasa.com
 ```
 
-### Obtener API Key de Resend
+### Configurar SMTP en OVH
 
-1. Regístrate en [Resend](https://resend.com)
-2. Ve a "API Keys" en el dashboard
-3. Crea una nueva API Key
-4. Copia la key y añádela a `.env` como `RESEND_API_KEY`
+1. **Accede a tu panel de OVH** → Webmail / Emails
+2. **Crea el buzón** `reservas@furgocasa.com` si no existe
+3. **Anota la contraseña** del buzón
+4. **Datos del servidor SMTP de OVH:**
+   - **Host:** `ssl0.ovh.net`
+   - **Puerto SSL:** `465`
+   - **Puerto TLS:** `587`
+   - **Usuario:** Email completo (ej: `reservas@furgocasa.com`)
+   - **Contraseña:** La del buzón
 
-### Configurar Dominio de Envío
+### Probar la Configuración
 
-1. En Resend, ve a "Domains"
-2. Añade tu dominio `furgocasa.com`
-3. Configura los registros DNS según las instrucciones
-4. Verifica el dominio
-5. Actualiza `RESEND_FROM_EMAIL` con un email de tu dominio verificado
+Una vez configuradas las variables de entorno, puedes probar:
+
+```bash
+# Solo verificar conexión SMTP
+curl http://localhost:3000/api/test-email?verify=true
+
+# Enviar email de prueba
+curl http://localhost:3000/api/test-email?to=tu-email@ejemplo.com
+```
 
 ## 📋 Funciones Principales
 

@@ -1,156 +1,116 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getResendClient, getFromEmail, getCompanyEmail } from "@/lib/email/resend-client";
+import { NextRequest, NextResponse } from 'next/server';
+import { verifySmtpConnection } from '@/lib/email';
+import { sendEmail, getFromEmail } from '@/lib/email/smtp-client';
 
 /**
  * GET /api/test-email
  * 
- * Endpoint de prueba para verificar la configuración de Resend
+ * Endpoint para probar la configuración de emails SMTP
  * 
- * Query params:
- * - to: Email de destino (opcional, por defecto usa COMPANY_EMAIL)
+ * Parámetros opcionales:
+ * - ?to=email@ejemplo.com - Email destino para enviar un test
+ * - ?verify=true - Solo verificar conexión sin enviar email
  */
 export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams;
-    const toEmail = searchParams.get('to') || getCompanyEmail();
+  const searchParams = request.nextUrl.searchParams;
+  const testEmail = searchParams.get('to');
+  const verifyOnly = searchParams.get('verify') === 'true';
 
-    // Verificar que las variables de entorno estén configuradas
-    if (!process.env.RESEND_API_KEY) {
-      return NextResponse.json(
-        { 
-          error: "RESEND_API_KEY no está configurada",
-          help: "Añade RESEND_API_KEY a tu archivo .env"
-        },
-        { status: 500 }
-      );
+  try {
+    // Primero verificar la conexión
+    const verifyResult = await verifySmtpConnection();
+    
+    if (!verifyResult.success) {
+      return NextResponse.json({
+        success: false,
+        step: 'verification',
+        error: verifyResult.error,
+        hint: 'Verifica las variables de entorno SMTP_HOST, SMTP_USER, SMTP_PASSWORD',
+      }, { status: 500 });
     }
 
-    const resend = getResendClient();
-    const fromEmail = getFromEmail();
+    if (verifyOnly) {
+      return NextResponse.json({
+        success: true,
+        message: 'Conexión SMTP verificada correctamente',
+        config: {
+          host: process.env.SMTP_HOST,
+          port: process.env.SMTP_PORT || '465',
+          user: process.env.SMTP_USER,
+          from: getFromEmail(),
+        },
+      });
+    }
+
+    // Si no se especifica email, usar el de la empresa
+    const destinatario = testEmail || process.env.COMPANY_EMAIL || 'reservas@furgocasa.com';
 
     // Enviar email de prueba
-    const result = await resend.emails.send({
-      from: fromEmail,
-      to: toEmail,
-      subject: '🧪 Test - Sistema de Emails Furgocasa',
+    const sendResult = await sendEmail({
+      to: destinatario,
+      subject: '🧪 Test de Email - Furgocasa',
       html: `
         <!DOCTYPE html>
         <html>
         <head>
-          <style>
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
-              line-height: 1.6;
-              color: #333;
-              max-width: 600px;
-              margin: 0 auto;
-              padding: 20px;
-            }
-            .header {
-              background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-              color: white;
-              padding: 30px;
-              text-align: center;
-              border-radius: 10px;
-              margin-bottom: 20px;
-            }
-            .content {
-              background: #f9fafb;
-              padding: 20px;
-              border-radius: 10px;
-              margin-bottom: 20px;
-            }
-            .success {
-              background: #d1fae5;
-              border-left: 4px solid #10b981;
-              padding: 15px;
-              border-radius: 4px;
-              margin: 15px 0;
-            }
-            .info {
-              background: #dbeafe;
-              border-left: 4px solid #3b82f6;
-              padding: 15px;
-              border-radius: 4px;
-              margin: 15px 0;
-            }
-            code {
-              background: #1e293b;
-              color: #e2e8f0;
-              padding: 2px 6px;
-              border-radius: 3px;
-              font-size: 0.9em;
-            }
-          </style>
+          <meta charset="UTF-8">
         </head>
-        <body>
-          <div class="header">
-            <h1 style="margin: 0;">🧪 Email de Prueba</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Sistema de Emails - Furgocasa</p>
-          </div>
-          
-          <div class="content">
-            <div class="success">
-              <strong>✅ ¡Configuración correcta!</strong>
-              <p style="margin: 10px 0 0 0;">
-                Si estás recibiendo este email, significa que el sistema de envío de emails está funcionando correctamente.
-              </p>
+        <body style="font-family: Arial, sans-serif; padding: 40px; background-color: #f5f5f5;">
+          <div style="max-width: 600px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px;">
+            <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border-radius: 8px;">
+              <h1 style="color: white; margin: 0;">🚐 FURGOCASA</h1>
             </div>
             
-            <div class="info">
-              <strong>ℹ️ Información de configuración:</strong>
-              <ul style="margin: 10px 0 0 0; padding-left: 20px;">
-                <li><strong>Remitente:</strong> <code>${fromEmail}</code></li>
-                <li><strong>Destinatario:</strong> <code>${toEmail}</code></li>
-                <li><strong>Fecha:</strong> ${new Date().toLocaleString('es-ES')}</li>
+            <div style="padding: 30px 0;">
+              <h2 style="color: #111827;">✅ ¡El sistema de emails funciona!</h2>
+              
+              <p>Este es un email de prueba enviado desde el sistema de Furgocasa.</p>
+              
+              <div style="background-color: #d1fae5; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0;">
+                <strong>Configuración correcta</strong>
+                <p style="margin: 5px 0 0 0;">El servidor SMTP está configurado y funcionando.</p>
+              </div>
+              
+              <p><strong>Detalles técnicos:</strong></p>
+              <ul>
+                <li>Servidor: ${process.env.SMTP_HOST}</li>
+                <li>Puerto: ${process.env.SMTP_PORT || '465'}</li>
+                <li>Remitente: ${getFromEmail()}</li>
+                <li>Fecha: ${new Date().toLocaleString('es-ES')}</li>
               </ul>
             </div>
             
-            <h3>Próximos pasos:</h3>
-            <ol>
-              <li>Verifica que el dominio esté verificado en Resend</li>
-              <li>Actualiza <code>RESEND_FROM_EMAIL</code> con un email de tu dominio</li>
-              <li>Prueba crear una reserva para verificar el flujo completo</li>
-            </ol>
-            
-            <h3>Tipos de email implementados:</h3>
-            <ul>
-              <li>📧 Reserva creada (pendiente de pago)</li>
-              <li>💰 Primer pago confirmado</li>
-              <li>🎉 Segundo pago confirmado (pago completo)</li>
-              <li>🏢 Notificaciones internas para la empresa</li>
-            </ul>
-          </div>
-          
-          <div style="text-align: center; color: #6b7280; font-size: 14px;">
-            <p>
-              Este es un email de prueba automático del sistema Furgocasa.<br>
-              Para más información, consulta: <strong>SISTEMA-EMAILS.md</strong>
-            </p>
+            <div style="text-align: center; padding: 20px; background-color: #f9fafb; border-radius: 8px;">
+              <p style="margin: 0; color: #6b7280; font-size: 14px;">
+                Furgocasa - Alquiler de Campers<br>
+                <a href="https://www.furgocasa.com" style="color: #f97316;">www.furgocasa.com</a>
+              </p>
+            </div>
           </div>
         </body>
         </html>
       `,
     });
 
+    if (!sendResult.success) {
+      return NextResponse.json({
+        success: false,
+        step: 'sending',
+        error: sendResult.error,
+      }, { status: 500 });
+    }
+
     return NextResponse.json({
       success: true,
-      message: "Email de prueba enviado correctamente",
-      emailId: result.data?.id,
-      from: fromEmail,
-      to: toEmail,
-      resendData: result.data,
+      message: 'Email de prueba enviado correctamente',
+      to: destinatario,
+      messageId: sendResult.messageId,
     });
+
   } catch (error: any) {
-    console.error("Error enviando email de prueba:", error);
-    
-    return NextResponse.json(
-      { 
-        error: error.message || "Error al enviar el email de prueba",
-        details: error.toString(),
-        help: "Verifica que RESEND_API_KEY esté correctamente configurada"
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: false,
+      error: error.message || 'Error desconocido',
+    }, { status: 500 });
   }
 }

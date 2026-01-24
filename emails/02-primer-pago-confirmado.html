@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pago Confirmado - Furgocasa</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: #ffffff;
+    }
+    .header {
+      background: linear-gradient(135deg, #063971 0%, #042a52 100%);
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    .content {
+      padding: 40px 30px;
+    }
+    .booking-number {
+      background-color: #fef3c7;
+      border-left: 4px solid #063971;
+      padding: 15px 20px;
+      margin: 20px 0;
+    }
+    .booking-number strong {
+      color: #063971;
+      font-size: 18px;
+    }
+    .detail-box {
+      background-color: #f9fafb;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 15px 0;
+    }
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+    .detail-label {
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .detail-value {
+      color: #111827;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .total-box {
+      background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+      color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .total-box .label {
+      font-size: 14px;
+      opacity: 0.9;
+      margin-bottom: 5px;
+    }
+    .total-box .amount {
+      font-size: 32px;
+      font-weight: 700;
+    }
+    .button {
+      display: inline-block;
+      background-color: #063971;
+      color: white !important;
+      padding: 14px 28px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .footer {
+      background-color: #f9fafb;
+      padding: 30px;
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .footer a {
+      color: #063971;
+      text-decoration: none;
+    }
+    .warning-box {
+      background-color: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    .success-box {
+      background-color: #d1fae5;
+      border-left: 4px solid #10b981;
+      padding: 15px 20px;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+    @media only screen and (max-width: 600px) {
+      .content {
+        padding: 30px 20px;
+      }
+      .detail-row {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <a href="https://www.furgocasa.com" style="display: inline-block;">
+        <img src="https://www.furgocasa.com/images/brand/LOGO%20BLANCO.png" alt="Furgocasa" style="max-width: 200px; height: auto;" />
+      </a>
+    </div>
+    
+    <div class="content">
+      <h2 style="color: #10b981; margin-top: 0;">✅ ¡Pago recibido y reserva confirmada!</h2>
+      
+      <p>Hola <strong>Juan García López</strong>,</p>
+      
+      <p>¡Excelentes noticias! Hemos recibido tu pago y tu reserva ha sido <strong>confirmada</strong>.</p>
+      
+      <div class="booking-number">
+        <div style="font-size: 14px; color: #92400e; margin-bottom: 5px;">Número de reserva:</div>
+        <strong>FG20260215-001</strong>
+      </div>
+
+      <div class="success-box">
+        <strong>✅ Reserva confirmada</strong>
+        <p style="margin: 10px 0 0 0;">Tu reserva está confirmada. Has pagado el 50% inicial.</p>
+      </div>
+
+      <!-- VEHÍCULO -->
+      <h3 style="color: #111827;">🚐 Vehículo</h3>
+      <div class="detail-box">
+        <div class="detail-row">
+          <span class="detail-label">Vehículo:</span>
+          <span class="detail-value">FC01 - Camper California Ocean</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Modelo:</span>
+          <span class="detail-value">Volkswagen California Ocean</span>
+        </div>
+      </div>
+
+      <!-- DATOS DEL CLIENTE -->
+      <h3 style="color: #111827;">👤 Datos del conductor principal</h3>
+      <div class="detail-box">
+        <div class="detail-row">
+          <span class="detail-label">Nombre:</span>
+          <span class="detail-value">Juan</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Apellidos:</span>
+          <span class="detail-value">García López</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">DNI / ID:</span>
+          <span class="detail-value">12345678A</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Dirección:</span>
+          <span class="detail-value">Calle Mayor 123, 2ºB</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Código postal:</span>
+          <span class="detail-value">30001</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Ciudad:</span>
+          <span class="detail-value">Murcia</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">País:</span>
+          <span class="detail-value">España</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Edad:</span>
+          <span class="detail-value">35 años</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Caducidad carnet:</span>
+          <span class="detail-value">15/06/2030</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Teléfono:</span>
+          <span class="detail-value">+34 612 345 678</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Email:</span>
+          <span class="detail-value">juan.garcia@email.com</span>
+        </div>
+      </div>
+
+      <!-- FECHAS -->
+      <h3 style="color: #111827;">📅 Fechas</h3>
+      <div class="detail-box">
+        <div class="detail-row">
+          <span class="detail-label">Recogida:</span>
+          <span class="detail-value">sábado, 15 de febrero de 2026 - 10:00</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Devolución:</span>
+          <span class="detail-value">sábado, 22 de febrero de 2026 - 10:00</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Duración:</span>
+          <span class="detail-value">7 días</span>
+        </div>
+      </div>
+
+      <!-- UBICACIONES -->
+      <h3 style="color: #111827;">📍 Ubicaciones</h3>
+      <div class="detail-box">
+        <div class="detail-row">
+          <span class="detail-label">Recogida en:</span>
+          <span class="detail-value">Murcia - Base Principal</span>
+        </div>
+        <div style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">Polígono Industrial Oeste, Parcela 45, 30169 San Ginés, Murcia</div>
+        <div class="detail-row">
+          <span class="detail-label">Devolución en:</span>
+          <span class="detail-value">Murcia - Base Principal</span>
+        </div>
+        <div style="font-size: 12px; color: #6b7280;">Polígono Industrial Oeste, Parcela 45, 30169 San Ginés, Murcia</div>
+      </div>
+
+      <!-- EXTRAS -->
+      <h3 style="color: #111827;">📦 Extras incluidos</h3>
+      <div class="detail-box">
+        <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb;">
+          <div><strong>Sillas de camping</strong> <span style="color: #6b7280; font-size: 12px;">x2</span></div>
+          <span style="font-weight: 600; color: #063971;">30,00 €</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+          <div><strong>Segundo conductor</strong> <span style="color: #6b7280; font-size: 12px;">x1</span></div>
+          <span style="font-weight: 600; color: #063971;">45,00 €</span>
+        </div>
+      </div>
+
+      <!-- PRECIOS -->
+      <h3 style="color: #111827;">💰 Desglose de precios</h3>
+      <div class="detail-box">
+        <div class="detail-row">
+          <span class="detail-label">Alquiler (7 días):</span>
+          <span class="detail-value">840,00 €</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Extras:</span>
+          <span class="detail-value">75,00 €</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">Fianza (se devuelve):</span>
+          <span class="detail-value">1.000,00 €</span>
+        </div>
+        <div class="detail-row" style="border-top: 2px solid #e5e7eb; padding-top: 15px; margin-top: 10px;">
+          <span class="detail-label"><strong>TOTAL:</strong></span>
+          <span class="detail-value" style="font-size: 18px; color: #063971;">915,00 €</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">💰 Pagado:</span>
+          <span class="detail-value" style="color: #10b981;">457,50 €</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">⏳ Pendiente:</span>
+          <span class="detail-value" style="color: #063971;">457,50 €</span>
+        </div>
+      </div>
+
+      <div class="warning-box">
+        <strong>📅 Segundo pago:</strong>
+        <p style="margin: 10px 0 0 0;">Recuerda que debes completar el pago restante de <strong>457,50 €</strong> como máximo 15 días antes de la fecha de recogida.</p>
+      </div>
+
+      <div style="text-align: center; margin: 30px 0;">
+        <a href="https://www.furgocasa.com/reservar/FG20260215-001" class="button">
+          Ver detalles de mi reserva
+        </a>
+      </div>
+
+      <h3 style="color: #111827;">Próximos pasos:</h3>
+      
+      <ol style="line-height: 1.8;">
+        <li>Completa el <strong>segundo pago</strong> máximo 15 días antes del inicio</li>
+        <li>Descarga, firma y envía la <strong>documentación</strong> desde <a href="https://www.furgocasa.com/documentacion-alquiler" style="color: #063971;">furgocasa.com/documentacion-alquiler</a></li>
+        <li>Realiza la <strong>transferencia de la fianza</strong> (1.000€) máximo 72h antes del inicio</li>
+        <li>El día de la recogida, trae tu DNI/Pasaporte y carnet de conducir B</li>
+        <li>¡Disfruta de tu aventura!</li>
+      </ol>
+
+      <div class="detail-box">
+        <div style="margin-bottom: 15px;">
+          <strong>💳 Fianza (1.000€):</strong>
+          <p style="margin: 10px 0 0 0;">La fianza se abona mediante <strong>transferencia bancaria</strong> máximo 72 horas antes del inicio. Debes enviar el justificante y certificado de titularidad de la cuenta (el titular debe coincidir con el arrendatario). Se devuelve en 10 días laborables tras la devolución del vehículo.</p>
+        </div>
+        
+        <div>
+          <strong>📋 Documentación necesaria el día de recogida:</strong>
+          <ul style="margin: 10px 0; padding-left: 20px;">
+            <li>DNI o Pasaporte en vigor de todos los conductores</li>
+            <li>Carnet de conducir B con mínimo 2 años de antigüedad</li>
+          </ul>
+        </div>
+      </div>
+
+      <p>Si tienes alguna pregunta, estamos a tu disposición.</p>
+      
+      <p>¡Nos vemos pronto!</p>
+    </div>
+    
+    <div class="footer">
+      <p><strong>Furgocasa - Alquiler de Campers</strong></p>
+      <p>
+        📞 <a href="tel:+34868364161">+34 868 364 161</a><br>
+        📧 <a href="mailto:info@furgocasa.com">info@furgocasa.com</a><br>
+        🌐 <a href="https://www.furgocasa.com">www.furgocasa.com</a>
+      </p>
+      <p style="margin-top: 20px; font-size: 12px; color: #9ca3af;">
+        Este correo ha sido enviado automáticamente. Por favor, no respondas a este email.<br>
+        Si tienes alguna consulta, contacta con nosotros en info@furgocasa.com
+      </p>
+    </div>
+  </div>
+</body>
+</html>

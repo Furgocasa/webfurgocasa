@@ -8,6 +8,21 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+// Detectar si es un dispositivo móvil (no mostrar en escritorio)
+function isMobileDevice(): boolean {
+  if (typeof window === "undefined") return false;
+  
+  // Verificar user agent para dispositivos móviles
+  const mobileUserAgent = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  // También verificar si es una pantalla táctil pequeña (tablets y móviles)
+  const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  const isSmallScreen = window.innerWidth <= 1024;
+  
+  // Solo considerar móvil si tiene user agent móvil O si es táctil con pantalla pequeña
+  return mobileUserAgent || (isTouchDevice && isSmallScreen);
+}
+
 // Detectar si es iOS
 function isIOS(): boolean {
   if (typeof window === "undefined") return false;
@@ -29,8 +44,18 @@ export function PWAInstallPrompt() {
   const [showBanner, setShowBanner] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [isIOSDevice, setIsIOSDevice] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Detectar si es dispositivo móvil
+    const mobile = isMobileDevice();
+    setIsMobile(mobile);
+    
+    // NO mostrar el prompt de instalación en dispositivos de escritorio
+    if (!mobile) {
+      return;
+    }
+    
     // Detectar iOS
     setIsIOSDevice(isIOS());
     
@@ -107,6 +132,11 @@ export function PWAInstallPrompt() {
     setShowBanner(false);
     localStorage.setItem("pwa-install-dismissed", new Date().toISOString());
   };
+
+  // No mostrar en dispositivos de escritorio (PC)
+  if (!isMobile) {
+    return null;
+  }
 
   // No mostrar nada si ya está instalada
   if (isInstalled) {
