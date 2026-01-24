@@ -283,20 +283,20 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* VEHÍCULOS DISPONIBLES - Textos dinámicos desde BD */}
+      {/* VEHÍCULOS DISPONIBLES - Textos fijos idénticos a producción */}
       {/* ================================================================== */}
       {vehicles.length > 0 && (
         <section className="py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
-              {/* H2 dinámico desde BD (h1_title) en mayúsculas o fallback */}
+              {/* H2 siempre "ALQUILER CAMPER {ciudad}" */}
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
-                {location.h1_title?.toUpperCase() || `${t("ALQUILER CAMPER")} ${location.name.toUpperCase()}`}
+                {t("ALQUILER CAMPER")} {location.name.toUpperCase()}
               </h2>
 
-              {/* Intro text dinámico desde BD */}
+              {/* Texto fijo */}
               <p className="text-xl text-gray-600 mb-8">
-                {location.intro_text || `${t("Tu punto de partida perfecto para explorar")} ${location.name} ${t("en camper")}.`}
+                {t("Tu punto de partida perfecto para explorar")} {location.name} {t("en camper")}.
               </p>
 
               <div className="text-center max-w-3xl mx-auto">

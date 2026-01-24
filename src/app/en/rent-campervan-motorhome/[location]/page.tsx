@@ -258,19 +258,19 @@ export default async function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* VEHICLES - Dynamic texts from DB */}
+      {/* VEHICLES - Fixed texts identical to production */}
       {vehicles.length > 0 && (
         <section className="py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
-              {/* H2 dynamic from DB (h1_title) in uppercase or fallback */}
+              {/* H2 always "CAMPER RENTAL {city}" */}
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
-                {location.h1_title?.toUpperCase() || `CAMPER RENTAL ${location.name.toUpperCase()}`}
+                CAMPER RENTAL {location.name.toUpperCase()}
               </h2>
 
-              {/* Intro text dynamic from DB */}
+              {/* Fixed text */}
               <p className="text-xl text-gray-600 mb-8">
-                {location.intro_text || `Your perfect starting point to explore ${location.name} by camper.`}
+                Your perfect starting point to explore {location.name} by camper.
               </p>
 
               <div className="text-center max-w-3xl mx-auto">

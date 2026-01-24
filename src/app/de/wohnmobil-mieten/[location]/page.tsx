@@ -257,19 +257,19 @@ export default async function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* FAHRZEUGE - Dynamische Texte aus der DB */}
+      {/* FAHRZEUGE - Feste Texte identisch zur Produktion */}
       {vehicles.length > 0 && (
         <section className="py-16 lg:py-24 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
-              {/* H2 dynamisch aus der DB (h1_title) in Großbuchstaben oder Fallback */}
+              {/* H2 immer "WOHNMOBIL MIETEN {Stadt}" */}
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
-                {location.h1_title?.toUpperCase() || `WOHNMOBIL MIETEN ${location.name.toUpperCase()}`}
+                WOHNMOBIL MIETEN {location.name.toUpperCase()}
               </h2>
 
-              {/* Intro text dynamisch aus der DB */}
+              {/* Fester Text */}
               <p className="text-xl text-gray-600 mb-8">
-                {location.intro_text || `Ihr perfekter Ausgangspunkt, um ${location.name} mit dem Wohnmobil zu erkunden.`}
+                Ihr perfekter Ausgangspunkt, um {location.name} mit dem Wohnmobil zu erkunden.
               </p>
 
               <div className="text-center max-w-3xl mx-auto">
