@@ -85,12 +85,20 @@ function PagoExitoContent() {
   const [payment, setPayment] = useState<Payment | null>(null);
   const [loading, setLoading] = useState(true);
   const [fallbackBookingId, setFallbackBookingId] = useState<string | null>(null);
+  const [hasRun, setHasRun] = useState(false);
 
   useEffect(() => {
+    // Evitar ejecución múltiple (StrictMode en dev ejecuta 2 veces)
+    if (hasRun) {
+      console.log("[PAGO-EXITO] Ya se ejecutó loadPaymentInfo, ignorando...");
+      return;
+    }
+    setHasRun(true);
+    
     // Redsys puede enviar el Ds_MerchantParameters en la URL de retorno
     // También podríamos recibir un ID de pago o booking desde nuestro sistema
     loadPaymentInfo();
-  }, []);
+  }, [hasRun]);
 
   const loadPaymentInfo = async () => {
     console.log("[PAGO-EXITO] === INICIANDO loadPaymentInfo ===");
@@ -187,25 +195,28 @@ function PagoExitoContent() {
       if (orderNumber) {
         console.log("[PAGO-EXITO] Buscando pago con orderNumber:", orderNumber);
         
-        const { data, error } = await supabase
-          .from("payments")
-          .select(`
-            *,
-            booking:bookings(
-              *,
-              vehicle:vehicles(name, brand, model),
-              pickup_location:locations!pickup_location_id(name),
-              dropoff_location:locations!dropoff_location_id(name)
-            )
-          `)
-          .eq("order_number", orderNumber)
-          .single();
+        // IMPORTANTE: Usamos fetch a una API server-side para evitar problemas de RLS
+        // El cliente Supabase del navegador puede no tener permisos para ver payments
+        try {
+          const searchResponse = await fetch(`/api/payments/by-order?orderNumber=${encodeURIComponent(orderNumber)}`);
+          console.log("[PAGO-EXITO] Respuesta de búsqueda:", searchResponse.status);
+          
+          if (!searchResponse.ok) {
+            console.error("[PAGO-EXITO] Error en API de búsqueda:", searchResponse.status, searchResponse.statusText);
+            // Fallback: intentar directamente con supabase client
+          }
+          
+          const searchResult = await searchResponse.json();
+          console.log("[PAGO-EXITO] Resultado de búsqueda:", searchResult);
+          
+          const data = searchResult.payment;
+          const error = searchResult.error ? { message: searchResult.error } : null;
 
-        if (error) {
-          console.error("[PAGO-EXITO] Error buscando pago:", error);
-        }
+          if (error) {
+            console.error("[PAGO-EXITO] Error buscando pago:", error);
+          }
         
-        if (!error && data) {
+          if (!error && data) {
           console.log("[PAGO-EXITO] Pago encontrado:", {
             paymentId: data.id,
             status: data.status,
@@ -284,6 +295,9 @@ function PagoExitoContent() {
           }
           
           setPayment(data as any);
+          }
+        } catch (fetchError) {
+          console.error("[PAGO-EXITO] Error en fetch de búsqueda:", fetchError);
         }
       }
     } catch (error) {
