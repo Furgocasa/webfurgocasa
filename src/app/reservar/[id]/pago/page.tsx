@@ -269,6 +269,13 @@ export default function PagoPage() {
         console.log("✅ FRONTEND - REDIRIGIENDO A REDSYS");
         console.log("=".repeat(80) + "\n");
         
+        // Guardar bookingId en sessionStorage para recuperarlo después del pago
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('lastPaymentBookingId', bookingId);
+          sessionStorage.setItem('lastPaymentOrderNumber', response.orderNumber);
+          console.log("💾 Guardado en sessionStorage: bookingId=" + bookingId + ", orderNumber=" + response.orderNumber);
+        }
+        
         document.body.appendChild(form);
         
         // Log antes de submit

@@ -16,6 +16,52 @@ import { formatPrice } from"@/lib/utils";
 import { CheckCircle, Calendar, Car, MapPin, Download, Mail } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
 
+/**
+ * Componente para mostrar cuando no tenemos datos del pago
+ * Intenta recuperar el bookingId de sessionStorage
+ */
+function PaymentSuccessGeneric() {
+  const { t } = useLanguage();
+  const [bookingId, setBookingId] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Intentar recuperar bookingId de sessionStorage
+    if (typeof window !== 'undefined') {
+      const savedBookingId = sessionStorage.getItem('lastPaymentBookingId');
+      if (savedBookingId) {
+        setBookingId(savedBookingId);
+        // Limpiar después de usar
+        sessionStorage.removeItem('lastPaymentBookingId');
+        sessionStorage.removeItem('lastPaymentOrderNumber');
+      }
+    }
+  }, []);
+
+  return (
+    <div className="text-center">
+      <p className="text-gray-600 mb-6">
+        {t("Tu pago ha sido procesado correctamente. Pronto recibirás un email de confirmación con todos los detalles de tu reserva.")}
+      </p>
+      <div className="space-y-3">
+        {bookingId && (
+          <LocalizedLink
+            href={`/reservar/${bookingId}`}
+            className="block w-full bg-furgocasa-blue text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            {t("Ver mi reserva")}
+          </LocalizedLink>
+        )}
+        <LocalizedLink
+          href="/"
+          className={`block w-full ${bookingId ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-furgocasa-orange text-white hover:bg-orange-600'} font-semibold py-3 px-8 rounded-lg transition-colors`}
+        >
+          {t("Volver al inicio")}
+        </LocalizedLink>
+      </div>
+    </div>
+  );
+}
+
 interface Payment {
   id: string;
   order_number: string;
@@ -281,18 +327,8 @@ function PagoExitoContent() {
                   </div>
                 </>
               ) : (
-                // Sin datos de pago específicos - mostrar mensaje genérico
-                <div className="text-center">
-                  <p className="text-gray-600 mb-6">
-                    {t("Tu pago ha sido procesado correctamente. Pronto recibirás un email de confirmación con todos los detalles de tu reserva.")}
-                  </p>
-                  <LocalizedLink
-                    href="/"
-                    className="inline-block bg-furgocasa-orange text-white font-semibold py-3 px-8 rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    {t("Volver al inicio")}
-                  </LocalizedLink>
-                </div>
+                // Sin datos de pago específicos - intentar recuperar de sessionStorage
+                <PaymentSuccessGeneric />
               )}
             </div>
           </div>
