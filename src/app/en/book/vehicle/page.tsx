@@ -259,7 +259,7 @@ function ReservarVehiculoContent() {
     });
 
     // Ruta funcional sin prefijo de idioma
-    router.push(`/reservar/nueva?${params.toString()}`);
+    router.push(`/en/book/new?${params.toString()}`);
   };
 
   if (loading) {
