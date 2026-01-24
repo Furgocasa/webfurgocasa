@@ -46,6 +46,20 @@ const supabase = createClient(
 
 export const revalidate = 3600; // 1 hora
 
+// Generar rutas estáticas en build time
+export async function generateStaticParams() {
+  const { data } = await supabase
+    .from('location_targets')
+    .select('slug')
+    .eq('is_active', true);
+
+  if (!data) return [];
+
+  return data.map((location) => ({
+    location: location.slug,
+  }));
+}
+
 // ============================================================================
 // NOTA: Esta página usa rutas dinámicas de Next.js
 // El parámetro [location] se extrae directamente de la URL
