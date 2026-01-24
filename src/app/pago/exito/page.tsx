@@ -95,6 +95,14 @@ function PagoExitoContent() {
     }
     setHasRun(true);
     
+    // 🔍 CAPTURAR DATOS POST si existen (Redsys puede enviar por POST)
+    console.log("[PAGO-EXITO] 🔍 Intentando capturar datos POST...");
+    if (typeof window !== 'undefined' && (window as any).redsysPostData) {
+      console.log("[PAGO-EXITO] 🔍 Datos POST capturados:", (window as any).redsysPostData);
+    } else {
+      console.log("[PAGO-EXITO] 🔍 No hay datos POST en window.redsysPostData");
+    }
+    
     // Redsys puede enviar el Ds_MerchantParameters en la URL de retorno
     // También podríamos recibir un ID de pago o booking desde nuestro sistema
     loadPaymentInfo();
@@ -102,6 +110,18 @@ function PagoExitoContent() {
 
   const loadPaymentInfo = async () => {
     console.log("[PAGO-EXITO] === INICIANDO loadPaymentInfo ===");
+    console.log("[PAGO-EXITO] URL actual:", window.location.href);
+    console.log("[PAGO-EXITO] Query params:", window.location.search);
+    console.log("[PAGO-EXITO] Hash:", window.location.hash);
+    
+    // 🔍 CAPTURAR TODOS LOS PARÁMETROS POSIBLES DE REDSYS
+    const allParams = new URLSearchParams(window.location.search);
+    const allParamsObj: Record<string, string> = {};
+    allParams.forEach((value, key) => {
+      allParamsObj[key] = value;
+    });
+    console.log("[PAGO-EXITO] 🔍 TODOS los parámetros URL:", allParamsObj);
+    console.log("[PAGO-EXITO] 🔍 Número total de parámetros:", Array.from(allParams.keys()).length);
     
     try {
       setLoading(true);
@@ -109,12 +129,17 @@ function PagoExitoContent() {
       // Stripe: session_id en la URL
       const stripeSessionId = searchParams.get("session_id");
       
-      // Redsys: Ds_MerchantParameters en la URL
+      // Redsys: MÚLTIPLES variantes de parámetros
       const merchantParams = searchParams.get("Ds_MerchantParameters");
+      const dsSignature = searchParams.get("Ds_Signature");
+      const dsSignatureVersion = searchParams.get("Ds_SignatureVersion");
       
-      console.log("[PAGO-EXITO] Parámetros de URL:", {
+      console.log("[PAGO-EXITO] 🔍 Parámetros Redsys específicos:", {
         stripeSessionId: !!stripeSessionId,
-        merchantParams: !!merchantParams
+        Ds_MerchantParameters: !!merchantParams,
+        Ds_MerchantParameters_length: merchantParams?.length || 0,
+        Ds_Signature: !!dsSignature,
+        Ds_SignatureVersion: dsSignatureVersion,
       });
       
       let orderNumber: string | null = null;
