@@ -198,6 +198,18 @@ export const routeTranslations = {
     fr: "/reservation-weekend", 
     de: "/wochenend-buchung" 
   },
+  "/alquiler-motorhome-europa-desde-espana": { 
+    es: "/alquiler-motorhome-europa-desde-espana", 
+    en: "/alquiler-motorhome-europa-desde-espana", 
+    fr: "/alquiler-motorhome-europa-desde-espana", 
+    de: "/alquiler-motorhome-europa-desde-espana" 
+  },
+  "/sitemap-html": { 
+    es: "/sitemap-html", 
+    en: "/sitemap-html", 
+    fr: "/sitemap-html", 
+    de: "/sitemap-html" 
+  },
   
   // Páginas legales
   "/aviso-legal": { 
