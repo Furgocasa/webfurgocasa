@@ -224,7 +224,9 @@ export default async function LocationPage({ params }: PageProps) {
 
   return (
     <>
-      <link rel="preload" as="image" href={heroImageUrl} fetchPriority="high" />
+      {/* Preconnect para acelerar carga de imágenes desde Supabase Storage */}
+      <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
+      <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       <LocalBusinessJsonLd location={location as any} />
       
       {/* ================================================================== */}
@@ -238,8 +240,8 @@ export default async function LocationPage({ params }: PageProps) {
             fill
             priority
             fetchPriority="high"
-            quality={75}
-            sizes="100vw"
+            quality={60}
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
             placeholder="blur"
             blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMEAQUBAAAAAAAAAAAAAQIDBAAFBhEhBxITMUFR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQEAAwEBAAAAAAAAAAAAAAABAAIRA0H/2gAMAwEAAhEDEQA/AMc4llF3yC4tQLi+h6KhPehpCANuqOgSfnAGh+1oOF4bay2G4aUqUVrCe9Z5JJPJJpSqOw7JP/Z"
             className="object-cover"

@@ -229,7 +229,9 @@ export default async function SaleLocationPage({ params }: PageProps) {
 
   return (
     <>
-      <link rel="preload" as="image" href={heroImageUrl} fetchPriority="high" />
+      {/* Preconnect para acelerar carga de imágenes desde Supabase Storage */}
+      <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
+      <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       <SaleLocationJsonLd location={location as any} />
       
       {/* ================================================================== */}
@@ -242,8 +244,12 @@ export default async function SaleLocationPage({ params }: PageProps) {
           alt={location.h1_title || `${t("Venta de autocaravanas en")} ${location.name}`}
           fill
           priority
+          fetchPriority="high"
+          quality={60}
           className="object-cover"
-          sizes="100vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1920px"
+          placeholder="blur"
+          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAQMEAQUBAAAAAAAAAAAAAQIDBAAFBhEhBxITMUFR/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAZEQEAAwEBAAAAAAAAAAAAAAABAAIRA0H/2gAMAwEAAhEDEQA/AMc4llF3yC4tQLi+h6KhPehpCANuqOgSfnAGh+1oOF4bay2G4aUqUVrCe9Z5JJPJJpSqOw7JP/Z"
         />
         
         <div className="relative z-20 container mx-auto px-4 text-center">
