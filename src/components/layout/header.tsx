@@ -22,10 +22,7 @@ export function Header() {
     setLanguageDropdownOpen(false);
     
     // Usar getTranslatedRoute para traducir correctamente la ruta actual
-    // Esto maneja automáticamente:
-    // - /es/reservar/vehiculo → /fr/reserver/vehicule
-    // - /es/blog/rutas → /en/blog/routes
-    // - /es/contacto → /de/kontakt
+    // Maneja ambos formatos: nuevo (/base/{location}) y antiguo (/base-{location})
     const translatedPath = getTranslatedRoute(pathname, lang);
     window.location.href = translatedPath;
   };

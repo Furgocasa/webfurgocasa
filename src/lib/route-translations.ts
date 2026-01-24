@@ -327,8 +327,18 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
       const locationPattern = /^\/(alquiler-autocaravanas-campervans|rent-campervan-motorhome|location-camping-car|wohnmobil-mieten)\/(.+)$/;
       const locationMatch = cleanPath.match(locationPattern);
       
+      // FORMATO ANTIGUO con guión: /alquiler-autocaravanas-campervans-{location}
+      const locationPatternOld = /^\/(alquiler-autocaravanas-campervans|rent-campervan-motorhome|location-camping-car|wohnmobil-mieten)-([a-z0-9-]+)$/;
+      const locationMatchOld = cleanPath.match(locationPatternOld);
+      
       if (locationMatch) {
+        // Formato nuevo: /base/{location}
         const [, basePattern, location] = locationMatch;
+        const translatedBase = routeTranslations["/alquiler-autocaravanas-campervans"][targetLang];
+        translatedPath = `${translatedBase}/${location}`;
+      } else if (locationMatchOld) {
+        // Formato antiguo: /base-{location} -> redirigir al formato nuevo
+        const [, basePattern, location] = locationMatchOld;
         const translatedBase = routeTranslations["/alquiler-autocaravanas-campervans"][targetLang];
         translatedPath = `${translatedBase}/${location}`;
       } else {
@@ -336,8 +346,18 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
         const saleLocationPattern = /^\/(venta-autocaravanas-camper|campervans-for-sale-in|camping-cars-a-vendre|wohnmobile-zu-verkaufen)\/(.+)$/;
         const saleLocationMatch = cleanPath.match(saleLocationPattern);
         
+        // FORMATO ANTIGUO con guión para ventas: /venta-autocaravanas-camper-{location}
+        const saleLocationPatternOld = /^\/(venta-autocaravanas-camper|campervans-for-sale-in|camping-cars-a-vendre|wohnmobile-zu-verkaufen)-([a-z0-9-]+)$/;
+        const saleLocationMatchOld = cleanPath.match(saleLocationPatternOld);
+        
         if (saleLocationMatch) {
+          // Formato nuevo: /base/{location}
           const [, basePattern, location] = saleLocationMatch;
+          const translatedBase = routeTranslations["/venta-autocaravanas-camper"][targetLang];
+          translatedPath = `${translatedBase}/${location}`;
+        } else if (saleLocationMatchOld) {
+          // Formato antiguo: /base-{location} -> redirigir al formato nuevo
+          const [, basePattern, location] = saleLocationMatchOld;
           const translatedBase = routeTranslations["/venta-autocaravanas-camper"][targetLang];
           translatedPath = `${translatedBase}/${location}`;
         } else {
