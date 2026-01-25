@@ -49,47 +49,48 @@ type LocationRow = {
 };
 
 const staticPages: Array<{ path: string; label: string }> = [
-  { path:"/", label:"Inicio" },
+  { path:"/", label:"Startseite" },
   { path:"/blog", label:"Blog" },
-  { path:"/vehiculos", label:"Vehículos" },
-  { path:"/ventas", label:"Ventas" },
-  { path:"/tarifas", label:"Tarifas" },
-  { path:"/reservar", label:"Reservar" },
-  { path:"/buscar", label:"Buscar" },
-  { path:"/contacto", label:"Contacto" },
-  { path:"/como-funciona", label:"Cómo funciona" },
-  { path:"/documentacion-alquiler", label:"Documentación alquiler" },
-  { path:"/guia-camper", label:"Guía camper" },
-  { path:"/mapa-areas", label:"Mapa de áreas" },
-  { path:"/parking-murcia", label:"Parking Murcia" },
-  { path:"/ofertas", label:"Ofertas" },
-  { path:"/publicaciones", label:"Publicaciones" },
-  { path:"/clientes-vip", label:"Clientes VIP" },
-  { path:"/quienes-somos", label:"Quiénes somos" },
+  { path:"/vehiculos", label:"Fahrzeuge" },
+  { path:"/ventas", label:"Verkauf" },
+  { path:"/tarifas", label:"Preise" },
+  { path:"/reservar", label:"Buchen" },
+  { path:"/alquiler-motorhome-europa-desde-espana", label:"Wohnmobil-Miete Europa" },
+  { path:"/buscar", label:"Suche" },
+  { path:"/contacto", label:"Kontakt" },
+  { path:"/como-funciona", label:"Wie es funktioniert" },
+  { path:"/documentacion-alquiler", label:"Mietdokumentation" },
+  { path:"/guia-camper", label:"Wohnmobil-Guide" },
+  { path:"/mapa-areas", label:"Gebietskarte" },
+  { path:"/parking-murcia", label:"Parkplatz Murcia" },
+  { path:"/ofertas", label:"Angebote" },
+  { path:"/publicaciones", label:"Publikationen" },
+  { path:"/clientes-vip", label:"VIP-Kunden" },
+  { path:"/quienes-somos", label:"Über uns" },
   { path:"/faqs", label:"FAQs" },
-  { path:"/como-reservar-fin-semana", label:"Cómo reservar fin de semana" },
-  { path:"/inteligencia-artificial", label:"Inteligencia artificial" },
-  { path:"/video-tutoriales", label:"Video tutoriales" },
-  { path:"/aviso-legal", label:"Aviso legal" },
-  { path:"/privacidad", label:"Privacidad" },
+  { path:"/como-reservar-fin-semana", label:"Wochenend-Buchung" },
+  { path:"/inteligencia-artificial", label:"Künstliche Intelligenz" },
+  { path:"/video-tutoriales", label:"Video-Anleitungen" },
+  { path:"/aviso-legal", label:"Impressum" },
+  { path:"/privacidad", label:"Datenschutz" },
   { path:"/cookies", label:"Cookies" },
-  { path:"/pago/exito", label:"Pago éxito" },
-  { path:"/pago/error", label:"Pago error" },
-  { path:"/pago/cancelado", label:"Pago cancelado" },
+  { path:"/pago/exito", label:"Zahlung erfolgreich" },
+  { path:"/pago/error", label:"Zahlungsfehler" },
+  { path:"/pago/cancelado", label:"Zahlung abgebrochen" },
   { path:"/sitemap-html", label:"Sitemap HTML" },
 ];
 
 const faqPages: Array<{ slug: string; label: string }> = [
-  { slug:"edad-minima-alquiler", label:"Edad mínima alquiler" },
-  { slug:"permiso-conducir", label:"Permiso de conducir" },
-  { slug:"alquiler-fin-semana", label:"Alquiler fin de semana" },
-  { slug:"como-reservar", label:"Cómo reservar" },
-  { slug:"precios-impuestos", label:"Precios e impuestos" },
-  { slug:"accesorios-gratuitos", label:"Accesorios gratuitos" },
-  { slug:"proposito-fianza", label:"Propósito de la fianza" },
-  { slug:"horarios-entrega", label:"Horarios de entrega" },
-  { slug:"documentos-necesarios", label:"Documentos necesarios" },
-  { slug:"funcionamiento-camper", label:"Funcionamiento de la camper" },
+  { slug:"edad-minima-alquiler", label:"Mindestalter Miete" },
+  { slug:"permiso-conducir", label:"Führerschein" },
+  { slug:"alquiler-fin-semana", label:"Wochenendmiete" },
+  { slug:"como-reservar", label:"Wie buchen" },
+  { slug:"precios-impuestos", label:"Preise und Steuern" },
+  { slug:"accesorios-gratuitos", label:"Kostenlose Accessoires" },
+  { slug:"proposito-fianza", label:"Zweck Kaution" },
+  { slug:"horarios-entrega", label:"Lieferzeiten" },
+  { slug:"documentos-necesarios", label:"Erforderliche Dokumente" },
+  { slug:"funcionamiento-camper", label:"Wohnmobil-Betrieb" },
 ];
 
 function getCategorySlug(category: PostRow["category"]) {
@@ -167,10 +168,10 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16">
           <div className="container mx-auto px-4 text-center">
             <h1 className="text-4xl md:text-5xl font-heading font-bold text-white mb-4">
-              Sitemap HTML
+              HTML-Sitemap
             </h1>
             <p className="text-blue-100 text-lg">
-              Listado completo de URLs públicas.
+              Vollständige Liste aller öffentlichen URLs.
             </p>
           </div>
         </section>
@@ -179,7 +180,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                Páginas principales
+                Hauptseiten
               </h2>
               <ul className="space-y-2">
                 {staticPages.map((page) => (
@@ -200,7 +201,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                Blog - Categorías
+                Blog - Kategorien
               </h2>
               <ul className="space-y-2">
                 {categoryList.map((category) => (
@@ -223,7 +224,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                Blog - Artículos
+                Blog - Artikel
               </h2>
               <ul className="space-y-2">
                 {postList.map((post) => {
@@ -250,7 +251,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                Vehículos en alquiler
+                Mietfahrzeuge
               </h2>
               <ul className="space-y-2">
                 {rentList.map((vehicle) => {
@@ -276,7 +277,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                Vehículos en venta
+                Fahrzeuge zum Verkauf
               </h2>
               <ul className="space-y-2">
                 {saleList.map((vehicle) => {
@@ -302,7 +303,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                Ubicaciones - Alquiler
+                Standorte - Vermietung
               </h2>
               <ul className="space-y-2">
                 {locationList.map((location) => {
@@ -328,7 +329,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                Ubicaciones - Venta
+                Standorte - Verkauf
               </h2>
               <ul className="space-y-2">
                 {saleLocationList.map((location) => {
@@ -354,7 +355,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
 
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
               <h2 className="text-xl font-heading font-bold text-gray-900 mb-4">
-                FAQs detalladas
+                Detaillierte FAQs
               </h2>
               <ul className="space-y-2">
                 {faqPages.map((faq) => {
