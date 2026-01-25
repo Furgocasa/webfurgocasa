@@ -4,6 +4,137 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🇲🇦 [4.4.0] - 25 de Enero 2026 - **Páginas SEO Multiidioma: Motorhome Marruecos**
+
+### 🎯 **NUEVA ESTRATEGIA SEO GEOGRÁFICA**
+
+#### Objetivo: Captar búsquedas de viajeros internacionales que quieren alquilar motorhome para viajar a Marruecos desde España
+
+**Problema identificado:**
+- Muchos clientes internacionales (europeos, americanos, australianos) nos contactan preguntando si pueden llevar nuestras campers a Marruecos
+- La respuesta es **SÍ** pero no teníamos páginas específicas para captar esta intención de búsqueda
+- Búsquedas como "motorhome rental morocco spain", "camping-car maroc espagne" no tenían landing dedicada
+
+**Solución:**
+- Creación de 4 nuevas páginas multiidioma específicas para Marruecos
+- Contenido diferenciado vs páginas Europa (sin descuento LATAM, enfoque en ferry y África)
+- Optimización SEO completa con canonical + hreflang
+
+---
+
+### ✅ **PÁGINAS CREADAS**
+
+| Idioma | URL | Keywords objetivo |
+|--------|-----|-------------------|
+| 🇪🇸 ES | `/es/alquiler-motorhome-marruecos-desde-espana` | "alquiler motorhome marruecos españa" |
+| 🇬🇧 EN | `/en/motorhome-rental-morocco-from-spain` | "motorhome rental morocco from spain" |
+| 🇫🇷 FR | `/fr/camping-car-maroc-depuis-espagne` | "location camping-car maroc espagne" |
+| 🇩🇪 DE | `/de/wohnmobil-miete-marokko-von-spanien` | "wohnmobil miete marokko spanien" |
+
+---
+
+### 📊 **CONTENIDO ESPECÍFICO MARRUECOS**
+
+**Información Ferry:**
+- ✅ **3 opciones de ferry**: Tarifa→Tánger (35min), Algeciras→Tánger (1h), Almería→Nador (3-4h)
+- ✅ **Frecuencias y tiempos** de travesía
+- ✅ **Precio aproximado** ferry: 150-200€ ida+vuelta
+
+**Documentación Incluida:**
+- ✅ **Carta Verde** - Seguro válido en Marruecos
+- ✅ **Autorización propietario** del vehículo
+- ✅ **Documentos para aduana** marroquí
+- ✅ **Asesoramiento completo** antes del viaje
+
+**Rutas Sugeridas por Marruecos:**
+- ✅ **Tánger & Norte** (7-10 días, ~800 km)
+- ✅ **Ciudades Imperiales + Costa** (12-14 días, ~1,500 km)
+- ✅ **Costa Atlántica** (10-12 días, ~1,200 km)
+- ✅ **Gran Ruta + Desierto** (16-21 días, ~2,500 km)
+
+**Diferencias con Páginas Europa:**
+- ❌ **NO incluye descuento -15% LATAM** (exclusivo páginas Europa)
+- ✅ Enfoque en **ferry y cruce a África**
+- ✅ Rutas por **Marruecos** en vez de Europa
+- ✅ Documentación específica para **cruzar frontera**
+
+---
+
+### 🔧 **IMPLEMENTACIÓN TÉCNICA**
+
+**Archivos creados** (2,733 líneas):
+```
+src/app/es/alquiler-motorhome-marruecos-desde-espana/page.tsx (683 líneas)
+src/app/en/motorhome-rental-morocco-from-spain/page.tsx (681 líneas)
+src/app/fr/camping-car-maroc-depuis-espagne/page.tsx (681 líneas)
+src/app/de/wohnmobil-miete-marokko-von-spanien/page.tsx (681 líneas)
+```
+
+**Archivos modificados:**
+```typescript
+// src/lib/route-translations.ts - Añadidas rutas Marruecos
+"/alquiler-motorhome-marruecos-desde-espana": { 
+  es: "/alquiler-motorhome-marruecos-desde-espana", 
+  en: "/motorhome-rental-morocco-from-spain", 
+  fr: "/camping-car-maroc-depuis-espagne", 
+  de: "/wohnmobil-miete-marokko-von-spanien" 
+}
+
+// src/app/sitemap.ts - Añadida entrada con prioridad 0.9
+{ path: '/alquiler-motorhome-marruecos-desde-espana', priority: 0.9, changeFrequency: 'monthly' }
+```
+
+**SEO Configuration:**
+```typescript
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const locale: Locale = 'es'; // o 'en', 'fr', 'de' según la página
+  
+  // buildCanonicalAlternates genera:
+  // - Canonical URL autorreferenciado
+  // - Hreflang alternates para los 4 idiomas
+  // - x-default apuntando a español
+  const alternates = buildCanonicalAlternates('/alquiler-motorhome-marruecos-desde-espana', locale);
+
+  return {
+    ...MOTORHOME_MARRUECOS_METADATA, // Title, description, keywords, OpenGraph
+    alternates,
+    openGraph: {
+      ...MOTORHOME_MARRUECOS_METADATA.openGraph,
+      url: alternates.canonical,
+    },
+  };
+}
+```
+
+---
+
+### 📈 **IMPACTO SEO ESPERADO**
+
+**Volúmenes de búsqueda mensuales (estimados):**
+- "motorhome rental morocco" → ~200 búsquedas/mes
+- "camping-car maroc espagne" → ~150 búsquedas/mes
+- "wohnmobil marokko mieten" → ~100 búsquedas/mes
+- "alquiler autocaravana marruecos" → ~250 búsquedas/mes
+
+**ROI esperado:**
+- **+20-30% tráfico orgánico internacional** en 3-6 meses (sumado a páginas Europa)
+- Captar nicho específico de viajeros a Marruecos
+- Diferenciación vs competencia (pocas empresas permiten cruzar a Marruecos)
+
+**Total páginas SEO estratégicas:** 8 (4 Europa + 4 Marruecos)
+
+---
+
+### 📚 **DOCUMENTACIÓN**
+
+**Archivo nuevo:**
+- `PAGINAS-MOTORHOME-MARRUECOS-MULTIIDIOMA.md` - Guía completa páginas Marruecos
+
+**Commits:**
+- `8c54fb2` - feat(seo): añadir páginas multiidioma Motorhome Marruecos
+
+---
+
 ## 🔍 [4.2.2] - 25 de Enero 2026 - **Mejora SEO: Enlaces Descriptivos**
 
 ### 📊 **OPTIMIZACIÓN SEO**

@@ -1,10 +1,57 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.14 ✅ PRODUCCIÓN - BLOG MULTIIDIOMA TOTALMENTE FUNCIONAL  
+**Versión**: 1.0.15 ✅ PRODUCCIÓN - PÁGINAS SEO MARRUECOS MULTIIDIOMA  
 **URL**: https://www.furgocasa.com  
 **Última actualización**: 25 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🇲🇦 VERSIÓN 1.0.15 - PÁGINAS MOTORHOME MARRUECOS MULTIIDIOMA
+
+**✅ ESTADO: COMPLETADO** - 4 nuevas páginas SEO para captar viajeros a Marruecos.
+
+**NUEVA FUNCIONALIDAD**: Páginas específicas para alquiler motorhome a Marruecos desde España.
+- **Audiencia**: Internacional (europeos, americanos, australianos)
+- **Destino**: Marruecos (Tánger, Marrakech, Desierto del Sahara)
+- **Diferencia clave**: SIN descuento LATAM (exclusivo páginas Europa)
+
+Ver **[PAGINAS-MOTORHOME-MARRUECOS-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-MARRUECOS-MULTIIDIOMA.md)** (v1.0.0) para detalles completos.
+
+### 🎯 Highlights v1.0.15:
+- ✅ **4 páginas nuevas**: ES/EN/FR/DE específicas para Marruecos
+- ✅ **Información ferry**: 3 opciones (Tarifa 35min, Algeciras 1h, Almería 3-4h)
+- ✅ **Documentación incluida**: Carta Verde, autorización, docs aduana
+- ✅ **Rutas por Marruecos**: Norte, Imperial, Costa, Desierto
+- ✅ **Sin descuento LATAM**: Diferenciador clave vs páginas Europa
+- ✅ **SEO optimizado**: Canonical + hreflang configurados, sitemap priority 0.9
+
+### 🌐 URLs Creadas:
+```
+/es/alquiler-motorhome-marruecos-desde-espana
+/en/motorhome-rental-morocco-from-spain
+/fr/camping-car-maroc-depuis-espagne
+/de/wohnmobil-miete-marokko-von-spanien
+```
+
+### 🔧 Archivos Creados/Modificados:
+```
+src/app/es/alquiler-motorhome-marruecos-desde-espana/page.tsx (683 líneas)
+src/app/en/motorhome-rental-morocco-from-spain/page.tsx (681 líneas)
+src/app/fr/camping-car-maroc-depuis-espagne/page.tsx (681 líneas)
+src/app/de/wohnmobil-miete-marokko-von-spanien/page.tsx (681 líneas)
+src/lib/route-translations.ts                            (rutas Marruecos añadidas)
+src/app/sitemap.ts                                       (entrada con priority 0.9)
+```
+
+### 📈 Impacto SEO Esperado:
+- **Keywords objetivo**: "motorhome rental morocco", "camping-car maroc", "wohnmobil marokko"
+- **Volumen búsqueda**: ~700 búsquedas/mes (total 4 idiomas)
+- **ROI esperado**: +20-30% tráfico internacional en 3-6 meses (8 páginas: 4 Europa + 4 Marruecos)
+
+### 🔗 Commit:
+- `8c54fb2` - feat(seo): añadir páginas multiidioma Motorhome Marruecos
 
 ---
 

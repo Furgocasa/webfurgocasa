@@ -1,6 +1,6 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.3.1-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.4.0-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-99%2F100_desktop-brightgreen.svg)](https://pagespeed.web.dev/)
@@ -9,23 +9,34 @@
 [![SEO](https://img.shields.io/badge/SEO-100%2F100-brightgreen.svg)](./CHANGELOG.md)
 [![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./I18N_IMPLEMENTATION.md)
 
-**🎉 VERSIÓN 4.3.1 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 4.4.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
-> **✅ ESTADO: BLOG MULTIIDIOMA TOTALMENTE FUNCIONAL** - URLs traducidas | Contenido traducido | Fallback inteligente
+> **✅ ESTADO: PÁGINAS SEO MULTIIDIOMA PARA EUROPA Y MARRUECOS** - 8 páginas estratégicas | SEO optimizado | Intención de búsqueda geográfica
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Enero 2026 - **Páginas Motorhome Europa Multiidioma**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Enero 2026 - **Páginas SEO Multiidioma: Marruecos**
 
-### 🌍 Nuevas Páginas para Viajeros Internacionales
+### 🇲🇦 Nuevas Páginas: Motorhome Marruecos desde España
 
 **Estado**: ✅ Completadas y funcionando  
 **Páginas creadas**: 4 (ES/EN/FR/DE)  
-**Diferenciación**: Por audiencia geográfica
+**Objetivo**: Captar búsquedas internacionales de viajeros que quieren alquilar motorhome para viajar a Marruecos
 
-### 📊 Páginas Implementadas
+### 📊 Todas las Páginas SEO Implementadas
+
+#### **Páginas Marruecos** (Nuevo - commit 8c54fb2)
+
+| Idioma | URL | Audiencia |
+|--------|-----|-----------|
+| 🇪🇸 ES | `/es/alquiler-motorhome-marruecos-desde-espana` | Internacional |
+| 🇬🇧 EN | `/en/motorhome-rental-morocco-from-spain` | Angloparlantes |
+| 🇫🇷 FR | `/fr/camping-car-maroc-depuis-espagne` | Francoparlantes |
+| 🇩🇪 DE | `/de/wohnmobil-miete-marokko-von-spanien` | Germanoparlantes |
+
+#### **Páginas Europa**
 
 | Idioma | URL | Audiencia |
 |--------|-----|-----------|
@@ -34,52 +45,77 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 | 🇫🇷 FR | `/fr/camping-car-europe-depuis-espagne` | Francoparlantes |
 | 🇩🇪 DE | `/de/wohnmobil-miete-europa-von-spanien` | Germanoparlantes |
 
-### ✅ Características Implementadas
+### ✅ Características Páginas Marruecos
 
-**Contenido Diferenciado:**
-- ✅ **Badge hero específico** por audiencia (ej: "🌎 Viajeros desde LATAM" en ES)
-- ✅ **Países destacados** según idioma (ej: Australia, USA en EN)
-- ✅ **Descuento -15%** diferenciado por geografía
-- ✅ **Blog dinámico** - "Rutas Sugeridas" con 4 artículos traducidos
+**Contenido Específico Marruecos:**
+- ✅ **Información Ferry** - 3 opciones: Tarifa→Tánger (35min), Algeciras→Tánger (1h), Almería→Nador (3-4h)
+- ✅ **Documentación incluida** - Carta Verde (seguro Marruecos), autorización propietario, docs aduana
+- ✅ **Rutas sugeridas** - Tánger & Norte, Ciudades Imperiales, Costa Atlántica, Gran Ruta + Desierto
+- ✅ **Sin descuento LATAM** - El descuento -15% es exclusivo para páginas Europa LATAM
+- ✅ **Badge hero** - "🇲🇦 Aventura en África desde España" (traducido)
 
-**SEO Optimizado:**
-- ✅ **Meta títulos** sin mención de LATAM/España en EN/FR/DE
+**Diferencias con Páginas Europa:**
+- ❌ NO incluye descuento -15% (solo para viajeros LATAM en páginas Europa)
+- ✅ Enfoque en ferry y cruce a África
+- ✅ Rutas por Marruecos en vez de Europa
+- ✅ Documentación específica para cruzar frontera
+
+**SEO Optimizado (común a ambas):**
+- ✅ **Meta títulos** específicos por destino (Europa vs Marruecos)
 - ✅ **Canonical URLs** correctos por idioma
 - ✅ **Hreflang alternates** conectando las 4 versiones
-- ✅ **Sitemap inclusion** - XML + HTML en 4 idiomas
+- ✅ **Sitemap inclusion** - XML + HTML en 4 idiomas, prioridad 0.9
 - ✅ **ISR configurado** - Revalidación cada 24h
 
-**Integración Blog:**
+**Integración Blog (común a ambas):**
 - ✅ **Categoría única `rutas`** - Todos los idiomas consultan la misma
 - ✅ **URLs traducidas** - Slugs desde `slug_fr`, `slug_en`, `slug_de`
 - ✅ **Contenido traducido** - Títulos y excerpts desde `content_translations`
 - ✅ **Fallback inteligente** - Usa español si no hay traducción
-- ✅ **SEO-friendly URLs** - `/fr/blog/itineraires/noels-differents...`
 
-### 📁 Archivos Modificados
+### 📁 Archivos Creados/Modificados (Marruecos)
 
-1. ✅ `src/app/es/alquiler-motorhome-europa-desde-espana/page.tsx` - Página ES (LATAM)
-2. ✅ `src/app/en/motorhome-rental-europe-from-spain/page.tsx` - Página EN
-3. ✅ `src/app/fr/camping-car-europe-depuis-espagne/page.tsx` - Página FR (renombrada)
-4. ✅ `src/app/de/wohnmobil-miete-europa-von-spanien/page.tsx` - Página DE
-5. ✅ `src/lib/home/server-actions.ts` - `getRoutesArticles` con traducciones completas
-6. ✅ `src/components/blog/blog-article-link.tsx` - Selección de slug traducido
-7. ✅ `src/components/blog/blog-list-client.tsx` - URLs con slugs traducidos
-8. ✅ `src/components/blog/blog-content.tsx` - Fetch slugs traducidos
-9. ✅ `src/lib/route-translations.ts` - Mapeo de slugs traducidos
-10. ✅ `src/app/sitemap.ts` - Entrada con prioridad 0.9
-11. ✅ `src/app/[locale]/sitemap-html/page.tsx` (×4) - HTML sitemaps localizados
+**Nuevos archivos:**
+1. ✅ `src/app/es/alquiler-motorhome-marruecos-desde-espana/page.tsx` - Página ES Marruecos (683 líneas)
+2. ✅ `src/app/en/motorhome-rental-morocco-from-spain/page.tsx` - Página EN Marruecos (681 líneas)
+3. ✅ `src/app/fr/camping-car-maroc-depuis-espagne/page.tsx` - Página FR Marruecos (681 líneas)
+4. ✅ `src/app/de/wohnmobil-miete-marokko-von-spanien/page.tsx` - Página DE Marruecos (681 líneas)
+
+**Archivos modificados:**
+5. ✅ `src/lib/route-translations.ts` - Añadidas rutas Marruecos
+6. ✅ `src/app/sitemap.ts` - Añadida entrada Marruecos con prioridad 0.9
+
+### 📁 Archivos Anteriores (Europa)
+
+7. ✅ `src/app/es/alquiler-motorhome-europa-desde-espana/page.tsx` - Página ES Europa (LATAM)
+8. ✅ `src/app/en/motorhome-rental-europe-from-spain/page.tsx` - Página EN Europa
+9. ✅ `src/app/fr/camping-car-europe-depuis-espagne/page.tsx` - Página FR Europa
+10. ✅ `src/app/de/wohnmobil-miete-europa-von-spanien/page.tsx` - Página DE Europa
+11. ✅ `src/lib/home/server-actions.ts` - `getRoutesArticles` con traducciones completas
+12. ✅ `src/components/blog/blog-article-link.tsx` - Selección de slug traducido
+13. ✅ `src/components/blog/blog-list-client.tsx` - URLs con slugs traducidos
+14. ✅ `src/components/blog/blog-content.tsx` - Fetch slugs traducidos
 
 ### 📚 Documentación Completa
 
-**👉 [PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** - Guía completa con:
-- Diferenciación por audiencia
+**👉 [PAGINAS-MOTORHOME-MARRUECOS-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-MARRUECOS-MULTIIDIOMA.md)** - Guía páginas Marruecos:
+- Información ferry (Tarifa, Algeciras, Almería)
+- Documentación para cruzar (Carta Verde, aduana)
+- Rutas por Marruecos (Norte, Imperial, Costa, Desierto)
+- SEO y metadata optimizados
+- Diferencias con páginas Europa
+
+**👉 [PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** - Guía páginas Europa:
+- Diferenciación por audiencia (LATAM vs resto)
+- Descuento -15% exclusivo LATAM
 - Estructura de contenido
 - SEO y metadata
 - Errores resueltos (French 404, Blog routes)
-- Mantenimiento y actualizaciones
 
-**Commits:**
+**Commits Marruecos:**
+- `8c54fb2` - feat(seo): añadir páginas multiidioma Motorhome Marruecos
+
+**Commits Europa:**
 - `d18de0f` - fix(motorhome-europa): corregir consulta traducciones en getRoutesArticles
 - `173e55b` - feat(blog): usar slugs traducidos en URLs de la página principal del blog
 - `4f7c8e0` - feat(motorhome-europa): usar slugs traducidos en URLs del blog
@@ -88,13 +124,19 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ### 🎯 Objetivo SEO
 
-Captar tráfico internacional de personas buscando:
+**Páginas Marruecos** - Captar tráfico de personas buscando:
+- "motorhome rental morocco from spain" (EN)
+- "location camping-car maroc espagne" (FR)
+- "wohnmobil miete marokko spanien" (DE)
+- "alquiler motorhome marruecos españa" (ES)
+
+**Páginas Europa** - Captar tráfico internacional buscando:
 - "motorhome rental europe" (EN)
 - "location camping-car europe" (FR)
 - "wohnmobil miete europa" (DE)
 - "alquiler motorhome europa" (ES/LATAM)
 
-**ROI esperado**: +15-25% tráfico orgánico internacional en 3-6 meses
+**ROI esperado**: +20-30% tráfico orgánico internacional en 3-6 meses (8 páginas estratégicas)
 
 ---
 
