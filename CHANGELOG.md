@@ -4,7 +4,151 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
-## 🇲🇦 [4.4.0] - 25 de Enero 2026 - **Páginas SEO Multiidioma: Motorhome Marruecos**
+## 📊 [4.4.0] - 25 de Enero 2026 - **Migración Google Analytics + Títulos Admin**
+
+### 🎯 **MIGRACIÓN A LIBRERÍA OFICIAL DE GOOGLE ANALYTICS**
+
+#### Problema identificado:
+- Implementación manual de Google Analytics con múltiples iteraciones (V1-V7)
+- Problemas persistentes con:
+  - Títulos de página faltantes o incorrectos
+  - Parámetros `fbclid` de Facebook no capturados correctamente
+  - Race conditions en carga inicial
+  - URLs largas rechazadas por GA4
+- ~300 líneas de código custom que mantener
+
+#### Solución:
+- Migración a `@next/third-parties/google` (librería oficial de Next.js)
+- Gestión automática de todos los problemas anteriores
+- Código simplificado: 300+ líneas → 1 línea
+
+---
+
+### ✅ **CAMBIOS IMPLEMENTADOS**
+
+**1. Nueva Dependencia:**
+```bash
+npm install @next/third-parties
+```
+
+**2. Modificación de `src/app/layout.tsx`:**
+```tsx
+// ❌ Antes (implementación manual)
+import { GoogleAnalytics } from "@/components/analytics";
+import { AnalyticsScripts } from "@/components/analytics-scripts";
+
+<AnalyticsScripts />
+<GoogleAnalytics />
+
+// ✅ Ahora (librería oficial)
+import { GoogleAnalytics } from "@next/third-parties/google"
+
+<GoogleAnalytics gaId="G-G5YLBN5XXZ" />
+```
+
+**3. Archivos Obsoletos (conservados para historial):**
+- `src/components/analytics.tsx` - Implementación manual V1-V7
+- `src/components/analytics-scripts.tsx` - Scripts con exclusión manual del admin
+
+---
+
+### 🎨 **TÍTULOS PERSONALIZADOS EN ADMIN**
+
+#### Problema:
+- Todas las páginas del admin mostraban el mismo título genérico en el navegador
+- Difícil identificar qué pestaña es cuál cuando hay múltiples abiertas
+
+#### Solución:
+Títulos descriptivos en todas las páginas del administrador:
+
+**Server Components (con `metadata`):**
+- Dashboard: "Admin - Dashboard | Furgocasa"
+- Informes: "Admin - Informes | Furgocasa"
+
+**Client Components (con `useEffect`):**
+- Reservas: "Admin - Reservas | Furgocasa"
+- Daños: "Admin - Daños | Furgocasa"
+- Clientes: "Admin - Clientes | Furgocasa"
+- Vehículos: "Admin - Vehículos | Furgocasa"
+- Calendario: "Admin - Calendario | Furgocasa"
+- Pagos: "Admin - Pagos | Furgocasa"
+- Blog: "Admin - Blog | Furgocasa"
+- Extras: "Admin - Extras | Furgocasa"
+- Configuración: "Admin - Configuración | Furgocasa"
+- Ubicaciones: "Admin - Ubicaciones | Furgocasa"
+- Temporadas: "Admin - Temporadas | Furgocasa"
+- Cupones: "Admin - Cupones | Furgocasa"
+- Media: "Admin - Media | Furgocasa"
+- Ofertas: "Admin - Ofertas | Furgocasa"
+- Equipamiento: "Admin - Equipamiento | Furgocasa"
+
+**Total: 17 páginas actualizadas**
+
+---
+
+### 🔧 **VENTAJAS DE LA MIGRACIÓN**
+
+| Aspecto | Antes (Manual) | Ahora (Oficial) | Mejora |
+|---------|----------------|-----------------|--------|
+| **Código** | ~300 líneas custom | 1 línea | -99% |
+| **Títulos** | MutationObserver + polling | Automático | ✅ |
+| **fbclid** | Recorte manual | Captura nativa | ✅ |
+| **Race conditions** | Polling con timeout | Gestión interna | ✅ |
+| **Mantenimiento** | Custom | Vercel/Google | ✅ |
+| **Estabilidad** | 7 iteraciones | Primera versión | ✅ |
+
+---
+
+### ⚠️ **TRADE-OFFS**
+
+**Desventaja:**
+- Se pierde la exclusión manual del admin
+- Google Analytics ahora trackea visitas en `/administrator`
+
+**Solución Recomendada:**
+Configurar filtro por IP en Google Analytics:
+1. Admin → Flujos de datos → Tu flujo
+2. Configuración de etiquetas → Mostrar todo
+3. Definir filtro de IP interno
+4. Añadir IP de oficina/casa
+
+---
+
+### 📚 **DOCUMENTACIÓN**
+
+**Nuevos documentos:**
+- `MIGRACION-NEXT-THIRD-PARTIES.md` - Guía completa de la migración
+
+**Documentos actualizados:**
+- `README.md` - Historial de versiones + estado actual
+- `docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md` - Marcado como obsoleto
+
+**Documentos históricos (conservados):**
+- `AUDITORIA-ANALYTICS-TITULOS.md` - V1: Problema títulos
+- `FIX-ANALYTICS-TITULOS.md` - V2: MutationObserver
+- `AUDITORIA-ANALYTICS-PARAMS.md` - V4: Captura fbclid
+- `AUDITORIA-ANALYTICS-INITIAL-LOAD.md` - V5: Race conditions
+- `AUDITORIA-ANALYTICS-URL-TRIMMING.md` - V6: URLs largas
+- `AUDITORIA-ANALYTICS-URL-TRIMMING-V7.md` - V7: Recorte agresivo
+
+---
+
+### 🎯 **RESULTADO FINAL**
+
+✅ Google Analytics funcionando con librería oficial  
+✅ Captura automática de títulos, URLs completas, fbclid  
+✅ Sin race conditions ni problemas de carga  
+✅ 17 páginas admin con títulos descriptivos  
+✅ Código simplificado (-300 líneas)  
+✅ Mantenimiento garantizado por Vercel/Google  
+
+**Commits:**
+- `31c6f20` - feat(analytics): migrar a @next/third-parties para estabilidad garantizada
+- `3b69769` - feat(admin): añadir títulos personalizados a todas las páginas del administrador
+
+---
+
+## 🇲🇦 [4.3.0] - 25 de Enero 2026 - **Páginas SEO Multiidioma: Motorhome Marruecos**
 
 ### 🎯 **NUEVA ESTRATEGIA SEO GEOGRÁFICA**
 

@@ -1,61 +1,119 @@
 # Configuración de Google Analytics
 
+## ⚠️ DOCUMENTO OBSOLETO - Implementación Manual
+
+**Fecha de obsolescencia**: 25 de enero de 2026  
+**Razón**: Migración a `@next/third-parties/google` (librería oficial de Next.js)
+
+**👉 Ver documento actual:** `MIGRACION-NEXT-THIRD-PARTIES.md` (raíz del proyecto)
+
+---
+
 ## ID de Medición
 **G-G5YLBN5XXZ**
 
-## ⚠️ IMPORTANTE - Exclusión Total de Páginas de Administrador
+## Nueva Implementación (v4.4.0)
 
-**CRÍTICO**: Los scripts de Google Analytics **NO SE CARGAN** en las páginas de administrador.
+Desde la versión 4.4.0, la aplicación utiliza la librería oficial de Next.js para Google Analytics:
 
-### Cómo Funciona la Exclusión
+```tsx
+import { GoogleAnalytics } from '@next/third-parties/google'
+
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {children}
+        <GoogleAnalytics gaId="G-G5YLBN5XXZ" />
+      </body>
+    </html>
+  )
+}
+```
+
+### Ventajas de la Nueva Implementación
+- ✅ **Estabilidad garantizada**: Mantenida por Vercel/Google
+- ✅ **Sin race conditions**: Gestión automática de carga asíncrona
+- ✅ **Captura automática**: Títulos, URLs completas (incluido `fbclid`)
+- ✅ **Menos código**: 1 línea vs 300+ líneas custom
+
+### Desventajas
+- ⚠️ **No hay exclusión del admin**: Los scripts se cargan en todas las páginas
+- **Solución recomendada**: Configurar filtro por IP en Google Analytics
+
+### Configurar Filtro por IP (Recomendado)
+1. Google Analytics → Admin → Flujos de datos → Tu flujo
+2. Configuración de etiquetas → Mostrar todo
+3. Definir filtro de IP interno
+4. Añadir tu IP de oficina/casa
+
+---
+
+## 📜 Documentación Histórica (Implementación Manual)
+
+### ⚠️ IMPORTANTE - Exclusión Total de Páginas de Administrador (YA NO APLICA)
+
+**NOTA**: La exclusión manual del admin ya NO está implementada en la nueva versión.
+
+La siguiente información se mantiene solo como referencia histórica de cómo funcionaba la implementación manual (v1.0.0 - v4.3.0).
+
+### Cómo Funcionaba la Exclusión Manual (Obsoleto)
 
 1. **Componente `AnalyticsScripts` (Client-Side)**:
-   - Detecta la ruta actual usando `usePathname()`
-   - Si la ruta comienza con `/administrator` o `/admin`:
-     - NO renderiza ningún script de Google Analytics
-     - NO carga gtag.js
-     - NO inicializa dataLayer
-   - Solo en páginas públicas se cargan los scripts
+   - Detectaba la ruta actual usando `usePathname()`
+   - Si la ruta comenzaba con `/administrator` o `/admin`:
+     - NO renderizaba ningún script de Google Analytics
+     - NO cargaba gtag.js
+     - NO inicializaba dataLayer
+   - Solo en páginas públicas se cargaban los scripts
 
 2. **Componente `GoogleAnalytics` (Tracking de Navegación)**:
-   - Detecta cambios de ruta
-   - Si es una ruta de admin, NO envía pageviews
-   - Solo trackea navegación en páginas públicas
+   - Detectaba cambios de ruta
+   - Si era una ruta de admin, NO enviaba pageviews
+   - Solo trackeaba navegación en páginas públicas
 
-### Verificación de la Exclusión
+### Archivos Obsoletos (Conservados para Historial)
 
-**En páginas de administrador:**
-- ✅ NO se carga el script de gtag.js
-- ✅ NO existe `window.gtag`
-- ✅ NO existe `window.dataLayer` (o está vacío)
-- ✅ NO hay peticiones a googletagmanager.com
-- ✅ Consola muestra: "Ruta de administrador detectada. Scripts de Analytics NO se cargarán."
+```
+src/components/
+├── analytics-scripts.tsx      # ❌ Ya NO se usa (exclusión manual)
+├── analytics.tsx              # ❌ Ya NO se usa (tracking manual con V1-V7)
+└── analytics-debug.tsx        # ✅ Se mantiene (útil en desarrollo)
+```
 
-**En páginas públicas:**
-- ✅ Se carga gtag.js
-- ✅ Se inicializa Analytics
-- ✅ Se envían pageviews
-- ✅ Consola muestra: "Ruta pública detectada. Cargando scripts de Analytics..."
+### Documentación Histórica de Iteraciones
+
+Los siguientes documentos explican los problemas que se intentaron resolver con la implementación manual:
+
+- `AUDITORIA-ANALYTICS-TITULOS.md` - V1: Problema de títulos faltantes
+- `FIX-ANALYTICS-TITULOS.md` - V2: MutationObserver para títulos
+- `AUDITORIA-ANALYTICS-PARAMS.md` - V4: Captura de parámetros `fbclid`
+- `AUDITORIA-ANALYTICS-INITIAL-LOAD.md` - V5: Race conditions en carga inicial
+- `AUDITORIA-ANALYTICS-URL-TRIMMING.md` - V6: Recorte de URLs largas
+- `AUDITORIA-ANALYTICS-URL-TRIMMING-V7.md` - V7: Recorte agresivo de `fbclid`
+
+**Todos estos problemas están ahora resueltos** con la librería oficial `@next/third-parties/google`.
+
+---
 
 ## Cumplimiento GDPR
 
-El sistema incluye gestión de consentimiento:
+El sistema incluye gestión de consentimiento con `CookieProvider`:
 
 ### Modo por Defecto (Sin Consentimiento)
 ```javascript
 gtag('consent', 'default', {
-  'analytics_storage': 'denied',      // No almacenar cookies de analytics
-  'ad_storage': 'denied',             // No almacenar cookies de publicidad
-  'ad_user_data': 'denied',           // No usar datos de usuario para ads
-  'ad_personalization': 'denied',     // No personalizar ads
-  'functionality_storage': 'denied',  // No cookies funcionales
-  'personalization_storage': 'denied',// No cookies de personalización
-  'security_storage': 'granted'       // Solo cookies de seguridad
+  'analytics_storage': 'denied',
+  'ad_storage': 'denied',
+  'ad_user_data': 'denied',
+  'ad_personalization': 'denied',
+  'functionality_storage': 'denied',
+  'personalization_storage': 'denied',
+  'security_storage': 'granted'
 });
 ```
 
 ### Cuando el Usuario Acepta
-El componente `CookieProvider` actualiza el consentimiento:
 ```javascript
 gtag('consent', 'update', {
   'analytics_storage': 'granted'
@@ -75,55 +133,31 @@ El sistema de cookies (`src/components/cookies/cookie-context.tsx`) gestiona:
 - `rejectAll()`: Solo cookies necesarias, analytics denegado
 - `updatePreferences()`: Preferencias personalizadas
 
-## Eventos Personalizados
-
-Hook disponible para trackear eventos:
-
-```typescript
-import { useAnalyticsEvent } from '@/components/analytics';
-
-function MiComponente() {
-  const { trackEvent } = useAnalyticsEvent();
-  
-  const handleReserva = () => {
-    trackEvent('click', 'reservas', 'boton_reservar');
-  };
-  
-  return <button onClick={handleReserva}>Reservar</button>;
-}
-```
-
-**Nota**: Los eventos también son bloqueados automáticamente en páginas de administrador.
-
 ## Verificación de Funcionamiento
 
 ### En el Navegador (Chrome DevTools)
 
 1. **Consola del Navegador**:
-   - Páginas públicas: `[Analytics] Enviando pageview: /`
-   - Páginas admin: `[Analytics] Página de administrador detectada. Analytics NO se cargará.`
+   - Debe verse el script de Google Tag Manager cargándose
+   - Verifica `window.gtag` existe
 
 2. **Network Tab**:
-   - Páginas públicas: Verás peticiones a `googletagmanager.com`
-   - Páginas admin: NO debe haber peticiones a Google Analytics
+   - Verás peticiones a `googletagmanager.com`
+   - Incluye tanto páginas públicas como admin (nueva implementación)
 
 3. **Verificar dataLayer**:
    ```javascript
-   // En la consola de páginas públicas
+   // En la consola
    window.dataLayer
    // Debe mostrar un array con eventos
-   
-   // En la consola de páginas admin
-   window.dataLayer
-   // Debe ser undefined o vacío
    ```
 
 ### En Google Analytics
 
 1. **Tiempo Real**:
    - Ve a Analytics → Informes → Tiempo Real
-   - Navega por páginas públicas: Verás tráfico
-   - Navega por `/administrator/*`: NO debe aparecer tráfico
+   - Navega por el sitio: Verás tráfico en todas las páginas
+   - **Nota**: Incluye navegación en admin (filtrar por IP recomendado)
 
 2. **Debug Mode** (opcional):
    ```javascript
@@ -132,40 +166,13 @@ function MiComponente() {
    });
    ```
 
-## Estructura de Archivos
-
-```
-src/
-├── components/
-│   ├── analytics-scripts.tsx      # Scripts de GA (solo páginas públicas)
-│   ├── analytics.tsx              # Tracking de navegación
-│   ├── analytics-debug.tsx        # Debug visual (desarrollo)
-│   └── cookies/
-│       ├── cookie-context.tsx     # Provider de gestión de cookies
-│       ├── cookie-banner.tsx      # Banner de consentimiento
-│       └── index.ts
-└── app/
-    └── layout.tsx                 # Layout raíz con AnalyticsScripts
-```
-
 ## Mantenimiento
 
 ### Cambiar el ID de Google Analytics
-Edita `src/components/analytics.tsx`:
-```typescript
-const GA_MEASUREMENT_ID = 'G-XXXXXXXXXX';
+Edita `src/app/layout.tsx`:
+```tsx
+<GoogleAnalytics gaId="G-XXXXXXXXXX" />
 ```
-
-### Añadir Más Rutas Excluidas
-Modifica el componente `AnalyticsScripts`:
-```typescript
-const isAdminPage = pathname?.startsWith('/administrator') 
-                 || pathname?.startsWith('/admin')
-                 || pathname?.startsWith('/dashboard'); // Nueva ruta
-```
-
-### Deshabilitar Logs de Consola (Producción)
-Quita o comenta los `console.log()` en `src/components/analytics.tsx`.
 
 ## Solución de Problemas
 
@@ -174,55 +181,21 @@ Quita o comenta los `console.log()` en `src/components/analytics.tsx`.
 - Revisa las cookies aceptadas en `localStorage`
 - Comprueba que no hay bloqueadores de ads activos
 
-### Problema: Analytics funciona en páginas admin
-- Revisa que `pathname` devuelve la ruta correcta
-- Verifica los logs de consola
-- Comprueba que el componente `GoogleAnalytics` está montado correctamente
-
 ### Problema: Las cookies no se actualizan
 - Limpia localStorage: `localStorage.clear()`
 - Borra las cookies del navegador
 - Recarga la página
 
-## Seguridad
-
-✅ **Implementado**:
-- Exclusión total de páginas admin del tracking
-- Modo de consentimiento GDPR por defecto (denied)
-- Gestión de preferencias de usuario
-- Eliminación de cookies cuando se deniega consentimiento
-
-❌ **NO se trackea**:
-- Ninguna actividad en `/administrator/*`
-- Ninguna actividad en `/admin/*`
-- Datos personales sin consentimiento
-- Eventos antes de aceptar cookies
-
-## Testing
-
-### Test Manual
-1. Navega a `https://www.furgocasa.com`
-2. Abre DevTools → Console
-3. Acepta cookies de analytics
-4. Navega por varias páginas públicas → Ver logs de pageview
-5. Navega a `/administrator/login`
-6. Verifica: "Página de administrador detectada. Analytics NO se cargará."
-7. En Google Analytics → Tiempo Real → NO debe aparecer la visita admin
-
-### Test en Google Tag Assistant
-1. Instala [Tag Assistant](https://tagassistant.google.com/)
-2. Activa el debugging
-3. Navega por el sitio
-4. Verifica que GA se activa solo en páginas públicas
-
 ## Recursos
 
 - [Google Analytics 4 - Consent Mode](https://support.google.com/analytics/answer/9976101)
-- [Next.js Analytics](https://nextjs.org/docs/app/building-your-application/optimizing/analytics)
+- [Next.js Third Parties - Google Analytics](https://nextjs.org/docs/app/building-your-application/optimizing/third-party-libraries#google-analytics)
+- [@next/third-parties Documentation](https://www.npmjs.com/package/@next/third-parties)
 - [GDPR Compliance](https://support.google.com/analytics/answer/9019185)
 
 ---
 
-**Última actualización**: 20 de enero de 2026  
+**Última actualización**: 25 de enero de 2026  
 **ID de Medición**: G-G5YLBN5XXZ  
-**Estado**: ✅ Implementado y probado
+**Estado**: ⚠️ Obsoleto (Migrado a @next/third-parties)  
+**Versión actual**: v4.4.0

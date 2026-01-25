@@ -1639,7 +1639,8 @@ NEXT_PUBLIC_GA_ID (opcional)
 
 #### Marketing
 - **CONFIGURACION-META-PIXEL.md** - Meta Pixel (Facebook)
-- **CONFIGURACION-GOOGLE-ANALYTICS.md** - Google Analytics
+- **MIGRACION-NEXT-THIRD-PARTIES.md** - Google Analytics (Librería oficial)
+- ~~**CONFIGURACION-GOOGLE-ANALYTICS.md**~~ - (Obsoleto - Implementación manual)
 
 #### Otros
 - **I18N_IMPLEMENTATION.md** - Sistema i18n
@@ -1751,7 +1752,7 @@ SELECT * FROM supabase/fix-all-rls-policies.sql
 | Blog/CMS | ✅ | 22 Enero 2026 |
 | i18n (ES/EN/FR/DE) | ✅ | 22 Enero 2026 |
 | PWA Admin | ✅ | 22 Enero 2026 |
-| Google Analytics | ✅ | 22 Enero 2026 |
+| Google Analytics | ✅ (Librería oficial) | 25 Enero 2026 |
 
 ---
 
@@ -1762,6 +1763,17 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 ---
 
 ## 📜 Historial de Versiones
+
+### v4.4.0 (25 Enero 2026) - Migración Google Analytics + Títulos Admin 📊
+- 📊 **MIGRACIÓN ANALYTICS**: Cambio a `@next/third-parties/google` (librería oficial)
+- ✅ **Títulos personalizados**: Todas las páginas del admin ahora muestran títulos descriptivos en el navegador
+  - Dashboard: "Admin - Dashboard | Furgocasa"
+  - Reservas: "Admin - Reservas | Furgocasa"
+  - Vehículos: "Admin - Vehículos | Furgocasa"
+  - (15 páginas totales actualizadas)
+- ✅ **Analytics estable**: Sin race conditions, títulos automáticos, fbclid nativo
+- ⚠️ **Trade-off**: Se pierde exclusión del admin (solución: filtro por IP en GA)
+- 📚 Documentación: `MIGRACION-NEXT-THIRD-PARTIES.md`
 
 ### v4.3.0 (25 Enero 2026) - Páginas Motorhome Europa Multiidioma 🌍
 - 🌍 **NUEVAS PÁGINAS**: 4 páginas "Motorhome Europa" diferenciadas por audiencia
@@ -1879,13 +1891,13 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 4.3.0 - Páginas Motorhome Europa Multiidioma  
+**Versión**: 4.4.0 - Migración Google Analytics + Títulos Admin  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 25 de Enero 2026  
+**Última actualización**: 25 de Enero 2026 (Google Analytics + Admin Títulos)  
 
 ---
 
