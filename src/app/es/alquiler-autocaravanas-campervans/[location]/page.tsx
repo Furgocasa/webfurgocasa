@@ -468,7 +468,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* SERVICIOS DESTACADOS - Igual que Home */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-16 lg:py-24" style={{ backgroundColor: '#5e7698' }}>
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
