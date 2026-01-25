@@ -46,10 +46,38 @@ function GoogleAnalyticsContent() {
             
             const currentTitle = document.title;
             console.log(`[Analytics] 📡 Enviando (${trigger}) | URL: ${fullPath} | Title: "${currentTitle}"`);
+
+            // Limpiar URL si es demasiado larga (límite seguro para GA4)
+            // GA4 soporta hasta ~420 chars en algunos contextos, aunque page_location es más flexible.
+            // Recortamos fbclid si es excesivo.
+            let safeFullPath = fullPath;
+            let safeLocation = window.location.href;
+
+            if (safeLocation.length > 300) {
+               // Si la URL es monstruosa, intentamos limpiar parámetros conocidos que sean muy largos
+               try {
+                 const urlObj = new URL(window.location.href);
+                 const fbclid = urlObj.searchParams.get('fbclid');
+                 if (fbclid && fbclid.length > 50) {
+                   // Truncar fbclid visualmente pero mantener que existe
+                   urlObj.searchParams.set('fbclid', fbclid.substring(0, 20) + '...');
+                   safeLocation = urlObj.toString();
+                   
+                   // Ajustar también el page_path relativo
+                   const newSearchParams = new URLSearchParams(searchParams?.toString());
+                   newSearchParams.set('fbclid', fbclid.substring(0, 20) + '...');
+                   safeFullPath = pathname + '?' + newSearchParams.toString();
+                   
+                   console.log(`[Analytics] ✂️ URL recortada para envío seguro: ${safeFullPath}`);
+                 }
+               } catch (e) {
+                 // Si falla el parseo, enviamos original
+               }
+            }
             
             (window as any).gtag('config', GA_MEASUREMENT_ID, {
-              page_path: fullPath, // Enviamos path + query string para registrar fbclid y otros params
-              page_location: window.location.href, // Aseguramos URL completa para atribución
+              page_path: safeFullPath, 
+              page_location: safeLocation, 
               page_title: currentTitle || 'Furgocasa',
             });
             sent = true;
