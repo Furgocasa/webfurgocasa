@@ -125,7 +125,7 @@ export async function NearbyOfficeNotice({
                   href="/contacto"
                   className="inline-flex items-center gap-2 bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-blue hover:text-white transition-all text-base lg:text-lg"
                 >
-                  {t("Más información")}
+                  {t("Contactar")}
                 </LocalizedLink>
               </div>
             </div>

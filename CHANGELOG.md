@@ -4,6 +4,57 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔍 [4.2.2] - 25 de Enero 2026 - **Mejora SEO: Enlaces Descriptivos**
+
+### 📊 **OPTIMIZACIÓN SEO**
+
+#### Problema: Enlaces con texto genérico "Más información"
+
+**Auditoría Google PageSpeed Insights (SEO 92/100):**
+- Detectados 2 enlaces sin texto descriptivo:
+  1. `/cookies` → Texto: "Más información" (no descriptivo)
+  2. `/es/contacto` → Texto: "Más información" (no descriptivo)
+
+**Impacto:**
+- ❌ SEO: Motores de búsqueda no entienden el destino del enlace
+- ❌ Accesibilidad: Lectores de pantalla sin contexto útil
+
+---
+
+### ✅ **Cambios Implementados**
+
+**Archivos modificados:**
+
+1. **`src/components/cookies/cookie-banner.tsx`** (línea 33)
+   ```tsx
+   // Antes
+   <Link href="/cookies">Más información</Link>
+   
+   // Después
+   <Link href="/cookies">Política de cookies</Link>
+   ```
+
+2. **`src/components/locations/nearby-office-notice.tsx`** (línea 128)
+   ```tsx
+   // Antes
+   <LocalizedLink href="/contacto">{t("Más información")}</LocalizedLink>
+   
+   // Después
+   <LocalizedLink href="/contacto">{t("Contactar")}</LocalizedLink>
+   ```
+
+---
+
+### 📊 **Resultado Esperado**
+
+- SEO Score: 92 → **100/100** ✅
+- Enlaces descriptivos: 0 → **2 corregidos**
+- Mejor experiencia de accesibilidad para usuarios con lectores de pantalla
+
+**Referencia:** [Directrices de enlaces accesibles - Google](https://developers.google.com/search/docs/crawling-indexing/links-crawlable)
+
+---
+
 ## ⚡ [4.2.1] - 25 de Enero 2026 - **Optimización LCP para Móvil**
 
 ### 🎯 **OPTIMIZACIÓN DE RENDIMIENTO**

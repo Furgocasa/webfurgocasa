@@ -30,7 +30,7 @@ export function CookieBanner() {
                   y mostrarte contenido personalizado. Puedes aceptar todas, rechazarlas o configurar 
                   tus preferencias.{" "}
                   <Link href="/cookies" className="text-furgocasa-orange hover:underline">
-                    Más información
+                    Política de cookies
                   </Link>
                 </p>
               </div>
