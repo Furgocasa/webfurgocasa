@@ -204,6 +204,12 @@ export const routeTranslations = {
     fr: "/camping-car-europe-depuis-espagne", 
     de: "/wohnmobil-miete-europa-von-spanien" 
   },
+  "/alquiler-motorhome-marruecos-desde-espana": { 
+    es: "/alquiler-motorhome-marruecos-desde-espana", 
+    en: "/motorhome-rental-morocco-from-spain", 
+    fr: "/camping-car-maroc-depuis-espagne", 
+    de: "/wohnmobil-miete-marokko-von-spanien" 
+  },
   "/sitemap-html": { 
     es: "/sitemap-html", 
     en: "/sitemap-html", 
