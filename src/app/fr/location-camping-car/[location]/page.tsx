@@ -276,9 +276,9 @@ export default async function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* VÉHICULES - Textes fixes identiques à la production */}
+      {/* VÉHICULES - Fond blanc */}
       {vehicles.length > 0 && (
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               {/* H2 toujours "LOCATION CAMPING-CAR {ville}" */}
@@ -351,6 +351,59 @@ export default async function LocationPage({ params }: PageProps) {
         </section>
       )}
 
+      {/* TARIFS - Fond gris clair */}
+      <section className="py-12 lg:py-20 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12 lg:mb-16">
+            <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+              MEILLEUR RAPPORT QUALITÉ-PRIX
+            </span>
+            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+              Nos camping-cars à partir de
+            </h2>
+            <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
+              PAYEZ 50% lors de la RÉSERVATION et le reste 15 jours avant.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto mb-12 lg:mb-16">
+            {[
+              { season: "SAISON BASSE", price: "95", color: "text-furgocasa-blue", border: "border-furgocasa-blue" },
+              { season: "Saison Moyenne", price: "125", color: "text-furgocasa-orange", border: "border-furgocasa-orange" },
+              { season: "Saison Haute", price: "155", color: "text-red-500", border: "border-red-500" },
+            ].map((pricing, index) => (
+              <div
+                key={index}
+                className={`bg-white rounded-2xl shadow-xl p-8 lg:p-10 text-center border-t-8 ${pricing.border} transform hover:scale-105 transition-transform duration-300`}
+              >
+                <h3 className="text-base lg:text-lg font-heading font-bold text-gray-500 mb-4 lg:mb-6 uppercase tracking-wider">
+                  {pricing.season}
+                </h3>
+                <div className="flex items-baseline justify-center gap-2 mb-2">
+                  <span className={`text-5xl lg:text-6xl font-heading font-bold ${pricing.color}`}>{pricing.price}€</span>
+                  <span className="text-lg lg:text-xl text-gray-400 font-medium">/ jour</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center max-w-3xl mx-auto bg-white p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
+            <p className="text-lg lg:text-xl font-medium text-gray-700">
+              Réductions jusqu'à <span className="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% et -30%</span> pour des locations de 1, 2 ou 3 semaines.
+            </p>
+          </div>
+
+          <div className="text-center mt-12">
+            <LocalizedLink
+              href="/tarifs"
+              className="inline-flex items-center gap-2 text-furgocasa-blue font-bold uppercase tracking-wider hover:text-furgocasa-blue-dark transition-colors"
+            >
+              Voir tous les tarifs <span className="text-xl">→</span>
+            </LocalizedLink>
+          </div>
+        </div>
+      </section>
+
       {/* NOTICE BUREAU PROCHE - Seulement pour les villes sans bureau (distance > 0) */}
       {location.nearest_location && location.distance_km && location.distance_km > 0 && (
         <NearbyOfficeNotice
@@ -370,63 +423,77 @@ export default async function LocationPage({ params }: PageProps) {
         locale="fr"
       />
 
-      {/* PRICING - Fond gris clair */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      {/* SERVICES - Fond bleu clair */}
+      <section className="py-12 lg:py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
-              MEILLEUR RAPPORT QUALITÉ PRIX
-            </span>
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
-              Nos camping-cars à partir de
+              Services qui vous simplifient la vie
             </h2>
-            <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
-              PAYEZ 50% à la RÉSERVATION et le reste 15 jours avant.
+            <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+              Tout ce dont vous avez besoin pour profiter de votre expérience camping-car
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto mb-12 lg:mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {[
-              { season: "BASSE SAISON", price: "95", color: "text-furgocasa-blue", border: "border-furgocasa-blue" },
-              { season: "Moyenne Saison", price: "125", color: "text-furgocasa-orange", border: "border-furgocasa-orange" },
-              { season: "Haute Saison", price: "155", color: "text-red-500", border: "border-red-500" },
-            ].map((pricing, index) => (
-              <div
+              {
+                icon: Bot,
+                title: "Intelligence Artificielle",
+                desc: "Planifiez votre itinéraire parfait avec l'IA",
+                link: "/intelligence-artificielle",
+                iconBg: "bg-purple-100",
+                iconColor: "text-purple-600"
+              },
+              {
+                icon: Map,
+                title: "Carte des aires",
+                desc: "Trouvez des aires de camping-car",
+                link: "/carte-aires",
+                iconBg: "bg-blue-100",
+                iconColor: "text-blue-600"
+              },
+              {
+                icon: Calendar,
+                title: "Parking MURCIA",
+                desc: "Gardez votre camping-car en sécurité",
+                link: "/parking-murcia",
+                iconBg: "bg-green-100",
+                iconColor: "text-green-600"
+              },
+              {
+                icon: HelpCircle,
+                title: "FAQs",
+                desc: "Résolvez tous vos doutes",
+                link: "/faqs",
+                iconBg: "bg-orange-100",
+                iconColor: "text-orange-600"
+              },
+            ].map((service, index) => (
+              <LocalizedLink
                 key={index}
-                className={`bg-white rounded-2xl shadow-xl p-8 lg:p-10 text-center border-t-8 ${pricing.border} transform hover:scale-105 transition-transform duration-300`}
+                href={service.link}
+                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-gray-100"
               >
-                <h3 className="text-base lg:text-lg font-heading font-bold text-gray-500 mb-4 lg:mb-6 uppercase tracking-wider">
-                  {pricing.season}
-                </h3>
-                <div className="flex items-baseline justify-center gap-2 mb-2">
-                  <span className={`text-5xl lg:text-6xl font-heading font-bold ${pricing.color}`}>{pricing.price}€</span>
-                  <span className="text-lg lg:text-xl text-gray-400 font-medium">/ jour</span>
+                <div className={`${service.iconBg} w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <service.icon className={`h-7 w-7 ${service.iconColor}`} />
                 </div>
-              </div>
+                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
+                  {service.title}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {service.desc}
+                </p>
+              </LocalizedLink>
             ))}
-          </div>
-
-          <div className="text-center max-w-3xl mx-auto bg-gray-50 p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
-            <p className="text-lg lg:text-xl font-medium text-gray-700">
-              Réductions jusqu&apos;à <span className="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% et -30%</span> pour les locations de 1, 2 ou 3 semaines.
-            </p>
-          </div>
-
-          <div className="text-center mt-12">
-            <LocalizedLink
-              href="/tarifs"
-              className="inline-flex items-center gap-2 text-furgocasa-blue font-bold uppercase tracking-wider hover:text-furgocasa-blue-dark transition-colors"
-            >
-              Voir tous les tarifs <span className="text-xl">→</span>
-            </LocalizedLink>
           </div>
         </div>
       </section>
 
-      {/* PRINCIPALES DESTINATIONS - Composant DestinationsGrid */}
+      {/* PRINCIPALES DESTINATIONS - Fond gris clair */}
       <DestinationsGrid />
 
-      {/* SERVICES - Identique à Home */}
+      {/* BLOG - Fond blanc */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
@@ -495,7 +562,7 @@ export default async function LocationPage({ params }: PageProps) {
 
       {/* BLOG - Identique à Home */}
       {blogArticles.length > 0 && (
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
@@ -577,7 +644,7 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* WHY FURGOCASA */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+      <section className="py-12 lg:py-20 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
@@ -615,7 +682,7 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
             Prêt à découvrir {location.name} ?

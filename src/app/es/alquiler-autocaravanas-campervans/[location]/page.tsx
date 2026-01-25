@@ -304,10 +304,10 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* VEHÍCULOS DISPONIBLES - Textos fijos idénticos a producción */}
+      {/* VEHÍCULOS DISPONIBLES - Fondo blanco */}
       {/* ================================================================== */}
       {vehicles.length > 0 && (
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               {/* H1 siempre "ALQUILER CAMPER {ciudad}" */}
@@ -383,32 +383,9 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* ================================================================== */}
-      {/* AVISO OFICINA CERCANA - Solo para ciudades sin sede (distance > 0) */}
-      {/* ================================================================== */}
-      {location.nearest_location && location.distance_km && location.distance_km > 0 && (
-        <NearbyOfficeNotice
-          locationName={location.name}
-          nearestLocationName={location.nearest_location.name}
-          nearestLocationCity={location.nearest_location.city}
-          distanceKm={location.distance_km}
-          travelTimeMinutes={location.travel_time_minutes || 0}
-          locale={locale}
-        />
-      )}
-
-      {/* ================================================================== */}
-      {/* CONTENIDO TURÍSTICO DE LA CIUDAD - Idéntico a producción */}
-      {/* ================================================================== */}
-      <LocationTourismContent 
-        locationName={location.name}
-        contentSections={location.content_sections}
-        locale="es"
-      />
-
-      {/* ================================================================== */}
       {/* PRECIOS - Fondo gris claro */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
@@ -443,7 +420,7 @@ export default async function LocationPage({ params }: PageProps) {
             ))}
           </div>
 
-          <div className="text-center max-w-3xl mx-auto bg-gray-50 p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
+          <div className="text-center max-w-3xl mx-auto bg-white p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
             <p className="text-lg lg:text-xl font-medium text-gray-700">
               {t("Descuentos de hasta el")} <span className="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% y -30%</span> {t("en alquileres de 1, 2 o 3 semanas")}.
             </p>
@@ -461,14 +438,32 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* DESTINOS PRINCIPALES - Componente DestinationsGrid */}
+      {/* AVISO OFICINA CERCANA - Solo para ciudades sin sede (distance > 0) */}
       {/* ================================================================== */}
-      <DestinationsGrid />
+      {location.nearest_location && location.distance_km && location.distance_km > 0 && (
+        <NearbyOfficeNotice
+          locationName={location.name}
+          nearestLocationName={location.nearest_location.name}
+          nearestLocationCity={location.nearest_location.city}
+          distanceKm={location.distance_km}
+          travelTimeMinutes={location.travel_time_minutes || 0}
+          locale={locale}
+        />
+      )}
 
       {/* ================================================================== */}
-      {/* SERVICIOS DESTACADOS - Igual que Home */}
+      {/* CONTENIDO TURÍSTICO DE LA CIUDAD - Idéntico a producción */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <LocationTourismContent 
+        locationName={location.name}
+        contentSections={location.content_sections}
+        locale="es"
+      />
+
+      {/* ================================================================== */}
+      {/* SERVICIOS DESTACADOS - Fondo azul claro */}
+      {/* ================================================================== */}
+      <section className="py-12 lg:py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
@@ -535,10 +530,15 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* BLOG - Igual que Home */}
+      {/* DESTINOS PRINCIPALES - Fondo gris claro */}
+      {/* ================================================================== */}
+      <DestinationsGrid />
+
+      {/* ================================================================== */}
+      {/* BLOG - Fondo blanco */}
       {/* ================================================================== */}
       {blogArticles.length > 0 && (
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
@@ -620,9 +620,9 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* ================================================================== */}
-      {/* POR QUÉ ELEGIR FURGOCASA - Similar a Home */}
+      {/* POR QUÉ ELEGIR FURGOCASA - Fondo gradiente azul */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+      <section className="py-12 lg:py-20 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
@@ -660,9 +660,9 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* CTA FINAL - Similar a Home */}
+      {/* CTA FINAL - Fondo blanco */}
       {/* ================================================================== */}
-      <section className="py-16 bg-white">
+      <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
             {t("¿Listo para descubrir")} {location.name}?

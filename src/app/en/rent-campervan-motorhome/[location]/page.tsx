@@ -277,9 +277,9 @@ export default async function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* VEHICLES - Fixed texts identical to production */}
+      {/* VEHICLES - White background */}
       {vehicles.length > 0 && (
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               {/* H2 always "CAMPER RENTAL {city}" */}
@@ -352,27 +352,8 @@ export default async function LocationPage({ params }: PageProps) {
         </section>
       )}
 
-      {/* NEARBY OFFICE NOTICE - Only for cities without office (distance > 0) */}
-      {location.nearest_location && location.distance_km && location.distance_km > 0 && (
-        <NearbyOfficeNotice
-          locationName={location.name}
-          nearestLocationName={location.nearest_location.name}
-          nearestLocationCity={location.nearest_location.city}
-          distanceKm={location.distance_km}
-          travelTimeMinutes={location.travel_time_minutes || 0}
-          locale={locale}
-        />
-      )}
-
-      {/* TOURISM CONTENT - Identical to production */}
-      <LocationTourismContent 
-        locationName={location.name}
-        contentSections={location.content_sections}
-        locale="en"
-      />
-
       {/* PRICING - Light gray background */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
@@ -407,7 +388,7 @@ export default async function LocationPage({ params }: PageProps) {
             ))}
           </div>
 
-          <div className="text-center max-w-3xl mx-auto bg-gray-50 p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
+          <div className="text-center max-w-3xl mx-auto bg-white p-6 lg:p-8 rounded-2xl shadow-sm border border-gray-100">
             <p className="text-lg lg:text-xl font-medium text-gray-700">
               Discounts up to <span className="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% and -30%</span> for 1, 2 or 3 week rentals.
             </p>
@@ -424,11 +405,27 @@ export default async function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* MAIN DESTINATIONS - DestinationsGrid component */}
-      <DestinationsGrid />
+      {/* NEARBY OFFICE NOTICE - Only for cities without office (distance > 0) */}
+      {location.nearest_location && location.distance_km && location.distance_km > 0 && (
+        <NearbyOfficeNotice
+          locationName={location.name}
+          nearestLocationName={location.nearest_location.name}
+          nearestLocationCity={location.nearest_location.city}
+          distanceKm={location.distance_km}
+          travelTimeMinutes={location.travel_time_minutes || 0}
+          locale={locale}
+        />
+      )}
 
-      {/* FEATURED SERVICES - Same as Home */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+      {/* TOURISM CONTENT - Identical to production */}
+      <LocationTourismContent 
+        locationName={location.name}
+        contentSections={location.content_sections}
+        locale="en"
+      />
+
+      {/* FEATURED SERVICES - Light blue background */}
+      <section className="py-12 lg:py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
@@ -494,9 +491,12 @@ export default async function LocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* BLOG - Same as Home */}
+      {/* MAIN DESTINATIONS - Light gray background */}
+      <DestinationsGrid />
+
+      {/* BLOG - White background */}
       {blogArticles.length > 0 && (
-        <section className="py-16 lg:py-24 bg-gray-50">
+        <section className="py-12 lg:py-20 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
@@ -578,7 +578,7 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* WHY FURGOCASA */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+      <section className="py-12 lg:py-20 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
@@ -616,7 +616,7 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-16 bg-white">
+      <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
             Ready to discover {location.name}?
