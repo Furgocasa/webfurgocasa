@@ -229,8 +229,7 @@ export default async function LocationPage({ params }: PageProps) {
       <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       
-      {/* Preload crítico de la imagen Hero para LCP */}
-      <link rel="preload" as="image" href={heroImageUrl} fetchPriority="high" />
+      {/* Next.js Image con priority ya genera automáticamente el preload correcto (optimizado) */}
       
       <LocalBusinessJsonLd location={location as any} />
       

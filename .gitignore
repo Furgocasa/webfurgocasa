@@ -85,3 +85,6 @@ commit-message.txt
 # Archivos de migración de datos antiguos (demasiado grandes)
 OLD_FURGOCASA_DATOS/*-mysql*
 OLD_FURGOCASA_DATOS/orders-raw*.txt
+
+# Archivos internos de estrategia (privados)
+src/app/es/escalabilidad/brainstorming.txt
