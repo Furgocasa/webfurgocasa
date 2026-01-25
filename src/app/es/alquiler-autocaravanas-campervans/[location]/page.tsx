@@ -468,7 +468,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* SERVICIOS DESTACADOS - Igual que Home */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24" style={{ backgroundColor: '#5e7698' }}>
+      <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
@@ -486,40 +486,46 @@ export default async function LocationPage({ params }: PageProps) {
                 titleKey: "Inteligencia Artificial",
                 descKey: "Planifica tu ruta perfecta con IA",
                 link: "/inteligencia-artificial",
-                color: "from-purple-50 to-purple-100 border-purple-300"
+                iconBg: "bg-purple-100",
+                iconColor: "text-purple-600"
               },
               {
                 icon: Map,
                 titleKey: "Mapa de áreas",
                 descKey: "Encuentra áreas de autocaravanas",
                 link: "/mapa-areas",
-                color: "from-blue-50 to-blue-100 border-blue-300"
+                iconBg: "bg-blue-100",
+                iconColor: "text-blue-600"
               },
               {
                 icon: Calendar,
                 titleKey: "Parking MURCIA",
                 descKey: "Guarda tu camper con seguridad",
                 link: "/parking-murcia",
-                color: "from-green-50 to-green-100 border-green-300"
+                iconBg: "bg-green-100",
+                iconColor: "text-green-600"
               },
               {
                 icon: HelpCircle,
                 titleKey: "FAQs",
                 descKey: "Resuelve todas tus dudas",
                 link: "/faqs",
-                color: "from-orange-50 to-orange-100 border-orange-300"
+                iconBg: "bg-orange-100",
+                iconColor: "text-orange-600"
               },
             ].map((service, index) => (
               <LocalizedLink
                 key={index}
                 href={service.link}
-                className={`bg-gradient-to-br ${service.color} border-2 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group`}
+                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-gray-100"
               >
-                <service.icon className="h-12 w-12 text-gray-700 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">
+                <div className={`${service.iconBg} w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  <service.icon className={`h-7 w-7 ${service.iconColor}`} />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
                   {t(service.titleKey)}
                 </h3>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-600">
                   {t(service.descKey)}
                 </p>
               </LocalizedLink>
