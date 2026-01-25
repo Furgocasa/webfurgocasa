@@ -1,6 +1,6 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.2.2-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.3.0-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-99%2F100_desktop-brightgreen.svg)](https://pagespeed.web.dev/)
@@ -9,15 +9,87 @@
 [![SEO](https://img.shields.io/badge/SEO-100%2F100-brightgreen.svg)](./CHANGELOG.md)
 [![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./I18N_IMPLEMENTATION.md)
 
-**🎉 VERSIÓN 4.2.2 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 4.3.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
-> **✅ ESTADO: RENDIMIENTO OPTIMIZADO AL MÁXIMO** - LCP 0.83s móvil | SEO 100/100 | 116 páginas | 4 idiomas
+> **✅ ESTADO: PÁGINAS MOTORHOME EUROPA MULTIIDIOMA** - 4 páginas diferenciadas | SEO optimizado | Blog dinámico integrado
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Enero 2026 - **Optimización LCP Móvil Completada**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Enero 2026 - **Páginas Motorhome Europa Multiidioma**
+
+### 🌍 Nuevas Páginas para Viajeros Internacionales
+
+**Estado**: ✅ Completadas y funcionando  
+**Páginas creadas**: 4 (ES/EN/FR/DE)  
+**Diferenciación**: Por audiencia geográfica
+
+### 📊 Páginas Implementadas
+
+| Idioma | URL | Audiencia |
+|--------|-----|-----------|
+| 🇪🇸 ES | `/es/alquiler-motorhome-europa-desde-espana` | LATAM |
+| 🇬🇧 EN | `/en/motorhome-rental-europe-from-spain` | Angloparlantes |
+| 🇫🇷 FR | `/fr/camping-car-europe-depuis-espagne` | Francoparlantes |
+| 🇩🇪 DE | `/de/wohnmobil-miete-europa-von-spanien` | Germanoparlantes |
+
+### ✅ Características Implementadas
+
+**Contenido Diferenciado:**
+- ✅ **Badge hero específico** por audiencia (ej: "🌎 Viajeros desde LATAM" en ES)
+- ✅ **Países destacados** según idioma (ej: Australia, USA en EN)
+- ✅ **Descuento -15%** diferenciado por geografía
+- ✅ **Blog dinámico** - "Rutas Sugeridas" con 4 artículos traducidos
+
+**SEO Optimizado:**
+- ✅ **Meta títulos** sin mención de LATAM/España en EN/FR/DE
+- ✅ **Canonical URLs** correctos por idioma
+- ✅ **Hreflang alternates** conectando las 4 versiones
+- ✅ **Sitemap inclusion** - XML + HTML en 4 idiomas
+- ✅ **ISR configurado** - Revalidación cada 24h
+
+**Integración Blog:**
+- ✅ **Categoría única `rutas`** - Todos los idiomas consultan la misma
+- ✅ **URLs traducidas** - `/blog/routes/`, `/blog/itineraires/`, `/blog/routen/`
+- ✅ **Slugs multiidioma** - Fetch desde `slug_en`, `slug_fr`, `slug_de`
+
+### 📁 Archivos Modificados
+
+1. ✅ `src/app/es/alquiler-motorhome-europa-desde-espana/page.tsx` - Página ES (LATAM)
+2. ✅ `src/app/en/motorhome-rental-europe-from-spain/page.tsx` - Página EN
+3. ✅ `src/app/fr/camping-car-europe-depuis-espagne/page.tsx` - Página FR (renombrada)
+4. ✅ `src/app/de/wohnmobil-miete-europa-von-spanien/page.tsx` - Página DE
+5. ✅ `src/lib/home/server-actions.ts` - `getRoutesArticles` usa categoría 'rutas'
+6. ✅ `src/lib/route-translations.ts` - Mapeo de slugs traducidos
+7. ✅ `src/app/sitemap.ts` - Entrada con prioridad 0.9
+8. ✅ `src/app/[locale]/sitemap-html/page.tsx` (×4) - HTML sitemaps localizados
+
+### 📚 Documentación Completa
+
+**👉 [PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** - Guía completa con:
+- Diferenciación por audiencia
+- Estructura de contenido
+- SEO y metadata
+- Errores resueltos (French 404, Blog routes)
+- Mantenimiento y actualizaciones
+
+**Commits:**
+- `c274f82` - feat(motorhome-europa): usar categoría 'rutas' para todos los idiomas
+
+### 🎯 Objetivo SEO
+
+Captar tráfico internacional de personas buscando:
+- "motorhome rental europe" (EN)
+- "location camping-car europe" (FR)
+- "wohnmobil miete europa" (DE)
+- "alquiler motorhome europa" (ES/LATAM)
+
+**ROI esperado**: +15-25% tráfico orgánico internacional en 3-6 meses
+
+---
+
+## ⚡ [ACTUALIZACIÓN ANTERIOR] - 25 de Enero 2026 - **Optimización LCP Móvil**
 
 ### 🏆 Hito de Rendimiento: LCP Móvil Optimizado al Máximo
 
@@ -215,17 +287,18 @@ src/app/
 1. **[MIGRACION-CARPETAS-FIJAS-COMPLETADA.md](./MIGRACION-CARPETAS-FIJAS-COMPLETADA.md)** - Informe completo de la migración
 2. **[CHANGELOG.md](./CHANGELOG.md)** - Historial de cambios v4.0.0
 
-### 🚀 Estado Actual (v4.2.2)
+### 🚀 Estado Actual (v4.3.0)
 
 1. ✅ Arquitectura carpetas fijas implementada
 2. ✅ 116 páginas migradas y funcionando
-3. ✅ Middleware y rewrites simplificados
-4. ✅ **Blog con slugs multiidioma** (200 posts × 4 idiomas)
-5. ✅ **+400 traducciones de UI** para todas las páginas
-6. ✅ **Language switcher inteligente** para blog
-7. ✅ **LCP móvil optimizado: 0.83s** (top 5% mundial)
-8. ✅ **SEO perfecto: 100/100**
-9. ✅ Deploy a producción (Vercel)
+3. ✅ **4 páginas Motorhome Europa** diferenciadas por audiencia (NUEVO)
+4. ✅ Middleware y rewrites simplificados
+5. ✅ **Blog con slugs multiidioma** (200 posts × 4 idiomas)
+6. ✅ **+400 traducciones de UI** para todas las páginas
+7. ✅ **Language switcher inteligente** para blog
+8. ✅ **LCP móvil optimizado: 0.83s** (top 5% mundial)
+9. ✅ **SEO perfecto: 100/100**
+10. ✅ Deploy a producción (Vercel)
 
 **ROI esperado**: +20-50% tráfico orgánico internacional en 3-6 meses + mejor ranking por Core Web Vitals
 
@@ -1507,10 +1580,15 @@ NEXT_PUBLIC_GA_ID (opcional)
 - **PWA-ADMIN-GUIA.md** - PWA del admin
 - **OPTIMIZACION-ADMIN.md** - Optimizaciones
 
+#### SEO
+- **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)** - Normas SEO
+- **[SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md)** - Modelo SEO con /es/ obligatorio
+- **[PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** - Páginas "Motorhome Europa" diferenciadas
+- **[AUDITORIA-SEO-CRITICA.md](./AUDITORIA-SEO-CRITICA.md)** - Impacto SEO
+
 #### Marketing
 - **CONFIGURACION-META-PIXEL.md** - Meta Pixel (Facebook)
-- **NORMAS-SEO-OBLIGATORIAS.md** - SEO
-- **AUDITORIA-SEO-CRITICA.md** - Impacto SEO
+- **CONFIGURACION-GOOGLE-ANALYTICS.md** - Google Analytics
 
 #### Otros
 - **I18N_IMPLEMENTATION.md** - Sistema i18n
@@ -1634,6 +1712,17 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 ## 📜 Historial de Versiones
 
+### v4.3.0 (25 Enero 2026) - Páginas Motorhome Europa Multiidioma 🌍
+- 🌍 **NUEVAS PÁGINAS**: 4 páginas "Motorhome Europa" diferenciadas por audiencia
+- ✅ **ES**: Enfoque LATAM (Argentina, México, Chile...)
+- ✅ **EN**: Angloparlantes (Australia, USA, UK, Canada...)
+- ✅ **FR**: Francoparlantes (Belgique, Suisse, Canada, Afrique...)
+- ✅ **DE**: Germanoparlantes (Deutschland, Österreich, Schweiz...)
+- ✅ **Blog dinámico**: "Rutas Sugeridas" con artículos traducidos
+- ✅ **SEO optimizado**: Meta títulos sin LATAM en EN/FR/DE
+- ✅ **Sitemap completo**: XML + HTML en 4 idiomas
+- 📚 Documentación: `PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md`
+
 ### v4.2.2 (25 Enero 2026) - Optimización LCP Móvil + SEO Perfecto 🚀
 - 🏆 **OPTIMIZACIÓN CRÍTICA**: LCP móvil reducido de 3.9s a **0.83s** (-79%)
 - ✅ Fix #1: Eliminado preload duplicado (3.9s → 3.2s)
@@ -1739,7 +1828,7 @@ Para consultas: [contacto@furgocasa.com](mailto:contacto@furgocasa.com)
 
 Desarrollado con ❤️ para Furgocasa
 
-**Versión**: 4.2.2 - Optimización LCP Móvil + SEO Perfecto  
+**Versión**: 4.3.0 - Páginas Motorhome Europa Multiidioma  
 **Estado**: ✅ Producción Estable  
 **URL**: https://www.furgocasa.com  
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  

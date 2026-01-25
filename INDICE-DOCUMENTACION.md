@@ -1,10 +1,31 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.12 ✅ PRODUCCIÓN - SISTEMA DE CUPONES DE DESCUENTO  
+**Versión**: 1.0.13 ✅ PRODUCCIÓN - PÁGINAS MOTORHOME EUROPA MULTIIDIOMA  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 23 de Enero, 2026
+**Última actualización**: 25 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🌍 VERSIÓN 1.0.13 - PÁGINAS MOTORHOME EUROPA MULTIIDIOMA
+
+**✅ ESTADO: TOTALMENTE FUNCIONAL** - 4 páginas diferenciadas por audiencia.
+
+**NUEVA FUNCIONALIDAD**: Páginas estáticas para viajeros internacionales.
+- **ES**: Enfoque LATAM (Argentina, México, Chile, Colombia...)
+- **EN**: Angloparlantes (Australia, USA, UK, Canada...)
+- **FR**: Francoparlantes (Belgique, Suisse, Canada, Afrique...)
+- **DE**: Germanoparlantes (Deutschland, Österreich, Schweiz...)
+
+Ver **[PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** para detalles completos.
+
+### 🎯 Highlights v1.0.13:
+- ✅ **4 páginas diferenciadas**: ES/EN/FR/DE con audiencias específicas
+- ✅ **Blog dinámico integrado**: "Rutas Sugeridas" carga artículos traducidos
+- ✅ **SEO optimizado**: Meta títulos sin "LATAM" en EN/FR/DE
+- ✅ **Descuento -15%**: Diferenciado por países según idioma
+- ✅ **Sitemap completo**: XML + HTML en 4 idiomas
 
 ---
 
@@ -146,6 +167,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | Documento | Descripción |
 |-----------|-------------|
 | **[SEO-MULTIIDIOMA-MODELO.md](./SEO-MULTIIDIOMA-MODELO.md)** | ⚠️ **CRÍTICO** - Modelo SEO multiidioma con /es/ obligatorio |
+| **[PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** | ⚠️ **NUEVO** - Páginas "Motorhome Europa" diferenciadas por audiencia |
 | **[AUDITORIA-SEO-CRITICA.md](./AUDITORIA-SEO-CRITICA.md)** | Por qué Server Components son críticos |
 | **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)** | Normas SEO del proyecto |
 
@@ -382,7 +404,7 @@ Ver carpeta `scripts/`:
 - **Cálculo de días**: `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO**
 - **Arquitectura y reglas**: `REGLAS-ARQUITECTURA-NEXTJS.md`
 - **Traducciones**: `GUIA-TRADUCCION.md`, `TRADUCCIONES.md`
-- **SEO**: `AUDITORIA-SEO-CRITICA.md`, `NORMAS-SEO-OBLIGATORIAS.md`
+- **SEO**: `SEO-MULTIIDIOMA-MODELO.md`, `PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md`, `AUDITORIA-SEO-CRITICA.md`, `NORMAS-SEO-OBLIGATORIAS.md`
 - **i18n**: `I18N_IMPLEMENTATION.md`
 - **Admin**: `ADMIN_SETUP.md`, `BUSCADOR-GLOBAL-ADMIN.md`, `PWA-ADMIN-GUIA.md` ⚠️ **NUEVO**
 - **Medios**: `GESTION-MEDIA-STORAGE.md` ⚠️ **NUEVO**, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO**, `FAQ-MEDIA-STORAGE.md` ⚠️ **NUEVO**, `SISTEMA-MEDIA-RESUMEN.md`, `GALERIA-MULTIPLE-VEHICULOS.md`
@@ -485,7 +507,7 @@ Estos documentos ya NO existen (fueron eliminados):
 
 ---
 
-**Total de documentos activos**: 30 archivos .md en raíz + subdirectorios  
-**Última actualización crítica**: Fix Búsqueda y CSP Google Analytics (22 Enero 2026)  
-**Última actualización anterior**: Sistema Completo de Media y Galería Integrado (21 Enero 2026)  
+**Total de documentos activos**: 31 archivos .md en raíz + subdirectorios  
+**Última actualización crítica**: Páginas Motorhome Europa Multiidioma (25 Enero 2026)  
+**Última actualización anterior**: Fix Búsqueda y CSP Google Analytics (22 Enero 2026)  
 **Última limpieza de obsoletos**: 20 Enero 2026
