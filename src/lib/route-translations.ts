@@ -200,9 +200,9 @@ export const routeTranslations = {
   },
   "/alquiler-motorhome-europa-desde-espana": { 
     es: "/alquiler-motorhome-europa-desde-espana", 
-    en: "/alquiler-motorhome-europa-desde-espana", 
-    fr: "/alquiler-motorhome-europa-desde-espana", 
-    de: "/alquiler-motorhome-europa-desde-espana" 
+    en: "/motorhome-rental-europe-from-spain", 
+    fr: "/location-camping-car-europe-depuis-espagne", 
+    de: "/wohnmobil-miete-europa-von-spanien" 
   },
   "/sitemap-html": { 
     es: "/sitemap-html", 

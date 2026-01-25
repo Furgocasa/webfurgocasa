@@ -16,25 +16,26 @@ import {
   BookOpen
 } from "lucide-react";
 import Image from "next/image";
-import { getFeaturedVehicles, getCompanyStats } from "@/lib/home/server-actions";
+import { getFeaturedVehicles, getCompanyStats, getRoutesArticles } from "@/lib/home/server-actions";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
+import { BlogArticleLink } from "@/components/blog/blog-article-link";
 
 interface PageProps {}
 
 // ⚡ ISR: Revalidar cada día (contenido muy estático)
 export const revalidate = 86400;
 
-// 🎯 METADATA SEO - Keywords diferenciadas para LATAM (evitar canibalización)
+// 🎯 METADATA SEO - Keywords diferenciadas para EUROPA (evitar canibalización)
 const MOTORHOME_EUROPA_METADATA: Metadata = {
-  title: "Alquiler Motorhome Europa para Viajeros LATAM",
-  description: "¿Venís desde Argentina, México, Chile o Colombia? Alquilá tu motorhome en España y recorré toda Europa en casa rodante. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español. ¡Arrancá tu aventura!",
-  keywords: "alquiler motorhome europa, casa rodante europa, motorhome para viajar por europa, renta casa rodante españa, alquiler motorhome viajeros latinoamericanos, casa rodante desde españa recorrer europa, motorhome argentina españa, motorhome mexico europa, campervan latinoamerica europa",
+  title: "Alquiler Motorhome Europa | Recorré Francia, Italia, Portugal",
+  description: "Alquilá tu motorhome y recorré toda Europa en casa rodante. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español. Base de salida en Murcia. ¡Arrancá tu aventura europea!",
+  keywords: "alquiler motorhome europa, casa rodante europa, motorhome para viajar por europa, alquiler autocaravana europa, casa rodante recorrer europa, motorhome francia italia portugal, campervan europa, alquiler motorhome recorrer europa",
   authors: [{ name: "Furgocasa" }],
   openGraph: {
-    title: "Alquiler Motorhome Europa para Viajeros LATAM",
-    description: "Tu aventura europea comienza en España. Casa rodante con kilómetros ilimitados para recorrer Francia, Italia, Portugal y más. Asistencia en español 24/7.",
+    title: "Alquiler Motorhome Europa | Recorré Francia, Italia, Portugal",
+    description: "Tu aventura europea comienza aquí. Casa rodante con kilómetros ilimitados para recorrer Francia, Italia, Portugal y más. Asistencia 24/7 en español.",
     type: "website",
     siteName: "Furgocasa - Alquiler de Motorhomes",
     images: [
@@ -53,8 +54,8 @@ const MOTORHOME_EUROPA_METADATA: Metadata = {
     card: "summary_large_image",
     site: "@furgocasa",
     creator: "@furgocasa",
-    title: "Alquiler Motorhome Europa para Viajeros LATAM",
-    description: "Tu casa rodante te espera en España para recorrer toda Europa. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español.",
+    title: "Alquiler Motorhome Europa | Recorré Francia, Italia, Portugal",
+    description: "Tu casa rodante te espera para recorrer toda Europa. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español.",
     images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
   },
   robots: {
@@ -89,6 +90,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function LocaleMotorhomeEuropaLatamPage({ params }: PageProps) {
   const featuredVehicles = await getFeaturedVehicles();
   const stats = await getCompanyStats();
+  const routesArticles = await getRoutesArticles(4);
   const featuredVehiclesHome = featuredVehicles.slice(0, 3);
 
   return (
@@ -203,21 +205,34 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
         </div>
       </section>
 
-      {/* Sección: Descuento LATAM */}
+      {/* Sección: Descuento LATAM - Con enlace al blog */}
       <section className="py-12 lg:py-16 bg-gradient-to-r from-furgocasa-orange to-orange-600">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center text-white">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
-              🌎 Descuento Especial LATAM 🌎
+              🌎 Descuento Especial LATAM: -15% 🌎
             </h2>
             <p className="text-xl lg:text-2xl mb-6">
               ¿Venís desde Latinoamérica?
             </p>
-            <p className="text-lg mb-8 text-orange-100">
-              Obtené un <strong>descuento especial</strong> en el alquiler de tu motorhome / casa rodante. 
-              Contactanos y mencioná tu país de origen para recibir una oferta personalizada.
+            <p className="text-lg mb-4 text-orange-100">
+              Si viajás desde <strong>Argentina, México, Chile, Colombia, Perú, Venezuela, Uruguay, Ecuador</strong> 
+              {' '}o cualquier país de América Latina, tenés un <strong>descuento del -15%</strong> en alquileres de mínimo 2 semanas.
             </p>
             
+            {/* Ejemplos de ahorro */}
+            <div className="grid md:grid-cols-2 gap-4 mb-8 max-w-2xl mx-auto">
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                <p className="font-bold text-xl mb-1">21 días (3 semanas)</p>
+                <p className="text-orange-100">Ahorrás hasta <strong className="text-white text-2xl">285€</strong></p>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                <p className="font-bold text-xl mb-1">14 días (2 semanas)</p>
+                <p className="text-orange-100">Ahorrás hasta <strong className="text-white text-2xl">210€</strong></p>
+              </div>
+            </div>
+            
+            {/* Países */}
             <div className="flex flex-wrap justify-center gap-3 mb-8">
               {['🇦🇷 Argentina', '🇲🇽 México', '🇨🇱 Chile', '🇨🇴 Colombia', '🇵🇪 Perú', '🇻🇪 Venezuela', '🇺🇾 Uruguay', '🇪🇨 Ecuador'].map((pais) => (
                 <span key={pais} className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
@@ -226,15 +241,31 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
               ))}
             </div>
             
-            <a
-              href="https://wa.me/34673414053?text=Hola!%20Soy%20de%20[TU%20PAÍS]%20y%20quiero%20consultar%20por%20el%20descuento%20especial%20LATAM"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-white text-furgocasa-orange font-bold px-8 py-4 rounded-xl hover:bg-orange-50 transition-all shadow-lg text-lg"
-            >
-              <Phone className="h-5 w-5" />
-              Consultá tu descuento por WhatsApp
-            </a>
+            {/* Botones - Artículo primero, WhatsApp segundo */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <LocalizedLink
+                href="/blog/noticias/visitas-espana-o-la-ue-desde-america-latina-alquila-tu-mortohome-con-un-15-de-descuento"
+                className="inline-flex items-center gap-2 bg-white text-furgocasa-orange font-bold px-8 py-4 rounded-xl hover:bg-orange-50 transition-all shadow-lg text-lg"
+              >
+                📋 Ver condiciones completas del descuento
+              </LocalizedLink>
+              
+              <a
+                href="https://wa.me/34673414053?text=Hola!%20Soy%20de%20[TU%20PAÍS]%20y%20quiero%20consultar%20sobre%20el%20descuento%20-15%25%20LATAM"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all shadow-lg text-lg"
+              >
+                <Phone className="h-5 w-5" />
+                Consultá por WhatsApp
+              </a>
+            </div>
+            
+            {/* Nota pequeña */}
+            <p className="text-sm text-orange-100 mt-6 max-w-2xl mx-auto">
+              * Válido para alquileres de mínimo 2 semanas en Temporada Baja y Media (septiembre-junio). 
+              Debes acreditar tu viaje desde Latinoamérica con billetes de avión.
+            </p>
           </div>
         </div>
       </section>
@@ -361,7 +392,7 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
         </div>
       </section>
 
-      {/* Sección: Rutas Sugeridas para LATAM */}
+      {/* Sección: Rutas Sugeridas para LATAM - Artículos del blog */}
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
@@ -372,68 +403,122 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
               </h2>
             </div>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-              Desde España, toda Europa te espera. Rutas pensadas para viajeros internacionales.
+              Desde España, toda Europa te espera. Descubrí nuestras guías completas.
             </p>
           </div>
 
+          {/* Artículos del blog de rutas */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
-            {[
-              {
-                title: "Costa Mediterránea",
-                days: "10-14 días",
-                km: "~1,200 km",
-                route: "Murcia → Valencia → Barcelona",
-                highlights: ["Playas increíbles", "Barcelona: Gaudí", "Costa Brava"],
-                color: "from-blue-50 to-blue-100 border-blue-300",
-                badge: "⭐ MÁS POPULAR"
-              },
-              {
-                title: "Andalucía Completa",
-                days: "12-16 días",
-                km: "~1,800 km",
-                route: "Murcia → Granada → Sevilla → Madrid",
-                highlights: ["Alhambra", "Pueblos blancos", "Flamenco"],
-                color: "from-orange-50 to-orange-100 border-orange-300",
-                badge: "🏛️ CULTURAL"
-              },
-              {
-                title: "España + Portugal",
-                days: "16-21 días",
-                km: "~2,800 km",
-                route: "Murcia → Sevilla → Lisboa → Porto",
-                highlights: ["Lisboa: tranvías", "Sintra: palacios", "Porto: vino"],
-                color: "from-green-50 to-green-100 border-green-300",
-                badge: "🇵🇹 2 PAÍSES"
-              },
-              {
-                title: "Gran Tour Europeo",
-                days: "21-30 días",
-                km: "~4,500 km",
-                route: "España → Francia → Italia",
-                highlights: ["Costa Azul", "Cinque Terre", "Toscana"],
-                color: "from-purple-50 to-purple-100 border-purple-300",
-                badge: "🌍 ÉPICO"
-              },
-            ].map((ruta, index) => (
-              <div
-                key={index}
-                className={`bg-gradient-to-br ${ruta.color} border-2 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
-              >
-                <span className="inline-block bg-white/80 text-gray-800 text-xs font-bold px-2 py-1 rounded mb-3">
-                  {ruta.badge}
-                </span>
-                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">
-                  {ruta.title}
-                </h3>
-                <p className="text-sm text-gray-600 mb-3">{ruta.days} | {ruta.km}</p>
-                <p className="text-sm text-gray-700 font-medium mb-3">{ruta.route}</p>
-                <ul className="text-sm text-gray-700 space-y-1">
-                  {ruta.highlights.map((h, i) => (
-                    <li key={i}>• {h}</li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            {routesArticles.length > 0 ? (
+              <>
+                {routesArticles.map((article) => (
+                  <BlogArticleLink
+                    key={article.id}
+                    categorySlug={article.category?.slug || 'rutas'}
+                    slug={article.slug}
+                    className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
+                  >
+                    <div className="h-48 lg:h-56 bg-gray-200 relative overflow-hidden">
+                      {article.featured_image ? (
+                        <Image
+                          src={article.featured_image}
+                          alt={article.title}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          className="object-cover group-hover:scale-110 transition-transform duration-500"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-furgocasa-blue to-blue-600">
+                          <Map className="h-16 w-16 text-white/50" />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute top-4 left-4">
+                        <span className="bg-furgocasa-orange text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                          Ruta
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <h3 className="text-lg lg:text-xl font-heading font-bold text-gray-900 mb-3 group-hover:text-furgocasa-blue transition-colors line-clamp-2">
+                        {article.title}
+                      </h3>
+                      {article.excerpt && (
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-3">{article.excerpt}</p>
+                      )}
+                      <div className="flex items-center justify-between text-xs text-gray-500">
+                        <span className="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">
+                          Leer más →
+                        </span>
+                      </div>
+                    </div>
+                  </BlogArticleLink>
+                ))}
+              </>
+            ) : (
+              <>
+                {/* Fallback: Cards estáticas si no hay artículos */}
+                {[
+                  {
+                    title: "Costa Mediterránea",
+                    days: "10-14 días",
+                    km: "~1,200 km",
+                    route: "Murcia → Valencia → Barcelona",
+                    highlights: ["Playas increíbles", "Barcelona: Gaudí", "Costa Brava"],
+                    color: "from-blue-50 to-blue-100 border-blue-300",
+                    badge: "⭐ MÁS POPULAR"
+                  },
+                  {
+                    title: "Andalucía Completa",
+                    days: "12-16 días",
+                    km: "~1,800 km",
+                    route: "Murcia → Granada → Sevilla → Madrid",
+                    highlights: ["Alhambra", "Pueblos blancos", "Flamenco"],
+                    color: "from-orange-50 to-orange-100 border-orange-300",
+                    badge: "🏛️ CULTURAL"
+                  },
+                  {
+                    title: "España + Portugal",
+                    days: "16-21 días",
+                    km: "~2,800 km",
+                    route: "Murcia → Sevilla → Lisboa → Porto",
+                    highlights: ["Lisboa: tranvías", "Sintra: palacios", "Porto: vino"],
+                    color: "from-green-50 to-green-100 border-green-300",
+                    badge: "🇵🇹 2 PAÍSES"
+                  },
+                  {
+                    title: "Gran Tour Europeo",
+                    days: "21-30 días",
+                    km: "~4,500 km",
+                    route: "España → Francia → Italia",
+                    highlights: ["Costa Azul", "Cinque Terre", "Toscana"],
+                    color: "from-purple-50 to-purple-100 border-purple-300",
+                    badge: "🌍 ÉPICO"
+                  },
+                ].map((ruta, index) => (
+                  <div
+                    key={index}
+                    className={`bg-gradient-to-br ${ruta.color} border-2 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1`}
+                  >
+                    <span className="inline-block bg-white/80 text-gray-800 text-xs font-bold px-2 py-1 rounded mb-3">
+                      {ruta.badge}
+                    </span>
+                    <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">
+                      {ruta.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-3">{ruta.days} | {ruta.km}</p>
+                    <p className="text-sm text-gray-700 font-medium mb-3">{ruta.route}</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      {ruta.highlights.map((h, i) => (
+                        <li key={i}>• {h}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
 
           <div className="text-center mt-12 max-w-3xl mx-auto bg-furgocasa-blue text-white p-8 rounded-2xl">

@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { cache } from 'react';
+import type { Locale } from '../i18n/config';
 
 export interface FeaturedVehicle {
   id: string;
@@ -88,6 +89,47 @@ export const getLatestBlogArticles = cache(async (limit: number = 3): Promise<Bl
       category:content_categories(id, name, slug)
     `)
     .eq('status', 'published')
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (!articles) return [];
+
+  return articles.map(article => ({
+    ...article,
+    category: Array.isArray(article.category) ? article.category[0] : article.category
+  }));
+});
+
+// ⚡ Obtener artículos de rutas para página LATAM
+export const getRoutesArticles = cache(async (limit: number = 4, locale: Locale = 'es'): Promise<BlogArticle[]> => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  // Mapeo de slug de categoría según idioma
+  const categorySlugMap: Record<Locale, string> = {
+    es: 'rutas',
+    en: 'routes',
+    fr: 'itineraires',
+    de: 'routen'
+  };
+
+  const categorySlug = categorySlugMap[locale] || 'rutas';
+
+  const { data: articles } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      title,
+      slug,
+      excerpt,
+      featured_image,
+      published_at,
+      category:content_categories!inner(id, name, slug)
+    `)
+    .eq('status', 'published')
+    .eq('content_categories.slug', categorySlug)
     .order('published_at', { ascending: false })
     .limit(limit);
 

@@ -164,6 +164,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/ventas', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/tarifas', priority: 0.8, changeFrequency: 'monthly' },
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/alquiler-motorhome-europa-desde-espana', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/como-funciona', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
