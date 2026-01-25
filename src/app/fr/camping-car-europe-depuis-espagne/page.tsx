@@ -413,7 +413,7 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
                 {routesArticles.map((article) => (
                   <BlogArticleLink
                     key={article.id}
-                    categorySlug={article.category?.slug || 'itineraires'}
+                    categorySlug={'itineraires'}
                     slug={article.slug}
                     className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                   >

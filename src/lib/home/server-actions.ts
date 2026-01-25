@@ -18,6 +18,9 @@ export interface BlogArticle {
   id: string;
   title: string;
   slug: string;
+  slug_en?: string | null;
+  slug_fr?: string | null;
+  slug_de?: string | null;
   excerpt: string | null;
   featured_image: string | null;
   published_at: string | null;
@@ -107,15 +110,9 @@ export const getRoutesArticles = cache(async (limit: number = 4, locale: Locale 
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Mapeo de slug de categoría según idioma
-  const categorySlugMap: Record<Locale, string> = {
-    es: 'rutas',
-    en: 'routes',
-    fr: 'itineraires',
-    de: 'routen'
-  };
-
-  const categorySlug = categorySlugMap[locale] || 'rutas';
+  // ⚠️ IMPORTANTE: Siempre buscar en la categoría 'rutas' (español)
+  // Los artículos deben tener slugs traducidos en las columnas slug_en, slug_fr, slug_de
+  const categorySlug = 'rutas';
 
   const { data: articles } = await supabase
     .from('posts')
@@ -123,6 +120,9 @@ export const getRoutesArticles = cache(async (limit: number = 4, locale: Locale 
       id,
       title,
       slug,
+      slug_en,
+      slug_fr,
+      slug_de,
       excerpt,
       featured_image,
       published_at,
