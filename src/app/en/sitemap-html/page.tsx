@@ -56,6 +56,7 @@ const staticPages: Array<{ path: string; label: string }> = [
   { path:"/rates", label:"Rates" },
   { path:"/book", label:"Book" },
   { path:"/motorhome-rental-europe-from-spain", label:"Motorhome Rental Europe" },
+  { path:"/motorhome-rental-morocco-from-spain", label:"Motorhome Rental Morocco" },
   { path:"/search", label:"Search" },
   { path:"/contact", label:"Contact" },
   { path:"/how-it-works", label:"How it works" },

@@ -56,6 +56,7 @@ const staticPages: Array<{ path: string; label: string }> = [
   { path:"/tarifs", label:"Tarifs" },
   { path:"/reserver", label:"Réserver" },
   { path:"/camping-car-europe-depuis-espagne", label:"Location Camping-Car Europe" },
+  { path:"/camping-car-maroc-depuis-espagne", label:"Location Camping-Car Maroc" },
   { path:"/recherche", label:"Recherche" },
   { path:"/contact", label:"Contact" },
   { path:"/comment-ca-marche", label:"Comment ça marche" },
