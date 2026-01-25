@@ -201,7 +201,7 @@ export const routeTranslations = {
   "/alquiler-motorhome-europa-desde-espana": { 
     es: "/alquiler-motorhome-europa-desde-espana", 
     en: "/motorhome-rental-europe-from-spain", 
-    fr: "/location-camping-car-europe-depuis-espagne", 
+    fr: "/camping-car-europe-depuis-espagne", 
     de: "/wohnmobil-miete-europa-von-spanien" 
   },
   "/sitemap-html": { 
@@ -361,7 +361,6 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
   } else {
     // Intentar coincidencia exacta BIDIRECCIONAL (funciona desde cualquier idioma)
     const exactTranslation = findRouteTranslation(cleanPath, targetLang);
-    console.log('🔍 [getTranslatedRoute] cleanPath:', cleanPath, 'targetLang:', targetLang, 'exactTranslation:', exactTranslation);
     if (exactTranslation) {
       translatedPath = exactTranslation;
     } else {
