@@ -20,10 +20,19 @@ export const metadata: Metadata = {
   robots: {
     index: false,
     follow: false,
+    nocache: true,
     googleBot: {
       index: false,
       follow: false,
+      noimageindex: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'none',
+      'max-snippet': -1,
     },
+  },
+  // Sin alternates/hreflang (no hay versiones en otros idiomas)
+  alternates: {
+    canonical: null, // Sin canonical - página interna sin SEO
   },
   // Sin OpenGraph ni Twitter Cards para máxima privacidad
   openGraph: undefined,

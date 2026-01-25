@@ -90,6 +90,11 @@ export default function robots(): MetadataRoute.Robots {
     '/de/cookies',
     
     // ========================================
+    // PÁGINAS ESTRATÉGICAS INTERNAS - NO INDEXABLES
+    // ========================================
+    '/es/escalabilidad/',
+    
+    // ========================================
     // OTRAS PÁGINAS NO INDEXABLES
     // ========================================
     '/preview/',
