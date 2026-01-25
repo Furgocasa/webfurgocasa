@@ -89,3 +89,11 @@ OLD_FURGOCASA_DATOS/orders-raw*.txt
 # Archivos internos de estrategia (privados)
 src/app/es/escalabilidad/brainstorming.txt
 src/app/es/escalabilidad/LATAM.txt
+
+# Archivos temporales de documentación (opcionales - ya movidos a docs/)
+docs/06-archivos-temporales/*.txt
+docs/06-archivos-temporales/*.json
+
+# Archivos históricos (scripts y SQL ya ejecutados - no necesarios en git)
+scripts/historicos/
+supabase/historicos/
