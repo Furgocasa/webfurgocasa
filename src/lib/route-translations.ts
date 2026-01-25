@@ -361,6 +361,7 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
   } else {
     // Intentar coincidencia exacta BIDIRECCIONAL (funciona desde cualquier idioma)
     const exactTranslation = findRouteTranslation(cleanPath, targetLang);
+    console.log('🔍 [getTranslatedRoute] cleanPath:', cleanPath, 'targetLang:', targetLang, 'exactTranslation:', exactTranslation);
     if (exactTranslation) {
       translatedPath = exactTranslation;
     } else {
