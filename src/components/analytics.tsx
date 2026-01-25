@@ -33,51 +33,67 @@ export function GoogleAnalytics() {
 
     // Enviar pageview cuando cambia la ruta
     if (typeof window !== 'undefined' && (window as any).gtag && pathname) {
-      // Usar MutationObserver para detectar el cambio real del título
-      // Esto soluciona el problema de títulos "not set" o antiguos en navegación SPA
+      // ESTRATEGIA HÍBRIDA ROBUSTA (V3):
+      // Combinamos MutationObserver + Polling para garantizar detección del título
       
       let sent = false;
-      const titleElement = document.querySelector('title');
-      let observer: MutationObserver | null = null;
+      const oldTitle = document.title; // Título de la página anterior
       
       const sendPageView = (trigger: string) => {
         if (sent) return;
         
         const currentTitle = document.title;
-        console.log(`[Analytics] Enviando pageview (${trigger}):`, pathname, 'Title:', currentTitle);
+        console.log(`[Analytics] 📡 Enviando (${trigger}) | Path: ${pathname} | Title: "${currentTitle}"`);
         
         (window as any).gtag('config', GA_MEASUREMENT_ID, {
           page_path: pathname,
           page_title: currentTitle || 'Furgocasa',
         });
         sent = true;
-        
-        // Limpiar observadores una vez enviado
+        cleanup();
+      };
+
+      // Limpieza de timers y observadores
+      let checkInterval: NodeJS.Timeout;
+      let fallbackTimer: NodeJS.Timeout;
+      let observer: MutationObserver | null = null;
+
+      const cleanup = () => {
+        clearInterval(checkInterval);
+        clearTimeout(fallbackTimer);
         if (observer) observer.disconnect();
       };
 
-      // 1. Fallback de seguridad: Si en 1.5s no cambia el título, enviar lo que haya
-      const timeoutId = setTimeout(() => {
-        sendPageView('timeout_fallback');
-      }, 1500);
+      // 1. POLLING INTELIGENTE (Cada 100ms)
+      // Detecta si el título cambia respecto al anterior
+      checkInterval = setInterval(() => {
+        if (document.title !== oldTitle && document.title.length > 0) {
+          sendPageView('polling_change_detected');
+        }
+      }, 100);
 
-      // 2. Observar cambios en el <title>
+      // 2. MUTATION OBSERVER (Reacción inmediata)
+      const titleElement = document.querySelector('title');
       if (titleElement) {
         observer = new MutationObserver(() => {
-          // Si el título no está vacío, asumimos que es el nuevo
-          if (document.title && document.title.trim().length > 0) {
-            // Pequeño delay extra para asegurar estabilidad
-            setTimeout(() => sendPageView('title_change'), 100);
+          if (document.title && document.title.length > 0) {
+            // Si el título es diferente al anterior, enviar ya.
+            // Si es igual, esperar al polling o fallback (evita falsos positivos en carga inicial)
+            if (document.title !== oldTitle) {
+               sendPageView('mutation_detected');
+            }
           }
         });
-        
         observer.observe(titleElement, { childList: true, subtree: true, characterData: true });
       }
 
-      return () => {
-        clearTimeout(timeoutId);
-        if (observer) observer.disconnect();
-      };
+      // 3. FALLBACK FINAL (1.5s)
+      // Si el título no ha cambiado en 1.5s (ej: misma página con params distintos), enviar igual
+      fallbackTimer = setTimeout(() => {
+        sendPageView('timeout_fallback');
+      }, 1500);
+
+      return cleanup;
     }
   }, [pathname]);
 
