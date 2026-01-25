@@ -31,66 +31,93 @@ function GoogleAnalyticsContent() {
     }
 
     // Enviar pageview cuando cambia la ruta o los parámetros
-    if (typeof window !== 'undefined' && (window as any).gtag && pathname) {
-      // ESTRATEGIA HÍBRIDA ROBUSTA (V3):
-      // Combinamos MutationObserver + Polling para garantizar detección del título
-      
-      let sent = false;
-      const oldTitle = document.title; // Título de la página anterior
-      
-      const sendPageView = (trigger: string) => {
-        if (sent) return;
-        
-        const currentTitle = document.title;
-        console.log(`[Analytics] 📡 Enviando (${trigger}) | URL: ${fullPath} | Title: "${currentTitle}"`);
-        
-        (window as any).gtag('config', GA_MEASUREMENT_ID, {
-          page_path: fullPath, // Enviamos path + query string para registrar fbclid y otros params
-          page_location: window.location.href, // Aseguramos URL completa para atribución
-          page_title: currentTitle || 'Furgocasa',
-        });
-        sent = true;
-        cleanup();
-      };
-
-      // Limpieza de timers y observadores
-      let checkInterval: NodeJS.Timeout;
-      let fallbackTimer: NodeJS.Timeout;
-      let observer: MutationObserver | null = null;
-
-      const cleanup = () => {
-        clearInterval(checkInterval);
-        clearTimeout(fallbackTimer);
-        if (observer) observer.disconnect();
-      };
-
-      // 1. POLLING INTELIGENTE (Cada 100ms)
-      checkInterval = setInterval(() => {
-        if (document.title !== oldTitle && document.title.length > 0) {
-          sendPageView('polling_change_detected');
-        }
-      }, 100);
-
-      // 2. MUTATION OBSERVER (Reacción inmediata)
-      const titleElement = document.querySelector('title');
-      if (titleElement) {
-        observer = new MutationObserver(() => {
-          if (document.title && document.title.length > 0) {
-            if (document.title !== oldTitle) {
-               sendPageView('mutation_detected');
+    // NOTA: Comprobamos window.gtag dentro de un intervalo para manejar la condición de carrera
+    // en la carga inicial (cuando el script de GA aún no se ha ejecutado pero el componente ya montó)
+    const trySendPageView = () => {
+       if (typeof window !== 'undefined' && (window as any).gtag && pathname) {
+          // ESTRATEGIA HÍBRIDA ROBUSTA (V3):
+          // Combinamos MutationObserver + Polling para garantizar detección del título
+          
+          let sent = false;
+          const oldTitle = document.title; // Título de la página anterior
+          
+          const sendPageView = (trigger: string) => {
+            if (sent) return;
+            
+            const currentTitle = document.title;
+            console.log(`[Analytics] 📡 Enviando (${trigger}) | URL: ${fullPath} | Title: "${currentTitle}"`);
+            
+            (window as any).gtag('config', GA_MEASUREMENT_ID, {
+              page_path: fullPath, // Enviamos path + query string para registrar fbclid y otros params
+              page_location: window.location.href, // Aseguramos URL completa para atribución
+              page_title: currentTitle || 'Furgocasa',
+            });
+            sent = true;
+            cleanup();
+          };
+    
+          // Limpieza de timers y observadores
+          let checkInterval: NodeJS.Timeout;
+          let fallbackTimer: NodeJS.Timeout;
+          let observer: MutationObserver | null = null;
+    
+          const cleanup = () => {
+            clearInterval(checkInterval);
+            clearTimeout(fallbackTimer);
+            if (observer) observer.disconnect();
+          };
+    
+          // 1. POLLING INTELIGENTE (Cada 100ms)
+          checkInterval = setInterval(() => {
+            if (document.title !== oldTitle && document.title.length > 0) {
+              sendPageView('polling_change_detected');
             }
+          }, 100);
+    
+          // 2. MUTATION OBSERVER (Reacción inmediata)
+          const titleElement = document.querySelector('title');
+          if (titleElement) {
+            observer = new MutationObserver(() => {
+              if (document.title && document.title.length > 0) {
+                if (document.title !== oldTitle) {
+                   sendPageView('mutation_detected');
+                }
+              }
+            });
+            observer.observe(titleElement, { childList: true, subtree: true, characterData: true });
           }
-        });
-        observer.observe(titleElement, { childList: true, subtree: true, characterData: true });
-      }
+    
+          // 3. FALLBACK FINAL (1.5s)
+          fallbackTimer = setTimeout(() => {
+            sendPageView('timeout_fallback');
+          }, 1500);
 
-      // 3. FALLBACK FINAL (1.5s)
-      fallbackTimer = setTimeout(() => {
-        sendPageView('timeout_fallback');
-      }, 1500);
+          return cleanup;
+       }
+       return null;
+    };
 
-      return cleanup;
+    // Intentar enviar inmediatamente
+    const cleanupFunc = trySendPageView();
+
+    // Si no se pudo enviar (gtag no definido), esperar a que cargue
+    let retryInterval: NodeJS.Timeout;
+    if (!cleanupFunc) {
+      let attempts = 0;
+      retryInterval = setInterval(() => {
+        const cleanup = trySendPageView();
+        if (cleanup) {
+          clearInterval(retryInterval);
+        }
+        attempts++;
+        if (attempts > 50) clearInterval(retryInterval); // Dejar de intentar tras 5s
+      }, 100);
     }
+
+    return () => {
+      if (cleanupFunc) cleanupFunc();
+      clearInterval(retryInterval);
+    };
   }, [pathname, searchParams]); // Dependencia añadida: searchParams
 
   return null;
