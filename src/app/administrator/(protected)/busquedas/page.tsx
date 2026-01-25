@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   TrendingUp, 
@@ -140,6 +140,11 @@ export default function SearchAnalyticsPage() {
     start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     end: new Date().toISOString().split('T')[0],
   });
+
+  // Actualizar título de la página
+  useEffect(() => {
+    document.title = "Admin - Búsquedas | Furgocasa";
+  }, []);
 
   // Queries para cada tipo de datos
   const { data: overview, isLoading: loadingOverview } = useQuery<AnalyticsData>({

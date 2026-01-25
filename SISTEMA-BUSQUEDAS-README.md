@@ -12,18 +12,26 @@ Sistema completo de tracking y análisis del funnel de conversión de búsquedas
 
 ### 1. Ejecutar SQL en Supabase
 
-Ejecuta el siguiente archivo SQL en tu dashboard de Supabase:
+**⚠️ IMPORTANTE:** Ejecuta el archivo SQL definitivo en tu dashboard de Supabase:
 
-```sql
--- Ver: SQL completo en este README o en el comentario del PR
+```bash
+# Archivo: supabase/search-queries-DEFINITIVO.sql
 ```
 
-El SQL crea:
-- Tabla `search_queries` con todos los campos necesarios
-- Índices optimizados para consultas rápidas
-- Triggers automáticos para calcular tiempos de conversión
-- Vistas para análisis agregados
-- Políticas RLS (Row Level Security)
+Este archivo SQL definitivo:
+- ✅ **DROP y CREATE limpio** - Elimina tabla anterior si existe
+- ✅ **33 columnas completas** - Todos los campos necesarios incluidos:
+  - `pickup_time` y `dropoff_time` (TIME)
+  - `pickup_location` y `dropoff_location` (TEXT para slugs)
+  - `pickup_location_id` y `dropoff_location_id` (UUID FK a locations)
+  - `same_location` (BOOLEAN)
+- ✅ **7 índices optimizados** para consultas rápidas
+- ✅ **Triggers automáticos** para calcular tiempos de conversión
+- ✅ **3 vistas analíticas** (search_conversion_stats, top_searched_dates, vehicle_search_performance)
+- ✅ **4 políticas RLS** (Row Level Security)
+- ✅ **Función de limpieza** automática de datos antiguos
+
+**Estado actual:** ✅ SQL definitivo creado y listo para ejecutar (commit `da8e0cf`)
 
 ### 2. Verificar instalación
 
@@ -367,6 +375,25 @@ Ideas para futuras versiones:
 2. Revisar logs del endpoint `/api/bookings/create`
 
 ## 📝 Changelog
+
+### v1.2.0 (2026-01-25) ⭐ SQL DEFINITIVO
+
+- ✅ **SQL Definitivo Creado** (`supabase/search-queries-DEFINITIVO.sql`)
+  - DROP y CREATE limpio de la tabla `search_queries`
+  - 33 columnas completas con todos los campos requeridos
+  - Incluye `pickup_time`, `dropoff_time`, `pickup_location_id`, `dropoff_location_id`, `same_location`
+  - Conversión automática de slugs → UUIDs en `/api/availability`
+  - 7 índices optimizados
+  - Triggers automáticos de tiempos
+  - 3 vistas analíticas
+  - RLS con 4 políticas
+- ✅ **Tracking Reactivado** en `/api/availability/route.ts`
+  - Ya no está deshabilitado (`if (false)` eliminado)
+  - Inserta todos los campos correctamente
+  - Manejo robusto de errores (no rompe búsqueda si falla tracking)
+- ✅ **Fix Bugs Informes** (`/administrator/informes`)
+  - Gráfico "Ingresos por mes" ahora muestra correctamente reservas creadas en año seleccionado
+  - Filtrado condicional por `created_at` o `pickup_date` según modo
 
 ### v1.1.0 (2026-01-25) ⭐ NUEVO
 
