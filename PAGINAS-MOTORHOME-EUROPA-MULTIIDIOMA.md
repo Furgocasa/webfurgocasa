@@ -137,29 +137,64 @@ Cada página incluye:
 - ✅ Base en Murcia, España
 
 ### 4. Rutas Sugeridas (Blog Dinámico)
-**Carga 4 artículos de la categoría `rutas` con URLs traducidas**
+**Carga 4 artículos de la categoría `rutas` con URLs y contenido totalmente traducidos**
 
-**Funcionamiento:**
+**Funcionamiento Completo:**
+
+#### Backend (`getRoutesArticles`)
 ```typescript
-// Todos los idiomas consultan la MISMA categoría 'rutas' (española)
-const routesArticles = await getRoutesArticles(4, 'en');
+// 1. Consulta SIEMPRE la categoría 'rutas' (español) en Supabase
+const routesArticles = await getRoutesArticles(4, 'fr');
 
-// Pero usan categorySlug traducido:
-🇪🇸 ES: categorySlug='rutas'       + article.slug (español)
-🇬🇧 EN: categorySlug='routes'      + article.slug (español)
-🇫🇷 FR: categorySlug='itineraires' + article.slug (español)
-🇩🇪 DE: categorySlug='routen'      + article.slug (español)
+// 2. SELECT incluye slugs traducidos
+SELECT id, title, slug, slug_en, slug_fr, slug_de, excerpt, ...
+
+// 3. Si locale !== 'es', busca traducciones en content_translations
+SELECT source_id, source_field, translated_text
+FROM content_translations
+WHERE source_table = 'posts'
+  AND locale = 'fr'
+  AND source_field IN ('title', 'excerpt')
+
+// 4. Aplica traducciones
+article.title = translatedTitle (francés)
+article.excerpt = translatedExcerpt (francés)
 ```
 
-**URLs generadas (ejemplo):**
-```
-/es/blog/rutas/navidades-diferentes-viajar-en-camper-por-la-nieve
-/en/blog/routes/navidades-diferentes-viajar-en-camper-por-la-nieve
-/fr/blog/itineraires/navidades-diferentes-viajar-en-camper-por-la-nieve
-/de/blog/routen/navidades-diferentes-viajar-en-camper-por-la-nieve
+#### Frontend (`BlogArticleLink`)
+```typescript
+// Elige el slug según el idioma
+switch (language) {
+  case 'fr': finalSlug = article.slug_fr || article.slug;
+  case 'en': finalSlug = article.slug_en || article.slug;
+  case 'de': finalSlug = article.slug_de || article.slug;
+  default:   finalSlug = article.slug;
+}
+
+// Genera URL con categorySlug traducido + slug traducido
+🇪🇸 ES: /es/blog/rutas/navidades-diferentes-viajar-en-camper...
+🇬🇧 EN: /en/blog/routes/christmas-different-travel-in-camper...
+🇫🇷 FR: /fr/blog/itineraires/noels-differents-voyager-en-van...
+🇩🇪 DE: /de/blog/routen/weihnachten-anders-reisen-in-camper...
 ```
 
-**Nota**: Los artículos de blog **aceptan slugs en español** en todos los idiomas y cargan el contenido traducido desde `content_translations`.
+**URLs Generadas (ejemplo real):**
+```
+🇪🇸 /es/blog/rutas/navidades-diferentes-viajar-en-camper-por-la-region-de-murcia-en-invierno
+🇬🇧 /en/blog/routes/different-christmas-travel-camper-murcia-region-winter
+🇫🇷 /fr/blog/itineraires/noels-differents-voyager-en-van-dans-la-region-de-murcie-en-hiver
+🇩🇪 /de/blog/routen/andere-weihnachten-wohnmobil-reise-murcia-region-winter
+```
+
+**Contenido Mostrado:**
+- ✅ **Títulos:** Traducidos desde `content_translations` (source_field='title')
+- ✅ **Excerpts:** Traducidos desde `content_translations` (source_field='excerpt')
+- ✅ **URLs:** Con slugs traducidos desde columnas `slug_fr`, `slug_en`, `slug_de`
+
+**Sistema de Fallback:**
+- Si no hay `slug_fr` → usa `slug` (español)
+- Si no hay traducción en `content_translations` → usa título/excerpt original
+- Las páginas de artículo aceptan slugs en cualquier idioma y cargan contenido traducido
 
 ### 5. Flota de Vehículos
 - Muestra 3 vehículos destacados
@@ -270,14 +305,22 @@ src/app/de/wohnmobil-miete-europa-von-spanien/page.tsx
 ```
 src/lib/home/server-actions.ts
   └── getRoutesArticles(limit: number, locale: Locale)
-      ⚠️ SIEMPRE consulta categoría 'rutas' (español)
-      ⚠️ Fetch slug_en, slug_fr, slug_de desde tabla posts
+      ✅ SIEMPRE consulta categoría 'rutas' (español)
+      ✅ Fetch slug_en, slug_fr, slug_de desde tabla posts
+      ✅ Consulta content_translations para title/excerpt traducidos
+      ✅ Usa: source_table='posts', source_field IN ('title','excerpt'), locale
 ```
 
 ### Componentes
 ```
 src/components/blog/blog-article-link.tsx
-  └── Usa categorySlug + article.slug para construir URL
+  └── Lógica de selección de slug traducido:
+      switch(language) {
+        'fr': usa slug_fr || slug
+        'en': usa slug_en || slug  
+        'de': usa slug_de || slug
+      }
+      └── Genera URL: /{language}/blog/{categorySlug}/{finalSlug}
 ```
 
 ### Traducciones
@@ -385,13 +428,62 @@ mv src/app/fr/location-camping-car-europe-depuis-espagne \
 
 **Resultado:** ✅ Los 4 artículos aparecen en todos los idiomas
 
+### ❌ Error 3: Títulos de Artículos en Español en Páginas FR/EN/DE
+**Problema:** Los artículos mostraban títulos/excerpts en español en todas las páginas
+
+**Causa:** 
+1. `getRoutesArticles` consultaba columnas inexistentes: `translated_title`, `translated_excerpt`, `language`
+2. La tabla real `content_translations` usa: `source_field`, `translated_text`, `locale`
+
+**Solución:**
+```typescript
+// Consulta corregida
+.select('source_id, source_field, translated_text')
+.eq('source_table', 'posts')
+.eq('locale', locale)  // NO 'language'
+.in('source_field', ['title', 'excerpt'])
+
+// Agrupar por source_id y aplicar traducciones
+```
+
+**Resultado:** ✅ Títulos y excerpts traducidos correctamente
+
+### ❌ Error 4: URLs del Blog con Slugs en Español
+**Problema:** Links generaban URLs como `/fr/blog/itineraires/navidades-diferentes...`
+
+**Causa:** `BlogArticleLink` solo usaba `article.slug` (español) en todos los idiomas
+
+**Solución:**
+```typescript
+// Selección de slug según idioma
+const finalSlug = language === 'fr' ? (article.slug_fr || article.slug) : article.slug;
+```
+
+**Resultado:** ✅ URLs con slugs traducidos: `/fr/blog/itineraires/noels-differents...`
+
 ## 📝 Mantenimiento
 
 ### Añadir Nuevo Artículo a "Rutas Sugeridas"
 
-1. Crear artículo en categoría `rutas` (español) en el admin
-2. Rellenar campos `slug_en`, `slug_fr`, `slug_de` en el post
-3. El artículo aparecerá automáticamente en las 4 páginas
+1. **Crear artículo** en categoría `rutas` (español) en el admin
+2. **Rellenar slugs traducidos** en la tabla `posts`:
+   - `slug` (español - obligatorio)
+   - `slug_en` (inglés - opcional, usa español si no existe)
+   - `slug_fr` (francés - opcional, usa español si no existe)
+   - `slug_de` (alemán - opcional, usa español si no existe)
+3. **Añadir traducciones** en `content_translations`:
+   ```sql
+   INSERT INTO content_translations (source_table, source_id, source_field, locale, translated_text)
+   VALUES 
+     ('posts', 'article-id', 'title', 'fr', 'Titre en français'),
+     ('posts', 'article-id', 'excerpt', 'fr', 'Extrait en français'),
+     ('posts', 'article-id', 'title', 'en', 'Title in English'),
+     ('posts', 'article-id', 'excerpt', 'en', 'Excerpt in English');
+   ```
+4. **El artículo aparecerá automáticamente** en las 4 páginas con:
+   - ✅ Título traducido
+   - ✅ Excerpt traducido
+   - ✅ URL con slug traducido
 
 ### Cambiar Países en Badge/Descuento
 
@@ -445,7 +537,11 @@ Editar directamente cada página:
 - [x] Hreflang alternates configurados
 - [x] Blog routes dinámicos funcionando
 - [x] getRoutesArticles usando categoría 'rutas'
-- [x] Blog article links con slugs correctos
+- [x] getRoutesArticles consultando content_translations correctamente
+- [x] Blog article links con slugs traducidos (slug_fr, slug_en, slug_de)
+- [x] Títulos de artículos traducidos desde content_translations
+- [x] Excerpts de artículos traducidos desde content_translations
+- [x] URLs de blog con slugs traducidos (SEO-friendly)
 - [x] Incluida en sitemap.xml
 - [x] Incluida en robots.txt (permitida)
 - [x] Incluida en HTML sitemaps (4 idiomas)
@@ -464,5 +560,6 @@ Editar directamente cada página:
 ---
 
 **Última actualización:** 25 de Enero 2026  
+**Versión:** 1.1.0 (URLs y Contenido Blog Totalmente Traducidos)  
 **Autor:** Sistema IA  
 **Estado:** ✅ Producción

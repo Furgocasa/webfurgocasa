@@ -1,10 +1,45 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.13 ✅ PRODUCCIÓN - PÁGINAS MOTORHOME EUROPA MULTIIDIOMA  
+**Versión**: 1.0.14 ✅ PRODUCCIÓN - BLOG MULTIIDIOMA TOTALMENTE FUNCIONAL  
 **URL**: https://www.furgocasa.com  
 **Última actualización**: 25 de Enero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🌍 VERSIÓN 1.0.14 - BLOG MULTIIDIOMA TOTALMENTE FUNCIONAL
+
+**✅ ESTADO: COMPLETADO** - URLs, títulos y excerpts traducidos en todo el blog.
+
+**MEJORAS IMPLEMENTADAS**: Sistema completo de traducción para el blog.
+- **URLs traducidas**: Slugs específicos por idioma (`slug_fr`, `slug_en`, `slug_de`)
+- **Contenido traducido**: Títulos y excerpts desde `content_translations`
+- **Páginas afectadas**: Blog principal (`/blog`) + Páginas Motorhome Europa
+- **Fallback inteligente**: Usa español si no hay traducción disponible
+
+Ver **[PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** (v1.1.0) para detalles completos.
+
+### 🎯 Highlights v1.0.14:
+- ✅ **URLs SEO-friendly**: `/fr/blog/itineraires/noels-differents...` (no español)
+- ✅ **Títulos traducidos**: Desde `content_translations` con `source_field='title'`
+- ✅ **Excerpts traducidos**: Desde `content_translations` con `source_field='excerpt'`
+- ✅ **4 errores críticos corregidos**: Queries incorrectas, columnas inexistentes
+- ✅ **Sistema unificado**: Misma lógica en blog principal y páginas especiales
+
+### 🔧 Archivos Modificados:
+```
+src/lib/home/server-actions.ts          - Query content_translations corregida
+src/components/blog/blog-article-link.tsx - Selección slug traducido
+src/components/blog/blog-list-client.tsx  - URLs con slugs traducidos
+src/components/blog/blog-content.tsx      - Fetch slugs + traducciones
+```
+
+### 🐛 Errores Corregidos:
+1. **Query incorrecta**: Usaba `language` en vez de `locale`
+2. **Columnas inexistentes**: Buscaba `translated_title` en vez de `source_field + translated_text`
+3. **Slugs en español**: Links usaban `article.slug` en todos los idiomas
+4. **Títulos sin traducir**: No consultaba `content_translations`
 
 ---
 
@@ -24,7 +59,7 @@ Ver **[PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTI
 - ✅ **4 páginas diferenciadas**: ES/EN/FR/DE con audiencias específicas
 - ✅ **Blog dinámico integrado**: "Rutas Sugeridas" carga artículos traducidos
 - ✅ **SEO optimizado**: Meta títulos sin "LATAM" en EN/FR/DE
-- ✅ **Descuento -15%**: Diferenciado por países según idioma
+- ✅ **Descuento -15%**: Exclusivo para LATAM (solo página ES)
 - ✅ **Sitemap completo**: XML + HTML en 4 idiomas
 
 ---

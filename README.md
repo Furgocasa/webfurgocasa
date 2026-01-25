@@ -1,6 +1,6 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.3.0-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.3.1-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-99%2F100_desktop-brightgreen.svg)](https://pagespeed.web.dev/)
@@ -9,9 +9,9 @@
 [![SEO](https://img.shields.io/badge/SEO-100%2F100-brightgreen.svg)](./CHANGELOG.md)
 [![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./I18N_IMPLEMENTATION.md)
 
-**🎉 VERSIÓN 4.3.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 4.3.1 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
-> **✅ ESTADO: PÁGINAS MOTORHOME EUROPA MULTIIDIOMA** - 4 páginas diferenciadas | SEO optimizado | Blog dinámico integrado
+> **✅ ESTADO: BLOG MULTIIDIOMA TOTALMENTE FUNCIONAL** - URLs traducidas | Contenido traducido | Fallback inteligente
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
@@ -51,8 +51,10 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 **Integración Blog:**
 - ✅ **Categoría única `rutas`** - Todos los idiomas consultan la misma
-- ✅ **URLs traducidas** - `/blog/routes/`, `/blog/itineraires/`, `/blog/routen/`
-- ✅ **Slugs multiidioma** - Fetch desde `slug_en`, `slug_fr`, `slug_de`
+- ✅ **URLs traducidas** - Slugs desde `slug_fr`, `slug_en`, `slug_de`
+- ✅ **Contenido traducido** - Títulos y excerpts desde `content_translations`
+- ✅ **Fallback inteligente** - Usa español si no hay traducción
+- ✅ **SEO-friendly URLs** - `/fr/blog/itineraires/noels-differents...`
 
 ### 📁 Archivos Modificados
 
@@ -60,10 +62,13 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 2. ✅ `src/app/en/motorhome-rental-europe-from-spain/page.tsx` - Página EN
 3. ✅ `src/app/fr/camping-car-europe-depuis-espagne/page.tsx` - Página FR (renombrada)
 4. ✅ `src/app/de/wohnmobil-miete-europa-von-spanien/page.tsx` - Página DE
-5. ✅ `src/lib/home/server-actions.ts` - `getRoutesArticles` usa categoría 'rutas'
-6. ✅ `src/lib/route-translations.ts` - Mapeo de slugs traducidos
-7. ✅ `src/app/sitemap.ts` - Entrada con prioridad 0.9
-8. ✅ `src/app/[locale]/sitemap-html/page.tsx` (×4) - HTML sitemaps localizados
+5. ✅ `src/lib/home/server-actions.ts` - `getRoutesArticles` con traducciones completas
+6. ✅ `src/components/blog/blog-article-link.tsx` - Selección de slug traducido
+7. ✅ `src/components/blog/blog-list-client.tsx` - URLs con slugs traducidos
+8. ✅ `src/components/blog/blog-content.tsx` - Fetch slugs traducidos
+9. ✅ `src/lib/route-translations.ts` - Mapeo de slugs traducidos
+10. ✅ `src/app/sitemap.ts` - Entrada con prioridad 0.9
+11. ✅ `src/app/[locale]/sitemap-html/page.tsx` (×4) - HTML sitemaps localizados
 
 ### 📚 Documentación Completa
 
@@ -75,6 +80,10 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 - Mantenimiento y actualizaciones
 
 **Commits:**
+- `d18de0f` - fix(motorhome-europa): corregir consulta traducciones en getRoutesArticles
+- `173e55b` - feat(blog): usar slugs traducidos en URLs de la página principal del blog
+- `4f7c8e0` - feat(motorhome-europa): usar slugs traducidos en URLs del blog
+- `f81e853` - feat(motorhome-europa): cargar títulos y excerpts traducidos del blog
 - `c274f82` - feat(motorhome-europa): usar categoría 'rutas' para todos los idiomas
 
 ### 🎯 Objetivo SEO
