@@ -569,7 +569,6 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
         </section>
       )}
-      )}
 
       {/* WHY FURGOCASA */}
       <section className="py-16 lg:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
