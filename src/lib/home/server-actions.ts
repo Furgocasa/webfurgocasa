@@ -141,14 +141,26 @@ export const getRoutesArticles = cache(async (limit: number = 4, locale: Locale 
     
     const { data: translations } = await supabase
       .from('content_translations')
-      .select('post_id, language, translated_title, translated_excerpt')
-      .in('post_id', postIds)
-      .eq('language', locale);
+      .select('source_id, source_field, translated_text')
+      .eq('source_table', 'posts')
+      .in('source_id', postIds)
+      .eq('locale', locale)
+      .in('source_field', ['title', 'excerpt']);
     
-    // Crear mapa de traducciones
-    const translationsMap = new Map(
-      translations?.map(t => [t.post_id, { title: t.translated_title, excerpt: t.translated_excerpt }]) || []
-    );
+    // Crear mapa de traducciones agrupado por post_id
+    const translationsMap = new Map<string, { title?: string; excerpt?: string }>();
+    
+    translations?.forEach(t => {
+      if (!translationsMap.has(t.source_id)) {
+        translationsMap.set(t.source_id, {});
+      }
+      const postTranslations = translationsMap.get(t.source_id)!;
+      if (t.source_field === 'title') {
+        postTranslations.title = t.translated_text;
+      } else if (t.source_field === 'excerpt') {
+        postTranslations.excerpt = t.translated_text;
+      }
+    });
     
     // Aplicar traducciones a los artículos
     return articles.map(article => {
