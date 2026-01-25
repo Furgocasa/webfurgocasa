@@ -315,6 +315,11 @@ export default async function LocationPage({ params }: PageProps) {
                 {t("ALQUILER CAMPER")} {location.name.toUpperCase()}
               </h1>
 
+              {/* H2 - Keyword adicional: "furgonetas camper" */}
+              <h2 className="text-xl lg:text-2xl font-heading font-medium text-gray-700 mb-6">
+                {t("Furgonetas camper de gran volumen en")} {location.name}
+              </h2>
+
               {/* Texto fijo */}
               <p className="text-xl text-gray-600 mb-8">
                 {t("Tu punto de partida perfecto para explorar")} {location.name} {t("en camper")}.
