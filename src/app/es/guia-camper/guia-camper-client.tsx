@@ -3,6 +3,7 @@
 import { LocalizedLink } from "@/components/localized-link";
 import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import Image from "next/image";
 
 export function GuiaCamperClient() {
   const { t } = useLanguage();
@@ -113,6 +114,23 @@ export function GuiaCamperClient() {
                 </div>
               </div>
             </div>
+
+            {/* Imagen del Panel de Control */}
+            <div className="mt-12">
+              <div className="bg-white rounded-3xl p-4 shadow-lg border border-gray-100">
+                <Image
+                  src="/images/funcionamiento/furgocasa_panel_control_baterias_knaus.jpg"
+                  alt="Panel de control de baterías Knaus - Furgocasa"
+                  width={1200}
+                  height={800}
+                  className="rounded-2xl w-full h-auto"
+                  quality={90}
+                />
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  {t("Panel de control donde puedes verificar el estado de las baterías y depósitos de agua")}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -164,6 +182,23 @@ export function GuiaCamperClient() {
                   <li>• {t("La batería auxiliar se carga también mientras conduces y, además, con la placa solar del techo.")}</li>
                   <li>• {t("Usa placas de inducción o conexión a 220v para cargar tus dispositivos más potentes.")}</li>
                 </ul>
+              </div>
+            </div>
+
+            {/* Imagen de Conexión Eléctrica */}
+            <div className="mt-12">
+              <div className="bg-white rounded-3xl p-4 shadow-lg border border-gray-100">
+                <Image
+                  src="/images/funcionamiento/furgocasa_conexion_electricidad_autocaravana.jpg"
+                  alt="Conexión eléctrica de autocaravana - Furgocasa"
+                  width={1200}
+                  height={800}
+                  className="rounded-2xl w-full h-auto"
+                  quality={90}
+                />
+                <p className="text-center text-sm text-gray-500 mt-4">
+                  {t("Conexión a 220v para cargar las baterías auxiliares en áreas de autocaravanas")}
+                </p>
               </div>
             </div>
           </div>
@@ -227,6 +262,23 @@ export function GuiaCamperClient() {
               </ul>
             </div>
           </div>
+
+          {/* Imagen del Panel de Calefacción */}
+          <div className="mt-12 max-w-4xl mx-auto">
+            <div className="bg-white rounded-3xl p-4 shadow-lg border border-gray-100">
+              <Image
+                src="/images/funcionamiento/Furgocasa_panel_control_calefaccion_truma_cp_plus.jpg"
+                alt="Panel de control de calefacción Truma CP Plus - Furgocasa"
+                width={1200}
+                height={800}
+                className="rounded-2xl w-full h-auto"
+                quality={90}
+              />
+              <p className="text-center text-sm text-gray-500 mt-4">
+                {t("Panel digital de control de la calefacción Truma")}
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -283,6 +335,71 @@ export function GuiaCamperClient() {
               <div className="bg-gray-700 p-4 rounded-xl shadow-sm text-xs text-gray-300 border border-gray-600">
                 <strong>{t("Importante:")}</strong> {t("Abrir válvula antes de usar. Cerrar después. Vaciar solo en puntos autorizados.")}
               </div>
+            </div>
+          </div>
+
+          {/* Imágenes de Gestión de Aguas */}
+          <div className="mt-16 grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            {/* Llenado de aguas limpias */}
+            <div className="bg-white rounded-3xl p-4 shadow-lg border border-blue-100">
+              <Image
+                src="/images/funcionamiento/Furgocasa_llenado_deposito_aguas_autocaravana_camper.jpg"
+                alt="Llenado de depósito de aguas limpias - Furgocasa"
+                width={600}
+                height={400}
+                className="rounded-2xl w-full h-auto"
+                quality={85}
+              />
+              <p className="text-center text-sm text-gray-500 mt-3">
+                {t("Punto de llenado del depósito de aguas limpias")}
+              </p>
+            </div>
+
+            {/* Vaciado de aguas grises */}
+            <div className="bg-white rounded-3xl p-4 shadow-lg border border-gray-200">
+              <Image
+                src="/images/funcionamiento/Furgocasa_vaciado_aguas_grises_autocaravana.jpg"
+                alt="Vaciado de aguas grises en área de autocaravanas - Furgocasa"
+                width={600}
+                height={400}
+                className="rounded-2xl w-full h-auto"
+                quality={85}
+              />
+              <p className="text-center text-sm text-gray-500 mt-3">
+                {t("Vaciado de aguas grises en área habilitada")}
+              </p>
+            </div>
+
+            {/* Depósito de aguas negras */}
+            <div className="bg-white rounded-3xl p-4 shadow-lg border border-gray-800">
+              <Image
+                src="/images/funcionamiento/Furgocasa_deposito_aguas_negras_wc_quimico.jpg"
+                alt="Depósito cassette de aguas negras WC químico - Furgocasa"
+                width={600}
+                height={400}
+                className="rounded-2xl w-full h-auto"
+                quality={85}
+              />
+              <p className="text-center text-sm text-gray-500 mt-3">
+                {t("Depósito cassette extraíble para aguas negras")}
+              </p>
+            </div>
+          </div>
+
+          {/* Imagen adicional: Área de autocaravanas */}
+          <div className="mt-16 max-w-5xl mx-auto">
+            <div className="bg-white rounded-3xl p-4 shadow-lg border border-gray-100">
+              <Image
+                src="/images/funcionamiento/Furgocasa_seal_area_autocaravanas.jpg"
+                alt="Área de autocaravanas certificada - Furgocasa"
+                width={1200}
+                height={800}
+                className="rounded-2xl w-full h-auto"
+                quality={90}
+              />
+              <p className="text-center text-sm text-gray-500 mt-4">
+                {t("Busca áreas de autocaravanas certificadas con servicio completo de agua y electricidad")}
+              </p>
             </div>
           </div>
         </div>

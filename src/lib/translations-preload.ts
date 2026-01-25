@@ -8699,6 +8699,50 @@ export const staticTranslations = {
     fr: "Vous pouvez également nous contacter pour toute question concernant votre voyage depuis",
     de: "Sie können uns auch kontaktieren, um Fragen zu Ihrer Reise von zu klären"
   },
+
+  // Guía Camper - Descripciones de imágenes
+  "Panel de control donde puedes verificar el estado de las baterías y depósitos de agua": {
+    es: "Panel de control donde puedes verificar el estado de las baterías y depósitos de agua",
+    en: "Control panel where you can check battery and water tank status",
+    fr: "Panneau de contrôle où vous pouvez vérifier l'état des batteries et des réservoirs d'eau",
+    de: "Kontrollpanel, wo Sie den Batterie- und Wassertankstatus überprüfen können"
+  },
+  "Conexión a 220v para cargar las baterías auxiliares en áreas de autocaravanas": {
+    es: "Conexión a 220v para cargar las baterías auxiliares en áreas de autocaravanas",
+    en: "220v connection to charge auxiliary batteries in motorhome areas",
+    fr: "Connexion 220v pour charger les batteries auxiliaires dans les aires de camping-car",
+    de: "220V-Anschluss zum Laden der Hilfsbatterien in Wohnmobilbereichen"
+  },
+  "Panel digital de control de la calefacción Truma": {
+    es: "Panel digital de control de la calefacción Truma",
+    en: "Digital control panel for Truma heating",
+    fr: "Panneau de contrôle numérique du chauffage Truma",
+    de: "Digitales Bedienfeld für Truma-Heizung"
+  },
+  "Punto de llenado del depósito de aguas limpias": {
+    es: "Punto de llenado del depósito de aguas limpias",
+    en: "Clean water tank filling point",
+    fr: "Point de remplissage du réservoir d'eau propre",
+    de: "Frischwassertank-Füllpunkt"
+  },
+  "Vaciado de aguas grises en área habilitada": {
+    es: "Vaciado de aguas grises en área habilitada",
+    en: "Grey water emptying in authorized area",
+    fr: "Vidange des eaux grises dans une zone autorisée",
+    de: "Grauwasserentsorgung im autorisierten Bereich"
+  },
+  "Depósito cassette extraíble para aguas negras": {
+    es: "Depósito cassette extraíble para aguas negras",
+    en: "Removable cassette tank for black water",
+    fr: "Réservoir cassette amovible pour eaux noires",
+    de: "Abnehmbarer Kassettentank für Schwarzwasser"
+  },
+  "Busca áreas de autocaravanas certificadas con servicio completo de agua y electricidad": {
+    es: "Busca áreas de autocaravanas certificadas con servicio completo de agua y electricidad",
+    en: "Look for certified motorhome areas with full water and electricity service",
+    fr: "Recherchez des aires de camping-car certifiées avec service complet d'eau et d'électricité",
+    de: "Suchen Sie nach zertifizierten Wohnmobilbereichen mit vollständigem Wasser- und Stromservice"
+  },
 };
 
 /**
