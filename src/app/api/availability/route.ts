@@ -194,39 +194,48 @@ export async function GET(request: NextRequest) {
     // TRACKING: Registrar búsqueda en search_queries
     // ============================================
     let searchQueryId: string | null = null;
+    let sessionId: string = request.cookies.get('furgocasa_session_id')?.value || crypto.randomUUID();
     
     try {
-      // Obtener session_id de cookie o generar uno nuevo
-      const sessionId = request.cookies.get('furgocasa_session_id')?.value || crypto.randomUUID();
-      
       // Calcular días de antelación
       const advanceDays = Math.ceil(
         (new Date(pickupDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
       );
       
-      // Obtener IDs reales de ubicaciones (convertir slugs a IDs si es necesario)
-      let pickupLocationId = pickupLocation;
-      let dropoffLocationId = dropoffLocation;
+      // Obtener IDs reales de ubicaciones (convertir slugs a UUIDs si es necesario)
+      let pickupLocationId: string | null = null;
+      let dropoffLocationId: string | null = null;
       
-      // Si las ubicaciones son slugs, obtener sus IDs
-      if (pickupLocation && !pickupLocation.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-        const { data: pickupLoc } = await supabase
-          .from("locations")
-          .select("id")
-          .eq("slug", pickupLocation)
-          .single();
-        pickupLocationId = pickupLoc?.id || null;
+      // Si las ubicaciones son slugs (no UUIDs), obtener sus IDs
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      
+      if (pickupLocation) {
+        if (uuidRegex.test(pickupLocation)) {
+          pickupLocationId = pickupLocation;
+        } else {
+          const { data: pickupLoc } = await supabase
+            .from("locations")
+            .select("id")
+            .eq("slug", pickupLocation)
+            .single();
+          pickupLocationId = pickupLoc?.id || null;
+        }
       }
       
-      if (dropoffLocation && !dropoffLocation.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-        const { data: dropoffLoc } = await supabase
-          .from("locations")
-          .select("id")
-          .eq("slug", dropoffLocation)
-          .single();
-        dropoffLocationId = dropoffLoc?.id || null;
+      if (dropoffLocation) {
+        if (uuidRegex.test(dropoffLocation)) {
+          dropoffLocationId = dropoffLocation;
+        } else {
+          const { data: dropoffLoc } = await supabase
+            .from("locations")
+            .select("id")
+            .eq("slug", dropoffLocation)
+            .single();
+          dropoffLocationId = dropoffLoc?.id || null;
+        }
       }
       
+      // Insertar registro en search_queries
       const { data: searchQuery, error: searchError } = await supabase
         .from("search_queries")
         .insert({
@@ -237,6 +246,8 @@ export async function GET(request: NextRequest) {
           dropoff_time: dropoffTime,
           rental_days: days,
           advance_days: Math.max(0, advanceDays),
+          pickup_location: pickupLocation,
+          dropoff_location: dropoffLocation,
           pickup_location_id: pickupLocationId,
           dropoff_location_id: dropoffLocationId,
           same_location: pickupLocation === dropoffLocation,
@@ -256,6 +267,7 @@ export async function GET(request: NextRequest) {
         searchQueryId = searchQuery.id;
       } else {
         console.error("Error registrando búsqueda:", searchError);
+        // No fallar la búsqueda si falla el tracking
       }
     } catch (trackingError) {
       // No fallar la búsqueda si falla el tracking
@@ -287,7 +299,7 @@ export async function GET(request: NextRequest) {
       totalResults: vehiclesWithPrices?.length || 0,
     });
     
-    // Establecer cookie de sesión si no existe
+    // Establecer cookie de sesión con el sessionId ya generado
     if (!request.cookies.get('furgocasa_session_id')) {
       response.cookies.set('furgocasa_session_id', sessionId, {
         maxAge: 60 * 60 * 24 * 30, // 30 días
