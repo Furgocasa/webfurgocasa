@@ -19,6 +19,9 @@ interface Post {
   id: string;
   title: string;
   slug: string;
+  slug_en?: string | null;
+  slug_fr?: string | null;
+  slug_de?: string | null;
   excerpt: string | null;
   featured_image: string | null;
   published_at: string | null;
@@ -61,6 +64,20 @@ export function BlogListClient({
 
   // Filtrar categorías con artículos
   const categoriesWithPosts = categories.filter(cat => (cat.post_count || 0) > 0);
+
+  // 🌐 Helper para obtener el slug según el idioma
+  const getLocalizedSlug = (post: Post): string => {
+    switch (language) {
+      case 'en':
+        return post.slug_en || post.slug;
+      case 'fr':
+        return post.slug_fr || post.slug;
+      case 'de':
+        return post.slug_de || post.slug;
+      default:
+        return post.slug;
+    }
+  };
 
   // Navegar con parámetros de búsqueda
   const navigateWithParams = (updates: { page?: number; category?: string | null; q?: string | null }) => {
@@ -248,10 +265,11 @@ export function BlogListClient({
               {featuredPosts.map((post) => {
                 const categorySlug = post.category?.slug || 'general';
                 const translatedCategorySlug = translateCategorySlug(categorySlug, language);
+                const localizedSlug = getLocalizedSlug(post);
                 return (
                   <LocalizedLink
                     key={post.id}
-                    href={`/blog/${translatedCategorySlug}/${post.slug}`}
+                    href={`/blog/${translatedCategorySlug}/${localizedSlug}`}
                     className="group bg-gradient-to-br from-white to-blue-50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-furgocasa-orange/30"
                   >
                     <div className="h-56 bg-gray-200 relative overflow-hidden">
@@ -355,10 +373,11 @@ export function BlogListClient({
               {initialPosts.map((post) => {
                 const categorySlug = post.category?.slug || 'general';
                 const translatedCategorySlug = translateCategorySlug(categorySlug, language);
+                const localizedSlug = getLocalizedSlug(post);
                 return (
                   <LocalizedLink
                     key={post.id}
-                    href={`/blog/${translatedCategorySlug}/${post.slug}`}
+                    href={`/blog/${translatedCategorySlug}/${localizedSlug}`}
                     className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                   >
                     <div className="h-48 bg-gray-200 relative overflow-hidden">

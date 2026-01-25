@@ -16,6 +16,9 @@ interface Post {
   id: string;
   title: string;
   slug: string;
+  slug_en?: string | null;
+  slug_fr?: string | null;
+  slug_de?: string | null;
   excerpt: string | null;
   featured_image: string | null;
   published_at: string | null;
@@ -45,6 +48,9 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
       id,
       title,
       slug,
+      slug_en,
+      slug_fr,
+      slug_de,
       excerpt,
       featured_image,
       published_at,
@@ -102,6 +108,9 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
         id,
         title,
         slug,
+        slug_en,
+        slug_fr,
+        slug_de,
         excerpt,
         featured_image,
         published_at,
