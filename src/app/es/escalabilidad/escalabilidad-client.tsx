@@ -325,6 +325,399 @@ export function EscalabilidadClient() {
         </div>
       </section>
 
+      {/* Oportunidad LATAM */}
+      <section className="py-16 bg-gradient-to-br from-amber-50 to-orange-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-3 mb-8">
+              <Globe className="h-8 w-8 text-orange-600" />
+              <h2 className="text-3xl font-heading font-bold text-gray-900">
+                Oportunidad Latinoamérica: Mercado Emergente sin Líder Claro
+              </h2>
+            </div>
+
+            {/* Análisis Competidores */}
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-orange-200 mb-8">
+              <h3 className="font-heading font-bold text-gray-900 text-2xl mb-6">
+                ¿Existen Indie Campers o roadsurfer en Latinoamérica?
+              </h3>
+              
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-purple-50 border-l-4 border-purple-500 p-6 rounded-r-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <ShoppingCart className="h-6 w-6 text-purple-600" />
+                    <h4 className="font-bold text-purple-900 text-lg">Indie Campers</h4>
+                  </div>
+                  <p className="text-purple-800 text-sm leading-relaxed">
+                    Opera en <strong>Europa, Norteamérica y Oceanía</strong>. No muestra LATAM como región 
+                    operativa con bases propias.
+                  </p>
+                </div>
+
+                <div className="bg-green-50 border-l-4 border-green-500 p-6 rounded-r-lg">
+                  <div className="flex items-center gap-3 mb-3">
+                    <MapPin className="h-6 w-6 text-green-600" />
+                    <h4 className="font-bold text-green-900 text-lg">roadsurfer</h4>
+                  </div>
+                  <p className="text-green-800 text-sm leading-relaxed">
+                    Declara alquiler en <strong>Europa y Norteamérica</strong>. Sin presencia en Latinoamérica.
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-green-100 to-blue-100 border-2 border-green-400 p-6 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-8 w-8 text-green-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <p className="text-gray-900 font-bold text-lg mb-2">
+                      ✅ Conclusión Estratégica:
+                    </p>
+                    <p className="text-gray-800 leading-relaxed">
+                      Los grandes "ecosistemas europeos" aún <strong>no están implantados de forma fuerte en LATAM</strong> 
+                      como lo están en Europa. Esto es una <strong>señal excelente</strong> porque significa que 
+                      <strong className="text-green-700"> no llegamos tarde</strong>.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Estado del Mercado */}
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-orange-200 mb-8">
+              <h3 className="font-heading font-bold text-gray-900 text-2xl mb-6">
+                ¿Cómo está el mercado camper en Latinoamérica?
+              </h3>
+
+              <div className="mb-6">
+                <h4 className="font-bold text-orange-900 text-lg mb-3 flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5" />
+                  Mercado Fragmentado y Local
+                </h4>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  En Chile, Argentina, México y Colombia hay oferta, pero está muy repartida entre:
+                </p>
+                
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="flex items-start gap-2 p-4 bg-gray-50 rounded-lg">
+                    <Users className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
+                    <p className="text-sm text-gray-700">
+                      Operadores locales pequeños (buena operación, poca tecnología)
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 p-4 bg-gray-50 rounded-lg">
+                    <Globe className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
+                    <p className="text-sm text-gray-700">
+                      Anuncios y grupos (Facebook Marketplace, grupos de viajeros)
+                    </p>
+                  </div>
+                  <div className="flex items-start gap-2 p-4 bg-gray-50 rounded-lg">
+                    <Building2 className="h-5 w-5 text-blue-600 flex-shrink-0 mt-1" />
+                    <p className="text-sm text-gray-700">
+                      Webs tipo comparador/agregador internacional
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 p-6 rounded-lg">
+                <p className="text-blue-900 font-semibold mb-3">
+                  📌 Lo que significa para nosotros:
+                </p>
+                <p className="text-blue-800 leading-relaxed">
+                  Hay turismo, hay infraestructura, pero <strong>falta una capa especializada "camper" bien montada</strong> 
+                  con comunidad, spots, pagos marketplace, verificación de anfitriones, rutas, etc.
+                </p>
+              </div>
+            </div>
+
+            {/* Potencial por País */}
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-orange-200 mb-8">
+              <h3 className="font-heading font-bold text-gray-900 text-2xl mb-6">
+                Mercado Emergente-Intermedio: Análisis por País
+              </h3>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-4 p-5 bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 rounded-r-xl">
+                  <div className="bg-blue-600 p-2 rounded-lg flex-shrink-0">
+                    <Award className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-blue-900 text-lg mb-2">🇨🇱 Chile - TOP PRIORIDAD</h4>
+                    <p className="text-blue-800 text-sm leading-relaxed">
+                      Muy potente por naturaleza: Patagonia, Carretera Austral, desierto de Atacama. 
+                      Mucha cultura outdoor y roadtrips. <strong>País ideal para pilotar.</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 p-5 bg-gradient-to-r from-green-50 to-green-100 border-l-4 border-green-500 rounded-r-xl">
+                  <div className="bg-green-600 p-2 rounded-lg flex-shrink-0">
+                    <MapPin className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-green-900 text-lg mb-2">🇦🇷 Argentina - SEGUNDA PRIORIDAD</h4>
+                    <p className="text-green-800 text-sm leading-relaxed">
+                      Enorme potencial con Patagonia y rutas infinitas. Logística y distancias más extremas, 
+                      requiere buena UX de planificación.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 p-5 bg-gray-50 border-l-4 border-gray-400 rounded-r-xl">
+                  <div className="bg-gray-600 p-2 rounded-lg flex-shrink-0">
+                    <Globe className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-lg mb-2">🇲🇽 México - ALTO VOLUMEN</h4>
+                    <p className="text-gray-700 text-sm leading-relaxed">
+                      Mercado grande por población y turismo. Requiere control de confianza y soporte por 
+                      fricción en seguridad según zonas.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 p-5 bg-orange-50 border-l-4 border-orange-400 rounded-r-xl">
+                  <div className="bg-orange-600 p-2 rounded-lg flex-shrink-0">
+                    <Target className="h-6 w-6 text-white" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-orange-900 text-lg mb-2">🇵🇪 🇨🇴 Perú / Colombia - CURADO</h4>
+                    <p className="text-orange-800 text-sm leading-relaxed">
+                      Potencial alto para experiencias, pero el "camper mainstream" va más lento. 
+                      Enfoque por rutas puntuales seleccionadas.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Ventaja del Español */}
+            <div className="bg-gradient-to-br from-yellow-50 to-orange-100 border-2 border-yellow-400 p-8 rounded-xl mb-8">
+              <div className="flex items-start gap-4 mb-6">
+                <Rocket className="h-10 w-10 text-yellow-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-heading font-bold text-gray-900 text-2xl mb-3">
+                    La Ventaja del Español: 3 Multiplicadores de Valor
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    El español nos da una ventaja estratégica única que multiplica el impacto de cada inversión en contenido y producto.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <div className="bg-yellow-600 h-12 w-12 rounded-lg flex items-center justify-center mb-4">
+                    <Globe className="h-6 w-6 text-white" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 mb-2">1. Contenido Reutilizable</h4>
+                  <p className="text-sm text-gray-700">
+                    Un mismo contenido sirve para muchos países: SEO, guías, landings, tutoriales, fichas se multiplican.
+                  </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <div className="bg-orange-600 h-12 w-12 rounded-lg flex items-center justify-center mb-4">
+                    <Award className="h-6 w-6 text-white" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 mb-2">2. Vacío de Autoridad</h4>
+                  <p className="text-sm text-gray-700">
+                    Falta "autoridad" en contenidos camper bien hechos. Mucho foro disperso, poca info formal + reserva.
+                  </p>
+                </div>
+
+                <div className="bg-white p-6 rounded-lg shadow-sm">
+                  <div className="bg-red-600 h-12 w-12 rounded-lg flex items-center justify-center mb-4">
+                    <Target className="h-6 w-6 text-white" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 mb-2">3. Marca Paraguas</h4>
+                  <p className="text-sm text-gray-700">
+                    Podemos ser la "marca paraguas" del mundo camper hispano antes que otros lo hagan.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Spots en LATAM */}
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-orange-200 mb-8">
+              <h3 className="font-heading font-bold text-gray-900 text-2xl mb-6">
+                ¿Y "Spots" encaja en LATAM?
+              </h3>
+
+              <div className="bg-green-50 border border-green-200 p-6 rounded-lg mb-6">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <p className="text-green-900 font-semibold mb-2">
+                      ✅ Sí, el concepto puede ser incluso más natural que en Europa
+                    </p>
+                    <p className="text-green-800 leading-relaxed mb-3">
+                      Hay abundancia de: fincas, estancias rurales, viñedos, terrenos grandes, negocios turísticos familiares.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <h4 className="font-bold text-orange-900 text-lg mb-4">
+                  Pero hay que hacerlo con sentido común en 3 puntos clave:
+                </h4>
+
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                    <Shield className="h-6 w-6 text-blue-600 flex-shrink-0 mt-1" />
+                    <div>
+                      <h5 className="font-bold text-blue-900 mb-2">A) Confianza y Seguridad</h5>
+                      <p className="text-blue-800 text-sm">
+                        La gente valora muchísimo: <strong>spot verificado, anfitrión identificado, reseñas reales, 
+                        soporte rápido</strong>. Es crítico para el éxito.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 bg-purple-50 border-l-4 border-purple-500 rounded-r-lg">
+                    <DollarSign className="h-6 w-6 text-purple-600 flex-shrink-0 mt-1" />
+                    <div>
+                      <h5 className="font-bold text-purple-900 mb-2">B) Pagos</h5>
+                      <p className="text-purple-800 text-sm">
+                        El pago con tarjeta y los reembolsos "como Europa" no siempre van finos 
+                        (comisiones, bancos, hábitos). No es un freno, pero condiciona el diseño del MVP.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-3 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg">
+                    <AlertTriangle className="h-6 w-6 text-amber-600 flex-shrink-0 mt-1" />
+                    <div>
+                      <h5 className="font-bold text-amber-900 mb-2">C) Legalidad "Difusa"</h5>
+                      <p className="text-amber-800 text-sm">
+                        La norma y presión municipal es variable. Enfoque: <strong>"Spots seguros y acordados con anfitrión"</strong> 
+                        más que "garantizamos legalidad absoluta" (depende del país/municipio).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Estrategia 2 Capas */}
+            <div className="bg-gradient-to-br from-green-600 to-green-700 text-white p-8 rounded-xl shadow-xl">
+              <div className="flex items-start gap-4 mb-6">
+                <Lightbulb className="h-10 w-10 text-green-200 flex-shrink-0" />
+                <div>
+                  <h3 className="font-heading font-bold text-2xl mb-3">
+                    Estrategia para FURGOCASA en LATAM: 2 Capas Complementarias
+                  </h3>
+                  <p className="text-green-100 leading-relaxed mb-4">
+                    Para no dispersarnos, debemos construir un sistema coherente donde cada capa alimenta a la siguiente.
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-green-400 p-2 rounded-lg">
+                      <MapPin className="h-6 w-6 text-green-900" />
+                    </div>
+                    <h4 className="font-bold text-xl">Capa 1 - MapaFurgoCasa</h4>
+                  </div>
+                  <p className="text-sm text-green-100 mb-3">Gratuita, expansión, autoridad</p>
+                  <ul className="space-y-2 text-sm text-green-50">
+                    <li>• Mapa de áreas</li>
+                    <li>• Puntos de servicio (agua, vaciado, parking)</li>
+                    <li>• Comunidad y reseñas</li>
+                    <li>• SEO internacional</li>
+                  </ul>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm p-6 rounded-lg border border-white/20">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="bg-yellow-400 p-2 rounded-lg">
+                      <DollarSign className="h-6 w-6 text-yellow-900" />
+                    </div>
+                    <h4 className="font-bold text-xl">Capa 2 - FURGOCASA Spots</h4>
+                  </div>
+                  <p className="text-sm text-green-100 mb-3">Monetización</p>
+                  <ul className="space-y-2 text-sm text-green-50">
+                    <li>• Spots privados reservables</li>
+                    <li>• Áreas camper de pago (las buenas)</li>
+                    <li>• Campings seleccionados (complemento)</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-6 bg-green-800 p-5 rounded-lg">
+                <p className="text-lg font-bold mb-2">🎯 La clave estratégica:</p>
+                <p className="text-green-100 leading-relaxed">
+                  No intentar ser "Booking de campings LATAM". <strong>Ser la solución camper completa</strong>: 
+                  contenido + herramientas + reserva.
+                </p>
+              </div>
+            </div>
+
+            {/* Plan de Acción */}
+            <div className="mt-8 bg-white p-8 rounded-xl shadow-lg border-2 border-orange-400">
+              <div className="flex items-center gap-3 mb-6">
+                <Target className="h-8 w-8 text-orange-600" />
+                <h3 className="font-heading font-bold text-gray-900 text-2xl">
+                  Plan de Acción para LATAM
+                </h3>
+              </div>
+
+              <div className="space-y-4 mb-6">
+                <div className="flex items-start gap-3 p-5 bg-blue-50 border-l-4 border-blue-600 rounded-r-lg">
+                  <div className="bg-blue-600 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">
+                    1
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-blue-900 mb-2">Piloto en Chile</h4>
+                    <p className="text-blue-800 text-sm">
+                      País TOP para roadtrips, turismo internacional fuerte, spots privados con gran potencial.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-5 bg-green-50 border-l-4 border-green-600 rounded-r-lg">
+                  <div className="bg-green-600 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">
+                    2
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-green-900 mb-2">Expansión a Argentina</h4>
+                    <p className="text-green-800 text-sm">
+                      Una vez validado Chile, expandir a Argentina aprovechando las sinergias de Patagonia.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-5 bg-purple-50 border-l-4 border-purple-600 rounded-r-lg">
+                  <div className="bg-purple-600 text-white rounded-full h-8 w-8 flex items-center justify-center font-bold flex-shrink-0">
+                    3
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-purple-900 mb-2">Fase 3: Perú / Colombia / México</h4>
+                    <p className="text-purple-800 text-sm">
+                      Expansión selectiva: Perú/Colombia por rutas curadas, México por volumen (con soporte fuerte).
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-400 p-6 rounded-lg">
+                <p className="text-orange-900 font-bold text-lg mb-2">
+                  💡 Resumen en una frase:
+                </p>
+                <p className="text-orange-800 leading-relaxed">
+                  <strong>Latinoamérica es una oportunidad real</strong> porque todavía no tiene un líder claro 
+                  tipo roadsurfer/Indie, y el español permite escalar contenido y marca rápidamente sin partir de cero 
+                  en cada país.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Modelos Digitales Disponibles */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">

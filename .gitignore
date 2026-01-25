@@ -88,3 +88,4 @@ OLD_FURGOCASA_DATOS/orders-raw*.txt
 
 # Archivos internos de estrategia (privados)
 src/app/es/escalabilidad/brainstorming.txt
+src/app/es/escalabilidad/LATAM.txt
