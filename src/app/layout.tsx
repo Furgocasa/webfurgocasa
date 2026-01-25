@@ -171,6 +171,7 @@ export default async function RootLayout({
             <AnalyticsScripts />
             
             {/* Componente para trackear navegación entre páginas */}
+            {/* Nota: GoogleAnalytics ya incluye su propio Suspense internamente */}
             <GoogleAnalytics />
             {/* Debug de Analytics (solo en desarrollo) */}
             <AnalyticsDebug />

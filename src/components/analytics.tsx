@@ -1,7 +1,7 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import { useEffect } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
 
 // ID de Google Analytics
 const GA_MEASUREMENT_ID = 'G-G5YLBN5XXZ';
@@ -14,24 +14,23 @@ function isAdminPath(pathname: string | null): boolean {
   return pathname.startsWith('/administrator') || pathname.startsWith('/admin');
 }
 
-/**
- * Componente de Google Analytics para trackear navegación
- * 
- * El script principal se carga en layout.tsx
- * Este componente solo maneja cambios de ruta
- */
-export function GoogleAnalytics() {
+function GoogleAnalyticsContent() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  // Trackear cambios de ruta
+  // Trackear cambios de ruta y parámetros
   useEffect(() => {
+    const paramsString = searchParams?.toString();
+    const queryString = paramsString ? `?${paramsString}` : '';
+    const fullPath = pathname + queryString;
+
     // No enviar pageviews de páginas de administrador
     if (isAdminPath(pathname)) {
       console.log('[Analytics] Página admin - NO se enviará pageview');
       return;
     }
 
-    // Enviar pageview cuando cambia la ruta
+    // Enviar pageview cuando cambia la ruta o los parámetros
     if (typeof window !== 'undefined' && (window as any).gtag && pathname) {
       // ESTRATEGIA HÍBRIDA ROBUSTA (V3):
       // Combinamos MutationObserver + Polling para garantizar detección del título
@@ -43,10 +42,11 @@ export function GoogleAnalytics() {
         if (sent) return;
         
         const currentTitle = document.title;
-        console.log(`[Analytics] 📡 Enviando (${trigger}) | Path: ${pathname} | Title: "${currentTitle}"`);
+        console.log(`[Analytics] 📡 Enviando (${trigger}) | URL: ${fullPath} | Title: "${currentTitle}"`);
         
         (window as any).gtag('config', GA_MEASUREMENT_ID, {
-          page_path: pathname,
+          page_path: fullPath, // Enviamos path + query string para registrar fbclid y otros params
+          page_location: window.location.href, // Aseguramos URL completa para atribución
           page_title: currentTitle || 'Furgocasa',
         });
         sent = true;
@@ -65,7 +65,6 @@ export function GoogleAnalytics() {
       };
 
       // 1. POLLING INTELIGENTE (Cada 100ms)
-      // Detecta si el título cambia respecto al anterior
       checkInterval = setInterval(() => {
         if (document.title !== oldTitle && document.title.length > 0) {
           sendPageView('polling_change_detected');
@@ -77,8 +76,6 @@ export function GoogleAnalytics() {
       if (titleElement) {
         observer = new MutationObserver(() => {
           if (document.title && document.title.length > 0) {
-            // Si el título es diferente al anterior, enviar ya.
-            // Si es igual, esperar al polling o fallback (evita falsos positivos en carga inicial)
             if (document.title !== oldTitle) {
                sendPageView('mutation_detected');
             }
@@ -88,16 +85,27 @@ export function GoogleAnalytics() {
       }
 
       // 3. FALLBACK FINAL (1.5s)
-      // Si el título no ha cambiado en 1.5s (ej: misma página con params distintos), enviar igual
       fallbackTimer = setTimeout(() => {
         sendPageView('timeout_fallback');
       }, 1500);
 
       return cleanup;
     }
-  }, [pathname]);
+  }, [pathname, searchParams]); // Dependencia añadida: searchParams
 
   return null;
+}
+
+/**
+ * Componente de Google Analytics para trackear navegación
+ * Envuelto en Suspense para compatibilidad con useSearchParams en Next.js App Router
+ */
+export function GoogleAnalytics() {
+  return (
+    <Suspense fallback={null}>
+      <GoogleAnalyticsContent />
+    </Suspense>
+  );
 }
 
 /**
