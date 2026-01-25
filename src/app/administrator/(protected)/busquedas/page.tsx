@@ -193,30 +193,34 @@ export default function SearchAnalyticsPage() {
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Análisis de Búsquedas</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Análisis de Búsquedas</h1>
+          <p className="text-gray-600 mt-1 text-sm lg:text-base">
             Analiza el comportamiento de búsqueda y conversión de usuarios
           </p>
         </div>
 
         {/* Selector de fechas */}
-        <div className="flex gap-3 items-center">
-          <label className="text-sm text-gray-600">Desde:</label>
-          <input
-            type="date"
-            value={dateRange.start}
-            onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-            className="px-3 py-2 border rounded-lg"
-          />
-          <label className="text-sm text-gray-600">Hasta:</label>
-          <input
-            type="date"
-            value={dateRange.end}
-            onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-            className="px-3 py-2 border rounded-lg"
-          />
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center w-full lg:w-auto">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <label className="text-sm text-gray-600 whitespace-nowrap">Desde:</label>
+            <input
+              type="date"
+              value={dateRange.start}
+              onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+              className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm"
+            />
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <label className="text-sm text-gray-600 whitespace-nowrap">Hasta:</label>
+            <input
+              type="date"
+              value={dateRange.end}
+              onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+              className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm"
+            />
+          </div>
         </div>
       </div>
 

@@ -31,7 +31,7 @@ Este archivo SQL definitivo:
 - ✅ **4 políticas RLS** (Row Level Security)
 - ✅ **Función de limpieza** automática de datos antiguos
 
-**Estado actual:** ✅ SQL definitivo creado y listo para ejecutar (commit `da8e0cf`)
+**Estado actual:** ✅ SQL ejecutado en producción - Sistema 100% operativo (commit `c60c2a2`)
 
 ### 2. Verificar instalación
 
@@ -376,6 +376,21 @@ Ideas para futuras versiones:
 
 ## 📝 Changelog
 
+### v1.2.1 (2026-01-25) ⭐ PRODUCCIÓN COMPLETA
+
+- ✅ **Sistema 100% Operativo en Producción**
+  - SQL ejecutado exitosamente en Supabase
+  - Tabla `search_queries` creada con 33 columnas
+  - Tracking funcionando correctamente en `/api/availability`
+  - Dashboard `/administrator/busquedas` accesible con título "Admin - Búsquedas | Furgocasa"
+  - Todas las búsquedas se registran automáticamente
+  - Análisis de demanda vs disponibilidad activo
+- ✅ **Verificación Completa**
+  - Búsquedas en web: ✅ Funcionando
+  - Registro en BD: ✅ OK
+  - Dashboard admin: ✅ OK
+  - Métricas: ✅ OK
+
 ### v1.2.0 (2026-01-25) ⭐ SQL DEFINITIVO
 
 - ✅ **SQL Definitivo Creado** (`supabase/search-queries-DEFINITIVO.sql`)
@@ -394,6 +409,8 @@ Ideas para futuras versiones:
 - ✅ **Fix Bugs Informes** (`/administrator/informes`)
   - Gráfico "Ingresos por mes" ahora muestra correctamente reservas creadas en año seleccionado
   - Filtrado condicional por `created_at` o `pickup_date` según modo
+- ✅ **UX Admin Mejorada**
+  - Título de página descriptivo: "Admin - Búsquedas | Furgocasa"
 
 ### v1.1.0 (2026-01-25) ⭐ NUEVO
 
