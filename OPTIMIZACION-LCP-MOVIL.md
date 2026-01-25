@@ -117,18 +117,40 @@ return (
 
 ## 📁 Archivos Modificados
 
+### Fix #1 (commit ea0f19b - 25 Ene 2026 12:38)
 1. ✅ `/src/app/es/alquiler-autocaravanas-campervans/[location]/page.tsx` (línea 233)
+   - Eliminado: `<link rel="preload" as="image" href={heroImageUrl} />`
+   - Resultado: 87 → 92, LCP: 3.9s → 3.2s
+
+### Fix #2 (este commit - 25 Ene 2026)
+2. ✅ `/src/app/es/alquiler-autocaravanas-campervans/[location]/page.tsx` (línea 247)
+   - Añadido: `decoding="sync"` a la imagen Hero
+   
+3. ✅ `/src/components/analytics-scripts.tsx` (línea 41)
+   - Cambiado: `strategy="beforeInteractive"` → `strategy="afterInteractive"`
 
 ## 🎯 Mejora Esperada
 
-### Antes:
+### Progresión:
+**Antes (v1):**
 - **Móvil:** LCP 3.9s, Score 87/100
-- Descarga: ~1.15MB (imagen original + optimizada)
+- Problemas: Doble descarga + decodificación async + GTM bloqueante
 
-### Después:
-- **Móvil estimado:** LCP ~2.2s, Score ~93-95/100
-- Descarga: ~150KB (solo optimizada)
-- **Ahorro:** ~85% de datos transferidos para el LCP
+**Después Fix #1:**
+- **Móvil:** LCP 3.2s, Score 92/100
+- Resuelto: Doble descarga ✅
+
+**Después Fix #2 (estimado):**
+- **Móvil:** LCP ~2.0s, Score ~95-97/100
+- Resuelto: Decodificación inmediata ✅ + GTM no bloqueante ✅
+
+### Desglose de mejoras:
+| Optimización | Impacto en LCP | Justificación |
+|--------------|----------------|---------------|
+| Eliminar preload duplicado | -0.7s (~18%) | Ahorra ancho de banda 4G |
+| `decoding="sync"` | -0.5s (~15%) | Elimina espera de decodificación |
+| GTM `afterInteractive` | -0.7s (~22%) | Deja al navegador priorizar imagen |
+| **Total estimado** | **-1.9s (~49%)** | **3.9s → 2.0s** |
 
 ### Otras métricas NO afectadas:
 - Desktop: Sigue perfecto (99/100)

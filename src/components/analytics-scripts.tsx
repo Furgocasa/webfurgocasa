@@ -38,7 +38,7 @@ export function AnalyticsScripts() {
       {/* Google Analytics - Consentimiento por defecto denegado (GDPR) */}
       <Script
         id="gtag-consent-default"
-        strategy="beforeInteractive"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];

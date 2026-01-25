@@ -8,53 +8,70 @@ Historial de cambios y versiones del proyecto.
 
 ### 🎯 **OPTIMIZACIÓN DE RENDIMIENTO**
 
-#### Problema: LCP alto en móvil (3.9s) vs Desktop perfecto (0.9s)
+#### Problema: LCP alto en móvil (3.9s → 3.2s → objetivo <2.5s)
 
 **Diagnóstico Google PageSpeed Insights:**
 - 🖥️ Desktop: 99/100 (LCP: 0.9s) ✅
-- 📱 Móvil: 87/100 (LCP: 3.9s) ⚠️
+- 📱 Móvil inicial: 87/100 (LCP: 3.9s) ⚠️
+- 📱 Móvil después fix 1: 92/100 (LCP: 3.2s) ⚙️
 - 🧪 GTmetrix: A (98%, LCP: 899ms) ✅
 
-**Causa raíz**: Doble descarga de imagen Hero en páginas de localización.
+**Causas identificadas:**
+1. Doble descarga de imagen Hero (✅ RESUELTO)
+2. Decodificación asíncrona de imagen Hero (🔧 FIX)
+3. Script GTM bloqueante antes de contenido (🔧 FIX)
 
 ---
 
 ### 🔍 **Análisis Técnico**
 
-El archivo `/src/app/es/alquiler-autocaravanas-campervans/[location]/page.tsx` tenía:
+**Fix #1 (commit ea0f19b):**
+- Eliminado preload manual duplicado
+- Mejora: 87 → 92 (+5pts), LCP: 3.9s → 3.2s (-18%)
 
-1. **Preload manual** → Descargaba imagen original de Supabase (~1MB JPG)
-2. **Next.js Image con `priority`** → Genera automáticamente preload optimizado (~150KB WebP/AVIF)
-
-**Resultado**: Móvil descargaba AMBAS imágenes en paralelo, saturando 4G lento.
-
----
-
-### ✅ **Solución Implementada**
-
-**Acción**: Eliminar `<link rel="preload" as="image" href={heroImageUrl} />` manual.
-
-**Por qué funciona**:
-- Next.js Image con `priority={true}` ya genera el preload automáticamente
-- La versión optimizada es ~85% más liviana y del tamaño correcto para móvil
+**Fix #2 (este commit):**
+- Añadido `decoding="sync"` a imagen Hero
+- Cambiado GTM script de `beforeInteractive` → `afterInteractive`
+- Objetivo: Reducir "Retraso de renderizado" (490ms) y "Retraso de carga" (1.49s)
 
 ---
 
-### 📊 **Mejora Esperada**
+### ✅ **Soluciones Implementadas**
 
-| Métrica | Antes | Después Estimado | Mejora |
-|---------|-------|------------------|--------|
-| **LCP Móvil** | 3.9s | ~2.2s | ⬇️ 44% |
-| **Score Móvil** | 87/100 | ~93-95/100 | ⬆️ +6-8pts |
-| **Datos LCP** | ~1.15MB | ~150KB | ⬇️ 85% |
-| **Desktop** | 99/100 | 99/100 | Sin cambios ✅ |
+**1. Decodificación síncrona de imagen Hero**
+```tsx
+<Image
+  decoding="sync"  // Fuerza pintado inmediato (era "async")
+  priority
+  fetchPriority="high"
+/>
+```
+
+**2. Carga diferida de GTM**
+```tsx
+<Script
+  strategy="afterInteractive"  // Era "beforeInteractive"
+/>
+```
+
+---
+
+### 📊 **Mejora Esperada Total**
+
+| Métrica | Antes (v1) | Después Fix #1 | Después Fix #2 (estimado) | Mejora Total |
+|---------|------------|----------------|---------------------------|--------------|
+| **LCP Móvil** | 3.9s | 3.2s | ~2.0s | ⬇️ 49% |
+| **Score Móvil** | 87/100 | 92/100 | ~95-97/100 | ⬆️ +8-10pts |
+| **FCP Móvil** | 1.5s | 1.2s | ~0.9s | ⬇️ 40% |
+| **Desktop** | 99/100 | 99/100 | 99/100 | Sin cambios ✅ |
 
 ---
 
 ### 📁 **ARCHIVOS MODIFICADOS**
 
-- ✅ `/src/app/es/alquiler-autocaravanas-campervans/[location]/page.tsx` (línea 233)
-- ✅ `/OPTIMIZACION-LCP-MOVIL.md` (nueva documentación completa)
+- ✅ `/src/app/es/alquiler-autocaravanas-campervans/[location]/page.tsx` (línea 247: decoding)
+- ✅ `/src/components/analytics-scripts.tsx` (línea 41: strategy)
+- ✅ `/OPTIMIZACION-LCP-MOVIL.md` (documentación actualizada)
 
 ---
 

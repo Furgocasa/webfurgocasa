@@ -244,6 +244,7 @@ export default async function LocationPage({ params }: PageProps) {
             fill
             priority
             fetchPriority="high"
+            decoding="sync"
             quality={50}
             sizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1920px"
             className="object-cover"
