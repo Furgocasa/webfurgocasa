@@ -47,6 +47,8 @@ Páginas estáticas especiales para viajeros internacionales que buscan alquilar
 /es/blog/noticias/visitas-espana-o-la-ue-desde-america-latina-alquila-tu-mortohome-con-un-15-de-descuento
 ```
 
+⚠️ **IMPORTANTE:** Esta sección de descuento **SOLO EXISTE EN LA PÁGINA ESPAÑOLA**. Las páginas EN/FR/DE **NO tienen descuento** porque es exclusivo para LATAM.
+
 ---
 
 ### 🇬🇧 Página Inglesa (Angloparlantes)
@@ -54,12 +56,6 @@ Páginas estáticas especiales para viajeros internacionales que buscan alquilar
 **Badge Hero:**
 ```
 For travelers from Australia, USA, UK, Canada...
-```
-
-**Sección Descuento:**
-```
-🌍 Special -15% Discount 🌍
-Traveling internationally?
 ```
 
 **Países destacados:**
@@ -72,6 +68,8 @@ Traveling internationally?
 - 🇯🇵 Japan
 - 🇰🇷 South Korea
 
+⚠️ **NO tiene sección de descuento** (exclusivo LATAM)
+
 ---
 
 ### 🇫🇷 Página Francesa (Francoparlantes)
@@ -81,17 +79,13 @@ Traveling internationally?
 Pour voyageurs de Belgique, Suisse, Canada, Afrique...
 ```
 
-**Sección Descuento:**
-```
-🌍 Réduction Spéciale -15% 🌍
-Vous voyagez depuis l'étranger?
-```
-
 **Países destacados:**
 - 🇧🇪 Belgique
 - 🇨🇭 Suisse
 - 🇨🇦 Canada
 - Afrique francophone
+
+⚠️ **NO tiene sección de descuento** (exclusivo LATAM)
 
 ---
 
@@ -102,16 +96,12 @@ Vous voyagez depuis l'étranger?
 Für Reisende aus Deutschland, Österreich, Schweiz...
 ```
 
-**Sección Descuento:**
-```
-🌍 Sonderrabatt -15% 🌍
-Reisen Sie international?
-```
-
 **Países destacados:**
 - 🇩🇪 Deutschland
 - 🇦🇹 Österreich
 - 🇨🇭 Schweiz
+
+⚠️ **NO tiene sección de descuento** (exclusivo LATAM)
 
 ## 📊 Estructura de Contenido
 
@@ -123,12 +113,20 @@ Cada página incluye:
 - Subtítulo: "Your home on wheels to explore Europe"
 - SearchWidget para buscar vehículos
 
-### 2. Sección de Descuento (-15%)
-- Título diferenciado por audiencia
-- Países específicos con banderas
+### 2. Sección de Descuento (-15%) ⚠️ **SOLO PÁGINA ES (LATAM)**
+
+**IMPORTANTE:** El descuento es **exclusivo para viajeros LATAM**. Las páginas EN, FR, DE **NO tienen esta sección**.
+
+**Solo en página española:**
+- Título: "🌎 Descuento Especial LATAM 🌎"
+- Subtítulo: "¿Venís desde Latinoamérica?"
+- Países destacados con banderas (Argentina, México, Chile, Colombia, Brasil, Perú, Uruguay, Venezuela)
 - Ejemplos de ahorro (21 días: €285, 14 días: €210)
-- Botón WhatsApp con texto traducido
-- **Solo ES**: Link al artículo de blog LATAM
+- Botón link al artículo de blog específico LATAM
+- Botón WhatsApp con texto preformateado
+- Nota: Válido para alquileres 14+ días en temporada baja/media
+
+**Páginas EN/FR/DE:** Esta sección **NO EXISTE** - van directo de "Ventajas" a "Flota de Vehículos"
 
 ### 3. Ventajas del Servicio
 - ✅ Kilometraje Ilimitado
@@ -409,14 +407,17 @@ Editar directamente cada página:
 
 ### Actualizar Descuento
 
-**Solo página ES** tiene link al artículo de blog:
+**⚠️ IMPORTANTE:** El descuento es **exclusivo para LATAM** (página ES).
+
+**Solo en página ES:**
 ```tsx
+// src/app/es/alquiler-motorhome-europa-desde-espana/page.tsx
 <LocalizedLink href="/blog/noticias/visitas-espana-o-la-ue-desde-america-latina-alquila-tu-mortohome-con-un-15-de-descuento">
   Leer más sobre el descuento LATAM
 </LocalizedLink>
 ```
 
-**Páginas EN/FR/DE** solo muestran info del descuento sin link específico.
+**Páginas EN/FR/DE:** NO tienen sección de descuento. Si se necesita añadir, debe ser un descuento diferente (no LATAM).
 
 ## 📊 Métricas Esperadas
 
@@ -434,10 +435,11 @@ Editar directamente cada página:
 
 ## ✅ Checklist de Implementación
 
-- [x] Página ES creada y diferenciada (LATAM)
-- [x] Página EN creada y diferenciada (Angloparlantes)
-- [x] Página FR creada y diferenciada (Francoparlantes)
-- [x] Página DE creada y diferenciada (Germanoparlantes)
+- [x] Página ES creada y diferenciada (LATAM + Descuento -15%)
+- [x] Página EN creada y diferenciada (Angloparlantes, SIN descuento)
+- [x] Página FR creada y diferenciada (Francoparlantes, SIN descuento)
+- [x] Página DE creada y diferenciada (Germanoparlantes, SIN descuento)
+- [x] ⚠️ Descuento EXCLUSIVO para página ES (LATAM)
 - [x] Metadata SEO optimizada (sin LATAM en EN/FR/DE)
 - [x] Canonical URLs correctas
 - [x] Hreflang alternates configurados
