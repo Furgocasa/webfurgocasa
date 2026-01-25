@@ -2425,14 +2425,14 @@ export const staticTranslations = {
   "¿Buscas alquilar al mejor precio?": {
     es: "¿Buscas alquilar al mejor precio?",
     en: "Looking to rent at the best price?",
-    fr: "Looking to rent at the best price?",
-    de: "Looking to rent at the best price?"
+    fr: "Vous cherchez à louer au meilleur prix ?",
+    de: "Möchtest du zum besten Preis mieten?"
   },
   "Consulta nuestras OFERTAS": {
     es: "Consulta nuestras OFERTAS",
     en: "Check our OFFERS",
-    fr: "Check our OFFERS",
-    de: "Check our OFFERS"
+    fr: "Consultez nos OFFRES",
+    de: "Sehen Sie unsere ANGEBOTE"
   },
   "Alquiler de furgonetas camper baratas": {
     es: "Alquiler de furgonetas camper baratas",
@@ -8768,6 +8768,44 @@ export const staticTranslations = {
     en: "Open Mapa Furgocasa",
     fr: "Ouvrir Mapa Furgocasa",
     de: "Mapa Furgocasa öffnen"
+  },
+  
+  // Página de vehículos
+  "Nuestra Flota de Campers": {
+    es: "Nuestra Flota de Campers",
+    en: "Our Camper Fleet",
+    fr: "Notre Flotte de Camping-Cars",
+    de: "Unsere Camper-Flotte"
+  },
+  "Autocaravanas y campers de gran volumen, perfectas para tu aventura": {
+    es: "Autocaravanas y campers de gran volumen, perfectas para tu aventura",
+    en: "Large motorhomes and campers, perfect for your adventure",
+    fr: "Camping-cars et vans aménagés spacieux, parfaits pour votre aventure",
+    de: "Großvolumige Wohnmobile und Camper, perfekt für Ihr Abenteuer"
+  },
+  "con kilómetros ilimitados": {
+    es: "con kilómetros ilimitados",
+    en: "with unlimited mileage",
+    fr: "avec kilomètres illimités",
+    de: "mit unbegrenzten Kilometern"
+  },
+  "¿No encuentras lo que buscas?": {
+    es: "¿No encuentras lo que buscas?",
+    en: "Can't find what you're looking for?",
+    fr: "Vous ne trouvez pas ce que vous cherchez ?",
+    de: "Finden Sie nicht, was Sie suchen?"
+  },
+  "Contáctanos y te ayudaremos a encontrar la autocaravana perfecta para tu viaje": {
+    es: "Contáctanos y te ayudaremos a encontrar la autocaravana perfecta para tu viaje",
+    en: "Contact us and we'll help you find the perfect motorhome for your trip",
+    fr: "Contactez-nous et nous vous aiderons à trouver le camping-car parfait pour votre voyage",
+    de: "Kontaktieren Sie uns und wir helfen Ihnen, das perfekte Wohnmobil für Ihre Reise zu finden"
+  },
+  "Contactar con nosotros": {
+    es: "Contactar con nosotros",
+    en: "Contact us",
+    fr: "Nous contacter",
+    de: "Kontaktieren Sie uns"
   },
 };
 

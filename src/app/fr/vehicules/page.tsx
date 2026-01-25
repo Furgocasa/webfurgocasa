@@ -131,8 +131,12 @@ export const revalidate = 3600;
 
 // ✅ SERVER COMPONENT
 export default async function VehiculosPage() {
-  // Función de traducción del servidor
-  const t = (key: string) => translateServer(key, 'es');
+  // Obtener el locale actual desde el header
+  const headersList = await headers();
+  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  
+  // Función de traducción del servidor con locale correcto
+  const t = (key: string) => translateServer(key, locale);
   
   // Cargar todos los vehículos en el servidor
   const vehicles = await loadVehicles();
