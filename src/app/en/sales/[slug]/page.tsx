@@ -201,7 +201,7 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
               </a>
             </div>
             <a
-              href={`https://wa.me/34868364161?text=Hola, me interesa el ${vehicle.name}`}
+              href={`https://wa.me/34673414053?text=Hola, me interesa el ${vehicle.name}`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2 bg-green-500 text-white font-semibold py-2.5 rounded-lg text-sm"
@@ -399,7 +399,7 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
                     Llamar ahora
                   </a>
                   <a
-                    href={`https://wa.me/34868364161?text=Hola, me interesa el ${vehicle.name}`}
+                    href={`https://wa.me/34673414053?text=Hola, me interesa el ${vehicle.name}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 bg-green-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors"

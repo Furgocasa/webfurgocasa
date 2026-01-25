@@ -227,7 +227,7 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
             </div>
             
             <a
-              href="https://wa.me/34868364161?text=Hola!%20Soy%20de%20[TU%20PAÍS]%20y%20quiero%20consultar%20por%20el%20descuento%20especial%20LATAM"
+              href="https://wa.me/34673414053?text=Hola!%20Soy%20de%20[TU%20PAÍS]%20y%20quiero%20consultar%20por%20el%20descuento%20especial%20LATAM"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white text-furgocasa-orange font-bold px-8 py-4 rounded-xl hover:bg-orange-50 transition-all shadow-lg text-lg"
@@ -442,7 +442,7 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
               Contanos cuántos días tenés y qué querés ver. Te sugerimos la mejor ruta.
             </p>
             <a
-              href="https://wa.me/34868364161?text=Hola!%20Soy%20de%20LATAM%20y%20quiero%20que%20me%20ayuden%20a%20armar%20una%20ruta%20por%20Europa"
+              href="https://wa.me/34673414053?text=Hola!%20Soy%20de%20LATAM%20y%20quiero%20que%20me%20ayuden%20a%20armar%20una%20ruta%20por%20Europa"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition-all"
@@ -571,7 +571,7 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
               ¡Reservá ahora! →
             </LocalizedLink>
             <a
-              href="https://wa.me/34868364161?text=Hola!%20Vengo%20desde%20LATAM%20y%20quiero%20alquilar%20un%20motorhome%20para%20recorrer%20Europa"
+              href="https://wa.me/34673414053?text=Hola!%20Vengo%20desde%20LATAM%20y%20quiero%20alquilar%20un%20motorhome%20para%20recorrer%20Europa"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all shadow-lg text-lg"

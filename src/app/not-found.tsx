@@ -301,7 +301,7 @@ export default function NotFound() {
                 Contactar
               </Link>
               <a
-                href="https://wa.me/34868364161"
+                href="https://wa.me/34673414053"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-green-500 text-white font-bold px-6 py-3 rounded-xl hover:bg-green-600 transition-all"
