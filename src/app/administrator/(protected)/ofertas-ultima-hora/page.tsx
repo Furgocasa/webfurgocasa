@@ -79,6 +79,11 @@ interface Location {
 }
 
 export default function OfertasUltimaHoraPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Ofertas | Furgocasa";
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const [detecting, setDetecting] = useState(false);
   const [detectedGaps, setDetectedGaps] = useState<DetectedGap[]>([]);

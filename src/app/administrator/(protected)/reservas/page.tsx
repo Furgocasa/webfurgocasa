@@ -82,6 +82,11 @@ const SORT_FIELD_KEY = 'bookings_sort_field';
 const SORT_DIRECTION_KEY = 'bookings_sort_direction';
 
 export default function BookingsPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Reservas | Furgocasa";
+  }, []);
+
   // Estados para búsqueda y filtros
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");

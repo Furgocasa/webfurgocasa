@@ -39,6 +39,11 @@ interface FolderItem {
 }
 
 export default function MediaPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Media | Furgocasa";
+  }, []);
+
   const [bucket, setBucket] = useState<BucketType>("vehicles");
   const [currentPath, setCurrentPath] = useState("");
   const [folders, setFolders] = useState<FolderItem[]>([]);

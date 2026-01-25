@@ -80,6 +80,11 @@ function generateSlug(name: string): string {
 }
 
 export default function EquipamientoPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Equipamiento | Furgocasa";
+  }, []);
+
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);

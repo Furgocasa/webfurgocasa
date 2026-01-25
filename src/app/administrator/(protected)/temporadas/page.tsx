@@ -42,6 +42,11 @@ const getTipoTemporada = (season: Season) => {
 };
 
 export default function TemporadasAdmin() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Temporadas | Furgocasa";
+  }, []);
+
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 

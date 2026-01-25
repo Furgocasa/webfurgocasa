@@ -30,6 +30,11 @@ interface Location {
 }
 
 export default function UbicacionesPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Ubicaciones | Furgocasa";
+  }, []);
+
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);

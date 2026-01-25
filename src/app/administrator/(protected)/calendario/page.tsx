@@ -78,6 +78,11 @@ interface Booking {
 }
 
 export default function CalendarioPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Calendario | Furgocasa";
+  }, []);
+
   const router = useRouter();
   const [startDate, setStartDate] = useState(new Date());
   const [monthsToShow, setMonthsToShow] = useState(3); // Por defecto 3 meses

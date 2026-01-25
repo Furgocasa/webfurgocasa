@@ -13,6 +13,11 @@ import {
 import Link from "next/link";
 import { getDashboardStats, getAllBookings } from "@/lib/supabase/queries";
 import { formatPrice } from "@/lib/utils";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin - Dashboard | Furgocasa",
+};
 
 export default async function AdminDashboard() {
   const stats = await getDashboardStats();

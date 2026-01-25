@@ -3,7 +3,7 @@
 // ✅ Forzar renderizado dinámico (no pre-renderizar en build)
 export const dynamic = 'force-dynamic';
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { 
@@ -50,6 +50,11 @@ const statusConfig: Record<string, { icon: typeof CheckCircle; bg: string; text:
 };
 
 export default function BlogPostsPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Blog | Furgocasa";
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');

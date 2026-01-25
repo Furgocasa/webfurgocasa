@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Search, Download, Eye, CreditCard, CheckCircle, Clock, XCircle, AlertCircle, Loader2 } from "lucide-react";
 import { usePaginatedData } from "@/hooks/use-paginated-data";
@@ -53,6 +53,11 @@ function formatDateTime(date: string): string {
 }
 
 export default function PagosPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Pagos | Furgocasa";
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [methodFilter, setMethodFilter] = useState("");

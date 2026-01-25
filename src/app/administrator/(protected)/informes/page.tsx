@@ -1,5 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import InformesClient from "./informes-client";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Admin - Informes | Furgocasa",
+};
 
 async function getInformesData() {
   const supabase = await createClient();

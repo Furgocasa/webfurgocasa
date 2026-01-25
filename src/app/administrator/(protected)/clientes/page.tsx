@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2, RefreshCw } from "lucide-react";
 import { useAllDataCached } from "@/hooks/use-all-data-cached";
@@ -31,6 +31,11 @@ function formatDate(date: string | null): string {
 }
 
 export default function ClientesPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Clientes | Furgocasa";
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
 

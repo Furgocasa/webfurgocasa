@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { Plus, Search, Car, Tag, Home, ArrowUpDown, ArrowUp, ArrowDown, Package, Loader2, RefreshCw } from "lucide-react";
 import { useAllDataCached } from "@/hooks/use-all-data-cached";
@@ -59,6 +59,11 @@ const saleStatusColors: Record<string, { bg: string; text: string; label: string
 };
 
 export default function VehiclesPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Vehículos | Furgocasa";
+  }, []);
+
   // Filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');

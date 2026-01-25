@@ -27,6 +27,11 @@ interface Coupon {
 }
 
 export default function CuponesPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Cupones | Furgocasa";
+  }, []);
+
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);

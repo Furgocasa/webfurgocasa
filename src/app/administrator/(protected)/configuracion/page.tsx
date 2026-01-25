@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Settings, Save, Globe, Mail, Phone, MapPin, CreditCard } from "lucide-react";
 
 export default function ConfiguracionPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Configuración | Furgocasa";
+  }, []);
+
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 

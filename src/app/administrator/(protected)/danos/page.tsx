@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { 
   Search, 
@@ -56,6 +56,11 @@ const statusColors: Record<string, { bg: string; text: string; label: string }> 
 };
 
 export default function DamagesPage() {
+  // Establecer título de la página
+  useEffect(() => {
+    document.title = "Admin - Daños | Furgocasa";
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
