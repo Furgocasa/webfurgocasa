@@ -120,6 +120,7 @@ export async function middleware(request: NextRequest) {
   const skipLocaleFor = [
     '/_next/',
     '/images/',
+    '/vehicle-views/',
     '/favicon',
     '/sw.js',
     '/sw-admin.js',
@@ -192,6 +193,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/api/:path*',
-    '/((?!_next|favicon\\.ico|images|sw\\.js|robots\\.txt|sitemap\\.xml|socket\\.io|__nextjs|webpack-hmr).*)',
+    '/((?!_next|favicon\\.ico|images|vehicle-views|sw\\.js|robots\\.txt|sitemap\\.xml|socket\\.io|__nextjs|webpack-hmr).*)',
   ],
 };
