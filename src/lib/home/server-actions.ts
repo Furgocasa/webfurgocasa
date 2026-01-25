@@ -135,6 +135,33 @@ export const getRoutesArticles = cache(async (limit: number = 4, locale: Locale 
 
   if (!articles) return [];
 
+  // Si no es español, obtener traducciones desde content_translations
+  if (locale !== 'es' && articles.length > 0) {
+    const postIds = articles.map(a => a.id);
+    
+    const { data: translations } = await supabase
+      .from('content_translations')
+      .select('post_id, language, translated_title, translated_excerpt')
+      .in('post_id', postIds)
+      .eq('language', locale);
+    
+    // Crear mapa de traducciones
+    const translationsMap = new Map(
+      translations?.map(t => [t.post_id, { title: t.translated_title, excerpt: t.translated_excerpt }]) || []
+    );
+    
+    // Aplicar traducciones a los artículos
+    return articles.map(article => {
+      const translation = translationsMap.get(article.id);
+      return {
+        ...article,
+        title: translation?.title || article.title,
+        excerpt: translation?.excerpt || article.excerpt,
+        category: Array.isArray(article.category) ? article.category[0] : article.category
+      };
+    });
+  }
+
   return articles.map(article => ({
     ...article,
     category: Array.isArray(article.category) ? article.category[0] : article.category
