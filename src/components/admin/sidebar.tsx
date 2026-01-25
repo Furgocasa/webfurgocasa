@@ -26,6 +26,7 @@ import {
   AlertTriangle,
   Tag,
   Clock,
+  Search,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
 import type { Admin } from "@/types/blog";
@@ -51,6 +52,7 @@ const navigation: NavItem[] = [
   { name: "Temporadas", href: "/administrator/temporadas", icon: Sun },
   { name: "Cupones", href: "/administrator/cupones", icon: Tag },
   { name: "Última Hora", href: "/administrator/ofertas-ultima-hora", icon: Clock },
+  { name: "Búsquedas", href: "/administrator/busquedas", icon: Search },
   {
     name: "Blog",
     href: "/administrator/blog",

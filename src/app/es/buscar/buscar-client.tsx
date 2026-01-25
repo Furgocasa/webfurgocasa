@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo, Suspense } from "react";
+import { useState, useMemo, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { VehicleCard } from "@/components/booking/vehicle-card";
 import { SearchSummary } from "@/components/booking/search-summary";
 import { Loader2, Car, AlertCircle, Filter, X } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { setSearchQueryId } from "@/lib/search-tracking/session";
 
 function LoadingState() {
   return (
@@ -43,6 +44,13 @@ function SearchResultsContent() {
     queryFn: () => fetchAvailability(searchParams),
     enabled: !!searchParams.get("pickup_date") && !!searchParams.get("dropoff_date"),
   });
+
+  // Guardar searchQueryId en sessionStorage cuando llega la respuesta
+  useEffect(() => {
+    if (data?.searchQueryId) {
+      setSearchQueryId(data.searchQueryId);
+    }
+  }, [data?.searchQueryId]);
 
   const filteredVehicles = useMemo(() => {
     if (!data?.vehicles) return [];
@@ -144,6 +152,7 @@ function SearchResultsContent() {
             vehicle={vehicle}
             pricing={vehicle.pricing}
             searchParams={vehicleSearchParams}
+            searchQueryId={data?.searchQueryId}
           />
         ))}
       </div>

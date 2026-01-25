@@ -15,6 +15,8 @@ import { formatPrice } from "@/lib/utils";
 import type { VehicleWithImages } from "@/types/database";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { useLanguage } from "@/contexts/language-context";
+import { useRouter } from "next/navigation";
+import { getSearchQueryId } from "@/lib/search-tracking/session";
 
 interface VehicleCardProps {
   vehicle: VehicleWithImages;
@@ -40,10 +42,12 @@ interface VehicleCardProps {
     pickup_location: string;
     dropoff_location: string;
   };
+  searchQueryId?: string;
 }
 
-export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps) {
+export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: VehicleCardProps) {
   const { t, language } = useLanguage();
+  const router = useRouter();
   
   // Construir parámetros para ver detalle del vehículo y seleccionar extras
   const bookingParams = new URLSearchParams({
@@ -72,10 +76,41 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
   const imageUrl = mainImage?.image_url || mainImage?.url;
   const imageAlt = mainImage?.alt_text || mainImage?.alt || vehicle.name;
 
+  // Handler para tracking de selección de vehículo
+  const handleVehicleClick = async (e: React.MouseEvent) => {
+    // Obtener el searchQueryId desde sessionStorage o desde props
+    const queryId = searchQueryId || getSearchQueryId();
+    
+    if (queryId) {
+      try {
+        // No bloquear la navegación mientras se hace el tracking
+        fetch('/api/search-tracking', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            search_query_id: queryId,
+            action: 'vehicle_selected',
+            vehicle_id: vehicle.id,
+            vehicle_price: pricing.totalPrice
+          }),
+          keepalive: true, // Asegura que la petición se complete aunque se navegue
+        }).catch(err => console.error('Error tracking vehicle selection:', err));
+      } catch (error) {
+        console.error('Error en tracking:', error);
+      }
+    }
+    
+    // Continuar con navegación normal
+    router.push(reservationUrl);
+  };
+
   return (
     <div className="card-vehicle group">
-      {/* Image - Clicable */}
-      <LocalizedLink href={reservationUrl} className="relative h-48 bg-gray-200 overflow-hidden block">
+      {/* Image - Clicable con tracking */}
+      <div 
+        onClick={handleVehicleClick}
+        className="relative h-48 bg-gray-200 overflow-hidden cursor-pointer"
+      >
         {imageUrl ? (
           <Image
             src={imageUrl}
@@ -96,14 +131,17 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
             {vehicle.category.name}
           </span>
         )}
-      </LocalizedLink>
+      </div>
 
       {/* Content */}
       <div className="p-5">
-        {/* Title - Clicable */}
-        <LocalizedLink href={reservationUrl}>
-          <h3 className="text-xl font-bold text-gray-900 mb-2 hover:text-furgocasa-orange transition-colors cursor-pointer">{vehicle.name}</h3>
-        </LocalizedLink>
+        {/* Title - Clicable con tracking */}
+        <h3 
+          onClick={handleVehicleClick}
+          className="text-xl font-bold text-gray-900 mb-2 hover:text-furgocasa-orange transition-colors cursor-pointer"
+        >
+          {vehicle.name}
+        </h3>
 
         {/* Short description */}
         {vehicle.short_description && (
@@ -190,13 +228,13 @@ export function VehicleCard({ vehicle, pricing, searchParams }: VehicleCardProps
               </p>
             </div>
 
-            <LocalizedLink
-              href={reservationUrl}
+            <button
+              onClick={handleVehicleClick}
               className="flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-semibold py-2 px-4 rounded-lg transition-colors"
             >
               {t("Reservar")}
               <ArrowRight className="h-4 w-4" />
-            </LocalizedLink>
+            </button>
           </div>
           
           {/* Info sobre descuentos disponibles - SIEMPRE VISIBLE */}

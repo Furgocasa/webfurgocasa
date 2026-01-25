@@ -158,6 +158,45 @@ export async function POST(request: Request) {
         });
     }
 
+    // ============================================
+    // TRACKING: Actualizar conversión en search_queries
+    // ============================================
+    try {
+      // Intentar obtener el search_query_id desde cookie o header
+      const sessionId = request.headers.get('cookie')
+        ?.split(';')
+        .find(c => c.trim().startsWith('furgocasa_session_id='))
+        ?.split('=')[1];
+      
+      if (sessionId) {
+        // Buscar la búsqueda más reciente de esta sesión que seleccionó este vehículo
+        const { data: searchQuery } = await supabase
+          .from("search_queries")
+          .select("id")
+          .eq("session_id", sessionId)
+          .eq("selected_vehicle_id", booking.vehicle_id)
+          .eq("booking_created", false)
+          .order("searched_at", { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (searchQuery) {
+          await supabase
+            .from("search_queries")
+            .update({
+              booking_created: true,
+              booking_id: createdBooking.id,
+              booking_created_at: new Date().toISOString(),
+              funnel_stage: "booking_created",
+            })
+            .eq("id", searchQuery.id);
+        }
+      }
+    } catch (trackingError) {
+      // No fallar la creación de reserva si falla el tracking
+      console.error("Error actualizando tracking de conversión:", trackingError);
+    }
+
     return NextResponse.json({ booking: createdBooking }, { status: 201 });
   } catch (error: any) {
     console.error("Error in bookings API:", error);

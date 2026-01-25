@@ -8,6 +8,7 @@ import {
   calculateDurationDiscount,
   Season 
 } from "@/lib/utils";
+import { detectDeviceType } from "@/lib/search-tracking/session";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -189,8 +190,81 @@ export async function GET(request: NextRequest) {
     // Obtener los días mínimos de la temporada dominante (viene del cálculo)
     const minDays = priceResult.minDays;
 
+    // ============================================
+    // TRACKING: Registrar búsqueda en search_queries
+    // ============================================
+    let searchQueryId: string | null = null;
+    
+    try {
+      // Obtener session_id de cookie o generar uno nuevo
+      const sessionId = request.cookies.get('furgocasa_session_id')?.value || crypto.randomUUID();
+      
+      // Calcular días de antelación
+      const advanceDays = Math.ceil(
+        (new Date(pickupDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+      );
+      
+      // Obtener IDs reales de ubicaciones (convertir slugs a IDs si es necesario)
+      let pickupLocationId = pickupLocation;
+      let dropoffLocationId = dropoffLocation;
+      
+      // Si las ubicaciones son slugs, obtener sus IDs
+      if (pickupLocation && !pickupLocation.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        const { data: pickupLoc } = await supabase
+          .from("locations")
+          .select("id")
+          .eq("slug", pickupLocation)
+          .single();
+        pickupLocationId = pickupLoc?.id || null;
+      }
+      
+      if (dropoffLocation && !dropoffLocation.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+        const { data: dropoffLoc } = await supabase
+          .from("locations")
+          .select("id")
+          .eq("slug", dropoffLocation)
+          .single();
+        dropoffLocationId = dropoffLoc?.id || null;
+      }
+      
+      const { data: searchQuery, error: searchError } = await supabase
+        .from("search_queries")
+        .insert({
+          session_id: sessionId,
+          pickup_date: pickupDate,
+          dropoff_date: dropoffDate,
+          pickup_time: pickupTime,
+          dropoff_time: dropoffTime,
+          rental_days: days,
+          advance_days: Math.max(0, advanceDays),
+          pickup_location_id: pickupLocationId,
+          dropoff_location_id: dropoffLocationId,
+          same_location: pickupLocation === dropoffLocation,
+          category_slug: category,
+          vehicles_available_count: vehiclesWithPrices?.length || 0,
+          season_applied: priceResult.dominantSeason,
+          avg_price_shown: finalPricePerDay,
+          had_availability: (vehiclesWithPrices?.length || 0) > 0,
+          funnel_stage: "search_only",
+          locale: request.headers.get("accept-language")?.split(",")[0]?.split("-")[0] || null,
+          user_agent_type: detectDeviceType(request.headers.get("user-agent")),
+        })
+        .select("id")
+        .single();
+      
+      if (!searchError && searchQuery) {
+        searchQueryId = searchQuery.id;
+      } else {
+        console.error("Error registrando búsqueda:", searchError);
+      }
+    } catch (trackingError) {
+      // No fallar la búsqueda si falla el tracking
+      console.error("Error en tracking de búsqueda:", trackingError);
+    }
+
     const response = NextResponse.json({
       success: true,
+      searchQueryId, // Incluir para tracking del cliente
       searchParams: {
         pickupDate,
         dropoffDate,
@@ -212,6 +286,16 @@ export async function GET(request: NextRequest) {
       vehicles: vehiclesWithPrices || [],
       totalResults: vehiclesWithPrices?.length || 0,
     });
+    
+    // Establecer cookie de sesión si no existe
+    if (!request.cookies.get('furgocasa_session_id')) {
+      response.cookies.set('furgocasa_session_id', sessionId, {
+        maxAge: 60 * 60 * 24 * 30, // 30 días
+        path: '/',
+        sameSite: 'lax',
+      });
+    }
+    
     response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
     response.headers.set("Pragma", "no-cache");
     response.headers.set("Expires", "0");

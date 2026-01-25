@@ -495,6 +495,86 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["settings"]["Insert"]>;
       };
+
+      search_queries: {
+        Row: {
+          id: string;
+          session_id: string;
+          // Nivel 1: Búsqueda
+          searched_at: string;
+          pickup_date: string;
+          dropoff_date: string;
+          pickup_time: string;
+          dropoff_time: string;
+          rental_days: number;
+          advance_days: number;
+          // Ubicaciones
+          pickup_location_id: string | null;
+          dropoff_location_id: string | null;
+          same_location: boolean;
+          // Filtros y resultados
+          category_slug: string | null;
+          vehicles_available_count: number;
+          season_applied: string | null;
+          avg_price_shown: number | null;
+          had_availability: boolean;
+          // Nivel 2: Selección de vehículo
+          vehicle_selected: boolean;
+          selected_vehicle_id: string | null;
+          selected_vehicle_price: number | null;
+          vehicle_selected_at: string | null;
+          time_to_select_seconds: number | null;
+          // Nivel 3: Reserva creada
+          booking_created: boolean;
+          booking_id: string | null;
+          booking_created_at: string | null;
+          time_to_booking_seconds: number | null;
+          total_conversion_seconds: number | null;
+          // Estado del funnel
+          funnel_stage: "search_only" | "vehicle_selected" | "booking_created";
+          // Metadatos
+          locale: string | null;
+          user_agent_type: "mobile" | "desktop" | "tablet" | null;
+          // Timestamps
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_id: string;
+          searched_at?: string;
+          pickup_date: string;
+          dropoff_date: string;
+          pickup_time?: string;
+          dropoff_time?: string;
+          rental_days: number;
+          advance_days?: number;
+          pickup_location_id?: string | null;
+          dropoff_location_id?: string | null;
+          same_location?: boolean;
+          category_slug?: string | null;
+          vehicles_available_count?: number;
+          season_applied?: string | null;
+          avg_price_shown?: number | null;
+          had_availability?: boolean;
+          vehicle_selected?: boolean;
+          selected_vehicle_id?: string | null;
+          selected_vehicle_price?: number | null;
+          vehicle_selected_at?: string | null;
+          time_to_select_seconds?: number | null;
+          booking_created?: boolean;
+          booking_id?: string | null;
+          booking_created_at?: string | null;
+          time_to_booking_seconds?: number | null;
+          total_conversion_seconds?: number | null;
+          funnel_stage?: "search_only" | "vehicle_selected" | "booking_created";
+          locale?: string | null;
+          user_agent_type?: "mobile" | "desktop" | "tablet" | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["search_queries"]["Insert"]>;
+      };
     };
     Views: {};
     Functions: {};
@@ -567,3 +647,8 @@ export type BookingWithRelations = Booking & {
   })[];
   payments: Payment[];
 };
+
+// Tipos para búsquedas
+export type SearchQuery = Database["public"]["Tables"]["search_queries"]["Row"];
+export type SearchQueryInsert = Database["public"]["Tables"]["search_queries"]["Insert"];
+export type SearchQueryUpdate = Database["public"]["Tables"]["search_queries"]["Update"];
