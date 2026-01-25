@@ -33,17 +33,51 @@ export function GoogleAnalytics() {
 
     // Enviar pageview cuando cambia la ruta
     if (typeof window !== 'undefined' && (window as any).gtag && pathname) {
-      // Usar setTimeout para asegurar que el título de la página se ha actualizado
-      // (Next.js actualiza el título asíncronamente después del cambio de ruta)
-      setTimeout(() => {
+      // Usar MutationObserver para detectar el cambio real del título
+      // Esto soluciona el problema de títulos "not set" o antiguos en navegación SPA
+      
+      let sent = false;
+      const titleElement = document.querySelector('title');
+      let observer: MutationObserver | null = null;
+      
+      const sendPageView = (trigger: string) => {
+        if (sent) return;
+        
         const currentTitle = document.title;
-        console.log('[Analytics] Enviando pageview:', pathname, 'Title:', currentTitle);
+        console.log(`[Analytics] Enviando pageview (${trigger}):`, pathname, 'Title:', currentTitle);
         
         (window as any).gtag('config', GA_MEASUREMENT_ID, {
           page_path: pathname,
           page_title: currentTitle || 'Furgocasa',
         });
-      }, 100);
+        sent = true;
+        
+        // Limpiar observadores una vez enviado
+        if (observer) observer.disconnect();
+      };
+
+      // 1. Fallback de seguridad: Si en 1.5s no cambia el título, enviar lo que haya
+      const timeoutId = setTimeout(() => {
+        sendPageView('timeout_fallback');
+      }, 1500);
+
+      // 2. Observar cambios en el <title>
+      if (titleElement) {
+        observer = new MutationObserver(() => {
+          // Si el título no está vacío, asumimos que es el nuevo
+          if (document.title && document.title.trim().length > 0) {
+            // Pequeño delay extra para asegurar estabilidad
+            setTimeout(() => sendPageView('title_change'), 100);
+          }
+        });
+        
+        observer.observe(titleElement, { childList: true, subtree: true, characterData: true });
+      }
+
+      return () => {
+        clearTimeout(timeoutId);
+        if (observer) observer.disconnect();
+      };
     }
   }, [pathname]);
 
