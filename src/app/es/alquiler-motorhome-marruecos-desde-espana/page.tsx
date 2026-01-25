@@ -547,8 +547,9 @@ export default async function LocaleMotorhomeMarruecosPage({ params }: PageProps
       <section className="py-16 lg:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
-              🇲🇦 ¿Por qué Furgocasa para viajar a Marruecos?
+            <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4 flex items-center justify-center gap-3">
+              <Map className="w-8 h-8 lg:w-12 lg:h-12 text-furgocasa-orange" />
+              ¿Por qué Furgocasa para viajar a Marruecos?
             </h2>
             <p className="text-lg lg:text-xl text-blue-100 max-w-3xl mx-auto">
               La mejor experiencia para cruzar a África en motorhome
