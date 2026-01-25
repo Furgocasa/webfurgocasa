@@ -69,7 +69,7 @@ export function DestinationsGrid({
   const { language } = useLanguage();
   
   return (
-    <section className="py-16 lg:py-24 bg-gray-50">
+    <section className="pt-8 pb-16 lg:pt-12 lg:pb-24 bg-gray-50">
       <div className="container mx-auto px-4">
         <h2 className="text-2xl lg:text-3xl font-heading font-bold text-center text-gray-800 mb-12 lg:mb-16">
           {t(title)}
