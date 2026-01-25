@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight } from "lucide-react";
+import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight, MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import Image from "next/image";
 
