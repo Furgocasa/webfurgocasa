@@ -69,14 +69,8 @@ export function DestinationsGrid({
   const { language } = useLanguage();
   
   return (
-    <section className="pt-8 pb-16 lg:pt-12 lg:pb-24 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-2xl lg:text-3xl font-heading font-bold text-center text-gray-800 mb-12 lg:mb-16">
-          {t(title)}
-        </h2>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-10 max-w-7xl mx-auto">
-          {destinations.map((destination, index) => {
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-10 max-w-7xl mx-auto">
+      {destinations.map((destination, index) => {
             const baseRoute = `/alquiler-autocaravanas-campervans-${destination.slug}`;
             const translatedRoute = getTranslatedRoute(baseRoute, language);
             const rotation = POLAROID_ROTATIONS[index % POLAROID_ROTATIONS.length];
@@ -133,7 +127,5 @@ export function DestinationsGrid({
             );
           })}
         </div>
-      </div>
-    </section>
   );
 }
