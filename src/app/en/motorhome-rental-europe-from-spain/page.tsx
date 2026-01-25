@@ -350,6 +350,9 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
                     key={article.id}
                     categorySlug={'routes'}
                     slug={article.slug}
+                    slug_en={article.slug_en}
+                    slug_fr={article.slug_fr}
+                    slug_de={article.slug_de}
                     className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                   >
                     <div className="h-48 lg:h-56 bg-gray-200 relative overflow-hidden">
