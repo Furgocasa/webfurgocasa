@@ -73,8 +73,9 @@ export function AnalyticsScripts() {
             gtag('js', new Date());
             gtag('config', 'G-G5YLBN5XXZ', {
               page_path: window.location.pathname,
+              send_page_view: false
             });
-            console.log('[Analytics] Google Analytics inicializado para:', window.location.pathname);
+            console.log('[Analytics] Google Analytics inicializado (sin pageview automático)');
           `,
         }}
       />
