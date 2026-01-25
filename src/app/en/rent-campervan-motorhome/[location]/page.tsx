@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import { LocationTourismContent } from "@/components/locations/location-tourism-content";
+import { NearbyOfficeNotice } from "@/components/locations/nearby-office-notice";
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { getLatestBlogArticles } from "@/lib/home/server-actions";
@@ -351,6 +352,18 @@ export default async function LocationPage({ params }: PageProps) {
         </section>
       )}
 
+      {/* NEARBY OFFICE NOTICE - Only for cities without office (distance > 0) */}
+      {location.nearest_location && location.distance_km && location.distance_km > 0 && (
+        <NearbyOfficeNotice
+          locationName={location.name}
+          nearestLocationName={location.nearest_location.name}
+          nearestLocationCity={location.nearest_location.city}
+          distanceKm={location.distance_km}
+          travelTimeMinutes={location.travel_time_minutes || 0}
+          locale={locale}
+        />
+      )}
+
       {/* TOURISM CONTENT - Identical to production */}
       <LocationTourismContent 
         locationName={location.name}
@@ -553,56 +566,6 @@ export default async function LocationPage({ params }: PageProps) {
                 <BookOpen className="h-5 w-5" />
                 View more articles
               </LocalizedLink>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* PICKUP POINT */}
-      {location.nearest_location && (
-        <section className="py-16 lg:py-24 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900">
-                  Pickup point for {location.name}
-                </h2>
-              </div>
-              
-              <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10 border border-gray-100">
-                <div className="flex flex-col md:flex-row items-start gap-6">
-                  <div className="bg-furgocasa-blue/10 p-4 rounded-2xl">
-                    <MapPin className="h-12 w-12 text-furgocasa-blue" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-2xl font-heading font-bold text-furgocasa-blue mb-2">
-                      {location.nearest_location.name}
-                    </h3>
-                    <p className="text-gray-600 text-lg mb-4">
-                      {location.nearest_location.address}
-                    </p>
-                    {location.distance_km && (
-                      <div className="flex items-center gap-4 text-gray-700">
-                        <span className="bg-gray-100 px-4 py-2 rounded-lg">
-                          <strong>{location.distance_km} km</strong> away
-                        </span>
-                        {location.travel_time_minutes && (
-                          <span className="bg-gray-100 px-4 py-2 rounded-lg">
-                            <strong>{Math.round(location.travel_time_minutes / 60)}h</strong> by car
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="mt-6 flex items-center gap-2 text-green-700 bg-green-50 px-6 py-4 rounded-xl">
-                  <CheckCircle className="h-6 w-6" />
-                  <span className="font-medium text-lg">
-                    Delivery and pickup available in {location.name}
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         </section>

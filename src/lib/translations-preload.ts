@@ -8565,6 +8565,140 @@ export const staticTranslations = {
     fr: "COMMENCER MAINTENANT!",
     de: "JETZT STARTEN!"
   },
+
+  // Nearby Office Notice (Aviso oficina cercana)
+  "No estamos en": {
+    es: "No estamos en",
+    en: "We are not in",
+    fr: "Nous ne sommes pas à",
+    de: "Wir sind nicht in"
+  },
+  "pero estamos muy cerca": {
+    es: "pero estamos muy cerca",
+    en: "but we are very close",
+    fr: "mais nous sommes très proches",
+    de: "aber wir sind ganz in der Nähe"
+  },
+  "Tenemos sede de entrega en": {
+    es: "Tenemos sede de entrega en",
+    en: "We have a delivery office in",
+    fr: "Nous avons un bureau de livraison à",
+    de: "Wir haben eine Abholstation in"
+  },
+  "Sede más cercana": {
+    es: "Sede más cercana",
+    en: "Nearest office",
+    fr: "Bureau le plus proche",
+    de: "Nächste Filiale"
+  },
+  "Distancia": {
+    es: "Distancia",
+    en: "Distance",
+    fr: "Distance",
+    de: "Entfernung"
+  },
+  "Tiempo en coche": {
+    es: "Tiempo en coche",
+    en: "Driving time",
+    fr: "Temps en voiture",
+    de: "Fahrzeit"
+  },
+  "1 hora": {
+    es: "1 hora",
+    en: "1 hour",
+    fr: "1 heure",
+    de: "1 Stunde"
+  },
+  "horas": {
+    es: "horas",
+    en: "hours",
+    fr: "heures",
+    de: "Stunden"
+  },
+  "¿Por qué merece la pena venir desde": {
+    es: "¿Por qué merece la pena venir desde",
+    en: "Why is it worth coming from",
+    fr: "Pourquoi ça vaut le coup de venir de",
+    de: "Warum lohnt es sich, von zu kommen"
+  },
+  "Flota premium de autocaravanas de gran volumen": {
+    es: "Flota premium de autocaravanas de gran volumen",
+    en: "Premium fleet of large-volume motorhomes",
+    fr: "Flotte premium de camping-cars grand volume",
+    de: "Premium-Flotte großvolumiger Wohnmobile"
+  },
+  "Kilómetros ilimitados incluidos": {
+    es: "Kilómetros ilimitados incluidos",
+    en: "Unlimited kilometers included",
+    fr: "Kilométrage illimité inclus",
+    de: "Unbegrenzte Kilometer inklusive"
+  },
+  "Equipamiento completo y moderno": {
+    es: "Equipamiento completo y moderno",
+    en: "Complete and modern equipment",
+    fr: "Équipement complet et moderne",
+    de: "Komplette und moderne Ausstattung"
+  },
+  "Atención personalizada y profesional": {
+    es: "Atención personalizada y profesional",
+    en: "Personalized and professional service",
+    fr: "Service personnalisé et professionnel",
+    de: "Persönlicher und professioneller Service"
+  },
+  "Vehículos nuevos y perfectamente mantenidos": {
+    es: "Vehículos nuevos y perfectamente mantenidos",
+    en: "New and perfectly maintained vehicles",
+    fr: "Véhicules neufs et parfaitement entretenus",
+    de: "Neue und perfekt gewartete Fahrzeuge"
+  },
+  "Flexibilidad en fechas y condiciones": {
+    es: "Flexibilidad en fechas y condiciones",
+    en: "Flexibility in dates and conditions",
+    fr: "Flexibilité des dates et conditions",
+    de: "Flexibilität bei Terminen und Bedingungen"
+  },
+  "Miles de clientes": {
+    es: "Miles de clientes",
+    en: "Thousands of customers",
+    fr: "Des milliers de clients",
+    de: "Tausende von Kunden"
+  },
+  "de": {
+    es: "de",
+    en: "from",
+    fr: "de",
+    de: "aus"
+  },
+  "y ciudades cercanas ya han confiado en nosotros.": {
+    es: "y ciudades cercanas ya han confiado en nosotros.",
+    en: "and nearby cities have already trusted us.",
+    fr: "et des villes voisines nous ont déjà fait confiance.",
+    de: "und nahe gelegene Städte haben uns bereits vertraut."
+  },
+  "El desplazamiento vale la pena:": {
+    es: "El desplazamiento vale la pena:",
+    en: "The trip is worth it:",
+    fr: "Le déplacement en vaut la peine:",
+    de: "Die Anreise lohnt sich:"
+  },
+  "nuestras campers son las mejores del mercado y nuestro servicio, excepcional.": {
+    es: "nuestras campers son las mejores del mercado y nuestro servicio, excepcional.",
+    en: "our campers are the best on the market and our service is exceptional.",
+    fr: "nos camping-cars sont les meilleurs du marché et notre service est exceptionnel.",
+    de: "unsere Camper sind die besten auf dem Markt und unser Service ist außergewöhnlich."
+  },
+  "Más información": {
+    es: "Más información",
+    en: "More information",
+    fr: "Plus d'informations",
+    de: "Mehr Informationen"
+  },
+  "También puedes contactarnos para resolver cualquier duda sobre tu viaje desde": {
+    es: "También puedes contactarnos para resolver cualquier duda sobre tu viaje desde",
+    en: "You can also contact us to resolve any questions about your trip from",
+    fr: "Vous pouvez également nous contacter pour toute question concernant votre voyage depuis",
+    de: "Sie können uns auch kontaktieren, um Fragen zu Ihrer Reise von zu klären"
+  },
 };
 
 /**
