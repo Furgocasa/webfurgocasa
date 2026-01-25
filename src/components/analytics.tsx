@@ -47,32 +47,36 @@ function GoogleAnalyticsContent() {
             const currentTitle = document.title;
             console.log(`[Analytics] 📡 Enviando (${trigger}) | URL: ${fullPath} | Title: "${currentTitle}"`);
 
-            // Limpiar URL si es demasiado larga (límite seguro para GA4)
-            // GA4 soporta hasta ~420 chars en algunos contextos, aunque page_location es más flexible.
-            // Recortamos fbclid si es excesivo.
+            // Limpiar URL para GA4
+            // REGLA AGRESIVA: Si hay fbclid, lo recortamos SIEMPRE a 20 caracteres.
+            // Esto asegura que Analytics nunca rechace el evento por longitud o formato del token.
             let safeFullPath = fullPath;
             let safeLocation = window.location.href;
 
-            if (safeLocation.length > 300) {
-               // Si la URL es monstruosa, intentamos limpiar parámetros conocidos que sean muy largos
-               try {
-                 const urlObj = new URL(window.location.href);
-                 const fbclid = urlObj.searchParams.get('fbclid');
-                 if (fbclid && fbclid.length > 50) {
-                   // Truncar fbclid visualmente pero mantener que existe
-                   urlObj.searchParams.set('fbclid', fbclid.substring(0, 20) + '...');
-                   safeLocation = urlObj.toString();
-                   
-                   // Ajustar también el page_path relativo
-                   const newSearchParams = new URLSearchParams(searchParams?.toString());
-                   newSearchParams.set('fbclid', fbclid.substring(0, 20) + '...');
-                   safeFullPath = pathname + '?' + newSearchParams.toString();
-                   
-                   console.log(`[Analytics] ✂️ URL recortada para envío seguro: ${safeFullPath}`);
-                 }
-               } catch (e) {
-                 // Si falla el parseo, enviamos original
-               }
+            try {
+              const urlObj = new URL(window.location.href);
+              const fbclid = urlObj.searchParams.get('fbclid');
+              
+              // Si existe fbclid (sea cual sea su longitud), lo saneamos
+              if (fbclid) {
+                const truncatedFbclid = fbclid.substring(0, 20) + '...';
+                
+                // Actualizar location absoluta
+                urlObj.searchParams.set('fbclid', truncatedFbclid);
+                safeLocation = urlObj.toString();
+                
+                // Actualizar path relativo
+                const newSearchParams = new URLSearchParams(searchParams?.toString());
+                newSearchParams.set('fbclid', truncatedFbclid);
+                safeFullPath = pathname + '?' + newSearchParams.toString();
+                
+                console.log(`[Analytics] ✂️ URL saneada (fbclid recortado) para envío seguro: ${safeFullPath}`);
+              } else if (safeLocation.length > 300) {
+                // Si no es fbclid pero la URL sigue siendo monstruosa por otras razones
+                console.log(`[Analytics] ⚠️ URL muy larga detectada (>300 chars), se envía tal cual pero podría truncarse.`);
+              }
+            } catch (e) {
+              // Si falla el parseo, enviamos original
             }
             
             (window as any).gtag('config', GA_MEASUREMENT_ID, {
