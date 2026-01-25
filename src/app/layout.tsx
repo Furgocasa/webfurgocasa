@@ -8,9 +8,8 @@ import { CookieProvider, CookieBanner, CookieSettingsModal } from "@/components/
 import WhatsAppChatbot from "@/components/whatsapp-chatbot";
 import BackToTop from "@/components/back-to-top";
 import { AdminFABButton } from "@/components/admin-fab-button";
-import { GoogleAnalytics } from "@/components/analytics";
 import { AnalyticsDebug } from "@/components/analytics-debug";
-import { AnalyticsScripts } from "@/components/analytics-scripts";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import Script from "next/script";
 import { i18n, isValidLocale } from "@/lib/i18n/config";
@@ -167,12 +166,10 @@ export default async function RootLayout({
       <body className={`${rubik.variable} ${amiko.variable} font-sans`}>
         <Providers>
           <CookieProvider>
-            {/* Scripts de Google Analytics - Solo se cargan en páginas públicas */}
-            <AnalyticsScripts />
+            {/* ⚠️ MIGRACIÓN A @next/third-parties */}
+            {/* Google Analytics oficial - Se carga en toda la aplicación */}
+            <GoogleAnalytics gaId="G-G5YLBN5XXZ" />
             
-            {/* Componente para trackear navegación entre páginas */}
-            {/* Nota: GoogleAnalytics ya incluye su propio Suspense internamente */}
-            <GoogleAnalytics />
             {/* Debug de Analytics (solo en desarrollo) */}
             <AnalyticsDebug />
             
