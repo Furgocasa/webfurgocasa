@@ -20,7 +20,13 @@ const discounts = [
   { percentage: "-30%", description: "Alquileres de 21 días o más (solo Temp. Baja)", icon: "🔥" },
 ];
 
-const includedFree = ["Kilómetros ilimitados", "Conductor/es adicional/es", "Utensilios de cocina completos", "Kit de camping (mesa y sillas)", "Derecho a desistir los primeros 14 días", "Cancelación gratuita hasta 60 días antes",
+const includedFree = [
+  "Kilómetros ilimitados",
+  "Conductor/es adicional/es",
+  "Utensilios de cocina completos",
+  "Kit de camping (mesa y sillas)",
+  "Derecho a desistir los primeros 14 días",
+  "Cancelación gratuita hasta 60 días antes",
 ];
 
 const extrasOptional = [
@@ -52,7 +58,7 @@ export function TarifasClient() {
   
   return (
     <main className="min-h-screen bg-gray-50 font-amiko">
-      {/* Hero Section - Modernizado */}
+      {/* Hero Section */}
       <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.png')]"></div>
         <div className="container mx-auto px-4 text-center relative z-10">
@@ -65,20 +71,17 @@ export function TarifasClient() {
         </div>
       </section>
 
-      {/* Tabla de Tarifas - Modernizado */}
+      {/* Tabla de Tarifas */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
               {t("Precios de alquiler")}
             </h2>
-            <p className="text-gray-600 text-lg">
-              {t("Tarifas orientativas por día según temporada")}
-            </p>
+            <p className="text-gray-600 text-lg">{t("Tarifas orientativas por día según temporada")}</p>
           </div>
           
           <div className="max-w-6xl mx-auto">
-            {/* Nota importante */}
             <div className="mb-8 bg-orange-50 border border-orange-200 p-4 rounded-xl flex items-center gap-3">
               <AlertCircle className="h-5 w-5 text-orange-500 flex-shrink-0" />
               <p className="text-sm text-orange-800">
@@ -91,9 +94,7 @@ export function TarifasClient() {
                 <table className="w-full min-w-[600px]">
                   <thead>
                     <tr className="bg-furgocasa-blue text-white">
-                      <th className="py-3 md:py-6 px-2 md:px-6 text-left font-heading font-bold text-xs md:text-lg border-r border-blue-800/30">
-                        {t("Temporada")}
-                      </th>
+                      <th className="py-3 md:py-6 px-2 md:px-6 text-left font-heading font-bold text-xs md:text-lg border-r border-blue-800/30">{t("Temporada")}</th>
                       <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base border-r border-blue-800/30 bg-white/5">
                         <span className="hidden md:inline">{t("Menos de una semana")}</span>
                         <span className="md:hidden">&lt;7d</span>
@@ -117,25 +118,14 @@ export function TarifasClient() {
                       <tr key={row.season} className={`group hover:bg-blue-50/50 transition-colors ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'}`}>
                         <td className="py-3 md:py-6 px-2 md:px-6 font-bold text-gray-900 border-r border-gray-100">
                           <div className="flex items-center gap-1 md:gap-2">
-                            <span className={`w-2 md:w-3 h-2 md:h-3 rounded-full flex-shrink-0 ${
-                              row.season === "Baja" ? "bg-furgocasa-blue" : 
-                              row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-500"
-                            }`}></span>
+                            <span className={`w-2 md:w-3 h-2 md:h-3 rounded-full flex-shrink-0 ${row.season === "Baja" ? "bg-furgocasa-blue" : row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-500"}`}></span>
                             <span className="text-sm md:text-base">{t(row.season)}</span>
                           </div>
                         </td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">
-                          {row.lessThanWeek}€
-                        </td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-furgocasa-blue font-bold text-base md:text-2xl border-r border-gray-100 bg-furgocasa-blue/5">
-                          {row.oneWeek}€
-                        </td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">
-                          {row.twoWeeks}€
-                        </td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl group-hover:text-furgocasa-blue transition-colors">
-                          {row.threeWeeks}€
-                        </td>
+                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">{row.lessThanWeek}€</td>
+                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-furgocasa-blue font-bold text-base md:text-2xl border-r border-gray-100 bg-furgocasa-blue/5">{row.oneWeek}€</td>
+                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">{row.twoWeeks}€</td>
+                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl group-hover:text-furgocasa-blue transition-colors">{row.threeWeeks}€</td>
                       </tr>
                     ))}
                   </tbody>
@@ -146,30 +136,311 @@ export function TarifasClient() {
         </div>
       </section>
 
-      {/* Rest of sections truncated for brevity - same as original */}
-      
-      {/* CTA Final - Modernizado */}
+      {/* Descuentos */}
+      <section id="descuentos" className="py-24 bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark text-white relative overflow-hidden scroll-mt-20">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-furgocasa-orange/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">{t("Descuentos por duración del alquiler")}</h2>
+            <p className="text-blue-100 text-lg">{t("Cuanto más largo sea tu viaje, mejor será el precio")}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+            {discounts.map((discount, index) => (
+              <div key={index} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 text-center hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
+                <div className="text-4xl mb-4">{discount.icon}</div>
+                <div className="text-6xl font-heading font-bold text-white mb-4 tracking-tight drop-shadow-lg">{discount.percentage}</div>
+                <p className="text-white font-medium text-lg px-4 py-2 bg-white/10 rounded-full inline-block">{t(discount.description)}</p>
+              </div>
+            ))}
+          </div>
+          
+          <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-bold text-lg mb-3 flex items-center gap-2"><Clock className="h-5 w-5 text-furgocasa-orange" />{t("Información general")}</h4>
+                <ul className="space-y-2 text-sm text-blue-100">
+                  <li className="flex items-start gap-2">• {t("Los precios se devengan por períodos completos de 24 horas")}</li>
+                  <li className="flex items-start gap-2">• {t("Los descuentos se aplican automáticamente según la duración del alquiler")}</li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-bold text-lg mb-3 flex items-center gap-2"><CreditCard className="h-5 w-5 text-furgocasa-orange" />{t("Método de pago")}</h4>
+                <p className="text-sm text-blue-100">{t("El método de pago aceptado será el pago con tarjeta de débito o crédito a través de nuestra pasarela de pago segura Redsys.")}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <LocalizedLink href="/reservar" className="inline-block bg-white text-furgocasa-blue font-bold text-lg py-4 px-10 rounded-full hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+              {t("Consultar precio para mis fechas")}
+            </LocalizedLink>
+          </div>
+        </div>
+      </section>
+
+      {/* Extras y Accesorios */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">{t("Extras y accesorios")}</h2>
+            <p className="text-gray-600 text-lg">{t("Qué está incluido en el precio y qué tiene coste adicional")}</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div className="bg-green-50/50 border border-green-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="bg-green-100 p-3 rounded-2xl"><CheckCircle className="h-8 w-8 text-green-600" /></div>
+                <div>
+                  <h3 className="text-2xl font-heading font-bold text-green-800">{t("Incluido sin coste")}</h3>
+                  <p className="text-green-700 text-sm">{t("Todo lo necesario para que disfrutes al máximo de tu viaje")}</p>
+                </div>
+              </div>
+              <ul className="space-y-4">
+                {includedFree.map((item) => (
+                  <li key={item} className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 font-medium">{t(item)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-blue-50/50 border border-blue-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="bg-blue-100 p-3 rounded-2xl"><Euro className="h-8 w-8 text-furgocasa-blue" /></div>
+                <div>
+                  <h3 className="text-2xl font-heading font-bold text-furgocasa-blue">{t("Extras opcionales")}</h3>
+                  <p className="text-blue-700 text-sm">{t("Complementos adicionales para mayor comodidad")}</p>
+                </div>
+              </div>
+              <ul className="space-y-4">
+                {extrasOptional.map((item) => (
+                  <li key={item.name} className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
+                    <span className="text-gray-700 font-medium">{t(item.name)}</span>
+                    <span className="bg-furgocasa-blue/10 text-furgocasa-blue px-3 py-1 rounded-lg font-bold text-sm">{item.price} / {t(item.per)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Temporadas - Calendarios */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">{t("Temporadas de alquiler")}</h2>
+            <p className="text-gray-600 text-lg">{t("Consulta nuestro calendario para planificar tu viaje")}</p>
+          </div>
+          
+          <div className="space-y-12 max-w-7xl mx-auto">
+            <div className="bg-gray-50 rounded-3xl p-6 md:p-8 shadow-inner">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-heading font-bold text-furgocasa-blue bg-white py-3 px-6 rounded-xl shadow-sm inline-block">{t("Calendario")} {currentYear}</h3>
+              </div>
+              <SeasonsCalendar year={currentYear} hidePassedMonths={true} />
+            </div>
+
+            <div className="bg-gray-50 rounded-3xl p-6 md:p-8 shadow-inner">
+              <div className="text-center mb-6">
+                <h3 className="text-2xl font-heading font-bold text-furgocasa-blue bg-white py-3 px-6 rounded-xl shadow-sm inline-block">{t("Calendario")} {nextYear}</h3>
+              </div>
+              <SeasonsCalendar year={nextYear} hidePassedMonths={false} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Requisitos del conductor */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">{t("Requisitos del conductor")}</h2>
+            <p className="text-gray-600 text-lg">{t("Todo lo que necesitas para alquilar una camper con nosotros")}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
+            <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center border-b-4 border-furgocasa-blue">
+              <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">👤</div>
+              <h3 className="font-heading font-bold text-xl text-gray-900 mb-3">{t("Edad mínima")}</h3>
+              <p className="text-gray-600 mb-4 font-medium">{t("El conductor principal y cada conductor adicional deben tener un mínimo de 25 años de edad.")}</p>
+              <span className="inline-block bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">{t("Máximo 2 conductores")}</span>
+            </div>
+
+            <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center border-b-4 border-furgocasa-orange">
+              <div className="w-20 h-20 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">🚗</div>
+              <h3 className="font-heading font-bold text-xl text-gray-900 mb-3">{t("Permiso de conducción")}</h3>
+              <p className="text-gray-600 mb-4 font-medium">{t("Carnet de conducir tipo B en vigor, con una antigüedad mínima de 2 años.")}</p>
+              <span className="inline-block bg-gray-100 text-gray-500 text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wide">{t("Permiso internacional si no UE")}</span>
+            </div>
+
+            <div className="bg-white rounded-3xl p-8 shadow-lg hover:shadow-xl transition-shadow text-center border-b-4 border-green-500">
+              <div className="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">📋</div>
+              <h3 className="font-heading font-bold text-xl text-gray-900 mb-3">{t("Documentación")}</h3>
+              <p className="text-gray-600 mb-4 font-medium">{t("Debes enviar copia del DNI/Pasaporte y del carnet de conducir antes del inicio del alquiler.")}</p>
+              <a href="mailto:reservas@furgocasa.com" className="inline-block text-furgocasa-blue font-bold text-sm hover:underline">reservas@furgocasa.com</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Duración del alquiler */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">{t("Duración del alquiler")}</h2>
+            <p className="text-gray-600 text-lg">{t("Mínimos establecidos según temporada")}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
+            <div className="bg-white border-2 border-blue-100 rounded-3xl p-8 text-center hover:border-blue-500 transition-colors group">
+              <h3 className="font-heading font-bold text-lg text-gray-500 mb-4 uppercase tracking-wider group-hover:text-blue-600 transition-colors">{t("Temp. Baja y Media")}</h3>
+              <div className="text-6xl font-heading font-bold text-furgocasa-blue mb-2 group-hover:scale-110 transition-transform duration-300">2</div>
+              <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">{t("Días Mínimo")}</p>
+            </div>
+
+            <div className="bg-white border-2 border-orange-100 rounded-3xl p-8 text-center hover:border-orange-500 transition-colors group">
+              <h3 className="font-heading font-bold text-lg text-gray-500 mb-4 uppercase tracking-wider group-hover:text-orange-600 transition-colors">{t("Temporada Alta")}</h3>
+              <div className="text-6xl font-heading font-bold text-furgocasa-orange mb-2 group-hover:scale-110 transition-transform duration-300">7</div>
+              <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">{t("Días Mínimo")}</p>
+            </div>
+
+            <div className="bg-white border-2 border-green-100 rounded-3xl p-8 text-center hover:border-green-500 transition-colors group">
+              <h3 className="font-heading font-bold text-lg text-gray-500 mb-4 uppercase tracking-wider group-hover:text-green-600 transition-colors">{t("Duración máxima")}</h3>
+              <div className="text-6xl font-heading font-bold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300">89</div>
+              <p className="text-gray-400 font-bold uppercase tracking-widest text-sm">{t("Días Máximo")}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Política de cancelación */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-heading font-bold text-center text-gray-900 mb-16">{t("Política de cancelación")}</h2>
+
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-4 gap-6 mb-12">
+              {cancellationPolicy.map((item, index) => (
+                <div key={index} className={`rounded-2xl p-8 text-center shadow-lg border-t-8 ${item.border} bg-white`}>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 h-10 flex items-center justify-center">{item.period}</p>
+                  <p className={`text-3xl font-heading font-bold ${item.color}`}>{item.charge}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8">
+              <div className="bg-blue-600 text-white rounded-3xl p-10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/3 -translate-y-1/3"><Shield className="w-64 h-64" /></div>
+                <div className="relative z-10">
+                  <h4 className="font-heading font-bold text-2xl mb-4 flex items-center gap-3"><Shield className="h-8 w-8 text-blue-300" />{t("Seguro de Cancelación")}</h4>
+                  <p className="text-blue-100 text-lg leading-relaxed mb-6">{t("Por 5€/día (contratado al reservar), se limita el coste de cancelación en el periodo de 59 a 16 días a dicho importe.")}</p>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100">
+                <h3 className="font-heading font-bold text-xl text-gray-900 mb-4 flex items-center gap-2"><FileText className="h-6 w-6 text-furgocasa-orange" />{t("Derecho de desistimiento")}</h3>
+                <p className="text-gray-600 mb-8 leading-relaxed">{t("El cliente dispone de 14 días naturales del derecho a desistir del contrato de alquiler sin necesidad de justificación y sin penalización alguna.")}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Fianza */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto bg-gray-900 rounded-[2.5rem] p-8 md:p-16 text-white shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-furgocasa-blue/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+            <div className="relative z-10">
+              <div className="flex flex-col md:flex-row gap-12 items-center mb-12">
+                <div className="text-center md:text-left">
+                  <h2 className="text-3xl md:text-5xl font-heading font-bold mb-4">{t("Fianza")}</h2>
+                  <p className="text-gray-400 max-w-md">{t("Garantía del fiel cumplimiento del contrato mediante transferencia bancaria.")}</p>
+                </div>
+                <div className="bg-furgocasa-orange text-white px-8 py-4 rounded-2xl text-center shadow-lg shadow-orange-500/20 transform rotate-3">
+                  <p className="text-5xl font-heading font-bold">1.000 €</p>
+                  <p className="text-sm font-bold uppercase tracking-wider opacity-90 mt-1">{t("Requerida")}</p>
+                </div>
+              </div>
+              <div className="grid md:grid-cols-2 gap-8">
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><CreditCard className="h-4 w-4" /></div><span>{t("Pago mediante transferencia bancaria")}</span></li>
+                  <li className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><Clock className="h-4 w-4" /></div><span>{t("Máximo 72 horas antes del inicio")}</span></li>
+                </ul>
+                <ul className="space-y-4">
+                  <li className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><User className="h-4 w-4" /></div><span>{t("El titular debe coincidir con el arrendatario")}</span></li>
+                  <li className="flex items-center gap-3"><div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center"><RefreshCw className="h-4 w-4" /></div><span>{t("Devolución en 10 días laborables")}</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Seguro y Devolución */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+            <div className="bg-white rounded-3xl p-10 shadow-lg">
+              <h2 className="text-2xl font-heading font-bold text-gray-900 mb-8 flex items-center gap-3"><Shield className="h-8 w-8 text-furgocasa-blue" />{t("Seguro a todo riesgo")}</h2>
+              <div className="mb-8 text-center p-6 bg-blue-50 rounded-2xl border border-blue-100">
+                <p className="text-gray-500 font-medium uppercase text-xs tracking-wider mb-2">{t("Franquicia por siniestro")}</p>
+                <p className="text-5xl font-heading font-bold text-furgocasa-blue">900 €</p>
+              </div>
+              <ul className="space-y-4 text-gray-700">
+                <li className="flex items-start gap-3"><CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /><span>{t("Cobertura a todo riesgo incluida")}</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /><span>{t("Si el daño no alcanza 900€, asumes el coste de reparación")}</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /><span>{t("Si supera 900€, ese es el máximo a pagar")}</span></li>
+              </ul>
+            </div>
+
+            <div className="space-y-8">
+              <div className="bg-white rounded-3xl p-10 shadow-lg">
+                <h2 className="text-2xl font-heading font-bold text-gray-900 mb-6 flex items-center gap-3"><RefreshCw className="h-8 w-8 text-furgocasa-orange" />{t("Devolución")}</h2>
+                <p className="text-gray-600 mb-6 font-medium">{t("El vehículo debe devolverse:")}</p>
+                <div className="flex flex-wrap gap-3">
+                  <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-700 font-medium">{t("Limpio interiormente")}</span>
+                  <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-700 font-medium">{t("Aguas grises vacías")}</span>
+                  <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-700 font-medium">{t("WC químico vacío")}</span>
+                </div>
+                <div className="mt-8 pt-8 border-t border-gray-100">
+                  <h4 className="font-bold text-gray-900 mb-4">{t("Suplementos por incumplimiento")}</h4>
+                  <div className="space-y-3">
+                    {returnFees.map((fee, i) => (
+                      <div key={i} className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">{fee.service}</span>
+                        <span className="font-bold text-orange-600">{fee.price}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-3xl p-10 shadow-lg border-l-8 border-red-500">
+                <h3 className="font-bold text-red-600 text-lg mb-4 flex items-center gap-2"><Clock className="h-5 w-5" />{t("Penalizaciones por retraso")}</h3>
+                <ul className="space-y-2 mb-4">
+                  <li className="flex justify-between text-sm"><span>{t("Primera hora")}</span> <span className="font-bold">40€</span></li>
+                  <li className="flex justify-between text-sm"><span>{t("Hora adicional")}</span> <span className="font-bold">20€</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
       <section className="py-24 bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark text-center">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">
-            {t("¿Listo para tu aventura?")}
-          </h2>
-          <p className="text-blue-200 mb-10 max-w-2xl mx-auto text-lg">
-            {t("Para cualquier aclaración en relación a lo dispuesto en esta sección, no dude en contactar con nosotros.")}
-          </p>
+          <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">{t("¿Listo para tu aventura?")}</h2>
+          <p className="text-blue-200 mb-10 max-w-2xl mx-auto text-lg">{t("Para cualquier aclaración en relación a lo dispuesto en esta sección, no dude en contactar con nosotros.")}</p>
           <div className="flex flex-wrap justify-center gap-6">
-            <LocalizedLink 
-              href="/reservar" 
-              className="bg-furgocasa-orange text-white font-bold py-4 px-12 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 text-lg"
-            >
-              {t("Reservar ahora")}
-            </LocalizedLink>
-            <LocalizedLink 
-              href="/contacto" 
-              className="bg-white/10 backdrop-blur-md text-white border border-white/20 font-bold py-4 px-12 rounded-xl hover:bg-white/20 transition-all text-lg"
-            >
-              {t("Contactar")}
-            </LocalizedLink>
+            <LocalizedLink href="/reservar" className="bg-furgocasa-orange text-white font-bold py-4 px-12 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 text-lg">{t("Reservar ahora")}</LocalizedLink>
+            <LocalizedLink href="/contacto" className="bg-white/10 backdrop-blur-md text-white border border-white/20 font-bold py-4 px-12 rounded-xl hover:bg-white/20 transition-all text-lg">{t("Contactar")}</LocalizedLink>
           </div>
         </div>
       </section>

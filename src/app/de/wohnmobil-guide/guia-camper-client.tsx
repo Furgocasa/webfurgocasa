@@ -36,6 +36,9 @@ export function GuiaCamperClient() {
                 {t("En los últimos años las Campervans de Gran Volumen han proliferado en gran medida y se han hecho un hueco importante dentro del sector de Caravaning.")}
               </p>
               <p>
+                {t("Creemos que esto se debe a la optimización y mejora de determinados equipos, sobre todo electrónicos, que han permitido que estos vehículos, en espacios mucho mas reducidos, puedan ofrecer las mismas comodidades básicas que una autocaravana de mayor tamaño. Hablamos por ejemplo de la mayor capacidad en las baterías, menores consumos en la iluminación, luces led, sistemas de calefacción y aguas más eficientes.")}
+              </p>
+              <p>
                 {t("Al principio, sobre todo si es tu primera vez con una autocaravana, puede que no conozcas como funcionan algunos de estos sistemas o que, haciendo uso de ellos, te surjan dudas acerca de su correcto uso, cuidado y mantenimiento.")}
               </p>
               <div className="bg-white p-6 rounded-2xl border-l-4 border-furgocasa-orange shadow-md">
@@ -72,7 +75,13 @@ export function GuiaCamperClient() {
                   {t("Funciones principales")}
                 </h3>
                 <ul className="space-y-4">
-                  {["Encender el automático de la electricidad", "Encender la bomba de aguas limpias", "Verificar el estado de carga de las baterías", "Verificar la cantidad restante de aguas limpias", "Comprobar si el deposito de aguas sucias esta lleno"
+                  {[
+                    "Encender el automático de la electricidad",
+                    "Encender la bomba de aguas limpias",
+                    "Verificar el estado de carga de las baterías",
+                    "Verificar la cantidad restante de aguas limpias",
+                    "Comprobar si el deposito de aguas sucias esta lleno",
+                    "Encender la iluminación exterior (según modelo)"
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-gray-600">
                       <ArrowRight className="h-5 w-5 text-furgocasa-orange flex-shrink-0 mt-0.5" />
@@ -97,6 +106,10 @@ export function GuiaCamperClient() {
                     <strong className="text-white block mb-1">{t("Alerta de aguas grises:")}</strong>
                     {t("El icono parpadea cuando el depósito supera el 75% de capacidad. ¡Es hora de vaciar!")}
                   </p>
+                  <p>
+                    <strong className="text-white block mb-1">{t("Activación de servicios:")}</strong>
+                    {t("Los botones de electricidad y bomba de agua tienen un piloto indicador de encendido/apagado.")}
+                  </p>
                 </div>
               </div>
             </div>
@@ -104,8 +117,61 @@ export function GuiaCamperClient() {
         </div>
       </section>
 
-      {/* Gas y Calefacción */}
+      {/* Electricidad */}
       <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-6 mb-12 justify-center md:justify-start">
+              <div className="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center shadow-md text-furgocasa-blue">
+                <Zap className="h-10 w-10" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900">
+                {t("Electricidad")}
+              </h2>
+            </div>
+
+            <div className="bg-gray-50 rounded-3xl p-8 md:p-12 shadow-inner border border-gray-100 mb-12">
+              <p className="text-gray-600 text-lg mb-8 text-center max-w-3xl mx-auto">
+                {t("Las camper llevan dos sistemas eléctricos independientes. Puedes comprobar la carga de ambos desde el panel de control.")}
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-8">
+                <div className="bg-white rounded-2xl p-8 shadow-sm border-t-4 border-furgocasa-blue hover:shadow-md transition-shadow">
+                  <h3 className="font-bold text-xl text-gray-900 mb-4 text-center">
+                    {t("Sistema del Vehículo")}
+                  </h3>
+                  <p className="text-gray-600 text-center">
+                    {t("Exclusivo para el motor y elementos del salpicadero (radio, mechero cabina). Funciona como un coche normal.")}
+                  </p>
+                </div>
+                <div className="bg-white rounded-2xl p-8 shadow-sm border-t-4 border-furgocasa-orange hover:shadow-md transition-shadow">
+                  <h3 className="font-bold text-xl text-gray-900 mb-4 text-center">
+                    {t("Sistema de la Vivienda")}
+                  </h3>
+                  <p className="text-gray-600 text-center">
+                    {t("Alimenta luces, nevera, calefacción, bomba de agua y enchufes traseros. Funciona con batería auxiliar de 12v.")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-8 flex items-start gap-4">
+              <Info className="h-8 w-8 text-yellow-600 flex-shrink-0" />
+              <div>
+                <h3 className="font-bold text-yellow-900 text-lg mb-2">{t("¿Cómo se cargan las baterías?")}</h3>
+                <ul className="text-yellow-800 space-y-2 text-sm">
+                  <li>• {t("La batería del vehículo se carga mientras conduces (alternador).")}</li>
+                  <li>• {t("La batería auxiliar se carga también mientras conduces y, además, con la placa solar del techo.")}</li>
+                  <li>• {t("Usa placas de inducción o conexión a 220v para cargar tus dispositivos más potentes.")}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Gas y Calefacción */}
+      <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12">
             <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100">
@@ -140,13 +206,17 @@ export function GuiaCamperClient() {
               </div>
 
               <p className="text-gray-600 mb-6">
-                {t("Controlada desde su propio panel digital. Funciona a gas o gasoil (según modelo).")}
+                {t("Controlada desde su propio panel digital. Funciona a gas o gasoil (según modelo) y requiere electricidad para los ventiladores.")}
               </p>
 
               <ul className="space-y-3">
                 <li className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                   {t("Abrir gas antes de encender")}
+                </li>
+                <li className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
+                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                  {t("Subir temperatura progresivamente")}
                 </li>
                 <li className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
                   <span className="w-2 h-2 bg-green-500 rounded-full"></span>
@@ -159,7 +229,7 @@ export function GuiaCamperClient() {
       </section>
 
       {/* Depósitos de Agua */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
             <div className="inline-block p-4 bg-blue-50 rounded-full mb-4">
@@ -168,34 +238,73 @@ export function GuiaCamperClient() {
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
               {t("Gestión de Aguas")}
             </h2>
+            <p className="text-gray-600">
+              {t("Todo lo que necesitas saber sobre los 3 tipos de agua en tu camper")}
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            <div className="bg-blue-50/50 rounded-3xl p-8 border border-blue-100">
+            <div className="bg-blue-50/50 rounded-3xl p-8 border border-blue-100 hover:border-blue-300 transition-colors">
               <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
                 <span className="text-2xl">💧</span> {t("Aguas Limpias")}
               </h3>
-              <p className="text-sm text-gray-600">
-                {t("Depósito de 100-120L para grifos y ducha. Llenar solo con agua potable.")}
+              <p className="text-sm text-gray-600 mb-4">
+                {t("Depósito de 100-120L para grifos y ducha. Llenar solo con agua potable en áreas habilitadas.")}
               </p>
+              <div className="bg-white p-4 rounded-xl shadow-sm text-xs text-gray-500">
+                <strong>{t("Ojo:")}</strong> {t("Nunca introducir combustible u otros líquidos. Dañaría todo el sistema.")}
+              </div>
             </div>
 
-            <div className="bg-gray-100 rounded-3xl p-8 border border-gray-200">
+            <div className="bg-gray-100 rounded-3xl p-8 border border-gray-200 hover:border-gray-400 transition-colors">
               <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
                 <span className="text-2xl">🚿</span> {t("Aguas Grises")}
               </h3>
-              <p className="text-sm text-gray-600">
-                {t("Recoge desagües de ducha y fregadero. Vaciar en áreas habilitadas.")}
+              <p className="text-sm text-gray-600 mb-4">
+                {t("Recoge desagües de ducha y fregadero. Vaciar cuando el piloto del panel parpadee (75%).")}
               </p>
+              <div className="bg-white p-4 rounded-xl shadow-sm text-xs text-gray-500">
+                <strong>{t("Vaciado:")}</strong> {t("Solo en rejillas de áreas de autocaravanas. Nunca en la naturaleza.")}
+              </div>
             </div>
 
-            <div className="bg-gray-800 text-white rounded-3xl p-8 shadow-xl">
+            <div className="bg-gray-800 text-white rounded-3xl p-8 shadow-xl hover:bg-gray-900 transition-colors">
               <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
                 <span className="text-2xl">🚽</span> {t("Aguas Negras (WC)")}
               </h3>
-              <p className="text-sm text-gray-300">
-                {t("Depósito extraíble (cassette). Usar siempre con producto químico.")}
+              <p className="text-sm text-gray-300 mb-4">
+                {t("Depósito extraíble (cassette). Usar siempre con producto químico azul/verde para descomponer y evitar olores.")}
               </p>
+              <div className="bg-gray-700 p-4 rounded-xl shadow-sm text-xs text-gray-300 border border-gray-600">
+                <strong>{t("Importante:")}</strong> {t("Abrir válvula antes de usar. Cerrar después. Vaciar solo en puntos autorizados.")}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tips para evitar olores */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto bg-white rounded-3xl p-8 md:p-12 shadow-lg border border-gray-100">
+            <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-8 flex items-center gap-3">
+              <span className="p-2 bg-green-100 rounded-lg text-green-600"><Zap className="h-6 w-6" /></span>
+              {t("Tips para evitar olores")}
+            </h2>
+            
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-bold text-gray-900 mb-3 text-lg">{t("En el fregadero")}</h4>
+                <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-4 rounded-xl">
+                  {t("Evita verter restos de comida, café o aceite. Intenta que caiga solo agua con jabón. Los restos orgánicos se descomponen y huelen.")}
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-3 text-lg">{t("En el baño")}</h4>
+                <p className="text-gray-600 text-sm leading-relaxed bg-gray-50 p-4 rounded-xl">
+                  {t("Usa siempre el químico adecuado y en la cantidad correcta. En verano, con el calor, vacía el cassette con más frecuencia, aunque no esté lleno.")}
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -203,6 +312,9 @@ export function GuiaCamperClient() {
 
       {/* CTA Final */}
       <section className="py-24 bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark relative overflow-hidden text-center">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-furgocasa-orange/10 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
+
         <div className="container mx-auto px-4 relative z-10">
           <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6">
             {t("¿Listo para ponerlo en práctica?")}
@@ -211,7 +323,7 @@ export function GuiaCamperClient() {
             {t("Ahora que conoces los secretos, ¡es hora de reservar tu compañera de viaje!")}
           </p>
           <div className="flex flex-wrap justify-center gap-6">
-            <LocalizedLink href="/vehiculos" className="bg-furgocasa-orange text-white font-bold py-4 px-10 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg">
+            <LocalizedLink href="/vehiculos" className="bg-furgocasa-orange text-white font-bold py-4 px-10 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
               {t("Ver vehículos disponibles")}
             </LocalizedLink>
             <LocalizedLink href="/video-tutoriales" className="bg-white/10 backdrop-blur-md text-white border border-white/20 font-bold py-4 px-10 rounded-xl hover:bg-white/20 transition-all">
