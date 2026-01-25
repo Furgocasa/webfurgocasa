@@ -528,17 +528,17 @@ export default function CalendarioPage() {
 
       {/* Navigation and Controls */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          {/* Period Selector */}
-          <div className="flex items-center gap-3">
-            <label htmlFor="period" className="text-sm font-medium text-gray-700">
+        <div className="flex flex-col gap-4">
+          {/* Period Selector - Full width en móvil */}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <label htmlFor="period" className="text-sm font-medium text-gray-700 whitespace-nowrap">
               Mostrar:
             </label>
             <select
               id="period"
               value={monthsToShow}
               onChange={(e) => setMonthsToShow(Number(e.target.value))}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             >
               <option value={1}>1 mes</option>
               <option value={3}>3 meses</option>
@@ -547,42 +547,44 @@ export default function CalendarioPage() {
             </select>
           </div>
 
-          {/* Navigation */}
-          <div className="flex items-center gap-2 md:gap-4">
-            <button
-              onClick={previousPeriod}
-              className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-              title={`${monthsToShow} ${periodLabel} anterior${monthsToShow > 1 ? 'es' : ''}`}
-            >
-              <ChevronLeft className="h-5 w-5 md:h-6 md:w-6" />
-            </button>
-            
-            <button
-              onClick={goToToday}
-              className="px-3 md:px-4 py-1.5 md:py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors flex-shrink-0"
-            >
-              Hoy
-            </button>
+          {/* Navigation - Apilado en móvil */}
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+            {/* Botones de navegación */}
+            <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto">
+              <button
+                onClick={previousPeriod}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                title={`${monthsToShow} ${periodLabel} anterior${monthsToShow > 1 ? 'es' : ''}`}
+              >
+                <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
+              </button>
+              
+              <button
+                onClick={goToToday}
+                className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                Hoy
+              </button>
 
-            <div className="text-center min-w-[160px] md:min-w-[200px] flex-1">
-              <div className="flex items-center justify-center gap-2">
-                <CalendarIcon className="h-4 w-4 md:h-5 md:w-5 text-gray-500" />
-                <span className="text-base md:text-lg font-bold text-gray-900 capitalize">
-                  {months[0].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
-                  {monthsToShow > 1 && (
-                    <> - {months[months.length - 1].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</>
-                  )}
-                </span>
-              </div>
+              <button
+                onClick={nextPeriod}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
+                title={`${monthsToShow} ${periodLabel} siguiente${monthsToShow > 1 ? 's' : ''}`}
+              >
+                <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
+              </button>
             </div>
 
-            <button
-              onClick={nextPeriod}
-              className="p-1.5 md:p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-              title={`${monthsToShow} ${periodLabel} siguiente${monthsToShow > 1 ? 's' : ''}`}
-            >
-              <ChevronRight className="h-5 w-5 md:h-6 md:w-6" />
-            </button>
+            {/* Rango de fechas - Centrado y responsive */}
+            <div className="flex items-center justify-center gap-2 w-full sm:flex-1">
+              <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
+              <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 capitalize text-center">
+                {months[0].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
+                {monthsToShow > 1 && (
+                  <span className="hidden sm:inline"> - {months[months.length - 1].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</span>
+                )}
+              </span>
+            </div>
           </div>
         </div>
       </div>
