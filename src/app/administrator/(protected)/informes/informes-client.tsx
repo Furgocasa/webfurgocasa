@@ -298,8 +298,9 @@ export default function InformesClient({
       if (revenueMode === 'creation') {
         // Modo "creación de pedidos": ingresos del mes en que se creó/confirmó la reserva
         const monthBookings = filteredBookings.filter(b => {
-          // Usar created_at como fecha de creación del pedido
-          const createdDate = b.created_at ? parseISO(b.created_at) : parseISO(b.pickup_date);
+          // Solo usar created_at (sin fallback a pickup_date)
+          if (!b.created_at) return false;
+          const createdDate = parseISO(b.created_at);
           return isWithinInterval(createdDate, { start: monthStart, end: monthEnd });
         });
         
