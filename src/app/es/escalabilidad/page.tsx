@@ -7,10 +7,16 @@ import { EscalabilidadClient } from "./escalabilidad-client";
  * 
  * Página de presentación del proyecto de escalabilidad digital
  * para socios de FURGOCASA. No debe ser indexada por Google.
+ * 
+ * PRIVACIDAD:
+ * - Sin OpenGraph para evitar previews en redes sociales
+ * - Sin Twitter Cards
+ * - Título genérico para no revelar contenido
  */
 
 export const metadata: Metadata = {
-  title: "Proyecto de Escalabilidad Digital - FURGOCASA",
+  title: "Acceso Restringido - FURGOCASA",
+  description: "Contenido de acceso restringido",
   robots: {
     index: false,
     follow: false,
@@ -19,6 +25,9 @@ export const metadata: Metadata = {
       follow: false,
     },
   },
+  // Sin OpenGraph ni Twitter Cards para máxima privacidad
+  openGraph: undefined,
+  twitter: undefined,
 };
 
 export default function EscalabilidadPage() {
