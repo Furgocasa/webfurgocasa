@@ -33,10 +33,17 @@ export function GoogleAnalytics() {
 
     // Enviar pageview cuando cambia la ruta
     if (typeof window !== 'undefined' && (window as any).gtag && pathname) {
-      console.log('[Analytics] Enviando pageview:', pathname);
-      (window as any).gtag('config', GA_MEASUREMENT_ID, {
-        page_path: pathname,
-      });
+      // Usar setTimeout para asegurar que el título de la página se ha actualizado
+      // (Next.js actualiza el título asíncronamente después del cambio de ruta)
+      setTimeout(() => {
+        const currentTitle = document.title;
+        console.log('[Analytics] Enviando pageview:', pathname, 'Title:', currentTitle);
+        
+        (window as any).gtag('config', GA_MEASUREMENT_ID, {
+          page_path: pathname,
+          page_title: currentTitle || 'Furgocasa',
+        });
+      }, 100);
     }
   }, [pathname]);
 
