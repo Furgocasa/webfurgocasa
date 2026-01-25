@@ -198,17 +198,25 @@ export default function InformesClient({
         return false;
       }
 
-      // Filtro por fecha
-      const pickupDate = parseISO(booking.pickup_date);
-      const dropoffDate = parseISO(booking.dropoff_date);
-      
-      // La reserva debe solaparse con el rango seleccionado
-      const overlaps = 
-        pickupDate <= getDateRange.end && dropoffDate >= getDateRange.start;
-      
-      return overlaps;
+      // Filtro por fecha: DEPENDE DEL MODO
+      if (revenueMode === 'creation') {
+        // Modo "Creación": filtrar por fecha de creación de la reserva
+        if (!booking.created_at) return false;
+        const createdDate = parseISO(booking.created_at);
+        return createdDate >= getDateRange.start && createdDate <= getDateRange.end;
+      } else {
+        // Modo "Días alquilados": filtrar por fechas de viaje
+        const pickupDate = parseISO(booking.pickup_date);
+        const dropoffDate = parseISO(booking.dropoff_date);
+        
+        // La reserva debe solaparse con el rango seleccionado
+        const overlaps = 
+          pickupDate <= getDateRange.end && dropoffDate >= getDateRange.start;
+        
+        return overlaps;
+      }
     });
-  }, [bookings, selectedVehicles, getDateRange]);
+  }, [bookings, selectedVehicles, getDateRange, revenueMode]);
 
   // ============================================
   // CÁLCULOS DE MÉTRICAS
