@@ -386,20 +386,45 @@ export function GuiaCamperClient() {
             </div>
           </div>
 
-          {/* Imagen adicional: Área de autocaravanas */}
+          {/* Banner promocional: Mapa Furgocasa App */}
           <div className="mt-16 max-w-5xl mx-auto">
-            <div className="bg-white rounded-3xl p-4 shadow-lg border border-gray-100">
-              <Image
-                src="/images/funcionamiento/Furgocasa_seal_area_autocaravanas.jpg"
-                alt="Área de autocaravanas certificada - Furgocasa"
-                width={1200}
-                height={800}
-                className="rounded-2xl w-full h-auto"
-                quality={90}
-              />
-              <p className="text-center text-sm text-gray-500 mt-4">
-                {t("Busca áreas de autocaravanas certificadas con servicio completo de agua y electricidad")}
-              </p>
+            <div 
+              className="relative bg-gradient-to-br from-furgocasa-blue to-blue-700 rounded-3xl p-8 md:p-12 shadow-2xl overflow-hidden"
+            >
+              {/* Imagen de fondo con overlay */}
+              <div className="absolute inset-0 opacity-20">
+                <Image
+                  src="/images/funcionamiento/Furgocasa_seal_area_autocaravanas.jpg"
+                  alt="Área de autocaravanas"
+                  fill
+                  className="object-cover"
+                  quality={60}
+                />
+              </div>
+
+              {/* Contenido del banner */}
+              <div className="relative z-10 text-center text-white">
+                <h3 className="text-2xl md:text-3xl font-heading font-bold mb-4">
+                  {t("¿Dónde encontrar áreas de autocaravanas certificadas?")}
+                </h3>
+                <p className="text-lg md:text-xl mb-2 font-semibold text-blue-100">
+                  {t("Usa nuestra app gratuita con todas las áreas de España")}
+                </p>
+                <p className="text-sm md:text-base text-blue-50 max-w-2xl mx-auto mb-8 leading-relaxed">
+                  {t("Encuentra áreas validadas, con servicios de agua, electricidad y vaciado. Comentarios reales de usuarios. Rutas, POIs y mucho más.")}
+                </p>
+                
+                <a
+                  href="https://www.mapafurgocasa.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white text-furgocasa-blue px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 hover:scale-105 transition-all duration-300 shadow-xl"
+                >
+                  <MapPin className="h-5 w-5" />
+                  {t("Abrir Mapa Furgocasa")}
+                  <span className="text-xl">→</span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

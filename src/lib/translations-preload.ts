@@ -8743,6 +8743,32 @@ export const staticTranslations = {
     fr: "Recherchez des aires de camping-car certifiées avec service complet d'eau et d'électricité",
     de: "Suchen Sie nach zertifizierten Wohnmobilbereichen mit vollständigem Wasser- und Stromservice"
   },
+  
+  // Banner Mapa Furgocasa App
+  "¿Dónde encontrar áreas de autocaravanas certificadas?": {
+    es: "¿Dónde encontrar áreas de autocaravanas certificadas?",
+    en: "Where to find certified motorhome areas?",
+    fr: "Où trouver des aires certifiées pour camping-cars?",
+    de: "Wo finde ich zertifizierte Wohnmobilstellplätze?"
+  },
+  "Usa nuestra app gratuita con todas las áreas de España": {
+    es: "Usa nuestra app gratuita con todas las áreas de España",
+    en: "Use our free app with all areas in Spain",
+    fr: "Utilisez notre appli gratuite avec toutes les aires d'Espagne",
+    de: "Nutzen Sie unsere kostenlose App mit allen Bereichen in Spanien"
+  },
+  "Encuentra áreas validadas, con servicios de agua, electricidad y vaciado. Comentarios reales de usuarios. Rutas, POIs y mucho más.": {
+    es: "Encuentra áreas validadas, con servicios de agua, electricidad y vaciado. Comentarios reales de usuarios. Rutas, POIs y mucho más.",
+    en: "Find validated areas with water, electricity and waste disposal services. Real user reviews. Routes, POIs and much more.",
+    fr: "Trouvez des aires validées avec services d'eau, électricité et vidange. Commentaires réels d'utilisateurs. Itinéraires, POI et bien plus.",
+    de: "Finden Sie validierte Bereiche mit Wasser-, Strom- und Entsorgungsdiensten. Echte Nutzerbewertungen. Routen, POIs und vieles mehr."
+  },
+  "Abrir Mapa Furgocasa": {
+    es: "Abrir Mapa Furgocasa",
+    en: "Open Mapa Furgocasa",
+    fr: "Ouvrir Mapa Furgocasa",
+    de: "Mapa Furgocasa öffnen"
+  },
 };
 
 /**

@@ -1,6 +1,5 @@
 "use client";
 
-import { LocalizedLink } from "@/components/localized-link";
 import { MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { getTranslatedRoute } from "@/lib/route-translations";
@@ -54,6 +53,9 @@ const FEATURED_DESTINATIONS: Destination[] = [
   },
 ];
 
+// Rotaciones sutiles para cada polaroid (en grados)
+const POLAROID_ROTATIONS = [2, -1.5, 1, -2, 1.5, -1];
+
 interface DestinationsGridProps {
   title?: string;
   destinations?: Destination[];
@@ -67,47 +69,66 @@ export function DestinationsGrid({
   const { language } = useLanguage();
   
   return (
-    <section className="py-16 lg:py-20 bg-white">
+    <section className="py-16 lg:py-24 bg-gray-50">
       <div className="container mx-auto px-4">
-        <h2 className="text-lg lg:text-xl font-semibold text-center text-gray-700 mb-8 lg:mb-12">
+        <h2 className="text-2xl lg:text-3xl font-heading font-bold text-center text-gray-800 mb-12 lg:mb-16">
           {t(title)}
         </h2>
 
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 lg:gap-6 max-w-6xl mx-auto">
-          {destinations.map((destination) => {
-            // Generar la ruta traducida correctamente
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-10 max-w-7xl mx-auto">
+          {destinations.map((destination, index) => {
             const baseRoute = `/alquiler-autocaravanas-campervans-${destination.slug}`;
             const translatedRoute = getTranslatedRoute(baseRoute, language);
+            const rotation = POLAROID_ROTATIONS[index % POLAROID_ROTATIONS.length];
             
             return (
               <a
                 key={destination.slug} 
                 href={translatedRoute}
-                className="text-center group"
+                className="group block"
+                style={{
+                  transform: `rotate(${rotation}deg)`,
+                  transition: 'all 0.3s ease-out'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = `rotate(0deg) translateY(-8px) scale(1.05)`;
+                  e.currentTarget.style.zIndex = '10';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = `rotate(${rotation}deg) translateY(0) scale(1)`;
+                  e.currentTarget.style.zIndex = '1';
+                }}
               >
-                <div className="bg-gray-200 h-32 lg:h-40 rounded-lg mb-3 flex items-center justify-center overflow-hidden relative group-hover:shadow-xl transition-all duration-300">
-                  {destination.image ? (
-                    <Image 
-                      src={destination.image} 
-                      alt={destination.name}
-                      fill
-                      sizes="(max-width: 1024px) 50vw, 16vw"
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      loading="lazy"
-                      quality={70}
-                    />
-                  ) : (
-                    <div className="flex flex-col items-center justify-center text-gray-400">
-                      <MapPin className="h-10 w-10 mb-2 opacity-50" />
-                      <span className="text-xs opacity-50">Imagen</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-furgocasa-blue/0 group-hover:bg-furgocasa-blue/20 transition-all duration-300"></div>
+                {/* Polaroid card */}
+                <div className="bg-white p-3 lg:p-4 shadow-lg group-hover:shadow-2xl transition-shadow duration-300">
+                  {/* Foto */}
+                  <div className="bg-gray-200 aspect-square relative overflow-hidden mb-3">
+                    {destination.image ? (
+                      <Image 
+                        src={destination.image} 
+                        alt={destination.name}
+                        fill
+                        sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                        className="object-cover"
+                        loading="lazy"
+                        quality={75}
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                        <MapPin className="h-12 w-12 mb-2 opacity-40" />
+                        <span className="text-xs opacity-40">Imagen</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Texto en la parte inferior del polaroid */}
+                  <div className="text-center px-2">
+                    <h3 className="font-bold text-gray-900 text-sm lg:text-base mb-0.5 group-hover:text-furgocasa-blue transition-colors">
+                      {destination.name}
+                    </h3>
+                    <p className="text-xs text-gray-600">{t(destination.region)}</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-gray-900 text-sm lg:text-base group-hover:text-furgocasa-blue transition-colors">
-                  {destination.name}
-                </h3>
-                <p className="text-xs lg:text-sm text-gray-600">{t(destination.region)}</p>
               </a>
             );
           })}
