@@ -107,7 +107,8 @@ export async function generateMetadata(
   }
 
   const title = `${vehicle.name} en Venta`;
-  const description = `Compra este ${vehicle.name} (${vehicle.year}) por ${formatPrice(vehicle.sale_price)}. ${vehicle.mileage.toLocaleString()} km, ${vehicle.seats} plazas. Garantía y revisión completa incluida.`;
+  // Descripción optimizada para Facebook (máx 200 caracteres)
+  const description = `${vehicle.name} ${vehicle.year} - ${formatPrice(vehicle.sale_price)}. ${vehicle.mileage.toLocaleString()} km, ${vehicle.seats} plazas. ¡Visítalo en Furgocasa Murcia!`;
 
   return {
     title,
@@ -117,6 +118,8 @@ export async function generateMetadata(
       title,
       description,
       url: alternates.canonical,
+      siteName: "Furgocasa - Alquiler y Venta de Autocaravanas",
+      locale: 'es_ES',
       images: [
         {
           url: ogImage,
@@ -125,10 +128,7 @@ export async function generateMetadata(
           alt: vehicle.name,
         },
       ],
-      type: "article",
-      publishedTime: vehicle.created_at,
-      section: "Vehículos en Venta",
-      tags: ["camper", "autocaravana", "venta", vehicle.brand, vehicle.model],
+      type: "website",
     },
     twitter: {
       card: "summary_large_image",

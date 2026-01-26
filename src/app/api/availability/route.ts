@@ -8,7 +8,7 @@ import {
   calculateDurationDiscount,
   Season 
 } from "@/lib/utils";
-import { detectDeviceType } from "@/lib/search-tracking/session";
+import { detectDeviceType, isBot } from "@/lib/search-tracking/session";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -197,77 +197,88 @@ export async function GET(request: NextRequest) {
     let sessionId: string = request.cookies.get('furgocasa_session_id')?.value || crypto.randomUUID();
     
     try {
-      // Calcular días de antelación
-      const advanceDays = Math.ceil(
-        (new Date(pickupDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
-      );
+      // Detectar si es un bot - NO registrar bots en analytics
+      const userAgent = request.headers.get("user-agent");
+      const isBotRequest = isBot(userAgent);
       
-      // Obtener IDs reales de ubicaciones (convertir slugs a UUIDs si es necesario)
-      let pickupLocationId: string | null = null;
-      let dropoffLocationId: string | null = null;
-      
-      // Si las ubicaciones son slugs (no UUIDs), obtener sus IDs
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      
-      if (pickupLocation) {
-        if (uuidRegex.test(pickupLocation)) {
-          pickupLocationId = pickupLocation;
-        } else {
-          const { data: pickupLoc } = await supabase
-            .from("locations")
-            .select("id")
-            .eq("slug", pickupLocation)
-            .single();
-          pickupLocationId = pickupLoc?.id || null;
+      if (!isBotRequest) {
+        // Solo registrar búsquedas de usuarios reales
+        
+        // Calcular días de antelación
+        const advanceDays = Math.ceil(
+          (new Date(pickupDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        );
+        
+        // Obtener IDs reales de ubicaciones (convertir slugs a UUIDs si es necesario)
+        let pickupLocationId: string | null = null;
+        let dropoffLocationId: string | null = null;
+        
+        // Si las ubicaciones son slugs (no UUIDs), obtener sus IDs
+        const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+        
+        if (pickupLocation) {
+          if (uuidRegex.test(pickupLocation)) {
+            pickupLocationId = pickupLocation;
+          } else {
+            const { data: pickupLoc } = await supabase
+              .from("locations")
+              .select("id")
+              .eq("slug", pickupLocation)
+              .single();
+            pickupLocationId = pickupLoc?.id || null;
+          }
         }
-      }
-      
-      if (dropoffLocation) {
-        if (uuidRegex.test(dropoffLocation)) {
-          dropoffLocationId = dropoffLocation;
-        } else {
-          const { data: dropoffLoc } = await supabase
-            .from("locations")
-            .select("id")
-            .eq("slug", dropoffLocation)
-            .single();
-          dropoffLocationId = dropoffLoc?.id || null;
+        
+        if (dropoffLocation) {
+          if (uuidRegex.test(dropoffLocation)) {
+            dropoffLocationId = dropoffLocation;
+          } else {
+            const { data: dropoffLoc } = await supabase
+              .from("locations")
+              .select("id")
+              .eq("slug", dropoffLocation)
+              .single();
+            dropoffLocationId = dropoffLoc?.id || null;
+          }
         }
-      }
-      
-      // Insertar registro en search_queries
-      const { data: searchQuery, error: searchError } = await supabase
-        .from("search_queries")
-        .insert({
-          session_id: sessionId,
-          pickup_date: pickupDate,
-          dropoff_date: dropoffDate,
-          pickup_time: pickupTime,
-          dropoff_time: dropoffTime,
-          rental_days: days,
-          advance_days: Math.max(0, advanceDays),
-          pickup_location: pickupLocation,
-          dropoff_location: dropoffLocation,
-          pickup_location_id: pickupLocationId,
-          dropoff_location_id: dropoffLocationId,
-          same_location: pickupLocation === dropoffLocation,
-          category_slug: category,
-          vehicles_available_count: vehiclesWithPrices?.length || 0,
-          season_applied: priceResult.dominantSeason,
-          avg_price_shown: finalPricePerDay,
-          had_availability: (vehiclesWithPrices?.length || 0) > 0,
-          funnel_stage: "search_only",
-          locale: request.headers.get("accept-language")?.split(",")[0]?.split("-")[0] || null,
-          user_agent_type: detectDeviceType(request.headers.get("user-agent")),
-        })
-        .select("id")
-        .single();
-      
-      if (!searchError && searchQuery) {
-        searchQueryId = searchQuery.id;
+        
+        // Insertar registro en search_queries
+        const { data: searchQuery, error: searchError } = await supabase
+          .from("search_queries")
+          .insert({
+            session_id: sessionId,
+            pickup_date: pickupDate,
+            dropoff_date: dropoffDate,
+            pickup_time: pickupTime,
+            dropoff_time: dropoffTime,
+            rental_days: days,
+            advance_days: Math.max(0, advanceDays),
+            pickup_location: pickupLocation,
+            dropoff_location: dropoffLocation,
+            pickup_location_id: pickupLocationId,
+            dropoff_location_id: dropoffLocationId,
+            same_location: pickupLocation === dropoffLocation,
+            category_slug: category,
+            vehicles_available_count: vehiclesWithPrices?.length || 0,
+            season_applied: priceResult.dominantSeason,
+            avg_price_shown: finalPricePerDay,
+            had_availability: (vehiclesWithPrices?.length || 0) > 0,
+            funnel_stage: "search_only",
+            locale: request.headers.get("accept-language")?.split(",")[0]?.split("-")[0] || null,
+            user_agent_type: detectDeviceType(userAgent),
+          })
+          .select("id")
+          .single();
+        
+        if (!searchError && searchQuery) {
+          searchQueryId = searchQuery.id;
+        } else {
+          console.error("Error registrando búsqueda:", searchError);
+          // No fallar la búsqueda si falla el tracking
+        }
       } else {
-        console.error("Error registrando búsqueda:", searchError);
-        // No fallar la búsqueda si falla el tracking
+        // Log opcional para debugging (puedes removerlo en producción)
+        console.log("[Bot detectado - tracking omitido]", userAgent?.substring(0, 100));
       }
     } catch (trackingError) {
       // No fallar la búsqueda si falla el tracking
