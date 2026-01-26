@@ -3,7 +3,7 @@
 // ✅ Forzar renderizado dinámico (no pre-renderizar en build)
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { 
@@ -16,7 +16,10 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { useAdminData } from "@/hooks/use-admin-data";
@@ -48,6 +51,95 @@ const statusConfig: Record<string, { icon: typeof CheckCircle; bg: string; text:
   published: { icon: CheckCircle, bg: "bg-green-100", text: "text-green-700", label: "Publicado" },
   archived: { icon: XCircle, bg: "bg-red-100", text: "text-red-700", label: "Archivado" },
 };
+
+// Hook personalizado para ordenación de tablas
+function useSortableData<T>(items: T[] | undefined, config?: { key: keyof T; direction: 'asc' | 'desc' }) {
+  const [sortConfig, setSortConfig] = useState<{ key: keyof T; direction: 'asc' | 'desc' } | null>(config || null);
+
+  const sortedItems = React.useMemo(() => {
+    if (!items) return [];
+    
+    let sortableItems = [...items];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        // Manejar valores nulos/undefined
+        if (aValue == null) return 1;
+        if (bValue == null) return -1;
+
+        // Convertir strings numéricos a números para comparación correcta
+        const aNum = typeof aValue === 'string' ? parseFloat(aValue) : aValue;
+        const bNum = typeof bValue === 'string' ? parseFloat(bValue) : bValue;
+
+        if (!isNaN(aNum as number) && !isNaN(bNum as number)) {
+          return sortConfig.direction === 'asc' 
+            ? (aNum as number) - (bNum as number)
+            : (bNum as number) - (aNum as number);
+        }
+
+        // Comparación de strings
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [items, sortConfig]);
+
+  const requestSort = (key: keyof T) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  return { items: sortedItems, requestSort, sortConfig };
+}
+
+// Componente de encabezado de tabla ordenable
+function SortableTableHeader<T>({ 
+  label, 
+  sortKey, 
+  currentSort, 
+  onSort,
+  align = 'left'
+}: { 
+  label: string; 
+  sortKey: keyof T; 
+  currentSort: { key: keyof T; direction: 'asc' | 'desc' } | null;
+  onSort: (key: keyof T) => void;
+  align?: 'left' | 'center' | 'right';
+}) {
+  const isSorted = currentSort?.key === sortKey;
+  const alignClass = align === 'center' ? 'text-center' : align === 'right' ? 'text-right' : 'text-left';
+  
+  return (
+    <th 
+      className={`px-6 py-4 ${alignClass} text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors select-none`}
+      onClick={() => onSort(sortKey)}
+    >
+      <div className={`flex items-center gap-1 ${align === 'center' ? 'justify-center' : align === 'right' ? 'justify-end' : ''}`}>
+        {label}
+        {isSorted ? (
+          currentSort?.direction === 'asc' ? (
+            <ArrowUp className="h-4 w-4" />
+          ) : (
+            <ArrowDown className="h-4 w-4" />
+          )
+        ) : (
+          <ArrowUpDown className="h-4 w-4 opacity-30" />
+        )}
+      </div>
+    </th>
+  );
+}
 
 export default function BlogPostsPage() {
   // Establecer título de la página
@@ -140,6 +232,9 @@ export default function BlogPostsPage() {
     const matchesStatus = !statusFilter || post.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
   });
+
+  // Ordenación de posts
+  const sortedPosts = useSortableData(filteredPosts, { key: 'created_at', direction: 'desc' });
 
   // Calcular estadísticas
   const stats = {
@@ -267,17 +362,17 @@ export default function BlogPostsPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Artículo</th>
+                    <SortableTableHeader<Post> label="Artículo" sortKey="title" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Categoría</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Autor</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Estado</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Visitas</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Fecha</th>
+                    <SortableTableHeader<Post> label="Estado" sortKey="status" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
+                    <SortableTableHeader<Post> label="Visitas" sortKey="views" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
+                    <SortableTableHeader<Post> label="Fecha" sortKey="created_at" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredPosts.map((post) => {
+                  {sortedPosts.items.map((post) => {
                     const StatusIcon = statusConfig[post.status]?.icon || Clock;
                     const statusStyle = statusConfig[post.status] || statusConfig.draft;
                     return (
