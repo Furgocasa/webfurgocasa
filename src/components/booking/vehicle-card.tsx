@@ -17,6 +17,7 @@ import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display"
 import { useLanguage } from "@/contexts/language-context";
 import { useRouter } from "next/navigation";
 import { getSearchQueryId } from "@/lib/search-tracking/session";
+import { getTranslatedRoute } from "@/lib/route-translations";
 
 interface VehicleCardProps {
   vehicle: VehicleWithImages;
@@ -60,16 +61,12 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
     dropoff_location: searchParams.dropoff_location,
   });
 
-  // Traducir ruta según idioma
-  const bookingPaths: Record<string, string> = {
-    es: '/reservar/vehiculo',
-    en: '/book/vehicle',
-    fr: '/reserver/vehicule',
-    de: '/buchen/fahrzeug'
-  };
-  
-  // URL a la página de detalle del vehículo con selección de extras
-  const reservationUrl = `${bookingPaths[language]}?${bookingParams.toString()}`;
+  // ✅ Usar ruta base en español y getTranslatedRoute() se encarga de traducirla
+  // y añadir el prefijo de idioma correcto (/fr/reserver/vehicule, /de/buchen/fahrzeug, etc.)
+  const reservationUrl = getTranslatedRoute(
+    `/reservar/vehiculo?${bookingParams.toString()}`,
+    language
+  );
 
   // Get main image - Supabase usa image_url, is_primary, alt_text
   const mainImage = vehicle.images?.find((img: any) => img.is_primary || img.is_main) || vehicle.images?.[0];

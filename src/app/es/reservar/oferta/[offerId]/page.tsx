@@ -12,6 +12,7 @@ import {
 import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
 import { formatPrice } from "@/lib/utils";
+import { getTranslatedRoute } from "@/lib/route-translations";
 
 interface OfferData {
   id: string;
@@ -307,8 +308,9 @@ export default function ReservarOfertaPage({
         })
       });
 
-      // Redirigir a confirmación/pago
-      router.push(`/${language}/reservar/${result.booking.id}/pago`);
+      // Redirigir a confirmación/pago con ruta traducida
+      const paymentPath = getTranslatedRoute(`/reservar/${result.booking.id}/pago`, language);
+      router.push(paymentPath);
 
     } catch (err: any) {
       console.error('Error creating booking:', err);

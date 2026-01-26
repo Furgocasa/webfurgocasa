@@ -432,6 +432,13 @@ const nextConfig = {
       { source: '/de/offers', destination: '/de/angebote', permanent: true },
       { source: '/de/about-us', destination: '/de/uber-uns', permanent: true },
       { source: '/de/privacy', destination: '/de/datenschutz', permanent: true },
+      // Corregir subrutas de reserva con palabras en otros idiomas
+      { source: '/de/buchen/vehiculo', destination: '/de/buchen/fahrzeug', permanent: true },
+      { source: '/de/buchen/vehicle', destination: '/de/buchen/fahrzeug', permanent: true },
+      { source: '/de/buchen/vehicule', destination: '/de/buchen/fahrzeug', permanent: true },
+      { source: '/de/buchen/nueva', destination: '/de/buchen/neu', permanent: true },
+      { source: '/de/buchen/new', destination: '/de/buchen/neu', permanent: true },
+      { source: '/de/buchen/nouvelle', destination: '/de/buchen/neu', permanent: true },
       
       // ── Francés (FR): Corregir rutas EN → FR ──
       { source: '/fr/vehicles', destination: '/fr/vehicules', permanent: true },
@@ -444,6 +451,13 @@ const nextConfig = {
       { source: '/fr/offers', destination: '/fr/offres', permanent: true },
       { source: '/fr/about-us', destination: '/fr/a-propos', permanent: true },
       { source: '/fr/privacy', destination: '/fr/confidentialite', permanent: true },
+      // Corregir subrutas de reserva con palabras en otros idiomas
+      { source: '/fr/reserver/vehiculo', destination: '/fr/reserver/vehicule', permanent: true },
+      { source: '/fr/reserver/vehicle', destination: '/fr/reserver/vehicule', permanent: true },
+      { source: '/fr/reserver/fahrzeug', destination: '/fr/reserver/vehicule', permanent: true },
+      { source: '/fr/reserver/nueva', destination: '/fr/reserver/nouvelle', permanent: true },
+      { source: '/fr/reserver/new', destination: '/fr/reserver/nouvelle', permanent: true },
+      { source: '/fr/reserver/neu', destination: '/fr/reserver/nouvelle', permanent: true },
       
       // ── Inglés (EN): Corregir rutas ES → EN ──
       { source: '/en/vehiculos', destination: '/en/vehicles', permanent: true },
@@ -457,6 +471,13 @@ const nextConfig = {
       { source: '/en/ofertas', destination: '/en/offers', permanent: true },
       { source: '/en/quienes-somos', destination: '/en/about-us', permanent: true },
       { source: '/en/privacidad', destination: '/en/privacy', permanent: true },
+      // Corregir subrutas de reserva con palabras en otros idiomas
+      { source: '/en/book/vehiculo', destination: '/en/book/vehicle', permanent: true },
+      { source: '/en/book/fahrzeug', destination: '/en/book/vehicle', permanent: true },
+      { source: '/en/book/vehicule', destination: '/en/book/vehicle', permanent: true },
+      { source: '/en/book/nueva', destination: '/en/book/new', permanent: true },
+      { source: '/en/book/neu', destination: '/en/book/new', permanent: true },
+      { source: '/en/book/nouvelle', destination: '/en/book/new', permanent: true },
       
       // ── Español (ES): Corregir rutas DE/EN/FR → ES ──
       { source: '/es/fahrzeuge', destination: '/es/vehiculos', permanent: true },
@@ -477,6 +498,18 @@ const nextConfig = {
       { source: '/es/book/:path*', destination: '/es/reservar/:path*', permanent: true },
       { source: '/es/reserver', destination: '/es/reservar', permanent: true },
       { source: '/es/reserver/:path*', destination: '/es/reservar/:path*', permanent: true },
+      // Corregir subrutas de reserva con palabras en otros idiomas
+      { source: '/es/reservar/fahrzeug', destination: '/es/reservar/vehiculo', permanent: true },
+      { source: '/es/reservar/vehicle', destination: '/es/reservar/vehiculo', permanent: true },
+      { source: '/es/reservar/vehicule', destination: '/es/reservar/vehiculo', permanent: true },
+      { source: '/es/reservar/neu', destination: '/es/reservar/nueva', permanent: true },
+      { source: '/es/reservar/new', destination: '/es/reservar/nueva', permanent: true },
+      { source: '/es/reservar/nouvelle', destination: '/es/reservar/nueva', permanent: true },
+      { source: '/es/reservar/:id/zahlung', destination: '/es/reservar/:id/pago', permanent: true },
+      { source: '/es/reservar/:id/payment', destination: '/es/reservar/:id/pago', permanent: true },
+      { source: '/es/reservar/:id/paiement', destination: '/es/reservar/:id/pago', permanent: true },
+      { source: '/es/reservar/:id/bestaetigung', destination: '/es/reservar/:id/confirmacion', permanent: true },
+      { source: '/es/reservar/:id/confirmation', destination: '/es/reservar/:id/confirmacion', permanent: true },
       { source: '/es/preise', destination: '/es/tarifas', permanent: true },
       { source: '/es/rates', destination: '/es/tarifas', permanent: true },
       { source: '/es/tarifs', destination: '/es/tarifas', permanent: true },

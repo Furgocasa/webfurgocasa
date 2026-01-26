@@ -1,6 +1,12 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 
+// Helper para validar UUID
+function isValidUUID(uuid: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: { id: string } }
@@ -11,6 +17,14 @@ export async function GET(
     if (!bookingId) {
       return NextResponse.json(
         { error: "Falta el ID de la reserva" },
+        { status: 400 }
+      );
+    }
+
+    // Validar que el ID sea un UUID válido
+    if (!isValidUUID(bookingId)) {
+      return NextResponse.json(
+        { error: "ID de reserva inválido. Debe ser un UUID válido." },
         { status: 400 }
       );
     }
