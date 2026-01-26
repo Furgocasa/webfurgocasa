@@ -15,9 +15,9 @@ const pricingTable = [
 ];
 
 const discounts = [
-  { percentage: "-10%", description: "Alquileres de 7 días o más", icon: "📅" },
-  { percentage: "-20%", description: "Alquileres de 14 días o más", icon: "🗓️" },
-  { percentage: "-30%", description: "Alquileres de 21 días o más (solo Temp. Baja)", icon: "🔥" },
+  { percentage: "hasta -10%", description: "Alquileres de 7 días o más (Temp. Baja)", icon: "📅" },
+  { percentage: "hasta -20%", description: "Alquileres de 14 días o más (Temp. Baja)", icon: "🗓️" },
+  { percentage: "hasta -30%", description: "Alquileres de 21 días o más (Temp. Baja)", icon: "🔥" },
 ];
 
 const includedFree = [
@@ -148,6 +148,45 @@ export function TarifasClient() {
                 </table>
               </div>
             </div>
+          
+          {/* Información adicional */}
+          <div className="mt-12 max-w-4xl mx-auto bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-furgocasa-blue" />
+                  {t("Información general")}
+                </h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">• {t("Los precios se devengan por períodos completos de 24 horas")}</li>
+                  <li className="flex items-start gap-2">• {t("Los descuentos se aplican automáticamente según la duración del alquiler")}</li>
+                </ul>
+              </div>
+              <div>
+                 <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-furgocasa-blue" />
+                  {t("Método de pago")}
+                </h4>
+                <p className="text-sm text-gray-700">
+                  {t("El método de pago aceptado será el pago con tarjeta de débito o crédito a través de nuestra pasarela de pago segura Redsys.")}
+                </p>
+              </div>
+            </div>
+            
+            <div className="mt-8 pt-8 border-t border-gray-200 grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">{t("Vehículos de 4 plazas:")}</h4>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {t("En relación a los vehículos de hasta 4 plazas de noche, con dos camas, en el caso de que se desee incluir el colchón de la segunda cama y, por tanto, disfrutar de la posibilidad de que duerman hasta 4 personas, los precios anteriormente mostrados se incrementarán en 10,00 euros día, debiendo el cliente incluir el referido extra de alquiler en el momento de hacer la reserva.")}
+                </p>
+              </div>
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">{t("Modificación de fechas:")}</h4>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {t("En el caso de que, habiéndose realizado una reserva previa, el cliente ejerza el derecho de modificación de fechas de su alquiler y el precio para estos nuevos días haya variado al alza o a la baja, siempre que la reserva se cambie dentro de la misma \"Temporada\", se mantendrá el precio día inicialmente contratado. En caso de que la modificación se realice a temporada distinta, se tendrán en cuenta para el ajuste los precios orientativos mostrados en esta tabla.")}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -178,46 +217,6 @@ export function TarifasClient() {
                 <p className="text-white font-medium text-lg px-4 py-2 bg-white/10 rounded-full inline-block">{t(discount.description)}</p>
               </div>
             ))}
-          </div>
-          
-          {/* Información adicional */}
-          <div className="max-w-4xl mx-auto bg-white/5 backdrop-blur-md rounded-2xl p-8 border border-white/10">
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-furgocasa-orange" />
-                  {t("Información general")}
-                </h4>
-                <ul className="space-y-2 text-sm text-blue-100">
-                  <li className="flex items-start gap-2">• {t("Los precios se devengan por períodos completos de 24 horas")}</li>
-                  <li className="flex items-start gap-2">• {t("Los descuentos se aplican automáticamente según la duración del alquiler")}</li>
-                </ul>
-              </div>
-              <div>
-                 <h4 className="font-bold text-lg mb-3 flex items-center gap-2">
-                  <CreditCard className="h-5 w-5 text-furgocasa-orange" />
-                  {t("Método de pago")}
-                </h4>
-                <p className="text-sm text-blue-100">
-                  {t("El método de pago aceptado será el pago con tarjeta de débito o crédito a través de nuestra pasarela de pago segura Redsys.")}
-                </p>
-              </div>
-            </div>
-            
-            <div className="mt-8 pt-8 border-t border-white/10 grid md:grid-cols-2 gap-8">
-              <div>
-                <h4 className="font-bold text-white mb-2">{t("Vehículos de 4 plazas:")}</h4>
-                <p className="text-sm text-blue-100 leading-relaxed">
-                  {t("En relación a los vehículos de hasta 4 plazas de noche, con dos camas, en el caso de que se desee incluir el colchón de la segunda cama y, por tanto, disfrutar de la posibilidad de que duerman hasta 4 personas, los precios anteriormente mostrados se incrementarán en 10,00 euros día, debiendo el cliente incluir el referido extra de alquiler en el momento de hacer la reserva.")}
-                </p>
-              </div>
-              <div>
-                <h4 className="font-bold text-white mb-2">{t("Modificación de fechas:")}</h4>
-                <p className="text-sm text-blue-100 leading-relaxed">
-                  {t("En el caso de que, habiéndose realizado una reserva previa, el cliente ejerza el derecho de modificación de fechas de su alquiler y el precio para estos nuevos días haya variado al alza o a la baja, siempre que la reserva se cambie dentro de la misma \"Temporada\", se mantendrá el precio día inicialmente contratado. En caso de que la modificación se realice a temporada distinta, se tendrán en cuenta para el ajuste los precios orientativos mostrados en esta tabla.")}
-                </p>
-              </div>
-            </div>
           </div>
 
           <div className="mt-12 text-center">
