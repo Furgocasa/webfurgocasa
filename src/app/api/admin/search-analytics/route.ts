@@ -329,6 +329,60 @@ export async function GET(request: NextRequest) {
     }
 
     // ============================================
+    // SEARCH-TIMING: Cuándo buscan los clientes
+    // ============================================
+    if (type === "search-timing") {
+      const { data: timingData } = await supabase
+        .from("search_queries")
+        .select("searched_at, had_availability, vehicle_selected, booking_created, advance_days, rental_days")
+        .gte("searched_at", dateFrom)
+        .lte("searched_at", dateTo + " 23:59:59");
+
+      // Agrupar por fecha de búsqueda
+      const dateGroups = timingData?.reduce((acc: any, s) => {
+        const searchDate = new Date(s.searched_at);
+        const dateKey = searchDate.toISOString().split('T')[0];
+        const dayOfWeek = searchDate.getDay(); // 0=domingo, 6=sábado
+        
+        if (!acc[dateKey]) {
+          acc[dateKey] = {
+            search_date: dateKey,
+            day_of_week: dayOfWeek,
+            day_name: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][dayOfWeek],
+            is_weekend: dayOfWeek === 0 || dayOfWeek === 6,
+            total_searches: 0,
+            searches_with_availability: 0,
+            vehicle_selections: 0,
+            bookings_created: 0,
+            advance_days_sum: 0,
+            rental_days_sum: 0,
+          };
+        }
+        
+        acc[dateKey].total_searches++;
+        if (s.had_availability) acc[dateKey].searches_with_availability++;
+        if (s.vehicle_selected) acc[dateKey].vehicle_selections++;
+        if (s.booking_created) acc[dateKey].bookings_created++;
+        acc[dateKey].advance_days_sum += s.advance_days || 0;
+        acc[dateKey].rental_days_sum += s.rental_days || 0;
+        
+        return acc;
+      }, {});
+
+      const searchTiming = Object.values(dateGroups || {})
+        .map((d: any) => ({
+          ...d,
+          selection_rate: d.total_searches > 0 ? (d.vehicle_selections / d.total_searches * 100).toFixed(2) : 0,
+          conversion_rate: d.total_searches > 0 ? (d.bookings_created / d.total_searches * 100).toFixed(2) : 0,
+          avg_advance_days: d.total_searches > 0 ? (d.advance_days_sum / d.total_searches).toFixed(1) : 0,
+          avg_rental_days: d.total_searches > 0 ? (d.rental_days_sum / d.total_searches).toFixed(1) : 0,
+        }))
+        .sort((a: any, b: any) => b.search_date.localeCompare(a.search_date));
+
+      return NextResponse.json({ searchTiming });
+    }
+
+    // ============================================
     // DEMAND-AVAILABILITY: Demanda vs Disponibilidad
     // ============================================
     if (type === "demand-availability") {

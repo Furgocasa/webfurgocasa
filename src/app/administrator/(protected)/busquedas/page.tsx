@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { 
   TrendingUp, 
@@ -13,7 +13,10 @@ import {
   Target,
   AlertTriangle,
   BarChart3,
-  Loader2
+  Loader2,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -108,6 +111,23 @@ interface DemandAvailabilityData {
   }>;
 }
 
+interface SearchTimingData {
+  searchTiming: Array<{
+    search_date: string;
+    day_of_week: number;
+    day_name: string;
+    is_weekend: boolean;
+    total_searches: number;
+    searches_with_availability: number;
+    vehicle_selections: number;
+    bookings_created: number;
+    selection_rate: string;
+    conversion_rate: string;
+    avg_advance_days: string;
+    avg_rental_days: string;
+  }>;
+}
+
 async function fetchAnalytics(type: string, startDate: string, endDate: string) {
   const params = new URLSearchParams({
     type,
@@ -133,6 +153,92 @@ function formatSeconds(seconds: number): string {
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
   return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+}
+
+// Hook personalizado para ordenación de tablas
+function useSortableData<T>(items: T[] | undefined, config?: { key: keyof T; direction: 'asc' | 'desc' }) {
+  const [sortConfig, setSortConfig] = useState<{ key: keyof T; direction: 'asc' | 'desc' } | null>(config || null);
+
+  const sortedItems = React.useMemo(() => {
+    if (!items) return [];
+    
+    let sortableItems = [...items];
+    if (sortConfig !== null) {
+      sortableItems.sort((a, b) => {
+        const aValue = a[sortConfig.key];
+        const bValue = b[sortConfig.key];
+
+        // Manejar valores nulos/undefined
+        if (aValue == null) return 1;
+        if (bValue == null) return -1;
+
+        // Convertir strings numéricos a números para comparación correcta
+        const aNum = typeof aValue === 'string' ? parseFloat(aValue) : aValue;
+        const bNum = typeof bValue === 'string' ? parseFloat(bValue) : bValue;
+
+        if (!isNaN(aNum as number) && !isNaN(bNum as number)) {
+          return sortConfig.direction === 'asc' 
+            ? (aNum as number) - (bNum as number)
+            : (bNum as number) - (aNum as number);
+        }
+
+        // Comparación de strings
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [items, sortConfig]);
+
+  const requestSort = (key: keyof T) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  return { items: sortedItems, requestSort, sortConfig };
+}
+
+// Componente de encabezado de tabla ordenable
+function SortableTableHeader<T>({ 
+  label, 
+  sortKey, 
+  currentSort, 
+  onSort 
+}: { 
+  label: string; 
+  sortKey: keyof T; 
+  currentSort: { key: keyof T; direction: 'asc' | 'desc' } | null;
+  onSort: (key: keyof T) => void;
+}) {
+  const isSorted = currentSort?.key === sortKey;
+  
+  return (
+    <th 
+      className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase cursor-pointer hover:bg-gray-100 transition-colors select-none"
+      onClick={() => onSort(sortKey)}
+    >
+      <div className="flex items-center gap-1">
+        {label}
+        {isSorted ? (
+          currentSort?.direction === 'asc' ? (
+            <ArrowUp className="h-4 w-4" />
+          ) : (
+            <ArrowDown className="h-4 w-4" />
+          )
+        ) : (
+          <ArrowUpDown className="h-4 w-4 opacity-30" />
+        )}
+      </div>
+    </th>
+  );
 }
 
 export default function SearchAnalyticsPage() {
@@ -180,6 +286,11 @@ export default function SearchAnalyticsPage() {
   const { data: demandAvailability, isLoading: loadingDemand } = useQuery<DemandAvailabilityData>({
     queryKey: ["search-analytics", "demand-availability", dateRange.start, dateRange.end],
     queryFn: () => fetchAnalytics("demand-availability", dateRange.start, dateRange.end),
+  });
+
+  const { data: searchTiming, isLoading: loadingTiming } = useQuery<SearchTimingData>({
+    queryKey: ["search-analytics", "search-timing", dateRange.start, dateRange.end],
+    queryFn: () => fetchAnalytics("search-timing", dateRange.start, dateRange.end),
   });
 
   if (loadingOverview) {
@@ -389,67 +500,191 @@ export default function SearchAnalyticsPage() {
         <h2 className="text-xl font-bold text-gray-900 mb-4">
           Fechas Más Buscadas (Top 20)
         </h2>
+        <p className="text-sm text-gray-600 mb-4">
+          Muestra qué periodos quieren alquilar los clientes (fechas de recogida/devolución más buscadas)
+        </p>
 
         {loadingDates ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recogida</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Devolución</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Días</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Búsquedas</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reservas</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conv. %</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Temporada</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio medio</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {topDates?.topDates.map((date, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {formatDate(date.pickup_date)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {formatDate(date.dropoff_date)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {date.rental_days}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-blue-600">
-                      {date.search_count}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-green-600">
-                      {date.bookings_count}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        parseFloat(date.conversion_rate) >= 30 
-                          ? "bg-green-100 text-green-800"
-                          : parseFloat(date.conversion_rate) >= 15
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}>
-                        {date.conversion_rate}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {date.season || "N/A"}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                      €{date.avg_price}
-                    </td>
+        ) : (() => {
+          const { items: sortedDates, requestSort, sortConfig } = useSortableData(
+            topDates?.topDates,
+            { key: 'search_count', direction: 'desc' }
+          );
+
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <SortableTableHeader label="Recogida" sortKey="pickup_date" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Devolución" sortKey="dropoff_date" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Días" sortKey="rental_days" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Búsquedas" sortKey="search_count" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Reservas" sortKey="bookings_count" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Conv. %" sortKey="conversion_rate" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Temporada" sortKey="season" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Precio medio" sortKey="avg_price" currentSort={sortConfig} onSort={requestSort} />
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {sortedDates.map((date, index) => (
+                    <tr key={index} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {formatDate(date.pickup_date)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-900">
+                        {formatDate(date.dropoff_date)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {date.rental_days}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-blue-600">
+                        {date.search_count}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-green-600">
+                        {date.bookings_count}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          parseFloat(date.conversion_rate) >= 30 
+                            ? "bg-green-100 text-green-800"
+                            : parseFloat(date.conversion_rate) >= 15
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}>
+                          {date.conversion_rate}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {date.season || "N/A"}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                        €{date.avg_price}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
+      </div>
+
+      {/* NUEVO: Cuándo buscan los clientes */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <Clock className="h-6 w-6 text-purple-600" />
+            Cuándo Buscan los Clientes
+          </h2>
+          <p className="text-sm text-gray-600">
+            Análisis de en qué momento realizan las búsquedas (no confundir con fechas que buscan)
+          </p>
+        </div>
+
+        {loadingTiming ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
           </div>
-        )}
+        ) : (() => {
+          const { items: sortedTiming, requestSort, sortConfig } = useSortableData(
+            searchTiming?.searchTiming,
+            { key: 'search_date', direction: 'desc' }
+          );
+
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <SortableTableHeader label="Fecha" sortKey="search_date" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Día" sortKey="day_name" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Búsquedas" sortKey="total_searches" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Disponib." sortKey="searches_with_availability" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Selecciones" sortKey="vehicle_selections" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Reservas" sortKey="bookings_created" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Conv. %" sortKey="conversion_rate" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Antelación" sortKey="avg_advance_days" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Días alquiler" sortKey="avg_rental_days" currentSort={sortConfig} onSort={requestSort} />
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {sortedTiming.map((timing) => (
+                    <tr 
+                      key={timing.search_date} 
+                      className={`hover:bg-gray-50 ${timing.is_weekend ? 'bg-blue-50' : ''}`}
+                    >
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        {formatDate(timing.search_date)}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          timing.is_weekend 
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}>
+                          {timing.day_name}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-blue-600">
+                        {timing.total_searches}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {timing.searches_with_availability}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-purple-600 font-semibold">
+                        {timing.vehicle_selections}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-green-600 font-semibold">
+                        {timing.bookings_created}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          parseFloat(timing.conversion_rate) >= 25 
+                            ? "bg-green-100 text-green-800"
+                            : parseFloat(timing.conversion_rate) >= 10
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}>
+                          {timing.conversion_rate}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {timing.avg_advance_days} días
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {timing.avg_rental_days} días
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Insights */}
+              <div className="mt-6 grid md:grid-cols-2 gap-4">
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h3 className="font-semibold text-blue-900 mb-2 text-sm">
+                    📊 Insights de fin de semana
+                  </h3>
+                  <p className="text-xs text-blue-700">
+                    Las filas marcadas en azul son fines de semana. Compara el volumen de búsquedas entre semana vs fin de semana.
+                  </p>
+                </div>
+                <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                  <h3 className="font-semibold text-purple-900 mb-2 text-sm">
+                    💡 Antelación media
+                  </h3>
+                  <p className="text-xs text-purple-700">
+                    La columna "Antelación" muestra con cuántos días de antelación los usuarios buscan respecto a su fecha de recogida deseada.
+                  </p>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
 
       {/* Rendimiento por vehículo */}
@@ -463,50 +698,57 @@ export default function SearchAnalyticsPage() {
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vehículo</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Selecciones</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reservas</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Conv. %</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Precio medio</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {vehiclePerf?.vehiclePerformance.map((vehicle) => (
-                  <tr key={vehicle.vehicle_id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
-                      {vehicle.vehicle_name}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-blue-600 font-semibold">
-                      {vehicle.times_selected}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-green-600 font-semibold">
-                      {vehicle.times_booked}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        parseFloat(vehicle.booking_rate) >= 40 
-                          ? "bg-green-100 text-green-800"
-                          : parseFloat(vehicle.booking_rate) >= 25
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}>
-                        {vehicle.booking_rate}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                      €{vehicle.avg_price}
-                    </td>
+        ) : (() => {
+          const { items: sortedVehicles, requestSort, sortConfig } = useSortableData(
+            vehiclePerf?.vehiclePerformance,
+            { key: 'times_selected', direction: 'desc' }
+          );
+
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <SortableTableHeader label="Vehículo" sortKey="vehicle_name" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Selecciones" sortKey="times_selected" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Reservas" sortKey="times_booked" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Conv. %" sortKey="booking_rate" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Precio medio" sortKey="avg_price" currentSort={sortConfig} onSort={requestSort} />
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {sortedVehicles.map((vehicle) => (
+                    <tr key={vehicle.vehicle_id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                        {vehicle.vehicle_name}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-blue-600 font-semibold">
+                        {vehicle.times_selected}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-green-600 font-semibold">
+                        {vehicle.times_booked}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          parseFloat(vehicle.booking_rate) >= 40 
+                            ? "bg-green-100 text-green-800"
+                            : parseFloat(vehicle.booking_rate) >= 25
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}>
+                          {vehicle.booking_rate}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-gray-900">
+                        €{vehicle.avg_price}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })()}
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -611,125 +853,132 @@ export default function SearchAnalyticsPage() {
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
           </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Semana</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Búsquedas</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ocupación</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Disponible</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Índice Demanda</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Oportunidad</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recomendación</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {demandAvailability?.demandAvailability.map((week) => (
-                  <tr 
-                    key={week.week_start} 
-                    className={`hover:bg-gray-50 ${
-                      week.price_opportunity === "high" ? "bg-red-50" :
-                      week.price_opportunity === "medium" ? "bg-yellow-50" :
-                      week.price_opportunity === "low" ? "bg-blue-50" :
-                      ""
-                    }`}
-                  >
-                    <td className="px-4 py-3 text-sm">
-                      <div>
-                        <div className="font-semibold text-gray-900">
-                          {formatDate(week.week_start)} - {formatDate(week.week_end)}
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {week.unique_date_ranges} rangos únicos
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex px-2 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
-                        {week.search_count}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2 w-16">
-                          <div
-                            className={`h-2 rounded-full ${
-                              parseFloat(week.occupancy_rate) >= 80 ? "bg-red-500" :
-                              parseFloat(week.occupancy_rate) >= 60 ? "bg-yellow-500" :
-                              "bg-green-500"
-                            }`}
-                            style={{ width: `${week.occupancy_rate}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900">
-                          {week.occupancy_rate}%
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm text-gray-600">
-                        {week.availability_rate}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`text-sm font-semibold ${
-                        parseFloat(week.demand_index) >= 2 ? "text-red-600" :
-                        parseFloat(week.demand_index) >= 1 ? "text-yellow-600" :
-                        "text-green-600"
-                      }`}>
-                        {week.demand_index}
-                      </span>
-                      <div className="text-xs text-gray-500">
-                        ({week.total_vehicles} veh.)
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        week.price_opportunity === "high" ? "bg-red-100 text-red-800" :
-                        week.price_opportunity === "medium" ? "bg-yellow-100 text-yellow-800" :
-                        week.price_opportunity === "low" ? "bg-blue-100 text-blue-800" :
-                        "bg-gray-100 text-gray-800"
-                      }`}>
-                        {week.price_opportunity === "high" ? "🔥 ALTA" :
-                         week.price_opportunity === "medium" ? "💡 MEDIA" :
-                         week.price_opportunity === "low" ? "📉 BAJA" :
-                         "✓ Normal"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-700 max-w-xs">
-                      {week.recommendation}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        ) : (() => {
+          const { items: sortedDemand, requestSort, sortConfig } = useSortableData(
+            demandAvailability?.demandAvailability,
+            { key: 'week_start', direction: 'desc' }
+          );
 
-            {/* Leyenda */}
-            <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-              <h3 className="font-semibold text-sm text-gray-900 mb-3">📖 Leyenda:</h3>
-              <div className="grid md:grid-cols-2 gap-3 text-xs text-gray-600">
-                <div>
-                  <strong>Índice de Demanda:</strong> Búsquedas / Vehículos disponibles
-                  <ul className="ml-4 mt-1 space-y-1">
-                    <li>• &gt;2.0 = Demanda muy alta</li>
-                    <li>• 1.0-2.0 = Demanda moderada</li>
-                    <li>• &lt;1.0 = Demanda baja</li>
-                  </ul>
-                </div>
-                <div>
-                  <strong>Oportunidad de Precio:</strong>
-                  <ul className="ml-4 mt-1 space-y-1">
-                    <li>🔥 <strong>ALTA:</strong> Ocupación ≥80% + Demanda ≥2.0 → Subir +15-20%</li>
-                    <li>💡 <strong>MEDIA:</strong> Ocupación ≥60% + Demanda ≥1.5 → Subir +10%</li>
-                    <li>📉 <strong>BAJA:</strong> Ocupación &lt;40% + Demanda &lt;0.5 → Promociones</li>
-                  </ul>
+          return (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <SortableTableHeader label="Semana" sortKey="week_start" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Búsquedas" sortKey="search_count" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Ocupación" sortKey="occupancy_rate" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Disponible" sortKey="availability_rate" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Índice Demanda" sortKey="demand_index" currentSort={sortConfig} onSort={requestSort} />
+                    <SortableTableHeader label="Oportunidad" sortKey="price_opportunity" currentSort={sortConfig} onSort={requestSort} />
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Recomendación</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {sortedDemand.map((week) => (
+                    <tr 
+                      key={week.week_start} 
+                      className={`hover:bg-gray-50 ${
+                        week.price_opportunity === "high" ? "bg-red-50" :
+                        week.price_opportunity === "medium" ? "bg-yellow-50" :
+                        week.price_opportunity === "low" ? "bg-blue-50" :
+                        ""
+                      }`}
+                    >
+                      <td className="px-4 py-3 text-sm">
+                        <div>
+                          <div className="font-semibold text-gray-900">
+                            {formatDate(week.week_start)} - {formatDate(week.week_end)}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {week.unique_date_ranges} rangos únicos
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex px-2 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
+                          {week.search_count}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="flex-1 bg-gray-200 rounded-full h-2 w-16">
+                            <div
+                              className={`h-2 rounded-full ${
+                                parseFloat(week.occupancy_rate) >= 80 ? "bg-red-500" :
+                                parseFloat(week.occupancy_rate) >= 60 ? "bg-yellow-500" :
+                                "bg-green-500"
+                              }`}
+                              style={{ width: `${week.occupancy_rate}%` }}
+                            />
+                          </div>
+                          <span className="text-sm font-semibold text-gray-900">
+                            {week.occupancy_rate}%
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-sm text-gray-600">
+                          {week.availability_rate}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`text-sm font-semibold ${
+                          parseFloat(week.demand_index) >= 2 ? "text-red-600" :
+                          parseFloat(week.demand_index) >= 1 ? "text-yellow-600" :
+                          "text-green-600"
+                        }`}>
+                          {week.demand_index}
+                        </span>
+                        <div className="text-xs text-gray-500">
+                          ({week.total_vehicles} veh.)
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          week.price_opportunity === "high" ? "bg-red-100 text-red-800" :
+                          week.price_opportunity === "medium" ? "bg-yellow-100 text-yellow-800" :
+                          week.price_opportunity === "low" ? "bg-blue-100 text-blue-800" :
+                          "bg-gray-100 text-gray-800"
+                        }`}>
+                          {week.price_opportunity === "high" ? "🔥 ALTA" :
+                           week.price_opportunity === "medium" ? "💡 MEDIA" :
+                           week.price_opportunity === "low" ? "📉 BAJA" :
+                           "✓ Normal"}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-700 max-w-xs">
+                        {week.recommendation}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Leyenda */}
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="font-semibold text-sm text-gray-900 mb-3">📖 Leyenda:</h3>
+                <div className="grid md:grid-cols-2 gap-3 text-xs text-gray-600">
+                  <div>
+                    <strong>Índice de Demanda:</strong> Búsquedas / Vehículos disponibles
+                    <ul className="ml-4 mt-1 space-y-1">
+                      <li>• &gt;2.0 = Demanda muy alta</li>
+                      <li>• 1.0-2.0 = Demanda moderada</li>
+                      <li>• &lt;1.0 = Demanda baja</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <strong>Oportunidad de Precio:</strong>
+                    <ul className="ml-4 mt-1 space-y-1">
+                      <li>🔥 <strong>ALTA:</strong> Ocupación ≥80% + Demanda ≥2.0 → Subir +15-20%</li>
+                      <li>💡 <strong>MEDIA:</strong> Ocupación ≥60% + Demanda ≥1.5 → Subir +10%</li>
+                      <li>📉 <strong>BAJA:</strong> Ocupación &lt;40% + Demanda &lt;0.5 → Promociones</li>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
     </div>
   );

@@ -188,6 +188,36 @@ GROUP BY v.id, v.name, v.slug
 ORDER BY times_selected DESC;
 
 -- ============================================
+-- NUEVA VISTA: Cuándo buscan los clientes
+-- (Agregado por fecha de búsqueda, no por fecha buscada)
+-- ============================================
+
+CREATE VIEW public.search_timing_analysis AS
+SELECT 
+  DATE(searched_at) as search_date,
+  DATE_PART('year', searched_at) as search_year,
+  DATE_PART('month', searched_at) as search_month,
+  DATE_PART('dow', searched_at) as search_day_of_week, -- 0=domingo, 6=sábado
+  CASE 
+    WHEN DATE_PART('dow', searched_at) IN (0, 6) THEN 'weekend'
+    ELSE 'weekday'
+  END as day_type,
+  COUNT(*) as total_searches,
+  COUNT(*) FILTER (WHERE had_availability) as searches_with_availability,
+  COUNT(*) FILTER (WHERE vehicle_selected) as vehicle_selections,
+  COUNT(*) FILTER (WHERE booking_created) as bookings_created,
+  ROUND(100.0 * COUNT(*) FILTER (WHERE vehicle_selected) / NULLIF(COUNT(*), 0), 2) as selection_rate,
+  ROUND(100.0 * COUNT(*) FILTER (WHERE booking_created) / NULLIF(COUNT(*), 0), 2) as conversion_rate,
+  AVG(advance_days) as avg_advance_days,
+  AVG(rental_days) as avg_rental_days,
+  MIN(advance_days) as min_advance_days,
+  MAX(advance_days) as max_advance_days
+FROM public.search_queries
+WHERE searched_at >= CURRENT_DATE - INTERVAL '12 months'
+GROUP BY DATE(searched_at), DATE_PART('year', searched_at), DATE_PART('month', searched_at), DATE_PART('dow', searched_at)
+ORDER BY search_date DESC;
+
+-- ============================================
 -- 5. ROW LEVEL SECURITY (RLS)
 -- ============================================
 
