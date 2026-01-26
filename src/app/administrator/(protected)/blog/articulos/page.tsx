@@ -241,21 +241,17 @@ export default function BlogPostsPage() {
     }
   };
 
-  // Filtrar posts y añadir campo calculado para ordenación de fecha
+  // Filtrar posts
   const filteredPosts = (posts || []).filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.slug.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || post.category?.id === categoryFilter;
     const matchesStatus = !statusFilter || post.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
-  }).map(post => ({
-    ...post,
-    // Campo calculado para ordenación: usa published_at si existe, sino created_at
-    display_date: post.published_at || post.created_at
-  }));
+  });
 
-  // Ordenación de posts (ahora usa display_date que coincide con lo que se muestra)
-  const sortedPosts = useSortableData(filteredPosts, { key: 'display_date', direction: 'desc' });
+  // Ordenación de posts (por defecto por fecha de creación, más reciente primero)
+  const sortedPosts = useSortableData(filteredPosts, { key: 'created_at', direction: 'desc' });
 
   // Paginación
   const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(sortedPosts.items.length / itemsPerPage);
@@ -399,7 +395,8 @@ export default function BlogPostsPage() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Autor</th>
                     <SortableTableHeader label="Estado" sortKey="status" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
                     <SortableTableHeader label="Visitas" sortKey="views" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
-                    <SortableTableHeader label="Fecha" sortKey="display_date" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
+                    <SortableTableHeader label="Creación" sortKey="created_at" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
+                    <SortableTableHeader label="Publicación" sortKey="published_at" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Acciones</th>
                   </tr>
                 </thead>
@@ -453,9 +450,12 @@ export default function BlogPostsPage() {
                           {post.views.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-gray-600 text-sm">
+                          {new Date(post.created_at).toLocaleDateString('es-ES')}
+                        </td>
+                        <td className="px-6 py-4 text-gray-600 text-sm">
                           {post.published_at 
                             ? new Date(post.published_at).toLocaleDateString('es-ES')
-                            : new Date(post.created_at).toLocaleDateString('es-ES')}
+                            : <span className="text-gray-400">-</span>}
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-2">
