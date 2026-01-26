@@ -132,6 +132,7 @@ export function TarifasClient() {
                 </table>
               </div>
             </div>
+          </div>
           
           {/* Información adicional */}
           <div className="mt-12 max-w-4xl mx-auto bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
