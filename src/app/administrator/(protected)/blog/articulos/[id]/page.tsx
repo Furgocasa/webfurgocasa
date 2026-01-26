@@ -608,7 +608,7 @@ export default function EditPostPage() {
           }
           setShowImageSelector(false);
         }}
-        bucket="featured-images"
+        bucket="blog"
         suggestedFolder=""
       />
     </div>
