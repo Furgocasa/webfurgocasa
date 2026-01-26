@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Car, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Car, ArrowUpDown, ArrowUp, ArrowDown, Link, Copy, Check } from "lucide-react";
 import { SmartTooltip } from "@/components/admin/smart-tooltip";
 import type { Database } from "@/lib/supabase/database.types";
 import { useAdminData } from "@/hooks/use-admin-data";
@@ -92,6 +92,10 @@ export default function CalendarioPage() {
   // Estado para ordenamiento
   const [sortField, setSortField] = useState<'internal_code' | 'name'>('internal_code');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
+  // Estado para modal de suscripción al calendario
+  const [showCalendarModal, setShowCalendarModal] = useState(false);
+  const [urlCopied, setUrlCopied] = useState(false);
 
   // Cargar vehículos con el hook
   const { 
@@ -483,6 +487,20 @@ export default function CalendarioPage() {
 
   const mobileEvents = isMobile ? getMobileCalendarEvents() : {};
 
+  // Función para copiar URL de suscripción al calendario
+  const copyCalendarUrl = () => {
+    const token = process.env.NEXT_PUBLIC_CALENDAR_TOKEN || 'furgocasa2026';
+    const url = `${window.location.origin}/api/calendar/entregas?token=${token}`;
+    
+    navigator.clipboard.writeText(url).then(() => {
+      setUrlCopied(true);
+      setTimeout(() => setUrlCopied(false), 3000);
+    }).catch(err => {
+      console.error('Error al copiar:', err);
+      alert('No se pudo copiar la URL. Por favor, cópiala manualmente.');
+    });
+  };
+
   // Mostrar estado de carga
   if (vehiclesLoading && !vehicles) {
     return (
@@ -524,6 +542,15 @@ export default function CalendarioPage() {
           <h1 className="text-3xl font-bold text-gray-900">Calendario de Disponibilidad</h1>
           <p className="text-gray-600 mt-1">Vista cronológica de reservas por vehículo</p>
         </div>
+        
+        {/* Botón de suscripción al calendario */}
+        <button
+          onClick={() => setShowCalendarModal(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+        >
+          <Link className="h-5 w-5" />
+          Sincronizar con mi Calendario
+        </button>
       </div>
 
       {/* Navigation and Controls */}
@@ -1224,6 +1251,167 @@ export default function CalendarioPage() {
                 className="flex-1 px-4 py-3 bg-furgocasa-orange text-white font-semibold rounded-lg hover:bg-furgocasa-orange-dark transition-colors"
               >
                 Ver detalles
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de Suscripción al Calendario */}
+      {showCalendarModal && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
+          onClick={() => setShowCalendarModal(false)}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 py-4 rounded-t-2xl">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-xl font-bold">📅 Sincronizar con tu Calendario</h3>
+                  <p className="text-sm opacity-90 mt-1">Recibe entregas y recogidas automáticamente en tu móvil</p>
+                </div>
+                <button 
+                  onClick={() => setShowCalendarModal(false)}
+                  className="text-white/80 hover:text-white transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Instrucciones */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <h4 className="font-semibold text-blue-900 mb-2">✨ ¿Qué es esto?</h4>
+                <p className="text-sm text-blue-800">
+                  Conecta esta URL a tu calendario nativo (iPhone, Android, Outlook, etc.) y todas las entregas y recogidas 
+                  aparecerán automáticamente en tu móvil. Se actualizan solas cada pocas horas, como Notion Calendar.
+                </p>
+              </div>
+
+              {/* URL de suscripción */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  URL de Suscripción:
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/calendar/entregas?token=${process.env.NEXT_PUBLIC_CALENDAR_TOKEN || 'furgocasa2026'}`}
+                    className="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono text-gray-700"
+                  />
+                  <button
+                    onClick={copyCalendarUrl}
+                    className={`px-4 py-3 rounded-lg font-semibold transition-all ${
+                      urlCopied 
+                        ? 'bg-green-600 text-white' 
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {urlCopied ? (
+                      <Check className="h-5 w-5" />
+                    ) : (
+                      <Copy className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+                {urlCopied && (
+                  <p className="text-sm text-green-600 mt-2 font-semibold">
+                    ✅ URL copiada al portapapeles
+                  </p>
+                )}
+              </div>
+
+              {/* Instrucciones paso a paso */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-gray-900">📱 Cómo añadirla a tu calendario:</h4>
+                
+                {/* iPhone / iPad */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <span className="text-xl">🍎</span> iPhone / iPad
+                  </h5>
+                  <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                    <li>Abre la app <strong>Calendario</strong> (la nativa de iOS)</li>
+                    <li>Toca <strong>Calendarios</strong> (abajo en el centro)</li>
+                    <li>Toca <strong>Añadir calendario</strong> → <strong>Añadir suscripción</strong></li>
+                    <li>Pega la URL que copiaste arriba</li>
+                    <li>Dale un nombre: <strong>"Furgocasa - Entregas"</strong></li>
+                    <li>¡Listo! Los eventos aparecerán automáticamente</li>
+                  </ol>
+                </div>
+
+                {/* Android / Google Calendar */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <span className="text-xl">📱</span> Android / Google Calendar
+                  </h5>
+                  <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                    <li>Abre <strong>Google Calendar</strong> en el navegador (no en la app)</li>
+                    <li>En el menú lateral, busca <strong>Otros calendarios</strong> y haz click en <strong>+</strong></li>
+                    <li>Selecciona <strong>Desde URL</strong></li>
+                    <li>Pega la URL que copiaste arriba</li>
+                    <li>Haz click en <strong>Añadir calendario</strong></li>
+                    <li>¡Listo! Sincronizará automáticamente con tu móvil</li>
+                  </ol>
+                </div>
+
+                {/* Outlook */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <h5 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                    <span className="text-xl">📧</span> Outlook / Microsoft
+                  </h5>
+                  <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                    <li>Abre <strong>Outlook.com</strong> en el navegador</li>
+                    <li>Haz click en <strong>Agregar calendario</strong></li>
+                    <li>Selecciona <strong>Suscribirse desde la web</strong></li>
+                    <li>Pega la URL que copiaste arriba</li>
+                    <li>Dale un nombre y elige el color</li>
+                    <li>¡Listo! Se sincronizará automáticamente</li>
+                  </ol>
+                </div>
+              </div>
+
+              {/* Características */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <h4 className="font-semibold text-green-900 mb-2">✅ Lo que verás:</h4>
+                <ul className="text-sm text-green-800 space-y-1">
+                  <li>🟢 <strong>Entregas</strong> con hora, cliente y vehículo</li>
+                  <li>🔴 <strong>Recogidas</strong> con hora, cliente y vehículo</li>
+                  <li>📍 <strong>Ubicación</strong> de cada evento (Murcia/Madrid)</li>
+                  <li>🔔 <strong>Notificaciones</strong> 30 minutos antes (según tu config)</li>
+                  <li>🔄 <strong>Actualización automática</strong> cada pocas horas</li>
+                  <li>📅 <strong>Eventos de los próximos 6 meses</strong></li>
+                </ul>
+              </div>
+
+              {/* Nota importante */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h4 className="font-semibold text-yellow-900 mb-2">⚠️ Importante:</h4>
+                <ul className="text-sm text-yellow-800 space-y-1">
+                  <li>• Solo tienes que hacer esto <strong>UNA VEZ</strong></li>
+                  <li>• Después se actualiza <strong>SOLO</strong> automáticamente</li>
+                  <li>• Esta URL es compartida por todo el equipo</li>
+                  <li>• No la compartas fuera de Furgocasa</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t border-gray-200 p-4 flex justify-end">
+              <button
+                onClick={() => setShowCalendarModal(false)}
+                className="px-6 py-2 bg-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Cerrar
               </button>
             </div>
           </div>
