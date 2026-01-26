@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
+import { SimpleImageSelector } from "@/components/media/simple-image-selector";
 
 const TinyEditor = dynamic(
   () => import("@/components/admin/tiny-editor").then((mod) => mod.TinyEditor),
@@ -59,6 +60,7 @@ export default function EditPostPage() {
   const [saving, setSaving] = useState(false);
   const [activeTab, setActiveTab] = useState<"content" | "seo">("content");
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [showImageSelector, setShowImageSelector] = useState(false);
 
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -547,7 +549,10 @@ export default function EditPostPage() {
                 </button>
               </div>
             ) : (
-              <button className="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 hover:border-furgocasa-orange hover:text-furgocasa-orange transition-colors">
+              <button 
+                onClick={() => setShowImageSelector(true)}
+                className="w-full h-40 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center text-gray-500 hover:border-furgocasa-orange hover:text-furgocasa-orange transition-colors"
+              >
                 <ImageIcon className="h-8 w-8 mb-2" />
                 <span className="text-sm">Subir imagen</span>
               </button>
@@ -592,6 +597,20 @@ export default function EditPostPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal de selector de imágenes */}
+      <SimpleImageSelector
+        isOpen={showImageSelector}
+        onClose={() => setShowImageSelector(false)}
+        onSelect={(urls) => {
+          if (urls.length > 0) {
+            setFeaturedImage(urls[0]);
+          }
+          setShowImageSelector(false);
+        }}
+        bucket="featured-images"
+        suggestedFolder=""
+      />
     </div>
   );
 }
