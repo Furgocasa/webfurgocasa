@@ -150,6 +150,8 @@ export default function BlogPostsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; title: string }>({
     isOpen: false,
@@ -235,6 +237,17 @@ export default function BlogPostsPage() {
 
   // Ordenación de posts
   const sortedPosts = useSortableData(filteredPosts, { key: 'created_at', direction: 'desc' });
+
+  // Paginación
+  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(sortedPosts.items.length / itemsPerPage);
+  const startIndex = itemsPerPage === -1 ? 0 : (currentPage - 1) * itemsPerPage;
+  const endIndex = itemsPerPage === -1 ? sortedPosts.items.length : startIndex + itemsPerPage;
+  const paginatedPosts = sortedPosts.items.slice(startIndex, endIndex);
+
+  // Resetear página al cambiar filtros o items por página
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, categoryFilter, statusFilter, itemsPerPage]);
 
   // Calcular estadísticas
   const stats = {
@@ -372,7 +385,7 @@ export default function BlogPostsPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {sortedPosts.items.map((post) => {
+                  {paginatedPosts.map((post) => {
                     const StatusIcon = statusConfig[post.status]?.icon || Clock;
                     const statusStyle = statusConfig[post.status] || statusConfig.draft;
                     return (
@@ -459,10 +472,100 @@ export default function BlogPostsPage() {
                 </tbody>
               </table>
             </div>
-            <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
-              <p className="text-sm text-gray-600">
-                Mostrando {filteredPosts.length} de {stats.total} artículos
-              </p>
+            {/* Footer con paginación */}
+            <div className="px-6 py-4 border-t border-gray-100">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                {/* Info y selector de items por página */}
+                <div className="flex items-center gap-4">
+                  <p className="text-sm text-gray-600">
+                    Mostrando {startIndex + 1}-{Math.min(endIndex, sortedPosts.items.length)} de {sortedPosts.items.length} artículos
+                    {sortedPosts.items.length !== filteredPosts.length && (
+                      <span className="text-gray-400"> (filtrados de {stats.total})</span>
+                    )}
+                  </p>
+                  <div className="flex items-center gap-2">
+                    <label htmlFor="itemsPerPage" className="text-sm text-gray-600">
+                      Mostrar:
+                    </label>
+                    <select
+                      id="itemsPerPage"
+                      value={itemsPerPage}
+                      onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                      className="px-3 py-1 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                    >
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={-1}>Todos</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Controles de paginación */}
+                {itemsPerPage !== -1 && totalPages > 1 && (
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Primera
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Anterior
+                    </button>
+                    
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                        let pageNum;
+                        if (totalPages <= 5) {
+                          pageNum = i + 1;
+                        } else if (currentPage <= 3) {
+                          pageNum = i + 1;
+                        } else if (currentPage >= totalPages - 2) {
+                          pageNum = totalPages - 4 + i;
+                        } else {
+                          pageNum = currentPage - 2 + i;
+                        }
+                        
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`px-3 py-1 border rounded-lg text-sm ${
+                              currentPage === pageNum
+                                ? 'bg-furgocasa-orange text-white border-furgocasa-orange'
+                                : 'border-gray-300 hover:bg-gray-50'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Siguiente
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage(totalPages)}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-1 border border-gray-300 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Última
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           </>
         )}
