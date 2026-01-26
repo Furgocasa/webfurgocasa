@@ -226,17 +226,21 @@ export default function BlogPostsPage() {
     }
   };
 
-  // Filtrar posts
+  // Filtrar posts y añadir campo calculado para ordenación de fecha
   const filteredPosts = (posts || []).filter(post => {
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          post.slug.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || post.category?.id === categoryFilter;
     const matchesStatus = !statusFilter || post.status === statusFilter;
     return matchesSearch && matchesCategory && matchesStatus;
-  });
+  }).map(post => ({
+    ...post,
+    // Campo calculado para ordenación: usa published_at si existe, sino created_at
+    display_date: post.published_at || post.created_at
+  }));
 
-  // Ordenación de posts
-  const sortedPosts = useSortableData(filteredPosts, { key: 'created_at', direction: 'desc' });
+  // Ordenación de posts (ahora usa display_date que coincide con lo que se muestra)
+  const sortedPosts = useSortableData(filteredPosts, { key: 'display_date', direction: 'desc' });
 
   // Paginación
   const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(sortedPosts.items.length / itemsPerPage);
@@ -375,12 +379,12 @@ export default function BlogPostsPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-100">
                   <tr>
-                    <SortableTableHeader<Post> label="Artículo" sortKey="title" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
+                    <SortableTableHeader label="Artículo" sortKey="title" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Categoría</th>
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Autor</th>
-                    <SortableTableHeader<Post> label="Estado" sortKey="status" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
-                    <SortableTableHeader<Post> label="Visitas" sortKey="views" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
-                    <SortableTableHeader<Post> label="Fecha" sortKey="created_at" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
+                    <SortableTableHeader label="Estado" sortKey="status" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
+                    <SortableTableHeader label="Visitas" sortKey="views" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} align="center" />
+                    <SortableTableHeader label="Fecha" sortKey="display_date" currentSort={sortedPosts.sortConfig} onSort={sortedPosts.requestSort} />
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Acciones</th>
                   </tr>
                 </thead>
