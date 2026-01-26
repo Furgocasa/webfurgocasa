@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
-  FileText, DollarSign, Package, ExternalLink, Edit
+  FileText, DollarSign, Package, ExternalLink, Edit, Send
 } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
@@ -98,6 +98,7 @@ export default function ReservaDetalleAdminPage() {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
@@ -219,6 +220,50 @@ export default function ReservaDetalleAdminPage() {
     }
   };
 
+  const sendEmail = async (type: 'first_payment' | 'second_payment') => {
+    const emailLabels = {
+      first_payment: 'Confirmación 1º Pago',
+      second_payment: 'Confirmación 2º Pago',
+    };
+
+    if (!confirm(`¿Enviar email de "${emailLabels[type]}" al cliente?`)) {
+      return;
+    }
+
+    try {
+      setSendingEmail(true);
+      const response = await fetch('/api/bookings/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          type,
+          bookingId,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al enviar el email');
+      }
+
+      setMessage({ 
+        type: 'success', 
+        text: `Email de ${emailLabels[type]} enviado correctamente a ${booking?.customer_email}` 
+      });
+    } catch (error: any) {
+      console.error('Error sending email:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error.message || 'Error al enviar el email' 
+      });
+    } finally {
+      setSendingEmail(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -278,13 +323,40 @@ export default function ReservaDetalleAdminPage() {
         </div>
         
         {/* Botones de acción */}
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
+          {/* Botones de emails */}
+          <div className="flex gap-2">
+            <button
+              onClick={() => sendEmail('first_payment')}
+              disabled={sendingEmail}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Reenviar email de confirmación (1º pago)"
+            >
+              <Send className="h-4 w-4" />
+              <span className="hidden sm:inline">Email 1º Pago</span>
+            </button>
+            
+            <button
+              onClick={() => sendEmail('second_payment')}
+              disabled={sendingEmail}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Reenviar email de confirmación (2º pago)"
+            >
+              <Send className="h-4 w-4" />
+              <span className="hidden sm:inline">Email 2º Pago</span>
+            </button>
+          </div>
+
+          {/* Separador visual */}
+          <div className="hidden sm:block w-px bg-gray-300 self-stretch"></div>
+
+          {/* Botones de acción originales */}
           <Link
             href={`/administrator/reservas/${bookingId}/editar`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium shadow-sm"
           >
             <Edit className="h-4 w-4" />
-            Editar reserva
+            <span className="hidden sm:inline">Editar</span>
           </Link>
           
           <a
@@ -294,7 +366,7 @@ export default function ReservaDetalleAdminPage() {
             className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium shadow-sm"
           >
             <ExternalLink className="h-4 w-4" />
-            Ver vista del cliente
+            <span className="hidden sm:inline">Vista Cliente</span>
           </a>
         </div>
       </div>
