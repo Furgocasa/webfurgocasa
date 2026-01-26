@@ -66,8 +66,7 @@ const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; k
 
 // ✅ METADATOS SEO con canonical + hreflang
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const locale: Locale = 'en'; // Locale fijo para /en/
   return generateMultilingualMetadata('/vehiculos', locale, VEHICULOS_METADATA);
 }
 
