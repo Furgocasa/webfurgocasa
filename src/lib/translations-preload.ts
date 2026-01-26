@@ -5678,8 +5678,8 @@ export const staticTranslations = {
   "Blog de Viajes en Camper": {
     es: "Blog de Viajes en Camper",
     en: "Camper Travel Blog",
-    fr: "Camper Travel Blog",
-    de: "Camper Travel Blog"
+    fr: "Blog de Voyages en Camping-car",
+    de: "Camper Reiseblog"
   },
   "¿Quieres más consejos sobre viajes en camper?": {
     es: "¿Quieres más consejos sobre viajes en camper?",
@@ -8806,6 +8806,30 @@ export const staticTranslations = {
     en: "Contact us",
     fr: "Nous contacter",
     de: "Kontaktieren Sie uns"
+  },
+  "Quiénes Somos": {
+    es: "Quiénes Somos",
+    en: "About Us",
+    fr: "À Propos",
+    de: "Über Uns"
+  },
+  "Tarifas y Precios de Alquiler de Campers 2026": {
+    es: "Tarifas y Precios de Alquiler de Campers 2026",
+    en: "Camper Rental Rates and Prices 2026",
+    fr: "Tarifs et Prix de Location de Camping-cars 2026",
+    de: "Wohnmobil Mietpreise und Tarife 2026"
+  },
+  "Tarifas y Precios de Alquiler de Campers": {
+    es: "Tarifas y Precios de Alquiler de Campers",
+    en: "Camper Rental Rates and Prices",
+    fr: "Tarifs et Prix de Location de Camping-cars",
+    de: "Wohnmobil Mietpreise und Tarife"
+  },
+  "Blog Camper": {
+    es: "Blog Camper",
+    en: "Camper Blog",
+    fr: "Blog Camping-car",
+    de: "Camper Blog"
   },
 };
 
