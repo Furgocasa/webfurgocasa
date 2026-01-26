@@ -341,7 +341,7 @@ export function TarifasClient() {
               <SeasonsCalendar year={currentYear} hidePassedMonths={true} />
             </div>
 
-            {/* Calendario Año Siguiente - Todos los meses */}
+            {/* Calendario Año Siguiente - Todos los meses - OCULTO HASTA SEPTIEMBRE 2026
             <div className="bg-gray-50 rounded-3xl p-6 md:p-8 shadow-inner">
               <div className="text-center mb-6">
                 <h3 className="text-2xl font-heading font-bold text-furgocasa-blue bg-white py-3 px-6 rounded-xl shadow-sm inline-block">
@@ -353,6 +353,7 @@ export function TarifasClient() {
               </div>
               <SeasonsCalendar year={nextYear} hidePassedMonths={false} />
             </div>
+            */}
           </div>
         </div>
       </section>
