@@ -58,6 +58,27 @@ Reemplazar la implementación manual de Google Analytics por la librería oficia
 - ✅ Gestión interna de carga asíncrona
 - ✅ Sin polling ni timeouts
 
+### 4. Visitas Duplicadas en Navegación SPA (Fix 27/01/2026)
+**Problema detectado post-migración:**
+- Las navegaciones entre páginas (blog, vehículos, etc.) registraban **2 pageviews** por cada visita
+- Landing directo funcionaba bien (1 pageview)
+- Solo afectaba a navegación del lado del cliente (SPA)
+
+**Causa:**
+- GA4 "Enhanced Measurement" tenía activado "Page changes based on browser history events"
+- Esto duplicaba el tracking que ya hacía `@next/third-parties/google`
+
+**Solución:**
+- Desactivar en GA4: **Admin** → **Flujos de datos** → **Medición mejorada** → **Configuración avanzada** → Desmarcar "La página cambia en función de los eventos del historial de navegación"
+- Mantener activo: "Cargas de página"
+
+**Resultado:**
+- ✅ 1 pageview por navegación (correcto)
+- ✅ Landing pages siguen funcionando
+- ✅ Todos los demás eventos funcionan correctamente
+
+**Documentación detallada:** `FIX-ANALYTICS-VISITAS-DUPLICADAS.md`
+
 ---
 
 ## ✅ Nuevas Características
@@ -201,11 +222,13 @@ window.gtag
 
 ### Documentos Creados
 - `MIGRACION-NEXT-THIRD-PARTIES.md` - Guía completa
+- `FIX-ANALYTICS-VISITAS-DUPLICADAS.md` - Fix de visitas duplicadas (27/01/2026)
 
 ### Documentos Actualizados
 - `README.md` - v4.4.0 en historial
 - `CHANGELOG.md` - Entry completa v4.4.0
 - `docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md` - Marcado obsoleto
+- `RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md` - Añadido problema #4 (visitas duplicadas)
 
 ### Documentos Históricos (Conservados)
 - `AUDITORIA-ANALYTICS-TITULOS.md`
@@ -242,12 +265,13 @@ window.gtag
 - ❌ Mantenimiento complejo
 - ✅ Exclusión del admin
 
-### Ahora (v4.4.0)
+### Ahora (v4.4.0+)
 - ✅ 1 línea de código
-- ✅ 0 problemas conocidos
+- ✅ 0 problemas conocidos (tras fix de visitas duplicadas)
 - ✅ Estabilidad garantizada (Vercel/Google)
 - ✅ Mantenimiento automático
 - ✅ 17 páginas admin con títulos descriptivos
+- ✅ Tracking correcto en navegaciones SPA (fix 27/01/2026)
 - ⚠️ Admin trackeado (solución: filtro IP)
 
 ---
@@ -294,6 +318,6 @@ Para preguntas sobre esta migración:
 
 ---
 
-**Versión**: 4.4.0  
+**Versión**: 4.4.0+  
 **Estado**: ✅ Producción  
-**Última actualización**: 25 de enero de 2026
+**Última actualización**: 27 de enero de 2026 (Fix visitas duplicadas)

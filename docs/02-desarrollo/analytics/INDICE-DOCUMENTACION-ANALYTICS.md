@@ -1,33 +1,147 @@
-# 📚 ÍNDICE: Documentación de Exclusión de Analytics en Admin
+# 📚 ÍNDICE: Documentación de Google Analytics
 
-**Proyecto**: Exclusión Total de Google Analytics en Área de Administrador  
-**Estado**: ✅ Completado  
-**Fecha**: 22 de enero de 2026  
-**Commits**: `1f82115`, `d1e6096`, `e33c27a`
+**Proyecto**: Sistema de Analytics con @next/third-parties  
+**Estado**: ✅ Funcionando correctamente  
+**Última actualización**: 27 de enero de 2026  
+**Versión**: v4.4.0+
 
 ---
 
-## 📖 Orden de Lectura Recomendado
+## 📖 Documentos de Implementación Actual (v4.4.0+)
 
 ### Para Entendimiento Rápido (5 min)
-1. **[RESUMEN-FIX-ANALYTICS-ADMIN.md](./RESUMEN-FIX-ANALYTICS-ADMIN.md)** - Resumen ejecutivo de la solución
+1. **[RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md](../../../RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md)** - Resumen ejecutivo de la migración
+2. **[FIX-ANALYTICS-VISITAS-DUPLICADAS.md](../../../FIX-ANALYTICS-VISITAS-DUPLICADAS.md)** - Fix de visitas duplicadas (27/01/2026)
 
-### Para Implementación/Testing (15 min)
-1. **[GUIA-TESTING-ANALYTICS-EXCLUSION.md](./GUIA-TESTING-ANALYTICS-EXCLUSION.md)** - Guía paso a paso de testing
-2. **[ARQUITECTURA-ANALYTICS-EXCLUSION.md](./ARQUITECTURA-ANALYTICS-EXCLUSION.md)** - Diagramas y arquitectura visual
-
-### Para Entendimiento Técnico Completo (30 min)
-1. **[RESUMEN-MAESTRO-ANALYTICS-ADMIN.md](./RESUMEN-MAESTRO-ANALYTICS-ADMIN.md)** - Visión general completa del proyecto
-2. **[FIX-ANALYTICS-ADMIN-EXCLUSION.md](./FIX-ANALYTICS-ADMIN-EXCLUSION.md)** - Documentación técnica detallada
-3. **[FIX-CRITICO-ADMIN-I18N-ANALYTICS.md](./FIX-CRITICO-ADMIN-I18N-ANALYTICS.md)** - Problema de URLs con i18n
-4. **[FIX-LOOP-ADMINISTRATOR.md](./FIX-LOOP-ADMINISTRATOR.md)** - Problema de loop infinito
-
-### Para Debugging
-1. **[scripts/verify-analytics-exclusion.js](./scripts/verify-analytics-exclusion.js)** - Script de verificación automática
+### Para Implementación Completa (15 min)
+1. **[MIGRACION-NEXT-THIRD-PARTIES.md](../../../MIGRACION-NEXT-THIRD-PARTIES.md)** - Guía completa de migración
+2. **[CONFIGURACION-GOOGLE-ANALYTICS.md](./CONFIGURACION-GOOGLE-ANALYTICS.md)** - Configuración (⚠️ parcialmente obsoleto)
 
 ---
 
-## 📑 Descripción de Documentos
+## 🔴 Problemas Resueltos (Histórico)
+
+### Problema #1: Títulos de Página Faltantes (V1-V3)
+- **Documentación**: `AUDITORIA-ANALYTICS-TITULOS.md`, `FIX-ANALYTICS-TITULOS.md`
+- **Estado**: ✅ Resuelto con @next/third-parties
+
+### Problema #2: Parámetros fbclid de Facebook (V4-V7)
+- **Documentación**: `AUDITORIA-ANALYTICS-PARAMS.md`, `AUDITORIA-ANALYTICS-URL-TRIMMING*.md`
+- **Estado**: ✅ Resuelto con @next/third-parties
+
+### Problema #3: Race Conditions en Carga Inicial (V5)
+- **Documentación**: `AUDITORIA-ANALYTICS-INITIAL-LOAD.md`
+- **Estado**: ✅ Resuelto con @next/third-parties
+
+### Problema #4: Visitas Duplicadas en Navegación SPA (27/01/2026)
+- **Documentación**: `FIX-ANALYTICS-VISITAS-DUPLICADAS.md`
+- **Estado**: ✅ Resuelto con configuración GA4
+- **Solución**: Desactivar "Page changes based on browser history events" en Enhanced Measurement
+
+---
+
+## 📑 Guía de Lectura según Necesidad
+
+### Si tienes visitas duplicadas
+1. **[FIX-ANALYTICS-VISITAS-DUPLICADAS.md](../../../FIX-ANALYTICS-VISITAS-DUPLICADAS.md)** - Solución paso a paso
+2. Ir a GA4 → Flujos de datos → Medición mejorada → Configuración avanzada
+3. Desactivar tracking por historial de navegación
+
+### Si necesitas entender la migración
+1. **[RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md](../../../RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md)** - Resumen ejecutivo
+2. **[MIGRACION-NEXT-THIRD-PARTIES.md](../../../MIGRACION-NEXT-THIRD-PARTIES.md)** - Guía técnica completa
+
+### Si necesitas excluir el admin de Analytics
+1. **[RESUMEN-MAESTRO-ANALYTICS-ADMIN.md](../../05-historico/RESUMEN-MAESTRO-ANALYTICS-ADMIN.md)** - Contexto histórico (ya no aplicable)
+2. Solución actual: Filtro por IP en Google Analytics
+
+---
+
+## 🗂️ Estructura de Documentos
+
+```
+furgocasa-app/
+│
+├── 📘 Implementación Actual (v4.4.0+)
+│   ├── RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md ⭐
+│   ├── FIX-ANALYTICS-VISITAS-DUPLICADAS.md ⭐ (27/01/2026)
+│   ├── MIGRACION-NEXT-THIRD-PARTIES.md
+│   └── docs/02-desarrollo/analytics/
+│       ├── CONFIGURACION-GOOGLE-ANALYTICS.md (⚠️ parcialmente obsoleto)
+│       └── INDICE-DOCUMENTACION-ANALYTICS.md (este archivo)
+│
+├── 📜 Documentación Histórica (V1-V7)
+│   ├── AUDITORIA-ANALYTICS-TITULOS.md
+│   ├── FIX-ANALYTICS-TITULOS.md
+│   ├── FIX-ANALYTICS-TITULOS-V2.md
+│   ├── AUDITORIA-ANALYTICS-PARAMS.md
+│   ├── AUDITORIA-ANALYTICS-INITIAL-LOAD.md
+│   ├── AUDITORIA-ANALYTICS-URL-TRIMMING.md
+│   └── AUDITORIA-ANALYTICS-URL-TRIMMING-V7.md
+│
+└── 🔧 Exclusión Admin (Histórico)
+    └── docs/05-historico/
+        ├── RESUMEN-MAESTRO-ANALYTICS-ADMIN.md
+        ├── RESUMEN-FIX-ANALYTICS-ADMIN.md
+        ├── FIX-ANALYTICS-ADMIN-EXCLUSION.md
+        ├── FIX-CRITICO-ADMIN-I18N-ANALYTICS.md
+        ├── ARQUITECTURA-ANALYTICS-EXCLUSION.md
+        └── GUIA-TESTING-ANALYTICS-EXCLUSION.md
+```
+
+---
+
+## 📊 Estado del Proyecto Analytics
+
+### Implementación Actual (v4.4.0+)
+- ✅ Librería oficial: `@next/third-parties/google`
+- ✅ Tracking automático de pageviews
+- ✅ Sin visitas duplicadas (tras configuración GA4)
+- ✅ Captura correcta de títulos
+- ✅ Parámetros de Facebook funcionando
+- ✅ Sin race conditions
+- ⚠️ Admin trackeado (solución: filtro IP)
+
+### Configuración GA4 Requerida
+```
+Medición mejorada → Configuración avanzada:
+☑️ Cargas de página                 (ACTIVADO)
+☐  La página cambia en función      (DESACTIVADO)
+   de los eventos del historial
+```
+
+---
+
+## 🔍 Buscar por Tema
+
+### Si tienes visitas duplicadas
+→ **[FIX-ANALYTICS-VISITAS-DUPLICADAS.md](../../../FIX-ANALYTICS-VISITAS-DUPLICADAS.md)**
+
+### Si necesitas entender la implementación actual
+→ **[RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md](../../../RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md)**
+
+### Si buscas historial de problemas resueltos
+→ Lee los documentos en la sección "Documentación Histórica"
+
+### Si necesitas excluir páginas de Analytics
+→ Solución: Configurar filtros en Google Analytics (no en código)
+
+---
+
+## 📖 Documentación de Exclusión Admin (Histórico)
+
+**⚠️ NOTA**: La exclusión manual del admin se perdió tras la migración a @next/third-parties (v4.4.0).  
+La documentación siguiente se mantiene como referencia histórica.
+
+### Para Entendimiento Rápido (5 min)
+1. **[RESUMEN-FIX-ANALYTICS-ADMIN.md](../../05-historico/RESUMEN-FIX-ANALYTICS-ADMIN.md)** - Resumen ejecutivo de la solución
+
+### Para Entendimiento Técnico Completo (30 min)
+1. **[RESUMEN-MAESTRO-ANALYTICS-ADMIN.md](../../05-historico/RESUMEN-MAESTRO-ANALYTICS-ADMIN.md)** - Visión general completa
+2. **[FIX-ANALYTICS-ADMIN-EXCLUSION.md](../../03-mantenimiento/fixes/FIX-ANALYTICS-ADMIN-EXCLUSION.md)** - Documentación técnica
+3. **[FIX-CRITICO-ADMIN-I18N-ANALYTICS.md](../../03-mantenimiento/fixes/FIX-CRITICO-ADMIN-I18N-ANALYTICS.md)** - Problema de URLs con i18n
+
+---
 
 ### 🌟 Documentos Principales
 

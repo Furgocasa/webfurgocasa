@@ -1,6 +1,6 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.4.0-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.4.0+-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-99%2F100_desktop-brightgreen.svg)](https://pagespeed.web.dev/)
@@ -17,7 +17,51 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Enero 2026 - **Sistema de Análisis de Búsquedas**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 27 de Enero 2026 - **Fix Visitas Duplicadas en Analytics**
+
+### 🔧 Problema Resuelto: Tracking Duplicado en Navegación SPA
+
+**Estado**: ✅ Resuelto mediante configuración GA4  
+**Documentación**: [`FIX-ANALYTICS-VISITAS-DUPLICADAS.md`](./FIX-ANALYTICS-VISITAS-DUPLICADAS.md)
+
+### 📊 Qué se Detectó
+
+Después de la migración a `@next/third-parties/google` (v4.4.0), las páginas del blog y vehículos registraban **2 pageviews** por cada navegación interna (SPA), inflando artificialmente las estadísticas.
+
+| Escenario | Comportamiento Esperado | Antes del Fix |
+|-----------|------------------------|---------------|
+| Landing directo | 1 pageview | 1 pageview ✅ |
+| Navegación SPA (blog → artículo) | 1 pageview | **2 pageviews** ❌ |
+
+### ✅ Solución Implementada
+
+**No requirió cambios de código**, solo configuración en Google Analytics 4:
+
+**Ruta**: Admin → Flujos de datos → Medición mejorada → Configuración avanzada
+
+**Cambio**:
+```
+☑️ Cargas de página                                    [ACTIVADO]
+☐  La página cambia en función de los eventos del      [DESACTIVADO] ✅
+   historial de navegación
+```
+
+### 🎯 Resultado
+
+- ✅ **1 pageview por navegación** (correcto)
+- ✅ Landing pages funcionando perfectamente
+- ✅ Todos los eventos (scroll, clicks, etc.) funcionando
+- ✅ Sin impacto en código o rendimiento
+
+### 📖 Causa Técnica
+
+GA4 "Enhanced Measurement" detectaba cambios en `window.history` (navegación SPA) y enviaba pageviews automáticos, **duplicando** los que ya enviaba `@next/third-parties/google`.
+
+**Documentación completa**: [`FIX-ANALYTICS-VISITAS-DUPLICADAS.md`](./FIX-ANALYTICS-VISITAS-DUPLICADAS.md)
+
+---
+
+## 📊 [ACTUALIZACIÓN PREVIA] - 25 de Enero 2026 - **Sistema de Análisis de Búsquedas**
 
 ### 🔍 Sistema Completo de Tracking del Funnel de Conversión
 

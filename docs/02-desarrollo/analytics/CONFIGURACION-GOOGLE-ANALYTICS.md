@@ -5,7 +5,10 @@
 **Fecha de obsolescencia**: 25 de enero de 2026  
 **Razón**: Migración a `@next/third-parties/google` (librería oficial de Next.js)
 
-**👉 Ver documento actual:** `MIGRACION-NEXT-THIRD-PARTIES.md` (raíz del proyecto)
+**👉 Documentos actuales:**
+- `MIGRACION-NEXT-THIRD-PARTIES.md` - Guía de migración
+- `RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md` - Resumen ejecutivo
+- `FIX-ANALYTICS-VISITAS-DUPLICADAS.md` - Fix de visitas duplicadas (27/01/2026)
 
 ---
 
@@ -36,6 +39,18 @@ export default function RootLayout({ children }) {
 - ✅ **Sin race conditions**: Gestión automática de carga asíncrona
 - ✅ **Captura automática**: Títulos, URLs completas (incluido `fbclid`)
 - ✅ **Menos código**: 1 línea vs 300+ líneas custom
+- ✅ **Tracking correcto**: Sin visitas duplicadas (tras configuración GA4)
+
+### Configuración Requerida en GA4
+
+**⚠️ IMPORTANTE**: Para evitar visitas duplicadas, debes configurar GA4:
+
+1. **Admin** → **Flujos de datos** → Selecciona tu flujo (G-G5YLBN5XXZ)
+2. **Medición mejorada** → **Mostrar configuración avanzada**
+3. **Desactivar**: "La página cambia en función de los eventos del historial de navegación"
+4. **Mantener activo**: "Cargas de página"
+
+📖 **Ver guía detallada:** `FIX-ANALYTICS-VISITAS-DUPLICADAS.md`
 
 ### Desventajas
 - ⚠️ **No hay exclusión del admin**: Los scripts se cargan en todas las páginas
@@ -195,7 +210,7 @@ Edita `src/app/layout.tsx`:
 
 ---
 
-**Última actualización**: 25 de enero de 2026  
+**Última actualización**: 27 de enero de 2026  
 **ID de Medición**: G-G5YLBN5XXZ  
 **Estado**: ⚠️ Obsoleto (Migrado a @next/third-parties)  
-**Versión actual**: v4.4.0
+**Versión actual**: v4.4.0+
