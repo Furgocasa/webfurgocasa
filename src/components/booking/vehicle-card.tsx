@@ -248,7 +248,7 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
                 {t("Descuentos por duración")}
               </p>
               <p className="text-xs text-gray-600">
-                -10% (7d) · -20% (14d) · -30% (21d)
+                hasta -10% (7d) · hasta -20% (14d) · hasta -30% (21d) en Temp. Baja
               </p>
             </div>
             <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 text-green-600 opacity-0 group-hover/discount:opacity-100 group-hover/discount:translate-x-0.5 transition-all" />

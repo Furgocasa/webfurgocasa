@@ -643,18 +643,16 @@ export default function ReservaPage() {
                     </div>
                   </div>
 
-                  {booking.pickup_location.name !== booking.dropoff_location.name && (
-                    <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
-                      <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Punto de devolución")}</p>
-                        <p className="font-semibold text-gray-900">{booking.dropoff_location.name}</p>
-                        {booking.dropoff_location.address && (
-                          <p className="text-sm text-gray-600 mt-1">{booking.dropoff_location.address}</p>
-                        )}
-                      </div>
+                  <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-lg">
+                    <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Punto de devolución")}</p>
+                      <p className="font-semibold text-gray-900">{booking.dropoff_location.name}</p>
+                      {booking.dropoff_location.address && (
+                        <p className="text-sm text-gray-600 mt-1">{booking.dropoff_location.address}</p>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
               </div>
 

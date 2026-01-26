@@ -444,8 +444,16 @@ function PagoExitoContent() {
                     <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
                       <MapPin className="h-5 w-5 text-furgocasa-blue" />
                       <div>
-                        <p className="text-xs text-gray-500 uppercase font-medium">{t("Ubicación")}</p>
+                        <p className="text-xs text-gray-500 uppercase font-medium">{t("Recogida en")}</p>
                         <p className="font-medium text-gray-900">{payment.booking.pickup_location.name}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
+                      <MapPin className="h-5 w-5 text-furgocasa-blue" />
+                      <div>
+                        <p className="text-xs text-gray-500 uppercase font-medium">{t("Devolución en")}</p>
+                        <p className="font-medium text-gray-900">{payment.booking.dropoff_location.name}</p>
                       </div>
                     </div>
                   </div>
