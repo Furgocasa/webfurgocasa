@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t("Quiénes Somos"),
     description: t("Furgocasa es una empresa familiar nacida de la pasión por el mundo camper. Desde 2012, ofrecemos alquiler de autocaravanas premium en Murcia con más de 500 viajes realizados."),
-    keywords: "quienes somos furgocasa, empresa alquiler camper murcia, historia furgocasa, familia furgocasa, autocaravanas murcia",
+    keywords: "à propos furgocasa, entreprise location camping-car murcie, histoire furgocasa, famille furgocasa, camping-cars murcie",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       title: t("Quiénes Somos"),
@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
-      locale: ogLocales[locale] || "es_ES",
+      locale: ogLocales[locale] || "fr_FR",
     },
     twitter: {
       card: "summary_large_image",

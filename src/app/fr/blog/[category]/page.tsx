@@ -44,18 +44,18 @@ const categoryMeta: Record<string, { name: string; description: string }> = {
 };
 
 type Props = {
-  params: Promise<{ locale: string; category: string }>;
+  params: Promise<{ category: string }>;
 };
 
 // 🎯 SEO Metadata dinámico para /blog/[category]
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale: localeStr, category } = await params;
-  const locale = localeStr as Locale;
+  const { category } = await params;
+  const locale: Locale = 'fr'; // Locale fijo para /fr/
   const t = (key: string) => translateServer(key, locale);
   
   const meta = categoryMeta[category] || {
     name: category.charAt(0).toUpperCase() + category.slice(1),
-    description: `Artículos sobre ${category} en el blog de Furgocasa. Consejos, guías y experiencias de viaje en camper.`,
+    description: `Articles sur ${category} dans le blog Furgocasa. Conseils, guides et expériences de voyage en camping-car.`,
   };
 
   // ✅ Canonical autorreferenciado
@@ -71,14 +71,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${meta.name} - ${t("Blog Camper")}`,
     description: meta.description,
-    keywords: `blog camper ${category}, artículos ${category}, viajes camper, furgocasa blog`,
+    keywords: `blog camping-car ${category}, articles ${category}, voyages camping-car, furgocasa blog`,
     openGraph: {
       title: `${meta.name} - ${t("Blog Camper")}`,
       description: meta.description,
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
-      locale: ogLocales[locale] || "es_ES",
+      locale: ogLocales[locale] || "fr_FR",
     },
     twitter: {
       card: "summary",
