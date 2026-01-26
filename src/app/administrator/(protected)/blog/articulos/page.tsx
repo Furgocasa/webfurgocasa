@@ -69,6 +69,21 @@ function useSortableData<T>(items: T[] | undefined, config?: { key: keyof T; dir
         if (aValue == null) return 1;
         if (bValue == null) return -1;
 
+        // Detectar y comparar fechas (strings en formato ISO: YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss)
+        const isDateString = (val: any): boolean => {
+          if (typeof val !== 'string') return false;
+          // Detectar formato ISO de fecha
+          return /^\d{4}-\d{2}-\d{2}/.test(val);
+        };
+
+        if (isDateString(aValue) && isDateString(bValue)) {
+          const aDate = new Date(aValue as string).getTime();
+          const bDate = new Date(bValue as string).getTime();
+          return sortConfig.direction === 'asc' 
+            ? aDate - bDate
+            : bDate - aDate;
+        }
+
         // Convertir strings numéricos a números para comparación correcta
         const aNum = typeof aValue === 'string' ? parseFloat(aValue) : aValue;
         const bNum = typeof bValue === 'string' ? parseFloat(bValue) : bValue;
@@ -93,9 +108,9 @@ function useSortableData<T>(items: T[] | undefined, config?: { key: keyof T; dir
   }, [items, sortConfig]);
 
   const requestSort = (key: keyof T) => {
-    let direction: 'asc' | 'desc' = 'asc';
-    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
+    let direction: 'asc' | 'desc' = 'desc'; // Por defecto DESC (más reciente primero)
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'desc') {
+      direction = 'asc'; // Toggle a ASC (más antiguo primero)
     }
     setSortConfig({ key, direction });
   };
