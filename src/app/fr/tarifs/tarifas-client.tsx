@@ -322,9 +322,25 @@ export function TarifasClient() {
             <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
               {t("Temporadas de alquiler")}
             </h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 text-lg mb-6">
               {t("Consulta nuestro calendario para planificar tu viaje")}
             </p>
+            
+            {/* Leyenda de colores */}
+            <div className="flex flex-wrap justify-center gap-6 mt-8">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-white border-2 border-gray-300 rounded"></div>
+                <span className="text-sm font-medium text-gray-700">Basse Saison</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-orange-200 border-2 border-orange-300 rounded"></div>
+                <span className="text-sm font-medium text-gray-700">Moyenne Saison</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-red-200 border-2 border-red-300 rounded"></div>
+                <span className="text-sm font-medium text-gray-700">Haute Saison</span>
+              </div>
+            </div>
           </div>
           
           <div className="space-y-12 max-w-7xl mx-auto">
