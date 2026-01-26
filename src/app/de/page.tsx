@@ -57,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${t("Las Mejores Campers en Alquiler")}`,
     description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
-    keywords: "alquiler camper, autocaravana alquiler, alquiler furgoneta camper, motorhome españa, campervan alquiler, casa rodante, alquiler autocaravana españa",
+    keywords: "wohnmobil mieten, camper mieten, wohnmobilvermietung, wohnmobil spanien, campervan mieten, wohnmobil vermietung spanien, furgocasa",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       title: `${t("Las Mejores Campers en Alquiler")}`,
@@ -84,11 +84,11 @@ export async function generateMetadata(): Promise<Metadata> {
           url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_1.webp",
           width: 1920,
           height: 1080,
-          alt: "Interior camper Furgocasa",
+          alt: t("Interior camper Furgocasa"),
           type: "image/webp",
         }
       ],
-      locale: ogLocales[locale] || 'es_ES',
+      locale: ogLocales[locale] || 'de_DE',
     },
     twitter: {
       card: "summary_large_image",

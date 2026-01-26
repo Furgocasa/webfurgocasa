@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: t("Blog de Viajes en Camper"),
     description: t("Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente."),
-    keywords: "blog camper, viajes autocaravana, rutas camper españa, consejos autocaravana, destinos camper, alquiler campers murcia, camping autocaravana, vida en camper",
+    keywords: "wohnmobil blog, camper reisen, wohnmobil routen spanien, wohnmobil tipps, camper ziele, wohnmobil miete murcia, wohnmobil camping, camper leben",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       title: t("Blog de Viajes en Camper"),
@@ -48,7 +48,7 @@ export async function generateMetadata(): Promise<Metadata> {
       type: "website",
       siteName: "Furgocasa",
       url: alternates.canonical,
-      locale: ogLocales[locale] || "es_ES",
+      locale: ogLocales[locale] || "de_DE",
       images: [
         {
           url: "https://www.furgocasa.com/og-blog.jpg",
