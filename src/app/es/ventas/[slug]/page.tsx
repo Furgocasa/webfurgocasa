@@ -106,9 +106,10 @@ export async function generateMetadata(
     }
   }
 
-  const title = `${vehicle.name} en Venta`;
-  // Descripción optimizada para Facebook (máx 200 caracteres)
-  const description = `${vehicle.name} ${vehicle.year} - ${formatPrice(vehicle.sale_price)}. ${vehicle.mileage.toLocaleString()} km, ${vehicle.seats} plazas. ¡Visítalo en Furgocasa Murcia!`;
+  // Título con precio y kilometraje
+  const title = `${vehicle.name} - ${formatPrice(vehicle.sale_price)} (${vehicle.mileage.toLocaleString()} km)`;
+  // Descripción con otros datos (año, plazas, combustible, transmisión)
+  const description = `${vehicle.name} ${vehicle.year}. ${vehicle.seats} plazas, ${vehicle.beds} camas. ${vehicle.fuel_type}, cambio ${vehicle.transmission}. Estado: ${vehicle.condition === 'excellent' ? 'Excelente' : vehicle.condition === 'like_new' ? 'Como nuevo' : 'Buen estado'}.`;
 
   return {
     title,
