@@ -153,7 +153,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: alternates.canonical,
       siteName: 'Furgocasa',
       locale: 'en_US',
-      images: [{ url: location.hero_image || DEFAULT_HERO_IMAGE, width: 1920, height: 1080 }],
+      images: [{ url: location.hero_image || getLocationHeroImage(slug), width: 1920, height: 1080 }],
     },
     robots: { index: true, follow: true },
   };
@@ -203,7 +203,7 @@ export default async function LocationPage({ params }: PageProps) {
 
   const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
-  const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
+  const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
   return (
     <>

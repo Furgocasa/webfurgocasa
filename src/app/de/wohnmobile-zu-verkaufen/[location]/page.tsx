@@ -149,7 +149,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const path = `/wohnmobile-zu-verkaufen/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale);
-  const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
+  const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
   return {
     title,
@@ -207,7 +207,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
   const vehicles = await getSaleVehicles();
   const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
-  const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
+  const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
   return (
     <>

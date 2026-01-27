@@ -28,6 +28,7 @@ import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { getLatestBlogArticles } from "@/lib/home/server-actions";
 import { LocationHeroWithSkeleton } from "@/components/locations/location-hero-with-skeleton";
+import { getLocationHeroImage } from "@/lib/locationImages";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -43,8 +44,6 @@ export const revalidate = 3600; // 1 hora
 // ============================================================================
 // LOCALE: ES (Español) | KIND: rent (Alquiler)
 // ============================================================================
-
-const DEFAULT_HERO_IMAGE = "/images/slides/hero-06.webp";
 
 // ============================================================================
 // generateStaticParams - Pre-renderizado de todas las ubicaciones
@@ -168,7 +167,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: alternates.canonical,
       siteName: 'Furgocasa',
       locale: 'es_ES',
-      images: [{ url: location.hero_image || DEFAULT_HERO_IMAGE, width: 1920, height: 1080 }],
+      images: [{ url: location.hero_image || getLocationHeroImage(slug), width: 1920, height: 1080 }],
     },
     robots: { index: true, follow: true },
   };
@@ -222,7 +221,7 @@ export default async function LocationPage({ params }: PageProps) {
 
   const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
-  const heroImageUrl = location.hero_image || DEFAULT_HERO_IMAGE;
+  const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
   return (
     <>
