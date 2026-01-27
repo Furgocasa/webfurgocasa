@@ -476,7 +476,7 @@ function PagoExitoContent() {
                       <strong>{payment.booking.customer_email}</strong>
                     </div>
 
-                    <LocalizedLink href={`/reserver/${payment.booking.id}`}
+                    <LocalizedLink href={`/reserver/${payment.booking.booking_number}`}
                       className="block w-full bg-furgocasa-blue text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-center"
                     >
                       {t("Ver mi reserva")}

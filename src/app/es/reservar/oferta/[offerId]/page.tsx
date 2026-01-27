@@ -309,7 +309,7 @@ export default function ReservarOfertaPage({
       });
 
       // Redirigir a confirmación/pago con ruta traducida
-      const paymentPath = getTranslatedRoute(`/reservar/${result.booking.id}/pago`, language);
+      const paymentPath = getTranslatedRoute(`/reservar/${result.booking.booking_number}/pago`, language);
       router.push(paymentPath);
 
     } catch (err: any) {
