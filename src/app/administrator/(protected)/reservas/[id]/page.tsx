@@ -22,7 +22,6 @@ interface Booking {
   base_price: number;
   extras_price: number;
   total_price: number;
-  deposit_amount: number;
   amount_paid: number | null;
   status: string;
   payment_status: string;

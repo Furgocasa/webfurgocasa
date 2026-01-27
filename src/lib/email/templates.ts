@@ -156,7 +156,6 @@ export interface BookingEmailData {
   extrasPrice: number;
   locationFee?: number;
   discount?: number;
-  depositAmount?: number;
   totalPrice: number;
   amountPaid?: number;
   pendingAmount?: number;
@@ -257,7 +256,7 @@ function getPriceSection(data: BookingEmailData): string {
   if (data.discount && data.discount > 0) {
     rows += tableRow('Descuento', `-${formatPrice(data.discount)}`, '#10b981');
   }
-  rows += tableRow('Fianza (se devuelve)', formatPrice(data.depositAmount || 1000));
+  rows += tableRow('Fianza (se devuelve)', formatPrice(1000));
   
   // Total con estilo especial
   rows += `
@@ -513,7 +512,7 @@ export function getFirstPaymentConfirmedTemplate(data: BookingEmailData): string
         <ol style="margin: 0; padding-left: 20px; font-size: 13px; color: #374151; line-height: 1.8;">
           ${!isPaidInFull ? '<li>Completa el <strong>segundo pago</strong> máximo 15 días antes del inicio</li>' : ''}
           <li>Descarga y firma la <strong>documentación</strong> desde <a href="https://www.furgocasa.com/documentacion-alquiler" style="color: #063971;">furgocasa.com/documentacion-alquiler</a></li>
-          <li>Realiza la <strong>transferencia de la fianza</strong> (${formatPrice(data.depositAmount || 1000)}) máximo 72h antes</li>
+          <li>Realiza la <strong>transferencia de la fianza</strong> (${formatPrice(1000)}) máximo 72h antes</li>
           <li>El día de la recogida, trae tu DNI/Pasaporte y carnet de conducir B</li>
           <li>¡Disfruta de tu aventura!</li>
         </ol>
@@ -523,7 +522,7 @@ export function getFirstPaymentConfirmedTemplate(data: BookingEmailData): string
     ${sectionTitle('💳 Fianza')}
     <tr>
       <td style="padding: 10px 20px;">
-        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;">La fianza de <strong>${formatPrice(data.depositAmount || 1000)}</strong> se abona mediante <strong>transferencia bancaria</strong> máximo 72 horas antes del inicio. Debes enviar el justificante y certificado de titularidad (el titular debe coincidir con el arrendatario).</p>
+        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;">La fianza de <strong>${formatPrice(1000)}</strong> se abona mediante <strong>transferencia bancaria</strong> máximo 72 horas antes del inicio. Debes enviar el justificante y certificado de titularidad (el titular debe coincidir con el arrendatario).</p>
         <p style="margin: 0; font-size: 13px; color: #374151;"><strong>Documentación necesaria:</strong> DNI/Pasaporte y carnet de conducir B (mín. 2 años) de todos los conductores.</p>
       </td>
     </tr>
@@ -628,7 +627,7 @@ export function getSecondPaymentConfirmedTemplate(data: BookingEmailData): strin
       <td style="padding: 10px 20px;">
         <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;"><strong>🕐 Cita:</strong> ${formatDate(data.pickupDate)} a las ${data.pickupTime} en ${data.pickupLocation}</p>
         <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;"><strong>📋 Documentación:</strong> DNI/Pasaporte y carnet B (mín. 2 años) de todos los conductores.</p>
-        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;"><strong>💳 Fianza:</strong> ${formatPrice(data.depositAmount || 1000)} por transferencia máximo 72h antes. Envía justificante + certificado titularidad.</p>
+        <p style="margin: 0 0 10px 0; font-size: 13px; color: #374151;"><strong>💳 Fianza:</strong> ${formatPrice(1000)} por transferencia máximo 72h antes. Envía justificante + certificado titularidad.</p>
         <p style="margin: 0; font-size: 13px; color: #374151;"><strong>📄 Contrato:</strong> Descarga y firma desde <a href="https://www.furgocasa.com/documentacion-alquiler" style="color: #063971;">furgocasa.com/documentacion-alquiler</a></p>
       </td>
     </tr>

@@ -141,9 +141,71 @@ export async function POST(request: NextRequest) {
     // Actualizar la reserva
     const booking = payment.booking as any;
     if (booking) {
-      const currentPaid = booking.amount_paid || 0;
+      // VALIDACIÓN CRÍTICA: Obtener datos completos de la reserva para verificar disponibilidad
+      console.log("🔍 [5/8] Obteniendo datos completos de la reserva...");
+      const { data: fullBooking, error: fullBookingError } = await supabase
+        .from("bookings")
+        .select("total_price, amount_paid, booking_number, vehicle_id, pickup_date, dropoff_date, status")
+        .eq("id", payment.booking_id)
+        .single();
+      
+      if (fullBookingError || !fullBooking) {
+        console.error("❌ [5/8] Error obteniendo reserva completa:", fullBookingError);
+        return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+      }
+      
+      // Verificar disponibilidad solo si es primer pago (reserva en pending)
+      if (fullBooking.status === 'pending') {
+        console.log("🔒 [5/8] Verificando disponibilidad del vehículo antes de confirmar...");
+        
+        const { data: conflictingBookings, error: conflictError } = await supabase
+          .from("bookings")
+          .select("id, booking_number, customer_name, status, payment_status")
+          .eq("vehicle_id", fullBooking.vehicle_id)
+          .neq("id", payment.booking_id)
+          .neq("status", "cancelled")
+          .in("payment_status", ["partial", "paid"])
+          .or(`and(pickup_date.lte.${fullBooking.dropoff_date},dropoff_date.gte.${fullBooking.pickup_date})`);
+        
+        if (conflictError) {
+          console.error("❌ ERROR verificando conflictos:", conflictError);
+          return NextResponse.json({ 
+            error: "Error verificando disponibilidad", 
+            details: conflictError 
+          }, { status: 500 });
+        }
+        
+        if (conflictingBookings && conflictingBookings.length > 0) {
+          // HAY CONFLICTO
+          console.error("🚨 CONFLICTO DETECTADO: El vehículo ya está reservado");
+          console.error({
+            bookingConflictiva: conflictingBookings[0].booking_number,
+            clienteConflictivo: conflictingBookings[0].customer_name,
+          });
+          
+          // Marcar el pago con nota de conflicto
+          await supabase
+            .from("payments")
+            .update({
+              notes: `⚠️ CONFLICTO: Pago recibido pero vehículo ya reservado. Reserva conflictiva: ${conflictingBookings[0].booking_number}. REQUIERE REEMBOLSO O CAMBIO DE VEHÍCULO.`,
+            })
+            .eq("id", payment.id);
+          
+          return NextResponse.json({ 
+            error: "Vehicle no longer available",
+            conflictWith: conflictingBookings[0].booking_number,
+            requiresAction: "REFUND_OR_REASSIGN"
+          }, { status: 409 });
+        }
+        
+        console.log("✅ [5/8] Vehículo disponible - se puede confirmar");
+      } else {
+        console.log("ℹ️ [5/8] Reserva ya confirmada (segundo pago) - saltando verificación");
+      }
+      
+      const currentPaid = fullBooking.amount_paid || 0;
       const newPaid = currentPaid + payment.amount;
-      const totalPrice = booking.total_price;
+      const totalPrice = fullBooking.total_price;
       
       let newPaymentStatus: "pending" | "partial" | "paid";
       if (newPaid >= totalPrice) {
@@ -182,6 +244,50 @@ export async function POST(request: NextRequest) {
         });
       } else {
         console.log("✅ [5/8] Reserva actualizada correctamente");
+        
+        // 🔒 CANCELAR AUTOMÁTICAMENTE OTRAS RESERVAS PENDIENTES DEL MISMO VEHÍCULO Y FECHAS
+        if (fullBooking.status === 'pending') {
+          console.log("🧹 [5/8] Buscando reservas pendientes conflictivas para cancelar...");
+          
+          const { data: pendingConflicts, error: pendingError } = await supabase
+            .from("bookings")
+            .select("id, booking_number, customer_name, customer_email")
+            .eq("vehicle_id", fullBooking.vehicle_id)
+            .neq("id", payment.booking_id)
+            .eq("status", "pending")
+            .eq("payment_status", "pending")
+            .or(`and(pickup_date.lte.${fullBooking.dropoff_date},dropoff_date.gte.${fullBooking.pickup_date})`);
+          
+          if (pendingError) {
+            console.error("❌ Error buscando reservas pendientes:", pendingError);
+          } else if (pendingConflicts && pendingConflicts.length > 0) {
+            console.log(`🧹 [5/8] Encontradas ${pendingConflicts.length} reserva(s) pendiente(s) conflictiva(s)`);
+            
+            // Cancelar todas las reservas pendientes conflictivas
+            const cancellationNote = `❌ CANCELADA AUTOMÁTICAMENTE: El vehículo fue reservado y pagado por otro cliente. Reserva confirmada: ${fullBooking.booking_number}. Si deseas estas fechas, contacta con nosotros para buscar alternativas. Fecha cancelación: ${new Date().toISOString()}`;
+            
+            const { data: cancelledBookings, error: cancelError } = await supabase
+              .from("bookings")
+              .update({
+                status: "cancelled",
+                notes: cancellationNote,
+                updated_at: new Date().toISOString(),
+              })
+              .in("id", pendingConflicts.map(b => b.id))
+              .select("booking_number, customer_name");
+            
+            if (cancelError) {
+              console.error("❌ Error cancelando reservas pendientes:", cancelError);
+            } else {
+              console.log(`✅ [5/8] ${cancelledBookings?.length || 0} reserva(s) pendiente(s) cancelada(s) automáticamente:`);
+              cancelledBookings?.forEach(b => {
+                console.log(`   - ${b.booking_number} (${b.customer_name})`);
+              });
+            }
+          } else {
+            console.log("✅ [5/8] No hay reservas pendientes conflictivas para cancelar");
+          }
+        }
         
         // Enviar email de confirmación
         console.log("📧 [6/8] Enviando email de confirmación...");

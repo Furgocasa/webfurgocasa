@@ -63,7 +63,6 @@ interface Booking {
   pickup_location_name?: string;
   dropoff_location_name?: string;
   total_price: number;
-  deposit_amount?: number;
   amount_paid?: number;
   payment_status?: string;
   status: string;
@@ -157,7 +156,6 @@ export default function CalendarioPage() {
           status,
           payment_status,
           total_price,
-          deposit_amount,
           amount_paid,
           notes
         `)

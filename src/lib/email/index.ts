@@ -269,7 +269,6 @@ export async function getBookingDataForEmail(
       extrasPrice: booking.extras_price || 0,
       locationFee: booking.location_fee || 0,
       discount: booking.discount || 0,
-      depositAmount: booking.deposit_amount || 1000,
       totalPrice: booking.total_price || 0,
       amountPaid: booking.amount_paid || 0,
       pendingAmount: (booking.total_price || 0) - (booking.amount_paid || 0),

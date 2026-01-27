@@ -83,7 +83,6 @@ interface FormData {
   base_price: number;
   extras_price: number;
   total_price: number;
-  deposit_amount: number;
   amount_paid: number;
   
   // Estados
@@ -134,7 +133,6 @@ export default function EditarReservaPage() {
     base_price: 0,
     extras_price: 0,
     total_price: 0,
-    deposit_amount: 1000,
     amount_paid: 0,
     status: 'pending',
     payment_status: 'pending',
@@ -275,7 +273,6 @@ export default function EditarReservaPage() {
         base_price: booking.base_price ?? 0,
         extras_price: booking.extras_price ?? 0,
         total_price: booking.total_price ?? 0,
-        deposit_amount: booking.deposit_amount ?? 1000,
         amount_paid: booking.amount_paid ?? 0,
         status: booking.status ?? 'pending',
         payment_status: booking.payment_status ?? 'pending',
@@ -440,7 +437,6 @@ export default function EditarReservaPage() {
         base_price: formData.base_price,
         extras_price: formData.extras_price,
         total_price: formData.total_price,
-        deposit_amount: formData.deposit_amount,
         amount_paid: formData.amount_paid,
         status: formData.status,
         payment_status: formData.payment_status,
@@ -1053,20 +1049,6 @@ export default function EditarReservaPage() {
                     step="0.01"
                     value={formData.base_price}
                     onChange={(e) => handleInputChange('base_price', parseFloat(e.target.value) || 0)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Fianza *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    value={formData.deposit_amount}
-                    onChange={(e) => handleInputChange('deposit_amount', parseFloat(e.target.value) || 0)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
                     required
                   />

@@ -22,7 +22,7 @@ const bookingSchema = z.object({
   location_fee: z.number().nonnegative().optional(),
   discount: z.number().nonnegative().optional(),
   total_price: z.number().positive(),
-  deposit_amount: z.number().nonnegative().optional(),
+  amount_paid: z.number().nonnegative().optional(),
   customer_name: z.string().min(2).max(200),
   customer_email: z.string().email().max(255),
   notes: z.string().max(2000).optional().nullable(),

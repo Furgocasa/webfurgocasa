@@ -373,7 +373,6 @@ function NuevaReservaContent() {
             base_price: basePrice,
             extras_price: extrasPrice,
             total_price: totalPrice,
-            deposit_amount: 1000, // Fianza estándar
             status: 'pending',
             payment_status: 'pending',
             // Snapshot básico del cliente (solo nombre y email para GDPR/auditoría)

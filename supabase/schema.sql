@@ -267,7 +267,6 @@ CREATE TABLE bookings (
     location_fee DECIMAL(10,2) DEFAULT 0,
     discount DECIMAL(10,2) DEFAULT 0,
     total_price DECIMAL(10,2) NOT NULL,
-    deposit_amount DECIMAL(10,2) DEFAULT 500,
     amount_paid DECIMAL(10,2) DEFAULT 0, -- Monto ya pagado por el cliente
     
     -- Estados

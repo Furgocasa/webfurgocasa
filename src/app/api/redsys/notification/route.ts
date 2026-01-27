@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
       console.log("🔍 [6/7] Obteniendo datos actuales de la reserva...");
       const { data: currentBooking, error: fetchError } = await supabase
         .from("bookings")
-        .select("total_price, amount_paid, booking_number")
+        .select("total_price, amount_paid, booking_number, vehicle_id, pickup_date, dropoff_date, status")
         .eq("id", payment.booking_id)
         .single();
 
@@ -179,7 +179,55 @@ export async function POST(request: NextRequest) {
           totalPrice: currentBooking.total_price,
           amountPaid: currentBooking.amount_paid,
           paymentAmount: payment.amount,
+          currentStatus: currentBooking.status,
         });
+        
+        // VALIDACIÓN CRÍTICA: Verificar que el vehículo sigue disponible
+        // Solo si la reserva está en 'pending' (primer pago)
+        if (currentBooking.status === 'pending') {
+          console.log("🔒 [6/7] Verificando disponibilidad del vehículo antes de confirmar...");
+          
+          const { data: conflictingBookings, error: conflictError } = await supabase
+            .from("bookings")
+            .select("id, booking_number, customer_name, status, payment_status")
+            .eq("vehicle_id", currentBooking.vehicle_id)
+            .neq("id", payment.booking_id)
+            .neq("status", "cancelled")
+            .in("payment_status", ["partial", "paid"])
+            .or(`and(pickup_date.lte.${currentBooking.dropoff_date},dropoff_date.gte.${currentBooking.pickup_date})`);
+          
+          if (conflictError) {
+            console.error("❌ ERROR verificando conflictos:", conflictError);
+            // En caso de error en verificación, marcar el pago pero NO confirmar la reserva
+            console.error("⚠️ NO SE CONFIRMA LA RESERVA - requiere revisión manual");
+          } else if (conflictingBookings && conflictingBookings.length > 0) {
+            // HAY CONFLICTO - otro cliente pagó antes
+            console.error("🚨 CONFLICTO DETECTADO: El vehículo ya está reservado para esas fechas");
+            console.error({
+              bookingConflictiva: conflictingBookings[0].booking_number,
+              clienteConflictivo: conflictingBookings[0].customer_name,
+              statusConflicto: conflictingBookings[0].status,
+              paymentStatusConflicto: conflictingBookings[0].payment_status,
+            });
+            
+            // NO actualizar la reserva a confirmed
+            // Solo registrar el pago como recibido con nota de conflicto
+            await supabase
+              .from("payments")
+              .update({
+                notes: `⚠️ CONFLICTO: Pago recibido pero vehículo ya reservado. Reserva conflictiva: ${conflictingBookings[0].booking_number}. REQUIERE REEMBOLSO O CAMBIO DE VEHÍCULO.`,
+              })
+              .eq("id", payment.id);
+            
+            console.error("⚠️ Pago marcado con conflicto. REQUIERE ACCIÓN MANUAL DEL ADMINISTRADOR.");
+            // Continuar respondiendo OK a Redsys (para no causar reintentos)
+            return;
+          } else {
+            console.log("✅ [6/7] Vehículo disponible - se puede confirmar la reserva");
+          }
+        } else {
+          console.log("ℹ️ [6/7] Reserva ya confirmada (segundo pago) - saltando verificación de disponibilidad");
+        }
         
         // Calcular nuevo amount_paid
         const currentPaid = currentBooking.amount_paid || 0;
@@ -228,6 +276,53 @@ export async function POST(request: NextRequest) {
             paymentStatus: newPaymentStatus,
             status: "confirmed",
           });
+          
+          // 🔒 CANCELAR AUTOMÁTICAMENTE OTRAS RESERVAS PENDIENTES DEL MISMO VEHÍCULO Y FECHAS
+          if (currentBooking.status === 'pending') {
+            console.log("🧹 [6/7] Buscando reservas pendientes conflictivas para cancelar...");
+            
+            const { data: pendingConflicts, error: pendingError } = await supabase
+              .from("bookings")
+              .select("id, booking_number, customer_name, customer_email")
+              .eq("vehicle_id", currentBooking.vehicle_id)
+              .neq("id", payment.booking_id)
+              .eq("status", "pending")
+              .eq("payment_status", "pending")
+              .or(`and(pickup_date.lte.${currentBooking.dropoff_date},dropoff_date.gte.${currentBooking.pickup_date})`);
+            
+            if (pendingError) {
+              console.error("❌ Error buscando reservas pendientes:", pendingError);
+            } else if (pendingConflicts && pendingConflicts.length > 0) {
+              console.log(`🧹 [6/7] Encontradas ${pendingConflicts.length} reserva(s) pendiente(s) conflictiva(s)`);
+              
+              // Cancelar todas las reservas pendientes conflictivas
+              const cancellationNote = `❌ CANCELADA AUTOMÁTICAMENTE: El vehículo fue reservado y pagado por otro cliente. Reserva confirmada: ${currentBooking.booking_number}. Si deseas estas fechas, contacta con nosotros para buscar alternativas. Fecha cancelación: ${new Date().toISOString()}`;
+              
+              const { data: cancelledBookings, error: cancelError } = await supabase
+                .from("bookings")
+                .update({
+                  status: "cancelled",
+                  notes: cancellationNote,
+                  updated_at: new Date().toISOString(),
+                })
+                .in("id", pendingConflicts.map(b => b.id))
+                .select("booking_number, customer_name");
+              
+              if (cancelError) {
+                console.error("❌ Error cancelando reservas pendientes:", cancelError);
+              } else {
+                console.log(`✅ [6/7] ${cancelledBookings?.length || 0} reserva(s) pendiente(s) cancelada(s) automáticamente:`);
+                cancelledBookings?.forEach(b => {
+                  console.log(`   - ${b.booking_number} (${b.customer_name})`);
+                });
+                
+                // TODO: Opcional - enviar email a los clientes afectados informando de la cancelación
+                // y ofreciendo alternativas
+              }
+            } else {
+              console.log("✅ [6/7] No hay reservas pendientes conflictivas para cancelar");
+            }
+          }
           
           // Enviar email de confirmación según el estado del pago
           console.log("📧 [7/7] Preparando envío de email...");

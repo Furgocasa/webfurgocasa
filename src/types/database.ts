@@ -224,7 +224,7 @@ export interface Database {
           location_fee: number;
           discount: number;
           total_price: number;
-          deposit_amount: number;
+          amount_paid: number;
           status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
           payment_status: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;
@@ -256,7 +256,7 @@ export interface Database {
           location_fee?: number;
           discount?: number;
           total_price: number;
-          deposit_amount?: number;
+          amount_paid?: number;
           status?: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
           payment_status?: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;

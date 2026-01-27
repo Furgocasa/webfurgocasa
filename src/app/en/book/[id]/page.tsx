@@ -55,7 +55,6 @@ interface Booking {
   location_fee: number;
   discount: number;
   total_price: number;
-  deposit_amount: number;
   amount_paid: number;
   status: string;
   payment_status: string;

@@ -256,7 +256,6 @@ export type Database = {
           customer_phone: string | null
           customer_postal_code: string | null
           days: number
-          deposit_amount: number | null
           discount: number | null
           dropoff_date: string
           dropoff_location_id: string
@@ -289,7 +288,6 @@ export type Database = {
           customer_phone?: string | null
           customer_postal_code?: string | null
           days: number
-          deposit_amount?: number | null
           discount?: number | null
           dropoff_date: string
           dropoff_location_id: string
@@ -322,7 +320,6 @@ export type Database = {
           customer_phone?: string | null
           customer_postal_code?: string | null
           days?: number
-          deposit_amount?: number | null
           discount?: number | null
           dropoff_date?: string
           dropoff_location_id?: string
