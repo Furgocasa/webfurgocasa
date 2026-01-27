@@ -102,7 +102,7 @@ interface FormData {
 export default function EditarReservaPage() {
   const router = useRouter();
   const params = useParams();
-  const bookingId = params.id as string;
+  const bookingNumber = params.id as string; // Mantener params.id pero usar booking_number
   
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -249,7 +249,7 @@ export default function EditarReservaPage() {
             extra:extras(name)
           )
         `)
-        .eq('id', bookingId)
+        .eq('booking_number', bookingNumber)
         .single();
 
       if (bookingError) throw bookingError;
@@ -457,7 +457,7 @@ export default function EditarReservaPage() {
       const { error: updateError } = await supabase
         .from('bookings')
         .update(updateData)
-        .eq('id', bookingId);
+        .eq('booking_number', bookingNumber);
 
       if (updateError) throw updateError;
 
@@ -567,7 +567,7 @@ export default function EditarReservaPage() {
       const { error } = await supabase
         .from('bookings')
         .delete()
-        .eq('id', bookingId);
+        .eq('booking_number', bookingNumber);
 
       if (error) throw error;
 

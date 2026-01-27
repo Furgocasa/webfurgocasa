@@ -1247,7 +1247,7 @@ export default function CalendarioPage() {
                 Cerrar
               </button>
               <button
-                onClick={() => router.push(`/administrator/reservas/${selectedBooking.id}`)}
+                onClick={() => router.push(`/administrator/reservas/${selectedBooking.booking_number}`)}
                 className="flex-1 px-4 py-3 bg-furgocasa-orange text-white font-semibold rounded-lg hover:bg-furgocasa-orange-dark transition-colors"
               >
                 Ver detalles

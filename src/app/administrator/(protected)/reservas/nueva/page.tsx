@@ -363,7 +363,7 @@ export default function NuevaReservaPage() {
 
       setMessage({ type: 'success', text: 'Reserva creada correctamente' });
       setTimeout(() => {
-        router.push(`/administrator/reservas/${booking.id}`);
+        router.push(`/administrator/reservas/${booking.booking_number}`);
       }, 1500);
 
     } catch (error: any) {

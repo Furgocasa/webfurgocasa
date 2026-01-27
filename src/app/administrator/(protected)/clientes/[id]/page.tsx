@@ -410,7 +410,7 @@ export default function ClienteDetallePage() {
                 {bookings.map((booking) => (
                   <Link
                     key={booking.id}
-                    href={`/administrator/reservas/${booking.id}`}
+                    href={`/administrator/reservas/${booking.booking_number}`}
                     className="block p-4 border border-gray-200 rounded-lg hover:border-furgocasa-orange hover:shadow-md transition-all"
                   >
                     <div className="flex items-start justify-between gap-4">

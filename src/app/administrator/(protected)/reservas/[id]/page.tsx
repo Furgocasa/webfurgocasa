@@ -93,7 +93,7 @@ const paymentStatusColors: Record<string, { bg: string; text: string; label: str
 export default function ReservaDetalleAdminPage() {
   const router = useRouter();
   const params = useParams();
-  const bookingId = params.id as string;
+  const bookingNumber = params.id as string; // Mantener params.id pero usar booking_number
   
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
@@ -102,10 +102,10 @@ export default function ReservaDetalleAdminPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
-    if (bookingId) {
+    if (bookingNumber) {
       loadBooking();
     }
-  }, [bookingId]);
+  }, [bookingNumber]);
 
   const loadBooking = async () => {
     try {
@@ -145,7 +145,7 @@ export default function ReservaDetalleAdminPage() {
             extra:extras(name, price_type)
           )
         `)
-        .eq('id', bookingId)
+        .eq('booking_number', bookingNumber)
         .single();
 
       if (error) throw error;
@@ -173,7 +173,7 @@ export default function ReservaDetalleAdminPage() {
       const { error } = await supabase
         .from('bookings')
         .update({ status: newStatus })
-        .eq('id', bookingId);
+        .eq('booking_number', bookingNumber);
 
       if (error) throw error;
 
@@ -206,7 +206,7 @@ export default function ReservaDetalleAdminPage() {
       const { error } = await supabase
         .from('bookings')
         .update(updateData)
-        .eq('id', bookingId);
+        .eq('booking_number', bookingNumber);
 
       if (error) throw error;
 
@@ -239,7 +239,7 @@ export default function ReservaDetalleAdminPage() {
         },
         body: JSON.stringify({
           type,
-          bookingId,
+          bookingId: booking.id, // Enviar el UUID para el endpoint de email
         }),
       });
 
@@ -352,7 +352,7 @@ export default function ReservaDetalleAdminPage() {
 
           {/* Botones de acción originales */}
           <Link
-            href={`/administrator/reservas/${bookingId}/editar`}
+            href={`/administrator/reservas/${booking.booking_number}/editar`}
             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors text-sm font-medium shadow-sm"
           >
             <Edit className="h-4 w-4" />

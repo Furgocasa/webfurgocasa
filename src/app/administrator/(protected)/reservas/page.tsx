@@ -711,7 +711,7 @@ export default function BookingsPage() {
                       <td className="px-2 py-3">
                         <div className="flex items-center justify-end gap-0.5">
                           <Link 
-                            href={`/administrator/reservas/${booking.id}`} 
+                            href={`/administrator/reservas/${booking.booking_number}`} 
                             className="p-1.5 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded transition-colors" 
                             title="Ver detalles"
                           >
@@ -739,7 +739,7 @@ export default function BookingsPage() {
                             <Mail className="h-3.5 w-3.5" />
                           </button>
                           <Link 
-                            href={`/administrator/reservas/${booking.id}/editar`} 
+                            href={`/administrator/reservas/${booking.booking_number}/editar`} 
                             className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors" 
                             title="Editar"
                           >
