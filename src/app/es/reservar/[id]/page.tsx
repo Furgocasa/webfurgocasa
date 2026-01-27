@@ -619,7 +619,14 @@ export default function ReservaPage() {
 
                   <div className="md:col-span-2 p-4 bg-blue-50 rounded-lg">
                     <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Duración")}</p>
-                    <p className="font-bold text-furgocasa-blue text-xl">{booking.days} {booking.days === 1 ? t("día") : t("días")}</p>
+                    <p className="font-bold text-furgocasa-blue text-xl">
+                      {(() => {
+                        const pickup = new Date(booking.pickup_date);
+                        const dropoff = new Date(booking.dropoff_date);
+                        const days = Math.ceil((dropoff.getTime() - pickup.getTime()) / (1000 * 60 * 60 * 24));
+                        return `${days} ${days === 1 ? t("día") : t("días")}`;
+                      })()}
+                    </p>
                   </div>
                 </div>
               </div>

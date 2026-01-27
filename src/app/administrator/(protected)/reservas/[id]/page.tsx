@@ -567,6 +567,23 @@ export default function ReservaDetalleAdminPage() {
                 </p>
                 <p className="text-sm text-gray-600 mt-1">{booking.dropoff_time}</p>
               </div>
+
+              <div className="md:col-span-2 p-4 bg-blue-50 rounded-lg">
+                <p className="text-sm text-gray-500 uppercase font-medium mb-1">Duración</p>
+                <p className="font-bold text-furgocasa-blue text-xl">
+                  {(() => {
+                    const pickup = new Date(booking.pickup_date);
+                    const dropoff = new Date(booking.dropoff_date);
+                    const days = Math.ceil((dropoff.getTime() - pickup.getTime()) / (1000 * 60 * 60 * 24));
+                    return days;
+                  })()} días
+                </p>
+                {booking.days !== Math.ceil((new Date(booking.dropoff_date).getTime() - new Date(booking.pickup_date).getTime()) / (1000 * 60 * 60 * 24)) && (
+                  <p className="text-xs text-orange-600 mt-1">
+                    ⚠️ Base de datos: {booking.days} días (desincronizado)
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-3">
