@@ -64,6 +64,13 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     const isBlogArticlePage = pathname.includes('/blog/') && 
                               pathname.split('/').length >= 5; // /es/blog/category/slug
     
+    console.log('🔍 Debug Language Switcher:', {
+      isBlogArticlePage,
+      blogRouteData,
+      pathname,
+      targetLang: lang
+    });
+    
     let translatedPath: string;
     
     if (isBlogArticlePage && blogRouteData) {
@@ -71,11 +78,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       const translatedSlug = blogRouteData.slugs[lang] || blogRouteData.slugs.es;
       const translatedCategory = blogRouteData.category[lang] || blogRouteData.category.es;
       translatedPath = `/${lang}/blog/${translatedCategory}/${translatedSlug}${queryString}${hash}`;
-      console.log('📚 Blog: usando slugs traducidos:', { translatedSlug, translatedCategory });
+      console.log('📚 Blog: usando slugs traducidos:', { translatedSlug, translatedCategory, translatedPath });
     } else {
       // Traducir la URL actual al nuevo idioma (incluyendo query params)
       const fullPathWithParams = pathname + queryString + hash;
       translatedPath = getTranslatedRoute(fullPathWithParams, lang);
+      console.log('📄 Página normal: usando getTranslatedRoute:', translatedPath);
     }
     
     console.log('🔗 Navegando a:', translatedPath, '(original:', pathname, ')');
