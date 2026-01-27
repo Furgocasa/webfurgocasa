@@ -189,11 +189,11 @@ function PagoExitoContent() {
       // FALLBACK: Si no hay parámetros en URL, intentar recuperar de sessionStorage
       if (!orderNumber && typeof window !== 'undefined') {
         const savedOrderNumberFromStorage = sessionStorage.getItem('lastPaymentOrderNumber');
-        savedBookingId = sessionStorage.getItem('lastPaymentBookingId');
+        savedBookingId = sessionStorage.getItem('lastPaymentBookingNumber');
         
         console.log("[PAGO-EXITO] SessionStorage valores:", {
           savedOrderNumber: savedOrderNumberFromStorage,
-          savedBookingId: savedBookingId
+          savedBookingNumber: savedBookingId
         });
         
         if (savedOrderNumberFromStorage) {
@@ -201,7 +201,7 @@ function PagoExitoContent() {
           console.log("[PAGO-EXITO] OrderNumber recuperado de sessionStorage:", orderNumber);
         }
         
-        // Guardar bookingId para fallback visual
+        // Guardar bookingNumber para fallback visual
         if (savedBookingId) {
           setFallbackBookingId(savedBookingId);
         }
@@ -209,7 +209,7 @@ function PagoExitoContent() {
         // Limpiar sessionStorage después de usar
         if (savedOrderNumberFromStorage || savedBookingId) {
           sessionStorage.removeItem('lastPaymentOrderNumber');
-          sessionStorage.removeItem('lastPaymentBookingId');
+          sessionStorage.removeItem('lastPaymentBookingNumber');
           console.log("[PAGO-EXITO] SessionStorage limpiado");
         }
       }

@@ -43,7 +43,7 @@ export default function PagoPage() {
   const { t } = useLanguage();
   const router = useRouter();
   const params = useParams();
-  const bookingId = params.id as string;
+  const bookingNumber = params.id as string;
   
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
@@ -291,11 +291,11 @@ export default function PagoPage() {
         console.log("✅ FRONTEND - REDIRIGIENDO A REDSYS");
         console.log("=".repeat(80) + "\n");
         
-        // Guardar bookingId y orderNumber en sessionStorage para recuperarlo después del pago
+        // Guardar bookingNumber y orderNumber en sessionStorage para recuperarlo después del pago
         if (typeof window !== 'undefined') {
-          sessionStorage.setItem('lastPaymentBookingId', bookingId);
+          sessionStorage.setItem('lastPaymentBookingNumber', bookingNumber);
           sessionStorage.setItem('lastPaymentOrderNumber', data.orderNumber);
-          console.log("💾 Guardado en sessionStorage: bookingId=" + bookingId + ", orderNumber=" + data.orderNumber);
+          console.log("💾 Guardado en sessionStorage: bookingNumber=" + bookingNumber + ", orderNumber=" + data.orderNumber);
         }
         
         document.body.appendChild(form);

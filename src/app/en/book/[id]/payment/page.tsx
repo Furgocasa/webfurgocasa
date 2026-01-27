@@ -293,7 +293,7 @@ export default function PagoPage() {
         
         // Guardar bookingId y orderNumber en sessionStorage para recuperarlo después del pago
         if (typeof window !== 'undefined') {
-          sessionStorage.setItem('lastPaymentBookingId', bookingId);
+          sessionStorage.setItem('lastPaymentBookingNumber', bookingNumber);
           sessionStorage.setItem('lastPaymentOrderNumber', data.orderNumber);
           console.log("💾 Guardado en sessionStorage: bookingId=" + bookingId + ", orderNumber=" + data.orderNumber);
         }
