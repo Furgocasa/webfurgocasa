@@ -27,6 +27,7 @@ import { NearbyOfficeNotice } from "@/components/locations/nearby-office-notice"
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { getLatestBlogArticles } from "@/lib/home/server-actions";
+import { LocationHeroWithSkeleton } from "@/components/locations/location-hero-with-skeleton";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -234,25 +235,13 @@ export default async function LocationPage({ params }: PageProps) {
       <LocalBusinessJsonLd location={location as any} />
       
       {/* ================================================================== */}
-      {/* HERO SECTION - Textos dinámicos desde BD */}
+      {/* HERO SECTION con SKELETON SCREEN - Mejora percepción de velocidad */}
       {/* ================================================================== */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center">
-        <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <Image
-            src={heroImageUrl}
-            alt={location.h1_title || `${t("Alquiler de Autocaravanas (motorhomes) en")} ${location.name}`}
-            fill
-            priority
-            fetchPriority="high"
-            decoding="sync"
-            quality={50}
-            sizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1920px"
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-black/40" />
-        </div>
-        
-        <div className="relative z-10 container mx-auto px-4 text-center">
+      <LocationHeroWithSkeleton
+        heroImageUrl={heroImageUrl}
+        alt={location.h1_title || `${t("Alquiler de Autocaravanas (motorhomes) en")} ${location.name}`}
+      >
+        <div className="container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3">
             {/* H1 - Formato fijo: Alquiler de Autocaravanas (Motorhomes) en {ciudad} */}
             <h1 
@@ -301,7 +290,7 @@ export default async function LocationPage({ params }: PageProps) {
             <SearchWidget />
           </div>
         </div>
-      </section>
+      </LocationHeroWithSkeleton>
 
       {/* ================================================================== */}
       {/* VEHÍCULOS DISPONIBLES - Fondo blanco */}
