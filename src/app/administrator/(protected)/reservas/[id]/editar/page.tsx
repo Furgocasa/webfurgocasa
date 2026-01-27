@@ -110,7 +110,7 @@ export default function EditarReservaPage() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [originalStatus, setOriginalStatus] = useState<string>('pending');
   
-  const [bookingNumber, setBookingNumber] = useState('');
+  const [bookingNumberDisplay, setBookingNumberDisplay] = useState('');
   const [customerId, setCustomerId] = useState<string>('');
   const [customerData, setCustomerData] = useState<Customer | null>(null);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -257,7 +257,7 @@ export default function EditarReservaPage() {
       console.log('Booking data loaded:', booking); // Debug
       console.log('Booking extras loaded:', booking.booking_extras); // Debug
       
-      setBookingNumber(booking.booking_number);
+      setBookingNumberDisplay(booking.booking_number);
       
       // Guardar customer_id y datos del cliente
       setCustomerId(booking.customer_id || '');
@@ -646,7 +646,7 @@ export default function EditarReservaPage() {
             <ArrowLeft className="h-4 w-4 mr-1" />
             Volver a la reserva
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Editar Reserva {bookingNumber}</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Editar Reserva {bookingNumberDisplay}</h1>
         </div>
 
         <button
