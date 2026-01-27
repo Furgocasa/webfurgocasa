@@ -3,7 +3,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { preloadTranslations } from '@/lib/translation-service';
-import { getPreloadCache, staticTranslations } from '@/lib/translations-preload';
+import { getPreloadCache } from '@/lib/translations-preload';
+import { staticTranslations } from '@/lib/i18n/translations';
 import { getTranslatedRoute, getLanguageFromRoute } from '@/lib/route-translations';
 import { getBlogRouteData } from '@/components/blog/blog-route-data';
 import type { Locale } from '@/lib/i18n/config';

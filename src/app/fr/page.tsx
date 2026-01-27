@@ -17,7 +17,8 @@ import {
   Shield,
   Package,
   BookOpen,
-  HelpCircle
+  HelpCircle,
+  Zap
 } from "lucide-react";
 import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from "@/lib/home/server-actions";
 import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/home/organization-jsonld";
@@ -338,6 +339,42 @@ export default async function LocaleHomePage() {
             >
               {t("Ver todas las tarifas")} <span className="text-xl">→</span>
             </LocalizedLink>
+          </div>
+        </div>
+      </section>
+
+      {/* Banner de Ofertas de Última Hora */}
+      <section className="py-12 lg:py-16 bg-gradient-to-br from-red-500 via-orange-500 to-furgocasa-orange relative overflow-hidden">
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE0YzQuNDE4IDAgOC0zLjU4MiA4LThzLTMuNTgyLTgtOC04LTggMy41ODItOCA4IDMuNTgyIDggOCA4em0wIDRjLTQuNDE4IDAtOCAzLjU4Mi04IDhzMy41ODIgOCA4IDggOC0zLjU4MiA4LTgtMy41ODItOC04LTh6bTAgMjhjLTQuNDE4IDAtOCAzLjU4Mi04IDhzMy41ODIgOCA4IDggOC0zLjU4MiA4LTgtMy41ODItOC04LTh6TTEyIDZjNC40MTggMCA4LTMuNTgyIDgtOHMtMy41ODItOC04LTgtOCAzLjU4Mi04IDggMy41ODIgOCA4IDh6bTAgNDBjNC40MTggMCA4LTMuNTgyIDgtOHMtMy41ODItOC04LTgtOCAzLjU4Mi04IDggMy41ODIgOCA4IDh6bTQ4IDRjNC40MTggMCA4LTMuNTgyIDgtOHMtMy41ODItOC04LTgtOCAzLjU4Mi04IDggMy41ODIgOCA4IDh6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20" />
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="inline-flex items-center justify-center gap-2 mb-6 animate-bounce">
+              <Zap className="h-12 w-12 lg:h-16 lg:w-16 text-yellow-300 fill-yellow-300" />
+            </div>
+            
+            <h2 className="text-3xl md:text-4xl lg:text-6xl font-heading font-black text-white mb-4 lg:mb-6 uppercase tracking-wider" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.3)' }}>
+              {t("¡Ofertas de Última Hora!")}
+            </h2>
+            
+            <p className="text-lg md:text-xl lg:text-2xl text-white/95 mb-6 lg:mb-8 font-medium leading-relaxed max-w-3xl mx-auto" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.2)' }}>
+              {t("Aprovecha nuestras ofertas especiales con descuentos de hasta el 40% en fechas seleccionadas")}
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <LocalizedLink
+                href="/ofertas"
+                className="group inline-flex items-center gap-3 bg-white text-furgocasa-orange font-bold px-8 lg:px-10 py-4 lg:py-5 rounded-2xl hover:bg-gray-50 transition-all shadow-2xl text-lg lg:text-xl uppercase tracking-wider transform hover:scale-105 duration-300"
+              >
+                <Zap className="h-6 w-6 group-hover:animate-pulse" />
+                {t("Ver Ofertas Ahora")}
+                <span className="text-2xl group-hover:translate-x-1 transition-transform">→</span>
+              </LocalizedLink>
+              
+              <span className="text-white/90 text-sm lg:text-base font-medium uppercase tracking-wide">
+                {t("¡Plazas limitadas!")}
+              </span>
+            </div>
           </div>
         </div>
       </section>
