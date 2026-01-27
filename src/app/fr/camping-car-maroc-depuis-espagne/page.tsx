@@ -100,11 +100,11 @@ export default async function LocaleCampingCarMarocPage({ params }: PageProps) {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <HeroSlider 
             images={[
-              "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
-              "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/new_slider_1.webp",
-              "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/new_slider_2.webp",
-              "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_1.webp",
-              "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/Slider_5.webp",
+              "/images/slides/hero-11.webp",
+              "/images/slides/hero-01.webp",
+              "/images/slides/hero-06.webp",
+              "/images/slides/hero-09.webp",
+              "/images/slides/hero-14.webp",
             ]}
             autoPlayInterval={20000}
           />
