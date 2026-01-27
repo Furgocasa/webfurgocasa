@@ -181,8 +181,11 @@ export async function getBookingByNumber(
  * @returns true si el formato es válido
  */
 export function isValidBookingNumber(bookingNumber: string): boolean {
-  // Formato real en DB: FCYYMMNNNNN (ej: FC26010038)
-  // FC + 4 dígitos de año/mes + 4 dígitos secuenciales
-  const regex = /^FC\d{8}$/;
-  return regex.test(bookingNumber);
+  // Soporta DOS formatos:
+  // 1. Formato nuevo: FCYYMMNNNNN (ej: FC26010038)
+  // 2. Formato viejo: BK-XXXXXX-XXXX o similar (migración)
+  const formatoNuevo = /^FC\d{8}$/;
+  const formatoViejo = /^BK-\d{6,8}-\d{4}$/;
+  
+  return formatoNuevo.test(bookingNumber) || formatoViejo.test(bookingNumber);
 }
