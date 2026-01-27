@@ -158,35 +158,6 @@ export default async function ESContactoPage() {
           </div>
         </section>
 
-        {/* Mapa */}
-        <section className="py-16 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
-                  {t("Nuestra ubicación")}
-                </h2>
-                <p className="text-lg text-gray-600">
-                  {t("Visítanos en nuestra sede de Casillas, Murcia")}
-                </p>
-              </div>
-              <div className="rounded-2xl overflow-hidden shadow-2xl">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3143.2!2d-1.099!3d38.007!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDAwJzI1LjIiTiAxwrAwNScyNi40Ilc!5e0!3m2!1ses!2ses!4v1234567890"
-                  width="100%"
-                  height="300"
-                  className="md:h-[450px]"
-                  style={{ border: 0 }}
-                  allowFullScreen
-                  loading="lazy"
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title={t("Ubicación de Furgocasa en Murcia")}
-                ></iframe>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* FAQ Quick Links */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
