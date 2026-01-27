@@ -8770,6 +8770,32 @@ export const staticTranslations = {
     de: "Mapa Furgocasa öffnen"
   },
   
+  // Banner Ofertas Home
+  "¡Ofertas de Última Hora!": {
+    es: "¡Ofertas de Última Hora!",
+    en: "Last Minute Deals!",
+    fr: "Offres de Dernière Minute !",
+    de: "Last-Minute-Angebote!"
+  },
+  "Aprovecha nuestras ofertas especiales con descuentos de hasta el 40% en fechas seleccionadas": {
+    es: "Aprovecha nuestras ofertas especiales con descuentos de hasta el 40% en fechas seleccionadas",
+    en: "Take advantage of our special offers with discounts up to 40% on selected dates",
+    fr: "Profitez de nos offres spéciales avec des réductions jusqu'à 40% sur des dates sélectionnées",
+    de: "Nutzen Sie unsere Sonderangebote mit Rabatten bis zu 40% auf ausgewählte Termine"
+  },
+  "Ver Ofertas Ahora": {
+    es: "Ver Ofertas Ahora",
+    en: "See Offers Now",
+    fr: "Voir les Offres Maintenant",
+    de: "Angebote Jetzt Ansehen"
+  },
+  "¡Plazas limitadas!": {
+    es: "¡Plazas limitadas!",
+    en: "Limited availability!",
+    fr: "Places limitées !",
+    de: "Begrenzte Plätze!"
+  },
+  
   // Página de vehículos
   "Nuestra Flota de Campers": {
     es: "Nuestra Flota de Campers",

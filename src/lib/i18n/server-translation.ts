@@ -1,9 +1,9 @@
 /**
  * Sistema de traducción para Server Components
- * Usa el mismo diccionario estático que el contexto de cliente
+ * Usa el diccionario estático modular combinado con el legacy
  */
 
-import { staticTranslations } from '@/lib/translations-preload';
+import { staticTranslations } from '@/lib/i18n/translations';
 import type { Locale } from '@/lib/i18n/config';
 
 /**

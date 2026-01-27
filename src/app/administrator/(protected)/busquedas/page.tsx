@@ -111,6 +111,20 @@ interface DemandAvailabilityData {
   }>;
 }
 
+interface LocaleStatsData {
+  localeStats: Array<{
+    locale_code: string;
+    locale_name: string;
+    search_count: number;
+    with_availability: number;
+    selection_count: number;
+    booking_count: number;
+    percentage: string;
+    selection_rate: string;
+    conversion_rate: string;
+  }>;
+}
+
 interface SearchTimingData {
   searchTiming: Array<{
     search_date: string;
@@ -293,6 +307,11 @@ export default function SearchAnalyticsPage() {
     queryFn: () => fetchAnalytics("search-timing", dateRange.start, dateRange.end),
   });
 
+  const { data: localeStats, isLoading: loadingLocale } = useQuery<LocaleStatsData>({
+    queryKey: ["search-analytics", "locale", dateRange.start, dateRange.end],
+    queryFn: () => fetchAnalytics("locale", dateRange.start, dateRange.end),
+  });
+
   // Hooks de ordenación para todas las tablas (deben estar al nivel superior)
   const sortedDates = useSortableData(topDates?.topDates, { key: 'search_count', direction: 'desc' });
   const sortedTiming = useSortableData(searchTiming?.searchTiming, { key: 'search_date', direction: 'desc' });
@@ -423,6 +442,124 @@ export default function SearchAnalyticsPage() {
           </p>
           <p className="text-sm text-green-700">Tiempo medio hasta selección</p>
         </div>
+      </div>
+
+      {/* NUEVO: Búsquedas por Idioma */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <svg className="h-6 w-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+            </svg>
+            Búsquedas por Idioma
+          </h2>
+          <p className="text-sm text-gray-600">
+            Distribución de búsquedas según el idioma de la página visitada
+          </p>
+        </div>
+
+        {loadingLocale ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <>
+            {/* Gráfico de barras visual */}
+            <div className="mb-8 space-y-4">
+              {localeStats?.localeStats.map((locale) => {
+                const percentage = parseFloat(locale.percentage);
+                const getFlagEmoji = (code: string) => {
+                  const flags: Record<string, string> = {
+                    'es': '🇪🇸',
+                    'en': '🇬🇧',
+                    'fr': '🇫🇷',
+                    'de': '🇩🇪',
+                    'desconocido': '🌐'
+                  };
+                  return flags[code] || '🌐';
+                };
+
+                const getColorClasses = (code: string) => {
+                  const colors: Record<string, { bg: string; bar: string }> = {
+                    'es': { bg: 'bg-yellow-50', bar: 'bg-yellow-500' },
+                    'en': { bg: 'bg-blue-50', bar: 'bg-blue-500' },
+                    'fr': { bg: 'bg-indigo-50', bar: 'bg-indigo-500' },
+                    'de': { bg: 'bg-red-50', bar: 'bg-red-500' },
+                    'desconocido': { bg: 'bg-gray-50', bar: 'bg-gray-400' }
+                  };
+                  return colors[code] || { bg: 'bg-gray-50', bar: 'bg-gray-400' };
+                };
+
+                const colors = getColorClasses(locale.locale_code);
+
+                return (
+                  <div key={locale.locale_code} className={`p-4 rounded-lg border ${colors.bg}`}>
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{getFlagEmoji(locale.locale_code)}</span>
+                        <div>
+                          <h3 className="font-bold text-gray-900 text-lg">
+                            {locale.locale_name}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {locale.search_count} búsquedas ({locale.percentage}%)
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600">
+                          <span className="font-semibold text-green-600">{locale.booking_count}</span> reservas
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {locale.conversion_rate}% conversión
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Barra de progreso */}
+                    <div className="w-full bg-gray-200 rounded-full h-8 relative overflow-hidden">
+                      <div
+                        className={`h-8 rounded-full ${colors.bar} flex items-center px-3 text-white text-sm font-bold transition-all duration-500`}
+                        style={{ width: `${Math.max(percentage, 5)}%` }}
+                      >
+                        {percentage}%
+                      </div>
+                    </div>
+                    
+                    {/* Detalles adicionales */}
+                    <div className="mt-3 grid grid-cols-3 gap-3 text-xs">
+                      <div className="text-center p-2 bg-white rounded border">
+                        <div className="font-semibold text-gray-900">{locale.with_availability}</div>
+                        <div className="text-gray-500">Con disponib.</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded border">
+                        <div className="font-semibold text-gray-900">{locale.selection_count}</div>
+                        <div className="text-gray-500">Selecciones</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded border">
+                        <div className="font-semibold text-gray-900">{locale.selection_rate}%</div>
+                        <div className="text-gray-500">Tasa selección</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Insights */}
+            <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h3 className="font-semibold text-blue-900 mb-2 text-sm flex items-center gap-2">
+                💡 Insights
+              </h3>
+              <ul className="text-xs text-blue-700 space-y-1">
+                <li>• El idioma se detecta desde la URL de la página visitada (/es/, /en/, /fr/, /de/)</li>
+                <li>• Usa estos datos para identificar qué idiomas tienen mayor demanda</li>
+                <li>• Compara tasas de conversión entre idiomas para optimizar traducciones</li>
+                <li>• "Desconocido" aparece cuando no se pudo detectar el idioma (búsquedas directas a API)</li>
+              </ul>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Embudo de conversión */}

@@ -17,7 +17,8 @@ import {
   Shield,
   Package,
   BookOpen,
-  HelpCircle
+  HelpCircle,
+  Zap
 } from "lucide-react";
 import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from "@/lib/home/server-actions";
 import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/home/organization-jsonld";

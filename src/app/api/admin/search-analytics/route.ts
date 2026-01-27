@@ -383,6 +383,54 @@ export async function GET(request: NextRequest) {
     }
 
     // ============================================
+    // LOCALE: Distribución por idioma
+    // ============================================
+    if (type === "locale") {
+      const { data: searches } = await supabase
+        .from("search_queries")
+        .select("locale, vehicle_selected, booking_created, had_availability")
+        .gte("searched_at", dateFrom)
+        .lte("searched_at", dateTo + " 23:59:59");
+
+      const localeGroups = searches?.reduce((acc: any, s) => {
+        const locale = s.locale || "desconocido";
+        if (!acc[locale]) {
+          acc[locale] = {
+            locale_code: locale,
+            locale_name: {
+              'es': 'Español',
+              'en': 'Inglés',
+              'fr': 'Francés',
+              'de': 'Alemán',
+              'desconocido': 'Desconocido'
+            }[locale] || locale,
+            search_count: 0,
+            with_availability: 0,
+            selection_count: 0,
+            booking_count: 0,
+          };
+        }
+        acc[locale].search_count++;
+        if (s.had_availability) acc[locale].with_availability++;
+        if (s.vehicle_selected) acc[locale].selection_count++;
+        if (s.booking_created) acc[locale].booking_count++;
+        return acc;
+      }, {});
+
+      const totalSearches = searches?.length || 0;
+      const localeStats = Object.values(localeGroups || {})
+        .map((l: any) => ({
+          ...l,
+          percentage: totalSearches > 0 ? ((l.search_count / totalSearches) * 100).toFixed(1) : 0,
+          selection_rate: l.search_count > 0 ? (l.selection_count / l.search_count * 100).toFixed(2) : 0,
+          conversion_rate: l.search_count > 0 ? (l.booking_count / l.search_count * 100).toFixed(2) : 0,
+        }))
+        .sort((a: any, b: any) => b.search_count - a.search_count);
+
+      return NextResponse.json({ localeStats });
+    }
+
+    // ============================================
     // DEMAND-AVAILABILITY: Demanda vs Disponibilidad
     // ============================================
     if (type === "demand-availability") {
