@@ -54,22 +54,36 @@ export async function generateMetadata({
 
   if (!post) {
     return {
-      title: "Artículo no encontrado",
-      description: "El artículo que buscas no existe o ha sido eliminado."
+      title: "Article not found",
+      description: "The article you are looking for does not exist or has been removed."
     };
   }
+
+  // 🌐 OBTENER TRADUCCIONES PARA METADATA
+  const translatedMeta = await getTranslatedContent(
+    'posts',
+    post.id,
+    ['title', 'excerpt', 'meta_title', 'meta_description'],
+    locale,
+    {
+      title: post.title,
+      excerpt: post.excerpt,
+      meta_title: post.meta_title,
+      meta_description: post.meta_description,
+    }
+  );
 
   // ✅ Canonical autorreferenciado
   const alternates = buildCanonicalAlternates(`/blog/${category}/${slug}`, locale);
   
   return {
-    title: post.meta_title || post.title,
-    description: post.meta_description || post.excerpt || post.title,
+    title: translatedMeta.meta_title || translatedMeta.title,
+    description: translatedMeta.meta_description || translatedMeta.excerpt || translatedMeta.title,
     authors: [{ name: "Furgocasa" }],
     keywords: post.tags?.map(tag => tag.name).join(","),
     openGraph: {
-      title: post.title,
-      description: post.excerpt || post.meta_description || "",
+      title: translatedMeta.title,
+      description: translatedMeta.excerpt || translatedMeta.meta_description || "",
       type: "article",
       url: alternates.canonical,
       images: post.featured_image ? [
@@ -77,7 +91,7 @@ export async function generateMetadata({
           url: post.featured_image,
           width: 1200,
           height: 630,
-          alt: post.title,
+          alt: translatedMeta.title,
         }
       ] : [],
       publishedTime: post.published_at || undefined,
@@ -88,8 +102,8 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: post.title,
-      description: post.excerpt || post.meta_description || "",
+      title: translatedMeta.title,
+      description: translatedMeta.excerpt || translatedMeta.meta_description || "",
       images: post.featured_image ? [post.featured_image] : [],
       creator: "@furgocasa",
     },
