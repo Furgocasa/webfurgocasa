@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from"react";
-import { useLanguage } from"@/contexts/language-context";
-import { useParams } from"next/navigation";
-import { formatPrice } from"@/lib/utils";
+import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/language-context";
+import { useParams } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
 import { 
   CheckCircle, AlertCircle, Calendar, MapPin, Car, 
   User, Mail, Phone, Building, CreditCard, Copy, Check
-} from"lucide-react";
-import Link from"next/link";
+} from "lucide-react";
+import Link from "next/link";
+import { getBookingByNumber, isValidBookingNumber } from "@/lib/bookings/get-by-number";
 
 interface Booking {
   id: string;
@@ -45,7 +46,7 @@ interface Booking {
 export default function ConfirmacionPage() {
   const { t } = useLanguage();
   const params = useParams();
-  const bookingId = params.id as string;
+  const bookingNumber = params.id as string;
   
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
@@ -62,38 +63,35 @@ export default function ConfirmacionPage() {
 
   // Actualizar título del navegador
   useEffect(() => {
-    document.title = 'Confirmación de reserva - Furgocasa';
+    document.title = 'Buchungsbestätigung - Furgocasa';
   }, []);
 
   useEffect(() => {
-    if (bookingId) {
+    if (bookingNumber) {
       loadBooking();
     }
-  }, [bookingId]);
+  }, [bookingNumber]);
 
   const loadBooking = async () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/api/bookings/${bookingId}`);
-      const payload = await response.json();
-
-      if (!response.ok) {
-        setError(payload?.error || 'Error al cargar la reserva');
+      if (!isValidBookingNumber(bookingNumber)) {
+        setError('Ungültige Buchungsnummer');
         return;
       }
 
-      const data = payload?.booking;
+      const data = await getBookingByNumber(bookingNumber);
 
       if (!data) {
-        setError('Reserva no encontrada');
+        setError('Buchung nicht gefunden');
         return;
       }
 
       setBooking(data as any);
     } catch (error: any) {
       console.error('Error loading booking:', error);
-      setError(error.message || 'Error al cargar la reserva');
+      setError(error.message || 'Fehler beim Laden der Buchung');
     } finally {
       setLoading(false);
     }
