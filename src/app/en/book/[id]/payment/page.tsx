@@ -443,23 +443,103 @@ export default function PagoPage() {
                 </div>
               </div>
 
-              {/* Customer */}
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                <User className="h-6 w-6 text-furgocasa-blue flex-shrink-0 mt-1" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Cliente")}</p>
-                  <p className="font-semibold text-gray-900">{booking.customer_name}</p>
-                  <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4 mt-2 text-sm text-gray-600">
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      {booking.customer_email}
+              {/* Customer Details */}
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <div className="flex items-center gap-3 mb-4">
+                  <User className="h-6 w-6 text-furgocasa-blue" />
+                  <h3 className="text-lg font-semibold text-gray-900">{t("Datos del conductor principal")}</h3>
+                </div>
+                
+                {booking.customer ? (
+                  <div className="space-y-3">
+                    {/* Name */}
+                    <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                      <p className="text-sm text-gray-600 font-medium">{t("Nombre")}:</p>
+                      <p className="text-gray-900">{booking.customer.name}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4" />
-                      {booking.customer_phone}
+
+                    {/* ID */}
+                    {booking.customer.dni && (
+                      <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                        <p className="text-sm text-gray-600 font-medium">{t("DNI - ID nº")}:</p>
+                        <p className="text-gray-900">{booking.customer.dni}</p>
+                      </div>
+                    )}
+
+                    {/* Address */}
+                    {booking.customer.address && (
+                      <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                        <p className="text-sm text-gray-600 font-medium">{t("Dirección")}:</p>
+                        <p className="text-gray-900">{booking.customer.address}</p>
+                      </div>
+                    )}
+
+                    {/* Postal Code */}
+                    {booking.customer.postal_code && (
+                      <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                        <p className="text-sm text-gray-600 font-medium">{t("Código postal")}:</p>
+                        <p className="text-gray-900">{booking.customer.postal_code}</p>
+                      </div>
+                    )}
+
+                    {/* City */}
+                    {booking.customer.city && (
+                      <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                        <p className="text-sm text-gray-600 font-medium">{t("Ciudad")}:</p>
+                        <p className="text-gray-900">{booking.customer.city}</p>
+                      </div>
+                    )}
+
+                    {/* Country */}
+                    {booking.customer.country && (
+                      <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                        <p className="text-sm text-gray-600 font-medium">{t("País")}:</p>
+                        <p className="text-gray-900">{booking.customer.country}</p>
+                      </div>
+                    )}
+
+                    {/* Age */}
+                    {booking.customer.date_of_birth && (
+                      <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                        <p className="text-sm text-gray-600 font-medium">{t("Edad")}:</p>
+                        <p className="text-gray-900">
+                          {(() => {
+                            const birthDate = new Date(booking.customer.date_of_birth);
+                            const today = new Date();
+                            let age = today.getFullYear() - birthDate.getFullYear();
+                            const monthDiff = today.getMonth() - birthDate.getMonth();
+                            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                              age--;
+                            }
+                            return age;
+                          })()}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Phone */}
+                    {booking.customer.phone && (
+                      <div className="grid grid-cols-[180px_1fr] gap-4 py-2 border-b border-gray-200">
+                        <p className="text-sm text-gray-600 font-medium">{t("Teléfono")}:</p>
+                        <a href={`tel:${booking.customer.phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                          <Phone className="h-4 w-4" />
+                          {booking.customer.phone}
+                        </a>
+                      </div>
+                    )}
+
+                    {/* Email */}
+                    <div className="grid grid-cols-[180px_1fr] gap-4 py-2">
+                      <p className="text-sm text-gray-600 font-medium">{t("Email")}:</p>
+                      <a href={`mailto:${booking.customer.email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        {booking.customer.email}
+                      </a>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="text-gray-500 text-sm">{t("No hay datos del cliente disponibles")}</div>
+                )}
               </div>
 
               {/* Price Summary */}
