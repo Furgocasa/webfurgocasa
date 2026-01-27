@@ -29,6 +29,9 @@ interface Post {
   id: string;
   title: string;
   slug: string;
+  slug_en?: string | null;
+  slug_fr?: string | null;
+  slug_de?: string | null;
   excerpt: string | null;
   featured_image: string | null;
   published_at: string | null;
@@ -113,6 +116,9 @@ function BlogCategoryContent() {
             id,
             title,
             slug,
+            slug_en,
+            slug_fr,
+            slug_de,
             excerpt,
             featured_image,
             published_at,
@@ -266,12 +272,22 @@ function BlogCategoryContent() {
           <>
             {/* Posts Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredPosts.map((post) => (
+              {filteredPosts.map((post) => {
+                // 🌐 Usar slug traducido según el idioma
+                const postSlug = language === 'fr' && post.slug_fr 
+                  ? post.slug_fr 
+                  : language === 'en' && post.slug_en 
+                  ? post.slug_en 
+                  : language === 'de' && post.slug_de 
+                  ? post.slug_de 
+                  : post.slug;
+                
+                return (
                 <article 
                   key={post.id} 
                   className="bg-white rounded-2xl shadow-sm overflow-hidden group hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full hover:-translate-y-1"
                 >
-                  <LocalizedLink href={`/blog/${categorySlug}/${post.slug}`} className="flex flex-col h-full">
+                  <LocalizedLink href={`/blog/${categorySlug}/${postSlug}`} className="flex flex-col h-full">
                     <div className="h-56 bg-gray-100 relative flex items-center justify-center overflow-hidden">
                       {post.featured_image ? (
                         <Image 
@@ -322,7 +338,8 @@ function BlogCategoryContent() {
                     </div>
                   </LocalizedLink>
                 </article>
-              ))}
+                );
+              })}
             </div>
 
             {/* Paginación */}
