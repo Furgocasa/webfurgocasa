@@ -46,6 +46,8 @@ export interface BookingData {
     postal_code: string;
     country: string;
     date_of_birth: string | null;
+    driver_license: string | null;
+    driver_license_expiry: string | null;
   };
   pickup_location?: {
     id: string;
@@ -122,7 +124,9 @@ export async function getBookingByNumber(
           city,
           postal_code,
           country,
-          date_of_birth
+          date_of_birth,
+          driver_license,
+          driver_license_expiry
         ),
         pickup_location:locations!pickup_location_id(
           id,
