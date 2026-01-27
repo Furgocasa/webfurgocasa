@@ -13,11 +13,13 @@ export function HeroSlider({ images, autoPlayInterval = 20000 }: HeroSliderProps
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Precargar todas las imágenes al montar el componente
+  // Precargar solo las 2 primeras imágenes al montar
   useEffect(() => {
-    images.forEach((src) => {
+    // Solo precargar la primera y segunda imagen para mejorar LCP
+    const imagesToPreload = images.slice(0, 2);
+    imagesToPreload.forEach((src) => {
       const img = new window.Image();
-      img.src = src;
+      img.src = `/_next/image?url=${encodeURIComponent(src)}&w=1920&q=50`;
     });
   }, [images]);
 
@@ -68,8 +70,8 @@ export function HeroSlider({ images, autoPlayInterval = 20000 }: HeroSliderProps
               priority={index === 0 || index === 1}
               loading={index === 0 || index === 1 ? "eager" : "lazy"}
               className="object-cover"
-              quality={70}
-              sizes="100vw"
+              quality={50}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
             />
           </div>
         ))}
