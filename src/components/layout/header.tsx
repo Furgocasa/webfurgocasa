@@ -6,7 +6,6 @@ import { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X, Phone, Mail, ChevronDown, Globe } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
-import { getTranslatedRoute } from "@/lib/route-translations";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -18,13 +17,9 @@ export function Header() {
   const pathname = usePathname();
 
   const handleLanguageChange = (lang: 'es' | 'en' | 'fr' | 'de') => {
+    // setLanguage maneja toda la lógica de navegación incluyendo slugs traducidos del blog
     setLanguage(lang);
     setLanguageDropdownOpen(false);
-    
-    // Usar getTranslatedRoute para traducir correctamente la ruta actual
-    // Maneja ambos formatos: nuevo (/base/{location}) y antiguo (/base-{location})
-    const translatedPath = getTranslatedRoute(pathname, lang);
-    window.location.href = translatedPath;
   };
 
   const languages = {
