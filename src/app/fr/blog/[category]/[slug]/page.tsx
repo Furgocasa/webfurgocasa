@@ -37,8 +37,8 @@ export const revalidate = 86400;
 
 // 🚀 Pre-generar TODOS los posts en build time (SEO óptimo)
 export async function generateStaticParams() {
-  const posts = await getAllPublishedPostSlugs();
-  console.log(`[generateStaticParams] Pre-generando ${posts.length} posts del blog`);
+  const posts = await getAllPublishedPostSlugs('fr');
+  console.log(`[generateStaticParams] Pre-generando ${posts.length} posts del blog en francés`);
   return posts;
 }
 

@@ -216,28 +216,57 @@ export const incrementPostViews = async (postId: string, currentViews: number) =
 };
 
 // Para generateStaticParams - Sin autenticación para build time
-export const getAllPublishedPostSlugs = cache(async (): Promise<{ category: string; slug: string }[]> => {
+export const getAllPublishedPostSlugs = cache(async (locale?: 'es' | 'en' | 'fr' | 'de'): Promise<{ category: string; slug: string }[]> => {
   // En build time, usar el cliente público sin cookies
   const { createClient } = require('@supabase/supabase-js');
+  const { translateCategorySlug } = require('@/lib/blog-translations');
   
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
+  // Seleccionar el slug según el idioma
+  const slugField = locale === 'en' ? 'slug_en' : locale === 'fr' ? 'slug_fr' : locale === 'de' ? 'slug_de' : 'slug';
+  const selectFields = locale && locale !== 'es' 
+    ? `slug, ${slugField}, category:content_categories(slug)`
+    : `slug, category:content_categories(slug)`;
+
   const { data } = await supabase
     .from("posts")
-    .select(`
-      slug,
-      category:content_categories(slug)
-    `)
+    .select(selectFields)
     .eq("status", "published")
     .order("published_at", { ascending: false });
 
   if (!data) return [];
 
-  return data.map(post => ({
-    category: Array.isArray(post.category) ? post.category[0]?.slug : post.category?.slug || 'general',
-    slug: post.slug
-  })).filter(item => item.category && item.slug);
+  return data.map(post => {
+    // Traducir categoría
+    const categorySlug = Array.isArray(post.category) 
+      ? post.category[0]?.slug 
+      : post.category?.slug || 'general';
+    
+    const translatedCategory = locale && locale !== 'es'
+      ? translateCategorySlug(categorySlug, locale)
+      : categorySlug;
+    
+    // Para idiomas distintos al español, solo incluir si tiene slug traducido
+    if (locale && locale !== 'es') {
+      const finalSlug = post[slugField];
+      // Si no tiene slug traducido, no incluir este post
+      if (!finalSlug) {
+        return null;
+      }
+      return {
+        category: translatedCategory,
+        slug: finalSlug
+      };
+    }
+    
+    // Para español, usar slug original
+    return {
+      category: translatedCategory,
+      slug: post.slug
+    };
+  }).filter((item): item is { category: string; slug: string } => item !== null && item.category && item.slug);
 });
