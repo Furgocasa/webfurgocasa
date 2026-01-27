@@ -202,6 +202,21 @@ export async function GET(request: NextRequest) {
         (new Date(pickupDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
       );
       
+      // Detectar locale desde el referer o accept-language
+      let detectedLocale = null;
+      const referer = request.headers.get("referer");
+      if (referer) {
+        // Extraer locale de la URL: /es/, /en/, /fr/, /de/
+        const localeMatch = referer.match(/\/(es|en|fr|de)\//);
+        if (localeMatch) {
+          detectedLocale = localeMatch[1];
+        }
+      }
+      // Fallback a accept-language si no se detecta desde referer
+      if (!detectedLocale) {
+        detectedLocale = request.headers.get("accept-language")?.split(",")[0]?.split("-")[0] || null;
+      }
+      
       // Obtener IDs reales de ubicaciones (convertir slugs a UUIDs si es necesario)
       let pickupLocationId: string | null = null;
       let dropoffLocationId: string | null = null;
@@ -235,43 +250,64 @@ export async function GET(request: NextRequest) {
         }
       }
       
+      // Preparar datos para insertar
+      const searchData = {
+        session_id: sessionId,
+        pickup_date: pickupDate,
+        dropoff_date: dropoffDate,
+        pickup_time: pickupTime,
+        dropoff_time: dropoffTime,
+        rental_days: days,
+        advance_days: Math.max(0, advanceDays),
+        pickup_location: pickupLocation,
+        dropoff_location: dropoffLocation,
+        pickup_location_id: pickupLocationId,
+        dropoff_location_id: dropoffLocationId,
+        same_location: pickupLocation === dropoffLocation,
+        category_slug: category,
+        vehicles_available_count: vehiclesWithPrices?.length || 0,
+        season_applied: priceResult.dominantSeason,
+        avg_price_shown: finalPricePerDay,
+        had_availability: (vehiclesWithPrices?.length || 0) > 0,
+        funnel_stage: "search_only",
+        locale: detectedLocale,
+        user_agent_type: detectDeviceType(request.headers.get("user-agent")),
+      };
+      
+      // Log para debugging
+      console.log("🔍 [TRACKING] Registrando búsqueda:", {
+        locale: detectedLocale,
+        referer: referer,
+        pickup_date: pickupDate,
+        vehicles_count: vehiclesWithPrices?.length || 0
+      });
+      
       // Insertar registro en search_queries
       const { data: searchQuery, error: searchError } = await supabase
         .from("search_queries")
-        .insert({
-          session_id: sessionId,
-          pickup_date: pickupDate,
-          dropoff_date: dropoffDate,
-          pickup_time: pickupTime,
-          dropoff_time: dropoffTime,
-          rental_days: days,
-          advance_days: Math.max(0, advanceDays),
-          pickup_location: pickupLocation,
-          dropoff_location: dropoffLocation,
-          pickup_location_id: pickupLocationId,
-          dropoff_location_id: dropoffLocationId,
-          same_location: pickupLocation === dropoffLocation,
-          category_slug: category,
-          vehicles_available_count: vehiclesWithPrices?.length || 0,
-          season_applied: priceResult.dominantSeason,
-          avg_price_shown: finalPricePerDay,
-          had_availability: (vehiclesWithPrices?.length || 0) > 0,
-          funnel_stage: "search_only",
-          locale: request.headers.get("accept-language")?.split(",")[0]?.split("-")[0] || null,
-          user_agent_type: detectDeviceType(request.headers.get("user-agent")),
-        })
+        .insert(searchData)
         .select("id")
         .single();
       
       if (!searchError && searchQuery) {
         searchQueryId = searchQuery.id;
+        console.log("✅ [TRACKING] Búsqueda registrada exitosamente:", searchQueryId);
       } else {
-        console.error("Error registrando búsqueda:", searchError);
+        console.error("❌ [TRACKING] Error registrando búsqueda:", {
+          error: searchError,
+          message: searchError?.message,
+          details: searchError?.details,
+          hint: searchError?.hint,
+          data: searchData
+        });
         // No fallar la búsqueda si falla el tracking
       }
     } catch (trackingError) {
       // No fallar la búsqueda si falla el tracking
-      console.error("Error en tracking de búsqueda:", trackingError);
+      console.error("❌ [TRACKING] Excepción en tracking de búsqueda:", trackingError);
+      if (trackingError instanceof Error) {
+        console.error("❌ [TRACKING] Stack trace:", trackingError.stack);
+      }
     }
 
     const response = NextResponse.json({
