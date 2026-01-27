@@ -65,6 +65,19 @@ const RATE_LIMITS: Record<string, { limit: number; window: number }> = {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ============================================
+  // 🛡️ BLOQUEO GEOGRÁFICO
+  // ============================================
+  // Vercel proporciona automáticamente la geolocalización en request.geo
+  const country = request.geo?.country || 'unknown';
+  
+  // Bloquear China debido a tráfico no legítimo (0.68% interacción, 0s permanencia)
+  const blockedCountries = ['CN'];
+  
+  if (blockedCountries.includes(country)) {
+    return new Response('Access denied', { status: 403 });
+  }
+
   // ✅ RATE LIMITING para APIs
   if (pathname.startsWith('/api/')) {
     const rateLimitConfig = Object.entries(RATE_LIMITS).find(([path]) => 
