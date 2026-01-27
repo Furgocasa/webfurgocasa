@@ -1,11 +1,13 @@
 "use client";
 
 import { useCookies } from "./cookie-context";
+import { useLanguage } from "@/contexts/language-context";
 import Link from "next/link";
 import { X, Cookie, Shield, BarChart3, Settings, Megaphone } from "lucide-react";
 
 export function CookieBanner() {
-  const { showBanner, acceptAll, rejectAll, openSettings } = useCookies();
+  const { showBanner, acceptAll, openSettings } = useCookies();
+  const { t, language } = useLanguage();
 
   if (!showBanner) return null;
 
@@ -13,7 +15,7 @@ export function CookieBanner() {
     <div 
       className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white border-t border-gray-200 shadow-lg md:p-6"
       role="region"
-      aria-label="Banner de consentimiento de cookies"
+      aria-label={t("Banner de consentimiento de cookies")}
     >
       <div className="container mx-auto max-w-6xl">
         <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
@@ -23,14 +25,12 @@ export function CookieBanner() {
               <Cookie className="h-8 w-8 text-furgocasa-orange flex-shrink-0 mt-1" aria-hidden="true" />
               <div>
                 <h3 className="text-lg font-bold text-gray-900 mb-1">
-                  Utilizamos cookies
+                  {t("Utilizamos cookies")}
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  Usamos cookies propias y de terceros para mejorar tu experiencia, analizar el tráfico 
-                  y mostrarte contenido personalizado. Puedes aceptar todas, rechazarlas o configurar 
-                  tus preferencias.{" "}
-                  <Link href="/cookies" className="text-furgocasa-orange hover:underline">
-                    Política de cookies
+                  {t("Usamos cookies propias y de terceros para mejorar tu experiencia, analizar el tráfico y mostrarte contenido personalizado. Puedes aceptar todas o configurar tus preferencias.")}{" "}
+                  <Link href={`/${language}/cookies`} className="text-furgocasa-orange hover:underline">
+                    {t("Política de cookies")}
                   </Link>
                 </p>
               </div>
@@ -43,19 +43,13 @@ export function CookieBanner() {
               onClick={openSettings}
               className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg font-medium hover:bg-gray-200 transition-colors text-sm"
             >
-              Configurar
-            </button>
-            <button
-              onClick={rejectAll}
-              className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors text-sm"
-            >
-              Rechazar todas
+              {t("Configurar")}
             </button>
             <button
               onClick={acceptAll}
               className="px-4 py-2 bg-furgocasa-orange text-white rounded-lg font-medium hover:bg-furgocasa-orange-dark transition-colors text-sm"
             >
-              Aceptar todas
+              {t("Aceptar todas")}
             </button>
           </div>
         </div>
@@ -74,42 +68,39 @@ export function CookieSettingsModal() {
     acceptAll,
     rejectAll,
   } = useCookies();
+  const { t, language } = useLanguage();
 
   if (!isSettingsOpen) return null;
 
   const cookieTypes = [
     {
       id: "necessary",
-      name: "Cookies necesarias",
-      description:
-        "Estas cookies son esenciales para el funcionamiento del sitio web. Sin ellas, el sitio no funcionaría correctamente.",
+      name: t("Cookies necesarias"),
+      description: t("Estas cookies son esenciales para el funcionamiento del sitio web. Sin ellas, el sitio no funcionaría correctamente."),
       icon: Shield,
       required: true,
       enabled: preferences.necessary,
     },
     {
       id: "analytics",
-      name: "Cookies analíticas",
-      description:
-        "Nos permiten contar las visitas y analizar cómo los usuarios navegan por el sitio para mejorarlo.",
+      name: t("Cookies analíticas"),
+      description: t("Nos permiten contar las visitas y analizar cómo los usuarios navegan por el sitio para mejorarlo."),
       icon: BarChart3,
       required: false,
       enabled: preferences.analytics,
     },
     {
       id: "functional",
-      name: "Cookies funcionales",
-      description:
-        "Permiten recordar tus preferencias (como búsquedas recientes) para una experiencia más personalizada.",
+      name: t("Cookies funcionales"),
+      description: t("Permiten recordar tus preferencias (como búsquedas recientes) para una experiencia más personalizada."),
       icon: Settings,
       required: false,
       enabled: preferences.functional,
     },
     {
       id: "marketing",
-      name: "Cookies de marketing",
-      description:
-        "Se utilizan para mostrarte anuncios relevantes y medir la efectividad de las campañas publicitarias.",
+      name: t("Cookies de marketing"),
+      description: t("Se utilizan para mostrarte anuncios relevantes y medir la efectividad de las campañas publicitarias."),
       icon: Megaphone,
       required: false,
       enabled: preferences.marketing,
@@ -128,12 +119,12 @@ export function CookieSettingsModal() {
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <Cookie className="h-8 w-8 text-furgocasa-orange" aria-hidden="true" />
-            <h2 id="cookie-settings-title" className="text-xl font-bold text-gray-900">Configuración de cookies</h2>
+            <h2 id="cookie-settings-title" className="text-xl font-bold text-gray-900">{t("Configuración de cookies")}</h2>
           </div>
           <button
             onClick={closeSettings}
             className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            aria-label="Cerrar configuración de cookies"
+            aria-label={t("Cerrar configuración de cookies")}
           >
             <X className="h-5 w-5" aria-hidden="true" />
           </button>
@@ -142,8 +133,7 @@ export function CookieSettingsModal() {
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-6">
           <p className="text-gray-600 mb-6">
-            Elige qué tipos de cookies deseas aceptar. Las cookies necesarias no se pueden desactivar 
-            ya que son imprescindibles para el funcionamiento del sitio.
+            {t("Elige qué tipos de cookies deseas aceptar. Las cookies necesarias no se pueden desactivar ya que son imprescindibles para el funcionamiento del sitio.")}
           </p>
 
           <div className="space-y-4">
@@ -170,7 +160,7 @@ export function CookieSettingsModal() {
                       <h3 className="font-semibold text-gray-900" id={`cookie-${cookie.id}-label`}>{cookie.name}</h3>
                       {cookie.required ? (
                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full">
-                          Siempre activas
+                          {t("Siempre activas")}
                         </span>
                       ) : (
                         <label className="relative inline-flex items-center cursor-pointer">
@@ -197,9 +187,9 @@ export function CookieSettingsModal() {
 
           {/* Más info */}
           <p className="text-sm text-gray-500 mt-6">
-            Para más información sobre cómo utilizamos las cookies, consulta nuestra{" "}
-            <Link href="/cookies" className="text-furgocasa-orange hover:underline" onClick={closeSettings}>
-              Política de Cookies
+            {t("Para más información sobre cómo utilizamos las cookies, consulta nuestra")}{" "}
+            <Link href={`/${language}/cookies`} className="text-furgocasa-orange hover:underline" onClick={closeSettings}>
+              {t("Política de Cookies")}
             </Link>
             .
           </p>
@@ -211,19 +201,19 @@ export function CookieSettingsModal() {
             onClick={rejectAll}
             className="flex-1 px-4 py-2.5 text-gray-700 border border-gray-300 rounded-lg font-medium hover:bg-white transition-colors"
           >
-            Rechazar todas
+            {t("Rechazar todas")}
           </button>
           <button
             onClick={savePreferences}
             className="flex-1 px-4 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition-colors"
           >
-            Guardar preferencias
+            {t("Guardar preferencias")}
           </button>
           <button
             onClick={acceptAll}
             className="flex-1 px-4 py-2.5 bg-furgocasa-orange text-white rounded-lg font-medium hover:bg-furgocasa-orange-dark transition-colors"
           >
-            Aceptar todas
+            {t("Aceptar todas")}
           </button>
         </div>
       </div>
@@ -234,15 +224,16 @@ export function CookieSettingsModal() {
 // Botón pequeño para abrir configuración (para el footer)
 export function CookieSettingsButton() {
   const { openSettings } = useCookies();
+  const { t } = useLanguage();
 
   return (
     <button
       onClick={openSettings}
       className="text-gray-400 hover:text-white transition-colors text-sm flex items-center gap-1"
-      aria-label="Abrir configuración de cookies"
+      aria-label={t("Abrir configuración de cookies")}
     >
       <Cookie className="h-4 w-4" aria-hidden="true" />
-      Configurar cookies
+      {t("Configurar cookies")}
     </button>
   );
 }

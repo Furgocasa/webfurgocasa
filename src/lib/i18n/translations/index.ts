@@ -20,6 +20,7 @@
 import { commonTranslations } from './common';
 import { homeTranslations } from './home';
 import { offersTranslations } from './offers';
+import { cookiesTranslations } from './cookies';
 // Importar legacy hasta que migremos todo
 import { staticTranslations as legacyTranslations } from '../../translations-preload';
 
@@ -32,6 +33,7 @@ export const staticTranslations = {
   ...commonTranslations,      // Override: traducciones comunes
   ...homeTranslations,        // Override: home page
   ...offersTranslations,      // Override: ofertas
+  ...cookiesTranslations,     // Override: cookies banner
 };
 
 /**

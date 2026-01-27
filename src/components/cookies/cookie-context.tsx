@@ -25,9 +25,9 @@ interface CookieContextType {
 
 const defaultPreferences: CookiePreferences = {
   necessary: true,
-  analytics: false,
-  functional: false,
-  marketing: false,
+  analytics: true,
+  functional: true,
+  marketing: true,
 };
 
 const CookieContext = createContext<CookieContextType | undefined>(undefined);
