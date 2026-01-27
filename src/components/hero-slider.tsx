@@ -69,6 +69,7 @@ export function HeroSlider({ images, autoPlayInterval = 20000 }: HeroSliderProps
               fill
               priority={index === 0 || index === 1}
               loading={index === 0 || index === 1 ? "eager" : "lazy"}
+              fetchPriority={index === 0 ? "high" : "low"}
               className="object-cover"
               quality={50}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
