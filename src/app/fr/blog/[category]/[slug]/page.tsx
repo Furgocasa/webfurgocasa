@@ -324,10 +324,21 @@ export default async function LocaleBlogPostPage({
                       {t("Artículos relacionados")}
                     </h3>
                     <div className="space-y-4">
-                      {relatedPosts.slice(0, 3).map((related) => (
+                      {relatedPosts.slice(0, 3).map((related) => {
+                        // 🌐 Usar slug traducido según el idioma de la página
+                        const relatedSlug = locale === 'en' && related.slug_en 
+                          ? related.slug_en 
+                          : locale === 'fr' && related.slug_fr 
+                          ? related.slug_fr 
+                          : locale === 'de' && related.slug_de 
+                          ? related.slug_de 
+                          : related.slug;
+                        const relatedCategory = related.category?.slug || 'blog';
+                        
+                        return (
                         <LocalizedLink
                           key={related.id}
-                          href={`/blog/${related.category?.slug}/${related.slug}`}
+                          href={`/blog/${relatedCategory}/${relatedSlug}`}
                           className="group block"
                         >
                           {related.featured_image && (
@@ -351,7 +362,8 @@ export default async function LocaleBlogPostPage({
                             </time>
                           )}
                         </LocalizedLink>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
                 )}
