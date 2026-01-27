@@ -44,7 +44,7 @@ export const revalidate = 3600; // 1 hora
 // LOCALE: ES (Español) | KIND: rent (Alquiler)
 // ============================================================================
 
-const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
+const DEFAULT_HERO_IMAGE = "/images/slides/hero-06.webp";
 
 // ============================================================================
 // generateStaticParams - Pre-renderizado de todas las ubicaciones

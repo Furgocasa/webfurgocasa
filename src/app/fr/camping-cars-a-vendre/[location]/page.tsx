@@ -41,7 +41,7 @@ export const revalidate = 3600;
 // LOCALE: FR (Français) | KIND: sale
 // ============================================================================
 
-const DEFAULT_HERO_IMAGE = "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/hero-location-mediterraneo.jpg";
+const DEFAULT_HERO_IMAGE = "/images/slides/hero-06.webp";
 
 export async function generateStaticParams() {
   const { data } = await supabase
