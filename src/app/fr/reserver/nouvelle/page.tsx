@@ -416,7 +416,7 @@ function NuevaReservaContent() {
       }
 
       // Step 7: Redirect to booking detail page (con ruta traducida)
-      const bookingDetailPath = getTranslatedRoute(`/reservar/${booking.id}`, language);
+      const bookingDetailPath = getTranslatedRoute(`/reservar/${booking.booking_number}`, language);
       router.push(bookingDetailPath);
       
     } catch (error: any) {

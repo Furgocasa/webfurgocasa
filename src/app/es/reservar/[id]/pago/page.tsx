@@ -1,14 +1,15 @@
 "use client";
 
-import { useState, useEffect } from"react";
-import { useLanguage } from"@/contexts/language-context";
-import { useRouter, useParams } from"next/navigation";
-import { formatPrice } from"@/lib/utils";
+import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/language-context";
+import { useRouter, useParams } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
 import { 
   ArrowLeft, CreditCard, CheckCircle, AlertCircle, 
   Calendar, MapPin, Car, User, Mail, Phone, Clock
-} from"lucide-react";
-import Link from"next/link";
+} from "lucide-react";
+import Link from "next/link";
+import { getBookingByNumber, isValidBookingNumber } from "@/lib/bookings/get-by-number";
 
 interface Booking {
   id: string;
@@ -56,24 +57,21 @@ export default function PagoPage() {
   }, []);
 
   useEffect(() => {
-    if (bookingId) {
+    if (bookingNumber) {
       loadBooking();
     }
-  }, [bookingId]);
+  }, [bookingNumber]);
 
   const loadBooking = async () => {
     try {
       setLoading(true);
       
-      const response = await fetch(`/api/bookings/${bookingId}`);
-      const payload = await response.json();
-
-      if (!response.ok) {
-        setError(payload?.error || 'Error al cargar la reserva');
+      if (!isValidBookingNumber(bookingNumber)) {
+        setError('Número de reserva inválido');
         return;
       }
 
-      const data = payload?.booking;
+      const data = await getBookingByNumber(bookingNumber);
 
       if (!data) {
         setError('Reserva no encontrada');

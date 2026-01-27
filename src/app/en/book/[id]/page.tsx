@@ -1,16 +1,17 @@
 "use client";
 
-import { useState, useEffect } from"react";
-import { useLanguage } from"@/contexts/language-context";
-import { useRouter, useParams } from"next/navigation";
-import { formatPrice } from"@/lib/utils";
+import { useState, useEffect } from "react";
+import { useLanguage } from "@/contexts/language-context";
+import { useRouter, useParams } from "next/navigation";
+import { formatPrice } from "@/lib/utils";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
   FileText, Package
-} from"lucide-react";
-import { LocalizedLink } from"@/components/localized-link";
-import { getTranslatedRoute } from"@/lib/route-translations";
+} from "lucide-react";
+import { LocalizedLink } from "@/components/localized-link";
+import { getTranslatedRoute } from "@/lib/route-translations";
+import { getBookingByNumber, isValidBookingNumber } from "@/lib/bookings/get-by-number";
 
 // Función para normalizar códigos de país a nombres completos
 const getCountryName = (countryCode: string | null | undefined): string => {
@@ -149,24 +150,24 @@ export default function ReservaPage() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const params = useParams();
-  const bookingId = params.id as string;
+  const bookingNumber = params.id as string;
   
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (bookingId) {
+    if (bookingNumber) {
       loadBooking();
     }
-  }, [bookingId]);
+  }, [bookingNumber]);
 
   // Actualizar título del navegador
   useEffect(() => {
     if (booking) {
-      document.title = `Reserva ${booking.booking_number} - Furgocasa`;
+      document.title = `Booking ${booking.booking_number} - Furgocasa`;
     } else {
-      document.title = 'Detalle de reserva - Furgocasa';
+      document.title = 'Booking details - Furgocasa';
     }
   }, [booking]);
 
@@ -174,26 +175,16 @@ export default function ReservaPage() {
     try {
       setLoading(true);
       
-      const response = await fetch(`/api/bookings/${bookingId}`);
-      const payload = await response.json();
-
-      if (!response.ok) {
-        setError(payload?.error || 'Error al cargar la reserva');
+      if (!isValidBookingNumber(bookingNumber)) {
+        setError('Invalid booking number');
         return;
       }
 
-      const data = payload?.booking;
+      const data = await getBookingByNumber(bookingNumber);
 
       if (!data) {
-        setError('Reserva no encontrada');
+        setError('Booking not found');
         return;
-      }
-
-      // Procesar la imagen principal del vehículo
-      if (data.vehicle && data.vehicle.images) {
-        const primaryImage = data.vehicle.images.find((img: any) => img.is_primary);
-        const firstImage = data.vehicle.images[0];
-        (data.vehicle as any).main_image = primaryImage?.image_url || firstImage?.image_url || null;
       }
 
       setBooking(data as any);
@@ -319,7 +310,7 @@ export default function ReservaPage() {
                     </p>
                   </div>
                   <button
-                    onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingId}/pago?amount=${firstPayment.toFixed(2)}`, language))}
+                    onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingNumber}/pago?amount=${firstPayment.toFixed(2)}`, language))}
                     className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center gap-2"
                   >
                     <CreditCard className="h-5 w-5" />
@@ -377,7 +368,7 @@ export default function ReservaPage() {
                   
                   {/* Botón siempre visible */}
                   <button
-                    onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingId}/pago?amount=${pendingAmount.toFixed(2)}`, language))}
+                    onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingNumber}/pago?amount=${pendingAmount.toFixed(2)}`, language))}
                     className={`w-full sm:w-auto font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base ${
                       secondPaymentDue 
                         ? 'bg-red-600 text-white hover:bg-red-700' 

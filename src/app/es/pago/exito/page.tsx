@@ -20,7 +20,7 @@ import { LocalizedLink } from"@/components/localized-link";
  * Componente para mostrar cuando no tenemos datos del pago
  * NO limpia sessionStorage - eso se hace en el componente principal
  */
-function PaymentSuccessGeneric({ bookingId }: { bookingId?: string | null }) {
+function PaymentSuccessGeneric({ bookingNumber }: { bookingNumber?: string | null }) {
   const { t } = useLanguage();
 
   return (
@@ -29,9 +29,9 @@ function PaymentSuccessGeneric({ bookingId }: { bookingId?: string | null }) {
         {t("Tu pago ha sido procesado correctamente. Pronto recibirás un email de confirmación con todos los detalles de tu reserva.")}
       </p>
       <div className="space-y-3">
-        {bookingId && (
+        {bookingNumber && (
           <LocalizedLink
-            href={`/reservar/${bookingId}`}
+            href={`/reservar/${bookingNumber}`}
             className="block w-full bg-furgocasa-blue text-white font-semibold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors"
           >
             {t("Ver mi reserva")}
@@ -39,7 +39,7 @@ function PaymentSuccessGeneric({ bookingId }: { bookingId?: string | null }) {
         )}
         <LocalizedLink
           href="/"
-          className={`block w-full ${bookingId ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-furgocasa-orange text-white hover:bg-orange-600'} font-semibold py-3 px-8 rounded-lg transition-colors`}
+          className={`block w-full ${bookingNumber ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-furgocasa-orange text-white hover:bg-orange-600'} font-semibold py-3 px-8 rounded-lg transition-colors`}
         >
           {t("Volver al inicio")}
         </LocalizedLink>
@@ -477,7 +477,7 @@ function PagoExitoContent() {
                     </div>
 
                     <LocalizedLink
-                      href={`/reservar/${payment.booking.id}`}
+                      href={`/reservar/${payment.booking.booking_number}`}
                       className="block w-full bg-furgocasa-blue text-white font-semibold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors text-center"
                     >
                       {t("Ver mi reserva")}
@@ -492,8 +492,8 @@ function PagoExitoContent() {
                   </div>
                 </>
               ) : (
-                // Sin datos de pago específicos - usar bookingId de fallback
-                <PaymentSuccessGeneric bookingId={fallbackBookingId} />
+                // Sin datos de pago específicos - usar bookingNumber de fallback
+                <PaymentSuccessGeneric bookingNumber={fallbackBookingId} />
               )}
             </div>
           </div>
