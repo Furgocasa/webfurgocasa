@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import { getTranslatedRoute } from "@/lib/route-translations";
-import { getBookingByNumber, isValidBookingNumber } from "@/lib/bookings/get-by-number";
+import { getBookingByNumber, isValidBookingNumber, isUUID, getBookingNumberByUUID } from "@/lib/bookings/get-by-number";
 
 // Función para normalizar códigos de país a nombres completos
 const getCountryName = (countryCode: string | null | undefined): string => {
@@ -174,6 +174,20 @@ export default function ReservaPage() {
   const loadBooking = async () => {
     try {
       setLoading(true);
+      
+      // Si es un UUID (URL antigua), obtener booking_number y redirigir
+      if (isUUID(bookingNumber)) {
+        const actualBookingNumber = await getBookingNumberByUUID(bookingNumber);
+        if (actualBookingNumber) {
+          // Redirigir a la URL correcta con booking_number
+          const newPath = getTranslatedRoute(`/reservar/${actualBookingNumber}`, language);
+          router.replace(newPath);
+          return;
+        } else {
+          setError('Reserva no encontrada');
+          return;
+        }
+      }
       
       // Validar formato de booking_number
       if (!isValidBookingNumber(bookingNumber)) {

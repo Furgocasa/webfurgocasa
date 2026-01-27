@@ -5,6 +5,39 @@
 
 import { createClient } from '@/lib/supabase/client';
 
+/**
+ * Verifica si un string es un UUID válido
+ */
+export function isUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
+/**
+ * Obtiene el booking_number a partir de un UUID
+ * Útil para migración de URLs antiguas
+ */
+export async function getBookingNumberByUUID(uuid: string): Promise<string | null> {
+  const supabase = createClient();
+  
+  try {
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('booking_number')
+      .eq('id', uuid)
+      .single();
+    
+    if (error || !data) {
+      return null;
+    }
+    
+    return data.booking_number;
+  } catch (error) {
+    console.error('Error getting booking_number by UUID:', error);
+    return null;
+  }
+}
+
 export interface BookingData {
   id: string;
   booking_number: string;

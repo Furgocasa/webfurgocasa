@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import { getTranslatedRoute } from "@/lib/route-translations";
-import { getBookingByNumber, isValidBookingNumber } from "@/lib/bookings/get-by-number";
+import { getBookingByNumber, isValidBookingNumber, isUUID, getBookingNumberByUUID } from "@/lib/bookings/get-by-number";
 
 // Función para normalizar códigos de país a nombres completos
 const getCountryName = (countryCode: string | null | undefined): string => {
