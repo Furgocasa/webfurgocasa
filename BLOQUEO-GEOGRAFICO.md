@@ -133,4 +133,6 @@ NO. Los bots de Google, Bing, etc. no aparecen como procedentes de China aunque 
 - Puede contactar por email/WhatsApp directamente
 
 ## Commit de referencia
-(Se añadirá después del commit)
+```
+dd009ae - feat(middleware): bloquear tráfico geográfico desde China (27 enero 2026)
+```
