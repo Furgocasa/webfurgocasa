@@ -46,24 +46,17 @@ export function getBlogRouteData(): BlogRouteData | null {
   
   // Primero intentar desde window (más rápido)
   const windowData = (window as any).__BLOG_ROUTE_DATA__;
-  if (windowData) {
-    console.log('✅ Blog route data from window:', windowData);
-    return windowData;
-  }
+  if (windowData) return windowData;
   
   // Fallback: leer desde el script JSON
   const script = document.getElementById('blog-route-data');
   if (script) {
     try {
-      const data = JSON.parse(script.textContent || '');
-      console.log('✅ Blog route data from script:', data);
-      return data;
-    } catch (e) {
-      console.error('❌ Error parsing blog route data:', e);
+      return JSON.parse(script.textContent || '');
+    } catch {
       return null;
     }
   }
   
-  console.warn('⚠️ No blog route data found');
   return null;
 }

@@ -17,9 +17,23 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 27 de Enero 2026 - **Fix Visitas Duplicadas en Analytics**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 27 de Enero 2026 - **Fix Language Switcher Blog + Analytics**
 
-### 🔧 Problema Resuelto: Tracking Duplicado en Navegación SPA
+### 🌐 Language Switcher con Slugs Traducidos del Blog
+
+**Estado**: ✅ Resuelto  
+**Documentación**: [`docs/SISTEMA-TRADUCCIONES-BLOG.md`](./docs/SISTEMA-TRADUCCIONES-BLOG.md)
+
+El Language Switcher ahora navega correctamente a URLs con slugs traducidos en el blog:
+
+| Cambio de idioma | Antes (incorrecto) | Ahora (correcto) |
+|------------------|-------------------|------------------|
+| ES → FR | `/fr/blog/itineraires/slug-en-español` | `/fr/blog/itineraires/slug-en-francais` |
+| ES → DE | `/de/blog/routen/slug-en-español` | `/de/blog/routen/slug-auf-deutsch` |
+
+**Causa del bug**: Navegación duplicada en `header.tsx` que competía con el contexto de idioma.
+
+### 🔧 Fix Visitas Duplicadas en Analytics
 
 **Estado**: ✅ Resuelto mediante configuración GA4  
 **Documentación**: [`FIX-ANALYTICS-VISITAS-DUPLICADAS.md`](./FIX-ANALYTICS-VISITAS-DUPLICADAS.md)

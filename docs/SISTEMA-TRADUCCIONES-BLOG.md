@@ -1,19 +1,45 @@
 # Sistema de Traducciones del Blog
 
+> **Última actualización**: 27 de Enero 2026 - Fix Language Switcher con slugs traducidos
+
 ## 📋 Resumen
 
 El blog tiene un sistema **híbrido** de traducciones:
 
-- **Inglés**: Las traducciones están en **columnas directas** de la tabla `posts`:
-  - `title_en`
-  - `excerpt_en`
-  - `content_en`
-  - `slug_en`
+### Contenido (título, excerpt, content)
 
-- **Francés y Alemán**: Las traducciones están en la **tabla `content_translations`** (NO en columnas de `posts`):
-  - `source_table = 'posts'`
-  - `source_field = 'title'`, `'excerpt'`, `'content'`, etc.
-  - `locale = 'fr'` o `'de'`
+- **Inglés**: Columnas directas en tabla `posts` (`title_en`, `excerpt_en`, `content_en`)
+- **Francés y Alemán**: Tabla `content_translations` (sistema flexible)
+
+### Slugs (URLs)
+
+- **Todos los idiomas**: Columnas en tabla `posts`:
+  - `slug` (español - original)
+  - `slug_en` (inglés)
+  - `slug_fr` (francés)
+  - `slug_de` (alemán)
+
+## 🌐 URLs Multiidioma del Blog
+
+Las URLs del blog son completamente traducidas:
+
+| Idioma | URL |
+|--------|-----|
+| 🇪🇸 Español | `/es/blog/rutas/navidades-diferentes-viajar-en-camper...` |
+| 🇬🇧 Inglés | `/en/blog/routes/different-christmas-traveling-in-a-camper...` |
+| 🇫🇷 Francés | `/fr/blog/itineraires/noels-differents-voyager-en-van...` |
+| 🇩🇪 Alemán | `/de/blog/routen/andere-weihnachten-mit-dem-camper...` |
+
+### Categorías traducidas
+
+| Español | Inglés | Francés | Alemán |
+|---------|--------|---------|--------|
+| rutas | routes | itineraires | routen |
+| noticias | news | actualites | nachrichten |
+| consejos | tips | conseils | tipps |
+| destinos | destinations | destinations | reiseziele |
+| vehiculos | vehicles | vehicules | fahrzeuge |
+| equipamiento | equipment | equipement | ausrustung |
 
 ## 🔍 Por qué no ves columnas `title_fr`, `content_fr`, etc.
 
@@ -106,9 +132,56 @@ Según la imagen que compartiste:
 2. **Generar traducciones al inglés** usando `translate-blog-content.js`
 3. **Generar traducciones a francés y alemán** usando el sistema de cola o un script manual
 
+## 🔄 Language Switcher en el Blog
+
+### Cómo funciona
+
+Cuando el usuario cambia de idioma en un artículo del blog:
+
+1. **`BlogRouteDataProvider`** inyecta los slugs traducidos en el DOM (Server Component)
+2. **`getBlogRouteData()`** lee estos datos desde el cliente
+3. **`setLanguage()`** en `language-context.tsx` construye la URL correcta con el slug traducido
+4. Navegación a la URL traducida con `window.location.replace()`
+
+### Archivos clave
+
+| Archivo | Función |
+|---------|---------|
+| `src/components/blog/blog-route-data.tsx` | Inyecta slugs en DOM, función `getBlogRouteData()` |
+| `src/contexts/language-context.tsx` | Lógica de cambio de idioma con slugs del blog |
+| `src/lib/blog-translations.ts` | `getAllPostSlugTranslations()` obtiene slugs de Supabase |
+
+### Fix importante (27/01/2026)
+
+**Problema**: El Language Switcher navegaba a URLs con slugs españoles en lugar de traducidos.
+
+**Causa**: En `header.tsx` había **dos navegaciones en carrera**:
+1. `setLanguage(lang)` - construía URL correcta pero usaba `setTimeout`
+2. `window.location.href = getTranslatedRoute(pathname, lang)` - se ejecutaba inmediatamente pero NO conocía los slugs del blog
+
+**Solución**: Eliminada la navegación duplicada del header. Ahora solo el contexto (`setLanguage`) maneja la navegación.
+
+### Lugares donde se usan slugs traducidos
+
+Los siguientes componentes usan slugs traducidos para evitar URLs incorrectas:
+
+1. **Páginas de categoría** (`blog-category-client.tsx`): Enlaces a artículos
+2. **Páginas de artículo** (`[slug]/page.tsx`): Enlaces a artículos relacionados
+3. **Language Switcher** (`language-context.tsx`): Cambio de idioma
+
+## 🛠️ Scripts Útiles
+
+| Script | Descripción |
+|--------|-------------|
+| `scripts/verificar-traducciones-blog.js` | Verifica estado de traducciones |
+| `scripts/traducir-blog-completo.js` | Traduce contenido con OpenAI |
+| `scripts/verificar-slugs-traducidos.js` | Verifica slugs traducidos |
+| `scripts/generar-slugs-traducidos.js` | Genera slugs desde títulos traducidos |
+
 ## 📝 Notas Técnicas
 
-- El sistema usa OpenAI para traducir automáticamente
+- El sistema usa OpenAI (gpt-4o-mini) para traducir automáticamente
 - Las traducciones se pueden marcar como automáticas (`is_auto_translated = true`) o manuales
 - El sistema tiene un fallback: si no hay traducción, muestra el español
 - Los slugs traducidos están en `slug_en`, `slug_fr`, `slug_de` en la tabla `posts`
+- `getPostBySlug()` solo busca por el slug correcto según el idioma (no permite combinaciones incorrectas)
