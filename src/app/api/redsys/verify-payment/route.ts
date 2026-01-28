@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
 import { validateSignature, decodeParams } from "@/lib/redsys";
+import { 
+  sendFirstPaymentConfirmedEmail, 
+  sendSecondPaymentConfirmedEmail,
+  getBookingDataForEmail 
+} from "@/lib/email";
 
 /**
  * POST /api/redsys/verify-payment
@@ -289,45 +294,64 @@ export async function POST(request: NextRequest) {
           }
         }
         
-        // Enviar email de confirmación
+        // Enviar email de confirmación DIRECTAMENTE (sin fetch HTTP)
         console.log("📧 [6/8] Enviando email de confirmación...");
         const isFirstPayment = currentPaid === 0;
-        const emailType = isFirstPayment ? 'first_payment' : 'second_payment';
         
-        console.log("📧 [6/8] Tipo de email:", {
+        console.log("📧 [6/8] Tipo de pago:", {
           isFirstPayment,
-          emailType,
           currentPaid,
           newPaid,
+          totalPrice,
         });
         
         try {
-          const emailUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/bookings/send-email`;
-          console.log("📧 [6/8] Llamando a:", emailUrl);
+          // Obtener datos completos de la reserva para el email
+          const bookingData = await getBookingDataForEmail(payment.booking_id, supabase);
           
-          const emailResponse = await fetch(emailUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: emailType,
-              bookingId: payment.booking_id,
-            }),
-          });
-          
-          console.log("📧 [6/8] Respuesta email:", {
-            status: emailResponse.status,
-            statusText: emailResponse.statusText,
-            ok: emailResponse.ok,
-          });
-          
-          if (!emailResponse.ok) {
-            const errorText = await emailResponse.text();
-            console.error("❌ [6/8] Error en respuesta email:", errorText);
+          if (!bookingData) {
+            console.error("❌ [6/8] No se pudieron obtener datos de la reserva para email");
           } else {
-            console.log("✅ [6/8] Email de confirmación enviado correctamente");
+            // Obtener email del cliente
+            const { data: bookingWithEmail } = await supabase
+              .from("bookings")
+              .select("customer_email")
+              .eq("id", payment.booking_id)
+              .single();
+            
+            const customerEmail = bookingWithEmail?.customer_email;
+            
+            if (!customerEmail) {
+              console.error("❌ [6/8] No se encontró email del cliente");
+            } else {
+              // Actualizar datos de pago en bookingData
+              bookingData.amountPaid = newPaid;
+              bookingData.pendingAmount = totalPrice - newPaid;
+              
+              // Enviar email correspondiente
+              if (isFirstPayment) {
+                console.log("📧 [6/8] Enviando email de PRIMER PAGO a:", customerEmail);
+                const result = await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
+                
+                if (result.success) {
+                  console.log("✅ [6/8] Email de primer pago enviado correctamente");
+                } else {
+                  console.error("❌ [6/8] Error enviando email de primer pago:", result.error);
+                }
+              } else {
+                console.log("📧 [6/8] Enviando email de SEGUNDO PAGO a:", customerEmail);
+                const result = await sendSecondPaymentConfirmedEmail(customerEmail, bookingData);
+                
+                if (result.success) {
+                  console.log("✅ [6/8] Email de segundo pago enviado correctamente");
+                } else {
+                  console.error("❌ [6/8] Error enviando email de segundo pago:", result.error);
+                }
+              }
+            }
           }
         } catch (emailError) {
-          console.error("❌ [6/8] Error enviando email:", {
+          console.error("❌ [6/8] Error al intentar enviar email:", {
             error: emailError,
             message: emailError instanceof Error ? emailError.message : String(emailError),
           });

@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/server";
+import { 
+  sendFirstPaymentConfirmedEmail, 
+  sendSecondPaymentConfirmedEmail,
+  getBookingDataForEmail 
+} from "@/lib/email";
 
 /**
  * POST /api/payments/update-manual
@@ -163,45 +168,65 @@ export async function POST(request: NextRequest) {
       
       console.log("✅ [5/7] Reserva actualizada correctamente");
       
-      // 4. Enviar email de confirmación
+      // 4. Enviar email de confirmación DIRECTAMENTE (sin fetch HTTP)
       console.log("📧 [6/7] Enviando email de confirmación...");
       const isFirstPayment = currentPaid === 0;
-      const emailType = isFirstPayment ? 'first_payment' : 'second_payment';
       
-      console.log("📧 [6/7] Tipo de email:", {
+      console.log("📧 [6/7] Tipo de pago:", {
         isFirstPayment,
-        emailType,
         currentPaid,
         newPaid,
+        totalPrice,
       });
       
       try {
-        const emailUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/bookings/send-email`;
-        console.log("📧 [6/7] Llamando a:", emailUrl);
+        // Obtener datos completos de la reserva para el email
+        const bookingData = await getBookingDataForEmail(bookingId, supabase);
         
-        const emailResponse = await fetch(emailUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: emailType,
-            bookingId,
-          }),
-        });
-        
-        console.log("📧 [6/7] Respuesta email:", {
-          status: emailResponse.status,
-          statusText: emailResponse.statusText,
-          ok: emailResponse.ok,
-        });
-        
-        if (!emailResponse.ok) {
-          const errorText = await emailResponse.text();
-          console.error("❌ [6/7] Error en respuesta email:", errorText);
+        if (!bookingData) {
+          console.error("❌ [6/7] No se pudieron obtener datos de la reserva para email");
+          // No bloqueamos el proceso
         } else {
-          console.log("✅ [6/7] Email de confirmación enviado correctamente");
+          // Obtener email del cliente
+          const { data: bookingWithEmail } = await supabase
+            .from("bookings")
+            .select("customer_email")
+            .eq("id", bookingId)
+            .single();
+          
+          const customerEmail = bookingWithEmail?.customer_email;
+          
+          if (!customerEmail) {
+            console.error("❌ [6/7] No se encontró email del cliente");
+          } else {
+            // Actualizar datos de pago en bookingData
+            bookingData.amountPaid = newPaid;
+            bookingData.pendingAmount = totalPrice - newPaid;
+            
+            // Enviar email correspondiente
+            if (isFirstPayment) {
+              console.log("📧 [6/7] Enviando email de PRIMER PAGO a:", customerEmail);
+              const result = await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
+              
+              if (result.success) {
+                console.log("✅ [6/7] Email de primer pago enviado correctamente");
+              } else {
+                console.error("❌ [6/7] Error enviando email de primer pago:", result.error);
+              }
+            } else {
+              console.log("📧 [6/7] Enviando email de SEGUNDO PAGO a:", customerEmail);
+              const result = await sendSecondPaymentConfirmedEmail(customerEmail, bookingData);
+              
+              if (result.success) {
+                console.log("✅ [6/7] Email de segundo pago enviado correctamente");
+              } else {
+                console.error("❌ [6/7] Error enviando email de segundo pago:", result.error);
+              }
+            }
+          }
         }
       } catch (emailError) {
-        console.error("❌ [6/7] Error enviando email:", {
+        console.error("❌ [6/7] Error al intentar enviar email:", {
           error: emailError,
           message: emailError instanceof Error ? emailError.message : String(emailError),
         });
