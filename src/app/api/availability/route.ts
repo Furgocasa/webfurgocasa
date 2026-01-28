@@ -193,8 +193,18 @@ export async function GET(request: NextRequest) {
     // ============================================
     // TRACKING: Registrar búsqueda en search_queries
     // ============================================
+    console.log("🔍 [TRACKING] ========================================");
+    console.log("🔍 [TRACKING] INICIANDO PROCESO DE TRACKING");
+    console.log("🔍 [TRACKING] URL:", request.url);
+    console.log("🔍 [TRACKING] Método:", request.method);
+    console.log("🔍 [TRACKING] ========================================");
+    
     let searchQueryId: string | null = null;
     let sessionId: string = request.cookies.get('furgocasa_session_id')?.value || crypto.randomUUID();
+    
+    console.log("🔍 [TRACKING] Session ID:", sessionId.substring(0, 20) + "...");
+    console.log("🔍 [TRACKING] Pickup Date:", pickupDate);
+    console.log("🔍 [TRACKING] Dropoff Date:", dropoffDate);
     
     try {
       // Calcular días de antelación
@@ -274,13 +284,21 @@ export async function GET(request: NextRequest) {
         user_agent_type: detectDeviceType(request.headers.get("user-agent")),
       };
       
-      // Log para debugging
-      console.log("🔍 [TRACKING] Registrando búsqueda:", {
-        locale: detectedLocale,
-        referer: referer,
+      // Log para debugging - MEJORADO para mejor visibilidad
+      console.log("🔍 [TRACKING] ========================================");
+      console.log("🔍 [TRACKING] INICIANDO REGISTRO DE BÚSQUEDA");
+      console.log("🔍 [TRACKING] ========================================");
+      console.log("🔍 [TRACKING] Datos a insertar:", JSON.stringify({
+        session_id: sessionId.substring(0, 20) + "...",
         pickup_date: pickupDate,
-        vehicles_count: vehiclesWithPrices?.length || 0
-      });
+        dropoff_date: dropoffDate,
+        pickup_location: pickupLocation,
+        dropoff_location: dropoffLocation,
+        vehicles_count: vehiclesWithPrices?.length || 0,
+        locale: detectedLocale,
+        user_agent_type: detectDeviceType(request.headers.get("user-agent")),
+        funnel_stage: "search_only"
+      }, null, 2));
       
       // Insertar registro en search_queries
       const { data: searchQuery, error: searchError } = await supabase
@@ -291,25 +309,49 @@ export async function GET(request: NextRequest) {
       
       if (!searchError && searchQuery) {
         searchQueryId = searchQuery.id;
-        console.log("✅ [TRACKING] Búsqueda registrada exitosamente:", searchQueryId);
+        console.log("✅ [TRACKING] ========================================");
+        console.log("✅ [TRACKING] BÚSQUEDA REGISTRADA EXITOSAMENTE");
+        console.log("✅ [TRACKING] ID:", searchQueryId);
+        console.log("✅ [TRACKING] Session ID:", sessionId.substring(0, 20) + "...");
+        console.log("✅ [TRACKING] ========================================");
       } else {
-        console.error("❌ [TRACKING] Error registrando búsqueda:", {
+        console.error("❌ [TRACKING] ========================================");
+        console.error("❌ [TRACKING] ERROR REGISTRANDO BÚSQUEDA");
+        console.error("❌ [TRACKING] ========================================");
+        console.error("❌ [TRACKING] Error completo:", JSON.stringify({
           error: searchError,
           message: searchError?.message,
           details: searchError?.details,
           hint: searchError?.hint,
-          data: searchData
-        });
+          code: searchError?.code
+        }, null, 2));
+        console.error("❌ [TRACKING] Datos que intentaron insertarse:", JSON.stringify({
+          ...searchData,
+          session_id: sessionId.substring(0, 20) + "..."
+        }, null, 2));
+        console.error("❌ [TRACKING] ========================================");
         // No fallar la búsqueda si falla el tracking
       }
     } catch (trackingError) {
       // No fallar la búsqueda si falla el tracking
-      console.error("❌ [TRACKING] Excepción en tracking de búsqueda:", trackingError);
+      console.error("❌ [TRACKING] ========================================");
+      console.error("❌ [TRACKING] EXCEPCIÓN EN TRACKING DE BÚSQUEDA");
+      console.error("❌ [TRACKING] ========================================");
+      console.error("❌ [TRACKING] Error:", trackingError);
       if (trackingError instanceof Error) {
+        console.error("❌ [TRACKING] Mensaje:", trackingError.message);
         console.error("❌ [TRACKING] Stack trace:", trackingError.stack);
       }
+      console.error("❌ [TRACKING] ========================================");
     }
 
+    // Log final antes de responder
+    console.log("🔍 [TRACKING] ========================================");
+    console.log("🔍 [TRACKING] PREPARANDO RESPUESTA");
+    console.log("🔍 [TRACKING] SearchQueryId en respuesta:", searchQueryId);
+    console.log("🔍 [TRACKING] Vehículos encontrados:", vehiclesWithPrices?.length || 0);
+    console.log("🔍 [TRACKING] ========================================");
+    
     const response = NextResponse.json({
       success: true,
       searchQueryId, // Incluir para tracking del cliente
