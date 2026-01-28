@@ -92,6 +92,7 @@ export const getLatestBlogArticles = cache(async (limit: number = 3): Promise<Bl
       category:content_categories(id, name, slug)
     `)
     .eq('status', 'published')
+    .lte('published_at', new Date().toISOString()) // Solo artículos con fecha <= hoy
     .order('published_at', { ascending: false })
     .limit(limit);
 
@@ -129,6 +130,7 @@ export const getRoutesArticles = cache(async (limit: number = 4, locale: Locale 
       category:content_categories!inner(id, name, slug)
     `)
     .eq('status', 'published')
+    .lte('published_at', new Date().toISOString()) // Solo artículos con fecha <= hoy
     .eq('content_categories.slug', categorySlug)
     .order('published_at', { ascending: false })
     .limit(limit);

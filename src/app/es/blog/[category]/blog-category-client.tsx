@@ -122,6 +122,7 @@ function BlogCategoryContent() {
           `, { count: "exact" })
           .eq("category_id", categoryData.id)
           .eq("status", "published")
+          .lte("published_at", new Date().toISOString()) // Solo artículos con fecha <= hoy
           .order("published_at", { ascending: false })
           .range(from, to);
 

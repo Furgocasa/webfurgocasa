@@ -89,6 +89,8 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
     .eq("slug", "")  // Búsqueda dummy que no encontrará nada
     .single();
 
+  const hoy = new Date().toISOString();
+  
   if (locale && locale !== 'es') {
     // Para idiomas traducidos, buscar SOLO por slug traducido
     const slugField = locale === 'en' ? 'slug_en' : locale === 'fr' ? 'slug_fr' : 'slug_de';
@@ -97,6 +99,7 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
       .from("posts")
       .select(postQuery)
       .eq("status", "published")
+      .lte("published_at", hoy) // Solo artículos con fecha <= hoy
       .eq(slugField, slug)
       .single();
     
@@ -110,6 +113,7 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
       .from("posts")
       .select(postQuery)
       .eq("status", "published")
+      .lte("published_at", hoy) // Solo artículos con fecha <= hoy
       .eq("slug", slug)
       .single();
     
@@ -120,6 +124,11 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
   }
 
   if (error || !postData) {
+    return null;
+  }
+  
+  // Verificación adicional: no retornar posts con fecha futura
+  if (postData.published_at && new Date(postData.published_at) > new Date()) {
     return null;
   }
 
@@ -162,6 +171,7 @@ export const getRelatedPosts = cache(async (categoryId: string, currentPostId: s
     `)
     .eq("category_id", categoryId)
     .eq("status", "published")
+    .lte("published_at", new Date().toISOString()) // Solo artículos con fecha <= hoy
     .neq("id", currentPostId)
     .order("published_at", { ascending: false })
     .limit(3);
@@ -202,6 +212,7 @@ export const getAllPublishedPostSlugs = cache(async (locale?: 'es' | 'en' | 'fr'
     .from("posts")
     .select(selectFields)
     .eq("status", "published")
+    .lte("published_at", new Date().toISOString()) // Solo artículos con fecha <= hoy
     .order("published_at", { ascending: false });
 
   if (!data) return [];

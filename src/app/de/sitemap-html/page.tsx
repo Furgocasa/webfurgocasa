@@ -127,6 +127,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
       .from("posts")
       .select("slug, title, category:content_categories(slug)")
       .eq("status", "published")
+      .lte("published_at", new Date().toISOString()) // Solo artículos con fecha <= hoy
       .order("published_at", { ascending: false }),
     supabase
       .from("content_categories")

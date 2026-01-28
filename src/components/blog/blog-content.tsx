@@ -59,7 +59,8 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
       is_featured,
       category:content_categories(id, name, slug)
     `, { count: 'exact' })
-    .eq('status', 'published');
+    .eq('status', 'published')
+    .lte('published_at', new Date().toISOString()); // Solo artículos con fecha <= hoy
 
   // Filtro por categoría
   if (categorySlug) {
@@ -120,6 +121,7 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
         category:content_categories(id, name, slug)
       `)
       .eq('status', 'published')
+      .lte('published_at', new Date().toISOString()) // Solo artículos con fecha <= hoy
       .eq('is_featured', true)
       .order('published_at', { ascending: false })
       .limit(3);
@@ -151,6 +153,7 @@ const getBlogData = cache(async (page: number, categorySlug?: string, searchQuer
           .from('posts')
           .select('id', { count: 'exact', head: true })
           .eq('status', 'published')
+          .lte('published_at', new Date().toISOString()) // Solo artículos con fecha <= hoy
           .eq('category_id', category.id);
         
         return {

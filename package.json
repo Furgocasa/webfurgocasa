@@ -58,6 +58,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "critters": "^0.0.23",
+    "csv-parse": "^6.1.0",
     "date-fns": "^3.2.0",
     "date-fns-tz": "^2.0.0",
     "dompurify": "^3.0.8",
