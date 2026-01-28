@@ -279,7 +279,7 @@ export default function SearchAnalyticsPage() {
 
   // Actualizar título de la página
   useEffect(() => {
-    document.title = "Estadisticas Busquedas - Furgocasa";
+    document.title = "Admin - Busquedas";
   }, []);
 
   // Queries para cada tipo de datos
