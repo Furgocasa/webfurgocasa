@@ -431,6 +431,82 @@ export async function GET(request: NextRequest) {
     }
 
     // ============================================
+    // LOCATION: Distribución por ubicación (Murcia vs Madrid)
+    // ============================================
+    if (type === "location") {
+      const { data: searches } = await supabase
+        .from("search_queries")
+        .select(`
+          pickup_location_id,
+          dropoff_location_id,
+          vehicle_selected,
+          booking_created,
+          had_availability,
+          avg_price_shown
+        `)
+        .gte("searched_at", dateFrom)
+        .lte("searched_at", dateTo + " 23:59:59");
+
+      // Obtener todas las ubicaciones para hacer el mapeo
+      const { data: locations } = await supabase
+        .from("locations")
+        .select("id, name, city, slug");
+
+      // Crear mapa de ubicaciones
+      const locationMap = new Map(
+        locations?.map(l => [l.id, { name: l.name, city: l.city, slug: l.slug }]) || []
+      );
+
+      // Función para determinar la ciudad principal (Murcia o Madrid)
+      const getCityGroup = (city: string | null): string => {
+        if (!city) return "Sin especificar";
+        const cityLower = city.toLowerCase();
+        if (cityLower.includes("murcia")) return "Murcia";
+        if (cityLower.includes("madrid")) return "Madrid";
+        return city; // Devolver la ciudad tal cual si no es ninguna de las dos
+      };
+
+      // Agrupar por ciudad de recogida
+      const locationGroups = searches?.reduce((acc: any, s) => {
+        const location = locationMap.get(s.pickup_location_id);
+        const cityGroup = getCityGroup(location?.city || null);
+        
+        if (!acc[cityGroup]) {
+          acc[cityGroup] = {
+            city: cityGroup,
+            location_name: location?.name || "Desconocido",
+            search_count: 0,
+            with_availability: 0,
+            selection_count: 0,
+            booking_count: 0,
+            prices: [],
+          };
+        }
+        acc[cityGroup].search_count++;
+        if (s.had_availability) acc[cityGroup].with_availability++;
+        if (s.vehicle_selected) acc[cityGroup].selection_count++;
+        if (s.booking_created) acc[cityGroup].booking_count++;
+        if (s.avg_price_shown) acc[cityGroup].prices.push(s.avg_price_shown);
+        return acc;
+      }, {});
+
+      const totalSearches = searches?.length || 0;
+      const locationStats = Object.values(locationGroups || {})
+        .map((l: any) => ({
+          ...l,
+          avg_price: l.prices.length > 0 
+            ? (l.prices.reduce((a: number, b: number) => a + b, 0) / l.prices.length).toFixed(2) 
+            : "0",
+          percentage: totalSearches > 0 ? ((l.search_count / totalSearches) * 100).toFixed(1) : "0",
+          selection_rate: l.search_count > 0 ? (l.selection_count / l.search_count * 100).toFixed(2) : "0",
+          conversion_rate: l.search_count > 0 ? (l.booking_count / l.search_count * 100).toFixed(2) : "0",
+        }))
+        .sort((a: any, b: any) => b.search_count - a.search_count);
+
+      return NextResponse.json({ locationStats });
+    }
+
+    // ============================================
     // DEMAND-AVAILABILITY: Demanda vs Disponibilidad
     // ============================================
     if (type === "demand-availability") {

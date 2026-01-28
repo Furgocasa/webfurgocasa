@@ -16,7 +16,8 @@ import {
   Loader2,
   ArrowUpDown,
   ArrowUp,
-  ArrowDown
+  ArrowDown,
+  MapPin
 } from "lucide-react";
 
 interface AnalyticsData {
@@ -119,6 +120,21 @@ interface LocaleStatsData {
     with_availability: number;
     selection_count: number;
     booking_count: number;
+    percentage: string;
+    selection_rate: string;
+    conversion_rate: string;
+  }>;
+}
+
+interface LocationStatsData {
+  locationStats: Array<{
+    city: string;
+    location_name: string;
+    search_count: number;
+    with_availability: number;
+    selection_count: number;
+    booking_count: number;
+    avg_price: string;
     percentage: string;
     selection_rate: string;
     conversion_rate: string;
@@ -310,6 +326,11 @@ export default function SearchAnalyticsPage() {
   const { data: localeStats, isLoading: loadingLocale } = useQuery<LocaleStatsData>({
     queryKey: ["search-analytics", "locale", dateRange.start, dateRange.end],
     queryFn: () => fetchAnalytics("locale", dateRange.start, dateRange.end),
+  });
+
+  const { data: locationStats, isLoading: loadingLocation } = useQuery<LocationStatsData>({
+    queryKey: ["search-analytics", "location", dateRange.start, dateRange.end],
+    queryFn: () => fetchAnalytics("location", dateRange.start, dateRange.end),
   });
 
   // Hooks de ordenación para todas las tablas (deben estar al nivel superior)
@@ -556,6 +577,164 @@ export default function SearchAnalyticsPage() {
                 <li>• Usa estos datos para identificar qué idiomas tienen mayor demanda</li>
                 <li>• Compara tasas de conversión entre idiomas para optimizar traducciones</li>
                 <li>• "Desconocido" aparece cuando no se pudo detectar el idioma (búsquedas directas a API)</li>
+              </ul>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* NUEVO: Búsquedas por Ubicación (Murcia vs Madrid) */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+            <MapPin className="h-6 w-6 text-green-600" />
+            Búsquedas por Ubicación
+          </h2>
+          <p className="text-sm text-gray-600">
+            Distribución de búsquedas según el punto de recogida (Murcia vs Madrid)
+          </p>
+        </div>
+
+        {loadingLocation ? (
+          <div className="flex justify-center py-8">
+            <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          </div>
+        ) : (
+          <>
+            {/* Gráfico de barras visual */}
+            <div className="mb-8 space-y-4">
+              {locationStats?.locationStats.map((location) => {
+                const percentage = parseFloat(location.percentage);
+                
+                const getLocationIcon = (city: string) => {
+                  if (city === "Murcia") return "🌴";
+                  if (city === "Madrid") return "🏙️";
+                  return "📍";
+                };
+
+                const getColorClasses = (city: string) => {
+                  const colors: Record<string, { bg: string; bar: string }> = {
+                    'Murcia': { bg: 'bg-orange-50', bar: 'bg-orange-500' },
+                    'Madrid': { bg: 'bg-purple-50', bar: 'bg-purple-500' },
+                    'Sin especificar': { bg: 'bg-gray-50', bar: 'bg-gray-400' }
+                  };
+                  return colors[city] || { bg: 'bg-teal-50', bar: 'bg-teal-500' };
+                };
+
+                const colors = getColorClasses(location.city);
+
+                return (
+                  <div key={location.city} className={`p-4 rounded-lg border ${colors.bg}`}>
+                    <div className="flex justify-between items-center mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-3xl">{getLocationIcon(location.city)}</span>
+                        <div>
+                          <h3 className="font-bold text-gray-900 text-lg">
+                            {location.city}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {location.search_count} búsquedas ({location.percentage}%)
+                          </p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600">
+                          <span className="font-semibold text-green-600">{location.booking_count}</span> reservas
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {location.conversion_rate}% conversión
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Barra de progreso */}
+                    <div className="w-full bg-gray-200 rounded-full h-8 relative overflow-hidden">
+                      <div
+                        className={`h-8 rounded-full ${colors.bar} flex items-center px-3 text-white text-sm font-bold transition-all duration-500`}
+                        style={{ width: `${Math.max(percentage, 5)}%` }}
+                      >
+                        {percentage}%
+                      </div>
+                    </div>
+                    
+                    {/* Detalles adicionales */}
+                    <div className="mt-3 grid grid-cols-4 gap-3 text-xs">
+                      <div className="text-center p-2 bg-white rounded border">
+                        <div className="font-semibold text-gray-900">{location.with_availability}</div>
+                        <div className="text-gray-500">Con disponib.</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded border">
+                        <div className="font-semibold text-gray-900">{location.selection_count}</div>
+                        <div className="text-gray-500">Selecciones</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded border">
+                        <div className="font-semibold text-gray-900">{location.selection_rate}%</div>
+                        <div className="text-gray-500">Tasa selección</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded border">
+                        <div className="font-semibold text-gray-900">€{location.avg_price}</div>
+                        <div className="text-gray-500">Precio medio</div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              
+              {(!locationStats?.locationStats || locationStats.locationStats.length === 0) && (
+                <div className="text-center py-8 text-gray-500">
+                  No hay datos de ubicación disponibles para el período seleccionado
+                </div>
+              )}
+            </div>
+
+            {/* Comparativa rápida */}
+            {locationStats?.locationStats && locationStats.locationStats.length >= 2 && (
+              <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-purple-50 border border-orange-200 rounded-lg">
+                <h3 className="font-semibold text-gray-900 mb-3 text-sm flex items-center gap-2">
+                  📊 Comparativa Murcia vs Madrid
+                </h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {locationStats.locationStats.slice(0, 2).map((loc) => (
+                    <div key={loc.city} className="p-3 bg-white rounded-lg border">
+                      <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                        {loc.city === "Murcia" ? "🌴" : "🏙️"} {loc.city}
+                      </h4>
+                      <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                          <span className="text-gray-600">Búsquedas:</span>
+                          <span className="ml-1 font-semibold">{loc.search_count}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Reservas:</span>
+                          <span className="ml-1 font-semibold text-green-600">{loc.booking_count}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Conversión:</span>
+                          <span className={`ml-1 font-semibold ${parseFloat(loc.conversion_rate) > 5 ? 'text-green-600' : 'text-amber-600'}`}>
+                            {loc.conversion_rate}%
+                          </span>
+                        </div>
+                        <div>
+                          <span className="text-gray-600">Precio medio:</span>
+                          <span className="ml-1 font-semibold">€{loc.avg_price}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Insights */}
+            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <h3 className="font-semibold text-green-900 mb-2 text-sm flex items-center gap-2">
+                💡 Insights
+              </h3>
+              <ul className="text-xs text-green-700 space-y-1">
+                <li>• La ubicación se determina por el punto de recogida seleccionado en la búsqueda</li>
+                <li>• Compara el rendimiento entre ubicaciones para optimizar la estrategia de marketing</li>
+                <li>• Analiza qué ubicación genera mejores tasas de conversión</li>
+                <li>• El precio medio te ayuda a identificar diferencias de demanda entre zonas</li>
               </ul>
             </div>
           </>
