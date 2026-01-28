@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
       responseCode: params.Ds_Response,
       status: status,
       message: responseMessage,
-      isAuthorized: status === "completed",
+      isAuthorized: status === "authorized",
     });
 
     const supabase = createAdminClient();
@@ -148,7 +148,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Si el pago fue autorizado, actualizar la reserva
-    if (status === "completed" && payment) {
+    if (status === "authorized" && payment) {
       console.log("💰 [6/7] Pago AUTORIZADO - Actualizando reserva...");
       
       // Obtener datos adicionales si existen

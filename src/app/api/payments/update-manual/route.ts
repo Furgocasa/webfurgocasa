@@ -101,8 +101,10 @@ export async function POST(request: NextRequest) {
     
     console.log("✅ [3/7] Pago actualizado correctamente");
     
-    // 3. Si cambió a "completed" desde otro estado, actualizar reserva y enviar email
-    const changedToCompleted = status === "completed" && previousStatus !== "completed";
+    // 3. Si cambió a "authorized" o "completed" desde otro estado, actualizar reserva y enviar email
+    const changedToCompleted = (status === "authorized" || status === "completed") && 
+                               previousStatus !== "authorized" && 
+                               previousStatus !== "completed";
     
     if (changedToCompleted) {
       console.log("🎯 [4/7] Pago marcado como completado - procesando reserva...");
@@ -206,7 +208,7 @@ export async function POST(request: NextRequest) {
         // No bloqueamos el proceso si falla el email
       }
     } else {
-      console.log("ℹ️ [4/7] No se cambió a 'completed' - saltando actualización de reserva");
+      console.log("ℹ️ [4/7] No se cambió a 'authorized' o 'completed' - saltando actualización de reserva");
     }
     
     console.log("=".repeat(80));
