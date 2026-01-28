@@ -320,14 +320,15 @@ export default function PaymentDetailPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
                 >
                   <option value="pending">Pendiente</option>
-                  <option value="completed">Completado</option>
-                  <option value="failed">Fallido</option>
+                  <option value="authorized">Autorizado / Completado</option>
+                  <option value="error">Error / Fallido</option>
                   <option value="refunded">Reembolsado</option>
                   <option value="cancelled">Cancelado</option>
                 </select>
-                {status === "completed" && payment.status !== "completed" && (
+                {(status === "authorized" || status === "completed") && 
+                 (payment.status !== "authorized" && payment.status !== "completed") && (
                   <p className="mt-1 text-sm text-amber-600">
-                    ⚠️ Al cambiar a "Completado", se actualizará la reserva y se enviará el email de confirmación
+                    ⚠️ Al cambiar a "Autorizado", se actualizará la reserva y se enviará el email de confirmación
                   </p>
                 )}
               </div>

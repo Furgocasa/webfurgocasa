@@ -211,8 +211,9 @@ export default function PagosPage() {
           >
             <option value="">Todos los estados</option>
             <option value="pending">Pendiente</option>
-            <option value="completed">Completado</option>
-            <option value="failed">Fallido</option>
+            <option value="authorized">Autorizado / Completado</option>
+            <option value="error">Error / Fallido</option>
+            <option value="cancelled">Cancelado</option>
             <option value="refunded">Reembolsado</option>
           </select>
           <select 
