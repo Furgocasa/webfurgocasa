@@ -104,14 +104,14 @@ export async function POST(request: NextRequest) {
       });
     }
     
-    // Actualizar el pago a authorized
-    console.log("💾 [4/8] Actualizando pago a 'authorized'...");
+    // Actualizar el pago a completed
+    console.log("💾 [4/8] Actualizando pago a 'completed'...");
     const notesText = fromSuccessPage 
       ? `Actualizado via respaldo en página de éxito (${new Date().toISOString()})`
       : `Actualizado via verify-payment API (${new Date().toISOString()})`;
     
     console.log("💾 [4/8] Datos a actualizar:", {
-      status: "authorized",
+      status: "completed",
       response_code: responseCode || "0000",
       authorization_code: authCode || "FALLBACK",
       notes: notesText,
@@ -120,7 +120,7 @@ export async function POST(request: NextRequest) {
     const { error: paymentError } = await supabase
       .from("payments")
       .update({
-        status: "authorized",
+        status: "completed",
         response_code: responseCode || "0000",
         authorization_code: authCode || "FALLBACK",
         notes: notesText,
@@ -136,7 +136,7 @@ export async function POST(request: NextRequest) {
       });
       return NextResponse.json({ error: "Failed to update payment", details: paymentError }, { status: 500 });
     }
-    console.log("✅ [4/8] Pago actualizado correctamente a 'authorized'");
+    console.log("✅ [4/8] Pago actualizado correctamente a 'completed'");
     
     // Actualizar la reserva
     const booking = payment.booking as any;

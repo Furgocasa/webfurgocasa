@@ -1,20 +1,22 @@
 export type PaymentStatus =
   | "pending"
-  | "authorized"   // Estado para pagos autorizados (coincide con constraint de BD)
+  | "completed"    // Pago completado exitosamente
+  | "authorized"   // Alias para compatibilidad (mismo que completed)
   | "cancelled"
   | "error"
+  | "failed"       // Alias para compatibilidad (mismo que error)
   | "refunded";
 
 /**
  * Determina el estado del pago según el código de respuesta de Redsys
- * 0000-0099: Transacción autorizada → authorized
+ * 0000-0099: Transacción autorizada → completed
  * 0101-0999: Transacción denegada → error
  */
 export function getPaymentStatus(responseCode: string): PaymentStatus {
   const code = parseInt(responseCode, 10);
 
   if (code >= 0 && code <= 99) {
-    return "authorized";  // Debe coincidir con CHECK constraint en payments table
+    return "completed";  // Pago exitoso
   } else if (code === 900) {
     return "cancelled"; // Cancelación por el usuario
   } else {
