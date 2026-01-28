@@ -65,26 +65,53 @@ function useSortableData<T>(items: T[] | undefined, config?: { key: keyof T; dir
         const aValue = a[sortConfig.key];
         const bValue = b[sortConfig.key];
 
-        // Manejar valores nulos/undefined
-        if (aValue == null) return 1;
-        if (bValue == null) return -1;
+        // Detectar si es una columna de fecha
+        const isDateColumn = sortConfig.key === 'created_at' || sortConfig.key === 'published_at';
 
-        // Detectar y comparar fechas (strings en formato ISO: YYYY-MM-DD o YYYY-MM-DDTHH:mm:ss)
+        // Para columnas de fecha, siempre tratar como fecha
+        if (isDateColumn) {
+          // Manejar valores nulos: null va al final en DESC, al principio en ASC
+          if (aValue == null && bValue == null) return 0;
+          if (aValue == null) return sortConfig.direction === 'desc' ? 1 : -1;
+          if (bValue == null) return sortConfig.direction === 'desc' ? -1 : 1;
+
+          // Convertir a Date y comparar timestamps
+          const aDate = new Date(aValue as string).getTime();
+          const bDate = new Date(bValue as string).getTime();
+          
+          if (isNaN(aDate) || isNaN(bDate)) {
+            // Si alguna fecha es inválida, ponerla al final
+            if (isNaN(aDate)) return 1;
+            if (isNaN(bDate)) return -1;
+          }
+          
+          return sortConfig.direction === 'asc' 
+            ? aDate - bDate  // ASC: más antiguo primero
+            : bDate - aDate; // DESC: más reciente primero
+        }
+
+        // Para otras columnas, detectar tipo
+        // Detectar fechas (strings en formato ISO)
         const isDateString = (val: any): boolean => {
           if (typeof val !== 'string') return false;
-          // Detectar formato ISO de fecha
           return /^\d{4}-\d{2}-\d{2}/.test(val);
         };
 
         if (isDateString(aValue) && isDateString(bValue)) {
           const aDate = new Date(aValue as string).getTime();
           const bDate = new Date(bValue as string).getTime();
-          return sortConfig.direction === 'asc' 
-            ? aDate - bDate
-            : bDate - aDate;
+          if (!isNaN(aDate) && !isNaN(bDate)) {
+            return sortConfig.direction === 'asc' 
+              ? aDate - bDate
+              : bDate - aDate;
+          }
         }
 
-        // Convertir strings numéricos a números para comparación correcta
+        // Manejar valores nulos para columnas no-fecha
+        if (aValue == null) return 1;
+        if (bValue == null) return -1;
+
+        // Convertir strings numéricos a números
         const aNum = typeof aValue === 'string' ? parseFloat(aValue) : aValue;
         const bNum = typeof bValue === 'string' ? parseFloat(bValue) : bValue;
 
@@ -94,13 +121,13 @@ function useSortableData<T>(items: T[] | undefined, config?: { key: keyof T; dir
             : (bNum as number) - (aNum as number);
         }
 
-        // Comparación de strings
-        if (aValue < bValue) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
+        // Comparación de strings (solo si no es fecha ni número)
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          return sortConfig.direction === 'asc' 
+            ? aValue.localeCompare(bValue, 'es', { numeric: true })
+            : bValue.localeCompare(aValue, 'es', { numeric: true });
         }
-        if (aValue > bValue) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
+
         return 0;
       });
     }
