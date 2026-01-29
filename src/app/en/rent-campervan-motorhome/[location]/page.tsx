@@ -27,6 +27,7 @@ import { NearbyOfficeNotice } from "@/components/locations/nearby-office-notice"
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { getLatestBlogArticles } from "@/lib/home/server-actions";
+import { ExtrasSection } from "@/components/pricing/extras-section";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -404,6 +405,9 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Section: What's included in your rental? - Extras and Accessories */}
+      <ExtrasSection backgroundColor="bg-white" />
 
       {/* NEARBY OFFICE NOTICE - Only for cities without office (distance > 0) */}
       {location.nearest_location && location.distance_km && location.distance_km > 0 && (

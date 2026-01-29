@@ -23,6 +23,7 @@ import {
 import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from "@/lib/home/server-actions";
 import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/home/organization-jsonld";
 import { getTranslatedRecords } from "@/lib/translations/get-translations";
+import { ExtrasSection } from "@/components/pricing/extras-section";
 import Image from "next/image";
 
 /**
@@ -342,6 +343,9 @@ export default async function LocaleHomePage() {
           </div>
         </div>
       </section>
+
+      {/* Section: What's included in your rental? - Extras and Accessories */}
+      <ExtrasSection backgroundColor="bg-white" />
 
       {/* Banner de Ofertas de Última Hora */}
       <section className="py-12 lg:py-16 bg-gradient-to-br from-red-500 via-orange-500 to-furgocasa-orange relative overflow-hidden">

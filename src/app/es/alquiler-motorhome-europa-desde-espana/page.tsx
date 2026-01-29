@@ -21,6 +21,7 @@ import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
+import { ExtrasSection } from "@/components/pricing/extras-section";
 
 interface PageProps {}
 
@@ -391,6 +392,9 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
           </div>
         </div>
       </section>
+
+      {/* Sección: ¿Qué incluye tu alquiler? - Extras y Accesorios */}
+      <ExtrasSection backgroundColor="bg-gray-50" />
 
       {/* Sección: Rutas Sugeridas para LATAM - Artículos del blog */}
       <section className="py-16 lg:py-24 bg-gray-50">

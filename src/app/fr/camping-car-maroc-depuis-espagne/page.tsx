@@ -21,6 +21,7 @@ import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
+import { ExtrasSection } from "@/components/pricing/extras-section";
 
 interface PageProps {}
 
@@ -390,6 +391,9 @@ export default async function LocaleCampingCarMarocPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Section: What's included in your rental? - Extras and Accessories */}
+      <ExtrasSection backgroundColor="bg-gray-50" />
 
       {/* Section: Itinéraires Suggérés pour le Maroc */}
       <section className="py-16 lg:py-24 bg-gray-50">

@@ -29,6 +29,7 @@ import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { getLatestBlogArticles } from "@/lib/home/server-actions";
 import { LocationHeroWithSkeleton } from "@/components/locations/location-hero-with-skeleton";
 import { getLocationHeroImage } from "@/lib/locationImages";
+import { ExtrasSection } from "@/components/pricing/extras-section";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -429,6 +430,9 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* Sección: ¿Qué incluye tu alquiler? - Extras y Accesorios */}
+      <ExtrasSection backgroundColor="bg-white" />
 
       {/* ================================================================== */}
       {/* AVISO OFICINA CERCANA - Solo para ciudades sin sede (distance > 0) */}
