@@ -385,10 +385,7 @@ function NuevaReservaContent() {
             coupon_discount: appliedCoupon?.discount_amount || 0,
           },
           extras: bookingExtrasData,
-          customerStats: {
-            customer_id: customerId,
-            total_price: totalPrice,
-          },
+          // customerStats ya no es necesario - se actualiza automáticamente via trigger DB
         }),
       });
 
