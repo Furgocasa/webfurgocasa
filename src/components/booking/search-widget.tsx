@@ -11,6 +11,7 @@ import { TimeSelector } from "./time-selector";
 import { useLanguage } from "@/contexts/language-context";
 import { calculateRentalDays } from "@/lib/utils";
 import { getTranslatedRoute } from "@/lib/route-translations";
+import { useSeasonMinDays } from "@/hooks/use-season-min-days";
 
 export function SearchWidget() {
   const router = useRouter();
@@ -29,10 +30,16 @@ export function SearchWidget() {
   const [pickupTime, setPickupTime] = useState("11:00");
   const [dropoffTime, setDropoffTime] = useState("11:00");
 
-  // Determinar el mínimo de días según la ubicación
+  // Obtener mínimo de días según temporadas activas
+  const pickupDateStr = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
+  const dropoffDateStr = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : null;
+  const seasonMinDays = useSeasonMinDays(pickupDateStr, dropoffDateStr);
+
+  // Determinar el mínimo de días según la ubicación y temporada
   const getMinDays = () => {
     if (location === "madrid") return 10;
-    return 2; // Murcia o sin selección
+    // Para Murcia, usar el mínimo de la temporada (si hay fechas seleccionadas)
+    return seasonMinDays;
   };
 
   // Resetear fechas cuando cambia la ubicación

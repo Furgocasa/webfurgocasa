@@ -42,10 +42,7 @@ const extraSchema = z.object({
 const requestSchema = z.object({
   booking: bookingSchema,
   extras: z.array(extraSchema).optional(),
-  customerStats: z.object({
-    customer_id: z.string().uuid(),
-    total_price: z.number().nonnegative(),
-  }).optional(),
+  // customerStats ya no es necesario - se actualiza automáticamente via trigger DB
 });
 
 export async function POST(request: Request) {
@@ -79,7 +76,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const { booking, extras, customerStats } = validationResult.data;
+    const { booking, extras } = validationResult.data;
 
     const { data: createdBooking, error: bookingError } = await supabase
       .from("bookings")
@@ -117,27 +114,11 @@ export async function POST(request: Request) {
       }
     }
 
-    if (customerStats?.customer_id) {
-      const { data: currentCustomer } = await supabase
-        .from("customers")
-        .select("total_bookings,total_spent")
-        .eq("id", customerStats.customer_id)
-        .single();
-
-      if (currentCustomer) {
-        const { error: statsError } = await supabase
-          .from("customers")
-          .update({
-            total_bookings: (currentCustomer.total_bookings || 0) + 1,
-            total_spent: (currentCustomer.total_spent || 0) + (customerStats.total_price || 0),
-          })
-          .eq("id", customerStats.customer_id);
-
-        if (statsError) {
-          console.error("Error updating customer stats:", statsError);
-        }
-      }
-    }
+    // ============================================
+    // NOTA: Las estadísticas del cliente (total_bookings y total_spent)
+    // se actualizan automáticamente mediante triggers de base de datos.
+    // Ver: supabase/auto-update-customer-stats.sql
+    // ============================================
 
     // Registrar uso del cupón si se aplicó uno
     if (booking.coupon_id && booking.coupon_discount && booking.coupon_discount > 0) {

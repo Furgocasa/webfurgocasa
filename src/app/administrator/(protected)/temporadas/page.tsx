@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Calendar, Plus, Trash2, Save, AlertCircle, Euro } from "lucide-react";
+import { Calendar, Plus, Trash2, Save, AlertCircle, Euro, Edit2, X } from "lucide-react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAdminData } from "@/hooks/use-admin-data";
@@ -49,6 +49,8 @@ export default function TemporadasAdmin() {
 
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [editingSeason, setEditingSeason] = useState<Season | null>(null);
+  const [editForm, setEditForm] = useState<Partial<Season>>({});
 
   // Usar el hook para cargar datos con retry automático (depende de selectedYear)
   const { data: seasons, loading, error, refetch } = useAdminData<Season[]>({
@@ -92,6 +94,54 @@ export default function TemporadasAdmin() {
     } catch (error: any) {
       console.error('Error deleting season:', error);
       showMessage('error', 'Error al eliminar la temporada');
+    }
+  };
+
+  const handleEditSeason = (season: Season) => {
+    setEditingSeason(season);
+    setEditForm({
+      name: season.name,
+      slug: season.slug,
+      start_date: season.start_date,
+      end_date: season.end_date,
+      price_less_than_week: season.price_less_than_week,
+      price_one_week: season.price_one_week,
+      price_two_weeks: season.price_two_weeks,
+      price_three_weeks: season.price_three_weeks,
+      min_days: season.min_days,
+      year: season.year,
+      is_active: season.is_active,
+    });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSeason(null);
+    setEditForm({});
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingSeason) return;
+
+    try {
+      const response = await fetch(`/api/admin/seasons/${editingSeason.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(editForm),
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al actualizar temporada');
+      }
+
+      showMessage('success', 'Temporada actualizada correctamente');
+      setEditingSeason(null);
+      setEditForm({});
+      loadSeasons();
+    } catch (error: any) {
+      console.error('Error updating season:', error);
+      showMessage('error', 'Error al actualizar la temporada');
     }
   };
 
@@ -256,13 +306,22 @@ export default function TemporadasAdmin() {
                         {season.min_days}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          onClick={() => handleDeleteSeason(season.id)}
-                          className="text-red-600 hover:text-red-900 transition-colors"
-                          title="Eliminar temporada"
-                        >
-                          <Trash2 className="h-5 w-5" />
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => handleEditSeason(season)}
+                            className="text-blue-600 hover:text-blue-900 transition-colors"
+                            title="Editar temporada"
+                          >
+                            <Edit2 className="h-5 w-5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSeason(season.id)}
+                            className="text-red-600 hover:text-red-900 transition-colors"
+                            title="Eliminar temporada"
+                          >
+                            <Trash2 className="h-5 w-5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -345,6 +404,191 @@ export default function TemporadasAdmin() {
         <strong>📝 Para añadir nuevas temporadas:</strong> Ejecuta el script SQL correspondiente en Supabase.
         Los períodos se definen directamente en la base de datos con sus precios específicos.
       </div>
+
+      {/* Modal de Edición */}
+      {editingSeason && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+                <Edit2 className="h-6 w-6 text-furgocasa-blue" />
+                Editar Temporada
+              </h2>
+              <button
+                onClick={handleCancelEdit}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            {/* Form */}
+            <div className="p-6 space-y-4">
+              {/* Nombre */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nombre
+                </label>
+                <input
+                  type="text"
+                  value={editForm.name || ''}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                />
+              </div>
+
+              {/* Slug */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Slug
+                </label>
+                <input
+                  type="text"
+                  value={editForm.slug || ''}
+                  onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                />
+              </div>
+
+              {/* Fechas */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha Inicio
+                  </label>
+                  <input
+                    type="date"
+                    value={editForm.start_date || ''}
+                    onChange={(e) => setEditForm({ ...editForm, start_date: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Fecha Fin
+                  </label>
+                  <input
+                    type="date"
+                    value={editForm.end_date || ''}
+                    onChange={(e) => setEditForm({ ...editForm, end_date: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {/* Precios */}
+              <div className="border-t pt-4">
+                <h3 className="text-sm font-bold text-gray-900 mb-3">Precios por Duración</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">{'< 7 días'}</label>
+                    <input
+                      type="number"
+                      value={editForm.price_less_than_week || ''}
+                      onChange={(e) => setEditForm({ ...editForm, price_less_than_week: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                      placeholder="95"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">7-13 días</label>
+                    <input
+                      type="number"
+                      value={editForm.price_one_week || ''}
+                      onChange={(e) => setEditForm({ ...editForm, price_one_week: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                      placeholder="85"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">14-20 días</label>
+                    <input
+                      type="number"
+                      value={editForm.price_two_weeks || ''}
+                      onChange={(e) => setEditForm({ ...editForm, price_two_weeks: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                      placeholder="75"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-600 mb-1">21+ días</label>
+                    <input
+                      type="number"
+                      value={editForm.price_three_weeks || ''}
+                      onChange={(e) => setEditForm({ ...editForm, price_three_weeks: Number(e.target.value) })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                      placeholder="65"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Mínimo de días */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Mínimo de Días
+                </label>
+                <input
+                  type="number"
+                  value={editForm.min_days || ''}
+                  onChange={(e) => setEditForm({ ...editForm, min_days: Number(e.target.value) })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  placeholder="2"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Duración mínima de alquiler para esta temporada (ej: 7 para temporada alta)
+                </p>
+              </div>
+
+              {/* Año */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Año
+                </label>
+                <input
+                  type="number"
+                  value={editForm.year || ''}
+                  onChange={(e) => setEditForm({ ...editForm, year: Number(e.target.value) })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                  placeholder="2026"
+                />
+              </div>
+
+              {/* Activo */}
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="is_active"
+                  checked={editForm.is_active ?? true}
+                  onChange={(e) => setEditForm({ ...editForm, is_active: e.target.checked })}
+                  className="w-4 h-4 text-furgocasa-blue focus:ring-furgocasa-blue border-gray-300 rounded"
+                />
+                <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
+                  Temporada Activa
+                </label>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+              <button
+                onClick={handleCancelEdit}
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="px-6 py-2 bg-furgocasa-blue text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+              >
+                <Save className="h-4 w-4" />
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
