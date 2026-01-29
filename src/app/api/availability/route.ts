@@ -173,12 +173,11 @@ export async function GET(request: NextRequest) {
       .select("*")
       .in("id", [pickupLocation, dropoffLocation].filter(Boolean) as string[]);
 
-    // Calcular fee de ubicación si son diferentes
+    // Calcular fee de ubicación (sumar ambas ubicaciones)
     let locationFee = 0;
-    if (pickupLocation !== dropoffLocation) {
-      const dropoffLoc = locations?.find((l) => l.id === dropoffLocation);
-      locationFee = dropoffLoc?.extra_fee || 0;
-    }
+    const pickupLoc = locations?.find((l) => l.id === pickupLocation);
+    const dropoffLoc = locations?.find((l) => l.id === dropoffLocation);
+    locationFee = (pickupLoc?.extra_fee || 0) + (dropoffLoc?.extra_fee || 0);
 
     // Información de las temporadas aplicables al período
     const seasonsInfo = priceResult.seasonBreakdown.map(s => ({

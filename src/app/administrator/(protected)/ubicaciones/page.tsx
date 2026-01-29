@@ -55,6 +55,7 @@ export default function UbicacionesPage() {
     email: '',
     latitude: '',
     longitude: '',
+    extra_fee: '',
     is_active: true,
     is_pickup: true,
     is_dropoff: true,
@@ -105,6 +106,7 @@ export default function UbicacionesPage() {
         email: formData.email || null,
         latitude: formData.latitude ? parseFloat(formData.latitude) : null,
         longitude: formData.longitude ? parseFloat(formData.longitude) : null,
+        extra_fee: formData.extra_fee ? parseFloat(formData.extra_fee) : 0,
         is_active: formData.is_active,
         is_pickup: formData.is_pickup,
         is_dropoff: formData.is_dropoff,
@@ -155,6 +157,7 @@ export default function UbicacionesPage() {
       email: location.email || '',
       latitude: location.latitude?.toString() || '',
       longitude: location.longitude?.toString() || '',
+      extra_fee: location.extra_fee?.toString() || '0',
       is_active: location.is_active ?? true,
       is_pickup: location.is_pickup ?? true,
       is_dropoff: location.is_dropoff ?? true,
@@ -223,6 +226,7 @@ export default function UbicacionesPage() {
       email: '',
       latitude: '',
       longitude: '',
+      extra_fee: '',
       is_active: true,
       is_pickup: true,
       is_dropoff: true,
@@ -405,6 +409,24 @@ export default function UbicacionesPage() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Cargo extra por ubicación (€)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={formData.extra_fee}
+                onChange={(e) => setFormData({ ...formData, extra_fee: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                placeholder="0.00"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Cargo adicional que se aplicará a las reservas que incluyan esta ubicación (recogida o entrega)
+              </p>
+            </div>
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <input
@@ -533,6 +555,13 @@ export default function UbicacionesPage() {
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <Mail className="h-4 w-4" />
                     {location.email}
+                  </div>
+                )}
+                {location.extra_fee && location.extra_fee > 0 && (
+                  <div className="flex items-center gap-2 text-sm font-medium text-furgocasa-orange">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-50">
+                      Cargo extra: {parseFloat(location.extra_fee.toString()).toFixed(2)} €
+                    </span>
                   </div>
                 )}
               </div>

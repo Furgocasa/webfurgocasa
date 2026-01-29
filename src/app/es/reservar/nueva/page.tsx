@@ -41,6 +41,7 @@ interface LocationData {
   id: string;
   name: string;
   address: string;
+  extra_fee: number;
 }
 
 interface SelectedExtra {
@@ -119,7 +120,14 @@ function NuevaReservaContent() {
     return sum + (price * extra.quantity);
   }, 0);
   
-  const subtotalBeforeCoupon = basePrice + extrasPrice;
+  const calculateLocationFee = () => {
+    const pickupFee = pickupLocation?.extra_fee || 0;
+    const dropoffFee = dropoffLocation?.extra_fee || 0;
+    return pickupFee + dropoffFee;
+  };
+  
+  const locationFee = calculateLocationFee();
+  const subtotalBeforeCoupon = basePrice + extrasPrice + locationFee;
   const couponDiscount = appliedCoupon?.discount_amount || 0;
   const totalPrice = subtotalBeforeCoupon - couponDiscount;
 
@@ -154,7 +162,7 @@ function NuevaReservaContent() {
       if (pickupLocationSlug) {
         const { data: pickupData } = await supabase
           .from('locations')
-          .select('id, name, address')
+          .select('id, name, address, extra_fee')
           .eq('slug', pickupLocationSlug)
           .single();
         
@@ -164,7 +172,7 @@ function NuevaReservaContent() {
       if (dropoffLocationSlug) {
         const { data: dropoffData } = await supabase
           .from('locations')
-          .select('id, name, address')
+          .select('id, name, address, extra_fee')
           .eq('slug', dropoffLocationSlug)
           .single();
         
@@ -372,6 +380,7 @@ function NuevaReservaContent() {
             days: days,
             base_price: basePrice,
             extras_price: extrasPrice,
+            location_fee: locationFee,
             total_price: totalPrice,
             status: 'pending',
             payment_status: 'pending',
@@ -920,6 +929,14 @@ function NuevaReservaContent() {
                         </div>
                       );
                     })}
+
+                    {/* Cargo extra por ubicación */}
+                    {locationFee > 0 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">{t("Cargo extra por ubicación")}</span>
+                        <span className="font-semibold">{formatPrice(locationFee)}</span>
+                      </div>
+                    )}
 
                     {/* Descuento de cupón */}
                     {appliedCoupon && (
