@@ -62,6 +62,7 @@ function ReservarVehiculoContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [locationFee, setLocationFee] = useState(0);
 
   // Usar hook para calcular precios con temporadas
   const seasonalPricing = useSeasonalPricing({
@@ -86,7 +87,7 @@ function ReservarVehiculoContent() {
     return sum + (price * item.quantity);
   }, 0);
   
-  const totalPrice = basePrice + extrasPrice;
+  const totalPrice = basePrice + extrasPrice + locationFee;
 
   useEffect(() => {
     if (!vehicleId || !pickupDate || !dropoffDate) {
@@ -167,6 +168,23 @@ function ReservarVehiculoContent() {
       
       console.log('[ReservarVehiculo] Extras loaded successfully:', extrasData?.length || 0);
       setExtras((extrasData || []) as Extra[]);
+
+      // Load locations to get extra_fee
+      const locationSlugs = [pickupLocation, dropoffLocation].filter(Boolean) as string[];
+      if (locationSlugs.length > 0) {
+        const { data: locationsData } = await supabase
+          .from('locations')
+          .select('slug, extra_fee')
+          .in('slug', locationSlugs);
+        
+        if (locationsData) {
+          const pickupLoc = locationsData.find(l => l.slug === pickupLocation);
+          const dropoffLoc = locationsData.find(l => l.slug === dropoffLocation);
+          const calculatedFee = (pickupLoc?.extra_fee || 0) + (dropoffLoc?.extra_fee || 0);
+          setLocationFee(calculatedFee);
+          console.log('[ReservarVehiculo] Location fee calculated:', calculatedFee);
+        }
+      }
       
       // Reset retry count on success
       setRetryCount(0);
@@ -648,6 +666,14 @@ function ReservarVehiculoContent() {
                       </div>
                     );
                   })}
+
+                  {/* Cargo extra por ubicación */}
+                  {locationFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">{t("Cargo extra por ubicación")}</span>
+                      <span className="font-semibold">{formatPrice(locationFee)}</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Total */}
@@ -676,7 +702,7 @@ function ReservarVehiculoContent() {
       <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)] z-[60] safe-area-inset-bottom">
         <div className="container mx-auto px-4 py-3">
           {/* Desglose de precios expandible */}
-          {selectedExtras.length > 0 && (
+          {(selectedExtras.length > 0 || locationFee > 0) && (
             <div className="mb-2 pb-2 border-b border-gray-100">
               <div className="flex justify-between text-xs text-gray-500 mb-1">
                 <span>{t("Alquiler")} ({days} {t("días")})</span>
@@ -698,6 +724,12 @@ function ReservarVehiculoContent() {
               })}
               {selectedExtras.length > 2 && (
                 <p className="text-xs text-gray-400">+{selectedExtras.length - 2} {t("extras más")}</p>
+              )}
+              {locationFee > 0 && (
+                <div className="flex justify-between text-xs text-gray-500">
+                  <span>{t("Cargo extra por ubicación")}</span>
+                  <span>+{formatPrice(locationFee)}</span>
+                </div>
               )}
             </div>
           )}
