@@ -146,18 +146,46 @@ export async function GET(request: NextRequest) {
     // Compara precio sin descuento (price_less_than_week de cada día) vs precio con descuento
     const durationDiscountInfo = calculateDurationDiscount(pickupDate, pricingDays, seasons);
 
+    // 6. Obtener datos de ubicaciones (por slug, no por ID)
+    const locationSlugs = [pickupLocation, dropoffLocation].filter(Boolean) as string[];
+    const { data: locations } = await supabase
+      .from("locations")
+      .select("*")
+      .in("slug", locationSlugs);
+
+    // Calcular fee de ubicación (sumar ambas ubicaciones)
+    let locationFee = 0;
+    const pickupLoc = locations?.find((l) => l.slug === pickupLocation);
+    const dropoffLoc = locations?.find((l) => l.slug === dropoffLocation);
+    locationFee = (pickupLoc?.extra_fee || 0) + (dropoffLoc?.extra_fee || 0);
+    console.log(`[LOCATION_FEE] Pickup: ${pickupLocation} (${pickupLoc?.extra_fee || 0}€), Dropoff: ${dropoffLocation} (${dropoffLoc?.extra_fee || 0}€), Total: ${locationFee}€`);
+
     // Calcular precios
     const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
+      // Calcular precio total incluyendo location_fee
+      const baseTotal = priceResult.total; // Precio con descuento por duración
+      const originalTotal = durationDiscountInfo.originalTotal; // Precio sin descuento por duración
+      
+      // Totales con location_fee
+      const totalWithLocationFee = baseTotal + locationFee;
+      const originalTotalWithLocationFee = originalTotal + locationFee;
+      
+      // Precio por día incluyendo location_fee (para mostrar correctamente)
+      const pricePerDayWithLocation = totalWithLocationFee / pricingDays;
+      const originalPricePerDayWithLocation = originalTotalWithLocationFee / pricingDays;
+      
       return {
         ...vehicle,
         pricing: {
           days, // Días reales del alquiler
           pricingDays, // Días usados para calcular el precio
           hasTwoDayPricing, // Flag para mostrar aviso
-          pricePerDay: Math.round(finalPricePerDay * 100) / 100,
-          originalPricePerDay: durationDiscountInfo.originalPricePerDay, // Precio promedio sin descuento por duración
-          totalPrice: Math.round(priceResult.total * 100) / 100,
-          originalTotalPrice: Math.round(durationDiscountInfo.originalTotal * 100) / 100,
+          pricePerDay: Math.round(pricePerDayWithLocation * 100) / 100, // Precio por día CON location_fee
+          originalPricePerDay: Math.round(originalPricePerDayWithLocation * 100) / 100, // Precio original por día CON location_fee
+          basePrice: Math.round(baseTotal * 100) / 100, // Precio base del alquiler (sin location_fee)
+          locationFee: Math.round(locationFee * 100) / 100, // Cargo extra por ubicación
+          totalPrice: Math.round(totalWithLocationFee * 100) / 100, // Total incluyendo location_fee
+          originalTotalPrice: Math.round(originalTotalWithLocationFee * 100) / 100, // Original CON location_fee
           season: priceResult.dominantSeason,
           seasonBreakdown: priceResult.seasonBreakdown,
           seasonalAddition: seasonalAddition,
@@ -166,19 +194,6 @@ export async function GET(request: NextRequest) {
         },
       };
     });
-
-    // 6. Obtener datos de ubicaciones
-    const { data: locations } = await supabase
-      .from("locations")
-      .select("*")
-      .in("id", [pickupLocation, dropoffLocation].filter(Boolean) as string[]);
-
-    // Calcular fee de ubicación si son diferentes
-    let locationFee = 0;
-    if (pickupLocation !== dropoffLocation) {
-      const dropoffLoc = locations?.find((l) => l.id === dropoffLocation);
-      locationFee = dropoffLoc?.extra_fee || 0;
-    }
 
     // Información de las temporadas aplicables al período
     const seasonsInfo = priceResult.seasonBreakdown.map(s => ({
