@@ -71,13 +71,13 @@ export function ExtrasSection({
   const sectionTitle = title || t("¿Qué incluye tu alquiler?");
   
   return (
-    <section className={`py-16 lg:py-24 ${backgroundColor}`}>
+    <section className={`py-10 lg:py-14 ${backgroundColor}`}>
       <div className="container mx-auto px-4">
-        <div className="text-center mb-12 lg:mb-16">
-          <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 lg:mb-10">
+          <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-3">
             {sectionTitle}
           </h2>
-          <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
+          <p className="text-base lg:text-lg text-gray-600 max-w-3xl mx-auto">
             {t("Qué está incluido en el precio y qué tiene coste adicional")}
           </p>
         </div>
@@ -159,14 +159,14 @@ export function ExtrasSection({
         </div>
 
         {/* Información destacada */}
-        <div className="mt-8 lg:mt-12 max-w-5xl mx-auto">
-          <div className="bg-gradient-to-r from-furgocasa-orange/10 via-yellow-50 to-furgocasa-orange/10 border-2 border-furgocasa-orange/30 rounded-2xl p-6 lg:p-8">
-            <div className="flex items-start gap-4">
+        <div className="mt-6 lg:mt-8 max-w-5xl mx-auto">
+          <div className="bg-gradient-to-r from-furgocasa-orange/10 via-yellow-50 to-furgocasa-orange/10 border-2 border-furgocasa-orange/30 rounded-2xl p-4 lg:p-6">
+            <div className="flex items-start gap-3">
               <div className="bg-furgocasa-orange/20 p-2 rounded-xl flex-shrink-0">
-                <CheckCircle className="h-6 w-6 text-furgocasa-orange" />
+                <CheckCircle className="h-5 w-5 text-furgocasa-orange" />
               </div>
               <div>
-                <h4 className="font-bold text-gray-900 mb-2 text-lg lg:text-xl">
+                <h4 className="font-bold text-gray-900 mb-1 text-base lg:text-lg">
                   {t("Todo incluido para tu aventura")}
                 </h4>
                 <p className="text-gray-700 leading-relaxed text-sm lg:text-base">
@@ -179,7 +179,7 @@ export function ExtrasSection({
 
         {/* Enlace a tarifas completas */}
         {showMoreLink && (
-          <div className="text-center mt-8 lg:mt-12">
+          <div className="text-center mt-6 lg:mt-8">
             <LocalizedLink
               href="/tarifas"
               className="inline-flex items-center gap-2 text-furgocasa-blue font-bold uppercase tracking-wider hover:text-furgocasa-blue-dark transition-colors text-base lg:text-lg group"

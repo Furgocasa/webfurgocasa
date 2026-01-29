@@ -242,10 +242,10 @@ export default async function LocationPage({ params }: PageProps) {
         alt={location.h1_title || `${t("Alquiler de Autocaravanas (motorhomes) en")} ${location.name}`}
       >
         <div className="container mx-auto px-4 text-center">
-          <div className="max-w-6xl mx-auto space-y-3">
+          <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
             {/* H1 - Formato fijo: Alquiler de Autocaravanas (Motorhomes) en {ciudad} */}
             <h1 
-              className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
+              className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4" 
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}
             >
               {t("Alquiler de Autocaravanas (Motorhomes) en")} {location.name}
@@ -296,7 +296,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* VEHÍCULOS DISPONIBLES - Fondo blanco */}
       {/* ================================================================== */}
       {vehicles.length > 0 && (
-        <section className="py-12 lg:py-20 bg-white">
+        <section className="py-10 lg:py-14 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               {/* H1 siempre "ALQUILER CAMPER {ciudad}" */}
@@ -379,7 +379,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* PRECIOS - Fondo gris claro */}
       {/* ================================================================== */}
-      <section className="py-12 lg:py-20 bg-gray-50">
+      <section className="py-10 lg:py-14 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
@@ -460,7 +460,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* SERVICIOS DESTACADOS - Fondo azul claro */}
       {/* ================================================================== */}
-      <section className="py-12 lg:py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <section className="py-10 lg:py-14 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
@@ -529,7 +529,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* DESTINOS PRINCIPALES - Fondo gris claro */}
       {/* ================================================================== */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -550,7 +550,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* BLOG - Fondo blanco */}
       {/* ================================================================== */}
       {blogArticles.length > 0 && (
-        <section className="py-12 lg:py-20 bg-white">
+        <section className="py-10 lg:py-14 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
@@ -634,7 +634,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* POR QUÉ ELEGIR FURGOCASA - Fondo gradiente azul */}
       {/* ================================================================== */}
-      <section className="py-12 lg:py-20 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+      <section className="py-10 lg:py-14 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">

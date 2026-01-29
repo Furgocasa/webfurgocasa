@@ -279,7 +279,7 @@ export default async function LocationPage({ params }: PageProps) {
 
       {/* FAHRZEUGE - Weißer Hintergrund */}
       {vehicles.length > 0 && (
-        <section className="py-12 lg:py-20 bg-white">
+        <section className="py-10 lg:py-14 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               {/* H2 immer "WOHNMOBIL MIETEN {Stadt}" */}
@@ -353,7 +353,7 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* PREISE - Hellgrauer Hintergrund */}
-      <section className="py-12 lg:py-20 bg-gray-50">
+      <section className="py-10 lg:py-14 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
@@ -428,7 +428,7 @@ export default async function LocationPage({ params }: PageProps) {
       />
 
       {/* SERVICES - Hellblauer Hintergrund */}
-      <section className="py-12 lg:py-20 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <section className="py-10 lg:py-14 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
@@ -495,7 +495,7 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* HAUPTZIELE - Hellgrauer Hintergrund */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -513,7 +513,7 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* BLOG - Weißer Hintergrund */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-blue-50 to-indigo-50">
+      <section className="py-12 lg:py-16 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
@@ -581,7 +581,7 @@ export default async function LocationPage({ params }: PageProps) {
 
       {/* BLOG - Wie auf der Startseite */}
       {blogArticles.length > 0 && (
-        <section className="py-12 lg:py-20 bg-white">
+        <section className="py-10 lg:py-14 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
@@ -663,7 +663,7 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* WHY FURGOCASA */}
-      <section className="py-12 lg:py-20 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+      <section className="py-10 lg:py-14 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">

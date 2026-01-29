@@ -151,7 +151,7 @@ export default async function LocaleWohnmobilMarokkoPage({ params }: PageProps) 
       </section>
 
       {/* Bereich: Was ist ein Wohnmobil */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
@@ -271,7 +271,7 @@ export default async function LocaleWohnmobilMarokkoPage({ params }: PageProps) 
       </section>
 
       {/* Bereich: Unsere Flotte */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
@@ -340,7 +340,7 @@ export default async function LocaleWohnmobilMarokkoPage({ params }: PageProps) 
       </section>
 
       {/* Bereich: Preise */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
@@ -396,7 +396,7 @@ export default async function LocaleWohnmobilMarokkoPage({ params }: PageProps) 
       <ExtrasSection backgroundColor="bg-gray-50" />
 
       {/* Bereich: Vorgeschlagene Routen für Marokko */}
-      <section className="py-16 lg:py-24 bg-gray-50">
+      <section className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
@@ -546,7 +546,7 @@ export default async function LocaleWohnmobilMarokkoPage({ params }: PageProps) 
       </section>
 
       {/* Bereich: Warum Furgocasa für Marokko */}
-      <section className="py-16 lg:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+      <section className="py-12 lg:py-16 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
@@ -604,7 +604,7 @@ export default async function LocaleWohnmobilMarokkoPage({ params }: PageProps) 
       </section>
 
       {/* Bereich: Warum Spanien als Basis */}
-      <section className="py-16 lg:py-24 bg-white">
+      <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
