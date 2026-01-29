@@ -146,17 +146,19 @@ export async function GET(request: NextRequest) {
     // Compara precio sin descuento (price_less_than_week de cada día) vs precio con descuento
     const durationDiscountInfo = calculateDurationDiscount(pickupDate, pricingDays, seasons);
 
-    // 6. Obtener datos de ubicaciones
+    // 6. Obtener datos de ubicaciones (por slug, no por ID)
+    const locationSlugs = [pickupLocation, dropoffLocation].filter(Boolean) as string[];
     const { data: locations } = await supabase
       .from("locations")
       .select("*")
-      .in("id", [pickupLocation, dropoffLocation].filter(Boolean) as string[]);
+      .in("slug", locationSlugs);
 
     // Calcular fee de ubicación (sumar ambas ubicaciones)
     let locationFee = 0;
-    const pickupLoc = locations?.find((l) => l.id === pickupLocation);
-    const dropoffLoc = locations?.find((l) => l.id === dropoffLocation);
+    const pickupLoc = locations?.find((l) => l.slug === pickupLocation);
+    const dropoffLoc = locations?.find((l) => l.slug === dropoffLocation);
     locationFee = (pickupLoc?.extra_fee || 0) + (dropoffLoc?.extra_fee || 0);
+    console.log(`[LOCATION_FEE] Pickup: ${pickupLocation} (${pickupLoc?.extra_fee || 0}€), Dropoff: ${dropoffLocation} (${dropoffLoc?.extra_fee || 0}€), Total: ${locationFee}€`);
 
     // Calcular precios
     const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
