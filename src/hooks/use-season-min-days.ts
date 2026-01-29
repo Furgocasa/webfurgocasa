@@ -15,11 +15,11 @@ interface Season {
 /**
  * Hook para obtener el mínimo de días requerido según las temporadas activas
  * 
- * Consulta las temporadas que cubren el rango de fechas y retorna el min_days
- * de la temporada dominante (la que cubre más días del periodo).
+ * Si solo se proporciona pickupDate, busca la temporada que aplica a ESA fecha específica.
+ * Si se proporcionan ambas fechas, calcula la temporada dominante del periodo.
  * 
  * @param pickupDate - Fecha de recogida (YYYY-MM-DD)
- * @param dropoffDate - Fecha de devolución (YYYY-MM-DD)
+ * @param dropoffDate - Fecha de devolución (YYYY-MM-DD) - opcional
  * @returns minDays - Número mínimo de días requerido (default: 2 si no hay temporadas)
  */
 export function useSeasonMinDays(
@@ -29,14 +29,42 @@ export function useSeasonMinDays(
   const [minDays, setMinDays] = useState(2); // Default para temporada BAJA
 
   useEffect(() => {
-    if (!pickupDate || !dropoffDate) {
+    if (!pickupDate) {
       setMinDays(2);
       return;
     }
 
     const loadMinDays = async () => {
       try {
-        // Obtener temporadas que cubren el rango de fechas
+        // Si solo tenemos fecha de inicio, buscar la temporada que aplica a ESA fecha
+        if (!dropoffDate || pickupDate === dropoffDate) {
+          const { data, error } = await supabase
+            .from("seasons")
+            .select("*")
+            .eq("is_active", true)
+            .lte("start_date", pickupDate)
+            .gte("end_date", pickupDate);
+
+          if (error) {
+            console.error("[useSeasonMinDays] Error loading seasons:", error);
+            setMinDays(2);
+            return;
+          }
+
+          const seasons = (data || []) as Season[];
+
+          if (seasons.length === 0) {
+            setMinDays(2);
+            return;
+          }
+
+          // Si hay múltiples temporadas, usar el máximo min_days para ser conservador
+          const maxMinDays = Math.max(...seasons.map(s => s.min_days || 2));
+          setMinDays(maxMinDays);
+          return;
+        }
+
+        // Si tenemos ambas fechas, calcular temporada dominante
         const { data, error } = await supabase
           .from("seasons")
           .select("*")
@@ -53,7 +81,6 @@ export function useSeasonMinDays(
         const seasons = (data || []) as Season[];
 
         if (seasons.length === 0) {
-          // No hay temporadas especiales, usar default (BAJA)
           setMinDays(2);
           return;
         }

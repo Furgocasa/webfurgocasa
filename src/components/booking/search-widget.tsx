@@ -31,9 +31,10 @@ export function SearchWidget() {
   const [dropoffTime, setDropoffTime] = useState("11:00");
 
   // Obtener mínimo de días según temporadas activas
+  // IMPORTANTE: Calcular min_days basado solo en la fecha de INICIO
+  // para que el calendario pueda bloquear fechas antes de seleccionar la fecha de fin
   const pickupDateStr = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
-  const dropoffDateStr = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : null;
-  const seasonMinDays = useSeasonMinDays(pickupDateStr, dropoffDateStr);
+  const seasonMinDays = useSeasonMinDays(pickupDateStr, pickupDateStr);
 
   // Determinar el mínimo de días según la ubicación y temporada
   const getMinDays = () => {
