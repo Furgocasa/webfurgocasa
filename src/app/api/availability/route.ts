@@ -146,27 +146,6 @@ export async function GET(request: NextRequest) {
     // Compara precio sin descuento (price_less_than_week de cada día) vs precio con descuento
     const durationDiscountInfo = calculateDurationDiscount(pickupDate, pricingDays, seasons);
 
-    // Calcular precios
-    const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
-      return {
-        ...vehicle,
-        pricing: {
-          days, // Días reales del alquiler
-          pricingDays, // Días usados para calcular el precio
-          hasTwoDayPricing, // Flag para mostrar aviso
-          pricePerDay: Math.round(finalPricePerDay * 100) / 100,
-          originalPricePerDay: durationDiscountInfo.originalPricePerDay, // Precio promedio sin descuento por duración
-          totalPrice: Math.round(priceResult.total * 100) / 100,
-          originalTotalPrice: Math.round(durationDiscountInfo.originalTotal * 100) / 100,
-          season: priceResult.dominantSeason,
-          seasonBreakdown: priceResult.seasonBreakdown,
-          seasonalAddition: seasonalAddition,
-          durationDiscount: durationDiscountInfo.discountPercentage,
-          hasDurationDiscount: durationDiscountInfo.discountPercentage > 0,
-        },
-      };
-    });
-
     // 6. Obtener datos de ubicaciones
     const { data: locations } = await supabase
       .from("locations")
@@ -178,6 +157,33 @@ export async function GET(request: NextRequest) {
     const pickupLoc = locations?.find((l) => l.id === pickupLocation);
     const dropoffLoc = locations?.find((l) => l.id === dropoffLocation);
     locationFee = (pickupLoc?.extra_fee || 0) + (dropoffLoc?.extra_fee || 0);
+
+    // Calcular precios
+    const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
+      // Calcular precio total incluyendo location_fee
+      const baseTotal = priceResult.total;
+      const totalWithLocationFee = baseTotal + locationFee;
+      
+      return {
+        ...vehicle,
+        pricing: {
+          days, // Días reales del alquiler
+          pricingDays, // Días usados para calcular el precio
+          hasTwoDayPricing, // Flag para mostrar aviso
+          pricePerDay: Math.round(finalPricePerDay * 100) / 100,
+          originalPricePerDay: durationDiscountInfo.originalPricePerDay, // Precio promedio sin descuento por duración
+          basePrice: Math.round(baseTotal * 100) / 100, // Precio base sin location_fee
+          locationFee: Math.round(locationFee * 100) / 100, // Cargo extra por ubicación
+          totalPrice: Math.round(totalWithLocationFee * 100) / 100, // Total incluyendo location_fee
+          originalTotalPrice: Math.round(durationDiscountInfo.originalTotal * 100) / 100,
+          season: priceResult.dominantSeason,
+          seasonBreakdown: priceResult.seasonBreakdown,
+          seasonalAddition: seasonalAddition,
+          durationDiscount: durationDiscountInfo.discountPercentage,
+          hasDurationDiscount: durationDiscountInfo.discountPercentage > 0,
+        },
+      };
+    });
 
     // Información de las temporadas aplicables al período
     const seasonsInfo = priceResult.seasonBreakdown.map(s => ({
