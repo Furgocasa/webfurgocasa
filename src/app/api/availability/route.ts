@@ -174,6 +174,12 @@ export async function GET(request: NextRequest) {
       const pricePerDayWithLocation = totalWithLocationFee / pricingDays;
       const originalPricePerDayWithLocation = originalTotalWithLocationFee / pricingDays;
       
+      // Calcular descuento efectivo (sobre totales CON location_fee)
+      // Esto es lo que el usuario realmente ve como descuento
+      const effectiveDiscountPercentage = originalTotalWithLocationFee > 0
+        ? Math.round(((originalTotalWithLocationFee - totalWithLocationFee) / originalTotalWithLocationFee) * 1000) / 10
+        : 0;
+      
       return {
         ...vehicle,
         pricing: {
@@ -189,8 +195,8 @@ export async function GET(request: NextRequest) {
           season: priceResult.dominantSeason,
           seasonBreakdown: priceResult.seasonBreakdown,
           seasonalAddition: seasonalAddition,
-          durationDiscount: durationDiscountInfo.discountPercentage,
-          hasDurationDiscount: durationDiscountInfo.discountPercentage > 0,
+          durationDiscount: effectiveDiscountPercentage, // Descuento efectivo considerando location_fee
+          hasDurationDiscount: effectiveDiscountPercentage > 0,
         },
       };
     });
