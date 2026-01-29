@@ -163,8 +163,16 @@ export async function GET(request: NextRequest) {
     // Calcular precios
     const vehiclesWithPrices = availableVehicles?.map((vehicle) => {
       // Calcular precio total incluyendo location_fee
-      const baseTotal = priceResult.total;
+      const baseTotal = priceResult.total; // Precio con descuento por duración
+      const originalTotal = durationDiscountInfo.originalTotal; // Precio sin descuento por duración
+      
+      // Totales con location_fee
       const totalWithLocationFee = baseTotal + locationFee;
+      const originalTotalWithLocationFee = originalTotal + locationFee;
+      
+      // Precio por día incluyendo location_fee (para mostrar correctamente)
+      const pricePerDayWithLocation = totalWithLocationFee / pricingDays;
+      const originalPricePerDayWithLocation = originalTotalWithLocationFee / pricingDays;
       
       return {
         ...vehicle,
@@ -172,12 +180,12 @@ export async function GET(request: NextRequest) {
           days, // Días reales del alquiler
           pricingDays, // Días usados para calcular el precio
           hasTwoDayPricing, // Flag para mostrar aviso
-          pricePerDay: Math.round(finalPricePerDay * 100) / 100,
-          originalPricePerDay: durationDiscountInfo.originalPricePerDay, // Precio promedio sin descuento por duración
-          basePrice: Math.round(baseTotal * 100) / 100, // Precio base sin location_fee
+          pricePerDay: Math.round(pricePerDayWithLocation * 100) / 100, // Precio por día CON location_fee
+          originalPricePerDay: Math.round(originalPricePerDayWithLocation * 100) / 100, // Precio original por día CON location_fee
+          basePrice: Math.round(baseTotal * 100) / 100, // Precio base del alquiler (sin location_fee)
           locationFee: Math.round(locationFee * 100) / 100, // Cargo extra por ubicación
           totalPrice: Math.round(totalWithLocationFee * 100) / 100, // Total incluyendo location_fee
-          originalTotalPrice: Math.round(durationDiscountInfo.originalTotal * 100) / 100,
+          originalTotalPrice: Math.round(originalTotalWithLocationFee * 100) / 100, // Original CON location_fee
           season: priceResult.dominantSeason,
           seasonBreakdown: priceResult.seasonBreakdown,
           seasonalAddition: seasonalAddition,
