@@ -2,71 +2,54 @@
 
 import { useState } from "react";
 import Link from"next/link";
-import { Play, Car, ArrowRight, Calendar, Gauge, Euro, X } from"lucide-react";
+import { Play, X, Youtube } from"lucide-react";
 
-// TODO: Von Supabase/YouTube API laden
+// Videos de YouTube con sus IDs reales
 const videos = [
   {
     id:"1",
-    title:"Volkswagen California Ocean T6.1 2021",
-    slug:"vw-california-ocean-t61-2021",
     youtubeId:"Rd1YaquF2wg",
-    thumbnail: null,
-    price: 72000,
-    mileage: 45000,
-    year: 2021,
-    description:"Komplette Besichtigung dieses California Ocean in einwandfreiem Zustand. Ein Vorbesitzer.",
-    duration:"12:34",
   },
   {
     id:"2",
-    title:"Ford Transit Custom Nugget 2022",
-    slug:"ford-transit-nugget-2022",
     youtubeId:"Ccb1PZMPyuA",
-    thumbnail: null,
-    price: 58000,
-    mileage: 28000,
-    year: 2022,
-    description:"Tour durch den praktisch neuen Nugget. Offizielle Ford-Garantie bis 2025.",
-    duration:"10:45",
   },
   {
     id:"3",
-    title:"Fiat Ducato Roller Team 284 2020",
-    slug:"fiat-ducato-roller-team-284-2020",
     youtubeId:"tOWVLB_1Tok",
-    thumbnail: null,
-    price: 52000,
-    mileage: 62000,
-    year: 2020,
-    description:"Sehr komplettes teilintegriertes Wohnmobil. Ideal für Familien.",
-    duration:"15:20",
   },
   {
     id:"4",
-    title:"Weiteres Fahrzeug zum Verkauf",
-    slug:"otro-vehiculo-venta",
     youtubeId:"DGJw9IsCx4Q",
-    thumbnail: null,
-    price: 48000,
-    mileage: 35000,
-    year: 2021,
-    description:"Fahrzeug in ausgezeichnetem Zustand mit allen Annehmlichkeiten.",
-    duration:"11:30",
   },
 ];
 
 export default function VideosVentasPage() {
   const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+  const [imgErrors, setImgErrors] = useState<Record<string, number>>({});
+
+  const getThumbnailUrl = (youtubeId: string) => {
+    const errorCount = imgErrors[youtubeId] || 0;
+    // Intentar diferentes calidades de miniatura en orden
+    const qualities = ['maxresdefault', 'hqdefault', 'mqdefault', 'default'];
+    return `https://img.youtube.com/vi/${youtubeId}/${qualities[errorCount]}.jpg`;
+  };
+
+  const handleImageError = (youtubeId: string) => {
+    setImgErrors(prev => ({
+      ...prev,
+      [youtubeId]: (prev[youtubeId] || 0) + 1
+    }));
+  };
 
   return (
     <>
 <main className="min-h-screen bg-gray-50">
         <section className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark py-16">
           <div className="container mx-auto px-4 text-center">
-            <Play className="h-16 w-16 text-furgocasa-orange mx-auto mb-4" />
+            <Youtube className="h-16 w-16 text-furgocasa-orange mx-auto mb-4" />
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Videos von Wohnmobilen zum Verkauf</h1>
-            <p className="text-xl text-white/80 max-w-2xl mx-auto">Entdecken Sie jedes Detail unserer Fahrzeuge vor Ihrem Besuch</p>
+            <p className="text-xl text-white/80 max-w-2xl mx-auto">Entdecken Sie jedes Detail unserer Fahrzeuge im Video</p>
           </div>
         </section>
 
@@ -79,59 +62,40 @@ export default function VideosVentasPage() {
                   {/* Video Thumbnail */}
                   <button
                     onClick={() => setSelectedVideo(video.youtubeId)}
-                    className="relative aspect-video bg-gray-200 block w-full"
+                    className="relative aspect-video bg-gradient-to-br from-gray-100 to-gray-200 block w-full overflow-hidden"
                   >
                     <img 
-                      src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
-                      alt={video.title}
+                      key={`${video.youtubeId}-${imgErrors[video.youtubeId] || 0}`}
+                      src={getThumbnailUrl(video.youtubeId)}
+                      alt="Fahrzeugvideo"
                       className="absolute inset-0 w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                      }}
+                      onError={() => handleImageError(video.youtubeId)}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <Car className="h-16 w-16 text-gray-300 opacity-50" />
-                    </div>
                     {/* Play button overlay */}
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="w-16 h-16 bg-furgocasa-orange rounded-full flex items-center justify-center">
-                        <Play className="h-8 w-8 text-white ml-1" />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 group-hover:bg-black/40 transition-colors">
+                      <div className="w-20 h-20 bg-furgocasa-orange rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                        <Play className="h-10 w-10 text-white ml-1" />
                       </div>
                     </div>
-                    {/* Duration */}
-                    <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                      {video.duration}
-                    </span>
+                    {/* YouTube badge */}
+                    <div className="absolute top-3 right-3 bg-red-600 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+                      <Youtube className="h-3 w-3" />
+                      <span>YouTube</span>
+                    </div>
                   </button>
 
                   {/* Info */}
-                  <div className="p-6">
-                    <h3 className="font-bold text-gray-900 mb-2 group-hover:text-furgocasa-orange transition-colors">
-                      {video.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-4">{video.description}</p>
-                    
-                    <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />{video.year}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Gauge className="h-4 w-4" />{video.mileage.toLocaleString()} km
-                      </span>
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                      <div className="flex items-center gap-1 text-furgocasa-orange">
-                        <Euro className="h-5 w-5" />
-                        <span className="text-xl font-bold">{video.price.toLocaleString()}</span>
-                      </div>
-                      <Link 
-                        href={`/ventas/${video.slug}`}
-                        className="flex items-center gap-1 text-sm font-medium text-furgocasa-orange hover:underline"
-                      >
-                        Details ansehen<ArrowRight className="h-4 w-4" />
-                      </Link>
-                    </div>
+                  <div className="p-6 text-center">
+                    <p className="text-gray-600 text-sm mb-4">
+                      Klicken Sie hier, um das vollständige Fahrzeugvideo anzusehen
+                    </p>
+                    <button
+                      onClick={() => setSelectedVideo(video.youtubeId)}
+                      className="w-full bg-furgocasa-orange hover:bg-furgocasa-orange/90 text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                    >
+                      <Play className="h-5 w-5" />
+                      Video ansehen
+                    </button>
                   </div>
                 </div>
               ))}
@@ -140,36 +104,22 @@ export default function VideosVentasPage() {
         </section>
 
         {/* Info */}
-        <section className="py-12 bg-white">
+        <section className="py-16 bg-white">
           <div className="container mx-auto px-4 text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Warum Videos?</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto mb-8">
-              Wir möchten, dass Sie jedes Fahrzeug kennenlernen, als hätten Sie es vor sich. In unseren Videos zeigen wir 
-              das Innere, Äußere, die Ausstattung und den tatsächlichen Zustand jedes Wohnmobils zum Verkauf.
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Videos unserer Fahrzeuge zum Verkauf</h2>
+            <p className="text-gray-600 max-w-3xl mx-auto mb-8">
+              Alle unsere Videos sind auf unserem YouTube-Kanal. Klicken Sie auf ein Video, 
+              um es direkt hier anzusehen und jedes Detail des Fahrzeugs kennenzulernen.
             </p>
-            <div className="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="p-4">
-                <div className="w-12 h-12 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Play className="h-6 w-6 text-furgocasa-orange" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-1">Komplette Besichtigung</h3>
-                <p className="text-gray-600 text-sm">Innen und außen ohne Filter</p>
-              </div>
-              <div className="p-4">
-                <div className="w-12 h-12 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Car className="h-6 w-6 text-furgocasa-orange" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-1">Tatsächlicher Zustand</h3>
-                <p className="text-gray-600 text-sm">Wir zeigen jedes Detail</p>
-              </div>
-              <div className="p-4">
-                <div className="w-12 h-12 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Gauge className="h-6 w-6 text-furgocasa-orange" />
-                </div>
-                <h3 className="font-bold text-gray-900 mb-1">Funktionsweise</h3>
-                <p className="text-gray-600 text-sm">Wir testen alle Systeme</p>
-              </div>
-            </div>
+            <a
+              href="https://www.youtube.com/@furgocasa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
+            >
+              <Youtube className="h-5 w-5" />
+              Besuchen Sie unseren YouTube-Kanal
+            </a>
           </div>
         </section>
 
