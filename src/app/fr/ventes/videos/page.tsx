@@ -62,7 +62,7 @@ export default function VideosVentasPage() {
               Visitez notre chaîne YouTube pour voir toutes les vidéos de véhicules disponibles
             </p>
             <a
-              href="https://www.youtube.com/@furgocasa"
+              href="https://www.youtube.com/@furgocasacampervans"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-8 rounded-lg transition-colors"
