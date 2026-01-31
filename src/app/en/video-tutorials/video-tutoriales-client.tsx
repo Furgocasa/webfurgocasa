@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-import { Play, Video, Tag, HelpCircle, ArrowRight, X } from "lucide-react";
+import { Video, ArrowRight } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import { useLanguage } from "@/contexts/language-context";
 
@@ -45,7 +44,6 @@ const videoTutorials = [
 
 export function VideoTutorialesClient() {
   const { t } = useLanguage();
-  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
 
   return (
     <main className="min-h-screen bg-gray-50 font-amiko">
@@ -65,28 +63,21 @@ export function VideoTutorialesClient() {
       {/* Videos Grid */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
             {videoTutorials.map((video, index) => (
-              <div key={index} className="bg-gray-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-                <button
-                  onClick={() => setSelectedVideo(video.youtubeId)}
-                  className="aspect-video bg-gray-200 relative flex items-center justify-center block group w-full"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  <img 
-                    src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
-                    alt={t(video.title)}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none';
-                    }}
+              <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                {/* Reproductor YouTube embebido */}
+                <div className="relative aspect-video">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${video.youtubeId}`}
+                    title={t(video.title)}
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className="w-full h-full"
                   />
-                  <div className="w-16 h-16 bg-furgocasa-orange rounded-full flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform cursor-pointer">
-                    <Play className="h-8 w-8 text-white ml-1" />
-                  </div>
-                </button>
+                </div>
                 <div className="p-6">
-                  <h3 className="font-bold text-gray-900 mb-2">{t(video.title)}</h3>
+                  <h3 className="font-bold text-gray-900 mb-2 text-lg">{t(video.title)}</h3>
                   <p className="text-gray-600 text-sm">{t(video.description)}</p>
                 </div>
               </div>
@@ -108,34 +99,6 @@ export function VideoTutorialesClient() {
           </LocalizedLink>
         </div>
       </section>
-
-      {/* Modal de video */}
-      {selectedVideo && (
-        <div 
-          className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedVideo(null)}
-        >
-          <button
-            onClick={() => setSelectedVideo(null)}
-            className="absolute top-4 right-4 text-white hover:text-furgocasa-orange transition-colors z-10"
-            aria-label="Close video"
-          >
-            <X className="h-8 w-8" />
-          </button>
-          <div 
-            className="w-full max-w-5xl aspect-video"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <iframe
-              src={`https://www.youtube.com/embed/${selectedVideo}?autoplay=1&rel=0`}
-              title="Video tutorial"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full rounded-lg"
-            />
-          </div>
-        </div>
-      )}
     </main>
   );
 }
