@@ -1,10 +1,8 @@
-import Link from"next/link";
-import { Play, Car, ArrowRight, Calendar, Gauge, Euro } from"lucide-react";
+"use client";
 
-export const metadata = {
-  title: "Videos von Wohnmobilen zum Verkauf",
-  description: "Sehen Sie Videos unserer Wohnmobile und Camper zum Verkauf. Komplette Innen- und Außenbesichtigung jedes Fahrzeugs.",
-};
+import { useState } from "react";
+import Link from"next/link";
+import { Play, Car, ArrowRight, Calendar, Gauge, Euro, X } from"lucide-react";
 
 // TODO: Von Supabase/YouTube API laden
 const videos = [
@@ -59,6 +57,8 @@ const videos = [
 ];
 
 export default function VideosVentasPage() {
+  const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+
   return (
     <>
 <main className="min-h-screen bg-gray-50">
@@ -77,11 +77,9 @@ export default function VideosVentasPage() {
               {videos.map((video) => (
                 <div key={video.id} className="bg-white rounded-2xl shadow-sm overflow-hidden group hover:shadow-lg transition-shadow">
                   {/* Video Thumbnail */}
-                  <a 
-                    href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="relative aspect-video bg-gray-200 block"
+                  <button
+                    onClick={() => setSelectedVideo(video.youtubeId)}
+                    className="relative aspect-video bg-gray-200 block w-full"
                   >
                     <img 
                       src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
@@ -104,7 +102,7 @@ export default function VideosVentasPage() {
                     <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
                       {video.duration}
                     </span>
-                  </a>
+                  </button>
 
                   {/* Info */}
                   <div className="p-6">
@@ -190,6 +188,34 @@ export default function VideosVentasPage() {
             </div>
           </div>
         </section>
+
+        {/* Modal de video */}
+        {selectedVideo && (
+          <div 
+            className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedVideo(null)}
+          >
+            <button
+              onClick={() => setSelectedVideo(null)}
+              className="absolute top-4 right-4 text-white hover:text-furgocasa-orange transition-colors z-10"
+              aria-label="Video schließen"
+            >
+              <X className="h-8 w-8" />
+            </button>
+            <div 
+              className="w-full max-w-5xl aspect-video"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <iframe
+                src={`https://www.youtube.com/embed/${selectedVideo}?autoplay=1&rel=0`}
+                title="Fahrzeugvideo"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full rounded-lg"
+              />
+            </div>
+          </div>
+        )}
       </main>
 </>
   );
