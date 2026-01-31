@@ -12,7 +12,7 @@ const videos = [
     id:"1",
     title:"Volkswagen California Ocean T6.1 2021",
     slug:"vw-california-ocean-t61-2021",
-    youtubeId:"dQw4w9WgXcQ", // Placeholder
+    youtubeId:"Rd1YaquF2wg",
     thumbnail: null,
     price: 72000,
     mileage: 45000,
@@ -24,7 +24,7 @@ const videos = [
     id:"2",
     title:"Ford Transit Custom Nugget 2022",
     slug:"ford-transit-nugget-2022",
-    youtubeId:"dQw4w9WgXcQ", // Placeholder
+    youtubeId:"Ccb1PZMPyuA",
     thumbnail: null,
     price: 58000,
     mileage: 28000,
@@ -36,13 +36,25 @@ const videos = [
     id:"3",
     title:"Fiat Ducato Roller Team 284 2020",
     slug:"fiat-ducato-roller-team-284-2020",
-    youtubeId:"dQw4w9WgXcQ", // Placeholder
+    youtubeId:"tOWVLB_1Tok",
     thumbnail: null,
     price: 52000,
     mileage: 62000,
     year: 2020,
     description:"Sehr komplettes teilintegriertes Wohnmobil. Ideal für Familien.",
     duration:"15:20",
+  },
+  {
+    id:"4",
+    title:"Weiteres Fahrzeug zum Verkauf",
+    slug:"otro-vehiculo-venta",
+    youtubeId:"DGJw9IsCx4Q",
+    thumbnail: null,
+    price: 48000,
+    mileage: 35000,
+    year: 2021,
+    description:"Fahrzeug in ausgezeichnetem Zustand mit allen Annehmlichkeiten.",
+    duration:"11:30",
   },
 ];
 
@@ -65,21 +77,34 @@ export default function VideosVentasPage() {
               {videos.map((video) => (
                 <div key={video.id} className="bg-white rounded-2xl shadow-sm overflow-hidden group hover:shadow-lg transition-shadow">
                   {/* Video Thumbnail */}
-                  <div className="relative aspect-video bg-gray-200">
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Car className="h-16 w-16 text-gray-300" />
+                  <a 
+                    href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative aspect-video bg-gray-200 block"
+                  >
+                    <img 
+                      src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                      alt={video.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <Car className="h-16 w-16 text-gray-300 opacity-50" />
                     </div>
                     {/* Play button overlay */}
-                    <button className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="w-16 h-16 bg-furgocasa-orange rounded-full flex items-center justify-center">
                         <Play className="h-8 w-8 text-white ml-1" />
                       </div>
-                    </button>
+                    </div>
                     {/* Duration */}
                     <span className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
                       {video.duration}
                     </span>
-                  </div>
+                  </a>
 
                   {/* Info */}
                   <div className="p-6">

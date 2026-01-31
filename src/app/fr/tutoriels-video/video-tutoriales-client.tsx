@@ -7,37 +7,37 @@ import { useLanguage } from "@/contexts/language-context";
 const videoTutorials = [
   {
     title: "Panneau de Contrôle",
-    youtubeId: "PANEL_CONTROL_ID",
+    youtubeId: "WWvnqr43Fwk",
     description: "Apprenez à utiliser le panneau de contrôle de votre camping-car"
   },
   {
     title: "Réservoirs d'eau",
-    youtubeId: "DEPOSITOS_AGUA_ID",
+    youtubeId: "e0DegVZ55zc",
     description: "Comment fonctionnent les réservoirs d'eau propre et usée"
   },
   {
     title: "Systèmes électriques",
-    youtubeId: "SISTEMAS_ELECTRICOS_ID",
+    youtubeId: "rJxVIT79cD8",
     description: "Tout sur le système électrique du camping-car"
   },
   {
     title: "Chauffage et eau chaude",
-    youtubeId: "CALEFACCION_ID",
+    youtubeId: "uyJFFnIw1C0",
     description: "Utilisation du chauffage et du système d'eau chaude"
   },
   {
     title: "Fenêtres, pare-soleil et moustiquaires",
-    youtubeId: "VENTANAS_ID",
+    youtubeId: "FkIfAw8p-4Y",
     description: "Manipulation des fenêtres, rideaux et moustiquaires"
   },
   {
     title: "Marche extérieure",
-    youtubeId: "ESCALON_ID",
+    youtubeId: "ygsYgQpN3SQ",
     description: "Utilisation correcte de la marche extérieure"
   },
   {
     title: "Réfrigérateur et congélateur",
-    youtubeId: "NEVERA_ID",
+    youtubeId: "LUg-H3uFpb8",
     description: "Fonctionnement du réfrigérateur et congélateur"
   },
 ];
@@ -66,12 +66,25 @@ export function VideoTutorialesClient() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {videoTutorials.map((video, index) => (
               <div key={index} className="bg-gray-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-video bg-gray-200 relative flex items-center justify-center">
+                <a 
+                  href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="aspect-video bg-gray-200 relative flex items-center justify-center block group"
+                >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  <div className="w-16 h-16 bg-furgocasa-orange rounded-full flex items-center justify-center relative z-10 hover:scale-110 transition-transform cursor-pointer">
+                  <img 
+                    src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                    alt={t(video.title)}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  <div className="w-16 h-16 bg-furgocasa-orange rounded-full flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform cursor-pointer">
                     <Play className="h-8 w-8 text-white ml-1" />
                   </div>
-                </div>
+                </a>
                 <div className="p-6">
                   <h3 className="font-bold text-gray-900 mb-2">{t(video.title)}</h3>
                   <p className="text-gray-600 text-sm">{t(video.description)}</p>

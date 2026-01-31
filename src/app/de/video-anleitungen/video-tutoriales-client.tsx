@@ -7,37 +7,37 @@ import { useLanguage } from "@/contexts/language-context";
 const videoTutorials = [
   {
     title: "Bedienfeld",
-    youtubeId: "PANEL_CONTROL_ID",
+    youtubeId: "WWvnqr43Fwk",
     description: "Lernen Sie, das Bedienfeld Ihres Wohnmobils zu benutzen"
   },
   {
     title: "Wassertanks",
-    youtubeId: "DEPOSITOS_AGUA_ID",
+    youtubeId: "e0DegVZ55zc",
     description: "Wie die Frisch- und Abwassertanks funktionieren"
   },
   {
     title: "Elektrische Systeme",
-    youtubeId: "SISTEMAS_ELECTRICOS_ID",
+    youtubeId: "rJxVIT79cD8",
     description: "Alles über das elektrische System des Wohnmobils"
   },
   {
     title: "Heizung und Warmwasser",
-    youtubeId: "CALEFACCION_ID",
+    youtubeId: "uyJFFnIw1C0",
     description: "Nutzung der Heizung und des Warmwassersystems"
   },
   {
     title: "Fenster, Sonnenschutz und Moskitonetze",
-    youtubeId: "VENTANAS_ID",
+    youtubeId: "FkIfAw8p-4Y",
     description: "Bedienung von Fenstern, Vorhängen und Moskitonetzen"
   },
   {
     title: "Außenstufe",
-    youtubeId: "ESCALON_ID",
+    youtubeId: "ygsYgQpN3SQ",
     description: "Richtige Verwendung der Außenstufe"
   },
   {
     title: "Kühlschrank und Gefrierfach",
-    youtubeId: "NEVERA_ID",
+    youtubeId: "LUg-H3uFpb8",
     description: "Funktionsweise von Kühlschrank und Gefrierfach"
   },
 ];
@@ -66,12 +66,25 @@ export function VideoTutorialesClient() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {videoTutorials.map((video, index) => (
               <div key={index} className="bg-gray-50 rounded-2xl overflow-hidden hover:shadow-lg transition-shadow">
-                <div className="aspect-video bg-gray-200 relative flex items-center justify-center">
+                <a 
+                  href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="aspect-video bg-gray-200 relative flex items-center justify-center block group"
+                >
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                  <div className="w-16 h-16 bg-furgocasa-orange rounded-full flex items-center justify-center relative z-10 hover:scale-110 transition-transform cursor-pointer">
+                  <img 
+                    src={`https://img.youtube.com/vi/${video.youtubeId}/maxresdefault.jpg`}
+                    alt={t(video.title)}
+                    className="absolute inset-0 w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                  <div className="w-16 h-16 bg-furgocasa-orange rounded-full flex items-center justify-center relative z-10 group-hover:scale-110 transition-transform cursor-pointer">
                     <Play className="h-8 w-8 text-white ml-1" />
                   </div>
-                </div>
+                </a>
                 <div className="p-6">
                   <h3 className="font-bold text-gray-900 mb-2">{t(video.title)}</h3>
                   <p className="text-gray-600 text-sm">{t(video.description)}</p>
