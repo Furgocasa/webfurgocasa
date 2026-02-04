@@ -497,7 +497,7 @@ function NuevaReservaContent() {
                   {/* Name */}
                   <div>
                     <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                      {t("Nombre completo")} *
+                      {t("First and last(s) name")} *
                     </label>
                     <input
                       type="text"
@@ -506,7 +506,7 @@ function NuevaReservaContent() {
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
-                      placeholder={t("Tu nombre completo")}
+                      placeholder={t("First and last(s) name")}
                     />
                   </div>
 
