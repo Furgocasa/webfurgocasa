@@ -1160,6 +1160,7 @@ export default function SearchAnalyticsPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <SortableTableHeader label="Semana" sortKey="week_start" currentSort={sortedDemand.sortConfig} onSort={sortedDemand.requestSort} />
+                  <SortableTableHeader label="Año" sortKey="week_start" currentSort={sortedDemand.sortConfig} onSort={sortedDemand.requestSort} />
                   <SortableTableHeader label="Búsquedas" sortKey="search_count" currentSort={sortedDemand.sortConfig} onSort={sortedDemand.requestSort} />
                   <SortableTableHeader label="Ocupación" sortKey="occupancy_rate" currentSort={sortedDemand.sortConfig} onSort={sortedDemand.requestSort} />
                   <SortableTableHeader label="Disponible" sortKey="availability_rate" currentSort={sortedDemand.sortConfig} onSort={sortedDemand.requestSort} />
@@ -1169,7 +1170,9 @@ export default function SearchAnalyticsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {sortedDemand.items.map((week) => (
+                {sortedDemand.items.map((week) => {
+                  const weekYear = new Date(week.week_start).getFullYear();
+                  return (
                   <tr 
                     key={week.week_start} 
                     className={`hover:bg-gray-50 ${
@@ -1188,6 +1191,11 @@ export default function SearchAnalyticsPage() {
                           {week.unique_date_ranges} rangos únicos
                         </div>
                       </div>
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className="inline-flex items-center justify-center px-3 py-1 rounded-lg text-sm font-bold bg-gray-100 text-gray-900 border border-gray-300">
+                        {weekYear}
+                      </span>
                     </td>
                     <td className="px-4 py-3">
                       <span className="inline-flex px-2 py-1 rounded-full text-sm font-semibold bg-blue-100 text-blue-800">
@@ -1245,7 +1253,8 @@ export default function SearchAnalyticsPage() {
                       {week.recommendation}
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
 
