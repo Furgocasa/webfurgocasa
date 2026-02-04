@@ -97,3 +97,51 @@ docs/06-archivos-temporales/*.json
 # Archivos históricos (scripts y SQL ya ejecutados - no necesarios en git)
 scripts/historicos/
 supabase/historicos/
+
+# Scripts temporales y de mantenimiento (un solo uso)
+scripts/*verificar*.js
+scripts/*diagnostico*.js
+scripts/*publicar*.js
+scripts/*redistribuir*.js
+scripts/*check*.js
+scripts/*inspect*.js
+scripts/traducir-*.js
+scripts/update-*.js
+scripts/generar-*.js
+scripts/analizar-*.js
+scripts/listar-*.js
+scripts/obtener-*.js
+scripts/*.json
+scripts/*.csv
+
+# SQL de fixes temporales y setup redundante (excepto migrations)
+supabase/fix-*.sql
+supabase/auto-update-*.sql
+supabase/cleanup-*.sql
+supabase/check-*.sql
+supabase/prevent-*.sql
+supabase/resolve-*.sql
+supabase/remove-*.sql
+supabase/verificar-*.sql
+supabase/temporadas-*.sql
+supabase/search-queries-*.sql
+supabase/plantilla-*.sql
+supabase/setup-blog-storage.sql
+
+# Documentos de fixes/implementaciones temporales (en raíz - deben ir a docs/)
+FIX-*.md
+SOLUCION-*.md
+AUDITORIA-*.md
+IMPLEMENTACION-*.md
+ELIMINACION-*.md
+DIAGNOSTICO-*.md
+MIGRACION-*.md
+OPTIMIZACION-*.md
+REFACTORIZACION-*.md
+SKELETON-*.md
+VALIDACION-*.md
+VERIFICACION-*.md
+VERIFICAR-*.md
+RESUMEN-*.md
+BLOQUEO-*.md
+ANALISIS-*.md
