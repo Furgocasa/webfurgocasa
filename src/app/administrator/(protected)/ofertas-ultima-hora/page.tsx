@@ -120,6 +120,10 @@ export default function OfertasUltimaHoraPage() {
   // Estado para confirmar borrado
   const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null);
 
+  // Estado para ordenamiento de tabla
+  const [sortField, setSortField] = useState<'internal_code' | 'vehicle_name' | 'start_date' | 'end_date' | 'duration' | 'discount' | 'price'>('start_date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+
   useEffect(() => {
     loadOffers();
     loadLocations();
@@ -466,6 +470,59 @@ export default function OfertasUltimaHoraPage() {
     ? offers 
     : offers.filter(o => o.status === filterStatus);
 
+  // Función para ordenar ofertas
+  const sortedOffers = [...filteredOffers].sort((a, b) => {
+    let aValue: any;
+    let bValue: any;
+
+    switch (sortField) {
+      case 'internal_code':
+        aValue = a.vehicle?.internal_code || '';
+        bValue = b.vehicle?.internal_code || '';
+        break;
+      case 'vehicle_name':
+        aValue = a.vehicle?.name || '';
+        bValue = b.vehicle?.name || '';
+        break;
+      case 'start_date':
+        aValue = new Date(a.offer_start_date).getTime();
+        bValue = new Date(b.offer_start_date).getTime();
+        break;
+      case 'end_date':
+        aValue = new Date(a.offer_end_date).getTime();
+        bValue = new Date(b.offer_end_date).getTime();
+        break;
+      case 'duration':
+        aValue = a.offer_days;
+        bValue = b.offer_days;
+        break;
+      case 'discount':
+        aValue = a.discount_percentage;
+        bValue = b.discount_percentage;
+        break;
+      case 'price':
+        aValue = a.final_price_per_day;
+        bValue = b.final_price_per_day;
+        break;
+      default:
+        return 0;
+    }
+
+    if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+    if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  // Función para cambiar el orden
+  const handleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
   // Estadísticas
   const stats = {
     published: offers.filter(o => o.status === 'published').length,
@@ -799,89 +856,202 @@ export default function OfertasUltimaHoraPage() {
             <p>No hay ofertas {filterStatus !== 'all' ? `con estado "${filterStatus}"` : ''}</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {filteredOffers.map((offer) => (
-              <div key={offer.id} className="p-4 hover:bg-gray-50">
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Truck className="h-5 w-5 text-furgocasa-blue" />
-                      <span className="font-medium text-gray-900">
-                        {offer.vehicle?.name || 'Vehículo'}
-                      </span>
-                      {offer.vehicle?.internal_code && (
-                        <span className="text-xs text-gray-500">({offer.vehicle.internal_code})</span>
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-200">
+                <tr>
+                  <th 
+                    onClick={() => handleSort('internal_code')}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      Código
+                      {sortField === 'internal_code' && (
+                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
                       )}
-                      {getStatusBadge(offer.status)}
                     </div>
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        {formatDate(offer.offer_start_date)} - {formatDate(offer.offer_end_date)}
+                  </th>
+                  <th 
+                    onClick={() => handleSort('vehicle_name')}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      Vehículo
+                      {sortField === 'vehicle_name' && (
+                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('start_date')}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      Fecha Inicio
+                      {sortField === 'start_date' && (
+                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('end_date')}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      Fecha Fin
+                      {sortField === 'end_date' && (
+                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('duration')}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      Duración
+                      {sortField === 'duration' && (
+                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('discount')}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      Descuento
+                      {sortField === 'discount' && (
+                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </div>
+                  </th>
+                  <th 
+                    onClick={() => handleSort('price')}
+                    className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center gap-1">
+                      Precio/día
+                      {sortField === 'price' && (
+                        sortDirection === 'asc' ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />
+                      )}
+                    </div>
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Estado
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Acciones
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-100">
+                {sortedOffers.map((offer) => (
+                  <tr key={offer.id} className="hover:bg-gray-50 transition-colors">
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <span className="text-sm font-mono text-gray-900">
+                        {offer.vehicle?.internal_code || '-'}
                       </span>
-                      <span className="flex items-center gap-1">
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <Truck className="h-4 w-4 text-furgocasa-blue flex-shrink-0" />
+                        <span className="text-sm font-medium text-gray-900">
+                          {offer.vehicle?.name || 'Vehículo'}
+                        </span>
+                      </div>
+                      {offer.admin_notes && (
+                        <p className="text-xs text-gray-400 mt-1 italic truncate max-w-xs" title={offer.admin_notes}>
+                          {offer.admin_notes}
+                        </p>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-sm text-gray-900">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        {formatDate(offer.offer_start_date)}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-sm text-gray-900">
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                        {formatDate(offer.offer_end_date)}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-sm font-medium text-furgocasa-orange">
                         <Clock className="h-4 w-4" />
                         {offer.offer_days} días
-                      </span>
-                      <span className="flex items-center gap-1 text-green-600 font-medium">
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex items-center gap-1 text-sm font-semibold text-green-600">
                         <TrendingDown className="h-4 w-4" />
                         -{offer.discount_percentage}%
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Euro className="h-4 w-4" />
-                        <span className="line-through text-gray-400">{formatPrice(offer.original_price_per_day)}</span>
-                        <span className="text-green-600 font-medium">{formatPrice(offer.final_price_per_day)}/día</span>
-                      </span>
-                    </div>
-                    {offer.admin_notes && (
-                      <p className="text-xs text-gray-400 mt-1 italic">{offer.admin_notes}</p>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {/* Editar */}
-                    {(offer.status === 'published' || offer.status === 'detected') && (
-                      <button
-                        onClick={() => openEditOffer(offer)}
-                        className="px-3 py-1.5 text-sm text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
-                        title="Editar oferta"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </button>
-                    )}
-                    
-                    {/* Ocultar/Expirar */}
-                    {offer.status === 'published' && (
-                      <button
-                        onClick={() => updateOfferStatus(offer.id, 'expired')}
-                        className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                        title="Marcar como expirada (ocultar)"
-                      >
-                        <EyeOff className="h-4 w-4" />
-                      </button>
-                    )}
-                    
-                    {/* Publicar si está ignorada */}
-                    {offer.status === 'ignored' && (
-                      <button
-                        onClick={() => updateOfferStatus(offer.id, 'published')}
-                        className="px-3 py-1.5 text-sm text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
-                      >
-                        Publicar
-                      </button>
-                    )}
-                    
-                    {/* Borrar */}
-                    <button
-                      onClick={() => setDeletingOfferId(offer.id)}
-                      className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Eliminar oferta"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <div className="flex flex-col gap-1">
+                        <span className="text-xs text-gray-400 line-through">
+                          {formatPrice(offer.original_price_per_day)}
+                        </span>
+                        <span className="text-sm font-bold text-green-600">
+                          {formatPrice(offer.final_price_per_day)}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {getStatusBadge(offer.status)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        {/* Editar */}
+                        {(offer.status === 'published' || offer.status === 'detected') && (
+                          <button
+                            onClick={() => openEditOffer(offer)}
+                            className="p-2 text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Editar oferta"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {/* Ocultar/Expirar */}
+                        {offer.status === 'published' && (
+                          <button
+                            onClick={() => updateOfferStatus(offer.id, 'expired')}
+                            className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Marcar como expirada (ocultar)"
+                          >
+                            <EyeOff className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {/* Publicar si está ignorada */}
+                        {offer.status === 'ignored' && (
+                          <button
+                            onClick={() => updateOfferStatus(offer.id, 'published')}
+                            className="p-2 text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors text-xs font-medium"
+                            title="Publicar oferta"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {/* Borrar */}
+                        <button
+                          onClick={() => setDeletingOfferId(offer.id)}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Eliminar oferta"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>
