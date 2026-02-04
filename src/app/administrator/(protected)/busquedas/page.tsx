@@ -185,6 +185,11 @@ function formatDate(dateString: string): string {
   return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
 }
 
+function formatDateWithYear(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
 // Hook personalizado para ordenación de tablas
 function useSortableData<T>(items: T[] | undefined, config?: { key: keyof T; direction: 'asc' | 'desc' }) {
   const [sortConfig, setSortConfig] = useState<{ key: keyof T; direction: 'asc' | 'desc' } | null>(config || null);
@@ -849,10 +854,10 @@ export default function SearchAnalyticsPage() {
                 {sortedDates.items.map((date, index) => (
                   <tr key={index} className="hover:bg-gray-50">
                     <td className="px-4 py-3 text-sm text-gray-900">
-                      {formatDate(date.pickup_date)}
+                      {formatDateWithYear(date.pickup_date)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-900">
-                      {formatDate(date.dropoff_date)}
+                      {formatDateWithYear(date.dropoff_date)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {date.rental_days}
