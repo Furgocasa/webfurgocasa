@@ -47,6 +47,12 @@ Documentación de desarrollo por área:
 ### 03-mantenimiento/
 Historial de correcciones y mejoras:
 
+#### 🔒 Seguridad (NUEVO - Febrero 2026)
+- **AUDITORIA-SEGURIDAD-2026.md** - Auditoría completa de seguridad
+- **ATAQUES-EXTERNOS-AMENAZAS.md** - Análisis de amenazas externas
+- **CORRECCIONES-SEGURAS-SIN-AFECTAR.md** - Estrategia de correcciones no invasivas
+- **GUIA-CAMBIAR-TOKEN-CALENDARIO.md** - Guía paso a paso para cambiar tokens
+
 #### fixes/
 - Correcciones críticas aplicadas
 - Resolución de errores específicos
@@ -144,6 +150,10 @@ Estos documentos contienen reglas absolutas que NUNCA deben violarse:
    - Flujo secuencial de reservas
    - NUNCA eliminar pasos del flujo
 
+4. **[03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md](./03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md)** ⚠️ **NUEVO**
+   - Auditoría completa de seguridad
+   - Vulnerabilidades críticas identificadas y corregidas
+
 ---
 
 ## 🚀 Quick Start
@@ -168,5 +178,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 25 de Enero, 2026
+Última actualización: 5 de Febrero, 2026
 Versión del proyecto: 4.4.0

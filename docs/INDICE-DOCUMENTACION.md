@@ -2,7 +2,7 @@
 
 **Versión**: 1.0.15 ✅ PRODUCCIÓN - PÁGINAS SEO MARRUECOS MULTIIDIOMA  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 25 de Enero, 2026
+**Última actualización**: 5 de Febrero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
 
@@ -212,6 +212,8 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 |-----------|-------------|-------------|
 | **[README.md](./README.md)** | Punto de entrada principal, arquitectura completa | **SIEMPRE PRIMERO** |
 | **[CHANGELOG.md](./CHANGELOG.md)** | Historial versiones, **v1.0.11 FIX ERROR 500** | Al debuggear o deployar |
+| **[AUDITORIA-SEGURIDAD-2026.md](./03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md)** | 🔒 **NUEVO** - Auditoría completa de seguridad | Antes de deployar cambios críticos |
+| **[ATAQUES-EXTERNOS-AMENAZAS.md](./03-mantenimiento/ATAQUES-EXTERNOS-AMENAZAS.md)** | 🔒 **NUEVO** - Análisis de amenazas externas | Para entender riesgos de seguridad |
 | **[FIX-ERROR-500-VEHICULOS.md](./FIX-ERROR-500-VEHICULOS.md)** | 🔴 **FIX CRÍTICO** - Error 500 páginas vehículos | Si falla `/vehiculos/[slug]` o `/ventas/[slug]` |
 | **[REGLAS-ARQUITECTURA-NEXTJS.md](./REGLAS-ARQUITECTURA-NEXTJS.md)** | ⚠️ **INCLUYE REGLAS DE SUPABASE CLIENT** | Antes de tocar CUALQUIER código |
 | **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** | ⚠️ **REGLAS OBLIGATORIAS** - Queries a Supabase | ANTES de hacer ANY query |
@@ -227,14 +229,23 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 
 ## 📖 DOCUMENTACIÓN POR ÁREA
 
-### 🔐 **Autenticación y Sistema de Datos (CRÍTICO - NUEVO)**
+### 🔐 **Autenticación y Sistema de Datos (CRÍTICO)**
 
 | Documento | Descripción |
 |-----------|-------------|
 | **[CHANGELOG.md](./CHANGELOG.md)** | Fix crítico sistema autenticación v1.0.4 (ver sección v1.0.4) |
 | **[CONFIGURACION-META-PIXEL.md](./CONFIGURACION-META-PIXEL.md)** | Configuración Meta Pixel con carga condicional |
-| **[CONFIGURACION-GOOGLE-ANALYTICS.md](./CONFIGURACION-GOOGLE-ANALYTICS.md)** | ⚠️ **NUEVO** - Configuración Google Analytics (G-G5YLBN5XXZ) con exclusión de páginas admin |
+| **[CONFIGURACION-GOOGLE-ANALYTICS.md](./CONFIGURACION-GOOGLE-ANALYTICS.md)** | Configuración Google Analytics (G-G5YLBN5XXZ) con exclusión de páginas admin |
 | **README.md** | Sección "Sistema de Autenticación - CÓMO FUNCIONA" |
+
+### 🔒 **Seguridad (NUEVO - Febrero 2026)**
+
+| Documento | Descripción |
+|-----------|-------------|
+| **[AUDITORIA-SEGURIDAD-2026.md](./03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md)** | ⚠️ **NUEVO** - Auditoría completa de seguridad con vulnerabilidades identificadas |
+| **[ATAQUES-EXTERNOS-AMENAZAS.md](./03-mantenimiento/ATAQUES-EXTERNOS-AMENAZAS.md)** | ⚠️ **NUEVO** - Análisis detallado de amenazas externas y vectores de ataque |
+| **[CORRECCIONES-SEGURAS-SIN-AFECTAR.md](./03-mantenimiento/CORRECCIONES-SEGURAS-SIN-AFECTAR.md)** | ⚠️ **NUEVO** - Estrategia de correcciones de seguridad sin afectar funcionalidad |
+| **[GUIA-CAMBIAR-TOKEN-CALENDARIO.md](./03-mantenimiento/GUIA-CAMBIAR-TOKEN-CALENDARIO.md)** | ⚠️ **NUEVO** - Guía paso a paso para cambiar tokens de calendario en Vercel |
 
 ### 🌍 Internacionalización (i18n)
 
@@ -530,6 +541,9 @@ Ver carpeta `scripts/`:
 | ¿Cómo se calculan los días de alquiler? | `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO** |
 | ¿Por qué cobran día completo si excedo 1 minuto? | `REGLA-CALCULO-DIAS-ALQUILER.md` ⚠️ **CRÍTICO** |
 | ¿Cómo instalar el panel de admin como PWA? | `PWA-ADMIN-GUIA.md` ⚠️ **NUEVO** |
+| ¿Qué vulnerabilidades de seguridad se encontraron? | `AUDITORIA-SEGURIDAD-2026.md` ⚠️ **NUEVO** |
+| ¿Qué amenazas externas existen? | `ATAQUES-EXTERNOS-AMENAZAS.md` ⚠️ **NUEVO** |
+| ¿Cómo cambiar el token del calendario? | `GUIA-CAMBIAR-TOKEN-CALENDARIO.md` ⚠️ **NUEVO** |
 
 ---
 
@@ -589,7 +603,7 @@ Estos documentos ya NO existen (fueron eliminados):
 
 ---
 
-**Total de documentos activos**: 31 archivos .md en raíz + subdirectorios  
-**Última actualización crítica**: Páginas Motorhome Europa Multiidioma (25 Enero 2026)  
-**Última actualización anterior**: Fix Búsqueda y CSP Google Analytics (22 Enero 2026)  
+**Total de documentos activos**: 35 archivos .md en raíz + subdirectorios  
+**Última actualización crítica**: Auditoría de Seguridad (5 Febrero 2026)  
+**Última actualización anterior**: Páginas Motorhome Europa Multiidioma (25 Enero 2026)  
 **Última limpieza de obsoletos**: 20 Enero 2026

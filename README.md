@@ -17,7 +17,33 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 27 de Enero 2026 - **Fix Language Switcher Blog + Analytics**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 5 de Febrero 2026 - **Auditoría de Seguridad Completa**
+
+### 🔒 Auditoría de Seguridad y Correcciones Implementadas
+
+**Estado**: ✅ Completada y desplegada  
+**Documentación**: [`docs/03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md`](./docs/03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md)
+
+Se ha realizado una auditoría completa de seguridad identificando y corrigiendo vulnerabilidades críticas:
+
+**Vulnerabilidades Corregidas:**
+- ✅ **Logs sensibles eliminados** - Información sensible solo en desarrollo
+- ✅ **Errores genéricos en producción** - Sin exposición de detalles internos
+- ✅ **Token hardcodeado eliminado** - Token de calendario ahora desde variables de entorno
+- ✅ **Datos admin minimizados** - Solo se expone `isAdmin` boolean
+- ✅ **Validación de montos** - Monitoreo de discrepancias en pagos
+
+**Documentación de Seguridad:**
+- 📖 **[AUDITORIA-SEGURIDAD-2026.md](./docs/03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md)** - Auditoría completa
+- 📖 **[ATAQUES-EXTERNOS-AMENAZAS.md](./docs/03-mantenimiento/ATAQUES-EXTERNOS-AMENAZAS.md)** - Análisis de amenazas
+- 📖 **[CORRECCIONES-SEGURAS-SIN-AFECTAR.md](./docs/03-mantenimiento/CORRECCIONES-SEGURAS-SIN-AFECTAR.md)** - Estrategia de correcciones
+- 📖 **[GUIA-CAMBIAR-TOKEN-CALENDARIO.md](./docs/03-mantenimiento/GUIA-CAMBIAR-TOKEN-CALENDARIO.md)** - Guía de tokens
+
+**Commit**: `7ad02ce` - fix(security): auditoría de seguridad - eliminar exposición de datos sensibles
+
+---
+
+## ⚡ [ACTUALIZACIÓN ANTERIOR] - 27 de Enero 2026 - **Fix Language Switcher Blog + Analytics**
 
 ### 🌐 Language Switcher con Slugs Traducidos del Blog
 
@@ -1794,6 +1820,7 @@ NEXT_PUBLIC_GA_ID (opcional)
 
 | Documento | Importancia | Cuándo Leer |
 |-----------|-------------|-------------|
+| **AUDITORIA-SEGURIDAD-2026.md** | 🔒 **NUEVO** - CRÍTICO | Antes de deployar cambios críticos |
 | **REGLAS-ARQUITECTURA-NEXTJS.md** | 🔴 CRÍTICO | Antes de modificar CUALQUIER página |
 | **GUIA-TRADUCCION.md** | 🔴 CRÍTICO | Antes de añadir textos traducibles |
 | **REGLAS-SUPABASE-OBLIGATORIAS.md** | 🔴 CRÍTICO | Antes de hacer queries |
@@ -2100,7 +2127,7 @@ Desarrollado con ❤️ para Furgocasa
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 25 de Enero 2026 (Google Analytics + Admin Títulos)  
+**Última actualización**: 5 de Febrero 2026 (Auditoría de Seguridad)  
 
 ---
 
