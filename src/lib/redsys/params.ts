@@ -116,27 +116,34 @@ export function getRedsysConfig(): RedsysConfig {
   // Soportar tanto NEXT_PUBLIC_URL como NEXT_PUBLIC_APP_URL
   const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   
-  // 🔍 LOG: Verificar variables de entorno (sin revelar datos sensibles completos)
-  console.log("🔧 [CONFIG] Variables de entorno Redsys:");
-  console.log("🔧 [CONFIG] REDSYS_MERCHANT_CODE:", merchantCode);
-  console.log("🔧 [CONFIG] REDSYS_TERMINAL:", terminal);
-  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY presente:", !!secretKey);
-  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY longitud:", secretKey.length);
-  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY primeros 4 chars:", secretKey.slice(0, 4) + "...");
-  console.log("🔧 [CONFIG] REDSYS_SECRET_KEY últimos 4 chars:", "..." + secretKey.slice(-4));
-  console.log("🔧 [CONFIG] REDSYS_ENVIRONMENT:", process.env.REDSYS_ENVIRONMENT);
-  console.log("🔧 [CONFIG] Base URL:", baseUrl);
-  
-  // Verificar que la clave secreta sea válida para 3DES (debe decodificarse a 24 bytes)
-  try {
-    const keyBuffer = Buffer.from(secretKey, "base64");
-    console.log("🔧 [CONFIG] Secret key decoded bytes:", keyBuffer.length);
-    if (keyBuffer.length !== 24) {
-      console.error("❌ [CONFIG] ERROR: La clave secreta debe decodificarse a 24 bytes para 3DES!");
-      console.error("❌ [CONFIG] Bytes actuales:", keyBuffer.length);
+  // 🔍 LOG: Verificar variables de entorno (SOLO en desarrollo, sin revelar datos sensibles)
+  if (process.env.NODE_ENV === 'development') {
+    console.log("🔧 [CONFIG] Variables de entorno Redsys:");
+    console.log("🔧 [CONFIG] REDSYS_MERCHANT_CODE:", merchantCode);
+    console.log("🔧 [CONFIG] REDSYS_TERMINAL:", terminal);
+    console.log("🔧 [CONFIG] REDSYS_SECRET_KEY configurado:", !!secretKey);
+    console.log("🔧 [CONFIG] REDSYS_ENVIRONMENT:", process.env.REDSYS_ENVIRONMENT);
+    console.log("🔧 [CONFIG] Base URL:", baseUrl);
+    
+    // Verificar que la clave secreta sea válida para 3DES (debe decodificarse a 24 bytes)
+    try {
+      const keyBuffer = Buffer.from(secretKey, "base64");
+      console.log("🔧 [CONFIG] Secret key decoded bytes:", keyBuffer.length);
+      if (keyBuffer.length !== 24) {
+        console.error("❌ [CONFIG] ERROR: La clave secreta debe decodificarse a 24 bytes para 3DES!");
+        console.error("❌ [CONFIG] Bytes actuales:", keyBuffer.length);
+      }
+    } catch (e) {
+      console.error("❌ [CONFIG] ERROR decodificando secret key:", e);
     }
-  } catch (e) {
-    console.error("❌ [CONFIG] ERROR decodificando secret key:", e);
+  } else {
+    // En producción: Solo loggear que está configurado (sin detalles sensibles)
+    console.log("🔧 [CONFIG] Redsys configurado:", {
+      hasMerchantCode: !!merchantCode,
+      hasTerminal: !!terminal,
+      hasSecretKey: !!secretKey,
+      environment: process.env.REDSYS_ENVIRONMENT || 'unknown'
+    });
   }
   
   return {

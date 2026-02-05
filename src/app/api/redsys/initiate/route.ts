@@ -27,15 +27,27 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { bookingId, amount, paymentType = "full" } = body;
 
-    // 🔍 LOG: Verificar datos recibidos
-    console.log("📥 [1/8] Datos recibidos en el request:", {
-      bookingId,
-      amount,
-      amountType: typeof amount,
-      amountValue: amount,
-      paymentType,
-      timestamp: new Date().toISOString(),
-    });
+    // 🔍 LOG: Verificar datos recibidos (sin información sensible)
+    if (process.env.NODE_ENV === 'development') {
+      console.log("📥 [1/8] Datos recibidos en el request:", {
+        bookingId,
+        amount,
+        amountType: typeof amount,
+        amountValue: amount,
+        paymentType,
+        timestamp: new Date().toISOString(),
+      });
+    } else {
+      // En producción: Solo loggear tipos y referencias
+      console.log("📥 [1/8] Request recibido:", {
+        hasBookingId: !!bookingId,
+        hasAmount: !!amount,
+        amountType: typeof amount,
+        paymentType,
+        timestamp: new Date().toISOString(),
+        // NO loggear: bookingId completo, amount exacto (información sensible)
+      });
+    }
 
     // Validaciones
     if (!bookingId) {
@@ -86,12 +98,42 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    console.log("✅ [2/8] Reserva encontrada:", {
-      bookingNumber: booking.booking_number,
-      customerEmail: booking.customer_email,
-      vehicleName: booking.vehicle?.name,
-      totalPrice: booking.total_price,
-    });
+    // ✅ SEGURIDAD: Validar que el monto coincide con la reserva (solo loggear por ahora)
+    const expectedAmount = booking.total_price - (booking.amount_paid || 0);
+    const tolerance = 0.01; // 1 céntimo de tolerancia
+    
+    if (Math.abs(amount - expectedAmount) > tolerance) {
+      console.warn("⚠️ [SEGURIDAD] Monto no coincide con reserva:", {
+        bookingId: bookingId.substring(0, 8) + "...",
+        bookingNumber: booking.booking_number,
+        expectedAmount,
+        receivedAmount: amount,
+        difference: Math.abs(amount - expectedAmount),
+        // Por ahora solo loggear - después de verificar que funciona, activar bloqueo
+      });
+      // TODO: Después de monitorear, activar bloqueo:
+      // return NextResponse.json(
+      //   { error: "El monto no coincide con la reserva" },
+      //   { status: 400 }
+      // );
+    }
+    
+    // ✅ SEGURIDAD: No loggear información sensible en producción
+    if (process.env.NODE_ENV === 'development') {
+      console.log("✅ [2/8] Reserva encontrada:", {
+        bookingNumber: booking.booking_number,
+        customerEmail: booking.customer_email,
+        vehicleName: booking.vehicle?.name,
+        totalPrice: booking.total_price,
+      });
+    } else {
+      // En producción: Solo loggear referencia (no datos sensibles)
+      console.log("✅ [2/8] Reserva encontrada:", {
+        bookingNumber: booking.booking_number,
+        vehicleName: booking.vehicle?.name,
+        // NO loggear: customerEmail, totalPrice (información sensible)
+      });
+    }
 
     // Generar número de pedido único para Redsys
     // IMPORTANTE: Sin prefijo - solo números para cumplir con Redsys
@@ -251,22 +293,31 @@ export async function POST(request: NextRequest) {
     });
 
     if (paymentError) {
-      console.error("❌ ERROR creando registro de pago:", paymentError);
-      console.error("❌ Código de error:", paymentError.code);
-      console.error("❌ Mensaje:", paymentError.message);
-      console.error("❌ Detalles:", paymentError.details);
-      console.error("❌ Hint:", paymentError.hint);
-      console.error("❌ JSON completo:", JSON.stringify(paymentError, null, 2));
+      // ✅ SEGURIDAD: Loggear detalles solo en desarrollo
+      if (process.env.NODE_ENV === 'development') {
+        console.error("❌ ERROR creando registro de pago:", paymentError);
+        console.error("❌ Código de error:", paymentError.code);
+        console.error("❌ Mensaje:", paymentError.message);
+        console.error("❌ Detalles:", paymentError.details);
+        console.error("❌ Hint:", paymentError.hint);
+        console.error("❌ JSON completo:", JSON.stringify(paymentError, null, 2));
+      } else {
+        // En producción: Solo loggear que hubo error (sin detalles sensibles)
+        console.error("❌ ERROR creando registro de pago (bookingId:", bookingId.substring(0, 8) + "...)");
+      }
       
-      // Devolver error más descriptivo
-      return NextResponse.json(
-        { 
-          error: "Error al procesar el pago",
-          details: paymentError.message,
-          code: paymentError.code
-        },
-        { status: 500 }
-      );
+      // ✅ SEGURIDAD: Error genérico en producción, detallado en desarrollo
+      const errorResponse = process.env.NODE_ENV === 'development'
+        ? {
+            error: "Error al procesar el pago",
+            details: paymentError.message,
+            code: paymentError.code
+          }
+        : {
+            error: "Error al procesar el pago"
+          };
+      
+      return NextResponse.json(errorResponse, { status: 500 });
     }
     console.log("✅ [6/8] Registro de pago creado en BD");
 

@@ -504,7 +504,16 @@ export default function CalendarioPage() {
 
   // Función para copiar URL de suscripción al calendario
   const copyCalendarUrl = () => {
-    const token = process.env.NEXT_PUBLIC_CALENDAR_TOKEN || 'furgocasa2026';
+    // ✅ SEGURIDAD: Usar variable de entorno (ya configurada en Vercel)
+    // Nota: NEXT_PUBLIC_ está expuesta al cliente, pero es necesaria para generar la URL
+    // El token real se valida en el servidor con CALENDAR_SUBSCRIPTION_TOKEN
+    const token = process.env.NEXT_PUBLIC_CALENDAR_TOKEN;
+    
+    if (!token) {
+      alert('Error: Token de calendario no configurado. Contacta al administrador.');
+      return;
+    }
+    
     const url = `${window.location.origin}/api/calendar/entregas?token=${token}`;
     
     navigator.clipboard.writeText(url).then(() => {
@@ -1365,7 +1374,7 @@ export default function CalendarioPage() {
                   <input
                     type="text"
                     readOnly
-                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/calendar/entregas?token=${process.env.NEXT_PUBLIC_CALENDAR_TOKEN || 'furgocasa2026'}`}
+                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/calendar/entregas?token=${process.env.NEXT_PUBLIC_CALENDAR_TOKEN || '[Token no configurado]'}`}
                     className="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono text-gray-700"
                   />
                   <button

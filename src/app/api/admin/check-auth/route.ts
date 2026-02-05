@@ -21,9 +21,10 @@ export async function GET() {
       .eq("is_active", true)
       .single();
 
+    // ✅ SEGURIDAD: Solo retornar si es admin, no datos completos
     return NextResponse.json({ 
-      isAdmin: !!admin,
-      adminData: admin || null 
+      isAdmin: !!admin
+      // NO exponer adminData completo (información sensible)
     });
   } catch (error) {
     console.error("Error checking admin auth:", error);

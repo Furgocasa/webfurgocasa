@@ -10,7 +10,13 @@ export async function handleCalendarRequest(request: NextRequest): Promise<NextR
   try {
     // 1. Verificar token de autenticación
     const token = request.nextUrl.searchParams.get('token');
-    const validToken = process.env.CALENDAR_SUBSCRIPTION_TOKEN || 'furgocasa2026';
+    // ✅ SEGURIDAD: Usar variable de entorno (ya configurada en Vercel)
+    const validToken = process.env.CALENDAR_SUBSCRIPTION_TOKEN;
+    
+    if (!validToken) {
+      console.error('[Calendar API] CALENDAR_SUBSCRIPTION_TOKEN no configurado');
+      return new NextResponse('Error de configuración del servidor', { status: 500 });
+    }
     
     if (!token || token !== validToken) {
       return new NextResponse('Unauthorized - Token inválido', { status: 401 });
