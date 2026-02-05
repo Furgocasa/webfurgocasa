@@ -92,6 +92,9 @@ export default function CalendarioPage() {
   const [sortField, setSortField] = useState<'internal_code' | 'name'>('internal_code');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
+  // Estado para filtro de búsqueda por código
+  const [searchCode, setSearchCode] = useState('');
+
   // Estado para modal de suscripción al calendario
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
@@ -328,28 +331,42 @@ export default function CalendarioPage() {
     );
   };
 
-  // Ordenar vehículos
-  const sortedVehicles = (vehicles || []).sort((a, b) => {
-    let aValue: string;
-    let bValue: string;
+  // Filtrar y ordenar vehículos
+  const filteredAndSortedVehicles = (vehicles || [])
+    // Primero filtrar por código de búsqueda
+    .filter(vehicle => {
+      if (!searchCode.trim()) return true; // Si no hay búsqueda, mostrar todos
+      
+      const search = searchCode.toLowerCase().trim();
+      const code = (vehicle.internal_code || '').toLowerCase();
+      const name = vehicle.name.toLowerCase();
+      const brand = (vehicle.brand || '').toLowerCase();
+      
+      // Buscar en código, nombre o marca
+      return code.includes(search) || name.includes(search) || brand.includes(search);
+    })
+    // Después ordenar
+    .sort((a, b) => {
+      let aValue: string;
+      let bValue: string;
 
-    if (sortField === 'internal_code') {
-      aValue = a.internal_code || '';
-      bValue = b.internal_code || '';
-    } else {
-      aValue = a.name;
-      bValue = b.name;
-    }
+      if (sortField === 'internal_code') {
+        aValue = a.internal_code || '';
+        bValue = b.internal_code || '';
+      } else {
+        aValue = a.name;
+        bValue = b.name;
+      }
 
-    aValue = aValue.toLowerCase();
-    bValue = bValue.toLowerCase();
+      aValue = aValue.toLowerCase();
+      bValue = bValue.toLowerCase();
 
-    if (sortDirection === 'asc') {
-      return aValue > bValue ? 1 : -1;
-    } else {
-      return aValue < bValue ? 1 : -1;
-    }
-  });
+      if (sortDirection === 'asc') {
+        return aValue > bValue ? 1 : -1;
+      } else {
+        return aValue < bValue ? 1 : -1;
+      }
+    });
 
   const previousPeriod = () => {
     setStartDate(new Date(startDate.getFullYear(), startDate.getMonth() - monthsToShow));
@@ -572,6 +589,40 @@ export default function CalendarioPage() {
             </select>
           </div>
 
+          {/* Filtro por código de vehículo */}
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <label htmlFor="search-code" className="text-sm font-medium text-gray-700 whitespace-nowrap">
+              Filtrar:
+            </label>
+            <div className="relative flex-1 sm:flex-none sm:min-w-[300px]">
+              <input
+                id="search-code"
+                type="text"
+                value={searchCode}
+                onChange={(e) => setSearchCode(e.target.value)}
+                placeholder="Buscar por código, nombre o marca..."
+                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+              <Car className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              {searchCode && (
+                <button
+                  onClick={() => setSearchCode('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Limpiar filtro"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
+            </div>
+            {searchCode && (
+              <span className="text-xs text-gray-500 whitespace-nowrap">
+                {filteredAndSortedVehicles.length} de {(vehicles || []).length} vehículos
+              </span>
+            )}
+          </div>
+
           {/* Navigation - Apilado en móvil */}
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
             {/* Botones de navegación */}
@@ -624,6 +675,17 @@ export default function CalendarioPage() {
             <div className="p-12 text-center">
               <Car className="h-12 w-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500">No hay vehículos disponibles para alquiler</p>
+            </div>
+          ) : filteredAndSortedVehicles.length === 0 ? (
+            <div className="p-12 text-center">
+              <Car className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500">No se encontraron vehículos con el filtro "{searchCode}"</p>
+              <button
+                onClick={() => setSearchCode('')}
+                className="mt-4 px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Limpiar filtro
+              </button>
             </div>
           ) : (
             // Cada mes con su propio scroll horizontal independiente
@@ -690,7 +752,7 @@ export default function CalendarioPage() {
                         </div>
 
                         {/* Filas de vehículos */}
-                        {sortedVehicles.map((vehicle) => {
+                        {filteredAndSortedVehicles.map((vehicle) => {
                           const vehicleBookings = getBookingsForVehicle(vehicle.id);
 
                           return (
