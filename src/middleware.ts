@@ -52,11 +52,24 @@ function getClientIP(request: NextRequest): string {
 }
 
 // Configuración de rate limits por ruta
+// ✅ SEGURIDAD: Límites MUY generosos para no afectar uso normal
+// Un usuario normal nunca alcanzará estos límites
 const RATE_LIMITS: Record<string, { limit: number; window: number }> = {
+  // Rutas existentes (sin cambios)
   '/api/customers': { limit: 10, window: 60 },
   '/api/bookings/create': { limit: 10, window: 60 },
   '/api/availability': { limit: 60, window: 60 },
   '/api/admin/check-auth': { limit: 30, window: 60 },
+  
+  // ✅ NUEVAS: Rutas de pago (límites muy generosos - solo protege contra abusos masivos)
+  '/api/redsys/initiate': { limit: 30, window: 60 },       // 30 pagos/minuto (muy generoso)
+  '/api/redsys/notification': { limit: 200, window: 60 },  // 200 webhooks/minuto (Redsys puede reintentar)
+  '/api/stripe/initiate': { limit: 30, window: 60 },       // 30 pagos/minuto
+  '/api/stripe/webhook': { limit: 200, window: 60 },       // 200 webhooks/minuto
+  
+  // ✅ NUEVAS: Otras APIs públicas (límites generosos)
+  '/api/coupons/validate': { limit: 60, window: 60 },      // 60 validaciones/minuto
+  '/api/search-tracking': { limit: 120, window: 60 },      // 120 trackings/minuto
 };
 
 // ============================================

@@ -18,6 +18,33 @@ export async function POST(request: NextRequest) {
   console.log("📨 REDSYS NOTIFICATION - RECIBIENDO NOTIFICACIÓN DE REDSYS");
   console.log("=".repeat(80));
   
+  // ✅ SEGURIDAD: Monitoreo de IP origen (SOLO LOGGEAR, no bloquear)
+  // Esto NO afecta funcionalidad - solo registra para análisis posterior
+  const clientIP = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() 
+    || request.headers.get('x-real-ip') 
+    || 'unknown';
+  
+  // IPs conocidas de Redsys (para monitoreo, NO para bloqueo)
+  // Nota: Estas IPs son de referencia, Redsys puede usar otras
+  const REDSYS_KNOWN_IPS = [
+    '195.76.9.',    // Rango de Redsys
+    '212.140.33.',  // Otro rango posible
+  ];
+  
+  const isKnownIP = REDSYS_KNOWN_IPS.some(prefix => clientIP.startsWith(prefix));
+  
+  // Solo loggear para monitoreo - NO bloquear nunca
+  if (!isKnownIP && clientIP !== 'unknown') {
+    console.warn('⚠️ [SEGURIDAD-MONITOREO] Webhook desde IP no en lista conocida:', {
+      ip: clientIP,
+      timestamp: new Date().toISOString(),
+      // NOTA: Esto es solo monitoreo. NO bloqueamos porque:
+      // 1. Redsys puede usar IPs adicionales
+      // 2. La firma criptográfica ya valida autenticidad
+      // 3. No queremos afectar pagos legítimos
+    });
+  }
+  
   try {
     // Redsys envía datos como form-urlencoded
     const formData = await request.formData();
