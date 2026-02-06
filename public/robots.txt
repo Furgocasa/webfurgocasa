@@ -1,0 +1,81 @@
+# Robots.txt - Furgocasa
+# Archivo de respaldo estático del robots.txt dinámico (src/app/robots.ts)
+
+User-agent: *
+Allow: /
+
+# Bloquear recursos técnicos
+Disallow: /_next/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /administrator/
+
+# Bloquear páginas de pago (todos los idiomas)
+Disallow: /es/pago/
+Disallow: /en/payment/
+Disallow: /fr/paiement/
+Disallow: /de/zahlung/
+
+# Bloquear páginas de reserva internas
+Disallow: /es/reservar/nueva
+Disallow: /es/reservar/vehiculo
+Disallow: /es/reservar/oferta/
+Disallow: /en/book/new
+Disallow: /en/book/vehicle
+Disallow: /en/book/oferta/
+Disallow: /fr/reserver/nouvelle
+Disallow: /fr/reserver/vehicule
+Disallow: /fr/reserver/oferta/
+Disallow: /de/buchen/neu
+Disallow: /de/buchen/fahrzeug
+Disallow: /de/buchen/oferta/
+
+# Bloquear páginas con datos privados
+Disallow: /es/reservar/*/pago
+Disallow: /es/reservar/*/confirmacion
+Disallow: /en/book/*/payment
+Disallow: /en/book/*/confirmation
+Disallow: /fr/reserver/*/paiement
+Disallow: /fr/reserver/*/confirmation
+Disallow: /de/buchen/*/zahlung
+Disallow: /de/buchen/*/bestaetigung
+
+# Bloquear páginas de búsqueda
+Disallow: /es/buscar
+Disallow: /en/search
+Disallow: /fr/recherche
+Disallow: /de/suche
+
+# Bloquear páginas legales
+Disallow: /es/aviso-legal
+Disallow: /es/privacidad
+Disallow: /es/cookies
+Disallow: /en/legal-notice
+Disallow: /en/privacy
+Disallow: /en/cookies
+Disallow: /fr/mentions-legales
+Disallow: /fr/confidentialite
+Disallow: /fr/cookies
+Disallow: /de/impressum
+Disallow: /de/datenschutz
+Disallow: /de/cookies
+
+# Bloquear páginas internas
+Disallow: /es/escalabilidad/
+Disallow: /preview/
+Disallow: /draft/
+
+# Configuración específica para Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /_next/
+Disallow: /api/
+Disallow: /admin/
+Disallow: /administrator/
+Crawl-delay: 0
+
+# Sitemap único con todas las URLs y hreflang alternates
+Sitemap: https://www.furgocasa.com/sitemap.xml
+
+# Host canónico
+Host: https://www.furgocasa.com
