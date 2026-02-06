@@ -542,18 +542,18 @@ export function TarifasClient() {
               ))}
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Servicio Cancelación */}
-              <div className="bg-blue-600 text-white rounded-3xl p-10 relative overflow-hidden">
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              {/* Assurance Annulation */}
+              <div className="bg-blue-600 text-white rounded-3xl p-8 relative overflow-hidden">
                 <div className="absolute top-0 right-0 opacity-10 transform translate-x-1/3 -translate-y-1/3">
                   <Shield className="w-64 h-64" />
                 </div>
                 <div className="relative z-10">
-                  <h4 className="font-heading font-bold text-2xl mb-4 flex items-center gap-3">
-                    <Shield className="h-8 w-8 text-blue-300" />
+                  <h4 className="font-heading font-bold text-xl mb-3 flex items-center gap-3">
+                    <Shield className="h-6 w-6 text-blue-300" />
                     {t("Seguro de Cancelación")}
                   </h4>
-                  <p className="text-blue-100 text-lg leading-relaxed mb-6">
+                  <p className="text-blue-100 text-base leading-relaxed mb-4">
                     {t("Por 5€/día (contratado al reservar), se limita el coste de cancelación en el periodo de 59 a 16 días a dicho importe.")}
                   </p>
                   <p className="text-xs text-blue-300 font-medium uppercase tracking-wide">
@@ -562,27 +562,38 @@ export function TarifasClient() {
                 </div>
               </div>
 
-              {/* Derecho de desistimiento */}
-              <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100">
-                <h3 className="font-heading font-bold text-xl text-gray-900 mb-4 flex items-center gap-2">
+              {/* Droit de rétractation */}
+              <div className="bg-white rounded-3xl p-8 shadow-lg border border-gray-100">
+                <h3 className="font-heading font-bold text-xl text-gray-900 mb-3 flex items-center gap-2">
                   <FileText className="h-6 w-6 text-furgocasa-orange" />
                   {t("Derecho de desistimiento")}
                 </h3>
-                <p className="text-gray-600 mb-8 leading-relaxed">
+                <p className="text-gray-600 mb-6 leading-relaxed text-sm">
                   {t("El cliente dispone de 14 días naturales del derecho a desistir del contrato de alquiler sin necesidad de justificación y sin penalización alguna.")}
                 </p>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-700">14</div>
-                    <p className="text-sm text-gray-600">{t("Días desde envío de contrato/factura")}</p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center font-bold text-green-700 text-sm">14</div>
+                    <p className="text-xs text-gray-600">{t("Días desde envío de contrato/factura")}</p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center font-bold text-red-700">7</div>
-                    <p className="text-sm text-gray-600">{t("Días antes del viaje (límite)")}</p>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center font-bold text-red-700 text-sm">7</div>
+                    <p className="text-xs text-gray-600">{t("Días antes del viaje (límite)")}</p>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Remboursement par virement */}
+            <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-6">
+              <h4 className="font-heading font-bold text-lg text-orange-900 mb-3 flex items-center gap-2">
+                <RefreshCw className="h-5 w-5 text-orange-600" />
+                {t("Devolución por transferencia")}
+              </h4>
+              <p className="text-orange-800 text-sm leading-relaxed">
+                {t("En el caso de que las devoluciones, que siempre se realizarán por transferencia, conlleven alguna comisión de gestión de la transferencia, este coste será siempre asumido por el cliente, de manera que Furgocasa devolverá el importe abonado descontando dicha comisión.")}
+              </p>
             </div>
           </div>
         </div>

@@ -59,9 +59,9 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
       filtered = filtered.filter(v => v.beds === parseInt(bedsFilter));
     }
 
-    // Filtrar por transmisión
+    // Filtrar por transmisión (case-insensitive para manejar inconsistencias en datos)
     if (transmissionFilter !== "all") {
-      filtered = filtered.filter(v => v.transmission === transmissionFilter);
+      filtered = filtered.filter(v => v.transmission?.toLowerCase() === transmissionFilter);
     }
 
     // Ordenar

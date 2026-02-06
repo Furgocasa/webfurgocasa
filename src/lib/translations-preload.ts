@@ -2096,6 +2096,18 @@ export const staticTranslations = {
     fr: "Le client dispose de 14 jours calendaires pour se retirer du contrat de location sans justification et sans penalite.",
     de: "Der Kunde hat 14 Kalendertage das Recht, vom Mietvertrag ohne Begrundung und ohne Strafe zuruckzutreten."
   },
+  "Devolución por transferencia": {
+    es: "Devolución por transferencia",
+    en: "Refund by bank transfer",
+    fr: "Remboursement par virement",
+    de: "Rückerstattung per Überweisung"
+  },
+  "En el caso de que las devoluciones, que siempre se realizarán por transferencia, conlleven alguna comisión de gestión de la transferencia, este coste será siempre asumido por el cliente, de manera que Furgocasa devolverá el importe abonado descontando dicha comisión.": {
+    es: "En el caso de que las devoluciones, que siempre se realizarán por transferencia, conlleven alguna comisión de gestión de la transferencia, este coste será siempre asumido por el cliente, de manera que Furgocasa devolverá el importe abonado descontando dicha comisión.",
+    en: "In the event that refunds, which will always be made by bank transfer, incur any transfer management fees, this cost will always be borne by the customer, so that Furgocasa will refund the amount paid minus said fee.",
+    fr: "Dans le cas où les remboursements, qui seront toujours effectués par virement bancaire, entraînent des frais de gestion de virement, ce coût sera toujours supporté par le client, de sorte que Furgocasa remboursera le montant payé en déduisant ces frais.",
+    de: "Falls bei Rückerstattungen, die immer per Banküberweisung erfolgen, Überweisungsgebühren anfallen, werden diese Kosten stets vom Kunden getragen, sodass Furgocasa den gezahlten Betrag abzüglich dieser Gebühr erstattet."
+  },
   "El plazo de desistimiento expira a los 14 días naturales del envío de la factura y contrato por parte de FURGOCASA.": {
     es: "El plazo de desistimiento expira a los 14 días naturales del envío de la factura y contrato por parte de FURGOCASA.",
     en: "The withdrawal period expires 14 calendar days after the invoice and contract are sent by FURGOCASA.",
