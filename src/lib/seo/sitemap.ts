@@ -190,8 +190,6 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/ventas', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/tarifas', priority: 0.8, changeFrequency: 'monthly' },
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
-    { path: '/alquiler-motorhome-europa-desde-espana', priority: 0.9, changeFrequency: 'monthly' },
-    { path: '/alquiler-motorhome-marruecos-desde-espana', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/como-funciona', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
@@ -206,8 +204,10 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/como-reservar-fin-semana', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/inteligencia-artificial', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/video-tutoriales', priority: 0.5, changeFrequency: 'monthly' },
+    { path: '/aviso-legal', priority: 0.3, changeFrequency: 'yearly' },
+    { path: '/privacidad', priority: 0.3, changeFrequency: 'yearly' },
+    { path: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
     { path: '/sitemap-html', priority: 0.2, changeFrequency: 'monthly' },
-    // NOTA: Páginas legales (/aviso-legal, /privacidad, /cookies) excluidas del sitemap - tienen noindex
   ];
 
   staticPages.forEach((page) => {
@@ -280,20 +280,18 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     });
   });
 
-  // Páginas de localización - Alquiler (formato: /alquiler-autocaravanas-campervans/{slug})
   locationList.forEach((location) => {
     entries.push({
-      path: `/alquiler-autocaravanas-campervans/${location.slug}`,
+      path: `/alquiler-autocaravanas-campervans-${location.slug}`,
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,
     });
   });
 
-  // Páginas de localización - Venta (formato: /venta-autocaravanas-camper/{slug})
   saleLocationList.forEach((location) => {
     entries.push({
-      path: `/venta-autocaravanas-camper/${location.slug}`,
+      path: `/venta-autocaravanas-camper-${location.slug}`,
       priority: 0.7,
       changeFrequency: 'weekly',
       lastModified: location.updated_at || now,
