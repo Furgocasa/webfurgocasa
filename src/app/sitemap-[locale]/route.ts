@@ -30,9 +30,11 @@ export async function generateStaticParams() {
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { locale: string } }
+  { params }: { params: Promise<{ locale: string }> | { locale: string } }
 ) {
-  const locale = params.locale;
+  // En Next.js 15, params puede ser una Promise
+  const resolvedParams = await Promise.resolve(params);
+  const locale = resolvedParams.locale;
 
   // Validar idioma
   if (!isValidLocale(locale)) {
