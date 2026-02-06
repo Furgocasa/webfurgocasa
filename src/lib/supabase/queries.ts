@@ -369,9 +369,11 @@ export async function getDashboardStats() {
   // ===== CÁLCULOS =====
   
   // Vehículos disponibles (considerando reservas activas HOY)
+  // IMPORTANTE: Usar EXACTAMENTE la misma lógica que el calendario
+  // El calendario solo filtra por: status !== 'cancelled' y rango de fechas
+  // NO considera payment_status para determinar disponibilidad
   const activeBookings = bookingsData?.filter(b => 
     b.status !== 'cancelled' && 
-    (b.payment_status === 'partial' || b.payment_status === 'paid') &&
     b.pickup_date <= todayStr &&
     b.dropoff_date >= todayStr
   ) || [];
