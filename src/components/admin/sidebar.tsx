@@ -40,6 +40,7 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/administrator", icon: LayoutDashboard },
+  { name: "Informes", href: "/administrator/informes", icon: BarChart3 },
   { name: "Vehículos", href: "/administrator/vehiculos", icon: Car },
   { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
   { name: "Reservas", href: "/administrator/reservas", icon: Calendar },
@@ -65,7 +66,6 @@ const navigation: NavItem[] = [
     ],
   },
   { name: "Media", href: "/administrator/media", icon: ImageIcon },
-  { name: "Informes", href: "/administrator/informes", icon: BarChart3 },
   { name: "Configuración", href: "/administrator/configuracion", icon: Settings },
 ];
 
