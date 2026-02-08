@@ -269,54 +269,30 @@ export default function NuevoBloqueoPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Motivo
+                  Motivo o descripción
                 </label>
-                <select
+                <textarea
                   value={formData.reason}
                   onChange={(e) => handleInputChange('reason', e.target.value)}
+                  rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                >
-                  <option value="">Selecciona un motivo (opcional)</option>
-                  {REASON_OPTIONS.map(option => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  placeholder="Ej: Taller - Fallo motor, Uso propio - Viaje familiar, ITV anual, etc."
+                />
               </div>
 
-              {formData.reason === 'Otro' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Especifica el motivo
-                  </label>
-                  <textarea
-                    value={formData.reason === 'Otro' ? '' : formData.reason}
-                    onChange={(e) => handleInputChange('reason', e.target.value)}
-                    rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                    placeholder="Describe el motivo del bloqueo..."
-                  />
-                </div>
-              )}
-
-              {formData.reason && formData.reason !== 'Otro' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Notas adicionales (opcional)
-                  </label>
-                  <textarea
-                    onChange={(e) => {
-                      const baseReason = REASON_OPTIONS.find(opt => opt.value === formData.reason)?.value || formData.reason;
-                      const notes = e.target.value ? ` - ${e.target.value}` : '';
-                      handleInputChange('reason', baseReason + notes);
-                    }}
-                    rows={2}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                    placeholder="Añade detalles adicionales si es necesario..."
-                  />
-                </div>
-              )}
+              <div className="flex flex-wrap gap-2">
+                <p className="text-sm text-gray-600 w-full mb-1">Razones rápidas (click para usar):</p>
+                {REASON_OPTIONS.map(option => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => handleInputChange('reason', option.value)}
+                    className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-full hover:bg-furgocasa-orange hover:text-white transition-colors"
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>

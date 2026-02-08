@@ -764,5 +764,28 @@ CREATE POLICY "Clientes ven sus reservas" ON bookings
     );
 
 -- ============================================
+-- POLÍTICAS PARA blocked_dates
+-- ============================================
+CREATE POLICY "Admins pueden ver bloqueos" ON blocked_dates 
+    FOR SELECT USING (
+        auth.uid() IN (SELECT user_id FROM admins)
+    );
+
+CREATE POLICY "Admins pueden crear bloqueos" ON blocked_dates 
+    FOR INSERT WITH CHECK (
+        auth.uid() IN (SELECT user_id FROM admins)
+    );
+
+CREATE POLICY "Admins pueden actualizar bloqueos" ON blocked_dates 
+    FOR UPDATE USING (
+        auth.uid() IN (SELECT user_id FROM admins)
+    );
+
+CREATE POLICY "Admins pueden eliminar bloqueos" ON blocked_dates 
+    FOR DELETE USING (
+        auth.uid() IN (SELECT user_id FROM admins)
+    );
+
+-- ============================================
 -- FIN DEL ESQUEMA
 -- ============================================
