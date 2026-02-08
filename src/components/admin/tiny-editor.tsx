@@ -20,16 +20,16 @@ export function TinyEditor({
 }: TinyEditorProps) {
   const editorRef = useRef<any>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
-  const [imageCallback, setImageCallback] = useState<((url: string) => void) | null>(null);
+  const imageCallbackRef = useRef<((url: string) => void) | null>(null);
 
   // API key de TinyMCE
   const apiKey = process.env.NEXT_PUBLIC_TINYMCE_API_KEY || "di2vd063kukhcz9eqysedg5eyh1hd3q6u7hphgp35035i3hs";
 
   // Manejar selección de imagen desde el modal
   const handleImageSelected = (imageUrl: string) => {
-    if (imageCallback) {
-      imageCallback(imageUrl);
-      setImageCallback(null);
+    if (imageCallbackRef.current) {
+      imageCallbackRef.current(imageUrl);
+      imageCallbackRef.current = null;
     }
     setShowImageSelector(false);
   };
@@ -134,7 +134,7 @@ export function TinyEditor({
             // Solo para imágenes
             if (meta.filetype === 'image') {
               // Guardar el callback para usarlo cuando se seleccione la imagen
-              setImageCallback(() => callback);
+              imageCallbackRef.current = callback;
               // Abrir el modal de selección de imágenes
               setShowImageSelector(true);
             }
@@ -217,7 +217,7 @@ export function TinyEditor({
         isOpen={showImageSelector}
         onClose={() => {
           setShowImageSelector(false);
-          setImageCallback(null);
+          imageCallbackRef.current = null;
         }}
         onSelect={handleImageSelected}
         suggestedFolder="blog-content"
