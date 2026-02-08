@@ -65,6 +65,7 @@ export async function GET() {
     const results: OfferAvailability[] = await Promise.all(
       offers.map(async (offer) => {
         // Consultar reservas confirmadas que se solapen con las fechas de la oferta
+        // Una reserva se solapa si: pickup <= offer_end AND dropoff >= offer_start
         const { data: bookings, error: bookingsError } = await supabase
           .from('bookings')
           .select(`
@@ -75,7 +76,8 @@ export async function GET() {
           `)
           .eq('vehicle_id', offer.vehicle_id)
           .in('status', ['confirmed', 'active', 'completed'])
-          .or(`and(pickup_date.lte.${offer.offer_end_date},dropoff_date.gte.${offer.offer_start_date})`);
+          .lte('pickup_date', offer.offer_end_date)
+          .gte('dropoff_date', offer.offer_start_date);
 
         if (bookingsError) {
           console.error('Error checking bookings:', bookingsError);
@@ -97,7 +99,8 @@ export async function GET() {
           .from('blocked_dates')
           .select('start_date, end_date, reason')
           .eq('vehicle_id', offer.vehicle_id)
-          .or(`and(start_date.lte.${offer.offer_end_date},end_date.gte.${offer.offer_start_date})`);
+          .lte('start_date', offer.offer_end_date)
+          .gte('end_date', offer.offer_start_date);
 
         let reason: string | undefined;
         if (!isAvailable) {
