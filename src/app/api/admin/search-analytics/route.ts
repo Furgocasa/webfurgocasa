@@ -4,6 +4,39 @@ import { createClient } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 /**
+ * Función helper para obtener TODOS los registros de una tabla
+ * superando el límite de 1000 de Supabase mediante paginación
+ */
+async function fetchAllRecords<T>(
+  query: any,
+  pageSize: number = 1000
+): Promise<T[]> {
+  let allRecords: T[] = [];
+  let page = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await query
+      .range(page * pageSize, (page + 1) * pageSize - 1);
+
+    if (error) {
+      console.error("Error en paginación:", error);
+      throw error;
+    }
+
+    if (data && data.length > 0) {
+      allRecords = allRecords.concat(data);
+      hasMore = data.length === pageSize; // Si obtuvimos menos que pageSize, es la última página
+      page++;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  return allRecords;
+}
+
+/**
  * GET /api/admin/search-analytics
  * 
  * Obtiene estadísticas y análisis de búsquedas
@@ -56,68 +89,73 @@ export async function GET(request: NextRequest) {
     // OVERVIEW: KPIs generales
     // ============================================
     if (type === "overview") {
-      const { data: searches, error } = await supabase
-        .from("search_queries")
-        .select("*")
-        .gte("searched_at", dateFrom)
-        .lte("searched_at", dateTo + " 23:59:59");
+      // Obtener TODAS las búsquedas usando paginación para evitar el límite de 1000
+      try {
+        const baseQuery = supabase
+          .from("search_queries")
+          .select("*")
+          .gte("searched_at", dateFrom)
+          .lte("searched_at", dateTo + " 23:59:59");
 
-      if (error) {
+        const searches = await fetchAllRecords<any>(baseQuery);
+
+        const totalSearches = searches?.length || 0;
+        const withAvailability = searches?.filter(s => s.had_availability).length || 0;
+        const vehicleSelections = searches?.filter(s => s.vehicle_selected).length || 0;
+        const bookingsCreated = searches?.filter(s => s.booking_created).length || 0;
+
+        const avgRentalDays = searches?.length 
+          ? searches.reduce((sum, s) => sum + s.rental_days, 0) / searches.length 
+          : 0;
+
+        const avgAdvanceDays = searches?.length 
+          ? searches.reduce((sum, s) => sum + s.advance_days, 0) / searches.length 
+          : 0;
+
+        const avgTimeToSelect = searches?.filter(s => s.time_to_select_seconds)
+          .reduce((sum, s) => sum + (s.time_to_select_seconds || 0), 0) / 
+          (searches?.filter(s => s.time_to_select_seconds).length || 1);
+
+        const avgTimeToBooking = searches?.filter(s => s.time_to_booking_seconds)
+          .reduce((sum, s) => sum + (s.time_to_booking_seconds || 0), 0) / 
+          (searches?.filter(s => s.time_to_booking_seconds).length || 1);
+
+        return NextResponse.json({
+          period: { from: dateFrom, to: dateTo },
+          kpis: {
+            totalSearches,
+            withAvailability,
+            vehicleSelections,
+            bookingsCreated,
+            selectionRate: totalSearches > 0 ? (vehicleSelections / totalSearches * 100).toFixed(2) : 0,
+            bookingRateFromSelection: vehicleSelections > 0 ? (bookingsCreated / vehicleSelections * 100).toFixed(2) : 0,
+            overallConversionRate: totalSearches > 0 ? (bookingsCreated / totalSearches * 100).toFixed(2) : 0,
+            avgRentalDays: avgRentalDays.toFixed(1),
+            avgAdvanceDays: avgAdvanceDays.toFixed(1),
+            avgTimeToSelectSeconds: Math.round(avgTimeToSelect),
+            avgTimeToBookingSeconds: Math.round(avgTimeToBooking),
+          }
+        });
+      } catch (error) {
         console.error("Error obteniendo búsquedas:", error);
         return NextResponse.json(
           { error: "Error al obtener estadísticas" },
           { status: 500 }
         );
       }
-
-      const totalSearches = searches?.length || 0;
-      const withAvailability = searches?.filter(s => s.had_availability).length || 0;
-      const vehicleSelections = searches?.filter(s => s.vehicle_selected).length || 0;
-      const bookingsCreated = searches?.filter(s => s.booking_created).length || 0;
-
-      const avgRentalDays = searches?.length 
-        ? searches.reduce((sum, s) => sum + s.rental_days, 0) / searches.length 
-        : 0;
-
-      const avgAdvanceDays = searches?.length 
-        ? searches.reduce((sum, s) => sum + s.advance_days, 0) / searches.length 
-        : 0;
-
-      const avgTimeToSelect = searches?.filter(s => s.time_to_select_seconds)
-        .reduce((sum, s) => sum + (s.time_to_select_seconds || 0), 0) / 
-        (searches?.filter(s => s.time_to_select_seconds).length || 1);
-
-      const avgTimeToBooking = searches?.filter(s => s.time_to_booking_seconds)
-        .reduce((sum, s) => sum + (s.time_to_booking_seconds || 0), 0) / 
-        (searches?.filter(s => s.time_to_booking_seconds).length || 1);
-
-      return NextResponse.json({
-        period: { from: dateFrom, to: dateTo },
-        kpis: {
-          totalSearches,
-          withAvailability,
-          vehicleSelections,
-          bookingsCreated,
-          selectionRate: totalSearches > 0 ? (vehicleSelections / totalSearches * 100).toFixed(2) : 0,
-          bookingRateFromSelection: vehicleSelections > 0 ? (bookingsCreated / vehicleSelections * 100).toFixed(2) : 0,
-          overallConversionRate: totalSearches > 0 ? (bookingsCreated / totalSearches * 100).toFixed(2) : 0,
-          avgRentalDays: avgRentalDays.toFixed(1),
-          avgAdvanceDays: avgAdvanceDays.toFixed(1),
-          avgTimeToSelectSeconds: Math.round(avgTimeToSelect),
-          avgTimeToBookingSeconds: Math.round(avgTimeToBooking),
-        }
-      });
     }
 
     // ============================================
     // FUNNEL: Datos para visualización de embudo
     // ============================================
     if (type === "funnel") {
-      const { data: searches } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select("funnel_stage, had_availability")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
+
+      const searches = await fetchAllRecords<any>(baseQuery);
 
       const total = searches?.length || 0;
       const withAvailability = searches?.filter(s => s.had_availability).length || 0;
@@ -144,11 +182,13 @@ export async function GET(request: NextRequest) {
     // DATES: Fechas más buscadas
     // ============================================
     if (type === "dates") {
-      const { data: searches } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select("pickup_date, dropoff_date, rental_days, booking_created, season_applied, avg_price_shown")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
+
+      const searches = await fetchAllRecords<any>(baseQuery);
 
       // Agrupar por rango de fechas
       const dateGroups = searches?.reduce((acc: any, s) => {
@@ -187,7 +227,7 @@ export async function GET(request: NextRequest) {
     // VEHICLES: Rendimiento por vehículo
     // ============================================
     if (type === "vehicles") {
-      const { data: vehicleStats } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select(`
           selected_vehicle_id,
@@ -198,6 +238,8 @@ export async function GET(request: NextRequest) {
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59")
         .not("selected_vehicle_id", "is", null);
+
+      const vehicleStats = await fetchAllRecords<any>(baseQuery);
 
       // Agrupar por vehículo
       const vehicleGroups = vehicleStats?.reduce((acc: any, s) => {
@@ -248,12 +290,14 @@ export async function GET(request: NextRequest) {
     // SEASONS: Análisis por temporada
     // ============================================
     if (type === "seasons") {
-      const { data: searches } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select("season_applied, vehicle_selected, booking_created, avg_price_shown")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59")
         .not("season_applied", "is", null);
+
+      const searches = await fetchAllRecords<any>(baseQuery);
 
       const seasonGroups = searches?.reduce((acc: any, s) => {
         const season = s.season_applied || "Sin temporada";
@@ -289,11 +333,13 @@ export async function GET(request: NextRequest) {
     // DURATION: Distribución por duración
     // ============================================
     if (type === "duration") {
-      const { data: searches } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select("rental_days, booking_created")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
+
+      const searches = await fetchAllRecords<any>(baseQuery);
 
       const durationGroups = {
         "1-2 días": { count: 0, bookings: 0 },
@@ -332,11 +378,13 @@ export async function GET(request: NextRequest) {
     // SEARCH-TIMING: Cuándo buscan los clientes
     // ============================================
     if (type === "search-timing") {
-      const { data: timingData } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select("searched_at, had_availability, vehicle_selected, booking_created, advance_days, rental_days")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
+
+      const timingData = await fetchAllRecords<any>(baseQuery);
 
       // Agrupar por fecha de búsqueda
       const dateGroups = timingData?.reduce((acc: any, s) => {
@@ -386,11 +434,13 @@ export async function GET(request: NextRequest) {
     // LOCALE: Distribución por idioma
     // ============================================
     if (type === "locale") {
-      const { data: searches } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select("locale, vehicle_selected, booking_created, had_availability")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
+
+      const searches = await fetchAllRecords<any>(baseQuery);
 
       const localeGroups = searches?.reduce((acc: any, s) => {
         const locale = s.locale || "desconocido";
@@ -434,7 +484,7 @@ export async function GET(request: NextRequest) {
     // LOCATION: Distribución por ubicación (Murcia vs Madrid)
     // ============================================
     if (type === "location") {
-      const { data: searches } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select(`
           pickup_location_id,
@@ -446,6 +496,8 @@ export async function GET(request: NextRequest) {
         `)
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
+
+      const searches = await fetchAllRecords<any>(baseQuery);
 
       // Obtener todas las ubicaciones para hacer el mapeo
       const { data: locations } = await supabase
@@ -511,13 +563,15 @@ export async function GET(request: NextRequest) {
     // ============================================
     if (type === "demand-availability") {
       // 1. Obtener todas las búsquedas agrupadas por semana
-      const { data: searches } = await supabase
+      const baseQuery = supabase
         .from("search_queries")
         .select("pickup_date, dropoff_date, rental_days")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59")
         .gte("pickup_date", dateFrom) // Solo búsquedas para fechas futuras en el rango
         .lte("pickup_date", new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]); // Próximo año
+
+      const searches = await fetchAllRecords<any>(baseQuery);
 
       // 2. Agrupar búsquedas por semana
       const weeklyDemand: Record<string, {
