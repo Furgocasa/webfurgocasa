@@ -298,63 +298,46 @@ export default function ReservaPage() {
           </div>
 
           {/* Action Buttons - Sistema de pagos fraccionados */}
-          {/* Primer pago (50%) - Pendiente */}
-          {booking.status === 'pending' && amountPaid === 0 && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 mb-6">
-              <div className="flex items-start gap-4">
-                <Clock className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-1" />
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900 mb-2">{t("Primer pago (50%)")}</h3>
-                  <p className="text-gray-600 mb-2">
-                    {t("Para confirmar tu reserva, necesitamos el pago del 50% del total.")}
-                  </p>
-                  <div className="bg-white rounded-lg p-4 mb-4">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-700 font-medium">{t("Pago inicial")} (50%):</span>
-                      <span className="text-2xl font-bold text-furgocasa-orange">{formatPrice(firstPayment)}</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-2">
-                      {t("El segundo pago")} ({formatPrice(secondPayment)}) {t("se realizará máximo 15 días antes del inicio del alquiler")}.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingId}/pago?amount=${firstPayment.toFixed(2)}`, language))}
-                    className="bg-furgocasa-orange text-white font-semibold py-3 px-6 rounded-lg hover:bg-orange-600 transition-colors inline-flex items-center gap-2"
-                  >
-                    <CreditCard className="h-5 w-5" />
-                    {t("Pagar")} {formatPrice(firstPayment)} {t("y confirmar")}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Primer pago realizado - Esperando segundo pago */}
-          {booking.status === 'confirmed' && amountPaid >= firstPayment && amountPaid < totalPrice && (
-            <div className={`rounded-2xl p-4 sm:p-6 mb-6 ${secondPaymentDue ? 'bg-red-50 border border-red-200' : 'bg-blue-50 border border-blue-200'}`}>
+          {/* Reserva con pago pendiente (cualquier cantidad) */}
+          {(booking.status === 'pending' || booking.status === 'confirmed') && pendingAmount > 0 && (
+            <div className={`rounded-2xl p-4 sm:p-6 mb-6 ${
+              booking.status === 'pending' && amountPaid === 0 
+                ? 'bg-yellow-50 border border-yellow-200'
+                : secondPaymentDue 
+                  ? 'bg-red-50 border border-red-200' 
+                  : 'bg-blue-50 border border-blue-200'
+            }`}>
               <div className="flex items-start gap-3 sm:gap-4">
-                {secondPaymentDue ? (
+                {booking.status === 'pending' && amountPaid === 0 ? (
+                  <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600 flex-shrink-0 mt-1" />
+                ) : secondPaymentDue ? (
                   <AlertCircle className="h-5 w-5 sm:h-6 sm:w-6 text-red-600 flex-shrink-0 mt-1" />
                 ) : (
                   <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600 flex-shrink-0 mt-1" />
                 )}
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-gray-900 mb-2 text-sm sm:text-base">
-                    {secondPaymentDue ? (
-                      t("⚠️ Segundo pago urgente")
+                    {booking.status === 'pending' && amountPaid === 0 ? (
+                      t("Pago pendiente - Confirma tu reserva")
+                    ) : amountPaid >= firstPayment ? (
+                      secondPaymentDue ? t("⚠️ Pago pendiente urgente") : t("Pago parcial completado ✓")
                     ) : (
-                      t("Primer pago completado ✓")
+                      t("Completa tu pago")
                     )}
                   </h3>
                   <p className="text-gray-600 mb-3 text-sm sm:text-base">
-                    {secondPaymentDue ? (
+                    {booking.status === 'pending' && amountPaid === 0 ? (
+                      t("Para confirmar tu reserva, necesitamos recibir el pago.")
+                    ) : secondPaymentDue ? (
                       <>
-                        <strong className="text-red-700">{t("¡Atención!")}</strong> {t("Faltan")} {daysUntilPickup} {t("días para el inicio del alquiler. El segundo pago debe realizarse como máximo 15 días antes.")}
+                        <strong className="text-red-700">{t("¡Atención!")}</strong> {t("Faltan")} {daysUntilPickup} {t("días para el inicio del alquiler. Completa el pago lo antes posible.")}
+                      </>
+                    ) : amountPaid > 0 ? (
+                      <>
+                        {t("Has pagado")} {formatPrice(amountPaid)}. {t("Puedes completar el pago restante cuando quieras.")}
                       </>
                     ) : (
-                      <>
-                        {t("Has pagado")} {formatPrice(amountPaid)}. {t("Puedes realizar el segundo pago cuando quieras.")}
-                      </>
+                      t("Completa el pago para asegurar tu reserva.")
                     )}
                   </p>
                   <div className="bg-white rounded-lg p-3 sm:p-4 mb-4">
@@ -374,27 +357,34 @@ export default function ReservaPage() {
                     </div>
                   </div>
                   
-                  {/* Botón siempre visible */}
+                  {/* Botón de pago - SIEMPRE visible si hay pendiente */}
                   <button
                     onClick={() => router.push(getTranslatedRoute(`/reservar/${bookingId}/pago?amount=${pendingAmount.toFixed(2)}`, language))}
                     className={`w-full sm:w-auto font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg transition-colors inline-flex items-center justify-center gap-2 text-sm sm:text-base ${
-                      secondPaymentDue 
-                        ? 'bg-red-600 text-white hover:bg-red-700' 
-                        : 'bg-furgocasa-orange text-white hover:bg-orange-600'
+                      booking.status === 'pending' && amountPaid === 0
+                        ? 'bg-yellow-600 text-white hover:bg-yellow-700'
+                        : secondPaymentDue 
+                          ? 'bg-red-600 text-white hover:bg-red-700' 
+                          : 'bg-furgocasa-orange text-white hover:bg-orange-600'
                     }`}
                   >
                     <CreditCard className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
                     <span className="truncate">
-                      {secondPaymentDue ? t("Pagar ahora") : t("Realizar segundo pago")} ({formatPrice(pendingAmount)})
+                      {booking.status === 'pending' && amountPaid === 0 
+                        ? t("Pagar y confirmar reserva")
+                        : secondPaymentDue 
+                          ? t("Pagar ahora") 
+                          : t("Completar pago")
+                      } ({formatPrice(pendingAmount)})
                     </span>
                   </button>
 
-                  {/* Aviso informativo si hay tiempo */}
-                  {!secondPaymentDue && (
+                  {/* Aviso informativo */}
+                  {booking.status === 'confirmed' && !secondPaymentDue && amountPaid > 0 && (
                     <p className="mt-3 text-xs sm:text-sm text-gray-600 flex items-start gap-2">
                       <Clock className="h-4 w-4 flex-shrink-0 mt-0.5" />
                       <span>
-                        {t("Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })})
+                        {t("Recuerda: el pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })})
                       </span>
                     </p>
                   )}
@@ -730,23 +720,23 @@ export default function ReservaPage() {
                   </div>
                 </div>
 
-                {/* Sistema de pagos fraccionados */}
-                {amountPaid < totalPrice && (
+                {/* Sistema de pagos - Mostrar solo si no está pagado completamente */}
+                {pendingAmount > 0 && (
                   <div className="space-y-2 mb-4 pb-4 border-b border-white/20">
                     <div className="flex justify-between text-sm">
-                      <span className="opacity-90">{t("Primer pago")} (50%)</span>
-                      <span className="font-semibold">{formatPrice(firstPayment)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="opacity-90">{t("Segundo pago")} (50%)</span>
-                      <span className="font-semibold">{formatPrice(secondPayment)}</span>
+                      <span className="opacity-90">{t("Total reserva")}:</span>
+                      <span className="font-semibold">{formatPrice(totalPrice)}</span>
                     </div>
                     {amountPaid > 0 && (
-                      <div className="flex justify-between text-sm pt-2 border-t border-white/20">
-                        <span className="opacity-90">{t("Ya pagado")}</span>
+                      <div className="flex justify-between text-sm">
+                        <span className="opacity-90">{t("Ya pagado")}:</span>
                         <span className="font-semibold text-green-300">{formatPrice(amountPaid)} ✓</span>
                       </div>
                     )}
+                    <div className="flex justify-between text-sm pt-2 border-t border-white/20">
+                      <span className="opacity-90 font-medium">{t("Pendiente de pago")}:</span>
+                      <span className="font-bold text-lg">{formatPrice(pendingAmount)}</span>
+                    </div>
                   </div>
                 )}
 
