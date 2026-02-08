@@ -72,7 +72,7 @@ export async function GET() {
             id,
             pickup_date,
             dropoff_date,
-            customer:customers(first_name, last_name)
+            customer:customers(name)
           `)
           .eq('vehicle_id', offer.vehicle_id)
           .in('status', ['confirmed', 'active', 'completed'])
@@ -80,16 +80,14 @@ export async function GET() {
           .gte('dropoff_date', offer.offer_start_date);
 
         if (bookingsError) {
-          console.error('Error checking bookings:', bookingsError);
+          console.error('Error checking bookings for offer', offer.id, ':', bookingsError);
         }
 
         const conflictingBookings = (bookings || []).map(b => ({
           booking_id: b.id,
           pickup_date: b.pickup_date,
           dropoff_date: b.dropoff_date,
-          customer_name: b.customer 
-            ? `${b.customer.first_name} ${b.customer.last_name}` 
-            : 'Cliente desconocido'
+          customer_name: b.customer?.name || 'Cliente desconocido'
         }));
 
         const isAvailable = conflictingBookings.length === 0;
