@@ -28,18 +28,31 @@ export function TinyEditor({
   // Manejar selección de imagen desde el modal
   const handleImageSelected = (imageUrl: string) => {
     console.log('Imagen seleccionada:', imageUrl);
-    if (imageCallbackRef.current) {
-      // Extraer el nombre del archivo para usarlo como alt/title
-      const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'Imagen';
-      console.log('Llamando callback con URL:', imageUrl);
-      // TinyMCE espera: callback(url, { alt, title })
-      imageCallbackRef.current(imageUrl, { 
-        alt: fileName,
-        title: fileName 
-      });
-      imageCallbackRef.current = null;
-    }
+    
+    // Cerrar el modal primero
     setShowImageSelector(false);
+    
+    // Llamar al callback después de un pequeño delay para asegurar que TinyMCE mantenga el contexto
+    setTimeout(() => {
+      if (imageCallbackRef.current) {
+        // Extraer el nombre del archivo para usarlo como alt/title
+        const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'Imagen';
+        console.log('Llamando callback con URL:', imageUrl);
+        
+        try {
+          // TinyMCE espera: callback(url, { alt, title })
+          imageCallbackRef.current(imageUrl, { 
+            alt: fileName,
+            title: fileName 
+          });
+          console.log('✓ Callback ejecutado exitosamente');
+        } catch (error) {
+          console.error('Error al ejecutar callback:', error);
+        }
+        
+        imageCallbackRef.current = null;
+      }
+    }, 100);
   };
 
   return (

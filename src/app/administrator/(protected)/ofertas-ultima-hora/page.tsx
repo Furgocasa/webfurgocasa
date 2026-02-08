@@ -60,7 +60,7 @@ interface LastMinuteOffer {
   original_price_per_day: number;
   discount_percentage: number;
   final_price_per_day: number;
-  status: 'detected' | 'published' | 'reserved' | 'expired' | 'ignored';
+  status: 'detected' | 'published' | 'reserved' | 'expired' | 'ignored' | 'auto_cancelled';
   admin_notes: string | null;
   detected_at: string;
   published_at: string | null;
@@ -490,6 +490,7 @@ export default function OfertasUltimaHoraPage() {
       reserved: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Reservada' },
       expired: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Expirada' },
       ignored: { bg: 'bg-red-100', text: 'text-red-800', label: 'Ignorada' },
+      auto_cancelled: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Auto-cancelada' },
     };
     const badge = badges[status] || badges.detected;
     return (
@@ -561,6 +562,7 @@ export default function OfertasUltimaHoraPage() {
     published: offers.filter(o => o.status === 'published').length,
     reserved: offers.filter(o => o.status === 'reserved').length,
     expired: offers.filter(o => o.status === 'expired').length,
+    auto_cancelled: offers.filter(o => o.status === 'auto_cancelled').length,
     detected: detectedGaps.length,
   };
 
@@ -716,7 +718,7 @@ export default function OfertasUltimaHoraPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
           <div className="flex items-center gap-2 text-yellow-600 mb-1">
             <Search className="h-4 w-4" />
@@ -737,6 +739,13 @@ export default function OfertasUltimaHoraPage() {
             <span className="text-sm font-medium">Reservadas</span>
           </div>
           <p className="text-2xl font-bold text-blue-700">{stats.reserved}</p>
+        </div>
+        <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+          <div className="flex items-center gap-2 text-orange-600 mb-1">
+            <XCircle className="h-4 w-4" />
+            <span className="text-sm font-medium">Auto-canceladas</span>
+          </div>
+          <p className="text-2xl font-bold text-orange-700">{stats.auto_cancelled}</p>
         </div>
         <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
           <div className="flex items-center gap-2 text-gray-600 mb-1">
@@ -989,6 +998,7 @@ export default function OfertasUltimaHoraPage() {
               <option value="published">Publicadas</option>
               <option value="reserved">Reservadas</option>
               <option value="expired">Expiradas</option>
+              <option value="auto_cancelled">Auto-canceladas</option>
               <option value="ignored">Ignoradas</option>
             </select>
             <button

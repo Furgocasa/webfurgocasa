@@ -140,6 +140,32 @@ Dos tipos de cupones:
 5. `05-setup-coupon-rls-policies.sql`
 6. `06-insert-sample-coupons.sql` (cupón INV2026)
 
+### **Sistema de Ofertas de Última Hora**
+
+Detecta huecos entre reservas que no cumplen el mínimo de días y los convierte en ofertas con descuento:
+
+```sql
+-- Características:
+-- - Detección automática de huecos
+-- - Cancelación automática cuando hay reservas solapadas
+-- - Panel admin para gestionar ofertas
+-- - Ofertas visibles en /ofertas
+```
+
+**SQL de instalación** (ejecutar en orden):
+1. `07-create-last-minute-offers-table.sql` - Tabla y estructura
+2. `08-last-minute-offers-rls-functions.sql` - Funciones de detección
+3. `auto-cancel-conflicting-offers.sql` - **Trigger de cancelación automática** ⚡
+
+**Estados de oferta**:
+- `published` - Visible en web
+- `auto_cancelled` - Cancelada automáticamente por reserva solapada
+- `reserved` - Alguien la reservó
+- `expired` - Fecha pasada
+- `ignored` - Admin la descartó
+
+**Ver documentación**: `docs/04-referencia/sistemas/AUTO-CANCELACION-OFERTAS.md`
+
 ## 🔐 Seguridad (RLS)
 
 Row Level Security está habilitado en todas las tablas:
@@ -245,8 +271,8 @@ Para modificar el esquema:
 
 ---
 
-**Última actualización**: Enero 2026  
-**Versión del esquema**: 1.1 (Sistema de Cupones añadido)
+**Última actualización**: Febrero 2026  
+**Versión del esquema**: 1.2 (Sistema de Ofertas de Última Hora añadido)
 
 
 
