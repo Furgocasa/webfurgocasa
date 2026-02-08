@@ -59,15 +59,6 @@ export function TinyEditor({
         apiKey={apiKey}
         onInit={(evt, editor) => {
           editorRef.current = editor;
-
-          // Registrar botón personalizado para insertar imagen desde Supabase
-          editor.ui.registry.addButton('supabaseImage', {
-            icon: 'image',
-            tooltip: 'Insertar imagen desde galería',
-            onAction: () => {
-              setShowImageSelector(true);
-            },
-          });
         }}
         value={value}
         onEditorChange={(content) => onChange(content)}
@@ -103,11 +94,21 @@ export function TinyEditor({
             "alignright alignjustify | bullist numlist outdent indent | " +
             "link supabaseImage media | table | codesample | " +
             "removeformat | fullscreen | help",
-          // Registrar el botón antes de que se renderice la toolbar
+          // Registrar botón y menú personalizados para insertar imagen desde galería Supabase
           setup: (editor: any) => {
+            // Botón en la toolbar
             editor.ui.registry.addButton('supabaseImage', {
               icon: 'image',
               tooltip: 'Insertar imagen desde galería',
+              onAction: () => {
+                setShowImageSelector(true);
+              },
+            });
+
+            // Sobrescribir el ítem "Image..." del menú Insert
+            editor.ui.registry.addMenuItem('image', {
+              icon: 'image',
+              text: 'Image...',
               onAction: () => {
                 setShowImageSelector(true);
               },
