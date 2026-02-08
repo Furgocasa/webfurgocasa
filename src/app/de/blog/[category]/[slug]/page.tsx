@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
-import { getPostBySlug, getRelatedPosts, incrementPostViews, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
+import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
+import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
 import { getCategoryName, getAllPostSlugTranslations } from "@/lib/blog-translations";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
@@ -171,9 +172,6 @@ export default async function LocaleBlogPostPage({
     ? await getRelatedPosts(post.category_id, post.id)
     : [];
 
-  // Incrementar vistas (sin esperar)
-  incrementPostViews(post.id, post.views).catch(console.error);
-
   const categoryName = post.category?.slug 
     ? getCategoryName(post.category.slug, locale)
     : "Blog";
@@ -190,6 +188,7 @@ export default async function LocaleBlogPostPage({
 
   return (
     <>
+      <BlogViewTracker postId={post.id} />
       <BlogRouteDataProvider data={blogRouteData} />
       <BlogPostJsonLd post={post} url={url} />
       <main className="min-h-screen bg-gray-50 font-amiko">

@@ -182,15 +182,6 @@ export const getRelatedPosts = cache(async (categoryId: string, currentPostId: s
   }));
 });
 
-export const incrementPostViews = async (postId: string, currentViews: number) => {
-  const supabase = await createClient();
-  
-  await supabase
-    .from("posts")
-    .update({ views: currentViews + 1 })
-    .eq("id", postId);
-};
-
 // Para generateStaticParams - Sin autenticación para build time
 export const getAllPublishedPostSlugs = cache(async (locale?: 'es' | 'en' | 'fr' | 'de'): Promise<{ category: string; slug: string }[]> => {
   // En build time, usar el cliente público sin cookies
