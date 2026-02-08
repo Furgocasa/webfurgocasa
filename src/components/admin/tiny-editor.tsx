@@ -29,30 +29,42 @@ export function TinyEditor({
   const handleImageSelected = (imageUrl: string) => {
     console.log('Imagen seleccionada:', imageUrl);
     
-    // Cerrar el modal primero
-    setShowImageSelector(false);
+    // Verificar que tenemos el callback antes de proceder
+    if (!imageCallbackRef.current) {
+      console.error('No hay callback disponible');
+      setShowImageSelector(false);
+      return;
+    }
     
-    // Llamar al callback después de un pequeño delay para asegurar que TinyMCE mantenga el contexto
-    setTimeout(() => {
-      if (imageCallbackRef.current) {
-        // Extraer el nombre del archivo para usarlo como alt/title
-        const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'Imagen';
-        console.log('Llamando callback con URL:', imageUrl);
-        
-        try {
-          // TinyMCE espera: callback(url, { alt, title })
-          imageCallbackRef.current(imageUrl, { 
-            alt: fileName,
-            title: fileName 
-          });
-          console.log('✓ Callback ejecutado exitosamente');
-        } catch (error) {
-          console.error('Error al ejecutar callback:', error);
-        }
-        
-        imageCallbackRef.current = null;
-      }
-    }, 100);
+    // Extraer el nombre del archivo para usarlo como alt/title
+    const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'Imagen';
+    console.log('Llamando callback con URL:', imageUrl);
+    
+    // Guardar el callback en una variable local
+    const callback = imageCallbackRef.current;
+    
+    // Limpiar la referencia inmediatamente para evitar llamadas múltiples
+    imageCallbackRef.current = null;
+    
+    try {
+      // Llamar al callback de TinyMCE INMEDIATAMENTE con la URL y metadatos
+      // TinyMCE espera: callback(url, meta) donde meta puede contener alt, title, etc.
+      callback(imageUrl, { 
+        alt: fileName,
+        title: fileName 
+      });
+      
+      console.log('✓ Callback ejecutado exitosamente con URL:', imageUrl);
+      
+      // Cerrar el modal después de ejecutar el callback
+      // Usar un pequeño delay para asegurar que TinyMCE procese la imagen
+      setTimeout(() => {
+        setShowImageSelector(false);
+      }, 50);
+    } catch (error) {
+      console.error('Error al ejecutar callback de TinyMCE:', error);
+      setShowImageSelector(false);
+    }
   };
 
   return (
@@ -154,14 +166,18 @@ export function TinyEditor({
           images_file_types: 'jpg,jpeg,png,gif,webp',
           // Callback personalizado para abrir nuestro selector de imágenes
           file_picker_callback: (callback, value, meta) => {
-            console.log('file_picker_callback llamado', { value, meta });
+            console.log('file_picker_callback llamado', { value, meta, callback });
             // Solo para imágenes
             if (meta.filetype === 'image') {
               // Guardar el callback para usarlo cuando se seleccione la imagen
+              // IMPORTANTE: Guardar una referencia estable al callback
               imageCallbackRef.current = callback;
-              console.log('Abriendo modal selector de imágenes');
+              console.log('Callback guardado, abriendo modal selector de imágenes');
               // Abrir el modal de selección de imágenes
               setShowImageSelector(true);
+            } else {
+              // Si no es imagen, llamar al callback con null para cancelar
+              callback('');
             }
           },
           // Mantener images_upload_handler como fallback para drag & drop
