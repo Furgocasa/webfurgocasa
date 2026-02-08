@@ -100,9 +100,9 @@ function getCategorySlug(category: PostRow["category"]) {
   return category.slug || "general";
 }
 
-function buildLabel(path: string) {
-  if (path === "/") return baseUrl;
-  return `${baseUrl}${path}`;
+function buildLabel(path: string, locale: Locale) {
+  if (path === "/") return `${baseUrl}/${locale}`;
+  return `${baseUrl}/${locale}${path}`;
 }
 
 export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
@@ -191,7 +191,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                       href={page.path}
                       className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                     >
-                      {buildLabel(page.path)}
+                      {buildLabel(page.path, locale)}
                     </LocalizedLink>
                     <span className="text-gray-400 text-sm ml-2">
                       {page.label}
@@ -238,7 +238,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                         href={path}
                         className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                       >
-                        {buildLabel(path)}
+                        {buildLabel(path, locale)}
                       </LocalizedLink>
                       {post.title && (
                         <span className="text-gray-400 text-sm ml-2">
@@ -264,7 +264,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                         href={path}
                         className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                       >
-                        {buildLabel(path)}
+                        {buildLabel(path, locale)}
                       </LocalizedLink>
                       {vehicle.name && (
                         <span className="text-gray-400 text-sm ml-2">
@@ -290,7 +290,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                         href={path}
                         className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                       >
-                        {buildLabel(path)}
+                        {buildLabel(path, locale)}
                       </LocalizedLink>
                       {vehicle.name && (
                         <span className="text-gray-400 text-sm ml-2">
@@ -316,7 +316,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                         href={path}
                         className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                       >
-                        {buildLabel(path)}
+                        {buildLabel(path, locale)}
                       </LocalizedLink>
                       {location.name && (
                         <span className="text-gray-400 text-sm ml-2">
@@ -342,7 +342,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                         href={path}
                         className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                       >
-                        {buildLabel(path)}
+                        {buildLabel(path, locale)}
                       </LocalizedLink>
                       {location.name && (
                         <span className="text-gray-400 text-sm ml-2">
@@ -368,7 +368,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                         href={path}
                         className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                       >
-                        {buildLabel(path)}
+                        {buildLabel(path, locale)}
                       </LocalizedLink>
                       <span className="text-gray-400 text-sm ml-2">
                         {faq.label}
