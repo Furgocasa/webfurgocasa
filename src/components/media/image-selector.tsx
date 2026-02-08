@@ -218,17 +218,11 @@ export function ImageSelector({
 
     if (multiSelect && onSelectMultiple) {
       onSelectMultiple(selectedUrls);
-      // Cerrar después de seleccionar múltiples imágenes
-      onClose();
     } else if (!multiSelect && onSelect && selectedUrls[0]) {
-      // Llamar a onSelect pero NO cerrar automáticamente
-      // El componente padre (TinyEditor) manejará el cierre después de procesar la selección
       onSelect(selectedUrls[0]);
-      // No llamar a onClose() aquí - el padre lo manejará
-    } else {
-      // Si no hay callback, cerrar normalmente
-      onClose();
     }
+    
+    onClose();
   };
 
   const filteredFiles = searchQuery

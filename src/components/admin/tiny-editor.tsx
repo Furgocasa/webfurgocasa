@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { supabase } from "@/lib/supabase/client";
 import { ImageSelector } from "@/components/media/image-selector";
@@ -20,64 +20,61 @@ export function TinyEditor({
 }: TinyEditorProps) {
   const editorRef = useRef<any>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
-  const imageCallbackRef = useRef<((url: string, meta?: { alt?: string; title?: string }) => void) | null>(null);
 
   // API key de TinyMCE
   const apiKey = process.env.NEXT_PUBLIC_TINYMCE_API_KEY || "di2vd063kukhcz9eqysedg5eyh1hd3q6u7hphgp35035i3hs";
 
   // Manejar selección de imagen desde el modal
-  const handleImageSelected = (imageUrl: string) => {
+  // Estrategia: insertar directamente con editor.insertContent() sin pasar por el diálogo de TinyMCE
+  const handleImageSelected = useCallback((imageUrl: string) => {
     console.log('Imagen seleccionada:', imageUrl);
     
-    // Verificar que tenemos el callback antes de proceder
-    if (!imageCallbackRef.current) {
-      console.error('No hay callback disponible');
-      setShowImageSelector(false);
-      return;
-    }
-    
-    // Extraer el nombre del archivo para usarlo como alt/title
+    // Extraer el nombre del archivo para usarlo como alt
     const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'Imagen';
-    console.log('Llamando callback con URL:', imageUrl);
     
-    // Guardar el callback en una variable local
-    const callback = imageCallbackRef.current;
+    // Cerrar el modal
+    setShowImageSelector(false);
     
-    // Limpiar la referencia inmediatamente para evitar llamadas múltiples
-    imageCallbackRef.current = null;
-    
-    try {
-      // Llamar al callback de TinyMCE INMEDIATAMENTE con la URL y metadatos
-      // TinyMCE espera: callback(url, meta) donde meta puede contener alt, title, etc.
-      callback(imageUrl, { 
-        alt: fileName,
-        title: fileName 
-      });
-      
-      console.log('✓ Callback ejecutado exitosamente con URL:', imageUrl);
-      
-      // Cerrar el modal después de ejecutar el callback
-      // Usar un pequeño delay para asegurar que TinyMCE procese la imagen
-      setTimeout(() => {
-        setShowImageSelector(false);
-      }, 50);
-    } catch (error) {
-      console.error('Error al ejecutar callback de TinyMCE:', error);
-      setShowImageSelector(false);
-    }
-  };
+    // Insertar la imagen directamente en el editor usando su API
+    // Usamos setTimeout para asegurar que el modal se cierre y el editor recupere el foco
+    setTimeout(() => {
+      if (editorRef.current) {
+        const editor = editorRef.current;
+        // Asegurar que el editor tiene foco
+        editor.focus();
+        // Insertar el HTML de la imagen directamente en el contenido
+        editor.insertContent(
+          `<p><img src="${imageUrl}" alt="${fileName}" width="100%" /></p>`
+        );
+        console.log('✓ Imagen insertada correctamente:', imageUrl);
+      } else {
+        console.error('Editor no disponible para insertar imagen');
+      }
+    }, 150);
+  }, []);
 
   return (
     <>
       <Editor
         apiKey={apiKey}
-        onInit={(evt, editor) => (editorRef.current = editor)}
+        onInit={(evt, editor) => {
+          editorRef.current = editor;
+
+          // Registrar botón personalizado para insertar imagen desde Supabase
+          editor.ui.registry.addButton('supabaseImage', {
+            icon: 'image',
+            tooltip: 'Insertar imagen desde galería',
+            onAction: () => {
+              setShowImageSelector(true);
+            },
+          });
+        }}
         value={value}
         onEditorChange={(content) => onChange(content)}
         init={{
           height,
           menubar: true,
-          language: 'en', // Usar inglés en lugar de español para evitar errores de carga
+          language: 'en',
           plugins: [
             "advlist",
             "autolink",
@@ -99,12 +96,23 @@ export function TinyEditor({
             "emoticons",
             "codesample",
           ],
+          // Reemplazar "image" por "supabaseImage" en la toolbar
           toolbar:
             "undo redo | blocks | " +
             "bold italic forecolor backcolor | alignleft aligncenter " +
             "alignright alignjustify | bullist numlist outdent indent | " +
-            "link image media | table | codesample | " +
+            "link supabaseImage media | table | codesample | " +
             "removeformat | fullscreen | help",
+          // Registrar el botón antes de que se renderice la toolbar
+          setup: (editor: any) => {
+            editor.ui.registry.addButton('supabaseImage', {
+              icon: 'image',
+              tooltip: 'Insertar imagen desde galería',
+              onAction: () => {
+                setShowImageSelector(true);
+              },
+            });
+          },
           content_style: `
             body { 
               font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
@@ -157,42 +165,23 @@ export function TinyEditor({
           placeholder,
           branding: false,
           promotion: false,
-          // Configuración de imágenes
+          // Configuración de imágenes (para drag & drop)
           image_title: true,
           image_caption: true,
           image_description: true,
-          automatic_uploads: true, // Mantener true para que funcione el file_picker_callback
-          file_picker_types: "image",
+          automatic_uploads: true,
           images_file_types: 'jpg,jpeg,png,gif,webp',
-          // Callback personalizado para abrir nuestro selector de imágenes
-          file_picker_callback: (callback, value, meta) => {
-            console.log('file_picker_callback llamado', { value, meta, callback });
-            // Solo para imágenes
-            if (meta.filetype === 'image') {
-              // Guardar el callback para usarlo cuando se seleccione la imagen
-              // IMPORTANTE: Guardar una referencia estable al callback
-              imageCallbackRef.current = callback;
-              console.log('Callback guardado, abriendo modal selector de imágenes');
-              // Abrir el modal de selección de imágenes
-              setShowImageSelector(true);
-            } else {
-              // Si no es imagen, llamar al callback con null para cancelar
-              callback('');
-            }
-          },
-          // Mantener images_upload_handler como fallback para drag & drop
+          // Handler para drag & drop de imágenes
           images_upload_handler: async (blobInfo: any, progress: any) => {
             try {
               const file = blobInfo.blob();
               const filename = blobInfo.filename();
               
-              // Generar nombre único para la imagen
               const timestamp = Date.now();
               const randomStr = Math.random().toString(36).substring(7);
               const extension = filename.split('.').pop();
               const uniqueFilename = `blog-content/${timestamp}-${randomStr}.${extension}`;
 
-              // Subir a Supabase Storage
               const { data, error } = await supabase.storage
                 .from('blog')
                 .upload(uniqueFilename, file, {
@@ -205,17 +194,14 @@ export function TinyEditor({
                 throw new Error('Error al subir la imagen: ' + error.message);
               }
 
-              // Obtener URL pública de la imagen
               const { data: { publicUrl } } = supabase.storage
                 .from('blog')
                 .getPublicUrl(uniqueFilename);
 
-              // Reportar progreso al 100%
               if (progress) {
                 progress(100);
               }
 
-              // Devolver la URL pública
               return publicUrl;
             } catch (error: any) {
               console.error('Error in images_upload_handler:', error);
@@ -256,10 +242,7 @@ export function TinyEditor({
       <ImageSelector
         bucket="blog"
         isOpen={showImageSelector}
-        onClose={() => {
-          setShowImageSelector(false);
-          imageCallbackRef.current = null;
-        }}
+        onClose={() => setShowImageSelector(false)}
         onSelect={handleImageSelected}
         suggestedFolder="blog-content"
         multiSelect={false}
