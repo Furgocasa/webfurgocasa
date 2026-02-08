@@ -8,6 +8,7 @@ import { translateServer } from "@/lib/i18n/server-translation";
 import { getTranslatedContent, getTranslatedContentSections, getTranslatedRecords } from "@/lib/translations/get-translations";
 import type { Locale } from "@/lib/i18n/config";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { getLocationHeroImage } from "@/lib/locationImages";
 import { 
   MapPin, 
   CheckCircle, 

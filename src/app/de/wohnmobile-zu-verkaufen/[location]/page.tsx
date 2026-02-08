@@ -8,6 +8,7 @@ import { getTranslatedContent, getTranslatedContentSections } from "@/lib/transl
 import type { Locale } from "@/lib/i18n/config";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { sortVehicleEquipment } from "@/lib/utils";
+import { getLocationHeroImage } from "@/lib/locationImages";
 import { 
   MapPin, 
   CheckCircle, 
