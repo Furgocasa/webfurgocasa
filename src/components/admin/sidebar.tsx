@@ -27,6 +27,7 @@ import {
   Tag,
   Clock,
   Search,
+  Ban,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
 import type { Admin } from "@/types/blog";
@@ -44,6 +45,7 @@ const navigation: NavItem[] = [
   { name: "Vehículos", href: "/administrator/vehiculos", icon: Car },
   { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
   { name: "Reservas", href: "/administrator/reservas", icon: Calendar },
+  { name: "Bloqueos", href: "/administrator/bloqueos", icon: Ban },
   { name: "Calendario", href: "/administrator/calendario", icon: Calendar },
   { name: "Clientes", href: "/administrator/clientes", icon: Users },
   { name: "Pagos", href: "/administrator/pagos", icon: CreditCard },

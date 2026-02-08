@@ -76,6 +76,15 @@ interface Booking {
   booking_extras?: BookingExtra[];
 }
 
+interface BlockedDate {
+  id: string;
+  vehicle_id: string;
+  start_date: string;
+  end_date: string;
+  reason: string | null;
+  created_at: string;
+}
+
 export default function CalendarioPage() {
   // Establecer título de la página
   useEffect(() => {
@@ -176,6 +185,41 @@ export default function CalendarioPage() {
     retryCount: 3,
     retryDelay: 1000,
     staleTime: 1000 * 60 * 10, // 10 minutos - las reservas del calendario se actualizan con frecuencia moderada
+  });
+
+  // Cargar bloqueos con el hook
+  const { 
+    data: blockedDatesRaw, 
+    loading: blockedDatesLoading, 
+    error: blockedDatesError 
+  } = useAdminData<BlockedDate[]>({
+    queryKey: ['blocked-dates-calendar'],
+    dependencies: [startDate, monthsToShow],
+    queryFn: async () => {
+      const supabase = createClient();
+      const firstYear = startDate.getFullYear();
+      const firstMonth = startDate.getMonth();
+      const firstDayStr = `${firstYear}-${String(firstMonth + 1).padStart(2, '0')}-01`;
+      
+      const lastDayDate = new Date(firstYear, firstMonth + monthsToShow, 0);
+      const lastDayStr = `${lastDayDate.getFullYear()}-${String(lastDayDate.getMonth() + 1).padStart(2, '0')}-${String(lastDayDate.getDate()).padStart(2, '0')}`;
+
+      const result = await supabase
+        .from('blocked_dates')
+        .select('*')
+        .gte('end_date', firstDayStr)
+        .lte('start_date', lastDayStr)
+        .order('start_date');
+
+      return {
+        data: (result.data || []) as BlockedDate[],
+        error: result.error
+      };
+    },
+    dependencies: [startDate, monthsToShow],
+    retryCount: 3,
+    retryDelay: 1000,
+    staleTime: 1000 * 60 * 10,
   });
 
   // Estado local para bookings enriquecidos
@@ -293,7 +337,7 @@ export default function CalendarioPage() {
     enrichBookings();
   }, [bookingsRaw]);
 
-  const loading = vehiclesLoading || bookingsLoading || enrichmentLoading;
+  const loading = vehiclesLoading || bookingsLoading || blockedDatesLoading || enrichmentLoading;
 
   // Detectar si es móvil o tablet
   useEffect(() => {
@@ -432,6 +476,10 @@ export default function CalendarioPage() {
 
   const getBookingsForVehicle = (vehicleId: string) => {
     return (bookings || []).filter(b => b.vehicle_id === vehicleId);
+  };
+
+  const getBlockedDatesForVehicle = (vehicleId: string) => {
+    return (blockedDatesRaw || []).filter(b => b.vehicle_id === vehicleId);
   };
 
   const getStatusColor = (status: string) => {
@@ -763,6 +811,7 @@ export default function CalendarioPage() {
                         {/* Filas de vehículos */}
                         {filteredAndSortedVehicles.map((vehicle) => {
                           const vehicleBookings = getBookingsForVehicle(vehicle.id);
+                          const vehicleBlocks = getBlockedDatesForVehicle(vehicle.id);
 
                           return (
                             <div
@@ -820,6 +869,15 @@ export default function CalendarioPage() {
                                   booking.dropoff_date === currentDateStr
                                 );
 
+                                // Verificar si este día está bloqueado
+                                const isBlocked = vehicleBlocks.some(block =>
+                                  currentDateStr >= block.start_date && currentDateStr <= block.end_date
+                                );
+
+                                const blockInfo = isBlocked ? vehicleBlocks.find(block =>
+                                  currentDateStr >= block.start_date && currentDateStr <= block.end_date
+                                ) : null;
+
                                 // Reserva principal para mostrar (la primera activa en el día)
                                 const dayBooking = dayBookings.length > 0 ? dayBookings[0] : null;
 
@@ -859,7 +917,20 @@ export default function CalendarioPage() {
                                       isTodayFlag ? 'bg-yellow-300 border-l-2 border-r-2 border-yellow-400' : ''
                                     }`}
                                   >
-                                    {dayBooking ? (
+                                    {isBlocked ? (
+                                      /* Mostrar bloqueo */
+                                      <div
+                                        className="h-12 flex items-center justify-center relative bg-gray-800 cursor-pointer hover:opacity-80 transition-opacity"
+                                        title={`🚫 BLOQUEADO\n${blockInfo?.reason || 'Sin razón especificada'}\nClick para editar`}
+                                        onClick={() => {
+                                          if (blockInfo) {
+                                            router.push(`/administrator/bloqueos/${blockInfo.id}/editar`);
+                                          }
+                                        }}
+                                      >
+                                        <span className="text-white text-xs font-bold">🚫</span>
+                                      </div>
+                                    ) : dayBooking ? (
                                       <div
                                         className={`h-12 flex items-center justify-center relative group/booking ${
                                           getStatusColor(dayBooking.status)
@@ -1093,6 +1164,10 @@ export default function CalendarioPage() {
               <div className="w-3 h-3 bg-red-500 rounded-sm border border-white shadow-sm"></div>
             </div>
             <span className="text-gray-600">Inicio / Fin</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 bg-gray-800 rounded flex items-center justify-center text-white text-xs font-bold">🚫</div>
+            <span className="text-gray-600">Bloqueado</span>
           </div>
         </div>
       </div>
