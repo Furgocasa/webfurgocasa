@@ -257,7 +257,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
               </h2>
               <ul className="space-y-2">
                 {rentList.map((vehicle) => {
-                  const path = `/vehiculos/${vehicle.slug}`;
+                  const path = `/fahrzeuge/${vehicle.slug}`;
                   return (
                     <li key={vehicle.slug}>
                       <LocalizedLink
@@ -283,7 +283,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
               </h2>
               <ul className="space-y-2">
                 {saleList.map((vehicle) => {
-                  const path = `/ventas/${vehicle.slug}`;
+                  const path = `/verkauf/${vehicle.slug}`;
                   return (
                     <li key={vehicle.slug}>
                       <LocalizedLink
@@ -309,7 +309,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
               </h2>
               <ul className="space-y-2">
                 {locationList.map((location) => {
-                  const path = `/alquiler-autocaravanas-campervans-${location.slug}`;
+                  const path = `/wohnmobil-mieten/${location.slug}`;
                   return (
                     <li key={location.slug}>
                       <LocalizedLink
@@ -335,7 +335,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
               </h2>
               <ul className="space-y-2">
                 {saleLocationList.map((location) => {
-                  const path = `/venta-autocaravanas-camper-${location.slug}`;
+                  const path = `/wohnmobile-zu-verkaufen/${location.slug}`;
                   return (
                     <li key={location.slug}>
                       <LocalizedLink
