@@ -4,6 +4,7 @@ import { LocalizedLink } from "@/components/localized-link";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
+import { translateCategorySlug, translatePostSlug } from "@/lib/blog-translations";
 
 interface PageProps {}
 
@@ -206,21 +207,24 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                 Blog - Categories
               </h2>
               <ul className="space-y-2">
-                {categoryList.map((category) => (
-                  <li key={category.slug}>
-                    <LocalizedLink
-                      href={`/blog/${category.slug}`}
-                      className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
-                    >
-                      {buildLabel(`/blog/${category.slug}`)}
-                    </LocalizedLink>
-                    {category.name && (
-                      <span className="text-gray-400 text-sm ml-2">
-                        {category.name}
-                      </span>
-                    )}
-                  </li>
-                ))}
+                {categoryList.map((category) => {
+                  const translatedSlug = translateCategorySlug(category.slug, locale);
+                  return (
+                    <li key={category.slug}>
+                      <LocalizedLink
+                        href={`/blog/${translatedSlug}`}
+                        className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
+                      >
+                        {buildLabel(`/blog/${translatedSlug}`)}
+                      </LocalizedLink>
+                      {category.name && (
+                        <span className="text-gray-400 text-sm ml-2">
+                          {category.name}
+                        </span>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
 
@@ -231,7 +235,9 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
               <ul className="space-y-2">
                 {postList.map((post) => {
                   const categorySlug = getCategorySlug(post.category);
-                  const path = `/blog/${categorySlug}/${post.slug}`;
+                  const translatedCategorySlug = translateCategorySlug(categorySlug, locale);
+                  const translatedPostSlug = translatePostSlug(post.slug, locale);
+                  const path = `/blog/${translatedCategorySlug}/${translatedPostSlug}`;
                   return (
                     <li key={post.slug}>
                       <LocalizedLink
