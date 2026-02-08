@@ -35,6 +35,7 @@ type CategoryRow = {
 
 type PostRow = {
   slug: string;
+  slug_de?: string | null;
   title?: string | null;
   category?: CategoryRow | CategoryRow[] | null;
 };
@@ -126,7 +127,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
   ] = await Promise.all([
     supabase
       .from("posts")
-      .select("slug, title, category:content_categories(slug)")
+      .select("slug, slug_de, title, category:content_categories(slug)")
       .eq("status", "published")
       .lte("published_at", new Date().toISOString()) // Solo artículos con fecha <= hoy
       .order("published_at", { ascending: false }),
@@ -236,7 +237,8 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                 {postList.map((post) => {
                   const categorySlug = getCategorySlug(post.category);
                   const translatedCategorySlug = translateCategorySlug(categorySlug, locale);
-                  const translatedPostSlug = translatePostSlug(post.slug, locale);
+                  // Usar el slug traducido si existe, sino usar el original
+                  const translatedPostSlug = post.slug_de || post.slug;
                   const path = `/blog/${translatedCategorySlug}/${translatedPostSlug}`;
                   return (
                     <li key={post.slug}>
