@@ -22,7 +22,9 @@ import {
   Info,
   MapPin,
   Pencil,
-  Trash2
+  Trash2,
+  CheckCircle2,
+  XCircle
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
@@ -93,6 +95,8 @@ export default function OfertasUltimaHoraPage() {
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [expandedGap, setExpandedGap] = useState<string | null>(null);
   const [tableExists, setTableExists] = useState(true);
+  const [checking, setChecking] = useState(false);
+  const [availabilityResults, setAvailabilityResults] = useState<any>(null);
   
   // Estado para edición de oferta antes de publicar (nueva)
   const [editingGap, setEditingGap] = useState<{
@@ -231,6 +235,35 @@ export default function OfertasUltimaHoraPage() {
       showMessage('error', 'Error al detectar huecos. Verifica que las funciones SQL estén creadas.');
     } finally {
       setDetecting(false);
+    }
+  };
+
+  const checkOfferAvailability = async () => {
+    setChecking(true);
+    setAvailabilityResults(null);
+    try {
+      const response = await fetch('/api/admin/last-minute-offers/check-availability');
+      const result = await response.json();
+      
+      if (result.error) {
+        showMessage('error', result.error);
+        return;
+      }
+
+      setAvailabilityResults(result);
+      
+      if (result.results.length === 0) {
+        showMessage('success', 'No hay ofertas publicadas para consultar');
+      } else if (result.summary.unavailable === 0) {
+        showMessage('success', `✓ Todas las ofertas (${result.summary.total}) están disponibles`);
+      } else {
+        showMessage('error', `⚠ ${result.summary.unavailable} de ${result.summary.total} ofertas ya NO están disponibles`);
+      }
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      showMessage('error', 'Error al consultar disponibilidad de ofertas');
+    } finally {
+      setChecking(false);
     }
   };
 
@@ -539,14 +572,24 @@ export default function OfertasUltimaHoraPage() {
           <h1 className="text-2xl font-bold text-gray-900">Ofertas de Última Hora</h1>
           <p className="text-gray-600 mt-1">Detecta y gestiona huecos entre reservas</p>
         </div>
-        <button
-          onClick={detectGaps}
-          disabled={detecting}
-          className="flex items-center gap-2 px-4 py-2 bg-furgocasa-orange text-white rounded-lg hover:bg-furgocasa-orange-dark transition-colors disabled:opacity-50"
-        >
-          <Search className={`h-5 w-5 ${detecting ? 'animate-spin' : ''}`} />
-          {detecting ? 'Buscando...' : 'Detectar Huecos'}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={detectGaps}
+            disabled={detecting}
+            className="flex items-center gap-2 px-4 py-2 bg-furgocasa-orange text-white rounded-lg hover:bg-furgocasa-orange-dark transition-colors disabled:opacity-50"
+          >
+            <Search className={`h-5 w-5 ${detecting ? 'animate-spin' : ''}`} />
+            {detecting ? 'Buscando...' : 'Detectar Huecos'}
+          </button>
+          <button
+            onClick={checkOfferAvailability}
+            disabled={checking}
+            className="flex items-center gap-2 px-4 py-2 bg-furgocasa-blue text-white rounded-lg hover:bg-furgocasa-blue-dark transition-colors disabled:opacity-50"
+          >
+            <Database className={`h-5 w-5 ${checking ? 'animate-spin' : ''}`} />
+            {checking ? 'Consultando...' : 'Consultar Ofertas'}
+          </button>
+        </div>
       </div>
 
       {/* Message */}
@@ -556,6 +599,119 @@ export default function OfertasUltimaHoraPage() {
         }`}>
           {message.type === 'success' ? <Check className="h-5 w-5" /> : <AlertCircle className="h-5 w-5" />}
           {message.text}
+        </div>
+      )}
+
+      {/* Availability Results */}
+      {availabilityResults && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-4 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <Database className="h-5 w-5 text-furgocasa-blue" />
+                Resultado de Consulta de Ofertas
+              </h2>
+              <button
+                onClick={() => setAvailabilityResults(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            {availabilityResults.summary && (
+              <div className="mt-3 flex gap-4 text-sm">
+                <span className="text-gray-600">
+                  Total: <strong>{availabilityResults.summary.total}</strong>
+                </span>
+                <span className="text-green-600">
+                  Disponibles: <strong>{availabilityResults.summary.available}</strong>
+                </span>
+                <span className="text-red-600">
+                  No disponibles: <strong>{availabilityResults.summary.unavailable}</strong>
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+            {availabilityResults.results.map((result: any) => (
+              <div 
+                key={result.offer_id} 
+                className={`p-4 ${result.is_available ? 'bg-white' : 'bg-red-50'}`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      {result.is_available ? (
+                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-500" />
+                      )}
+                      <Truck className="h-5 w-5 text-furgocasa-blue" />
+                      <span className="font-medium text-gray-900">{result.vehicle_name}</span>
+                      <span className="text-xs text-gray-500">({result.vehicle_internal_code})</span>
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        result.is_available 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-red-100 text-red-800'
+                      }`}>
+                        {result.is_available ? 'Disponible' : 'No Disponible'}
+                      </span>
+                    </div>
+                    
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-600 ml-7">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {formatDate(result.offer_start_date)} - {formatDate(result.offer_end_date)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-4 w-4" />
+                        {result.offer_days} días
+                      </span>
+                      <span className="flex items-center gap-1 text-green-600 font-medium">
+                        <TrendingDown className="h-4 w-4" />
+                        -{result.discount_percentage}% descuento
+                      </span>
+                    </div>
+
+                    {/* Mostrar conflictos si existen */}
+                    {!result.is_available && result.conflicting_bookings.length > 0 && (
+                      <div className="mt-3 ml-7 bg-white rounded-lg p-3 border border-red-200">
+                        <p className="text-xs font-medium text-red-600 mb-2">
+                          ⚠ Reservas en conflicto:
+                        </p>
+                        {result.conflicting_bookings.map((booking: any, idx: number) => (
+                          <div key={idx} className="text-xs text-gray-600 flex items-center gap-2 mt-1">
+                            <span>•</span>
+                            <span className="font-medium">{booking.customer_name}</span>
+                            <span>-</span>
+                            <span>{formatDate(booking.pickup_date)} a {formatDate(booking.dropoff_date)}</span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {result.reason && (
+                      <p className="text-xs text-gray-500 mt-2 ml-7 italic">
+                        {result.reason}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Botón para marcar como expirada si no está disponible */}
+                  {!result.is_available && (
+                    <button
+                      onClick={() => updateOfferStatus(result.offer_id, 'expired')}
+                      className="px-3 py-1.5 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-xs font-medium"
+                      title="Marcar como expirada"
+                    >
+                      <EyeOff className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 

@@ -20,15 +20,23 @@ export function TinyEditor({
 }: TinyEditorProps) {
   const editorRef = useRef<any>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
-  const imageCallbackRef = useRef<((url: string) => void) | null>(null);
+  const imageCallbackRef = useRef<((url: string, meta?: { alt?: string; title?: string }) => void) | null>(null);
 
   // API key de TinyMCE
   const apiKey = process.env.NEXT_PUBLIC_TINYMCE_API_KEY || "di2vd063kukhcz9eqysedg5eyh1hd3q6u7hphgp35035i3hs";
 
   // Manejar selección de imagen desde el modal
   const handleImageSelected = (imageUrl: string) => {
+    console.log('Imagen seleccionada:', imageUrl);
     if (imageCallbackRef.current) {
-      imageCallbackRef.current(imageUrl);
+      // Extraer el nombre del archivo para usarlo como alt/title
+      const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'Imagen';
+      console.log('Llamando callback con URL:', imageUrl);
+      // TinyMCE espera: callback(url, { alt, title })
+      imageCallbackRef.current(imageUrl, { 
+        alt: fileName,
+        title: fileName 
+      });
       imageCallbackRef.current = null;
     }
     setShowImageSelector(false);
@@ -126,15 +134,19 @@ export function TinyEditor({
           promotion: false,
           // Configuración de imágenes
           image_title: true,
-          automatic_uploads: false, // Desactivar subida automática para usar nuestro selector
+          image_caption: true,
+          image_description: true,
+          automatic_uploads: true, // Mantener true para que funcione el file_picker_callback
           file_picker_types: "image",
           images_file_types: 'jpg,jpeg,png,gif,webp',
           // Callback personalizado para abrir nuestro selector de imágenes
           file_picker_callback: (callback, value, meta) => {
+            console.log('file_picker_callback llamado', { value, meta });
             // Solo para imágenes
             if (meta.filetype === 'image') {
               // Guardar el callback para usarlo cuando se seleccione la imagen
               imageCallbackRef.current = callback;
+              console.log('Abriendo modal selector de imágenes');
               // Abrir el modal de selección de imágenes
               setShowImageSelector(true);
             }
