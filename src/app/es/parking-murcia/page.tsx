@@ -8,20 +8,20 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Único y optimizado para /parking-murcia
 const PARKING_MURCIA_METADATA: Metadata = {
-  title: "Parking para Autocaravanas en Murcia",
-  description: "Parking vigilado para autocaravanas y campers en Murcia. Acceso 24h, videovigilancia, electricidad, zona de aguas y vaciado WC químico. Desde 10€/día.",
-  keywords: "parking autocaravanas murcia, guardar camper murcia, parking caravanas murcia, estacionamiento autocaravana, parking seguro camper",
+  title: "Parking Larga Duración para Autocaravanas en Murcia | Casillas",
+  description: "Aparcamiento de larga duración para autocaravanas, campers y caravanas en Casillas, Murcia. Plazas amplias, acceso fácil, videovigilancia, electricidad y zona de aguas. Desde 75€/mes.",
+  keywords: "parking autocaravanas murcia, aparcamiento caravanas murcia, parking campers murcia, parking larga duración, guardar autocaravana murcia, parking casillas murcia, aparcamiento autocaravanas seguro",
   openGraph: {
-    title: "Parking para Autocaravanas en Murcia",
-    description: "Parking vigilado 24h para tu autocaravana en Murcia. Servicios de agua, electricidad y vaciado.",
+    title: "Parking Larga Duración para Autocaravanas en Murcia | Casillas",
+    description: "Aparcamiento de larga duración en Casillas, Murcia. Plazas amplias, videovigilancia, electricidad y zona de aguas. Desde 75€/mes.",
     type: "website",
     siteName: "Furgocasa",
     locale: "es_ES",
   },
   twitter: {
     card: "summary",
-    title: "Parking para Autocaravanas en Murcia",
-    description: "Parking vigilado 24h para tu autocaravana en Murcia.",
+    title: "Parking Larga Duración para Autocaravanas en Murcia",
+    description: "Aparcamiento de larga duración en Casillas, Murcia. Desde 75€/mes.",
   },
   robots: {
     index: true,

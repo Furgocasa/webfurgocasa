@@ -188,6 +188,7 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/blog', priority: 0.9, changeFrequency: 'daily' },
     { path: '/vehiculos', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/ventas', priority: 0.8, changeFrequency: 'weekly' },
+    { path: '/ventas/videos', priority: 0.7, changeFrequency: 'weekly' },
     { path: '/tarifas', priority: 0.8, changeFrequency: 'monthly' },
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },

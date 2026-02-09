@@ -53,6 +53,7 @@ const staticPages: Array<{ path: string; label: string }> = [
   { path:"/blog", label:"Blog" },
   { path:"/vehiculos", label:"Vehículos" },
   { path:"/ventas", label:"Ventas" },
+  { path:"/ventas/videos", label:"Videos de Ventas" },
   { path:"/tarifas", label:"Tarifas" },
   { path:"/reservar", label:"Reservar" },
   { path:"/alquiler-motorhome-europa-desde-espana", label:"Alquiler Motorhome Europa" },
