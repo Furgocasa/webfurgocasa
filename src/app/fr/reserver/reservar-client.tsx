@@ -1,6 +1,7 @@
 "use client";
 
 import { SearchWidget } from "@/components/booking/search-widget";
+import { OccupancyHighlights } from "@/components/booking/occupancy-highlights";
 import Link from "next/link";
 import { MapPin, Clock, Phone, Car, ArrowRight, CheckCircle, Calendar, CreditCard } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
@@ -62,8 +63,17 @@ export function ReservarClient() {
         </div>
       </section>
 
+      {/* Occupancy Highlights - Semáforo de ocupación */}
+      <section className="pt-40 pb-16 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <OccupancyHighlights />
+          </div>
+        </div>
+      </section>
+
       {/* Locations */}
-      <section className="pt-40 pb-16 bg-white">
+      <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-heading font-bold text-gray-900 mb-8 text-center">
             {t("Puntos de recogida")}

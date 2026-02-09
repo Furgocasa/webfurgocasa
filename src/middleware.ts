@@ -70,6 +70,7 @@ const RATE_LIMITS: Record<string, { limit: number; window: number }> = {
   // ✅ NUEVAS: Otras APIs públicas (límites generosos)
   '/api/coupons/validate': { limit: 60, window: 60 },      // 60 validaciones/minuto
   '/api/search-tracking': { limit: 120, window: 60 },      // 120 trackings/minuto
+  '/api/occupancy-highlights': { limit: 120, window: 60 }, // 120 consultas/minuto (público, con cache)
 };
 
 // ============================================

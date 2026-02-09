@@ -8869,6 +8869,86 @@ export const staticTranslations = {
     fr: "Blog Camping-car",
     de: "Camper Blog"
   },
+  
+  // Occupancy Highlights - Semáforo de ocupación
+  "Disponibilidad por periodos": {
+    es: "Disponibilidad por periodos",
+    en: "Availability by periods",
+    fr: "Disponibilité par périodes",
+    de: "Verfügbarkeit nach Zeiträumen"
+  },
+  "Consulta la ocupación de fechas clave": {
+    es: "Consulta la ocupación de fechas clave",
+    en: "Check occupancy for key dates",
+    fr: "Consultez l'occupation pour les dates clés",
+    de: "Überprüfen Sie die Auslastung für wichtige Daten"
+  },
+  "Ocupación": {
+    es: "Ocupación",
+    en: "Occupancy",
+    fr: "Occupation",
+    de: "Auslastung"
+  },
+  "Completo": {
+    es: "Completo",
+    en: "Full",
+    fr: "Complet",
+    de: "Voll"
+  },
+  "Alta demanda": {
+    es: "Alta demanda",
+    en: "High demand",
+    fr: "Forte demande",
+    de: "Hohe Nachfrage"
+  },
+  "Ocupación moderada": {
+    es: "Ocupación moderada",
+    en: "Moderate occupancy",
+    fr: "Occupation modérée",
+    de: "Mäßige Auslastung"
+  },
+  "Reserva con antelación": {
+    es: "Reserva con antelación",
+    en: "Book in advance",
+    fr: "Réservez à l'avance",
+    de: "Im Voraus buchen"
+  },
+  "Últimas plazas disponibles": {
+    es: "Últimas plazas disponibles",
+    en: "Last spots available",
+    fr: "Dernières places disponibles",
+    de: "Letzte Plätze verfügbar"
+  },
+  "Moderado": {
+    es: "Moderado",
+    en: "Moderate",
+    fr: "Modéré",
+    de: "Mäßig"
+  },
+  "Alta": {
+    es: "Alta",
+    en: "High",
+    fr: "Élevée",
+    de: "Hoch"
+  },
+  "vehículos disponibles": {
+    es: "vehículos disponibles",
+    en: "vehicles available",
+    fr: "véhicules disponibles",
+    de: "Fahrzeuge verfügbar"
+  },
+  "¡Amplia disponibilidad!": {
+    es: "¡Amplia disponibilidad!",
+    en: "Great availability!",
+    fr: "Large disponibilité !",
+    de: "Große Verfügbarkeit!"
+  },
+  "Tenemos excelente disponibilidad en todos los periodos. Reserva con tranquilidad las fechas que prefieras.": {
+    es: "Tenemos excelente disponibilidad en todos los periodos. Reserva con tranquilidad las fechas que prefieras.",
+    en: "We have excellent availability for all periods. Book your preferred dates with confidence.",
+    fr: "Nous avons une excellente disponibilité pour toutes les périodes. Réservez vos dates préférées en toute tranquillité.",
+    de: "Wir haben eine ausgezeichnete Verfügbarkeit für alle Zeiträume. Buchen Sie Ihre bevorzugten Daten mit Vertrauen."
+  },
 };
 
 /**

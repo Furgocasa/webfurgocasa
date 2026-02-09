@@ -23,7 +23,8 @@
     "validate:urls": "node scripts/validate-urls.js",
     "validate:urls:local": "node scripts/validate-urls.js --env=local",
     "validate:urls:staging": "node scripts/validate-urls.js --env=staging",
-    "validate:urls:verbose": "node scripts/validate-urls.js --verbose"
+    "validate:urls:verbose": "node scripts/validate-urls.js --verbose",
+    "test:occupancy": "node scripts/test-occupancy-api.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
