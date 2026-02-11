@@ -408,7 +408,7 @@ export function OfertasClient() {
       {/* Ofertas de Última Hora - Contenido */}
       <section className="py-20 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-6xl mx-auto">
             {/* Explicación */}
             <div className="bg-white rounded-3xl p-8 md:p-12 shadow-sm border border-gray-100 mb-8">
               <div className="flex flex-col md:flex-row items-start gap-6">
@@ -439,107 +439,96 @@ export function OfertasClient() {
                 <p className="text-gray-500">{t("Cargando ofertas...")}</p>
               </div>
             ) : lastMinuteOffers.length > 0 ? (
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {lastMinuteOffers.map((offer) => (
                   <div 
                     key={offer.id}
-                    className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition-all group"
+                    className="group bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                   >
-                    <div className="flex flex-col md:flex-row">
-                      {/* Imagen del vehículo */}
-                      <div className="md:w-1/3 relative">
-                        <div className="aspect-[4/3] md:aspect-auto md:h-full relative bg-gray-100">
-                          {offer.vehicle_image_url ? (
-                            <Image
-                              src={offer.vehicle_image_url}
-                              alt={offer.vehicle_name}
-                              fill
-                              className="object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          ) : (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Truck className="w-16 h-16 text-gray-300" />
-                            </div>
-                          )}
-                          {/* Badge de descuento */}
-                          <div className="absolute top-4 left-4 bg-furgocasa-orange text-white px-3 py-1.5 rounded-full font-bold text-sm shadow-lg">
-                            -{offer.discount_percentage}%
+                    {/* Imagen del vehículo */}
+                    <LocalizedLink href={`/reservar/oferta/${offer.id}`} className="block">
+                      <div className="h-64 relative bg-gray-100 overflow-hidden">
+                        {offer.vehicle_image_url ? (
+                          <Image
+                            src={offer.vehicle_image_url}
+                            alt={offer.vehicle_name}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Truck className="w-16 h-16 text-gray-300" />
                           </div>
+                        )}
+                        {/* Badge de descuento */}
+                        <div className="absolute top-4 left-4 bg-furgocasa-orange text-white px-3 py-1.5 rounded-full font-bold text-sm shadow-lg">
+                          -{offer.discount_percentage}%
                         </div>
                       </div>
+                    </LocalizedLink>
 
-                      {/* Contenido */}
-                      <div className="md:w-2/3 p-6 flex flex-col justify-between">
-                        <div>
-                          <h4 className="text-xl font-heading font-bold text-gray-900 mb-1">
-                            {offer.vehicle_name}
-                          </h4>
-                          <p className="text-sm text-gray-500 mb-3">
-                            {offer.vehicle_brand} {offer.vehicle_model}
-                          </p>
-                          
-                          {/* Características del vehículo */}
-                          <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-3">
-                            <span className="flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-full text-furgocasa-blue">
-                              <Users className="w-4 h-4" />
-                              {offer.vehicle_seats} {t("plazas")}
-                            </span>
-                            <span className="flex items-center gap-1.5 bg-blue-50 px-3 py-1 rounded-full text-furgocasa-blue">
-                              <Bed className="w-4 h-4" />
-                              {offer.vehicle_beds} {t("camas")}
-                            </span>
-                            {/* Ubicación */}
-                            {offer.pickup_location_name && (
-                              <span className="flex items-center gap-1.5 bg-green-50 px-3 py-1 rounded-full text-green-700">
-                                <Map className="w-4 h-4" />
-                                {offer.pickup_location_name}
-                              </span>
-                            )}
-                          </div>
-                          
-                          {/* Fechas y duración */}
-                          <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-4">
-                            <span className="flex items-center gap-1.5 bg-gray-100 px-3 py-1 rounded-full">
-                              <Calendar className="w-4 h-4 text-furgocasa-blue" />
-                              {formatDate(offer.offer_start_date)} - {formatDate(offer.offer_end_date)}
-                            </span>
-                            <span className="flex items-center gap-1.5 bg-furgocasa-orange/10 px-3 py-1 rounded-full text-furgocasa-orange font-medium">
-                              <Clock className="w-4 h-4" />
-                              {offer.offer_days} {t("días")}
-                            </span>
-                          </div>
+                    {/* Contenido */}
+                    <div className="p-6">
+                      <LocalizedLink href={`/reservar/oferta/${offer.id}`}>
+                        <h4 className="text-xl font-heading font-bold text-gray-900 mb-1 group-hover:text-furgocasa-orange transition-colors">
+                          {offer.vehicle_name}
+                        </h4>
+                        <p className="text-sm text-gray-500 mb-3">
+                          {offer.vehicle_brand} {offer.vehicle_model}
+                        </p>
+                      </LocalizedLink>
+                      
+                      {/* Características y fechas */}
+                      <div className="flex flex-wrap gap-2 text-sm text-gray-600 mb-3">
+                        <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full text-furgocasa-blue">
+                          <Users className="w-4 h-4" />
+                          {offer.vehicle_seats} {t("plazas")}
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full text-furgocasa-blue">
+                          <Bed className="w-4 h-4" />
+                          {offer.vehicle_beds} {t("camas")}
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1 rounded-full">
+                          <Calendar className="w-4 h-4 text-furgocasa-blue" />
+                          {formatDate(offer.offer_start_date)} - {formatDate(offer.offer_end_date)}
+                        </span>
+                        <span className="flex items-center gap-1.5 bg-furgocasa-orange/10 px-2.5 py-1 rounded-full text-furgocasa-orange font-medium">
+                          <Clock className="w-4 h-4" />
+                          {offer.offer_days} {t("días")}
+                        </span>
+                      </div>
+                      {offer.pickup_location_name && (
+                        <p className="text-xs text-gray-500 mb-4 flex items-center gap-1.5">
+                          <Map className="w-4 h-4 text-green-600" />
+                          {offer.pickup_location_name}
+                        </p>
+                      )}
+
+                      {/* Precios y CTA */}
+                      <div className="pt-4 border-t border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-gray-400 line-through text-sm">
+                            {formatPrice(offer.total_original_price)}
+                          </span>
+                          <span className="text-green-600 text-xs font-medium bg-green-50 px-2 py-0.5 rounded">
+                            {t("Ahorras")} {formatPrice(offer.savings)}
+                          </span>
                         </div>
-
-                        <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
-                          {/* Precios */}
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-gray-400 line-through text-sm">
-                                {formatPrice(offer.total_original_price)}
-                              </span>
-                              <span className="text-green-600 text-xs font-medium bg-green-50 px-2 py-0.5 rounded">
-                                {t("Ahorras")} {formatPrice(offer.savings)}
-                              </span>
-                            </div>
-                            <div className="flex items-baseline gap-2">
-                              <span className="text-3xl font-bold text-gray-900">
-                                {formatPrice(offer.total_final_price)}
-                              </span>
-                              <span className="text-gray-500 text-sm">
-                                ({formatPrice(offer.final_price_per_day)}/{t("día")})
-                              </span>
-                            </div>
-                          </div>
-
-                          {/* Botón reservar - va a página especial de oferta */}
-                          <LocalizedLink
-                            href={`/reservar/oferta/${offer.id}`}
-                            className="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
-                          >
-                            <CalendarClock className="w-5 h-5" />
-                            {t("Reservar ahora")}
-                          </LocalizedLink>
+                        <div className="flex items-baseline gap-2 mb-4">
+                          <span className="text-2xl font-bold text-gray-900">
+                            {formatPrice(offer.total_final_price)}
+                          </span>
+                          <span className="text-gray-500 text-sm">
+                            ({formatPrice(offer.final_price_per_day)}/{t("día")})
+                          </span>
                         </div>
+                        <LocalizedLink
+                          href={`/reservar/oferta/${offer.id}`}
+                          className="flex items-center justify-center gap-2 w-full bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md hover:shadow-lg"
+                        >
+                          <CalendarClock className="w-5 h-5" />
+                          {t("Reservar ahora")}
+                        </LocalizedLink>
                       </div>
                     </div>
                   </div>
