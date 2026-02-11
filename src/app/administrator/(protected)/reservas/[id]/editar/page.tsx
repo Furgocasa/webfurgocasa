@@ -82,8 +82,11 @@ interface FormData {
   // Precios
   base_price: number;
   extras_price: number;
+  location_fee: number;
+  discount: number;
   total_price: number;
   amount_paid: number;
+  coupon_code?: string | null;
   
   // Estados
   status: string;
@@ -132,6 +135,8 @@ export default function EditarReservaPage() {
     days: 1,
     base_price: 0,
     extras_price: 0,
+    location_fee: 0,
+    discount: 0,
     total_price: 0,
     amount_paid: 0,
     status: 'pending',
@@ -164,19 +169,19 @@ export default function EditarReservaPage() {
   }, [formData.pickup_date, formData.dropoff_date, formData.pickup_time, formData.dropoff_time]);
 
   useEffect(() => {
-    // Recalcular precio total cuando cambian los extras, días o precio base
+    // Recalcular precio total: base + extras + location_fee - discount
     const extrasTotal = calculateExtrasTotal();
-    const newTotal = formData.base_price + extrasTotal;
+    const newTotal = formData.base_price + extrasTotal + (formData.location_fee || 0) - (formData.discount || 0);
     
     // Solo actualizar si hay cambios reales
     if (formData.extras_price !== extrasTotal || formData.total_price !== newTotal) {
       setFormData(prev => ({
         ...prev,
         extras_price: extrasTotal,
-        total_price: newTotal
+        total_price: Math.max(0, Math.round(newTotal * 100) / 100)
       }));
     }
-  }, [bookingExtras, formData.days, formData.base_price, extras]);
+  }, [bookingExtras, formData.days, formData.base_price, formData.location_fee, formData.discount, extras]);
 
   useEffect(() => {
     // Calcular automáticamente el payment_status según el monto pagado
@@ -193,6 +198,7 @@ export default function EditarReservaPage() {
     if (!customerId) return;
     
     try {
+      const supabase = createClient();
       const { data, error } = await supabase
         .from('customers')
         .select('*')
@@ -272,8 +278,11 @@ export default function EditarReservaPage() {
         days: booking.days ?? 1,
         base_price: booking.base_price ?? 0,
         extras_price: booking.extras_price ?? 0,
+        location_fee: (booking as any).location_fee ?? 0,
+        discount: (booking as any).discount ?? (booking as any).coupon_discount ?? 0,
         total_price: booking.total_price ?? 0,
         amount_paid: booking.amount_paid ?? 0,
+        coupon_code: (booking as any).coupon_code ?? null,
         status: booking.status ?? 'pending',
         payment_status: booking.payment_status ?? 'pending',
         customer_name: booking.customer_name ?? '',
@@ -436,6 +445,8 @@ export default function EditarReservaPage() {
         days: formData.days,
         base_price: formData.base_price,
         extras_price: formData.extras_price,
+        location_fee: formData.location_fee || 0,
+        discount: formData.discount || 0,
         total_price: formData.total_price,
         amount_paid: formData.amount_paid,
         status: formData.status,
@@ -1054,6 +1065,38 @@ export default function EditarReservaPage() {
                   />
                 </div>
 
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Comisión entrega/recogida
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.location_fee}
+                    onChange={(e) => handleInputChange('location_fee', parseFloat(e.target.value) || 0)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Descuento / cupón
+                  </label>
+                  {formData.coupon_code && (
+                    <p className="text-xs text-gray-500 mb-1">Cupón aplicado: <span className="font-mono font-semibold">{formData.coupon_code}</span></p>
+                  )}
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.discount}
+                    onChange={(e) => handleInputChange('discount', parseFloat(e.target.value) || 0)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                    placeholder="Importe descontado"
+                  />
+                </div>
+
                 <div className="pt-4 border-t border-gray-200">
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-600">Precio base:</span>
@@ -1063,6 +1106,18 @@ export default function EditarReservaPage() {
                     <span className="text-gray-600">Extras:</span>
                     <span className="font-semibold">{formatPrice(formData.extras_price)}</span>
                   </div>
+                  {(formData.location_fee || 0) > 0 && (
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-600">Comisión entrega/recogida:</span>
+                      <span className="font-semibold">{formatPrice(formData.location_fee)}</span>
+                    </div>
+                  )}
+                  {(formData.discount || 0) > 0 && (
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-600">Descuento:</span>
+                      <span className="font-semibold text-green-600">- {formatPrice(formData.discount)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                     <span>Total:</span>
                     <span className="text-furgocasa-orange">{formatPrice(formData.total_price)}</span>
