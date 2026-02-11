@@ -1174,6 +1174,12 @@ export const staticTranslations = {
     fr: "Frais de livraison/prise en charge",
     de: "Liefer-/Abholgebühr"
   },
+  "Cupón": {
+    es: "Cupón",
+    en: "Coupon",
+    fr: "Code promo",
+    de: "Gutschein"
+  },
   "Descuento": {
     es: "Descuento",
     en: "Discount",
@@ -3065,6 +3071,12 @@ export const staticTranslations = {
     en: "Delivery/pick-up fee",
     fr: "Delivery/pick-up fee",
     de: "Delivery/pick-up fee"
+  },
+  "Cupón": {
+    es: "Cupón",
+    en: "Coupon",
+    fr: "Code promo",
+    de: "Gutschein"
   },
   "Descuento": {
     es: "Descuento",

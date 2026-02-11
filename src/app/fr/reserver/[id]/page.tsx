@@ -54,6 +54,8 @@ interface Booking {
   extras_price: number;
   location_fee: number;
   discount: number;
+  coupon_code?: string | null;
+  coupon_discount?: number | null;
   total_price: number;
   amount_paid: number;
   status: string;
@@ -696,12 +698,20 @@ export default function ReservaPage() {
                     <span className="font-semibold">{formatPrice(booking.base_price)}</span>
                   </div>
                   
-                  {booking.extras_price > 0 && (
+                  {/* Extras desglosados */}
+                  {booking.booking_extras && booking.booking_extras.length > 0 ? (
+                    booking.booking_extras.map((item: any) => (
+                      <div key={item.id} className="flex justify-between text-sm">
+                        <span className="opacity-90">{item.extra?.name || t("Extra")} {item.quantity > 1 && `×${item.quantity}`}</span>
+                        <span className="font-semibold">{formatPrice(item.total_price)}</span>
+                      </div>
+                    ))
+                  ) : booking.extras_price > 0 ? (
                     <div className="flex justify-between text-sm">
                       <span className="opacity-90">{t("Extras")}</span>
                       <span className="font-semibold">{formatPrice(booking.extras_price)}</span>
                     </div>
-                  )}
+                  ) : null}
 
                   {booking.location_fee > 0 && (
                     <div className="flex justify-between text-sm">
@@ -710,38 +720,49 @@ export default function ReservaPage() {
                     </div>
                   )}
 
-                  {booking.discount > 0 && (
+                  {((booking.discount ?? booking.coupon_discount) || 0) > 0 && (
                     <div className="flex justify-between text-sm">
-                      <span className="opacity-90">{t("Descuento")}</span>
-                      <span className="font-semibold text-green-300">- {formatPrice(booking.discount)}</span>
+                      <span className="opacity-90">
+                        {booking.coupon_code ? `${t("Cupón")} ${booking.coupon_code}` : t("Descuento")}
+                      </span>
+                      <span className="font-semibold text-green-300">
+                        - {formatPrice(booking.discount ?? booking.coupon_discount ?? 0)}
+                      </span>
                     </div>
                   )}
-                  
-                  <div className="flex justify-between text-sm">
-                    <span className="opacity-90">{t("Fianza")} *</span>
-                    <span className="font-semibold">1.000,00 €</span>
-                  </div>
                 </div>
 
-                {/* Sistema de pagos fraccionados */}
-                {amountPaid < totalPrice && (
-                  <div className="space-y-2 mb-4 pb-4 border-b border-white/20">
-                    <div className="flex justify-between text-sm">
-                      <span className="opacity-90">{t("Primer pago")} (50%)</span>
-                      <span className="font-semibold">{formatPrice(firstPayment)}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="opacity-90">{t("Segundo pago")} (50%)</span>
-                      <span className="font-semibold">{formatPrice(secondPayment)}</span>
-                    </div>
-                    {amountPaid > 0 && (
-                      <div className="flex justify-between text-sm pt-2 border-t border-white/20">
-                        <span className="opacity-90">{t("Ya pagado")}</span>
-                        <span className="font-semibold text-green-300">{formatPrice(amountPaid)} ✓</span>
-                      </div>
-                    )}
+                {/* Total reserva y pagos fraccionados */}
+                <div className="space-y-2 mb-4 pb-4 border-b border-white/20">
+                  <div className="flex justify-between text-sm">
+                    <span className="opacity-90 font-medium">{t("Total reserva")}:</span>
+                    <span className="font-semibold">{formatPrice(totalPrice)}</span>
                   </div>
-                )}
+                  {amountPaid < totalPrice && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="opacity-90">{t("Primer pago")} (50%)</span>
+                        <span className="font-semibold">{formatPrice(firstPayment)}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="opacity-90">{t("Segundo pago")} (50%)</span>
+                        <span className="font-semibold">{formatPrice(secondPayment)}</span>
+                      </div>
+                    </>
+                  )}
+                  {amountPaid > 0 && (
+                    <div className="flex justify-between text-sm pt-2 border-t border-white/20">
+                      <span className="opacity-90">{t("Ya pagado")}</span>
+                      <span className="font-semibold text-green-300">{formatPrice(amountPaid)} ✓</span>
+                    </div>
+                  )}
+                  {pendingAmount > 0 && (
+                    <div className="flex justify-between text-sm pt-2 border-t border-white/20">
+                      <span className="opacity-90 font-medium">{t("Pendiente de pago")}:</span>
+                      <span className="font-bold text-lg">{formatPrice(pendingAmount)}</span>
+                    </div>
+                  )}
+                </div>
 
                 <div className="mb-4">
                   <p className="text-sm opacity-90 mb-1">{t("Total")}</p>
@@ -758,9 +779,16 @@ export default function ReservaPage() {
                   )}
                 </div>
 
-                <p className="text-xs opacity-75">
-                  * {t("La fianza se devuelve al finalizar el alquiler si no hay daños")}
-                </p>
+                {/* Fianza al final */}
+                <div className="pt-2 border-t border-white/20">
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="opacity-90">{t("Fianza")} *</span>
+                    <span className="font-semibold">1.000,00 €</span>
+                  </div>
+                  <p className="text-xs opacity-75">
+                    * {t("La fianza se devuelve al finalizar el alquiler si no hay daños")}
+                  </p>
+                </div>
               </div>
 
               {/* Help */}
