@@ -56,7 +56,11 @@ export async function GET(request: NextRequest) {
       .select(`
         *,
         category:vehicle_categories(*),
-        images:vehicle_images(*)
+        images:vehicle_images(*),
+        vehicle_equipment(
+          id,
+          equipment(*)
+        )
       `)
       .eq("is_for_rent", true)
       .eq("status", "available")
