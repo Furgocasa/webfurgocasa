@@ -498,7 +498,14 @@ export default function VehiclesPage() {
                 </tr>
               ) : (
                 vehiclesList.map((vehicle) => (
-                  <tr key={vehicle.id} className="hover:bg-gray-50 transition-colors">
+                  <tr 
+                    key={vehicle.id} 
+                    className={`transition-colors ${
+                      vehicle.sale_status === 'sold' 
+                        ? 'bg-red-50 hover:bg-red-100' 
+                        : 'hover:bg-gray-50'
+                    }`}
+                  >
                     <td className="px-6 py-4">
                       {vehicle.internal_code ? (
                         <span className="inline-flex items-center px-3 py-1 rounded-md text-sm font-mono font-bold bg-blue-100 text-blue-800">
