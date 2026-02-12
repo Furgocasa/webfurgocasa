@@ -83,7 +83,7 @@ export async function handleCalendarRequest(request: NextRequest): Promise<NextR
     // Cargar datos relacionados en paralelo
     const [customersResult, vehiclesResult, locationsResult] = await Promise.all([
       supabase.from('customers').select('id, name, phone').in('id', customerIds),
-      supabase.from('vehicles').select('id, name, internal_code').in('id', vehicleIds),
+      supabase.from('vehicles').select('id, name, internal_code').in('id', vehicleIds).or('sale_status.neq.sold,sale_status.is.null'),
       supabase.from('locations').select('id, name, address').in('id', locationIds),
     ]);
     

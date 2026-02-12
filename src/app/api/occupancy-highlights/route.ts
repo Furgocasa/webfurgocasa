@@ -83,7 +83,8 @@ export async function GET() {
       .from("vehicles")
       .select("id")
       .eq("is_for_rent", true)
-      .eq("status", "available");
+      .eq("status", "available")
+      .or('sale_status.neq.sold,sale_status.is.null');
 
     if (vehiclesError) {
       console.error("Error fetching vehicles:", vehiclesError);

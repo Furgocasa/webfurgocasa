@@ -172,7 +172,8 @@ export default function NuevaReservaPage() {
       // Cargar vehículos ordenados por código interno
       const { data: vehiclesData } = await supabase
         .from('vehicles')
-        .select('id, name, brand, internal_code')
+        .select('id, name, brand, internal_code, sale_status')
+        .or('sale_status.neq.sold,sale_status.is.null')
         .order('internal_code', { ascending: true });
       setVehicles(vehiclesData || []);
 

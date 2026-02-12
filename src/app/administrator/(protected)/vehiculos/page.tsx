@@ -69,6 +69,7 @@ export default function VehiclesPage() {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [typeFilter, setTypeFilter] = useState(''); // rent/sale/both
   const [statusFilter, setStatusFilter] = useState('');
+  const [showSold, setShowSold] = useState(false);
 
   // Ordenamiento - por defecto por código interno
   const [sortField, setSortField] = useState<string>('internal_code');
@@ -200,8 +201,15 @@ export default function VehiclesPage() {
       filtered = filtered.filter(v => v.status === statusFilter);
     }
 
+    // Filtro de vendidos
+    if (!showSold) {
+      filtered = filtered.filter(v => v.sale_status !== 'sold');
+    } else if (statusFilter === 'sold') {
+      filtered = filtered.filter(v => v.sale_status === 'sold');
+    }
+
     return filtered;
-  }, [processedVehicles, searchTerm, categoryFilter, typeFilter, statusFilter]);
+  }, [processedVehicles, searchTerm, categoryFilter, typeFilter, statusFilter, showSold]);
 
   // Ordenamiento
   const sortedVehicles = useMemo(() => {
@@ -296,7 +304,7 @@ export default function VehiclesPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Total flota</p>
           <p className="text-2xl font-bold text-gray-900">{allVehicles.length}</p>
@@ -316,6 +324,10 @@ export default function VehiclesPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Alquilados ahora</p>
           <p className="text-2xl font-bold text-orange-600">{allVehicles.filter(v => v.status === 'rented').length}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <p className="text-sm text-gray-500">Vendidos (histórico)</p>
+          <p className="text-2xl font-bold text-red-600">{allVehicles.filter(v => v.sale_status === 'sold').length}</p>
         </div>
       </div>
 
@@ -367,6 +379,19 @@ export default function VehiclesPage() {
             <option value="rented">Alquilado</option>
             <option value="maintenance">Mantenimiento</option>
           </select>
+          
+          <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg">
+            <input
+              type="checkbox"
+              id="show_sold"
+              checked={showSold}
+              onChange={(e) => setShowSold(e.target.checked)}
+              className="w-4 h-4 text-furgocasa-orange focus:ring-furgocasa-orange border-gray-300 rounded"
+            />
+            <label htmlFor="show_sold" className="text-sm text-gray-700 cursor-pointer">
+              Mostrar vendidos
+            </label>
+          </div>
         </div>
       </div>
 

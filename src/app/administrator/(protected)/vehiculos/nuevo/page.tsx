@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import supabase from "@/lib/supabase/client";
-import { ArrowLeft, Save, Loader2, AlertCircle } from "lucide-react";
+import { ArrowLeft, Save, Loader2, AlertCircle, RefreshCw } from "lucide-react";
 import Link from "next/link";
 import { ImageGalleryManager, type GalleryImage } from "@/components/media/image-gallery-manager";
 import { EquipmentIcon } from "@/components/vehicle/equipment-display";
@@ -47,6 +47,7 @@ interface Category {
 export default function NuevoVehiculoPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [showSoldModal, setShowSoldModal] = useState(false);
   const [extras, setExtras] = useState<Extra[]>([]);
   const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
   const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
@@ -737,6 +738,168 @@ export default function NuevoVehiculoPage() {
           )}
         </div>
 
+        {/* Estado definitivo del vehículo */}
+        <div className="bg-red-50 rounded-xl shadow-sm border border-red-200 p-6">
+          <div className="flex items-start gap-3 mb-4">
+            <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+            <div className="flex-1">
+              <h2 className="text-xl font-bold text-gray-900 mb-1">Estado definitivo</h2>
+              <p className="text-sm text-gray-600">
+                Marca este vehículo como vendido para sacarlo permanentemente del calendario y alquiler. 
+                Los datos históricos se mantendrán en informes.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="is_sold"
+              checked={formData.sale_status === 'sold'}
+              onChange={(e) => {
+                if (e.target.checked) {
+                  setShowSoldModal(true);
+                }
+              }}
+              className="w-4 h-4 text-red-600 focus:ring-red-600 border-gray-300 rounded"
+            />
+            <label htmlFor="is_sold" className="text-base font-semibold text-red-900 cursor-pointer">
+              Marcar como VENDIDO (acción definitiva)
+            </label>
+          </div>
+          
+          {formData.sale_status === 'sold' && (
+            <>
+              <div className="mt-3 p-3 bg-red-100 border border-red-300 rounded-lg">
+                <p className="text-sm text-red-800 font-medium">
+                  Este vehículo está marcado como vendido y NO aparece en:
+                </p>
+                <ul className="mt-2 text-sm text-red-700 list-disc list-inside space-y-1">
+                  <li>Calendario de administrador</li>
+                  <li>Búsqueda de disponibilidad para alquiler</li>
+                  <li>Nueva reserva</li>
+                  <li>Sección pública de venta</li>
+                </ul>
+                <p className="mt-2 text-sm text-green-700 font-medium">
+                  Los datos históricos se mantienen en informes.
+                </p>
+              </div>
+              
+              <div className="mt-4 pt-4 border-t border-red-200">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('¿Revertir la venta de este vehículo? Volverá a estar disponible para gestión. Solo usar si la venta se cancela (ej: comprador se retracta).')) {
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        sale_status: 'available'
+                      }));
+                    }
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors text-sm font-medium"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Revertir venta (acción excepcional)
+                </button>
+                <p className="text-xs text-gray-500 mt-2">
+                  Solo usar si la venta se cancela (ej: comprador se retracta de arras)
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Modal de confirmación */}
+        {showSoldModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="flex-shrink-0 w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertCircle className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">
+                    ¿Marcar vehículo como VENDIDO?
+                  </h3>
+                  <p className="text-gray-600">
+                    Estás a punto de marcar <strong>{formData.name}</strong> como vendido. 
+                    Este cambio tendrá los siguientes efectos:
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <h4 className="font-semibold text-red-900 mb-3">El vehículo NO aparecerá en:</h4>
+                <ul className="space-y-2 text-sm text-red-800">
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span>Calendario de administrador</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span>Búsqueda de disponibilidad para alquiler</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span>Listado de vehículos disponibles para reservas</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-red-600 mt-0.5 font-bold">✗</span>
+                    <span>Sección pública de venta (si estaba en venta)</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <h4 className="font-semibold text-green-900 mb-3">Se mantendrán intactos:</h4>
+                <ul className="space-y-2 text-sm text-green-800">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5 font-bold">✓</span>
+                    <span>Todos los datos históricos del vehículo</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5 font-bold">✓</span>
+                    <span>Historial completo de reservas y alquileres</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5 font-bold">✓</span>
+                    <span>Datos en informes y estadísticas</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
+                <p className="text-sm text-blue-800">
+                  <strong>Nota:</strong> Podrás revertir esta acción si fuera necesario 
+                  (por ejemplo, si la venta se cancela por arras).
+                </p>
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setShowSoldModal(false)}
+                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    setFormData(prev => ({ 
+                      ...prev, 
+                      sale_status: 'sold',
+                      is_for_rent: false
+                    }));
+                    setShowSoldModal(false);
+                  }}
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold"
+                >
+                  Sí, marcar como vendido
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Alquiler */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-2 mb-6">
@@ -745,11 +908,17 @@ export default function NuevoVehiculoPage() {
               id="is_for_rent"
               checked={formData.is_for_rent}
               onChange={(e) => setFormData(prev => ({ ...prev, is_for_rent: e.target.checked }))}
-              className="w-4 h-4 text-furgocasa-orange focus:ring-furgocasa-orange border-gray-300 rounded"
+              disabled={formData.sale_status === 'sold'}
+              className="w-4 h-4 text-furgocasa-orange focus:ring-furgocasa-orange border-gray-300 rounded disabled:opacity-50"
             />
             <label htmlFor="is_for_rent" className="text-xl font-bold text-gray-900">
               Disponible para alquiler
             </label>
+            {formData.sale_status === 'sold' && (
+              <span className="text-sm text-red-600 font-medium ml-2">
+                (No disponible: vehículo vendido)
+              </span>
+            )}
           </div>
           
           {formData.is_for_rent && (
@@ -807,14 +976,19 @@ export default function NuevoVehiculoPage() {
                   Estado de venta
                 </label>
                 <select
-                  value={formData.sale_status}
+                  value={formData.sale_status === 'sold' ? 'available' : formData.sale_status}
                   onChange={(e) => setFormData(prev => ({ ...prev, sale_status: e.target.value as any }))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  disabled={formData.sale_status === 'sold'}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent disabled:opacity-50"
                 >
                   <option value="available">Disponible</option>
                   <option value="reserved">Reservado</option>
-                  <option value="sold">Vendido</option>
                 </select>
+                {formData.sale_status === 'sold' && (
+                  <p className="text-sm text-amber-600 mt-1">
+                    Para cambiar el estado de venta, usa el botón "Revertir venta"
+                  </p>
+                )}
               </div>
 
               <div className="md:col-span-2">

@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
       `)
       .eq("is_for_rent", true)
       .eq("status", "available")
+      .or('sale_status.neq.sold,sale_status.is.null')
       .order("sort_order", { ascending: true });
 
     // Filtrar por categoría si se especifica

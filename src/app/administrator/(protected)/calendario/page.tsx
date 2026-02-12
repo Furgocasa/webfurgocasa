@@ -121,6 +121,7 @@ export default function CalendarioPage() {
         .from('vehicles')
         .select('id, name, brand, slug, internal_code')
         .eq('is_for_rent', true)
+        .or('sale_status.neq.sold,sale_status.is.null')
         .order('internal_code', { ascending: true, nullsFirst: false });
       
       return {
