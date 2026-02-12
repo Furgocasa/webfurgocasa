@@ -9,7 +9,8 @@ import {
   ArrowRight,
   Info,
   Percent,
-  TrendingDown
+  TrendingDown,
+  Baby
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import type { VehicleWithImages } from "@/types/database";
@@ -72,6 +73,11 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
   const mainImage = vehicle.images?.find((img: any) => img.is_primary || img.is_main) || vehicle.images?.[0];
   const imageUrl = mainImage?.image_url || mainImage?.url;
   const imageAlt = mainImage?.alt_text || mainImage?.alt || vehicle.name;
+
+  // ✅ Detectar si el vehículo tiene Isofix
+  const hasIsofix = (vehicle as any).vehicle_equipment?.some(
+    (ve: any) => ve.equipment?.slug === 'isofix'
+  );
 
   // Handler para tracking de selección de vehículo
   const handleVehicleClick = async (e: React.MouseEvent) => {
@@ -145,6 +151,16 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
           <p className="text-gray-600 text-sm mb-4 line-clamp-2">
             {vehicle.short_description}
           </p>
+        )}
+
+        {/* ✅ Badge Isofix destacado - MUY VISIBLE */}
+        {hasIsofix && (
+          <div className="mb-3 inline-flex items-center gap-2 bg-gradient-to-r from-furgocasa-orange/10 to-furgocasa-orange/5 border-2 border-furgocasa-orange/30 px-3 py-2 rounded-lg">
+            <Baby className="h-5 w-5 text-furgocasa-orange" />
+            <span className="text-sm font-bold text-furgocasa-orange">
+              {t("Isofix disponible")}
+            </span>
+          </div>
         )}
 
         {/* Features */}

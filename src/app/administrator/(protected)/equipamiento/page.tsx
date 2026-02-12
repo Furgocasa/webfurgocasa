@@ -23,7 +23,7 @@ const AVAILABLE_ICONS = [
   "Zap", "Plug", "Tent", "Bike", "ArrowUpFromLine", "Package", "Radio", "Tv",
   "Wifi", "Camera", "CircleDot", "Gauge", "Snowflake", "Droplets", "Droplet",
   "ShowerHead", "Flame", "RotateCcw", "Table", "DoorOpen", "Lightbulb", "Usb",
-  "Layers", "Grid3X3", "CloudSun", "CheckCircle"
+  "Layers", "Grid3X3", "CloudSun", "CheckCircle", "Baby"
 ];
 
 const CATEGORIES = [

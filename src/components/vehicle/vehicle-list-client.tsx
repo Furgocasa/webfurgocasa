@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { LocalizedLink } from "@/components/localized-link";
-import { Car, Users, Bed, Fuel, Settings, ArrowRight, Filter, Gauge, X, Calendar, TrendingDown } from "lucide-react";
+import { Car, Users, Bed, Fuel, Settings, ArrowRight, Filter, Gauge, X, Calendar, TrendingDown, Baby } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
 import { useLanguage } from "@/contexts/language-context";
@@ -279,6 +279,16 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                   <p className="text-sm text-gray-700 mb-4 line-clamp-2">
                     {vehicle.short_description}
                   </p>
+                )}
+
+                {/* ✅ Badge Isofix destacado */}
+                {vehicle.vehicle_equipment?.some((ve: any) => ve.equipment?.slug === 'isofix') && (
+                  <div className="mb-4 inline-flex items-center gap-2 bg-gradient-to-r from-furgocasa-orange/10 to-furgocasa-orange/5 border-2 border-furgocasa-orange/30 px-3 py-2 rounded-lg">
+                    <Baby className="h-5 w-5 text-furgocasa-orange" />
+                    <span className="text-sm font-bold text-furgocasa-orange">
+                      {t("Isofix disponible")}
+                    </span>
+                  </div>
                 )}
 
                 {/* Equipamiento */}

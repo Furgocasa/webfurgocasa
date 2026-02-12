@@ -490,6 +490,12 @@ export const staticTranslations = {
     fr: "places jour",
     de: "Tagessitze"
   },
+  "Isofix disponible": {
+    es: "Isofix disponible",
+    en: "Isofix available",
+    fr: "Isofix disponible",
+    de: "Isofix verfügbar"
+  },
   "plazas noche": {
     es: "plazas noche",
     en: "night beds",

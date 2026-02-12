@@ -21,6 +21,10 @@ interface Booking {
   days: number;
   base_price: number;
   extras_price: number;
+  location_fee: number;
+  discount: number;
+  coupon_code: string | null;
+  coupon_discount: number;
   total_price: number;
   amount_paid: number | null;
   status: string;
@@ -491,20 +495,85 @@ export default function ReservaDetalleAdminPage() {
             <DollarSign className="h-6 w-6" />
             <h3 className="font-semibold">Resumen económico</h3>
           </div>
-          <div className="space-y-2 text-sm mb-4">
+          
+          {/* Desglose de precios */}
+          <div className="space-y-2 text-sm mb-4 pb-4 border-b border-white/20">
             <div className="flex justify-between">
-              <span className="opacity-90">Precio base:</span>
+              <span className="opacity-90">Alquiler ({booking.days} días):</span>
               <span className="font-semibold">{formatPrice(booking.base_price)}</span>
             </div>
-            {booking.extras_price > 0 && (
+            
+            {/* Extras desglosados */}
+            {booking.booking_extras && booking.booking_extras.length > 0 ? (
+              booking.booking_extras.map((item) => (
+                <div key={item.id} className="flex justify-between">
+                  <span className="opacity-90">
+                    {item.extra.name} {item.quantity > 1 && `×${item.quantity}`}
+                  </span>
+                  <span className="font-semibold">{formatPrice(item.total_price)}</span>
+                </div>
+              ))
+            ) : booking.extras_price > 0 ? (
               <div className="flex justify-between">
                 <span className="opacity-90">Extras:</span>
                 <span className="font-semibold">{formatPrice(booking.extras_price)}</span>
               </div>
+            ) : null}
+            
+            {/* Comisión de entrega/recogida */}
+            {booking.location_fee > 0 && (
+              <div className="flex justify-between">
+                <span className="opacity-90">Comisión entrega/recogida:</span>
+                <span className="font-semibold">{formatPrice(booking.location_fee)}</span>
+              </div>
+            )}
+            
+            {/* Descuento o Cupón */}
+            {((booking.discount ?? booking.coupon_discount) || 0) > 0 && (
+              <div className="flex justify-between">
+                <span className="opacity-90">
+                  {booking.coupon_code ? `Cupón ${booking.coupon_code}` : 'Descuento'}:
+                </span>
+                <span className="font-semibold text-green-300">
+                  - {formatPrice(booking.discount ?? booking.coupon_discount ?? 0)}
+                </span>
+              </div>
             )}
           </div>
-          <div className="text-3xl font-bold">{formatPrice(booking.total_price)}</div>
-          <p className="text-sm opacity-90 mt-1">{booking.days} días de alquiler</p>
+          
+          {/* Total y estado de pago */}
+          <div className="space-y-2 mb-4">
+            <div className="flex justify-between text-base">
+              <span className="opacity-90 font-medium">Total reserva:</span>
+              <span className="font-semibold">{formatPrice(booking.total_price)}</span>
+            </div>
+            {booking.amount_paid && booking.amount_paid > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="opacity-90">Ya pagado:</span>
+                <span className="font-semibold text-green-300">{formatPrice(booking.amount_paid)} ✓</span>
+              </div>
+            )}
+            {booking.amount_paid && booking.amount_paid < booking.total_price && (
+              <div className="flex justify-between text-sm pt-2 border-t border-white/20">
+                <span className="opacity-90 font-medium">Pendiente:</span>
+                <span className="font-bold text-lg">{formatPrice(booking.total_price - booking.amount_paid)}</span>
+              </div>
+            )}
+          </div>
+          
+          <div className="text-3xl font-bold mb-2">{formatPrice(booking.total_price)}</div>
+          <p className="text-sm opacity-90">{booking.days} días de alquiler</p>
+          
+          {/* Fianza al final */}
+          <div className="mt-4 pt-4 border-t border-white/20">
+            <div className="flex justify-between text-sm mb-1">
+              <span className="opacity-90">Fianza *</span>
+              <span className="font-semibold">1.000,00 €</span>
+            </div>
+            <p className="text-xs opacity-75">
+              * Se devuelve al finalizar el alquiler si no hay daños
+            </p>
+          </div>
         </div>
       </div>
 

@@ -34,6 +34,7 @@ import {
   Grid3X3,
   CloudSun,
   CheckCircle,
+  Baby,
   LucideIcon,
 } from "lucide-react";
 // Mapeo de nombres de iconos a componentes
@@ -70,6 +71,7 @@ const iconMap: Record<string, LucideIcon> = {
   Grid3X3,
   CloudSun,
   CheckCircle,
+  Baby,
 };
 
 // Colores por categoría
