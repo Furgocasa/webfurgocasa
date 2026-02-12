@@ -171,6 +171,8 @@ interface EquipmentListProps {
   maxVisible?: number;
   showCategory?: boolean;
   groupByCategory?: boolean;
+  showIsofixBadge?: boolean;
+  hasIsofix?: boolean;
 }
 
 /**
@@ -181,7 +183,9 @@ export function EquipmentList({
   variant = "badges",
   maxVisible,
   showCategory = false,
-  groupByCategory = false
+  groupByCategory = false,
+  showIsofixBadge = false,
+  hasIsofix = false
 }: EquipmentListProps) {
   if (!equipment || equipment.length === 0) {
     return null;
@@ -193,7 +197,7 @@ export function EquipmentList({
   // Variante de solo iconos (para cards)
   if (variant === "icons") {
     return (
-      <div className="flex gap-2 flex-wrap">
+      <div className="flex gap-2 flex-wrap items-center">
         {displayEquipment.map((eq) => (
           <EquipmentBadge key={eq.id} equipment={eq} variant="icon-only" />
         ))}
@@ -201,6 +205,14 @@ export function EquipmentList({
           <span className="p-2 bg-gray-100 rounded-lg text-xs font-medium text-gray-500">
             +{equipment.length - maxVisible!}
           </span>
+        )}
+        {showIsofixBadge && hasIsofix && (
+          <div className="inline-flex items-center gap-1.5 bg-gradient-to-r from-furgocasa-orange/10 to-furgocasa-orange/5 border border-furgocasa-orange/30 px-2.5 py-1.5 rounded-lg">
+            <Baby className="h-4 w-4 text-furgocasa-orange" />
+            <span className="text-xs font-bold text-furgocasa-orange">
+              Isofix
+            </span>
+          </div>
         )}
       </div>
     );
@@ -346,6 +358,8 @@ interface VehicleEquipmentDisplayProps {
   maxVisible?: number;
   groupByCategory?: boolean;
   title?: string;
+  showIsofixBadge?: boolean;
+  hasIsofix?: boolean;
 }
 
 export function VehicleEquipmentDisplay({
@@ -355,6 +369,8 @@ export function VehicleEquipmentDisplay({
   maxVisible,
   groupByCategory = false,
   title,
+  showIsofixBadge = false,
+  hasIsofix = false,
 }: VehicleEquipmentDisplayProps) {
   // Usar nuevo sistema si hay equipment, si no convertir legacy
   const displayEquipment = equipment && equipment.length > 0 
@@ -379,6 +395,8 @@ export function VehicleEquipmentDisplay({
         variant={variant}
         maxVisible={maxVisible}
         groupByCategory={groupByCategory}
+        showIsofixBadge={showIsofixBadge}
+        hasIsofix={hasIsofix}
       />
     </div>
   );

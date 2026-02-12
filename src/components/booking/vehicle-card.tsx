@@ -154,14 +154,11 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
           </p>
         )}
 
-        {/* ✅ Badge Isofix destacado - MUY VISIBLE */}
-        {hasIsofix && (
-          <div className="mb-3 inline-flex items-center gap-2 bg-gradient-to-r from-furgocasa-orange/10 to-furgocasa-orange/5 border-2 border-furgocasa-orange/30 px-3 py-2 rounded-lg">
-            <Baby className="h-5 w-5 text-furgocasa-orange" />
-            <span className="text-sm font-bold text-furgocasa-orange">
-              {t("Isofix disponible")}
-            </span>
-          </div>
+        {/* Descripción */}
+        {vehicle.short_description && (
+          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+            {vehicle.short_description}
+          </p>
         )}
 
         {/* Features */}
@@ -182,13 +179,15 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
           )}
         </div>
 
-        {/* Equipamiento */}
+        {/* Equipamiento con badge de Isofix integrado en la misma línea */}
         <div className="mb-4">
           <VehicleEquipmentDisplay
             equipment={(vehicle as any).vehicle_equipment?.map((item: any) => item.equipment || item).filter(Boolean) || []}
             legacyData={vehicle}
             variant="icons"
-            maxVisible={5}
+            maxVisible={6}
+            showIsofixBadge={true}
+            hasIsofix={hasIsofix}
           />
         </div>
 
