@@ -178,6 +178,30 @@ export async function POST(request: Request) {
       console.error("Error actualizando tracking de conversión:", trackingError);
     }
 
+    // ============================================
+    // EMAIL: Enviar email de reserva creada
+    // ============================================
+    try {
+      const { sendBookingCreatedEmail, getBookingDataForEmail } = await import('@/lib/email');
+      
+      const bookingData = await getBookingDataForEmail(createdBooking.id, supabase);
+      
+      if (bookingData) {
+        const result = await sendBookingCreatedEmail(booking.customer_email, bookingData);
+        
+        if (result.success) {
+          console.log('✅ Email de reserva creada enviado a:', booking.customer_email);
+        } else {
+          console.error('❌ Error enviando email de reserva creada:', result.error);
+        }
+      } else {
+        console.error('❌ No se pudieron obtener datos de la reserva para el email');
+      }
+    } catch (emailError) {
+      console.error('❌ Error crítico enviando email de reserva creada:', emailError);
+      // No bloqueamos la creación de reserva si falla el email
+    }
+
     return NextResponse.json({ booking: createdBooking }, { status: 201 });
   } catch (error: any) {
     console.error("Error in bookings API:", error);

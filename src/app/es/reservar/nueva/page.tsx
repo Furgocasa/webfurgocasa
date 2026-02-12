@@ -405,21 +405,6 @@ function NuevaReservaContent() {
 
       const { booking } = await createBookingResponse.json();
 
-      // Step 4: Enviar email de confirmación de reserva creada
-      try {
-        await fetch('/api/bookings/send-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            type: 'booking_created',
-            bookingId: booking.id,
-          }),
-        });
-      } catch (emailError) {
-        console.error('Error enviando email de confirmación:', emailError);
-        // No bloqueamos el proceso si falla el email
-      }
-
       // Step 7: Redirect to booking detail page (con ruta traducida)
       const bookingDetailPath = getTranslatedRoute(`/reservar/${booking.id}`, language);
       router.push(bookingDetailPath);
