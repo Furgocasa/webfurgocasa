@@ -39,6 +39,7 @@ interface Vehicle {
   internal_code: string | null;
   main_image_url: string | null;
   status: string | null;
+  sale_status: string | null;
   vehicle_damages?: VehicleDamage[];
   vehicle_images?: VehicleImage[];
 }
@@ -63,6 +64,7 @@ export default function DamagesPage() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [showSold, setShowSold] = useState(false);
 
   // Cargar vehículos con sus daños e imágenes
   const { 
@@ -81,6 +83,7 @@ export default function DamagesPage() {
       internal_code,
       main_image_url,
       status,
+      sale_status,
       vehicle_images (
         id,
         image_url,
@@ -159,8 +162,13 @@ export default function DamagesPage() {
       filtered = filtered.filter(v => v.totalDamages > 0);
     }
 
+    // Filtro de vendidos (ocultos por defecto)
+    if (!showSold) {
+      filtered = filtered.filter(v => v.sale_status !== 'sold');
+    }
+
     return filtered;
-  }, [processedVehicles, searchTerm, statusFilter]);
+  }, [processedVehicles, searchTerm, statusFilter, showSold]);
 
   // Estadísticas globales
   const stats = useMemo(() => {
@@ -251,6 +259,19 @@ export default function DamagesPage() {
             <option value="with_damages">Con daños registrados</option>
             <option value="no_damages">Sin daños</option>
           </select>
+          
+          <div className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg">
+            <input
+              type="checkbox"
+              id="show_sold_damages"
+              checked={showSold}
+              onChange={(e) => setShowSold(e.target.checked)}
+              className="w-4 h-4 text-furgocasa-orange focus:ring-furgocasa-orange border-gray-300 rounded"
+            />
+            <label htmlFor="show_sold_damages" className="text-sm text-gray-700 cursor-pointer">
+              Mostrar vendidos
+            </label>
+          </div>
         </div>
       </div>
 
@@ -270,7 +291,11 @@ export default function DamagesPage() {
             <Link
               key={vehicle.id}
               href={`/administrator/danos/${vehicle.id}`}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all group"
+              className={`rounded-xl shadow-sm border p-4 hover:shadow-md transition-all group ${
+                vehicle.sale_status === 'sold'
+                  ? 'bg-red-50 border-red-200'
+                  : 'bg-white border-gray-100'
+              }`}
             >
               <div className="flex items-start gap-4">
                 {/* Vehicle Image */}
@@ -292,6 +317,11 @@ export default function DamagesPage() {
                     {vehicle.internal_code && (
                       <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-bold bg-blue-100 text-blue-800">
                         {vehicle.internal_code}
+                      </span>
+                    )}
+                    {vehicle.sale_status === 'sold' && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-red-200 text-red-800">
+                        VENDIDO
                       </span>
                     )}
                     <ChevronRight className="h-4 w-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity ml-auto" />
