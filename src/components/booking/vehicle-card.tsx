@@ -75,8 +75,9 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
   const imageAlt = mainImage?.alt_text || mainImage?.alt || vehicle.name;
 
   // ✅ Detectar si el vehículo tiene Isofix
+  // Manejar ambos formatos: transformado [equipment] o sin transformar [{equipment}]
   const hasIsofix = (vehicle as any).vehicle_equipment?.some(
-    (ve: any) => ve.equipment?.slug === 'isofix'
+    (item: any) => item?.slug === 'isofix' || item?.equipment?.slug === 'isofix'
   );
 
   // Handler para tracking de selección de vehículo
@@ -184,7 +185,7 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
         {/* Equipamiento */}
         <div className="mb-4">
           <VehicleEquipmentDisplay
-            equipment={(vehicle as any).vehicle_equipment?.map((ve: any) => ve.equipment) || []}
+            equipment={(vehicle as any).vehicle_equipment?.map((item: any) => item.equipment || item).filter(Boolean) || []}
             legacyData={vehicle}
             variant="icons"
             maxVisible={5}
