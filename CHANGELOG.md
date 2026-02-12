@@ -4,6 +4,43 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## ⚡ [4.4.2] - 12 de Febrero 2026 - **Sistema de Vehículos Vendidos**
+
+### 🚗 Estado Definitivo "Vendido"
+
+Sistema completo para marcar vehículos como vendidos de forma independiente (no requiere estar "en venta").
+
+#### Funcionalidades
+
+- **Sección "Estado definitivo"** en formularios de vehículos (editar/nuevo)
+- **Modal de confirmación** detallado al marcar como vendido
+- **Botón "Revertir venta"** para casos excepcionales (arras canceladas)
+- **Exclusión automática** de vendidos en: calendario, disponibilidad, nueva reserva
+- **Toggle "Mostrar vendidos"** en lista de vehículos y registro de daños
+- **Indicadores visuales** rojos (fondo + badge VENDIDO) donde aparecen
+
+#### Informes: Corrección Importante
+
+- **Antes:** Vehículos vendidos no aparecían (filtro `is_for_rent`)
+- **Ahora:** Informes muestran **TODOS** los vehículos incluyendo vendidos
+- Histórico completo de reservas e ingresos se mantiene
+- Cálculo de ocupación solo usa vehículos activos en alquiler
+
+#### Documentación
+
+- **Nuevo:** `docs/04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md`
+- **Actualizado:** `docs/04-referencia/vehiculos/GUIA-QUERIES-VEHICULOS.md`
+- **Actualizado:** `README.md` con sección de actualización
+
+#### Commits
+
+- `72c2147` - feat(vehiculos): estado vendido independiente con modal y reversion
+- `cd076ab` - feat(vehiculos): fondo rojo claro para vehiculos vendidos en lista
+- `865734c` - fix(informes): mostrar todos los vehiculos incluidos vendidos con indicador visual
+- `02440f1` - feat(danos): ocultar vehiculos vendidos por defecto con toggle
+
+---
+
 ## ⚡ [4.4.1] - 27 de Enero 2026 - **Skeleton Screen: Optimización de Percepción**
 
 ### 🎯 **PROBLEMA IDENTIFICADO: PERCEPCIÓN DE LENTITUD**

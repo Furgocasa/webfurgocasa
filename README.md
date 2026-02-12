@@ -17,7 +17,33 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 5 de Febrero 2026 - **Auditoría de Seguridad Completa**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 12 de Febrero 2026 - **Sistema de Vehículos Vendidos**
+
+### 🚗 Estado Definitivo para Vehículos Vendidos
+
+**Estado**: ✅ Completado y desplegada  
+**Documentación**: [`docs/04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md`](./docs/04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)
+
+Nuevo sistema para marcar vehículos como vendidos de forma independiente (no requiere estar "en venta"):
+
+**Funcionalidades:**
+- ✅ **Sección "Estado definitivo"** en formularios (editar/nuevo vehículo)
+- ✅ **Modal de confirmación** detallado al marcar como vendido
+- ✅ **Botón "Revertir venta"** para casos excepcionales (ej: arras canceladas)
+- ✅ **Exclusión automática** de vendidos en: calendario, disponibilidad, nueva reserva
+- ✅ **Toggle "Mostrar vendidos"** en lista de vehículos y registro de daños
+- ✅ **Indicadores visuales** rojos (fondo + badge VENDIDO)
+
+**Informes (cambio importante):**
+- Los informes muestran **TODOS** los vehículos (incluidos vendidos) para mantener histórico completo
+- Los vendidos se destacan con fondo rojo y badge VENDIDO
+- El cálculo de ocupación solo usa vehículos activos en alquiler
+
+**Commits**: `72c2147`, `cd076ab`, `865734c`, `02440f1`
+
+---
+
+## ⚡ [ACTUALIZACIÓN ANTERIOR] - 5 de Febrero 2026 - **Auditoría de Seguridad Completa**
 
 ### 🔒 Auditoría de Seguridad y Correcciones Implementadas
 
@@ -2127,7 +2153,7 @@ Desarrollado con ❤️ para Furgocasa
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 5 de Febrero 2026 (Auditoría de Seguridad)  
+**Última actualización**: 12 de Febrero 2026 (Sistema Vehículos Vendidos)  
 
 ---
 

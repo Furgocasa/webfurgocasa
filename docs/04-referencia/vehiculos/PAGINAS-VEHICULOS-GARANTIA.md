@@ -1,7 +1,14 @@
 # 🚗 GARANTÍA DE CALIDAD - PÁGINAS DE VEHÍCULOS
 
 **Fecha creación:** 2026-01-08  
+**Última actualización:** 2026-02-12 (Sistema vehículos vendidos)  
 **Estado:** ✅ VERIFICADO Y FUNCIONAL
+
+---
+
+## 📌 RELACIÓN CON VEHÍCULOS VENDIDOS
+
+Los vehículos con `sale_status = 'sold'` están excluidos de búsqueda de disponibilidad, calendario y nueva reserva. Las páginas públicas de alquiler no los mostrarán. Ver [SISTEMA-VEHICULOS-VENDIDOS.md](./SISTEMA-VEHICULOS-VENDIDOS.md).
 
 ---
 

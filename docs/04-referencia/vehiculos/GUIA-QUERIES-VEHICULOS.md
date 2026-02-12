@@ -1,6 +1,6 @@
 # 🚗 GUÍA DEFINITIVA - QUERIES DE VEHÍCULOS
 
-**Última actualización:** 2026-01-08  
+**Última actualización:** 2026-02-12  
 **Basado en:** SUPABASE-SCHEMA-REAL.md
 
 ---
@@ -204,6 +204,19 @@ sale_price: number
 sale_price_negotiable: boolean
 ```
 
+### ⚠️ Vehículos vendidos (sale_status = 'sold')
+
+Cuando un vehículo está vendido, debe **excluirse** de operaciones activas (calendario, disponibilidad, nueva reserva):
+
+```typescript
+// Para excluir vehículos vendidos:
+.or('sale_status.neq.sold,sale_status.is.null')
+```
+
+Los **informes** incluyen TODOS los vehículos (incluidos vendidos) para mantener histórico completo.
+
+**Ver:** [SISTEMA-VEHICULOS-VENDIDOS.md](./SISTEMA-VEHICULOS-VENDIDOS.md)
+
 ### Campos comunes:
 ```typescript
 id, slug, name, brand, model, year,
@@ -314,11 +327,12 @@ Antes de modificar cualquier página de vehículos:
 
 ## 🔗 DOCUMENTOS RELACIONADOS
 
+- **[SISTEMA-VEHICULOS-VENDIDOS.md](./SISTEMA-VEHICULOS-VENDIDOS.md)** - Estado vendido y filtros
 - **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** - Reglas generales
 - **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** - Schema completo
 - **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** - Flujo de reservas
 
 ---
 
-**Última verificación:** 2026-01-08 19:15 UTC  
+**Última verificación:** 2026-02-12  
 **Estado:** ✅ Todas las páginas actualizadas y verificadas

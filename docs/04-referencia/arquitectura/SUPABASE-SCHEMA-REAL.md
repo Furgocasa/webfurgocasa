@@ -67,7 +67,10 @@ const { data } = await supabase
   `)
   .eq('is_for_rent', true)
   .eq('status', 'available')
+  .or('sale_status.neq.sold,sale_status.is.null')  // Excluir vendidos
 ```
+
+> **Nota:** Los vehículos con `sale_status = 'sold'` deben excluirse de disponibilidad, calendario y nueva reserva. Ver [SISTEMA-VEHICULOS-VENDIDOS.md](../vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)
 
 ---
 

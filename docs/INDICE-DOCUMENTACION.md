@@ -1,10 +1,30 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.15 ✅ PRODUCCIÓN - PÁGINAS SEO MARRUECOS MULTIIDIOMA  
+**Versión**: 1.0.16 ✅ PRODUCCIÓN - SISTEMA VEHÍCULOS VENDIDOS  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 5 de Febrero, 2026
+**Última actualización**: 12 de Febrero, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🚗 VERSIÓN 1.0.16 - SISTEMA DE VEHÍCULOS VENDIDOS (12 Feb 2026)
+
+**✅ ESTADO: COMPLETADO** - Estado definitivo para vehículos vendidos con exclusión de operaciones activas.
+
+**NUEVA FUNCIONALIDAD**: Marcar vehículos como vendidos de forma independiente (no requiere estar "en venta").
+- **Modal de confirmación** detallado al marcar vendido
+- **Botón "Revertir venta"** para casos excepcionales (arras canceladas)
+- **Toggle "Mostrar vendidos"** en lista vehículos y daños
+- **Informes**: Muestran TODOS los vehículos (incluidos vendidos) para histórico completo
+
+Ver **[SISTEMA-VEHICULOS-VENDIDOS.md](./04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)** para detalles completos.
+
+### 🎯 Highlights v1.0.16:
+- ✅ Estado vendido independiente de "en venta"
+- ✅ Exclusión automática: calendario, disponibilidad, nueva reserva
+- ✅ Informes con histórico completo + indicadores visuales rojos
+- ✅ Daños: vendidos ocultos por defecto con toggle
 
 ---
 
@@ -219,6 +239,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** | ⚠️ **REGLAS OBLIGATORIAS** - Queries a Supabase | ANTES de hacer ANY query |
 | **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** | Schema real con campos exactos | Al consultar tablas |
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
+| **[SISTEMA-VEHICULOS-VENDIDOS.md](./04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)** | 🚗 **NUEVO** - Estado vendido e informes | Admin vehículos, calendario, informes, daños |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo de reservas | Antes de tocar /reservar/** |
 | **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** | 🎟️ Sistema de cupones de descuento | Antes de tocar cupones o `/reservar/nueva` |
@@ -340,6 +361,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 - **[REGLAS-SUPABASE-OBLIGATORIAS.md](./REGLAS-SUPABASE-OBLIGATORIAS.md)** - ⚠️ LEER ANTES DE QUERIES
 - **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** - Schema real con campos exactos
 - **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** - ⚠️ Garantía de calidad páginas vehículos
+- **[SISTEMA-VEHICULOS-VENDIDOS.md](./04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)** - 🚗 Estado vendido, informes, calendario
 - **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** - ⚠️ **NUEVO** - Gestión de clientes
 
 Ver carpeta `supabase/`:
