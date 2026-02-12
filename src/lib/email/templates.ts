@@ -156,6 +156,7 @@ export interface BookingEmailData {
   extrasPrice: number;
   locationFee?: number;
   discount?: number;
+  couponCode?: string | null;
   totalPrice: number;
   amountPaid?: number;
   pendingAmount?: number;
@@ -243,35 +244,71 @@ function getExtrasSection(extras: BookingExtra[]): string {
 
 /**
  * Genera la sección de precios (tabla HTML)
+ * IMPORTANTE: Debe coincidir exactamente con el resumen de la página web
  */
 function getPriceSection(data: BookingEmailData): string {
   let rows = tableRow(`Alquiler (${data.days} días)`, formatPrice(data.basePrice));
   
-  if (data.extrasPrice > 0) {
+  // Mostrar extras desglosados (igual que en la web)
+  if (data.extras && data.extras.length > 0) {
+    data.extras.forEach(extra => {
+      const label = extra.quantity > 1 ? `${extra.name} ×${extra.quantity}` : extra.name;
+      rows += tableRow(label, formatPrice(extra.totalPrice));
+    });
+  } else if (data.extrasPrice > 0) {
+    // Fallback si no hay desglose disponible
     rows += tableRow('Extras', formatPrice(data.extrasPrice));
   }
+  
+  // Comisión de entrega/recogida
   if (data.locationFee && data.locationFee > 0) {
     rows += tableRow('Comisión entrega/recogida', formatPrice(data.locationFee));
   }
+  
+  // Descuento con código de cupón si existe (igual que en la web)
   if (data.discount && data.discount > 0) {
-    rows += tableRow('Descuento', `-${formatPrice(data.discount)}`, '#10b981');
+    const discountLabel = data.couponCode ? `Cupón ${data.couponCode}` : 'Descuento';
+    rows += tableRow(discountLabel, `-${formatPrice(data.discount)}`, '#10b981');
   }
-  rows += tableRow('Fianza (se devuelve)', formatPrice(1000));
+  
+  // Separador antes del total
+  rows += `
+    <tr>
+      <td colspan="2" style="padding: 8px 0; border-bottom: 2px solid #063971;"></td>
+    </tr>
+  `;
   
   // Total con estilo especial
   rows += `
     <tr>
-      <td style="padding: 12px 0 8px 0; font-size: 14px; font-weight: bold; color: #111827; border-top: 2px solid #063971;">TOTAL</td>
-      <td style="padding: 12px 0 8px 0; font-size: 18px; font-weight: bold; color: #063971; text-align: right; border-top: 2px solid #063971;">${formatPrice(data.totalPrice)}</td>
+      <td style="padding: 12px 0 8px 0; font-size: 14px; font-weight: bold; color: #111827;">TOTAL RESERVA</td>
+      <td style="padding: 12px 0 8px 0; font-size: 18px; font-weight: bold; color: #063971; text-align: right;">${formatPrice(data.totalPrice)}</td>
     </tr>
   `;
   
   if (data.amountPaid !== undefined && data.amountPaid > 0) {
-    rows += tableRow('Pagado', formatPrice(data.amountPaid), '#10b981');
+    rows += tableRow('Ya pagado', formatPrice(data.amountPaid), '#10b981');
   }
   if (data.pendingAmount !== undefined && data.pendingAmount > 0) {
-    rows += tableRow('Pendiente', formatPrice(data.pendingAmount), '#dc2626');
+    rows += tableRow('Pendiente de pago', formatPrice(data.pendingAmount), '#dc2626');
   }
+  
+  // Fianza al final con nota explicativa (igual que en la web)
+  rows += `
+    <tr>
+      <td colspan="2" style="padding: 12px 0 8px 0; border-top: 1px solid #e5e7eb;"></td>
+    </tr>
+  `;
+  rows += tableRow('Fianza', formatPrice(1000));
+  rows += `
+    <tr>
+      <td colspan="2" style="padding: 4px 0;">
+        <p style="margin: 0; font-size: 11px; color: #6b7280; font-style: italic;">
+          * La fianza se devuelve al finalizar el alquiler si no hay daños
+        </p>
+      </td>
+    </tr>
+  `;
   
   return rows;
 }
