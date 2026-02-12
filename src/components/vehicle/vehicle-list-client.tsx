@@ -282,7 +282,7 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                 )}
 
                 {/* ✅ Badge Isofix destacado */}
-                {vehicle.vehicle_equipment?.some((ve: any) => ve.equipment?.slug === 'isofix') && (
+                {vehicle.vehicle_equipment?.some((item: any) => item?.slug === 'isofix' || item?.equipment?.slug === 'isofix') && (
                   <div className="mb-4 inline-flex items-center gap-2 bg-gradient-to-r from-furgocasa-orange/10 to-furgocasa-orange/5 border-2 border-furgocasa-orange/30 px-3 py-2 rounded-lg">
                     <Baby className="h-5 w-5 text-furgocasa-orange" />
                     <span className="text-sm font-bold text-furgocasa-orange">
@@ -295,7 +295,7 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                 {vehicle.vehicle_equipment && vehicle.vehicle_equipment.length > 0 && (
                   <div className="mb-4">
                     <VehicleEquipmentDisplay 
-                      equipment={vehicle.vehicle_equipment.map((ve: any) => ve.equipment).filter(Boolean)}
+                      equipment={vehicle.vehicle_equipment.map((item: any) => item.equipment || item).filter(Boolean)}
                       variant="icons"
                       maxVisible={6}
                     />
