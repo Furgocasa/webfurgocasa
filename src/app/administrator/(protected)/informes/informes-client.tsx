@@ -52,6 +52,7 @@ interface Vehicle {
   internal_code: string | null;
   is_for_rent: boolean | null;
   status: string | null;
+  sale_status: string | null;
 }
 
 interface Booking {
@@ -127,8 +128,11 @@ export default function InformesClient({
   // Estado para años expandidos en la tabla de control
   const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set([currentYear]));
 
-  // Vehículos de alquiler solamente
-  const rentableVehicles = vehicles.filter(v => v.is_for_rent);
+  // Todos los vehículos (incluidos vendidos para mantener histórico)
+  const allVehiclesForReports = vehicles;
+  
+  // Vehículos de alquiler activos (para cálculo de ocupación)
+  const activeRentableVehicles = vehicles.filter(v => v.is_for_rent);
 
   // Años disponibles basado en reservas
   const availableYears = useMemo(() => {
@@ -240,11 +244,11 @@ export default function InformesClient({
   // Total reservas
   const totalBookings = filteredBookings.length;
 
-  // Cálculo de ocupación real
+  // Cálculo de ocupación real (solo vehículos activos en alquiler)
   const occupancyData = useMemo(() => {
     const vehiclesToCalculate = selectedVehicles.length > 0 
-      ? rentableVehicles.filter(v => selectedVehicles.includes(v.id))
-      : rentableVehicles;
+      ? activeRentableVehicles.filter(v => selectedVehicles.includes(v.id))
+      : activeRentableVehicles;
     
     if (vehiclesToCalculate.length === 0) return { percentage: 0, daysBooked: 0, daysAvailable: 0 };
 
@@ -287,7 +291,7 @@ export default function InformesClient({
       daysBooked: totalBookedDays,
       daysAvailable: totalAvailableDays,
     };
-  }, [filteredBookings, rentableVehicles, selectedVehicles, getDateRange]);
+  }, [filteredBookings, activeRentableVehicles, selectedVehicles, getDateRange]);
 
   // Valor medio por reserva
   const avgBookingValue = totalBookings > 0 ? totalRevenue / totalBookings : 0;
@@ -357,11 +361,11 @@ export default function InformesClient({
     return data;
   }, [filteredBookings, selectedYear, revenueMode]);
 
-  // Ocupación por mes
+  // Ocupación por mes (solo vehículos activos en alquiler)
   const occupancyByMonth = useMemo(() => {
     const vehiclesToCalculate = selectedVehicles.length > 0 
-      ? rentableVehicles.filter(v => selectedVehicles.includes(v.id))
-      : rentableVehicles;
+      ? activeRentableVehicles.filter(v => selectedVehicles.includes(v.id))
+      : activeRentableVehicles;
     
     if (vehiclesToCalculate.length === 0) return [];
 
@@ -411,13 +415,13 @@ export default function InformesClient({
     }
     
     return data;
-  }, [bookings, rentableVehicles, selectedVehicles, selectedYear]);
+  }, [bookings, activeRentableVehicles, selectedVehicles, selectedYear]);
 
-  // Datos por vehículo
+  // Datos por vehículo (todos los vehículos incluidos vendidos)
   const vehicleStats = useMemo(() => {
     const vehiclesToShow = selectedVehicles.length > 0 
-      ? rentableVehicles.filter(v => selectedVehicles.includes(v.id))
-      : rentableVehicles;
+      ? allVehiclesForReports.filter(v => selectedVehicles.includes(v.id))
+      : allVehiclesForReports;
 
     return vehiclesToShow.map(vehicle => {
       const vehicleBookings = filteredBookings.filter(b => b.vehicle_id === vehicle.id);
@@ -443,15 +447,17 @@ export default function InformesClient({
       const occupancy = daysInRange > 0 ? (bookedDates.size / daysInRange) * 100 : 0;
 
       return {
+        id: vehicle.id,
         name: vehicle.internal_code || vehicle.name,
         fullName: vehicle.name,
         ingresos: revenue,
         reservas: vehicleBookings.length,
         ocupacion: Math.round(occupancy * 10) / 10,
         diasReservados: bookedDates.size,
+        isSold: vehicle.sale_status === 'sold',
       };
     }).sort((a, b) => b.ingresos - a.ingresos);
-  }, [rentableVehicles, selectedVehicles, filteredBookings, getDateRange]);
+  }, [allVehiclesForReports, selectedVehicles, filteredBookings, getDateRange]);
 
   // Datos por temporada - Agrupados en 3 categorías: Baja, Media, Alta
   const seasonStats = useMemo(() => {
@@ -465,8 +471,8 @@ export default function InformesClient({
     };
     
     const vehiclesToCalculate = selectedVehicles.length > 0 
-      ? rentableVehicles.filter(v => selectedVehicles.includes(v.id))
-      : rentableVehicles;
+      ? activeRentableVehicles.filter(v => selectedVehicles.includes(v.id))
+      : activeRentableVehicles;
 
     return seasonTypes.map(seasonType => {
       // Obtener todas las temporadas de este tipo
@@ -572,7 +578,7 @@ export default function InformesClient({
         periodo: allPeriods.length > 0 ? allPeriods.join(' | ') : 'Sin periodos definidos',
       };
     });
-  }, [seasons, bookings, rentableVehicles, selectedVehicles]);
+  }, [seasons, bookings, activeRentableVehicles, selectedVehicles]);
 
   // Distribución de ingresos para gráfico de pastel
   const revenueDistribution = useMemo(() => {
@@ -615,10 +621,11 @@ export default function InformesClient({
     sortedYears.forEach(year => {
       // Inicializar estructura del año
       const yearData = {
-        vehicles: rentableVehicles.map(vehicle => ({
+        vehicles: allVehiclesForReports.map(vehicle => ({
           id: vehicle.id,
           name: vehicle.name,
           internalCode: vehicle.internal_code || vehicle.name,
+          isSold: vehicle.sale_status === 'sold',
           months: Array(12).fill(0),
           total: 0,
         })),
@@ -704,7 +711,7 @@ export default function InformesClient({
     });
     
     return { years: sortedYears, data: tableData };
-  }, [bookings, rentableVehicles, revenueMode]);
+  }, [bookings, allVehiclesForReports, revenueMode]);
   
   // Totales generales de todos los años
   const grandTotals = useMemo(() => {
@@ -928,17 +935,22 @@ export default function InformesClient({
               )}
             </label>
             <div className="flex flex-wrap gap-2">
-              {rentableVehicles.map(vehicle => (
+              {allVehiclesForReports.map(vehicle => (
                 <button
                   key={vehicle.id}
                   onClick={() => toggleVehicle(vehicle.id)}
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                     selectedVehicles.includes(vehicle.id)
                       ? 'bg-furgocasa-orange text-white'
+                      : vehicle.sale_status === 'sold'
+                      ? 'bg-red-100 text-red-700 hover:bg-red-200'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
                   {vehicle.internal_code || vehicle.name}
+                  {vehicle.sale_status === 'sold' && (
+                    <span className="ml-1.5 text-xs">🔴</span>
+                  )}
                 </button>
               ))}
               {selectedVehicles.length > 0 && (
@@ -1004,7 +1016,7 @@ export default function InformesClient({
           <p className="text-sm text-gray-500">Reservas</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">{totalBookings}</p>
           <p className="text-xs text-gray-500 mt-1">
-            {(totalBookings / Math.max(1, (selectedVehicles.length || rentableVehicles.length))).toFixed(1)} por vehículo
+            {(totalBookings / Math.max(1, (selectedVehicles.length || allVehiclesForReports.length))).toFixed(1)} por vehículo
           </p>
         </div>
 
@@ -1171,10 +1183,22 @@ export default function InformesClient({
               </thead>
               <tbody>
                 {vehicleStats.map((vehicle, i) => (
-                  <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
+                  <tr 
+                    key={i} 
+                    className={`border-b border-gray-100 ${
+                      vehicle.isSold ? 'bg-red-50 hover:bg-red-100' : 'hover:bg-gray-50'
+                    }`}
+                  >
                     <td className="py-3 px-2">
                       <div>
-                        <p className="font-medium text-gray-900">{vehicle.name}</p>
+                        <p className={`font-medium ${vehicle.isSold ? 'text-red-900' : 'text-gray-900'}`}>
+                          {vehicle.name}
+                          {vehicle.isSold && (
+                            <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-200 text-red-800 font-semibold">
+                              VENDIDO
+                            </span>
+                          )}
+                        </p>
                         <p className="text-xs text-gray-500">{vehicle.fullName}</p>
                       </div>
                     </td>

@@ -9,10 +9,10 @@ export const metadata: Metadata = {
 async function getInformesData() {
   const supabase = await createClient();
   
-  // Obtener vehículos
+  // Obtener vehículos (incluidos vendidos para histórico)
   const { data: vehicles, error: vehiclesError } = await supabase
     .from('vehicles')
-    .select('id, name, slug, internal_code, is_for_rent, status')
+    .select('id, name, slug, internal_code, is_for_rent, status, sale_status')
     .order('internal_code', { ascending: true, nullsFirst: false });
 
   if (vehiclesError) {
