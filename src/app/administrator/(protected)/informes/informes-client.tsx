@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -28,6 +28,7 @@ import {
   X,
   ChevronDown,
   Download,
+  ChevronRight,
 } from "lucide-react";
 import { formatPrice } from "@/lib/utils";
 import {
@@ -122,6 +123,9 @@ export default function InformesClient({
   
   // Modo de visualización de ingresos: 'creation' (fecha de creación) o 'rental' (días alquilados)
   const [revenueMode, setRevenueMode] = useState<'creation' | 'rental'>('creation');
+  
+  // Estado para años expandidos en la tabla de control
+  const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set([currentYear]));
 
   // Vehículos de alquiler solamente
   const rentableVehicles = vehicles.filter(v => v.is_for_rent);
@@ -578,6 +582,157 @@ export default function InformesClient({
       color: COLORS[i % COLORS.length],
     }));
   }, [vehicleStats]);
+
+  // ============================================
+  // TABLA DE CONTROL DE INGRESOS (Año → Vehículo → Meses)
+  // ============================================
+  
+  // Estructura de datos para la tabla de control mensual
+  const revenueControlTable = useMemo(() => {
+    // Obtener años con datos reales
+    const yearsWithData = new Set<number>();
+    bookings.forEach(b => {
+      if (VALID_STATUSES.includes(b.status)) {
+        yearsWithData.add(new Date(b.pickup_date).getFullYear());
+      }
+    });
+    
+    const sortedYears = Array.from(yearsWithData).sort((a, b) => b - a);
+    
+    // Estructura por año
+    const tableData: Record<number, {
+      vehicles: Array<{
+        id: string;
+        name: string;
+        internalCode: string;
+        months: number[]; // 12 meses (0=Enero, 11=Diciembre)
+        total: number;
+      }>;
+      monthTotals: number[]; // Totales por mes
+      yearTotal: number;
+    }> = {};
+    
+    sortedYears.forEach(year => {
+      // Inicializar estructura del año
+      const yearData = {
+        vehicles: rentableVehicles.map(vehicle => ({
+          id: vehicle.id,
+          name: vehicle.name,
+          internalCode: vehicle.internal_code || vehicle.name,
+          months: Array(12).fill(0),
+          total: 0,
+        })),
+        monthTotals: Array(12).fill(0),
+        yearTotal: 0,
+      };
+      
+      // Procesar reservas del año
+      bookings.forEach(booking => {
+        if (!VALID_STATUSES.includes(booking.status)) return;
+        
+        const pickupDate = parseISO(booking.pickup_date);
+        const dropoffDate = parseISO(booking.dropoff_date);
+        const bookingYear = pickupDate.getFullYear();
+        
+        // Solo procesar reservas de este año
+        if (bookingYear !== year) return;
+        
+        // Encontrar vehículo
+        const vehicleIndex = yearData.vehicles.findIndex(v => v.id === booking.vehicle_id);
+        if (vehicleIndex === -1) return;
+        
+        if (revenueMode === 'creation') {
+          // Modo creación: ingresos en el mes de creación
+          if (!booking.created_at) return;
+          const createdDate = parseISO(booking.created_at);
+          const createdYear = createdDate.getFullYear();
+          const createdMonth = createdDate.getMonth();
+          
+          if (createdYear === year) {
+            yearData.vehicles[vehicleIndex].months[createdMonth] += booking.total_price || 0;
+          }
+        } else {
+          // Modo días alquilados: distribuir proporcionalmente
+          const yearStart = new Date(year, 0, 1);
+          const yearEnd = new Date(year, 11, 31, 23, 59, 59);
+          
+          // Solo si la reserva solapa con este año
+          if (pickupDate <= yearEnd && dropoffDate >= yearStart) {
+            // Iterar por cada mes del año
+            for (let month = 0; month < 12; month++) {
+              const monthStart = new Date(year, month, 1);
+              const monthEnd = new Date(year, month + 1, 0, 23, 59, 59);
+              
+              // Verificar si la reserva solapa con este mes
+              if (pickupDate <= monthEnd && dropoffDate >= monthStart) {
+                const effectiveStart = pickupDate < monthStart ? monthStart : pickupDate;
+                const effectiveEnd = dropoffDate > monthEnd ? monthEnd : dropoffDate;
+                
+                if (effectiveStart <= effectiveEnd) {
+                  const daysInMonth = differenceInDays(effectiveEnd, effectiveStart) + 1;
+                  const totalDays = booking.days || differenceInDays(dropoffDate, pickupDate) + 1;
+                  
+                  // Distribuir ingresos proporcionalmente
+                  const proportionalRevenue = (booking.total_price || 0) * (daysInMonth / totalDays);
+                  yearData.vehicles[vehicleIndex].months[month] += proportionalRevenue;
+                }
+              }
+            }
+          }
+        }
+      });
+      
+      // Calcular totales
+      yearData.vehicles.forEach(vehicle => {
+        vehicle.total = vehicle.months.reduce((sum, val) => sum + val, 0);
+        yearData.yearTotal += vehicle.total;
+        
+        // Sumar a totales mensuales
+        vehicle.months.forEach((value, monthIndex) => {
+          yearData.monthTotals[monthIndex] += value;
+        });
+      });
+      
+      // Ordenar vehículos por código interno
+      yearData.vehicles.sort((a, b) => {
+        const codeA = a.internalCode.toUpperCase();
+        const codeB = b.internalCode.toUpperCase();
+        return codeA.localeCompare(codeB);
+      });
+      
+      tableData[year] = yearData;
+    });
+    
+    return { years: sortedYears, data: tableData };
+  }, [bookings, rentableVehicles, revenueMode]);
+  
+  // Totales generales de todos los años
+  const grandTotals = useMemo(() => {
+    const monthTotals = Array(12).fill(0);
+    let total = 0;
+    
+    Object.values(revenueControlTable.data).forEach(yearData => {
+      yearData.monthTotals.forEach((value, index) => {
+        monthTotals[index] += value;
+      });
+      total += yearData.yearTotal;
+    });
+    
+    return { monthTotals, total };
+  }, [revenueControlTable]);
+  
+  // Función para expandir/colapsar años
+  const toggleYear = (year: number) => {
+    setExpandedYears(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(year)) {
+        newSet.delete(year);
+      } else {
+        newSet.add(year);
+      }
+      return newSet;
+    });
+  };
 
   // ============================================
   // FUNCIONES DE CONTROL
@@ -1123,6 +1278,171 @@ export default function InformesClient({
             </BarChart>
           </ResponsiveContainer>
         </div>
+      </div>
+
+      {/* Tabla de Control de Ingresos Mensual */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-lg font-bold text-gray-900">Tabla de Control de Ingresos Mensual</h3>
+            <p className="text-sm text-gray-500 mt-1">Vista detallada por vehículo y mes</p>
+          </div>
+          
+          {/* Selector de modo de visualización */}
+          <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+            <button
+              onClick={() => setRevenueMode('creation')}
+              className={`px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                revenueMode === 'creation'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Creación de pedidos
+            </button>
+            <button
+              onClick={() => setRevenueMode('rental')}
+              className={`px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                revenueMode === 'rental'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Días alquilados
+            </button>
+          </div>
+        </div>
+
+        {revenueControlTable.years.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p>No hay datos de ingresos disponibles</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="border-b-2 border-gray-300">
+                  <th className="text-left py-3 px-4 font-bold text-gray-700 bg-gray-50 sticky left-0 z-10 min-w-[140px]">
+                    Año / Vehículo
+                  </th>
+                  {MONTHS.map((month, i) => (
+                    <th key={i} className="text-right py-3 px-3 font-semibold text-gray-600 bg-gray-50 min-w-[90px]">
+                      {month.substring(0, 3)}
+                    </th>
+                  ))}
+                  <th className="text-right py-3 px-4 font-bold text-gray-700 bg-orange-50 min-w-[110px]">
+                    TOTAL
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {revenueControlTable.years.map((year, yearIndex) => {
+                  const yearData = revenueControlTable.data[year];
+                  const isExpanded = expandedYears.has(year);
+                  
+                  return (
+                    <React.Fragment key={year}>
+                      {/* Fila del año (siempre visible) */}
+                      <tr 
+                        className={`border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
+                          yearIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                        }`}
+                        onClick={() => toggleYear(year)}
+                      >
+                        <td className="py-3 px-4 font-bold text-gray-900 bg-gray-100 sticky left-0 z-10">
+                          <div className="flex items-center gap-2">
+                            {isExpanded ? (
+                              <ChevronDown className="h-4 w-4 text-gray-600" />
+                            ) : (
+                              <ChevronRight className="h-4 w-4 text-gray-600" />
+                            )}
+                            <span>{year}</span>
+                          </div>
+                        </td>
+                        {yearData.monthTotals.map((value, monthIndex) => (
+                          <td key={monthIndex} className="text-right py-3 px-3 font-semibold text-gray-900">
+                            {value > 0 ? formatPrice(value) : '-'}
+                          </td>
+                        ))}
+                        <td className="text-right py-3 px-4 font-bold text-furgocasa-orange bg-orange-50">
+                          {formatPrice(yearData.yearTotal)}
+                        </td>
+                      </tr>
+                      
+                      {/* Filas de vehículos (solo si está expandido) */}
+                      {isExpanded && yearData.vehicles.map((vehicle, vehIndex) => {
+                        // Solo mostrar vehículos con ingresos
+                        if (vehicle.total === 0) return null;
+                        
+                        return (
+                          <tr 
+                            key={vehicle.id}
+                            className={`border-b border-gray-100 hover:bg-blue-50/30 transition-colors ${
+                              vehIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50/30'
+                            }`}
+                          >
+                            <td className="py-2 px-4 pl-10 text-gray-700 bg-white sticky left-0 z-10">
+                              {vehicle.internalCode}
+                            </td>
+                            {vehicle.months.map((value, monthIndex) => (
+                              <td key={monthIndex} className="text-right py-2 px-3 text-gray-700">
+                                {value > 0 ? formatPrice(value) : '-'}
+                              </td>
+                            ))}
+                            <td className="text-right py-2 px-4 font-semibold text-gray-900 bg-orange-50/50">
+                              {formatPrice(vehicle.total)}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                      
+                      {/* Fila de total del año (solo si está expandido) */}
+                      {isExpanded && (
+                        <tr className="border-b-2 border-gray-300 bg-gray-100 font-semibold">
+                          <td className="py-3 px-4 text-gray-900 sticky left-0 z-10">
+                            TOTAL {year}
+                          </td>
+                          {yearData.monthTotals.map((value, monthIndex) => (
+                            <td key={monthIndex} className="text-right py-3 px-3 text-gray-900">
+                              {value > 0 ? formatPrice(value) : '-'}
+                            </td>
+                          ))}
+                          <td className="text-right py-3 px-4 font-bold text-furgocasa-orange bg-orange-100">
+                            {formatPrice(yearData.yearTotal)}
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
+                
+                {/* Fila de TOTAL GENERAL (si hay más de un año) */}
+                {revenueControlTable.years.length > 1 && (
+                  <tr className="border-t-2 border-gray-400 bg-gradient-to-r from-gray-200 to-gray-100 font-bold">
+                    <td className="py-4 px-4 text-gray-900 sticky left-0 z-10 bg-gradient-to-r from-gray-200 to-gray-100">
+                      TOTAL GENERAL
+                    </td>
+                    {grandTotals.monthTotals.map((value, monthIndex) => (
+                      <td key={monthIndex} className="text-right py-4 px-3 text-gray-900">
+                        {value > 0 ? formatPrice(value) : '-'}
+                      </td>
+                    ))}
+                    <td className="text-right py-4 px-4 font-bold text-white bg-furgocasa-orange">
+                      {formatPrice(grandTotals.total)}
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+        
+        <p className="text-xs text-gray-500 mt-4">
+          {revenueMode === 'creation' 
+            ? '💡 Ingresos contabilizados en el mes que se realizó la reserva'
+            : '💡 Ingresos distribuidos proporcionalmente según los días reales del alquiler en cada mes'
+          }
+        </p>
       </div>
 
       {/* Info adicional */}
