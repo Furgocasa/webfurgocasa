@@ -12,7 +12,7 @@ import {
   TrendingDown,
   Baby
 } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, sortVehicleEquipment } from "@/lib/utils";
 import type { VehicleWithImages } from "@/types/database";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { useLanguage } from "@/contexts/language-context";
@@ -147,14 +147,7 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
           {vehicle.name}
         </h3>
 
-        {/* Short description */}
-        {vehicle.short_description && (
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-            {vehicle.short_description}
-          </p>
-        )}
-
-        {/* Descripción */}
+        {/* Descripción corta */}
         {vehicle.short_description && (
           <p className="text-gray-600 text-sm mb-4 line-clamp-2">
             {vehicle.short_description}
@@ -182,7 +175,7 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
         {/* Equipamiento con badge de Isofix integrado en la misma línea */}
         <div className="mb-4">
           <VehicleEquipmentDisplay
-            equipment={(vehicle as any).vehicle_equipment?.map((item: any) => item.equipment || item).filter(Boolean) || []}
+            equipment={sortVehicleEquipment((vehicle as any).vehicle_equipment?.map((item: any) => item.equipment || item).filter(Boolean) || [])}
             legacyData={vehicle}
             variant="icons"
             maxVisible={6}
