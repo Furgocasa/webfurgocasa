@@ -115,6 +115,7 @@ async function getSaleVehicles() {
       ...v,
       category: Array.isArray(v.category) ? v.category[0] : v.category,
       main_image: sorted.find((i: any) => i.is_primary) || sorted[0] || null,
+      images: sorted.slice(0, 3).map((img: any) => img.image_url),
       vehicle_equipment: sortVehicleEquipment(
         (v.vehicle_equipment || []).map((ve: any) => ve?.equipment).filter(Boolean)
       ),
@@ -305,7 +306,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {vehicles.map((vehicle: any) => (
                 <SaleVehicleCard
                   key={vehicle.id}
