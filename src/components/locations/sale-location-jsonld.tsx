@@ -88,7 +88,17 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
             "vehicleModelDate": "2020",
             "name": "Autocaravana Premium",
             "description": "Autocaravanas y campers de alta gama de marcas como Weinsberg, Knaus, Adria, Dethleffs",
-            "bodyType": "Motorhome"
+            "bodyType": "Motorhome",
+            "offers": {
+              "@type": "Offer",
+              "price": "49900",
+              "priceCurrency": "EUR",
+              "availability": "https://schema.org/InStock",
+              "seller": {
+                "@type": "AutoDealer",
+                "name": "Furgocasa"
+              }
+            }
           },
           "price": "49900",
           "priceCurrency": "EUR",
