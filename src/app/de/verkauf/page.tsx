@@ -103,6 +103,7 @@ async function loadVehiclesForSale() {
         ...vehicle,
         category: Array.isArray(vehicle.category) ? vehicle.category[0] : vehicle.category,
         main_image: sortedImages.find((img: any) => img.is_primary) || sortedImages[0],
+        images: sortedImages.slice(0, 3).map((img: any) => img.image_url),
         sale_highlights: vehicle.sale_highlights || [],
         vehicle_equipment: sortVehicleEquipment(((vehicle as any).vehicle_equipment || [])
           .map((ve: any) => ve?.equipment)

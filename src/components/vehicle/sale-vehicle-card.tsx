@@ -1,4 +1,5 @@
-import Image from "next/image";
+"use client";
+
 import { LocalizedLink } from "@/components/localized-link";
 import { 
   Car, 
@@ -10,6 +11,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
+import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
 
 interface SaleVehicleCardProps {
   vehicle: {
@@ -29,10 +31,12 @@ interface SaleVehicleCardProps {
     transmission?: string;
     seats?: number;
     beds?: number;
+    short_description?: string;
     main_image?: {
       image_url: string;
       alt_text?: string;
     };
+    images?: string[];
     vehicle_equipment?: any[];
   };
   locale?: 'es' | 'en' | 'fr' | 'de';
@@ -44,26 +48,34 @@ const translations = {
   es: {
     price: "Precio",
     viewDetails: "Ver detalles",
-    daySeats: "plazas día",
-    nightSeats: "plazas noche",
+    seats: "plazas",
+    beds: "camas",
+    automatic: "Automática",
+    manual: "Manual",
   },
   en: {
     price: "Price",
     viewDetails: "View details",
-    daySeats: "day seats",
-    nightSeats: "night beds",
+    seats: "seats",
+    beds: "beds",
+    automatic: "Automatic",
+    manual: "Manual",
   },
   fr: {
     price: "Prix",
     viewDetails: "Voir détails",
-    daySeats: "places jour",
-    nightSeats: "places nuit",
+    seats: "places",
+    beds: "couchages",
+    automatic: "Automatique",
+    manual: "Manuel",
   },
   de: {
     price: "Preis",
     viewDetails: "Details ansehen",
-    daySeats: "Tagessitze",
-    nightSeats: "Nachtplätze",
+    seats: "Sitze",
+    beds: "Betten",
+    automatic: "Automatik",
+    manual: "Manuell",
   },
 };
 
@@ -80,106 +92,111 @@ export function SaleVehicleCard({ vehicle, locale = 'es', basePath = '/ventas' }
   const href = `${basePath}/${vehicle.slug}`;
 
   return (
-    <LocalizedLink
-      href={href}
-      className="bg-white rounded-2xl shadow-sm overflow-hidden group hover:shadow-lg transition-shadow"
-    >
-      {/* Imagen */}
-      <div className="relative h-56 bg-gray-200">
-        {vehicle.main_image?.image_url ? (
-          <Image 
-            src={vehicle.main_image.image_url} 
-            alt={vehicle.main_image.alt_text || vehicle.name}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-            quality={70}
+    <div className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+      {/* Imagen con slider */}
+      <LocalizedLink href={href} className="block">
+        <div className="h-64 bg-gray-200 relative overflow-hidden">
+          <VehicleImageSlider
+            images={vehicle.images || (vehicle.main_image?.image_url ? [vehicle.main_image.image_url] : [])}
+            alt={vehicle.name}
+            autoPlay={true}
+            interval={10000}
           />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-            <Car className="h-16 w-16" />
-          </div>
-        )}
-        
-        {/* Badge categoría */}
-        {vehicle.category?.name && (
-          <div className="absolute bottom-4 left-4">
-            <span className="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-medium text-gray-700">
-              {vehicle.category.name}
-            </span>
-          </div>
-        )}
-      </div>
+          {/* Badge categoría */}
+          {vehicle.category?.name && (
+            <div className="absolute bottom-4 left-4 z-10">
+              <span className="px-3 py-1 bg-white/90 backdrop-blur rounded-full text-xs font-medium text-gray-700">
+                {vehicle.category.name}
+              </span>
+            </div>
+          )}
+        </div>
+      </LocalizedLink>
 
-      {/* Info */}
+      {/* Contenido */}
       <div className="p-6">
-        <div className="mb-4">
-          <p className="text-sm text-gray-500">{vehicle.brand} · {vehicle.year}</p>
-          <h3 className="text-lg font-bold text-gray-900 group-hover:text-furgocasa-orange transition-colors">
+        <LocalizedLink href={href}>
+          <h3 className="text-2xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-orange transition-colors">
             {vehicle.name}
           </h3>
-        </div>
+          <p className="text-sm text-gray-600 mb-4">
+            {vehicle.brand} · {vehicle.year}
+          </p>
+        </LocalizedLink>
 
-        {/* Specs */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4 text-sm">
+        {/* Specs en flex wrap (coherente con /vehiculos) */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-sm text-gray-600">
           {vehicle.mileage !== undefined && (
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-1">
               <Gauge className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{formatMileage(vehicle.mileage, locale)}</span>
-            </div>
-          )}
-          {vehicle.fuel_type && (
-            <div className="flex items-center gap-2 text-gray-600">
-              <Fuel className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{vehicle.fuel_type}</span>
-            </div>
-          )}
-          {vehicle.transmission && (
-            <div className="flex items-center gap-2 text-gray-600">
-              <Settings className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{vehicle.transmission}</span>
+              <span>{formatMileage(vehicle.mileage, locale)}</span>
             </div>
           )}
           {vehicle.seats !== undefined && (
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-1">
               <Users className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{vehicle.seats} {t.daySeats}</span>
+              <span>{vehicle.seats} {t.seats}</span>
             </div>
           )}
           {vehicle.beds !== undefined && (
-            <div className="flex items-center gap-2 text-gray-600">
+            <div className="flex items-center gap-1">
               <Bed className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{vehicle.beds} {t.nightSeats}</span>
+              <span>{vehicle.beds} {t.beds}</span>
+            </div>
+          )}
+          {vehicle.fuel_type && (
+            <div className="flex items-center gap-1">
+              <Fuel className="h-4 w-4 flex-shrink-0" />
+              <span>{vehicle.fuel_type}</span>
+            </div>
+          )}
+          {vehicle.transmission && (
+            <div className="flex items-center gap-1">
+              <Settings className="h-4 w-4 flex-shrink-0" />
+              <span>{vehicle.transmission === 'automatic' ? t.automatic : t.manual}</span>
             </div>
           )}
         </div>
 
-        {/* Equipamiento */}
+        {/* Descripción corta */}
+        {vehicle.short_description && (
+          <p className="text-sm text-gray-700 mb-4 line-clamp-2">
+            {vehicle.short_description}
+          </p>
+        )}
+
+        {/* Equipamiento con badge Isofix */}
         {vehicle.vehicle_equipment && vehicle.vehicle_equipment.length > 0 && (
           <div className="mb-4">
             <VehicleEquipmentDisplay
               equipment={vehicle.vehicle_equipment}
               variant="icons"
               maxVisible={6}
+              showIsofixBadge={true}
+              hasIsofix={vehicle.vehicle_equipment?.some((item: any) => item?.slug === 'isofix' || item?.equipment?.slug === 'isofix')}
             />
           </div>
         )}
 
-        {/* Precio */}
-        <div className="flex items-end justify-between pt-4 border-t border-gray-100">
-          <div>
-            <p className="text-sm text-gray-500">{t.price}</p>
-            <p className="text-2xl font-bold text-furgocasa-orange">
-              {formatPrice(vehicle.sale_price, locale)}
-            </p>
+        {/* Precio y CTA */}
+        <div className="pt-4 border-t border-gray-200">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm text-gray-600">{t.price}</p>
+              <p className="text-2xl font-heading font-bold text-furgocasa-orange">
+                {formatPrice(vehicle.sale_price, locale)}
+              </p>
+            </div>
+            <LocalizedLink
+              href={href}
+              className="flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3 px-6 rounded-lg transition-colors"
+            >
+              {t.viewDetails}
+              <ArrowRight className="h-5 w-5" />
+            </LocalizedLink>
           </div>
-          <span className="flex items-center gap-1 text-furgocasa-orange font-medium text-sm group-hover:underline">
-            {t.viewDetails}
-            <ArrowRight className="h-4 w-4" />
-          </span>
         </div>
       </div>
-    </LocalizedLink>
+    </div>
   );
 }
