@@ -5,11 +5,11 @@ import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
 import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
-import { getCategoryName, getAllPostSlugTranslations } from "@/lib/blog-translations";
+import { getCategoryName, getAllPostSlugTranslations, translateCategorySlug } from "@/lib/blog-translations";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
-import { getTranslatedContent, type Locale } from "@/lib/translations/get-translations";
+import { getTranslatedContent, getTranslatedRecords, type Locale } from "@/lib/translations/get-translations";
 import { translateServer } from "@/lib/i18n/server-translation";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 
@@ -167,10 +167,13 @@ export default async function LocaleBlogPostPage({
     }
   );
 
-  // Obtener posts relacionados
-  const relatedPosts = post.category_id 
+  // Obtener posts relacionados y traducir títulos al idioma de la página
+  const rawRelatedPosts = post.category_id 
     ? await getRelatedPosts(post.category_id, post.id)
     : [];
+  const relatedPosts = locale !== 'es'
+    ? await getTranslatedRecords('posts', rawRelatedPosts, ['title'], locale)
+    : rawRelatedPosts;
 
   const categoryName = post.category?.slug 
     ? getCategoryName(post.category.slug, locale)
@@ -346,12 +349,12 @@ export default async function LocaleBlogPostPage({
                           : locale === 'de' && related.slug_de 
                           ? related.slug_de 
                           : related.slug;
-                        const relatedCategory = related.category?.slug || 'blog';
+                        const relatedCategorySlug = translateCategorySlug(related.category?.slug || 'blog', locale);
                         
                         return (
                         <LocalizedLink
                           key={related.id}
-                          href={`/blog/${relatedCategory}/${relatedSlug}`}
+                          href={`/blog/${relatedCategorySlug}/${relatedSlug}`}
                           className="group block"
                         >
                           {related.featured_image && (

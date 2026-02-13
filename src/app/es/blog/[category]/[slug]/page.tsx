@@ -5,7 +5,7 @@ import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
 import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
-import { getCategoryName, getAllPostSlugTranslations } from "@/lib/blog-translations";
+import { getCategoryName, getAllPostSlugTranslations, translateCategorySlug } from "@/lib/blog-translations";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
@@ -332,12 +332,12 @@ export default async function LocaleBlogPostPage({
                           : locale === 'de' && related.slug_de 
                           ? related.slug_de 
                           : related.slug;
-                        const relatedCategory = related.category?.slug || 'blog';
+                        const relatedCategorySlug = translateCategorySlug(related.category?.slug || 'blog', locale);
                         
                         return (
                         <LocalizedLink
                           key={related.id}
-                          href={`/blog/${relatedCategory}/${relatedSlug}`}
+                          href={`/blog/${relatedCategorySlug}/${relatedSlug}`}
                           className="group block"
                         >
                           {related.featured_image && (
