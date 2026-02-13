@@ -9,6 +9,7 @@ import {
   Calendar, MapPin, Car, User, Mail, Phone, Clock
 } from"lucide-react";
 import Link from"next/link";
+import ConfirmDialog from "@/components/admin/ConfirmDialog";
 
 interface Booking {
   id: string;
@@ -49,6 +50,8 @@ export default function PagoPage() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<'redsys' | 'stripe'>('redsys'); // Redsys habilitado
+  const [showRedsysWarning, setShowRedsysWarning] = useState(false);
+  const [pendingPaymentType, setPendingPaymentType] = useState<'deposit' | 'full' | null>(null);
 
   // Actualizar título del navegador
   useEffect(() => {
@@ -611,7 +614,14 @@ export default function PagoPage() {
             <div className="space-y-4">
               {/* Botón pago principal (50% o restante) */}
               <button
-                onClick={() => handlePayment("deposit")}
+                onClick={() => {
+                  if (paymentMethod === 'redsys') {
+                    setPendingPaymentType('deposit');
+                    setShowRedsysWarning(true);
+                  } else {
+                    handlePayment("deposit");
+                  }
+                }}
                 disabled={processing}
                 className="w-full bg-furgocasa-orange text-white font-semibold py-4 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
@@ -641,7 +651,14 @@ export default function PagoPage() {
               {/* Opción de pagar el total (solo si no se ha pagado nada) */}
               {!paymentInfo.isPending50 && (
                 <button
-                  onClick={() => handlePayment("full")}
+                  onClick={() => {
+                    if (paymentMethod === 'redsys') {
+                      setPendingPaymentType('full');
+                      setShowRedsysWarning(true);
+                    } else {
+                      handlePayment("full");
+                    }
+                  }}
                   disabled={processing}
                   className="w-full bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-semibold py-4 px-6 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -688,6 +705,18 @@ export default function PagoPage() {
           </div>
         </div>
       </main>
+
+      {/* Modal advertencia doble verificación Redsys */}
+      <ConfirmDialog
+        isOpen={showRedsysWarning}
+        onClose={() => { setShowRedsysWarning(false); setPendingPaymentType(null); }}
+        onConfirm={() => { if (pendingPaymentType) handlePayment(pendingPaymentType); }}
+        title={t("Advertencia: Doble verificación de pago")}
+        message={t("¡Importante! Tras realizar el pago en Redsys, es necesario que hagas clic en 'Continuar' para volver a nuestra página. En caso contrario, tu reserva puede no confirmarse y el vehículo quedar libre para esas fechas hasta que podamos gestionarlo internamente.")}
+        confirmText={t("Entendido, ir a pagar")}
+        cancelText={t("Cancelar")}
+        type="warning"
+      />
 </>
   );
 }

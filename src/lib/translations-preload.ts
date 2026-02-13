@@ -4490,6 +4490,24 @@ export const staticTranslations = {
     fr: "Secure payment with Redsys",
     de: "Secure payment with Redsys"
   },
+  "Advertencia: Doble verificación de pago": {
+    es: "Advertencia: Doble verificación de pago",
+    en: "Warning: Payment double verification",
+    fr: "Avertissement : Double vérification du paiement",
+    de: "Warnung: Doppelte Zahlungsüberprüfung"
+  },
+  "¡Importante! Tras realizar el pago en Redsys, es necesario que hagas clic en 'Continuar' para volver a nuestra página. En caso contrario, tu reserva puede no confirmarse y el vehículo quedar libre para esas fechas hasta que podamos gestionarlo internamente.": {
+    es: "¡Importante! Tras realizar el pago en Redsys, es necesario que hagas clic en 'Continuar' para volver a nuestra página. En caso contrario, tu reserva puede no confirmarse y el vehículo quedar libre para esas fechas hasta que podamos gestionarlo internamente.",
+    en: "Important! After completing the payment on Redsys, you must click 'Continue' to return to our page. Otherwise, your booking may not be confirmed and the vehicle may remain available for those dates until we can process it internally.",
+    fr: "Important ! Après avoir effectué le paiement sur Redsys, vous devez cliquer sur 'Continuer' pour revenir à notre page. Sinon, votre réservation peut ne pas être confirmée et le véhicule restera disponible pour ces dates jusqu'à ce que nous puissions le gérer en interne.",
+    de: "Wichtig! Nach Abschluss der Zahlung bei Redsys müssen Sie auf 'Weiter' klicken, um zu unserer Seite zurückzukehren. Andernfalls kann Ihre Buchung nicht bestätigt werden und das Fahrzeug bleibt für diese Daten verfügbar, bis wir es intern bearbeiten können."
+  },
+  "Entendido, ir a pagar": {
+    es: "Entendido, ir a pagar",
+    en: "Understood, go to payment",
+    fr: "Compris, aller au paiement",
+    de: "Verstanden, zur Zahlung"
+  },
   "Pago seguro con Stripe": {
     es: "Pago seguro con Stripe",
     en: "Secure payment with Stripe",
