@@ -166,10 +166,10 @@ Posicionarse en búsquedas como:
 - 1500-2000 palabras totales`;
 
   try {
-    console.log(`   📝 Generando contenido de propietario con GPT-4o...`);
+    console.log(`   📝 Generando contenido de propietario con GPT-5.2...`);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-5.2",
       messages: [
         {
           role: "system",
@@ -181,14 +181,16 @@ Posicionarse en búsquedas como:
         }
       ],
       temperature: 0.7,
-      max_tokens: 4500,
       response_format: { type: "json_object" }
     });
 
-    const content = JSON.parse(completion.choices[0].message.content || '{}');
+    const rawContent = completion.choices[0].message.content || '{}';
+    const content = JSON.parse(rawContent);
 
-    // Validar estructura
+    // Validar estructura - log para debug si falla
     if (!content.owner_introduction || !content.workshops_and_services || !content.itv_and_regulations) {
+      console.error(`   ⚠️  Claves recibidas: ${Object.keys(content).join(', ')}`);
+      console.error(`   ⚠️  finish_reason: ${completion.choices[0].finish_reason}`);
       throw new Error('Contenido generado incompleto');
     }
 
@@ -232,15 +234,23 @@ async function saveGeneratedContent(
 ): Promise<void> {
   const wordCount = countWords(content);
 
-  const { error } = await supabase
+  // Intentar con updated_at primero, si no existe la columna, sin ella
+  let { error } = await supabase
     .from('sale_location_targets')
     .update({
       content_sections: content,
-      content_generated_at: new Date().toISOString(),
-      content_word_count: wordCount,
       updated_at: new Date().toISOString()
     })
     .eq('id', locationId);
+
+  if (error && error.message.includes('does not exist')) {
+    console.log(`   ⚠️  Columna updated_at no existe, guardando solo content_sections...`);
+    const retry = await supabase
+      .from('sale_location_targets')
+      .update({ content_sections: content })
+      .eq('id', locationId);
+    error = retry.error;
+  }
 
   if (error) {
     throw new Error(`Error guardando contenido: ${error.message}`);
@@ -253,12 +263,12 @@ async function saveGeneratedContent(
  * Genera contenido para todas las ubicaciones de venta activas
  */
 async function generateAllContent(regenerate: boolean = false): Promise<void> {
-  console.log('🚀 Generando contenido de VENTA (propietario) con GPT-4o\n');
+  console.log('🚀 Generando contenido de VENTA (propietario) con GPT-5.2\n');
   console.log('━'.repeat(60));
 
   const { data: locations, error } = await supabase
     .from('sale_location_targets')
-    .select('id, slug, name, province, region, distance_km, travel_time_minutes, content_generated_at')
+    .select('id, slug, name, province, region, distance_km, travel_time_minutes, content_sections')
     .eq('is_active', true)
     .order('name', { ascending: true });
 
@@ -277,7 +287,7 @@ async function generateAllContent(regenerate: boolean = false): Promise<void> {
   for (const location of locations || []) {
     processed++;
 
-    if (!regenerate && location.content_generated_at) {
+    if (!regenerate && location.content_sections) {
       skipped++;
       console.log(`⏭️  [${processed}/${total}] ${location.name} - Ya tiene contenido (usar --regenerate para sobrescribir)`);
       continue;

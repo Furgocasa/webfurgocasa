@@ -280,13 +280,6 @@ export default async function SaleLocationPage({ params }: PageProps) {
         </div>
       </section>
 
-      {/* CONTENT SECTIONS */}
-      <SaleLocationOwnerContent 
-        locationName={location.name}
-        contentSections={location.content_sections}
-        locale="en"
-      />
-
       {/* VEHICLES FOR SALE */}
       {vehicles.length > 0 && (
         <section className="py-16 lg:py-24 bg-gray-50">
@@ -416,6 +409,13 @@ export default async function SaleLocationPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* OWNER CONTENT - Local owner oriented content */}
+      <SaleLocationOwnerContent 
+        locationName={location.name}
+        contentSections={location.content_sections}
+        locale="en"
+      />
 
       {/* FINAL CTA */}
       <section className="py-16 bg-white">

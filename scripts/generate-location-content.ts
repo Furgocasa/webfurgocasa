@@ -172,10 +172,10 @@ Posicionarse en búsquedas como:
 - Como si fuera una guía turística profesional especializada en autocaravanas`;
 
   try {
-    console.log(`   📝 Generando contenido con GPT-4o...`);
+    console.log(`   📝 Generando contenido con GPT-5.2...`);
     
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",  // Modelo más reciente
+      model: "gpt-5.2",  // Modelo más reciente
       messages: [
         {
           role: "system",
@@ -187,14 +187,16 @@ Posicionarse en búsquedas como:
         }
       ],
       temperature: 0.7,
-      max_tokens: 4500,  // Aumentado para contenido extenso
       response_format: { type: "json_object" }
     });
 
-    const content = JSON.parse(completion.choices[0].message.content || '{}');
+    const rawContent = completion.choices[0].message.content || '{}';
+    const content = JSON.parse(rawContent);
     
     // Validar que el contenido tenga la estructura esperada
     if (!content.introduction || !content.attractions || !content.gastronomy) {
+      console.error(`   ⚠️  Claves recibidas: ${Object.keys(content).join(', ')}`);
+      console.error(`   ⚠️  finish_reason: ${completion.choices[0].finish_reason}`);
       throw new Error('Contenido generado incompleto');
     }
     
@@ -260,7 +262,7 @@ async function saveGeneratedContent(
  * Genera contenido para todas las ubicaciones activas
  */
 async function generateAllContent(regenerate: boolean = false): Promise<void> {
-  console.log('🚀 Iniciando generación de contenido con OpenAI GPT-4o\n');
+  console.log('🚀 Iniciando generación de contenido con OpenAI GPT-5.2\n');
   console.log('━'.repeat(60));
 
   // Obtener todas las ubicaciones activas

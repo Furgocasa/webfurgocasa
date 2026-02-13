@@ -304,15 +304,6 @@ export default async function SaleLocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* CONTENIDO ÚNICO DE LA CIUDAD - Si existe */}
-      {/* ================================================================== */}
-      <SaleLocationOwnerContent 
-        locationName={location.name}
-        contentSections={location.content_sections}
-        locale="es"
-      />
-
-      {/* ================================================================== */}
       {/* VEHÍCULOS EN VENTA - Idéntico a /ventas */}
       {/* ================================================================== */}
       {vehicles.length > 0 && (
@@ -448,6 +439,15 @@ export default async function SaleLocationPage({ params }: PageProps) {
           </div>
         </div>
       </section>
+
+      {/* ================================================================== */}
+      {/* CONTENIDO ÚNICO DE LA CIUDAD - Orientado al propietario local */}
+      {/* ================================================================== */}
+      <SaleLocationOwnerContent 
+        locationName={location.name}
+        contentSections={location.content_sections}
+        locale="es"
+      />
 
       {/* ================================================================== */}
       {/* CTA FINAL - Similar a Home */}
