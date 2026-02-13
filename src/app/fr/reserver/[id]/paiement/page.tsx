@@ -9,7 +9,7 @@ import {
   Calendar, MapPin, Car, User, Mail, Phone, Clock
 } from"lucide-react";
 import Link from"next/link";
-import ConfirmDialog from "@/components/admin/ConfirmDialog";
+import RedsysWarningModal from "@/components/RedsysWarningModal";
 
 interface Booking {
   id: string;
@@ -707,7 +707,7 @@ export default function PagoPage() {
       </main>
 
       {/* Modal advertencia doble verificación Redsys */}
-      <ConfirmDialog
+      <RedsysWarningModal
         isOpen={showRedsysWarning}
         onClose={() => { setShowRedsysWarning(false); setPendingPaymentType(null); }}
         onConfirm={() => { if (pendingPaymentType) handlePayment(pendingPaymentType); }}
@@ -715,7 +715,6 @@ export default function PagoPage() {
         message={t("¡Importante! Tras realizar el pago en Redsys, es necesario que hagas clic en 'Continuar' para volver a nuestra página. En caso contrario, tu reserva puede no confirmarse y el vehículo quedar libre para esas fechas hasta que podamos gestionarlo internamente.")}
         confirmText={t("Entendido, ir a pagar")}
         cancelText={t("Cancelar")}
-        type="warning"
       />
 </>
   );
