@@ -24,7 +24,7 @@ import {
   HeartHandshake
 } from "lucide-react";
 import Image from "next/image";
-import { LocationTourismContent } from "@/components/locations/location-tourism-content";
+import { SaleLocationOwnerContent } from "@/components/locations/sale-location-owner-content";
 import { SaleVehicleCard } from "@/components/vehicle/sale-vehicle-card";
 
 // ============================================================================
@@ -306,7 +306,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* CONTENIDO ÚNICO DE LA CIUDAD - Si existe */}
       {/* ================================================================== */}
-      <LocationTourismContent 
+      <SaleLocationOwnerContent 
         locationName={location.name}
         contentSections={location.content_sections}
         locale="es"

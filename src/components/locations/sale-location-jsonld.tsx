@@ -1,5 +1,3 @@
-import type { SaleLocationData } from "@/app/venta-autocaravanas-camper-[location]/page";
-
 interface SaleLocationJsonLdProps {
   location: {
     name: string;
@@ -22,7 +20,7 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
     "name": "Furgocasa",
     "alternateName": `Furgocasa - Venta de Autocaravanas cerca de ${location.name}`,
     "description": `Venta de autocaravanas y campers premium cerca de ${location.name}. Entrega desde Murcia. Garantía oficial, financiación flexible hasta 120 meses y asesoramiento personalizado.`,
-    "url": `${baseUrl}/es/venta-autocaravanas-camper-${location.slug}`,
+    "url": `${baseUrl}/es/venta-autocaravanas-camper/${location.slug}`,
     "telephone": "+34868364161",
     "email": "info@furgocasa.com",
     "priceRange": "35.000€ - 75.000€",
@@ -116,7 +114,7 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
         "@type": "ListItem",
         "position": 3,
         "name": `Venta en ${location.name}`,
-        "item": `${baseUrl}/es/venta-autocaravanas-camper-${location.slug}`
+        "item": `${baseUrl}/es/venta-autocaravanas-camper/${location.slug}`
       }
     ]
   };
