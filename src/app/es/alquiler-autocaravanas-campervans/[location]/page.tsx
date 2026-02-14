@@ -449,15 +449,6 @@ export default async function LocationPage({ params }: PageProps) {
       )}
 
       {/* ================================================================== */}
-      {/* CONTENIDO TURÍSTICO DE LA CIUDAD - Idéntico a producción */}
-      {/* ================================================================== */}
-      <LocationTourismContent 
-        locationName={location.name}
-        contentSections={location.content_sections}
-        locale="es"
-      />
-
-      {/* ================================================================== */}
       {/* SERVICIOS DESTACADOS - Fondo azul claro */}
       {/* ================================================================== */}
       <section className="py-10 lg:py-14 bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -630,6 +621,15 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* ================================================================== */}
+      {/* CONTENIDO TURÍSTICO DE LA CIUDAD - Entre blog y por qué alquilar */}
+      {/* ================================================================== */}
+      <LocationTourismContent 
+        locationName={location.name}
+        contentSections={location.content_sections}
+        locale="es"
+      />
 
       {/* ================================================================== */}
       {/* POR QUÉ ELEGIR FURGOCASA - Fondo gradiente azul */}

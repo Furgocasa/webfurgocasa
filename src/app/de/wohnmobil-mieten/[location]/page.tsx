@@ -421,13 +421,6 @@ export default async function LocationPage({ params }: PageProps) {
         />
       )}
 
-      {/* TOURISMUS-INHALT - Identisch mit Produktion */}
-      <LocationTourismContent 
-        locationName={location.name}
-        contentSections={location.content_sections}
-        locale="de"
-      />
-
       {/* SERVICES - Hellblauer Hintergrund */}
       <section className="py-10 lg:py-14 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
@@ -662,6 +655,13 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
         </section>
       )}
+
+      {/* TOURISMUS-INHALT - Zwischen Blog und Warum Furgocasa */}
+      <LocationTourismContent 
+        locationName={location.name}
+        contentSections={location.content_sections}
+        locale="de"
+      />
 
       {/* WHY FURGOCASA */}
       <section className="py-10 lg:py-14 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
