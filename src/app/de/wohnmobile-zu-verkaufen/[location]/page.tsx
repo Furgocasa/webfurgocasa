@@ -145,7 +145,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     { name: location.name, meta_title: location.meta_title, meta_description: location.meta_description }
   );
 
-  const title = translated.meta_title || location.meta_title || `Wohnmobile zu verkaufen in ${translated.name || location.name}`;
+  const title = translated.meta_title || location.meta_title || `Wohnmobile & Camper zu verkaufen in ${translated.name || location.name}`;
   const description = translated.meta_description || location.meta_description || 
     `Kaufen Sie Ihr Wohnmobil in ${translated.name || location.name}. Fahrzeuge mit Garantie und Finanzierung.`;
 
@@ -242,7 +242,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}>
-              {location.h1_title || `Wohnmobile zu Verkaufen in ${location.name}`}
+              {location.h1_title || `Wohnmobile & Camper zu Verkaufen in ${location.name}`}
             </h1>
             
             <div className="w-24 h-1 bg-furgocasa-orange mx-auto my-4"></div>
