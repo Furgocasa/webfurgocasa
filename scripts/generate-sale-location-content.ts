@@ -330,17 +330,26 @@ async function saveGeneratedContent(
 ): Promise<void> {
   const wordCount = countWords(content);
 
-  // Sanitizar: eliminar caracteres Unicode problemáticos (control chars, surrogates, emojis, nbsp especiales)
-  const sanitized = JSON.parse(
-    JSON.stringify(content)
-      .replace(/[\u0000-\u001F\uD800-\uDFFF]/g, '')
-      .replace(/\\u[0-9a-fA-F]{4}/g, (match) => {
-        // Dejar pasar escapes comunes (\\n, \\t convertidos), eliminar los raros
-        const code = parseInt(match.slice(2), 16);
-        if (code < 0x20 || (code >= 0xD800 && code <= 0xDFFF)) return '';
-        return match;
-      })
-  );
+  // Sanitizar contenido para Supabase:
+  // El contenido ya viene parseado de JSON.parse(rawContent) en generateSaleLocationContent,
+  // así que los \uXXXX ya están decodificados a caracteres reales.
+  // Solo necesitamos limpiar recursivamente los strings del objeto para quitar chars de control.
+  function sanitizeStrings(obj: any): any {
+    if (typeof obj === 'string') {
+      // Eliminar caracteres de control (excepto \n \r \t) y surrogates huérfanos
+      return obj.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, '');
+    }
+    if (Array.isArray(obj)) return obj.map(sanitizeStrings);
+    if (obj && typeof obj === 'object') {
+      const result: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        result[key] = sanitizeStrings(value);
+      }
+      return result;
+    }
+    return obj;
+  }
+  const sanitized = sanitizeStrings(content);
 
   // Intentar con updated_at primero, si no existe la columna, sin ella
   let { error } = await supabase

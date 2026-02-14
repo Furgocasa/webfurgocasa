@@ -351,10 +351,24 @@ async function saveGeneratedContent(
 ): Promise<void> {
   const wordCount = countWords(content);
 
-  // Sanitizar: eliminar caracteres Unicode problemáticos
-  const sanitized = JSON.parse(
-    JSON.stringify(content).replace(/[\u0000-\u001F\uD800-\uDFFF]/g, '')
-  );
+  // Sanitizar contenido para Supabase:
+  // El contenido ya viene parseado, los \uXXXX ya están decodificados a caracteres reales.
+  // Solo limpiar recursivamente strings para quitar chars de control.
+  function sanitizeStrings(obj: any): any {
+    if (typeof obj === 'string') {
+      return obj.replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F\uFFFE\uFFFF]/g, '');
+    }
+    if (Array.isArray(obj)) return obj.map(sanitizeStrings);
+    if (obj && typeof obj === 'object') {
+      const result: any = {};
+      for (const [key, value] of Object.entries(obj)) {
+        result[key] = sanitizeStrings(value);
+      }
+      return result;
+    }
+    return obj;
+  }
+  const sanitized = sanitizeStrings(content);
   
   const { error } = await supabase
     .from('location_targets')
