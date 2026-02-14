@@ -25,7 +25,7 @@ interface WorkshopService {
 interface StorageOption {
   name: string;
   description: string;
-  type?: 'guardamuebles' | 'parking' | 'camping_invernal';
+  type?: 'guardamuebles' | 'parking' | 'camping_invernal' | 'parking_larga_estancia' | 'camping_invernaje' | 'nave_cochera';
   approximate_location?: string;
 }
 
@@ -73,7 +73,7 @@ const translations = {
     ownerSubtitle: 'Todo lo que necesitas saber para disfrutar de tu autocaravana en {location}',
     workshopsTitle: 'Talleres y servicios para autocaravanas en {location}',
     itvTitle: 'ITV y normativa en {location}',
-    storageTitle: 'Almacenamiento y parking en {location}',
+    storageTitle: 'Dónde aparcar tu camper en {location}',
     destinationsTitle: 'Escapadas de fin de semana desde {location}',
     distance: 'Distancia',
     duration: 'Duración',
@@ -84,7 +84,7 @@ const translations = {
     ownerSubtitle: 'Everything you need to know to enjoy your motorhome in {location}',
     workshopsTitle: 'Workshops and services for motorhomes in {location}',
     itvTitle: 'MOT and regulations in {location}',
-    storageTitle: 'Storage and parking in {location}',
+    storageTitle: 'Where to park your campervan in {location}',
     destinationsTitle: 'Weekend getaways from {location}',
     distance: 'Distance',
     duration: 'Duration',
@@ -95,7 +95,7 @@ const translations = {
     ownerSubtitle: 'Tout ce que vous devez savoir pour profiter de votre camping-car à {location}',
     workshopsTitle: 'Ateliers et services pour camping-cars à {location}',
     itvTitle: 'Contrôle technique et réglementation à {location}',
-    storageTitle: 'Stockage et parking à {location}',
+    storageTitle: 'Où garer votre camping-car à {location}',
     destinationsTitle: 'Escapades de week-end depuis {location}',
     distance: 'Distance',
     duration: 'Durée',
@@ -106,7 +106,7 @@ const translations = {
     ownerSubtitle: 'Alles, was Sie wissen müssen, um Ihr Wohnmobil in {location} zu genießen',
     workshopsTitle: 'Werkstätten und Dienstleistungen für Wohnmobile in {location}',
     itvTitle: 'TÜV und Vorschriften in {location}',
-    storageTitle: 'Lagerung und Parken in {location}',
+    storageTitle: 'Wo Sie Ihr Wohnmobil in {location} parken können',
     destinationsTitle: 'Wochenendausflüge ab {location}',
     distance: 'Entfernung',
     duration: 'Dauer',
@@ -137,8 +137,11 @@ function getStorageIcon(type?: string) {
   switch (type) {
     case 'guardamuebles': return Warehouse;
     case 'parking': return ParkingCircle;
+    case 'parking_larga_estancia': return ParkingCircle;
     case 'camping_invernal': return Home;
-    default: return Warehouse;
+    case 'camping_invernaje': return Home;
+    case 'nave_cochera': return Warehouse;
+    default: return ParkingCircle;
   }
 }
 
@@ -209,18 +212,18 @@ export function SaleLocationOwnerContent({
                       return (
                         <div
                           key={index}
-                          className="bg-blue-50 p-6 rounded-xl border-l-4 border-furgocasa-blue"
+                          className="bg-blue-50 p-5 sm:p-6 rounded-xl border-l-4 border-furgocasa-blue overflow-hidden"
                         >
-                          <div className="flex items-start gap-3 mb-3">
+                          <div className="flex items-start gap-3 mb-3 min-w-0">
                             <div className="bg-furgocasa-blue/10 p-2 rounded-lg flex-shrink-0">
                               <Icon className="h-5 w-5 text-furgocasa-blue" />
                             </div>
-                            <h4 className="text-lg font-bold text-furgocasa-blue">
+                            <h4 className="text-base sm:text-lg font-bold text-furgocasa-blue break-words min-w-0">
                               {service.name}
                             </h4>
                           </div>
                           <div
-                            className="text-gray-700 text-sm"
+                            className="text-gray-700 text-sm break-words [&_p]:break-words"
                             dangerouslySetInnerHTML={{ __html: service.description }}
                           />
                           {service.approximate_location && (
@@ -238,17 +241,17 @@ export function SaleLocationOwnerContent({
 
               {/* ITV Y NORMATIVA */}
               {itv_and_regulations && (
-                <div className="mt-12 bg-orange-50 p-8 rounded-2xl border-l-4 border-furgocasa-orange">
-                  <div className="flex items-start gap-3 mb-4">
+                <div className="mt-12 bg-orange-50 p-5 sm:p-8 rounded-2xl border-l-4 border-furgocasa-orange overflow-hidden">
+                  <div className="flex items-start gap-3 mb-4 min-w-0">
                     <div className="bg-furgocasa-orange/10 p-2 rounded-lg flex-shrink-0">
                       <FileCheck className="h-6 w-6 text-furgocasa-orange" />
                     </div>
-                    <h3 className="text-2xl font-heading font-bold text-furgocasa-orange">
+                    <h3 className="text-xl sm:text-2xl font-heading font-bold text-furgocasa-orange break-words min-w-0">
                       {replaceLocation(t.itvTitle)}
                     </h3>
                   </div>
                   <div
-                    className="text-gray-700 prose prose-lg max-w-none [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-gray-800 [&_h3]:mt-4 [&_h3]:mb-2"
+                    className="text-gray-700 prose prose-lg max-w-none break-words [&_p]:break-words [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-gray-900 [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-semibold [&_h3]:text-gray-800 [&_h3]:mt-4 [&_h3]:mb-2"
                     dangerouslySetInnerHTML={{ __html: itv_and_regulations }}
                   />
                 </div>
@@ -266,18 +269,18 @@ export function SaleLocationOwnerContent({
                       return (
                         <div
                           key={index}
-                          className="bg-purple-50 p-6 rounded-xl border-l-4 border-purple-600"
+                          className="bg-purple-50 p-5 sm:p-6 rounded-xl border-l-4 border-purple-600 overflow-hidden"
                         >
-                          <div className="flex items-start gap-3 mb-3">
+                          <div className="flex items-start gap-3 mb-3 min-w-0">
                             <div className="bg-purple-100 p-2 rounded-lg flex-shrink-0">
                               <Icon className="h-5 w-5 text-purple-700" />
                             </div>
-                            <h4 className="text-lg font-bold text-purple-700">
+                            <h4 className="text-base sm:text-lg font-bold text-purple-700 break-words min-w-0">
                               {option.name}
                             </h4>
                           </div>
                           <div
-                            className="text-gray-700 text-sm"
+                            className="text-gray-700 text-sm break-words [&_p]:break-words"
                             dangerouslySetInnerHTML={{ __html: option.description }}
                           />
                           {option.approximate_location && (
@@ -303,33 +306,35 @@ export function SaleLocationOwnerContent({
                     {weekend_destinations.map((destination, index) => (
                       <div
                         key={index}
-                        className="bg-green-50 p-6 rounded-xl border-l-4 border-green-600"
+                        className="bg-green-50 p-5 sm:p-6 rounded-xl border-l-4 border-green-600 overflow-hidden"
                       >
-                        <div className="flex justify-between items-start mb-3 flex-wrap gap-2">
-                          <div className="flex items-start gap-3">
+                        <div className="mb-3">
+                          <div className="flex items-start gap-3 mb-2 min-w-0">
                             <div className="bg-green-100 p-2 rounded-lg flex-shrink-0">
                               <Navigation className="h-5 w-5 text-green-700" />
                             </div>
-                            <h4 className="text-lg font-bold text-green-700">
+                            <h4 className="text-base sm:text-lg font-bold text-green-700 break-words min-w-0">
                               {destination.title}
                             </h4>
                           </div>
-                          <div className="flex gap-2 flex-wrap">
-                            {destination.distance_km && (
-                              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
-                                {destination.distance_km}
-                              </span>
-                            )}
-                            {destination.duration && (
-                              <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                                <Clock className="h-3 w-3" />
-                                {destination.duration}
-                              </span>
-                            )}
-                          </div>
+                          {(destination.distance_km || destination.duration) && (
+                            <div className="flex gap-2 flex-wrap ml-11">
+                              {destination.distance_km && (
+                                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold">
+                                  {destination.distance_km}
+                                </span>
+                              )}
+                              {destination.duration && (
+                                <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {destination.duration}
+                                </span>
+                              )}
+                            </div>
+                          )}
                         </div>
                         <div
-                          className="text-gray-700 text-sm"
+                          className="text-gray-700 text-sm break-words [&_p]:break-words"
                           dangerouslySetInnerHTML={{ __html: destination.description }}
                         />
                       </div>

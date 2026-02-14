@@ -13,6 +13,7 @@
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { getJson } from 'serpapi';
 import { resolve } from 'path';
 
 // Cargar variables de entorno desde .env.local
@@ -22,6 +23,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY! // Usar service role para escritura
 );
+
+const SERPAPI_KEY = process.env.SERPAPI_KEY;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -69,6 +72,100 @@ function getNearestOffice(location: SaleLocationTarget): 'murcia' | 'madrid' {
 }
 
 /**
+ * Busca en Google con SerpAPI y devuelve resultados resumidos
+ */
+async function searchGoogle(query: string): Promise<string> {
+  if (!SERPAPI_KEY) {
+    return '(sin resultados - SerpAPI no configurada)';
+  }
+  
+  try {
+    const response = await getJson({
+      engine: 'google',
+      api_key: SERPAPI_KEY,
+      q: query,
+      location: 'Spain',
+      gl: 'es',
+      hl: 'es',
+      num: 5,
+    });
+
+    const results: string[] = [];
+
+    // Dominios de marketplaces/portales/agregadores a filtrar
+    const blockedDomains = [
+      'milanuncios', 'wallapop', 'autoscout24', 'coches.net', 'motor.es',
+      'vibbo', 'segundamano', 'mil anuncios', 'facebook.com/marketplace',
+      'ebay', 'amazon', 'idealista', 'fotocasa', 'trovit', 'mundoanuncio',
+      'autocasion', 'standvirtual', 'carfax', 'sumauto', 'cochesnet',
+      'mundocamper.com/anuncios', 'campermanía', 'furgovw', 'tripadvisor',
+      'booking.com', 'airbnb', 'expedia', 'kayak', 'trivago'
+    ];
+    const isBlocked = (url: string, title: string) => {
+      const lower = (url + ' ' + title).toLowerCase();
+      return blockedDomains.some(d => lower.includes(d));
+    };
+    
+    // Resultados orgánicos (los primeros de Google = más relevancia) - sin marketplaces
+    if (response.organic_results) {
+      let count = 0;
+      for (const r of response.organic_results.slice(0, 10)) {
+        if (isBlocked(r.link || '', r.title || '')) continue;
+        const position = r.position ? `#${r.position}` : '';
+        results.push(`- ${position} ${r.title}: ${r.snippet || ''}`);
+        count++;
+        if (count >= 5) break;
+      }
+    }
+    
+    // Local results (Google Maps) - ordenados por rating y reviews (mejor primero)
+    if (response.local_results?.places) {
+      const sortedPlaces = [...response.local_results.places].sort((a: any, b: any) => {
+        // Priorizar por rating * reviews (relevancia real)
+        const scoreA = (a.rating || 0) * (a.reviews || 0);
+        const scoreB = (b.rating || 0) * (b.reviews || 0);
+        return scoreB - scoreA;
+      });
+      for (const p of sortedPlaces.slice(0, 5)) {
+        const rating = p.rating ? ` (${p.rating}★, ${p.reviews || 0} reseñas)` : '';
+        results.push(`- [LOCAL DESTACADO] ${p.title}${rating} - ${p.address || ''}`);
+      }
+    }
+
+    return results.length > 0 ? results.join('\n') : '(sin resultados relevantes)';
+  } catch (error) {
+    console.log(`   ⚠️  Error en búsqueda "${query}": ${(error as Error).message}`);
+    return '(error en búsqueda)';
+  }
+}
+
+/**
+ * Realiza las búsquedas de contexto local para una ciudad
+ */
+async function searchLocalContext(location: SaleLocationTarget): Promise<string> {
+  console.log(`   🔍 Buscando datos reales con SerpAPI...`);
+  
+  const searches = [
+    `taller autocaravanas camper ${location.name} ${location.province}`,
+    `ITV vehículos pesados autocaravanas ${location.name} ${location.province}`,
+    `parking autocaravanas larga estancia ${location.name}`,
+    `escapadas fin de semana autocaravana desde ${location.name}`,
+  ];
+
+  const results: string[] = [];
+  
+  for (const query of searches) {
+    const searchResults = await searchGoogle(query);
+    results.push(`\n### Búsqueda: "${query}"\n${searchResults}`);
+    // Pequeña espera entre búsquedas para no saturar
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  
+  console.log(`   ✅ ${searches.length} búsquedas completadas`);
+  return results.join('\n');
+}
+
+/**
  * Genera contenido único orientado al PROPIETARIO para una ubicación
  */
 async function generateSaleLocationContent(location: SaleLocationTarget): Promise<SaleGeneratedContent> {
@@ -76,94 +173,86 @@ async function generateSaleLocationContent(location: SaleLocationTarget): Promis
   const officeName = nearestOffice === 'murcia' ? 'Murcia (Casillas)' : 'Madrid';
   const isSede = location.name === 'Murcia' || location.name === 'Madrid';
 
+  // Buscar datos reales con SerpAPI
+  const localContext = await searchLocalContext(location);
+
   const sedeContext = isSede
     ? `${location.name} es donde Furgocasa tiene presencia directa.`
     : `Furgocasa tiene su sede en ${officeName}. La distancia a ${location.name} es de aproximadamente ${location.distance_km || '?'} km.`;
 
-  const prompt = `Eres un redactor copywriter especializado en el sector de autocaravanas y campers, orientado a COMPRADORES y PROPIETARIOS de vehículos recreativos.
+  const prompt = `Genera contenido ÚNICO para la página de venta de autocaravanas en "${location.name}, ${location.province}, ${location.region}".
 
-**CONTEXTO DE FURGOCASA:**
-${sedeContext}
-Furgocasa vende autocaravanas y campers de su flota de alquiler, revisados, con garantía y financiación.
+CONTEXTO: ${sedeContext} Furgocasa vende campers revisados de su flota, con garantía y financiación.
 
-**TU MISIÓN:**
-Crear contenido SEO optimizado, extenso y de calidad para la landing page de VENTA de autocaravanas en "${location.name}, ${location.province}, ${location.region}".
+DATOS REALES ENCONTRADOS EN GOOGLE (usa estos datos para escribir contenido con nombres y datos reales):
+${localContext}
 
-**PÚBLICO OBJETIVO:**
-Persona LOCAL de ${location.name} o alrededores que:
-- Está pensando en COMPRAR una autocaravana o camper
-- Ya es propietario y busca información práctica
-- Quiere saber qué servicios hay cerca de su casa para mantener su vehículo
-- Busca escapadas de fin de semana cercanas
+PÚBLICO: Persona de ${location.name} que quiere comprar una autocaravana.
 
-**IMPORTANTE: ESTE NO ES CONTENIDO TURÍSTICO.**
-No escribas sobre atracciones turísticas, gastronomía para visitantes ni guías de viaje.
-El enfoque es 100% práctico: ser PROPIETARIO de autocaravana en ${location.name}.
+INSTRUCCIÓN CLAVE: Piensa en qué hace DIFERENTE a ${location.name} de cualquier otra ciudad para un propietario de autocaravana. No escribas nada que podrías copiar-pegar cambiando el nombre de la ciudad. Cada dato, cada frase, debe ser ESPECÍFICA de ${location.name}.
 
-**OBJETIVO SEO:**
-Posicionarse en búsquedas como:
-- "comprar autocaravana ${location.name}"
-- "venta camper ${location.name}"
-- "autocaravanas de segunda mano ${location.province}"
-- "taller autocaravanas ${location.name}"
-- "ITV autocaravanas ${location.province}"
-- "parking autocaravanas ${location.name}"
+PRIORIDAD DE RESULTADOS: Los datos de Google están ordenados por relevancia. Los marcados como [LOCAL DESTACADO] tienen mejores valoraciones y más reseñas. PRIORIZA SIEMPRE los negocios/servicios con más estrellas y reseñas, son los más conocidos y fiables de la zona. Si aparecen con 4.5★+ y cientos de reseñas, menciónalo: aporta confianza.
 
-**REQUISITOS CRÍTICOS:**
+NO incluyas enlaces HTML ni URLs en el contenido. Solo texto plano con los nombres reales.
 
-1. **Solo información REAL y VERIFICABLE** - No inventes nombres de talleres, empresas o direcciones
-2. **Tono práctico e informativo** - Como un vecino que te cuenta lo que sabe de la zona
-3. **Sin exageraciones** - Datos útiles, no marketing vacío
-4. **NO mencionar empresas competidoras** de venta de autocaravanas
-5. **Formato HTML limpio** - UTF-8, sin estilos ni clases CSS. Usa <h2>, <h3>, <p>, <ul><li>. NO uses <h1>
+PROHIBIDO mencionar marketplaces, portales de anuncios o agregadores (Milanuncios, Wallapop, AutoScout24, etc.). Solo negocios/servicios REALES con ubicación física: talleres, estaciones ITV, campings, áreas de autocaravanas, parkings.
 
-**GENERA EL CONTENIDO EN FORMATO JSON CON ESTA ESTRUCTURA:**
+Ejemplos de lo que SÍ quiero:
+- "En ${location.name} la ITV de vehículos pesados se pasa en [nombre estación concreta], en [zona/dirección]"
+- "Los talleres especializados en Fiat Ducato (base de la mayoría de campers) se concentran en [polígono concreto]"
+- "Cuidado con [problema local específico]: la sal marina / el polvo / las heladas..."
+- "Desde ${location.name} tienes [destino concreto] a solo 45 min por la [carretera concreta]"
+
+Ejemplos de lo que NO quiero (PROHIBIDO):
+- "En ${location.name} hay talleres que ofrecen servicios de mecánica general" (genérico, vale para cualquier ciudad)
+- "Es recomendable contar con un seguro a todo riesgo" (obvio, no aporta nada)
+- "Hay opciones de almacenamiento en la zona" (vacío)
+
+FORMATO: JSON con esta estructura. HTML limpio dentro (p, h3, ul/li). Sin h1, sin CSS.
 
 {
-  "owner_introduction": "<p>Introducción extensa (300-400 palabras) en HTML sobre lo que supone ser propietario de autocaravana o camper viviendo en ${location.name}. Habla del estilo de vida camper desde la perspectiva de un residente local: clima de la zona y cómo afecta al uso de la camper, frecuencia con la que se puede salir (fines de semana, puentes), la cultura camper en ${location.province}. Menciona de forma natural que Furgocasa vende vehículos revisados de su flota con garantía. ${!isSede ? 'Indica que la sede está en ' + officeName + ' y que merece la pena el desplazamiento por la calidad y garantía.' : ''} Usa keywords: comprar autocaravana, camper, ${location.name}.</p>",
-  
+  "owner_introduction": "HTML. Máx 150 palabras. Qué tiene de especial ${location.name} para un propietario de camper. Clima CONCRETO (temperaturas reales), qué tienes cerca (costa/montaña a X km por [carretera]), particularidades locales. ${!isSede ? 'Furgocasa está en ' + officeName + ' (' + (location.distance_km || '?') + ' km por [autovía]).' : 'Furgocasa tiene sede aquí.'}",
+
   "workshops_and_services": [
     {
-      "name": "Tipo de servicio genérico (ej: Talleres mecánicos especializados en la zona de ${location.name})",
-      "description": "<p>Descripción de 120-150 palabras en HTML. Qué tipo de talleres o servicios para autocaravanas hay en la zona de ${location.name}. Polígonos industriales donde suelen estar, tipo de servicios que ofrecen (mecánica general, instalaciones de gas, electricidad, placa solar, etc.). NO inventes nombres de talleres específicos. Habla en genérico sobre la oferta de servicios de la zona.</p>",
+      "name": "Nombre ESPECÍFICO (no genérico)",
+      "description": "HTML. 30-60 palabras. SOLO si tienes info concreta: nombre real del taller/polígono/zona, qué hacen, por qué es relevante para campers.",
       "type": "taller|accesorios|concesionario|servicio",
-      "approximate_location": "Zona genérica (ej: Polígono industrial de ${location.name}, Zona sur de la provincia, etc.)"
+      "approximate_location": "Zona/polígono/barrio concreto"
     }
   ],
-  // 3-4 tipos de servicios diferentes: talleres mecánicos, tiendas de accesorios, servicios de instalación, servicios de limpieza/detailing
+  // SOLO los que conozcas con datos reales. Si solo conoces 1, pon 1. Mejor 1 real que 4 inventados.
 
-  "itv_and_regulations": "<h2>ITV y normativa para autocaravanas en ${location.province}</h2><h3>Estaciones ITV</h3><p>Información sobre estaciones ITV en ${location.name} y alrededores que aceptan autocaravanas y vehículos de gran tamaño. Requisitos especiales, periodicidad, documentación necesaria (150 palabras).</p><h3>Normativa de estacionamiento</h3><p>Regulación local sobre estacionamiento de autocaravanas en ${location.name}: dónde se puede y no se puede aparcar, restricciones de altura, ZBE si existe, multas habituales (150 palabras).</p><h3>Documentación y seguros</h3><p>Tipos de seguro recomendados para autocaravanas, permiso de circulación, ficha técnica, cambio de titularidad, impuesto de circulación en ${location.province} (120 palabras).</p>",
-  
+  "itv_and_regulations": "HTML. SOLO datos específicos de ${location.name}/${location.province}: nombres de estaciones ITV concretas, si hay ZBE o no (dato real), restricciones de altura en calles concretas, particularidades locales. NO repitas info genérica de España que aplica a todas las ciudades.",
+
   "storage_and_parking": [
     {
-      "name": "Tipo de almacenamiento (ej: Guardamuebles y naves en la zona de ${location.name})",
-      "description": "<p>Descripción de 100-130 palabras en HTML. Opciones de almacenamiento para autocaravanas cuando no se usan: guardamuebles, naves industriales, parkings cubiertos, campings que ofrecen invernaje. NO inventes nombres específicos. Habla en genérico sobre las opciones típicas de la zona, precios orientativos si son conocidos, qué buscar al elegir un guardamuebles.</p>",
-      "type": "guardamuebles|parking|camping_invernal",
-      "approximate_location": "Zona genérica"
+      "name": "Nombre concreto de la opción",
+      "description": "HTML. 30-60 palabras. Dónde dejar aparcada tu autocaravana cuando no la usas: parkings de larga estancia para campers, campings con servicio de invernaje, naves o cocheras para vehículos grandes. Precio orientativo mensual si lo sabes.",
+      "type": "parking_larga_estancia|camping_invernaje|nave_cochera",
+      "approximate_location": "Ubicación"
     }
   ],
-  // 2-3 opciones: guardamuebles/naves, parkings al aire libre, invernaje en camping
-  
+  // Parkings de larga estancia, campings con invernaje, naves para vehículos grandes. Si no conoces opciones concretas de ${location.name}, pon array vacío [].
+
   "weekend_destinations": [
     {
-      "title": "Destino: [Nombre del destino]",
-      "description": "<p>Descripción de 150-200 palabras en HTML. Escapada de fin de semana en camper desde ${location.name}. Qué se puede hacer, dónde aparcar la autocaravana, mejor época. Orientado a alguien que sale el viernes por la tarde y vuelve el domingo. Incluye áreas de autocaravanas o campings donde pernoctar.</p>",
-      "distance_km": "X km desde ${location.name}",
-      "duration": "X horas en coche"
+      "title": "Nombre del destino",
+      "description": "HTML. 40-80 palabras. Qué hacer EN CAMPER. Nombre del área/camping donde pernoctar si lo sabes. Carretera para llegar.",
+      "distance_km": "X km",
+      "duration": "Xh Xmin"
     }
   ]
-  // 4-5 destinos de fin de semana REALES, variados: playa, montaña, pueblos con encanto, parques naturales. Todos a distancia razonable (máx 3h).
+  // 3-5 destinos REALES accesibles desde ${location.name}. Que sean diferentes a los de otras ciudades cercanas.
 }
 
-**RECORDATORIO FINAL:**
-- Todo el contenido en HTML limpio dentro de cada campo
-- Solo información REAL y VERIFICABLE
-- NUNCA inventes nombres de empresas, talleres o direcciones concretas
-- Habla en genérico cuando no estés seguro de datos específicos
-- Contenido orientado al PROPIETARIO LOCAL, NO al turista
-- EXTENSO, COMPLETO y de MÁXIMA CALIDAD
-- Keywords: comprar autocaravana, camper, ${location.name}, ${location.province}
-- 1500-2000 palabras totales`;
+REGLAS FINALES:
+- SÍ puedes usar tu conocimiento geográfico general: clima, carreteras, distancias, parques naturales, zonas costeras, etc. Eso lo sabes bien.
+- SÍ puedes mencionar polígonos industriales conocidos, zonas comerciales, barrios, etc.
+- SÍ debes rellenar TODAS las secciones con contenido útil.
+- NO inventes nombres de talleres o negocios específicos, pero SÍ describe las zonas donde se concentran y qué tipo de servicios suelen ofrecer.
+- Lo que hace ÚNICO el contenido de ${location.name} es: su clima específico, su geografía, qué tiene cerca (costa/montaña/ambas), las carreteras que conectan, los destinos concretos accesibles, y las particularidades de la provincia.
+- NUNCA escribas algo que podrías copiar-pegar en otra ciudad cambiando solo el nombre.`;
 
   try {
     console.log(`   📝 Generando contenido de propietario con GPT-5.2...`);
@@ -173,7 +262,7 @@ Posicionarse en búsquedas como:
       messages: [
         {
           role: "system",
-          content: "Eres un redactor copywriter profesional especializado en el sector de autocaravanas y campers en España. Tu enfoque es práctico y orientado al PROPIETARIO de vehículo recreativo: talleres, ITV, almacenamiento, normativa, escapadas de fin de semana. NO escribes contenido turístico genérico. NUNCA inventas nombres de empresas concretas ni direcciones exactas. Cuando no estés seguro de un dato específico, hablas en genérico."
+          content: "Eres un redactor de contenido web especializado en autocaravanas en España. Tienes amplio conocimiento geográfico de España: clima por zonas, carreteras principales, distancias entre ciudades, parques naturales, zonas costeras, zonas de montaña, polígonos industriales de ciudades grandes, y cultura camper. Usas tu conocimiento para escribir contenido útil y diferenciado por ciudad. Cuando no conoces un nombre concreto (de un taller, ITV, etc.), describes la zona o tipo de servicio de forma que sea útil sin inventar nombres. Tu tono es directo y práctico, como alguien que conoce bien la zona."
         },
         {
           role: "user",
@@ -181,18 +270,25 @@ Posicionarse en búsquedas como:
         }
       ],
       temperature: 0.7,
+      max_completion_tokens: 12000,
       response_format: { type: "json_object" }
     });
 
     const rawContent = completion.choices[0].message.content || '{}';
     const content = JSON.parse(rawContent);
 
-    // Validar estructura - log para debug si falla
-    if (!content.owner_introduction || !content.workshops_and_services || !content.itv_and_regulations) {
+    // Validar que al menos tenga la introducción (lo mínimo)
+    if (!content.owner_introduction) {
       console.error(`   ⚠️  Claves recibidas: ${Object.keys(content).join(', ')}`);
       console.error(`   ⚠️  finish_reason: ${completion.choices[0].finish_reason}`);
-      throw new Error('Contenido generado incompleto');
+      throw new Error('Contenido generado incompleto: falta owner_introduction');
     }
+    
+    // Asegurar que los arrays existen aunque estén vacíos
+    content.workshops_and_services = content.workshops_and_services || [];
+    content.storage_and_parking = content.storage_and_parking || [];
+    content.weekend_destinations = content.weekend_destinations || [];
+    content.itv_and_regulations = content.itv_and_regulations || '';
 
     return content as SaleGeneratedContent;
   } catch (error) {
@@ -234,11 +330,23 @@ async function saveGeneratedContent(
 ): Promise<void> {
   const wordCount = countWords(content);
 
+  // Sanitizar: eliminar caracteres Unicode problemáticos (control chars, surrogates, emojis, nbsp especiales)
+  const sanitized = JSON.parse(
+    JSON.stringify(content)
+      .replace(/[\u0000-\u001F\uD800-\uDFFF]/g, '')
+      .replace(/\\u[0-9a-fA-F]{4}/g, (match) => {
+        // Dejar pasar escapes comunes (\\n, \\t convertidos), eliminar los raros
+        const code = parseInt(match.slice(2), 16);
+        if (code < 0x20 || (code >= 0xD800 && code <= 0xDFFF)) return '';
+        return match;
+      })
+  );
+
   // Intentar con updated_at primero, si no existe la columna, sin ella
   let { error } = await supabase
     .from('sale_location_targets')
     .update({
-      content_sections: content,
+      content_sections: sanitized,
       updated_at: new Date().toISOString()
     })
     .eq('id', locationId);
@@ -247,7 +355,7 @@ async function saveGeneratedContent(
     console.log(`   ⚠️  Columna updated_at no existe, guardando solo content_sections...`);
     const retry = await supabase
       .from('sale_location_targets')
-      .update({ content_sections: content })
+      .update({ content_sections: sanitized })
       .eq('id', locationId);
     error = retry.error;
   }

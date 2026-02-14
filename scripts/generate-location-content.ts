@@ -8,6 +8,7 @@
 import { config } from 'dotenv';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { getJson } from 'serpapi';
 import { resolve } from 'path';
 
 // Cargar variables de entorno desde .env.local
@@ -17,6 +18,8 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.SUPABASE_SERVICE_ROLE_KEY! // Usar service role para escritura
 );
+
+const SERPAPI_KEY = process.env.SERPAPI_KEY;
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -65,6 +68,100 @@ function getNearestOffice(location: LocationTarget): 'murcia' | 'madrid' {
 }
 
 /**
+ * Busca en Google con SerpAPI y devuelve resultados resumidos (sin marketplaces)
+ */
+async function searchGoogle(query: string): Promise<string> {
+  if (!SERPAPI_KEY) {
+    return '(sin resultados - SerpAPI no configurada)';
+  }
+  
+  try {
+    const response = await getJson({
+      engine: 'google',
+      api_key: SERPAPI_KEY,
+      q: query,
+      location: 'Spain',
+      gl: 'es',
+      hl: 'es',
+      num: 10,
+    });
+
+    const results: string[] = [];
+
+    // Dominios de marketplaces/portales/agregadores a filtrar
+    const blockedDomains = [
+      'milanuncios', 'wallapop', 'autoscout24', 'coches.net', 'motor.es',
+      'vibbo', 'segundamano', 'facebook.com/marketplace',
+      'ebay', 'amazon', 'idealista', 'fotocasa', 'trovit', 'mundoanuncio',
+      'autocasion', 'standvirtual', 'carfax', 'sumauto', 'cochesnet',
+      'campermanía', 'furgovw', 'tripadvisor', 'booking.com', 'airbnb',
+      'expedia', 'kayak', 'trivago', 'park4night', 'campercontact', 'ioverlander'
+    ];
+    const isBlocked = (url: string, title: string) => {
+      const lower = (url + ' ' + title).toLowerCase();
+      return blockedDomains.some(d => lower.includes(d));
+    };
+    
+    // Resultados orgánicos (sin marketplaces, ordenados por posición Google)
+    if (response.organic_results) {
+      let count = 0;
+      for (const r of response.organic_results.slice(0, 10)) {
+        if (isBlocked(r.link || '', r.title || '')) continue;
+        const position = r.position ? `#${r.position}` : '';
+        results.push(`- ${position} ${r.title}: ${r.snippet || ''}`);
+        count++;
+        if (count >= 5) break;
+      }
+    }
+    
+    // Local results (Google Maps) - ordenados por rating * reviews (mejor primero)
+    if (response.local_results?.places) {
+      const sortedPlaces = [...response.local_results.places].sort((a: any, b: any) => {
+        const scoreA = (a.rating || 0) * (a.reviews || 0);
+        const scoreB = (b.rating || 0) * (b.reviews || 0);
+        return scoreB - scoreA;
+      });
+      for (const p of sortedPlaces.slice(0, 5)) {
+        const rating = p.rating ? ` (${p.rating}★, ${p.reviews || 0} reseñas)` : '';
+        results.push(`- [LOCAL DESTACADO] ${p.title}${rating} - ${p.address || ''}`);
+      }
+    }
+
+    return results.length > 0 ? results.join('\n') : '(sin resultados relevantes)';
+  } catch (error) {
+    console.log(`   ⚠️  Error en búsqueda "${query}": ${(error as Error).message}`);
+    return '(error en búsqueda)';
+  }
+}
+
+/**
+ * Realiza las búsquedas de contexto local para una ciudad (orientado a TURISTA/ALQUILER)
+ */
+async function searchLocalContext(location: LocationTarget): Promise<string> {
+  console.log(`   🔍 Buscando datos reales con SerpAPI...`);
+  
+  const searches = [
+    `área autocaravanas pernocta camping ${location.name} ${location.province}`,
+    `ruta autocaravana camper desde ${location.name}`,
+    `qué ver ${location.name} turismo`,
+    `gastronomía platos típicos ${location.name} ${location.province}`,
+    `normativa autocaravanas ZBE ${location.name}`,
+  ];
+
+  const results: string[] = [];
+  
+  for (const query of searches) {
+    const searchResults = await searchGoogle(query);
+    results.push(`\n### Búsqueda: "${query}"\n${searchResults}`);
+    // Pequeña espera entre búsquedas para no saturar
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+  
+  console.log(`   ✅ ${searches.length} búsquedas completadas`);
+  return results.join('\n');
+}
+
+/**
  * Genera contenido único para una ubicación usando OpenAI
  */
 async function generateLocationContent(location: LocationTarget): Promise<GeneratedContent> {
@@ -76,10 +173,16 @@ async function generateLocationContent(location: LocationTarget): Promise<Genera
     ? `${location.name} ${location.name === 'Murcia' ? 'es la sede principal' : 'ofrece servicio de recogida para alquileres de larga duración'} de Furgocasa.`
     : `Furgocasa tiene su sede en ${officeName}. Para ${location.name}, sé transparente: no hay sede física allí, pero la recogida en ${officeName} merece la pena por la cercanía y la calidad de las campers. Calcula la distancia aproximada desde ${location.name} a ${officeName} y menciónala de forma natural.`;
 
+  // Buscar datos reales con SerpAPI
+  const localContext = await searchLocalContext(location);
+
   const prompt = `Eres un redactor copywriter especializado en temática de viajes y en posicionamiento SEO para empresas de alquiler de autocaravanas camper.
 
 **CONTEXTO DE FURGOCASA:**
 ${sedeContext}
+
+**DATOS REALES ENCONTRADOS EN GOOGLE** (usa estos datos para escribir contenido con nombres, lugares y datos reales):
+${localContext}
 
 **TU MISIÓN:**
 Crear contenido SEO optimizado, extenso y de máxima calidad para la landing page de "${location.name}, ${location.province}, ${location.region}".
@@ -162,6 +265,12 @@ Posicionarse en búsquedas como:
   "practical_tips": "<h2>Consejos prácticos para viajar en autocaravana a ${location.name}</h2><h3>Mejor época para visitar</h3><p>Información sobre clima y temporadas (80 palabras).</p><h3>Normativas y restricciones</h3><p>Normativas locales de estacionamiento, Zonas de Bajas Emisiones (ZBE) si existen, restricciones (100 palabras).</p><h3>Cómo llegar y moverse</h3><p>Distancia y tiempo desde ${officeName} a ${location.name}. Cómo moverse por la zona en autocaravana. Carreteras principales (120 palabras).</p><h3>Servicios para autocaravanas</h3><p>Gasolineras con servicio para vehículos grandes, talleres si es relevante, otros servicios útiles (80 palabras).</p>"
 }
 
+**PRIORIDAD DE RESULTADOS:** Los datos de Google están ordenados por relevancia. Los marcados como [LOCAL DESTACADO] tienen mejores valoraciones y más reseñas en Google Maps. PRIORIZA SIEMPRE los sitios con más estrellas y reseñas: son los más conocidos y fiables de la zona. Si un área de pernocta, camping o restaurante tiene 4.5★+ y cientos de reseñas, menciónalo: aporta confianza al lector.
+
+**PROHIBIDO:** NO menciones marketplaces, portales de anuncios o agregadores (Milanuncios, Wallapop, AutoScout24, etc.). Solo negocios/servicios REALES con ubicación física.
+
+**NO incluyas enlaces HTML ni URLs.** Solo texto plano con los nombres reales de los sitios.
+
 **RECORDATORIO FINAL:**
 - Todo el contenido en HTML limpio dentro de cada campo
 - Solo información REAL y VERIFICABLE
@@ -179,7 +288,7 @@ Posicionarse en búsquedas como:
       messages: [
         {
           role: "system",
-          content: "Eres un redactor copywriter profesional especializado en turismo en autocaravana con conocimiento profundo de España: geografía, rutas turísticas, áreas de pernocta, gastronomía regional y destinos turísticos. Generas contenido SEO de máxima calidad, siempre verificable, transparente y útil para viajeros reales. NUNCA mencionas apps de terceros como Park4Night, CamperContact o iOverlander. SIEMPRE recomiendas Mapa Furgocasa (www.mapafurgocasa.com) cuando sea necesario mencionar una app para encontrar áreas de autocaravanas."
+          content: "Eres un redactor copywriter profesional especializado en turismo en autocaravana con conocimiento profundo de España: geografía, rutas turísticas, áreas de pernocta, gastronomía regional y destinos turísticos. Generas contenido SEO de máxima calidad, siempre verificable, transparente y útil para viajeros reales. Priorizas los negocios y sitios con mejores valoraciones y más reseñas en Google. NUNCA mencionas apps de terceros como Park4Night, CamperContact o iOverlander. SIEMPRE recomiendas Mapa Furgocasa (www.mapafurgocasa.com). NUNCA mencionas marketplaces ni portales de anuncios. Tu tono es directo y práctico, cada frase aporta información concreta."
         },
         {
           role: "user",
@@ -187,6 +296,7 @@ Posicionarse en búsquedas como:
         }
       ],
       temperature: 0.7,
+      max_completion_tokens: 16000,
       response_format: { type: "json_object" }
     });
 
@@ -240,11 +350,16 @@ async function saveGeneratedContent(
   content: GeneratedContent
 ): Promise<void> {
   const wordCount = countWords(content);
+
+  // Sanitizar: eliminar caracteres Unicode problemáticos
+  const sanitized = JSON.parse(
+    JSON.stringify(content).replace(/[\u0000-\u001F\uD800-\uDFFF]/g, '')
+  );
   
   const { error } = await supabase
     .from('location_targets')
     .update({
-      content_sections: content,
+      content_sections: sanitized,
       content_generated_at: new Date().toISOString(),
       content_word_count: wordCount,
       updated_at: new Date().toISOString()

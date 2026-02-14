@@ -311,15 +311,15 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 uppercase tracking-wide">
-                {t("AUTOCARAVANAS EN VENTA EN")} {location.name.toUpperCase()}
+                {t("Comprar Autocaravana Camper en")} {location.name.toUpperCase()}
               </h2>
 
               <div className="text-center max-w-3xl mx-auto">
                 <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
-                  {t("Vehículos revisados con garantía")}
+                  {t("Autocaravanas y campers en venta con garantía")}
                 </h3>
                 <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
-                  {t("Compra tu autocaravana con total tranquilidad. Entrega disponible en")} {location.name}.
+                  {t("Compra tu autocaravana o camper con total tranquilidad. Vehículos revisados y entrega disponible en")} {location.name}.
                 </p>
               </div>
             </div>
@@ -455,10 +455,10 @@ export default async function SaleLocationPage({ params }: PageProps) {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
-            {t("¿Buscas tu autocaravana ideal en")} {location.name}?
+            {t("¿Quieres comprar una autocaravana o camper en")} {location.name}?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            {t("Contáctanos y te ayudaremos a encontrar el vehículo perfecto para ti")}
+            {t("Contáctanos y te ayudaremos a encontrar tu autocaravana ideal. Venta con garantía y financiación.")}
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink

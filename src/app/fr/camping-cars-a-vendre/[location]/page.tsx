@@ -286,15 +286,15 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 uppercase tracking-wide">
-                CAMPING-CARS À VENDRE À {location.name.toUpperCase()}
+                Acheter un Camping-car ou Fourgon à {location.name.toUpperCase()}
               </h2>
 
               <div className="text-center max-w-3xl mx-auto">
                 <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
-                  Véhicules révisés avec garantie
+                  Camping-cars et fourgons en vente avec garantie
                 </h3>
                 <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
-                  Achetez votre camping-car en toute tranquillité. Livraison disponible à {location.name}.
+                  Achetez votre camping-car ou fourgon en toute tranquillité. Véhicules révisés avec livraison disponible à {location.name}.
                 </p>
               </div>
             </div>
@@ -421,10 +421,10 @@ export default async function SaleLocationPage({ params }: PageProps) {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
-            Vous cherchez votre camping-car idéal à {location.name} ?
+            Vous voulez acheter un camping-car à {location.name} ?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Contactez-nous et nous vous aiderons à trouver le véhicule parfait pour vous
+            Contactez-nous et nous vous aiderons à trouver votre camping-car idéal. Vente avec garantie et financement.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink

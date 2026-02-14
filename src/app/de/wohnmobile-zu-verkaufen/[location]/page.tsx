@@ -286,15 +286,15 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 uppercase tracking-wide">
-                WOHNMOBILE ZU VERKAUFEN IN {location.name.toUpperCase()}
+                Wohnmobil oder Camper kaufen in {location.name.toUpperCase()}
               </h2>
 
               <div className="text-center max-w-3xl mx-auto">
                 <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
-                  Geprüfte Fahrzeuge mit Garantie
+                  Wohnmobile und Camper zu verkaufen mit Garantie
                 </h3>
                 <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
-                  Kaufen Sie Ihr Wohnmobil mit voller Sicherheit. Lieferung in {location.name} verfügbar.
+                  Kaufen Sie Ihr Wohnmobil oder Ihren Camper mit voller Sicherheit. Geprüfte Fahrzeuge mit Lieferung in {location.name} verfügbar.
                 </p>
               </div>
             </div>
@@ -421,10 +421,10 @@ export default async function SaleLocationPage({ params }: PageProps) {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
-            Suchen Sie Ihr ideales Wohnmobil in {location.name}?
+            Möchten Sie ein Wohnmobil oder einen Camper in {location.name} kaufen?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Kontaktieren Sie uns und wir helfen Ihnen, das perfekte Fahrzeug für Sie zu finden
+            Kontaktieren Sie uns und wir helfen Ihnen, Ihr ideales Wohnmobil zu finden. Verkauf mit Garantie und Finanzierung.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink

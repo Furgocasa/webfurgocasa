@@ -209,13 +209,13 @@ export function LocationTourismContent({
                     {attractions.map((attraction, index) => (
                       <div 
                         key={index}
-                        className="bg-blue-50 p-6 rounded-xl border-l-4 border-furgocasa-blue"
+                        className="bg-blue-50 p-5 sm:p-6 rounded-xl border-l-4 border-furgocasa-blue overflow-hidden"
                       >
-                        <h4 className="text-lg font-bold text-furgocasa-blue mb-3">
+                        <h4 className="text-base sm:text-lg font-bold text-furgocasa-blue mb-3 break-words">
                           {attraction.title}
                         </h4>
                         <div 
-                          className="text-gray-700 text-sm"
+                          className="text-gray-700 text-sm break-words [&_p]:break-words"
                           dangerouslySetInnerHTML={{ __html: attraction.description }}
                         />
                       </div>
@@ -234,18 +234,18 @@ export function LocationTourismContent({
                     {parking_areas.map((area, index) => (
                       <div 
                         key={index}
-                        className="bg-orange-50 p-6 rounded-xl border-l-4 border-furgocasa-orange"
+                        className="bg-orange-50 p-5 sm:p-6 rounded-xl border-l-4 border-furgocasa-orange overflow-hidden"
                       >
-                        <h4 className="text-lg font-bold text-furgocasa-orange mb-2">
+                        <h4 className="text-base sm:text-lg font-bold text-furgocasa-orange mb-2 break-words">
                           {area.name}
                         </h4>
                         {area.approximate_location && (
-                          <p className="text-xs text-gray-500 mb-3">
+                          <p className="text-xs text-gray-500 mb-3 break-words">
                             📍 {area.approximate_location}
                           </p>
                         )}
                         <div 
-                          className="text-gray-700 text-sm mb-3"
+                          className="text-gray-700 text-sm mb-3 break-words [&_p]:break-words"
                           dangerouslySetInnerHTML={{ __html: area.description }}
                         />
                         {area.services && area.services.length > 0 && (
@@ -276,20 +276,20 @@ export function LocationTourismContent({
                     {routes.map((route, index) => (
                       <div 
                         key={index}
-                        className="bg-purple-50 p-6 rounded-xl border-l-4 border-purple-600"
+                        className="bg-purple-50 p-5 sm:p-6 rounded-xl border-l-4 border-purple-600 overflow-hidden"
                       >
-                        <div className="flex justify-between items-start mb-3">
-                          <h4 className="text-lg font-bold text-purple-700">
+                        <div className="mb-3">
+                          <h4 className="text-base sm:text-lg font-bold text-purple-700 break-words mb-2">
                             {route.title}
                           </h4>
                           {route.duration && (
-                            <span className="bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
+                            <span className="inline-block bg-purple-100 text-purple-700 px-3 py-1 rounded-full text-xs font-semibold">
                               {route.duration}
                             </span>
                           )}
                         </div>
                         <div 
-                          className="text-gray-700 text-sm"
+                          className="text-gray-700 text-sm break-words [&_p]:break-words"
                           dangerouslySetInnerHTML={{ __html: route.description }}
                         />
                         {route.difficulty && (
@@ -305,12 +305,12 @@ export function LocationTourismContent({
 
               {/* GASTRONOMÍA - Diseño idéntico a producción (card verde) */}
               {gastronomy && (
-                <div className="mt-12 bg-green-50 p-8 rounded-2xl border-l-4 border-green-600">
-                  <h3 className="text-2xl font-heading font-bold text-green-700 mb-4">
+                <div className="mt-12 bg-green-50 p-5 sm:p-8 rounded-2xl border-l-4 border-green-600 overflow-hidden">
+                  <h3 className="text-xl sm:text-2xl font-heading font-bold text-green-700 mb-4">
                     🍽️ {replaceLocation(t.local_gastronomy)}
                   </h3>
                   <div 
-                    className="text-gray-700"
+                    className="text-gray-700 break-words [&_p]:break-words"
                     dangerouslySetInnerHTML={{ __html: gastronomy }}
                   />
                 </div>
@@ -318,12 +318,12 @@ export function LocationTourismContent({
 
               {/* CONSEJOS PRÁCTICOS - Diseño idéntico a producción (card azul con gradiente) */}
               {practical_tips && (
-                <div className="mt-12 bg-gradient-to-r from-furgocasa-blue to-blue-600 text-white p-8 rounded-2xl">
-                  <h3 className="text-2xl font-heading font-bold mb-4">
+                <div className="mt-12 bg-gradient-to-r from-furgocasa-blue to-blue-600 text-white p-5 sm:p-8 rounded-2xl overflow-hidden">
+                  <h3 className="text-xl sm:text-2xl font-heading font-bold mb-4">
                     💡 {t.practical_tips}
                   </h3>
                   <div 
-                    className="[&_h2]:text-white [&_h3]:text-white [&_p]:text-white/90 [&_li]:text-white/90"
+                    className="break-words [&_h2]:text-white [&_h3]:text-white [&_p]:text-white/90 [&_p]:break-words [&_li]:text-white/90"
                     dangerouslySetInnerHTML={{ __html: practical_tips }}
                   />
                 </div>
