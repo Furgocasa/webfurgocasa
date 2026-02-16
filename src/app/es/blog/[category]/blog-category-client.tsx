@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, Clock, ArrowRight, BookOpen, Search, Mail, Tag, ArrowLeft, Filter } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
@@ -268,21 +269,21 @@ function BlogCategoryContent() {
             {/* Posts Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.map((post) => {
-                // 🌐 Usar slug traducido según el idioma
-                const postSlug = language === 'fr' && post.slug_fr 
-                  ? post.slug_fr 
-                  : language === 'en' && post.slug_en 
-                  ? post.slug_en 
-                  : language === 'de' && post.slug_de 
-                  ? post.slug_de 
-                  : post.slug;
+                // 🌐 Solo enlazar al idioma actual si el artículo existe en ese idioma (evita 404)
+                const hasTranslation = (language === 'es') || (language === 'en' && post.slug_en) || (language === 'fr' && post.slug_fr) || (language === 'de' && post.slug_de);
+                const postSlug = language === 'fr' && post.slug_fr ? post.slug_fr : language === 'en' && post.slug_en ? post.slug_en : language === 'de' && post.slug_de ? post.slug_de : post.slug;
+                const esCategorySlug = getCategorySlugInSpanish(categorySlug, language);
+                const translatedCategory = translateCategorySlug(esCategorySlug, language);
+                const href = hasTranslation
+                  ? `/${language}/blog/${translatedCategory}/${postSlug}`
+                  : `/es/blog/${esCategorySlug}/${post.slug}`;
                 
                 return (
                 <article 
                   key={post.id} 
                   className="bg-white rounded-2xl shadow-sm overflow-hidden group hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col h-full hover:-translate-y-1"
                 >
-                  <LocalizedLink href={`/blog/${categorySlug}/${postSlug}`} className="flex flex-col h-full">
+                  <Link href={href} className="flex flex-col h-full">
                     <div className="h-56 bg-gray-100 relative flex items-center justify-center overflow-hidden">
                       {post.featured_image ? (
                         <Image 
@@ -331,7 +332,7 @@ function BlogCategoryContent() {
                         <ArrowRight className="h-4 w-4 text-furgocasa-orange transform group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>
-                  </LocalizedLink>
+                  </Link>
                 </article>
                 );
               })}

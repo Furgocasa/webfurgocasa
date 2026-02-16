@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getTranslatedRoute } from '@/lib/route-translations';
+import { translateCategorySlug } from '@/lib/blog-translations';
 import { i18n, type Locale } from '@/lib/i18n/config';
 
 /**
@@ -24,6 +25,9 @@ const LOCALES: Locale[] = i18n.locales as unknown as Locale[];
 type CategoryRow = { slug: string; name?: string | null };
 type PostRow = {
   slug: string;
+  slug_en?: string | null;
+  slug_fr?: string | null;
+  slug_de?: string | null;
   updated_at?: string | null;
   published_at?: string | null;
   category?: CategoryRow | CategoryRow[] | null;
@@ -75,6 +79,9 @@ export async function GET(
       .from('posts')
       .select(`
         slug,
+        slug_en,
+        slug_fr,
+        slug_de,
         updated_at,
         published_at,
         category:content_categories(slug)
@@ -238,15 +245,40 @@ export async function GET(
     });
   });
 
-  // Artículos del blog
+  // Artículos del blog - SOLO si el artículo existe en el idioma actual (evita 404)
+  const postExistsInLocale = (post: PostRow): boolean => {
+    if (currentLocale === 'es') return true;
+    if (currentLocale === 'en') return !!post.slug_en;
+    if (currentLocale === 'fr') return !!post.slug_fr;
+    if (currentLocale === 'de') return !!post.slug_de;
+    return false;
+  };
+  const getPostSlugForLocale = (post: PostRow, locale: Locale): string =>
+    locale === 'es' ? post.slug : locale === 'en' ? (post.slug_en || post.slug) : locale === 'fr' ? (post.slug_fr || post.slug) : (post.slug_de || post.slug);
   postList.forEach((post) => {
+    if (!postExistsInLocale(post)) return;
     const categorySlug = Array.isArray(post.category)
       ? post.category[0]?.slug || 'general'
       : post.category?.slug || 'general';
-    addEntry(`/blog/${categorySlug}/${post.slug}`, {
-      priority: 0.8,
-      changeFrequency: 'weekly',
+    const availableLocales: Locale[] = ['es'];
+    if (post.slug_en) availableLocales.push('en');
+    if (post.slug_fr) availableLocales.push('fr');
+    if (post.slug_de) availableLocales.push('de');
+    const translatedCategory = translateCategorySlug(categorySlug, currentLocale);
+    const slug = getPostSlugForLocale(post, currentLocale);
+    const alternates: Record<string, string> = {};
+    availableLocales.forEach((lang) => {
+      const altCategory = translateCategorySlug(categorySlug, lang);
+      const altSlug = getPostSlugForLocale(post, lang);
+      alternates[lang] = `${BASE_URL}/${lang}/blog/${altCategory}/${altSlug}`;
+    });
+    alternates['x-default'] = `${BASE_URL}/es/blog/${categorySlug}/${post.slug}`;
+    entries.push({
+      url: `${BASE_URL}/${currentLocale}/blog/${translatedCategory}/${slug}`,
       lastModified: post.updated_at || post.published_at || now,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+      alternates: { languages: alternates },
     });
   });
 

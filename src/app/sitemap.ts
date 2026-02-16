@@ -2,6 +2,7 @@ import { MetadataRoute } from 'next';
 import { i18n, type Locale } from '@/lib/i18n/config';
 import { createClient } from '@supabase/supabase-js';
 import { getTranslatedRoute } from '@/lib/route-translations';
+import { translateCategorySlug } from '@/lib/blog-translations';
 
 /**
  * SITEMAP POR IDIOMA - MEJOR PRÁCTICA MULTIIDIOMA
@@ -49,6 +50,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   type CategoryRow = { slug: string; name?: string | null };
   type PostRow = {
     slug: string;
+    slug_en?: string | null;
+    slug_fr?: string | null;
+    slug_de?: string | null;
     updated_at?: string | null;
     published_at?: string | null;
     category?: CategoryRow | CategoryRow[] | null;
@@ -68,6 +72,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .from('posts')
       .select(`
         slug,
+        slug_en,
+        slug_fr,
+        slug_de,
         updated_at,
         published_at,
         category:content_categories(slug)
@@ -222,15 +229,34 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  // Artículos del blog
+  // Artículos del blog - SOLO idiomas donde el artículo existe (evita 404 en crawlers)
   postList.forEach((post) => {
     const categorySlug = Array.isArray(post.category)
       ? post.category[0]?.slug || 'general'
       : post.category?.slug || 'general';
-    addEntry(`/blog/${categorySlug}/${post.slug}`, {
-      priority: 0.8,
-      changeFrequency: 'weekly',
-      lastModified: post.updated_at || post.published_at || now,
+    const availableLocales: Locale[] = ['es'];
+    if (post.slug_en) availableLocales.push('en');
+    if (post.slug_fr) availableLocales.push('fr');
+    if (post.slug_de) availableLocales.push('de');
+    const getSlugForLocale = (locale: Locale) =>
+      locale === 'es' ? post.slug : locale === 'en' ? (post.slug_en || post.slug) : locale === 'fr' ? (post.slug_fr || post.slug) : (post.slug_de || post.slug);
+    availableLocales.forEach((locale) => {
+      const translatedCategory = translateCategorySlug(categorySlug, locale);
+      const slug = getSlugForLocale(locale);
+      const alternates: Record<string, string> = {};
+      availableLocales.forEach((altLocale) => {
+        const altCategory = translateCategorySlug(categorySlug, altLocale);
+        const altSlug = getSlugForLocale(altLocale);
+        alternates[altLocale] = `${baseUrl}/${altLocale}/blog/${altCategory}/${altSlug}`;
+      });
+      alternates['x-default'] = `${baseUrl}/es/blog/${categorySlug}/${post.slug}`;
+      entries.push({
+        url: `${baseUrl}/${locale}/blog/${translatedCategory}/${slug}`,
+        lastModified: post.updated_at || post.published_at || now,
+        changeFrequency: 'weekly',
+        priority: 0.8,
+        alternates: { languages: alternates },
+      });
     });
   });
 

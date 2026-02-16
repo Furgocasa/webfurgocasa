@@ -159,7 +159,8 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
       .order("display_order", { ascending: true }),
   ]);
 
-  const postList = (posts || []) as PostRow[];
+  const allPosts = (posts || []) as PostRow[];
+  const postList = allPosts.filter((p) => p.slug_de); // Solo artículos que existen en alemán
   const categoryList = (categories || []) as CategoryRow[];
   const rentList = (vehiclesRent || []) as VehicleRow[];
   const saleList = (vehiclesSale || []) as VehicleRow[];
@@ -238,7 +239,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                   const categorySlug = getCategorySlug(post.category);
                   const translatedCategorySlug = translateCategorySlug(categorySlug, locale);
                   // Usar el slug traducido si existe, sino usar el original
-                  const translatedPostSlug = post.slug_de || post.slug;
+                  const translatedPostSlug = post.slug_de!;
                   const path = `/blog/${translatedCategorySlug}/${translatedPostSlug}`;
                   return (
                     <li key={post.slug}>

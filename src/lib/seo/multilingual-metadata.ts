@@ -1,4 +1,5 @@
 import { getTranslatedRoute } from "@/lib/route-translations";
+import { translateCategorySlug } from "@/lib/blog-translations";
 import type { Locale } from "@/lib/i18n/config";
 import type { Metadata } from "next";
 
@@ -136,6 +137,59 @@ export function buildCanonicalAlternates(path: string, currentLang: Locale) {
 
   // Canonical autorreferenciado: apunta a la URL actual del idioma actual
   const canonicalUrl = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, currentLang)}`;
+
+  return {
+    canonical: canonicalUrl,
+    languages,
+  };
+}
+
+/**
+ * Genera alternates para artículos del blog - SOLO idiomas donde el contenido existe
+ *
+ * Los artículos del blog solo existen en idiomas donde hay slug traducido (slug_en, slug_fr, slug_de).
+ * Incluir hreflang para idiomas sin contenido genera URLs 404 que los crawlers siguen.
+ *
+ * @param path - Ruta en español sin prefijo (ej: "/blog/rutas/mi-articulo")
+ * @param currentLang - Idioma actual
+ * @param post - Post con slug, slug_en, slug_fr, slug_de y category
+ * @returns Objeto con canonical y languages (solo idiomas disponibles)
+ */
+export function buildBlogCanonicalAlternates(
+  path: string,
+  currentLang: Locale,
+  post: { slug: string; slug_en?: string | null; slug_fr?: string | null; slug_de?: string | null; category?: { slug: string } | null }
+) {
+  const baseUrl = 'https://www.furgocasa.com';
+
+  const categorySlug = Array.isArray(post.category)
+    ? post.category[0]?.slug || 'general'
+    : post.category?.slug || 'general';
+
+  const availableLocales: Locale[] = ['es'];
+  if (post.slug_en) availableLocales.push('en');
+  if (post.slug_fr) availableLocales.push('fr');
+  if (post.slug_de) availableLocales.push('de');
+
+  const getSlugForLocale = (locale: Locale) => {
+    if (locale === 'es') return post.slug;
+    if (locale === 'en') return post.slug_en || post.slug;
+    if (locale === 'fr') return post.slug_fr || post.slug;
+    if (locale === 'de') return post.slug_de || post.slug;
+    return post.slug;
+  };
+
+  const languages: Record<string, string> = {};
+  availableLocales.forEach((locale) => {
+    const translatedCategory = translateCategorySlug(categorySlug, locale);
+    const slug = getSlugForLocale(locale);
+    languages[locale] = `${baseUrl}/${locale}/blog/${translatedCategory}/${slug}`;
+  });
+  languages['x-default'] = `${baseUrl}/es/blog/${categorySlug}/${post.slug}`;
+
+  const currentSlug = getSlugForLocale(currentLang);
+  const currentCategory = translateCategorySlug(categorySlug, currentLang);
+  const canonicalUrl = `${baseUrl}/${currentLang}/blog/${currentCategory}/${currentSlug}`;
 
   return {
     canonical: canonicalUrl,

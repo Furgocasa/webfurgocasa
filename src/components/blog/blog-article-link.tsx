@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLanguage } from "@/contexts/language-context";
+import { translateCategorySlug } from "@/lib/blog-translations";
 import { ReactNode } from "react";
 
 interface BlogArticleLinkProps {
@@ -14,6 +15,10 @@ interface BlogArticleLinkProps {
   children: ReactNode;
 }
 
+/**
+ * Enlaza a artículos del blog. Si el artículo no existe en el idioma actual,
+ * enlaza a la versión española (evita 404 en en/fr/de).
+ */
 export function BlogArticleLink({ 
   categorySlug, 
   slug, 
@@ -24,29 +29,30 @@ export function BlogArticleLink({
   children 
 }: BlogArticleLinkProps) {
   const { language } = useLanguage();
+  const catSlug = categorySlug || 'general';
   
-  // Elegir el slug según el idioma, con fallback al español
-  let finalSlug = slug;
+  // Solo enlazar al idioma actual si el artículo existe en ese idioma
+  const hasTranslation = 
+    (language === 'es') || 
+    (language === 'en' && slug_en) || 
+    (language === 'fr' && slug_fr) || 
+    (language === 'de' && slug_de);
   
-  switch (language) {
-    case 'en':
-      finalSlug = slug_en || slug;
-      break;
-    case 'fr':
-      finalSlug = slug_fr || slug;
-      break;
-    case 'de':
-      finalSlug = slug_de || slug;
-      break;
-    default:
-      finalSlug = slug;
+  let href: string;
+  if (hasTranslation) {
+    const finalSlug = language === 'es' ? slug 
+      : language === 'en' ? (slug_en || slug) 
+      : language === 'fr' ? (slug_fr || slug) 
+      : (slug_de || slug);
+    const translatedCategory = translateCategorySlug(catSlug, language);
+    href = `/${language}/blog/${translatedCategory}/${finalSlug}`;
+  } else {
+    // Fallback: enlazar a la versión española (única que existe)
+    href = `/es/blog/${catSlug}/${slug}`;
   }
   
   return (
-    <Link
-      href={`/${language}/blog/${categorySlug || 'general'}/${finalSlug}`}
-      className={className}
-    >
+    <Link href={href} className={className}>
       {children}
     </Link>
   );

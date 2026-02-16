@@ -11,7 +11,7 @@ import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, getTranslatedRecords, type Locale } from "@/lib/translations/get-translations";
 import { translateServer } from "@/lib/i18n/server-translation";
-import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { buildBlogCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 
 /**
  * 🎯 ARTÍCULOS DE BLOG MULTIIDIOMA - Nueva arquitectura [locale]
@@ -74,8 +74,8 @@ export async function generateMetadata({
     }
   );
 
-  // ✅ Canonical autorreferenciado
-  const alternates = buildCanonicalAlternates(`/blog/${category}/${slug}`, locale);
+  // ✅ Canonical + hreflang solo para idiomas donde el artículo existe
+  const alternates = buildBlogCanonicalAlternates(`/blog/${category}/${slug}`, locale, post);
   
   return {
     title: translatedMeta.meta_title || translatedMeta.title,
