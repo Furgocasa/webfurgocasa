@@ -314,3 +314,52 @@ export async function getAllPostSlugTranslations(
   
   return { postId, slugs, category };
 }
+
+/**
+ * Detecta a qué idioma pertenece un slug de categoría del blog
+ * @returns El locale al que pertenece la categoría, o null si no se reconoce
+ */
+function detectCategoryLocale(categorySlug: string): Locale | null {
+  for (const [, translations] of Object.entries(blogCategoryTranslations)) {
+    for (const [lang, slug] of Object.entries(translations)) {
+      if (slug === categorySlug) return lang as Locale;
+    }
+  }
+  return null;
+}
+
+/**
+ * Sanitiza links internos del blog dentro del contenido HTML.
+ * 
+ * Problema: cuando el contenido se tradujo con IA, los links internos quedaron
+ * con prefijo /es/ pero categoría/slug en otro idioma. Ejemplo:
+ *   /es/blog/routes/english-slug (debería ser /en/blog/routes/english-slug)
+ *   /es/blog/actualites/french-slug (debería ser /fr/blog/actualites/french-slug)
+ * 
+ * Esta función detecta el idioma de la categoría y reescribe el prefijo de locale.
+ * Si la categoría no corresponde al locale de la página, usa el locale detectado.
+ * Si corresponde, deja el link tal cual.
+ */
+export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): string {
+  if (!html) return html;
+
+  return html.replace(
+    /href="(?:https?:\/\/(?:www\.)?furgocasa\.com)?\/(es|en|fr|de)\/blog\/([^/"]+)\/([^/"]+)"/g,
+    (_match, linkLocale: string, categorySlug: string, articleSlug: string) => {
+      const detectedLocale = detectCategoryLocale(categorySlug);
+
+      if (detectedLocale && detectedLocale !== linkLocale) {
+        return `href="/${detectedLocale}/blog/${categorySlug}/${articleSlug}"`;
+      }
+
+      if (linkLocale !== pageLocale) {
+        const catLocale = detectedLocale || linkLocale as Locale;
+        if (catLocale === pageLocale) {
+          return `href="/${pageLocale}/blog/${categorySlug}/${articleSlug}"`;
+        }
+      }
+
+      return `href="/${linkLocale}/blog/${categorySlug}/${articleSlug}"`;
+    }
+  );
+}

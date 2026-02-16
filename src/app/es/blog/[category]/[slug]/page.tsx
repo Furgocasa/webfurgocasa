@@ -6,7 +6,7 @@ import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
 import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
-import { getCategoryName, getAllPostSlugTranslations, translateCategorySlug } from "@/lib/blog-translations";
+import { getCategoryName, getAllPostSlugTranslations, translateCategorySlug, sanitizeBlogContentLinks } from "@/lib/blog-translations";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
@@ -267,7 +267,7 @@ export default async function LocaleBlogPostPage({
 
               <div 
                 className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-furgocasa-blue hover:prose-a:text-furgocasa-blue-dark prose-img:rounded-2xl prose-img:shadow-lg"
-                dangerouslySetInnerHTML={{ __html: translatedPost.content || post.content || "" }}
+                dangerouslySetInnerHTML={{ __html: sanitizeBlogContentLinks(translatedPost.content || post.content || "", locale) }}
               />
 
               {/* Tags */}

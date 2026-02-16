@@ -136,18 +136,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // ✅ Redirigir /es/blog/routes|news|vehicles|... (URLs mal formadas) → idioma correcto
-  // Evita 404 cuando crawlers encuentran /es/blog/routes/english-slug (debe ser /en/blog/routes/...)
-  const esBlogWrongCategoryMatch = pathname.match(/^\/es\/blog\/(routes|news|vehicles|tips|destinations|equipment|itineraires|actualites|vehicules|conseils|equipement|routen|nachrichten|fahrzeuge|tipps|reiseziele|ausrustung)\/([^/]+)\/?$/);
-  if (esBlogWrongCategoryMatch) {
-    const [, category, slug] = esBlogWrongCategoryMatch;
-    const enCategories = ['routes', 'news', 'vehicles', 'tips', 'destinations', 'equipment'];
-    const frCategories = ['itineraires', 'actualites', 'vehicules', 'conseils', 'equipement'];
-    const deCategories = ['routen', 'nachrichten', 'fahrzeuge', 'tipps', 'reiseziele', 'ausrustung'];
-    const targetLocale = enCategories.includes(category) ? 'en' : frCategories.includes(category) ? 'fr' : 'de';
-    const url = request.nextUrl.clone();
-    url.pathname = `/${targetLocale}/blog/${category}/${slug}`;
-    return NextResponse.redirect(url, 301);
+  // ✅ Redirigir blog URLs con categoría en idioma incorrecto → idioma que corresponde a esa categoría
+  // Ejemplo: /es/blog/routes/english-slug → /en/blog/routes/english-slug (routes es categoría EN)
+  // Ejemplo: /en/blog/rutas/slug → /es/blog/rutas/slug (rutas es categoría ES)
+  const blogCategoryMatch = pathname.match(/^\/(es|en|fr|de)\/blog\/([^/]+)\/([^/]+)\/?$/);
+  if (blogCategoryMatch) {
+    const [, urlLocale, category, slug] = blogCategoryMatch;
+    const categoryToLocale: Record<string, string> = {
+      rutas: 'es', noticias: 'es', vehiculos: 'es', consejos: 'es', destinos: 'es', equipamiento: 'es',
+      routes: 'en', news: 'en', vehicles: 'en', tips: 'en', destinations: 'en', equipment: 'en',
+      itineraires: 'fr', actualites: 'fr', vehicules: 'fr', conseils: 'fr', equipement: 'fr',
+      routen: 'de', nachrichten: 'de', fahrzeuge: 'de', tipps: 'de', reiseziele: 'de', ausrustung: 'de',
+    };
+    const correctLocale = categoryToLocale[category];
+    if (correctLocale && correctLocale !== urlLocale) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/${correctLocale}/blog/${category}/${slug}`;
+      return NextResponse.redirect(url, 301);
+    }
   }
 
   // ✅ Normalizar URLs legacy con index.php (SEO)
