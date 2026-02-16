@@ -158,10 +158,9 @@ export async function middleware(request: NextRequest) {
 
   // ✅ Redirigir rutas españolas bajo locale incorrecto → /es/
   // Ejemplo: /de/alquiler-casas-rodantes-murcia → /es/alquiler-casas-rodantes-murcia
-  // Ejemplo: /fr/alquiler-autocaravanas-campervans/murcia → /es/alquiler-autocaravanas-campervans/murcia
   const localeMatch = pathname.match(/^\/(en|fr|de)(\/.*)/);
   if (localeMatch) {
-    const [, urlLocale, rest] = localeMatch;
+    const [, , rest] = localeMatch;
     const spanishPrefixes = [
       '/alquiler-autocaravanas-campervans',
       '/alquiler-casas-rodantes',
@@ -173,6 +172,28 @@ export async function middleware(request: NextRequest) {
       url.pathname = `/es${rest}`;
       return NextResponse.redirect(url, 301);
     }
+  }
+
+  // ✅ Limpiar "undefined" en URLs (bug legacy del LanguageProvider)
+  // Ejemplo: /es/undefined/blog/rutas → /es/blog/rutas
+  if (pathname.includes('/undefined/')) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(/\/undefined\//g, '/');
+    return NextResponse.redirect(url, 301);
+  }
+
+  // ✅ Redirigir URLs con slugs de ruta incorrectos (traducciones erróneas)
+  const typoRedirects: Record<string, string> = {
+    '/en/area-map': '/en/areas-map',
+    '/fr/carte-aires': '/fr/carte-zones',
+    '/fr/reservez': '/fr/reserver',
+    '/de/stellplatzkarte': '/de/gebietskarte',
+    '/de/kuenstliche-intelligenz': '/de/kunstliche-intelligenz',
+  };
+  if (typoRedirects[pathname]) {
+    const url = request.nextUrl.clone();
+    url.pathname = typoRedirects[pathname];
+    return NextResponse.redirect(url, 301);
   }
 
   // ✅ Normalizar URLs legacy con index.php (SEO)
