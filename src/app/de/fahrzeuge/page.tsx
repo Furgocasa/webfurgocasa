@@ -1,4 +1,5 @@
 import { Metadata } from"next";
+import { headers } from"next/headers";
 import { createClient } from"@supabase/supabase-js";
 import { VehicleListClient } from"@/components/vehicle/vehicle-list-client";
 import { LocalizedLink } from"@/components/localized-link";
