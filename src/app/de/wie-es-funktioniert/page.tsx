@@ -1,25 +1,5 @@
-import { redirect } from 'next/navigation';
-import { Metadata } from 'next';
-import { translateServer } from "@/lib/i18n/server-translation";
-import type { Locale } from "@/lib/i18n/config";
+import { permanentRedirect } from 'next/navigation';
 
-interface PageProps {}
-
-// Metadata para evitar indexación temporal durante la redirección
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const locale: Locale = 'de'; // Locale fijo
-  
-  
-  return {
-    title: "Redirección",
-    robots: { index: false, follow: false }
-  };
-}
-
-export default async function LocaleComoFuncionaPage({ params }: PageProps) {
-  const locale: Locale = 'de'; // Locale fijo
-  
-  
-  // Redirect permanente del lado del servidor (no aparecerá en Analytics)
-  redirect(`/${locale}/guia-camper`);
+export default async function LocaleWieEsFunktioniertPage() {
+  permanentRedirect('/de/wohnmobil-guide');
 }
