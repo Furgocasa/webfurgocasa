@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { LocalizedLink } from "@/components/localized-link";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
@@ -232,15 +233,15 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
               <ul className="space-y-2">
                 {postList.map((post) => {
                   const categorySlug = getCategorySlug(post.category);
-                  const path = `/blog/${categorySlug}/${post.slug}`;
+                  const href = `/${locale}/blog/${categorySlug}/${post.slug}`;
                   return (
                     <li key={post.slug}>
-                      <LocalizedLink
-                        href={path}
+                      <Link
+                        href={href}
                         className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                       >
-                        {buildLabel(path, locale)}
-                      </LocalizedLink>
+                        {buildLabel(`/blog/${categorySlug}/${post.slug}`, locale)}
+                      </Link>
                       {post.title && (
                         <span className="text-gray-400 text-sm ml-2">
                           {post.title}

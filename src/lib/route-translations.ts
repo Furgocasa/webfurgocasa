@@ -1,5 +1,5 @@
 import type { Locale } from './i18n/config';
-import { translateCategorySlug, getCategorySlugInSpanish, translatePostSlug, getPostSlugInSpanish } from './blog-translations';
+import { blogCategoryTranslations, translateCategorySlug, getCategorySlugInSpanish, translatePostSlug, getPostSlugInSpanish } from './blog-translations';
 
 /**
  * Mapeo de rutas traducidas
@@ -344,10 +344,17 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
   if (blogMatch) {
     const [, categorySlug, articleSlug] = blogMatch;
     
-    // Si el idioma actual no es español, necesitamos obtener el slug en español primero
-    const esCategorySlug = currentLocale && currentLocale !== 'es' 
-      ? getCategorySlugInSpanish(categorySlug, currentLocale)
-      : categorySlug;
+    // Obtener slug de categoría en español (puede venir en cualquier idioma si path no tiene prefijo)
+    let esCategorySlug: string;
+    if (currentLocale && currentLocale !== 'es') {
+      esCategorySlug = getCategorySlugInSpanish(categorySlug, currentLocale);
+    } else if (blogCategoryTranslations[categorySlug as keyof typeof blogCategoryTranslations]) {
+      esCategorySlug = categorySlug; // Ya está en español
+    } else {
+      // Path sin prefijo con categoría en en/fr/de - detectar idioma origen
+      const detected = (['en', 'fr', 'de'] as Locale[]).map((lang) => getCategorySlugInSpanish(categorySlug, lang)).find((s) => s !== categorySlug);
+      esCategorySlug = detected ?? categorySlug;
+    }
     
     // Traducir la categoría al idioma destino
     const translatedCategory = translateCategorySlug(esCategorySlug, targetLang);

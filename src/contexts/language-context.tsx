@@ -18,9 +18,12 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Locale>('es');
-  const router = useRouter();
   const pathname = usePathname();
+  // ✅ CRÍTICO: Inicializar desde pathname para SSR - evita links /es/blog/routes/... en páginas EN
+  const [language, setLanguageState] = useState<Locale>(() => 
+    getLanguageFromRoute(pathname || '') || 'es'
+  );
+  const router = useRouter();
 
   // ✅ Sincronizar idioma con la URL (detectar cambios de ruta)
   useEffect(() => {

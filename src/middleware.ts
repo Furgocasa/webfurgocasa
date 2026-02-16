@@ -136,6 +136,20 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // ✅ Redirigir /es/blog/routes|news|vehicles|... (URLs mal formadas) → idioma correcto
+  // Evita 404 cuando crawlers encuentran /es/blog/routes/english-slug (debe ser /en/blog/routes/...)
+  const esBlogWrongCategoryMatch = pathname.match(/^\/es\/blog\/(routes|news|vehicles|tips|destinations|equipment|itineraires|actualites|vehicules|conseils|equipement|routen|nachrichten|fahrzeuge|tipps|reiseziele|ausrustung)\/([^/]+)\/?$/);
+  if (esBlogWrongCategoryMatch) {
+    const [, category, slug] = esBlogWrongCategoryMatch;
+    const enCategories = ['routes', 'news', 'vehicles', 'tips', 'destinations', 'equipment'];
+    const frCategories = ['itineraires', 'actualites', 'vehicules', 'conseils', 'equipement'];
+    const deCategories = ['routen', 'nachrichten', 'fahrzeuge', 'tipps', 'reiseziele', 'ausrustung'];
+    const targetLocale = enCategories.includes(category) ? 'en' : frCategories.includes(category) ? 'fr' : 'de';
+    const url = request.nextUrl.clone();
+    url.pathname = `/${targetLocale}/blog/${category}/${slug}`;
+    return NextResponse.redirect(url, 301);
+  }
+
   // ✅ Normalizar URLs legacy con index.php (SEO)
   if (pathname.startsWith('/index.php')) {
     const normalizedPath = pathname.replace(/^\/index\.php/, '') || '/';

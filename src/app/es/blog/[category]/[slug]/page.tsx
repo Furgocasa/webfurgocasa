@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
 import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
@@ -324,20 +325,16 @@ export default async function LocaleBlogPostPage({
                     </h3>
                     <div className="space-y-4">
                       {relatedPosts.slice(0, 3).map((related) => {
-                        // 🌐 Usar slug traducido según el idioma de la página
-                        const relatedSlug = locale === 'en' && related.slug_en 
-                          ? related.slug_en 
-                          : locale === 'fr' && related.slug_fr 
-                          ? related.slug_fr 
-                          : locale === 'de' && related.slug_de 
-                          ? related.slug_de 
-                          : related.slug;
-                        const relatedCategorySlug = translateCategorySlug(related.category?.slug || 'blog', locale);
+                        // 🌐 Link directo con locale - evita LocalizedLink que genera /es/blog/routes/english-slug (404)
+                        const hasTranslation = (locale === 'es') || (locale === 'en' && related.slug_en) || (locale === 'fr' && related.slug_fr) || (locale === 'de' && related.slug_de);
+                        const relatedSlug = hasTranslation ? (locale === 'es' ? related.slug : locale === 'en' ? (related.slug_en || related.slug) : locale === 'fr' ? (related.slug_fr || related.slug) : (related.slug_de || related.slug)) : related.slug;
+                        const relatedCategorySlug = translateCategorySlug(related.category?.slug || 'general', hasTranslation ? locale : 'es');
+                        const href = hasTranslation ? `/${locale}/blog/${relatedCategorySlug}/${relatedSlug}` : `/es/blog/${related.category?.slug || 'general'}/${related.slug}`;
                         
                         return (
-                        <LocalizedLink
+                        <Link
                           key={related.id}
-                          href={`/blog/${relatedCategorySlug}/${relatedSlug}`}
+                          href={href}
                           className="group block"
                         >
                           {related.featured_image && (
@@ -360,7 +357,7 @@ export default async function LocaleBlogPostPage({
                               {formatDate(related.published_at, locale)}
                             </time>
                           )}
-                        </LocalizedLink>
+                        </Link>
                         );
                       })}
                     </div>

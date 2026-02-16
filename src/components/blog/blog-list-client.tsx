@@ -1,10 +1,11 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import { LocalizedLink } from "@/components/localized-link";
+import Link from "next/link";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { Calendar, Clock, BookOpen, Search, Tag, ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { getCategoryName, translateCategorySlug } from "@/lib/blog-translations";
+import { getLanguageFromRoute } from "@/lib/route-translations";
 import { useState, useTransition } from "react";
 
 interface Category {
@@ -57,6 +58,9 @@ export function BlogListClient({
   searchQuery
 }: BlogListClientProps) {
   const { t, language } = useLanguage();
+  const pathname = usePathname();
+  // Locale desde URL (fuente de verdad para SSR) - evita links /es/blog/... en páginas EN
+  const locale = getLanguageFromRoute(pathname || "") || language;
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -65,18 +69,16 @@ export function BlogListClient({
   // Filtrar categorías con artículos
   const categoriesWithPosts = categories.filter(cat => (cat.post_count || 0) > 0);
 
-  // 🌐 Helper para obtener el slug según el idioma
-  const getLocalizedSlug = (post: Post): string => {
-    switch (language) {
-      case 'en':
-        return post.slug_en || post.slug;
-      case 'fr':
-        return post.slug_fr || post.slug;
-      case 'de':
-        return post.slug_de || post.slug;
-      default:
-        return post.slug;
+  // 🌐 Helper para obtener slug y construir href - solo enlazar a idiomas donde existe (evita 404)
+  const getBlogArticleHref = (post: Post): string => {
+    const categorySlug = post.category?.slug || 'general';
+    const hasTranslation = (locale === 'es') || (locale === 'en' && post.slug_en) || (locale === 'fr' && post.slug_fr) || (locale === 'de' && post.slug_de);
+    const slug = locale === 'es' ? post.slug : locale === 'en' ? (post.slug_en || post.slug) : locale === 'fr' ? (post.slug_fr || post.slug) : (post.slug_de || post.slug);
+    const translatedCategory = translateCategorySlug(categorySlug, locale);
+    if (hasTranslation) {
+      return `/${locale}/blog/${translatedCategory}/${slug}`;
     }
+    return `/es/blog/${categorySlug}/${post.slug}`;
   };
 
   // Navegar con parámetros de búsqueda
@@ -166,7 +168,7 @@ export function BlogListClient({
                 }`}
               >
                 <div className="flex items-center justify-between">
-                  <span>{getCategoryName(category.slug, language)}</span>
+                  <span>{getCategoryName(category.slug, locale)}</span>
                   <span className={`text-sm ${selectedCategory === category.slug ? 'text-white/80' : 'text-gray-500'}`}>
                     {category.post_count || 0}
                   </span>
@@ -237,7 +239,7 @@ export function BlogListClient({
                     : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200"
                 }`}
               >
-                {getCategoryName(category.slug, language)} ({category.post_count || 0})
+                {getCategoryName(category.slug, locale)} ({category.post_count || 0})
               </button>
             ))}
           </div>
@@ -262,14 +264,10 @@ export function BlogListClient({
             </div>
             <p className="text-sm md:text-base text-gray-600 mb-6 md:mb-8">{t("Los mejores artículos seleccionados para ti")}</p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {featuredPosts.map((post) => {
-                const categorySlug = post.category?.slug || 'general';
-                const translatedCategorySlug = translateCategorySlug(categorySlug, language);
-                const localizedSlug = getLocalizedSlug(post);
-                return (
-                  <LocalizedLink
+              {featuredPosts.map((post) => (
+                  <Link
                     key={post.id}
-                    href={`/blog/${translatedCategorySlug}/${localizedSlug}`}
+                    href={getBlogArticleHref(post)}
                     className="group bg-gradient-to-br from-white to-blue-50 rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-furgocasa-orange/30"
                   >
                     <div className="h-56 bg-gray-200 relative overflow-hidden">
@@ -294,7 +292,7 @@ export function BlogListClient({
                       {post.category && (
                         <div className="absolute top-3 right-3">
                           <span className="bg-white/95 text-gray-900 px-2.5 py-1 rounded-full text-xs font-semibold backdrop-blur-sm">
-                            {getCategoryName(post.category.slug, language)}
+                            {getCategoryName(post.category.slug, locale)}
                           </span>
                         </div>
                       )}
@@ -321,9 +319,8 @@ export function BlogListClient({
                         )}
                       </div>
                     </div>
-                  </LocalizedLink>
-                );
-              })}
+                  </Link>
+                ))}
             </div>
             
             {/* Separador visual */}
@@ -370,14 +367,10 @@ export function BlogListClient({
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-              {initialPosts.map((post) => {
-                const categorySlug = post.category?.slug || 'general';
-                const translatedCategorySlug = translateCategorySlug(categorySlug, language);
-                const localizedSlug = getLocalizedSlug(post);
-                return (
-                  <LocalizedLink
+              {initialPosts.map((post) => (
+                  <Link
                     key={post.id}
-                    href={`/blog/${translatedCategorySlug}/${localizedSlug}`}
+                    href={getBlogArticleHref(post)}
                     className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2"
                   >
                     <div className="h-48 bg-gray-200 relative overflow-hidden">
@@ -397,7 +390,7 @@ export function BlogListClient({
                       {post.category && (
                         <div className="absolute top-3 left-3">
                           <span className="bg-furgocasa-blue text-white px-2 py-1 rounded-full text-xs font-semibold">
-                            {getCategoryName(post.category.slug, language)}
+                            {getCategoryName(post.category.slug, locale)}
                           </span>
                         </div>
                       )}
@@ -424,9 +417,8 @@ export function BlogListClient({
                         </span>
                       </div>
                     </div>
-                  </LocalizedLink>
-                );
-              })}
+                  </Link>
+                ))}
             </div>
 
             {/* Paginación */}
