@@ -156,6 +156,25 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // ✅ Redirigir rutas españolas bajo locale incorrecto → /es/
+  // Ejemplo: /de/alquiler-casas-rodantes-murcia → /es/alquiler-casas-rodantes-murcia
+  // Ejemplo: /fr/alquiler-autocaravanas-campervans/murcia → /es/alquiler-autocaravanas-campervans/murcia
+  const localeMatch = pathname.match(/^\/(en|fr|de)(\/.*)/);
+  if (localeMatch) {
+    const [, urlLocale, rest] = localeMatch;
+    const spanishPrefixes = [
+      '/alquiler-autocaravanas-campervans',
+      '/alquiler-casas-rodantes',
+      '/alquiler-motorhome',
+      '/venta-autocaravanas-camper',
+    ];
+    if (spanishPrefixes.some(prefix => rest.startsWith(prefix))) {
+      const url = request.nextUrl.clone();
+      url.pathname = `/es${rest}`;
+      return NextResponse.redirect(url, 301);
+    }
+  }
+
   // ✅ Normalizar URLs legacy con index.php (SEO)
   if (pathname.startsWith('/index.php')) {
     const normalizedPath = pathname.replace(/^\/index\.php/, '') || '/';

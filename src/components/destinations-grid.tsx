@@ -71,7 +71,7 @@ export function DestinationsGrid({
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 lg:gap-10 max-w-7xl mx-auto">
       {destinations.map((destination, index) => {
-            const baseRoute = `/alquiler-autocaravanas-campervans-${destination.slug}`;
+            const baseRoute = `/alquiler-autocaravanas-campervans/${destination.slug}`;
             const translatedRoute = getTranslatedRoute(baseRoute, language);
             const rotation = POLAROID_ROTATIONS[index % POLAROID_ROTATIONS.length];
             
