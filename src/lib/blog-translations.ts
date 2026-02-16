@@ -343,7 +343,18 @@ function detectCategoryLocale(categorySlug: string): Locale | null {
 export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): string {
   if (!html) return html;
 
-  return html.replace(
+  // Paso 1: Eliminar etiquetas <title> del contenido (causan "Multiple title tags" en SEO)
+  // El contenido de blog puede tener SVGs embebidos con <title>Banner Mapa Furgocasa</title>
+  let sanitized = html.replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '');
+
+  // Paso 2: Corregir http:// → https:// en todos los links a furgocasa.com
+  sanitized = sanitized.replace(
+    /href="http:\/\/(www\.)?furgocasa\.com/g,
+    'href="https://www.furgocasa.com'
+  );
+
+  // Paso 3: Corregir links internos del blog con locale incorrecto
+  return sanitized.replace(
     /href="(?:https?:\/\/(?:www\.)?furgocasa\.com)?\/(es|en|fr|de)\/blog\/([^/"]+)\/([^/"]+)"/g,
     (_match, linkLocale: string, categorySlug: string, articleSlug: string) => {
       const detectedLocale = detectCategoryLocale(categorySlug);
