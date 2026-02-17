@@ -203,7 +203,14 @@ export default async function LocationPage({ params }: PageProps) {
   // Blog-Artikel abrufen
   const blogArticles = await getLatestBlogArticles(3);
 
-  const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
+  const { data: ownLocation } = await supabase
+    .from('locations')
+    .select('id')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .eq('is_pickup', true)
+    .maybeSingle();
+  const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
@@ -411,7 +418,7 @@ export default async function LocationPage({ params }: PageProps) {
       <ExtrasSection backgroundColor="bg-white" />
 
       {/* HINWEIS NAHES BÜRO - Nur für Städte ohne Büro (Entfernung > 0) */}
-      {location.nearest_location && location.distance_km && location.distance_km > 0 && (
+      {!hasOffice && location.nearest_location && location.distance_km && location.distance_km > 0 && (
         <NearbyOfficeNotice
           locationName={location.name}
           nearestLocationName={location.nearest_location.name}

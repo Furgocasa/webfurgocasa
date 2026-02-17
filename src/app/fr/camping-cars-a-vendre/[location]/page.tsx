@@ -207,7 +207,14 @@ export default async function SaleLocationPage({ params }: PageProps) {
   };
 
   const vehicles = await getSaleVehicles();
-  const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
+  const { data: ownLocation } = await supabase
+    .from('locations')
+    .select('id')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .eq('is_pickup', true)
+    .maybeSingle();
+  const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 

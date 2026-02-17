@@ -221,7 +221,15 @@ export default async function LocationPage({ params }: PageProps) {
     content_sections: translatedSections || locationRaw.content_sections,
   };
 
-  const hasOffice = location.name === 'Murcia' || location.name === 'Madrid';
+  // Verificar si la ciudad tiene su propia ubicación activa (no hardcodeado)
+  const { data: ownLocation } = await supabase
+    .from('locations')
+    .select('id')
+    .eq('slug', slug)
+    .eq('is_active', true)
+    .eq('is_pickup', true)
+    .maybeSingle();
+  const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
@@ -438,7 +446,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       {/* AVISO OFICINA CERCANA - Solo para ciudades sin sede (distance > 0) */}
       {/* ================================================================== */}
-      {location.nearest_location && location.distance_km && location.distance_km > 0 && (
+      {!hasOffice && location.nearest_location && location.distance_km && location.distance_km > 0 && (
         <NearbyOfficeNotice
           locationName={location.name}
           nearestLocationName={location.nearest_location.name}
