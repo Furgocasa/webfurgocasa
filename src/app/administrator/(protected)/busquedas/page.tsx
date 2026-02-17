@@ -596,7 +596,7 @@ export default function SearchAnalyticsPage() {
             Búsquedas por Ubicación
           </h2>
           <p className="text-sm text-gray-600">
-            Distribución de búsquedas según el punto de recogida (Murcia vs Madrid)
+            Distribución de búsquedas según el punto de recogida
           </p>
         </div>
 
@@ -608,25 +608,32 @@ export default function SearchAnalyticsPage() {
           <>
             {/* Gráfico de barras visual */}
             <div className="mb-8 space-y-4">
-              {locationStats?.locationStats.map((location) => {
+              {locationStats?.locationStats.map((location, index) => {
                 const percentage = parseFloat(location.percentage);
                 
-                const getLocationIcon = (city: string) => {
-                  if (city === "Murcia") return "🌴";
-                  if (city === "Madrid") return "🏙️";
-                  return "📍";
+                const locationIcons: Record<string, string> = {
+                  'Murcia': '🌴', 'Madrid': '🏙️', 'Alicante': '🏖️',
+                  'Albacete': '🌾', 'Valencia': '🍊', 'Barcelona': '⛪',
+                  'Sin especificar': '❓'
+                };
+                const getLocationIcon = (city: string) => locationIcons[city] || '📍';
+
+                const colorPalette = [
+                  { bg: 'bg-orange-50', bar: 'bg-orange-500' },
+                  { bg: 'bg-purple-50', bar: 'bg-purple-500' },
+                  { bg: 'bg-cyan-50', bar: 'bg-cyan-500' },
+                  { bg: 'bg-emerald-50', bar: 'bg-emerald-500' },
+                  { bg: 'bg-rose-50', bar: 'bg-rose-500' },
+                  { bg: 'bg-amber-50', bar: 'bg-amber-500' },
+                  { bg: 'bg-indigo-50', bar: 'bg-indigo-500' },
+                  { bg: 'bg-teal-50', bar: 'bg-teal-500' },
+                ];
+                const getColorClasses = (_city: string, idx: number) => {
+                  if (_city === 'Sin especificar') return { bg: 'bg-gray-50', bar: 'bg-gray-400' };
+                  return colorPalette[idx % colorPalette.length];
                 };
 
-                const getColorClasses = (city: string) => {
-                  const colors: Record<string, { bg: string; bar: string }> = {
-                    'Murcia': { bg: 'bg-orange-50', bar: 'bg-orange-500' },
-                    'Madrid': { bg: 'bg-purple-50', bar: 'bg-purple-500' },
-                    'Sin especificar': { bg: 'bg-gray-50', bar: 'bg-gray-400' }
-                  };
-                  return colors[city] || { bg: 'bg-teal-50', bar: 'bg-teal-500' };
-                };
-
-                const colors = getColorClasses(location.city);
+                const colors = getColorClasses(location.city, index);
 
                 return (
                   <div key={location.city} className={`p-4 rounded-lg border ${colors.bg}`}>
@@ -696,13 +703,18 @@ export default function SearchAnalyticsPage() {
             {locationStats?.locationStats && locationStats.locationStats.length >= 2 && (
               <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-purple-50 border border-orange-200 rounded-lg">
                 <h3 className="font-semibold text-gray-900 mb-3 text-sm flex items-center gap-2">
-                  📊 Comparativa Murcia vs Madrid
+                  📊 Comparativa {locationStats.locationStats.slice(0, 2).map(l => l.city).join(' vs ')}
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
-                  {locationStats.locationStats.slice(0, 2).map((loc) => (
+                  {locationStats.locationStats.slice(0, 2).map((loc) => {
+                    const icons: Record<string, string> = {
+                      'Murcia': '🌴', 'Madrid': '🏙️', 'Alicante': '🏖️',
+                      'Albacete': '🌾', 'Valencia': '🍊', 'Barcelona': '⛪'
+                    };
+                    return (
                     <div key={loc.city} className="p-3 bg-white rounded-lg border">
                       <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                        {loc.city === "Murcia" ? "🌴" : "🏙️"} {loc.city}
+                        {icons[loc.city] || '📍'} {loc.city}
                       </h4>
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div>
@@ -725,7 +737,8 @@ export default function SearchAnalyticsPage() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
