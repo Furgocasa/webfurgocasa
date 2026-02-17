@@ -179,6 +179,7 @@ export interface Database {
           is_pickup: boolean;
           is_dropoff: boolean;
           extra_fee: number;
+          min_days: number | null;
           notes: string | null;
           is_active: boolean;
           created_at: string;
@@ -199,6 +200,7 @@ export interface Database {
           is_pickup?: boolean;
           is_dropoff?: boolean;
           extra_fee?: number;
+          min_days?: number | null;
           notes?: string | null;
           is_active?: boolean;
           created_at?: string;

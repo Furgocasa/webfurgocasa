@@ -174,6 +174,7 @@ CREATE TABLE locations (
     is_pickup BOOLEAN DEFAULT TRUE,
     is_dropoff BOOLEAN DEFAULT TRUE,
     extra_fee DECIMAL(10,2) DEFAULT 0,
+    min_days INTEGER DEFAULT NULL, -- NULL = usa el mínimo de la temporada, un valor = override por ubicación
     notes TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

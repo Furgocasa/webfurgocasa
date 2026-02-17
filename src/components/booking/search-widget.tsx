@@ -19,7 +19,8 @@ export function SearchWidget() {
   const [isLoading, setIsLoading] = useState(false);
 
   // Form state
-  const [location, setLocation] = useState(""); // Una sola ubicación para recogida y devolución
+  const [location, setLocation] = useState(""); // slug de la ubicación
+  const [locationMinDays, setLocationMinDays] = useState<number | null>(null); // min_days de la ubicación seleccionada
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -31,27 +32,26 @@ export function SearchWidget() {
   const [dropoffTime, setDropoffTime] = useState("11:00");
 
   // Obtener mínimo de días según temporadas activas
-  // IMPORTANTE: Calcular min_days basado solo en la fecha de INICIO
-  // para que el calendario pueda bloquear fechas antes de seleccionar la fecha de fin
   const pickupDateStr = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
   const seasonMinDays = useSeasonMinDays(pickupDateStr, pickupDateStr);
 
-  // Determinar el mínimo de días según la ubicación y temporada
+  // Determinar el mínimo de días: si la ubicación tiene min_days fijo, usar ese; si no, usar temporada
   const getMinDays = () => {
-    if (location === "madrid") return 10;
-    // Para Murcia, usar el mínimo de la temporada (si hay fechas seleccionadas)
+    if (locationMinDays !== null) return locationMinDays;
     return seasonMinDays;
   };
 
-  // Resetear fechas cuando cambia la ubicación
-  const handleLocationChange = (locationId: string) => {
-    setLocation(locationId);
-    // Si cambia a Madrid y las fechas actuales no cumplen el mínimo, resetear
-    if (locationId === "madrid" && dateRange.from && dateRange.to) {
+  // Cuando cambia la ubicación, guardar slug y min_days
+  const handleLocationChange = (slug: string, minDays: number | null) => {
+    setLocation(slug);
+    setLocationMinDays(minDays);
+    // Si las fechas actuales no cumplen el nuevo mínimo, resetear
+    if (dateRange.from && dateRange.to) {
+      const newMinDays = minDays !== null ? minDays : seasonMinDays;
       const pickupDate = format(dateRange.from, 'yyyy-MM-dd');
       const dropoffDate = format(dateRange.to, 'yyyy-MM-dd');
       const days = calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime);
-      if (days < 10) {
+      if (days < newMinDays) {
         setDateRange({ from: undefined, to: undefined });
       }
     }

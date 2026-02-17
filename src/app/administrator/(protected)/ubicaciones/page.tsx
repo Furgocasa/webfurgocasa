@@ -23,6 +23,7 @@ interface Location {
   opening_time?: string | null;
   closing_time?: string | null;
   extra_fee?: number | null;
+  min_days?: number | null;
   notes?: string | null;
   sort_order: number;
   created_at?: string | null;
@@ -56,6 +57,7 @@ export default function UbicacionesPage() {
     latitude: '',
     longitude: '',
     extra_fee: '',
+    min_days: '',
     is_active: true,
     is_pickup: true,
     is_dropoff: true,
@@ -107,6 +109,7 @@ export default function UbicacionesPage() {
         latitude: formData.latitude ? parseFloat(formData.latitude) : null,
         longitude: formData.longitude ? parseFloat(formData.longitude) : null,
         extra_fee: formData.extra_fee ? parseFloat(formData.extra_fee) : 0,
+        min_days: formData.min_days ? parseInt(formData.min_days) : null,
         is_active: formData.is_active,
         is_pickup: formData.is_pickup,
         is_dropoff: formData.is_dropoff,
@@ -158,6 +161,7 @@ export default function UbicacionesPage() {
       latitude: location.latitude?.toString() || '',
       longitude: location.longitude?.toString() || '',
       extra_fee: location.extra_fee?.toString() || '0',
+      min_days: location.min_days?.toString() || '',
       is_active: location.is_active ?? true,
       is_pickup: location.is_pickup ?? true,
       is_dropoff: location.is_dropoff ?? true,
@@ -227,6 +231,7 @@ export default function UbicacionesPage() {
       latitude: '',
       longitude: '',
       extra_fee: '',
+      min_days: '',
       is_active: true,
       is_pickup: true,
       is_dropoff: true,
@@ -409,22 +414,41 @@ export default function UbicacionesPage() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Cargo extra por ubicación (€)
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={formData.extra_fee}
-                onChange={(e) => setFormData({ ...formData, extra_fee: e.target.value })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                placeholder="0.00"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Cargo adicional que se aplicará a las reservas que incluyan esta ubicación (recogida o entrega)
-              </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Cargo extra por ubicación (€)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.extra_fee}
+                  onChange={(e) => setFormData({ ...formData, extra_fee: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  placeholder="0.00"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Cargo adicional que se aplicará a las reservas que incluyan esta ubicación (recogida o entrega)
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Días mínimos de alquiler
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  step="1"
+                  value={formData.min_days}
+                  onChange={(e) => setFormData({ ...formData, min_days: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  placeholder="Según temporada"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Mínimo de días obligatorio para esta ubicación. Vacío = usa el mínimo de la temporada.
+                </p>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -564,6 +588,11 @@ export default function UbicacionesPage() {
                     </span>
                   </div>
                 )}
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-50 text-blue-700 font-medium">
+                    Mín. {location.min_days ? `${location.min_days} días` : 'según temporada'}
+                  </span>
+                </div>
               </div>
 
               <div className="flex gap-2 mb-4">

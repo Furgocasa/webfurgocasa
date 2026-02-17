@@ -759,6 +759,7 @@ export type Database = {
           is_pickup: boolean | null
           latitude: number | null
           longitude: number | null
+          min_days: number | null
           name: string
           notes: string | null
           opening_time: string | null
@@ -781,6 +782,7 @@ export type Database = {
           is_pickup?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          min_days?: number | null
           name: string
           notes?: string | null
           opening_time?: string | null
@@ -803,6 +805,7 @@ export type Database = {
           is_pickup?: boolean | null
           latitude?: number | null
           longitude?: number | null
+          min_days?: number | null
           name?: string
           notes?: string | null
           opening_time?: string | null
