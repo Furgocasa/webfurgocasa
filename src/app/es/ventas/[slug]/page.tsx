@@ -184,27 +184,28 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
 
         <div className="container mx-auto px-4 py-4 md:py-8 max-w-7xl overflow-hidden">
           {/* Mobile CTA - Visible solo en móvil, arriba */}
-          <div className="lg:hidden bg-white rounded-xl shadow-sm p-4 mb-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="lg:hidden bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden mb-4">
+            <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-4 py-3 flex items-center justify-between">
               <div>
-                <p className="text-xs text-gray-500">Precio de venta</p>
-                <p className="text-2xl font-bold text-furgocasa-orange">{formatPrice(vehicle.sale_price)}</p>
-                {vehicle.sale_price_negotiable && (
-                  <p className="text-xs text-purple-600">Negociable</p>
-                )}
+                <p className="text-xs text-gray-400 uppercase tracking-wider">Precio de venta</p>
+                <p className="text-2xl font-bold text-white">{formatPrice(vehicle.sale_price)}</p>
               </div>
-              <a href="tel:+34868364161" className="bg-furgocasa-orange text-white font-semibold py-2.5 px-5 rounded-lg text-sm">
+            </div>
+            <div className="p-4 flex gap-2">
+              <a href="tel:+34868364161" className="flex-1 flex items-center justify-center gap-1.5 bg-furgocasa-orange text-white font-semibold py-2.5 rounded-xl text-sm shadow-md shadow-orange-200/50">
+                <Phone className="h-4 w-4" />
                 Llamar
               </a>
+              <a
+                href={`https://wa.me/34673414053?text=Hola, me interesa el ${vehicle.name}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-[#25D366] text-white font-semibold py-2.5 rounded-xl text-sm"
+              >
+                <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.37 0-4.567-.696-6.42-1.885l-.447-.296-2.646.887.887-2.646-.296-.447A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                WhatsApp
+              </a>
             </div>
-            <a
-              href={`https://wa.me/34673414053?text=Hola, me interesa el ${vehicle.name}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 bg-green-500 text-white font-semibold py-2.5 rounded-lg text-sm"
-            >
-              WhatsApp
-            </a>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-8">
@@ -225,11 +226,6 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
                   <span className="px-2 md:px-3 py-0.5 md:py-1 bg-gray-100 rounded-full text-xs md:text-sm text-gray-700">
                     {vehicle.category.name}
                   </span>
-                  {vehicle.sale_price_negotiable && (
-                    <span className="px-2 md:px-3 py-0.5 md:py-1 bg-purple-100 text-purple-700 rounded-full text-xs md:text-sm font-medium">
-                      Negociable
-                    </span>
-                  )}
                 </div>
 
                 <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">{vehicle.name}</h1>
@@ -376,57 +372,57 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
             {/* Sidebar - Solo visible en desktop */}
             <div className="hidden lg:block space-y-6">
               {/* Precio */}
-              <div className="bg-white rounded-2xl shadow-sm p-6 sticky top-24">
-                <div className="text-center mb-6">
-                  <p className="text-sm text-gray-500 mb-1">Precio de venta</p>
-                  <p className="text-4xl font-bold text-furgocasa-orange">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-24">
+                {/* Cabecera con precio */}
+                <div className="bg-gradient-to-br from-gray-900 to-gray-800 px-6 py-5 text-center">
+                  <p className="text-sm text-gray-400 uppercase tracking-wider mb-1">Precio de venta</p>
+                  <p className="text-4xl font-bold text-white">
                     {formatPrice(vehicle.sale_price)}
                   </p>
-                  {vehicle.sale_price_negotiable && (
-                    <p className="text-sm text-purple-600 mt-1">Precio negociable</p>
+                </div>
+
+                <div className="p-6">
+                  <div className="space-y-3 mb-5">
+                    <a
+                      href="tel:+34868364161"
+                      className="w-full flex items-center justify-center gap-2 bg-furgocasa-orange text-white font-semibold py-3.5 px-4 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-md shadow-orange-200/50 hover:shadow-lg hover:shadow-orange-200/50"
+                    >
+                      <Phone className="h-5 w-5" />
+                      Llamar ahora
+                    </a>
+                    <a
+                      href={`https://wa.me/34673414053?text=Hola, me interesa el ${vehicle.name}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-white font-semibold py-3.5 px-4 rounded-xl hover:bg-[#1FB855] transition-all"
+                    >
+                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.952 11.952 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.37 0-4.567-.696-6.42-1.885l-.447-.296-2.646.887.887-2.646-.296-.447A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>
+                      WhatsApp
+                    </a>
+                    <button className="w-full flex items-center justify-center gap-2 border border-gray-200 text-gray-700 font-medium py-3.5 px-4 rounded-xl hover:bg-gray-50 hover:border-gray-300 transition-all">
+                      <Mail className="h-5 w-5" />
+                      Solicitar información
+                    </button>
+                  </div>
+
+                  {/* También en alquiler */}
+                  {vehicle.is_for_rent && (
+                    <div className="border-t border-gray-100 pt-5">
+                      <p className="text-sm font-semibold text-gray-900 mb-1">
+                        ¿Prefieres alquilarlo primero?
+                      </p>
+                      <p className="text-sm text-gray-500 mb-3">
+                        Este vehículo también está disponible para alquiler desde <span className="font-semibold text-gray-700">{formatPrice(vehicle.base_price_per_day)}/día</span>
+                      </p>
+                      <Link
+                        href={`/vehiculos/${vehicle.slug}`}
+                        className="inline-flex items-center gap-1 text-sm font-semibold text-furgocasa-orange hover:text-furgocasa-orange-dark transition-colors"
+                      >
+                        Ver opción de alquiler →
+                      </Link>
+                    </div>
                   )}
                 </div>
-
-                <div className="space-y-3 mb-6">
-                  <a
-                    href="tel:+34868364161"
-                    className="w-full flex items-center justify-center gap-2 bg-furgocasa-orange text-white font-semibold py-3 px-4 rounded-lg hover:bg-furgocasa-orange-dark transition-colors"
-                  >
-                    <Phone className="h-5 w-5" />
-                    Llamar ahora
-                  </a>
-                  <a
-                    href={`https://wa.me/34673414053?text=Hola, me interesa el ${vehicle.name}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full flex items-center justify-center gap-2 bg-green-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-green-600 transition-colors"
-                  >
-                    WhatsApp
-                  </a>
-                  <button className="w-full flex items-center justify-center gap-2 border-2 border-gray-200 text-gray-700 font-semibold py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors">
-                    <Mail className="h-5 w-5" />
-                    Solicitar información
-                  </button>
-                </div>
-
-                {/* También en alquiler */}
-                {vehicle.is_for_rent && (
-                  <div className="p-4 bg-blue-50 rounded-lg">
-                    <p className="text-sm text-blue-700 font-medium mb-2">
-                      ¿Prefieres alquilarlo primero?
-                    </p>
-                    <p className="text-sm text-blue-600 mb-3">
-                      Este vehículo también está disponible para alquiler desde {formatPrice(vehicle.base_price_per_day)}/día
-                    </p>
-                    <Link
-                      href={`/vehiculos/${vehicle.slug}`}
-                      className="text-sm font-medium text-blue-700 hover:underline"
-                    >
-                      Ver opción de alquiler →
-                    </Link>
-                  </div>
-                )}
-
               </div>
             </div>
           </div>
