@@ -257,14 +257,14 @@ export function OfertasClient() {
               <div className="bg-gradient-to-br from-furgocasa-orange to-red-500 rounded-2xl md:rounded-[3rem] p-6 md:p-12 text-center shadow-2xl transform hover:scale-[1.02] transition-transform duration-300 flex flex-col justify-center relative overflow-hidden group">
                 <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10"></div>
                 <h3 className="text-4xl md:text-8xl font-heading font-bold text-white mb-1 md:mb-2 tracking-tighter">
-                  -15%
+                  -20%
                 </h3>
                 <p className="text-sm md:text-2xl font-bold text-white/90 mb-4 md:mb-8 uppercase tracking-wide md:tracking-widest border-b border-white/20 pb-4 md:pb-8 mx-4 md:mx-10">
                   {t("Descuento Invierno")}
                 </p>
                 <div className="space-y-2 md:space-y-4 text-white font-medium text-sm md:text-xl">
                   <p className="flex items-center justify-center gap-2"><Zap className="w-4 h-4 md:w-5 md:h-5" /> {t("En TODAS nuestras campers")}</p>
-                  <p className="flex items-center justify-center gap-2"><Clock className="w-4 h-4 md:w-5 md:h-5" /> {t("¡ALQUILA MÍNIMO 10 DÍAS!")}</p>
+                  <p className="flex items-center justify-center gap-2"><Clock className="w-4 h-4 md:w-5 md:h-5" /> {t("¡ALQUILA MÍNIMO 5 DÍAS!")}</p>
                 </div>
               </div>
 
@@ -299,7 +299,7 @@ export function OfertasClient() {
                 <span className="text-2xl">⚠️</span>
               </div>
               <p className="text-yellow-100 text-lg">
-                <strong className="text-white">{t("Condiciones:")}</strong> {t("Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.")}
+                <strong className="text-white">{t("Condiciones:")}</strong> {t("Reserva mínima de 5 días para obtener el 20% de descuento. Promoción válida del 5 de enero hasta el 20 de marzo de 2026.")}
               </p>
             </div>
           </div>
@@ -345,7 +345,7 @@ export function OfertasClient() {
                     <Calendar className="w-5 h-5 text-furgocasa-blue" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{t("Elige fechas")}</h3>
-                  <p className="text-sm text-gray-600">{t("Selecciona vehículo y fechas (mín. 10 días)")}</p>
+                  <p className="text-sm text-gray-600">{t("Selecciona vehículo y fechas (mín. 5 días)")}</p>
                 </div>
                 <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-gray-300 text-2xl z-10">→</div>
               </div>
@@ -375,7 +375,7 @@ export function OfertasClient() {
                     <PartyPopper className="w-5 h-5 text-green-600" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{t("¡Descuento aplicado!")}</h3>
-                  <p className="text-sm text-gray-600">{t("Verás el -15% reflejado en tu precio final")}</p>
+                  <p className="text-sm text-gray-600">{t("Verás el -20% reflejado en tu precio final")}</p>
                 </div>
               </div>
             </div>

@@ -2548,11 +2548,11 @@ export const staticTranslations = {
     fr: "On ALL our MOTORHOMES",
     de: "On ALL our MOTORHOMES"
   },
-  "¡ALQUILA MÍNIMO 10 DÍAS!": {
-    es: "¡ALQUILA MÍNIMO 10 DÍAS!",
-    en: "RENT MINIMUM 10 DAYS!",
-    fr: "RENT MINIMUM 10 DAYS!",
-    de: "RENT MINIMUM 10 DAYS!"
+  "¡ALQUILA MÍNIMO 5 DÍAS!": {
+    es: "¡ALQUILA MÍNIMO 5 DÍAS!",
+    en: "RENT MINIMUM 5 DAYS!",
+    fr: "RENT MINIMUM 5 DAYS!",
+    de: "RENT MINIMUM 5 DAYS!"
   },
   "¡TU CÓDIGO PROMOCIONAL!": {
     es: "¡TU CÓDIGO PROMOCIONAL!",
@@ -2596,11 +2596,11 @@ export const staticTranslations = {
     fr: "Don't miss this unique opportunity to experience winter in a motorhome. Snowy mountains, charming villages, deserted beaches, spectacular routes... YOU choose the destination!",
     de: "Don't miss this unique opportunity to experience winter in a motorhome. Snowy mountains, charming villages, deserted beaches, spectacular routes... YOU choose the destination!"
   },
-  "Condiciones: Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.": {
-    es: "Condiciones: Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.",
-    en: "Conditions: Minimum booking of 10 days to get 15% discount. Promotion valid from January 5th until the beginning of spring 2026.",
-    fr: "Conditions: Minimum booking of 10 days to get 15% discount. Promotion valid from January 5th until the beginning of spring 2026.",
-    de: "Conditions: Minimum booking of 10 days to get 15% discount. Promotion valid from January 5th until the beginning of spring 2026."
+  "Condiciones: Reserva mínima de 5 días para obtener el 20% de descuento. Promoción válida del 5 de enero hasta el 20 de marzo de 2026.": {
+    es: "Condiciones: Reserva mínima de 5 días para obtener el 20% de descuento. Promoción válida del 5 de enero hasta el 20 de marzo de 2026.",
+    en: "Conditions: Minimum booking of 5 days to get 20% discount. Promotion valid from January 5th until March 20th, 2026.",
+    fr: "Conditions: Minimum booking of 5 days to get 20% discount. Promotion valid from January 5th until March 20th, 2026.",
+    de: "Conditions: Minimum booking of 5 days to get 20% discount. Promotion valid from January 5th until March 20th, 2026."
   },
   "¿POR QUÉ ELEGIR FURGOCASA?": {
     es: "¿POR QUÉ ELEGIR FURGOCASA?",
@@ -2722,17 +2722,17 @@ export const staticTranslations = {
     fr: "START NOW!",
     de: "START NOW!"
   },
-  "Promoción válida del 5 de enero al inicio de la primavera 2026": {
-    es: "Promoción válida del 5 de enero al inicio de la primavera 2026",
-    en: "Promotion valid from January 5th to the beginning of spring 2026",
-    fr: "Promotion valid from January 5th to the beginning of spring 2026",
-    de: "Promotion valid from January 5th to the beginning of spring 2026"
+  "Promoción válida del 5 de enero al 20 de marzo de 2026": {
+    es: "Promoción válida del 5 de enero al 20 de marzo de 2026",
+    en: "Promotion valid from January 5th to March 20th, 2026",
+    fr: "Promotion valid from January 5th to March 20th, 2026",
+    de: "Promotion valid from January 5th to March 20th, 2026"
   },
-  "Descuento del 15% aplicable solo en reservas de 10 días o más. No acumulable con otras ofertas. Sujeto a disponibilidad. ¡Tu escapada invernal perfecta te está esperando!": {
-    es: "Descuento del 15% aplicable solo en reservas de 10 días o más. No acumulable con otras ofertas. Sujeto a disponibilidad. ¡Tu escapada invernal perfecta te está esperando!",
-    en: "15% discount applicable only on bookings of 10 days or more. Not cumulative with other offers. Subject to availability. Your perfect winter getaway is waiting for you!",
-    fr: "15% discount applicable only on bookings of 10 days or more. Not cumulative with other offers. Subject to availability. Your perfect winter getaway is waiting for you!",
-    de: "15% discount applicable only on bookings of 10 days or more. Not cumulative with other offers. Subject to availability. Your perfect winter getaway is waiting for you!"
+  "Descuento del 20% aplicable solo en reservas de 5 días o más. No acumulable con otras ofertas. Sujeto a disponibilidad. ¡Tu escapada invernal perfecta te está esperando!": {
+    es: "Descuento del 20% aplicable solo en reservas de 5 días o más. No acumulable con otras ofertas. Sujeto a disponibilidad. ¡Tu escapada invernal perfecta te está esperando!",
+    en: "20% discount applicable only on bookings of 5 days or more. Not cumulative with other offers. Subject to availability. Your perfect winter getaway is waiting for you!",
+    fr: "20% discount applicable only on bookings of 5 days or more. Not cumulative with other offers. Subject to availability. Your perfect winter getaway is waiting for you!",
+    de: "20% discount applicable only on bookings of 5 days or more. Not cumulative with other offers. Subject to availability. Your perfect winter getaway is waiting for you!"
   },
   "¿Te interesa alguna de estas ofertas?": {
     es: "¿Te interesa alguna de estas ofertas?",
@@ -8325,11 +8325,11 @@ export const staticTranslations = {
     fr: "Sur TOUS nos camping-cars",
     de: "Auf ALLE unsere Camper"
   },
-  "¡ALQUILA MÍNIMO 10 DÍAS!": {
-    es: "¡ALQUILA MÍNIMO 10 DÍAS!",
-    en: "RENT MINIMUM 10 DAYS!",
-    fr: "LOUEZ MINIMUM 10 JOURS!",
-    de: "MIETEN SIE MINDESTENS 10 TAGE!"
+  "¡ALQUILA MÍNIMO 5 DÍAS!": {
+    es: "¡ALQUILA MÍNIMO 5 DÍAS!",
+    en: "RENT MINIMUM 5 DAYS!",
+    fr: "LOUEZ MINIMUM 5 JOURS!",
+    de: "MIETEN SIE MINDESTENS 5 TAGE!"
   },
   "CÓDIGO PROMOCIONAL": {
     es: "CÓDIGO PROMOCIONAL",
@@ -8361,11 +8361,11 @@ export const staticTranslations = {
     fr: "Conditions:",
     de: "Bedingungen:"
   },
-  "Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.": {
-    es: "Reserva mínima de 10 días para obtener el 15% de descuento. Promoción válida del 5 de enero hasta el inicio de la primavera 2026.",
-    en: "Minimum booking of 10 days to get 15% discount. Promotion valid from January 5th until the beginning of spring 2026.",
-    fr: "Réservation minimum de 10 jours pour obtenir 15% de réduction. Promotion valable du 5 janvier jusqu'au début du printemps 2026.",
-    de: "Mindestbuchung von 10 Tagen für 15% Rabatt. Aktion gültig vom 5. Januar bis zum Frühlingsanfang 2026."
+  "Reserva mínima de 5 días para obtener el 20% de descuento. Promoción válida del 5 de enero hasta el 20 de marzo de 2026.": {
+    es: "Reserva mínima de 5 días para obtener el 20% de descuento. Promoción válida del 5 de enero hasta el 20 de marzo de 2026.",
+    en: "Minimum booking of 5 days to get 20% discount. Promotion valid from January 5th until March 20th, 2026.",
+    fr: "Réservation minimum de 5 jours pour obtenir 20% de réduction. Promotion valable du 5 janvier jusqu'au 20 mars 2026.",
+    de: "Mindestbuchung von 5 Tagen für 20% Rabatt. Aktion gültig vom 5. Januar bis zum 20. März 2026."
   },
   "Fácil y rápido": {
     es: "Fácil y rápido",
@@ -8397,11 +8397,11 @@ export const staticTranslations = {
     fr: "Choisissez les dates",
     de: "Wählen Sie Daten"
   },
-  "Selecciona vehículo y fechas (mín. 10 días)": {
-    es: "Selecciona vehículo y fechas (mín. 10 días)",
-    en: "Select vehicle and dates (min. 10 days)",
-    fr: "Sélectionnez véhicule et dates (min. 10 jours)",
-    de: "Wählen Sie Fahrzeug und Daten (min. 10 Tage)"
+  "Selecciona vehículo y fechas (mín. 5 días)": {
+    es: "Selecciona vehículo y fechas (mín. 5 días)",
+    en: "Select vehicle and dates (min. 5 days)",
+    fr: "Sélectionnez véhicule et dates (min. 5 jours)",
+    de: "Wählen Sie Fahrzeug und Daten (min. 5 Tage)"
   },
   "Aplica el cupón": {
     es: "Aplica el cupón",
@@ -8421,11 +8421,11 @@ export const staticTranslations = {
     fr: "Réduction appliquée!",
     de: "Rabatt angewendet!"
   },
-  "Verás el -15% reflejado en tu precio final": {
-    es: "Verás el -15% reflejado en tu precio final",
-    en: "You will see the -15% reflected in your final price",
-    fr: "Vous verrez les -15% reflétés dans votre prix final",
-    de: "Sie werden die -15% in Ihrem Endpreis sehen"
+  "Verás el -20% reflejado en tu precio final": {
+    es: "Verás el -20% reflejado en tu precio final",
+    en: "You will see the -20% reflected in your final price",
+    fr: "Vous verrez les -20% reflétés dans votre prix final",
+    de: "Sie werden die -20% in Ihrem Endpreis sehen"
   },
   "Empezar reserva con descuento": {
     es: "Empezar reserva con descuento",
