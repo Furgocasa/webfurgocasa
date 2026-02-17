@@ -288,7 +288,7 @@ export default async function LocationPage({ params }: PageProps) {
 
           {/* Widget de búsqueda integrado en hero */}
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget defaultLocation={location.nearest_location?.slug} />
+            <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
           </div>
         </div>
       </LocationHeroWithSkeleton>

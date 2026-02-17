@@ -61,6 +61,7 @@ interface LocationSelectorProps {
   placeholder?: string;
   pickupDate?: string | null;
   defaultLocation?: string;
+  fallbackLocation?: string;
 }
 
 export function LocationSelector({
@@ -69,6 +70,7 @@ export function LocationSelector({
   placeholder = "Selecciona ubicación",
   pickupDate = null,
   defaultLocation,
+  fallbackLocation,
 }: LocationSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [allLocations, setAllLocations] = useState<LocationData[]>([]);
@@ -95,15 +97,20 @@ export function LocationSelector({
   // Filtrar ubicaciones disponibles según la fecha de recogida
   const locations = allLocations.filter(loc => isLocationAvailableForDate(loc, pickupDate));
 
-  // Aplicar preselección cuando se cargan las ubicaciones
+  // Aplicar preselección: primero intenta defaultLocation (slug de la landing),
+  // si no existe como ubicación activa, usa fallbackLocation (nearest_location)
   useEffect(() => {
-    if (defaultApplied || !defaultLocation || allLocations.length === 0 || value) return;
-    const loc = allLocations.find(l => l.slug === defaultLocation);
+    if (defaultApplied || allLocations.length === 0 || value) return;
+    if (!defaultLocation && !fallbackLocation) return;
+
+    const loc = (defaultLocation && allLocations.find(l => l.slug === defaultLocation))
+      || (fallbackLocation && allLocations.find(l => l.slug === fallbackLocation));
+
     if (loc) {
       onChange(loc.slug, loc.min_days);
       setDefaultApplied(true);
     }
-  }, [defaultLocation, allLocations, defaultApplied, value, onChange]);
+  }, [defaultLocation, fallbackLocation, allLocations, defaultApplied, value, onChange]);
 
   const selectedLocation = locations.find((loc) => loc.slug === value);
 

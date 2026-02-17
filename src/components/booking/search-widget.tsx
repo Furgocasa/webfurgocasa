@@ -15,9 +15,10 @@ import { useSeasonMinDays } from "@/hooks/use-season-min-days";
 
 interface SearchWidgetProps {
   defaultLocation?: string;
+  fallbackLocation?: string;
 }
 
-export function SearchWidget({ defaultLocation }: SearchWidgetProps = {}) {
+export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidgetProps = {}) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
@@ -126,6 +127,7 @@ export function SearchWidget({ defaultLocation }: SearchWidgetProps = {}) {
             placeholder={t("MURCIA (SEDE)")}
             pickupDate={pickupDateStr}
             defaultLocation={defaultLocation}
+            fallbackLocation={fallbackLocation}
           />
         </div>
 

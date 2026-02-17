@@ -275,7 +275,7 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
 
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget defaultLocation={location.nearest_location?.slug} />
+            <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
           </div>
         </div>
       </section>
