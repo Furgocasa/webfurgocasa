@@ -13,7 +13,11 @@ import { calculateRentalDays } from "@/lib/utils";
 import { getTranslatedRoute } from "@/lib/route-translations";
 import { useSeasonMinDays } from "@/hooks/use-season-min-days";
 
-export function SearchWidget() {
+interface SearchWidgetProps {
+  defaultLocation?: string;
+}
+
+export function SearchWidget({ defaultLocation }: SearchWidgetProps = {}) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
@@ -120,6 +124,8 @@ export function SearchWidget() {
             value={location}
             onChange={handleLocationChange}
             placeholder={t("MURCIA (SEDE)")}
+            pickupDate={pickupDateStr}
+            defaultLocation={defaultLocation}
           />
         </div>
 

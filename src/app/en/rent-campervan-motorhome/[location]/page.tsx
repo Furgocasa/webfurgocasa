@@ -72,6 +72,7 @@ interface RentLocation {
   travel_time_minutes: number | null;
   nearest_location: {
     id: string;
+    slug: string;
     name: string;
     city: string;
     address: string;
@@ -83,7 +84,7 @@ async function getRentLocation(slug: string): Promise<RentLocation | null> {
     .from('location_targets')
     .select(`
       *,
-      nearest_location:locations!nearest_location_id(id, name, city, address)
+      nearest_location:locations!nearest_location_id(id, slug, name, city, address)
     `)
     .eq('slug', slug)
     .eq('is_active', true)
@@ -274,7 +275,7 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
 
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget />
+            <SearchWidget defaultLocation={location.nearest_location?.slug} />
           </div>
         </div>
       </section>

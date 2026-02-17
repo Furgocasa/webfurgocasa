@@ -24,6 +24,9 @@ interface Location {
   closing_time?: string | null;
   extra_fee?: number | null;
   min_days?: number | null;
+  active_from?: string | null;
+  active_until?: string | null;
+  active_recurring?: boolean | null;
   notes?: string | null;
   sort_order: number;
   created_at?: string | null;
@@ -58,6 +61,9 @@ export default function UbicacionesPage() {
     longitude: '',
     extra_fee: '',
     min_days: '',
+    active_from: '',
+    active_until: '',
+    active_recurring: false,
     is_active: true,
     is_pickup: true,
     is_dropoff: true,
@@ -110,6 +116,9 @@ export default function UbicacionesPage() {
         longitude: formData.longitude ? parseFloat(formData.longitude) : null,
         extra_fee: formData.extra_fee ? parseFloat(formData.extra_fee) : 0,
         min_days: formData.min_days ? parseInt(formData.min_days) : null,
+        active_from: formData.active_from || null,
+        active_until: formData.active_until || null,
+        active_recurring: formData.active_recurring,
         is_active: formData.is_active,
         is_pickup: formData.is_pickup,
         is_dropoff: formData.is_dropoff,
@@ -162,6 +171,9 @@ export default function UbicacionesPage() {
       longitude: location.longitude?.toString() || '',
       extra_fee: location.extra_fee?.toString() || '0',
       min_days: location.min_days?.toString() || '',
+      active_from: location.active_from || '',
+      active_until: location.active_until || '',
+      active_recurring: location.active_recurring ?? false,
       is_active: location.is_active ?? true,
       is_pickup: location.is_pickup ?? true,
       is_dropoff: location.is_dropoff ?? true,
@@ -232,6 +244,9 @@ export default function UbicacionesPage() {
       longitude: '',
       extra_fee: '',
       min_days: '',
+      active_from: '',
+      active_until: '',
+      active_recurring: false,
       is_active: true,
       is_pickup: true,
       is_dropoff: true,
@@ -451,6 +466,53 @@ export default function UbicacionesPage() {
               </div>
             </div>
 
+            {/* Disponibilidad temporal */}
+            <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+              <h3 className="text-sm font-semibold text-gray-800">Disponibilidad temporal</h3>
+              <p className="text-xs text-gray-500 -mt-2">
+                Vacío = disponible siempre. Con fechas = solo disponible en ese periodo.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Disponible desde
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.active_from}
+                    onChange={(e) => setFormData({ ...formData, active_from: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Disponible hasta
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.active_until}
+                    onChange={(e) => setFormData({ ...formData, active_until: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  />
+                </div>
+              </div>
+              {(formData.active_from || formData.active_until) && (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="active_recurring"
+                    checked={formData.active_recurring}
+                    onChange={(e) => setFormData({ ...formData, active_recurring: e.target.checked })}
+                    className="w-4 h-4 text-furgocasa-orange focus:ring-furgocasa-orange border-gray-300 rounded"
+                  />
+                  <label htmlFor="active_recurring" className="text-sm font-medium text-gray-700">
+                    Repetir cada año
+                  </label>
+                  <span className="text-xs text-gray-400">(ignora el año, solo usa mes y día)</span>
+                </div>
+              )}
+            </div>
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <input
@@ -588,10 +650,23 @@ export default function UbicacionesPage() {
                     </span>
                   </div>
                 )}
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-50 text-blue-700 font-medium">
                     Mín. {location.min_days ? `${location.min_days} días` : 'según temporada'}
                   </span>
+                  {location.active_from || location.active_until ? (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-50 text-amber-700 font-medium">
+                      {location.active_from && location.active_until 
+                        ? `${new Date(location.active_from + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })} - ${new Date(location.active_until + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}` 
+                        : location.active_from ? `Desde ${new Date(location.active_from + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}` 
+                        : `Hasta ${new Date(location.active_until! + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}`}
+                      {location.active_recurring ? ' (cada año)' : ''}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-50 text-green-700 font-medium">
+                      Siempre disponible
+                    </span>
+                  )}
                 </div>
               </div>
 

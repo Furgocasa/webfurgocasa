@@ -747,6 +747,9 @@ export type Database = {
       }
       locations: {
         Row: {
+          active_from: string | null
+          active_recurring: boolean | null
+          active_until: string | null
           address: string | null
           city: string | null
           closing_time: string | null
@@ -770,6 +773,9 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          active_from?: string | null
+          active_recurring?: boolean | null
+          active_until?: string | null
           address?: string | null
           city?: string | null
           closing_time?: string | null
@@ -793,6 +799,9 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          active_from?: string | null
+          active_recurring?: boolean | null
+          active_until?: string | null
           address?: string | null
           city?: string | null
           closing_time?: string | null

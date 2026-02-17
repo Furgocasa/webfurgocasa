@@ -175,6 +175,9 @@ CREATE TABLE locations (
     is_dropoff BOOLEAN DEFAULT TRUE,
     extra_fee DECIMAL(10,2) DEFAULT 0,
     min_days INTEGER DEFAULT NULL, -- NULL = usa el mínimo de la temporada, un valor = override por ubicación
+    active_from DATE DEFAULT NULL, -- NULL = disponible siempre
+    active_until DATE DEFAULT NULL, -- NULL = disponible siempre
+    active_recurring BOOLEAN DEFAULT FALSE, -- TRUE = se repite cada año (ignora el año de las fechas)
     notes TEXT,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

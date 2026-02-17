@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { createClient } from "@/lib/supabase/client";
@@ -11,21 +11,68 @@ interface LocationData {
   name: string;
   address: string | null;
   min_days: number | null;
+  active_from: string | null;
+  active_until: string | null;
+  active_recurring: boolean | null;
+}
+
+/**
+ * Comprueba si una ubicación está disponible para una fecha dada.
+ * - Sin fechas de disponibilidad → siempre disponible
+ * - Con recurring = true → compara solo mes/día (se repite cada año)
+ * - Con recurring = false → compara fecha completa (periodo puntual)
+ */
+function isLocationAvailableForDate(location: LocationData, pickupDate: string | null): boolean {
+  if (!location.active_from && !location.active_until) return true;
+  if (!pickupDate) return true;
+
+  if (location.active_recurring) {
+    const [, pickupMonth, pickupDay] = pickupDate.split('-').map(Number);
+    const pickupMD = pickupMonth * 100 + pickupDay;
+
+    let fromMD = 0;
+    let untilMD = 1231;
+
+    if (location.active_from) {
+      const [, fromMonth, fromDay] = location.active_from.split('-').map(Number);
+      fromMD = fromMonth * 100 + fromDay;
+    }
+    if (location.active_until) {
+      const [, untilMonth, untilDay] = location.active_until.split('-').map(Number);
+      untilMD = untilMonth * 100 + untilDay;
+    }
+
+    if (fromMD <= untilMD) {
+      return pickupMD >= fromMD && pickupMD <= untilMD;
+    } else {
+      // Rango cruzado (ej: oct-feb): disponible si >= from O <= until
+      return pickupMD >= fromMD || pickupMD <= untilMD;
+    }
+  } else {
+    if (location.active_from && pickupDate < location.active_from) return false;
+    if (location.active_until && pickupDate > location.active_until) return false;
+    return true;
+  }
 }
 
 interface LocationSelectorProps {
   value: string;
   onChange: (slug: string, minDays: number | null) => void;
   placeholder?: string;
+  pickupDate?: string | null;
+  defaultLocation?: string;
 }
 
 export function LocationSelector({
   value,
   onChange,
   placeholder = "Selecciona ubicación",
+  pickupDate = null,
+  defaultLocation,
 }: LocationSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [locations, setLocations] = useState<LocationData[]>([]);
+  const [allLocations, setAllLocations] = useState<LocationData[]>([]);
+  const [defaultApplied, setDefaultApplied] = useState(false);
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -33,17 +80,30 @@ export function LocationSelector({
       const supabase = createClient();
       const { data } = await supabase
         .from("locations")
-        .select("id, slug, name, address, min_days")
+        .select("id, slug, name, address, min_days, active_from, active_until, active_recurring")
         .eq("is_active", true)
         .eq("is_pickup", true)
         .order("name");
       
       if (data) {
-        setLocations(data as LocationData[]);
+        setAllLocations(data as LocationData[]);
       }
     };
     loadLocations();
   }, []);
+
+  // Filtrar ubicaciones disponibles según la fecha de recogida
+  const locations = allLocations.filter(loc => isLocationAvailableForDate(loc, pickupDate));
+
+  // Aplicar preselección cuando se cargan las ubicaciones
+  useEffect(() => {
+    if (defaultApplied || !defaultLocation || allLocations.length === 0 || value) return;
+    const loc = allLocations.find(l => l.slug === defaultLocation);
+    if (loc) {
+      onChange(loc.slug, loc.min_days);
+      setDefaultApplied(true);
+    }
+  }, [defaultLocation, allLocations, defaultApplied, value, onChange]);
 
   const selectedLocation = locations.find((loc) => loc.slug === value);
 
