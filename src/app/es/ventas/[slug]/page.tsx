@@ -5,7 +5,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 import { 
   ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Bed, 
-  CheckCircle, Phone, Mail, MapPin, Shield, Wrench, Ruler,
+  CheckCircle, Phone, Mail, Ruler,
   Share2, Heart
 } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
@@ -147,10 +147,6 @@ const conditionLabels: Record<string, { label: string; color: string }> = {
   good: { label:"Buen estado", color:"bg-yellow-100 text-yellow-700" },
   fair: { label:"Aceptable", color:"bg-orange-100 text-orange-700" },
 };
-
-function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("es-ES", { month:"long", year:"numeric" });
-}
 
 export default async function VehicleSalePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
@@ -431,41 +427,6 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
                   </div>
                 )}
 
-                {/* Info adicional */}
-                <div className="mt-6 pt-6 border-t border-gray-100 space-y-3 text-sm">
-                  <div className="flex items-center gap-3 text-gray-600">
-                    <Calendar className="h-4 w-4" />
-                    <span>Matriculado en {formatDate(vehicle.registration_date)}</span>
-                  </div>
-                  {vehicle.next_itv_date && (
-                    <div className="flex items-center gap-3 text-gray-600">
-                      <Wrench className="h-4 w-4" />
-                      <span>Próxima ITV: {formatDate(vehicle.next_itv_date)}</span>
-                    </div>
-                  )}
-                  {vehicle.warranty_until && (
-                    <div className="flex items-center gap-3 text-gray-600">
-                      <Shield className="h-4 w-4" />
-                      <span>Garantía hasta {formatDate(vehicle.warranty_until)}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Ubicación */}
-              <div className="bg-white rounded-2xl shadow-sm p-6">
-                <h3 className="font-semibold text-gray-900 mb-4">Ubicación</h3>
-                <div className="h-40 bg-gray-200 rounded-lg mb-4 flex items-center justify-center text-gray-400">
-                  Mapa
-                </div>
-                <div className="flex items-start gap-3">
-                  <MapPin className="h-5 w-5 text-gray-400 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-gray-900">Furgocasa Murcia</p>
-                    <p className="text-gray-600 text-sm">Avenida Puente Tocinos, 4</p>
-                    <p className="text-gray-600 text-sm">30007 Casillas - Murcia</p>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
