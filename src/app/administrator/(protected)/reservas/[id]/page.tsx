@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
-  FileText, DollarSign, Package, ExternalLink, Edit, Send
+  FileText, DollarSign, Package, ExternalLink, Edit, Send, Copy
 } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
@@ -103,6 +103,7 @@ export default function ReservaDetalleAdminPage() {
   const [updating, setUpdating] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (bookingId) {
@@ -264,6 +265,43 @@ export default function ReservaDetalleAdminPage() {
       });
     } finally {
       setSendingEmail(false);
+    }
+  };
+
+  const copyReservationDetails = async () => {
+    if (!booking) return;
+    const pickup = new Date(booking.pickup_date);
+    const dropoff = new Date(booking.dropoff_date);
+    const days = Math.ceil((dropoff.getTime() - pickup.getTime()) / (1000 * 60 * 60 * 24));
+    const pickupFormatted = pickup.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    const dropoffFormatted = dropoff.toLocaleDateString('es-ES', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+    const pickupLocation = booking.pickup_location
+      ? [booking.pickup_location.name, booking.pickup_location.address].filter(Boolean).join(' ')
+      : '-';
+    const dropoffLocation = booking.dropoff_location
+      ? [booking.dropoff_location.name, booking.dropoff_location.address].filter(Boolean).join(' ')
+      : '-';
+    const text = `Recogida ${pickupFormatted}${booking.pickup_time ? ` ${booking.pickup_time}` : ''}
+Devolución ${dropoffFormatted}${booking.dropoff_time ? ` ${booking.dropoff_time}` : ''}
+Duración ${days} días
+Recogida en ${pickupLocation}
+Devolución en ${dropoffLocation}`;
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setMessage({ type: 'error', text: 'No se pudo copiar al portapapeles' });
     }
   };
 
@@ -604,10 +642,20 @@ export default function ReservaDetalleAdminPage() {
 
           {/* Dates & Location */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Calendar className="h-6 w-6 text-furgocasa-blue" />
-              Fechas y ubicación
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Calendar className="h-6 w-6 text-furgocasa-blue" />
+                Fechas y ubicación
+              </h3>
+              <button
+                type="button"
+                onClick={copyReservationDetails}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <Copy className="h-4 w-4" />
+                {copied ? '¡Copiado!' : 'Copiar detalles de la reserva'}
+              </button>
+            </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="p-4 bg-gray-50 rounded-lg">
