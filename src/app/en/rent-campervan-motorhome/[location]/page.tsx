@@ -464,7 +464,7 @@ export default async function LocationPage({ params }: PageProps) {
                 icon: Calendar,
                 title: "Parking MURCIA",
                 desc: "Store your camper safely",
-                link: "/parking-murcia",
+                link: "/aparcamiento-autocaravanas-campers-murcia",
                 iconBg: "bg-green-100",
                 iconColor: "text-green-600"
               },

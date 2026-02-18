@@ -313,7 +313,7 @@ const nextConfig = {
       },
       // ✅ Páginas informativas estáticas - 1 día
       {
-        source: '/(quienes-somos|como-funciona|guia-camper|documentacion-alquiler|como-reservar-fin-semana|mapa-areas|parking-murcia|inteligencia-artificial|video-tutoriales|clientes-vip)',
+        source: '/(quienes-somos|como-funciona|guia-camper|documentacion-alquiler|como-reservar-fin-semana|mapa-areas|aparcamiento-autocaravanas-campers-murcia|inteligencia-artificial|video-tutoriales|clientes-vip)',
         headers: [
           {
             key: 'Cache-Control',
@@ -412,6 +412,17 @@ const nextConfig = {
       { source: '/de/venta-autocaravanas-camper-:location', destination: '/de/wohnmobile-zu-verkaufen/:location', permanent: true },
       // ── VENTA DE: Formato antiguo (guión) → Formato nuevo (barra) ──
       { source: '/de/wohnmobile-zu-verkaufen-:location', destination: '/de/wohnmobile-zu-verkaufen/:location', permanent: true },
+
+      // ================================================================
+      // GRUPO 2B: CAMBIO SLUG PARKING MURCIA → APARCAMIENTO
+      // ================================================================
+      // Propósito: Redirigir URL antigua /parking-murcia al nuevo slug SEO
+      // Fecha: 18/02/2026
+      // ================================================================
+      { source: '/es/parking-murcia', destination: '/es/aparcamiento-autocaravanas-campers-murcia', permanent: true },
+      { source: '/en/parking-murcia', destination: '/en/murcia-parking', permanent: true },
+      { source: '/fr/parking-murcia', destination: '/fr/parking-murcie', permanent: true },
+      { source: '/de/parking-murcia', destination: '/de/parkplatz-murcia', permanent: true },
 
       // ================================================================
       // GRUPO 3: CORRECCIÓN IDIOMA CRUZADO (RUTAS GENERALES)

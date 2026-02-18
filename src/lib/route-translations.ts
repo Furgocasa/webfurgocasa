@@ -154,8 +154,8 @@ export const routeTranslations = {
     fr: "/carte-zones", 
     de: "/gebietskarte" 
   },
-  "/parking-murcia": { 
-    es: "/parking-murcia", 
+  "/aparcamiento-autocaravanas-campers-murcia": { 
+    es: "/aparcamiento-autocaravanas-campers-murcia", 
     en: "/murcia-parking", 
     fr: "/parking-murcie", 
     de: "/parkplatz-murcia" 

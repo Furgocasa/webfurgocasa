@@ -434,7 +434,7 @@ export default async function LocaleHomePage() {
                 icon: Calendar,
                 titleKey: "Parking MURCIA",
                 descKey: "Guarda tu camper con seguridad",
-                link: "/parking-murcia",
+                link: "/aparcamiento-autocaravanas-campers-murcia",
                 color: "from-green-50 to-green-100 border-green-300"
               },
               {

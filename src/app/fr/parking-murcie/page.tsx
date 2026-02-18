@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const locale: Locale = 'fr'; // Locale fijo
   
   const t = (key: string) => translateServer(key, locale);
-  const alternates = buildCanonicalAlternates('/parking-murcia', locale);
+  const alternates = buildCanonicalAlternates('/aparcamiento-autocaravanas-campers-murcia', locale);
 
   return {
     ...PARKING_MURCIA_METADATA,

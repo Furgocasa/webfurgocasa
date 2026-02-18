@@ -65,7 +65,7 @@ const staticPages: Array<{ path: string; label: string }> = [
   { path:"/documentacion-alquiler", label:"Documentación alquiler" },
   { path:"/guia-camper", label:"Guía camper" },
   { path:"/mapa-areas", label:"Mapa de áreas" },
-  { path:"/parking-murcia", label:"Parking Murcia" },
+  { path:"/aparcamiento-autocaravanas-campers-murcia", label:"Aparcamiento Autocaravanas y Campers Murcia" },
   { path:"/ofertas", label:"Ofertas" },
   { path:"/publicaciones", label:"Publicaciones" },
   { path:"/clientes-vip", label:"Clientes VIP" },

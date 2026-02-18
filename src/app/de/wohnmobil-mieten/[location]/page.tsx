@@ -463,7 +463,7 @@ export default async function LocationPage({ params }: PageProps) {
                 icon: Calendar,
                 title: "Parking MURCIA",
                 desc: "Bewahren Sie Ihr Wohnmobil sicher auf",
-                link: "/parking-murcia",
+                link: "/aparcamiento-autocaravanas-campers-murcia",
                 iconBg: "bg-green-100",
                 iconColor: "text-green-600"
               },
@@ -548,7 +548,7 @@ export default async function LocationPage({ params }: PageProps) {
                 icon: Calendar,
                 title: "Parking MURCIA",
                 desc: "Bewahren Sie Ihr Wohnmobil sicher auf",
-                link: "/parking-murcia",
+                link: "/aparcamiento-autocaravanas-campers-murcia",
                 iconBg: "bg-green-100",
                 iconColor: "text-green-600"
               },

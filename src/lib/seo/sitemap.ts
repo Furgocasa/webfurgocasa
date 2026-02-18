@@ -196,7 +196,7 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
-    { path: '/parking-murcia', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/ofertas', priority: 0.6, changeFrequency: 'weekly' },
     { path: '/publicaciones', priority: 0.5, changeFrequency: 'weekly' },
     { path: '/clientes-vip', priority: 0.4, changeFrequency: 'monthly' },

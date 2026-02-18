@@ -31,7 +31,7 @@ export function Header() {
     { name: t("Guía Camper"), href: "/guia-camper" },
     { name: t("Inteligencia Artificial"), href: "/inteligencia-artificial" },
     { name: t("Mapa áreas"), href: "/mapa-areas" },
-    { name: t("Parking MURCIA"), href: "/parking-murcia" },
+    { name: t("Parking MURCIA"), href: "/aparcamiento-autocaravanas-campers-murcia" },
     { name: t("Preguntas Frecuentes"), href: "/faqs" },
     { name: t("Video Tutoriales"), href: "/video-tutoriales" },
   ];
