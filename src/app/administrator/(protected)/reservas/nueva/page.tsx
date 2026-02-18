@@ -30,6 +30,7 @@ interface Extra {
   price_per_rental: number | null;
   price_per_unit?: number | null;
   price_type: string | null;
+  min_quantity?: number | null;
   max_quantity?: number | null;
   is_active?: boolean | null;
 }
@@ -199,7 +200,8 @@ export default function NuevaReservaPage() {
       const extra = extras.find(e => e.id === extraId);
       if (extra && quantity > 0) {
         if (extra.price_type === 'per_day') {
-          total += (extra.price_per_day ?? 0) * quantity * formData.days;
+          const effectiveDays = extra.min_quantity ? Math.max(formData.days, extra.min_quantity) : formData.days;
+          total += (extra.price_per_day ?? 0) * quantity * effectiveDays;
         } else {
           total += (extra.price_per_rental ?? 0) * quantity;
         }

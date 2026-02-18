@@ -50,6 +50,7 @@ interface SelectedExtra {
   quantity: number;
   price_per_day: number;
   price_per_rental: number;
+  min_quantity?: number | null;
 }
 
 interface AppliedCoupon {
@@ -116,7 +117,7 @@ function NuevaReservaContent() {
   const extrasPrice = selectedExtras.reduce((sum, extra) => {
     const price = extra.price_per_rental > 0 
       ? extra.price_per_rental 
-      : extra.price_per_day * pricingDays;
+      : extra.price_per_day * (extra.min_quantity ? Math.max(pricingDays, extra.min_quantity) : pricingDays);
     return sum + (price * extra.quantity);
   }, 0);
   
@@ -191,7 +192,7 @@ function NuevaReservaContent() {
         // Load extra data
         const { data: extraData } = await supabase
           .from('extras')
-          .select('id, name, price_per_day, price_per_rental')
+          .select('id, name, price_per_day, price_per_rental, min_quantity')
           .eq('id', extraId)
           .single();
         
@@ -351,9 +352,10 @@ function NuevaReservaContent() {
 
       // Step 3: Crear booking desde API (bypasea RLS)
       const bookingExtrasData = selectedExtras.map(extra => {
+        const effectiveDays = extra.min_quantity ? Math.max(days, extra.min_quantity) : days;
         const unitPrice = extra.price_per_rental > 0 
           ? extra.price_per_rental 
-          : extra.price_per_day * days;
+          : extra.price_per_day * effectiveDays;
         
         return {
           extra_id: extra.id,
@@ -917,9 +919,10 @@ function NuevaReservaContent() {
                     </div>
                     
                     {selectedExtras.length > 0 && selectedExtras.map((extra) => {
+                      const effectiveDays = extra.min_quantity ? Math.max(days, extra.min_quantity) : days;
                       const price = extra.price_per_rental > 0 
                         ? extra.price_per_rental 
-                        : extra.price_per_day * days;
+                        : extra.price_per_day * effectiveDays;
                       return (
                         <div key={extra.id} className="flex justify-between text-sm">
                           <span className="text-gray-600">
@@ -979,9 +982,10 @@ function NuevaReservaContent() {
                 <span>{formatPrice(basePrice)}</span>
               </div>
               {selectedExtras.slice(0, 2).map((extra) => {
+                const effectiveDays = extra.min_quantity ? Math.max(pricingDays, extra.min_quantity) : pricingDays;
                 const price = extra.price_per_rental > 0 
                   ? extra.price_per_rental 
-                  : extra.price_per_day * pricingDays;
+                  : extra.price_per_day * effectiveDays;
                 return (
                   <div key={extra.id} className="flex justify-between text-xs text-gray-500">
                     <span>{extra.name} {extra.quantity > 1 && `×${extra.quantity}`}</span>

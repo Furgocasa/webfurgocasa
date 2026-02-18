@@ -33,6 +33,7 @@ interface Extra {
   price_per_day: number | null;
   price_per_unit: number | null;
   price_type: 'per_day' | 'per_unit';
+  min_quantity: number | null;
   max_quantity: number;
   icon: string;
 }
@@ -240,14 +241,18 @@ function ReservarVehiculoContent() {
             : item
         );
       }
-      return [...prev, { extra, quantity: 1 }];
+      // Para per_unit con min_quantity, empezar con el mínimo
+      const initialQty = (extra.price_type === 'per_unit' && extra.min_quantity) ? extra.min_quantity : 1;
+      return [...prev, { extra, quantity: initialQty }];
     });
   };
 
   const removeExtra = (extraId: string) => {
     setSelectedExtras(prev => {
       const existing = prev.find(item => item.extra.id === extraId);
-      if (existing && existing.quantity > 1) {
+      if (!existing) return prev;
+      const minQty = existing.extra.min_quantity ?? 0;
+      if (existing.quantity > 1 && existing.quantity > minQty) {
         return prev.map(item => 
           item.extra.id === extraId 
             ? { ...item, quantity: item.quantity - 1 }
@@ -512,9 +517,14 @@ function ReservarVehiculoContent() {
                                 )}
                                 <p className="text-sm font-medium text-furgocasa-orange mt-2">
                                   {priceDisplay}
+                                  {extra.min_quantity && extra.price_type === 'per_day' && (
+                                    <span className="text-xs text-gray-500 ml-2">
+                                      ({t("Mín")}: {extra.min_quantity} {t("días")})
+                                    </span>
+                                  )}
                                   {maxQuantity > 1 && (
                                     <span className="text-xs text-gray-500 ml-2">
-                                      (Máx: {maxQuantity})
+                                      ({t("Máx")}: {maxQuantity})
                                     </span>
                                   )}
                                 </p>
@@ -527,7 +537,12 @@ function ReservarVehiculoContent() {
                                     <>
                                       <button
                                         onClick={() => removeExtra(extra.id)}
-                                        className="w-8 h-8 flex items-center justify-center rounded-full border-2 border-gray-300 hover:border-furgocasa-orange hover:text-furgocasa-orange transition-colors"
+                                        disabled={quantity <= (extra.min_quantity ?? 0)}
+                                        className={`w-8 h-8 flex items-center justify-center rounded-full border-2 transition-colors ${
+                                          quantity <= (extra.min_quantity ?? 0)
+                                            ? 'border-gray-200 text-gray-300 cursor-not-allowed'
+                                            : 'border-gray-300 hover:border-furgocasa-orange hover:text-furgocasa-orange'
+                                        }`}
                                       >
                                         <Minus className="h-4 w-4" />
                                       </button>

@@ -598,6 +598,7 @@ export type Database = {
           id: string
           image_url: string | null
           is_active: boolean | null
+          min_quantity: number | null
           max_quantity: number | null
           name: string
           price_per_day: number | null
@@ -614,6 +615,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          min_quantity?: number | null
           max_quantity?: number | null
           name: string
           price_per_day?: number | null
@@ -630,6 +632,7 @@ export type Database = {
           id?: string
           image_url?: string | null
           is_active?: boolean | null
+          min_quantity?: number | null
           max_quantity?: number | null
           name?: string
           price_per_day?: number | null

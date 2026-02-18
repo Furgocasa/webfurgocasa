@@ -62,6 +62,7 @@ interface ExtraData {
   price_per_day: number | null;
   price_per_unit: number | null;
   price_type: 'per_day' | 'per_unit';
+  min_quantity: number | null;
   max_quantity: number;
   icon: string;
 }
@@ -168,14 +169,16 @@ export default function ReservarOfertaPage({
         ));
       }
     } else {
-      setSelectedExtras([...selectedExtras, { extra, quantity: 1 }]);
+      const initialQty = (extra.price_type === 'per_unit' && extra.min_quantity) ? extra.min_quantity : 1;
+      setSelectedExtras([...selectedExtras, { extra, quantity: initialQty }]);
     }
   };
 
   const removeExtra = (extraId: string) => {
     const existing = selectedExtras.find(item => item.extra.id === extraId);
     if (existing) {
-      if (existing.quantity > 1) {
+      const minQty = existing.extra.min_quantity ?? 0;
+      if (existing.quantity > 1 && existing.quantity > minQty) {
         setSelectedExtras(selectedExtras.map(item =>
           item.extra.id === extraId
             ? { ...item, quantity: item.quantity - 1 }
@@ -195,7 +198,8 @@ export default function ReservarOfertaPage({
       if (item.extra.price_type === 'per_unit') {
         price = item.extra.price_per_unit || 0;
       } else {
-        price = (item.extra.price_per_day || 0) * offer.offer_days;
+        const effectiveDays = item.extra.min_quantity ? Math.max(offer.offer_days, item.extra.min_quantity) : offer.offer_days;
+        price = (item.extra.price_per_day || 0) * effectiveDays;
       }
       return total + (price * item.quantity);
     }, 0);
@@ -273,7 +277,8 @@ export default function ReservarOfertaPage({
             if (item.extra.price_type === 'per_unit') {
               totalPrice = (item.extra.price_per_unit || 0) * item.quantity;
             } else {
-              totalPrice = (item.extra.price_per_day || 0) * item.quantity * offer.offer_days;
+              const effectiveDays = item.extra.min_quantity ? Math.max(offer.offer_days, item.extra.min_quantity) : offer.offer_days;
+              totalPrice = (item.extra.price_per_day || 0) * item.quantity * effectiveDays;
             }
             return {
               extra_id: item.extra.id,

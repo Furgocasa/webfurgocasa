@@ -17,6 +17,7 @@ interface Extra {
   price_type: string | null;
   is_active: boolean | null;
   sort_order: number | null;
+  min_quantity: number | null;
   max_quantity: number | null;
   icon: string | null;
   image_url?: string | null;
@@ -48,6 +49,7 @@ export default function ExtrasPage() {
     price_per_unit: '',
     price_type: 'per_day' as 'per_day' | 'per_unit' | 'fixed',
     is_active: true,
+    min_quantity: '',
     max_quantity: '',
     icon: '',
   });
@@ -94,6 +96,7 @@ export default function ExtrasPage() {
         price_per_unit: formData.price_per_unit ? parseFloat(formData.price_per_unit) : null,
         price_type: formData.price_type,
         is_active: formData.is_active,
+        min_quantity: formData.min_quantity ? parseInt(formData.min_quantity) : null,
         max_quantity: formData.max_quantity ? parseInt(formData.max_quantity) : null,
         icon: formData.icon || null,
       };
@@ -141,6 +144,7 @@ export default function ExtrasPage() {
       price_per_unit: extra.price_per_unit?.toString() || '',
       price_type: (extra.price_type as 'per_day' | 'per_unit' | 'fixed') || 'per_day',
       is_active: extra.is_active ?? true,
+      min_quantity: extra.min_quantity?.toString() || '',
       max_quantity: extra.max_quantity?.toString() || '',
       icon: extra.icon || '',
     });
@@ -206,6 +210,7 @@ export default function ExtrasPage() {
       price_per_unit: '',
       price_type: 'per_day',
       is_active: true,
+      min_quantity: '',
       max_quantity: '',
       icon: '',
     });
@@ -314,7 +319,7 @@ export default function ExtrasPage() {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Precio por día (€)
@@ -338,6 +343,20 @@ export default function ExtrasPage() {
                   onChange={(e) => setFormData({ ...formData, price_per_unit: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Cantidad mínima
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={formData.min_quantity}
+                  onChange={(e) => setFormData({ ...formData, min_quantity: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                  placeholder="Ej: 4 días mínimo"
+                />
+                <p className="text-xs text-gray-500 mt-1">Para per_day: mín. días. Para per_unit: mín. unidades</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -414,7 +433,8 @@ export default function ExtrasPage() {
                     <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Tipo</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Precio/día</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Precio/unidad</th>
-                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Cantidad máx.</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Cant. mín.</th>
+                    <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Cant. máx.</th>
                     <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Estado</th>
                     <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Acciones</th>
                   </tr>
@@ -422,7 +442,7 @@ export default function ExtrasPage() {
                 <tbody className="divide-y divide-gray-100">
                   {filteredExtras.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
                         <Package className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                         <p className="text-lg font-medium">No hay extras disponibles</p>
                         <p className="text-sm mt-1">Añade extras para ofrecer a tus clientes</p>
@@ -457,6 +477,9 @@ export default function ExtrasPage() {
                           ) : (
                             <span className="text-gray-400">—</span>
                           )}
+                        </td>
+                        <td className="px-6 py-4 text-center text-gray-600">
+                          {extra.min_quantity ?? '—'}
                         </td>
                         <td className="px-6 py-4 text-center text-gray-600">
                           {extra.max_quantity || '∞'}

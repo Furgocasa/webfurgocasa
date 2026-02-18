@@ -197,6 +197,7 @@ CREATE TABLE extras (
     price_per_day DECIMAL(10,2) DEFAULT 0,
     price_per_rental DECIMAL(10,2) DEFAULT 0,
     price_type VARCHAR(20) DEFAULT 'per_day' CHECK (price_type IN ('per_day', 'per_rental', 'one_time')),
+    min_quantity INTEGER DEFAULT NULL,
     max_quantity INTEGER DEFAULT 1,
     image_url TEXT,
     is_active BOOLEAN DEFAULT TRUE,
