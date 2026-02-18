@@ -253,6 +253,12 @@ export default function NuevaReservaPage() {
       setSaving(true);
       setMessage(null);
 
+      // Obtener nombre del vehículo para mensajes
+      const selectedVehicle = vehicles.find(v => v.id === formData.vehicle_id);
+      const vehicleName = selectedVehicle 
+        ? `${selectedVehicle.internal_code ? `[${selectedVehicle.internal_code}] ` : ''}${selectedVehicle.name} - ${selectedVehicle.brand}`
+        : 'Vehículo seleccionado';
+
       // VALIDACIÓN: Verificar BLOQUEOS del vehículo
       const { data: blockedDates, error: blockedError } = await supabase
         .from('blocked_dates')
@@ -269,12 +275,12 @@ export default function NuevaReservaPage() {
 
       if (blockedDates && blockedDates.length > 0) {
         const blockInfo = blockedDates.map(b => 
-          `Del ${b.start_date} al ${b.end_date} (${b.reason || 'sin motivo'})`
+          `  • Del ${b.start_date} al ${b.end_date} — Motivo: ${b.reason || 'No especificado'}`
         ).join('\n');
         
         setMessage({ 
           type: 'error', 
-          text: `🚫 VEHÍCULO BLOQUEADO en esas fechas:\n\n${blockInfo}\n\nPor favor, selecciona otras fechas o un vehículo diferente.`
+          text: `🚫 NO SE PUEDE RESERVAR — ${vehicleName} tiene BLOQUEO activo:\n\n${blockInfo}\n\nSelecciona otras fechas o elige un vehículo diferente.`
         });
         setSaving(false);
         return;
@@ -305,12 +311,12 @@ export default function NuevaReservaPage() {
 
       if (conflictingBookings.length > 0) {
         const conflictInfo = conflictingBookings.map(b => 
-          `${b.booking_number} (${b.customer_name || 'Sin nombre'}) del ${b.pickup_date} al ${b.dropoff_date}`
+          `  • Reserva ${b.booking_number} (${b.customer_name || 'Sin nombre'}) del ${b.pickup_date} al ${b.dropoff_date}`
         ).join('\n');
         
         setMessage({ 
           type: 'error', 
-          text: `⚠️ CONFLICTO DE RESERVA: El vehículo ya tiene ${conflictingBookings.length} reserva(s) en esas fechas:\n\n${conflictInfo}\n\nPor favor, selecciona otras fechas o un vehículo diferente.`
+          text: `🚫 NO SE PUEDE RESERVAR — ${vehicleName} ya tiene ${conflictingBookings.length} reserva(s) en esas fechas:\n\n${conflictInfo}\n\nSelecciona otras fechas o elige un vehículo diferente.`
         });
         setSaving(false);
         return;
