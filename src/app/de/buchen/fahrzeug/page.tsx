@@ -82,8 +82,9 @@ function ReservarVehiculoContent() {
       // Precio único por toda la reserva
       price = (item.extra.price_per_unit || 0);
     } else {
-      // Precio por día multiplicado por número de días de pricing
-      price = (item.extra.price_per_day || 0) * pricingDays;
+      // Precio por día: aplicar mínimo de días si existe (ej. parking 4 días mín.)
+      const effectiveDays = item.extra.min_quantity ? Math.max(pricingDays, item.extra.min_quantity) : pricingDays;
+      price = (item.extra.price_per_day || 0) * effectiveDays;
     }
     return sum + (price * item.quantity);
   }, 0);
@@ -669,8 +670,9 @@ function ReservarVehiculoContent() {
                       // Precio único por toda la reserva
                       price = (item.extra.price_per_unit || 0);
                     } else {
-                      // Precio por día multiplicado por número de días de pricing
-                      price = (item.extra.price_per_day || 0) * pricingDays;
+                      // Precio por día: aplicar mínimo si existe (ej. parking 4 días mín.)
+                      const effectiveDays = item.extra.min_quantity ? Math.max(pricingDays, item.extra.min_quantity) : pricingDays;
+                      price = (item.extra.price_per_day || 0) * effectiveDays;
                     }
                     return (
                       <div key={item.extra.id} className="flex justify-between text-sm">
@@ -728,7 +730,8 @@ function ReservarVehiculoContent() {
                 if (item.extra.price_type === 'per_unit') {
                   price = (item.extra.price_per_unit || 0);
                 } else {
-                  price = (item.extra.price_per_day || 0) * pricingDays;
+                  const effectiveDays = item.extra.min_quantity ? Math.max(pricingDays, item.extra.min_quantity) : pricingDays;
+                  price = (item.extra.price_per_day || 0) * effectiveDays;
                 }
                 return (
                   <div key={item.extra.id} className="flex justify-between text-xs text-gray-500">
