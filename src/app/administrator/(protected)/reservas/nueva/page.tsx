@@ -253,6 +253,33 @@ export default function NuevaReservaPage() {
       setSaving(true);
       setMessage(null);
 
+      // VALIDACIÓN: Verificar BLOQUEOS del vehículo
+      const { data: blockedDates, error: blockedError } = await supabase
+        .from('blocked_dates')
+        .select('id, start_date, end_date, reason')
+        .eq('vehicle_id', formData.vehicle_id)
+        .or(`and(start_date.lte.${formData.dropoff_date},end_date.gte.${formData.pickup_date})`);
+
+      if (blockedError) {
+        console.error('Error checking blocks:', blockedError);
+        setMessage({ type: 'error', text: 'Error al verificar bloqueos del vehículo' });
+        setSaving(false);
+        return;
+      }
+
+      if (blockedDates && blockedDates.length > 0) {
+        const blockInfo = blockedDates.map(b => 
+          `Del ${b.start_date} al ${b.end_date} (${b.reason || 'sin motivo'})`
+        ).join('\n');
+        
+        setMessage({ 
+          type: 'error', 
+          text: `🚫 VEHÍCULO BLOQUEADO en esas fechas:\n\n${blockInfo}\n\nPor favor, selecciona otras fechas o un vehículo diferente.`
+        });
+        setSaving(false);
+        return;
+      }
+
       // VALIDACIÓN: Verificar disponibilidad del vehículo considerando fecha Y hora
       const { data: potentialConflicts, error: checkError } = await supabase
         .from('bookings')
@@ -268,18 +295,11 @@ export default function NuevaReservaPage() {
         return;
       }
 
-      // Filtrar conflictos reales considerando las horas
       const conflictingBookings = potentialConflicts?.filter(booking => {
-        // Crear objetos Date con fecha y hora completas
         const newPickup = new Date(`${formData.pickup_date}T${formData.pickup_time}`);
         const newDropoff = new Date(`${formData.dropoff_date}T${formData.dropoff_time}`);
         const bookingPickup = new Date(`${booking.pickup_date}T${booking.pickup_time}`);
         const bookingDropoff = new Date(`${booking.dropoff_date}T${booking.dropoff_time}`);
-
-        // Verificar si realmente hay solapamiento considerando fecha Y hora
-        // Hay conflicto si:
-        // - La nueva reserva empieza antes de que termine la existente Y
-        // - La nueva reserva termina después de que empiece la existente
         return newPickup < bookingDropoff && newDropoff > bookingPickup;
       }) || [];
 

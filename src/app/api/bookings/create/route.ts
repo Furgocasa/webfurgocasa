@@ -78,6 +78,64 @@ export async function POST(request: Request) {
 
     const { booking, extras } = validationResult.data;
 
+    // ================================================================
+    // VALIDACIÓN CRÍTICA: Verificar que el vehículo NO tiene bloqueos
+    // ni reservas activas en las fechas solicitadas ANTES de crear
+    // ================================================================
+    const { data: blockedDates, error: blockedError } = await supabase
+      .from("blocked_dates")
+      .select("id, start_date, end_date, reason")
+      .eq("vehicle_id", booking.vehicle_id)
+      .or(`and(start_date.lte.${booking.dropoff_date},end_date.gte.${booking.pickup_date})`);
+
+    if (blockedError) {
+      console.error("Error verificando bloqueos:", blockedError);
+      return NextResponse.json(
+        { error: "Error al verificar disponibilidad del vehículo" },
+        { status: 500 }
+      );
+    }
+
+    if (blockedDates && blockedDates.length > 0) {
+      console.error("🚫 RESERVA RECHAZADA: Vehículo bloqueado", {
+        vehicle_id: booking.vehicle_id,
+        fechas_solicitadas: `${booking.pickup_date} → ${booking.dropoff_date}`,
+        bloqueos: blockedDates.map(b => `${b.start_date} → ${b.end_date} (${b.reason || 'sin motivo'})`),
+      });
+      return NextResponse.json(
+        { error: "El vehículo no está disponible en las fechas seleccionadas. Por favor, elige otras fechas o un vehículo diferente." },
+        { status: 409 }
+      );
+    }
+
+    const { data: conflictingBookings, error: conflictError } = await supabase
+      .from("bookings")
+      .select("id, booking_number")
+      .eq("vehicle_id", booking.vehicle_id)
+      .neq("status", "cancelled")
+      .or(`and(pickup_date.lte.${booking.dropoff_date},dropoff_date.gte.${booking.pickup_date})`);
+
+    if (conflictError) {
+      console.error("Error verificando reservas existentes:", conflictError);
+      return NextResponse.json(
+        { error: "Error al verificar disponibilidad del vehículo" },
+        { status: 500 }
+      );
+    }
+
+    if (conflictingBookings && conflictingBookings.length > 0) {
+      console.error("🚫 RESERVA RECHAZADA: Vehículo ya reservado", {
+        vehicle_id: booking.vehicle_id,
+        fechas_solicitadas: `${booking.pickup_date} → ${booking.dropoff_date}`,
+        conflictos: conflictingBookings.map(b => b.booking_number),
+      });
+      return NextResponse.json(
+        { error: "El vehículo no está disponible en las fechas seleccionadas. Por favor, elige otras fechas o un vehículo diferente." },
+        { status: 409 }
+      );
+    }
+    // ================================================================
+
     const { data: createdBooking, error: bookingError } = await supabase
       .from("bookings")
       .insert(booking)

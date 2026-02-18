@@ -214,6 +214,33 @@ export async function POST(request: NextRequest) {
         if (currentBooking.status === 'pending') {
           console.log("🔒 [6/7] Verificando disponibilidad del vehículo antes de confirmar...");
           
+          // Verificar BLOQUEOS del vehículo
+          const { data: blockedDates, error: blockedError } = await supabase
+            .from("blocked_dates")
+            .select("id, start_date, end_date, reason")
+            .eq("vehicle_id", currentBooking.vehicle_id)
+            .or(`and(start_date.lte.${currentBooking.dropoff_date},end_date.gte.${currentBooking.pickup_date})`);
+          
+          if (blockedError) {
+            console.error("❌ ERROR verificando bloqueos:", blockedError);
+          } else if (blockedDates && blockedDates.length > 0) {
+            console.error("🚨 CONFLICTO DETECTADO: El vehículo está BLOQUEADO para esas fechas");
+            console.error({
+              bloqueos: blockedDates.map(b => `${b.start_date} → ${b.end_date} (${b.reason || 'sin motivo'})`),
+            });
+            
+            await supabase
+              .from("payments")
+              .update({
+                notes: `⚠️ CONFLICTO: Pago recibido pero vehículo BLOQUEADO del ${blockedDates[0].start_date} al ${blockedDates[0].end_date} (${blockedDates[0].reason || 'sin motivo'}). REQUIERE REEMBOLSO O CAMBIO DE VEHÍCULO.`,
+              })
+              .eq("id", payment.id);
+            
+            console.error("⚠️ Pago marcado con conflicto por bloqueo. REQUIERE ACCIÓN MANUAL DEL ADMINISTRADOR.");
+            return;
+          }
+          
+          // Verificar RESERVAS conflictivas
           const { data: conflictingBookings, error: conflictError } = await supabase
             .from("bookings")
             .select("id, booking_number, customer_name, status, payment_status")
@@ -225,10 +252,8 @@ export async function POST(request: NextRequest) {
           
           if (conflictError) {
             console.error("❌ ERROR verificando conflictos:", conflictError);
-            // En caso de error en verificación, marcar el pago pero NO confirmar la reserva
             console.error("⚠️ NO SE CONFIRMA LA RESERVA - requiere revisión manual");
           } else if (conflictingBookings && conflictingBookings.length > 0) {
-            // HAY CONFLICTO - otro cliente pagó antes
             console.error("🚨 CONFLICTO DETECTADO: El vehículo ya está reservado para esas fechas");
             console.error({
               bookingConflictiva: conflictingBookings[0].booking_number,
@@ -237,8 +262,6 @@ export async function POST(request: NextRequest) {
               paymentStatusConflicto: conflictingBookings[0].payment_status,
             });
             
-            // NO actualizar la reserva a confirmed
-            // Solo registrar el pago como recibido con nota de conflicto
             await supabase
               .from("payments")
               .update({
@@ -247,10 +270,9 @@ export async function POST(request: NextRequest) {
               .eq("id", payment.id);
             
             console.error("⚠️ Pago marcado con conflicto. REQUIERE ACCIÓN MANUAL DEL ADMINISTRADOR.");
-            // Continuar respondiendo OK a Redsys (para no causar reintentos)
             return;
           } else {
-            console.log("✅ [6/7] Vehículo disponible - se puede confirmar la reserva");
+            console.log("✅ [6/7] Vehículo disponible (sin bloqueos ni conflictos) - se puede confirmar la reserva");
           }
         } else {
           console.log("ℹ️ [6/7] Reserva ya confirmada (segundo pago) - saltando verificación de disponibilidad");
