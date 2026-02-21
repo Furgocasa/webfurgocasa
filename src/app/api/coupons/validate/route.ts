@@ -63,8 +63,10 @@ export async function POST(request: Request) {
     }
 
     const now = new Date();
+    const pickupDateObj = new Date(pickup_date + "T00:00:00");
 
-    // Validar fecha de inicio
+    // Validar que el cupón esté activo (no desactivado manualmente)
+    // y que no haya expirado para poder usarlo HOY
     if (coupon.valid_from && new Date(coupon.valid_from) > now) {
       return NextResponse.json({
         valid: false,
@@ -72,11 +74,25 @@ export async function POST(request: Request) {
       });
     }
 
-    // Validar fecha de expiración
     if (coupon.valid_until && new Date(coupon.valid_until) < now) {
       return NextResponse.json({
         valid: false,
         error: "El cupón ha expirado",
+      });
+    }
+
+    // Validar que las fechas de la reserva caigan dentro del rango del cupón
+    if (coupon.valid_from && pickupDateObj < new Date(coupon.valid_from)) {
+      return NextResponse.json({
+        valid: false,
+        error: "Este cupón no es válido para las fechas seleccionadas",
+      });
+    }
+
+    if (coupon.valid_until && pickupDateObj > new Date(coupon.valid_until)) {
+      return NextResponse.json({
+        valid: false,
+        error: "Este cupón no es válido para las fechas seleccionadas",
       });
     }
 
@@ -89,8 +105,7 @@ export async function POST(request: Request) {
     }
 
     // Calcular días de alquiler
-    const pickupDateObj = new Date(pickup_date);
-    const dropoffDateObj = new Date(dropoff_date);
+    const dropoffDateObj = new Date(dropoff_date + "T00:00:00");
     const days = Math.ceil((dropoffDateObj.getTime() - pickupDateObj.getTime()) / (1000 * 60 * 60 * 24));
 
     // Validar días mínimos

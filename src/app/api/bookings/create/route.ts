@@ -178,6 +178,42 @@ export async function POST(request: Request) {
     // Ver: supabase/auto-update-customer-stats.sql
     // ============================================
 
+    // Re-validar cupón antes de registrar su uso
+    if (booking.coupon_id && booking.coupon_discount && booking.coupon_discount > 0) {
+      const { data: couponCheck } = await supabase
+        .from("coupons")
+        .select("valid_from, valid_until, is_active, max_uses, current_uses")
+        .eq("id", booking.coupon_id)
+        .single();
+
+      if (couponCheck) {
+        const pickupDate = new Date(booking.pickup_date + "T00:00:00");
+        const couponInvalid = !couponCheck.is_active
+          || (couponCheck.valid_from && pickupDate < new Date(couponCheck.valid_from))
+          || (couponCheck.valid_until && pickupDate > new Date(couponCheck.valid_until))
+          || (couponCheck.max_uses !== null && couponCheck.current_uses >= couponCheck.max_uses);
+
+        if (couponInvalid) {
+          await supabase
+            .from("bookings")
+            .update({
+              coupon_id: null,
+              coupon_code: null,
+              coupon_discount: 0,
+              discount: 0,
+              total_price: booking.total_price + booking.coupon_discount,
+            })
+            .eq("id", createdBooking.id);
+
+          return NextResponse.json({
+            success: true,
+            booking: { ...createdBooking, coupon_removed: true },
+            message: "Reserva creada pero el cupón no era válido para las fechas seleccionadas y fue eliminado",
+          });
+        }
+      }
+    }
+
     // Registrar uso del cupón si se aplicó uno
     if (booking.coupon_id && booking.coupon_discount && booking.coupon_discount > 0) {
       // Incrementar contador de usos

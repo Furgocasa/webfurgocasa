@@ -566,14 +566,24 @@ Devolución en ${dropoffLocation}`;
               </div>
             )}
             
-            {/* Descuento o Cupón */}
-            {((booking.discount ?? booking.coupon_discount) || 0) > 0 && (
+            {/* Cupón */}
+            {(booking.coupon_discount || 0) > 0 && (
               <div className="flex justify-between">
                 <span className="opacity-90">
-                  {booking.coupon_code ? `Cupón ${booking.coupon_code}` : 'Descuento'}:
+                  {booking.coupon_code ? `Cupón ${booking.coupon_code}` : 'Cupón'}:
                 </span>
                 <span className="font-semibold text-green-300">
-                  - {formatPrice(booking.discount ?? booking.coupon_discount ?? 0)}
+                  - {formatPrice(booking.coupon_discount)}
+                </span>
+              </div>
+            )}
+            
+            {/* Descuento manual (sin cupón) */}
+            {(booking.discount || 0) > 0 && !(booking.coupon_discount > 0) && (
+              <div className="flex justify-between">
+                <span className="opacity-90">Descuento:</span>
+                <span className="font-semibold text-green-300">
+                  - {formatPrice(booking.discount)}
                 </span>
               </div>
             )}

@@ -280,7 +280,7 @@ export default function EditarReservaPage() {
         base_price: booking.base_price ?? 0,
         extras_price: booking.extras_price ?? 0,
         location_fee: (booking as any).location_fee ?? 0,
-        discount: (booking as any).discount ?? (booking as any).coupon_discount ?? 0,
+        discount: (booking as any).discount || (booking as any).coupon_discount || 0,
         total_price: booking.total_price ?? 0,
         amount_paid: booking.amount_paid ?? 0,
         coupon_code: (booking as any).coupon_code ?? null,
@@ -1141,7 +1141,9 @@ export default function EditarReservaPage() {
                   )}
                   {(formData.discount || 0) > 0 && (
                     <div className="flex justify-between text-sm mb-2">
-                      <span className="text-gray-600">Descuento:</span>
+                      <span className="text-gray-600">
+                        {formData.coupon_code ? `Cupón ${formData.coupon_code}` : 'Descuento'}:
+                      </span>
                       <span className="font-semibold text-green-600">- {formatPrice(formData.discount)}</span>
                     </div>
                   )}
