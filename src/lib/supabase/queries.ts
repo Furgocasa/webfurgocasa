@@ -503,7 +503,7 @@ export async function getDashboardStats() {
     revenue
   }));
   
-  // Próximas entregas y recogidas (hoy y mañana)
+  // Próximas entregas y recogidas (hoy y mañana) - para compatibilidad
   const tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000).toISOString().split('T')[0];
   const upcomingActions = bookingsData?.filter(b => 
     (b.pickup_date === todayStr || b.pickup_date === tomorrow || 
@@ -518,6 +518,45 @@ export async function getDashboardStats() {
     vehicle: b.vehicle?.name || 'Vehículo',
     bookingId: b.id
   })) || [];
+
+  // Datos para dashboard de Operaciones
+  const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  const upcomingRentals = bookingsData?.filter(b => 
+    b.pickup_date >= todayStr && b.pickup_date <= weekEnd && b.status !== 'cancelled'
+  ) || [];
+  const upcomingActionsWeek: Array<{ id: string; type: 'pickup' | 'dropoff'; date: string; time: string; customer: string; vehicle: string; bookingId: string }> = [];
+  bookingsData?.forEach(b => {
+    if (b.status === 'cancelled') return;
+    if (b.pickup_date >= todayStr && b.pickup_date <= weekEnd) {
+      upcomingActionsWeek.push({
+        id: `${b.id}-pickup`,
+        type: 'pickup',
+        date: b.pickup_date,
+        time: b.pickup_time || '09:00',
+        customer: b.customer_name || 'Cliente',
+        vehicle: b.vehicle?.name || 'Vehículo',
+        bookingId: b.id
+      });
+    }
+    if (b.dropoff_date >= todayStr && b.dropoff_date <= weekEnd) {
+      upcomingActionsWeek.push({
+        id: `${b.id}-dropoff`,
+        type: 'dropoff',
+        date: b.dropoff_date,
+        time: b.dropoff_time || '09:00',
+        customer: b.customer_name || 'Cliente',
+        vehicle: b.vehicle?.name || 'Vehículo',
+        bookingId: b.id
+      });
+    }
+  });
+  upcomingActionsWeek.sort((a, b) => {
+    if (a.date !== b.date) return a.date.localeCompare(b.date);
+    return a.time.localeCompare(b.time);
+  });
+  const pendingReview = bookingsData?.filter(b => 
+    b.status === 'in_progress' && b.dropoff_date < todayStr
+  ) || [];
   
   return {
     // Básicas
@@ -554,7 +593,11 @@ export async function getDashboardStats() {
     upcomingActions: upcomingActions.sort((a, b) => {
       if (a.date !== b.date) return a.date.localeCompare(b.date);
       return a.time.localeCompare(b.time);
-    }).slice(0, 10)
+    }).slice(0, 10),
+    // Operaciones
+    upcomingRentals,
+    upcomingActionsWeek,
+    pendingReview,
   };
 }
 
