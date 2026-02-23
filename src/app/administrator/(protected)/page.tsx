@@ -12,6 +12,7 @@ import {
   FileText,
   Ban,
   ShieldAlert,
+  Route,
 } from "lucide-react";
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/supabase/queries";
@@ -173,8 +174,8 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      {/* ── Tres columnas principales ── */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      {/* ── Columnas principales ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* 1. Alquileres próximos 7 días */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
@@ -285,7 +286,123 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* 2. Entregas y recogidas (semana) */}
+        {/* 2. Alquileres en curso */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900">
+              En curso
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
+                ({stats.activeRentals?.length || 0})
+              </span>
+            </h2>
+            <Link
+              href="/administrator/calendario"
+              className="text-xs text-furgocasa-orange hover:underline font-medium"
+            >
+              Calendario
+            </Link>
+          </div>
+          <div className="divide-y divide-gray-100">
+            {(stats.activeRentals || []).length > 0 ? (
+              stats.activeRentals.map((b) => {
+                const progress = Math.round(
+                  (b.currentDay / b.totalDays) * 100
+                );
+                return (
+                  <Link
+                    key={b.id}
+                    href={`/administrator/reservas/${b.id}`}
+                    className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <p className="font-semibold text-gray-900 text-sm leading-tight">
+                        {b.vehicle}
+                        {b.vehicleCode && (
+                          <span className="text-gray-400 font-normal text-xs">
+                            {" "}
+                            {b.vehicleCode}
+                          </span>
+                        )}
+                      </p>
+                      <span className="text-xs font-bold text-blue-600 whitespace-nowrap">
+                        Día {b.currentDay}/{b.totalDays}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 mb-1">
+                      {b.customer}
+                      {b.customerPhone && (
+                        <span className="ml-2 text-blue-600">
+                          <Phone className="h-3 w-3 inline" />{" "}
+                          {b.customerPhone}
+                        </span>
+                      )}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span>
+                        Salió{" "}
+                        {new Date(
+                          b.pickupDate + "T12:00:00"
+                        ).toLocaleDateString("es-ES", {
+                          day: "numeric",
+                          month: "short",
+                        })}
+                      </span>
+                      <span>→</span>
+                      <span className="font-medium text-gray-700">
+                        Vuelve{" "}
+                        {formatDateLabel(b.dropoffDate)}{" "}
+                        {b.dropoffTime}
+                      </span>
+                    </div>
+                    {(b.pickupLocation || b.dropoffLocation) && (
+                      <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
+                        <MapPin className="h-3 w-3 flex-shrink-0" />
+                        <span>
+                          {b.pickupLocation}
+                          {b.pickupLocation !== b.dropoffLocation &&
+                            ` → ${b.dropoffLocation}`}
+                        </span>
+                      </div>
+                    )}
+                    {/* Barra de progreso */}
+                    <div className="mt-2 flex items-center gap-2">
+                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${
+                            b.daysRemaining <= 1
+                              ? "bg-orange-500"
+                              : "bg-blue-500"
+                          }`}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                      <span
+                        className={`text-[10px] font-medium whitespace-nowrap ${
+                          b.daysRemaining <= 1
+                            ? "text-orange-600"
+                            : "text-gray-400"
+                        }`}
+                      >
+                        {b.daysRemaining === 0
+                          ? "Vuelve hoy"
+                          : b.daysRemaining === 1
+                            ? "Vuelve mañana"
+                            : `${b.daysRemaining}d restantes`}
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })
+            ) : (
+              <div className="px-4 py-8 text-center text-gray-400">
+                <Route className="h-10 w-10 mx-auto mb-2" />
+                <p className="text-sm">Ningún camper en ruta</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 3. Entregas y recogidas (semana) */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900">
@@ -396,7 +513,7 @@ export default async function AdminDashboard() {
           </div>
         </div>
 
-        {/* 3. Pendientes de revisión + Daños */}
+        {/* 4. Pendientes de revisión + Daños */}
         <div className="md:col-span-2 xl:col-span-1 flex flex-col sm:flex-row xl:flex-col gap-4">
           {/* Pendientes de revisión */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1">

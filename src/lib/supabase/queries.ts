@@ -580,6 +580,21 @@ export async function getDashboardStats() {
   });
   upcomingActionsWeek.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 
+  // Alquileres en curso: pickup ya pasó y dropoff >= hoy
+  const activeRentals = nonCancelledBookings
+    .filter(b => b.pickup_date <= todayStr && b.dropoff_date >= todayStr && (b.status === 'confirmed' || b.status === 'in_progress'))
+    .sort((a, b) => a.dropoff_date.localeCompare(b.dropoff_date))
+    .map(b => {
+      const mapped = mapBookingOps(b);
+      const startMs = new Date(b.pickup_date + 'T00:00:00').getTime();
+      const endMs = new Date(b.dropoff_date + 'T00:00:00').getTime();
+      const todayMs = new Date(todayStr + 'T00:00:00').getTime();
+      const totalDays = Math.max(1, Math.round((endMs - startMs) / 86400000) + 1);
+      const currentDay = Math.min(totalDays, Math.round((todayMs - startMs) / 86400000) + 1);
+      const daysRemaining = Math.max(0, Math.round((endMs - todayMs) / 86400000));
+      return { ...mapped, currentDay, totalDays, daysRemaining };
+    });
+
   const pendingReview = nonCancelledBookings
     .filter(b => b.status === 'in_progress' && b.dropoff_date < todayStr)
     .sort((a, b) => a.dropoff_date.localeCompare(b.dropoff_date))
@@ -677,6 +692,7 @@ export async function getDashboardStats() {
     }).slice(0, 10),
     // Operaciones
     upcomingRentals,
+    activeRentals,
     upcomingActionsWeek,
     pendingReview,
     fleetStatus,
