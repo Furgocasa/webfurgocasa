@@ -54,125 +54,141 @@ export default async function AdminDashboard() {
     (stats.activeBlocks?.length || 0) > 0;
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Header + resumen flota */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-bold text-gray-900">
-            Dashboard Operaciones
-          </h1>
-          <p className="text-sm text-gray-600">
-            Alquileres, entregas, recogidas, revisiones y flota
-          </p>
+    <div className="flex flex-col gap-4 sm:gap-5">
+      {/* ── Header + estado de flota ── */}
+      <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div>
+            <h1 className="text-lg sm:text-xl font-bold text-gray-900">
+              Dashboard Operaciones
+            </h1>
+            <p className="text-xs sm:text-sm text-gray-500">
+              Alquileres, entregas, recogidas, revisiones y flota
+            </p>
+          </div>
         </div>
-        {/* Estado de flota en badges */}
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
-            <Car className="h-3.5 w-3.5 text-green-600" />
-            <span className="text-sm font-semibold text-green-700">
+        {/* Estado de flota */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 flex items-center gap-2">
+            <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
+            <span className="text-lg font-bold text-green-700 leading-none">
               {stats.fleetStatus?.available || 0}
             </span>
             <span className="text-xs text-green-600">libres</span>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
-            <Car className="h-3.5 w-3.5 text-blue-600" />
-            <span className="text-sm font-semibold text-blue-700">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2">
+            <Car className="h-4 w-4 text-blue-600 flex-shrink-0" />
+            <span className="text-lg font-bold text-blue-700 leading-none">
               {stats.fleetStatus?.rented || 0}
             </span>
             <span className="text-xs text-blue-600">alquilados</span>
           </div>
-          {(stats.fleetStatus?.maintenance || 0) > 0 && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
-              <Wrench className="h-3.5 w-3.5 text-orange-600" />
-              <span className="text-sm font-semibold text-orange-700">
-                {stats.fleetStatus.maintenance}
-              </span>
-              <span className="text-xs text-orange-600">mant.</span>
-            </div>
-          )}
-          {(stats.fleetStatus?.blocked || 0) > 0 && (
-            <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-1.5 flex items-center gap-1.5">
-              <Ban className="h-3.5 w-3.5 text-red-600" />
-              <span className="text-sm font-semibold text-red-700">
-                {stats.fleetStatus.blocked}
-              </span>
-              <span className="text-xs text-red-600">bloqueados</span>
-            </div>
-          )}
+          <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-orange-600 flex-shrink-0" />
+            <span className="text-lg font-bold text-orange-700 leading-none">
+              {stats.fleetStatus?.maintenance || 0}
+            </span>
+            <span className="text-xs text-orange-600">mant.</span>
+          </div>
+          <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2">
+            <Ban className="h-4 w-4 text-red-600 flex-shrink-0" />
+            <span className="text-lg font-bold text-red-700 leading-none">
+              {stats.fleetStatus?.blocked || 0}
+            </span>
+            <span className="text-xs text-red-600">bloqueados</span>
+          </div>
         </div>
       </div>
 
-      {/* Alertas: carnets caducados + bloqueos */}
+      {/* ── Alertas: carnets caducados + bloqueos ── */}
       {hasAlerts && (
         <div className="flex flex-col gap-2">
           {(stats.expiringLicenses || []).map((lic, idx) => (
             <div
               key={`lic-${idx}`}
-              className="bg-red-50 border-2 border-red-200 rounded-lg p-3 flex items-center gap-3"
+              className="bg-red-50 border-2 border-red-200 rounded-lg p-3 sm:p-4"
             >
-              <ShieldAlert className="h-5 w-5 text-red-600 flex-shrink-0" />
-              <div className="flex-1 text-sm">
-                <span className="font-semibold text-red-700">
-                  Carnet caducado:
-                </span>{" "}
-                {lic.customer} — caduca{" "}
-                {new Date(lic.licenseExpiry + "T12:00:00").toLocaleDateString(
-                  "es-ES",
-                  { day: "numeric", month: "short" }
-                )}
-                , pickup{" "}
-                {new Date(lic.pickupDate + "T12:00:00").toLocaleDateString(
-                  "es-ES",
-                  { day: "numeric", month: "short" }
-                )}{" "}
-                ({lic.vehicle}, {lic.bookingNumber})
-                {lic.customerPhone && (
-                  <a
-                    href={`tel:${lic.customerPhone}`}
-                    className="ml-2 text-red-600 underline"
-                  >
-                    {lic.customerPhone}
-                  </a>
-                )}
+              <div className="flex items-start gap-3">
+                <ShieldAlert className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-red-700 text-sm">
+                    Carnet caducado
+                  </p>
+                  <p className="text-sm text-red-800 mt-0.5">
+                    {lic.customer} — carnet caduca{" "}
+                    {new Date(
+                      lic.licenseExpiry + "T12:00:00"
+                    ).toLocaleDateString("es-ES", {
+                      day: "numeric",
+                      month: "short",
+                    })}
+                    , pickup{" "}
+                    {new Date(
+                      lic.pickupDate + "T12:00:00"
+                    ).toLocaleDateString("es-ES", {
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </p>
+                  <p className="text-xs text-red-600 mt-0.5">
+                    {lic.vehicle} · {lic.bookingNumber}
+                  </p>
+                  {lic.customerPhone && (
+                    <a
+                      href={`tel:${lic.customerPhone}`}
+                      className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1.5 bg-red-100 hover:bg-red-200 rounded-md text-sm font-medium text-red-700 transition-colors"
+                    >
+                      <Phone className="h-3.5 w-3.5" />
+                      {lic.customerPhone}
+                    </a>
+                  )}
+                </div>
               </div>
             </div>
           ))}
           {(stats.activeBlocks || []).map((bl, idx) => (
             <div
               key={`bl-${idx}`}
-              className="bg-amber-50 border border-amber-200 rounded-lg p-2 flex items-center gap-2 text-sm"
+              className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2"
             >
-              <Ban className="h-4 w-4 text-amber-600 flex-shrink-0" />
-              <span>
-                <span className="font-medium">{bl.vehicleName}</span>
+              <Ban className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm">
+                <span className="font-medium text-amber-800">
+                  {bl.vehicleName}
+                </span>
                 {bl.vehicleCode && (
-                  <span className="text-gray-500"> ({bl.vehicleCode})</span>
-                )}{" "}
-                — bloqueado: {bl.reason} (hasta{" "}
-                {new Date(bl.endDate + "T12:00:00").toLocaleDateString("es-ES", {
-                  day: "numeric",
-                  month: "short",
-                })}
-                )
-              </span>
+                  <span className="text-amber-600"> ({bl.vehicleCode})</span>
+                )}
+                <span className="text-amber-700">
+                  {" "}
+                  — {bl.reason} · hasta{" "}
+                  {new Date(bl.endDate + "T12:00:00").toLocaleDateString(
+                    "es-ES",
+                    { day: "numeric", month: "short" }
+                  )}
+                </span>
+              </div>
             </div>
           ))}
         </div>
       )}
 
-      {/* Tres columnas principales */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* ── Tres columnas principales ── */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {/* 1. Alquileres próximos 7 días */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="p-3 border-b border-gray-100 flex justify-between items-center">
+          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900">
-              Alquileres próximos 7 días ({stats.upcomingRentals?.length || 0})
+              Alquileres 7 días
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
+                ({stats.upcomingRentals?.length || 0})
+              </span>
             </h2>
             <Link
               href="/administrator/reservas"
               className="text-xs text-furgocasa-orange hover:underline font-medium"
             >
-              Ver reservas
+              Ver todas
             </Link>
           </div>
           <div className="divide-y divide-gray-100">
@@ -181,23 +197,23 @@ export default async function AdminDashboard() {
                 <Link
                   key={b.id}
                   href={`/administrator/reservas/${b.id}`}
-                  className="block p-3 hover:bg-gray-50 transition-colors"
+                  className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <p className="font-medium text-gray-900 text-sm">
+                    <p className="font-semibold text-gray-900 text-sm leading-tight">
                       {b.vehicle}
                       {b.vehicleCode && (
-                        <span className="text-gray-400 font-normal">
+                        <span className="text-gray-400 font-normal text-xs">
                           {" "}
-                          ({b.vehicleCode})
+                          {b.vehicleCode}
                         </span>
                       )}
                     </p>
-                    <span className="text-xs text-gray-400 whitespace-nowrap">
+                    <span className="text-[11px] text-gray-400 whitespace-nowrap font-mono">
                       {b.bookingNumber}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-600">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-600 mb-1">
                     <span>{b.customer}</span>
                     {b.customerPhone && (
                       <span className="flex items-center gap-0.5 text-blue-600">
@@ -206,7 +222,7 @@ export default async function AdminDashboard() {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500">
                     <span>
                       {formatDateLabel(b.pickupDate)} {b.pickupTime} →{" "}
                       {new Date(
@@ -217,36 +233,43 @@ export default async function AdminDashboard() {
                       })}{" "}
                       {b.dropoffTime}
                     </span>
-                    <span className="font-medium">{b.days}d</span>
+                    <span className="font-semibold text-gray-700">
+                      {b.days}d
+                    </span>
                   </div>
                   {(b.pickupLocation || b.dropoffLocation) && (
-                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-                      <MapPin className="h-3 w-3" />
-                      {b.pickupLocation}
-                      {b.pickupLocation !== b.dropoffLocation &&
-                        ` → ${b.dropoffLocation}`}
+                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                      <MapPin className="h-3 w-3 flex-shrink-0" />
+                      <span>
+                        {b.pickupLocation}
+                        {b.pickupLocation !== b.dropoffLocation &&
+                          ` → ${b.dropoffLocation}`}
+                      </span>
                     </div>
                   )}
-                  {b.extras.length > 0 && (
-                    <div className="flex items-center gap-1 text-xs text-blue-600 mt-0.5">
-                      <Package className="h-3 w-3" />
-                      {b.extras.join(", ")}
-                    </div>
-                  )}
-                  {b.paymentStatus && (
-                    <span
-                      className={`inline-block mt-1 px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                        paymentBadge[b.paymentStatus]?.cls ||
-                        "bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {paymentBadge[b.paymentStatus]?.label || b.paymentStatus}
-                    </span>
-                  )}
+                  <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                    {b.paymentStatus && (
+                      <span
+                        className={`px-2 py-0.5 rounded text-[11px] font-medium ${
+                          paymentBadge[b.paymentStatus]?.cls ||
+                          "bg-gray-100 text-gray-600"
+                        }`}
+                      >
+                        {paymentBadge[b.paymentStatus]?.label ||
+                          b.paymentStatus}
+                      </span>
+                    )}
+                    {b.extras.length > 0 && (
+                      <span className="flex items-center gap-1 text-[11px] text-blue-600">
+                        <Package className="h-3 w-3" />
+                        {b.extras.join(", ")}
+                      </span>
+                    )}
+                  </div>
                   {(b.notes || b.adminNotes) && (
-                    <div className="flex items-start gap-1 text-xs text-amber-700 mt-1">
+                    <div className="flex items-start gap-1 text-xs text-amber-700 mt-1.5 bg-amber-50 rounded px-2 py-1">
                       <FileText className="h-3 w-3 mt-0.5 flex-shrink-0" />
-                      <span className="line-clamp-1">
+                      <span className="line-clamp-2">
                         {b.adminNotes || b.notes}
                       </span>
                     </div>
@@ -254,11 +277,9 @@ export default async function AdminDashboard() {
                 </Link>
               ))
             ) : (
-              <div className="p-6 text-center text-gray-500">
-                <Calendar className="h-10 w-10 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">
-                  No hay alquileres en los próximos 7 días
-                </p>
+              <div className="px-4 py-8 text-center text-gray-400">
+                <Calendar className="h-10 w-10 mx-auto mb-2" />
+                <p className="text-sm">Sin alquileres próximos</p>
               </div>
             )}
           </div>
@@ -266,16 +287,18 @@ export default async function AdminDashboard() {
 
         {/* 2. Entregas y recogidas (semana) */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="p-3 border-b border-gray-100 flex justify-between items-center">
+          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900">
-              Entregas y recogidas (
-              {stats.upcomingActionsWeek?.length || 0})
+              Entregas / Recogidas
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
+                ({stats.upcomingActionsWeek?.length || 0})
+              </span>
             </h2>
             <Link
               href="/administrator/calendario"
               className="text-xs text-furgocasa-orange hover:underline font-medium"
             >
-              Ver calendario
+              Calendario
             </Link>
           </div>
           <div className="divide-y divide-gray-100">
@@ -291,45 +314,45 @@ export default async function AdminDashboard() {
                   <Link
                     key={`${action.id}-${action.type}`}
                     href={`/administrator/reservas/${action.id}`}
-                    className={`block p-3 hover:bg-gray-50 transition-colors ${
-                      isToday ? "bg-blue-50" : ""
+                    className={`block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors ${
+                      isToday ? "bg-blue-50/60" : ""
                     }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-start gap-2.5">
                       <div
-                        className={`p-1.5 rounded ${
+                        className={`p-1.5 rounded-lg mt-0.5 ${
                           isPickup
                             ? "bg-green-100 text-green-600"
                             : "bg-orange-100 text-orange-600"
                         }`}
                       >
                         {isPickup ? (
-                          <TrendingUp className="h-3.5 w-3.5" />
+                          <TrendingUp className="h-4 w-4" />
                         ) : (
-                          <TrendingUp className="h-3.5 w-3.5 rotate-180" />
+                          <TrendingUp className="h-4 w-4 rotate-180" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-1">
-                          <p className="font-medium text-gray-900 text-sm truncate">
+                        <div className="flex items-start justify-between gap-1 mb-0.5">
+                          <p className="font-semibold text-gray-900 text-sm leading-tight">
                             {isPickup ? "Entrega" : "Recogida"}:{" "}
                             {action.vehicle}
                           </p>
-                          <span className="text-[10px] text-gray-400 whitespace-nowrap">
+                          <span className="text-[10px] text-gray-400 whitespace-nowrap font-mono">
                             {action.bookingNumber}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-600">
-                          <span className="truncate">{action.customer}</span>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-600">
+                          <span>{action.customer}</span>
                           {action.customerPhone && (
-                            <span className="flex items-center gap-0.5 text-blue-600 whitespace-nowrap">
+                            <span className="flex items-center gap-0.5 text-blue-600">
                               <Phone className="h-3 w-3" />
                               {action.customerPhone}
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-0.5">
-                          <span>
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500 mt-0.5">
+                          <span className="font-medium">
                             {formatDateLabel(action.date)} {action.time}
                           </span>
                           {locationName && (
@@ -339,53 +362,56 @@ export default async function AdminDashboard() {
                             </span>
                           )}
                         </div>
-                        {action.extras.length > 0 && (
-                          <div className="flex items-center gap-1 text-xs text-blue-600 mt-0.5">
-                            <Package className="h-3 w-3" />
-                            {action.extras.join(", ")}
-                          </div>
-                        )}
-                        {action.paymentStatus && (
-                          <span
-                            className={`inline-block mt-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium ${
-                              paymentBadge[action.paymentStatus]?.cls ||
-                              "bg-gray-100 text-gray-600"
-                            }`}
-                          >
-                            {paymentBadge[action.paymentStatus]?.label ||
-                              action.paymentStatus}
-                          </span>
-                        )}
+                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                          {action.paymentStatus && (
+                            <span
+                              className={`px-2 py-0.5 rounded text-[11px] font-medium ${
+                                paymentBadge[action.paymentStatus]?.cls ||
+                                "bg-gray-100 text-gray-600"
+                              }`}
+                            >
+                              {paymentBadge[action.paymentStatus]?.label ||
+                                action.paymentStatus}
+                            </span>
+                          )}
+                          {action.extras.length > 0 && (
+                            <span className="flex items-center gap-1 text-[11px] text-blue-600">
+                              <Package className="h-3 w-3" />
+                              {action.extras.join(", ")}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                      <ChevronRight className="h-4 w-4 text-gray-300 flex-shrink-0 mt-1" />
                     </div>
                   </Link>
                 );
               })
             ) : (
-              <div className="p-6 text-center text-gray-500">
-                <Package className="h-10 w-10 mx-auto mb-2 text-gray-300" />
-                <p className="text-sm">
-                  No hay entregas ni recogidas esta semana
-                </p>
+              <div className="px-4 py-8 text-center text-gray-400">
+                <Package className="h-10 w-10 mx-auto mb-2" />
+                <p className="text-sm">Sin entregas ni recogidas</p>
               </div>
             )}
           </div>
         </div>
 
-        {/* 3. Pendientes de revisión + Daños pendientes */}
-        <div className="flex flex-col gap-4">
+        {/* 3. Pendientes de revisión + Daños */}
+        <div className="md:col-span-2 xl:col-span-1 flex flex-col sm:flex-row xl:flex-col gap-4">
           {/* Pendientes de revisión */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="p-3 border-b border-gray-100 flex justify-between items-center">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1">
+            <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-sm font-semibold text-gray-900">
-                Pendientes de revisión ({stats.pendingReview?.length || 0})
+                Pendientes revisión
+                <span className="ml-1.5 text-xs font-normal text-gray-400">
+                  ({stats.pendingReview?.length || 0})
+                </span>
               </h2>
               <Link
                 href="/administrator/reservas"
                 className="text-xs text-furgocasa-orange hover:underline font-medium"
               >
-                Ver reservas
+                Reservas
               </Link>
             </div>
             <div className="divide-y divide-gray-100">
@@ -394,30 +420,32 @@ export default async function AdminDashboard() {
                   <Link
                     key={b.id}
                     href={`/administrator/reservas/${b.id}`}
-                    className="block p-3 hover:bg-gray-50 transition-colors"
+                    className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="font-medium text-gray-900 text-sm">
+                      <p className="font-semibold text-gray-900 text-sm leading-tight">
                         {b.vehicle}
                         {b.vehicleCode && (
-                          <span className="text-gray-400 font-normal">
+                          <span className="text-gray-400 font-normal text-xs">
                             {" "}
-                            ({b.vehicleCode})
+                            {b.vehicleCode}
                           </span>
                         )}
                       </p>
                       <span
-                        className={`text-xs font-semibold whitespace-nowrap ${
+                        className={`text-xs font-bold whitespace-nowrap px-2 py-0.5 rounded ${
                           b.daysSinceReturn > 2
-                            ? "text-red-600"
-                            : "text-amber-600"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-amber-100 text-amber-700"
                         }`}
                       >
-                        {b.daysSinceReturn}d retraso
+                        {b.daysSinceReturn}d
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">{b.customer}</p>
-                    <div className="flex items-center gap-3 text-xs mt-0.5">
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {b.customer}
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs mt-1">
                       <span className="text-gray-500">
                         Devuelto{" "}
                         {new Date(
@@ -428,10 +456,9 @@ export default async function AdminDashboard() {
                         })}
                       </span>
                       {b.vehicleDamages > 0 && (
-                        <span className="text-orange-600 flex items-center gap-0.5">
+                        <span className="text-orange-600 flex items-center gap-0.5 font-medium">
                           <AlertTriangle className="h-3 w-3" />
                           {b.vehicleDamages} daño
-                          {b.vehicleDamages > 1 ? "s" : ""} previo
                           {b.vehicleDamages > 1 ? "s" : ""}
                         </span>
                       )}
@@ -439,11 +466,9 @@ export default async function AdminDashboard() {
                   </Link>
                 ))
               ) : (
-                <div className="p-6 text-center text-gray-500">
-                  <ClipboardCheck className="h-10 w-10 mx-auto mb-2 text-gray-300" />
-                  <p className="text-sm">
-                    Ningún camper pendiente de revisión
-                  </p>
+                <div className="px-4 py-8 text-center text-gray-400">
+                  <ClipboardCheck className="h-10 w-10 mx-auto mb-2" />
+                  <p className="text-sm">Todo revisado</p>
                 </div>
               )}
             </div>
@@ -451,8 +476,8 @@ export default async function AdminDashboard() {
 
           {/* Daños pendientes por vehículo */}
           {(stats.damagesByVehicleList?.length || 0) > 0 && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="p-3 border-b border-gray-100 flex justify-between items-center">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1">
+              <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
                 <h2 className="text-sm font-semibold text-gray-900">
                   Daños pendientes
                 </h2>
@@ -465,20 +490,22 @@ export default async function AdminDashboard() {
               </div>
               <div className="divide-y divide-gray-100">
                 {stats.damagesByVehicleList.map((v) => (
-                  <div key={v.name} className="p-3">
-                    <p className="font-medium text-sm text-gray-900">
-                      {v.name}
-                      {v.code && (
-                        <span className="text-gray-400 font-normal">
-                          {" "}
-                          ({v.code})
-                        </span>
-                      )}
-                      <span className="ml-2 text-xs text-gray-500">
-                        {v.damages.length} daño{v.damages.length > 1 ? "s" : ""}
+                  <div key={v.name} className="px-4 py-3">
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="font-semibold text-sm text-gray-900 leading-tight">
+                        {v.name}
+                        {v.code && (
+                          <span className="text-gray-400 font-normal text-xs">
+                            {" "}
+                            {v.code}
+                          </span>
+                        )}
+                      </p>
+                      <span className="text-xs text-gray-400">
+                        {v.damages.length}
                       </span>
-                    </p>
-                    <div className="mt-1 space-y-0.5">
+                    </div>
+                    <div className="space-y-0.5">
                       {v.damages.map((d, i) => (
                         <p
                           key={i}
@@ -488,7 +515,11 @@ export default async function AdminDashboard() {
                         >
                           • {d.description || d.severity}{" "}
                           <span className="text-gray-400">
-                            ({d.status === "pending" ? "pendiente" : "en reparación"})
+                            (
+                            {d.status === "pending"
+                              ? "pendiente"
+                              : "en reparación"}
+                            )
                           </span>
                         </p>
                       ))}
@@ -501,32 +532,32 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex flex-wrap items-center gap-2">
+      {/* ── Quick Actions ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <Link
           href="/administrator/reservas/nueva"
-          className="flex items-center gap-2 px-4 py-2 bg-furgocasa-orange/10 hover:bg-furgocasa-orange/20 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-furgocasa-orange/10 hover:bg-furgocasa-orange/20 active:bg-furgocasa-orange/30 rounded-lg transition-colors text-sm font-medium"
         >
           <Calendar className="h-4 w-4 text-furgocasa-orange" />
           Nueva reserva
         </Link>
         <Link
           href="/administrator/calendario"
-          className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-lg transition-colors text-sm font-medium"
         >
           <Calendar className="h-4 w-4 text-blue-600" />
           Calendario
         </Link>
         <Link
           href="/administrator/vehiculos"
-          className="flex items-center gap-2 px-4 py-2 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-purple-50 hover:bg-purple-100 active:bg-purple-200 rounded-lg transition-colors text-sm font-medium"
         >
           <Car className="h-4 w-4 text-purple-600" />
           Vehículos
         </Link>
         <Link
           href="/administrator/danos"
-          className="flex items-center gap-2 px-4 py-2 bg-amber-50 hover:bg-amber-100 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 rounded-lg transition-colors text-sm font-medium"
         >
           <ClipboardCheck className="h-4 w-4 text-amber-600" />
           Daños
