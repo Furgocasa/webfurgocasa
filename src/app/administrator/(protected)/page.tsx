@@ -51,9 +51,8 @@ const severityColor: Record<string, string> = {
 export default async function AdminDashboard() {
   const stats = await getDashboardStats();
 
-  const hasAlerts =
-    (stats.expiringLicenses?.length || 0) > 0 ||
-    (stats.activeBlocks?.length || 0) > 0;
+  const hasCarnetAlerts = (stats.expiringLicenses?.length || 0) > 0;
+  const hasBlocks = (stats.activeBlocks?.length || 0) > 0;
 
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
@@ -102,8 +101,8 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* ── Alertas: carnets caducados + bloqueos ── */}
-      {hasAlerts && (
+      {/* ── Alertas: carnets caducados ── */}
+      {hasCarnetAlerts && (
         <div className="flex flex-col gap-2">
           {(stats.expiringLicenses || []).map((lic, idx) => (
             <ReservationCardActions
@@ -146,30 +145,6 @@ export default async function AdminDashboard() {
                 </div>
               </div>
             </ReservationCardActions>
-          ))}
-          {(stats.activeBlocks || []).map((bl, idx) => (
-            <div
-              key={`bl-${idx}`}
-              className="bg-amber-50 border border-amber-200 rounded-lg p-3 flex items-start gap-2"
-            >
-              <Ban className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-              <div className="text-sm">
-                <span className="font-medium text-amber-800">
-                  {bl.vehicleName}
-                </span>
-                {bl.vehicleCode && (
-                  <span className="text-amber-600"> ({bl.vehicleCode})</span>
-                )}
-                <span className="text-amber-700">
-                  {" "}
-                  — {bl.reason} · hasta{" "}
-                  {new Date(bl.endDate + "T12:00:00").toLocaleDateString(
-                    "es-ES",
-                    { day: "numeric", month: "short" }
-                  )}
-                </span>
-              </div>
-            </div>
           ))}
         </div>
       )}
@@ -660,6 +635,54 @@ export default async function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* ── Bloqueos activos (debajo de las columnas) ── */}
+      {hasBlocks && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900">
+              Bloqueos activos
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
+                ({stats.activeBlocks?.length || 0})
+              </span>
+            </h2>
+            <Link
+              href="/administrator/bloqueos"
+              className="text-xs text-furgocasa-orange hover:underline font-medium"
+            >
+              Ver bloqueos
+            </Link>
+          </div>
+          <div className="p-4">
+            <div className="flex flex-wrap gap-2">
+              {(stats.activeBlocks || []).map((bl, idx) => (
+                <div
+                  key={`bl-${idx}`}
+                  className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2"
+                >
+                  <Ban className="h-4 w-4 text-amber-600 flex-shrink-0" />
+                  <span className="text-sm">
+                    <span className="font-bold text-furgocasa-orange">
+                      {bl.vehicleCode}
+                    </span>{" "}
+                    <span className="font-medium text-amber-800">
+                      {bl.vehicleName}
+                    </span>
+                    <span className="text-amber-700">
+                      {" "}
+                      — {bl.reason} · hasta{" "}
+                      {new Date(bl.endDate + "T12:00:00").toLocaleDateString(
+                        "es-ES",
+                        { day: "numeric", month: "short" }
+                      )}
+                    </span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ── Quick Actions ── */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
