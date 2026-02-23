@@ -201,14 +201,15 @@ export default async function AdminDashboard() {
                   className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                 >
                   <div className="flex items-start justify-between gap-2 mb-1">
-                    <p className="font-semibold text-gray-900 text-sm leading-tight">
-                      {b.vehicle}
+                    <p className="text-sm leading-tight">
                       {b.vehicleCode && (
-                        <span className="text-gray-400 font-normal text-xs">
-                          {" "}
+                        <span className="font-bold text-furgocasa-orange">
                           {b.vehicleCode}
                         </span>
-                      )}
+                      )}{" "}
+                      <span className="font-medium text-gray-700">
+                        {b.vehicle}
+                      </span>
                     </p>
                     <span className="text-[11px] text-gray-400 whitespace-nowrap font-mono">
                       {b.bookingNumber}
@@ -315,14 +316,15 @@ export default async function AdminDashboard() {
                     className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <p className="font-semibold text-gray-900 text-sm leading-tight">
-                        {b.vehicle}
+                      <p className="text-sm leading-tight">
                         {b.vehicleCode && (
-                          <span className="text-gray-400 font-normal text-xs">
-                            {" "}
+                          <span className="font-bold text-furgocasa-orange">
                             {b.vehicleCode}
                           </span>
-                        )}
+                        )}{" "}
+                        <span className="font-medium text-gray-700">
+                          {b.vehicle}
+                        </span>
                       </p>
                       <span className="text-xs font-bold text-blue-600 whitespace-nowrap">
                         Día {b.currentDay}/{b.totalDays}
@@ -451,9 +453,18 @@ export default async function AdminDashboard() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-1 mb-0.5">
-                          <p className="font-semibold text-gray-900 text-sm leading-tight">
-                            {isPickup ? "Entrega" : "Recogida"}:{" "}
-                            {action.vehicle}
+                          <p className="text-sm leading-tight">
+                            <span className={`font-bold ${isPickup ? "text-green-700" : "text-orange-700"}`}>
+                              {isPickup ? "▲" : "▼"}
+                            </span>{" "}
+                            {action.vehicleCode && (
+                              <span className="font-bold text-furgocasa-orange">
+                                {action.vehicleCode}
+                              </span>
+                            )}{" "}
+                            <span className="font-medium text-gray-700">
+                              {action.vehicle}
+                            </span>
                           </p>
                           <span className="text-[10px] text-gray-400 whitespace-nowrap font-mono">
                             {action.bookingNumber}
@@ -540,14 +551,15 @@ export default async function AdminDashboard() {
                     className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <p className="font-semibold text-gray-900 text-sm leading-tight">
-                        {b.vehicle}
+                      <p className="text-sm leading-tight">
                         {b.vehicleCode && (
-                          <span className="text-gray-400 font-normal text-xs">
-                            {" "}
+                          <span className="font-bold text-furgocasa-orange">
                             {b.vehicleCode}
                           </span>
-                        )}
+                        )}{" "}
+                        <span className="font-medium text-gray-700">
+                          {b.vehicle}
+                        </span>
                       </p>
                       <span
                         className={`text-xs font-bold whitespace-nowrap px-2 py-0.5 rounded ${
@@ -609,14 +621,15 @@ export default async function AdminDashboard() {
                 {stats.damagesByVehicleList.map((v) => (
                   <div key={v.name} className="px-4 py-3">
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <p className="font-semibold text-sm text-gray-900 leading-tight">
-                        {v.name}
+                      <p className="text-sm leading-tight">
                         {v.code && (
-                          <span className="text-gray-400 font-normal text-xs">
-                            {" "}
+                          <span className="font-bold text-furgocasa-orange">
                             {v.code}
                           </span>
-                        )}
+                        )}{" "}
+                        <span className="font-medium text-gray-700">
+                          {v.name}
+                        </span>
                       </p>
                       <span className="text-xs text-gray-400">
                         {v.damages.length}
