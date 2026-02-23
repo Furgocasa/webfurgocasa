@@ -176,11 +176,11 @@ export default async function AdminDashboard() {
 
       {/* ── Columnas principales ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {/* 1. Alquileres próximos 7 días */}
+        {/* 1. Entregas próximos 7 días */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900">
-              Alquileres 7 días
+              Entregas 7 días
               <span className="ml-1.5 text-xs font-normal text-gray-400">
                 ({stats.upcomingRentals?.length || 0})
               </span>
@@ -280,7 +280,7 @@ export default async function AdminDashboard() {
             ) : (
               <div className="px-4 py-8 text-center text-gray-400">
                 <Calendar className="h-10 w-10 mx-auto mb-2" />
-                <p className="text-sm">Sin alquileres próximos</p>
+                <p className="text-sm">Sin entregas próximas</p>
               </div>
             )}
           </div>
