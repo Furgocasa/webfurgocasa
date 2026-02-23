@@ -342,7 +342,7 @@ export async function getDashboardStats() {
       total_price, amount_paid, pickup_date, dropoff_date,
       pickup_time, dropoff_time, pickup_location_id, dropoff_location_id,
       days, notes, admin_notes, created_at, vehicle_id,
-      customer_id, customer_name, customer_phone,
+      customer_id, customer_name,
       vehicle:vehicles(name, internal_code),
       customer:customers(name, total_bookings, phone, driver_license_expiry),
       booking_extras(quantity, extra:extras(name))
@@ -549,7 +549,7 @@ export async function getDashboardStats() {
     vehicle: (b.vehicle as BookingVeh)?.name || 'Vehículo',
     vehicleCode: (b.vehicle as BookingVeh)?.internal_code || '',
     customer: b.customer_name || 'Cliente',
-    customerPhone: b.customer_phone || (b.customer as BookingCustomer)?.phone || '',
+    customerPhone: (b.customer as BookingCustomer)?.phone || '',
     pickupLocation: locMap.get(b.pickup_location_id)?.name || '',
     dropoffLocation: locMap.get(b.dropoff_location_id)?.name || '',
     extras: ((b.booking_extras || []) as BookingExtra[])
@@ -633,7 +633,7 @@ export async function getDashboardStats() {
     .map(b => ({
       bookingNumber: b.booking_number || '',
       customer: b.customer_name || 'Cliente',
-      customerPhone: b.customer_phone || (b.customer as BookingCustomer)?.phone || '',
+      customerPhone: (b.customer as BookingCustomer)?.phone || '',
       licenseExpiry: (b.customer as BookingCustomer)?.driver_license_expiry || '',
       pickupDate: b.pickup_date,
       vehicle: (b.vehicle as BookingVeh)?.name || 'Vehículo',
