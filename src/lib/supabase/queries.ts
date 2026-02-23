@@ -334,11 +334,12 @@ export async function getDashboardStats() {
     .from('vehicles')
     .select('id, name, status, is_for_rent, base_price_per_day, next_itv_date');
   
-  // 2. RESERVAS (completas con relaciones)
+  // 2. RESERVAS (completas con relaciones para operaciones)
   const { data: bookingsData } = await supabaseServer
     .from('bookings')
     .select(`
       id, 
+      booking_number,
       status, 
       payment_status,
       total_price, 
@@ -347,12 +348,21 @@ export async function getDashboardStats() {
       dropoff_date,
       pickup_time,
       dropoff_time,
+      pickup_location_id,
+      dropoff_location_id,
+      days,
+      notes,
+      admin_notes,
       created_at, 
       vehicle_id,
       customer_id,
       customer_name,
-      vehicle:vehicles(name),
-      customer:customers(name, total_bookings)
+      customer_phone,
+      vehicle:vehicles(name, internal_code),
+      customer:customers(name, total_bookings, phone, driver_license_expiry),
+      pickup_location:locations!bookings_pickup_location_id_fkey(name, city),
+      dropoff_location:locations!bookings_dropoff_location_id_fkey(name, city),
+      booking_extras(quantity, extra:extras(name))
     `);
   
   // 3. PAGOS
@@ -360,11 +370,18 @@ export async function getDashboardStats() {
     .from('payments')
     .select('id, amount, status, created_at, booking_id');
   
-  // 4. DAÑOS PENDIENTES
+  // 4. DAÑOS PENDIENTES (con detalle de vehículo)
   const { data: damagesData } = await supabaseServer
     .from('vehicle_damages')
-    .select('id, vehicle_id, severity, repair_cost, status')
+    .select('id, vehicle_id, severity, repair_cost, status, description, vehicle:vehicles(name, internal_code)')
     .neq('status', 'repaired');
+
+  // 5. BLOQUEOS ACTIVOS
+  const { data: blockedDatesData } = await supabaseServer
+    .from('blocked_dates')
+    .select('id, vehicle_id, start_date, end_date, reason, vehicle:vehicles(name, internal_code)')
+    .gte('end_date', todayStr)
+    .lte('start_date', todayStr);
   
   // ===== CÁLCULOS =====
   
@@ -519,44 +536,116 @@ export async function getDashboardStats() {
     bookingId: b.id
   })) || [];
 
-  // Datos para dashboard de Operaciones
+  // ===== DATOS PARA DASHBOARD DE OPERACIONES =====
   const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-  const upcomingRentals = bookingsData?.filter(b => 
-    b.pickup_date >= todayStr && b.pickup_date <= weekEnd && b.status !== 'cancelled'
-  ) || [];
-  const upcomingActionsWeek: Array<{ id: string; type: 'pickup' | 'dropoff'; date: string; time: string; customer: string; vehicle: string; bookingId: string }> = [];
-  bookingsData?.forEach(b => {
-    if (b.status === 'cancelled') return;
+
+  type BookingLoc = { name?: string; city?: string } | null;
+  type BookingVeh = { name?: string; internal_code?: string } | null;
+  type BookingExtra = { quantity: number; extra: { name: string } | null } | null;
+  type BookingCustomer = { name?: string; total_bookings?: number; phone?: string; driver_license_expiry?: string } | null;
+
+  const mapBookingOps = (b: (typeof bookingsData)[0]) => ({
+    id: b.id,
+    bookingNumber: b.booking_number || '',
+    status: b.status,
+    paymentStatus: b.payment_status,
+    pickupDate: b.pickup_date,
+    pickupTime: b.pickup_time || '09:00',
+    dropoffDate: b.dropoff_date,
+    dropoffTime: b.dropoff_time || '09:00',
+    days: b.days || 0,
+    vehicle: (b.vehicle as BookingVeh)?.name || 'Vehículo',
+    vehicleCode: (b.vehicle as BookingVeh)?.internal_code || '',
+    customer: b.customer_name || 'Cliente',
+    customerPhone: b.customer_phone || (b.customer as BookingCustomer)?.phone || '',
+    pickupLocation: (b.pickup_location as BookingLoc)?.name || '',
+    dropoffLocation: (b.dropoff_location as BookingLoc)?.name || '',
+    extras: ((b.booking_extras || []) as BookingExtra[])
+      .filter((e): e is NonNullable<BookingExtra> => !!e?.extra?.name)
+      .map(e => `${e.extra!.name}${e.quantity > 1 ? ` x${e.quantity}` : ''}`),
+    notes: b.notes || '',
+    adminNotes: b.admin_notes || '',
+    driverLicenseExpiry: (b.customer as BookingCustomer)?.driver_license_expiry || '',
+  });
+
+  const nonCancelledBookings = bookingsData?.filter(b => b.status !== 'cancelled') || [];
+
+  const upcomingRentals = nonCancelledBookings
+    .filter(b => b.pickup_date >= todayStr && b.pickup_date <= weekEnd)
+    .sort((a, b) => a.pickup_date.localeCompare(b.pickup_date) || a.pickup_time.localeCompare(b.pickup_time))
+    .map(mapBookingOps);
+
+  type ActionWeek = ReturnType<typeof mapBookingOps> & { type: 'pickup' | 'dropoff'; date: string; time: string };
+  const upcomingActionsWeek: ActionWeek[] = [];
+  nonCancelledBookings.forEach(b => {
+    const mapped = mapBookingOps(b);
     if (b.pickup_date >= todayStr && b.pickup_date <= weekEnd) {
-      upcomingActionsWeek.push({
-        id: `${b.id}-pickup`,
-        type: 'pickup',
-        date: b.pickup_date,
-        time: b.pickup_time || '09:00',
-        customer: b.customer_name || 'Cliente',
-        vehicle: b.vehicle?.name || 'Vehículo',
-        bookingId: b.id
-      });
+      upcomingActionsWeek.push({ ...mapped, type: 'pickup', date: b.pickup_date, time: b.pickup_time || '09:00' });
     }
     if (b.dropoff_date >= todayStr && b.dropoff_date <= weekEnd) {
-      upcomingActionsWeek.push({
-        id: `${b.id}-dropoff`,
-        type: 'dropoff',
-        date: b.dropoff_date,
-        time: b.dropoff_time || '09:00',
-        customer: b.customer_name || 'Cliente',
-        vehicle: b.vehicle?.name || 'Vehículo',
-        bookingId: b.id
-      });
+      upcomingActionsWeek.push({ ...mapped, type: 'dropoff', date: b.dropoff_date, time: b.dropoff_time || '09:00' });
     }
   });
-  upcomingActionsWeek.sort((a, b) => {
-    if (a.date !== b.date) return a.date.localeCompare(b.date);
-    return a.time.localeCompare(b.time);
+  upcomingActionsWeek.sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
+
+  const pendingReview = nonCancelledBookings
+    .filter(b => b.status === 'in_progress' && b.dropoff_date < todayStr)
+    .sort((a, b) => a.dropoff_date.localeCompare(b.dropoff_date))
+    .map(b => {
+      const mapped = mapBookingOps(b);
+      const daysSinceReturn = Math.ceil((today.getTime() - new Date(b.dropoff_date).getTime()) / (1000 * 60 * 60 * 24));
+      const vehicleDamages = damagesData?.filter(d => d.vehicle_id === b.vehicle_id).length || 0;
+      return { ...mapped, daysSinceReturn, vehicleDamages };
+    });
+
+  // Estado de flota
+  const blockedVehicleIds = new Set((blockedDatesData || []).map(bd => bd.vehicle_id));
+  const fleetStatus = {
+    available: (vehiclesData || []).filter(v => v.is_for_rent && v.status === 'available' && !occupiedVehicleIds.has(v.id) && !blockedVehicleIds.has(v.id)).length,
+    rented: occupiedVehicleIds.size,
+    maintenance: vehiclesInMaintenance,
+    blocked: blockedVehicleIds.size,
+  };
+  const activeBlocks = (blockedDatesData || []).map(bd => ({
+    vehicleName: (bd.vehicle as BookingVeh)?.name || 'Vehículo',
+    vehicleCode: (bd.vehicle as BookingVeh)?.internal_code || '',
+    reason: bd.reason || 'Sin motivo',
+    endDate: bd.end_date,
+  }));
+
+  // Daños pendientes agrupados por vehículo
+  type DamageRow = { id: string; vehicle_id: string; severity: string; repair_cost: number | null; status: string; description: string; vehicle: BookingVeh };
+  const damagesByVehicle = new Map<string, { name: string; code: string; damages: { severity: string; status: string; description: string }[] }>();
+  (damagesData as DamageRow[] || []).forEach(d => {
+    const key = d.vehicle_id;
+    if (!damagesByVehicle.has(key)) {
+      damagesByVehicle.set(key, {
+        name: d.vehicle?.name || 'Vehículo',
+        code: d.vehicle?.internal_code || '',
+        damages: [],
+      });
+    }
+    damagesByVehicle.get(key)!.damages.push({ severity: d.severity, status: d.status, description: d.description });
   });
-  const pendingReview = bookingsData?.filter(b => 
-    b.status === 'in_progress' && b.dropoff_date < todayStr
-  ) || [];
+  const damagesByVehicleList = Array.from(damagesByVehicle.values()).sort((a, b) => b.damages.length - a.damages.length);
+
+  // Carnets próximos a caducar (reservas confirmadas/in_progress con pickup futuro)
+  const expiringLicenses = nonCancelledBookings
+    .filter(b => {
+      if (b.status !== 'confirmed' && b.status !== 'in_progress') return false;
+      if (b.pickup_date < todayStr) return false;
+      const expiry = (b.customer as BookingCustomer)?.driver_license_expiry;
+      if (!expiry) return false;
+      return expiry <= b.pickup_date;
+    })
+    .map(b => ({
+      bookingNumber: b.booking_number || '',
+      customer: b.customer_name || 'Cliente',
+      customerPhone: b.customer_phone || (b.customer as BookingCustomer)?.phone || '',
+      licenseExpiry: (b.customer as BookingCustomer)?.driver_license_expiry || '',
+      pickupDate: b.pickup_date,
+      vehicle: (b.vehicle as BookingVeh)?.name || 'Vehículo',
+    }));
   
   return {
     // Básicas
@@ -598,6 +687,10 @@ export async function getDashboardStats() {
     upcomingRentals,
     upcomingActionsWeek,
     pendingReview,
+    fleetStatus,
+    activeBlocks,
+    damagesByVehicleList,
+    expiringLicenses,
   };
 }
 
