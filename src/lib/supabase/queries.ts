@@ -646,6 +646,7 @@ export async function getDashboardStats() {
       return expiry <= b.pickup_date;
     })
     .map(b => ({
+      id: b.id,
       bookingNumber: b.booking_number || '',
       customer: b.customer_name || 'Cliente',
       customerPhone: (b.customer as BookingCustomer)?.phone || '',

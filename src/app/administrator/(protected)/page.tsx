@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { getDashboardStats } from "@/lib/supabase/queries";
+import { ReservationCardActions } from "@/components/admin/reservation-card-actions";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -105,11 +106,13 @@ export default async function AdminDashboard() {
       {hasAlerts && (
         <div className="flex flex-col gap-2">
           {(stats.expiringLicenses || []).map((lic, idx) => (
-            <div
+            <ReservationCardActions
               key={`lic-${idx}`}
-              className="bg-red-50 border-2 border-red-200 rounded-lg p-3 sm:p-4"
+              reservationId={lic.id}
+              phone={lic.customerPhone}
+              className="!p-0 !block"
             >
-              <div className="flex items-start gap-3">
+              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-3 sm:p-4 flex items-start gap-3">
                 <ShieldAlert className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-red-700 text-sm">
@@ -135,17 +138,14 @@ export default async function AdminDashboard() {
                     {lic.vehicle} · {lic.bookingNumber}
                   </p>
                   {lic.customerPhone && (
-                    <a
-                      href={`tel:${lic.customerPhone}`}
-                      className="inline-flex items-center gap-1.5 mt-1.5 px-3 py-1.5 bg-red-100 hover:bg-red-200 rounded-md text-sm font-medium text-red-700 transition-colors"
-                    >
+                    <p className="mt-1.5 text-sm font-medium text-red-700 flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5" />
                       {lic.customerPhone}
-                    </a>
+                    </p>
                   )}
                 </div>
               </div>
-            </div>
+            </ReservationCardActions>
           ))}
           {(stats.activeBlocks || []).map((bl, idx) => (
             <div
@@ -195,10 +195,10 @@ export default async function AdminDashboard() {
           <div className="divide-y divide-gray-100">
             {(stats.upcomingRentals || []).length > 0 ? (
               stats.upcomingRentals.map((b) => (
-                <Link
+                <ReservationCardActions
                   key={b.id}
-                  href={`/administrator/reservas/${b.id}`}
-                  className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                  reservationId={b.id}
+                  phone={b.customerPhone}
                 >
                   <div className="flex items-start justify-between gap-2 mb-1">
                     <p className="text-sm leading-tight">
@@ -276,7 +276,7 @@ export default async function AdminDashboard() {
                       </span>
                     </div>
                   )}
-                </Link>
+                </ReservationCardActions>
               ))
             ) : (
               <div className="px-4 py-8 text-center text-gray-400">
@@ -310,10 +310,10 @@ export default async function AdminDashboard() {
                   (b.currentDay / b.totalDays) * 100
                 );
                 return (
-                  <Link
+                  <ReservationCardActions
                     key={b.id}
-                    href={`/administrator/reservas/${b.id}`}
-                    className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                    reservationId={b.id}
+                    phone={b.customerPhone}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <p className="text-sm leading-tight">
@@ -333,8 +333,8 @@ export default async function AdminDashboard() {
                     <p className="text-xs text-gray-600 mb-1">
                       {b.customer}
                       {b.customerPhone && (
-                        <span className="ml-2 text-blue-600">
-                          <Phone className="h-3 w-3 inline" />{" "}
+                        <span className="ml-2 flex items-center gap-0.5 text-blue-600">
+                          <Phone className="h-3 w-3" />
                           {b.customerPhone}
                         </span>
                       )}
@@ -392,7 +392,7 @@ export default async function AdminDashboard() {
                             : `${b.daysRemaining}d restantes`}
                       </span>
                     </div>
-                  </Link>
+                  </ReservationCardActions>
                 );
               })
             ) : (
@@ -430,12 +430,11 @@ export default async function AdminDashboard() {
                   ? action.pickupLocation
                   : action.dropoffLocation;
                 return (
-                  <Link
+                  <ReservationCardActions
                     key={`${action.id}-${action.type}`}
-                    href={`/administrator/reservas/${action.id}`}
-                    className={`block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors ${
-                      isToday ? "bg-blue-50/60" : ""
-                    }`}
+                    reservationId={action.id}
+                    phone={action.customerPhone}
+                    highlight={isToday}
                   >
                     <div className="flex items-start gap-2.5">
                       <div
@@ -512,7 +511,7 @@ export default async function AdminDashboard() {
                       </div>
                       <ChevronRight className="h-4 w-4 text-gray-300 flex-shrink-0 mt-1" />
                     </div>
-                  </Link>
+                  </ReservationCardActions>
                 );
               })
             ) : (
@@ -545,10 +544,10 @@ export default async function AdminDashboard() {
             <div className="divide-y divide-gray-100">
               {(stats.pendingReview || []).length > 0 ? (
                 stats.pendingReview.map((b) => (
-                  <Link
+                  <ReservationCardActions
                     key={b.id}
-                    href={`/administrator/reservas/${b.id}`}
-                    className="block px-4 py-3 hover:bg-gray-50 active:bg-gray-100 transition-colors"
+                    reservationId={b.id}
+                    phone={b.customerPhone}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm leading-tight">
@@ -592,7 +591,7 @@ export default async function AdminDashboard() {
                         </span>
                       )}
                     </div>
-                  </Link>
+                  </ReservationCardActions>
                 ))
               ) : (
                 <div className="px-4 py-8 text-center text-gray-400">
