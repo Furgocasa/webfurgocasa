@@ -8,7 +8,7 @@
 -- ============================================
 INSERT INTO settings (key, value, description) VALUES
     ('company', '{"name": "Furgocasa", "email": "info@furgocasa.com", "phone": "+34 678 081 261", "address": "Murcia, España"}', 'Datos de la empresa'),
-    ('booking', '{"min_days": 2, "max_days": 30, "advance_days": 1, "deposit_percentage": 30, "cancellation_hours": 48}', 'Configuración de reservas'),
+    ('booking', '{"min_days": 2, "max_days": 30, "advance_days": 1, "deposit_percentage": 30, "cancellation_free_days": 60}', 'Configuración de reservas'),
     ('payment', '{"currency": "EUR", "deposit_default": 500, "full_payment_days_before": 7}', 'Configuración de pagos'),
     ('notifications', '{"send_confirmation": true, "send_reminder": true, "reminder_days_before": 3}', 'Configuración de notificaciones');
 

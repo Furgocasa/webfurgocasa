@@ -883,7 +883,7 @@ export default function ReservarOfertaPage({
                   <CheckCircle className="w-5 h-5 text-furgocasa-blue flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
                     <p className="font-medium text-gray-900">{t("Reserva segura")}</p>
-                    <p className="text-gray-600">{t("Cancelación gratuita hasta 48h antes")}</p>
+                    <p className="text-gray-600">{t("Cancelación gratuita hasta 60 días antes")}</p>
                   </div>
                 </div>
               </div>
