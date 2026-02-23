@@ -334,59 +334,28 @@ export async function getDashboardStats() {
     .from('vehicles')
     .select('id, name, status, is_for_rent, base_price_per_day, next_itv_date');
   
-  // 2. RESERVAS (completas con relaciones para operaciones)
-  // Primero intentar con joins de locations; si falla, sin locations
-  let bookingsData: any[] | null = null;
-  {
-    const { data, error } = await supabaseServer
-      .from('bookings')
-      .select(`
-        id, 
-        booking_number,
-        status, 
-        payment_status,
-        total_price, 
-        amount_paid,
-        pickup_date, 
-        dropoff_date,
-        pickup_time,
-        dropoff_time,
-        pickup_location_id,
-        dropoff_location_id,
-        days,
-        notes,
-        admin_notes,
-        created_at, 
-        vehicle_id,
-        customer_id,
-        customer_name,
-        customer_phone,
-        vehicle:vehicles(name, internal_code),
-        customer:customers(name, total_bookings, phone, driver_license_expiry),
-        pickup_location:locations!pickup_location_id(name, city),
-        dropoff_location:locations!dropoff_location_id(name, city),
-        booking_extras(quantity, extra:extras(name))
-      `);
-    if (error) {
-      console.error('[Dashboard] Bookings query with locations failed:', error.message);
-      // Fallback: sin joins de locations
-      const { data: fallback } = await supabaseServer
-        .from('bookings')
-        .select(`
-          id, booking_number, status, payment_status,
-          total_price, amount_paid, pickup_date, dropoff_date,
-          pickup_time, dropoff_time, pickup_location_id, dropoff_location_id,
-          days, notes, admin_notes, created_at, vehicle_id,
-          customer_id, customer_name, customer_phone,
-          vehicle:vehicles(name, internal_code),
-          customer:customers(name, total_bookings, phone, driver_license_expiry),
-          booking_extras(quantity, extra:extras(name))
-        `);
-      bookingsData = fallback;
-    } else {
-      bookingsData = data;
-    }
+  // 2. RESERVAS — query simple sin joins de locations (más robusta)
+  const { data: bookingsData, error: bookingsError } = await supabaseServer
+    .from('bookings')
+    .select(`
+      id, booking_number, status, payment_status,
+      total_price, amount_paid, pickup_date, dropoff_date,
+      pickup_time, dropoff_time, pickup_location_id, dropoff_location_id,
+      days, notes, admin_notes, created_at, vehicle_id,
+      customer_id, customer_name, customer_phone,
+      vehicle:vehicles(name, internal_code),
+      customer:customers(name, total_bookings, phone, driver_license_expiry),
+      booking_extras(quantity, extra:extras(name))
+    `);
+  if (bookingsError) {
+    console.error('[Dashboard] Bookings query failed:', bookingsError.message);
   }
+
+  // 2b. LOCATIONS — mapa id→nombre para resolver ubicaciones
+  const { data: locationsData } = await supabaseServer
+    .from('locations')
+    .select('id, name, city');
+  const locMap = new Map((locationsData || []).map(l => [l.id, l]));
   
   // 3. PAGOS
   const { data: paymentsData } = await supabaseServer
@@ -562,7 +531,6 @@ export async function getDashboardStats() {
   // ===== DATOS PARA DASHBOARD DE OPERACIONES =====
   const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-  type BookingLoc = { name?: string; city?: string } | null;
   type BookingVeh = { name?: string; internal_code?: string } | null;
   type BookingExtra = { quantity: number; extra: { name: string } | null } | null;
   type BookingCustomer = { name?: string; total_bookings?: number; phone?: string; driver_license_expiry?: string } | null;
@@ -582,8 +550,8 @@ export async function getDashboardStats() {
     vehicleCode: (b.vehicle as BookingVeh)?.internal_code || '',
     customer: b.customer_name || 'Cliente',
     customerPhone: b.customer_phone || (b.customer as BookingCustomer)?.phone || '',
-    pickupLocation: (b.pickup_location as BookingLoc)?.name || '',
-    dropoffLocation: (b.dropoff_location as BookingLoc)?.name || '',
+    pickupLocation: locMap.get(b.pickup_location_id)?.name || '',
+    dropoffLocation: locMap.get(b.dropoff_location_id)?.name || '',
     extras: ((b.booking_extras || []) as BookingExtra[])
       .filter((e): e is NonNullable<BookingExtra> => !!e?.extra?.name)
       .map(e => `${e.extra!.name}${e.quantity > 1 ? ` x${e.quantity}` : ''}`),
