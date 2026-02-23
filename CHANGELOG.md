@@ -4,6 +4,40 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## ⚡ [4.4.3] - 18 de Febrero 2026 - **Botón Copiar detalles de reserva**
+
+### Admin: Detalle de reserva
+
+- **Botón "Copiar detalles de la reserva"** en la sección "Fechas y ubicación" (`/administrator/reservas/[id]`)
+- Copia al portapapeles en texto plano: recogida, devolución, duración y ubicaciones
+- Formato listo para pegar en emails, documentos u otros sistemas
+- Feedback visual "¡Copiado!" durante 2 segundos
+
+#### Archivos modificados
+
+- `src/app/administrator/(protected)/reservas/[id]/page.tsx`
+
+---
+
+## ⚡ [4.4.3] - 18 de Febrero 2026 - **Cantidad Mínima en Extras**
+
+### 🎁 min_quantity para extras
+
+- **Nuevo campo** `min_quantity` en tabla `extras` (migración: `add-min-quantity-to-extras.sql`)
+- **Per día**: Mínimo de días a facturar (ej. parking 4 días = 40€ aunque alquile 2 días)
+- **Per unidad**: Cantidad mínima al seleccionar (ej. mínimo 4 sillas)
+- **Admin**: Campo "Cantidad mínima" en formulario y tabla de extras
+- **Páginas reserva**: Cálculo correcto en vehiculo, nueva, oferta (ES/FR/EN/DE)
+- **Fix**: Página vehiculo aplicaba min_quantity en resumen y barra móvil
+
+### Documentación actualizada
+
+- `SUPABASE-SCHEMA-REAL.md`, `PAGINAS-VEHICULOS-GARANTIA.md`
+- `PROCESO-RESERVA-COMPLETO.md`, `FLUJO-RESERVAS-CRITICO.md`
+- `supabase/README.md` - Scripts de migración adicionales
+
+---
+
 ## ⚡ [4.4.2] - 12 de Febrero 2026 - **Sistema de Vehículos Vendidos**
 
 ### 🚗 Estado Definitivo "Vendido"

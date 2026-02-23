@@ -128,6 +128,7 @@ SELECT id, pickup_date, dropoff_date, days FROM bookings WHERE id = 'algún-id-d
 1. Acceder a `/administrator/reservas/[id]` de cualquier reserva
 2. Verificar que en la sección "Fechas y ubicación" aparece una tarjeta azul con "Duración: X días"
 3. Si hay desincronización, aparecerá texto naranja indicándolo
+4. **Botón "Copiar detalles de la reserva"** (arriba a la derecha): copia recogida, devolución, duración y ubicaciones en texto plano para pegar en otros sitios
 
 ## Beneficios
 

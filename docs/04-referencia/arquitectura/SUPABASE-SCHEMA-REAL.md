@@ -173,13 +173,15 @@ const { data } = await supabase
 
 ## 📋 TABLA: `extras`
 
-**Total de columnas: 14**
+**Total de columnas: 15**
 
 ```
 id, name, description, price_per_day, price_per_rental,
-price_type, max_quantity, image_url, is_active, sort_order,
+price_type, min_quantity, max_quantity, image_url, is_active, sort_order,
 created_at, updated_at, icon, price_per_unit
 ```
+
+- `min_quantity` (INTEGER, nullable): Para `per_day` = mínimo de días a facturar (ej. parking 4 días); para `per_unit` = cantidad mínima al seleccionar.
 
 ### ⚠️ IMPORTANTE: Esta tabla NO tiene columna `category`
 

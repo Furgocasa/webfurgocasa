@@ -101,6 +101,12 @@ className="bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bo
 className="border-2 border-furgocasa-blue text-furgocasa-blue hover:bg-furgocasa-blue hover:text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200"
 ```
 
+#### Acción de texto (Admin / acciones secundarias)
+```tsx
+// Botón sutil para copiar, exportar, etc. Ej: "Copiar detalles de la reserva"
+className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
+```
+
 ### Cards
 
 #### Estándar

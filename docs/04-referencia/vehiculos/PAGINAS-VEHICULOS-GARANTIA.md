@@ -72,9 +72,10 @@ Este documento garantiza que **TODAS** las páginas del frontend que muestran in
 ### 💰 Extras (solo `/reservar/vehiculo`)
 - [x] **Lista de extras disponibles** - Desde tabla `extras`
 - [x] **price_type** - Muestra si es por día o por reserva
+- [x] **min_quantity** - Mínimo de días (per_day) o unidades (per_unit); ej. parking 4 días mín.
 - [x] **max_quantity** - Respeta cantidad máxima
 - [x] **Selector de cantidad** - Para extras con max_quantity > 1
-- [x] **Cálculo correcto de precio** - Según tipo de precio y cantidad
+- [x] **Cálculo correcto de precio** - Según tipo de precio, cantidad y min_quantity
 
 ### 🚗 Campos específicos de VENTA (solo `/ventas/[slug]`)
 - [x] **mileage** - Kilometraje

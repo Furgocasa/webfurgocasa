@@ -301,9 +301,9 @@ interface Extra {
   price_per_day: number | null;      // Para extras "Por día"
   price_per_unit: number | null;     // Para extras "Por unidad"
   price_type: 'per_day' | 'per_unit'; // ⚠️ IMPORTANTE: per_unit, NO per_rental
+  min_quantity: number | null;       // per_day: mín. días (ej. parking 4); per_unit: mín. unidades
   max_quantity: number;
   icon: string;
-  category: string;
 }
 
 interface SelectedExtra {
@@ -317,15 +317,14 @@ interface SelectedExtra {
 // Precio base del vehículo
 const basePrice = vehicle.base_price_per_day * days;
 
-// Precio de extras
+// Precio de extras (aplicar min_quantity para per_day: ej. parking 4 días mín.)
 const extrasPrice = selectedExtras.reduce((sum, item) => {
   let price = 0;
   if (item.extra.price_type === 'per_unit') {
-    // Precio único por toda la reserva
     price = (item.extra.price_per_unit || 0);
   } else {
-    // Precio por día multiplicado por número de días
-    price = (item.extra.price_per_day || 0) * days;
+    const effectiveDays = item.extra.min_quantity ? Math.max(days, item.extra.min_quantity) : days;
+    price = (item.extra.price_per_day || 0) * effectiveDays;
   }
   return sum + (price * item.quantity);
 }, 0);
@@ -649,8 +648,8 @@ CREATE TABLE extras (
   price_per_day NUMERIC(10,2),     -- Precio por día (puede ser null)
   price_per_unit NUMERIC(10,2),    -- Precio único (puede ser null)
   price_type VARCHAR NOT NULL,     -- 'per_day' o 'per_unit'
+  min_quantity INTEGER,            -- per_day: mín. días (ej. parking 4); per_unit: mín. unidades; NULL=sin mínimo
   max_quantity INTEGER DEFAULT 1,
-  category VARCHAR,
   icon VARCHAR,
   is_active BOOLEAN DEFAULT true,
   sort_order INTEGER,
@@ -676,12 +675,12 @@ if (extra.price_type === 'per_rental') {
 
 ### Ejemplos de Extras
 
-| Extra | price_type | price_per_day | price_per_unit | Descripción |
-|-------|------------|---------------|----------------|-------------|
-| Sábanas y almohadas | `per_unit` | `null` | `20.00` | Se cobra una vez por reserva |
-| Edredón de invierno | `per_unit` | `null` | `30.00` | Se cobra una vez por reserva |
-| Aparcamiento en Murcia | `per_day` | `10.00` | `null` | Se cobra por cada día |
-| Bicicletas | `per_day` | `5.00` | `null` | Se cobra por cada día |
+| Extra | price_type | price_per_day | price_per_unit | min_quantity | Descripción |
+|-------|------------|---------------|----------------|--------------|-------------|
+| Sábanas y almohadas | `per_unit` | `null` | `20.00` | `null` | Se cobra una vez por reserva |
+| Edredón de invierno | `per_unit` | `null` | `30.00` | `null` | Se cobra una vez por reserva |
+| Aparcamiento en Murcia | `per_day` | `10.00` | `null` | `4` | Mín. 4 días (40€); 7 días = 70€ |
+| Bicicletas | `per_day` | `5.00` | `null` | `null` | Se cobra por cada día |
 
 ### Display de Precios
 

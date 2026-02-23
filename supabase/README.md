@@ -203,6 +203,16 @@ INSERT INTO storage.buckets (id, name, public) VALUES
     ('media', 'media', true);
 ```
 
+## 📜 Scripts de Migración Adicionales
+
+Para BBDD ya existentes, ejecutar en SQL Editor según necesidad:
+
+| Script | Descripción |
+|--------|-------------|
+| `add-min-quantity-to-extras.sql` | Añade `min_quantity` a extras (mín. días para per_day, ej. parking 4 días) |
+| `add-availability-dates-to-locations.sql` | Fechas de disponibilidad por ubicación |
+| `add-min-days-to-locations.sql` | Días mínimos de alquiler por ubicación |
+
 ## 🔄 Migraciones Futuras
 
 Para cambios futuros, crear archivos en `migrations/`:

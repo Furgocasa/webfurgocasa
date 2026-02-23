@@ -522,6 +522,7 @@ description TEXT
 price_per_day DECIMAL(10,2)
 price_per_rental DECIMAL(10,2)
 price_type VARCHAR(20)
+min_quantity INTEGER   -- per_day: mín. días (ej. parking 4); per_unit: mín. unidades; NULL=sin mínimo
 max_quantity INTEGER
 image_url TEXT
 is_active BOOLEAN  -- ⚠️ NO is_available
