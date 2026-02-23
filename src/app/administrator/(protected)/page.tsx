@@ -59,9 +59,9 @@ export default async function AdminDashboard() {
   ].filter(a => a.show);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] min-h-0 gap-3">
+    <div className="flex flex-col gap-4">
       {/* Header compacto */}
-      <div className="flex-shrink-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
           <h1 className="text-xl font-bold text-gray-900">Dashboard Operaciones</h1>
           <p className="text-sm text-gray-600">Alquileres, entregas, recogidas y revisiones</p>
@@ -97,17 +97,17 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Tres columnas - ocupan el espacio disponible, cada una con su alto */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 flex-1 min-h-0">
+      {/* Tres columnas - sin scroll interno, scroll de toda la ventana */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Alquileres próximos días */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col min-h-0">
-          <div className="p-3 border-b border-gray-100 flex justify-between items-center flex-shrink-0">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-3 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900">Alquileres próximos 7 días</h2>
             <Link href="/administrator/reservas" className="text-xs text-furgocasa-orange hover:underline font-medium">
               Ver reservas
             </Link>
           </div>
-          <div className="divide-y divide-gray-100 flex-1 min-h-0 overflow-y-auto">
+          <div className="divide-y divide-gray-100">
             {(stats.upcomingRentals || []).length > 0 ? (
               stats.upcomingRentals.map((b) => (
                 <Link
@@ -132,14 +132,14 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Próximas entregas y recogidas (semana) */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col min-h-0">
-          <div className="p-3 border-b border-gray-100 flex justify-between items-center flex-shrink-0">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-3 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900">Entregas y recogidas (semana)</h2>
             <Link href="/administrator/calendario" className="text-xs text-furgocasa-orange hover:underline font-medium">
               Ver calendario
             </Link>
           </div>
-          <div className="divide-y divide-gray-100 flex-1 min-h-0 overflow-y-auto">
+          <div className="divide-y divide-gray-100">
             {(stats.upcomingActionsWeek || []).length > 0 ? (
               stats.upcomingActionsWeek.map((action) => {
                 const isToday = action.date === new Date().toISOString().split('T')[0];
@@ -181,14 +181,14 @@ export default async function AdminDashboard() {
         </div>
 
         {/* Campers de vuelta pendientes de revisión */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex flex-col min-h-0">
-          <div className="p-3 border-b border-gray-100 flex justify-between items-center flex-shrink-0">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="p-3 border-b border-gray-100 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900">Pendientes de revisión</h2>
             <Link href="/administrator/reservas" className="text-xs text-furgocasa-orange hover:underline font-medium">
               Ver reservas
             </Link>
           </div>
-          <div className="divide-y divide-gray-100 flex-1 min-h-0 overflow-y-auto">
+          <div className="divide-y divide-gray-100">
             {(stats.pendingReview || []).length > 0 ? (
               stats.pendingReview.map((b) => (
                 <Link
@@ -214,8 +214,8 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* Quick Actions - compacto */}
-      <div className="flex-shrink-0 flex items-center gap-2">
+      {/* Quick Actions - compacto, wrap en móvil */}
+      <div className="flex flex-wrap items-center gap-2">
         <Link href="/administrator/reservas/nueva" className="flex items-center gap-2 px-4 py-2 bg-furgocasa-orange/10 hover:bg-furgocasa-orange/20 rounded-lg transition-colors text-sm font-medium">
           <Calendar className="h-4 w-4 text-furgocasa-orange" />
           Nueva reserva
