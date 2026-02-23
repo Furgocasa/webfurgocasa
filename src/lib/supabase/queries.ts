@@ -335,35 +335,58 @@ export async function getDashboardStats() {
     .select('id, name, status, is_for_rent, base_price_per_day, next_itv_date');
   
   // 2. RESERVAS (completas con relaciones para operaciones)
-  const { data: bookingsData } = await supabaseServer
-    .from('bookings')
-    .select(`
-      id, 
-      booking_number,
-      status, 
-      payment_status,
-      total_price, 
-      amount_paid,
-      pickup_date, 
-      dropoff_date,
-      pickup_time,
-      dropoff_time,
-      pickup_location_id,
-      dropoff_location_id,
-      days,
-      notes,
-      admin_notes,
-      created_at, 
-      vehicle_id,
-      customer_id,
-      customer_name,
-      customer_phone,
-      vehicle:vehicles(name, internal_code),
-      customer:customers(name, total_bookings, phone, driver_license_expiry),
-      pickup_location:locations!bookings_pickup_location_id_fkey(name, city),
-      dropoff_location:locations!bookings_dropoff_location_id_fkey(name, city),
-      booking_extras(quantity, extra:extras(name))
-    `);
+  // Primero intentar con joins de locations; si falla, sin locations
+  let bookingsData: any[] | null = null;
+  {
+    const { data, error } = await supabaseServer
+      .from('bookings')
+      .select(`
+        id, 
+        booking_number,
+        status, 
+        payment_status,
+        total_price, 
+        amount_paid,
+        pickup_date, 
+        dropoff_date,
+        pickup_time,
+        dropoff_time,
+        pickup_location_id,
+        dropoff_location_id,
+        days,
+        notes,
+        admin_notes,
+        created_at, 
+        vehicle_id,
+        customer_id,
+        customer_name,
+        customer_phone,
+        vehicle:vehicles(name, internal_code),
+        customer:customers(name, total_bookings, phone, driver_license_expiry),
+        pickup_location:locations!pickup_location_id(name, city),
+        dropoff_location:locations!dropoff_location_id(name, city),
+        booking_extras(quantity, extra:extras(name))
+      `);
+    if (error) {
+      console.error('[Dashboard] Bookings query with locations failed:', error.message);
+      // Fallback: sin joins de locations
+      const { data: fallback } = await supabaseServer
+        .from('bookings')
+        .select(`
+          id, booking_number, status, payment_status,
+          total_price, amount_paid, pickup_date, dropoff_date,
+          pickup_time, dropoff_time, pickup_location_id, dropoff_location_id,
+          days, notes, admin_notes, created_at, vehicle_id,
+          customer_id, customer_name, customer_phone,
+          vehicle:vehicles(name, internal_code),
+          customer:customers(name, total_bookings, phone, driver_license_expiry),
+          booking_extras(quantity, extra:extras(name))
+        `);
+      bookingsData = fallback;
+    } else {
+      bookingsData = data;
+    }
+  }
   
   // 3. PAGOS
   const { data: paymentsData } = await supabaseServer
@@ -544,7 +567,8 @@ export async function getDashboardStats() {
   type BookingExtra = { quantity: number; extra: { name: string } | null } | null;
   type BookingCustomer = { name?: string; total_bookings?: number; phone?: string; driver_license_expiry?: string } | null;
 
-  const mapBookingOps = (b: (typeof bookingsData)[0]) => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapBookingOps = (b: any) => ({
     id: b.id,
     bookingNumber: b.booking_number || '',
     status: b.status,
