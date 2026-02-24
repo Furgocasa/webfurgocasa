@@ -18,7 +18,9 @@ import {
   Camera,
   RefreshCw,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { VehicleDamagePlan, type DamageMark } from "@/components/admin/vehicle-damage-plan";
 import { DamageReportPDF } from "@/components/admin/damage-report-pdf";
@@ -527,15 +529,43 @@ export default function VehicleDamageDetailPage() {
             </span>
           </button>
 
-          {/* Vehicle Plan */}
-          <VehicleDamagePlan
-            viewType={activeView}
-            damages={currentViewDamages}
-            onAddDamage={isEditing ? handleAddDamage : undefined}
-            onSelectDamage={handleSelectDamage}
-            selectedDamageId={selectedDamage?.id}
-            isEditing={isEditing}
-          />
+          {/* Vehicle Plan with navigation arrows */}
+          {(() => {
+            const currentViews = viewTypes.filter(v => v.category === activeTab);
+            const currentIdx = currentViews.findIndex(v => v.id === activeView);
+            const hasPrev = currentIdx > 0;
+            const hasNext = currentIdx < currentViews.length - 1;
+            return (
+              <div className="relative group">
+                {hasPrev && (
+                  <button
+                    onClick={() => setActiveView(currentViews[currentIdx - 1].id)}
+                    className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-md rounded-full p-1.5 transition-opacity opacity-70 group-hover:opacity-100"
+                    title={currentViews[currentIdx - 1].label}
+                  >
+                    <ChevronLeft className="h-5 w-5 text-gray-700" />
+                  </button>
+                )}
+                <VehicleDamagePlan
+                  viewType={activeView}
+                  damages={currentViewDamages}
+                  onAddDamage={isEditing ? handleAddDamage : undefined}
+                  onSelectDamage={handleSelectDamage}
+                  selectedDamageId={selectedDamage?.id}
+                  isEditing={isEditing}
+                />
+                {hasNext && (
+                  <button
+                    onClick={() => setActiveView(currentViews[currentIdx + 1].id)}
+                    className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-md rounded-full p-1.5 transition-opacity opacity-70 group-hover:opacity-100"
+                    title={currentViews[currentIdx + 1].label}
+                  >
+                    <ChevronRight className="h-5 w-5 text-gray-700" />
+                  </button>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Legend */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
