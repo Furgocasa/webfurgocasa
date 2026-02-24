@@ -4,6 +4,52 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## ⚡ [4.4.4] - 24 de Febrero 2026 - **Sistema de Daños: Navegación + Fix Caché PWA**
+
+### 🔧 Fix Caché PWA en Imágenes del Plano de Daños
+
+Las imágenes del plano de daños (laterales izq/der) se mostraban intercambiadas en la PWA móvil por el caché del service worker (CacheFirst, 30 días). Se añadió cache-bust `?v=2` a las URLs de las 6 imágenes del vehículo.
+
+- **Problema**: Imágenes correctas en PC, intercambiadas en PWA móvil
+- **Causa**: Service worker cacheaba imágenes estáticas por 30 días
+- **Solución**: Cache-bust `?v=2` fuerza descarga fresca tras deploy
+
+### ⬅️➡️ Flechas de Navegación entre Vistas
+
+Botones de navegación ← → directamente sobre el plano del vehículo para cambiar entre vistas sin usar los botones superiores.
+
+- Flechas con fondo azul y flecha blanca, visibles sobre cualquier imagen
+- Navegación circular dentro de la categoría activa (exterior/interior)
+
+### 🔢 Numeración Independiente Exterior/Interior
+
+Los daños exteriores e interiores ahora tienen numeración propia e independiente.
+
+- Exteriores: 1, 2, 3... / Interiores: 1, 2, 3...
+- Lista lateral con secciones separadas (naranja para ext, azul para int)
+- PDF con tablas separadas por tipo
+- Nuevo constraint DB: `interior` añadido a `vehicle_damages_view_type_check`
+
+#### Migraciones SQL
+
+- `supabase/migrations/fix-vehicle-damages-view-type-check.sql`
+- `supabase/migrations/renumber-damages-by-type.sql`
+
+#### Archivos modificados
+
+- `src/app/administrator/(protected)/danos/[id]/page.tsx` - Flechas + numeración + lista separada
+- `src/components/admin/vehicle-damage-plan.tsx` - Cache-bust imágenes
+- `src/components/admin/damage-report-pdf.tsx` - PDF separado por tipo
+
+#### Commits
+
+- `38276d7` - fix(danos): cache-bust imagenes del plano para forzar recarga en PWA
+- `8589b95` - style(danos): flechas de navegacion con fondo azul y flecha blanca
+- `bd67640` - feat(danos): flechas de navegacion entre vistas del vehiculo
+- `4df0b36` - feat(danos): numeracion independiente exterior/interior
+
+---
+
 ## ⚡ [4.4.3] - 18 de Febrero 2026 - **Botón Copiar detalles de reserva**
 
 ### Admin: Detalle de reserva

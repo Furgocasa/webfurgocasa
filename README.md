@@ -17,16 +17,32 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 24 de Febrero 2026 - **Sistema de Daños: Numeración Independiente Exterior/Interior**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 24 de Febrero 2026 - **Sistema de Daños: Fix Caché PWA + Navegación + Numeración Independiente**
 
-### 🔧 Numeración Independiente y Listas Separadas por Tipo de Daño
+### 🔧 Fix Imágenes del Plano de Daños en PWA
 
 **Estado**: ✅ Completado y desplegado  
-**Commit**: `4df0b36`
+**Commit**: `38276d7`
 
-Los daños exteriores e interiores ahora tienen numeración propia e independiente, y se muestran en secciones separadas tanto en la página de administración como en el PDF.
+Las imágenes del plano de daños (lateral izquierdo/derecho) se mostraban intercambiadas en la PWA del administrador debido al caché agresivo del service worker. Se añadió cache-bust (`?v=2`) a todas las URLs de imágenes del vehículo.
 
-**Funcionalidades:**
+**Problema detectado:**
+- En PC (navegador normal): Las imágenes se mostraban correctamente
+- En PWA (móvil): Las imágenes laterales aparecían intercambiadas por caché del service worker (CacheFirst, 30 días)
+
+**Solución:**
+- ✅ **Cache-bust en URLs**: Añadido `?v=2` a las 6 imágenes del plano del vehículo en `vehicle-damage-plan.tsx`
+- ✅ El nuevo deploy fuerza la descarga de imágenes frescas en la PWA
+
+**Archivo modificado:**
+- `src/components/admin/vehicle-damage-plan.tsx` - Cache-bust en URLs de imágenes
+
+### 🔧 Flechas de Navegación entre Vistas + Numeración Independiente
+
+**Commits anteriores**: `8589b95`, `bd67640`, `4df0b36`
+
+**Funcionalidades del sistema de daños:**
+- ✅ **Flechas de navegación**: Botones ← → para cambiar entre vistas del vehículo directamente en el plano
 - ✅ **Numeración independiente por tipo**: Exteriores: 1, 2, 3... / Interiores: 1, 2, 3... (ya no es secuencial global)
 - ✅ **Lista lateral separada**: Dos secciones diferenciadas (cabecera naranja para exteriores, azul para interiores) con conteo
 - ✅ **PDF separado**: La tabla "Detalle de Daños" se divide en "Daños Exteriores" y "Daños Interiores" con numeración propia
@@ -39,7 +55,8 @@ Los daños exteriores e interiores ahora tienen numeración propia e independien
 - ✅ `supabase/migrations/renumber-damages-by-type.sql` - Renumerar daños existentes por tipo
 
 **Archivos modificados:**
-- `src/app/administrator/(protected)/danos/[id]/page.tsx` - Numeración por tipo + lista separada
+- `src/app/administrator/(protected)/danos/[id]/page.tsx` - Navegación con flechas + numeración por tipo + lista separada
+- `src/components/admin/vehicle-damage-plan.tsx` - Cache-bust imágenes PWA
 - `src/components/admin/damage-report-pdf.tsx` - PDF con tablas separadas por tipo
 
 ---
@@ -2187,7 +2204,7 @@ Desarrollado con ❤️ para Furgocasa
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 24 de Febrero 2026 (Sistema Daños: Numeración Independiente Ext/Int)  
+**Última actualización**: 24 de Febrero 2026 (Sistema Daños: Fix Caché PWA + Navegación Flechas + Numeración Independiente)  
 
 ---
 

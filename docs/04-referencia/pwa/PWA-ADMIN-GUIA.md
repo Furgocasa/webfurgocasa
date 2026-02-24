@@ -187,6 +187,33 @@ La PWA solo funciona dentro de `/administrator/`:
 - Solo cachea recursos del administrador
 - No intercepta peticiones fuera de `/administrator/`
 
+## ⚠️ Caché de Imágenes Estáticas en PWA
+
+### Problema Conocido (Fix aplicado 24/02/2026)
+
+Las imágenes servidas desde `/public/` (como las del plano de daños en `/vehicle-views/`) se cachean con estrategia **CacheFirst durante 30 días**. Esto significa que si se cambian las imágenes o el código que las referencia, la PWA seguirá mostrando la versión cacheada.
+
+### Solución: Cache-Bust con Query Parameter
+
+Cuando se modifiquen imágenes estáticas referenciadas en componentes, añadir un parámetro de versión a la URL:
+
+```typescript
+// Antes (se cachea indefinidamente)
+const image = '/vehicle-views/front.png';
+
+// Después (fuerza recarga al cambiar versión)
+const image = '/vehicle-views/front.png?v=2';
+```
+
+### Si el usuario reporta imágenes desactualizadas en PWA
+
+1. **Cerrar la PWA** completamente (quitar de apps recientes)
+2. **Reabrir la PWA** - debería cargar el nuevo JS que apunta a URLs con cache-bust
+3. Si persiste: **Borrar caché del navegador** (Ajustes → Apps → Chrome → Almacenamiento → Borrar caché)
+4. Última opción: **Reinstalar la PWA**
+
+---
+
 ## 🐛 Troubleshooting
 
 ### El banner no aparece
