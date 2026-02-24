@@ -43,14 +43,14 @@ const statusColors: Record<string, { fill: string; stroke: string }> = {
   repaired: { fill: '#f0fdf4', stroke: '#22c55e' },
 };
 
-// Imágenes del vehículo para cada vista
+// Imágenes del vehículo para cada vista (v=2 fuerza recarga en PWA)
 const vehicleImages: Record<string, string> = {
-  front: '/vehicle-views/front.png',
-  back: '/vehicle-views/back.png',
-  left: '/vehicle-views/left.png',
-  right: '/vehicle-views/right.png',
-  top: '/vehicle-views/top.png',
-  interior: '/vehicle-views/interior.png',
+  front: '/vehicle-views/front.png?v=2',
+  back: '/vehicle-views/back.png?v=2',
+  left: '/vehicle-views/left.png?v=2',
+  right: '/vehicle-views/right.png?v=2',
+  top: '/vehicle-views/top.png?v=2',
+  interior: '/vehicle-views/interior.png?v=2',
 };
 
 // Componente de imagen del vehículo para cada vista
