@@ -71,8 +71,8 @@ const statusColors: Record<string, { fill: string; stroke: string }> = {
   repaired: { fill: '#f0fdf4', stroke: '#22c55e' },
 };
 
-// Componente de imagen con marcadores - mismo estilo que la página /administrator/danos/[id]
-// w-7 h-7 (28px), border-2, shadow-md, número centrado con tabla (html2canvas)
+// Componente de imagen con marcadores para PDF
+// Usa <table> para centrado porque html2canvas no soporta bien flexbox/line-height
 function VehicleImage({ viewType, damages, displayNumbers }: { viewType: ViewType; damages: VehicleDamage[]; displayNumbers: Map<string, number> }) {
   const viewDamages = damages.filter(d => d.view_type === viewType);
   
@@ -85,6 +85,7 @@ function VehicleImage({ viewType, damages, displayNumbers }: { viewType: ViewTyp
       />
       {viewDamages.map((damage) => {
         const colors = statusColors[damage.status || 'pending'] || statusColors.pending;
+        const num = displayNumbers.get(damage.id) || '?';
         return (
           <div
             key={damage.id}
@@ -96,20 +97,37 @@ function VehicleImage({ viewType, damages, displayNumbers }: { viewType: ViewTyp
               marginTop: '-14px',
               width: '28px',
               height: '28px',
-              borderRadius: '50%',
-              backgroundColor: colors.fill,
-              border: `2px solid ${colors.stroke}`,
-              color: colors.stroke,
-              fontSize: '14px',
-              fontWeight: 'bold',
-              lineHeight: '28px',
-              textAlign: 'center',
-              overflow: 'hidden',
-              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
               zIndex: 10,
             }}
           >
-            {displayNumbers.get(damage.id) || '?'}
+            <table style={{
+              width: '28px',
+              height: '28px',
+              borderCollapse: 'collapse',
+              borderSpacing: '0',
+              borderRadius: '50%',
+              backgroundColor: colors.fill,
+              border: `2px solid ${colors.stroke}`,
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+              overflow: 'hidden',
+            }}>
+              <tbody>
+                <tr>
+                  <td style={{
+                    textAlign: 'center',
+                    verticalAlign: 'middle',
+                    padding: '0',
+                    margin: '0',
+                    color: colors.stroke,
+                    fontSize: '12px',
+                    fontWeight: 'bold',
+                    lineHeight: '1',
+                  }}>
+                    {num}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         );
       })}
