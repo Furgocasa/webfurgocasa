@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { formatInTimeZone } from "date-fns-tz";
+import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DayPicker, DateRange } from "react-day-picker";
 import { Calendar, X } from "lucide-react";
@@ -56,20 +56,17 @@ export function DateRangePicker({
     return minEnd;
   };
 
-  const tz = "Europe/Madrid";
-
-  // Format the display text (timezone-aware for users in different regions)
+  // Format the display text
   const displayText = () => {
     if (dateRange.from && dateRange.to) {
-      return `${formatInTimeZone(dateRange.from, tz, "dd MMM", { locale: es })} - ${formatInTimeZone(
+      return `${format(dateRange.from, "dd MMM", { locale: es })} - ${format(
         dateRange.to,
-        tz,
         "dd MMM yyyy",
         { locale: es }
       )}`;
     }
     if (dateRange.from) {
-      return `${formatInTimeZone(dateRange.from, tz, "dd MMM yyyy", { locale: es })} - ${t("Selecciona fin")}`;
+      return `${format(dateRange.from, "dd MMM yyyy", { locale: es })} - ${t("Selecciona fin")}`;
     }
     return t("Selecciona el periodo de alquiler");
   };
