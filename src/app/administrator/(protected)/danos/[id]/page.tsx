@@ -16,7 +16,9 @@ import {
   Clock,
   Loader2,
   Camera,
-  RefreshCw
+  RefreshCw,
+  ChevronDown,
+  ChevronUp
 } from "lucide-react";
 import { VehicleDamagePlan, type DamageMark } from "@/components/admin/vehicle-damage-plan";
 import { DamageReportPDF } from "@/components/admin/damage-report-pdf";
@@ -88,6 +90,8 @@ export default function VehicleDamageDetailPage() {
   const [isEditing, setIsEditing] = useState(false);
   const [selectedDamage, setSelectedDamage] = useState<VehicleDamage | null>(null);
   const [showDamageForm, setShowDamageForm] = useState(false);
+  const [exteriorListOpen, setExteriorListOpen] = useState(false);
+  const [interiorListOpen, setInteriorListOpen] = useState(false);
 
   // New damage form
   const [newDamagePosition, setNewDamagePosition] = useState<{ x: number; y: number } | null>(null);
@@ -547,8 +551,8 @@ export default function VehicleDamageDetailPage() {
           </div>
         </div>
 
-        {/* Damage List - separated by type */}
-        <div className="space-y-4">
+        {/* Damage List - accordion en móvil, abierto en desktop */}
+        <div className="space-y-3">
           {damages.length === 0 ? (
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
               <div className="p-8 text-center">
@@ -569,12 +573,18 @@ export default function VehicleDamageDetailPage() {
               {/* DAÑOS EXTERIORES */}
               {damages.filter(d => d.damage_type !== 'interior').length > 0 && (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100 bg-orange-50">
+                  <button
+                    className="w-full px-4 py-3 border-b border-gray-100 bg-orange-50 flex items-center justify-between lg:cursor-default"
+                    onClick={() => setExteriorListOpen(prev => !prev)}
+                  >
                     <h3 className="font-medium text-gray-900">
                       Daños Exteriores <span className="text-orange-600">({damages.filter(d => d.damage_type !== 'interior').length})</span>
                     </h3>
-                  </div>
-                  <div className="max-h-[350px] overflow-y-auto">
+                    <span className="lg:hidden">
+                      {exteriorListOpen ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
+                    </span>
+                  </button>
+                  <div className={`max-h-[350px] overflow-y-auto ${exteriorListOpen ? '' : 'hidden'} lg:!block`}>
                     <ul className="divide-y divide-gray-100">
                       {damages.filter(d => d.damage_type !== 'interior').map((damage) => {
                         const statusColor = statusOptions.find(s => s.value === damage.status)?.color || 'text-gray-600 bg-gray-100';
@@ -639,12 +649,18 @@ export default function VehicleDamageDetailPage() {
               {/* DAÑOS INTERIORES */}
               {damages.filter(d => d.damage_type === 'interior').length > 0 && (
                 <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-4 py-3 border-b border-gray-100 bg-blue-50">
+                  <button
+                    className="w-full px-4 py-3 border-b border-gray-100 bg-blue-50 flex items-center justify-between lg:cursor-default"
+                    onClick={() => setInteriorListOpen(prev => !prev)}
+                  >
                     <h3 className="font-medium text-gray-900">
                       Daños Interiores <span className="text-blue-600">({damages.filter(d => d.damage_type === 'interior').length})</span>
                     </h3>
-                  </div>
-                  <div className="max-h-[350px] overflow-y-auto">
+                    <span className="lg:hidden">
+                      {interiorListOpen ? <ChevronUp className="h-5 w-5 text-gray-500" /> : <ChevronDown className="h-5 w-5 text-gray-500" />}
+                    </span>
+                  </button>
+                  <div className={`max-h-[350px] overflow-y-auto ${interiorListOpen ? '' : 'hidden'} lg:!block`}>
                     <ul className="divide-y divide-gray-100">
                       {damages.filter(d => d.damage_type === 'interior').map((damage) => {
                         const statusColor = statusOptions.find(s => s.value === damage.status)?.color || 'text-gray-600 bg-gray-100';
