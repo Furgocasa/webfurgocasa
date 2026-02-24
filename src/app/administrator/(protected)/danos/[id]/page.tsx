@@ -136,6 +136,24 @@ export default function VehicleDamageDetailPage() {
     loadData();
   }, [loadData]);
 
+  // Numeración independiente por tipo (exterior: 1,2,3... / interior: 1,2,3...)
+  const damageDisplayNumbers = useMemo(() => {
+    const map = new Map<string, number>();
+    let extCounter = 0;
+    let intCounter = 0;
+    const sorted = [...damages].sort((a, b) => (a.damage_number || 0) - (b.damage_number || 0));
+    for (const d of sorted) {
+      if (d.damage_type === 'interior') {
+        intCounter++;
+        map.set(d.id, intCounter);
+      } else {
+        extCounter++;
+        map.set(d.id, extCounter);
+      }
+    }
+    return map;
+  }, [damages]);
+
   // Filter damages by current view - EXCLUIR reparados de los marcadores visuales
   const currentViewDamages = useMemo(() => {
     return damages
@@ -154,24 +172,6 @@ export default function VehicleDamageDetailPage() {
   // Daños activos (no reparados) para contar en las pestañas
   const activeDamages = useMemo(() => {
     return damages.filter(d => d.status !== 'repaired');
-  }, [damages]);
-
-  // Numeración independiente por tipo (exterior: 1,2,3... / interior: 1,2,3...)
-  const damageDisplayNumbers = useMemo(() => {
-    const map = new Map<string, number>();
-    let extCounter = 0;
-    let intCounter = 0;
-    const sorted = [...damages].sort((a, b) => (a.damage_number || 0) - (b.damage_number || 0));
-    for (const d of sorted) {
-      if (d.damage_type === 'interior') {
-        intCounter++;
-        map.set(d.id, intCounter);
-      } else {
-        extCounter++;
-        map.set(d.id, extCounter);
-      }
-    }
-    return map;
   }, [damages]);
 
   // Stats - Pestañas muestran solo daños activos, historial muestra reparados
