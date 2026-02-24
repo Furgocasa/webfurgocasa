@@ -83,21 +83,20 @@ function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: Vehi
             position: 'absolute',
             left: `${damage.position_x || 50}%`,
             top: `${damage.position_y || 50}%`,
-            transform: 'translate(-50%, -50%)',
-            width: '20px',
-            height: '20px',
+            marginLeft: '-11px',
+            marginTop: '-11px',
+            width: '22px',
+            height: '22px',
             borderRadius: '50%',
             backgroundColor: damage.status === 'repaired' ? '#dcfce7' : damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
             border: `2px solid ${damage.status === 'repaired' ? '#22c55e' : damage.status === 'in_progress' ? '#eab308' : '#ef4444'}`,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '10px',
+            fontSize: '11px',
             fontWeight: 'bold',
             color: damage.status === 'repaired' ? '#166534' : damage.status === 'in_progress' ? '#854d0e' : '#dc2626',
             zIndex: 10,
-            lineHeight: '20px',
+            lineHeight: '18px',
             textAlign: 'center',
+            overflow: 'hidden',
           }}
         >
           {damage.damage_number || '?'}
@@ -120,7 +119,8 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
     month: '2-digit', 
     year: 'numeric',
     hour: '2-digit',
-    minute: '2-digit'
+    minute: '2-digit',
+    timeZone: 'Europe/Madrid',
   });
 
   const generatePDF = async () => {
