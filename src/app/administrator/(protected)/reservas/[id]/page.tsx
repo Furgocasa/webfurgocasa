@@ -277,13 +277,15 @@ export default function ReservaDetalleAdminPage() {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'Europe/Madrid'
     });
     const dropoffFormatted = dropoff.toLocaleDateString('es-ES', {
       weekday: 'long',
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'Europe/Madrid'
     });
     const pickupLocation = booking.pickup_location
       ? [booking.pickup_location.name, booking.pickup_location.address].filter(Boolean).join(' ')
@@ -358,7 +360,8 @@ Devolución en ${dropoffLocation}`;
               month: 'long', 
               year: 'numeric',
               hour: '2-digit',
-              minute: '2-digit'
+              minute: '2-digit',
+              timeZone: 'Europe/Madrid'
             })}
           </p>
         </div>
@@ -675,7 +678,8 @@ Devolución en ${dropoffLocation}`;
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long',
-                    year: 'numeric'
+                    year: 'numeric',
+                    timeZone: 'Europe/Madrid'
                   })}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">{booking.pickup_time}</p>
@@ -688,7 +692,8 @@ Devolución en ${dropoffLocation}`;
                     weekday: 'long',
                     day: 'numeric',
                     month: 'long',
-                    year: 'numeric'
+                    year: 'numeric',
+                    timeZone: 'Europe/Madrid'
                   })}
                 </p>
                 <p className="text-sm text-gray-600 mt-1">{booking.dropoff_time}</p>
@@ -830,7 +835,8 @@ Devolución en ${dropoffLocation}`;
                       {new Date(booking.customer.date_of_birth).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'long',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                   </div>
@@ -860,7 +866,7 @@ Devolución en ${dropoffLocation}`;
                     )}
                     {booking.customer.driver_license_expiry && (
                       <p className="text-sm text-gray-600">
-                        Vence: {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES')}
+                        Vence: {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })}
                       </p>
                     )}
                   </div>

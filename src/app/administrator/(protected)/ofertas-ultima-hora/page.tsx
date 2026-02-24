@@ -479,7 +479,8 @@ export default function OfertasUltimaHoraPage() {
     return new Date(dateStr).toLocaleDateString('es-ES', {
       day: 'numeric',
       month: 'short',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'Europe/Madrid'
     });
   };
 

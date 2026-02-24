@@ -115,12 +115,12 @@ export function OccupancyHighlights() {
   const formatDateRange = (start: string, end: string) => {
     const startDate = new Date(start);
     const endDate = new Date(end);
-    
-    const startDay = startDate.getDate();
-    const endDay = endDate.getDate();
-    
-    const startMonth = startDate.toLocaleDateString("es-ES", { month: "short" });
-    const endMonth = endDate.toLocaleDateString("es-ES", { month: "short" });
+    const tz = "Europe/Madrid";
+
+    const startDay = startDate.toLocaleDateString("es-ES", { day: "numeric", timeZone: tz });
+    const endDay = endDate.toLocaleDateString("es-ES", { day: "numeric", timeZone: tz });
+    const startMonth = startDate.toLocaleDateString("es-ES", { month: "short", timeZone: tz });
+    const endMonth = endDate.toLocaleDateString("es-ES", { month: "short", timeZone: tz });
     
     if (startMonth === endMonth) {
       return `${startDay}-${endDay} ${startMonth}`;

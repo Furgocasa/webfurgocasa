@@ -182,12 +182,12 @@ function formatSeconds(seconds: number): string {
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
+  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', timeZone: 'Europe/Madrid' });
 }
 
 function formatDateWithYear(dateString: string): string {
   const date = new Date(dateString);
-  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+  return date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' });
 }
 
 // Hook personalizado para ordenación de tablas

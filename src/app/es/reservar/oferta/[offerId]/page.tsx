@@ -220,7 +220,8 @@ export default function ReservarOfertaPage({
       weekday: 'long',
       day: 'numeric',
       month: 'long',
-      year: 'numeric'
+      year: 'numeric',
+      timeZone: 'Europe/Madrid'
     });
   };
 

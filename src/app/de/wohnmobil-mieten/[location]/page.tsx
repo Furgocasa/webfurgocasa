@@ -639,7 +639,7 @@ export default async function LocationPage({ params }: PageProps) {
                     <div className="flex items-center justify-between text-xs text-gray-500">
                       {article.published_at && (
                         <time dateTime={article.published_at}>
-                          {new Date(article.published_at).toLocaleDateString('de-DE')}
+                          {new Date(article.published_at).toLocaleDateString('de-DE', { timeZone: 'Europe/Madrid' })}
                         </time>
                       )}
                       <span className="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">

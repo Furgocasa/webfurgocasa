@@ -657,9 +657,9 @@ export default function UbicacionesPage() {
                   {location.active_from || location.active_until ? (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-50 text-amber-700 font-medium">
                       {location.active_from && location.active_until 
-                        ? `${new Date(location.active_from + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })} - ${new Date(location.active_until + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}` 
-                        : location.active_from ? `Desde ${new Date(location.active_from + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}` 
-                        : `Hasta ${new Date(location.active_until! + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short' })}`}
+                        ? `${new Date(location.active_from + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', timeZone: 'Europe/Madrid' })} - ${new Date(location.active_until + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', timeZone: 'Europe/Madrid' })}` 
+                        : location.active_from ? `Desde ${new Date(location.active_from + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', timeZone: 'Europe/Madrid' })}` 
+                        : `Hasta ${new Date(location.active_until! + 'T00:00:00').toLocaleDateString('es-ES', { day: '2-digit', month: 'short', timeZone: 'Europe/Madrid' })}`}
                       {location.active_recurring ? ' (cada año)' : ''}
                     </span>
                   ) : (

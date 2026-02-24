@@ -293,7 +293,8 @@ export default function ReservaPage() {
                   month: 'long',
                   year: 'numeric',
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
+                  timeZone: 'Europe/Madrid'
                 })}
               </p>
             </div>
@@ -386,7 +387,7 @@ export default function ReservaPage() {
                     <p className="mt-3 text-xs sm:text-sm text-gray-600 flex items-start gap-2">
                       <Clock className="h-4 w-4 flex-shrink-0 mt-0.5" />
                       <span>
-                        {t("Recuerda: el pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })})
+                        {t("Recuerda: el pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' })})
                       </span>
                     </p>
                   )}
@@ -538,7 +539,8 @@ export default function ReservaPage() {
                         {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { 
                           day: '2-digit', 
                           month: '2-digit', 
-                          year: 'numeric' 
+                          year: 'numeric',
+                          timeZone: 'Europe/Madrid'
                         })}
                       </p>
                     </div>
@@ -589,7 +591,8 @@ export default function ReservaPage() {
                         weekday: 'long',
                         day: 'numeric',
                         month: 'long',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600 mt-1">{booking.pickup_time}</p>
@@ -602,7 +605,8 @@ export default function ReservaPage() {
                         weekday: 'long',
                         day: 'numeric',
                         month: 'long',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600 mt-1">{booking.dropoff_time}</p>
@@ -611,12 +615,7 @@ export default function ReservaPage() {
                   <div className="md:col-span-2 p-4 bg-blue-50 rounded-lg">
                     <p className="text-sm text-gray-500 uppercase font-medium mb-1">{t("Duración")}</p>
                     <p className="font-bold text-furgocasa-blue text-xl">
-                      {(() => {
-                        const pickup = new Date(booking.pickup_date);
-                        const dropoff = new Date(booking.dropoff_date);
-                        const days = Math.ceil((dropoff.getTime() - pickup.getTime()) / (1000 * 60 * 60 * 24));
-                        return `${days} ${days === 1 ? t("día") : t("días")}`;
-                      })()}
+                      {booking.days} {booking.days === 1 ? t("día") : t("días")}
                     </p>
                   </div>
                 </div>

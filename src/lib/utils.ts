@@ -31,6 +31,7 @@ export function formatDate(date: Date | string, format: "short" | "long" = "shor
       year: "numeric",
       month: "long",
       day: "numeric",
+      timeZone: "Europe/Madrid",
     });
   }
   
@@ -38,6 +39,7 @@ export function formatDate(date: Date | string, format: "short" | "long" = "shor
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "Europe/Madrid",
   });
 }
 

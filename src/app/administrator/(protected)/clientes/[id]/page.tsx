@@ -201,7 +201,8 @@ export default function ClienteDetallePage() {
               <p className="text-gray-600 mt-1">
                 Cliente desde {new Date(customer.created_at).toLocaleDateString('es-ES', { 
                   month: 'long', 
-                  year: 'numeric'
+                  year: 'numeric',
+                  timeZone: 'Europe/Madrid'
                 })}
               </p>
             </div>
@@ -322,7 +323,8 @@ export default function ClienteDetallePage() {
                     {new Date(customer.date_of_birth).toLocaleDateString('es-ES', {
                       day: 'numeric',
                       month: 'long',
-                      year: 'numeric'
+                      year: 'numeric',
+                      timeZone: 'Europe/Madrid'
                     })}
                   </p>
                 </div>
@@ -370,7 +372,7 @@ export default function ClienteDetallePage() {
                   <div>
                     <p className="text-sm text-gray-500 uppercase font-medium mb-1">Fecha de vencimiento</p>
                     <p className="text-gray-900">
-                      {new Date(customer.driver_license_expiry).toLocaleDateString('es-ES')}
+                      {new Date(customer.driver_license_expiry).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })}
                     </p>
                   </div>
                 )}
@@ -434,7 +436,8 @@ export default function ClienteDetallePage() {
                             {new Date(booking.pickup_date).toLocaleDateString('es-ES', {
                               day: 'numeric',
                               month: 'short',
-                              year: 'numeric'
+                              year: 'numeric',
+                              timeZone: 'Europe/Madrid'
                             })}
                           </span>
                           <span>→</span>
@@ -442,7 +445,8 @@ export default function ClienteDetallePage() {
                             {new Date(booking.dropoff_date).toLocaleDateString('es-ES', {
                               day: 'numeric',
                               month: 'short',
-                              year: 'numeric'
+                              year: 'numeric',
+                              timeZone: 'Europe/Madrid'
                             })}
                           </span>
                           <span className="text-gray-400">·</span>

@@ -561,7 +561,7 @@ export default function MediaPage() {
                       {formatFileSize(file.size)}
                     </td>
                     <td className="p-4 text-sm text-gray-600">
-                      {new Date(file.created_at).toLocaleDateString("es-ES")}
+                      {new Date(file.created_at).toLocaleDateString("es-ES", { timeZone: 'Europe/Madrid' })}
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex gap-2 justify-end">

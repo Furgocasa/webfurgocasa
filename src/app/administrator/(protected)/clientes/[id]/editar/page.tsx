@@ -495,7 +495,8 @@ export default function EditarClientePage() {
                     {new Date(customer.created_at).toLocaleDateString('es-ES', {
                       day: 'numeric',
                       month: 'long',
-                      year: 'numeric'
+                      year: 'numeric',
+                      timeZone: 'Europe/Madrid'
                     })}
                   </p>
                 </div>

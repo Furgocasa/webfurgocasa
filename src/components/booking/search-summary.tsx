@@ -1,7 +1,5 @@
 "use client";
 
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
 import { Calendar, MapPin, Clock, Edit2 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/language-context";
@@ -27,7 +25,12 @@ export function SearchSummary({
   const { t } = useLanguage();
   const formatDateDisplay = (dateStr: string) => {
     const date = new Date(dateStr);
-    return format(date, "EEE, d 'de' MMM", { locale: es });
+    return date.toLocaleDateString("es-ES", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      timeZone: "Europe/Madrid",
+    });
   };
 
   // IMPORTANTE: Usar calculateRentalDays que considera las horas

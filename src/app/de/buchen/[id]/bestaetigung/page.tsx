@@ -293,7 +293,8 @@ export default function ConfirmacionPage() {
                       {new Date(booking.pickup_date).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600">{booking.pickup_time}</p>
@@ -308,7 +309,8 @@ export default function ConfirmacionPage() {
                       {new Date(booking.dropoff_date).toLocaleDateString('es-ES', {
                         day: 'numeric',
                         month: 'short',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600">{booking.dropoff_time}</p>

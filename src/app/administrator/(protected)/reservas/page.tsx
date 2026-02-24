@@ -54,7 +54,8 @@ function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("es-ES", { 
     day: "2-digit", 
     month: "2-digit",
-    year: "numeric"
+    year: "numeric",
+    timeZone: "Europe/Madrid"
   });
 }
 
@@ -64,7 +65,8 @@ function formatDateTime(date: string): string {
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
-    minute: "2-digit"
+    minute: "2-digit",
+    timeZone: "Europe/Madrid"
   });
 }
 
@@ -620,7 +622,7 @@ export default function BookingsPage() {
                       {/* Fecha de Creación */}
                       <td className="px-2 py-3">
                         <p className="text-xs text-gray-600">{formatDate(booking.created_at || '')}</p>
-                        <p className="text-[10px] text-gray-400">{new Date(booking.created_at || '').toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}</p>
+                        <p className="text-[10px] text-gray-400">{new Date(booking.created_at || '').toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Madrid' })}</p>
                       </td>
                       
                       {/* Cliente */}

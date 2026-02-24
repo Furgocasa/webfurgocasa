@@ -369,11 +369,11 @@ export default function PaymentDetailPage() {
                   )}
                   <div>
                     <p className="text-gray-500">Creado</p>
-                    <p className="text-gray-900">{new Date(payment.created_at).toLocaleString("es-ES")}</p>
+                    <p className="text-gray-900">{new Date(payment.created_at).toLocaleString("es-ES", { timeZone: 'Europe/Madrid' })}</p>
                   </div>
                   <div>
                     <p className="text-gray-500">Actualizado</p>
-                    <p className="text-gray-900">{new Date(payment.updated_at).toLocaleString("es-ES")}</p>
+                    <p className="text-gray-900">{new Date(payment.updated_at).toLocaleString("es-ES", { timeZone: 'Europe/Madrid' })}</p>
                   </div>
                 </div>
               </div>

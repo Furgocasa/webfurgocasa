@@ -402,7 +402,7 @@ export default function EditarBloqueoPage({ params }: { params: { id: string } }
             <ul className="space-y-2 text-sm text-blue-800">
               <li className="flex gap-2">
                 <span>•</span>
-                <span>Creado el {new Date(blockedDate.created_at).toLocaleDateString('es-ES')}</span>
+                <span>Creado el {new Date(blockedDate.created_at).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })}</span>
               </li>
               <li className="flex gap-2">
                 <span>•</span>

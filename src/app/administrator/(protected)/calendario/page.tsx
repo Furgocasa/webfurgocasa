@@ -445,7 +445,7 @@ export default function CalendarioPage() {
 
   const getDayName = (day: number, monthDate: Date) => {
     const date = new Date(monthDate.getFullYear(), monthDate.getMonth(), day);
-    return date.toLocaleDateString('es-ES', { weekday: 'short' }).substring(0, 3);
+    return date.toLocaleDateString('es-ES', { weekday: 'short', timeZone: 'Europe/Madrid' }).substring(0, 3);
   };
 
   const isDateInRange = (day: number, monthDate: Date, pickup: string, dropoff: string) => {
@@ -713,9 +713,9 @@ export default function CalendarioPage() {
             <div className="flex items-center justify-center gap-2 w-full sm:flex-1">
               <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
               <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 capitalize text-center">
-                {months[0].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}
+                {months[0].toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' })}
                 {monthsToShow > 1 && (
-                  <span className="hidden sm:inline"> - {months[months.length - 1].toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })}</span>
+                  <span className="hidden sm:inline"> - {months[months.length - 1].toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' })}</span>
                 )}
               </span>
             </div>
@@ -750,7 +750,7 @@ export default function CalendarioPage() {
             <>
               {months.map((monthDate, monthIndex) => {
                 const days = getDaysInMonth(monthDate);
-                const monthName = monthDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+                const monthName = monthDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' });
 
                 return (
                   <div key={monthIndex} className="mb-8 last:mb-0 border-b border-gray-300 last:border-b-0 pb-8 last:pb-0">
@@ -1045,7 +1045,7 @@ export default function CalendarioPage() {
                 const firstDayOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
                 const startingDayOfWeek = firstDayOfMonth.getDay();
                 
-                const monthName = monthDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' });
+                const monthName = monthDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' });
                 
                 return (
                   <div key={monthIndex} className="space-y-3">
@@ -1258,14 +1258,14 @@ export default function CalendarioPage() {
                   <div className="bg-green-50 rounded-lg p-3 border border-green-200">
                     <div className="text-xs font-semibold text-green-700 mb-1">🟢 Recogida</div>
                     <div className="font-bold text-gray-900">
-                      {new Date(selectedBooking.pickup_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(selectedBooking.pickup_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}
                     </div>
                     <div className="text-sm text-gray-600">{selectedBooking.pickup_time?.substring(0, 5) || '10:00'}</div>
                   </div>
                   <div className="bg-red-50 rounded-lg p-3 border border-red-200">
                     <div className="text-xs font-semibold text-red-700 mb-1">🔴 Devolución</div>
                     <div className="font-bold text-gray-900">
-                      {new Date(selectedBooking.dropoff_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {new Date(selectedBooking.dropoff_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}
                     </div>
                     <div className="text-sm text-gray-600">{selectedBooking.dropoff_time?.substring(0, 5) || '10:00'}</div>
                   </div>

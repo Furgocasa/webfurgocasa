@@ -1003,7 +1003,7 @@ export default function EditarReservaPage() {
                       </label>
                       <p className="text-sm font-medium text-gray-900">
                         {customerData.date_of_birth 
-                          ? new Date(customerData.date_of_birth).toLocaleDateString('es-ES') 
+                          ? new Date(customerData.date_of_birth).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' }) 
                           : '-'}
                       </p>
                     </div>
@@ -1021,7 +1021,7 @@ export default function EditarReservaPage() {
                       </label>
                       <p className="text-sm font-medium text-gray-900">
                         {customerData.driver_license_expiry 
-                          ? new Date(customerData.driver_license_expiry).toLocaleDateString('es-ES') 
+                          ? new Date(customerData.driver_license_expiry).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' }) 
                           : '-'}
                       </p>
                     </div>

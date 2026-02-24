@@ -141,7 +141,7 @@ const conditionLabels: Record<string, { label: string; color: string }> = {
 };
 
 function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString("es-ES", { month:"long", year:"numeric" });
+  return new Date(date).toLocaleDateString("es-ES", { month:"long", year:"numeric", timeZone: "Europe/Madrid" });
 }
 
 export default async function VehicleSalePage({ params }: { params: Promise<{ slug: string }> }) {

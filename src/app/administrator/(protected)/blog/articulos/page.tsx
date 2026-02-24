@@ -477,11 +477,11 @@ export default function BlogPostsPage() {
                           {post.views.toLocaleString()}
                         </td>
                         <td className="px-6 py-4 text-gray-600 text-sm">
-                          {new Date(post.created_at).toLocaleDateString('es-ES')}
+                          {new Date(post.created_at).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })}
                         </td>
                         <td className="px-6 py-4 text-gray-600 text-sm">
                           {post.published_at 
-                            ? new Date(post.published_at).toLocaleDateString('es-ES')
+                            ? new Date(post.published_at).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })
                             : <span className="text-gray-400">-</span>}
                         </td>
                         <td className="px-6 py-4">

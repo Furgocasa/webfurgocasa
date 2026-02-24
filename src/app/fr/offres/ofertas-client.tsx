@@ -59,7 +59,8 @@ export function OfertasClient() {
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString(locale === 'en' ? 'en-US' : 'es-ES', {
       day: 'numeric',
-      month: 'short'
+      month: 'short',
+      timeZone: 'Europe/Madrid'
     });
   };
 

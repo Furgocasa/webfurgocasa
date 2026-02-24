@@ -32,6 +32,7 @@ function formatDateLabel(dateStr: string): string {
     weekday: "short",
     day: "numeric",
     month: "short",
+    timeZone: "Europe/Madrid",
   });
 }
 
@@ -124,6 +125,7 @@ export default async function AdminDashboard() {
                     ).toLocaleDateString("es-ES", {
                       day: "numeric",
                       month: "short",
+                      timeZone: "Europe/Madrid",
                     })}
                     , pickup{" "}
                     {new Date(
@@ -131,6 +133,7 @@ export default async function AdminDashboard() {
                     ).toLocaleDateString("es-ES", {
                       day: "numeric",
                       month: "short",
+                      timeZone: "Europe/Madrid",
                     })}
                   </p>
                   <p className="text-xs text-red-600 mt-0.5">
@@ -207,6 +210,7 @@ export default async function AdminDashboard() {
                       ).toLocaleDateString("es-ES", {
                         day: "numeric",
                         month: "short",
+                        timeZone: "Europe/Madrid",
                       })}{" "}
                       {b.dropoffTime}
                     </span>
@@ -322,6 +326,7 @@ export default async function AdminDashboard() {
                         ).toLocaleDateString("es-ES", {
                           day: "numeric",
                           month: "short",
+                          timeZone: "Europe/Madrid",
                         })}
                       </span>
                       <span>→</span>
@@ -556,6 +561,7 @@ export default async function AdminDashboard() {
                         ).toLocaleDateString("es-ES", {
                           day: "numeric",
                           month: "short",
+                          timeZone: "Europe/Madrid",
                         })}
                       </span>
                       {b.vehicleDamages > 0 && (
@@ -673,7 +679,7 @@ export default async function AdminDashboard() {
                       — {bl.reason} · hasta{" "}
                       {new Date(bl.endDate + "T12:00:00").toLocaleDateString(
                         "es-ES",
-                        { day: "numeric", month: "short" }
+                        { day: "numeric", month: "short", timeZone: "Europe/Madrid" }
                       )}
                     </span>
                   </span>

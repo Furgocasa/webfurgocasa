@@ -293,7 +293,8 @@ export default function ReservaPage() {
                   month: 'long',
                   year: 'numeric',
                   hour: '2-digit',
-                  minute: '2-digit'
+                  minute: '2-digit',
+                  timeZone: 'Europe/Madrid'
                 })}
               </p>
             </div>
@@ -396,7 +397,7 @@ export default function ReservaPage() {
                     <p className="mt-3 text-xs sm:text-sm text-gray-600 flex items-start gap-2">
                       <Clock className="h-4 w-4 flex-shrink-0 mt-0.5" />
                       <span>
-                        {t("Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })})
+                        {t("Recuerda: el segundo pago debe completarse como máximo 15 días antes del inicio del alquiler")} ({new Date(pickupDate.getTime() - 15 * 24 * 60 * 60 * 1000).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', timeZone: 'Europe/Madrid' })})
                       </span>
                     </p>
                   )}
@@ -548,7 +549,8 @@ export default function ReservaPage() {
                         {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { 
                           day: '2-digit', 
                           month: '2-digit', 
-                          year: 'numeric' 
+                          year: 'numeric',
+                          timeZone: 'Europe/Madrid'
                         })}
                       </p>
                     </div>
@@ -599,7 +601,8 @@ export default function ReservaPage() {
                         weekday: 'long',
                         day: 'numeric',
                         month: 'long',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600 mt-1">{booking.pickup_time}</p>
@@ -612,7 +615,8 @@ export default function ReservaPage() {
                         weekday: 'long',
                         day: 'numeric',
                         month: 'long',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600 mt-1">{booking.dropoff_time}</p>

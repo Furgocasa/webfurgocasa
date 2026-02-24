@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
                 <li>Servidor: ${process.env.SMTP_HOST}</li>
                 <li>Puerto: ${process.env.SMTP_PORT || '465'}</li>
                 <li>Remitente: ${getFromEmail()}</li>
-                <li>Fecha: ${new Date().toLocaleString('es-ES')}</li>
+                <li>Fecha: ${new Date().toLocaleString('es-ES', { timeZone: 'Europe/Madrid' })}</li>
               </ul>
             </div>
             

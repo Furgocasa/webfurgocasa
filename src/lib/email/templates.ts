@@ -95,6 +95,7 @@ function formatDate(date: string): string {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    timeZone: 'Europe/Madrid',
   });
 }
 
@@ -212,7 +213,7 @@ function getCustomerSection(data: BookingEmailData): string {
     rows.push(tableRow('Edad', `${data.customerAge} años`));
   }
   if (data.customerDriverLicenseExpiry) {
-    rows.push(tableRow('Caducidad carnet', new Date(data.customerDriverLicenseExpiry).toLocaleDateString('es-ES')));
+    rows.push(tableRow('Caducidad carnet', new Date(data.customerDriverLicenseExpiry).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })));
   }
   if (data.customerPhone) {
     rows.push(tableRow('Teléfono', data.customerPhone));

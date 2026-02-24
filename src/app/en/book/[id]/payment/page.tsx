@@ -405,7 +405,8 @@ export default function PagoPage() {
                         weekday: 'long',
                         day: 'numeric',
                         month: 'long',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600">{booking.pickup_time}</p>
@@ -421,7 +422,8 @@ export default function PagoPage() {
                         weekday: 'long',
                         day: 'numeric',
                         month: 'long',
-                        year: 'numeric'
+                        year: 'numeric',
+                        timeZone: 'Europe/Madrid'
                       })}
                     </p>
                     <p className="text-sm text-gray-600">{booking.dropoff_time}</p>

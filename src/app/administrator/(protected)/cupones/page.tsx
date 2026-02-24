@@ -588,11 +588,11 @@ export default function CuponesPage() {
                             {coupon.valid_from || coupon.valid_until ? (
                               <>
                                 {coupon.valid_from && (
-                                  <p>Desde: {new Date(coupon.valid_from).toLocaleDateString('es-ES')}</p>
+                                  <p>Desde: {new Date(coupon.valid_from).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })}</p>
                                 )}
                                 {coupon.valid_until && (
                                   <p className={isExpired(coupon) ? 'text-red-500 font-medium' : ''}>
-                                    Hasta: {new Date(coupon.valid_until).toLocaleDateString('es-ES')}
+                                    Hasta: {new Date(coupon.valid_until).toLocaleDateString('es-ES', { timeZone: 'Europe/Madrid' })}
                                   </p>
                                 )}
                               </>
