@@ -540,10 +540,10 @@ export default function VehicleDamageDetailPage() {
                 {hasPrev && (
                   <button
                     onClick={() => setActiveView(currentViews[currentIdx - 1].id)}
-                    className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-md rounded-full p-1.5 transition-opacity opacity-70 group-hover:opacity-100"
+                    className="absolute left-1 top-1/2 -translate-y-1/2 z-10 bg-furgocasa-blue hover:bg-furgocasa-blue/90 shadow-md rounded-full p-1.5 transition-opacity opacity-80 group-hover:opacity-100"
                     title={currentViews[currentIdx - 1].label}
                   >
-                    <ChevronLeft className="h-5 w-5 text-gray-700" />
+                    <ChevronLeft className="h-5 w-5 text-white" />
                   </button>
                 )}
                 <VehicleDamagePlan
@@ -557,10 +557,10 @@ export default function VehicleDamageDetailPage() {
                 {hasNext && (
                   <button
                     onClick={() => setActiveView(currentViews[currentIdx + 1].id)}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white shadow-md rounded-full p-1.5 transition-opacity opacity-70 group-hover:opacity-100"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 z-10 bg-furgocasa-blue hover:bg-furgocasa-blue/90 shadow-md rounded-full p-1.5 transition-opacity opacity-80 group-hover:opacity-100"
                     title={currentViews[currentIdx + 1].label}
                   >
-                    <ChevronRight className="h-5 w-5 text-gray-700" />
+                    <ChevronRight className="h-5 w-5 text-white" />
                   </button>
                 )}
               </div>
