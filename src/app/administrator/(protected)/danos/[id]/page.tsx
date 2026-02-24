@@ -139,21 +139,39 @@ export default function VehicleDamageDetailPage() {
   // Filter damages by current view - EXCLUIR reparados de los marcadores visuales
   const currentViewDamages = useMemo(() => {
     return damages
-      .filter(d => d.view_type === activeView && d.status !== 'repaired') // Solo daños activos
+      .filter(d => d.view_type === activeView && d.status !== 'repaired')
       .map(d => ({
         id: d.id,
-        damage_number: d.damage_number || 0,
+        damage_number: damageDisplayNumbers.get(d.id) || 0,
         position_x: d.position_x || 50,
         position_y: d.position_y || 50,
         description: d.description,
         severity: d.severity,
         status: d.status,
       }));
-  }, [damages, activeView]);
+  }, [damages, activeView, damageDisplayNumbers]);
 
   // Daños activos (no reparados) para contar en las pestañas
   const activeDamages = useMemo(() => {
     return damages.filter(d => d.status !== 'repaired');
+  }, [damages]);
+
+  // Numeración independiente por tipo (exterior: 1,2,3... / interior: 1,2,3...)
+  const damageDisplayNumbers = useMemo(() => {
+    const map = new Map<string, number>();
+    let extCounter = 0;
+    let intCounter = 0;
+    const sorted = [...damages].sort((a, b) => (a.damage_number || 0) - (b.damage_number || 0));
+    for (const d of sorted) {
+      if (d.damage_type === 'interior') {
+        intCounter++;
+        map.set(d.id, intCounter);
+      } else {
+        extCounter++;
+        map.set(d.id, extCounter);
+      }
+    }
+    return map;
   }, [damages]);
 
   // Stats - Pestañas muestran solo daños activos, historial muestra reparados
@@ -233,11 +251,16 @@ export default function VehicleDamageDetailPage() {
 
         if (error) throw error;
       } else if (newDamagePosition) {
-        // Create new damage
+        // Calcular siguiente damage_number para este tipo (exterior o interior por separado)
+        const sameTypeDamages = damages.filter(d => d.damage_type === category);
+        const maxNumber = sameTypeDamages.reduce((max, d) => Math.max(max, d.damage_number || 0), 0);
+        const nextNumber = maxNumber + 1;
+
         const { error } = await supabase
           .from('vehicle_damages')
           .insert({
             vehicle_id: vehicleId,
+            damage_number: nextNumber,
             description: formData.description,
             damage_type: category,
             view_type: activeView,
@@ -524,89 +547,166 @@ export default function VehicleDamageDetailPage() {
           </div>
         </div>
 
-        {/* Damage List - 1 column */}
+        {/* Damage List - separated by type */}
         <div className="space-y-4">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
-              <h3 className="font-medium text-gray-900">Lista de Daños</h3>
+          {damages.length === 0 ? (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-8 text-center">
+                <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-300" />
+                <p className="text-gray-500">Sin daños registrados</p>
+                {!isEditing && (
+                  <button
+                    onClick={() => setIsEditing(true)}
+                    className="mt-4 text-furgocasa-orange hover:underline text-sm"
+                  >
+                    Añadir primer daño
+                  </button>
+                )}
+              </div>
             </div>
-            <div className="max-h-[600px] overflow-y-auto">
-              {damages.length === 0 ? (
-                <div className="p-8 text-center">
-                  <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-300" />
-                  <p className="text-gray-500">Sin daños registrados</p>
-                  {!isEditing && (
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="mt-4 text-furgocasa-orange hover:underline text-sm"
-                    >
-                      Añadir primer daño
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <ul className="divide-y divide-gray-100">
-                  {damages.map((damage) => {
-                    const statusColor = statusOptions.find(s => s.value === damage.status)?.color || 'text-gray-600 bg-gray-100';
-                    const severityColor = severityOptions.find(s => s.value === damage.severity)?.color || 'text-gray-600 bg-gray-100';
-                    const viewLabel = viewTypes.find(v => v.id === damage.view_type)?.label || damage.view_type;
-                    
-                    return (
-                      <li 
-                        key={damage.id}
-                        className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                          selectedDamage?.id === damage.id ? 'bg-orange-50 border-l-4 border-furgocasa-orange' : ''
-                        }`}
-                        onClick={() => {
-                          // Navigate to the damage's view
-                          const view = viewTypes.find(v => v.id === damage.view_type);
-                          if (view) {
-                            setActiveTab(view.category);
-                            setActiveView(view.id);
-                          }
-                          handleSelectDamage({
-                            id: damage.id,
-                            damage_number: damage.damage_number || 0,
-                            position_x: damage.position_x || 50,
-                            position_y: damage.position_y || 50,
-                            description: damage.description,
-                            severity: damage.severity,
-                            status: damage.status,
-                          });
-                        }}
-                      >
-                        <div className="flex items-start gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                            damage.status === 'repaired' 
-                              ? 'bg-green-100 text-green-700 border-2 border-green-500' 
-                              : damage.status === 'in_progress'
-                                ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
-                                : 'bg-red-100 text-red-700 border-2 border-red-500'
-                          }`}>
-                            {damage.damage_number || '?'}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="font-medium text-gray-900 truncate">{damage.description}</p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              <span className={`px-2 py-0.5 text-xs rounded-full ${statusColor}`}>
-                                {statusOptions.find(s => s.value === damage.status)?.label || damage.status}
-                              </span>
-                              <span className={`px-2 py-0.5 text-xs rounded-full ${severityColor}`}>
-                                {severityOptions.find(s => s.value === damage.severity)?.label || damage.severity}
-                              </span>
+          ) : (
+            <>
+              {/* DAÑOS EXTERIORES */}
+              {damages.filter(d => d.damage_type !== 'interior').length > 0 && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 bg-orange-50">
+                    <h3 className="font-medium text-gray-900">
+                      Daños Exteriores <span className="text-orange-600">({damages.filter(d => d.damage_type !== 'interior').length})</span>
+                    </h3>
+                  </div>
+                  <div className="max-h-[350px] overflow-y-auto">
+                    <ul className="divide-y divide-gray-100">
+                      {damages.filter(d => d.damage_type !== 'interior').map((damage) => {
+                        const statusColor = statusOptions.find(s => s.value === damage.status)?.color || 'text-gray-600 bg-gray-100';
+                        const severityColor = severityOptions.find(s => s.value === damage.severity)?.color || 'text-gray-600 bg-gray-100';
+                        const viewLabel = viewTypes.find(v => v.id === damage.view_type)?.label || damage.view_type;
+                        const displayNum = damageDisplayNumbers.get(damage.id) || '?';
+                        
+                        return (
+                          <li 
+                            key={damage.id}
+                            className={`p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
+                              selectedDamage?.id === damage.id ? 'bg-orange-50 border-l-4 border-furgocasa-orange' : ''
+                            }`}
+                            onClick={() => {
+                              const view = viewTypes.find(v => v.id === damage.view_type);
+                              if (view) {
+                                setActiveTab(view.category);
+                                setActiveView(view.id);
+                              }
+                              handleSelectDamage({
+                                id: damage.id,
+                                damage_number: damageDisplayNumbers.get(damage.id) || 0,
+                                position_x: damage.position_x || 50,
+                                position_y: damage.position_y || 50,
+                                description: damage.description,
+                                severity: damage.severity,
+                                status: damage.status,
+                              });
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                                damage.status === 'repaired' 
+                                  ? 'bg-green-100 text-green-700 border-2 border-green-500' 
+                                  : damage.status === 'in_progress'
+                                    ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
+                                    : 'bg-red-100 text-red-700 border-2 border-red-500'
+                              }`}>
+                                {displayNum}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-gray-900 truncate">{damage.description}</p>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  <span className={`px-2 py-0.5 text-xs rounded-full ${statusColor}`}>
+                                    {statusOptions.find(s => s.value === damage.status)?.label || damage.status}
+                                  </span>
+                                  <span className={`px-2 py-0.5 text-xs rounded-full ${severityColor}`}>
+                                    {severityOptions.find(s => s.value === damage.severity)?.label || damage.severity}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">{viewLabel}</p>
+                              </div>
                             </div>
-                            <p className="text-xs text-gray-400 mt-1">
-                              {viewLabel} · {damage.damage_type === 'interior' ? 'Interior' : 'Exterior'}
-                            </p>
-                          </div>
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </div>
               )}
-            </div>
-          </div>
+
+              {/* DAÑOS INTERIORES */}
+              {damages.filter(d => d.damage_type === 'interior').length > 0 && (
+                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="px-4 py-3 border-b border-gray-100 bg-blue-50">
+                    <h3 className="font-medium text-gray-900">
+                      Daños Interiores <span className="text-blue-600">({damages.filter(d => d.damage_type === 'interior').length})</span>
+                    </h3>
+                  </div>
+                  <div className="max-h-[350px] overflow-y-auto">
+                    <ul className="divide-y divide-gray-100">
+                      {damages.filter(d => d.damage_type === 'interior').map((damage) => {
+                        const statusColor = statusOptions.find(s => s.value === damage.status)?.color || 'text-gray-600 bg-gray-100';
+                        const severityColor = severityOptions.find(s => s.value === damage.severity)?.color || 'text-gray-600 bg-gray-100';
+                        const viewLabel = viewTypes.find(v => v.id === damage.view_type)?.label || damage.view_type;
+                        const displayNum = damageDisplayNumbers.get(damage.id) || '?';
+                        
+                        return (
+                          <li 
+                            key={damage.id}
+                            className={`p-3 hover:bg-gray-50 cursor-pointer transition-colors ${
+                              selectedDamage?.id === damage.id ? 'bg-blue-50 border-l-4 border-blue-500' : ''
+                            }`}
+                            onClick={() => {
+                              const view = viewTypes.find(v => v.id === damage.view_type);
+                              if (view) {
+                                setActiveTab(view.category);
+                                setActiveView(view.id);
+                              }
+                              handleSelectDamage({
+                                id: damage.id,
+                                damage_number: damageDisplayNumbers.get(damage.id) || 0,
+                                position_x: damage.position_x || 50,
+                                position_y: damage.position_y || 50,
+                                description: damage.description,
+                                severity: damage.severity,
+                                status: damage.status,
+                              });
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 ${
+                                damage.status === 'repaired' 
+                                  ? 'bg-green-100 text-green-700 border-2 border-green-500' 
+                                  : damage.status === 'in_progress'
+                                    ? 'bg-yellow-100 text-yellow-700 border-2 border-yellow-500'
+                                    : 'bg-red-100 text-red-700 border-2 border-red-500'
+                              }`}>
+                                {displayNum}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-medium text-gray-900 truncate">{damage.description}</p>
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  <span className={`px-2 py-0.5 text-xs rounded-full ${statusColor}`}>
+                                    {statusOptions.find(s => s.value === damage.status)?.label || damage.status}
+                                  </span>
+                                  <span className={`px-2 py-0.5 text-xs rounded-full ${severityColor}`}>
+                                    {severityOptions.find(s => s.value === damage.severity)?.label || damage.severity}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-400 mt-1">{viewLabel}</p>
+                              </div>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
 
@@ -616,7 +716,7 @@ export default function VehicleDamageDetailPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">
-                {selectedDamage ? `Editar Daño #${selectedDamage.damage_number}` : 'Nuevo Daño'}
+                {selectedDamage ? `Editar Daño #${damageDisplayNumbers.get(selectedDamage.id) || selectedDamage.damage_number} (${selectedDamage.damage_type === 'interior' ? 'Interior' : 'Exterior'})` : 'Nuevo Daño'}
               </h3>
               <button
                 onClick={() => {

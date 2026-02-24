@@ -73,7 +73,7 @@ const statusColors: Record<string, { fill: string; stroke: string }> = {
 
 // Componente de imagen con marcadores - mismo estilo que la página /administrator/danos/[id]
 // w-7 h-7 (28px), border-2, shadow-md, número centrado con tabla (html2canvas)
-function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: VehicleDamage[] }) {
+function VehicleImage({ viewType, damages, displayNumbers }: { viewType: ViewType; damages: VehicleDamage[]; displayNumbers: Map<string, number> }) {
   const viewDamages = damages.filter(d => d.view_type === viewType);
   
   return (
@@ -100,21 +100,16 @@ function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: Vehi
               backgroundColor: colors.fill,
               border: `2px solid ${colors.stroke}`,
               color: colors.stroke,
-              fontSize: '12px',
+              fontSize: '14px',
               fontWeight: 'bold',
+              lineHeight: '28px',
+              textAlign: 'center',
+              overflow: 'hidden',
               boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
               zIndex: 10,
             }}
           >
-            <table style={{ width: '100%', height: '100%', borderCollapse: 'collapse', border: 'none', margin: 0, padding: 0 }}>
-              <tbody>
-                <tr>
-                  <td style={{ verticalAlign: 'middle', textAlign: 'center', margin: 0, padding: 0, fontSize: '12px', fontWeight: 'bold' }}>
-                    {damage.damage_number || '?'}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            {displayNumbers.get(damage.id) || '?'}
           </div>
         );
       })}
@@ -129,6 +124,24 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
   const activeDamages = damages.filter(d => d.status !== 'repaired');
   const exteriorDamages = activeDamages.filter(d => d.damage_type === 'exterior');
   const interiorDamages = activeDamages.filter(d => d.damage_type === 'interior');
+
+  // Numeración independiente por tipo
+  const damageDisplayNumbers = (() => {
+    const map = new Map<string, number>();
+    let extCounter = 0;
+    let intCounter = 0;
+    const sorted = [...damages].sort((a, b) => (a.damage_number || 0) - (b.damage_number || 0));
+    for (const d of sorted) {
+      if (d.damage_type === 'interior') {
+        intCounter++;
+        map.set(d.id, intCounter);
+      } else {
+        extCounter++;
+        map.set(d.id, extCounter);
+      }
+    }
+    return map;
+  })();
   
   const today = new Date().toLocaleDateString('es-ES', { 
     day: '2-digit', 
@@ -271,7 +284,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                             <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                               <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Frontal</div>
                               <div style={{ width: '60%', margin: '0 auto' }}>
-                                <VehicleImage viewType="front" damages={activeDamages} />
+                                <VehicleImage viewType="front" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                               </div>
                             </div>
                           </td>
@@ -279,7 +292,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                             <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                               <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Trasera</div>
                               <div style={{ width: '60%', margin: '0 auto' }}>
-                                <VehicleImage viewType="back" damages={activeDamages} />
+                                <VehicleImage viewType="back" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                               </div>
                             </div>
                           </td>
@@ -294,13 +307,13 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                           <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'top' }}>
                             <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                               <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Lateral Izquierdo</div>
-                              <VehicleImage viewType="left" damages={activeDamages} />
+                              <VehicleImage viewType="left" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                             </div>
                           </td>
                           <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'top' }}>
                             <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                               <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Lateral Derecho</div>
-                              <VehicleImage viewType="right" damages={activeDamages} />
+                              <VehicleImage viewType="right" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                             </div>
                           </td>
                         </tr>
@@ -311,7 +324,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
                       <div style={{ width: '60%', border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
                         <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Superior</div>
-                        <VehicleImage viewType="top" damages={activeDamages} />
+                        <VehicleImage viewType="top" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                       </div>
                     </div>
                   </div>
@@ -321,21 +334,22 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                     <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
                       DAÑO INTERIOR ({interiorDamages.length})
                     </div>
-                    <VehicleImage viewType="interior" damages={activeDamages} />
+                    <VehicleImage viewType="interior" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                   </div>
 
                 </td>
 
-                {/* COLUMNA DERECHA: DETALLES DE DAÑOS */}
+                {/* COLUMNA DERECHA: DETALLES DE DAÑOS separados por tipo */}
                 <td style={{ width: '42%', verticalAlign: 'top', paddingLeft: '8px' }}>
-                  {activeDamages.length > 0 && (
-                    <div>
-                      <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
-                        DETALLE DE DAÑOS
+                  {/* TABLA DAÑOS EXTERIORES */}
+                  {exteriorDamages.length > 0 && (
+                    <div style={{ marginBottom: '10px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#ea580c', marginBottom: '6px', borderBottom: '2px solid #ea580c', paddingBottom: '3px' }}>
+                        DAÑOS EXTERIORES ({exteriorDamages.length})
                       </div>
                       <table style={{ width: '100%', fontSize: '8px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
                         <thead>
-                          <tr style={{ backgroundColor: '#f3f4f6' }}>
+                          <tr style={{ backgroundColor: '#fff7ed' }}>
                             <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>#</th>
                             <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Descripción</th>
                             <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Ubicación</th>
@@ -344,9 +358,60 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                           </tr>
                         </thead>
                         <tbody>
-                          {activeDamages.map((damage, i) => (
+                          {exteriorDamages.map((damage, i) => (
                             <tr key={damage.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : '#f9fafb' }}>
-                              <td style={{ padding: '2px 3px', fontWeight: 'bold', fontSize: '8px' }}>{damage.damage_number || '?'}</td>
+                              <td style={{ padding: '2px 3px', fontWeight: 'bold', fontSize: '8px' }}>{damageDisplayNumbers.get(damage.id) || '?'}</td>
+                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{damage.description}</td>
+                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{viewLabels[damage.view_type || '']}</td>
+                              <td style={{ padding: '2px 3px' }}>
+                                <span style={{
+                                  padding: '1px 2px',
+                                  borderRadius: '2px',
+                                  fontSize: '6px',
+                                  backgroundColor: damage.severity === 'severe' ? '#fee2e2' : damage.severity === 'moderate' ? '#ffedd5' : '#fef9c3',
+                                  color: damage.severity === 'severe' ? '#b91c1c' : damage.severity === 'moderate' ? '#c2410c' : '#a16207',
+                                }}>
+                                  {severityLabels[damage.severity || '']}
+                                </span>
+                              </td>
+                              <td style={{ padding: '2px 3px' }}>
+                                <span style={{
+                                  padding: '1px 2px',
+                                  borderRadius: '2px',
+                                  fontSize: '6px',
+                                  backgroundColor: damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
+                                  color: damage.status === 'in_progress' ? '#a16207' : '#b91c1c',
+                                }}>
+                                  {statusLabels[damage.status || '']}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
+                  {/* TABLA DAÑOS INTERIORES */}
+                  {interiorDamages.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#2563eb', marginBottom: '6px', borderBottom: '2px solid #2563eb', paddingBottom: '3px' }}>
+                        DAÑOS INTERIORES ({interiorDamages.length})
+                      </div>
+                      <table style={{ width: '100%', fontSize: '8px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#eff6ff' }}>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>#</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Descripción</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Ubicación</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Severidad</th>
+                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Estado</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {interiorDamages.map((damage, i) => (
+                            <tr key={damage.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : '#f9fafb' }}>
+                              <td style={{ padding: '2px 3px', fontWeight: 'bold', fontSize: '8px' }}>{damageDisplayNumbers.get(damage.id) || '?'}</td>
                               <td style={{ padding: '2px 3px', fontSize: '7px' }}>{damage.description}</td>
                               <td style={{ padding: '2px 3px', fontSize: '7px' }}>{viewLabels[damage.view_type || '']}</td>
                               <td style={{ padding: '2px 3px' }}>
