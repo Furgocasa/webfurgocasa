@@ -31,7 +31,7 @@ const steps = [
   { step:"1", title:"Wählen Sie Ihr Datum", desc:"Wählen Sie den Abholfreitag in unserem Kalender", icon: Calendar },
   { step:"2", title:"Wählen Sie das Fahrzeug", desc:"Wählen Sie aus den verfügbaren Wohnmobilen für diese Daten", icon: CheckCircle },
   { step:"3", title:"Extras hinzufügen", desc:"Stühle, Tisch, Strand-Kit... was Sie brauchen", icon: CheckCircle },
-  { step:"4", title:"Bestätigen und bezahlen", desc:"Nur 30% Anzahlung. Der Rest bei Abholung", icon: Euro },
+  { step:"4", title:"Bestätigen und bezahlen", desc:"Zahlen Sie die erste Hälfte. Der Rest 15 Tage vorher", icon: Euro },
 ];
 
 export default async function LocaleComoReservarFinSemanaPage({ params }: PageProps) {

@@ -128,7 +128,7 @@ export function ReservarClient() {
             {[
               { icon: Calendar, title: "1. Elige fechas", desc: "Selecciona tus fechas de viaje" },
               { icon: Car, title: "2. Elige camper", desc: "Compara y selecciona tu vehículo" },
-              { icon: CreditCard, title: "3. Paga señal", desc: "Solo el 30% para confirmar" },
+              { icon: CreditCard, title: "3. Confirma con el primer pago", desc: "Abona la primera mitad del importe" },
               { icon: CheckCircle, title: "4. ¡A viajar!", desc: "Recoge tu camper y disfruta" },
             ].map((step, index) => (
               <div key={index} className="text-center">

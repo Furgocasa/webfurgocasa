@@ -31,7 +31,7 @@ const steps = [
   { step:"1", title:"Choisissez votre date", desc:"Sélectionnez le vendredi de récupération dans notre calendrier", icon: Calendar },
   { step:"2", title:"Sélectionnez le véhicule", desc:"Choisissez parmi les camping-cars disponibles pour ces dates", icon: CheckCircle },
   { step:"3", title:"Ajoutez des extras", desc:"Chaises, table, kit plage... ce dont vous avez besoin", icon: CheckCircle },
-  { step:"4", title:"Confirmez et payez", desc:"Seulement 30% d'acompte. Le reste à la récupération", icon: Euro },
+  { step:"4", title:"Confirmez et payez", desc:"Payez la première moitié du montant. Le reste 15 jours avant", icon: Euro },
 ];
 
 export default async function LocaleComoReservarFinSemanaPage({ params }: PageProps) {

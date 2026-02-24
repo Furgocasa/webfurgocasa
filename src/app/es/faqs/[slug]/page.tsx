@@ -40,7 +40,7 @@ const faqs: Record<string, { question: string; answer: string; category: string;
   },"como-reservar": {
     question:"¿Cuál es la forma más rápida de reservar mi autocaravana camper?",
     answer: `<p>La forma más rápida es a través de nuestra web:</p>
-    <ol><li>Selecciona las fechas de recogida y devolución</li><li>Elige el vehículo que más te guste</li><li>Añade los extras que necesites</li><li>Completa tus datos y realiza el pago del 30%</li></ol>
+    <ol><li>Selecciona las fechas de recogida y devolución</li><li>Elige el vehículo que más te guste</li><li>Añade los extras que necesites</li><li>Completa tus datos y realiza el pago de la primera mitad</li></ol>
     <p>Recibirás la confirmación por email en menos de 24 horas.</p>
     <p>También puedes llamarnos al <strong>+34 968 000 000</strong> o enviarnos un WhatsApp.</p>`,
     category:"Reserva y pago",

@@ -126,10 +126,10 @@ export function ReservarClient() {
           
           <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
             {[
-              { icon: Calendar, title: "1. Elige fechas", desc: "Selecciona tus fechas de viaje" },
-              { icon: Car, title: "2. Elige camper", desc: "Compara y selecciona tu vehículo" },
-              { icon: CreditCard, title: "3. Paga señal", desc: "Solo el 30% para confirmar" },
-              { icon: CheckCircle, title: "4. ¡A viajar!", desc: "Recoge tu camper y disfruta" },
+              { icon: Calendar, title: "1. Choisissez les dates", desc: "Sélectionnez vos dates de voyage" },
+              { icon: Car, title: "2. Choisissez le camping-car", desc: "Comparez et sélectionnez votre véhicule" },
+              { icon: CreditCard, title: "3. Premier paiement", desc: "Payez la première moitié du montant total" },
+              { icon: CheckCircle, title: "4. En route !", desc: "Récupérez votre camping-car et profitez" },
             ].map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-16 h-16 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">

@@ -31,7 +31,7 @@ const steps = [
   { step:"1", title:"Elige tu fecha", desc:"Selecciona el viernes de recogida en nuestro calendario", icon: Calendar },
   { step:"2", title:"Selecciona el vehículo", desc:"Elige entre los campers disponibles para esas fechas", icon: CheckCircle },
   { step:"3", title:"Añade extras", desc:"Sillas, mesa, kit de playa... lo que necesites", icon: CheckCircle },
-  { step:"4", title:"Confirma y paga", desc:"Solo el 30% de señal. El resto a la recogida", icon: Euro },
+  { step:"4", title:"Confirma y paga", desc:"Abona la primera mitad del importe. El resto 15 días antes", icon: Euro },
 ];
 
 export default async function LocaleComoReservarFinSemanaPage({ params }: PageProps) {

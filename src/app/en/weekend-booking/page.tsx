@@ -31,7 +31,7 @@ const steps = [
   { step:"1", title:"Choose your date", desc:"Select the Friday pick-up date in our calendar", icon: Calendar },
   { step:"2", title:"Select the vehicle", desc:"Choose from the available campers for those dates", icon: CheckCircle },
   { step:"3", title:"Add extras", desc:"Chairs, table, beach kit... whatever you need", icon: CheckCircle },
-  { step:"4", title:"Confirm and pay", desc:"Only 30% deposit. The rest on pick-up", icon: Euro },
+  { step:"4", title:"Confirm and pay", desc:"Pay the first half of the total. The rest 15 days before", icon: Euro },
 ];
 
 export default async function LocaleComoReservarFinSemanaPage({ params }: PageProps) {

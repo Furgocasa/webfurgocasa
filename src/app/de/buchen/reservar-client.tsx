@@ -128,7 +128,7 @@ export function ReservarClient() {
             {[
               { icon: Calendar, title: "1. Daten wählen", desc: "Wählen Sie Ihre Reisedaten" },
               { icon: Car, title: "2. Wohnmobil wählen", desc: "Vergleichen und wählen Sie Ihr Fahrzeug" },
-              { icon: CreditCard, title: "3. Anzahlung zahlen", desc: "Nur 30% zur Bestätigung" },
+              { icon: CreditCard, title: "3. Erste Zahlung", desc: "Zahlen Sie die erste Hälfte des Gesamtbetrags" },
               { icon: CheckCircle, title: "4. Auf die Reise!", desc: "Holen Sie Ihr Wohnmobil ab und genießen Sie" },
             ].map((step, index) => (
               <div key={index} className="text-center">
