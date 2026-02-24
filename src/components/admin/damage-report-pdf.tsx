@@ -64,8 +64,15 @@ const vehicleImages: Record<string, string> = {
   interior: '/vehicle-views/interior.png',
 };
 
-// Componente de imagen con marcadores
-// IMPORTANTE: height: auto para mantener la proporción de la imagen
+// Colores idénticos a vehicle-damage-plan.tsx (página de daños)
+const statusColors: Record<string, { fill: string; stroke: string }> = {
+  pending: { fill: '#fef2f2', stroke: '#ef4444' },
+  in_progress: { fill: '#fefce8', stroke: '#eab308' },
+  repaired: { fill: '#f0fdf4', stroke: '#22c55e' },
+};
+
+// Componente de imagen con marcadores - mismo estilo que la página /administrator/danos/[id]
+// w-7 h-7 (28px), border-2, shadow-md, número centrado con tabla (html2canvas)
 function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: VehicleDamage[] }) {
   const viewDamages = damages.filter(d => d.view_type === viewType);
   
@@ -76,32 +83,41 @@ function VehicleImage({ viewType, damages }: { viewType: ViewType; damages: Vehi
         alt={viewLabels[viewType]}
         style={{ width: '100%', height: 'auto', display: 'block' }}
       />
-      {viewDamages.map((damage) => (
-        <div
-          key={damage.id}
-          style={{
-            position: 'absolute',
-            left: `${damage.position_x || 50}%`,
-            top: `${damage.position_y || 50}%`,
-            marginLeft: '-11px',
-            marginTop: '-11px',
-            width: '22px',
-            height: '22px',
-            borderRadius: '50%',
-            backgroundColor: damage.status === 'repaired' ? '#dcfce7' : damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
-            border: `2px solid ${damage.status === 'repaired' ? '#22c55e' : damage.status === 'in_progress' ? '#eab308' : '#ef4444'}`,
-            fontSize: '11px',
-            fontWeight: 'bold',
-            color: damage.status === 'repaired' ? '#166534' : damage.status === 'in_progress' ? '#854d0e' : '#dc2626',
-            zIndex: 10,
-            lineHeight: '18px',
-            textAlign: 'center',
-            overflow: 'hidden',
-          }}
-        >
-          {damage.damage_number || '?'}
-        </div>
-      ))}
+      {viewDamages.map((damage) => {
+        const colors = statusColors[damage.status || 'pending'] || statusColors.pending;
+        return (
+          <div
+            key={damage.id}
+            style={{
+              position: 'absolute',
+              left: `${damage.position_x || 50}%`,
+              top: `${damage.position_y || 50}%`,
+              marginLeft: '-14px',
+              marginTop: '-14px',
+              width: '28px',
+              height: '28px',
+              borderRadius: '50%',
+              backgroundColor: colors.fill,
+              border: `2px solid ${colors.stroke}`,
+              color: colors.stroke,
+              fontSize: '12px',
+              fontWeight: 'bold',
+              boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+              zIndex: 10,
+            }}
+          >
+            <table style={{ width: '100%', height: '100%', borderCollapse: 'collapse', border: 'none', margin: 0, padding: 0 }}>
+              <tbody>
+                <tr>
+                  <td style={{ verticalAlign: 'middle', textAlign: 'center', margin: 0, padding: 0, fontSize: '12px', fontWeight: 'bold' }}>
+                    {damage.damage_number || '?'}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        );
+      })}
     </div>
   );
 }
