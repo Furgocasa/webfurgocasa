@@ -3,7 +3,7 @@
 import { SearchWidget } from "@/components/booking/search-widget";
 import { OccupancyHighlights } from "@/components/booking/occupancy-highlights";
 import Link from "next/link";
-import { MapPin, Clock, Phone, Car, ArrowRight, CheckCircle, Calendar, CreditCard } from "lucide-react";
+import { MapPin, Clock, Phone, ArrowRight } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 
 const locations = [
@@ -117,26 +117,32 @@ export function ReservarClient() {
         </div>
       </section>
 
-      {/* How it works */}
-      <section className="py-16 bg-gray-50">
+      {/* Pasos del alquiler */}
+      <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-heading font-bold text-gray-900 mb-12 text-center">
-            {t("¿Cómo funciona?")}
-          </h2>
-          
-          <div className="grid md:grid-cols-4 gap-8 max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
+              {t("Pasos del alquiler")}
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              {t("Así es el proceso de reserva de tu camper paso a paso")}
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
             {[
-              { icon: Calendar, title: "1. Choose dates", desc: "Select your travel dates" },
-              { icon: Car, title: "2. Choose camper", desc: "Compare and select your vehicle" },
-              { icon: CreditCard, title: "3. Confirm with first payment", desc: "Pay the first half of the total amount" },
-              { icon: CheckCircle, title: "4. Hit the road!", desc: "Pick up your camper and enjoy" },
-            ].map((step, index) => (
-              <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <step.icon className="h-8 w-8 text-furgocasa-orange" />
+              { paso: "1", titulo: t("Busca fechas y modelo"), descripcion: t("Selecciona tus fechas y escoge tu modelo de camper en nuestro buscador") },
+              { paso: "2", titulo: t("Confirma con el primer pago"), descripcion: t("Para confirmar la reserva se abona la primera mitad del importe") },
+              { paso: "3", titulo: t("Segundo pago"), descripcion: t("15 días antes del comienzo se abona la segunda mitad") },
+              { paso: "4", titulo: t("Documentación y contrato"), descripcion: t("Entre el día 15 y el 3 antes del inicio se envía documentación y contrato firmado") },
+              { paso: "5", titulo: t("Fianza"), descripcion: t("Máximo 72 horas (3 días antes del inicio) se debe abonar la fianza de 1.000€") },
+              { paso: "6", titulo: t("Confirmación de entrega"), descripcion: t("Con todo verificado: se confirma la cita de entrega") },
+            ].map((item) => (
+              <div key={item.paso} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 bg-furgocasa-orange text-white rounded-full flex items-center justify-center font-bold text-lg mb-3">
+                  {item.paso}
                 </div>
-                <h3 className="font-bold text-gray-900 mb-2">{t(step.title)}</h3>
-                <p className="text-gray-600 text-sm">{t(step.desc)}</p>
+                <h3 className="font-bold text-gray-900 mb-1">{item.titulo}</h3>
+                <p className="text-sm text-gray-600">{item.descripcion}</p>
               </div>
             ))}
           </div>
