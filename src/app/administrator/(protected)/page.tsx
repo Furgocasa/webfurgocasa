@@ -583,66 +583,69 @@ export default async function AdminDashboard() {
             </div>
           </div>
 
-          {/* Daños pendientes por vehículo */}
-          {(stats.damagesByVehicleList?.length || 0) > 0 && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1">
-              <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-                <h2 className="text-sm font-semibold text-gray-900">
-                  Daños pendientes
-                </h2>
-                <Link
-                  href="/administrator/danos"
-                  className="text-xs text-furgocasa-orange hover:underline font-medium"
-                >
-                  Ver daños
-                </Link>
-              </div>
-              <div className="divide-y divide-gray-100">
-                {stats.damagesByVehicleList.map((v) => (
-                  <div key={v.name} className="px-4 py-3">
-                    <div className="flex items-center justify-between gap-2 mb-1">
-                      <p className="text-sm leading-tight">
-                        {v.code && (
-                          <span className="font-bold text-furgocasa-orange">
-                            {v.code}
-                          </span>
-                        )}{" "}
-                        <span className="font-medium text-gray-700">
-                          {v.name}
-                        </span>
-                      </p>
-                      <span className="text-xs text-gray-400">
-                        {v.damages.length}
-                      </span>
-                    </div>
-                    <div className="space-y-0.5">
-                      {v.damages.map((d, i) => (
-                        <p
-                          key={i}
-                          className={`text-xs ${
-                            severityColor[d.severity] || "text-gray-600"
-                          }`}
-                        >
-                          • {d.description || d.severity}{" "}
-                          <span className="text-gray-400">
-                            (
-                            {d.status === "pending"
-                              ? "pendiente"
-                              : "en reparación"}
-                            )
-                          </span>
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {/* ── Bloqueos activos (debajo de las columnas) ── */}
+      {/* ── Daños pendientes por vehículo (fila independiente, una columna por vehículo) ── */}
+      {(stats.damagesByVehicleList?.length || 0) > 0 && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900">
+              Daños pendientes
+              <span className="ml-1.5 text-xs font-normal text-gray-400">
+                ({stats.damagesByVehicleList.reduce((acc, v) => acc + v.damages.length, 0)})
+              </span>
+            </h2>
+            <Link
+              href="/administrator/danos"
+              className="text-xs text-furgocasa-orange hover:underline font-medium"
+            >
+              Ver daños
+            </Link>
+          </div>
+          <div className="p-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {stats.damagesByVehicleList.map((v) => (
+                <div
+                  key={v.name}
+                  className="bg-amber-50 border border-amber-200 rounded-lg p-4"
+                >
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <p className="text-sm font-semibold leading-tight">
+                      {v.code && (
+                        <span className="font-bold text-furgocasa-orange">
+                          {v.code}
+                        </span>
+                      )}{" "}
+                      <span className="text-gray-700">{v.name}</span>
+                    </p>
+                    <span className="text-xs font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                      {v.damages.length}
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    {v.damages.map((d, i) => (
+                      <p
+                        key={i}
+                        className={`text-xs ${
+                          severityColor[d.severity] || "text-gray-600"
+                        }`}
+                      >
+                        • {d.description || d.severity}{" "}
+                        <span className="text-gray-400">
+                          ({d.status === "pending" ? "pendiente" : "en reparación"})
+                        </span>
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Bloqueos activos (debajo de daños) ── */}
       {hasBlocks && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
