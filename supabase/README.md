@@ -100,6 +100,9 @@ La tabla `vehicle_damages` permite:
 - Marcar como "en reparación"
 - Marcar como "reparado" con fecha
 - Historial completo de daños
+- **Numeración independiente** por tipo: exteriores (1, 2, 3...) e interiores (1, 2, 3...) se numeran por separado
+- **Vistas**: `front`, `back`, `left`, `right`, `top` (exterior) e `interior`
+- **Constraint**: `vehicle_damages_view_type_check` incluye todos los tipos anteriores
 
 ### **Blog y Publicaciones Unificados**
 

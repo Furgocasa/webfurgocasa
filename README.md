@@ -17,7 +17,34 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 12 de Febrero 2026 - **Sistema de Vehículos Vendidos**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 24 de Febrero 2026 - **Sistema de Daños: Numeración Independiente Exterior/Interior**
+
+### 🔧 Numeración Independiente y Listas Separadas por Tipo de Daño
+
+**Estado**: ✅ Completado y desplegado  
+**Commit**: `4df0b36`
+
+Los daños exteriores e interiores ahora tienen numeración propia e independiente, y se muestran en secciones separadas tanto en la página de administración como en el PDF.
+
+**Funcionalidades:**
+- ✅ **Numeración independiente por tipo**: Exteriores: 1, 2, 3... / Interiores: 1, 2, 3... (ya no es secuencial global)
+- ✅ **Lista lateral separada**: Dos secciones diferenciadas (cabecera naranja para exteriores, azul para interiores) con conteo
+- ✅ **PDF separado**: La tabla "Detalle de Daños" se divide en "Daños Exteriores" y "Daños Interiores" con numeración propia
+- ✅ **Marcadores correctos**: Los números sobre las imágenes del vehículo usan la numeración por tipo
+- ✅ **Insert con número correcto**: Al crear un nuevo daño se calcula automáticamente el siguiente número para su tipo
+- ✅ **Fix constraint DB**: Se incluye `interior` en `vehicle_damages_view_type_check` para poder guardar daños interiores
+
+**Migraciones SQL aplicadas:**
+- ✅ `supabase/migrations/fix-vehicle-damages-view-type-check.sql` - Añadir `interior` al constraint
+- ✅ `supabase/migrations/renumber-damages-by-type.sql` - Renumerar daños existentes por tipo
+
+**Archivos modificados:**
+- `src/app/administrator/(protected)/danos/[id]/page.tsx` - Numeración por tipo + lista separada
+- `src/components/admin/damage-report-pdf.tsx` - PDF con tablas separadas por tipo
+
+---
+
+## ⚡ [ACTUALIZACIÓN ANTERIOR] - 12 de Febrero 2026 - **Sistema de Vehículos Vendidos**
 
 ### 🚗 Estado Definitivo para Vehículos Vendidos
 
@@ -1203,6 +1230,7 @@ src/lib/supabase/
 | **Temporadas** | `/administrator/temporadas` | ✅ | `useAdminData` | Por año |
 | **Ubicaciones** | `/administrator/ubicaciones` | ✅ | `useAdminData` | CRUD inline |
 | **Calendario** | `/administrator/calendario` | ✅ | `useAdminData` (x2) | Vista Gantt |
+| **Daños** | `/administrator/danos/[id]` | ✅ | Client Component | Numeración ext/int independiente, PDF |
 
 **⚠️ SI UNA SECCIÓN DEJA DE FUNCIONAR:**
 
@@ -1760,6 +1788,10 @@ Ahorro: -84% de espacio ✨
 ### 🔧 Scripts Disponibles
 
 ```bash
+# ⭐ Re-traducir artículo del blog (ES → EN, FR, DE) - Uso recurrente tras modificar contenido
+node translate-blog-content.js <slug-del-articulo>
+# Ejemplo: node translate-blog-content.js ruta-en-camper-por-la-toscana-espanola-los-pueblos-de-guadalajara-en-autocaravana
+
 # Migrar imágenes de blog a Supabase
 node scripts/migrate-blog-images-to-supabase.js
 
@@ -1769,6 +1801,8 @@ node scripts/upload-location-images.js
 # Subir imágenes hero de localizaciones
 node scripts/upload-hero-slides.js
 ```
+
+**Documentación de traducciones del blog**: [`docs/SISTEMA-TRADUCCIONES-BLOG.md`](./docs/SISTEMA-TRADUCCIONES-BLOG.md)
 
 ### 📚 Documentación Completa
 
@@ -2153,7 +2187,7 @@ Desarrollado con ❤️ para Furgocasa
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 12 de Febrero 2026 (Sistema Vehículos Vendidos)  
+**Última actualización**: 24 de Febrero 2026 (Sistema Daños: Numeración Independiente Ext/Int)  
 
 ---
 

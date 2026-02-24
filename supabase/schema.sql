@@ -133,6 +133,14 @@ CREATE INDEX idx_vehicle_images_vehicle ON vehicle_images(vehicle_id);
 -- ============================================
 -- DAÑOS DE VEHÍCULOS
 -- ============================================
+-- NOTA: La tabla real en producción incluye campos adicionales añadidos post-migración:
+--   damage_number INTEGER      - Número secuencial POR TIPO (ext: 1,2,3... / int: 1,2,3...)
+--   damage_type VARCHAR(20)    - 'exterior' o 'interior'
+--   view_type VARCHAR(20)      - 'front','back','left','right','top','interior'
+--   position_x NUMERIC         - Posición X (%) del marcador sobre la imagen
+--   position_y NUMERIC         - Posición Y (%) del marcador sobre la imagen
+--   photo_urls JSONB           - URLs de fotos del daño
+-- Constraint: vehicle_damages_view_type_check (incluye 'interior')
 CREATE TABLE vehicle_damages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     vehicle_id UUID NOT NULL REFERENCES vehicles(id) ON DELETE CASCADE,
