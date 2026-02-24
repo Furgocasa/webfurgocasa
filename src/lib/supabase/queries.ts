@@ -622,11 +622,12 @@ export async function getDashboardStats() {
 
   // Daños pendientes agrupados por vehículo
   type DamageRow = { id: string; vehicle_id: string; severity: string; repair_cost: number | null; status: string; description: string; damage_type: string | null; vehicle: BookingVeh };
-  const damagesByVehicle = new Map<string, { name: string; code: string; damages: { severity: string; status: string; description: string; damage_type: string }[] }>();
+  const damagesByVehicle = new Map<string, { vehicleId: string; name: string; code: string; damages: { severity: string; status: string; description: string; damage_type: string }[] }>();
   (damagesData as DamageRow[] || []).forEach(d => {
     const key = d.vehicle_id;
     if (!damagesByVehicle.has(key)) {
       damagesByVehicle.set(key, {
+        vehicleId: key,
         name: d.vehicle?.name || 'Vehículo',
         code: d.vehicle?.internal_code || '',
         damages: [],

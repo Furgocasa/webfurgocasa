@@ -605,13 +605,14 @@ export default async function AdminDashboard() {
           </div>
           <div className="p-4">
             <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-              {stats.damagesByVehicleList.map((v) => {
-                const extDamages = v.damages.filter((d: { damage_type?: string }) => d.damage_type !== 'interior');
-                const intDamages = v.damages.filter((d: { damage_type?: string }) => d.damage_type === 'interior');
+              {stats.damagesByVehicleList.map((v: { vehicleId?: string; name: string; code: string; damages: { severity: string; status: string; description: string; damage_type?: string }[] }) => {
+                const extDamages = v.damages.filter((d) => d.damage_type !== 'interior');
+                const intDamages = v.damages.filter((d) => d.damage_type === 'interior');
                 return (
-                  <div
+                  <Link
                     key={v.name}
-                    className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 break-inside-avoid"
+                    href={`/administrator/danos/${v.vehicleId || ''}`}
+                    className="block bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 break-inside-avoid hover:bg-amber-100 hover:border-amber-300 transition-colors"
                   >
                     <div className="flex items-center justify-between gap-2 mb-2">
                       <p className="text-sm font-semibold leading-tight">
@@ -668,7 +669,7 @@ export default async function AdminDashboard() {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </Link>
                 );
               })}
             </div>
