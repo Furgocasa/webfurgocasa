@@ -71,8 +71,56 @@ const statusColors: Record<string, { fill: string; stroke: string }> = {
   repaired: { fill: '#f0fdf4', stroke: '#22c55e' },
 };
 
-// Componente de imagen con marcadores para PDF
-// Usa <table> para centrado porque html2canvas no soporta bien flexbox/line-height
+// Marcador circular con número centrado (usa table para html2canvas)
+function DamageMarker({ damage, displayNumbers }: { damage: VehicleDamage; displayNumbers: Map<string, number> }) {
+  const colors = statusColors[damage.status || 'pending'] || statusColors.pending;
+  const num = displayNumbers.get(damage.id) || '?';
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        left: `${damage.position_x || 50}%`,
+        top: `${damage.position_y || 50}%`,
+        marginLeft: '-14px',
+        marginTop: '-14px',
+        width: '28px',
+        height: '28px',
+        zIndex: 10,
+      }}
+    >
+      <table style={{
+        width: '28px',
+        height: '28px',
+        borderCollapse: 'collapse',
+        borderSpacing: '0',
+        borderRadius: '50%',
+        backgroundColor: colors.fill,
+        border: `2px solid ${colors.stroke}`,
+        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+        overflow: 'hidden',
+      }}>
+        <tbody>
+          <tr>
+            <td style={{
+              textAlign: 'center',
+              verticalAlign: 'middle',
+              padding: '0',
+              margin: '0',
+              color: colors.stroke,
+              fontSize: '12px',
+              fontWeight: 'bold',
+              lineHeight: '1',
+            }}>
+              {num}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// Imagen exterior: marcadores relativos a la imagen directamente
 function VehicleImage({ viewType, damages, displayNumbers }: { viewType: ViewType; damages: VehicleDamage[]; displayNumbers: Map<string, number> }) {
   const viewDamages = damages.filter(d => d.view_type === viewType);
   
@@ -83,54 +131,45 @@ function VehicleImage({ viewType, damages, displayNumbers }: { viewType: ViewTyp
         alt={viewLabels[viewType]}
         style={{ width: '100%', height: 'auto', display: 'block' }}
       />
-      {viewDamages.map((damage) => {
-        const colors = statusColors[damage.status || 'pending'] || statusColors.pending;
-        const num = displayNumbers.get(damage.id) || '?';
-        return (
-          <div
-            key={damage.id}
-            style={{
-              position: 'absolute',
-              left: `${damage.position_x || 50}%`,
-              top: `${damage.position_y || 50}%`,
-              marginLeft: '-14px',
-              marginTop: '-14px',
-              width: '28px',
-              height: '28px',
-              zIndex: 10,
-            }}
-          >
-            <table style={{
-              width: '28px',
-              height: '28px',
-              borderCollapse: 'collapse',
-              borderSpacing: '0',
-              borderRadius: '50%',
-              backgroundColor: colors.fill,
-              border: `2px solid ${colors.stroke}`,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-              overflow: 'hidden',
-            }}>
-              <tbody>
-                <tr>
-                  <td style={{
-                    textAlign: 'center',
-                    verticalAlign: 'middle',
-                    padding: '0',
-                    margin: '0',
-                    color: colors.stroke,
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    lineHeight: '1',
-                  }}>
-                    {num}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        );
-      })}
+      {viewDamages.map((damage) => (
+        <DamageMarker key={damage.id} damage={damage} displayNumbers={displayNumbers} />
+      ))}
+    </div>
+  );
+}
+
+// Imagen interior: replica aspect-ratio 16:9 con padding como en la página web
+// Las coordenadas se capturaron respecto al contenedor con padding, no la imagen
+function VehicleImageInterior({ damages, displayNumbers }: { damages: VehicleDamage[]; displayNumbers: Map<string, number> }) {
+  const viewDamages = damages.filter(d => d.view_type === 'interior');
+  
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      paddingBottom: '56.25%', /* 16:9 aspect ratio */
+      overflow: 'hidden',
+    }}>
+      <div style={{
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        padding: '16px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+        <img 
+          src={vehicleImages.interior} 
+          alt={viewLabels.interior}
+          style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+        />
+      </div>
+      {viewDamages.map((damage) => (
+        <DamageMarker key={damage.id} damage={damage} displayNumbers={displayNumbers} />
+      ))}
     </div>
   );
 }
@@ -352,7 +391,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                     <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
                       DAÑO INTERIOR ({interiorDamages.length})
                     </div>
-                    <VehicleImage viewType="interior" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
+                    <VehicleImageInterior damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                   </div>
 
                 </td>
