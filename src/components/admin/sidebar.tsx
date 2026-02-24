@@ -79,7 +79,7 @@ interface AdminSidebarProps {
 
 function AdminSidebarComponent({ admin, isOpen = true, onClose }: AdminSidebarProps) {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<string[]>(["Blog"]);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isMobile, setIsMobile] = useState(false);
 
   // Detectar si es móvil - optimizado con debounce

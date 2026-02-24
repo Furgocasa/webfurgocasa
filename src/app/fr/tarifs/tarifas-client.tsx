@@ -315,6 +315,38 @@ export function TarifasClient() {
         </div>
       </section>
 
+      {/* Pasos del alquiler - Barra de tiempo */}
+      <section className="py-24 bg-gray-50">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
+              {t("Pasos del alquiler")}
+            </h2>
+            <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+              {t("Así es el proceso de reserva de tu camper paso a paso")}
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+            {[
+              { paso: "1", titulo: t("Busca fechas y modelo"), descripcion: t("Selecciona tus fechas y escoge tu modelo de camper en nuestro buscador") },
+              { paso: "2", titulo: t("Confirma con el primer pago"), descripcion: t("Para confirmar la reserva se abona la primera mitad del importe") },
+              { paso: "3", titulo: t("Segundo pago"), descripcion: t("15 días antes del comienzo se abona la segunda mitad") },
+              { paso: "4", titulo: t("Documentación y contrato"), descripcion: t("Entre el día 15 y el 3 antes del inicio se envía documentación y contrato firmado") },
+              { paso: "5", titulo: t("Fianza"), descripcion: t("Máximo 72 horas (3 días antes del inicio) se debe abonar la fianza de 1.000€") },
+              { paso: "6", titulo: t("Confirmación de entrega"), descripcion: t("Con todo verificado: se confirma la cita de entrega") },
+            ].map((item) => (
+              <div key={item.paso} className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-10 h-10 bg-furgocasa-orange text-white rounded-full flex items-center justify-center font-bold text-lg mb-3">
+                  {item.paso}
+                </div>
+                <h3 className="font-bold text-gray-900 mb-1">{item.titulo}</h3>
+                <p className="text-sm text-gray-600">{item.descripcion}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Temporadas - Calendarios - Modernizado */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">

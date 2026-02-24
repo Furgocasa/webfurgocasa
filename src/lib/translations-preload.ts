@@ -1624,6 +1624,84 @@ export const staticTranslations = {
     fr: "Extras et accessoires",
     de: "Extras und Zubehör"
   },
+  "Pasos del alquiler": {
+    es: "Pasos del alquiler",
+    en: "Rental steps",
+    fr: "Étapes de la location",
+    de: "Miet-Schritte"
+  },
+  "Así es el proceso de reserva de tu camper paso a paso": {
+    es: "Así es el proceso de reserva de tu camper paso a paso",
+    en: "This is the rental process step by step",
+    fr: "Voici le processus de réservation de votre camping-car étape par étape",
+    de: "So läuft der Reservierungsprozess für Ihren Camper Schritt für Schritt"
+  },
+  "Busca fechas y modelo": {
+    es: "Busca fechas y modelo",
+    en: "Search dates and model",
+    fr: "Choisissez dates et modèle",
+    de: "Daten und Modell suchen"
+  },
+  "Selecciona tus fechas y escoge tu modelo de camper en nuestro buscador": {
+    es: "Selecciona tus fechas y escoge tu modelo de camper en nuestro buscador",
+    en: "Select your dates and choose your camper model in our search",
+    fr: "Sélectionnez vos dates et choisissez votre modèle de camping-car dans notre moteur de recherche",
+    de: "Wählen Sie Ihre Daten und Ihr Camper-Modell in unserer Suche"
+  },
+  "Confirma con el primer pago": {
+    es: "Confirma con el primer pago",
+    en: "Confirm with first payment",
+    fr: "Confirmez avec le premier paiement",
+    de: "Mit erster Zahlung bestätigen"
+  },
+  "Para confirmar la reserva se abona la primera mitad del importe": {
+    es: "Para confirmar la reserva se abona la primera mitad del importe",
+    en: "To confirm the booking, the first half of the amount is paid",
+    fr: "Pour confirmer la réservation, la première moitié du montant est payée",
+    de: "Zur Bestätigung der Buchung wird die erste Hälfte des Betrags gezahlt"
+  },
+  "Segundo pago": {
+    es: "Segundo pago",
+    en: "Second payment",
+    fr: "Deuxième paiement",
+    de: "Zweite Zahlung"
+  },
+  "15 días antes del comienzo se abona la segunda mitad": {
+    es: "15 días antes del comienzo se abona la segunda mitad",
+    en: "15 days before the start, the second half is paid",
+    fr: "15 jours avant le début, la deuxième moitié est payée",
+    de: "15 Tage vor Beginn wird die zweite Hälfte gezahlt"
+  },
+  "Documentación y contrato": {
+    es: "Documentación y contrato",
+    en: "Documentation and contract",
+    fr: "Documentation et contrat",
+    de: "Dokumentation und Vertrag"
+  },
+  "Entre el día 15 y el 3 antes del inicio se envía documentación y contrato firmado": {
+    es: "Entre el día 15 y el 3 antes del inicio se envía documentación y contrato firmado",
+    en: "Between day 15 and 3 before the start, documentation and signed contract are sent",
+    fr: "Entre le jour 15 et le 3 avant le début, la documentation et le contrat signé sont envoyés",
+    de: "Zwischen Tag 15 und 3 vor Beginn werden Dokumentation und unterzeichneter Vertrag gesendet"
+  },
+  "Máximo 72 horas (3 días antes del inicio) se debe abonar la fianza de 1.000€": {
+    es: "Máximo 72 horas (3 días antes del inicio) se debe abonar la fianza de 1.000€",
+    en: "Maximum 72 hours (3 days before the start) the €1,000 deposit must be paid",
+    fr: "Maximum 72 heures (3 jours avant le début), la caution de 1 000 € doit être payée",
+    de: "Maximal 72 Stunden (3 Tage vor Beginn) muss die Kaution von 1.000 € gezahlt werden"
+  },
+  "Confirmación de entrega": {
+    es: "Confirmación de entrega",
+    en: "Delivery confirmation",
+    fr: "Confirmation de livraison",
+    de: "Übergabebestätigung"
+  },
+  "Con todo verificado: se confirma la cita de entrega": {
+    es: "Con todo verificado: se confirma la cita de entrega",
+    en: "With everything verified: the delivery appointment is confirmed",
+    fr: "Avec tout vérifié : le rendez-vous de livraison est confirmé",
+    de: "Nach vollständiger Prüfung: der Übergabetermin wird bestätigt"
+  },
   "Qué está incluido en el precio y qué tiene coste adicional": {
     es: "Qué está incluido en el precio y qué tiene coste adicional",
     en: "What's included in the price and what has additional cost",
