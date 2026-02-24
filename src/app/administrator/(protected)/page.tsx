@@ -605,41 +605,72 @@ export default async function AdminDashboard() {
           </div>
           <div className="p-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {stats.damagesByVehicleList.map((v) => (
-                <div
-                  key={v.name}
-                  className="bg-amber-50 border border-amber-200 rounded-lg p-4"
-                >
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <p className="text-sm font-semibold leading-tight">
-                      {v.code && (
-                        <span className="font-bold text-furgocasa-orange">
-                          {v.code}
-                        </span>
-                      )}{" "}
-                      <span className="text-gray-700">{v.name}</span>
-                    </p>
-                    <span className="text-xs font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
-                      {v.damages.length}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    {v.damages.map((d, i) => (
-                      <p
-                        key={i}
-                        className={`text-xs ${
-                          severityColor[d.severity] || "text-gray-600"
-                        }`}
-                      >
-                        • {d.description || d.severity}{" "}
-                        <span className="text-gray-400">
-                          ({d.status === "pending" ? "pendiente" : "en reparación"})
-                        </span>
+              {stats.damagesByVehicleList.map((v) => {
+                const extDamages = v.damages.filter((d: { damage_type?: string }) => d.damage_type !== 'interior');
+                const intDamages = v.damages.filter((d: { damage_type?: string }) => d.damage_type === 'interior');
+                return (
+                  <div
+                    key={v.name}
+                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
+                  >
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <p className="text-sm font-semibold leading-tight">
+                        {v.code && (
+                          <span className="font-bold text-furgocasa-orange">
+                            {v.code}
+                          </span>
+                        )}{" "}
+                        <span className="text-gray-700">{v.name}</span>
                       </p>
-                    ))}
+                      <span className="text-xs font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                        {v.damages.length}
+                      </span>
+                    </div>
+
+                    {extDamages.length > 0 && (
+                      <div className="mb-2">
+                        <p className="text-[10px] font-semibold text-orange-600 uppercase tracking-wide mb-1">
+                          Exteriores ({extDamages.length})
+                        </p>
+                        <div className="space-y-0.5">
+                          {extDamages.map((d: { severity: string; status: string; description: string }, i: number) => (
+                            <p
+                              key={`ext-${i}`}
+                              className={`text-xs ${severityColor[d.severity] || "text-gray-600"}`}
+                            >
+                              • {d.description || d.severity}{" "}
+                              <span className="text-gray-400">
+                                ({d.status === "pending" ? "pendiente" : "en reparación"})
+                              </span>
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {intDamages.length > 0 && (
+                      <div>
+                        <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide mb-1">
+                          Interiores ({intDamages.length})
+                        </p>
+                        <div className="space-y-0.5">
+                          {intDamages.map((d: { severity: string; status: string; description: string }, i: number) => (
+                            <p
+                              key={`int-${i}`}
+                              className={`text-xs ${severityColor[d.severity] || "text-gray-600"}`}
+                            >
+                              • {d.description || d.severity}{" "}
+                              <span className="text-gray-400">
+                                ({d.status === "pending" ? "pendiente" : "en reparación"})
+                              </span>
+                            </p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

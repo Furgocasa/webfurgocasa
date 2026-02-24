@@ -365,7 +365,7 @@ export async function getDashboardStats() {
   // 4. DAÑOS PENDIENTES (con detalle de vehículo)
   const { data: damagesData } = await supabaseServer
     .from('vehicle_damages')
-    .select('id, vehicle_id, severity, repair_cost, status, description, vehicle:vehicles(name, internal_code)')
+    .select('id, vehicle_id, severity, repair_cost, status, description, damage_type, vehicle:vehicles(name, internal_code)')
     .neq('status', 'repaired');
 
   // 5. BLOQUEOS ACTIVOS
@@ -621,8 +621,8 @@ export async function getDashboardStats() {
   }));
 
   // Daños pendientes agrupados por vehículo
-  type DamageRow = { id: string; vehicle_id: string; severity: string; repair_cost: number | null; status: string; description: string; vehicle: BookingVeh };
-  const damagesByVehicle = new Map<string, { name: string; code: string; damages: { severity: string; status: string; description: string }[] }>();
+  type DamageRow = { id: string; vehicle_id: string; severity: string; repair_cost: number | null; status: string; description: string; damage_type: string | null; vehicle: BookingVeh };
+  const damagesByVehicle = new Map<string, { name: string; code: string; damages: { severity: string; status: string; description: string; damage_type: string }[] }>();
   (damagesData as DamageRow[] || []).forEach(d => {
     const key = d.vehicle_id;
     if (!damagesByVehicle.has(key)) {
@@ -632,7 +632,7 @@ export async function getDashboardStats() {
         damages: [],
       });
     }
-    damagesByVehicle.get(key)!.damages.push({ severity: d.severity, status: d.status, description: d.description });
+    damagesByVehicle.get(key)!.damages.push({ severity: d.severity, status: d.status, description: d.description, damage_type: d.damage_type || 'exterior' });
   });
   const damagesByVehicleList = Array.from(damagesByVehicle.values()).sort((a, b) => b.damages.length - a.damages.length);
 
