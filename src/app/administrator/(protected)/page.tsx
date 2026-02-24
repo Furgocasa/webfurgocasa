@@ -604,16 +604,16 @@ export default async function AdminDashboard() {
             </Link>
           </div>
           <div className="p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
               {stats.damagesByVehicleList.map((v) => {
                 const extDamages = v.damages.filter((d: { damage_type?: string }) => d.damage_type !== 'interior');
                 const intDamages = v.damages.filter((d: { damage_type?: string }) => d.damage_type === 'interior');
                 return (
                   <div
                     key={v.name}
-                    className="bg-amber-50 border border-amber-200 rounded-lg p-4"
+                    className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 break-inside-avoid"
                   >
-                    <div className="flex items-center justify-between gap-2 mb-3">
+                    <div className="flex items-center justify-between gap-2 mb-2">
                       <p className="text-sm font-semibold leading-tight">
                         {v.code && (
                           <span className="font-bold text-furgocasa-orange">
@@ -622,25 +622,25 @@ export default async function AdminDashboard() {
                         )}{" "}
                         <span className="text-gray-700">{v.name}</span>
                       </p>
-                      <span className="text-xs font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full">
+                      <span className="text-xs font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full shrink-0">
                         {v.damages.length}
                       </span>
                     </div>
 
                     {extDamages.length > 0 && (
                       <div className="mb-2">
-                        <p className="text-[10px] font-semibold text-orange-600 uppercase tracking-wide mb-1">
+                        <p className="text-[10px] font-semibold text-orange-600 uppercase tracking-wide mb-0.5">
                           Exteriores ({extDamages.length})
                         </p>
-                        <div className="space-y-0.5">
+                        <div className="space-y-0">
                           {extDamages.map((d: { severity: string; status: string; description: string }, i: number) => (
                             <p
                               key={`ext-${i}`}
-                              className={`text-xs ${severityColor[d.severity] || "text-gray-600"}`}
+                              className={`text-xs leading-tight ${severityColor[d.severity] || "text-gray-600"}`}
                             >
                               • {d.description || d.severity}{" "}
                               <span className="text-gray-400">
-                                ({d.status === "pending" ? "pendiente" : "en reparación"})
+                                ({d.status === "pending" ? "pte" : "rep."})
                               </span>
                             </p>
                           ))}
@@ -650,18 +650,18 @@ export default async function AdminDashboard() {
 
                     {intDamages.length > 0 && (
                       <div>
-                        <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide mb-1">
+                        <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
                           Interiores ({intDamages.length})
                         </p>
-                        <div className="space-y-0.5">
+                        <div className="space-y-0">
                           {intDamages.map((d: { severity: string; status: string; description: string }, i: number) => (
                             <p
                               key={`int-${i}`}
-                              className={`text-xs ${severityColor[d.severity] || "text-gray-600"}`}
+                              className={`text-xs leading-tight ${severityColor[d.severity] || "text-gray-600"}`}
                             >
                               • {d.description || d.severity}{" "}
                               <span className="text-gray-400">
-                                ({d.status === "pending" ? "pendiente" : "en reparación"})
+                                ({d.status === "pending" ? "pte" : "rep."})
                               </span>
                             </p>
                           ))}
