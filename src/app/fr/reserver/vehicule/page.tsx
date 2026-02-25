@@ -609,9 +609,10 @@ function ReservarVehiculoContent() {
                     <div className="text-sm">
                       <p className="text-gray-500">{t("Recogida")}</p>
                       <p className="font-semibold text-gray-900">
-                        {pickupDate && new Date(pickupDate).toLocaleDateString('es-ES', {
+                        {pickupDate && new Date(pickupDate + 'T00:00:00').toLocaleDateString('es-ES', {
                           day: 'numeric',
-                          month: 'short'
+                          month: 'short',
+                          timeZone: 'Europe/Madrid'
                         })}
                       </p>
                     </div>
@@ -622,9 +623,10 @@ function ReservarVehiculoContent() {
                     <div className="text-sm">
                       <p className="text-gray-500">{t("Devolución")}</p>
                       <p className="font-semibold text-gray-900">
-                        {dropoffDate && new Date(dropoffDate).toLocaleDateString('es-ES', {
+                        {dropoffDate && new Date(dropoffDate + 'T00:00:00').toLocaleDateString('es-ES', {
                           day: 'numeric',
-                          month: 'short'
+                          month: 'short',
+                          timeZone: 'Europe/Madrid'
                         })}
                       </p>
                     </div>

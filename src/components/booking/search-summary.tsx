@@ -3,7 +3,7 @@
 import { Calendar, MapPin, Clock, Edit2 } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/contexts/language-context";
-import { calculateRentalDays } from "@/lib/utils";
+import { calculateRentalDays, parseDateString } from "@/lib/utils";
 
 interface SearchSummaryProps {
   pickupDate: string;
@@ -24,7 +24,7 @@ export function SearchSummary({
 }: SearchSummaryProps) {
   const { t } = useLanguage();
   const formatDateDisplay = (dateStr: string) => {
-    const date = new Date(dateStr);
+    const date = parseDateString(dateStr);
     return date.toLocaleDateString("es-ES", {
       weekday: "short",
       day: "numeric",

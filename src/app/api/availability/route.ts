@@ -234,8 +234,10 @@ export async function GET(request: NextRequest) {
     
     try {
       // Calcular días de antelación
+      const [pY, pM, pD] = pickupDate.split('-').map(Number);
+      const pickupMs = new Date(pY, pM - 1, pD).getTime();
       const advanceDays = Math.ceil(
-        (new Date(pickupDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24)
+        (pickupMs - Date.now()) / (1000 * 60 * 60 * 24)
       );
       
       // Detectar locale desde el referer o accept-language

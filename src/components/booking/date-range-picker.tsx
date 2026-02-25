@@ -7,6 +7,13 @@ import { DayPicker, DateRange } from "react-day-picker";
 import { Calendar, X } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 
+function getMadridToday(): Date {
+  const now = new Date();
+  const madridStr = now.toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
+  const [y, m, d] = madridStr.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 interface DateRangePickerProps {
   dateRange: {
     from: Date | undefined;
@@ -39,12 +46,10 @@ export function DateRangePicker({
     return () => window.removeEventListener('resize', updateMonths);
   }, []);
 
-  // Calculate min date (+3 days from today)
-  const today = new Date();
+  const today = getMadridToday();
   const minDate = new Date(today);
   minDate.setDate(today.getDate() + 3);
 
-  // Calculate max date (36 months from now - 3 years)
   const maxDate = new Date(today);
   maxDate.setMonth(today.getMonth() + 36);
 
@@ -216,7 +221,7 @@ export function DateRangePicker({
                 ...disabledDates.map((date) => date),
               ]}
               modifiers={{
-                today: new Date(),
+                today: getMadridToday(),
               }}
               modifiersStyles={{
                 today: {

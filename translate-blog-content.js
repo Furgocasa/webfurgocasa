@@ -1,15 +1,23 @@
 /**
- * Script para traducir TODOS los artículos del blog a inglés usando OpenAI
- * Ejecutar una sola vez con: node translate-blog-content.js
+ * Script para traducir artículos del blog usando OpenAI
+ * 
+ * Uso:
+ *   node translate-blog-content.js                    → Traduce TODOS los posts sin traducción (solo inglés, modo legacy)
+ *   node translate-blog-content.js <slug>              → Re-traduce UN artículo específico a EN, FR, DE
+ * 
+ * Ejemplo para re-traducir artículo modificado:
+ *   node translate-blog-content.js ruta-en-camper-por-la-toscana-espanola-los-pueblos-de-guadalajara-en-autocaravana
  * 
  * IMPORTANTE: 
- * 1. Antes de ejecutar, asegúrate de tener NEXT_PUBLIC_OPENAI_API_KEY en .env
- * 2. Este script agregará las columnas title_en, excerpt_en, content_en si no existen
- * 3. Solo traducirá posts que NO tengan traducción aún
+ * 1. Antes de ejecutar, asegúrate de tener OPENAI_API_KEY en .env.local
+ * 2. Con slug: guarda en content_translations (EN, FR, DE) y actualiza slugs en posts
  */
 
 require('dotenv').config({ path: '.env.local' });
 const { createClient } = require('@supabase/supabase-js');
+
+// Slug opcional como argumento
+const SLUG_ARG = process.argv[2];
 
 // ⚠️ IMPORTANTE: Usar SERVICE_ROLE_KEY para tener permisos de escritura
 const supabase = createClient(
@@ -27,6 +35,8 @@ if (!OPENAI_API_KEY) {
   process.exit(1);
 }
 
+const LOCALE_NAMES = { en: 'English', fr: 'French', de: 'German' };
+
 // Función para generar slug desde texto
 function generateSlug(text) {
   return text
@@ -38,17 +48,26 @@ function generateSlug(text) {
     .replace(/-+/g, '-'); // Múltiples guiones a uno solo
 }
 
-// Función para traducir texto con OpenAI
-async function translateWithOpenAI(text, context = 'general') {
+// Función para traducir texto con OpenAI (acepta idioma destino)
+async function translateWithOpenAI(text, context = 'general', targetLocale = 'en') {
   if (!text || text.trim() === '') return '';
 
-  try {
-    const systemPrompt = context === 'title' 
-      ? 'You are a professional translator specializing in travel and campervan blog content. Translate the following blog post title from Spanish to English. Keep it engaging, SEO-friendly, and natural. Maintain the same tone and style.'
-      : context === 'excerpt'
-      ? 'You are a professional translator specializing in travel and campervan blog content. Translate the following blog post excerpt/summary from Spanish to English. Keep it concise, engaging, and natural. Maintain the same tone.'
-      : 'You are a professional translator specializing in travel and campervan blog content. Translate the following blog post content from Spanish to English. Maintain all HTML tags, formatting, links, and structure exactly as they are. Keep the same tone, style, and SEO keywords. Be natural and fluent.';
+  const targetLang = LOCALE_NAMES[targetLocale] || 'English';
+  const isHtml = context === 'content' && text.includes('<') && text.includes('>');
 
+  const contextHints = {
+    title: `a blog post title. Keep it engaging, SEO-friendly, and natural.`,
+    excerpt: `a brief excerpt/summary. Keep it concise, engaging, and natural.`,
+    content: `article content. ${isHtml ? 'Maintain all HTML tags, formatting, links, and structure exactly as they are.' : ''} Keep the same tone, style, and SEO keywords. Be natural and fluent.`
+  };
+  const hint = contextHints[context] || 'text content';
+
+  const systemPrompt = `You are a professional translator specializing in travel and campervan blog content. 
+Translate the following Spanish text to ${targetLang}.
+The text is ${hint}
+Only return the translated text, nothing else. Do not add explanations.`;
+
+  try {
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -58,17 +77,11 @@ async function translateWithOpenAI(text, context = 'general') {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: text,
-          },
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: text },
         ],
         temperature: 0.3,
-        max_tokens: context === 'title' ? 100 : context === 'excerpt' ? 300 : 4000,
+        max_tokens: context === 'title' ? 150 : context === 'excerpt' ? 400 : 4000,
       }),
     });
 
@@ -79,11 +92,10 @@ async function translateWithOpenAI(text, context = 'general') {
 
     const data = await response.json();
     const translation = data.choices[0]?.message?.content || text;
-    
     return translation.trim();
   } catch (error) {
-    console.error(`❌ Error traduciendo: ${error.message}`);
-    return text; // Fallback al texto original
+    console.error(`❌ Error traduciendo (${targetLocale}): ${error.message}`);
+    return text;
   }
 }
 
@@ -138,13 +150,121 @@ CREATE INDEX IF NOT EXISTS idx_posts_title_en ON posts(title_en);
   }
 }
 
-// Función principal de traducción
+// ========== MODO: Re-traducir UN artículo específico a EN, FR, DE ==========
+async function translateSinglePost(slug) {
+  console.log('🚀 Re-traduciendo artículo específico a EN, FR, DE...\n');
+  console.log(`   Slug buscado: ${slug}\n`);
+
+  const { data: post, error } = await supabase
+    .from('posts')
+    .select('id, title, excerpt, content, slug, meta_title, meta_description')
+    .eq('status', 'published')
+    .eq('slug', slug)
+    .single();
+
+  if (error || !post) {
+    console.error('❌ No se encontró el artículo con slug:', slug);
+    console.error('   Verifica que el slug sea correcto (ej: ruta-en-camper-por-la-toscana-espanola-los-pueblos-de-guadalajara-en-autocaravana)');
+    process.exit(1);
+  }
+
+  console.log(`📄 Artículo: "${post.title}"\n`);
+
+  const locales = ['en', 'fr', 'de'];
+  const fields = ['title', 'excerpt', 'content', 'meta_title', 'meta_description'];
+
+  for (const locale of locales) {
+    console.log(`\n🌐 === ${locale.toUpperCase()} ===`);
+    const translations = {};
+
+    for (const field of fields) {
+      const value = post[field];
+      if (!value || (typeof value === 'string' && !value.trim())) continue;
+
+      console.log(`   📝 Traduciendo ${field}...`);
+      const translated = await translateWithOpenAI(value, field === 'title' ? 'title' : field === 'excerpt' ? 'excerpt' : 'content', locale);
+      translations[field] = translated;
+      await new Promise(r => setTimeout(r, 800));
+    }
+
+    // Guardar en content_translations
+    for (const [field, text] of Object.entries(translations)) {
+      const { error: upsertErr } = await supabase
+        .from('content_translations')
+        .upsert({
+          source_table: 'posts',
+          source_id: post.id,
+          source_field: field,
+          locale,
+          translated_text: text,
+          is_auto_translated: true,
+          translation_model: 'gpt-4o-mini',
+        }, { onConflict: 'source_table,source_id,source_field,locale' });
+
+      if (upsertErr) {
+        console.error(`   ❌ Error guardando ${field} (${locale}):`, upsertErr.message);
+      }
+    }
+    console.log(`   ✅ ${locale.toUpperCase()} guardado en content_translations`);
+  }
+
+  // Actualizar slugs en posts desde títulos traducidos
+  const slugUpdates = {};
+  for (const locale of locales) {
+    const { data: titleRow } = await supabase
+      .from('content_translations')
+      .select('translated_text')
+      .eq('source_table', 'posts')
+      .eq('source_id', post.id)
+      .eq('source_field', 'title')
+      .eq('locale', locale)
+      .single();
+
+    const col = locale === 'en' ? 'slug_en' : locale === 'fr' ? 'slug_fr' : 'slug_de';
+    slugUpdates[col] = titleRow?.translated_text ? generateSlug(titleRow.translated_text) : null;
+  }
+
+  // También actualizar columnas legacy para inglés
+  const { data: titleEn } = await supabase
+    .from('content_translations')
+    .select('translated_text')
+    .eq('source_table', 'posts')
+    .eq('source_id', post.id)
+    .eq('source_field', 'title')
+    .eq('locale', 'en')
+    .single();
+
+  const postUpdates = { ...slugUpdates };
+  if (titleEn?.translated_text) {
+    postUpdates.slug_en = generateSlug(titleEn.translated_text);
+    postUpdates.title_en = titleEn.translated_text;
+  }
+  const { data: excerptEn } = await supabase.from('content_translations').select('translated_text')
+    .eq('source_table', 'posts').eq('source_id', post.id).eq('source_field', 'excerpt').eq('locale', 'en').single();
+  const { data: contentEn } = await supabase.from('content_translations').select('translated_text')
+    .eq('source_table', 'posts').eq('source_id', post.id).eq('source_field', 'content').eq('locale', 'en').single();
+  if (excerptEn?.translated_text) postUpdates.excerpt_en = excerptEn.translated_text;
+  if (contentEn?.translated_text) postUpdates.content_en = contentEn.translated_text;
+
+  const { error: updateErr } = await supabase.from('posts').update(postUpdates).eq('id', post.id);
+  if (updateErr) {
+    console.error('   ⚠️ Error actualizando slugs en posts:', updateErr.message);
+  } else {
+    console.log('\n   ✅ Slugs actualizados en posts (slug_en, slug_fr, slug_de)');
+  }
+
+  console.log('\n' + '='.repeat(60));
+  console.log('🎉 ¡Re-traducción completada!');
+  console.log('   El artículo está traducido a EN, FR y DE.');
+  console.log('='.repeat(60));
+}
+
+// ========== MODO: Traducir TODOS los posts sin traducción (solo inglés, legacy) ==========
 async function translateAllPosts() {
-  console.log('🚀 Iniciando traducción de artículos del blog...\n');
+  console.log('🚀 Iniciando traducción de artículos del blog (modo legacy: solo inglés)...\n');
 
   await ensureTranslationColumns();
 
-  // Obtener todos los posts publicados que NO tienen traducción
   const { data: posts, error } = await supabase
     .from('posts')
     .select('id, title, excerpt, content, slug')
@@ -173,37 +293,21 @@ async function translateAllPosts() {
     console.log(`   Slug: ${post.slug}`);
 
     try {
-      // Traducir título
       console.log('   📝 Traduciendo título...');
-      const titleEn = await translateWithOpenAI(post.title, 'title');
-      
-      // Generar slug en inglés desde el título traducido
+      const titleEn = await translateWithOpenAI(post.title, 'title', 'en');
       const slugEn = generateSlug(titleEn);
       console.log(`   🔗 Slug generado: ${slugEn}`);
-      
-      // Pequeña pausa para no saturar la API
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Traducir excerpt
       console.log('   📝 Traduciendo excerpt...');
-      const excerptEn = post.excerpt ? await translateWithOpenAI(post.excerpt, 'excerpt') : null;
-      
+      const excerptEn = post.excerpt ? await translateWithOpenAI(post.excerpt, 'excerpt', 'en') : null;
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Traducir contenido
       console.log('   📝 Traduciendo contenido (esto puede tardar)...');
-      const contentEn = post.content ? await translateWithOpenAI(post.content, 'content') : null;
-      
-      // Guardar en BD
+      const contentEn = post.content ? await translateWithOpenAI(post.content, 'content', 'en') : null;
+
       console.log('   💾 Guardando traducción...');
-      console.log(`   📊 Datos a guardar:`, {
-        title_en: titleEn ? titleEn.substring(0, 50) + '...' : 'NULL',
-        slug_en: slugEn || 'NULL',
-        excerpt_en: excerptEn ? 'OK' : 'NULL',
-        content_en: contentEn ? 'OK' : 'NULL'
-      });
-      
-      const { data: updateData, error: updateError } = await supabase
+      const { error: updateError } = await supabase
         .from('posts')
         .update({
           title_en: titleEn,
@@ -211,19 +315,16 @@ async function translateAllPosts() {
           excerpt_en: excerptEn,
           content_en: contentEn,
         })
-        .eq('id', post.id)
-        .select();
+        .eq('id', post.id);
 
       if (updateError) {
         console.error('   ❌ Error en UPDATE:', updateError);
         throw updateError;
       }
 
-      console.log('   ✅ Actualización exitosa:', updateData ? 'Datos actualizados' : 'Sin datos retornados');
       console.log('   ✅ ¡Traducción completada!');
       successCount++;
 
-      // Pausa más larga entre posts para no saturar la API
       if (i < posts.length - 1) {
         console.log('   ⏳ Esperando 2 segundos antes del siguiente...');
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -246,4 +347,8 @@ async function translateAllPosts() {
 }
 
 // Ejecutar
-translateAllPosts().catch(console.error);
+if (SLUG_ARG) {
+  translateSinglePost(SLUG_ARG).catch(console.error);
+} else {
+  translateAllPosts().catch(console.error);
+}

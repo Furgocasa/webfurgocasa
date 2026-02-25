@@ -62,12 +62,16 @@ function calculateSeasonalPrice(
   let total = 0;
   const breakdown: Record<string, number> = {};
   
-  const startDate = new Date(pickupDate);
+  const [sY, sM, sD] = pickupDate.split('-').map(Number);
+  const startDate = new Date(sY, sM - 1, sD);
   
   for (let i = 0; i < pricingDays; i++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + i);
-    const dateStr = currentDate.toISOString().split('T')[0];
+    const y = currentDate.getFullYear();
+    const m = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const d = String(currentDate.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
     
     const season = getSeasonForDate(dateStr, seasons);
     const priceForDay = getPriceForDayByDuration(season, pricingDays);
@@ -97,15 +101,18 @@ function calculatePriceWithoutDurationDiscount(
   seasons: Season[]
 ): { total: number; avgPricePerDay: number } {
   let total = 0;
-  const startDate = new Date(pickupDate);
+  const [pY, pM, pD] = pickupDate.split('-').map(Number);
+  const startDate = new Date(pY, pM - 1, pD);
   
   for (let i = 0; i < pricingDays; i++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + i);
-    const dateStr = currentDate.toISOString().split('T')[0];
+    const y = currentDate.getFullYear();
+    const m = String(currentDate.getMonth() + 1).padStart(2, '0');
+    const d = String(currentDate.getDate()).padStart(2, '0');
+    const dateStr = `${y}-${m}-${d}`;
     
     const season = getSeasonForDate(dateStr, seasons);
-    // Siempre usar price_less_than_week (sin descuento por duración)
     const priceForDay = season?.price_less_than_week ?? PRECIO_TEMPORADA_BAJA.price_less_than_week;
     total += priceForDay;
   }

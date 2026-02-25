@@ -1,6 +1,29 @@
 # Sistema de Traducciones del Blog
 
-> **Última actualización**: 27 de Enero 2026 - Fix Language Switcher con slugs traducidos
+> **Última actualización**: 24 de Febrero 2026 - Script para re-traducir artículo específico
+
+## ⭐ Re-traducir un artículo modificado (uso recurrente)
+
+Cuando modificas el contenido de un artículo en español y necesitas actualizar las traducciones a EN, FR y DE:
+
+```bash
+node translate-blog-content.js <slug-del-articulo>
+```
+
+**Ejemplo** (artículo de la Toscana española):
+```bash
+node translate-blog-content.js ruta-en-camper-por-la-toscana-espanola-los-pueblos-de-guadalajara-en-autocaravana
+```
+
+El script:
+- Traduce título, excerpt, contenido, meta_title y meta_description
+- Guarda en `content_translations` para EN, FR y DE
+- Actualiza slugs en `posts` (slug_en, slug_fr, slug_de)
+- **Sobrescribe** traducciones existentes (re-traducción completa)
+
+**Requisitos**: `OPENAI_API_KEY` o `NEXT_PUBLIC_OPENAI_API_KEY` en `.env.local`
+
+---
 
 ## 📋 Resumen
 
@@ -59,52 +82,30 @@ Este script te mostrará:
 
 ## 🔧 Generar Traducciones Faltantes
 
-### Para Inglés (columnas en `posts`)
+### Script unificado: `translate-blog-content.js`
 
-Usa el script existente:
-```bash
-node translate-blog-content.js
-```
+El script tiene dos modos según si pasas argumentos o no:
 
-Este script traduce y guarda en las columnas `title_en`, `excerpt_en`, `content_en`.
+| Modo | Comando | Uso |
+|------|---------|-----|
+| **Re-traducir artículo** | `node translate-blog-content.js <slug>` | **Uso recurrente**: tras modificar un artículo en español y necesitar actualizar EN, FR, DE |
+| **Traducir todos** | `node translate-blog-content.js` | Traduce todos los posts sin traducción (solo inglés, modo legacy) |
 
 ### Para Francés y Alemán (tabla `content_translations`)
 
-Hay dos opciones:
+El modo **con slug** ya traduce a EN, FR y DE y guarda en `content_translations`. Si prefieres el sistema de cola:
 
-#### Opción 1: Usar el sistema automático de cola de traducciones
+#### Opción: Sistema automático de cola de traducciones
 
 1. Encolar contenido para traducción:
 ```sql
 -- Ver: supabase/historicos/encolar-contenido-existente.sql
--- Este script encola todos los posts para traducción automática
 ```
 
 2. Procesar la cola usando la función de Supabase:
 ```bash
 # La función process-translations procesa la cola automáticamente
 # Ver: supabase/functions/process-translations/index.ts
-```
-
-#### Opción 2: Script manual de traducción
-
-Crear un script similar a `translate-blog-content.js` pero que guarde en `content_translations`:
-
-```javascript
-// Ejemplo de cómo guardar traducción en content_translations
-const { data, error } = await supabase
-  .from('content_translations')
-  .upsert({
-    source_table: 'posts',
-    source_id: post.id,
-    source_field: 'title',
-    locale: 'fr',
-    translated_text: titleFr,
-    is_auto_translated: true,
-    translation_model: 'gpt-4o-mini'
-  }, {
-    onConflict: 'source_table,source_id,source_field,locale'
-  });
 ```
 
 ## 🎯 Cómo Funciona el Código
@@ -173,10 +174,9 @@ Los siguientes componentes usan slugs traducidos para evitar URLs incorrectas:
 
 | Script | Descripción |
 |--------|-------------|
-| `scripts/verificar-traducciones-blog.js` | Verifica estado de traducciones |
-| `scripts/traducir-blog-completo.js` | Traduce contenido con OpenAI |
-| `scripts/verificar-slugs-traducidos.js` | Verifica slugs traducidos |
-| `scripts/generar-slugs-traducidos.js` | Genera slugs desde títulos traducidos |
+| **`translate-blog-content.js`** | **⭐ Principal**: Re-traducir artículo (`node translate-blog-content.js <slug>`) o traducir todos los pendientes |
+| `scripts/generate-blog-slug-translations.ts` | Genera slugs desde títulos en content_translations |
+| `supabase/verificar-traducciones-blog.sql` | Verifica estado de traducciones en BD |
 
 ## 📝 Notas Técnicas
 

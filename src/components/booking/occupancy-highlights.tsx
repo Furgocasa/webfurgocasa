@@ -113,8 +113,8 @@ export function OccupancyHighlights() {
   };
 
   const formatDateRange = (start: string, end: string) => {
-    const startDate = new Date(start);
-    const endDate = new Date(end);
+    const startDate = new Date(start + 'T00:00:00');
+    const endDate = new Date(end + 'T00:00:00');
     const tz = "Europe/Madrid";
 
     const startDay = startDate.toLocaleDateString("es-ES", { day: "numeric", timeZone: tz });

@@ -6,6 +6,33 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Parsea un string "YYYY-MM-DD" como medianoche hora LOCAL del navegador.
+ * Evita el problema de new Date("2026-04-15") que lo interpreta como UTC
+ * y puede desplazar el día en zonas horarias negativas (LATAM, etc.).
+ *
+ * Combinado con timeZone: "Europe/Madrid" en toLocaleDateString,
+ * garantiza que las fechas siempre se muestran como hora de Madrid.
+ *
+ * REGLA: NUNCA usar new Date("YYYY-MM-DD") directamente. Siempre parseDateString().
+ */
+export function parseDateString(dateStr: string): Date {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/**
+ * Convierte un Date a string "YYYY-MM-DD" usando hora LOCAL (no UTC).
+ * Reemplaza el patrón date.toISOString().split('T')[0] que usa UTC
+ * y puede devolver el día anterior en zonas horarias positivas.
+ */
+export function toDateString(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+/**
  * Format price in EUR with Spanish format (1.111,11 €)
  * Always uses thousand separator (.) even for numbers < 10.000
  */
@@ -23,7 +50,7 @@ export function formatPrice(amount: number): string {
  * Format date in Spanish
  */
 export function formatDate(date: Date | string, format: "short" | "long" = "short"): string {
-  const d = typeof date === "string" ? new Date(date) : date;
+  const d = typeof date === "string" ? parseDateString(date) : date;
   
   if (format === "long") {
     return d.toLocaleDateString("es-ES", {
@@ -74,9 +101,13 @@ export function calculateRentalDays(
   dropoffDate: string,
   dropoffTime: string
 ): number {
-  // Combinar fecha y hora en timestamps completos
-  const pickupDateTime = new Date(`${pickupDate}T${pickupTime}:00`);
-  const dropoffDateTime = new Date(`${dropoffDate}T${dropoffTime}:00`);
+  const [pYear, pMonth, pDay] = pickupDate.split('-').map(Number);
+  const [pH, pM] = pickupTime.split(':').map(Number);
+  const pickupDateTime = new Date(pYear, pMonth - 1, pDay, pH, pM, 0);
+
+  const [dYear, dMonth, dDay] = dropoffDate.split('-').map(Number);
+  const [dH, dM] = dropoffTime.split(':').map(Number);
+  const dropoffDateTime = new Date(dYear, dMonth - 1, dDay, dH, dM, 0);
   
   // Calcular diferencia en milisegundos
   const diffMs = dropoffDateTime.getTime() - pickupDateTime.getTime();
@@ -282,13 +313,12 @@ export function calculateSeasonalPrice(
   let total = 0;
   const breakdown: Record<string, { days: number; pricePerDay: number; minDays: number }> = {};
   
-  // Generar cada día del alquiler
-  const startDate = new Date(pickupDate);
+  const startDate = parseDateString(pickupDate);
   
   for (let i = 0; i < pricingDays; i++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + i);
-    const dateStr = currentDate.toISOString().split('T')[0];
+    const dateStr = toDateString(currentDate);
     
     const season = getSeasonForDate(dateStr, seasons);
     const priceForDay = getPriceForDayByDuration(season, pricingDays);
@@ -341,15 +371,14 @@ export function calculatePriceWithoutDurationDiscount(
   seasons: Season[]
 ): { total: number; avgPricePerDay: number } {
   let total = 0;
-  const startDate = new Date(pickupDate);
+  const startDate = parseDateString(pickupDate);
   
   for (let i = 0; i < pricingDays; i++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + i);
-    const dateStr = currentDate.toISOString().split('T')[0];
+    const dateStr = toDateString(currentDate);
     
     const season = getSeasonForDate(dateStr, seasons);
-    // Siempre usar price_less_than_week (sin descuento por duración)
     const priceForDay = season?.price_less_than_week ?? PRECIO_TEMPORADA_BAJA.price_less_than_week;
     total += priceForDay;
   }

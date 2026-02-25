@@ -187,10 +187,11 @@ export async function POST(request: Request) {
         .single();
 
       if (couponCheck) {
-        const pickupDate = new Date(booking.pickup_date + "T00:00:00");
+        const [cpY, cpM, cpD] = booking.pickup_date.split('-').map(Number);
+        const pickupDate = new Date(cpY, cpM - 1, cpD);
         const couponInvalid = !couponCheck.is_active
-          || (couponCheck.valid_from && pickupDate < new Date(couponCheck.valid_from))
-          || (couponCheck.valid_until && pickupDate > new Date(couponCheck.valid_until))
+          || (couponCheck.valid_from && pickupDate < new Date(couponCheck.valid_from + 'T00:00:00'))
+          || (couponCheck.valid_until && pickupDate > new Date(couponCheck.valid_until + 'T00:00:00'))
           || (couponCheck.max_uses !== null && couponCheck.current_uses >= couponCheck.max_uses);
 
         if (couponInvalid) {

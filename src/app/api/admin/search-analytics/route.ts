@@ -582,20 +582,22 @@ export async function GET(request: NextRequest) {
       }> = {};
 
       searches?.forEach(s => {
-        const pickupDate = new Date(s.pickup_date);
-        // Obtener lunes de esa semana
+        const [pY, pM, pD] = s.pickup_date.split('-').map(Number);
+        const pickupDate = new Date(pY, pM - 1, pD);
         const monday = new Date(pickupDate);
         monday.setDate(pickupDate.getDate() - pickupDate.getDay() + 1);
-        const weekKey = monday.toISOString().split('T')[0];
+        const wy = monday.getFullYear();
+        const wm = String(monday.getMonth() + 1).padStart(2, '0');
+        const wd = String(monday.getDate()).padStart(2, '0');
+        const weekKey = `${wy}-${wm}-${wd}`;
         
-        // Calcular domingo
         const sunday = new Date(monday);
         sunday.setDate(monday.getDate() + 6);
         
         if (!weeklyDemand[weekKey]) {
           weeklyDemand[weekKey] = {
             start: weekKey,
-            end: sunday.toISOString().split('T')[0],
+            end: `${sunday.getFullYear()}-${String(sunday.getMonth() + 1).padStart(2, '0')}-${String(sunday.getDate()).padStart(2, '0')}`,
             searches: 0,
             dateRanges: new Set(),
           };

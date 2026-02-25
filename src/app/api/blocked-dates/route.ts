@@ -106,7 +106,7 @@ export async function POST(request: Request) {
     const { vehicle_id, start_date, end_date, reason, created_by } = validationResult.data;
 
     // Validar que la fecha de fin sea posterior a la de inicio
-    if (new Date(end_date) < new Date(start_date)) {
+    if (new Date(end_date + 'T00:00:00') < new Date(start_date + 'T00:00:00')) {
       return NextResponse.json(
         { error: "La fecha de fin debe ser posterior a la fecha de inicio" },
         { status: 400 }

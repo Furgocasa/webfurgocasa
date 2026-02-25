@@ -85,18 +85,21 @@ export function useSeasonMinDays(
           return;
         }
 
-        // Calcular cuántos días del periodo están en cada temporada
-        const startDate = new Date(pickupDate);
-        const endDate = new Date(dropoffDate);
+        const [sY, sM, sD] = pickupDate.split('-').map(Number);
+        const startDate = new Date(sY, sM - 1, sD);
+        const [eY, eM, eD] = dropoffDate.split('-').map(Number);
+        const endDate = new Date(eY, eM - 1, eD);
         const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
         const seasonDays: Map<string, { season: Season; days: number }> = new Map();
 
-        // Iterar cada día del periodo
         for (let i = 0; i < totalDays; i++) {
           const currentDate = new Date(startDate);
           currentDate.setDate(startDate.getDate() + i);
-          const dateStr = currentDate.toISOString().split('T')[0];
+          const y = currentDate.getFullYear();
+          const m = String(currentDate.getMonth() + 1).padStart(2, '0');
+          const d = String(currentDate.getDate()).padStart(2, '0');
+          const dateStr = `${y}-${m}-${d}`;
 
           // Buscar qué temporada aplica para este día
           const season = seasons.find((s) => 
