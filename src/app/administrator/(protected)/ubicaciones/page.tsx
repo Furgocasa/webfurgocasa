@@ -2,9 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Search, Edit, Trash2, Save, X, MapPin, AlertCircle, Phone, Mail } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Save, X, MapPin, AlertCircle, Phone, Mail, Clock } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useAdminData } from "@/hooks/use-admin-data";
+
+interface TimeSlot {
+  open: string;
+  close: string;
+}
 
 interface Location {
   id: string;
@@ -22,6 +27,7 @@ interface Location {
   is_dropoff: boolean | null;
   opening_time?: string | null;
   closing_time?: string | null;
+  opening_hours?: TimeSlot[] | null;
   extra_fee?: number | null;
   min_days?: number | null;
   active_from?: string | null;
@@ -32,6 +38,11 @@ interface Location {
   created_at?: string | null;
   updated_at?: string | null;
 }
+
+const DEFAULT_TIME_SLOTS: TimeSlot[] = [
+  { open: "10:00", close: "14:00" },
+  { open: "17:00", close: "19:00" },
+];
 
 export default function UbicacionesPage() {
   // Establecer título de la página
@@ -69,6 +80,22 @@ export default function UbicacionesPage() {
     is_dropoff: true,
   });
 
+  const [openingHours, setOpeningHours] = useState<TimeSlot[]>(DEFAULT_TIME_SLOTS);
+
+  const addTimeSlot = () => {
+    setOpeningHours([...openingHours, { open: "09:00", close: "13:00" }]);
+  };
+
+  const removeTimeSlot = (index: number) => {
+    setOpeningHours(openingHours.filter((_, i) => i !== index));
+  };
+
+  const updateTimeSlot = (index: number, field: 'open' | 'close', value: string) => {
+    const updated = [...openingHours];
+    updated[index] = { ...updated[index], [field]: value };
+    setOpeningHours(updated);
+  };
+
   // Usar el hook para cargar datos con retry automático
   const { data: locations, loading, error, refetch } = useAdminData<Location[]>({
     queryFn: async () => {
@@ -104,6 +131,7 @@ export default function UbicacionesPage() {
       const supabase = createClient();
       const slug = formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
       
+      const validSlots = openingHours.filter(s => s.open && s.close && s.open < s.close);
       const dataToSave = {
         name: formData.name,
         slug: slug,
@@ -122,6 +150,7 @@ export default function UbicacionesPage() {
         is_active: formData.is_active,
         is_pickup: formData.is_pickup,
         is_dropoff: formData.is_dropoff,
+        opening_hours: validSlots.length > 0 ? validSlots : null,
       };
 
       if (editingId) {
@@ -178,6 +207,11 @@ export default function UbicacionesPage() {
       is_pickup: location.is_pickup ?? true,
       is_dropoff: location.is_dropoff ?? true,
     });
+    setOpeningHours(
+      location.opening_hours && Array.isArray(location.opening_hours) && location.opening_hours.length > 0
+        ? location.opening_hours
+        : DEFAULT_TIME_SLOTS
+    );
     setEditingId(location.id);
     setShowAddForm(true);
   };
@@ -251,6 +285,7 @@ export default function UbicacionesPage() {
       is_pickup: true,
       is_dropoff: true,
     });
+    setOpeningHours(DEFAULT_TIME_SLOTS);
     setEditingId(null);
     setShowAddForm(false);
   };
@@ -466,6 +501,65 @@ export default function UbicacionesPage() {
               </div>
             </div>
 
+            {/* Franjas horarias */}
+            <div className="border border-blue-200 rounded-lg p-4 space-y-4 bg-blue-50/30">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <h3 className="text-sm font-semibold text-gray-800">Horarios de apertura</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={addTimeSlot}
+                  className="text-xs px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-1"
+                >
+                  <Plus className="h-3 w-3" />
+                  Añadir franja
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 -mt-2">
+                Define las franjas horarias en las que los clientes pueden recoger y devolver vehículos.
+              </p>
+              {openingHours.length === 0 ? (
+                <p className="text-sm text-gray-400 italic text-center py-3">
+                  Sin franjas horarias definidas. Los clientes no podrán seleccionar hora.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {openingHours.map((slot, index) => (
+                    <div key={index} className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-200">
+                      <span className="text-xs font-medium text-gray-500 min-w-[60px]">
+                        Horario {index + 1}
+                      </span>
+                      <div className="flex items-center gap-2 flex-1">
+                        <input
+                          type="time"
+                          value={slot.open}
+                          onChange={(e) => updateTimeSlot(index, 'open', e.target.value)}
+                          className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        />
+                        <span className="text-gray-400 text-sm">a</span>
+                        <input
+                          type="time"
+                          value={slot.close}
+                          onChange={(e) => updateTimeSlot(index, 'close', e.target.value)}
+                          className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeTimeSlot(index)}
+                        className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Eliminar franja"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Disponibilidad temporal */}
             <div className="border border-gray-200 rounded-lg p-4 space-y-4">
               <h3 className="text-sm font-semibold text-gray-800">Disponibilidad temporal</h3>
@@ -648,6 +742,18 @@ export default function UbicacionesPage() {
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-orange-50">
                       Cargo extra: {parseFloat(location.extra_fee.toString()).toFixed(2)} €
                     </span>
+                  </div>
+                )}
+                {location.opening_hours && Array.isArray(location.opening_hours) && location.opening_hours.length > 0 && (
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Clock className="h-3.5 w-3.5 text-blue-500" />
+                    <div className="flex flex-wrap gap-1.5">
+                      {(location.opening_hours as TimeSlot[]).map((slot, i) => (
+                        <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-full text-xs bg-blue-50 text-blue-700 font-medium">
+                          {slot.open} - {slot.close}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 )}
                 <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">

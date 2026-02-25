@@ -179,6 +179,7 @@ CREATE TABLE locations (
     email VARCHAR(255),
     opening_time TIME DEFAULT '08:00',
     closing_time TIME DEFAULT '20:00',
+    opening_hours JSONB DEFAULT '[{"open":"10:00","close":"14:00"},{"open":"17:00","close":"19:00"}]',
     is_pickup BOOLEAN DEFAULT TRUE,
     is_dropoff BOOLEAN DEFAULT TRUE,
     extra_fee DECIMAL(10,2) DEFAULT 0,

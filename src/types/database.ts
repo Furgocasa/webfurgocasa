@@ -176,6 +176,7 @@ export interface Database {
           email: string | null;
           opening_time: string;
           closing_time: string;
+          opening_hours: { open: string; close: string }[] | null;
           is_pickup: boolean;
           is_dropoff: boolean;
           extra_fee: number;
@@ -200,6 +201,7 @@ export interface Database {
           email?: string | null;
           opening_time?: string;
           closing_time?: string;
+          opening_hours?: { open: string; close: string }[] | null;
           is_pickup?: boolean;
           is_dropoff?: boolean;
           extra_fee?: number;

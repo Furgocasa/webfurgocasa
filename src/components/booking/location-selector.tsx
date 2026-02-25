@@ -5,12 +5,18 @@ import { ChevronDown } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { createClient } from "@/lib/supabase/client";
 
+export interface TimeSlot {
+  open: string;
+  close: string;
+}
+
 interface LocationData {
   id: string;
   slug: string;
   name: string;
   address: string | null;
   min_days: number | null;
+  opening_hours: TimeSlot[] | null;
   active_from: string | null;
   active_until: string | null;
   active_recurring: boolean | null;
@@ -57,7 +63,7 @@ function isLocationAvailableForDate(location: LocationData, pickupDate: string |
 
 interface LocationSelectorProps {
   value: string;
-  onChange: (slug: string, minDays: number | null) => void;
+  onChange: (slug: string, minDays: number | null, openingHours: TimeSlot[] | null) => void;
   placeholder?: string;
   pickupDate?: string | null;
   defaultLocation?: string;
@@ -82,7 +88,7 @@ export function LocationSelector({
       const supabase = createClient();
       const { data } = await supabase
         .from("locations")
-        .select("id, slug, name, address, min_days, active_from, active_until, active_recurring")
+        .select("id, slug, name, address, min_days, opening_hours, active_from, active_until, active_recurring")
         .eq("is_active", true)
         .eq("is_pickup", true)
         .order("name");
@@ -107,7 +113,7 @@ export function LocationSelector({
       || (fallbackLocation && allLocations.find(l => l.slug === fallbackLocation));
 
     if (loc) {
-      onChange(loc.slug, loc.min_days);
+      onChange(loc.slug, loc.min_days, loc.opening_hours);
       setDefaultApplied(true);
     }
   }, [defaultLocation, fallbackLocation, allLocations, defaultApplied, value, onChange]);
@@ -160,7 +166,7 @@ export function LocationSelector({
                 key={location.id}
                 type="button"
                 onClick={() => {
-                  onChange(location.slug, location.min_days);
+                  onChange(location.slug, location.min_days, location.opening_hours);
                   setIsOpen(false);
                 }}
                 className={`w-full px-4 py-3 hover:bg-furgocasa-blue hover:text-white transition-colors text-left ${

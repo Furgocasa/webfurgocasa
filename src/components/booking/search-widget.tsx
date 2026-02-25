@@ -6,7 +6,7 @@ import { format, addDays } from "date-fns";
 import { es } from "date-fns/locale";
 import { Calendar, Clock, MapPin, Search } from "lucide-react";
 import { DateRangePicker } from "./date-range-picker";
-import { LocationSelector } from "./location-selector";
+import { LocationSelector, type TimeSlot } from "./location-selector";
 import { TimeSelector } from "./time-selector";
 import { useLanguage } from "@/contexts/language-context";
 import { calculateRentalDays } from "@/lib/utils";
@@ -25,7 +25,8 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
 
   // Form state
   const [location, setLocation] = useState(""); // slug de la ubicación
-  const [locationMinDays, setLocationMinDays] = useState<number | null>(null); // min_days de la ubicación seleccionada
+  const [locationMinDays, setLocationMinDays] = useState<number | null>(null);
+  const [locationOpeningHours, setLocationOpeningHours] = useState<TimeSlot[] | null>(null);
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
     to: Date | undefined;
@@ -46,10 +47,11 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
     return seasonMinDays;
   };
 
-  // Cuando cambia la ubicación, guardar slug y min_days
-  const handleLocationChange = (slug: string, minDays: number | null) => {
+  // Cuando cambia la ubicación, guardar slug, min_days y opening_hours
+  const handleLocationChange = (slug: string, minDays: number | null, openingHours: TimeSlot[] | null) => {
     setLocation(slug);
     setLocationMinDays(minDays);
+    setLocationOpeningHours(openingHours);
     // Si las fechas actuales no cumplen el nuevo mínimo, resetear
     if (dateRange.from && dateRange.to) {
       const newMinDays = minDays !== null ? minDays : seasonMinDays;
@@ -153,6 +155,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
             <TimeSelector
               value={pickupTime}
               onChange={setPickupTime}
+              timeSlots={locationOpeningHours}
             />
           </div>
 
@@ -164,6 +167,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
             <TimeSelector
               value={dropoffTime}
               onChange={setDropoffTime}
+              timeSlots={locationOpeningHours}
             />
           </div>
         </div>
