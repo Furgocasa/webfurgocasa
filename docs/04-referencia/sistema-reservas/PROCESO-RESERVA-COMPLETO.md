@@ -1,7 +1,7 @@
 # 📋 PROCESO DE RESERVA COMPLETO - Guía Técnica
 
-**Versión**: 1.0.2  
-**Última actualización**: 9 de Enero 2026  
+**Versión**: 1.1.0  
+**Última actualización**: 25 de Febrero 2026  
 **Estado**: ✅ Producción - TOTALMENTE FUNCIONAL
 
 ---
@@ -27,14 +27,26 @@
 
 ```
 Usuario ingresa:
-├─ Fechas de recogida y devolución
-├─ Horas de recogida y devolución
-├─ Ubicación de recogida
-└─ Ubicación de devolución
+├─ Ubicación de recogida (y devolución, misma ubicación)
+├─ Fechas de recogida y devolución (calendario con mínimo por temporada/ubicación)
+├─ Hora de recogida (slots generados según franjas horarias de la ubicación)
+└─ Hora de devolución (idem)
 
 Acción: Click en "Buscar"
 → Redirige a: /buscar?pickup_date=...&dropoff_date=...&...
 ```
+
+**Franjas horarias (v1.1.0)**:
+- Cada ubicación tiene franjas horarias configurables en `opening_hours` (JSONB)
+- Formato: `[{"open":"10:00","close":"14:00"},{"open":"17:00","close":"19:00"}]`
+- El `TimeSelector` genera slots cada 30 min dentro de cada franja
+- Default sin configurar: 10:00-14:00 y 17:00-19:00
+
+**Timezone (v1.1.0)**:
+- Todas las fechas se procesan en timezone `Europe/Madrid`
+- `parseDateString()` evita interpretación UTC de strings `YYYY-MM-DD`
+- `getMadridToday()` asegura que el calendario siempre usa la fecha de Madrid
+- Resuelve desfase de +1 día para usuarios en zonas horarias negativas (Latinoamérica)
 
 ### Paso 2: Resultados de búsqueda
 **URL**: `/buscar`

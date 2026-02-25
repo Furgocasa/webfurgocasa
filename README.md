@@ -1,6 +1,6 @@
 # Furgocasa - Sistema de Alquiler de Campers
 
-[![Version](https://img.shields.io/badge/version-4.4.0+-green.svg)](./CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-4.5.0-green.svg)](./CHANGELOG.md)
 [![Status](https://img.shields.io/badge/status-production-success.svg)](https://www.furgocasa.com)
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-99%2F100_desktop-brightgreen.svg)](https://pagespeed.web.dev/)
@@ -9,55 +9,78 @@
 [![SEO](https://img.shields.io/badge/SEO-100%2F100-brightgreen.svg)](./CHANGELOG.md)
 [![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./I18N_IMPLEMENTATION.md)
 
-**🎉 VERSIÓN 4.4.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
+**🎉 VERSIÓN 4.5.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
-> **✅ ESTADO: PÁGINAS SEO MULTIIDIOMA PARA EUROPA Y MARRUECOS** - 8 páginas estratégicas | SEO optimizado | Intención de búsqueda geográfica
+> **✅ ESTADO: Franjas horarias por ubicación + Timezone Europe/Madrid estandarizado** - Horarios configurables | Fechas consistentes globalmente
 
 Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado con Next.js 15, TypeScript, Supabase, sistema dual de pagos (Redsys + Stripe) y TinyMCE.
 
 ---
 
-## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 24 de Febrero 2026 - **Sistema de Daños: Fix Caché PWA + Navegación + Numeración Independiente**
+## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Febrero 2026 - **Franjas Horarias por Ubicación + Fix Timezone Europe/Madrid**
 
-### 🔧 Fix Imágenes del Plano de Daños en PWA
+### 🕐 Franjas Horarias Configurables por Ubicación
 
 **Estado**: ✅ Completado y desplegado  
-**Commit**: `38276d7`
+**Commit**: `eec9bf5`
 
-Las imágenes del plano de daños (lateral izquierdo/derecho) se mostraban intercambiadas en la PWA del administrador debido al caché agresivo del service worker. Se añadió cache-bust (`?v=2`) a todas las URLs de imágenes del vehículo.
+Las ubicaciones ahora permiten configurar múltiples franjas horarias de apertura (ej: Horario 1: 10:00-14:00, Horario 2: 17:00-19:00). El selector de hora en el buscador de reservas genera los slots disponibles dinámicamente según la ubicación seleccionada.
 
-**Problema detectado:**
-- En PC (navegador normal): Las imágenes se mostraban correctamente
-- En PWA (móvil): Las imágenes laterales aparecían intercambiadas por caché del service worker (CacheFirst, 30 días)
+**Funcionalidades:**
+- ✅ **Franjas horarias dinámicas**: Cada ubicación puede tener N franjas horarias configurables desde el admin
+- ✅ **UI en admin**: Sección "Horarios de apertura" con inputs de hora, botón añadir/eliminar franjas
+- ✅ **TimeSelector dinámico**: Genera slots cada 30 min basándose en las franjas de la ubicación seleccionada
+- ✅ **Propagación automática**: Ubicación → LocationSelector → SearchWidget → TimeSelector
+- ✅ **Almacenamiento JSONB**: Campo `opening_hours` en tabla `locations` con formato `[{"open":"10:00","close":"14:00"}]`
+- ✅ **Defaults inteligentes**: Sin franjas configuradas → usa 10:00-14:00 y 17:00-19:00
 
-**Solución:**
-- ✅ **Cache-bust en URLs**: Añadido `?v=2` a las 6 imágenes del plano del vehículo en `vehicle-damage-plan.tsx`
-- ✅ El nuevo deploy fuerza la descarga de imágenes frescas en la PWA
-
-**Archivo modificado:**
-- `src/components/admin/vehicle-damage-plan.tsx` - Cache-bust en URLs de imágenes
-
-### 🔧 Flechas de Navegación entre Vistas + Numeración Independiente
-
-**Commits anteriores**: `8589b95`, `bd67640`, `4df0b36`
-
-**Funcionalidades del sistema de daños:**
-- ✅ **Flechas de navegación**: Botones ← → para cambiar entre vistas del vehículo directamente en el plano
-- ✅ **Numeración independiente por tipo**: Exteriores: 1, 2, 3... / Interiores: 1, 2, 3... (ya no es secuencial global)
-- ✅ **Lista lateral separada**: Dos secciones diferenciadas (cabecera naranja para exteriores, azul para interiores) con conteo
-- ✅ **PDF separado**: La tabla "Detalle de Daños" se divide en "Daños Exteriores" y "Daños Interiores" con numeración propia
-- ✅ **Marcadores correctos**: Los números sobre las imágenes del vehículo usan la numeración por tipo
-- ✅ **Insert con número correcto**: Al crear un nuevo daño se calcula automáticamente el siguiente número para su tipo
-- ✅ **Fix constraint DB**: Se incluye `interior` en `vehicle_damages_view_type_check` para poder guardar daños interiores
-
-**Migraciones SQL aplicadas:**
-- ✅ `supabase/migrations/fix-vehicle-damages-view-type-check.sql` - Añadir `interior` al constraint
-- ✅ `supabase/migrations/renumber-damages-by-type.sql` - Renumerar daños existentes por tipo
+**Migración SQL requerida:**
+- `supabase/migrations/add-opening-hours-to-locations.sql` - Añadir columna `opening_hours` JSONB
 
 **Archivos modificados:**
-- `src/app/administrator/(protected)/danos/[id]/page.tsx` - Navegación con flechas + numeración por tipo + lista separada
-- `src/components/admin/vehicle-damage-plan.tsx` - Cache-bust imágenes PWA
-- `src/components/admin/damage-report-pdf.tsx` - PDF con tablas separadas por tipo
+- `src/app/administrator/(protected)/ubicaciones/page.tsx` - UI franjas horarias en formulario + badges en listado
+- `src/components/booking/time-selector.tsx` - Generación dinámica de slots desde franjas
+- `src/components/booking/location-selector.tsx` - Propaga `opening_hours` al seleccionar ubicación
+- `src/components/booking/search-widget.tsx` - Conecta ubicación con TimeSelector
+- `src/types/database.ts` - Tipo `opening_hours` en Location
+
+### 🌍 Fix Timezone: Todas las Fechas en Europe/Madrid
+
+**Commit**: `654f3b9`
+
+Un cliente desde Latinoamérica experimentó un desfase de +1 día en sus fechas de reserva (15-30 abril → 16 abril - 1 mayo). Se estandarizó todo el manejo de fechas a timezone `Europe/Madrid` en toda la aplicación.
+
+**Problema detectado:**
+- `new Date("2026-04-15")` se interpreta como UTC midnight → en zonas horarias negativas (Latinoamérica) el día retrocede
+- Las fechas de reserva, cálculos de precios y visualización mostraban días incorrectos
+
+**Solución:**
+- ✅ **Helpers centralizados**: `parseDateString()` y `toDateString()` en `src/lib/utils.ts`
+- ✅ **getMadridToday()**: El calendario siempre usa la fecha actual de Madrid
+- ✅ **timeZone: Europe/Madrid**: En todos los `toLocaleDateString` de las 8 páginas de booking (es, en, fr, de)
+- ✅ **APIs corregidas**: availability, pricing, bookings/create, blocked-dates, search-analytics
+- ✅ **Sin impacto en reservas existentes**: Solo se modifica la lógica de procesamiento, no los datos almacenados
+
+**Archivos modificados (20):**
+- `src/lib/utils.ts` - Helpers parseDateString/toDateString + cálculos corregidos
+- `src/components/booking/date-range-picker.tsx` - getMadridToday()
+- `src/components/booking/search-summary.tsx` - parseDateString
+- `src/components/booking/occupancy-highlights.tsx` - Fechas con T00:00:00
+- `src/hooks/use-season-min-days.ts` - Parseo explícito
+- `src/app/{es,en,fr,de}/reservar|book/vehiculo|nueva|vehicle|new/page.tsx` (8 archivos)
+- `src/app/api/{availability,pricing/calculate,bookings/create,blocked-dates,admin/search-analytics}/route.ts`
+
+---
+
+### ⚡ [ACTUALIZACIÓN ANTERIOR] - 24 de Febrero 2026 - **Sistema de Daños: Fix Caché PWA + Navegación + Numeración Independiente**
+
+**Funcionalidades del sistema de daños (commits: `38276d7`, `8589b95`, `bd67640`, `4df0b36`):**
+- ✅ **Cache-bust PWA**: `?v=2` en URLs de imágenes del plano de daños para forzar recarga
+- ✅ **Flechas de navegación**: Botones ← → para cambiar entre vistas del vehículo directamente en el plano
+- ✅ **Numeración independiente por tipo**: Exteriores: 1, 2, 3... / Interiores: 1, 2, 3...
+- ✅ **Lista lateral separada**: Secciones diferenciadas (naranja ext, azul int)
+- ✅ **PDF separado**: Tablas independientes para exteriores e interiores
+- ✅ **Fix constraint DB**: `interior` añadido a `vehicle_damages_view_type_check`
 
 ---
 

@@ -4,6 +4,57 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## ⚡ [4.5.0] - 25 de Febrero 2026 - **Franjas Horarias por Ubicación + Fix Timezone**
+
+### 🕐 Franjas Horarias Configurables
+
+Las ubicaciones ahora soportan múltiples franjas horarias de apertura. El selector de hora del buscador genera slots dinámicamente.
+
+- Nueva columna `opening_hours` (JSONB) en tabla `locations`
+- UI en admin: sección "Horarios de apertura" con añadir/eliminar franjas
+- `TimeSelector` genera slots cada 30 min según franjas de la ubicación
+- Flujo: LocationSelector → SearchWidget → TimeSelector (propagación automática)
+- Defaults: 10:00-14:00 y 17:00-19:00 si no hay franjas configuradas
+
+#### Migración SQL
+
+- `supabase/migrations/add-opening-hours-to-locations.sql`
+
+#### Archivos modificados
+
+- `src/app/administrator/(protected)/ubicaciones/page.tsx`
+- `src/components/booking/time-selector.tsx`
+- `src/components/booking/location-selector.tsx`
+- `src/components/booking/search-widget.tsx`
+- `src/types/database.ts`
+- `supabase/schema.sql`
+
+#### Commits
+
+- `eec9bf5` - feat(ubicaciones): franjas horarias configurables por ubicacion
+
+### 🌍 Fix Timezone Europe/Madrid
+
+Estandarizado todo el manejo de fechas a timezone `Europe/Madrid`. Resuelve desfase de +1 día para usuarios de Latinoamérica.
+
+- Helpers `parseDateString()` y `toDateString()` en utils.ts
+- `getMadridToday()` en date-range-picker
+- `timeZone: 'Europe/Madrid'` en 8 páginas de booking (es, en, fr, de)
+- APIs corregidas: availability, pricing, bookings/create, blocked-dates, search-analytics
+- Sin impacto en reservas existentes
+
+#### Archivos modificados (20 archivos)
+
+- `src/lib/utils.ts`, `src/components/booking/date-range-picker.tsx`, `search-summary.tsx`, `occupancy-highlights.tsx`
+- `src/hooks/use-season-min-days.ts`
+- 8 páginas de booking i18n + 5 rutas API
+
+#### Commits
+
+- `654f3b9` - fix(timezone): estandarizar manejo de fechas a Europe/Madrid en toda la app
+
+---
+
 ## ⚡ [4.4.4] - 24 de Febrero 2026 - **Sistema de Daños: Navegación + Fix Caché PWA**
 
 ### 🔧 Fix Caché PWA en Imágenes del Plano de Daños
