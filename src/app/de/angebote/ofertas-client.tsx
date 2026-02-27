@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, TrendingDown, Loader2, Users, Bed } from "lucide-react";
+import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, TrendingDown, Loader2, Users, Moon } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -486,8 +486,8 @@ export function OfertasClient() {
                           {offer.vehicle_seats} {t("plazas")}
                         </span>
                         <span className="flex items-center gap-1.5 bg-blue-50 px-2.5 py-1 rounded-full text-furgocasa-blue">
-                          <Bed className="w-4 h-4" />
-                          {offer.vehicle_beds} {t("camas")}
+                          <Moon className="w-4 h-4" />
+                          {offer.vehicle_beds} {t("plazas noche")}
                         </span>
                         <span className="flex items-center gap-1.5 bg-gray-100 px-2.5 py-1 rounded-full">
                           <Calendar className="w-4 h-4 text-furgocasa-blue" />

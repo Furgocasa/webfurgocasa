@@ -8,7 +8,7 @@ import {
   Gauge, 
   Fuel, 
   Users, 
-  Bed,
+  Moon,
   CheckCircle,
   Phone,
   Mail,
@@ -314,8 +314,8 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
                             <span>{vehicle.seats} {t("plazas")}</span>
                           </div>
                           <div className="flex items-center gap-1">
-                            <Bed className="h-4 w-4 flex-shrink-0" />
-                            <span>{vehicle.beds} {t("camas")}</span>
+                            <Moon className="h-4 w-4 flex-shrink-0" />
+                            <span>{vehicle.beds} {t("plazas noche")}</span>
                           </div>
                           <div className="flex items-center gap-1">
                             <Fuel className="h-4 w-4 flex-shrink-0" />

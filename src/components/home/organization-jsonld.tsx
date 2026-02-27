@@ -93,7 +93,7 @@ export function ProductJsonLd({ vehicles }: ProductJsonLdProps) {
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `${vehicle.brand} ${vehicle.model} - ${vehicle.name}`,
-    "description": `Camper van de ${vehicle.passengers} plazas con ${vehicle.beds} camas. Equipada con cocina, baño, calefacción y todo lo necesario para tu aventura.`,
+    "description": `Camper van de ${vehicle.passengers} plazas con ${vehicle.beds} plazas de noche. Equipada con cocina, baño, calefacción y todo lo necesario para tu aventura.`,
     "image": vehicle.main_image || "https://www.furgocasa.com/default-vehicle.jpg",
     "url": `https://www.furgocasa.com/vehiculos/${vehicle.slug}`,
     "brand": {

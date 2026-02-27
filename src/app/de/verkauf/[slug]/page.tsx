@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Metadata, ResolvingMetadata } from "next";
 import { 
-  ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Bed, 
+  ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Moon,
   CheckCircle, Phone, Mail, MapPin, Shield, Wrench, Ruler,
   Share2, Heart
 } from "lucide-react";

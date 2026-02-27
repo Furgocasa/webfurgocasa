@@ -398,17 +398,23 @@ export const staticTranslations = {
     fr: "places",
     de: "Sitze"
   },
-  "Camas": {
-    es: "Camas",
-    en: "Beds",
-    fr: "Lits",
-    de: "Betten"
+  "Plazas noche": {
+    es: "Plazas noche",
+    en: "Night berths",
+    fr: "Places nuit",
+    de: "Schlafplätze"
   },
-  "camas": {
-    es: "camas",
-    en: "beds",
-    fr: "lits",
-    de: "Betten"
+  "plazas noche": {
+    es: "plazas noche",
+    en: "night berths",
+    fr: "places nuit",
+    de: "Schlafplätze"
+  },
+  "Plazas de noche": {
+    es: "Plazas de noche",
+    en: "Night berths",
+    fr: "Places de nuit",
+    de: "Schlafplätze"
   },
   "Combustible": {
     es: "Combustible",
@@ -495,12 +501,6 @@ export const staticTranslations = {
     en: "Isofix available",
     fr: "Isofix disponible",
     de: "Isofix verfügbar"
-  },
-  "plazas noche": {
-    es: "plazas noche",
-    en: "night beds",
-    fr: "couchages",
-    de: "Schlafplätze"
   },
   "Precio especial 2 días": {
     es: "Precio especial 2 días",
@@ -4106,11 +4106,11 @@ export const staticTranslations = {
     fr: "seats",
     de: "seats"
   },
-  "camas": {
-    es: "camas",
-    en: "beds",
-    fr: "lits",
-    de: "Betten"
+  "plazas noche": {
+    es: "plazas noche",
+    en: "night berths",
+    fr: "places nuit",
+    de: "Schlafplätze"
   },
   "CONTACTAR CON EXPERTO": {
     es: "CONTACTAR CON EXPERTO",
@@ -4821,11 +4821,11 @@ export const staticTranslations = {
     fr: "Places",
     de: "Plätze"
   },
-  "Camas": {
-    es: "Camas",
-    en: "Beds",
-    fr: "Lits",
-    de: "Betten"
+  "Plazas noche": {
+    es: "Plazas noche",
+    en: "Night berths",
+    fr: "Places nuit",
+    de: "Schlafplätze"
   },
   "Combustible": {
     es: "Combustible",
@@ -7917,12 +7917,6 @@ export const staticTranslations = {
     fr: "places jour",
     de: "Tagessitze"
   },
-  "plazas noche": {
-    es: "plazas noche",
-    en: "sleeping spots",
-    fr: "couchages",
-    de: "Schlafplätze"
-  },
   "Precio": {
     es: "Precio",
     en: "Price",
@@ -8541,11 +8535,11 @@ export const staticTranslations = {
     fr: "places",
     de: "Sitze"
   },
-  "camas": {
-    es: "camas",
-    en: "beds",
-    fr: "lits",
-    de: "Betten"
+  "plazas noche": {
+    es: "plazas noche",
+    en: "night berths",
+    fr: "places nuit",
+    de: "Schlafplätze"
   },
   "días": {
     es: "días",

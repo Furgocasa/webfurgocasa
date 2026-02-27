@@ -14,7 +14,7 @@ function LoadingState() {
 }
 import { supabase } from"@/lib/supabase/client";
 import { 
-  ArrowLeft, Calendar, MapPin, Users, Bed, Fuel, Settings, 
+  ArrowLeft, Calendar, MapPin, Users, Moon, Fuel, Settings, 
   ArrowRight, Plus, Minus, AlertCircle, Loader2, Ruler, Car, Info
 } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
@@ -155,21 +155,37 @@ function ReservarVehiculoContent() {
       
       setVehicle(vehicleData as any);
 
-      // Load available extras
-      const { data: extrasData, error: extrasError } = await supabase
-        .from('extras')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order', { ascending: true })
-        .order('name', { ascending: true });
+      // Load extras available for this specific vehicle
+      const { data: vehicleExtrasData, error: vehicleExtrasError } = await supabase
+        .from('vehicle_available_extras')
+        .select('extra_id')
+        .eq('vehicle_id', vehicleId);
 
-      if (extrasError) {
-        console.error('[ReservarVehiculo] Extras error:', extrasError);
-        throw extrasError;
+      if (vehicleExtrasError) {
+        console.error('[ReservarVehiculo] Vehicle extras error:', vehicleExtrasError);
+      }
+
+      const availableExtraIds = (vehicleExtrasData || []).map(ve => ve.extra_id);
+
+      let extrasData: any[] = [];
+      if (availableExtraIds.length > 0) {
+        const { data, error: extrasError } = await supabase
+          .from('extras')
+          .select('*')
+          .eq('is_active', true)
+          .in('id', availableExtraIds)
+          .order('sort_order', { ascending: true })
+          .order('name', { ascending: true });
+
+        if (extrasError) {
+          console.error('[ReservarVehiculo] Extras error:', extrasError);
+          throw extrasError;
+        }
+        extrasData = data || [];
       }
       
-      console.log('[ReservarVehiculo] Extras loaded successfully:', extrasData?.length || 0);
-      setExtras((extrasData || []) as Extra[]);
+      console.log('[ReservarVehiculo] Extras loaded for vehicle:', extrasData.length);
+      setExtras(extrasData as Extra[]);
 
       // Load locations to get extra_fee
       const locationSlugs = [pickupLocation, dropoffLocation].filter(Boolean) as string[];
@@ -363,9 +379,9 @@ function ReservarVehiculoContent() {
                     <p className="text-xs md:text-sm text-gray-500">{t("Plazas")}</p>
                   </div>
                   <div className="text-center">
-                    <Bed className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" />
+                    <Moon className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" />
                     <p className="font-bold text-sm md:text-base">{vehicle.beds}</p>
-                    <p className="text-xs md:text-sm text-gray-500">{t("Camas")}</p>
+                    <p className="text-xs md:text-sm text-gray-500">{t("Plazas noche")}</p>
                   </div>
                   <div className="text-center">
                     <Fuel className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" />
@@ -415,7 +431,7 @@ function ReservarVehiculoContent() {
                         <span className="font-medium">{vehicle.seats}</span>
                       </div>
                       <div className="flex justify-between py-1.5 md:py-2 border-b border-gray-100 text-sm md:text-base">
-                        <span className="text-gray-600">{t("Camas")}</span>
+                        <span className="text-gray-600">{t("Plazas noche")}</span>
                         <span className="font-medium">{vehicle.beds}</span>
                       </div>
                       {vehicle.length_m && (

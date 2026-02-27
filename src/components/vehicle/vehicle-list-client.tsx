@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { LocalizedLink } from "@/components/localized-link";
-import { Car, Users, Bed, Fuel, Settings, ArrowRight, Filter, Gauge, X, Calendar, TrendingDown, Baby } from "lucide-react";
+import { Car, Users, Moon, Fuel, Settings, ArrowRight, Filter, Gauge, X, Calendar, TrendingDown, Baby } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
 import { useLanguage } from "@/contexts/language-context";
@@ -108,10 +108,10 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
 
           {/* Filtros desktop / mobile expandido */}
           <div className={`${showFilters ? 'flex' : 'hidden'} lg:flex flex-col lg:flex-row gap-4 w-full lg:w-auto`}>
-            {/* Filtro de camas */}
+            {/* Filtro de plazas de noche */}
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium text-gray-700">
-                {t("Capacidad de camas")}
+                {t("Plazas de noche")}
               </label>
               <div className="flex gap-2">
                 {[
@@ -261,8 +261,8 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
                     <span>{vehicle.seats} {t("plazas")}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <Bed className="h-4 w-4 flex-shrink-0" />
-                    <span>{vehicle.beds} {t("camas")}</span>
+                    <Moon className="h-4 w-4 flex-shrink-0" />
+                    <span>{vehicle.beds} {t("plazas noche")}</span>
                   </div>
                   <div className="flex items-center gap-1">
                     <Fuel className="h-4 w-4 flex-shrink-0" />

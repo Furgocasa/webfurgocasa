@@ -15,7 +15,7 @@ function LoadingState() {
 import { supabase } from "@/lib/supabase/client";
 import { 
   Calendar, MapPin, User, Mail, Phone, 
-  CreditCard, AlertCircle, Loader2, FileText, Users, Bed, Tag, CheckCircle, X
+  CreditCard, AlertCircle, Loader2, FileText, Users, Moon, Tag, CheckCircle, X
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
@@ -835,8 +835,8 @@ function NuevaReservaContent() {
                       {vehicle.seats} {t("plazas")}
                     </span>
                     <span className="flex items-center gap-1 text-sm text-gray-600">
-                      <Bed className="h-4 w-4" />
-                      {vehicle.beds} {t("camas")}
+                      <Moon className="h-4 w-4" />
+                      {vehicle.beds} {t("plazas noche")}
                     </span>
                   </div>
 

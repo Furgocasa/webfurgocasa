@@ -2,7 +2,7 @@ import { Metadata } from"next";
 import { LocalizedLink } from"@/components/localized-link";
 import { notFound } from"next/navigation";
 import { headers } from"next/headers";
-import { ArrowLeft, Users, Bed, Fuel, Settings, Ruler } from"lucide-react";
+import { ArrowLeft, Users, Moon, Fuel, Settings, Ruler } from"lucide-react";
 import { getVehicleBySlug } from"@/lib/supabase/queries";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
@@ -144,7 +144,7 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
 
                 <div className="grid grid-cols-4 gap-2 md:gap-4 py-4 md:py-6 border-y border-gray-100">
                   <div className="text-center"><Users className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" /><p className="font-bold text-sm md:text-base">{vehicle.seats}</p><p className="text-xs md:text-sm text-gray-500">{t("Plazas")}</p></div>
-                  <div className="text-center"><Bed className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" /><p className="font-bold text-sm md:text-base">{vehicle.beds}</p><p className="text-xs md:text-sm text-gray-500">{t("Camas")}</p></div>
+                  <div className="text-center"><Moon className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" /><p className="font-bold text-sm md:text-base">{vehicle.beds}</p><p className="text-xs md:text-sm text-gray-500">{t("Plazas noche")}</p></div>
                   <div className="text-center"><Fuel className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" /><p className="font-bold text-sm md:text-base truncate">{vehicle.fuel_type}</p><p className="text-xs md:text-sm text-gray-500">{t("Comb.")}</p></div>
                   <div className="text-center"><Settings className="h-5 w-5 md:h-6 md:w-6 mx-auto text-gray-400 mb-1 md:mb-2" /><p className="font-bold text-sm md:text-base truncate">{vehicle.transmission}</p><p className="text-xs md:text-sm text-gray-500">{t("Cambio")}</p></div>
                 </div>

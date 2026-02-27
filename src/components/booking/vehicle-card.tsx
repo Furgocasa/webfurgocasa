@@ -4,7 +4,7 @@ import Image from "next/image";
 import { LocalizedLink } from "@/components/localized-link";
 import { 
   Users, 
-  Bed, 
+  Moon, 
   Fuel, 
   ArrowRight,
   Info,
@@ -161,7 +161,7 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
             {vehicle.seats} {t("plazas día")}
           </span>
           <span className="flex items-center gap-1 text-sm text-gray-600">
-            <Bed className="h-4 w-4" />
+            <Moon className="h-4 w-4" />
             {vehicle.beds} {t("plazas noche")}
           </span>
           {vehicle.fuel_type && (

@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 import { 
   Calendar, MapPin, User, Mail, Phone, 
-  CreditCard, AlertCircle, Loader2, FileText, Users, Bed, 
+  CreditCard, AlertCircle, Loader2, FileText, Users, Moon, 
   Tag, CheckCircle, Clock, Percent, Lock, ArrowLeft, Plus, Minus
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
@@ -137,15 +137,25 @@ export default function ReservarOfertaPage({
         setDropoffLocationId(offerData.offer.dropoff_location_id);
       }
 
-      // Cargar extras
-      const { data: extrasData } = await supabase
-        .from('extras')
-        .select('*')
-        .eq('is_active', true)
-        .order('sort_order');
-      
-      if (extrasData) {
-        setExtras(extrasData);
+      // Cargar solo extras disponibles para este vehículo
+      const { data: vehicleExtrasData } = await supabase
+        .from('vehicle_available_extras')
+        .select('extra_id')
+        .eq('vehicle_id', offerData.offer.vehicle_id);
+
+      const availableExtraIds = (vehicleExtrasData || []).map(ve => ve.extra_id);
+
+      if (availableExtraIds.length > 0) {
+        const { data: extrasData } = await supabase
+          .from('extras')
+          .select('*')
+          .eq('is_active', true)
+          .in('id', availableExtraIds)
+          .order('sort_order');
+        
+        if (extrasData) {
+          setExtras(extrasData);
+        }
       }
 
     } catch (err) {
@@ -431,8 +441,8 @@ export default function ReservarOfertaPage({
                       {offer.vehicle.seats} {t("plazas")}
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-600">
-                      <Bed className="w-4 h-4" />
-                      {offer.vehicle.beds} {t("camas")}
+                      <Moon className="w-4 h-4" />
+                      {offer.vehicle.beds} {t("plazas noche")}
                     </div>
                     <div className="flex items-center gap-1 text-sm text-furgocasa-orange font-medium">
                       <Clock className="w-4 h-4" />

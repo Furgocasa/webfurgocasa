@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Metadata, ResolvingMetadata } from "next";
 import { headers } from "next/headers";
 import { 
-  ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Bed, 
+  ArrowLeft, Car, Calendar, Gauge, Fuel, Users, Moon,
   CheckCircle, Phone, Mail, Ruler,
   Share2, Heart
 } from "lucide-react";
@@ -109,7 +109,7 @@ export async function generateMetadata(
   // Título con precio y kilometraje
   const title = `${vehicle.name} - ${formatPrice(vehicle.sale_price)} (${vehicle.mileage.toLocaleString()} km)`;
   // Descripción con otros datos (año, plazas, combustible, transmisión)
-  const description = `${vehicle.name} ${vehicle.year}. ${vehicle.seats} plazas, ${vehicle.beds} camas. ${vehicle.fuel_type}, cambio ${vehicle.transmission}. Estado: ${vehicle.condition === 'excellent' ? 'Excelente' : vehicle.condition === 'like_new' ? 'Como nuevo' : 'Buen estado'}.`;
+  const description = `${vehicle.name} ${vehicle.year}. ${vehicle.seats} plazas, ${vehicle.beds} plazas de noche. ${vehicle.fuel_type}, cambio ${vehicle.transmission}. Estado: ${vehicle.condition === 'excellent' ? 'Excelente' : vehicle.condition === 'like_new' ? 'Como nuevo' : 'Buen estado'}.`;
 
   return {
     title,

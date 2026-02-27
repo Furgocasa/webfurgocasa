@@ -6,7 +6,7 @@ import {
   Gauge, 
   Fuel, 
   Users, 
-  Bed,
+  Moon,
   Settings,
   ArrowRight
 } from "lucide-react";
@@ -49,7 +49,7 @@ const translations = {
     price: "Precio",
     viewDetails: "Ver detalles",
     seats: "plazas",
-    beds: "camas",
+    beds: "plazas noche",
     automatic: "Automática",
     manual: "Manual",
   },
@@ -57,7 +57,7 @@ const translations = {
     price: "Price",
     viewDetails: "View details",
     seats: "seats",
-    beds: "beds",
+    beds: "night berths",
     automatic: "Automatic",
     manual: "Manual",
   },
@@ -65,7 +65,7 @@ const translations = {
     price: "Prix",
     viewDetails: "Voir détails",
     seats: "places",
-    beds: "couchages",
+    beds: "places nuit",
     automatic: "Automatique",
     manual: "Manuel",
   },
@@ -73,7 +73,7 @@ const translations = {
     price: "Preis",
     viewDetails: "Details ansehen",
     seats: "Sitze",
-    beds: "Betten",
+    beds: "Schlafplätze",
     automatic: "Automatik",
     manual: "Manuell",
   },
@@ -140,7 +140,7 @@ export function SaleVehicleCard({ vehicle, locale = 'es', basePath = '/ventas' }
           )}
           {vehicle.beds !== undefined && (
             <div className="flex items-center gap-1">
-              <Bed className="h-4 w-4 flex-shrink-0" />
+              <Moon className="h-4 w-4 flex-shrink-0" />
               <span>{vehicle.beds} {t.beds}</span>
             </div>
           )}
