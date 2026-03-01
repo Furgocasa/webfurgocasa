@@ -6,7 +6,8 @@ import {
   Truck, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, Globe, Star, ExternalLink,
   Shield, Scale, FileText, Wrench, CarFront, Building2, AlertTriangle, Info,
   ArrowRight, CheckCircle2, XCircle, HelpCircle, BadgeCheck, Filter, X,
-  Fuel, Bed, Users, Ruler, CircleDot, Navigation, Map, Wifi, Droplets, Zap
+  Fuel, Bed, Users, Ruler, CircleDot, Navigation, Map, Wifi, Droplets, Zap,
+  LayoutGrid, List
 } from "lucide-react";
 import type { MotorhomeService } from "@/types/database";
 
@@ -201,6 +202,61 @@ function ServiceCard({ service }: { service: MotorhomeService }) {
   );
 }
 
+// --- Vista lista compacta ---
+
+function ServiceListRow({ service }: { service: MotorhomeService }) {
+  const categoryLabel = service.category === 'taller_camper' ? 'Taller' : 'Concesionario';
+  const categoryColor = service.category === 'taller_camper'
+    ? 'bg-amber-100 text-amber-800'
+    : 'bg-blue-100 text-blue-800';
+
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3 py-4 px-4 border-b border-gray-100 last:border-0 hover:bg-gray-50/50 transition-colors">
+      <div className="flex-1 min-w-0">
+        <div className="flex flex-wrap items-center gap-2 mb-1">
+          <h3 className="font-heading font-bold text-gray-900 truncate">{service.name}</h3>
+          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full flex-shrink-0 ${categoryColor}`}>
+            {categoryLabel}
+          </span>
+          {service.rating && (
+            <span className="flex items-center gap-1 text-sm text-gray-600">
+              <Star className="h-3.5 w-3.5 text-yellow-500 fill-yellow-500" />
+              {service.rating}
+              {service.review_count > 0 && (
+                <span className="text-gray-400">({service.review_count})</span>
+              )}
+            </span>
+          )}
+        </div>
+        {service.address && (
+          <p className="text-sm text-gray-500 truncate flex items-center gap-1">
+            <MapPin className="h-3 w-3 text-gray-400 flex-shrink-0" />
+            {service.address}
+          </p>
+        )}
+      </div>
+      <div className="flex items-center gap-4 flex-shrink-0">
+        {service.province && (
+          <span className="text-xs text-gray-400 hidden sm:inline">{service.province}</span>
+        )}
+        {service.phone && (
+          <a href={`tel:${service.phone.replace(/\s/g, '')}`} className="flex items-center gap-1 text-sm text-furgocasa-blue hover:text-furgocasa-orange">
+            <Phone className="h-4 w-4" />
+            <span className="hidden sm:inline">{service.phone}</span>
+          </a>
+        )}
+        {service.website && service.website_valid && (
+          <a href={service.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-furgocasa-blue hover:text-furgocasa-orange">
+            <Globe className="h-4 w-4" />
+            <span className="hidden sm:inline">Web</span>
+            <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // --- Componente principal ---
 
 export function AutocaravanasClient({ initialServices, initialCount, stats, provinces }: Props) {
@@ -214,6 +270,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
   const [activeTypeTab, setActiveTypeTab] = useState(0);
   const [pageSize, setPageSize] = useState<number | "all">(50);
   const [currentPage, setCurrentPage] = useState(1);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   const fetchServices = useCallback(async (category: string, province: string, search: string) => {
     setLoading(true);
@@ -988,9 +1045,34 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
               <p className="text-sm text-gray-500">
                 {loading ? "Buscando..." : `${totalCount} resultado${totalCount !== 1 ? 's' : ''}`}
               </p>
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">Mostrar:</span>
-                <select
+              <div className="flex items-center gap-4">
+                <div className="flex items-center rounded-lg border border-gray-200 p-1 bg-gray-50">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    title="Vista grid"
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'grid'
+                        ? 'bg-white text-furgocasa-blue shadow-sm'
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    title="Vista lista"
+                    className={`p-2 rounded-md transition-colors ${
+                      viewMode === 'list'
+                        ? 'bg-white text-furgocasa-blue shadow-sm'
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    <List className="h-4 w-4" />
+                  </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Mostrar:</span>
+                  <select
                   value={pageSize}
                   onChange={(e) => setPageSize(e.target.value === "all" ? "all" : parseInt(e.target.value, 10))}
                   className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:ring-2 focus:ring-furgocasa-blue/20 focus:border-furgocasa-blue outline-none"
@@ -1001,6 +1083,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
                     </option>
                   ))}
                 </select>
+                </div>
               </div>
             </div>
 
@@ -1012,11 +1095,19 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
               </div>
             ) : services.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {paginatedServices.map((service) => (
-                    <ServiceCard key={service.id} service={service} />
-                  ))}
-                </div>
+                {viewMode === 'grid' ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {paginatedServices.map((service) => (
+                      <ServiceCard key={service.id} service={service} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+                    {paginatedServices.map((service) => (
+                      <ServiceListRow key={service.id} service={service} />
+                    ))}
+                  </div>
+                )}
 
                 {totalPages > 1 && (
                   <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
