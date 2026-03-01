@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { LocalizedLink } from "@/components/localized-link";
 import {
   Truck, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, Globe, Star, ExternalLink,
@@ -350,17 +351,25 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
 
   return (
     <main className="min-h-screen bg-white font-amiko">
-      {/* ============ HERO ============ */}
-      <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-20 lg:py-28 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-        }} />
-        <div className="container mx-auto px-4 text-center relative z-10">
-          <Truck className="h-16 w-16 text-white/20 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white mb-6 leading-tight">
+      {/* ============ HERO con imagen de fondo ============ */}
+      <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
+        <Image
+          src="/images/slides/hero-11.webp"
+          alt="Autocaravanas en paisaje"
+          fill
+          priority
+          fetchPriority="high"
+          quality={75}
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
+        <div className="container mx-auto px-4 text-center relative z-10 py-16 lg:py-24">
+          <Truck className="h-14 w-14 text-white/30 mx-auto mb-6" />
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white mb-6 leading-tight" style={{ textShadow: "2px 2px 12px rgba(0,0,0,0.8)" }}>
             Autocaravanas
           </h1>
-          <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed mb-8">
+          <p className="text-xl md:text-2xl text-white/95 max-w-3xl mx-auto font-light leading-relaxed mb-10" style={{ textShadow: "1px 1px 6px rgba(0,0,0,0.9)" }}>
             La guía más completa de España: tipos, permisos, normativa, mantenimiento y el mayor directorio de talleres y concesionarios
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm">
@@ -370,9 +379,9 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
               { n: stats.concesionarios.toLocaleString(), l: "Concesionarios" },
               { n: stats.provinces.toString(), l: "Provincias" },
             ].map((s) => (
-              <div key={s.l} className="bg-white/10 backdrop-blur-sm rounded-xl px-5 py-3">
+              <div key={s.l} className="bg-white/15 backdrop-blur-md rounded-xl px-5 py-3 border border-white/20">
                 <div className="text-2xl font-heading font-bold text-white">{s.n}</div>
-                <div className="text-blue-200 text-xs">{s.l}</div>
+                <div className="text-white/80 text-xs">{s.l}</div>
               </div>
             ))}
           </div>

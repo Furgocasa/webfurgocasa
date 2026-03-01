@@ -28,7 +28,9 @@
     "validate:urls:staging": "node scripts/validate-urls.js --env=staging",
     "validate:urls:verbose": "node scripts/validate-urls.js --verbose",
     "test:occupancy": "node scripts/test-occupancy-api.js",
-    "import:motorhome-services": "tsx scripts/import-motorhome-services.ts"
+    "import:motorhome-services": "tsx scripts/import-motorhome-services.ts",
+    "identify:rental-businesses": "tsx scripts/identify-rental-businesses.ts",
+    "delete:rental-businesses": "tsx scripts/delete-rental-businesses.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
