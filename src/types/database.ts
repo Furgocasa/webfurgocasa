@@ -585,6 +585,81 @@ export interface Database {
         };
         Update: Partial<Database["public"]["Tables"]["search_queries"]["Insert"]>;
       };
+
+      // ============================================
+      // DIRECTORIO MOTORHOME SERVICES
+      // ============================================
+      motorhome_services: {
+        Row: {
+          id: string;
+          name: string;
+          slug: string;
+          category: MotorhomeServiceCategory;
+          address: string | null;
+          phone: string | null;
+          phone_secondary: string | null;
+          website: string | null;
+          email: string | null;
+          rating: number | null;
+          review_count: number;
+          price_level: string | null;
+          google_types: string[] | null;
+          place_id: string | null;
+          google_maps_url: string | null;
+          latitude: number | null;
+          longitude: number | null;
+          province: string | null;
+          region: string | null;
+          country: string;
+          opening_hours: string | null;
+          operational_status: "OPERATIONAL" | "CLOSED_TEMPORARILY" | "CLOSED_PERMANENTLY";
+          website_valid: boolean;
+          quality_score: number;
+          search_query: string | null;
+          meta_title: string | null;
+          meta_description: string | null;
+          is_featured: boolean;
+          is_verified: boolean;
+          status: "active" | "inactive" | "pending";
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          name: string;
+          slug: string;
+          category: MotorhomeServiceCategory;
+          address?: string | null;
+          phone?: string | null;
+          phone_secondary?: string | null;
+          website?: string | null;
+          email?: string | null;
+          rating?: number | null;
+          review_count?: number;
+          price_level?: string | null;
+          google_types?: string[] | null;
+          place_id?: string | null;
+          google_maps_url?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          province?: string | null;
+          region?: string | null;
+          country?: string;
+          opening_hours?: string | null;
+          operational_status?: "OPERATIONAL" | "CLOSED_TEMPORARILY" | "CLOSED_PERMANENTLY";
+          website_valid?: boolean;
+          quality_score?: number;
+          search_query?: string | null;
+          meta_title?: string | null;
+          meta_description?: string | null;
+          is_featured?: boolean;
+          is_verified?: boolean;
+          status?: "active" | "inactive" | "pending";
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["motorhome_services"]["Insert"]>;
+      };
     };
     Views: {};
     Functions: {};
@@ -662,3 +737,20 @@ export type BookingWithRelations = Booking & {
 export type SearchQuery = Database["public"]["Tables"]["search_queries"]["Row"];
 export type SearchQueryInsert = Database["public"]["Tables"]["search_queries"]["Insert"];
 export type SearchQueryUpdate = Database["public"]["Tables"]["search_queries"]["Update"];
+
+// Tipos para directorio de servicios
+export type MotorhomeServiceCategory =
+  | "taller_camper"
+  | "concesionario_autocaravanas"
+  | "area_servicio"
+  | "camping"
+  | "tienda_accesorios"
+  | "alquiler"
+  | "homologador"
+  | "itv"
+  | "aseguradora"
+  | "otro";
+
+export type MotorhomeService = Database["public"]["Tables"]["motorhome_services"]["Row"];
+export type MotorhomeServiceInsert = Database["public"]["Tables"]["motorhome_services"]["Insert"];
+export type MotorhomeServiceUpdate = Database["public"]["Tables"]["motorhome_services"]["Update"];

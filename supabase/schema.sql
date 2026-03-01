@@ -801,5 +801,71 @@ CREATE POLICY "Admins pueden eliminar bloqueos" ON blocked_dates
     );
 
 -- ============================================
+-- DIRECTORIO MOTORHOME SERVICES
+-- ============================================
+CREATE TABLE motorhome_services (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name TEXT NOT NULL,
+    slug TEXT NOT NULL UNIQUE,
+    category TEXT NOT NULL CHECK (category IN (
+        'taller_camper', 'concesionario_autocaravanas', 'area_servicio',
+        'camping', 'tienda_accesorios', 'alquiler', 'homologador',
+        'itv', 'aseguradora', 'otro'
+    )),
+    address TEXT,
+    phone TEXT,
+    phone_secondary TEXT,
+    website TEXT,
+    email TEXT,
+    rating DECIMAL(2, 1),
+    review_count INTEGER DEFAULT 0,
+    price_level TEXT,
+    google_types TEXT[],
+    place_id TEXT UNIQUE,
+    google_maps_url TEXT,
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
+    province TEXT,
+    region TEXT,
+    country TEXT DEFAULT 'España',
+    opening_hours TEXT,
+    operational_status TEXT DEFAULT 'OPERATIONAL' CHECK (operational_status IN (
+        'OPERATIONAL', 'CLOSED_TEMPORARILY', 'CLOSED_PERMANENTLY'
+    )),
+    website_valid BOOLEAN DEFAULT false,
+    quality_score INTEGER DEFAULT 0 CHECK (quality_score BETWEEN 0 AND 5),
+    search_query TEXT,
+    meta_title TEXT,
+    meta_description TEXT,
+    is_featured BOOLEAN DEFAULT false,
+    is_verified BOOLEAN DEFAULT false,
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'inactive', 'pending')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE INDEX idx_ms_category ON motorhome_services(category);
+CREATE INDEX idx_ms_province ON motorhome_services(province);
+CREATE INDEX idx_ms_region ON motorhome_services(region);
+CREATE INDEX idx_ms_status ON motorhome_services(status);
+CREATE INDEX idx_ms_rating ON motorhome_services(rating DESC NULLS LAST);
+CREATE INDEX idx_ms_location ON motorhome_services(latitude, longitude);
+
+ALTER TABLE motorhome_services ADD COLUMN fts tsvector
+    GENERATED ALWAYS AS (
+        to_tsvector('spanish',
+            coalesce(name, '') || ' ' ||
+            coalesce(address, '') || ' ' ||
+            coalesce(province, '') || ' ' ||
+            coalesce(region, '')
+        )
+    ) STORED;
+CREATE INDEX idx_ms_fts ON motorhome_services USING GIN(fts);
+
+ALTER TABLE motorhome_services ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "motorhome_services_public_read" ON motorhome_services
+    FOR SELECT USING (true);
+
+-- ============================================
 -- FIN DEL ESQUEMA
 -- ============================================

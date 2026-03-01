@@ -177,6 +177,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/como-funciona', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/autocaravanas', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },

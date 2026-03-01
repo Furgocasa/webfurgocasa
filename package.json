@@ -27,7 +27,8 @@
     "validate:urls:local": "node scripts/validate-urls.js --env=local",
     "validate:urls:staging": "node scripts/validate-urls.js --env=staging",
     "validate:urls:verbose": "node scripts/validate-urls.js --verbose",
-    "test:occupancy": "node scripts/test-occupancy-api.js"
+    "test:occupancy": "node scripts/test-occupancy-api.js",
+    "import:motorhome-services": "tsx scripts/import-motorhome-services.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

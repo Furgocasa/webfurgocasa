@@ -704,6 +704,106 @@ export async function getDashboardStats() {
   };
 }
 
+// ==============================================
+// MOTORHOME SERVICES (Directorio)
+// ==============================================
 
+export async function getMotorhomeServices(options?: {
+  category?: string;
+  province?: string;
+  region?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+  minQuality?: number;
+}) {
+  let query = supabase
+    .from('motorhome_services')
+    .select('*', { count: 'exact' })
+    .eq('status', 'active')
+    .eq('operational_status', 'OPERATIONAL')
+    .order('quality_score', { ascending: false })
+    .order('rating', { ascending: false, nullsFirst: false })
+    .order('review_count', { ascending: false });
 
+  if (options?.category) {
+    query = query.eq('category', options.category);
+  }
+  if (options?.province) {
+    query = query.eq('province', options.province);
+  }
+  if (options?.region) {
+    query = query.eq('region', options.region);
+  }
+  if (options?.search) {
+    query = query.textSearch('fts', options.search, { type: 'websearch', config: 'spanish' });
+  }
+  if (options?.minQuality) {
+    query = query.gte('quality_score', options.minQuality);
+  }
+
+  const limit = options?.limit || 50;
+  const offset = options?.offset || 0;
+  query = query.range(offset, offset + limit - 1);
+
+  const { data, error, count } = await query;
+
+  if (error) {
+    console.error('Error fetching motorhome services:', error);
+    return { data: null, error, count: 0 };
+  }
+
+  return { data, error: null, count: count || 0 };
+}
+
+export async function getMotorhomeServiceStats() {
+  const [talleres, concesionarios, provinces] = await Promise.all([
+    supabase
+      .from('motorhome_services')
+      .select('*', { count: 'exact', head: true })
+      .eq('category', 'taller_camper')
+      .eq('status', 'active'),
+    supabase
+      .from('motorhome_services')
+      .select('*', { count: 'exact', head: true })
+      .eq('category', 'concesionario_autocaravanas')
+      .eq('status', 'active'),
+    supabase
+      .from('motorhome_services')
+      .select('province')
+      .eq('status', 'active')
+      .not('province', 'is', null),
+  ]);
+
+  const uniqueProvinces = new Set(provinces.data?.map((p: { province: string }) => p.province));
+
+  return {
+    talleres: talleres.count || 0,
+    concesionarios: concesionarios.count || 0,
+    total: (talleres.count || 0) + (concesionarios.count || 0),
+    provinces: uniqueProvinces.size,
+  };
+}
+
+export async function getMotorhomeServiceProvinces() {
+  const { data, error } = await supabase
+    .from('motorhome_services')
+    .select('province, region')
+    .eq('status', 'active')
+    .not('province', 'is', null);
+
+  if (error) return [];
+
+  const provinceMap = new Map<string, { province: string; region: string; count: number }>();
+  data?.forEach((item: { province: string; region: string }) => {
+    const existing = provinceMap.get(item.province);
+    if (existing) {
+      existing.count++;
+    } else {
+      provinceMap.set(item.province, { province: item.province, region: item.region, count: 1 });
+    }
+  });
+
+  return Array.from(provinceMap.values()).sort((a, b) => b.count - a.count);
+}
 

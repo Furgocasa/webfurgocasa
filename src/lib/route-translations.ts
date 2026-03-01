@@ -210,6 +210,12 @@ export const routeTranslations = {
     fr: "/camping-car-maroc-depuis-espagne", 
     de: "/wohnmobil-miete-marokko-von-spanien" 
   },
+  "/autocaravanas": { 
+    es: "/autocaravanas", 
+    en: "/motorhomes", 
+    fr: "/camping-cars", 
+    de: "/wohnmobile" 
+  },
   "/sitemap-html": { 
     es: "/sitemap-html", 
     en: "/sitemap-html", 
