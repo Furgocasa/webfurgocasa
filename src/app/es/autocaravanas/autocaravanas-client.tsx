@@ -6,7 +6,7 @@ import {
   Truck, ChevronDown, ChevronRight, Search, MapPin, Phone, Globe, Star, ExternalLink,
   Shield, Scale, FileText, Wrench, CarFront, Building2, AlertTriangle, Info,
   ArrowRight, CheckCircle2, XCircle, HelpCircle, BadgeCheck, Filter, X,
-  Fuel, Bed, Users, Ruler, CircleDot, Navigation
+  Fuel, Bed, Users, Ruler, CircleDot, Navigation, Map, Wifi, Droplets, Zap
 } from "lucide-react";
 import type { MotorhomeService } from "@/types/database";
 
@@ -256,6 +256,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
     { id: "mantenimiento", label: "Mantenimiento" },
     { id: "comprar", label: "Comprar" },
     { id: "alquilar", label: "Alquilar" },
+    { id: "areas", label: "Áreas" },
     { id: "directorio", label: "Directorio" },
     { id: "faq", label: "FAQ" },
   ];
@@ -791,6 +792,110 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
               >
                 Consultar tarifas
               </LocalizedLink>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ ÁREAS DE SERVICIO Y PERNOCTA ============ */}
+      <section id="areas" className="py-16 lg:py-24 bg-gray-50 scroll-mt-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-5xl mx-auto">
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-14 h-14 bg-furgocasa-blue/10 rounded-2xl flex items-center justify-center text-furgocasa-blue">
+                <Map className="h-7 w-7" />
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900">
+                Áreas de servicio y pernocta
+              </h2>
+            </div>
+
+            <p className="text-gray-600 text-lg leading-relaxed mb-8">
+              Las áreas de servicio para autocaravanas son espacios habilitados donde puedes vaciar aguas grises y negras, cargar agua limpia, y en muchos casos pernoctar. En España hay más de 700, y en Europa miles. Conocer dónde están es esencial para cualquier viaje en autocaravana.
+            </p>
+
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              {[
+                { icon: <Droplets className="h-6 w-6" />, title: "Vaciado de aguas", desc: "Puntos para vaciar aguas grises (fregadero, ducha) y negras (WC) de forma segura y ecológica" },
+                { icon: <Zap className="h-6 w-6" />, title: "Electricidad", desc: "Muchas áreas ofrecen tomas de corriente para recargar las baterías de servicio del vehículo" },
+                { icon: <Wifi className="h-6 w-6" />, title: "Servicios adicionales", desc: "WiFi, lavandería, duchas, barbacoas y zonas de ocio según el tipo de área" },
+              ].map((item) => (
+                <div key={item.title} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+                  <div className="text-furgocasa-blue mb-3">{item.icon}</div>
+                  <h3 className="font-heading font-bold text-gray-900 mb-1 text-sm">{item.title}</h3>
+                  <p className="text-gray-500 text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 rounded-3xl p-8 md:p-10 text-white relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-72 h-72 bg-furgocasa-orange/10 rounded-full blur-3xl" />
+              <div className="relative z-10">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="bg-yellow-400/20 text-yellow-300 text-xs font-bold px-3 py-1 rounded-full">
+                    POWERED BY GPT-4
+                  </span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-heading font-bold text-white mb-3">
+                  Mapa Furgocasa
+                </h3>
+                <p className="text-blue-100 text-lg leading-relaxed mb-6 max-w-2xl">
+                  Tenemos nuestra propia app con más de <strong className="text-white">1.000 áreas verificadas</strong> en España, Portugal, Francia, Andorra, Argentina y más países. Planifica rutas, encuentra áreas de pernocta cercanas y gestiona tu autocaravana con inteligencia artificial.
+                </p>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                  {[
+                    { n: "+1.000", l: "Áreas verificadas" },
+                    { n: "100%", l: "Gratis siempre" },
+                    { n: "24/7", l: "Actualizado" },
+                    { n: "GPT-4", l: "IA integrada" },
+                  ].map((s) => (
+                    <div key={s.l} className="bg-white/10 backdrop-blur-sm rounded-xl px-4 py-3 text-center">
+                      <div className="text-lg font-heading font-bold text-white">{s.n}</div>
+                      <div className="text-blue-200 text-xs">{s.l}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <LocalizedLink
+                    href="/mapa-areas"
+                    className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold px-6 py-3 rounded-xl hover:bg-furgocasa-orange-dark transition-colors shadow-lg"
+                  >
+                    <Map className="h-5 w-5" />
+                    Explorar Mapa Furgocasa
+                  </LocalizedLink>
+                  <a
+                    href="https://www.mapafurgocasa.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white font-bold px-6 py-3 rounded-xl hover:bg-white/20 transition-colors border border-white/20"
+                  >
+                    Ir a la App
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 bg-white rounded-2xl p-6 border border-gray-100">
+              <h3 className="font-heading font-bold text-gray-900 mb-4">Tipos de áreas para autocaravanas</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  { title: "Áreas públicas gratuitas", desc: "Gestionadas por ayuntamientos. Incluyen vaciado de aguas y a veces electricidad. Suelen tener limitación de estancia (24-72h)." },
+                  { title: "Áreas privadas", desc: "Gestionadas por empresas o particulares. Más servicios (WiFi, duchas, lavandería) con tarifas de 8-15€/noche." },
+                  { title: "Campings", desc: "Instalaciones completas con parcelas, piscina, restaurante. Ideales para estancias largas. Precios de 20-45€/noche según temporada." },
+                  { title: "Parkings habilitados", desc: "Parkings que permiten pernocta de autocaravanas. Servicios mínimos pero ubicación céntrica. De 5-12€/noche." },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <CircleDot className="h-5 w-5 text-furgocasa-orange flex-shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-gray-900 text-sm">{item.title}: </span>
+                      <span className="text-gray-600 text-sm">{item.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
