@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     category,
     province,
     search,
-    limit: Math.min(limit, 200),
+    limit: Math.min(limit, 1000),
     offset,
     minQuality: 0,
   });

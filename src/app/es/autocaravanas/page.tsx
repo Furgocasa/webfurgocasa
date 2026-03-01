@@ -35,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function AutocaravanasPage() {
   const [servicesResult, stats, provinces] = await Promise.all([
-    getMotorhomeServices({ limit: 50, minQuality: 3 }),
+    getMotorhomeServices({ limit: 1000 }),
     getMotorhomeServiceStats(),
     getMotorhomeServiceProvinces(),
   ]);

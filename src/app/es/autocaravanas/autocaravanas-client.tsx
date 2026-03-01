@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { LocalizedLink } from "@/components/localized-link";
 import {
-  Truck, ChevronDown, ChevronRight, Search, MapPin, Phone, Globe, Star, ExternalLink,
+  Truck, ChevronDown, ChevronLeft, ChevronRight, Search, MapPin, Phone, Globe, Star, ExternalLink,
   Shield, Scale, FileText, Wrench, CarFront, Building2, AlertTriangle, Info,
   ArrowRight, CheckCircle2, XCircle, HelpCircle, BadgeCheck, Filter, X,
   Fuel, Bed, Users, Ruler, CircleDot, Navigation, Map, Wifi, Droplets, Zap
@@ -211,8 +211,9 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
-  const [showAllServices, setShowAllServices] = useState(false);
   const [activeTypeTab, setActiveTypeTab] = useState(0);
+  const [pageSize, setPageSize] = useState<number | "all">(50);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchServices = useCallback(async (category: string, province: string, search: string) => {
     setLoading(true);
@@ -221,7 +222,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
       if (category) params.set('category', category);
       if (province) params.set('province', province);
       if (search) params.set('search', search);
-      params.set('limit', showAllServices ? '200' : '50');
+      params.set('limit', '1000');
 
       const res = await fetch(`/api/motorhome-services?${params.toString()}`);
       const json = await res.json();
@@ -232,7 +233,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
     } finally {
       setLoading(false);
     }
-  }, [showAllServices]);
+  }, []);
 
   useEffect(() => {
     if (categoryFilter || provinceFilter || searchTerm) {
@@ -245,6 +246,17 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
       setTotalCount(initialCount);
     }
   }, [categoryFilter, provinceFilter, searchTerm, fetchServices, initialServices, initialCount]);
+
+  // Reset página al cambiar filtros o resultados por página
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [services, pageSize]);
+
+  const PAGE_SIZE_OPTIONS = [20, 30, 50, 100, 200, "all"] as const;
+  const totalPages = pageSize === "all" ? 1 : Math.ceil(services.length / pageSize) || 1;
+  const paginatedServices = pageSize === "all"
+    ? services
+    : services.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const tocItems = [
     { id: "que-es", label: "Qué es" },
@@ -972,10 +984,24 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
 
           {/* Resultados */}
           <div className="max-w-6xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <p className="text-sm text-gray-500">
                 {loading ? "Buscando..." : `${totalCount} resultado${totalCount !== 1 ? 's' : ''}`}
               </p>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500">Mostrar:</span>
+                <select
+                  value={pageSize}
+                  onChange={(e) => setPageSize(e.target.value === "all" ? "all" : parseInt(e.target.value, 10))}
+                  className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:ring-2 focus:ring-furgocasa-blue/20 focus:border-furgocasa-blue outline-none"
+                >
+                  {PAGE_SIZE_OPTIONS.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt === "all" ? "Todos" : opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {loading ? (
@@ -987,20 +1013,59 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
             ) : services.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {services.map((service) => (
+                  {paginatedServices.map((service) => (
                     <ServiceCard key={service.id} service={service} />
                   ))}
                 </div>
 
-                {totalCount > services.length && !showAllServices && (
-                  <div className="text-center mt-8">
+                {totalPages > 1 && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 mt-8">
                     <button
-                      onClick={() => { setShowAllServices(true); fetchServices(categoryFilter, provinceFilter, searchTerm); }}
-                      className="inline-flex items-center gap-2 bg-furgocasa-blue text-white font-medium px-6 py-3 rounded-xl hover:bg-furgocasa-blue-dark transition-colors"
+                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
-                      Ver todos los {totalCount} resultados
-                      <ChevronDown className="h-4 w-4" />
+                      <ChevronLeft className="h-4 w-4" />
+                      Anterior
                     </button>
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: Math.min(7, totalPages) }, (_, i) => {
+                        let pageNum: number;
+                        if (totalPages <= 7) {
+                          pageNum = i + 1;
+                        } else if (currentPage <= 4) {
+                          pageNum = i + 1;
+                        } else if (currentPage >= totalPages - 3) {
+                          pageNum = totalPages - 6 + i;
+                        } else {
+                          pageNum = currentPage - 3 + i;
+                        }
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`w-10 h-10 rounded-lg text-sm font-medium transition-colors ${
+                              currentPage === pageNum
+                                ? 'bg-furgocasa-blue text-white'
+                                : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="flex items-center gap-1 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    >
+                      Siguiente
+                      <ChevronRight className="h-4 w-4" />
+                    </button>
+                    <span className="text-sm text-gray-500 ml-2">
+                      Página {currentPage} de {totalPages}
+                    </span>
                   </div>
                 )}
               </>
