@@ -418,6 +418,9 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
             <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-8">
               ¿Qué es una autocaravana?
             </h2>
+            <div className="rounded-2xl overflow-hidden shadow-lg mb-8 aspect-video relative">
+              <Image src="/images/slides/hero-01.webp" alt="Autocaravana en ruta" fill className="object-cover" sizes="(max-width: 768px) 100vw, 896px" />
+            </div>
             <div className="space-y-5 text-gray-600 text-lg leading-relaxed">
               <p>
                 Una <strong className="text-gray-900">autocaravana</strong> es un vehículo que integra un espacio habitable sobre un chasis motorizado. A diferencia de una caravana (que necesita ser remolcada), la autocaravana tiene motor propio y se conduce como un vehículo convencional. En su interior incluye zona de dormitorio, cocina, baño y salón-comedor.
@@ -456,9 +459,12 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
           <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4 text-center">
             Tipos de autocaravanas
           </h2>
-          <p className="text-gray-500 text-center mb-12 max-w-2xl mx-auto">
+          <p className="text-gray-500 text-center mb-8 max-w-2xl mx-auto">
             Conoce las diferencias entre cada tipo para elegir la que mejor se adapta a tus necesidades
           </p>
+          <div className="rounded-2xl overflow-hidden shadow-lg mb-10 max-w-3xl mx-auto aspect-[16/9] relative">
+            <Image src="/images/slides/hero-05.webp" alt="Tipos de autocaravanas" fill className="object-cover" sizes="(max-width: 768px) 100vw, 672px" />
+          </div>
 
           {/* Tabs */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
@@ -912,9 +918,12 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
               </h2>
             </div>
 
-            <p className="text-gray-600 text-lg leading-relaxed mb-8">
+            <p className="text-gray-600 text-lg leading-relaxed mb-6">
               Las áreas de servicio para autocaravanas son espacios habilitados donde puedes vaciar aguas grises y negras, cargar agua limpia, y en muchos casos pernoctar. En España hay más de 700, y en Europa miles. Conocer dónde están es esencial para cualquier viaje en autocaravana.
             </p>
+            <div className="rounded-2xl overflow-hidden shadow-lg mb-8 aspect-video relative">
+              <Image src="/images/slides/hero-07.webp" alt="Área de pernocta para autocaravanas" fill className="object-cover" sizes="(max-width: 768px) 100vw, 1024px" />
+            </div>
 
             <div className="grid md:grid-cols-3 gap-4 mb-8">
               {[
