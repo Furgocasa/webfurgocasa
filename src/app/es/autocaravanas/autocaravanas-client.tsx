@@ -380,14 +380,14 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
       </section>
 
       {/* ============ TABLE OF CONTENTS (sticky) ============ */}
-      <nav className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+      <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-200 shadow-sm">
         <div className="container mx-auto px-4">
-          <div className="flex overflow-x-auto gap-1 py-2 scrollbar-hide">
+          <div className="flex flex-wrap justify-center items-center gap-2 py-3">
             {tocItems.map((item) => (
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                className="flex-shrink-0 px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-furgocasa-blue hover:bg-blue-50 rounded-full transition-colors whitespace-nowrap"
+                className="flex-shrink-0 px-4 py-2 text-sm font-medium text-gray-600 hover:text-furgocasa-blue hover:bg-furgocasa-blue/5 rounded-lg border border-transparent hover:border-furgocasa-blue/20 transition-all duration-200 whitespace-nowrap"
               >
                 {item.label}
               </a>
