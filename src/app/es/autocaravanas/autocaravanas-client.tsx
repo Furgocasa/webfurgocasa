@@ -365,7 +365,13 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70" />
         <div className="container mx-auto px-4 text-center relative z-10 py-16 lg:py-24">
-          <Truck className="h-14 w-14 text-white/30 mx-auto mb-6" />
+          <Image
+            src="/images/brand/LOGO BLANCO.png"
+            alt="Furgocasa"
+            width={200}
+            height={80}
+            className="mx-auto mb-6 h-16 w-auto object-contain opacity-95"
+          />
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white mb-6 leading-tight" style={{ textShadow: "2px 2px 12px rgba(0,0,0,0.8)" }}>
             Autocaravanas
           </h1>
