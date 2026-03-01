@@ -762,16 +762,19 @@ export async function getMotorhomeServiceStats() {
       .from('motorhome_services')
       .select('*', { count: 'exact', head: true })
       .eq('category', 'taller_camper')
-      .eq('status', 'active'),
+      .eq('status', 'active')
+      .eq('operational_status', 'OPERATIONAL'),
     supabase
       .from('motorhome_services')
       .select('*', { count: 'exact', head: true })
       .eq('category', 'concesionario_autocaravanas')
-      .eq('status', 'active'),
+      .eq('status', 'active')
+      .eq('operational_status', 'OPERATIONAL'),
     supabase
       .from('motorhome_services')
       .select('province')
       .eq('status', 'active')
+      .eq('operational_status', 'OPERATIONAL')
       .not('province', 'is', null),
   ]);
 
