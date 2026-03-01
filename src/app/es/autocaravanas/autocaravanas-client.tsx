@@ -271,6 +271,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
   const [pageSize, setPageSize] = useState<number | "all">(50);
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [sortBy, setSortBy] = useState<'quality' | 'rating' | 'reviews'>('quality');
 
   const fetchServices = useCallback(async (category: string, province: string, search: string) => {
     setLoading(true);
@@ -304,16 +305,33 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
     }
   }, [categoryFilter, provinceFilter, searchTerm, fetchServices, initialServices, initialCount]);
 
-  // Reset página al cambiar filtros o resultados por página
+  // Reset página al cambiar filtros, resultados por página o orden
   useEffect(() => {
     setCurrentPage(1);
-  }, [services, pageSize]);
+  }, [services, pageSize, sortBy]);
 
   const PAGE_SIZE_OPTIONS = [20, 30, 50, 100, 200, "all"] as const;
-  const totalPages = pageSize === "all" ? 1 : Math.ceil(services.length / pageSize) || 1;
+
+  const sortedServices = [...services].sort((a, b) => {
+    if (sortBy === 'rating') {
+      const ra = a.rating ?? 0;
+      const rb = b.rating ?? 0;
+      if (rb !== ra) return rb - ra;
+      return (b.review_count ?? 0) - (a.review_count ?? 0);
+    }
+    if (sortBy === 'reviews') {
+      const rcA = a.review_count ?? 0;
+      const rcB = b.review_count ?? 0;
+      if (rcB !== rcA) return rcB - rcA;
+      return (b.rating ?? 0) - (a.rating ?? 0);
+    }
+    return 0; // quality: mantener orden del servidor
+  });
+
+  const totalPages = pageSize === "all" ? 1 : Math.ceil(sortedServices.length / pageSize) || 1;
   const paginatedServices = pageSize === "all"
-    ? services
-    : services.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+    ? sortedServices
+    : sortedServices.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const tocItems = [
     { id: "que-es", label: "Qué es" },
@@ -1069,6 +1087,18 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
                   >
                     <List className="h-4 w-4" />
                   </button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-500">Ordenar:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'quality' | 'rating' | 'reviews')}
+                    className="px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 bg-white focus:ring-2 focus:ring-furgocasa-blue/20 focus:border-furgocasa-blue outline-none"
+                  >
+                    <option value="quality">Recomendado</option>
+                    <option value="rating">Valoración</option>
+                    <option value="reviews">Nº reseñas</option>
+                  </select>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-500">Mostrar:</span>
