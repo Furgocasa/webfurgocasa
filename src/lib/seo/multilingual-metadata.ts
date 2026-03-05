@@ -17,7 +17,8 @@ export function generateMultilingualMetadata(
     en: { title: string; description: string; keywords?: string };
     fr: { title: string; description: string; keywords?: string };
     de: { title: string; description: string; keywords?: string };
-  }
+  },
+  options?: { images?: string[] }
 ): Metadata {
   // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
   const baseUrl = 'https://www.furgocasa.com';
@@ -50,11 +51,13 @@ export function generateMultilingualMetadata(
       url: canonicalUrl,
       locale: `${currentLang}_${currentLang.toUpperCase()}`,
       type: 'website',
+      images: options?.images?.length ? options.images : [`${baseUrl}/og-image.jpg`],
     },
     twitter: {
       card: 'summary_large_image',
       title: currentMetadata.title,
       description: currentMetadata.description,
+      images: options?.images?.length ? options.images : [`${baseUrl}/og-image.jpg`],
     },
   };
 }

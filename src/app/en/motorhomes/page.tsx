@@ -30,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
       description: "Alles über Wohnmobile in Spanien: Typen, Führerschein, Vorschriften, Gewicht, Versicherung, Wartung. Verzeichnis mit über 900 Werkstätten und Händlern.",
       keywords: "Wohnmobile, Wohnmobiltypen, Führerschein Wohnmobil, Wohnmobil Vorschriften Spanien",
     },
-  });
+  }, { images: ['https://www.furgocasa.com/images/slides/hero-11.webp'] });
 }
 
 export default async function MotorhomesPage() {
