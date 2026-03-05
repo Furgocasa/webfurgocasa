@@ -354,7 +354,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
       {/* ============ HERO con imagen de fondo ============ */}
       <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden">
         <Image
-          src="/images/slides/hero-11.webp"
+          src="/images/slides/hero-15.webp"
           alt="Autocaravanas en paisaje"
           fill
           priority
