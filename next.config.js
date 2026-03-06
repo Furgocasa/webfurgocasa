@@ -577,21 +577,21 @@ const nextConfig = {
       { source: '/alquiler-casas-rodantes-espana', destination: '/es/', permanent: true },
       { source: '/es/alquiler-motorhome-espana', destination: '/es/', permanent: true },
       { source: '/alquiler-motorhome-espana', destination: '/es/', permanent: true },
-      { source: '/es/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/es/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans-madrid', permanent: true },
-      { source: '/es/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/es/alquiler-casas-rodantes-alicante', destination: '/es/alquiler-autocaravanas-campervans-alicante', permanent: true },
-      { source: '/alquiler-casas-rodantes-alicante', destination: '/es/alquiler-autocaravanas-campervans-alicante', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
+      { source: '/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
+      { source: '/es/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
+      { source: '/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
+      { source: '/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
+      { source: '/es/alquiler-casas-rodantes-alicante', destination: '/es/alquiler-autocaravanas-campervans/alicante', permanent: true },
+      { source: '/alquiler-casas-rodantes-alicante', destination: '/es/alquiler-autocaravanas-campervans/alicante', permanent: true },
       
-      // ── Ciudades sin página propia → página más cercana ──
+      // ── Ciudades sin página propia → página más cercana (formato nuevo con barra) ──
       // Propósito: Evitar 404s, ofrecer alternativa geográficamente cercana
-      { source: '/es/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans-murcia', permanent: true },
-      { source: '/es/alquiler-autocaravanas-campervans-benalmadena', destination: '/es/alquiler-autocaravanas-campervans-malaga', permanent: true },
-      { source: '/alquiler-autocaravanas-campervans-benalmadena', destination: '/es/alquiler-autocaravanas-campervans-malaga', permanent: true },
+      { source: '/es/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
+      { source: '/alquiler-autocaravanas-campervans-puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
+      { source: '/es/alquiler-autocaravanas-campervans-benalmadena', destination: '/es/alquiler-autocaravanas-campervans/malaga', permanent: true },
+      { source: '/alquiler-autocaravanas-campervans-benalmadena', destination: '/es/alquiler-autocaravanas-campervans/malaga', permanent: true },
 
       // ================================================================
       // GRUPO 5: CAMBIO DE NOMENCLATURA (PERMANENTE)
