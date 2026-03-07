@@ -11,6 +11,7 @@ import {
   LayoutGrid, List
 } from "lucide-react";
 import type { MotorhomeService } from "@/types/database";
+import { getAutocaravanasContent } from "./autocaravanas-content";
 
 // --- Tipos ---
 
@@ -32,11 +33,12 @@ interface Props {
   initialCount: number;
   stats: ServiceStats;
   provinces: ProvinceItem[];
+  locale?: 'es' | 'en';
 }
 
-// --- Datos estáticos para SEO ---
+// --- Datos estáticos para SEO (ES - usado cuando no hay content.types) ---
 
-const MOTORHOME_TYPES = [
+const MOTORHOME_TYPES_LEGACY = [
   {
     name: "Autocaravana Perfilada",
     aka: "Semi-integral",
@@ -83,7 +85,7 @@ const MOTORHOME_TYPES = [
   },
 ];
 
-const FAQ_DATA = [
+const FAQ_DATA_LEGACY = [
   {
     q: "¿Qué permiso necesito para conducir una autocaravana?",
     a: "Con el permiso B puedes conducir autocaravanas de hasta 3.500 kg de MMA (Masa Máxima Autorizada). Para autocaravanas de más de 3.500 kg necesitas el permiso C1, que permite conducir vehículos de hasta 7.500 kg. La gran mayoría de autocaravanas de alquiler no superan los 3.500 kg.",
@@ -128,8 +130,10 @@ const FAQ_DATA = [
 
 // --- Componente de tarjeta de servicio ---
 
-function ServiceCard({ service }: { service: MotorhomeService }) {
-  const categoryLabel = service.category === 'taller_camper' ? 'Taller' : 'Concesionario';
+function ServiceCard({ service, locale }: { service: MotorhomeService; locale?: 'es' | 'en' }) {
+  const categoryLabel = service.category === 'taller_camper'
+    ? (locale === 'en' ? 'Workshop' : 'Taller')
+    : (locale === 'en' ? 'Dealer' : 'Concesionario');
   const categoryColor = service.category === 'taller_camper'
     ? 'bg-amber-100 text-amber-800'
     : 'bg-blue-100 text-blue-800';
@@ -260,7 +264,8 @@ function ServiceListRow({ service }: { service: MotorhomeService }) {
 
 // --- Componente principal ---
 
-export function AutocaravanasClient({ initialServices, initialCount, stats, provinces }: Props) {
+export function AutocaravanasClient({ initialServices, initialCount, stats, provinces, locale = 'es' }: Props) {
+  const content = getAutocaravanasContent(locale);
   const [services, setServices] = useState<MotorhomeService[]>(initialServices);
   const [totalCount, setTotalCount] = useState(initialCount);
   const [categoryFilter, setCategoryFilter] = useState<string>("");
@@ -334,20 +339,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
     ? sortedServices
     : sortedServices.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-  const tocItems = [
-    { id: "que-es", label: "Qué es" },
-    { id: "tipos", label: "Tipos" },
-    { id: "permisos", label: "Permisos" },
-    { id: "normativa", label: "Normativa" },
-    { id: "peso", label: "Peso" },
-    { id: "seguros", label: "Seguros" },
-    { id: "mantenimiento", label: "Mantenimiento" },
-    { id: "comprar", label: "Comprar" },
-    { id: "alquilar", label: "Alquilar" },
-    { id: "areas", label: "Áreas" },
-    { id: "directorio", label: "Directorio" },
-    { id: "faq", label: "FAQ" },
-  ];
+  const tocItems = content.toc;
 
   return (
     <main className="min-h-screen bg-white font-amiko">
@@ -373,17 +365,17 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
             className="mx-auto mb-6 h-16 w-auto object-contain opacity-95"
           />
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-black text-white mb-6 leading-tight" style={{ textShadow: "2px 2px 12px rgba(0,0,0,0.8)" }}>
-            Autocaravanas
+            {content.hero.h1}
           </h1>
           <p className="text-xl md:text-2xl text-white/95 max-w-3xl mx-auto font-light leading-relaxed mb-10" style={{ textShadow: "1px 1px 6px rgba(0,0,0,0.9)" }}>
-            La guía más completa de España: tipos, permisos, normativa, mantenimiento y el mayor directorio de talleres y concesionarios
+            {content.hero.subtitle}
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm">
             {[
-              { n: stats.total.toLocaleString()+"+", l: "Servicios" },
-              { n: stats.talleres.toLocaleString(), l: "Talleres" },
-              { n: stats.concesionarios.toLocaleString(), l: "Concesionarios" },
-              { n: stats.provinces.toString(), l: "Provincias" },
+              { n: stats.total.toLocaleString()+"+", l: content.hero.stats[0].l },
+              { n: stats.talleres.toLocaleString(), l: content.hero.stats[1].l },
+              { n: stats.concesionarios.toLocaleString(), l: content.hero.stats[2].l },
+              { n: stats.provinces.toString(), l: content.hero.stats[3].l },
             ].map((s) => (
               <div key={s.l} className="bg-white/15 backdrop-blur-md rounded-xl px-5 py-3 border border-white/20">
                 <div className="text-2xl font-heading font-bold text-white">{s.n}</div>
@@ -416,35 +408,31 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-8">
-              ¿Qué es una autocaravana?
+              {content.queEs.h2}
             </h2>
             <div className="rounded-2xl overflow-hidden shadow-lg mb-8 aspect-video relative">
-              <Image src="/images/slides/hero-01.webp" alt="Autocaravana en ruta" fill className="object-cover" sizes="(max-width: 768px) 100vw, 896px" />
+              <Image src="/images/slides/hero-01.webp" alt={content.queEs.h2} fill className="object-cover" sizes="(max-width: 768px) 100vw, 896px" />
             </div>
             <div className="space-y-5 text-gray-600 text-lg leading-relaxed">
-              <p>
-                Una <strong className="text-gray-900">autocaravana</strong> es un vehículo que integra un espacio habitable sobre un chasis motorizado. A diferencia de una caravana (que necesita ser remolcada), la autocaravana tiene motor propio y se conduce como un vehículo convencional. En su interior incluye zona de dormitorio, cocina, baño y salón-comedor.
-              </p>
-              <p>
-                En España, las autocaravanas están clasificadas como <strong className="text-gray-900">vehículos vivienda</strong> y deben cumplir la homologación como tal. Según la DGT, se definen como &ldquo;vehículos construidos con propósito especial, incluyendo alojamiento, que contiene al menos el equipamiento siguiente: asientos y mesa, camas o literas y cocina&rdquo;.
-              </p>
+              <p>{content.queEs.p1}</p>
+              <p>{content.queEs.p2}</p>
               <div className="bg-furgocasa-blue/5 border border-furgocasa-blue/10 p-6 rounded-2xl">
                 <h3 className="font-heading font-bold text-gray-900 mb-3 flex items-center gap-2">
                   <Info className="h-5 w-5 text-furgocasa-blue" />
-                  Autocaravana vs Camper vs Caravana
+                  {content.queEs.vsTitle}
                 </h3>
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
                   <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <p className="font-bold text-gray-900 mb-1">Autocaravana</p>
-                    <p className="text-gray-500">Vehículo con carrocería habitable construida sobre un chasis-cabina. Tiene motor propio.</p>
+                    <p className="font-bold text-gray-900 mb-1">{locale === 'es' ? 'Autocaravana' : 'Motorhome'}</p>
+                    <p className="text-gray-500">{content.queEs.motorhome}</p>
                   </div>
                   <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <p className="font-bold text-gray-900 mb-1">Camper / Furgoneta camperizada</p>
-                    <p className="text-gray-500">Furgoneta comercial adaptada como vivienda manteniendo su carrocería original.</p>
+                    <p className="font-bold text-gray-900 mb-1">{locale === 'es' ? 'Camper / Furgoneta camperizada' : 'Camper / Converted van'}</p>
+                    <p className="text-gray-500">{content.queEs.camper}</p>
                   </div>
                   <div className="bg-white rounded-xl p-4 border border-gray-100">
-                    <p className="font-bold text-gray-900 mb-1">Caravana</p>
-                    <p className="text-gray-500">Remolque habitable sin motor. Necesita un vehículo tractor para desplazarse.</p>
+                    <p className="font-bold text-gray-900 mb-1">Caravan</p>
+                    <p className="text-gray-500">{content.queEs.caravan}</p>
                   </div>
                 </div>
               </div>
@@ -457,10 +445,10 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
       <section id="tipos" className="py-16 lg:py-24 bg-gray-50 scroll-mt-16">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900 mb-4 text-center">
-            Tipos de autocaravanas
+            {content.tipos.h2}
           </h2>
           <p className="text-gray-500 text-center mb-8 max-w-2xl mx-auto">
-            Conoce las diferencias entre cada tipo para elegir la que mejor se adapta a tus necesidades
+            {content.tipos.subtitle}
           </p>
           <div className="rounded-2xl overflow-hidden shadow-lg mb-10 max-w-3xl mx-auto aspect-[16/9] relative">
             <Image src="/images/slides/hero-05.webp" alt="Tipos de autocaravanas" fill className="object-cover" sizes="(max-width: 768px) 100vw, 672px" />
@@ -468,7 +456,9 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
 
           {/* Tabs */}
           <div className="flex flex-wrap justify-center gap-2 mb-10">
-            {MOTORHOME_TYPES.map((type, i) => (
+            {content.tipos.types.map((type, i) => {
+              const icons = [<Truck key="truck" className="h-8 w-8" />, <CarFront key="car" className="h-8 w-8" />, <Bed key="bed" className="h-8 w-8" />, <Navigation key="nav" className="h-8 w-8" />];
+              return (
               <button
                 key={type.name}
                 onClick={() => setActiveTypeTab(i)}
@@ -478,26 +468,27 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
                     : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
                 }`}
               >
-                {type.icon}
+                {icons[i] ?? icons[0]}
                 <span className="hidden sm:inline">{type.name}</span>
                 <span className="sm:hidden">{type.aka}</span>
               </button>
-            ))}
+            );})}
           </div>
 
           {/* Active type detail */}
           {(() => {
-            const type = MOTORHOME_TYPES[activeTypeTab];
+            const type = content.tipos.types[activeTypeTab];
+            const typeIcons = [<Truck key="t" className="h-8 w-8" />, <CarFront key="c" className="h-8 w-8" />, <Bed key="b" className="h-8 w-8" />, <Navigation key="n" className="h-8 w-8" />];
             return (
               <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
                 <div className="p-6 md:p-10">
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-16 h-16 bg-furgocasa-blue/10 rounded-2xl flex items-center justify-center text-furgocasa-blue">
-                      {type.icon}
+                      {typeIcons[activeTypeTab] ?? typeIcons[0]}
                     </div>
                     <div>
                       <h3 className="text-2xl font-heading font-bold text-gray-900">{type.name}</h3>
-                      <p className="text-gray-400 text-sm">También conocida como: {type.aka}</p>
+                      <p className="text-gray-400 text-sm">{content.tipos.alsoKnown} {type.aka}</p>
                     </div>
                   </div>
 
@@ -506,10 +497,10 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
                   {/* Specs */}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                     {[
-                      { icon: <Ruler className="h-5 w-5" />, label: "Longitud", value: type.length },
-                      { icon: <Scale className="h-5 w-5" />, label: "Peso MMA", value: type.weight },
-                      { icon: <Bed className="h-5 w-5" />, label: "Plazas dormir", value: type.beds },
-                      { icon: <Users className="h-5 w-5" />, label: "Permiso", value: "B / C1" },
+                      { icon: <Ruler className="h-5 w-5" />, label: content.tipos.length, value: type.length },
+                      { icon: <Scale className="h-5 w-5" />, label: content.tipos.weight, value: type.weight },
+                      { icon: <Bed className="h-5 w-5" />, label: content.tipos.beds, value: type.beds },
+                      { icon: <Users className="h-5 w-5" />, label: content.tipos.permit, value: "B / C1" },
                     ].map((spec) => (
                       <div key={spec.label} className="bg-gray-50 rounded-xl p-4 text-center">
                         <div className="text-furgocasa-blue mx-auto mb-2 flex justify-center">{spec.icon}</div>
@@ -523,7 +514,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
                   <div className="grid md:grid-cols-2 gap-6">
                     <div className="bg-green-50 rounded-2xl p-6 border border-green-100">
                       <h4 className="font-bold text-green-800 mb-4 flex items-center gap-2">
-                        <CheckCircle2 className="h-5 w-5" /> Ventajas
+                        <CheckCircle2 className="h-5 w-5" /> {content.tipos.pros}
                       </h4>
                       <ul className="space-y-2">
                         {type.pros.map((pro) => (
@@ -535,7 +526,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
                     </div>
                     <div className="bg-red-50 rounded-2xl p-6 border border-red-100">
                       <h4 className="font-bold text-red-800 mb-4 flex items-center gap-2">
-                        <XCircle className="h-5 w-5" /> Inconvenientes
+                        <XCircle className="h-5 w-5" /> {content.tipos.cons}
                       </h4>
                       <ul className="space-y-2">
                         {type.cons.map((con) => (

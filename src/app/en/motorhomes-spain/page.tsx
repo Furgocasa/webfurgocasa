@@ -16,9 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
       keywords: "autocaravanas, tipos de autocaravanas, permiso autocaravana, normativa autocaravanas España",
     },
     en: {
-      title: "Motorhomes: Complete Guide 2026 | Types, Licences, Regulations & Directory",
-      description: "Everything about motorhomes in Spain: types, driving licences, regulations, weight, insurance, maintenance. Directory with 900+ workshops and dealers.",
-      keywords: "motorhomes, motorhome types, motorhome licence, motorhome regulations Spain, motorhome workshops, motorhome dealers",
+      title: "Motorhomes in Spain: Complete Guide 2026 | Types, Licences, DGT Regulations & Directory",
+      description: "Complete guide to motorhomes in Spain: Spanish regulations (DGT, ITV, MMA), driving licences, types, weight, insurance, maintenance. Directory with 900+ workshops and dealers in Spain.",
+      keywords: "motorhomes Spain, motorhome Spain, motorhome types Spain, motorhome licence Spain, DGT motorhome, motorhome regulations Spain, motorhome workshops Spain",
     },
     fr: {
       title: "Camping-Cars: Guide Complet 2026 | Types, Permis, Réglementation et Annuaire",
@@ -46,6 +46,7 @@ export default async function MotorhomesPage() {
       initialCount={servicesResult.count}
       stats={stats}
       provinces={provinces}
+      locale="en"
     />
   );
 }

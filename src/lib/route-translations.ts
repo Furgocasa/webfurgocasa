@@ -212,9 +212,9 @@ export const routeTranslations = {
   },
   "/autocaravanas": { 
     es: "/autocaravanas", 
-    en: "/motorhomes", 
-    fr: "/camping-cars", 
-    de: "/wohnmobile" 
+    en: "/motorhomes-spain", 
+    fr: "/camping-cars-espagne", 
+    de: "/wohnmobile-spanien" 
   },
   "/sitemap-html": { 
     es: "/sitemap-html", 

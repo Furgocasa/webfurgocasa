@@ -425,6 +425,15 @@ const nextConfig = {
       { source: '/de/parking-murcia', destination: '/de/parkplatz-murcia', permanent: true },
 
       // ================================================================
+      // GRUPO 2C: GUÍA AUTOCARAVANAS - Slugs centrados en España
+      // ================================================================
+      // Propósito: /motorhomes → /motorhomes-spain (y equivalentes) para SEO España
+      // ================================================================
+      { source: '/en/motorhomes', destination: '/en/motorhomes-spain', permanent: true },
+      { source: '/fr/camping-cars', destination: '/fr/camping-cars-espagne', permanent: true },
+      { source: '/de/wohnmobile', destination: '/de/wohnmobile-spanien', permanent: true },
+
+      // ================================================================
       // GRUPO 3: CORRECCIÓN IDIOMA CRUZADO (RUTAS GENERALES)
       // ================================================================
       // Propósito: Corregir URLs mal formadas (ej: /de/vehicles → /de/fahrzeuge)
