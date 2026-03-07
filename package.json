@@ -30,7 +30,9 @@
     "test:occupancy": "node scripts/test-occupancy-api.js",
     "import:motorhome-services": "tsx scripts/import-motorhome-services.ts",
     "identify:rental-businesses": "tsx scripts/identify-rental-businesses.ts",
-    "delete:rental-businesses": "tsx scripts/delete-rental-businesses.ts"
+    "delete:rental-businesses": "tsx scripts/delete-rental-businesses.ts",
+    "assign:location-tags": "tsx scripts/assign-location-tags-to-posts.ts",
+    "assign:location-tags:dry": "tsx scripts/assign-location-tags-to-posts.ts --dry-run"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

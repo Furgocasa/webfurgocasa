@@ -26,7 +26,7 @@ import { LocationTourismContent } from "@/components/locations/location-tourism-
 import { NearbyOfficeNotice } from "@/components/locations/nearby-office-notice";
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
-import { getLatestBlogArticles } from "@/lib/home/server-actions";
+import { getLatestBlogArticles, getBlogArticlesByLocation } from "@/lib/home/server-actions";
 import { LocationHeroWithSkeleton } from "@/components/locations/location-hero-with-skeleton";
 import { getLocationHeroImage } from "@/lib/locationImages";
 import { getNearbyLocationsForGrid } from "@/lib/locations/server-actions";
@@ -209,7 +209,7 @@ export default async function LocationPage({ params }: PageProps) {
       'location_targets', locationRaw.id, locale, locationRaw.content_sections
     ),
     getRentVehicles(),
-    getLatestBlogArticles(3),
+    getBlogArticlesByLocation(slug, 3, 'es').then(async (arts) => (arts.length > 0 ? arts : await getLatestBlogArticles(3))),
     getNearbyLocationsForGrid(slug, locationRaw.region, locationRaw.province, getLocationHeroImage),
   ]);
 

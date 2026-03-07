@@ -995,6 +995,7 @@ export type Database = {
           author_id: string | null
           category_id: string | null
           content: string
+          location_tags: string[] | null
           content_en: string | null
           created_at: string | null
           excerpt: string | null
@@ -1023,6 +1024,7 @@ export type Database = {
           author_id?: string | null
           category_id?: string | null
           content: string
+          location_tags?: string[] | null
           content_en?: string | null
           created_at?: string | null
           excerpt?: string | null
@@ -1051,6 +1053,7 @@ export type Database = {
           author_id?: string | null
           category_id?: string | null
           content?: string
+          location_tags?: string[] | null
           content_en?: string | null
           created_at?: string | null
           excerpt?: string | null

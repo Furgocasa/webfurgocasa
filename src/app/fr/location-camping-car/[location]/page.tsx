@@ -28,7 +28,7 @@ import { LocationTourismContent } from "@/components/locations/location-tourism-
 import { NearbyOfficeNotice } from "@/components/locations/nearby-office-notice";
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
-import { getLatestBlogArticles } from "@/lib/home/server-actions";
+import { getLatestBlogArticles, getBlogArticlesByLocation } from "@/lib/home/server-actions";
 import { ExtrasSection } from "@/components/pricing/extras-section";
 
 // ============================================================================
@@ -203,7 +203,7 @@ export default async function LocationPage({ params }: PageProps) {
 
   // Obtenir les articles du blog et les destinations proches
   const [blogArticles, nearbyLocations] = await Promise.all([
-    getLatestBlogArticles(3),
+    getBlogArticlesByLocation(slug, 3, 'fr').then(async (arts) => (arts.length > 0 ? arts : await getLatestBlogArticles(3))),
     getNearbyLocationsForGrid(slug, locationRaw.region, locationRaw.province, getLocationHeroImage),
   ]);
 

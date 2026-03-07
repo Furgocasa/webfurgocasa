@@ -104,6 +104,71 @@ export const getLatestBlogArticles = cache(async (limit: number = 3): Promise<Bl
   }));
 });
 
+// ⚡ Obtener artículos del blog por ubicación (location_tags)
+// Muestra rutas/contenido relevante para cada destino
+export const getBlogArticlesByLocation = cache(async (
+  locationSlug: string,
+  limit: number = 3,
+  locale: Locale = 'es'
+): Promise<BlogArticle[]> => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: articles } = await supabase
+    .from('posts')
+    .select(`
+      id,
+      title,
+      slug,
+      slug_en,
+      slug_fr,
+      slug_de,
+      excerpt,
+      featured_image,
+      published_at,
+      category:content_categories(id, name, slug)
+    `)
+    .eq('status', 'published')
+    .lte('published_at', new Date().toISOString())
+    .contains('location_tags', [locationSlug])
+    .order('published_at', { ascending: false })
+    .limit(limit);
+
+  if (!articles || articles.length === 0) return [];
+
+  const base = articles.map(article => ({
+    ...article,
+    category: Array.isArray(article.category) ? article.category[0] : article.category
+  }));
+
+  if (locale !== 'es' && base.length > 0) {
+    const { data: translations } = await supabase
+      .from('content_translations')
+      .select('source_id, source_field, translated_text')
+      .eq('source_table', 'posts')
+      .in('source_id', base.map(a => a.id))
+      .eq('locale', locale)
+      .in('source_field', ['title', 'excerpt']);
+
+    const map = new Map<string, { title?: string; excerpt?: string }>();
+    translations?.forEach(t => {
+      if (!map.has(t.source_id)) map.set(t.source_id, {});
+      const m = map.get(t.source_id)!;
+      if (t.source_field === 'title') m.title = t.translated_text;
+      else if (t.source_field === 'excerpt') m.excerpt = t.translated_text;
+    });
+
+    return base.map(a => {
+      const tr = map.get(a.id);
+      return { ...a, title: tr?.title || a.title, excerpt: tr?.excerpt || a.excerpt };
+    });
+  }
+
+  return base;
+});
+
 // ⚡ Obtener artículos de rutas para página LATAM
 export const getRoutesArticles = cache(async (limit: number = 4, locale: Locale = 'es'): Promise<BlogArticle[]> => {
   const supabase = createClient(
