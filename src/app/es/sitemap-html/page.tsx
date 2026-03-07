@@ -60,9 +60,7 @@ const staticPages: Array<{ path: string; label: string }> = [
   { path:"/alquiler-motorhome-europa-desde-espana", label:"Alquiler Motorhome Europa" },
   { path:"/alquiler-motorhome-marruecos-desde-espana", label:"Alquiler Motorhome Marruecos" },
   { path:"/alquiler-motorhome-espana", label:"Alquiler Motorhome España" },
-  { path:"/motorhome-rental-spain", label:"Motorhome Rental Spain" },
-  { path:"/location-camping-car-espagne", label:"Location Camping-Car Espagne" },
-  { path:"/wohnmobil-miete-spanien", label:"Wohnmobil Miete Spanien" },
+  { path:"/autocaravanas", label:"Guía Autocaravanas" },
   { path:"/buscar", label:"Buscar" },
   { path:"/contacto", label:"Contacto" },
   { path:"/como-funciona", label:"Cómo funciona" },
@@ -218,7 +216,7 @@ export default async function LocaleSitemapHtmlPage({ params }: PageProps) {
                       href={`/blog/${category.slug}`}
                       className="text-furgocasa-blue hover:text-furgocasa-orange transition-colors"
                     >
-                      {buildLabel(`/blog/${category.slug}`)}
+                      {buildLabel(`/blog/${category.slug}`, locale)}
                     </LocalizedLink>
                     {category.name && (
                       <span className="text-gray-400 text-sm ml-2">

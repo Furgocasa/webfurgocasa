@@ -61,6 +61,7 @@ const staticPages: Array<{ path: string; label: string }> = [
   { path:"/wohnmobil-miete-europa-von-spanien", label:"Wohnmobil-Miete Europa" },
   { path:"/wohnmobil-miete-marokko-von-spanien", label:"Wohnmobil-Miete Marokko" },
   { path:"/wohnmobil-miete-spanien", label:"Wohnmobil-Miete Spanien" },
+  { path:"/wohnmobile-spanien", label:"Wohnmobile Spanien Guide" },
   { path:"/suche", label:"Suche" },
   { path:"/kontakt", label:"Kontakt" },
   { path:"/wie-es-funktioniert", label:"Wie es funktioniert" },

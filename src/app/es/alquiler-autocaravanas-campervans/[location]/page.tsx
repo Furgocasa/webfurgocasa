@@ -314,8 +314,13 @@ export default async function LocationPage({ params }: PageProps) {
               </h1>
 
               {/* H2 - Keyword adicional: "furgonetas camper" */}
-              <h2 className="text-xl lg:text-2xl font-heading font-medium text-gray-700 mb-6">
+              <h2 className="text-xl lg:text-2xl font-heading font-medium text-gray-700 mb-4">
                 {t("Furgonetas camper de gran volumen en")} {location.name}
+              </h2>
+
+              {/* H2 - Keywords LATAM: motorhome, casa rodante */}
+              <h2 className="text-xl lg:text-2xl font-heading font-medium text-furgocasa-blue mb-6">
+                {t("Alquiler de Motorhomes y Casa Rodante en")} {location.name}
               </h2>
 
               {/* Texto fijo */}
@@ -442,6 +447,25 @@ export default async function LocationPage({ params }: PageProps) {
 
       {/* Sección: ¿Qué incluye tu alquiler? - Extras y Accesorios */}
       <ExtrasSection backgroundColor="bg-white" />
+
+      {/* ================================================================== */}
+      {/* SECCIÓN LATAM - Motorhome, Casa Rodante (keywords para América Latina) */}
+      {/* ================================================================== */}
+      <section className="py-10 lg:py-14 bg-gradient-to-br from-amber-50 to-orange-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
+              {t("¿Buscas alquilar un motorhome o casa rodante en")} {location.name}?
+            </h2>
+            <p className="text-lg lg:text-xl text-gray-700 leading-relaxed mb-4">
+              {t("En España los llamamos autocaravanas o campers, pero es lo mismo: tu hotel sobre ruedas. Si vienes de Argentina, México, Colombia, Chile o cualquier país de América Latina, aquí encontrarás el mejor alquiler de motorhomes y casas rodantes para explorar España y Europa.")}
+            </p>
+            <p className="text-base lg:text-lg text-gray-600">
+              {t("Flota premium con kilómetros ilimitados, entrega en")} {location.name} {t("y toda España. ¡Reserva tu motorhome o casa rodante ahora!")}
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* ================================================================== */}
       {/* AVISO OFICINA CERCANA - Solo para ciudades sin sede (distance > 0) */}
