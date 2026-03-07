@@ -223,12 +223,16 @@ export default function OfertasUltimaHoraPage() {
         })
       );
       
-      setDetectedGaps(gapsWithRealPrices);
+      // Ordenar solo por fecha de inicio (sin agrupar por vehículo)
+      const sortedByDate = [...gapsWithRealPrices].sort(
+        (a, b) => new Date(a.gap_start_date).getTime() - new Date(b.gap_start_date).getTime()
+      );
+      setDetectedGaps(sortedByDate);
       
-      if (gapsWithRealPrices.length === 0) {
+      if (sortedByDate.length === 0) {
         showMessage('success', 'No se encontraron nuevos huecos entre reservas');
       } else {
-        showMessage('success', `Se encontraron ${gapsWithRealPrices.length} huecos potenciales`);
+        showMessage('success', `Se encontraron ${sortedByDate.length} huecos potenciales`);
       }
     } catch (error) {
       console.error('Error detecting gaps:', error);
