@@ -29,6 +29,7 @@ import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { getLatestBlogArticles } from "@/lib/home/server-actions";
 import { LocationHeroWithSkeleton } from "@/components/locations/location-hero-with-skeleton";
 import { getLocationHeroImage } from "@/lib/locationImages";
+import { getNearbyLocationsForGrid } from "@/lib/locations/server-actions";
 import { ExtrasSection } from "@/components/pricing/extras-section";
 
 // ============================================================================
@@ -191,7 +192,7 @@ export default async function LocationPage({ params }: PageProps) {
   }
 
   // Paralelizar consultas de traducción y datos adicionales para mejorar TTFB
-  const [translatedFields, translatedSections, vehiclesRaw, blogArticles] = await Promise.all([
+  const [translatedFields, translatedSections, vehiclesRaw, blogArticles, nearbyLocations] = await Promise.all([
     getTranslatedContent(
       'location_targets', locationRaw.id,
       ['name', 'h1_title', 'meta_title', 'meta_description', 'intro_text'],
@@ -208,7 +209,8 @@ export default async function LocationPage({ params }: PageProps) {
       'location_targets', locationRaw.id, locale, locationRaw.content_sections
     ),
     getRentVehicles(),
-    getLatestBlogArticles(3)
+    getLatestBlogArticles(3),
+    getNearbyLocationsForGrid(slug, locationRaw.region, locationRaw.province, getLocationHeroImage),
   ]);
 
   const vehicles = await getTranslatedRecords('vehicles', vehiclesRaw, ['name', 'short_description'], locale);
@@ -559,7 +561,7 @@ export default async function LocationPage({ params }: PageProps) {
       </section>
 
       {/* ================================================================== */}
-      {/* DESTINOS PRINCIPALES - Fondo gris claro */}
+      {/* DESTINOS CERCANOS (landings) o PRINCIPALES (fallback) - Fondo gris claro */}
       {/* ================================================================== */}
       <section className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -567,14 +569,21 @@ export default async function LocationPage({ params }: PageProps) {
             <div className="flex items-center justify-center gap-3 mb-4">
               <Map className="h-8 w-8 text-furgocasa-blue" />
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
-                {t("Principales destinos para visitar en Campervan")}
+                {nearbyLocations.length > 0
+                  ? t("Destinos cercanos para visitar en camper")
+                  : t("Principales destinos para visitar en Campervan")}
               </h2>
             </div>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-              {t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}
+              {nearbyLocations.length > 0
+                ? t("Alquila tu camper y explora estas localidades cercanas desde") + ` ${location.name}`
+                : t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}
             </p>
           </div>
-          <DestinationsGrid />
+          <DestinationsGrid
+            title={nearbyLocations.length > 0 ? t("Destinos cercanos") : undefined}
+            destinations={nearbyLocations.length > 0 ? nearbyLocations : undefined}
+          />
         </div>
       </section>
 

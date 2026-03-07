@@ -9,6 +9,7 @@ import { getTranslatedContent, getTranslatedContentSections, getTranslatedRecord
 import type { Locale } from "@/lib/i18n/config";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { getLocationHeroImage } from "@/lib/locationImages";
+import { getNearbyLocationsForGrid } from "@/lib/locations/server-actions";
 import { 
   MapPin, 
   CheckCircle, 
@@ -200,8 +201,11 @@ export default async function LocationPage({ params }: PageProps) {
   const vehiclesRaw = await getRentVehicles();
   const vehicles = await getTranslatedRecords('vehicles', vehiclesRaw, ['name', 'short_description'], locale);
 
-  // Blog-Artikel abrufen
-  const blogArticles = await getLatestBlogArticles(3);
+  // Blog-Artikel und nahe gelegene Orte abrufen
+  const [blogArticles, nearbyLocations] = await Promise.all([
+    getLatestBlogArticles(3),
+    getNearbyLocationsForGrid(slug, locationRaw.region, locationRaw.province, getLocationHeroImage),
+  ]);
 
   const { data: ownLocation } = await supabase
     .from('locations')
@@ -503,14 +507,21 @@ export default async function LocationPage({ params }: PageProps) {
             <div className="flex items-center justify-center gap-3 mb-4">
               <Map className="h-8 w-8 text-furgocasa-blue" />
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
-                {t("Principales destinos para visitar en Campervan")}
+                {nearbyLocations.length > 0
+                  ? t("Nahe gelegene Ziele mit dem Wohnmobil")
+                  : t("Principales destinos para visitar en Campervan")}
               </h2>
             </div>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
-              {t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}
+              {nearbyLocations.length > 0
+                ? t("Mieten Sie Ihr Wohnmobil und erkunden Sie diese Orte in der Nähe von") + ` ${location.name}`
+                : t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}
             </p>
           </div>
-          <DestinationsGrid />
+          <DestinationsGrid
+            title={nearbyLocations.length > 0 ? t("Nahe gelegene Ziele") : undefined}
+            destinations={nearbyLocations.length > 0 ? nearbyLocations : undefined}
+          />
         </div>
       </section>
 

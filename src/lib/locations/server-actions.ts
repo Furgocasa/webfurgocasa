@@ -81,6 +81,49 @@ export const getNearbyDestinations = cache(async (locationId: string): Promise<N
   return [];
 });
 
+/** Destinos cercanos para el grid: misma región/provincia. Formato para DestinationsGrid. */
+export interface NearbyLocationForGrid {
+  name: string;
+  region: string;
+  slug: string;
+  image?: string;
+}
+
+export const getNearbyLocationsForGrid = cache(async (
+  currentSlug: string,
+  region: string | null,
+  province: string | null,
+  getImage: (slug: string) => string
+): Promise<NearbyLocationForGrid[]> => {
+  const filterValue = region || province;
+  if (!filterValue) return [];
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  let query = supabase
+    .from('location_targets')
+    .select('slug, name, region, province')
+    .eq('is_active', true)
+    .neq('slug', currentSlug);
+
+  query = region ? query.eq('region', region) : query.eq('province', province!);
+
+  const { data } = await query
+    .order('display_order', { ascending: true, nullsFirst: false })
+    .order('name', { ascending: true })
+    .limit(6);
+
+  return (data || []).map((loc: { slug: string; name: string; region: string | null; province: string | null }) => ({
+    name: loc.name.toUpperCase(),
+    region: loc.region || loc.province || '',
+    slug: loc.slug,
+    image: getImage(loc.slug),
+  }));
+});
+
 // Obtener vehículos disponibles
 export const getAvailableVehicles = cache(async (limit: number = 3) => {
   const supabase = createClient(
