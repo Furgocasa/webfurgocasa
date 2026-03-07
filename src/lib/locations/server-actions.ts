@@ -89,6 +89,16 @@ export interface NearbyLocationForGrid {
   image?: string;
 }
 
+/** Normaliza nombre de provincia a slug (ej: "Murcia" → "murcia", "Castellón" → "castellon") */
+function provinceToSlug(province: string): string {
+  return province
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, '-')
+    .trim();
+}
+
 export const getNearbyLocationsForGrid = cache(async (
   currentSlug: string,
   region: string | null,
@@ -116,12 +126,40 @@ export const getNearbyLocationsForGrid = cache(async (
     .order('name', { ascending: true })
     .limit(6);
 
-  return (data || []).map((loc: { slug: string; name: string; region: string | null; province: string | null }) => ({
+  const list = (data || []).map((loc: { slug: string; name: string; region: string | null; province: string | null }) => ({
     name: loc.name.toUpperCase(),
     region: loc.region || loc.province || '',
     slug: loc.slug,
     image: getImage(loc.slug),
   }));
+
+  // Regla: si NO estamos en la capital provincial, la capital debe aparecer siempre
+  if (province) {
+    const capitalSlug = provinceToSlug(province);
+    const isCapital = currentSlug === capitalSlug || currentSlug.toLowerCase() === capitalSlug;
+    const hasCapital = list.some((loc) => loc.slug.toLowerCase() === capitalSlug);
+
+    if (!isCapital && !hasCapital) {
+      const { data: capital } = await supabase
+        .from('location_targets')
+        .select('slug, name, region, province')
+        .eq('is_active', true)
+        .eq('slug', capitalSlug)
+        .maybeSingle();
+
+      if (capital) {
+        const capitalItem: NearbyLocationForGrid = {
+          name: capital.name.toUpperCase(),
+          region: capital.region || capital.province || '',
+          slug: capital.slug,
+          image: getImage(capital.slug),
+        };
+        return [capitalItem, ...list].slice(0, 6);
+      }
+    }
+  }
+
+  return list;
 });
 
 // Obtener vehículos disponibles
