@@ -6,37 +6,37 @@ import { getTranslatedRecords } from "@/lib/translations/get-translations";
 import { MotorhomeRentalSpainLanding } from "@/components/landing/motorhome-rental-spain-landing";
 
 /**
- * Página: Alquiler Motorhome España
- * URL: /es/alquiler-motorhome-espana
+ * Page: Wohnmobil Miete Spanien
+ * URL: /de/wohnmobil-miete-spanien
  */
 
 export const revalidate = 7200;
 
 const METADATA_BASE: Metadata = {
-  title: "Alquiler Motorhome España | Campers y Autocaravanas desde Murcia",
-  description: "Alquiler de motorhomes y campers en España. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados, entrega en toda España. Desde 95€/día. ¡Reserva tu motorhome!",
-  keywords: "alquiler motorhome españa, alquiler autocaravana españa, motorhome alquiler, camper españa, alquiler camper murcia, autocaravana españa",
+  title: "Wohnmobil Miete Spanien | Camper und Wohnmobile aus Murcia",
+  description: "Wohnmobil- und Campervermietung in Spanien. Premium-Flotte Dreamer, Knaus, Weinsberg. Unbegrenzte Kilometer, Lieferung in ganz Spanien. Ab 95€/Tag. Buchen Sie Ihr Wohnmobil!",
+  keywords: "wohnmobil miete spanien, wohnmobil vermieten spanien, camper spanien, wohnmobil spanien mieten, camper miete murcia",
   authors: [{ name: "Furgocasa" }],
   openGraph: {
-    title: "Alquiler Motorhome España | Campers y Autocaravanas desde Murcia",
-    description: "Las mejores campers y motorhomes en alquiler en España. Kilómetros ilimitados, equipamiento completo. Desde Murcia a toda España.",
+    title: "Wohnmobil Miete Spanien | Campers aus Murcia",
+    description: "Die besten Campers und Wohnmobile zur Miete in Spanien. Unbegrenzte Kilometer, vollständige Ausstattung. Von Murcia nach ganz Spanien.",
     type: "website",
-    siteName: "Furgocasa - Alquiler de Autocaravanas",
-    images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1920, height: 1080, alt: "Alquiler de motorhome y camper en España - Furgocasa", type: "image/webp" }],
-    locale: "es_ES",
+    siteName: "Furgocasa - Wohnmobilvermietung",
+    images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1920, height: 1080, alt: "Wohnmobil- und Campermiete in Spanien - Furgocasa", type: "image/webp" }],
+    locale: "de_DE",
   },
-  twitter: { card: "summary_large_image", site: "@furgocasa", creator: "@furgocasa", title: "Alquiler Motorhome España | Campers desde Murcia", description: "Motorhomes y campers en alquiler en España. Kilómetros ilimitados, equipamiento completo.", images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"] },
+  twitter: { card: "summary_large_image", site: "@furgocasa", creator: "@furgocasa", title: "Wohnmobil Miete Spanien | Campers aus Murcia", description: "Wohnmobile und Campers zur Miete in Spanien. Unbegrenzte Kilometer, vollständige Ausstattung.", images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 } },
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale: Locale = "es";
+  const locale: Locale = "de";
   const alternates = buildCanonicalAlternates("/alquiler-motorhome-espana", locale);
   return { ...METADATA_BASE, alternates, openGraph: { ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
 }
 
-export default async function AlquilerMotorhomeEspanaPage() {
-  const locale: Locale = "es";
+export default async function WohnmobilMieteSpanienPage() {
+  const locale: Locale = "de";
   const featuredVehiclesRaw = await getFeaturedVehicles();
   const blogArticlesRaw = await getLatestBlogArticles(3);
   const stats = await getCompanyStats();
@@ -46,9 +46,9 @@ export default async function AlquilerMotorhomeEspanaPage() {
   return (
     <MotorhomeRentalSpainLanding
       locale={locale}
-      heroTitle="Alquiler Motorhome España"
-      heroSubtitle="en España"
-      deliveryText="Alquiler en Murcia con entrega en toda España."
+      heroTitle="Wohnmobil Miete Spanien"
+      heroSubtitle="in Spanien"
+      deliveryText="Vermietung von Murcia mit Lieferung in ganz Spanien."
       vehicles={featuredVehicles.slice(0, 3).map((v) => ({ id: v.id, name: v.name, brand: v.brand || "", model: v.model || "", slug: v.slug, main_image: v.main_image }))}
       blogArticles={blogArticles.map((a) => ({ id: a.id, title: a.title, excerpt: a.excerpt, slug: a.slug, featured_image: a.featured_image, published_at: a.published_at, category: a.category }))}
       stats={stats}

@@ -218,9 +218,9 @@ export const routeTranslations = {
   },
   "/alquiler-motorhome-espana": { 
     es: "/alquiler-motorhome-espana", 
-    en: "/", 
-    fr: "/", 
-    de: "/" 
+    en: "/motorhome-rental-spain", 
+    fr: "/location-camping-car-espagne", 
+    de: "/wohnmobil-miete-spanien" 
   },
   "/sitemap-html": { 
     es: "/sitemap-html", 

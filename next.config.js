@@ -584,8 +584,11 @@ const nextConfig = {
       { source: '/alquiler-casas-rodantes-europa', destination: '/es/alquiler-motorhome-europa-desde-espana', permanent: true },
       { source: '/es/alquiler-casas-rodantes-espana', destination: '/es/', permanent: true },
       { source: '/alquiler-casas-rodantes-espana', destination: '/es/', permanent: true },
-      // /es/alquiler-motorhome-espana tiene página propia - sin redirect
+      // /es/alquiler-motorhome-espana y equivalentes EN/FR/DE
       { source: '/alquiler-motorhome-espana', destination: '/es/alquiler-motorhome-espana', permanent: true },
+      { source: '/motorhome-rental-spain', destination: '/en/motorhome-rental-spain', permanent: true },
+      { source: '/location-camping-car-espagne', destination: '/fr/location-camping-car-espagne', permanent: true },
+      { source: '/wohnmobil-miete-spanien', destination: '/de/wohnmobil-miete-spanien', permanent: true },
       { source: '/es/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
       { source: '/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
       { source: '/es/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
