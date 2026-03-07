@@ -248,16 +248,16 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       <LocationHeroWithSkeleton
         heroImageUrl={heroImageUrl}
-        alt={location.h1_title || `${t("Alquiler de autocaravanas y camper en")} ${location.name}`}
+        alt={location.h1_title || `${t("Alquiler de autocaravanas campers en")} ${location.name}`}
       >
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
-            {/* H1 - Formato: Alquiler de autocaravanas y camper en {ciudad} */}
+            {/* H1 - Formato: Alquiler de autocaravanas campers en {ciudad} */}
             <h1 
               className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4" 
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}
             >
-              {t("Alquiler de autocaravanas y camper en")} {location.name}
+              {t("Alquiler de autocaravanas campers en")} {location.name}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
