@@ -122,7 +122,6 @@ export const getNearbyLocationsForGrid = cache(async (
   query = region ? query.eq('region', region) : query.eq('province', province!);
 
   const { data } = await query
-    .order('display_order', { ascending: true, nullsFirst: false })
     .order('name', { ascending: true })
     .limit(6);
 
@@ -154,12 +153,13 @@ export const getNearbyLocationsForGrid = cache(async (
           slug: capital.slug,
           image: getImage(capital.slug),
         };
-        return [capitalItem, ...list].slice(0, 6);
+        const withCapital = [capitalItem, ...list].slice(0, 6);
+        return withCapital.sort((a, b) => a.name.localeCompare(b.name, 'es'));
       }
     }
   }
 
-  return list;
+  return list.sort((a, b) => a.name.localeCompare(b.name, 'es'));
 });
 
 // Obtener vehículos disponibles
