@@ -195,6 +195,7 @@ export async function GET(
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/alquiler-motorhome-espana', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/ofertas', priority: 0.6, changeFrequency: 'weekly' },
     { path: '/publicaciones', priority: 0.5, changeFrequency: 'weekly' },
     { path: '/clientes-vip', priority: 0.4, changeFrequency: 'monthly' },

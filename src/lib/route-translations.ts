@@ -216,6 +216,12 @@ export const routeTranslations = {
     fr: "/camping-cars-espagne", 
     de: "/wohnmobile-spanien" 
   },
+  "/alquiler-motorhome-espana": { 
+    es: "/alquiler-motorhome-espana", 
+    en: "/", 
+    fr: "/", 
+    de: "/" 
+  },
   "/sitemap-html": { 
     es: "/sitemap-html", 
     en: "/sitemap-html", 
