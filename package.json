@@ -32,7 +32,8 @@
     "identify:rental-businesses": "tsx scripts/identify-rental-businesses.ts",
     "delete:rental-businesses": "tsx scripts/delete-rental-businesses.ts",
     "assign:location-tags": "tsx scripts/assign-location-tags-to-posts.ts",
-    "assign:location-tags:dry": "tsx scripts/assign-location-tags-to-posts.ts --dry-run"
+    "assign:location-tags:dry": "tsx scripts/assign-location-tags-to-posts.ts --dry-run",
+    "check:location-tags": "tsx scripts/check-location-tags.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

@@ -116,6 +116,7 @@ export const getBlogArticlesByLocation = cache(async (
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
+  // Usar filter(cs) en lugar de contains: PostgREST requiere JSON string para JSONB
   const { data: articles } = await supabase
     .from('posts')
     .select(`
@@ -132,7 +133,7 @@ export const getBlogArticlesByLocation = cache(async (
     `)
     .eq('status', 'published')
     .lte('published_at', new Date().toISOString())
-    .contains('location_tags', [locationSlug])
+    .filter('location_tags', 'cs', JSON.stringify([locationSlug]))
     .order('published_at', { ascending: false })
     .limit(limit);
 
