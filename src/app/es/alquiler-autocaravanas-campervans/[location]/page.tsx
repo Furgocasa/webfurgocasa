@@ -248,16 +248,16 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       <LocationHeroWithSkeleton
         heroImageUrl={heroImageUrl}
-        alt={location.h1_title || `${t("Alquiler de Autocaravanas (motorhomes) en")} ${location.name}`}
+        alt={location.h1_title || `${t("Alquiler de autocaravanas y camper en")} ${location.name}`}
       >
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
-            {/* H1 - Formato fijo: Alquiler de Autocaravanas (Motorhomes) en {ciudad} */}
+            {/* H1 - Formato: Alquiler de autocaravanas y camper en {ciudad} */}
             <h1 
               className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4" 
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}
             >
-              {t("Alquiler de Autocaravanas (Motorhomes) en")} {location.name}
+              {t("Alquiler de autocaravanas y camper en")} {location.name}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
@@ -314,13 +314,8 @@ export default async function LocationPage({ params }: PageProps) {
               </h1>
 
               {/* H2 - Keyword adicional: "furgonetas camper" */}
-              <h2 className="text-xl lg:text-2xl font-heading font-medium text-gray-700 mb-4">
+              <h2 className="text-xl lg:text-2xl font-heading font-medium text-gray-700 mb-6">
                 {t("Furgonetas camper de gran volumen en")} {location.name}
-              </h2>
-
-              {/* H2 - Keywords LATAM: motorhome, casa rodante */}
-              <h2 className="text-xl lg:text-2xl font-heading font-medium text-furgocasa-blue mb-6">
-                {t("Alquiler de Motorhomes y Casa Rodante en")} {location.name}
               </h2>
 
               {/* Texto fijo */}
@@ -449,19 +444,32 @@ export default async function LocationPage({ params }: PageProps) {
       <ExtrasSection backgroundColor="bg-white" />
 
       {/* ================================================================== */}
-      {/* SECCIÓN LATAM - Motorhome, Casa Rodante (keywords para América Latina) */}
+      {/* SECCIÓN LATAM - Alquiler Motorhomes (keywords para América Latina) */}
       {/* ================================================================== */}
       <section className="py-10 lg:py-14 bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-2xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
-              {t("¿Buscas alquilar un motorhome o casa rodante en")} {location.name}?
+              {t("Alquiler de Motorhomes en")} {location.name}
             </h2>
-            <p className="text-lg lg:text-xl text-gray-700 leading-relaxed mb-4">
-              {t("En España los llamamos autocaravanas o campers, pero es lo mismo: tu hotel sobre ruedas. Si vienes de Argentina, México, Colombia, Chile o cualquier país de América Latina, aquí encontrarás el mejor alquiler de motorhomes y casas rodantes para explorar España y Europa.")}
+            <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
+              {t("En España los llamamos autocaravanas o campers, pero es lo mismo: tu hotel sobre ruedas. Si vienes de Argentina, México, Colombia, Chile o cualquier país de América Latina, aquí encontrarás el mejor alquiler de motorhomes para explorar España y Europa. Flota premium con kilómetros ilimitados.")}
             </p>
-            <p className="text-base lg:text-lg text-gray-600">
-              {t("Flota premium con kilómetros ilimitados, entrega en")} {location.name} {t("y toda España. ¡Reserva tu motorhome o casa rodante ahora!")}
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================== */}
+      {/* SECCIÓN LATAM - Alquiler Casa Rodante (keywords para América Latina) */}
+      {/* ================================================================== */}
+      <section className="py-10 lg:py-14 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-2xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
+              {t("Alquiler de Casa Rodante en")} {location.name}
+            </h2>
+            <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
+              {t("Casa rodante es como se conoce en América Latina a lo que en España llamamos autocaravana o camper. Tu hogar sobre ruedas para viajar con total libertad. En Furgocasa ofrecemos alquiler de casas rodantes desde")} {location.name} {t("con entrega en toda España. Kilómetros ilimitados y equipamiento completo.")}
             </p>
           </div>
         </div>
