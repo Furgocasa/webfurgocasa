@@ -187,16 +187,23 @@ export function SummerBanner() {
         .satellite-signal { position: absolute; top: -4px; left: 50%; width: 3px; height: 3px; background: red; border-radius: 50%; transform: translateX(-50%); animation: signalBlink 2s ease-in-out infinite; }
         @keyframes signalBlink { 0%,45%,55%,100% { opacity: 0; } 50% { opacity: 1; box-shadow: 0 0 4px 1px red; } }
 
-        .ufo { position: absolute; top: 6%; right: 35%; z-index: 2; animation: ufoFloat 12s ease-in-out infinite; }
-        @keyframes ufoFloat { 0%,100% { transform: translate(0, 0) rotate(-2deg); } 25% { transform: translate(30px, -8px) rotate(1deg); } 50% { transform: translate(-20px, 5px) rotate(-3deg); } 75% { transform: translate(15px, -3px) rotate(2deg); } }
-        .ufo-dome { width: 20px; height: 12px; background: radial-gradient(ellipse at 50% 80%, rgba(150,220,255,0.6), rgba(100,200,255,0.2)); border-radius: 50% 50% 0 0; margin: 0 auto; border: 1px solid rgba(150,220,255,0.3); }
-        .ufo-body { width: 44px; height: 10px; background: linear-gradient(180deg, #bbb 0%, #888 40%, #666 100%); border-radius: 50%; position: relative; left: 50%; transform: translateX(-50%); margin-top: -3px; }
-        .ufo-lights { position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); display: flex; gap: 5px; }
-        .ufo-light { width: 4px; height: 4px; border-radius: 50%; animation: ufoLights 1.5s ease-in-out infinite; }
-        .ufo-light:nth-child(1) { background: #ff4444; animation-delay: 0s; } .ufo-light:nth-child(2) { background: #44ff44; animation-delay: 0.3s; } .ufo-light:nth-child(3) { background: #4444ff; animation-delay: 0.6s; } .ufo-light:nth-child(4) { background: #ffff44; animation-delay: 0.9s; } .ufo-light:nth-child(5) { background: #ff44ff; animation-delay: 1.2s; }
-        @keyframes ufoLights { 0%,100% { opacity: 0.3; box-shadow: none; } 50% { opacity: 1; box-shadow: 0 0 6px 2px currentColor; } }
-        .ufo-beam { width: 30px; height: 50px; background: linear-gradient(180deg, rgba(150,255,200,0.15) 0%, transparent 100%); clip-path: polygon(30% 0%, 70% 0%, 100% 100%, 0% 100%); margin: 0 auto; animation: beamPulse 3s ease-in-out infinite; }
-        @keyframes beamPulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+        .ufo { position: absolute; top: 0; left: 50%; z-index: 15; animation: ufoAction 30s ease-in-out infinite; transform-origin: center bottom; }
+        @keyframes ufoAction {
+            0%, 33% { transform: translate(25vw, 10vh) scale(calc(var(--ufo-scale, 1) * 0.8)) rotate(-5deg); opacity: 1; }
+            40% { transform: translate(0, 42vh) scale(calc(var(--ufo-scale, 1) * 1.5)) rotate(0deg); opacity: 1; }
+            56% { transform: translate(0, 42vh) scale(calc(var(--ufo-scale, 1) * 1.5)) rotate(2deg); opacity: 1; }
+            63% { transform: translate(-30vw, -20vh) scale(calc(var(--ufo-scale, 1) * 0.5)) rotate(15deg); opacity: 1; }
+            64%, 95% { transform: translate(-30vw, -20vh) scale(0); opacity: 0; }
+            98%, 100% { transform: translate(25vw, 10vh) scale(calc(var(--ufo-scale, 1) * 0.8)) rotate(-5deg); opacity: 1; }
+        }
+        .ufo-dome { width: 40px; height: 25px; background: radial-gradient(ellipse at 50% 80%, rgba(150,220,255,0.9), rgba(100,200,255,0.4)); border-radius: 50% 50% 0 0; margin: 0 auto; border: 1px solid rgba(150,220,255,0.6); box-shadow: inset 0 2px 8px rgba(255,255,255,0.9); position: relative; z-index: 2; }
+        .ufo-body { width: 90px; height: 22px; background: linear-gradient(180deg, #f8fafc 0%, #94a3b8 40%, #334155 100%); border-radius: 50%; position: relative; left: 50%; transform: translateX(-50%); margin-top: -6px; box-shadow: 0 8px 20px rgba(0,0,0,0.6), inset 0 3px 4px rgba(255,255,255,0.8); border: 1px solid #1e293b; z-index: 1; }
+        .ufo-lights { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; }
+        .ufo-light { width: 6px; height: 6px; border-radius: 50%; animation: ufoLights 1s ease-in-out infinite; }
+        .ufo-light:nth-child(1) { background: #ef4444; animation-delay: 0s; } .ufo-light:nth-child(2) { background: #22c55e; animation-delay: 0.2s; } .ufo-light:nth-child(3) { background: #3b82f6; animation-delay: 0.4s; } .ufo-light:nth-child(4) { background: #eab308; animation-delay: 0.6s; } .ufo-light:nth-child(5) { background: #d946ef; animation-delay: 0.8s; }
+        @keyframes ufoLights { 0%,100% { opacity: 0.4; box-shadow: none; } 50% { opacity: 1; box-shadow: 0 0 12px 4px currentColor; } }
+        .ufo-beam { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 400px; height: 450px; background: linear-gradient(180deg, rgba(150,255,200,0.9) 0%, rgba(150,255,200,0.4) 60%, transparent 100%); clip-path: polygon(45% 0%, 55% 0%, 100% 100%, 0% 100%); animation: beamAction 30s linear infinite; z-index: -1; pointer-events: none; }
+        @keyframes beamAction { 0%, 43% { opacity: 0; } 45%, 55% { opacity: 1; } 57%, 100% { opacity: 0; } }
 
         .rocket { position: absolute; top: 18%; left: 25%; z-index: 2; animation: rocketFly 20s linear infinite; transform: rotate(-35deg); }
         @keyframes rocketFly { 0% { transform: translate(0,0) rotate(-35deg); } 100% { transform: translate(-60vw, -30vh) rotate(-35deg); } }
@@ -279,7 +286,16 @@ export function SummerBanner() {
             75% { transform: translateX(-50%) translateY(-1px) rotate(-0.5deg); } 
         }
         
-        .camper { position: relative; width: 280px; height: 130px; }
+        .camper { position: relative; width: 280px; height: 130px; animation: camperAbduction 30s ease-in-out infinite; }
+        @keyframes camperAbduction {
+            0%, 44% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; filter: brightness(1); }
+            48% { transform: translate(0, -30px) scale(0.9) rotate(3deg); opacity: 1; filter: brightness(1.3) drop-shadow(0 -10px 20px rgba(150,255,200,0.8)); }
+            52% { transform: translate(0, -120px) scale(0.5) rotate(-5deg); opacity: 0.8; filter: brightness(1.6) drop-shadow(0 -20px 40px rgba(150,255,200,0.9)); }
+            56% { transform: translate(0, -250px) scale(0); opacity: 0; filter: brightness(2); }
+            72% { transform: translate(-100vw, 0) scale(1); opacity: 0; }
+            73% { transform: translate(-100vw, 0) scale(1); opacity: 1; filter: brightness(1); }
+            85%, 100% { transform: translate(0, 0) scale(1); opacity: 1; }
+        }
         .camper-body { position: absolute; bottom: 25px; left: 0; width: 100%; height: 95px; background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 45%, #e2e8f0 100%); border-radius: 20px 30px 8px 8px; border: 2px solid #94a3b8; overflow: hidden; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.05), 5px 10px 20px rgba(0,0,0,0.15); }
         .camper-body::before { content: ''; position: absolute; top: 48px; left: -10%; width: 120%; height: 60px; background: linear-gradient(9deg, var(--sunset-orange) 0%, #ff8a5c 100%); border-top: 3px solid white; border-radius: 50% 50% 0 0 / 20px 20px 0 0; }
         .camper-body::after { content: ''; position: absolute; top: 43px; left: 0; width: 100%; height: 4px; background: var(--sunset-pink); }
@@ -372,12 +388,13 @@ export function SummerBanner() {
         .copied-tooltip.show { transform: translateX(-50%) translateY(0); }
 
         @media (max-width: 768px) {
+          #summer-banner-wrapper { --ufo-scale: 0.7; }
           .palm-tree-1 { left: -2%; } .palm-tree-2 { right: -2%; }
           .camper { transform: scale(0.75); } .umbrella { left: 12%; } .towel { left: 8%; }
           .sb-code-pill { flex-direction: column; border-radius: 20px; }
           .sb-code-pill-label { padding: 10px 20px; font-size: 0.75rem; } .sb-code-pill-code { padding: 10px 24px; font-size: 1.3rem; }
           .sb-countdown-item { min-width: 48px; padding: 6px 10px; } .sb-countdown-number { font-size: 1.2rem; }
-          .sb-floating-emoji { display: none; } .ufo, .rocket { transform: scale(0.7); }
+          .sb-floating-emoji { display: none; } .rocket { transform: scale(0.7); }
         }
         @media (max-width: 480px) {
           .palm-tree, .umbrella, .towel, .flipflop { display: none; }
@@ -391,7 +408,6 @@ export function SummerBanner() {
         <div className="moon"></div>
         <div className="planet"></div>
         <div className="satellite"><div className="satellite-signal"></div><div className="satellite-body"></div></div>
-        <div className="ufo"><div className="ufo-dome"></div><div className="ufo-body"><div className="ufo-lights"><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div></div></div><div className="ufo-beam"></div></div>
         <div className="rocket"><div className="rocket-body"></div><div className="rocket-flame"></div></div>
         <div className="constellation">
           <svg width="120" height="40" style={{position:'absolute',top:'-15px',left:'-5px',overflow:'visible'}}>
@@ -421,6 +437,8 @@ export function SummerBanner() {
 
       <div className="palm-tree palm-tree-1"><div className="palm-trunk"><div className="palm-leaves"><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div></div></div></div>
       <div className="palm-tree palm-tree-2"><div className="palm-trunk"><div className="palm-leaves"><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div></div></div></div>
+
+      <div className="ufo"><div className="ufo-dome"></div><div className="ufo-body"><div className="ufo-lights"><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div></div></div><div className="ufo-beam"></div></div>
 
       <div className="camper-scene">
         <div className="camper">
