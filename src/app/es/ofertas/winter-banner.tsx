@@ -69,13 +69,14 @@ export function WinterBanner() {
 
     let animationFrame: number;
     const snowflakes: {x: number, y: number, r: number, vx: number, vy: number}[] = [];
-    for(let i=0; i<150; i++) {
+    for(let i=0; i<250; i++) {
+        const isBig = Math.random() > 0.8;
         snowflakes.push({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
-            r: Math.random() * 2.5 + 0.5,
-            vx: Math.random() * 1 - 0.5,
-            vy: Math.random() * 1 + 0.5
+            r: isBig ? (Math.random() * 4 + 2.5) : (Math.random() * 2 + 0.5),
+            vx: Math.random() * 2 - 1,
+            vy: isBig ? (Math.random() * 2 + 1.5) : (Math.random() * 1 + 0.5)
         });
     }
 
@@ -328,7 +329,23 @@ export function WinterBanner() {
             80%, 100% { transform: translateX(0) scaleY(1) scaleX(1); opacity: 1; filter: brightness(1); }
         }
 
-        .giant-snow-pile { position: absolute; bottom: 110px; left: 0; width: 250px; height: 0px; background: #ffffff; border-radius: 30px 30px 10px 10px; z-index: 10; animation: snowGrow 30s ease-in infinite; box-shadow: inset 0 -10px 20px rgba(226,232,240,0.9); pointer-events: none; }
+        .giant-snow-pile { 
+            position: absolute; bottom: 110px; left: 0; width: 250px; height: 0px; 
+            background: #ffffff; border-radius: 30px 30px 10px 10px; z-index: 10; 
+            animation: snowGrow 30s steps(40, end) infinite; 
+            box-shadow: inset 0 -10px 20px rgba(226,232,240,0.9); pointer-events: none; 
+            filter: drop-shadow(0 -2px 3px rgba(255,255,255,0.8));
+        }
+        .giant-snow-pile::before {
+            content: ''; position: absolute; top: -15px; left: -10px; right: -10px; height: 30px;
+            background-image: 
+                radial-gradient(circle at 10% 60%, white 30%, transparent 60%),
+                radial-gradient(circle at 30% 40%, white 40%, transparent 60%),
+                radial-gradient(circle at 50% 70%, white 35%, transparent 60%),
+                radial-gradient(circle at 70% 30%, white 45%, transparent 60%),
+                radial-gradient(circle at 90% 60%, white 35%, transparent 60%);
+            background-size: 100% 100%;
+        }
         @keyframes snowGrow {
             0%, 10% { height: 0px; bottom: 110px; opacity: 0; }
             15% { height: 10px; bottom: 110px; opacity: 1; width: 250px; left: 0; }
@@ -340,7 +357,12 @@ export function WinterBanner() {
             59%, 100% { height: 0px; bottom: 110px; opacity: 0; }
         }
         
-        .ground-snow-swallow { position: absolute; bottom: -10px; left: 0px; width: 250px; height: 0px; background: #ffffff; border-radius: 50%; z-index: 15; animation: swallowGrow 30s ease-in infinite; filter: blur(3px); pointer-events: none; }
+        .ground-snow-swallow { 
+            position: absolute; bottom: -10px; left: 0px; width: 250px; height: 0px; 
+            background: #ffffff; border-radius: 50%; z-index: 15; 
+            animation: swallowGrow 30s steps(30, end) infinite; 
+            filter: blur(2px) drop-shadow(0 -5px 5px rgba(255,255,255,0.9)); pointer-events: none; 
+        }
         @keyframes swallowGrow {
             0%, 40% { height: 0px; opacity: 0; }
             45% { height: 40px; opacity: 1; width: 310px; left: -30px; }
@@ -348,6 +370,27 @@ export function WinterBanner() {
             55% { height: 120px; opacity: 1; width: 410px; left: -80px; }
             58% { height: 120px; opacity: 0; width: 410px; left: -80px; transform: translateY(20px); }
             59%, 100% { height: 0px; opacity: 0; transform: translateY(0); }
+        }
+
+        .camper-blizzard {
+            position: absolute; bottom: 0; left: -50px; width: 350px; height: 400px;
+            z-index: 12; pointer-events: none;
+            background-image: 
+                radial-gradient(circle at 30% 30%, white 25%, transparent 35%),
+                radial-gradient(circle at 70% 60%, white 25%, transparent 35%),
+                radial-gradient(circle at 40% 80%, white 25%, transparent 35%);
+            background-size: 18px 18px, 28px 28px, 40px 40px;
+            animation: blizzardFall 30s linear infinite;
+            opacity: 0;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 90%, transparent 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 20%, black 90%, transparent 100%);
+        }
+        @keyframes blizzardFall {
+            0%, 10% { opacity: 0; background-position: 0 0, 0 0, 0 0; }
+            12% { opacity: 1; }
+            55% { opacity: 1; }
+            58% { opacity: 0; }
+            59%, 100% { opacity: 0; background-position: 150px 800px, -200px 1000px, 250px 1200px; }
         }
         .camper-body { position: absolute; bottom: 25px; left: 0; width: 100%; height: 85px; background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 45%, #cbd5e1 100%); border-radius: 20px 30px 8px 8px; border: 2px solid #64748b; overflow: hidden; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.05), 5px 10px 20px rgba(0,0,0,0.15); }
         .camper-body::before { content: ''; position: absolute; top: 40px; left: -10%; width: 120%; height: 60px; background: linear-gradient(9deg, #0284c7 0%, #0ea5e9 100%); border-top: 3px solid white; border-radius: 50% 50% 0 0 / 20px 20px 0 0; }
@@ -567,6 +610,7 @@ export function WinterBanner() {
       </div>
 
       <div className="camper-scene">
+        <div className="camper-blizzard"></div>
         <div className="camper-snow-pile"></div>
         <div className="giant-snow-pile"></div>
         <div className="ground-snow-swallow"></div>
