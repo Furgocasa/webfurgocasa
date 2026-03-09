@@ -215,13 +215,46 @@ export function WinterBanner() {
         .snowman-hat { width: 24px; height: 20px; background: #1f2937; position: absolute; bottom: 108px; left: 18px; border-radius: 2px 2px 0 0; }
         .snowman-hat-brim { width: 36px; height: 4px; background: #1f2937; position: absolute; bottom: 106px; left: 12px; border-radius: 2px; }
 
+        /* Ski Resort Lodge / City Buildings */
+        .lodge { position: absolute; bottom: 28%; left: 8%; width: 220px; height: 160px; background: #451a03; border-radius: 4px; z-index: 3; border: 2px solid #290f02; box-shadow: 10px 10px 30px rgba(0,0,0,0.3); }
+        .lodge-roof { position: absolute; top: -50px; left: -20px; width: 260px; height: 0; border-bottom: 50px solid #f1f5f9; border-left: 20px solid transparent; border-right: 20px solid transparent; border-radius: 4px; z-index: 2; }
+        .lodge-roof::after { content: ''; position: absolute; top: 44px; left: -15px; width: 250px; height: 10px; background: #e2e8f0; border-radius: 5px; }
+        .lodge-balcony { position: absolute; top: 60px; left: -10px; width: 240px; height: 18px; background: #78350f; border-radius: 2px; border: 2px solid #451a03; border-top: 4px solid #f1f5f9; z-index: 2; box-shadow: 0 10px 10px rgba(0,0,0,0.2); }
+        .lodge-window { position: absolute; width: 24px; height: 35px; background: #fef08a; border: 2px solid #94a3b8; box-shadow: 0 0 25px rgba(253,224,71,0.7), inset 0 0 15px rgba(234,179,8,0.9); border-radius: 2px; }
+        .lodge-window::before { content: ''; position: absolute; top: 0; left: 10px; width: 2px; height: 100%; background: #94a3b8; }
+        .lodge-window::after { content: ''; position: absolute; top: 15px; left: 0; width: 100%; height: 2px; background: #94a3b8; }
+        .lw-1 { top: 15px; left: 20px; } .lw-2 { top: 15px; left: 75px; } .lw-3 { top: 15px; right: 75px; } .lw-4 { top: 15px; right: 20px; }
+        .lw-5 { top: 100px; left: 30px; } .lw-6 { top: 100px; left: 80px; }
+        .lodge-door { position: absolute; bottom: 0; right: 40px; width: 45px; height: 60px; background: #78350f; border: 2px solid #290f02; border-radius: 4px 4px 0 0; }
+        .lodge-door-glass { position: absolute; top: 8px; left: 8px; width: 25px; height: 25px; background: #fef08a; box-shadow: 0 0 20px rgba(253,224,71,0.6); border-radius: 2px; }
+        .lodge-sign { position: absolute; top: 5px; left: 50%; transform: translateX(-50%); background: #78350f; color: #fef08a; padding: 4px 14px; border-radius: 4px; font-family: 'Rubik', sans-serif; font-size: 0.75rem; border: 2px solid #451a03; box-shadow: 0 0 15px rgba(253,224,71,0.4); z-index: 3; white-space: nowrap; font-weight: 800; letter-spacing: 1px; }
+
+        /* Street Lamps */
+        .street-lamp { position: absolute; bottom: 25%; z-index: 4; }
+        .sl-1 { left: 28%; } .sl-2 { right: 28%; } .sl-3 { left: 70%; bottom: 22%; transform: scale(1.2); z-index: 7; }
+        .sl-pole { width: 6px; height: 90px; background: #1e293b; margin: 0 auto; border-radius: 3px; }
+        .sl-top { position: absolute; top: -8px; left: -12px; width: 30px; height: 14px; background: #0f172a; border-radius: 15px 15px 0 0; }
+        .sl-bulb { position: absolute; top: 6px; left: -2px; width: 10px; height: 10px; background: #fef08a; border-radius: 50%; box-shadow: 0 0 30px 15px rgba(253,224,71,0.7); }
+        .sl-cone { position: absolute; top: 12px; left: -60px; width: 126px; height: 130px; background: linear-gradient(180deg, rgba(253,224,71,0.5) 0%, transparent 100%); clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%); pointer-events: none; }
+
+        /* Snowplow / Snowcat */
+        .snowcat { position: absolute; bottom: 18%; right: 2%; width: 120px; height: 60px; background: #f59e0b; border-radius: 6px; z-index: 5; border: 2px solid #b45309; transform: scaleX(-1); box-shadow: 5px 5px 15px rgba(0,0,0,0.4); }
+        .snowcat-cab { position: absolute; top: -35px; left: 15px; width: 50px; height: 35px; background: #f59e0b; border: 2px solid #b45309; border-radius: 6px 6px 0 0; }
+        .snowcat-window { position: absolute; top: 6px; left: 6px; width: 38px; height: 20px; background: #e0f2fe; border: 2px solid #94a3b8; border-radius: 2px; }
+        .snowcat-window::after { content: ''; position: absolute; top: 0; left: 15px; width: 15px; height: 100%; background: rgba(255,255,255,0.3); transform: skewX(-20deg); }
+        .snowcat-plow { position: absolute; bottom: -5px; left: -25px; width: 25px; height: 50px; background: #475569; border-radius: 4px; transform: skewX(-15deg); border: 2px solid #1e293b; box-shadow: inset -5px 0 10px rgba(0,0,0,0.5); }
+        .snowcat-treads { position: absolute; bottom: -12px; left: 5px; width: 110px; height: 24px; background: #1e293b; border-radius: 12px; border: 2px solid #0f172a; box-shadow: 0 4px 6px rgba(0,0,0,0.4); }
+        .snowcat-treads::after { content: ''; position: absolute; top: 4px; left: 4px; width: 98px; height: 12px; background: repeating-linear-gradient(90deg, #334155 0px, #334155 8px, #0f172a 8px, #0f172a 12px); border-radius: 6px; }
+        .snowcat-light { position: absolute; top: -8px; right: 5px; width: 8px; height: 8px; background: #ef4444; border-radius: 50%; animation: snowcatBlink 0.8s infinite alternate; box-shadow: 0 0 15px rgba(239,68,68,0.9); }
+        @keyframes snowcatBlink { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
         /* PARKING LOT & SKI RESORT PROPS */
-        .ski-resort-ground { position: absolute; bottom: 0; left: 0; width: 100%; height: 25%; background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%); z-index: 5; border-top: 4px solid #f1f5f9; box-shadow: inset 0 20px 20px -20px rgba(0,0,0,0.1); }
-        .parking-line { position: absolute; bottom: 5%; width: 6px; height: 15%; background: rgba(255,255,255,0.8); transform: skewX(-45deg); box-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        .parking-line-1 { left: 20%; } .parking-line-2 { left: 45%; } .parking-line-3 { left: 70%; } .parking-line-4 { left: 95%; }
+        .ski-resort-ground { position: absolute; bottom: 0; left: 0; width: 100%; height: 28%; background: linear-gradient(180deg, #cbd5e1 0%, #94a3b8 100%); z-index: 5; border-top: 8px solid #f8fafc; box-shadow: inset 0 30px 30px -20px rgba(0,0,0,0.15); }
+        .parking-line { position: absolute; bottom: 2%; width: 8px; height: 22%; background: rgba(255,255,255,0.85); transform: skewX(-55deg); box-shadow: 2px 2px 4px rgba(0,0,0,0.15); }
+        .parking-line-1 { left: 15%; } .parking-line-2 { left: 40%; } .parking-line-3 { left: 65%; } .parking-line-4 { left: 90%; }
         
-        .parking-sign { position: absolute; bottom: 26%; left: 15%; width: 30px; height: 30px; background: #3b82f6; border: 2px solid white; border-radius: 4px; z-index: 4; display: flex; align-items: center; justify-content: center; font-family: 'Rubik', sans-serif; font-weight: 800; color: white; font-size: 1.2rem; transform: rotate(-5deg); }
-        .parking-sign::after { content: ''; position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); width: 4px; height: 20px; background: #94a3b8; }
+        .parking-sign { position: absolute; bottom: 28%; left: 20%; width: 35px; height: 35px; background: #3b82f6; border: 3px solid white; border-radius: 6px; z-index: 4; display: flex; align-items: center; justify-content: center; font-family: 'Rubik', sans-serif; font-weight: 800; color: white; font-size: 1.4rem; transform: rotate(-5deg); box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .parking-sign::after { content: ''; position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); width: 5px; height: 25px; background: #64748b; }
 
         /* Skier */
         .skier { position: absolute; z-index: 4; animation: skiDown 15s linear infinite; }
@@ -474,14 +507,6 @@ export function WinterBanner() {
         .sb-countdown-number { font-family: 'Rubik', sans-serif; font-weight: 700; font-size: 1.5rem; color: #f1f5f9; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
         .sb-countdown-label { font-family: 'Amiko', sans-serif; font-size: 0.6rem; color: #7dd3fc; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
 
-        .sb-floating-emoji { position: absolute; font-size: 2rem; z-index: 8; animation: floatUp 8s ease-in-out infinite; opacity: 0.8; text-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-        .sb-floating-emoji:nth-child(1) { left: 8%; top: 45%; animation-delay: 0s; font-size: 1.8rem; }
-        .sb-floating-emoji:nth-child(2) { right: 10%; top: 40%; animation-delay: 2s; font-size: 2.2rem; }
-        .sb-floating-emoji:nth-child(3) { left: 15%; top: 60%; animation-delay: 4s; font-size: 1.5rem; }
-        .sb-floating-emoji:nth-child(4) { right: 15%; top: 58%; animation-delay: 1s; font-size: 1.6rem; }
-        .sb-floating-emoji:nth-child(5) { left: 5%; top: 52%; animation-delay: 3s; font-size: 2rem; }
-        @keyframes floatUp { 0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.7; } 25% { transform: translateY(-15px) rotate(5deg); opacity: 0.9; } 50% { transform: translateY(-25px) rotate(-3deg); opacity: 0.6; } 75% { transform: translateY(-10px) rotate(2deg); opacity: 0.8; } }
-
         @keyframes fadeSlideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
 
         .copied-tooltip { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(255,255,255,0.95); color: #0284c7; font-family: 'Rubik', sans-serif; font-weight: 700; padding: 12px 28px; border-radius: 30px; z-index: 100; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); pointer-events: none; font-size: 0.95rem; letter-spacing: 1px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
@@ -554,6 +579,25 @@ export function WinterBanner() {
         <div className="cabin-smoke cabin-smoke-1"></div>
         <div className="cabin-smoke cabin-smoke-2"></div>
         <div className="cabin-smoke cabin-smoke-3"></div>
+      </div>
+
+      <div className="lodge">
+        <div className="lodge-roof"></div>
+        <div className="lodge-sign">HOTEL</div>
+        <div className="lodge-balcony"></div>
+        <div className="lodge-window lw-1"></div><div className="lodge-window lw-2"></div><div className="lodge-window lw-3"></div><div className="lodge-window lw-4"></div>
+        <div className="lodge-window lw-5"></div><div className="lodge-window lw-6"></div>
+        <div className="lodge-door"><div className="lodge-door-glass"></div></div>
+      </div>
+
+      <div className="street-lamp sl-1"><div className="sl-top"></div><div className="sl-bulb"></div><div className="sl-cone"></div><div className="sl-pole"></div></div>
+      <div className="street-lamp sl-2"><div className="sl-top"></div><div className="sl-bulb"></div><div className="sl-cone"></div><div className="sl-pole"></div></div>
+      <div className="street-lamp sl-3"><div className="sl-top"></div><div className="sl-bulb"></div><div className="sl-cone"></div><div className="sl-pole"></div></div>
+
+      <div className="snowcat">
+        <div className="snowcat-cab"><div className="snowcat-window"></div><div className="snowcat-light"></div></div>
+        <div className="snowcat-plow"></div>
+        <div className="snowcat-treads"></div>
       </div>
 
       <div className="ski-rack">
@@ -651,8 +695,6 @@ export function WinterBanner() {
         <div className="snowman-hat"></div>
         <div className="snowman-hat-brim"></div>
       </div>
-
-      <div className="sb-floating-emoji">❄️</div><div className="sb-floating-emoji">⛄</div><div className="sb-floating-emoji">🏔️</div><div className="sb-floating-emoji">🏂</div><div className="sb-floating-emoji">☕</div>
 
       <canvas id="snowCanvas" ref={canvasRef}></canvas>
 
