@@ -277,6 +277,112 @@ export function SummerBanner() {
         .palm-leaf:nth-child(1) { --rot: -30deg; transform: rotate(-30deg); animation-delay: 0s; } .palm-leaf:nth-child(2) { --rot: -60deg; transform: rotate(-60deg); animation-delay: 0.3s; } .palm-leaf:nth-child(3) { --rot: -90deg; transform: rotate(-90deg); animation-delay: 0.6s; } .palm-leaf:nth-child(4) { --rot: -120deg; transform: rotate(-120deg); animation-delay: 0.1s; } .palm-leaf:nth-child(5) { --rot: -150deg; transform: rotate(-150deg); animation-delay: 0.5s; } .palm-leaf:nth-child(6) { --rot: 0deg; transform: rotate(0deg); animation-delay: 0.2s; } .palm-leaf:nth-child(7) { --rot: -180deg; transform: rotate(-180deg); animation-delay: 0.4s; }
         @keyframes palmSway { 0%,100% { transform: rotate(var(--rot, -30deg)); } 50% { transform: rotate(calc(var(--rot, -30deg) + 8deg)); } }
 
+        /* FIGHTER JETS & ATTACK */
+        .fighter-jets { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 14; pointer-events: none; }
+        .jet { position: absolute; top: 0; left: 0; opacity: 0; }
+        .jet-1 { animation: jetFly1 30s linear infinite; }
+        .jet-2 { animation: jetFly2 30s linear infinite; }
+        
+        .jet-body { width: 50px; height: 12px; background: #64748b; border-radius: 5px 20px 20px 5px; position: relative; z-index: 2; border: 1px solid #334155; }
+        .jet-body::before { content: ''; position: absolute; top: -4px; left: 25px; width: 15px; height: 6px; background: #e0f2fe; border-radius: 10px 10px 0 0; }
+        .jet-wing-top { position: absolute; top: -12px; left: 20px; border-left: 5px solid transparent; border-right: 15px solid transparent; border-bottom: 12px solid #475569; z-index: 1; }
+        .jet-wing-bot { position: absolute; top: 10px; left: 20px; border-left: 5px solid transparent; border-right: 15px solid transparent; border-top: 12px solid #334155; z-index: 3; }
+        .jet-tail { position: absolute; top: -10px; left: 2px; border-left: 3px solid transparent; border-right: 10px solid transparent; border-bottom: 10px solid #1e293b; z-index: 1; }
+        .jet-fire { position: absolute; top: 3px; left: -20px; width: 20px; height: 6px; background: linear-gradient(90deg, transparent, #ef4444, #fef08a); border-radius: 50%; animation: jetFire 0.1s infinite alternate; }
+        
+        @keyframes jetFire { 0% { opacity: 0.8; transform: scaleX(0.8); } 100% { opacity: 1; transform: scaleX(1.2); } }
+        
+        @keyframes jetFly1 {
+            0%, 42% { transform: translate(-20vw, 35vh) scale(0.8); opacity: 0; }
+            43% { opacity: 1; }
+            47% { transform: translate(30vw, 35vh) scale(1); opacity: 1; }
+            53% { transform: translate(120vw, 15vh) scale(0.8) rotate(-15deg); opacity: 1; }
+            54%, 100% { transform: translate(120vw, 15vh) scale(0.8); opacity: 0; }
+        }
+        @keyframes jetFly2 {
+            0%, 44% { transform: translate(120vw, 15vh) scale(0.9) scaleX(-1); opacity: 0; }
+            45% { opacity: 1; }
+            49% { transform: translate(70vw, 30vh) scale(1.1) scaleX(-1); opacity: 1; }
+            55% { transform: translate(-20vw, 10vh) scale(0.9) scaleX(-1) rotate(-10deg); opacity: 1; }
+            56%, 100% { transform: translate(-20vw, 10vh) scale(0.9) scaleX(-1); opacity: 0; }
+        }
+
+        .laser { position: absolute; width: 40px; height: 3px; background: #ef4444; box-shadow: 0 0 10px 3px #ef4444; border-radius: 2px; opacity: 0; }
+        .laser-1 { top: 8px; left: 30px; animation: shootLaser1 30s linear infinite; transform-origin: left center; }
+        .laser-3 { top: 12px; left: 30px; animation: shootLaser3 30s linear infinite; transform-origin: left center; }
+        .laser-2 { top: 8px; left: 30px; animation: shootLaser2 30s linear infinite; transform-origin: left center; }
+        .laser-4 { top: 12px; left: 30px; animation: shootLaser4 30s linear infinite; transform-origin: left center; }
+        
+        @keyframes shootLaser1 {
+            0%, 45.9% { transform: rotate(15deg) translateX(0) scaleX(0); opacity: 0; }
+            46% { transform: rotate(15deg) translateX(0) scaleX(1); opacity: 1; }
+            46.5% { transform: rotate(15deg) translateX(30vw) scaleX(2); opacity: 1; }
+            46.6%, 100% { opacity: 0; transform: rotate(15deg) translateX(30vw); }
+        }
+        @keyframes shootLaser2 {
+            0%, 46.9% { transform: rotate(20deg) translateX(0) scaleX(0); opacity: 0; }
+            47% { transform: rotate(20deg) translateX(0) scaleX(1); opacity: 1; }
+            47.5% { transform: rotate(20deg) translateX(40vw) scaleX(2); opacity: 1; }
+            47.6%, 100% { opacity: 0; transform: rotate(20deg) translateX(40vw); }
+        }
+        @keyframes shootLaser3 {
+            0%, 47.9% { transform: rotate(10deg) translateX(0) scaleX(0); opacity: 0; }
+            48% { transform: rotate(10deg) translateX(0) scaleX(1); opacity: 1; }
+            48.5% { transform: rotate(10deg) translateX(30vw) scaleX(2); opacity: 1; }
+            48.6%, 100% { opacity: 0; transform: rotate(10deg) translateX(30vw); }
+        }
+        @keyframes shootLaser4 {
+            0%, 48.9% { transform: rotate(15deg) translateX(0) scaleX(0); opacity: 0; }
+            49% { transform: rotate(15deg) translateX(0) scaleX(1); opacity: 1; }
+            49.5% { transform: rotate(15deg) translateX(40vw) scaleX(2); opacity: 1; }
+            49.6%, 100% { opacity: 0; transform: rotate(15deg) translateX(40vw); }
+        }
+
+        .explosions { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 16; pointer-events: none; }
+        .explosion { position: absolute; width: 60px; height: 60px; background: radial-gradient(circle, #ffffff 10%, #fef08a 30%, #ef4444 60%, transparent 100%); border-radius: 50%; opacity: 0; transform: scale(0); mix-blend-mode: screen; filter: blur(1px); }
+        .exp-1 { top: 40vh; left: 45%; animation: explode1 30s ease-out infinite; }
+        .exp-2 { top: 45vh; left: 52%; animation: explode2 30s ease-out infinite; }
+        .exp-3 { top: 38vh; left: 55%; animation: explode3 30s ease-out infinite; }
+        .exp-4 { top: 48vh; left: 48%; animation: explode4 30s ease-out infinite; }
+
+        @keyframes explode1 {
+            0%, 46.4% { opacity: 0; transform: scale(0); }
+            46.5% { opacity: 1; transform: scale(1.5); box-shadow: 0 0 30px #ef4444; }
+            47.5% { opacity: 0.5; transform: scale(2.5); filter: blur(4px); box-shadow: 0 0 60px #fef08a; }
+            48.5%, 100% { opacity: 0; transform: scale(3); }
+        }
+        @keyframes explode2 {
+            0%, 47.4% { opacity: 0; transform: scale(0); }
+            47.5% { opacity: 1; transform: scale(1.2); box-shadow: 0 0 30px #ef4444; }
+            48.5% { opacity: 0.5; transform: scale(2); filter: blur(4px); box-shadow: 0 0 60px #fef08a; }
+            49.5%, 100% { opacity: 0; transform: scale(3); }
+        }
+        @keyframes explode3 {
+            0%, 48.4% { opacity: 0; transform: scale(0); }
+            48.5% { opacity: 1; transform: scale(1.8); box-shadow: 0 0 30px #ef4444; }
+            49.5% { opacity: 0.5; transform: scale(2.8); filter: blur(4px); box-shadow: 0 0 60px #fef08a; }
+            50.5%, 100% { opacity: 0; transform: scale(3); }
+        }
+        @keyframes explode4 {
+            0%, 49.4% { opacity: 0; transform: scale(0); }
+            49.5% { opacity: 1; transform: scale(1.6); box-shadow: 0 0 30px #ef4444; }
+            50.5% { opacity: 0.5; transform: scale(2.5); filter: blur(4px); box-shadow: 0 0 60px #fef08a; }
+            51.5%, 100% { opacity: 0; transform: scale(3); }
+        }
+        
+        .ufo-shield { position: absolute; top: -15px; left: -20px; right: -20px; bottom: -15px; border-radius: 50%; border: 3px solid #00f3ff; background: radial-gradient(circle, rgba(0,243,255,0.3) 0%, transparent 70%); box-shadow: inset 0 0 20px #00f3ff, 0 0 20px #00f3ff; opacity: 0; animation: shieldPulse 30s linear infinite; pointer-events: none; z-index: 5; }
+        @keyframes shieldPulse {
+            0%, 45.5% { opacity: 0; transform: scale(0.95); }
+            46% { opacity: 1; transform: scale(1.1); }
+            46.5% { opacity: 0.3; transform: scale(1.05); }
+            47% { opacity: 1; transform: scale(1.15); }
+            47.5% { opacity: 0.2; transform: scale(1.0); }
+            48.5% { opacity: 1; transform: scale(1.1); }
+            49.5% { opacity: 1; transform: scale(1.15); }
+            50% { opacity: 0; transform: scale(0.95); }
+            51%, 100% { opacity: 0; }
+        }
+
         /* CAMPER REDESIGN & ENHANCED ANIMATION */
         .camper-scene { position: absolute; bottom: 23%; left: 50%; transform: translateX(-50%); z-index: 6; animation: camperIdle 4s ease-in-out infinite; }
         @keyframes camperIdle { 
@@ -438,7 +544,35 @@ export function SummerBanner() {
       <div className="palm-tree palm-tree-1"><div className="palm-trunk"><div className="palm-leaves"><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div></div></div></div>
       <div className="palm-tree palm-tree-2"><div className="palm-trunk"><div className="palm-leaves"><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div></div></div></div>
 
-      <div className="ufo"><div className="ufo-dome"></div><div className="ufo-body"><div className="ufo-lights"><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div></div></div><div className="ufo-beam"></div></div>
+      <div className="fighter-jets">
+        <div className="jet jet-1">
+          <div className="jet-wing-bot"></div>
+          <div className="jet-body"></div>
+          <div className="jet-wing-top"></div>
+          <div className="jet-tail"></div>
+          <div className="jet-fire"></div>
+          <div className="laser laser-1"></div>
+          <div className="laser laser-3"></div>
+        </div>
+        <div className="jet jet-2">
+          <div className="jet-wing-bot"></div>
+          <div className="jet-body"></div>
+          <div className="jet-wing-top"></div>
+          <div className="jet-tail"></div>
+          <div className="jet-fire"></div>
+          <div className="laser laser-2"></div>
+          <div className="laser laser-4"></div>
+        </div>
+      </div>
+      
+      <div className="explosions">
+        <div className="explosion exp-1"></div>
+        <div className="explosion exp-2"></div>
+        <div className="explosion exp-3"></div>
+        <div className="explosion exp-4"></div>
+      </div>
+
+      <div className="ufo"><div className="ufo-shield"></div><div className="ufo-dome"></div><div className="ufo-body"><div className="ufo-lights"><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div><div className="ufo-light"></div></div></div><div className="ufo-beam"></div></div>
 
       <div className="camper-scene">
         <div className="camper">
