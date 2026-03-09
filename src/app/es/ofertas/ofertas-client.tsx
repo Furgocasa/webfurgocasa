@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { SummerBanner } from "./summer-banner";
 import { WinterBanner } from "./winter-banner";
-import { WinterBannerTron } from "./winter-banner-tron";
 
 interface LastMinuteOffer {
   id: string;
@@ -234,9 +233,6 @@ export function OfertasClient() {
 
       {/* Oferta Principal - Invierno Mágico 2026 - Animado */}
       <WinterBanner />
-
-      {/* Oferta Tron - Ruta Neon - Prueba */}
-      <WinterBannerTron />
 
       {/* Oferta Verano 2026 (Diseño Original Animado) */}
       <SummerBanner />
