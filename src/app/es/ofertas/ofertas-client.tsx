@@ -6,7 +6,6 @@ import { useLanguage } from "@/contexts/language-context";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { SummerBanner } from "./summer-banner";
-import { WinterBanner } from "./winter-banner";
 
 interface LastMinuteOffer {
   id: string;
@@ -230,9 +229,6 @@ export function OfertasClient() {
           </div>
         </div>
       </section>
-
-      {/* Oferta Principal - Invierno Mágico 2026 - Animado */}
-      <WinterBanner />
 
       {/* Oferta Verano 2026 (Diseño Original Animado) */}
       <SummerBanner />
