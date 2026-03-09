@@ -13,7 +13,7 @@ export function WinterBannerTron() {
 
   useEffect(() => {
     // Countdown
-    const target = new Date('2026-01-05T00:00:00').getTime();
+    const target = new Date('2026-03-20T23:59:59').getTime();
     const updateCountdown = () => {
       const diff = target - Date.now();
       if (diff <= 0) {
