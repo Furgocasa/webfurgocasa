@@ -315,7 +315,40 @@ export function WinterBanner() {
             75% { transform: translateX(-50%) translateY(-1px) rotate(-0.5deg); } 
         }
         
-        .camper { position: relative; width: 250px; height: 115px; }
+        .camper { position: relative; width: 250px; height: 115px; animation: camperSnowMovie 30s ease-in-out infinite; transform-origin: bottom center; }
+        @keyframes camperSnowMovie {
+            0%, 15% { transform: translateX(0) scaleY(1) scaleX(1); opacity: 1; filter: brightness(1); }
+            30% { transform: translateX(0) scaleY(0.9) scaleX(1.02); opacity: 1; filter: brightness(0.95); }
+            45% { transform: translateX(0) scaleY(0.7) scaleX(1.05); opacity: 1; filter: brightness(0.9); }
+            50% { transform: translateX(0) scaleY(0.3) scaleX(1.1); opacity: 1; filter: brightness(0.8); }
+            55% { transform: translateX(0) scaleY(0.05) scaleX(1.2); opacity: 1; filter: brightness(0.7); }
+            58% { transform: translateX(0) scaleY(0) scaleX(1.2); opacity: 0; }
+            65% { transform: translateX(-100vw) scaleY(1) scaleX(1); opacity: 0; filter: brightness(1); }
+            66% { transform: translateX(-100vw) scaleY(1) scaleX(1); opacity: 1; }
+            80%, 100% { transform: translateX(0) scaleY(1) scaleX(1); opacity: 1; filter: brightness(1); }
+        }
+
+        .giant-snow-pile { position: absolute; bottom: 110px; left: 0; width: 250px; height: 0px; background: #ffffff; border-radius: 30px 30px 10px 10px; z-index: 10; animation: snowGrow 30s ease-in infinite; box-shadow: inset 0 -10px 20px rgba(226,232,240,0.9); pointer-events: none; }
+        @keyframes snowGrow {
+            0%, 10% { height: 0px; bottom: 110px; opacity: 0; }
+            15% { height: 10px; bottom: 110px; opacity: 1; width: 250px; left: 0; }
+            30% { height: 60px; bottom: 100px; opacity: 1; width: 270px; left: -10px; border-radius: 40px 40px 10px 10px; }
+            45% { height: 120px; bottom: 80px; opacity: 1; width: 290px; left: -20px; border-radius: 50px 50px 10px 10px; }
+            50% { height: 160px; bottom: 35px; opacity: 1; width: 330px; left: -40px; border-radius: 70px 70px 10px 10px; }
+            55% { height: 180px; bottom: 5px; opacity: 1; width: 370px; left: -60px; border-radius: 90px 90px 10px 10px; }
+            58% { height: 180px; bottom: 5px; opacity: 0; width: 370px; left: -60px; }
+            59%, 100% { height: 0px; bottom: 110px; opacity: 0; }
+        }
+        
+        .ground-snow-swallow { position: absolute; bottom: -10px; left: 0px; width: 250px; height: 0px; background: #ffffff; border-radius: 50%; z-index: 15; animation: swallowGrow 30s ease-in infinite; filter: blur(3px); pointer-events: none; }
+        @keyframes swallowGrow {
+            0%, 40% { height: 0px; opacity: 0; }
+            45% { height: 40px; opacity: 1; width: 310px; left: -30px; }
+            50% { height: 80px; opacity: 1; width: 350px; left: -50px; }
+            55% { height: 120px; opacity: 1; width: 410px; left: -80px; }
+            58% { height: 120px; opacity: 0; width: 410px; left: -80px; transform: translateY(20px); }
+            59%, 100% { height: 0px; opacity: 0; transform: translateY(0); }
+        }
         .camper-body { position: absolute; bottom: 25px; left: 0; width: 100%; height: 85px; background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 45%, #cbd5e1 100%); border-radius: 20px 30px 8px 8px; border: 2px solid #64748b; overflow: hidden; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.05), 5px 10px 20px rgba(0,0,0,0.15); }
         .camper-body::before { content: ''; position: absolute; top: 40px; left: -10%; width: 120%; height: 60px; background: linear-gradient(9deg, #0284c7 0%, #0ea5e9 100%); border-top: 3px solid white; border-radius: 50% 50% 0 0 / 20px 20px 0 0; }
         .camper-body::after { content: ''; position: absolute; top: 35px; left: 0; width: 100%; height: 4px; background: #0369a1; }
@@ -338,7 +371,12 @@ export function WinterBanner() {
         .camper-taillight { position: absolute; left: -2px; top: 45px; width: 6px; height: 16px; background: #ef4444; border-radius: 2px 0 0 2px; border: 1px solid #991b1b; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
         
         .wheel { position: absolute; bottom: 0; width: 44px; height: 44px; background: #0f172a; border-radius: 50%; border: 4px solid #020617; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 2px 5px 10px rgba(0,0,0,0.3); z-index: 3; }
-        .wheel::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background: repeating-conic-gradient(#94a3b8 0deg 30deg, #64748b 30deg 60deg); border-radius: 50%; border: 2px solid #cbd5e1; }
+        .wheel::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 24px; height: 24px; background: repeating-conic-gradient(#94a3b8 0deg 30deg, #64748b 30deg 60deg); border-radius: 50%; border: 2px solid #cbd5e1; animation: wheelSpinMovie 30s ease-out infinite; }
+        @keyframes wheelSpinMovie {
+            0%, 65% { transform: translate(-50%, -50%) rotate(0deg); }
+            66% { transform: translate(-50%, -50%) rotate(0deg); }
+            80%, 100% { transform: translate(-50%, -50%) rotate(1080deg); }
+        }
         .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: #020617; border-radius: 50%; border: 2px solid #94a3b8; }
         .wheel-front { right: 30px; } .wheel-rear { left: 35px; }
         
@@ -530,6 +568,8 @@ export function WinterBanner() {
 
       <div className="camper-scene">
         <div className="camper-snow-pile"></div>
+        <div className="giant-snow-pile"></div>
+        <div className="ground-snow-swallow"></div>
         <div className="camper">
             <div className="camper-snow-roof"></div>
             <div className="camper-popup"></div>
