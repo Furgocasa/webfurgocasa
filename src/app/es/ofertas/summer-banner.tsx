@@ -77,37 +77,37 @@ export function SummerBanner() {
       // Wave 1 - back
       ctx.beginPath(); ctx.moveTo(0,h);
       for (let x=0;x<=w;x+=3) {
-        ctx.lineTo(x, h*0.5+Math.sin(x*0.008+time*0.8)*12+Math.sin(x*0.015+time*1.2)*6+Math.sin(x*0.003+time*0.5)*8);
+        ctx.lineTo(x, h*0.5+Math.sin(x*0.008+time*0.8)*18+Math.sin(x*0.015+time*1.2)*8+Math.sin(x*0.003+time*0.5)*10);
       }
       ctx.lineTo(w,h); ctx.closePath();
-      ctx.fillStyle='rgba(8,146,208,0.35)'; ctx.fill();
+      ctx.fillStyle='rgba(8,146,208,0.4)'; ctx.fill();
 
       // Wave 2 - mid
       ctx.beginPath(); ctx.moveTo(0,h);
       for (let x=0;x<=w;x+=3) {
-        ctx.lineTo(x, h*0.6+Math.sin(x*0.01+time+1)*10+Math.sin(x*0.02+time*1.5)*5+Math.cos(x*0.005+time*0.7)*7);
+        ctx.lineTo(x, h*0.6+Math.sin(x*0.01+time+1)*15+Math.sin(x*0.02+time*1.5)*7+Math.cos(x*0.005+time*0.7)*9);
       }
       ctx.lineTo(w,h); ctx.closePath();
-      ctx.fillStyle='rgba(72,201,232,0.3)'; ctx.fill();
+      ctx.fillStyle='rgba(72,201,232,0.4)'; ctx.fill();
 
       // Wave 3 - front
       ctx.beginPath(); ctx.moveTo(0,h);
       for (let x=0;x<=w;x+=3) {
-        ctx.lineTo(x, h*0.72+Math.sin(x*0.012+time*1.3+2)*8+Math.sin(x*0.025+time*1.8)*4+Math.cos(x*0.006+time*0.9)*6);
+        ctx.lineTo(x, h*0.75+Math.sin(x*0.012+time*1.3+2)*12+Math.sin(x*0.025+time*1.8)*6+Math.cos(x*0.006+time*0.9)*8);
       }
       ctx.lineTo(w,h); ctx.closePath();
-      ctx.fillStyle='rgba(255,255,255,0.2)'; ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.25)'; ctx.fill();
 
       // Foam dots
       for (let i=0;i<30;i++) {
         const fx=(i*67+time*20)%w;
-        const fy=h*0.72+Math.sin(fx*0.012+time*1.3+2)*8+Math.sin(fx*0.025+time*1.8)*4+Math.sin(i*3+time*2)*3;
+        const fy=h*0.75+Math.sin(fx*0.012+time*1.3+2)*12+Math.sin(fx*0.025+time*1.8)*6+Math.sin(i*3+time*2)*3;
         const r=1.5+Math.sin(i*7+time*3)*0.8;
         ctx.beginPath(); ctx.arc(fx,fy,r,0,Math.PI*2);
         ctx.fillStyle=`rgba(255,255,255,${0.3+Math.sin(i+time)*0.15})`; ctx.fill();
       }
 
-      time+=0.02;
+      time+=0.035;
       animationFrame = requestAnimationFrame(drawWaves);
     };
     drawWaves();
@@ -270,31 +270,57 @@ export function SummerBanner() {
         .palm-leaf:nth-child(1) { --rot: -30deg; transform: rotate(-30deg); animation-delay: 0s; } .palm-leaf:nth-child(2) { --rot: -60deg; transform: rotate(-60deg); animation-delay: 0.3s; } .palm-leaf:nth-child(3) { --rot: -90deg; transform: rotate(-90deg); animation-delay: 0.6s; } .palm-leaf:nth-child(4) { --rot: -120deg; transform: rotate(-120deg); animation-delay: 0.1s; } .palm-leaf:nth-child(5) { --rot: -150deg; transform: rotate(-150deg); animation-delay: 0.5s; } .palm-leaf:nth-child(6) { --rot: 0deg; transform: rotate(0deg); animation-delay: 0.2s; } .palm-leaf:nth-child(7) { --rot: -180deg; transform: rotate(-180deg); animation-delay: 0.4s; }
         @keyframes palmSway { 0%,100% { transform: rotate(var(--rot, -30deg)); } 50% { transform: rotate(calc(var(--rot, -30deg) + 8deg)); } }
 
-        .camper-scene { position: absolute; bottom: 24%; left: 50%; transform: translateX(-50%); z-index: 6; animation: camperBounce 3s ease-in-out infinite; }
-        @keyframes camperBounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-3px); } }
-        .camper { position: relative; width: 220px; height: 110px; }
-        .camper-body { position: absolute; bottom: 20px; left: 0; width: 220px; height: 80px; background: linear-gradient(180deg, #fff 0%, #f5f5f5 100%); border-radius: 12px 12px 5px 5px; border: 2px solid #ddd; overflow: hidden; }
-        .camper-body::before { content: ''; position: absolute; top: 35px; left: 0; width: 100%; height: 18px; background: linear-gradient(90deg, var(--sunset-orange), var(--sunset-pink)); }
-        .camper-roof { position: absolute; top: -8px; left: 10px; width: 160px; height: 8px; background: #ccc; border-radius: 4px; border: 1px solid #bbb; }
-        .camper-popup { position: absolute; top: -25px; left: 30px; width: 120px; height: 20px; background: #f0f0f0; border: 2px solid #ddd; border-radius: 6px 6px 0 0; border-bottom: none; }
-        .camper-window { position: absolute; background: linear-gradient(135deg, #a8d8ea, #87CEEB); border: 2px solid #bbb; border-radius: 4px; }
-        .camper-window::after { content: ''; position: absolute; top: 3px; left: 3px; width: 40%; height: 40%; background: rgba(255,255,255,0.5); border-radius: 2px; }
-        .camper-window-front { right: 8px; top: 8px; width: 45px; height: 25px; border-radius: 4px 10px 4px 4px; } .camper-window-side1 { left: 20px; top: 8px; width: 30px; height: 22px; } .camper-window-side2 { left: 60px; top: 8px; width: 30px; height: 22px; }
-        .camper-headlight { position: absolute; right: -2px; top: 42px; width: 8px; height: 14px; background: radial-gradient(circle, #FFD700, #FFA500); border-radius: 0 4px 4px 0; border: 1px solid #e0a000; box-shadow: 0 0 8px rgba(255,215,0,0.5); }
-        .camper-door { position: absolute; left: 100px; top: 12px; width: 30px; height: 48px; border: 2px solid #ccc; border-radius: 3px; background: linear-gradient(180deg, #fff 0%, #f0f0f0 48%, transparent 48%, transparent 52%, #f0f0f0 52%); }
-        .camper-door::after { content: ''; position: absolute; right: 4px; top: 50%; width: 4px; height: 8px; background: #999; border-radius: 2px; transform: translateY(-50%); }
-        .wheel { position: absolute; bottom: -10px; width: 30px; height: 30px; background: radial-gradient(circle, #666 30%, #333 32%, #333 55%, #555 57%, #444 100%); border-radius: 50%; border: 3px solid #222; }
-        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: radial-gradient(circle, #ccc, #999); border-radius: 50%; transform: translate(-50%,-50%); }
-        .wheel-front { right: 20px; } .wheel-rear { left: 25px; }
-        .camper-vw-logo { position: absolute; right: 14px; top: 38px; width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 50%; }
+        /* CAMPER REDESIGN & ENHANCED ANIMATION */
+        .camper-scene { position: absolute; bottom: 23%; left: 50%; transform: translateX(-50%); z-index: 6; animation: camperIdle 4s ease-in-out infinite; }
+        @keyframes camperIdle { 
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); } 
+            25% { transform: translateX(-50%) translateY(-2px) rotate(0.5deg); } 
+            50% { transform: translateX(-50%) translateY(1px) rotate(0deg); } 
+            75% { transform: translateX(-50%) translateY(-1px) rotate(-0.5deg); } 
+        }
+        
+        .camper { position: relative; width: 280px; height: 130px; }
+        .camper-body { position: absolute; bottom: 25px; left: 0; width: 100%; height: 95px; background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 45%, #e2e8f0 100%); border-radius: 20px 30px 8px 8px; border: 2px solid #94a3b8; overflow: hidden; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.05), 5px 10px 20px rgba(0,0,0,0.15); }
+        .camper-body::before { content: ''; position: absolute; top: 48px; left: -10%; width: 120%; height: 60px; background: linear-gradient(9deg, var(--sunset-orange) 0%, #ff8a5c 100%); border-top: 3px solid white; border-radius: 50% 50% 0 0 / 20px 20px 0 0; }
+        .camper-body::after { content: ''; position: absolute; top: 43px; left: 0; width: 100%; height: 4px; background: var(--sunset-pink); }
+        
+        .camper-roof { position: absolute; top: -2px; left: 20px; width: 190px; height: 12px; background: #f8fafc; border-radius: 8px; border: 2px solid #cbd5e1; box-shadow: inset 0 -3px 5px rgba(0,0,0,0.05); }
+        .camper-popup { position: absolute; top: -30px; left: 40px; width: 140px; height: 30px; background: repeating-linear-gradient(90deg, #f1f5f9 0px, #f1f5f9 10px, #e2e8f0 10px, #e2e8f0 12px); border: 2px solid #cbd5e1; border-radius: 8px 8px 0 0; border-bottom: none; transform: skewX(-5deg); z-index: -1; }
+        
+        .camper-window { position: absolute; background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #94a3b8; border-radius: 6px; overflow: hidden; }
+        .camper-window::after { content: ''; position: absolute; top: 0; left: -20px; width: 30px; height: 100%; background: rgba(255,255,255,0.15); transform: skewX(-20deg); animation: glassShine 4s infinite; }
+        @keyframes glassShine { 0% { left: -30px; } 20%, 100% { left: 100%; } }
+        .camper-window-front { right: 12px; top: 12px; width: 60px; height: 32px; border-radius: 6px 16px 6px 6px; } .camper-window-side1 { left: 25px; top: 12px; width: 50px; height: 28px; } .camper-window-side2 { left: 85px; top: 12px; width: 50px; height: 28px; }
+        
+        .camper-door { position: absolute; left: 145px; top: 10px; width: 38px; height: 80px; border: 2px solid #cbd5e1; border-radius: 4px; border-bottom: none; z-index: 2; }
+        .camper-door::after { content: ''; position: absolute; right: 4px; top: 50%; width: 6px; height: 12px; background: #94a3b8; border-radius: 3px; transform: translateY(-50%); box-shadow: inset 1px 1px 2px rgba(255,255,255,0.5); }
+        
+        .camper-bumper-front { position: absolute; right: -4px; bottom: 20px; width: 15px; height: 18px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); border-radius: 0 6px 6px 0; border: 2px solid #94a3b8; border-left: none; }
+        .camper-bumper-rear { position: absolute; left: -4px; bottom: 20px; width: 15px; height: 18px; background: linear-gradient(180deg, #e2e8f0, #94a3b8); border-radius: 6px 0 0 6px; border: 2px solid #94a3b8; border-right: none; }
+        
+        .camper-headlight { position: absolute; right: -2px; top: 52px; width: 10px; height: 16px; background: radial-gradient(circle, #fff, #fef08a); border-radius: 0 4px 4px 0; border: 1px solid #eab308; box-shadow: 0 0 20px 5px rgba(250,204,21,0.6); }
+        .camper-taillight { position: absolute; left: -2px; top: 50px; width: 6px; height: 18px; background: #ef4444; border-radius: 2px 0 0 2px; border: 1px solid #991b1b; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        
+        .wheel { position: absolute; bottom: 0; width: 48px; height: 48px; background: #1e293b; border-radius: 50%; border: 4px solid #0f172a; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 2px 5px 10px rgba(0,0,0,0.3); z-index: 3; }
+        .wheel::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 26px; height: 26px; background: repeating-conic-gradient(#cbd5e1 0deg 30deg, #94a3b8 30deg 60deg); border-radius: 50%; border: 2px solid #e2e8f0; animation: wheelSpin 10s linear infinite; }
+        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: #0f172a; border-radius: 50%; border: 2px solid #94a3b8; }
+        @keyframes wheelSpin { 100% { transform: translate(-50%, -50%) rotate(360deg); } }
+        .wheel-front { right: 35px; } .wheel-rear { left: 40px; }
+        
+        .wheel-arch { position: absolute; bottom: 23px; width: 62px; height: 38px; background: transparent; border: 4px solid #cbd5e1; border-bottom: none; border-radius: 30px 30px 0 0; z-index: 1; }
+        .wheel-arch-front { right: 28px; } .wheel-arch-rear { left: 33px; }
+        
+        .camper-awning { position: absolute; top: 8px; left: 15px; width: 200px; height: 10px; background: linear-gradient(180deg, #fff, #cbd5e1); border-radius: 4px; border: 1px solid #94a3b8; z-index: 2; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .camper-surfboard { position: absolute; top: -14px; left: 50px; width: 120px; height: 12px; background: linear-gradient(90deg, #fbbf24, #f59e0b); border-radius: 10px 20px 20px 10px; transform: rotate(-2deg); border: 1px solid #b45309; z-index: 3; box-shadow: inset 0 2px 4px rgba(255,255,255,0.4); }
+        .camper-surfboard::after { content: ''; position: absolute; top: 0; left: 25px; width: 70px; height: 10px; border-left: 3px solid #334155; border-right: 3px solid #334155; }
+        
+        .camper-mirror { position: absolute; right: 8px; top: 35px; width: 8px; height: 16px; background: #cbd5e1; border: 1px solid #94a3b8; border-radius: 3px; z-index: 3; }
+        .camper-mirror::before { content: ''; position: absolute; left: -6px; top: 6px; width: 6px; height: 3px; background: #0f172a; }
 
         .umbrella { position: absolute; bottom: 2%; left: 22%; z-index: 5; }
         .umbrella-pole { width: 4px; height: 130px; background: linear-gradient(90deg, #d4a94e, #c69538); margin: 0 auto; }
         .umbrella-top { width: 140px; height: 70px; background: conic-gradient(var(--sunset-orange) 0deg, var(--sunset-orange) 45deg, #fff 45deg, #fff 90deg, var(--sunset-orange) 90deg, var(--sunset-orange) 135deg, #fff 135deg, #fff 180deg); border-radius: 140px 140px 0 0; position: relative; left: 50%; transform: translateX(-50%) rotate(-5deg); }
         .towel { position: absolute; bottom: 3%; left: 17%; width: 100px; height: 20px; background: repeating-linear-gradient(90deg, #FF6B35 0px, #FF6B35 12px, #fff 12px, #fff 24px); border-radius: 3px; transform: perspective(200px) rotateX(40deg) rotate(-8deg); z-index: 5; }
-        .surfboard { position: absolute; bottom: 2%; right: 20%; width: 18px; height: 100px; background: linear-gradient(180deg, #FFD700 0%, #FF6B35 50%, var(--sunset-pink) 100%); border-radius: 9px 9px 5px 5px; transform: rotate(15deg); z-index: 5; border: 1px solid rgba(0,0,0,0.1); }
-        .surfboard::before { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 8px; height: 12px; background: #333; border-radius: 0 0 4px 4px; }
-        .surfboard::after { content: ''; position: absolute; top: 20%; left: 50%; transform: translateX(-50%); width: 10px; height: 2px; background: rgba(255,255,255,0.6); box-shadow: 0 8px 0 rgba(255,255,255,0.5), 0 16px 0 rgba(255,255,255,0.4); }
         .shell { position: absolute; z-index: 5; font-size: 18px; opacity: 0.7; }
         .shell-1 { bottom: 6%; left: 40%; transform: rotate(30deg); } .shell-2 { bottom: 4%; left: 60%; transform: rotate(-15deg); font-size: 14px; } .shell-3 { bottom: 8%; left: 75%; transform: rotate(45deg); font-size: 22px; }
         .starfish { position: absolute; bottom: 5%; right: 35%; font-size: 28px; z-index: 5; animation: starSpin 20s linear infinite; opacity: 0.8; }
@@ -347,14 +373,14 @@ export function SummerBanner() {
 
         @media (max-width: 768px) {
           .palm-tree-1 { left: -2%; } .palm-tree-2 { right: -2%; }
-          .camper { transform: scale(0.8); } .umbrella { left: 12%; } .towel { left: 8%; } .surfboard { right: 10%; }
+          .camper { transform: scale(0.75); } .umbrella { left: 12%; } .towel { left: 8%; }
           .sb-code-pill { flex-direction: column; border-radius: 20px; }
           .sb-code-pill-label { padding: 10px 20px; font-size: 0.75rem; } .sb-code-pill-code { padding: 10px 24px; font-size: 1.3rem; }
           .sb-countdown-item { min-width: 48px; padding: 6px 10px; } .sb-countdown-number { font-size: 1.2rem; }
           .sb-floating-emoji { display: none; } .ufo, .rocket { transform: scale(0.7); }
         }
         @media (max-width: 480px) {
-          .palm-tree, .umbrella, .towel, .surfboard, .flipflop { display: none; }
+          .palm-tree, .umbrella, .towel, .flipflop { display: none; }
           .sb-code-pill-code { font-size: 1.1rem; letter-spacing: 3px; } .sb-discount-headline { font-size: 1.3rem; }
           .satellite, .rocket, .constellation { display: none; }
         }
@@ -396,10 +422,32 @@ export function SummerBanner() {
       <div className="palm-tree palm-tree-1"><div className="palm-trunk"><div className="palm-leaves"><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div></div></div></div>
       <div className="palm-tree palm-tree-2"><div className="palm-trunk"><div className="palm-leaves"><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div><div className="palm-leaf"></div></div></div></div>
 
-      <div className="camper-scene"><div className="camper"><div className="camper-popup"></div><div className="camper-roof"></div><div className="camper-body"><div className="camper-window camper-window-front"></div><div className="camper-window camper-window-side1"></div><div className="camper-window camper-window-side2"></div><div className="camper-headlight"></div><div className="camper-door"></div><div className="camper-vw-logo"></div></div><div className="wheel wheel-front"></div><div className="wheel wheel-rear"></div></div></div>
+      <div className="camper-scene">
+        <div className="camper">
+          <div className="camper-popup"></div>
+          <div className="camper-roof"></div>
+          <div className="camper-awning"></div>
+          <div className="camper-surfboard"></div>
+          <div className="camper-body">
+            <div className="camper-window camper-window-front"></div>
+            <div className="camper-window camper-window-side1"></div>
+            <div className="camper-window camper-window-side2"></div>
+            <div className="camper-door"></div>
+            <div className="camper-headlight"></div>
+            <div className="camper-taillight"></div>
+            <div className="camper-mirror"></div>
+          </div>
+          <div className="wheel-arch wheel-arch-front"></div>
+          <div className="wheel-arch wheel-arch-rear"></div>
+          <div className="camper-bumper-front"></div>
+          <div className="camper-bumper-rear"></div>
+          <div className="wheel wheel-front"></div>
+          <div className="wheel wheel-rear"></div>
+        </div>
+      </div>
 
       <div className="umbrella"><div className="umbrella-top"></div><div className="umbrella-pole"></div></div>
-      <div className="towel"></div><div className="surfboard"></div>
+      <div className="towel"></div>
       <div className="shell shell-1">🐚</div><div className="shell shell-2">🐚</div><div className="shell shell-3">🦪</div>
       <div className="starfish">⭐</div><div className="flipflop">🩴</div>
 
