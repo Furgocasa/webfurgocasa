@@ -1,7 +1,7 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, TrendingDown, Loader2, Users, Moon } from "lucide-react";
+import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, MousePointer, CreditCard, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, TrendingDown, Loader2, Users, Moon, Sun, Palmtree } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -37,6 +37,7 @@ interface LastMinuteOffer {
 export function OfertasClient() {
   const { t, locale } = useLanguage();
   const [copied, setCopied] = useState(false);
+  const [copiedSummer, setCopiedSummer] = useState(false);
   const [lastMinuteOffers, setLastMinuteOffers] = useState<LastMinuteOffer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
 
@@ -80,6 +81,12 @@ export function OfertasClient() {
     navigator.clipboard.writeText("INV2026");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopySummerCode = () => {
+    navigator.clipboard.writeText("EARLY2026");
+    setCopiedSummer(true);
+    setTimeout(() => setCopiedSummer(false), 2000);
   };
 
   const benefits = [
@@ -385,6 +392,177 @@ export function OfertasClient() {
               <div className="text-blue-100/80 text-sm md:text-base">
                 <span className="text-white font-medium mr-2">{t("Condiciones:")}</span>
                 {t("Reserva mínima de 5 días para obtener el 20% de descuento. Promoción válida del 5 de enero hasta el 20 de marzo de 2026.")}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* Oferta Verano 2026 - Rediseñado */}
+      <section className="py-24 relative overflow-hidden bg-[#1a0b2e]">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-[-20%] right-[-10%] w-[50%] h-[50%] bg-orange-500/20 blur-[120px] rounded-full mix-blend-screen"></div>
+          <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-pink-500/20 blur-[120px] rounded-full mix-blend-screen"></div>
+          <div className="absolute top-[30%] left-[40%] w-[30%] h-[30%] bg-yellow-500/10 blur-[100px] rounded-full mix-blend-screen"></div>
+          
+          {/* Floating glowing orbs (Sunset vibe) */}
+          <div className="absolute inset-0 opacity-40">
+            {[...Array(6)].map((_, i) => (
+              <div 
+                key={i} 
+                className="absolute rounded-full bg-gradient-to-tr from-orange-400 to-yellow-200 animate-pulse"
+                style={{
+                  top: `${Math.random() * 100}%`,
+                  left: `${Math.random() * 100}%`,
+                  width: `${Math.random() * 6 + 4}px`,
+                  height: `${Math.random() * 6 + 4}px`,
+                  opacity: Math.random() * 0.5 + 0.3,
+                  animationDuration: `${Math.random() * 3 + 2}s`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  boxShadow: '0 0 10px 2px rgba(251, 146, 60, 0.4)'
+                }} 
+              />
+            ))}
+          </div>
+          
+          {/* subtle grid overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCI+PHBhdGggZD0iTTAgMGg0MHY0MEgweiIgZmlsbD0ibm9uZSIvPjxwYXRoIGQ9Ik0wIDB2NDBIMHYtNDB6TTAgMGg0MHYxSDB6IiBmaWxsPSJyZ2JhKDI1NSwyNTUsMjU1LDAuMDIpIi8+PC9zdmc+')] opacity-30"></div>
+        </div>
+
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-7xl mx-auto">
+            {/* Header Area */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md mb-8 shadow-[0_0_15px_rgba(255,165,0,0.1)]">
+                <span className="relative flex h-3 w-3">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3 w-3 bg-orange-500"></span>
+                </span>
+                <span className="text-xs font-bold text-orange-100 tracking-widest uppercase">
+                  {t("Early Bird Verano")}
+                </span>
+              </div>
+              
+              <h2 className="text-5xl md:text-7xl lg:text-8xl font-heading font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 via-orange-400 to-pink-500 mb-4 tracking-tighter drop-shadow-sm">
+                {t("VERANO")}
+              </h2>
+              <div className="flex items-center justify-center gap-4 text-2xl md:text-3xl lg:text-4xl text-orange-400 font-heading font-bold">
+                <div className="h-px w-12 md:w-24 bg-gradient-to-r from-transparent to-orange-500"></div>
+                <span>2026</span>
+                <div className="h-px w-12 md:w-24 bg-gradient-to-l from-transparent to-orange-500"></div>
+              </div>
+            </div>
+
+            {/* Bento Grid Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 mb-8">
+              
+              {/* Discount Highlight Card (Left side for Summer) */}
+              <div className="lg:col-span-5 bg-gradient-to-br from-yellow-400 to-orange-600 rounded-[2.5rem] p-8 md:p-12 shadow-[0_0_40px_rgba(249,115,22,0.3)] relative overflow-hidden flex flex-col justify-center items-center text-center transform hover:scale-[1.02] transition-transform duration-500">
+                <div className="absolute inset-0 bg-[url('/images/pattern.png')] opacity-10 mix-blend-overlay"></div>
+                <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-white/30 rounded-full blur-3xl"></div>
+                
+                <p className="text-orange-950 font-bold uppercase tracking-[0.2em] text-sm md:text-base mb-4 relative z-10">
+                  {t("Descuento Anticipado")}
+                </p>
+                <div className="relative z-10 flex items-start justify-center text-white mb-2 drop-shadow-md">
+                  <span className="text-4xl md:text-6xl font-bold mt-2 mr-1">-</span>
+                  <span className="text-7xl md:text-9xl font-black font-heading tracking-tighter leading-none">20</span>
+                  <span className="text-4xl md:text-6xl font-bold mt-2 ml-1">%</span>
+                </div>
+                <p className="text-xl md:text-2xl font-bold text-orange-900 mt-4 relative z-10 bg-white/30 px-6 py-2 rounded-full backdrop-blur-sm shadow-sm">
+                  {t("EN TU RESERVA")}
+                </p>
+              </div>
+
+              {/* Main Value Prop Card */}
+              <div className="lg:col-span-7 bg-white/5 backdrop-blur-xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl overflow-hidden relative group">
+                <div className="absolute bottom-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full blur-[80px] group-hover:bg-orange-500/20 transition-colors duration-700"></div>
+                
+                <h3 className="text-3xl md:text-5xl font-heading font-bold text-white mb-6 leading-tight">
+                  {t("Adelántate al sol")} <br/>
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-300">
+                    {t("y asegura tu viaje")}
+                  </span>
+                </h3>
+                
+                <p className="text-orange-100/80 text-lg md:text-xl font-light leading-relaxed max-w-xl mb-8">
+                  {t("El verano perfecto te espera. Reserva ahora tu camper para las próximas vacaciones y disfruta de la libertad total con el mejor precio garantizado.")}
+                </p>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-white/5 rounded-2xl p-4 border border-white/5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-orange-500/20 flex items-center justify-center flex-shrink-0 text-orange-400">
+                      <Sun className="w-6 h-6" />
+                    </div>
+                    <div className="text-sm font-medium text-white">{t("Playas y Sol")}</div>
+                  </div>
+                  <div className="bg-white/5 rounded-2xl p-4 border border-white/5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-pink-500/20 flex items-center justify-center flex-shrink-0 text-pink-400">
+                      <Palmtree className="w-6 h-6" />
+                    </div>
+                    <div className="text-sm font-medium text-white">{t("Atardeceres Únicos")}</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Promo Code Interactive Ticket */}
+              <div className="lg:col-span-12 bg-white rounded-[2.5rem] p-3 md:p-4 shadow-2xl relative overflow-hidden flex flex-col md:flex-row items-center border border-gray-100">
+                
+                {/* Info side */}
+                <div className="w-full md:w-5/12 p-6 md:p-8 text-center md:text-left">
+                  <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-50 text-furgocasa-orange rounded-xl mb-4">
+                    <Ticket className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-2xl font-bold text-gray-900 mb-2">{t("Aplica este código")}</h4>
+                  <p className="text-gray-500 text-sm md:text-base">{t("Úsalo durante el proceso de reserva online para obtener tu descuento directo.")}</p>
+                </div>
+
+                {/* Divider (Hidden on mobile, dashed line on desktop) */}
+                <div className="hidden md:flex flex-col items-center w-8 relative">
+                  <div className="w-6 h-6 rounded-full bg-gray-50 absolute -top-8 border-b border-gray-200 shadow-inner"></div>
+                  <div className="h-full border-r-2 border-dashed border-gray-200 my-4"></div>
+                  <div className="w-6 h-6 rounded-full bg-gray-50 absolute -bottom-8 border-t border-gray-200 shadow-inner"></div>
+                </div>
+
+                {/* Code action side */}
+                <div className="w-full md:w-7/12 p-4 md:p-6 flex flex-col sm:flex-row items-center gap-4">
+                  <div 
+                    onClick={handleCopySummerCode}
+                    className="relative group cursor-pointer w-full sm:w-auto flex-1 h-16 md:h-24 bg-gray-50 hover:bg-orange-50 border-2 border-dashed border-gray-300 hover:border-furgocasa-orange rounded-2xl flex items-center justify-center transition-all duration-300 overflow-hidden"
+                  >
+                    <div className="absolute inset-0 bg-furgocasa-orange/5 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
+                    <div className="relative z-10 flex items-center gap-3 md:gap-4 px-4 md:px-6">
+                      <span className="text-2xl md:text-5xl font-mono font-black text-furgocasa-orange tracking-widest">
+                        EARLY2026
+                      </span>
+                      <div className="text-gray-400 group-hover:text-furgocasa-orange transition-colors bg-white p-2 md:p-2.5 rounded-full shadow-sm">
+                        {copiedSummer ? <Check className="w-5 h-5 md:w-6 md:h-6 text-green-500" /> : <Copy className="w-5 h-5 md:w-6 md:h-6" />}
+                      </div>
+                    </div>
+                  </div>
+
+                  <LocalizedLink
+                    href="/reservar"
+                    className="w-full sm:w-auto h-16 md:h-24 px-6 md:px-8 bg-gray-900 hover:bg-black text-white rounded-2xl flex items-center justify-center gap-2 md:gap-3 transition-all shadow-xl hover:shadow-2xl hover:scale-105 group flex-shrink-0"
+                  >
+                    <span className="font-bold text-base md:text-xl whitespace-nowrap">{t("RESERVAR")}</span>
+                    <MousePointer className="w-5 h-5 md:w-6 md:h-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                  </LocalizedLink>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Terms and Conditions Banner */}
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-4 md:gap-6 justify-center text-center sm:text-left">
+              <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-orange-300 flex-shrink-0 border border-white/20">
+                <AlertCircle className="w-5 h-5" />
+              </div>
+              <div className="text-orange-100/80 text-sm md:text-base">
+                <span className="text-white font-medium mr-2">{t("Condiciones:")}</span>
+                {t("Promoción Early Bird válida para alquileres realizados entre el 1 de junio y el 30 de septiembre de 2026. Sujeto a disponibilidad.")}
               </div>
             </div>
 
