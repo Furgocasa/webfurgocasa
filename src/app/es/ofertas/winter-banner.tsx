@@ -214,28 +214,89 @@ export function WinterBanner() {
         .snowman-hat { width: 24px; height: 20px; background: #1f2937; position: absolute; bottom: 108px; left: 18px; border-radius: 2px 2px 0 0; }
         .snowman-hat-brim { width: 36px; height: 4px; background: #1f2937; position: absolute; bottom: 106px; left: 12px; border-radius: 2px; }
 
-        .camper-scene { position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%); z-index: 6; animation: camperBounce 3s ease-in-out infinite; }
-        @keyframes camperBounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(-3px); } }
-        .camper { position: relative; width: 220px; height: 110px; }
-        .camper-body { position: absolute; bottom: 20px; left: 0; width: 220px; height: 80px; background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%); border-radius: 12px 12px 5px 5px; border: 2px solid #94a3b8; overflow: hidden; }
-        .camper-body::before { content: ''; position: absolute; top: 35px; left: 0; width: 100%; height: 18px; background: linear-gradient(90deg, #0284c7, #38bdf8); }
-        .camper-roof { position: absolute; top: -8px; left: 10px; width: 160px; height: 8px; background: #f8fafc; border-radius: 4px; border: 1px solid #cbd5e1; }
-        .camper-popup { position: absolute; top: -25px; left: 30px; width: 120px; height: 20px; background: #f8fafc; border: 2px solid #cbd5e1; border-radius: 6px 6px 0 0; border-bottom: none; }
-        .camper-window { position: absolute; background: linear-gradient(135deg, #1e293b, #334155); border: 2px solid #94a3b8; border-radius: 4px; }
-        .camper-window::after { content: ''; position: absolute; top: 3px; left: 3px; width: 40%; height: 40%; background: rgba(255,255,255,0.2); border-radius: 2px; }
-        .camper-window-front { right: 8px; top: 8px; width: 45px; height: 25px; border-radius: 4px 10px 4px 4px; } .camper-window-side1 { left: 20px; top: 8px; width: 30px; height: 22px; } .camper-window-side2 { left: 60px; top: 8px; width: 30px; height: 22px; }
-        .camper-headlight { position: absolute; right: -2px; top: 42px; width: 8px; height: 14px; background: radial-gradient(circle, #fef08a, #eab308); border-radius: 0 4px 4px 0; border: 1px solid #ca8a04; box-shadow: 0 0 12px rgba(250,204,21,0.6); }
-        .camper-door { position: absolute; left: 100px; top: 12px; width: 30px; height: 48px; border: 2px solid #94a3b8; border-radius: 3px; background: linear-gradient(180deg, #fff 0%, #f1f5f9 48%, transparent 48%, transparent 52%, #f1f5f9 52%); }
-        .camper-door::after { content: ''; position: absolute; right: 4px; top: 50%; width: 4px; height: 8px; background: #64748b; border-radius: 2px; transform: translateY(-50%); }
-        .wheel { position: absolute; bottom: -10px; width: 30px; height: 30px; background: radial-gradient(circle, #475569 30%, #1e293b 32%, #1e293b 55%, #334155 57%, #0f172a 100%); border-radius: 50%; border: 3px solid #020617; }
-        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; width: 8px; height: 8px; background: radial-gradient(circle, #cbd5e1, #94a3b8); border-radius: 50%; transform: translate(-50%,-50%); }
-        .wheel-front { right: 20px; } .wheel-rear { left: 25px; }
-        .camper-vw-logo { position: absolute; right: 14px; top: 38px; width: 16px; height: 16px; border: 2px solid #94a3b8; border-radius: 50%; }
+        /* PARKING LOT & SKI RESORT PROPS */
+        .ski-resort-ground { position: absolute; bottom: 0; left: 0; width: 100%; height: 25%; background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%); z-index: 5; border-top: 4px solid #f1f5f9; box-shadow: inset 0 20px 20px -20px rgba(0,0,0,0.1); }
+        .parking-line { position: absolute; bottom: 5%; width: 6px; height: 15%; background: rgba(255,255,255,0.8); transform: skewX(-45deg); box-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
+        .parking-line-1 { left: 20%; } .parking-line-2 { left: 45%; } .parking-line-3 { left: 70%; } .parking-line-4 { left: 95%; }
+
+        .chairlift-system { position: absolute; top: 15%; left: 0; width: 100%; height: 40%; z-index: 4; pointer-events: none; }
+        .cable { position: absolute; top: 20%; left: -10%; width: 120%; height: 2px; background: #475569; transform: rotate(-8deg); }
+        .chair { position: absolute; top: 20%; width: 30px; height: 40px; animation: chairMove 20s linear infinite; }
+        .chair-pole { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 2px; height: 25px; background: #64748b; }
+        .chair-seat { position: absolute; bottom: 0; left: 0; width: 30px; height: 15px; border: 2px solid #64748b; border-top: none; border-radius: 0 0 4px 4px; }
+        .chair-bar { position: absolute; top: 25px; left: -2px; width: 34px; height: 2px; background: #94a3b8; }
+        .chair-1 { left: 10%; animation-delay: 0s; }
+        .chair-2 { left: 40%; animation-delay: -6s; }
+        .chair-3 { left: 70%; animation-delay: -13s; }
+        @keyframes chairMove { 0% { transform: translateX(100vw) translateY(5vh) rotate(-8deg); } 100% { transform: translateX(-20vw) translateY(22vh) rotate(-8deg); } }
+
+        .cabin { position: absolute; bottom: 35%; right: 15%; width: 100px; height: 75px; background: #78350f; border-radius: 4px; z-index: 4; border: 2px solid #451a03; }
+        .cabin-roof { position: absolute; top: -30px; left: -15px; width: 130px; height: 0; border-bottom: 35px solid #f1f5f9; border-left: 15px solid transparent; border-right: 15px solid transparent; border-radius: 4px; }
+        .cabin-roof::after { content: ''; position: absolute; top: 30px; left: -10px; width: 120px; height: 6px; background: #e2e8f0; border-radius: 3px; }
+        .cabin-door { position: absolute; bottom: 0; left: 20px; width: 25px; height: 45px; background: #451a03; border-radius: 2px 2px 0 0; }
+        .cabin-door::after { content: ''; position: absolute; right: 4px; top: 20px; width: 4px; height: 4px; background: #fef08a; border-radius: 50%; }
+        .cabin-window { position: absolute; top: 20px; right: 20px; width: 25px; height: 25px; background: #e0f2fe; border: 2px solid #94a3b8; box-shadow: inset 0 0 15px rgba(250,204,21,0.6); }
+        .cabin-window::after { content: ''; position: absolute; top: 0; left: 11px; width: 2px; height: 100%; background: #94a3b8; }
+        .cabin-window::before { content: ''; position: absolute; top: 11px; left: 0; width: 100%; height: 2px; background: #94a3b8; }
+        .cabin-chimney { position: absolute; top: -45px; right: 25px; width: 12px; height: 25px; background: #475569; z-index: -1; }
+        .cabin-smoke { position: absolute; top: -55px; right: 20px; width: 12px; height: 12px; background: rgba(255,255,255,0.7); border-radius: 50%; animation: smokeRise 4s ease-out infinite; }
+        .cabin-smoke-2 { animation-delay: 1.3s; } .cabin-smoke-3 { animation-delay: 2.6s; }
+        @keyframes smokeRise { 0% { transform: translateY(0) scale(1) translateX(0); opacity: 0.8; } 100% { transform: translateY(-40px) scale(4) translateX(15px); opacity: 0; } }
+        
+        .ski-rack { position: absolute; bottom: 30%; right: 35%; width: 50px; height: 50px; border: 4px solid #64748b; border-bottom: none; border-top: none; z-index: 4; }
+        .ski-rack-bar { position: absolute; top: 15px; left: -10px; width: 70px; height: 4px; background: #64748b; border-radius: 2px; }
+        .rack-ski { position: absolute; width: 6px; height: 60px; background: #ef4444; border-radius: 3px; transform: rotate(12deg); bottom: 0; box-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .rack-ski-1 { left: 5px; } .rack-ski-2 { left: 20px; background: #3b82f6; transform: rotate(-8deg); } .rack-ski-3 { left: 35px; background: #10b981; transform: rotate(5deg); }
+
+        /* CAMPER REDESIGN & ENHANCED ANIMATION */
+        .camper-scene { position: absolute; bottom: 12%; left: 60%; transform: translateX(-50%); z-index: 6; animation: camperIdle 4s ease-in-out infinite; }
+        @keyframes camperIdle { 
+            0%, 100% { transform: translateX(-50%) translateY(0) rotate(0deg); } 
+            25% { transform: translateX(-50%) translateY(-2px) rotate(0.5deg); } 
+            50% { transform: translateX(-50%) translateY(1px) rotate(0deg); } 
+            75% { transform: translateX(-50%) translateY(-1px) rotate(-0.5deg); } 
+        }
+        
+        .camper { position: relative; width: 280px; height: 130px; }
+        .camper-body { position: absolute; bottom: 25px; left: 0; width: 100%; height: 95px; background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 45%, #cbd5e1 100%); border-radius: 20px 30px 8px 8px; border: 2px solid #64748b; overflow: hidden; box-shadow: inset -5px -5px 15px rgba(0,0,0,0.05), 5px 10px 20px rgba(0,0,0,0.15); }
+        .camper-body::before { content: ''; position: absolute; top: 48px; left: -10%; width: 120%; height: 60px; background: linear-gradient(9deg, #0ea5e9 0%, #38bdf8 100%); border-top: 3px solid white; border-radius: 50% 50% 0 0 / 20px 20px 0 0; }
+        .camper-body::after { content: ''; position: absolute; top: 43px; left: 0; width: 100%; height: 4px; background: #0284c7; }
+        
+        .camper-roof { position: absolute; top: -2px; left: 20px; width: 190px; height: 12px; background: #f8fafc; border-radius: 8px; border: 2px solid #94a3b8; box-shadow: inset 0 -3px 5px rgba(0,0,0,0.05); }
+        .camper-popup { position: absolute; top: -30px; left: 40px; width: 140px; height: 30px; background: repeating-linear-gradient(90deg, #e2e8f0 0px, #e2e8f0 10px, #cbd5e1 10px, #cbd5e1 12px); border: 2px solid #94a3b8; border-radius: 8px 8px 0 0; border-bottom: none; transform: skewX(-5deg); z-index: -1; }
+        
+        .camper-window { position: absolute; background: linear-gradient(135deg, #1e293b, #0f172a); border: 2px solid #64748b; border-radius: 6px; overflow: hidden; }
+        .camper-window::after { content: ''; position: absolute; top: 0; left: -20px; width: 30px; height: 100%; background: rgba(255,255,255,0.15); transform: skewX(-20deg); animation: glassShine 4s infinite; }
+        @keyframes glassShine { 0% { left: -30px; } 20%, 100% { left: 100%; } }
+        .camper-window-front { right: 12px; top: 12px; width: 60px; height: 32px; border-radius: 6px 16px 6px 6px; } .camper-window-side1 { left: 25px; top: 12px; width: 50px; height: 28px; } .camper-window-side2 { left: 85px; top: 12px; width: 50px; height: 28px; }
+        
+        .camper-door { position: absolute; left: 145px; top: 10px; width: 38px; height: 80px; border: 2px solid #94a3b8; border-radius: 4px; border-bottom: none; z-index: 2; }
+        .camper-door::after { content: ''; position: absolute; right: 4px; top: 50%; width: 6px; height: 12px; background: #64748b; border-radius: 3px; transform: translateY(-50%); box-shadow: inset 1px 1px 2px rgba(255,255,255,0.5); }
+        
+        .camper-bumper-front { position: absolute; right: -4px; bottom: 20px; width: 15px; height: 18px; background: linear-gradient(180deg, #94a3b8, #64748b); border-radius: 0 6px 6px 0; border: 2px solid #475569; border-left: none; }
+        .camper-bumper-rear { position: absolute; left: -4px; bottom: 20px; width: 15px; height: 18px; background: linear-gradient(180deg, #94a3b8, #64748b); border-radius: 6px 0 0 6px; border: 2px solid #475569; border-right: none; }
+        
+        .camper-headlight { position: absolute; right: -2px; top: 52px; width: 10px; height: 16px; background: radial-gradient(circle, #fff, #fef08a); border-radius: 0 4px 4px 0; border: 1px solid #eab308; box-shadow: 0 0 20px 5px rgba(250,204,21,0.6); }
+        .camper-taillight { position: absolute; left: -2px; top: 50px; width: 6px; height: 18px; background: #ef4444; border-radius: 2px 0 0 2px; border: 1px solid #991b1b; box-shadow: 0 0 10px rgba(239,68,68,0.5); }
+        
+        .wheel { position: absolute; bottom: 0; width: 48px; height: 48px; background: #0f172a; border-radius: 50%; border: 4px solid #020617; box-shadow: inset 0 0 10px rgba(0,0,0,0.8), 2px 5px 10px rgba(0,0,0,0.3); z-index: 3; }
+        .wheel::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 26px; height: 26px; background: repeating-conic-gradient(#94a3b8 0deg 30deg, #64748b 30deg 60deg); border-radius: 50%; border: 2px solid #cbd5e1; }
+        .wheel::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 10px; height: 10px; background: #020617; border-radius: 50%; border: 2px solid #94a3b8; }
+        .wheel-front { right: 35px; } .wheel-rear { left: 40px; }
+        
+        .wheel-arch { position: absolute; bottom: 23px; width: 62px; height: 38px; background: transparent; border: 4px solid #94a3b8; border-bottom: none; border-radius: 30px 30px 0 0; z-index: 1; }
+        .wheel-arch-front { right: 28px; } .wheel-arch-rear { left: 33px; }
+        
+        .camper-mirror { position: absolute; right: 8px; top: 35px; width: 8px; height: 16px; background: #94a3b8; border: 1px solid #64748b; border-radius: 3px; z-index: 3; }
+        .camper-mirror::before { content: ''; position: absolute; left: -6px; top: 6px; width: 6px; height: 3px; background: #0f172a; }
+
         /* Skis on roof */
-        .skis { position: absolute; top: -14px; left: 40px; width: 100px; height: 6px; z-index: 2; transform: rotate(-2deg); }
-        .ski { width: 100%; height: 3px; background: #ef4444; border-radius: 3px 10px 10px 3px; position: absolute; }
-        .ski::before { content: ''; position: absolute; right: -4px; top: -2px; width: 8px; height: 3px; background: #ef4444; border-radius: 50%; transform: rotate(30deg); }
-        .ski-1 { top: 0; } .ski-2 { top: 3px; background: #b91c1c; } .ski-2::before { background: #b91c1c; }
+        .skis { position: absolute; top: -14px; left: 40px; width: 130px; height: 8px; z-index: 2; transform: rotate(-2deg); }
+        .ski { width: 100%; height: 4px; background: #ef4444; border-radius: 4px 12px 12px 4px; position: absolute; box-shadow: inset 0 2px 2px rgba(255,255,255,0.4); border: 1px solid #991b1b; }
+        .ski::before { content: ''; position: absolute; right: -5px; top: -3px; width: 12px; height: 4px; background: #ef4444; border-radius: 50%; transform: rotate(30deg); border: 1px solid #991b1b; border-bottom: none; }
+        .ski-1 { top: 0; } .ski-2 { top: 4px; background: #b91c1c; } .ski-2::before { background: #b91c1c; }
+        /* Ski rack mounts */
+        .skis::after { content: ''; position: absolute; left: 20px; bottom: -8px; width: 8px; height: 8px; background: #64748b; box-shadow: 70px 0 0 #64748b; }
 
         #snowCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 7; pointer-events: none; }
 
@@ -281,14 +342,15 @@ export function WinterBanner() {
 
         @media (max-width: 768px) {
           .pine-tree-1 { left: -2%; } .pine-tree-3 { right: -2%; }
-          .camper { transform: scale(0.8); }
+          .camper { transform: scale(0.65); }
           .sb-code-pill { flex-direction: column; border-radius: 20px; }
           .sb-code-pill-label { padding: 10px 20px; font-size: 0.75rem; } .sb-code-pill-code { padding: 10px 24px; font-size: 1.3rem; }
           .sb-countdown-item { min-width: 48px; padding: 6px 10px; } .sb-countdown-number { font-size: 1.2rem; }
           .sb-floating-emoji { display: none; }
+          .chairlift-system, .cabin { display: none; }
         }
         @media (max-width: 480px) {
-          .pine-tree, .snowman { display: none; }
+          .pine-tree, .snowman, .ski-rack { display: none; }
           .sb-code-pill-code { font-size: 1.1rem; letter-spacing: 3px; } .sb-discount-headline { font-size: 1.3rem; }
           .mountain-range { opacity: 0.5; }
         }
@@ -311,6 +373,36 @@ export function WinterBanner() {
         <div className="mountain mountain-4"></div>
       </div>
       
+      <div className="ski-resort-ground">
+        <div className="parking-line parking-line-1"></div>
+        <div className="parking-line parking-line-2"></div>
+        <div className="parking-line parking-line-3"></div>
+        <div className="parking-line parking-line-4"></div>
+      </div>
+
+      <div className="chairlift-system">
+        <div className="cable"></div>
+        <div className="chair chair-1"><div className="chair-pole"></div><div className="chair-seat"></div><div className="chair-bar"></div></div>
+        <div className="chair chair-2"><div className="chair-pole"></div><div className="chair-seat"></div><div className="chair-bar"></div></div>
+        <div className="chair chair-3"><div className="chair-pole"></div><div className="chair-seat"></div><div className="chair-bar"></div></div>
+      </div>
+
+      <div className="cabin">
+        <div className="cabin-roof"></div>
+        <div className="cabin-door"></div>
+        <div className="cabin-window"></div>
+        <div className="cabin-smoke cabin-smoke-1"></div>
+        <div className="cabin-smoke cabin-smoke-2"></div>
+        <div className="cabin-smoke cabin-smoke-3"></div>
+      </div>
+
+      <div className="ski-rack">
+        <div className="ski-rack-bar"></div>
+        <div className="rack-ski rack-ski-1"></div>
+        <div className="rack-ski rack-ski-2"></div>
+        <div className="rack-ski rack-ski-3"></div>
+      </div>
+
       <div className="snow-hills">
         <div className="snow-hill snow-hill-1"></div>
         <div className="snow-hill snow-hill-2"></div>
@@ -322,6 +414,37 @@ export function WinterBanner() {
       <div className="pine-tree pine-tree-3"><div className="pine-trunk"></div><div className="pine-layer pine-layer-1"></div><div className="pine-layer pine-layer-2"></div><div className="pine-layer pine-layer-3"></div></div>
       <div className="pine-tree pine-tree-4"><div className="pine-trunk"></div><div className="pine-layer pine-layer-1"></div><div className="pine-layer pine-layer-2"></div><div className="pine-layer pine-layer-3"></div></div>
 
+      <div className="ski-resort-ground">
+        <div className="parking-line parking-line-1"></div>
+        <div className="parking-line parking-line-2"></div>
+        <div className="parking-line parking-line-3"></div>
+        <div className="parking-line parking-line-4"></div>
+      </div>
+
+      <div className="chairlift-system">
+        <div className="cable"></div>
+        <div className="chair chair-1"><div className="chair-pole"></div><div className="chair-seat"></div><div className="chair-bar"></div></div>
+        <div className="chair chair-2"><div className="chair-pole"></div><div className="chair-seat"></div><div className="chair-bar"></div></div>
+        <div className="chair chair-3"><div className="chair-pole"></div><div className="chair-seat"></div><div className="chair-bar"></div></div>
+      </div>
+
+      <div className="cabin">
+        <div className="cabin-chimney"></div>
+        <div className="cabin-roof"></div>
+        <div className="cabin-door"></div>
+        <div className="cabin-window"></div>
+        <div className="cabin-smoke cabin-smoke-1"></div>
+        <div className="cabin-smoke cabin-smoke-2"></div>
+        <div className="cabin-smoke cabin-smoke-3"></div>
+      </div>
+
+      <div className="ski-rack">
+        <div className="ski-rack-bar"></div>
+        <div className="rack-ski rack-ski-1"></div>
+        <div className="rack-ski rack-ski-2"></div>
+        <div className="rack-ski rack-ski-3"></div>
+      </div>
+
       <div className="camper-scene">
         <div className="camper">
             <div className="camper-popup"></div>
@@ -331,10 +454,15 @@ export function WinterBanner() {
                 <div className="camper-window camper-window-front"></div>
                 <div className="camper-window camper-window-side1"></div>
                 <div className="camper-window camper-window-side2"></div>
-                <div className="camper-headlight"></div>
                 <div className="camper-door"></div>
-                <div className="camper-vw-logo"></div>
             </div>
+            <div className="wheel-arch wheel-arch-front"></div>
+            <div className="wheel-arch wheel-arch-rear"></div>
+            <div className="camper-bumper-front"></div>
+            <div className="camper-bumper-rear"></div>
+            <div className="camper-mirror"></div>
+            <div className="camper-headlight"></div>
+            <div className="camper-taillight"></div>
             <div className="wheel wheel-front"></div>
             <div className="wheel wheel-rear"></div>
         </div>
