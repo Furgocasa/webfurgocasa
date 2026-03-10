@@ -605,7 +605,7 @@ export function SummerBanner() {
 
       <div className="sb-content">
         <div className="sb-logo-tag">Furgocasa</div>
-        <h1 className="sb-main-title">VERANO 2026<span>¡Reserva ya tu camper al mejor precio!</span></h1>
+        <h2 className="sb-main-title">VERANO 2026<span>¡Reserva ya tu camper al mejor precio!</span></h2>
         <p className="sb-subtitle">Adelántate al verano desde Murcia</p>
 
         <div className="sb-coupon-section">

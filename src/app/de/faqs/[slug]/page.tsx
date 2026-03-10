@@ -1,7 +1,9 @@
-import { LocalizedLink } from"@/components/localized-link";
-import { notFound } from"next/navigation";
-import { ArrowLeft, ChevronRight } from"lucide-react";
+import { LocalizedLink } from "@/components/localized-link";
+import { notFound } from "next/navigation";
+import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Metadata } from "next";
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import type { Locale } from "@/lib/i18n/config";
 
 // TODO: Cargar desde base de datos o CMS
 const faqs: Record<string, { question: string; answer: string; category: string; related: string[] }> = {"edad-minima-alquiler": {
@@ -105,22 +107,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     };
   }
 
-  // Extraer texto limpio de la respuesta HTML
   const cleanAnswer = faq.answer.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 155);
+
+  const locale: Locale = 'de';
+  const alternates = buildCanonicalAlternates(`/faqs/${slug}`, locale);
 
   return {
     title: faq.question,
     description: cleanAnswer + '...',
     keywords: `${faq.question}, faq camper, preguntas autocaravana, ${faq.category}`,
+    alternates,
     openGraph: {
       title: faq.question,
       description: cleanAnswer,
       type: 'article',
+      url: alternates.canonical,
+      siteName: 'Furgocasa',
     },
-    robots: {
-      index: true,
-      follow: true
-    }
+    robots: { index: true, follow: true }
   };
 }
 
@@ -147,7 +151,7 @@ export default async function FaqDetailPage({ params }: { params: Promise<{ slug
 
               {faq.related.length > 0 && (
                 <div className="mt-8 bg-gray-100 rounded-xl p-6">
-                  <h3 className="font-bold text-gray-900 mb-4">Preguntas relacionadas</h3>
+                  <h2 className="font-bold text-gray-900 mb-4 text-xl">Verwandte Fragen</h2>
                   <ul className="space-y-2">
                     {faq.related.map((slug) => faqs[slug] && (
                       <li key={slug}>

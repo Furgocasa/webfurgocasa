@@ -13,6 +13,10 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import Script from "next/script";
 import { i18n, isValidLocale } from "@/lib/i18n/config";
+import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+
+// Hreflang por defecto para homepages - las páginas hijas sobrescriben con sus propios alternates
+const defaultAlternates = buildCanonicalAlternates("/", "es");
 
 // Rubik - Para títulos y headings
 const rubik = Rubik({ 
@@ -101,6 +105,8 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  // Hreflang por defecto (es, en, fr, de + x-default) - cada página con generateMetadata lo sobrescribe
+  alternates: defaultAlternates,
   // Verificación de propiedad (añadir IDs reales cuando estén disponibles)
   verification: {
     google: "tu-codigo-de-verificacion-google",

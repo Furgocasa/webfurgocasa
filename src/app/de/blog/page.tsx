@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Blog de Viajes en Camper"),
-    description: t("Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente."),
+    description: "Wohnmobil-Tipps, Routen in Spanien und Reiseführer. Wöchentlich aktualisierter Blog.",
     keywords: "wohnmobil blog, camper reisen, wohnmobil routen spanien, wohnmobil tipps, camper ziele, wohnmobil miete murcia, wohnmobil camping, camper leben",
     authors: [{ name: "Furgocasa" }],
     openGraph: {

@@ -41,6 +41,8 @@ export const metadata: Metadata = {
     title: "Furgocasa Admin",
     description: "Panel de administración de Furgocasa",
   },
+  // Sin hreflang - el panel admin no tiene versiones multiidioma
+  alternates: { canonical: "https://www.furgocasa.com/administrator" },
 };
 
 export const viewport: Viewport = {

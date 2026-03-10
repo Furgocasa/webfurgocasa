@@ -44,13 +44,15 @@ const categoryMeta: Record<string, { name: string; description: string }> = {
 };
 
 type Props = {
-  params: Promise<{ locale: string; category: string }>;
+  params: Promise<{ category: string }>;
 };
+
+const LOCALE: Locale = 'es';
 
 // 🎯 SEO Metadata dinámico para /blog/[category]
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale: localeStr, category } = await params;
-  const locale = localeStr as Locale;
+  const { category } = await params;
+  const locale = LOCALE;
   const t = (key: string) => translateServer(key, locale);
   
   const meta = categoryMeta[category] || {

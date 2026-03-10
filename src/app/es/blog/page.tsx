@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Blog de Viajes en Camper"),
-    description: t("Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente."),
+    description: t("Consejos para viajar en camper, rutas por España y guías de autocaravana. Blog actualizado semanalmente."),
     keywords: "blog camper, viajes autocaravana, rutas camper españa, consejos autocaravana, destinos camper, alquiler campers murcia, camping autocaravana, vida en camper",
     authors: [{ name: "Furgocasa" }],
     openGraph: {

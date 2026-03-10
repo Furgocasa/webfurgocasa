@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Blog de Viajes en Camper"),
-    description: t("Descubre los mejores consejos para viajar en camper, rutas espectaculares por España, destinos imprescindibles y guías completas para tu próxima aventura en autocaravana. Blog actualizado semanalmente."),
+    description: "Conseils camping-car, itinéraires en Espagne et guides. Blog mis à jour chaque semaine.",
     keywords: "blog camping-car, voyages camping-car, itinéraires camping-car espagne, conseils camping-car, destinations camping-car, location camping-car murcie, camping camping-car, vie en camping-car",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
