@@ -192,22 +192,19 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/tarifas', priority: 0.8, changeFrequency: 'monthly' },
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
-    { path: '/como-funciona', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/ofertas', priority: 0.6, changeFrequency: 'weekly' },
-    { path: '/publicaciones', priority: 0.5, changeFrequency: 'weekly' },
     { path: '/clientes-vip', priority: 0.4, changeFrequency: 'monthly' },
     { path: '/quienes-somos', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/faqs', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/como-reservar-fin-semana', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/inteligencia-artificial', priority: 0.5, changeFrequency: 'monthly' },
     { path: '/video-tutoriales', priority: 0.5, changeFrequency: 'monthly' },
-    { path: '/aviso-legal', priority: 0.3, changeFrequency: 'yearly' },
-    { path: '/privacidad', priority: 0.3, changeFrequency: 'yearly' },
-    { path: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
+    // NOTA: Páginas con redirect 301 (/como-funciona, /publicaciones) excluidas del sitemap
+    // NOTA: Páginas legales (/aviso-legal, /privacidad, /cookies) excluidas del sitemap - tienen noindex
     { path: '/sitemap-html', priority: 0.2, changeFrequency: 'monthly' },
   ];
 
