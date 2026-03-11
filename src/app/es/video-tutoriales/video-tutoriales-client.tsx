@@ -60,6 +60,19 @@ export function VideoTutorialesClient() {
         </div>
       </section>
 
+      {/* Intro */}
+      <section className="py-12 bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4 max-w-4xl text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{t("Todo lo que necesitas saber antes de tu viaje")}</h2>
+          <p className="text-gray-600 mb-4">
+            {t("Entendemos que viajar en autocaravana por primera vez puede generar dudas. Por eso, hemos preparado esta colección completa de video tutoriales explicativos. En ellos, te mostramos paso a paso y de manera visual cómo utilizar todos los sistemas de nuestras campers, desde el panel de control central hasta el vaciado de depósitos.")}
+          </p>
+          <p className="text-gray-600">
+            {t("Te recomendamos visualizar estos videos antes del día de recogida para familiarizarte con el vehículo. De esta forma, el día de la entrega podremos centrarnos en resolver tus dudas específicas y agilizar el proceso para que puedas comenzar tus vacaciones lo antes posible. Si durante tu viaje no recuerdas cómo funciona algo, siempre puedes volver a esta página.")}
+          </p>
+        </div>
+      </section>
+
       {/* Videos Grid */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">

@@ -81,6 +81,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...WOHNMOBIL_MAROKKO_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(WOHNMOBIL_MAROKKO_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

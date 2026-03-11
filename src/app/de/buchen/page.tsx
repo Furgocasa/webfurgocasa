@@ -9,6 +9,7 @@ const RESERVAR_METADATA: Metadata = {
   description: "Buchen Sie Ihr Wohnmobil oder Camper online in wenigen Schritten. Wählen Sie Daten, wählen Sie ein Fahrzeug und vervollständigen Sie Ihre Buchung. Abholung in Murcia oder Madrid.",
   keywords: "wohnmobil online buchen, wohnmobil reservieren, wohnmobil mieten murcia, online buchen furgocasa",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Wohnmobil online buchen",
     description: "Buchen Sie Ihr Wohnmobil in wenigen Schritten. Abholung in Murcia oder Madrid.",
     type: "website",
@@ -42,6 +43,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...RESERVAR_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(RESERVAR_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

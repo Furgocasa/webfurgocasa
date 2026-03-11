@@ -347,14 +347,19 @@ export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): stri
   // El contenido de blog puede tener SVGs embebidos con <title>Banner Mapa Furgocasa</title>
   let sanitized = html.replace(/<title[^>]*>[\s\S]*?<\/title>/gi, '');
 
-  // Paso 2: Corregir http:// → https:// en todos los links a furgocasa.com
+  // Paso 2: Corregir http:// → https:// general para furgocasa y otras webs (evita warnings SEO)
   sanitized = sanitized.replace(
-    /href="http:\/\/(www\.)?furgocasa\.com/g,
-    'href="https://www.furgocasa.com'
+    /http:\/\/(www\.)?(furgocasa\.com|mapafurgocasa\.com)/g,
+    'https://$1$2'
+  );
+  // Reemplazar enlaces http genéricos por https en href y src, excepto w3.org (namespaces)
+  sanitized = sanitized.replace(
+    /(href|src)="http:\/\/(?!www\.w3\.org)/g,
+    '$1="https://'
   );
 
   // Paso 3: Corregir links internos del blog con locale incorrecto
-  return sanitized.replace(
+  sanitized = sanitized.replace(
     /href="(?:https?:\/\/(?:www\.)?furgocasa\.com)?\/(es|en|fr|de)\/blog\/([^/"]+)\/([^/"]+)"/g,
     (_match, linkLocale: string, categorySlug: string, articleSlug: string) => {
       const detectedLocale = detectCategoryLocale(categorySlug);
@@ -373,4 +378,15 @@ export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): stri
       return `href="/${linkLocale}/blog/${categorySlug}/${articleSlug}"`;
     }
   );
+
+  // Paso 4: Añadir alt genérico a las imágenes que no lo tengan (Mejora SEO)
+  sanitized = sanitized.replace(/<img(?![^>]*\balt=)[^>]*>/gi, (match) => {
+    return match.replace('<img', '<img alt="Imagen del artículo de blog de Furgocasa"');
+  });
+
+  // Paso 5: Reemplazar h1 por h2 en el contenido para evitar múltiples H1 (Mejora SEO)
+  sanitized = sanitized.replace(/<h1/gi, '<h2');
+  sanitized = sanitized.replace(/<\/h1>/gi, '</h2>');
+
+  return sanitized;
 }

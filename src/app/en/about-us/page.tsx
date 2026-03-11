@@ -39,6 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: "about furgocasa, camper rental company murcia, furgocasa history, furgocasa family, motorhomes murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       title: t("Quiénes Somos"),
       description: t("Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2012."),
       type: "website",

@@ -18,6 +18,7 @@ const VENTAS_METADATA: Metadata = {
   description: "Buy your second-hand motorhome or campervan at Furgocasa. Fleet vehicles, inspected with warranty. Full history known. Financing available.",
   keywords: "buy motorhome, used campervan, second-hand motorhome, used camper, buy campervan spain, motorhome warranty",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Motorhomes and Campervans for Sale",
     description: "Fleet vehicles, inspected with warranty. Full history known.",
     type: "website",
@@ -51,6 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...VENTAS_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(VENTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

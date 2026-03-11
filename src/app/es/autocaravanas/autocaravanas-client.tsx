@@ -1228,7 +1228,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
             </p>
 
             <div className="space-y-3">
-              {FAQ_DATA.map((faq, i) => (
+              {content.faq.items.map((faq, i) => (
                 <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
                   <button
                     onClick={() => setOpenFaq(openFaq === i ? null : i)}
@@ -1289,7 +1289,7 @@ export function AutocaravanasClient({ initialServices, initialCount, stats, prov
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "FAQPage",
-            "mainEntity": FAQ_DATA.map((faq) => ({
+            "mainEntity": content.faq.items.map((faq) => ({
               "@type": "Question",
               "name": faq.q,
               "acceptedAnswer": {

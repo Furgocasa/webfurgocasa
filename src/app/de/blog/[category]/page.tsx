@@ -73,6 +73,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: meta.description,
     keywords: `wohnmobil blog ${category}, ${category} artikel, camper reisen, furgocasa blog`,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       title: `${meta.name} - ${t("Blog Camper")}`,
       description: meta.description,
       type: "website",

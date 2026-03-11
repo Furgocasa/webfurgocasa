@@ -36,6 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t("Consulta las tarifas de alquiler de campers y autocaravanas en Furgocasa. Precios desde 95€/día según temporada. Descuentos por larga estancia y kilómetros ilimitados incluidos."),
     keywords: "tarifs location camping-car, prix camping-car, location camping-car murcie prix, tarifs furgocasa, coût location camping-car",
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       title: t("Tarifas y Precios de Alquiler de Campers"),
       description: t("Precios transparentes desde 95€/día. Descuentos hasta -30% por larga estancia. Kilómetros ilimitados incluidos."),
       type: "website",

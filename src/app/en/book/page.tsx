@@ -10,6 +10,7 @@ const RESERVAR_METADATA: Metadata = {
   description: "Book your campervan or motorhome online in a few steps. Select dates, choose vehicle and complete your booking. Pick-up in Murcia or Madrid.",
   keywords: "book campervan online, motorhome reservation, rent camper murcia, book online furgocasa",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Book Campervan Online",
     description: "Book your campervan in a few steps. Pick-up in Murcia or Madrid.",
     type: "website",
@@ -44,6 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...RESERVAR_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(RESERVAR_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

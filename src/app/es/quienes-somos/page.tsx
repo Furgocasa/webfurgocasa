@@ -34,12 +34,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
-    title: t("Quiénes Somos"),
+    title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
     description: t("Furgocasa es una empresa familiar nacida de la pasión por el mundo camper. Desde 2012, ofrecemos alquiler de autocaravanas premium en Murcia con más de 500 viajes realizados."),
     keywords: "quienes somos furgocasa, empresa alquiler camper murcia, historia furgocasa, familia furgocasa, autocaravanas murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      title: t("Quiénes Somos"),
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
       description: t("Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2012."),
       type: "website",
       url: alternates.canonical,
@@ -100,10 +101,13 @@ export default async function LocaleQuienesSomosPage() {
                   {t("Somos una empresa familiar nacida de la pasión por el mundo camper y las ganas de compartir esa libertad con los demás.")}
                 </p>
                 <p className="text-lg mb-6">
-                  {t("En Furgocasa, no solo alquilamos vehículos; ofrecemos experiencias. Entendemos que cada viaje es único y personal, por eso cuidamos cada detalle para que tu única preocupación sea disfrutar del camino.")}
+                  {t("En Furgocasa, no solo alquilamos vehículos; ofrecemos experiencias. Entendemos que cada viaje es único y personal, por eso cuidamos cada detalle para que tu única preocupación sea disfrutar del camino. Ya sea tu primera vez en autocaravana o seas un viajero experimentado, nuestro equipo te guiará en cada paso del proceso, asegurándose de que tengas todo lo necesario para una aventura inolvidable.")}
+                </p>
+                <p className="text-lg mb-6">
+                  {t("Nuestra flota está compuesta por vehículos modernos, seguros y equipados con todo lo necesario para que te sientas como en casa, estés donde estés. Cada vehículo es revisado minuciosamente antes de cada entrega, garantizando los más altos estándares de calidad y seguridad para ti y los tuyos.")}
                 </p>
                 <p className="text-lg">
-                  {t("Nuestra flota está compuesta por vehículos modernos, seguros y equipados con todo lo necesario para que te sientas como en casa, estés donde estés.")}
+                  {t("Desde nuestras instalaciones en Murcia, hemos sido el punto de partida de cientos de historias increíbles a lo largo de España y Europa. Nos enorgullece ser parte de tus recuerdos y trabajamos cada día para seguir siendo la opción preferida de los amantes del caravaning. Tu satisfacción es nuestro mayor éxito.")}
                 </p>
               </div>
 

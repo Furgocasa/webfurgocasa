@@ -18,6 +18,7 @@ const VENTAS_METADATA: Metadata = {
   description: "Compra tu autocaravana o camper de ocasión en Furgocasa. Vehículos de nuestra flota, revisados con garantía. Historial completo conocido. Financiación disponible.",
   keywords: "comprar autocaravana, camper segunda mano, venta autocaravana ocasión, camper usado, comprar camper murcia, autocaravana ocasión garantía",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Autocaravanas y Campers en Venta",
     description: "Vehículos de nuestra flota, revisados con garantía. Historial completo conocido.",
     type: "website",
@@ -51,6 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...VENTAS_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(VENTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

@@ -12,6 +12,7 @@ const PARKING_MURCIA_METADATA: Metadata = {
   description: "Aparcamiento de larga duración para autocaravanas, campers y caravanas en Casillas, Murcia. Plazas amplias, acceso fácil, videovigilancia, electricidad y zona de aguas. Desde 75€/mes.",
   keywords: "parking autocaravanas murcia, aparcamiento caravanas murcia, parking campers murcia, parking larga duración, guardar autocaravana murcia, parking casillas murcia, aparcamiento autocaravanas seguro",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Parking Larga Duración para Autocaravanas en Murcia | Casillas",
     description: "Aparcamiento de larga duración en Casillas, Murcia. Plazas amplias, videovigilancia, electricidad y zona de aguas. Desde 75€/mes.",
     type: "website",
@@ -46,6 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...PARKING_MURCIA_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(PARKING_MURCIA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

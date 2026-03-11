@@ -12,6 +12,7 @@ const PARKING_MURCIA_METADATA: Metadata = {
   description: "Bewachter Parkplatz für Wohnmobile und Camper in Murcia. 24h Zugang, Videoüberwachung, Strom, Wasserzone und Chemie-WC Entleerung. Ab 10€/Tag.",
   keywords: "wohnmobil parkplatz murcia, camper abstellen murcia, wohnwagen parkplatz murcia, wohnmobil stellplatz, sicherer camper parkplatz",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Wohnmobil-Parkplatz in Murcia",
     description: "24h bewachter Parkplatz für Ihr Wohnmobil in Murcia. Wasser, Strom und Entsorgung.",
     type: "website",
@@ -46,6 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...PARKING_MURCIA_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(PARKING_MURCIA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

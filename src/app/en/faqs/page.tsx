@@ -10,6 +10,7 @@ const FAQS_METADATA: Metadata = {
   description: "Get answers to your questions about motorhome rental at Furgocasa. Requirements, insurance, mileage, pets, pick-up and return. Everything you need to know.",
   keywords: "campervan rental faq, motorhome questions, camper rental requirements, furgocasa faqs, motorhome rental information",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Frequently Asked Questions about Campervan Rental",
     description: "Get all your questions about motorhome rental answered. Requirements, insurance, pets and more.",
     type: "website",
@@ -43,6 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...FAQS_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(FAQS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

@@ -12,6 +12,7 @@ const GUIA_CAMPER_METADATA: Metadata = {
   description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen: Bedienfeld, Wassertanks, Elektrik, Heizung, Gas und mehr. Praktischer Ratgeber für Anfänger und Experten.",
   keywords: "wohnmobil ratgeber, wie benutzt man wohnmobil, wohnmobil handbuch, wohnmobil funktionsweise, wohnmobil elektrik, wohnmobil wasser, wohnmobil heizung",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Kompletter Wohnmobil-Ratgeber",
     description: "Alles, was Sie über die Funktionsweise Ihres Miet-Wohnmobils wissen müssen.",
     type: "website",
@@ -46,6 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...GUIA_CAMPER_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(GUIA_CAMPER_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

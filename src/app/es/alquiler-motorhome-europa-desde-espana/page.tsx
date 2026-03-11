@@ -30,12 +30,12 @@ export const revalidate = 86400;
 
 // 🎯 METADATA SEO - Keywords diferenciadas para EUROPA (evitar canibalización)
 const MOTORHOME_EUROPA_METADATA: Metadata = {
-  title: "Alquiler Motorhome Europa | Recorré Francia, Italia, Portugal",
+  title: "Alquiler de Motorhome en Europa desde España",
   description: "Alquilá tu motorhome y recorré toda Europa en casa rodante. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español. Base de salida en Murcia. ¡Arrancá tu aventura europea!",
   keywords: "alquiler motorhome europa, casa rodante europa, motorhome para viajar por europa, alquiler autocaravana europa, casa rodante recorrer europa, motorhome francia italia portugal, campervan europa, alquiler motorhome recorrer europa",
   authors: [{ name: "Furgocasa" }],
   openGraph: {
-    title: "Alquiler Motorhome Europa | Recorré Francia, Italia, Portugal",
+    title: "Alquiler de Motorhome en Europa desde España",
     description: "Tu aventura europea comienza aquí. Casa rodante con kilómetros ilimitados para recorrer Francia, Italia, Portugal y más. Asistencia 24/7 en español.",
     type: "website",
     siteName: "Furgocasa - Alquiler de Motorhomes",
@@ -81,6 +81,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...MOTORHOME_EUROPA_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(MOTORHOME_EUROPA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

@@ -12,6 +12,7 @@ const IA_METADATA: Metadata = {
   description: "Discover our AI tools to plan your camper trip. 24/7 intelligent chatbot and AI-powered route planner.",
   keywords: "artificial intelligence camper, motorhome chatbot, ai route planner, virtual camper assistant, camper travel technology",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Artificial Intelligence for Camper Travelers",
     description: "AI chatbot and intelligent route planner for your camper trip.",
     type: "website",
@@ -46,6 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...IA_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(IA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

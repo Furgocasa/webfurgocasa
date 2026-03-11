@@ -12,6 +12,7 @@ const PARKING_MURCIA_METADATA: Metadata = {
   description: "Secure parking for motorhomes and campervans in Murcia. 24h access, video surveillance, electricity, water area and chemical toilet disposal. From €10/day.",
   keywords: "motorhome parking murcia, store camper murcia, caravan parking murcia, motorhome storage, secure camper parking",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Motorhome Parking in Murcia",
     description: "24h secure parking for your motorhome in Murcia. Water, electricity and disposal services.",
     type: "website",
@@ -46,6 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...PARKING_MURCIA_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(PARKING_MURCIA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

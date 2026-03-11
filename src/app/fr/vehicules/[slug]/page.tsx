@@ -66,6 +66,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     description,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       title,
       description,
       url: alternates.canonical,

@@ -117,6 +117,21 @@ export function ReservarClient() {
         </div>
       </section>
 
+      {/* SEO Text Block */}
+      <section className="bg-white py-12">
+        <div className="container mx-auto px-4 text-center max-w-4xl">
+          <h2 className="text-2xl font-heading font-bold text-gray-900 mb-4">
+            Alquiler de Autocaravanas y Campers Online
+          </h2>
+          <p className="text-gray-600 mb-4">
+            Alquilar una camper o autocaravana online nunca fue tan sencillo. En Furgocasa te ofrecemos un proceso de reserva rápido, transparente y 100% online. Nuestra flota cuenta con modelos nuevos y totalmente equipados, ideales para explorar la Región de Murcia, viajar por España o emprender una aventura por toda Europa.
+          </p>
+          <p className="text-gray-600">
+            Además, nuestro equipo de atención al cliente está siempre disponible para asesorarte en la elección del vehículo que mejor se adapte a tus necesidades, explicarte el funcionamiento del equipamiento y resolver cualquier duda que pueda surgir antes, durante o después de tu viaje. Confía en Furgocasa para tus próximas vacaciones sobre ruedas.
+          </p>
+        </div>
+      </section>
+
       {/* Pasos del alquiler */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">

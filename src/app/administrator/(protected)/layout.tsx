@@ -36,6 +36,7 @@ export const metadata: Metadata = {
     telephone: false,
   },
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     type: "website",
     siteName: "Furgocasa Admin",
     title: "Furgocasa Admin",

@@ -10,6 +10,7 @@ const FAQS_METADATA: Metadata = {
   description: "Resuelve tus dudas sobre el alquiler de autocaravanas en Furgocasa. Requisitos, seguros, kilómetros, mascotas, recogida y devolución. Todo lo que necesitas saber.",
   keywords: "preguntas frecuentes alquiler camper, dudas autocaravana, requisitos alquiler camper, faqs furgocasa, información alquiler autocaravana",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Preguntas Frecuentes sobre Alquiler de Campers",
     description: "Resuelve todas tus dudas sobre el alquiler de autocaravanas. Requisitos, seguros, mascotas y más.",
     type: "website",

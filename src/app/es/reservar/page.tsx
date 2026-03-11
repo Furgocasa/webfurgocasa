@@ -6,11 +6,12 @@ import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Único y optimizado para /reservar
 const RESERVAR_METADATA: Metadata = {
-  title: "Reservar Camper Online",
+  title: "Reservar Camper o Autocaravana Online en Furgocasa",
   description: "Reserva tu camper o autocaravana online en pocos pasos. Selecciona fechas, elige vehículo y completa tu reserva. Recogida en Murcia o Madrid.",
   keywords: "reservar camper online, reserva autocaravana, alquilar camper murcia, reserva online furgocasa",
-  openGraph: {
-    title: "Reservar Camper Online",
+    openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+    title: "Reservar Camper o Autocaravana Online en Furgocasa",
     description: "Reserva tu camper en pocos pasos. Recogida en Murcia o Madrid.",
     type: "website",
     url: "https://www.furgocasa.com/es/reservar",
@@ -44,6 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...RESERVAR_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(RESERVAR_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

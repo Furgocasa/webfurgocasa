@@ -30,12 +30,12 @@ export const revalidate = 86400;
 
 // 🎯 METADATA SEO - Keywords específicas MARRUECOS
 const MOTORHOME_MARRUECOS_METADATA: Metadata = {
-  title: "Alquiler Motorhome Marruecos | Viaje a Marruecos desde España",
+  title: "Alquiler de Motorhome a Marruecos desde España",
   description: "Alquilá tu motorhome y viajá a Marruecos desde España. Permitimos cruzar a África. Ferry, documentación y seguro incluido. Asistencia 24/7 en español. ¡Empezá tu aventura marroquí!",
   keywords: "alquiler motorhome marruecos, casa rodante marruecos, motorhome para viajar a marruecos, alquiler autocaravana marruecos, casa rodante africa, motorhome tanger marrakech, camper marruecos españa, viaje marruecos camper",
   authors: [{ name: "Furgocasa" }],
   openGraph: {
-    title: "Alquiler Motorhome Marruecos | Viaje a Marruecos desde España",
+    title: "Alquiler de Motorhome a Marruecos desde España",
     description: "Tu aventura africana comienza aquí. Casa rodante con permiso para cruzar a Marruecos. Tánger, Marrakech, desierto del Sahara... Asistencia 24/7 en español.",
     type: "website",
     siteName: "Furgocasa - Alquiler de Motorhomes",
@@ -81,6 +81,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...MOTORHOME_MARRUECOS_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(MOTORHOME_MARRUECOS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

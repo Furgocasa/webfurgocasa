@@ -10,6 +10,7 @@ const RESERVAR_METADATA: Metadata = {
   description: "Réservez votre camping-car ou van en ligne en quelques étapes. Sélectionnez les dates, choisissez le véhicule et complétez votre réservation. Récupération à Murcie ou Madrid.",
   keywords: "réserver camping-car en ligne, réservation van, louer camping-car murcie, réservation en ligne furgocasa",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Réserver Camping-Car en Ligne",
     description: "Réservez votre camping-car en quelques étapes. Récupération à Murcie ou Madrid.",
     type: "website",
@@ -44,6 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...RESERVAR_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(RESERVAR_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

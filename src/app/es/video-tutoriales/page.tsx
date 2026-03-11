@@ -8,11 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Único y optimizado para /video-tutoriales
 const VIDEO_TUTORIALES_METADATA: Metadata = {
-  title: "Video Tutoriales del Camper",
+  title: "Video Tutoriales y Guías de Uso del Camper",
   description: "Videos tutoriales sobre el funcionamiento de tu camper de alquiler. Panel de control, agua, electricidad, calefacción, nevera y más sistemas explicados paso a paso.",
   keywords: "video tutorial camper, como usar autocaravana, tutorial panel control camper, videos furgocasa, aprender usar camper",
-  openGraph: {
-    title: "Video Tutoriales del Camper",
+    openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+    title: "Video Tutoriales y Guías de Uso del Camper",
     description: "Aprende a usar tu camper de alquiler con nuestros videos tutoriales.",
     type: "website",
     siteName: "Furgocasa",
@@ -46,6 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...VIDEO_TUTORIALES_METADATA,
     alternates,
     openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(VIDEO_TUTORIALES_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

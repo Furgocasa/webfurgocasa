@@ -12,6 +12,7 @@ const GUIA_CAMPER_METADATA: Metadata = {
   description: "Aprende a usar tu camper de alquiler: panel de control, depósitos de agua, electricidad, calefacción, gas y más. Guía práctica para principiantes y expertos.",
   keywords: "guía camper, cómo usar autocaravana, manual camper, funcionamiento camper, electricidad autocaravana, agua camper, calefacción camper",
   openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Guía Completa del Camper",
     description: "Todo lo que necesitas saber sobre el funcionamiento de tu camper de alquiler.",
     type: "website",

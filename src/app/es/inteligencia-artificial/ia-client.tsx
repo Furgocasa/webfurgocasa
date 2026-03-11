@@ -43,16 +43,16 @@ export function IAClient() {
 
               <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-8 rounded-3xl mb-10 border border-blue-100">
                 <p className="mb-6">
-                  {t("Después de meses de trabajo y mucha ilusión, hemos desarrollado dos herramientas revolucionarias que transformarán tu experiencia de viaje en camper:")}
+                  {t("Después de meses de trabajo y mucha ilusión, hemos desarrollado dos herramientas revolucionarias que transformarán tu experiencia de viaje en camper. Nuestra misión es facilitar cada etapa de tu aventura, desde la planificación inicial hasta la resolución de dudas durante el trayecto, utilizando la tecnología más avanzada del mercado para ofrecerte un servicio inigualable:")}
                 </p>
                 <ul className="space-y-4">
                   <li className="flex items-start gap-3">
                     <MessageSquare className="h-6 w-6 text-furgocasa-blue flex-shrink-0 mt-1" />
-                    <span><strong>{t("Chatbot IA:")}</strong> {t("Tu asistente virtual 24/7 para resolver dudas sobre el camper")}</span>
+                    <span><strong>{t("Chatbot IA:")}</strong> {t("Tu asistente virtual 24/7 para resolver dudas sobre el camper. Olvídate de los manuales en papel, pregúntale a nuestra IA cómo funciona la calefacción, el panel de control o dónde vaciar las aguas grises.")}</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <Map className="h-6 w-6 text-furgocasa-orange flex-shrink-0 mt-1" />
-                    <span><strong>{t("Planificador de Rutas IA:")}</strong> {t("Crea itinerarios personalizados en segundos")}</span>
+                    <span><strong>{t("Planificador de Rutas IA:")}</strong> {t("Crea itinerarios personalizados en segundos basándote en tus intereses, el tiempo disponible y las mejores carreteras para vehículos camper.")}</span>
                   </li>
                 </ul>
               </div>

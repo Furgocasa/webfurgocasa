@@ -290,10 +290,10 @@ export default async function LocaleBlogPostPage({
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="mt-12 pt-8 border-t border-gray-200">
-                  <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Tag className="h-4 w-4" />
                     {t("Etiquetas")}
-                  </h3>
+                  </h2>
                   <div className="flex flex-wrap gap-2">
                     {post.tags.map((tag) => (
                       <span
@@ -309,9 +309,9 @@ export default async function LocaleBlogPostPage({
 
               {/* Share Buttons */}
               <div className="mt-12 pt-8 border-t border-gray-200">
-                <h3 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">
+                <h2 className="text-sm font-bold text-gray-500 uppercase tracking-wider mb-4">
                   {t("Compartir artículo")}
-                </h3>
+                </h2>
                 <ShareButtons
                   url={url}
                   title={translatedPost.title || post.title}
@@ -336,10 +336,10 @@ export default async function LocaleBlogPostPage({
                 {/* Related Posts */}
                 {relatedPosts.length > 0 && (
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                    <h3 className="text-xl font-heading font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <h2 className="text-xl font-heading font-bold text-gray-900 mb-6 flex items-center gap-2">
                       <BookOpen className="h-5 w-5 text-furgocasa-orange" />
                       {t("Artículos relacionados")}
-                    </h3>
+                    </h2>
                     <div className="space-y-4">
                       {relatedPosts.slice(0, 3).map((related) => {
                         const hasTranslation = (locale === 'es') || (locale === 'en' && related.slug_en) || (locale === 'fr' && related.slug_fr) || (locale === 'de' && related.slug_de);
@@ -365,9 +365,9 @@ export default async function LocaleBlogPostPage({
                               />
                             </div>
                           )}
-                          <h4 className="text-sm font-bold text-gray-900 group-hover:text-furgocasa-blue transition-colors line-clamp-2 leading-snug">
+                          <h3 className="text-sm font-bold text-gray-900 group-hover:text-furgocasa-blue transition-colors line-clamp-2 leading-snug">
                             {(related as { title_en?: string | null }).title_en || related.title}
-                          </h4>
+                          </h3>
                           {related.published_at && (
                             <time className="text-xs text-gray-500 mt-1 block">
                               {formatDate(related.published_at, locale)}
@@ -382,9 +382,9 @@ export default async function LocaleBlogPostPage({
 
                 {/* CTA */}
                 <div className="bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark rounded-2xl p-6 text-white">
-                  <h3 className="text-xl font-heading font-bold mb-3">
+                  <h2 className="text-xl font-heading font-bold mb-3">
                     {t("¿Listo para tu aventura?")}
-                  </h3>
+                  </h2>
                   <p className="text-blue-100 text-sm mb-6">
                     {t("Descubre nuestra flota de campers y comienza tu viaje")}
                   </p>

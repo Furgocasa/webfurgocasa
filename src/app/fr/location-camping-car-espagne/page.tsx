@@ -32,7 +32,8 @@ const METADATA_BASE: Metadata = {
 export async function generateMetadata(): Promise<Metadata> {
   const locale: Locale = "fr";
   const alternates = buildCanonicalAlternates("/alquiler-motorhome-espana", locale);
-  return { ...METADATA_BASE, alternates, openGraph: { ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
+  return { ...METADATA_BASE, alternates, openGraph: {
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }], ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
 }
 
 export default async function LocationCampingCarEspagnePage() {
