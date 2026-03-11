@@ -431,5 +431,11 @@ export function sanitizeBlogContentLinks(html: string, pageLocale: Locale, artic
   sanitized = sanitized.replace(/<h1/gi, '<h2');
   sanitized = sanitized.replace(/<\/h1>/gi, '</h2>');
 
+  // Paso 6: Convertir enlaces vacíos (href="#", href="javascript:...") a span (evita empty_links SEO)
+  sanitized = sanitized.replace(
+    /<a\s+[^>]*href\s*=\s*["'](?:#|javascript\s*:\s*(?:void\s*\(\s*0\s*\)\s*;?|;?)|)\s*["'][^>]*>([\s\S]*?)<\/a>/gi,
+    '<span class="blog-empty-link">$1</span>'
+  );
+
   return sanitized;
 }
