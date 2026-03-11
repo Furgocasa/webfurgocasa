@@ -147,8 +147,9 @@ export default async function FaqDetailPage({ params }: { params: Promise<{ slug
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
               <span className="text-furgocasa-orange font-medium">{faq.category}</span>
-              <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-8">{faq.question}</h1>
-              <div className="bg-white rounded-xl shadow-sm p-8 prose prose-lg max-w-none" dangerouslySetInnerHTML={{ __html: faq.answer }} />
+              <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-4">{faq.question}</h1>
+              <h2 className="text-xl font-bold text-gray-800 mb-4">Antwort</h2>
+              <div className="bg-white rounded-xl shadow-sm p-8 prose prose-lg max-w-none prose-h3:font-bold prose-h4:font-semibold" dangerouslySetInnerHTML={{ __html: faq.answer }} />
 
               {faq.related.length > 0 && (
                 <div className="mt-8 bg-gray-100 rounded-xl p-6">

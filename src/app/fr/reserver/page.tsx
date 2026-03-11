@@ -6,12 +6,12 @@ import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Unique et optimisé pour /reserver
 const RESERVAR_METADATA: Metadata = {
-  title: "Réserver Camping-Car en Ligne",
+  title: "Réserver Camping-Car en Ligne - Réservation Murcie | Furgocasa",
   description: "Réservez votre camping-car ou van en ligne en quelques étapes. Sélectionnez les dates, choisissez le véhicule et complétez votre réservation. Récupération à Murcie ou Madrid.",
   keywords: "réserver camping-car en ligne, réservation van, louer camping-car murcie, réservation en ligne furgocasa",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Réserver Camping-Car en Ligne",
+    title: "Réserver Camping-Car en Ligne - Réservation Murcie | Furgocasa",
     description: "Réservez votre camping-car en quelques étapes. Récupération à Murcie ou Madrid.",
     type: "website",
     url: "https://www.furgocasa.com/fr/reserver",
@@ -20,7 +20,7 @@ const RESERVAR_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Réserver Camping-Car en Ligne",
+    title: "Réserver Camping-Car en Ligne - Réservation Murcie | Furgocasa",
     description: "Réservez votre camping-car en quelques étapes.",
   },
   robots: {

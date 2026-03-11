@@ -275,6 +275,8 @@ export function BlogListClient({
                         <img
                           src={post.featured_image}
                           alt={post.title || "Imagen del artículo"}
+                          width={400}
+                          height={224}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                       ) : (
@@ -378,6 +380,8 @@ export function BlogListClient({
                         <img
                           src={post.featured_image}
                           alt={post.title || "Imagen del artículo"}
+                          width={400}
+                          height={192}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                           loading="lazy"
                         />

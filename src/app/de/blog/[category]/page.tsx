@@ -15,8 +15,14 @@ import type { Locale } from "@/lib/i18n/config";
  * - /de/blog/routen → Alemán (via middleware)
  */
 
-// Mapeo de categorías a nombres y descripciones
+// Mapeo de categorías a nombres y descripciones (incluye slugs DE)
 const categoryMeta: Record<string, { name: string; description: string }> = {
+  routen: { name: "Wohnmobil-Routen", description: "Die besten Wohnmobil-Routen in Spanien und Europa. Entdecken Sie tolle Reiseziele und einzigartige Erlebnisse." },
+  tipps: { name: "Reisetipps für Wohnmobilfahrer", description: "Praktische Anleitungen und Tipps für Ihre Wohnmobil-Erfahrung. Expertenrat von Reisenden." },
+  reiseziele: { name: "Wohnmobil-Reiseziele", description: "Entdecken Sie die besten Reiseziele für Wohnmobil-Reisen. Strände, Berge und charmante Dörfer." },
+  ausrustung: { name: "Ausrüstung und Zubehör", description: "Alles über Zubehör und Ausrüstung für Ihren Camper. Bewertungen und Empfehlungen." },
+  nachrichten: { name: "Wohnmobil-Nachrichten", description: "Bleiben Sie auf dem Laufenden mit den neuesten Wohnmobil-News. Events, Messen und Trends." },
+  fahrzeuge: { name: "Fahrzeuge und Vergleiche", description: "Lernen Sie die besten Fahrzeuge für Wohnmobil-Reisen kennen. Vergleiche und Empfehlungen." },
   rutas: {
     name: "Rutas en Camper",
     description: "Las mejores rutas en camper por España y Europa. Descubre destinos increíbles, consejos de viaje y experiencias únicas para tu próxima aventura.",

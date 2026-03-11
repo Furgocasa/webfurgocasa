@@ -48,7 +48,7 @@ const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; k
     keywords: "alquiler autocaravanas, alquiler campers, furgonetas camper, motorhomes alquiler, weinsberg, dreamer, knaus",
   },
   en: {
-    title: "Motorhome & Campervan Rentals",
+    title: "Motorhome & Campervan Rentals - Hire from Murcia | Furgocasa",
     description: "Explore our motorhome and campervan fleet. Fully equipped vehicles from 95€/day with unlimited mileage.",
     keywords: "motorhome rental, campervan rental, camper vans, motorhome hire, furgocasa",
   },

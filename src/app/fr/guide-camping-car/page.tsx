@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Unique et optimisé pour /guide-camping-car
 const GUIA_CAMPER_METADATA: Metadata = {
-  title: "Guide Complet du Camping-Car",
+  title: "Guide Complet du Camping-Car - Manuel | Furgocasa",
   description: "Apprenez à utiliser votre camping-car de location : panneau de contrôle, réservoirs d'eau, électricité, chauffage, gaz et plus. Guide pratique pour débutants et experts.",
   keywords: "guide camping-car, comment utiliser van, manuel camping-car, fonctionnement camping-car, électricité van, eau camping-car, chauffage camping-car",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Guide Complet du Camping-Car",
+    title: "Guide Complet du Camping-Car - Manuel | Furgocasa",
     description: "Tout ce que vous devez savoir sur le fonctionnement de votre camping-car de location.",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const GUIA_CAMPER_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Guide Complet du Camping-Car",
+    title: "Guide Complet du Camping-Car - Manuel | Furgocasa",
     description: "Apprenez à utiliser votre camping-car de location.",
   },
   robots: {

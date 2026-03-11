@@ -8,7 +8,7 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const COMO_RESERVAR_FIN_SEMANA_METADATA: Metadata = {
-  title: "How to Book a Weekend",
+  title: "How to Book a Camper Weekend - Guide | Furgocasa",
   description: "Complete guide to rent a camper for the weekend. Schedules, prices and special conditions for short getaways.",
 };
 

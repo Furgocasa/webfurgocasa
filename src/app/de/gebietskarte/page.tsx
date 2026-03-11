@@ -12,7 +12,7 @@ import Image from "next/image";
 interface PageProps {}
 
 const MAPA_AREAS_METADATA: Metadata = {
-  title: "Furgocasa Karte - Wohnmobil-Stellplätze + KI Intelligentes Management | +3600 Standorte",
+  title: "Furgocasa Karte - Wohnmobil-Stellplätze + KI | +3600 | Furgocasa",
   description: "Ihre komplette Plattform zur Verwaltung Ihres Wohnmobils mit KI. +1000 verifizierte Stellplätze, intelligente Routen, GPT-4-Bewertung und 24/7-Schutz mit QR-System.",
   keywords: "wohnmobil karte, wohnmobilstellplätze, wohnmobil übernachtung, wohnmobil KI bewertung, GPT-4, wohnmobil QR-system, wohnmobil routen",
 };

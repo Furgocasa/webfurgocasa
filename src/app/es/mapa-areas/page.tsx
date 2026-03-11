@@ -12,7 +12,7 @@ import Image from "next/image";
 interface PageProps {}
 
 const MAPA_AREAS_METADATA: Metadata = {
-  title: "Mapa Furgocasa - Áreas Autocaravanas + Gestión Inteligente con IA | +3600 Ubicaciones",
+  title: "Mapa Furgocasa - Áreas Autocaravanas + IA | +3600 Ubicaciones | Furgocasa",
   description: "Tu plataforma completa para gestionar tu autocaravana con IA. +1000 áreas verificadas, rutas inteligentes, valoración con GPT-4 y protección 24/7 con sistema QR.",
   keywords: "mapa autocaravanas, áreas autocaravanas, pernocta autocaravanas, valoración autocaravana IA, GPT-4, sistema QR autocaravana, rutas autocaravanas",
 };

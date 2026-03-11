@@ -5,12 +5,12 @@ import type { Locale } from "@/lib/i18n/config";
 
 // 🎯 SEO Metadata - Unique and optimized for /book
 const RESERVAR_METADATA: Metadata = {
-  title: "Book Campervan Online",
+  title: "Book Campervan Online - Reserve Your Motorhome | Furgocasa",
   description: "Book your campervan or motorhome online in a few steps. Select dates, choose vehicle and complete your booking. Pick-up in Murcia or Madrid.",
   keywords: "book campervan online, motorhome reservation, rent camper murcia, book online furgocasa",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Book Campervan Online",
+    title: "Book Campervan Online - Reserve Your Motorhome | Furgocasa",
     description: "Book your campervan in a few steps. Pick-up in Murcia or Madrid.",
     type: "website",
     url: "https://www.furgocasa.com/en/book",
@@ -19,7 +19,7 @@ const RESERVAR_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Book Campervan Online",
+    title: "Book Campervan Online - Reserve Your Motorhome | Furgocasa",
     description: "Book your campervan in a few steps.",
   },
   robots: {

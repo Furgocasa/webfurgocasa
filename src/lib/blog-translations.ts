@@ -418,6 +418,15 @@ export function sanitizeBlogContentLinks(html: string, pageLocale: Locale, artic
     return match.replace(/^<img\s*/, `<img alt="${descriptiveAlt}" `);
   });
 
+  // Paso 4b: Añadir width/height a imágenes sin dimensiones (evita CLS)
+  sanitized = sanitized.replace(/<img\s*([\s\S]*?)>/gi, (match, attrs) => {
+    const hasWidth = /width\s*=/i.test(attrs);
+    const hasHeight = /height\s*=/i.test(attrs);
+    if (hasWidth && hasHeight) return match;
+    const dims = !hasWidth && !hasHeight ? ' width="800" height="450"' : !hasWidth ? ' width="800"' : ' height="450"';
+    return match.replace(/^<img\s*/, `<img${dims} `);
+  });
+
   // Paso 5: Reemplazar h1 por h2 en el contenido para evitar múltiples H1 (Mejora SEO)
   sanitized = sanitized.replace(/<h1/gi, '<h2');
   sanitized = sanitized.replace(/<\/h1>/gi, '</h2>');

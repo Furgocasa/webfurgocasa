@@ -58,7 +58,7 @@ const VEHICULOS_METADATA: Record<Locale, { title: string; description: string; k
     keywords: "location camping-car, location van, camping-cars, vans aménagés, furgocasa",
   },
   de: {
-    title: "Wohnmobil & Camper mieten",
+    title: "Wohnmobil & Camper mieten - Vermietung Murcia | Furgocasa",
     description: "Entdecke unsere Wohnmobil- und Camperflotte. Voll ausgestattet ab 95€/Tag mit unbegrenzten Kilometern.",
     keywords: "wohnmobil mieten, camper mieten, wohnmobilvermietung, campervan, furgocasa",
   },

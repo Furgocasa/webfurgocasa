@@ -12,7 +12,7 @@ import Image from "next/image";
 interface PageProps {}
 
 const MAPA_AREAS_METADATA: Metadata = {
-  title: "Carte Furgocasa - Aires Camping-Cars + Gestion Intelligente IA | +3600 Emplacements",
+  title: "Carte Furgocasa - Aires Camping-Cars + IA | +3600 | Furgocasa",
   description: "Votre plateforme complète pour gérer votre camping-car avec l'IA. +1000 aires vérifiées, routes intelligentes, évaluation GPT-4 et protection 24/7 avec système QR.",
   keywords: "carte camping-cars, aires camping-cars, stationnement camping-cars, évaluation camping-car IA, GPT-4, système QR camping-car, routes camping-cars",
 };

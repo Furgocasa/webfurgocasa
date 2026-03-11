@@ -15,8 +15,14 @@ import type { Locale } from "@/lib/i18n/config";
  * - /de/blog/routen → Alemán (via middleware)
  */
 
-// Mapeo de categorías a nombres y descripciones
+// Mapeo de categorías a nombres y descripciones (incluye slugs FR)
 const categoryMeta: Record<string, { name: string; description: string }> = {
+  itineraires: { name: "Itinéraires en Camping-Car", description: "Les meilleurs itinéraires en camping-car en Espagne et Europe. Découvrez des destinations incroyables et des expériences uniques." },
+  conseils: { name: "Conseils pour Voyageurs Camping-Car", description: "Guides pratiques et conseils pour profiter au maximum de votre expérience camping-car." },
+  destinations: { name: "Destinations Camping-Car", description: "Découvrez les meilleures destinations pour voyager en camping-car. Plages, montagnes et villages charmants." },
+  equipement: { name: "Équipement et Accessoires", description: "Tout sur les accessoires et équipements pour votre camping-car. Avis et recommandations." },
+  actualites: { name: "Actualités Camping-Car", description: "Restez informé des dernières nouveautés du monde du camping-car. Événements et tendances." },
+  vehicules: { name: "Véhicules et Comparatifs", description: "Découvrez les meilleurs véhicules pour voyager en camping-car. Comparatifs et recommandations." },
   rutas: {
     name: "Rutas en Camper",
     description: "Las mejores rutas en camper por España y Europa. Descubre destinos increíbles, consejos de viaje y experiencias únicas para tu próxima aventura.",

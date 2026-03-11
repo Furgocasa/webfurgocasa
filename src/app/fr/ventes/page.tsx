@@ -14,12 +14,12 @@ const supabase = createClient(
 
 // 🎯 SEO Metadata - Unique et optimisé pour /ventes
 const VENTAS_METADATA: Metadata = {
-  title: "Camping-Cars et Vans à Vendre",
+  title: "Camping-Cars et Vans à Vendre - Achat Occasion | Furgocasa",
   description: "Achetez votre camping-car ou van d'occasion chez Furgocasa. Véhicules de notre flotte, révisés avec garantie. Historique complet connu. Financement disponible.",
   keywords: "acheter camping-car, van occasion, vente camping-car occasion, van usagé, acheter van espagne, camping-car garantie",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Camping-Cars et Vans à Vendre",
+    title: "Camping-Cars et Vans à Vendre - Achat Occasion | Furgocasa",
     description: "Véhicules de notre flotte, révisés avec garantie. Historique complet connu.",
     type: "website",
     siteName: "Furgocasa",
@@ -27,7 +27,7 @@ const VENTAS_METADATA: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Camping-Cars et Vans à Vendre",
+    title: "Camping-Cars et Vans à Vendre - Achat Occasion | Furgocasa",
     description: "Véhicules révisés avec garantie. Historique complet.",
   },
   robots: {

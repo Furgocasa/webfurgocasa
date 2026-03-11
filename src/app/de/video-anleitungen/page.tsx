@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Einzigartig und optimiert für /video-anleitungen
 const VIDEO_TUTORIALES_METADATA: Metadata = {
-  title: "Video-Anleitungen Wohnmobil",
+  title: "Video-Anleitungen Wohnmobil - Bedienung lernen | Furgocasa",
   description: "Video-Anleitungen zur Bedienung Ihres Miet-Wohnmobils. Bedienfeld, Wasser, Elektrik, Heizung, Kühlschrank und mehr Systeme Schritt für Schritt erklärt.",
   keywords: "video anleitung wohnmobil, wie benutzt man wohnmobil, tutorial bedienfeld wohnmobil, videos furgocasa, wohnmobil benutzen lernen",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Video-Anleitungen Wohnmobil",
+    title: "Video-Anleitungen Wohnmobil - Bedienung lernen | Furgocasa",
     description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen mit unseren Video-Anleitungen.",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const VIDEO_TUTORIALES_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Video-Anleitungen Wohnmobil",
+    title: "Video-Anleitungen Wohnmobil - Bedienung lernen | Furgocasa",
     description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen.",
   },
   robots: {

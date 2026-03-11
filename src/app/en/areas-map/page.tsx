@@ -12,7 +12,7 @@ import Image from "next/image";
 interface PageProps {}
 
 const MAPA_AREAS_METADATA: Metadata = {
-  title: "Furgocasa Map - Motorhome Areas + AI Intelligent Management | +3600 Locations",
+  title: "Furgocasa Map - Motorhome Areas + AI | +3600 Locations | Furgocasa",
   description: "Your complete platform to manage your motorhome with AI. +1000 verified areas, intelligent routes, GPT-4 valuation and 24/7 protection with QR system.",
   keywords: "motorhome map, motorhome areas, motorhome overnight parking, motorhome AI valuation, GPT-4, motorhome QR system, motorhome routes",
 };

@@ -15,8 +15,14 @@ import type { Locale } from "@/lib/i18n/config";
  * - /de/blog/routen → Alemán (via middleware)
  */
 
-// Mapeo de categorías a nombres y descripciones
+// Mapeo de categorías a nombres y descripciones (incluye slugs EN)
 const categoryMeta: Record<string, { name: string; description: string }> = {
+  routes: { name: "Camper Routes", description: "The best camper routes across Spain and Europe. Discover amazing destinations, travel tips and unique experiences for your next adventure." },
+  tips: { name: "Travel Tips for Campers", description: "Practical guides and tips to get the most out of your camper experience. Expert traveler advice." },
+  destinations: { name: "Camper Destinations", description: "Discover the best destinations for camper travel. Beaches, mountains, charming villages and unique places." },
+  equipment: { name: "Equipment and Accessories", description: "Everything about accessories, equipment and gadgets for your camper. Reviews, comparisons and recommendations." },
+  news: { name: "Camper News", description: "Stay up to date with the latest camper world news. Events, fairs, industry updates and caravaning trends." },
+  vehicles: { name: "Vehicles and Comparisons", description: "Get to know the best vehicles for camper travel. Comparisons, detailed analysis and expert recommendations." },
   rutas: {
     name: "Rutas en Camper",
     description: "Las mejores rutas en camper por España y Europa. Descubre destinos increíbles, consejos de viaje y experiencias únicas para tu próxima aventura.",

@@ -36,6 +36,7 @@ export function VehicleImageSlider({
           src={images[0]}
           alt={alt}
           fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           className="object-cover"
           loading="eager"
         />
@@ -90,6 +91,7 @@ export function VehicleImageSlider({
             src={image}
             alt={`${alt} - Imagen ${index + 1}`}
             fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover"
             loading={index === 0 ? "eager" : "lazy"}
           />
