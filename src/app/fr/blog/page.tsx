@@ -38,12 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
-    title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+    title: "Blog Camping-Car - Conseils & Itinéraires | Furgocasa",
     description: "Conseils camping-car, itinéraires en Espagne et guides. Blog mis à jour chaque semaine.",
     keywords: "blog camping-car, voyages camping-car, itinéraires camping-car espagne, conseils camping-car, destinations camping-car, location camping-car murcie, camping camping-car, vie en camping-car",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Blog Camping-Car - Conseils & Itinéraires | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España."),
       type: "website",
       siteName: "Furgocasa",
@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Blog Camping-Car - Conseils & Itinéraires | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana"),
       images: ["https://www.furgocasa.com/og-blog.jpg"],
       creator: "@furgocasa",

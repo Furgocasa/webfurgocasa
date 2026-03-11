@@ -58,8 +58,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `Artikel über ${category} im Furgocasa Blog. Tipps, Reiseführer und Camper-Reiseerfahrungen.`,
   };
 
-  // ✅ Canonical autorreferenciado
-  const alternates = buildCanonicalAlternates(`/blog/${category}`, locale);
+  // ✅ Canonical autorreferenciado a la URL exacta (evita canonical incorrecto)
+  const alternates = buildCanonicalAlternates(`/blog/${category}`, locale, { useActualPath: true });
 
   const ogLocales: Record<Locale, string> = {
     es: "es_ES",
@@ -68,13 +68,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     de: "de_DE",
   };
 
+  const shortTitle = `${meta.name} | Blog Furgocasa`;
   return {
-    title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Wohnmobil Miete Spanien`,
+    title: shortTitle,
     description: meta.description,
     keywords: `wohnmobil blog ${category}, ${category} artikel, camper reisen, furgocasa blog`,
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-      title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Wohnmobil Miete Spanien`,
+      title: shortTitle,
       description: meta.description,
       type: "website",
       url: alternates.canonical,
@@ -83,7 +84,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary",
-      title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Wohnmobil Miete Spanien`,
+      title: shortTitle,
       description: meta.description,
     },
     alternates,

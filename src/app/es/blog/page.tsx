@@ -38,12 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
-    title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+    title: "Blog Camper - Consejos y Rutas España | Furgocasa",
     description: t("Consejos para viajar en camper, rutas por España y guías de autocaravana. Blog actualizado semanalmente."),
     keywords: "blog camper, viajes autocaravana, rutas camper españa, consejos autocaravana, destinos camper, alquiler campers murcia, camping autocaravana, vida en camper",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Blog Camper - Consejos y Rutas España | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España."),
       type: "website",
       siteName: "Furgocasa",
@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Blog Camper - Consejos y Rutas España | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana"),
       images: ["https://www.furgocasa.com/og-blog.jpg"],
       creator: "@furgocasa",

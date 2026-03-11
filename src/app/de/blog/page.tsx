@@ -38,12 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
-    title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+    title: "Wohnmobil Blog - Tipps & Routen | Furgocasa",
     description: "Wohnmobil-Tipps, Routen in Spanien und Reiseführer. Wöchentlich aktualisierter Blog.",
     keywords: "wohnmobil blog, camper reisen, wohnmobil routen spanien, wohnmobil tipps, camper ziele, wohnmobil miete murcia, wohnmobil camping, camper leben",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Wohnmobil Blog - Tipps & Routen | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España."),
       type: "website",
       siteName: "Furgocasa",
@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Wohnmobil Blog - Tipps & Routen | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana"),
       images: ["https://www.furgocasa.com/og-blog.jpg"],
       creator: "@furgocasa",

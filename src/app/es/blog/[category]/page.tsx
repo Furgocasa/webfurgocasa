@@ -60,8 +60,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: `Artículos sobre ${category} en el blog de Furgocasa. Consejos, guías y experiencias de viaje en camper.`,
   };
 
-  // ✅ Canonical autorreferenciado
-  const alternates = buildCanonicalAlternates(`/blog/${category}`, locale);
+  // ✅ Canonical autorreferenciado a la URL exacta (evita canonical incorrecto /fr/blog/rutas → /fr/blog/itineraires)
+  const alternates = buildCanonicalAlternates(`/blog/${category}`, locale, { useActualPath: true });
 
   const ogLocales: Record<Locale, string> = {
     es: "es_ES",
@@ -70,13 +70,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     de: "de_DE",
   };
 
+  const shortTitle = `${meta.name} | Blog Furgocasa`;
   return {
-    title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Alquiler Campers España`,
+    title: shortTitle,
     description: meta.description,
     keywords: `blog camper ${category}, artículos ${category}, viajes camper, furgocasa blog`,
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-      title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Alquiler Campers España`,
+      title: shortTitle,
       description: meta.description,
       type: "website",
       url: alternates.canonical,
@@ -85,7 +86,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary",
-      title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Alquiler Campers España`,
+      title: shortTitle,
       description: meta.description,
     },
     alternates,

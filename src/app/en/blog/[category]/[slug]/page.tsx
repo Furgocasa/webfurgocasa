@@ -12,7 +12,7 @@ import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, getTranslatedRecords, type Locale } from "@/lib/translations/get-translations";
 import { translateServer } from "@/lib/i18n/server-translation";
-import { buildBlogCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { buildBlogCanonicalAlternates, truncateTitle } from "@/lib/seo/multilingual-metadata";
 
 /**
  * 🎯 ARTÍCULOS DE BLOG MULTIIDIOMA - Nueva arquitectura [locale]
@@ -77,25 +77,30 @@ export async function generateMetadata({
 
   // ✅ Canonical + hreflang solo para idiomas donde el artículo existe
   const alternates = buildBlogCanonicalAlternates(`/blog/${category}/${slug}`, locale, post);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.furgocasa.com";
+  const ogImage = post.featured_image?.startsWith("http") ? post.featured_image : `${baseUrl}/og-blog.jpg`;
   
+  const pageTitle = truncateTitle(translatedMeta.meta_title || translatedMeta.title, 60);
   return {
-    title: translatedMeta.meta_title || translatedMeta.title,
+    title: pageTitle,
     description: translatedMeta.meta_description || translatedMeta.excerpt || translatedMeta.title,
     authors: [{ name: "Furgocasa" }],
     keywords: post.tags?.map(tag => tag.name).join(","),
     openGraph: {
-      title: translatedMeta.title,
+      title: pageTitle,
       description: translatedMeta.excerpt || translatedMeta.meta_description || "",
       type: "article",
+      siteName: "Furgocasa",
+      locale: "en_US",
       url: alternates.canonical,
-      images: post.featured_image ? [
+      images: [
         {
-          url: post.featured_image,
+          url: ogImage,
           width: 1200,
           height: 630,
           alt: translatedMeta.title,
         }
-      ] : [],
+      ],
       publishedTime: post.published_at || undefined,
       modifiedTime: post.updated_at || undefined,
       authors: ["Furgocasa"],
@@ -104,9 +109,9 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: translatedMeta.title,
+      title: pageTitle,
       description: translatedMeta.excerpt || translatedMeta.meta_description || "",
-      images: post.featured_image ? [post.featured_image] : [],
+      images: [ogImage],
       creator: "@furgocasa",
     },
     alternates,

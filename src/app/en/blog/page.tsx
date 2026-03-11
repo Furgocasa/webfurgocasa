@@ -38,12 +38,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
-    title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+    title: "Camper Blog - Tips & Routes Spain | Furgocasa",
     description: t("Camper travel tips, routes in Spain and motorhome guides. Weekly updated blog."),
     keywords: "camper blog, motorhome travel, campervan routes spain, motorhome tips, camper destinations, motorhome rental murcia, motorhome camping, camper life",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Camper Blog - Tips & Routes Spain | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana. Descubre los mejores destinos de España."),
       type: "website",
       siteName: "Furgocasa",
@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${t("Blog de Viajes en Camper")} - ${t("Consejos y Rutas por España")} | Furgocasa`,
+      title: "Camper Blog - Tips & Routes Spain | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana"),
       images: ["https://www.furgocasa.com/og-blog.jpg"],
       creator: "@furgocasa",
