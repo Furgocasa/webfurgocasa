@@ -672,6 +672,14 @@ const nextConfig = {
       { source: '/en/blog/routes/visiting-puerto-lumbreras-and-its-surroundings-in-a-rental-campervan', destination: '/en/blog/routes/visitar-puerto-lumbreras-y-alrededores-en-autocaravana-camper-de-alquiler', permanent: true },
       { source: '/es/blog/rutas/visiter-puerto-lumbreras-et-ses-environs-en-un-camping-car-de-location', destination: '/fr/blog/itineraires/visitar-puerto-lumbreras-y-alrededores-en-autocaravana-camper-de-alquiler', permanent: true },
       { source: '/de/blog/routen/ruta-del-vino-la-region-murcia-en-autocaravana-conoce-hasta-3-denominaciones-de-origen', destination: '/de/blog/routen/ruta-del-vino-de-la-region-de-murcia-en-autocaravana-conoce-hasta-3-denominaciones-de-origen', permanent: true },
+      
+      // Corrección de 404s recientes (Marzo 2026)
+      { source: '/fr/location-camping-cars-campers/:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/es/alquiler-autocaravanas-campervans/puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
+      { source: '/en/rent-campervan-motorhome/puerto-lumbreras', destination: '/en/rent-campervan-motorhome/murcia', permanent: true },
+      { source: '/de/blog/routen/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', destination: '/es/blog/rutas/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
+      { source: '/en/blog/routes/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', destination: '/es/blog/rutas/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
+      { source: '/fr/blog/itineraires/visitar-puerto-lumbreras-y-alrededores-en-autocaravana-camper-de-alquiler', destination: '/es/blog/rutas/visitar-puerto-lumbreras-y-sus-alrededores-en-una-autocaravana-camper-de-alquiler', permanent: true },
     ];
   },
 };
