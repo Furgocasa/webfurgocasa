@@ -58,7 +58,7 @@ export async function generateMetadata(): Promise<Metadata> {
   
   return {
     title: `${t("Las Mejores Campers en Alquiler")} - ${t("Alquiler en España")} | Furgocasa`,
-    description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
+    description: "Location de camping-cars et vans en Espagne. Flotte premium Dreamer, Knaus, Weinsberg. Kilométrage illimité, équipement complet. Réservez votre camping-car !",
     keywords: "location camping-car, location van, camping-cars, vans aménagés, motorhome espagne, location camping-car espagne, furgocasa",
     authors: [{ name: "Furgocasa" }],
     openGraph: {

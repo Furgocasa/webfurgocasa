@@ -31,7 +31,7 @@ export const revalidate = 86400;
 // 🎯 METADATA SEO - Keywords diferenciadas para EUROPA (evitar canibalización)
 const MOTORHOME_EUROPA_METADATA: Metadata = {
   title: "Alquiler de Motorhome en Europa desde España",
-  description: "Alquilá tu motorhome y recorré toda Europa en casa rodante. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español. Base de salida en Murcia. ¡Arrancá tu aventura europea!",
+  description: "Alquilá tu motorhome y recorré toda Europa en casa rodante. Kilómetros ilimitados, seguro europeo, asistencia 24/7. Base Murcia. ¡Arrancá tu aventura europea!",
   keywords: "alquiler motorhome europa, casa rodante europa, motorhome para viajar por europa, alquiler autocaravana europa, casa rodante recorrer europa, motorhome francia italia portugal, campervan europa, alquiler motorhome recorrer europa",
   authors: [{ name: "Furgocasa" }],
   openGraph: {
