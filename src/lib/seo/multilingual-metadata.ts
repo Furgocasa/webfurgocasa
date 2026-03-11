@@ -4,6 +4,34 @@ import type { Locale } from "@/lib/i18n/config";
 import type { Metadata } from "next";
 
 /**
+ * Helper para truncar el título SEO
+ */
+export function truncateTitle(title: string | null | undefined, maxLength: number = 60): string {
+  if (!title) return '';
+  if (title.length <= maxLength) return title;
+  const truncated = title.substring(0, maxLength);
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > maxLength - 15) {
+    return truncated.substring(0, lastSpace).trim();
+  }
+  return truncated.trim();
+}
+
+/**
+ * Helper para truncar la descripción SEO
+ */
+export function truncateDescription(desc: string | null | undefined, maxLength: number = 155): string {
+  if (!desc) return '';
+  if (desc.length <= maxLength) return desc;
+  const truncated = desc.substring(0, maxLength - 3);
+  const lastSpace = truncated.lastIndexOf(' ');
+  if (lastSpace > maxLength - 20) {
+    return truncated.substring(0, lastSpace).trim() + '...';
+  }
+  return truncated.trim() + '...';
+}
+
+/**
  * Genera metadatos multiidioma incluyendo hreflang alternates
  * @param path - Ruta base sin prefijo de idioma (ej: "/vehiculos")
  * @param currentLang - Idioma actual
@@ -38,8 +66,8 @@ export function generateMultilingualMetadata(
   const canonicalUrl = `${baseUrl}${getTranslatedRoute(path, currentLang)}`;
   
   return {
-    title: currentMetadata.title,
-    description: currentMetadata.description,
+    title: truncateTitle(currentMetadata.title),
+    description: truncateDescription(currentMetadata.description),
     keywords: currentMetadata.keywords,
     robots: {
       index: true,
@@ -57,8 +85,8 @@ export function generateMultilingualMetadata(
       languages,
     },
     openGraph: {
-      title: currentMetadata.title,
-      description: currentMetadata.description,
+      title: truncateTitle(currentMetadata.title),
+      description: truncateDescription(currentMetadata.description),
       url: canonicalUrl,
       locale: `${currentLang}_${currentLang.toUpperCase()}`,
       type: 'website',
@@ -66,8 +94,8 @@ export function generateMultilingualMetadata(
     },
     twitter: {
       card: 'summary_large_image',
-      title: currentMetadata.title,
-      description: currentMetadata.description,
+      title: truncateTitle(currentMetadata.title),
+      description: truncateDescription(currentMetadata.description),
       images: options?.images?.length ? options.images : [`${baseUrl}/og-image.jpg`],
     },
   };
@@ -99,15 +127,15 @@ export function generateSimpleMultilingualMetadata(
   const canonicalUrl = `${baseUrl}${getTranslatedRoute(path, currentLang)}`;
   
   return {
-    title,
-    description,
+    title: truncateTitle(title),
+    description: truncateDescription(description),
     alternates: {
       canonical: canonicalUrl,
       languages,
     },
     openGraph: {
-      title,
-      description: description.substring(0, 155),
+      title: truncateTitle(title),
+      description: truncateDescription(description),
       url: canonicalUrl,
       locale: `${currentLang}_${currentLang.toUpperCase()}`,
       type: 'website',
@@ -174,8 +202,8 @@ export function buildOpenGraphMetadata(
     ? options.images
     : [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: 'Furgocasa - Alquiler de Campers' }];
   return {
-    title: base.title,
-    description: base.description.substring(0, 155),
+    title: truncateTitle(base.title),
+    description: truncateDescription(base.description),
     url: alternates.canonical,
     type: 'website' as const,
     siteName: 'Furgocasa',

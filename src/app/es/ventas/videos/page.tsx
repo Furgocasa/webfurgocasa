@@ -1,5 +1,6 @@
 import Link from"next/link";
 import { Youtube } from"lucide-react";
+import type { Metadata } from "next";
 
 // Videos de YouTube con sus IDs reales
 const videos = [
@@ -20,6 +21,14 @@ const videos = [
     youtubeId:"DGJw9IsCx4Q",
   },
 ];
+
+export const metadata: Metadata = {
+  title: "Videos de Campers en Venta",
+  description: "Mira nuestros vehículos en video. Descubre en detalle las autocaravanas y campers que tenemos a la venta en Furgocasa.",
+  alternates: {
+    canonical: "https://www.furgocasa.com/es/ventas/videos"
+  }
+};
 
 export default function VideosVentasPage() {
 

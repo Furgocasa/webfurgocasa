@@ -40,7 +40,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
     default: "Alquiler de Campers y Autocaravanas en España - Furgocasa",
-    template: "%s - Furgocasa",
+    // Eliminado el template automático para tener control total sobre la longitud (SEO)
   },
   description:
     "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa. Flota premium de vehículos equipados para tus vacaciones.",

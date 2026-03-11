@@ -310,10 +310,10 @@ export default async function LocationPage({ params }: PageProps) {
         <section className="py-10 lg:py-14 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
-              {/* H1 siempre "ALQUILER CAMPER {ciudad}" */}
-              <h1 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
+              {/* H2 siempre "ALQUILER CAMPER {ciudad}" (Cambiado a H2 para evitar múltiples H1) */}
+              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
                 {t("ALQUILER CAMPER")} {location.name.toUpperCase()}
-              </h1>
+              </h2>
 
               {/* H2 - Keyword adicional: "furgonetas camper" */}
               <h2 className="text-xl lg:text-2xl font-heading font-medium text-gray-700 mb-6">

@@ -451,8 +451,14 @@ export function getTranslatedRoute(path: string, targetLang: Locale): string {
     }
   }
   
-  // Añadir prefijo de idioma
-  const finalPath = `/${targetLang}${translatedPath}`;
+  // Añadir prefijo de idioma (evitar doble barra o barra final innecesaria)
+  let finalPath = `/${targetLang}${translatedPath}`;
+  if (finalPath.endsWith('/') && finalPath.length > 3) { // ej: /es/ no, pero /es sí
+    finalPath = finalPath.slice(0, -1);
+  }
+  if (finalPath === `/${targetLang}/`) {
+    finalPath = `/${targetLang}`;
+  }
   
   return finalPath + queryAndHash;
 }
