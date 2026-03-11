@@ -615,6 +615,63 @@ const nextConfig = {
       { source: '/publicaciones/:slug', destination: '/es/blog/:slug', permanent: true },
       { source: '/publications', destination: '/en/blog', permanent: true },
       { source: '/publications/:slug', destination: '/en/blog/:slug', permanent: true },
+
+      // ================================================================
+      // GRUPO 6: REDIRECCIONES DE ERRORES 404 (AUDITORIA SEO)
+      // ================================================================
+      
+      // Errores comunes de idioma cruzado en reservas
+      { source: '/fr/reservar', destination: '/fr/reserver', permanent: true },
+      { source: '/de/reservar', destination: '/de/buchen', permanent: true },
+      { source: '/de/reservieren', destination: '/de/buchen', permanent: true },
+      { source: '/de/ofertas', destination: '/de/angebote', permanent: true },
+      { source: '/de/offerten', destination: '/de/angebote', permanent: true },
+      
+      // Errores de "Como funciona" (Guía camper)
+      { source: '/fr/comment-fonctionne-mon-camper-de-location', destination: '/fr/guide-camping-car', permanent: true },
+      { source: '/fr/comment-fonctionne-mon-camping-car-de-location', destination: '/fr/guide-camping-car', permanent: true },
+      { source: '/fr/comment-fonctionne-votre-camping-car-de-location', destination: '/fr/guide-camping-car', permanent: true },
+      { source: '/fr/comment-fonctionne-mon-van-de-location', destination: '/fr/guide-camping-car', permanent: true },
+      { source: '/fr/como-funciona-mi-camper-de-alquiler', destination: '/fr/guide-camping-car', permanent: true },
+      { source: '/de/como-funciona-mi-camper-de-alquiler', destination: '/de/wohnmobil-guide', permanent: true },
+      { source: '/de/wie-funktioniert-mein-mietcamper', destination: '/de/wohnmobil-guide', permanent: true },
+
+      // Errores de URLs dinámicas de localizaciones FR
+      { source: '/fr/location-camping-car/espagne', destination: '/fr/location-camping-car-espagne', permanent: true },
+      { source: '/fr/location-autocaravanes-campervans/:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-autocaravanescampervans/:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-autocaravanes-campervans-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-camping-cars-campervans-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-camping-cars-vans-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-camping-cars-campers-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-camping-cars-campervans/:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-maisons-roulantes-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      { source: '/fr/location-camping-cars-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      
+      // Ajuste específico de ciudades para FR
+      { source: '/fr/location-camping-car/murcie', destination: '/fr/location-camping-car/murcia', permanent: true },
+
+      // Errores de URLs dinámicas de localizaciones DE
+      { source: '/de/mietwohnmobile-campervans/:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      { source: '/de/mietwohnmobile-campervans-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      { source: '/de/mietcamper-in-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      { source: '/de/wohnmobile-camper-in-:location-mieten', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      { source: '/de/mietwohnmobile-camper-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      { source: '/de/wohnmobile-camper-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+      { source: '/de/miet-autocaravans-campervans-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
+
+      // Otros de ciudades ES/EN
+      { source: '/en/rent-campervans-puerto-lumbreras', destination: '/en/rent-campervan-motorhome/puerto-lumbreras', permanent: true },
+
+      // Errores del Blog
+      { source: '/en/blog/destinations/2026-en-fete-tous-les-evenements-locaux-de-la-region-de-murcie-a-decouvrir-en-van-de-location', destination: '/fr/blog/destinations/2026-en-fete-tous-les-evenements-locaux-de-la-region-de-murcie-a-decouvrir-en-van-de-location', permanent: true },
+      { source: '/en/blog/routes/five-spanish-regions-with-designation-of-origin-of-typical-products-to-visit-with-your-rental-camper', destination: '/en/blog/routes/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
+      { source: '/en/blog/routes/five-spanish-regions-with-designation-of-origin-for-typical-products-to-visit-with-your-rental-camper', destination: '/en/blog/routes/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
+      { source: '/de/blog/routen/fuenf-spanische-regionen-mit-herkunftsbezeichnung-typischer-produkte-die-du-mit-deinem-miet-camper-besuchen-kannst', destination: '/de/blog/routen/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
+      { source: '/de/blog/routen/fuenf-spanische-regionen-mit-geschuetzter-ursprungsbezeichnung-von-typischen-produkten-fuer-deinen-mietcamper', destination: '/de/blog/routen/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
+      { source: '/en/blog/routes/visiting-puerto-lumbreras-and-its-surroundings-in-a-rental-campervan', destination: '/en/blog/routes/visitar-puerto-lumbreras-y-alrededores-en-autocaravana-camper-de-alquiler', permanent: true },
+      { source: '/es/blog/rutas/visiter-puerto-lumbreras-et-ses-environs-en-un-camping-car-de-location', destination: '/fr/blog/itineraires/visitar-puerto-lumbreras-y-alrededores-en-autocaravana-camper-de-alquiler', permanent: true },
+      { source: '/de/blog/routen/ruta-del-vino-la-region-murcia-en-autocaravana-conoce-hasta-3-denominaciones-de-origen', destination: '/de/blog/routen/ruta-del-vino-de-la-region-de-murcia-en-autocaravana-conoce-hasta-3-denominaciones-de-origen', permanent: true },
     ];
   },
 };
