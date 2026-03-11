@@ -35,9 +35,16 @@ const RESERVAR_METADATA: Metadata = {
   },
 };
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams?: Promise<{ vehiculo?: string }>;
+}): Promise<Metadata> {
   const locale: Locale = 'de'; // Locale fijo
-  const alternates = buildCanonicalAlternates('/buchen', locale);
+  const resolved = searchParams ? await searchParams : undefined;
+  const alternates = buildCanonicalAlternates('/reservar', locale, {
+    searchParams: resolved?.vehiculo ? { vehiculo: resolved.vehiculo } : undefined,
+  });
 
   return {
     ...RESERVAR_METADATA,

@@ -158,7 +158,11 @@ export function generateSimpleMultilingualMetadata(
  * @param options - useActualPath: canonical = URL exacta (locale + path) sin traducir
  * @returns Objeto con canonical (URL absoluta) y languages (hreflang alternates)
  */
-export type BuildCanonicalOptions = { useActualPath?: boolean };
+export type BuildCanonicalOptions = {
+  useActualPath?: boolean;
+  /** Parámetros de query a incluir en el canonical (ej: { vehiculo: 'x' } → ?vehiculo=x). Evita canonical mismatch cuando la URL tiene params. */
+  searchParams?: Record<string, string>;
+};
 
 export function buildCanonicalAlternates(path: string, currentLang: Locale, options?: BuildCanonicalOptions) {
   // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
@@ -166,7 +170,7 @@ export function buildCanonicalAlternates(path: string, currentLang: Locale, opti
   const locales: Locale[] = ['es', 'en', 'fr', 'de'];
   const languages: Record<string, string> = {};
 
-  // Remover parámetros de query y hash si existen (canonical siempre sin parámetros)
+  // Remover parámetros de query y hash si existen (para el path base)
   const cleanPath = path.split('?')[0].split('#')[0];
   
   // Remover prefijo de idioma si existe (el helper lo añadirá correctamente)
@@ -189,6 +193,12 @@ export function buildCanonicalAlternates(path: string, currentLang: Locale, opti
     languages[currentLang] = canonicalUrl;
   } else {
     canonicalUrl = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, currentLang)}`;
+  }
+
+  // Incluir searchParams en canonical para que coincida con la URL (evita canonical mismatch en auditorías)
+  if (options?.searchParams && Object.keys(options.searchParams).length > 0) {
+    const params = new URLSearchParams(options.searchParams);
+    canonicalUrl += `?${params.toString()}`;
   }
 
   return {
