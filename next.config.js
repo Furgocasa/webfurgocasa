@@ -664,6 +664,16 @@ const nextConfig = {
       { source: '/en/rent-campervans-puerto-lumbreras', destination: '/en/rent-campervan-motorhome/puerto-lumbreras', permanent: true },
 
       // Errores del Blog
+      // Paginación mal formada: /blog/page/8 se interpretaba como categoría "page" + slug "8" → 404
+      { source: '/es/blog/page/:pageNum', destination: '/es/blog?page=:pageNum', permanent: true },
+      { source: '/en/blog/page/:pageNum', destination: '/en/blog?page=:pageNum', permanent: true },
+      { source: '/fr/blog/page/:pageNum', destination: '/fr/blog?page=:pageNum', permanent: true },
+      { source: '/de/blog/page/:pageNum', destination: '/de/blog?page=:pageNum', permanent: true },
+      // Paginación en categorías: /blog/rutas/page/8 → /blog/rutas?page=8
+      { source: '/es/blog/:category/page/:pageNum', destination: '/es/blog/:category?page=:pageNum', permanent: true },
+      { source: '/en/blog/:category/page/:pageNum', destination: '/en/blog/:category?page=:pageNum', permanent: true },
+      { source: '/fr/blog/:category/page/:pageNum', destination: '/fr/blog/:category?page=:pageNum', permanent: true },
+      { source: '/de/blog/:category/page/:pageNum', destination: '/de/blog/:category?page=:pageNum', permanent: true },
       { source: '/en/blog/destinations/2026-en-fete-tous-les-evenements-locaux-de-la-region-de-murcie-a-decouvrir-en-van-de-location', destination: '/fr/blog/destinations/2026-en-fete-tous-les-evenements-locaux-de-la-region-de-murcie-a-decouvrir-en-van-de-location', permanent: true },
       { source: '/en/blog/routes/five-spanish-regions-with-designation-of-origin-of-typical-products-to-visit-with-your-rental-camper', destination: '/en/blog/routes/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
       { source: '/en/blog/routes/five-spanish-regions-with-designation-of-origin-for-typical-products-to-visit-with-your-rental-camper', destination: '/en/blog/routes/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
@@ -677,6 +687,15 @@ const nextConfig = {
       { source: '/fr/location-camping-cars-campers/:location', destination: '/fr/location-camping-car/:location', permanent: true },
       { source: '/es/alquiler-autocaravanas-campervans/puerto-lumbreras', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
       { source: '/en/rent-campervan-motorhome/puerto-lumbreras', destination: '/en/rent-campervan-motorhome/murcia', permanent: true },
+      // Auditoría SEO 404s - Localizaciones sin página propia → provincia más cercana
+      { source: '/fr/location-camping-car/benalmadena', destination: '/fr/location-camping-car/malaga', permanent: true },
+      { source: '/fr/location-camping-car/puerto-lumbreras', destination: '/fr/location-camping-car/murcia', permanent: true },
+      { source: '/es/alquiler-autocaravanas-campervans/benalmadena', destination: '/es/alquiler-autocaravanas-campervans/malaga', permanent: true },
+      { source: '/de/wohnmobil-mieten/benalmadena', destination: '/de/wohnmobil-mieten/malaga', permanent: true },
+      // Auditoría SEO 404s - Blog: artículos en idioma incorrecto o slug inexistente
+      { source: '/en/blog/routes/visitar-puerto-lumbreras-y-alrededores-en-autocaravana-camper-de-alquiler', destination: '/es/blog/rutas/visitar-puerto-lumbreras-y-sus-alrededores-en-una-autocaravana-camper-de-alquiler', permanent: true },
+      { source: '/fr/location-camping-car/europe', destination: '/fr/camping-car-europe-depuis-espagne', permanent: true },
+      { source: '/de/blog/routen/ruta-del-vino-de-la-region-de-murcia-en-autocaravana-conoce-hasta-3-denominaciones-de-origen', destination: '/es/blog/rutas/ruta-del-vino-la-region-murcia-en-autocaravana-conoce-hasta-3-denominaciones-de-origen', permanent: true },
       { source: '/de/blog/routen/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', destination: '/es/blog/rutas/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
       { source: '/en/blog/routes/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', destination: '/es/blog/rutas/cinco-regiones-espanolas-con-denominacion-de-origen-de-productos-tipicos-para-visitar-con-tu-camper-de-alquiler', permanent: true },
       { source: '/fr/blog/itineraires/visitar-puerto-lumbreras-y-alrededores-en-autocaravana-camper-de-alquiler', destination: '/es/blog/rutas/visitar-puerto-lumbreras-y-sus-alrededores-en-una-autocaravana-camper-de-alquiler', permanent: true },
