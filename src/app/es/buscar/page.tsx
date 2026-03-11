@@ -26,8 +26,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...BUSCAR_METADATA,
     alternates,
     openGraph: {
-      ...BUSCAR_METADATA,
+      title: BUSCAR_METADATA.title,
+      description: "Busca y compara disponibilidad de campers. Reserva online tu camper ideal con Furgocasa.",
       url: alternates.canonical,
+      type: "website",
+      siteName: "Furgocasa",
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa - Alquiler de Campers" }],
     },
   };
 }

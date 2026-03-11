@@ -7,7 +7,7 @@ import type { Locale } from "@/lib/i18n/config";
 // 🎯 SEO Metadata - Unique et optimisé pour /faqs
 const FAQS_METADATA: Metadata = {
   title: "Questions Fréquentes Location Camping-Cars",
-  description: "Répondez à vos questions sur la location de camping-cars chez Furgocasa. Exigences, assurances, kilométrage, animaux, récupération et retour. Tout ce que vous devez savoir.",
+  description: "Réponses à vos questions sur la location de camping-cars. Exigences, assurances, kilométrage, animaux. Tout ce qu'il faut savoir chez Furgocasa.",
   keywords: "questions fréquentes location camping-car, doutes van, exigences location camping-car, faqs furgocasa, information location van",
   openGraph: {
     title: "Questions Fréquentes Location Camping-Cars",

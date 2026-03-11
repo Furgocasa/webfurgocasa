@@ -41,6 +41,17 @@ export function generateMultilingualMetadata(
     title: currentMetadata.title,
     description: currentMetadata.description,
     keywords: currentMetadata.keywords,
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large' as const,
+        'max-snippet': -1,
+      },
+    },
     alternates: {
       canonical: canonicalUrl,
       languages,
@@ -96,10 +107,11 @@ export function generateSimpleMultilingualMetadata(
     },
     openGraph: {
       title,
-      description,
+      description: description.substring(0, 155),
       url: canonicalUrl,
       locale: `${currentLang}_${currentLang.toUpperCase()}`,
       type: 'website',
+      images: [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: 'Furgocasa - Alquiler de Campers' }],
     },
   };
 }
@@ -144,6 +156,30 @@ export function buildCanonicalAlternates(path: string, currentLang: Locale) {
   return {
     canonical: canonicalUrl,
     languages,
+  };
+}
+
+const OG_DEFAULT_IMAGE = 'https://www.furgocasa.com/og-image.jpg';
+
+/**
+ * Genera openGraph completo (title, description, url, images) para páginas que usan buildCanonicalAlternates.
+ * Garantiza que todas las páginas tengan og:title, og:description, og:url, og:image (auditoría SEO).
+ */
+export function buildOpenGraphMetadata(
+  alternates: { canonical: string },
+  base: { title: string; description: string },
+  options?: { images?: string[] | { url: string; width?: number; height?: number; alt?: string }[] }
+) {
+  const images = options?.images?.length
+    ? options.images
+    : [{ url: OG_DEFAULT_IMAGE, width: 1200, height: 630, alt: 'Furgocasa - Alquiler de Campers' }];
+  return {
+    title: base.title,
+    description: base.description.substring(0, 155),
+    url: alternates.canonical,
+    type: 'website' as const,
+    siteName: 'Furgocasa',
+    images,
   };
 }
 

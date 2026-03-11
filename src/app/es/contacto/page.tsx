@@ -38,6 +38,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: alternates.canonical,
       siteName: "Furgocasa",
       locale: ogLocales[locale] || "es_ES",
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa - Contacto" }],
     },
     twitter: {
       card: "summary",

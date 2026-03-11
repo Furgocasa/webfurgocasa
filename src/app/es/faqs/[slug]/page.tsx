@@ -128,10 +128,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     alternates,
     openGraph: {
       title: faq.question,
-      description: cleanAnswer,
+      description: cleanAnswer.substring(0, 155),
       type: 'article',
       url: alternates.canonical,
       siteName: 'Furgocasa',
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa - FAQs" }],
     },
     robots: {
       index: true,

@@ -34,11 +34,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function CampingCarsPage() {
-  const [servicesResult, stats, provinces] = await Promise.all([
-    getMotorhomeServices({ limit: 1000 }),
-    getMotorhomeServiceStats(),
-    getMotorhomeServiceProvinces(),
-  ]);
+  let servicesResult = { data: null as unknown[], error: null, count: 0 };
+  let stats = { talleres: 0, concesionarios: 0, total: 0, provinces: 0 };
+  let provinces: { province: string; region: string; count: number }[] = [];
+
+  try {
+    const [servicesRes, statsRes, provincesRes] = await Promise.all([
+      getMotorhomeServices({ limit: 1000 }),
+      getMotorhomeServiceStats(),
+      getMotorhomeServiceProvinces(),
+    ]);
+    servicesResult = servicesRes;
+    stats = statsRes;
+    provinces = provincesRes;
+  } catch (err) {
+    console.error('[camping-cars-espagne] Error loading data:', err);
+  }
 
   return (
     <AutocaravanasClient

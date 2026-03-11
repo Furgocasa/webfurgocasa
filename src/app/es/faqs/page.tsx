@@ -45,6 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       ...(FAQS_METADATA.openGraph || {}),
       url: alternates.canonical,
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa - FAQs" }],
     },
   };
 }

@@ -48,6 +48,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       ...(OFERTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
+      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa - Ofertas" }],
     },
   };
 }

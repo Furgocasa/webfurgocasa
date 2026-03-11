@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return generateMultilingualMetadata('/autocaravanas', locale, {
     es: {
       title: "Autocaravanas: Guía Completa 2026 | Tipos, Permisos, Normativa y Directorio",
-      description: "Todo sobre autocaravanas en España: tipos (perfilada, integral, capuchina), permisos de conducir, normativa DGT, peso, seguro, mantenimiento. Directorio con +900 talleres y concesionarios.",
+      description: "Todo sobre autocaravanas en España: tipos, permisos, normativa DGT, peso y seguro. Directorio con +900 talleres y concesionarios.",
       keywords: "autocaravanas, tipos de autocaravanas, permiso autocaravana, normativa autocaravanas España, talleres autocaravanas, concesionarios autocaravanas, autocaravana perfilada, autocaravana integral, autocaravana capuchina, alquiler autocaravanas, comprar autocaravana",
     },
     en: {
@@ -36,11 +36,22 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AutocaravanasPage() {
-  const [servicesResult, stats, provinces] = await Promise.all([
-    getMotorhomeServices({ limit: 1000 }),
-    getMotorhomeServiceStats(),
-    getMotorhomeServiceProvinces(),
-  ]);
+  let servicesResult = { data: null as unknown[], error: null, count: 0 };
+  let stats = { talleres: 0, concesionarios: 0, total: 0, provinces: 0 };
+  let provinces: { province: string; region: string; count: number }[] = [];
+
+  try {
+    const [servicesRes, statsRes, provincesRes] = await Promise.all([
+      getMotorhomeServices({ limit: 1000 }),
+      getMotorhomeServiceStats(),
+      getMotorhomeServiceProvinces(),
+    ]);
+    servicesResult = servicesRes;
+    stats = statsRes;
+    provinces = provincesRes;
+  } catch (err) {
+    console.error('[autocaravanas] Error loading data:', err);
+  }
 
   return (
     <AutocaravanasClient
