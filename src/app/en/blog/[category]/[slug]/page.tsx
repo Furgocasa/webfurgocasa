@@ -289,7 +289,7 @@ export default async function LocaleBlogPostPage({
 
               <div 
                 className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-furgocasa-blue hover:prose-a:text-furgocasa-blue-dark prose-img:rounded-2xl prose-img:shadow-lg"
-                dangerouslySetInnerHTML={{ __html: sanitizeBlogContentLinks(translatedPost.content || post.content || "", locale) }}
+                dangerouslySetInnerHTML={{ __html: sanitizeBlogContentLinks(translatedPost.content || post.content || "", locale, translatedPost.title || post.title) }}
               />
 
               {/* Tags */}

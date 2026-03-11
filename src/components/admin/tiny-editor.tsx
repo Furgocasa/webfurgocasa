@@ -29,8 +29,10 @@ export function TinyEditor({
   const handleImageSelected = useCallback((imageUrl: string) => {
     console.log('Imagen seleccionada:', imageUrl);
     
-    // Extraer el nombre del archivo para usarlo como alt
-    const fileName = imageUrl.split('/').pop()?.split('?')[0] || 'Imagen';
+    // Extraer nombre descriptivo para alt (SEO y accesibilidad) - sin extensión
+    const rawName = imageUrl.split('/').pop()?.split('?')[0] || '';
+    const nameWithoutExt = rawName.replace(/\.(jpg|jpeg|png|gif|webp|avif|svg)$/i, '');
+    const altText = (nameWithoutExt ? nameWithoutExt.replace(/[-_]/g, ' ').trim() : 'Imagen del artículo') || 'Imagen del artículo';
     
     // Cerrar el modal
     setShowImageSelector(false);
@@ -43,8 +45,9 @@ export function TinyEditor({
         // Asegurar que el editor tiene foco
         editor.focus();
         // Insertar el HTML de la imagen directamente en el contenido
+        const safeAlt = String(altText).replace(/"/g, '&quot;').substring(0, 125);
         editor.insertContent(
-          `<p><img src="${imageUrl}" alt="${fileName}" width="100%" /></p>`
+          `<p><img src="${imageUrl}" alt="${safeAlt}" width="100%" /></p>`
         );
         console.log('✓ Imagen insertada correctamente:', imageUrl);
       } else {

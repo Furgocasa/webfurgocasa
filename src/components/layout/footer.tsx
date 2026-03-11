@@ -46,7 +46,7 @@ export function Footer() {
               <a 
                 href="https://facebook.com/furgocasa" 
                 target="_blank" 
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-furgocasa-orange transition-all duration-200 hover:scale-110"
                 aria-label="Síguenos en Facebook"
               >
@@ -55,7 +55,7 @@ export function Footer() {
               <a 
                 href="https://instagram.com/furgocasa" 
                 target="_blank" 
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-furgocasa-orange transition-all duration-200 hover:scale-110"
                 aria-label="Síguenos en Instagram"
               >
@@ -64,7 +64,7 @@ export function Footer() {
               <a 
                 href="https://youtube.com/furgocasa" 
                 target="_blank" 
-                rel="noopener noreferrer"
+                rel="noopener noreferrer nofollow"
                 className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-furgocasa-orange transition-all duration-200 hover:scale-110"
                 aria-label="Suscríbete a nuestro canal de YouTube"
               >
@@ -105,7 +105,6 @@ export function Footer() {
                 { name: t("Aviso legal"), href: "/aviso-legal" },
                 { name: t("Política de privacidad"), href: "/privacidad" },
                 { name: t("Política de cookies"), href: "/cookies" },
-                { name: t("Tarifas y condiciones"), href: "/tarifas" },
               ].map((link) => (
                 <li key={link.href}>
                   <LocalizedLink 
@@ -165,15 +164,10 @@ export function Footer() {
         </div>
 
         {/* Bottom bar - Mejorado */}
-        <div className="border-t border-white/10 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-gray-400 text-sm">
+        <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-400 text-sm">
           <p className="font-medium">
             © {new Date().getFullYear()} Furgocasa. {t("Todos los derechos reservados.")}
           </p>
-          <div className="flex items-center gap-6">
-            <LocalizedLink href="/aviso-legal" className="hover:text-white transition-colors duration-200">{t("Aviso legal")}</LocalizedLink>
-            <LocalizedLink href="/privacidad" className="hover:text-white transition-colors duration-200">{t("Privacidad")}</LocalizedLink>
-            <LocalizedLink href="/cookies" className="hover:text-white transition-colors duration-200">{t("Cookies")}</LocalizedLink>
-          </div>
         </div>
       </div>
     </footer>

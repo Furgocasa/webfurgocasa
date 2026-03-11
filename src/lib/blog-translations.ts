@@ -339,8 +339,12 @@ function detectCategoryLocale(categorySlug: string): Locale | null {
  * Esta función detecta el idioma de la categoría y reescribe el prefijo de locale.
  * Si la categoría no corresponde al locale de la página, usa el locale detectado.
  * Si corresponde, deja el link tal cual.
+ * 
+ * @param html - Contenido HTML del artículo
+ * @param pageLocale - Idioma de la página
+ * @param articleTitle - Título del artículo (opcional) para alt contextual en imágenes
  */
-export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): string {
+export function sanitizeBlogContentLinks(html: string, pageLocale: Locale, articleTitle?: string): string {
   if (!html) return html;
 
   // Paso 1: Eliminar etiquetas <title> del contenido (causan "Multiple title tags" en SEO)
@@ -380,7 +384,7 @@ export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): stri
   );
 
   // Paso 4: Añadir/reemplazar alt en imágenes para SEO y accesibilidad
-  // Cubre: sin alt, alt="", alt vacío. Usa nombre del archivo si existe para descripción más relevante
+  // Cubre: sin alt, alt="", alt vacío. Usa nombre del archivo o título del artículo para descripción relevante
   const altByLocale: Record<Locale, string> = {
     es: 'Ilustración del artículo',
     en: 'Article illustration',
@@ -388,22 +392,25 @@ export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): stri
     de: 'Artikelillustration',
   };
   const baseAlt = altByLocale[pageLocale] || altByLocale.es;
-  sanitized = sanitized.replace(/<img([^>]*)>/gi, (match, attrs) => {
+  // Regex robusto: captura <img ...> incluyendo saltos de línea y atributos en cualquier orden
+  sanitized = sanitized.replace(/<img\s*([\s\S]*?)>/gi, (match, attrs) => {
     const altMatch = attrs.match(/alt\s*=\s*["']([^"']*)["']/i);
     const hasNonEmptyAlt = altMatch && altMatch[1].trim().length > 0;
     if (hasNonEmptyAlt) return match;
 
-    let altDesc = baseAlt;
+    let altDesc = articleTitle && articleTitle.trim().length > 0 ? articleTitle : baseAlt;
     const srcMatch = attrs.match(/src\s*=\s*["']([^"']*)["']/i);
     if (srcMatch) {
       const filename = srcMatch[1].split('/').pop()?.split('?')[0] || '';
-      const nameWithoutExt = filename.replace(/\.(jpg|jpeg|png|gif|webp|avif)$/i, '');
+      const nameWithoutExt = filename.replace(/\.(jpg|jpeg|png|gif|webp|avif|svg)$/i, '');
       if (nameWithoutExt && nameWithoutExt.length > 2) {
-        const fromName = nameWithoutExt.replace(/[-_]/g, ' ').trim();
+        const fromName = nameWithoutExt.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
         if (fromName.length > 0 && fromName.length <= 80) altDesc = fromName;
       }
     }
-    const descriptiveAlt = `${altDesc} - Furgocasa`;
+    // Escapar comillas para evitar rotura del HTML
+    const safeAlt = `${altDesc} - Furgocasa`.replace(/"/g, '&quot;').substring(0, 125);
+    const descriptiveAlt = safeAlt;
 
     if (altMatch) {
       return match.replace(/alt\s*=\s*["'][^"']*["']/i, `alt="${descriptiveAlt}"`);
