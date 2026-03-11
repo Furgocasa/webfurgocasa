@@ -157,7 +157,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `${t("Alquila tu autocaravana camper en")} ${translated.name || location.name}. ${t("Flota premium con kilómetros ilimitados")}.`;
 
   const path = `/alquiler-autocaravanas-campervans/${slug}`;
-  const alternates = buildCanonicalAlternates(path, locale);
+  const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
 
   return {
     title,

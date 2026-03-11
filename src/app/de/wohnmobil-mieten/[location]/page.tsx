@@ -143,7 +143,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `Mieten Sie Ihr Wohnmobil in ${translated.name || location.name}. Premium-Flotte mit unbegrenzten Kilometern.`;
 
   const path = `/wohnmobil-mieten/${slug}`;
-  const alternates = buildCanonicalAlternates(path, locale);
+  const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
 
   return {
     title,

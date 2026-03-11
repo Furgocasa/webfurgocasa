@@ -150,7 +150,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `Achetez votre camping-car à ${translated.name || location.name}. Véhicules avec garantie et financement.`;
 
   const path = `/camping-cars-a-vendre/${slug}`;
-  const alternates = buildCanonicalAlternates(path, locale);
+  const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
   return {

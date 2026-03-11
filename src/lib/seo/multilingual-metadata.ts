@@ -155,9 +155,12 @@ export function generateSimpleMultilingualMetadata(
  * 
  * @param path - Ruta SIN prefijo de idioma y SIN parámetros de query (ej: "/blog/rutas")
  * @param currentLang - Idioma actual de la página
+ * @param options - useActualPath: canonical = URL exacta (locale + path) sin traducir
  * @returns Objeto con canonical (URL absoluta) y languages (hreflang alternates)
  */
-export function buildCanonicalAlternates(path: string, currentLang: Locale) {
+export type BuildCanonicalOptions = { useActualPath?: boolean };
+
+export function buildCanonicalAlternates(path: string, currentLang: Locale, options?: BuildCanonicalOptions) {
   // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
   const baseUrl = 'https://www.furgocasa.com';
   const locales: Locale[] = ['es', 'en', 'fr', 'de'];
@@ -178,8 +181,15 @@ export function buildCanonicalAlternates(path: string, currentLang: Locale) {
   // x-default siempre apunta a español
   languages['x-default'] = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, 'es')}`;
 
-  // Canonical autorreferenciado: apunta a la URL actual del idioma actual
-  const canonicalUrl = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, currentLang)}`;
+  // Canonical: autorreferenciado a la URL exacta que ve el usuario
+  let canonicalUrl: string;
+  if (options?.useActualPath) {
+    const pathWithLeadingSlash = pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`;
+    canonicalUrl = `${baseUrl}/${currentLang}${pathWithLeadingSlash}`;
+    languages[currentLang] = canonicalUrl;
+  } else {
+    canonicalUrl = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, currentLang)}`;
+  }
 
   return {
     canonical: canonicalUrl,

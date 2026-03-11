@@ -144,7 +144,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `Rent your campervan in ${translated.name || location.name}. Premium fleet with unlimited mileage.`;
 
   const path = `/rent-campervan-motorhome/${slug}`;
-  const alternates = buildCanonicalAlternates(path, locale);
+  const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
 
   return {
     title,

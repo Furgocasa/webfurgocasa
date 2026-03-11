@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furgocasa - Ofertas Verano 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@400;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --sky-top: #0a9cf5;
+    --sky-bottom: #87CEEB;
+    --sand: #f4d9a0;
+    --sand-dark: #e8c676;
+    --ocean-deep: #006994;
+    --ocean-mid: #0892d0;
+    --ocean-light: #48c9e8;
+    --foam: rgba(255,255,255,0.85);
+    --sunset-orange: #FF6B35;
+    --sunset-pink: #FF3864;
+    --camper-body: #ffffff;
+    --palm-trunk: #8B5E3C;
+    --palm-leaf: #228B22;
+    --cta-gradient-1: #FF6B35;
+    --cta-gradient-2: #FF3864;
+  }
+
+  body {
+    font-family: 'Quicksand', sans-serif;
+    overflow-x: hidden;
+    background: #0a1628;
+  }
+
+  .banner-wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--sky-top) 0%, var(--sky-bottom) 40%, var(--ocean-light) 55%, var(--sand) 70%, var(--sand-dark) 100%);
+  }
+
+  /* ===== SUN ===== */
+  .sun {
+    position: absolute;
+    top: 6%;
+    right: 15%;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle, #FFD700 0%, #FFA500 60%, transparent 70%);
+    border-radius: 50%;
+    box-shadow: 0 0 80px 30px rgba(255,200,0,0.4), 0 0 200px 60px rgba(255,165,0,0.15);
+    animation: sunPulse 4s ease-in-out infinite;
+  }
+  @keyframes sunPulse {
+    0%,100% { box-shadow: 0 0 80px 30px rgba(255,200,0,0.4), 0 0 200px 60px rgba(255,165,0,0.15); }
+    50% { box-shadow: 0 0 100px 40px rgba(255,200,0,0.5), 0 0 250px 80px rgba(255,165,0,0.2); }
+  }
+
+  /* ===== CLOUDS ===== */
+  .cloud {
+    position: absolute;
+    background: white;
+    border-radius: 50px;
+    opacity: 0.85;
+    filter: blur(1px);
+  }
+  .cloud::before, .cloud::after {
+    content: '';
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+  }
+  .cloud-1 {
+    width: 120px; height: 40px; top: 8%; left: -150px;
+    animation: cloudDrift 25s linear infinite;
+  }
+  .cloud-1::before { width: 60px; height: 60px; top: -30px; left: 20px; }
+  .cloud-1::after { width: 45px; height: 45px; top: -20px; left: 55px; }
+  .cloud-2 {
+    width: 90px; height: 30px; top: 15%; left: -100px;
+    animation: cloudDrift 35s linear infinite 8s;
+    opacity: 0.6;
+  }
+  .cloud-2::before { width: 45px; height: 45px; top: -22px; left: 15px; }
+  .cloud-2::after { width: 35px; height: 35px; top: -15px; left: 42px; }
+  .cloud-3 {
+    width: 140px; height: 45px; top: 5%; left: -180px;
+    animation: cloudDrift 30s linear infinite 15s;
+    opacity: 0.7;
+  }
+  .cloud-3::before { width: 70px; height: 70px; top: -35px; left: 25px; }
+  .cloud-3::after { width: 50px; height: 50px; top: -25px; left: 70px; }
+
+  @keyframes cloudDrift {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(100vw + 300px)); }
+  }
+
+  /* ===== BIRDS ===== */
+  .birds {
+    position: absolute;
+    top: 12%;
+    left: 20%;
+    animation: birdsFly 18s linear infinite;
+  }
+  .bird {
+    position: absolute;
+    width: 0; height: 0;
+  }
+  .bird::before, .bird::after {
+    content: '';
+    position: absolute;
+    background: #333;
+    width: 14px; height: 2px;
+    border-radius: 50%;
+    transform-origin: right center;
+  }
+  .bird::before { transform: rotate(-25deg); }
+  .bird::after { left: 12px; transform-origin: left center; transform: rotate(25deg); }
+  .bird:nth-child(1) { top: 0; left: 0; }
+  .bird:nth-child(2) { top: 8px; left: 25px; animation: birdFlap 0.8s ease-in-out infinite; }
+  .bird:nth-child(3) { top: -5px; left: 50px; animation: birdFlap 0.9s ease-in-out infinite 0.3s; }
+  .bird:nth-child(4) { top: 12px; left: 70px; animation: birdFlap 0.7s ease-in-out infinite 0.5s; }
+
+  @keyframes birdsFly {
+    from { transform: translate(0,0); }
+    to { transform: translate(60vw, -5vh); }
+  }
+  @keyframes birdFlap {
+    0%,100% { transform: scaleY(1); }
+    50% { transform: scaleY(-1); }
+  }
+
+  /* ===== OCEAN ===== */
+  .ocean {
+    position: absolute;
+    bottom: 28%;
+    left: 0;
+    width: 100%;
+    height: 30%;
+  }
+
+  .wave {
+    position: absolute;
+    width: 200%;
+    height: 100%;
+    bottom: 0;
+    left: -50%;
+  }
+
+  .wave-back {
+    background:
+      radial-gradient(ellipse 120px 18px at 60px 50%, var(--ocean-deep) 0%, transparent 100%) repeat-x,
+      linear-gradient(180deg, transparent 0%, var(--ocean-deep) 30%);
+    background-size: 200px 100%, 100% 100%;
+    animation: waveMove 7s ease-in-out infinite;
+    opacity: 0.7;
+  }
+  .wave-mid {
+    background:
+      radial-gradient(ellipse 140px 20px at 70px 45%, var(--ocean-mid) 0%, transparent 100%) repeat-x,
+      linear-gradient(180deg, transparent 10%, var(--ocean-mid) 40%);
+    background-size: 180px 100%, 100% 100%;
+    animation: waveMove 5s ease-in-out infinite reverse;
+    bottom: -5%;
+  }
+  .wave-front {
+    background:
+      radial-gradient(ellipse 160px 22px at 80px 40%, var(--ocean-light) 0%, transparent 100%) repeat-x,
+      linear-gradient(180deg, transparent 15%, var(--ocean-light) 50%);
+    background-size: 160px 100%, 100% 100%;
+    animation: waveMove 4s ease-in-out infinite;
+    bottom: -10%;
+  }
+
+  @keyframes waveMove {
+    0%,100% { transform: translateX(0); }
+    50% { transform: translateX(80px); }
+  }
+
+  /* ===== SHORE WAVES (water lapping the sand) ===== */
+  .shore {
+    position: absolute;
+    bottom: 26%;
+    left: 0;
+    width: 100%;
+    height: 12%;
+    z-index: 3;
+  }
+
+  .shore-wave {
+    position: absolute;
+    bottom: 0;
+    left: -5%;
+    width: 110%;
+    height: 100%;
+  }
+
+  .shore-wave-1 {
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(72, 201, 232, 0.3) 30%,
+      rgba(72, 201, 232, 0.5) 50%,
+      rgba(72, 201, 232, 0.2) 80%,
+      transparent 100%
+    );
+    animation: shoreWash 6s ease-in-out infinite;
+    transform-origin: bottom center;
+  }
+
+  .shore-wave-2 {
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(255,255,255,0.15) 20%,
+      rgba(255,255,255,0.4) 45%,
+      rgba(255,255,255,0.2) 70%,
+      transparent 100%
+    );
+    animation: shoreWash 6s ease-in-out infinite 1.5s;
+    transform-origin: bottom center;
+  }
+
+  .shore-wave-3 {
+    background: linear-gradient(180deg,
+      transparent 0%,
+      rgba(72, 201, 232, 0.15) 30%,
+      rgba(255,255,255,0.3) 50%,
+      transparent 100%
+    );
+    animation: shoreWash 6s ease-in-out infinite 3s;
+  }
+
+  /* Foam line */
+  .foam-line {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    background: repeating-linear-gradient(90deg,
+      transparent 0px,
+      rgba(255,255,255,0.6) 20px,
+      rgba(255,255,255,0.9) 40px,
+      rgba(255,255,255,0.6) 60px,
+      transparent 80px
+    );
+    filter: blur(2px);
+    animation: foamSlide 4s linear infinite, shoreWash 6s ease-in-out infinite;
+  }
+
+  @keyframes shoreWash {
+    0% { transform: translateY(100%) scaleY(0.3); opacity: 0; }
+    15% { opacity: 1; }
+    40% { transform: translateY(-30%) scaleY(1); opacity: 0.9; }
+    60% { transform: translateY(-20%) scaleY(0.9); opacity: 0.7; }
+    80% { transform: translateY(50%) scaleY(0.5); opacity: 0.3; }
+    100% { transform: translateY(100%) scaleY(0.2); opacity: 0; }
+  }
+
+  @keyframes foamSlide {
+    from { background-position: 0 0; }
+    to { background-position: 80px 0; }
+  }
+
+  /* ===== WET SAND ===== */
+  .wet-sand {
+    position: absolute;
+    bottom: 22%;
+    left: 0;
+    width: 100%;
+    height: 8%;
+    background: linear-gradient(180deg, #d4b876 0%, #c9a85c 40%, var(--sand) 100%);
+    z-index: 2;
+  }
+  .wet-sand::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40%;
+    background: linear-gradient(180deg, rgba(72,201,232,0.15), transparent);
+    animation: wetShimmer 6s ease-in-out infinite;
+  }
+  @keyframes wetShimmer {
+    0%,100% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+  }
+
+  /* ===== SAND AREA ===== */
+  .sand-area {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 25%;
+    background: linear-gradient(180deg, var(--sand) 0%, var(--sand-dark) 60%, #d4a948 100%);
+    z-index: 4;
+  }
+
+  /* Sand texture dots */
+  .sand-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(0,0,0,0.08) 50%, transparent 50%),
+      radial-gradient(1px 1px at 30% 50%, rgba(0,0,0,0.06) 50%, transparent 50%),
+      radial-gradient(1px 1px at 50% 30%, rgba(0,0,0,0.07) 50%, transparent 50%),
+      radial-gradient(1px 1px at 70% 60%, rgba(0,0,0,0.05) 50%, transparent 50%),
+      radial-gradient(1px 1px at 90% 40%, rgba(0,0,0,0.08) 50%, transparent 50%);
+    background-size: 40px 40px;
+  }
+
+  /* ===== PALM TREES ===== */
+  .palm-tree {
+    position: absolute;
+    z-index: 5;
+  }
+  .palm-tree-1 { bottom: 22%; left: 3%; }
+  .palm-tree-2 { bottom: 22%; right: 5%; transform: scaleX(-1); }
+
+  .palm-trunk {
+    width: 14px;
+    height: 180px;
+    background: linear-gradient(90deg, #6B4226 0%, #8B5E3C 40%, #A0704B 60%, #7A4E30 100%);
+    border-radius: 8px 8px 12px 12px;
+    transform: rotate(-5deg);
+    transform-origin: bottom center;
+    position: relative;
+  }
+  .palm-tree-2 .palm-trunk { transform: rotate(5deg); height: 160px; }
+
+  .palm-trunk::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg,
+      transparent 0px,
+      rgba(0,0,0,0.1) 8px,
+      transparent 10px
+    );
+    border-radius: inherit;
+  }
+
+  .palm-leaves {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .palm-leaf {
+    position: absolute;
+    width: 120px;
+    height: 20px;
+    background: linear-gradient(90deg, #2d8a2d, #45a845 40%, #228B22);
+    border-radius: 0 80% 80% 0 / 0 50% 50% 0;
+    transform-origin: left center;
+    animation: palmSway 4s ease-in-out infinite;
+  }
+  .palm-leaf::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    width: 80%;
+    height: 1px;
+    background: rgba(0,0,0,0.15);
+  }
+
+  .palm-leaf:nth-child(1) { --rot: -30deg; transform: rotate(-30deg); animation-delay: 0s; }
+  .palm-leaf:nth-child(2) { --rot: -60deg; transform: rotate(-60deg); animation-delay: 0.3s; }
+  .palm-leaf:nth-child(3) { --rot: -90deg; transform: rotate(-90deg); animation-delay: 0.6s; }
+  .palm-leaf:nth-child(4) { --rot: -120deg; transform: rotate(-120deg); animation-delay: 0.1s; }
+  .palm-leaf:nth-child(5) { --rot: -150deg; transform: rotate(-150deg); animation-delay: 0.5s; }
+  .palm-leaf:nth-child(6) { --rot: 0deg; transform: rotate(0deg); animation-delay: 0.2s; }
+  .palm-leaf:nth-child(7) { --rot: -180deg; transform: rotate(-180deg); animation-delay: 0.4s; }
+
+  @keyframes palmSway {
+    0%,100% { transform: rotate(var(--rot, -30deg)); }
+    50% { transform: rotate(calc(var(--rot, -30deg) + 8deg)); }
+  }
+
+  /* ===== CAMPER VAN (CSS ART) ===== */
+  .camper-scene {
+    position: absolute;
+    bottom: 24%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 6;
+    animation: camperBounce 3s ease-in-out infinite;
+  }
+
+  @keyframes camperBounce {
+    0%,100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(-3px); }
+  }
+
+  .camper {
+    position: relative;
+    width: 220px;
+    height: 110px;
+  }
+
+  .camper-body {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    width: 220px;
+    height: 80px;
+    background: linear-gradient(180deg, #fff 0%, #f5f5f5 100%);
+    border-radius: 12px 12px 5px 5px;
+    border: 2px solid #ddd;
+    overflow: hidden;
+  }
+
+  .camper-body::before {
+    content: '';
+    position: absolute;
+    top: 35px;
+    left: 0;
+    width: 100%;
+    height: 18px;
+    background: linear-gradient(90deg, var(--sunset-orange), var(--sunset-pink));
+  }
+
+  .camper-roof {
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    width: 160px;
+    height: 8px;
+    background: #ccc;
+    border-radius: 4px;
+    border: 1px solid #bbb;
+  }
+
+  .camper-popup {
+    position: absolute;
+    top: -25px;
+    left: 30px;
+    width: 120px;
+    height: 20px;
+    background: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 6px 6px 0 0;
+    border-bottom: none;
+  }
+
+  .camper-window {
+    position: absolute;
+    background: linear-gradient(135deg, #a8d8ea, #87CEEB);
+    border: 2px solid #bbb;
+    border-radius: 4px;
+  }
+  .camper-window-front {
+    right: 8px;
+    top: 8px;
+    width: 45px;
+    height: 25px;
+    border-radius: 4px 10px 4px 4px;
+  }
+  .camper-window-side1 {
+    left: 20px;
+    top: 8px;
+    width: 30px;
+    height: 22px;
+  }
+  .camper-window-side2 {
+    left: 60px;
+    top: 8px;
+    width: 30px;
+    height: 22px;
+  }
+
+  .camper-window::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 40%;
+    height: 40%;
+    background: rgba(255,255,255,0.5);
+    border-radius: 2px;
+  }
+
+  .camper-headlight {
+    position: absolute;
+    right: -2px;
+    top: 42px;
+    width: 8px;
+    height: 14px;
+    background: radial-gradient(circle, #FFD700, #FFA500);
+    border-radius: 0 4px 4px 0;
+    border: 1px solid #e0a000;
+    box-shadow: 0 0 8px rgba(255,215,0,0.5);
+  }
+
+  .camper-door {
+    position: absolute;
+    left: 100px;
+    top: 12px;
+    width: 30px;
+    height: 48px;
+    border: 2px solid #ccc;
+    border-radius: 3px;
+    background: linear-gradient(180deg, #fff 0%, #f0f0f0 48%, transparent 48%, transparent 52%, #f0f0f0 52%);
+  }
+  .camper-door::after {
+    content: '';
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    width: 4px;
+    height: 8px;
+    background: #999;
+    border-radius: 2px;
+    transform: translateY(-50%);
+  }
+
+  .wheel {
+    position: absolute;
+    bottom: -10px;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, #666 30%, #333 32%, #333 55%, #555 57%, #444 100%);
+    border-radius: 50%;
+    border: 3px solid #222;
+  }
+  .wheel::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: radial-gradient(circle, #ccc, #999);
+    border-radius: 50%;
+    transform: translate(-50%,-50%);
+  }
+  .wheel-front { right: 20px; }
+  .wheel-rear { left: 25px; }
+
+  .camper-vw-logo {
+    position: absolute;
+    right: 14px;
+    top: 38px;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+  }
+
+  /* ===== UMBRELLA ===== */
+  .umbrella {
+    position: absolute;
+    bottom: 2%;
+    left: 22%;
+    z-index: 5;
+  }
+  .umbrella-pole {
+    width: 4px;
+    height: 130px;
+    background: linear-gradient(90deg, #d4a94e, #c69538);
+    margin: 0 auto;
+  }
+  .umbrella-top {
+    width: 140px;
+    height: 70px;
+    background: conic-gradient(
+      var(--sunset-orange) 0deg, var(--sunset-orange) 45deg,
+      #fff 45deg, #fff 90deg,
+      var(--sunset-orange) 90deg, var(--sunset-orange) 135deg,
+      #fff 135deg, #fff 180deg
+    );
+    border-radius: 140px 140px 0 0;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%) rotate(-5deg);
+  }
+
+  /* ===== BEACH TOWEL ===== */
+  .towel {
+    position: absolute;
+    bottom: 3%;
+    left: 17%;
+    width: 100px;
+    height: 20px;
+    background: repeating-linear-gradient(90deg,
+      #FF6B35 0px, #FF6B35 12px,
+      #fff 12px, #fff 24px
+    );
+    border-radius: 3px;
+    transform: perspective(200px) rotateX(40deg) rotate(-8deg);
+    z-index: 5;
+  }
+
+  /* ===== SURFBOARD ===== */
+  .surfboard {
+    position: absolute;
+    bottom: 2%;
+    right: 20%;
+    width: 18px;
+    height: 100px;
+    background: linear-gradient(180deg, #FFD700 0%, #FF6B35 50%, var(--sunset-pink) 100%);
+    border-radius: 9px 9px 5px 5px;
+    transform: rotate(15deg);
+    z-index: 5;
+    border: 1px solid rgba(0,0,0,0.1);
+  }
+  .surfboard::before {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 12px;
+    background: #333;
+    border-radius: 0 0 4px 4px;
+  }
+  .surfboard::after {
+    content: '';
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 2px;
+    background: rgba(255,255,255,0.6);
+    box-shadow: 0 8px 0 rgba(255,255,255,0.5), 0 16px 0 rgba(255,255,255,0.4);
+  }
+
+  /* ===== SEASHELLS ===== */
+  .shell {
+    position: absolute;
+    z-index: 5;
+    font-size: 18px;
+    opacity: 0.7;
+  }
+  .shell-1 { bottom: 6%; left: 40%; transform: rotate(30deg); }
+  .shell-2 { bottom: 4%; left: 60%; transform: rotate(-15deg); font-size: 14px; }
+  .shell-3 { bottom: 8%; left: 75%; transform: rotate(45deg); font-size: 22px; }
+
+  .starfish {
+    position: absolute;
+    bottom: 5%;
+    right: 35%;
+    font-size: 28px;
+    z-index: 5;
+    animation: starSpin 20s linear infinite;
+    opacity: 0.8;
+  }
+  @keyframes starSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* ===== CONTENT OVERLAY ===== */
+  .content {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 5%;
+    z-index: 10;
+    text-align: center;
+  }
+
+  .logo-tag {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    color: white;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+    padding: 6px 20px;
+    border-radius: 30px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    animation: fadeSlideDown 1s ease-out;
+  }
+
+  .main-title {
+    font-family: 'Permanent Marker', cursive;
+    font-size: clamp(2.5rem, 7vw, 5rem);
+    color: white;
+    text-shadow:
+      3px 3px 0 var(--sunset-orange),
+      6px 6px 0 rgba(0,0,0,0.15);
+    line-height: 1.1;
+    animation: fadeSlideDown 1s ease-out 0.2s both;
+  }
+  .main-title span {
+    display: block;
+    font-size: 0.5em;
+    font-family: 'Fredoka One', cursive;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.2);
+    margin-top: 5px;
+  }
+
+  .subtitle {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    color: white;
+    margin-top: 12px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    animation: fadeSlideDown 1s ease-out 0.4s both;
+  }
+
+  /* ===== PROMO CODE ===== */
+  .promo-container {
+    margin-top: 20px;
+    animation: fadeSlideDown 1s ease-out 0.6s both;
+  }
+
+  .promo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 16px;
+    padding: 12px 24px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .promo-badge::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,107,53,0.15), rgba(255,56,100,0.15));
+    z-index: 0;
+  }
+
+  .promo-label {
+    font-family: 'Quicksand', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.9);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .promo-code {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.6rem;
+    color: #FFD700;
+    text-shadow: 0 0 20px rgba(255,215,0,0.4);
+    letter-spacing: 3px;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.2s;
+  }
+  .promo-code:hover {
+    transform: scale(1.05);
+  }
+
+  .promo-discount {
+    font-family: 'Permanent Marker', cursive;
+    font-size: 1.8rem;
+    color: white;
+    text-shadow: 2px 2px 0 var(--sunset-pink);
+    margin-top: 8px;
+    animation: fadeSlideDown 1s ease-out 0.8s both;
+  }
+  .promo-discount small {
+    font-family: 'Quicksand', sans-serif;
+    font-size: 0.45em;
+    font-weight: 600;
+    display: block;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  /* ===== CTA BUTTON ===== */
+  .cta-wrapper {
+    margin-top: 24px;
+    animation: fadeSlideDown 1s ease-out 1s both;
+  }
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 40px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: white;
+    background: linear-gradient(135deg, var(--sunset-orange), var(--sunset-pink));
+    border: none;
+    border-radius: 60px;
+    cursor: pointer;
+    text-decoration: none;
+    box-shadow: 0 8px 30px rgba(255,56,100,0.4), 0 2px 8px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-btn::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+    animation: ctaShine 3s ease-in-out infinite;
+  }
+  @keyframes ctaShine {
+    0%,100% { transform: translate(-30%,-30%); }
+    50% { transform: translate(30%,30%); }
+  }
+  .cta-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 12px 40px rgba(255,56,100,0.5), 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  .cta-arrow {
+    font-size: 1.4em;
+    transition: transform 0.3s;
+  }
+  .cta-btn:hover .cta-arrow {
+    transform: translateX(4px);
+  }
+
+  /* ===== FLOATING ELEMENTS ===== */
+  .floating-emoji {
+    position: absolute;
+    font-size: 2rem;
+    z-index: 8;
+    animation: floatUp 8s ease-in-out infinite;
+    opacity: 0.6;
+  }
+  .floating-emoji:nth-child(1) { left: 8%; top: 30%; animation-delay: 0s; font-size: 1.8rem; }
+  .floating-emoji:nth-child(2) { right: 10%; top: 25%; animation-delay: 2s; font-size: 2.2rem; }
+  .floating-emoji:nth-child(3) { left: 15%; top: 55%; animation-delay: 4s; font-size: 1.5rem; }
+  .floating-emoji:nth-child(4) { right: 15%; top: 50%; animation-delay: 1s; font-size: 1.6rem; }
+  .floating-emoji:nth-child(5) { left: 5%; top: 45%; animation-delay: 3s; font-size: 2rem; }
+
+  @keyframes floatUp {
+    0%,100% { transform: translateY(0) rotate(0deg); opacity: 0.6; }
+    25% { transform: translateY(-15px) rotate(5deg); opacity: 0.8; }
+    50% { transform: translateY(-25px) rotate(-3deg); opacity: 0.5; }
+    75% { transform: translateY(-10px) rotate(2deg); opacity: 0.7; }
+  }
+
+  /* ===== SPARKLES ===== */
+  .sparkle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #FFD700;
+    border-radius: 50%;
+    z-index: 8;
+    animation: sparkle 2s ease-in-out infinite;
+  }
+  .sparkle::before, .sparkle::after {
+    content: '';
+    position: absolute;
+    background: #FFD700;
+  }
+  .sparkle::before {
+    width: 12px; height: 2px; top: 1px; left: -4px; border-radius: 1px;
+  }
+  .sparkle::after {
+    width: 2px; height: 12px; top: -4px; left: 1px; border-radius: 1px;
+  }
+
+  .sparkle:nth-child(1) { top: 18%; left: 30%; animation-delay: 0s; }
+  .sparkle:nth-child(2) { top: 22%; right: 25%; animation-delay: 0.7s; }
+  .sparkle:nth-child(3) { top: 10%; left: 50%; animation-delay: 1.4s; }
+
+  @keyframes sparkle {
+    0%,100% { opacity: 0; transform: scale(0) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1) rotate(45deg); }
+  }
+
+  /* ===== COUNTDOWN TIMER ===== */
+  .countdown-bar {
+    margin-top: 15px;
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    animation: fadeSlideDown 1s ease-out 1.2s both;
+  }
+  .countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 8px 14px;
+    min-width: 60px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .countdown-number {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.6rem;
+    color: white;
+  }
+  .countdown-label {
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  @keyframes fadeSlideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .flipflop {
+    position: absolute;
+    bottom: 10%;
+    right: 28%;
+    font-size: 26px;
+    z-index: 5;
+    transform: rotate(-20deg);
+  }
+
+  /* ===== COPIED TOOLTIP ===== */
+  .copied-tooltip {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: rgba(0,0,0,0.8);
+    color: #FFD700;
+    font-family: 'Fredoka One', cursive;
+    padding: 10px 24px;
+    border-radius: 30px;
+    z-index: 100;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+  }
+  .copied-tooltip.show {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ===== WAVE CANVAS ===== */
+  #waveCanvas {
+    position: absolute;
+    bottom: 25%;
+    left: 0;
+    width: 100%;
+    height: 15%;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .palm-tree-1 { left: -2%; }
+    .palm-tree-2 { right: -2%; }
+    .camper { transform: scale(0.8); }
+    .umbrella { left: 12%; }
+    .towel { left: 8%; }
+    .surfboard { right: 10%; }
+    .promo-badge { flex-direction: column; gap: 6px; padding: 10px 18px; }
+    .promo-code { font-size: 1.3rem; }
+    .countdown-item { min-width: 50px; padding: 6px 10px; }
+    .countdown-number { font-size: 1.2rem; }
+    .floating-emoji { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .palm-tree { display: none; }
+    .umbrella { display: none; }
+    .towel { display: none; }
+    .surfboard { display: none; }
+    .flipflop { display: none; }
+    .cta-btn { padding: 14px 30px; font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="banner-wrapper">
+
+  <!-- Sky elements -->
+  <div class="sun"></div>
+  <div class="cloud cloud-1"></div>
+  <div class="cloud cloud-2"></div>
+  <div class="cloud cloud-3"></div>
+
+  <div class="birds">
+    <div class="bird"></div>
+    <div class="bird"></div>
+    <div class="bird"></div>
+    <div class="bird"></div>
+  </div>
+
+  <!-- Sparkles -->
+  <div class="sparkle"></div>
+  <div class="sparkle"></div>
+  <div class="sparkle"></div>
+
+  <!-- Floating emojis -->
+  <div class="floating-emoji">🌊</div>
+  <div class="floating-emoji">☀️</div>
+  <div class="floating-emoji">🏖️</div>
+  <div class="floating-emoji">🐚</div>
+  <div class="floating-emoji">🌴</div>
+
+  <!-- Ocean waves -->
+  <div class="ocean">
+    <div class="wave wave-back"></div>
+    <div class="wave wave-mid"></div>
+    <div class="wave wave-front"></div>
+  </div>
+
+  <!-- Animated shore canvas -->
+  <canvas id="waveCanvas"></canvas>
+
+  <!-- Shore (water hitting sand) -->
+  <div class="shore">
+    <div class="shore-wave shore-wave-1"></div>
+    <div class="shore-wave shore-wave-2"></div>
+    <div class="shore-wave shore-wave-3"></div>
+    <div class="foam-line"></div>
+  </div>
+
+  <!-- Wet sand transition -->
+  <div class="wet-sand"></div>
+
+  <!-- Sand -->
+  <div class="sand-area"></div>
+
+  <!-- Palm trees -->
+  <div class="palm-tree palm-tree-1">
+    <div class="palm-trunk">
+      <div class="palm-leaves">
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+      </div>
+    </div>
+  </div>
+  <div class="palm-tree palm-tree-2">
+    <div class="palm-trunk">
+      <div class="palm-leaves">
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+        <div class="palm-leaf"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Camper Van -->
+  <div class="camper-scene">
+    <div class="camper">
+      <div class="camper-popup"></div>
+      <div class="camper-roof"></div>
+      <div class="camper-body">
+        <div class="camper-window camper-window-front"></div>
+        <div class="camper-window camper-window-side1"></div>
+        <div class="camper-window camper-window-side2"></div>
+        <div class="camper-headlight"></div>
+        <div class="camper-door"></div>
+        <div class="camper-vw-logo"></div>
+      </div>
+      <div class="wheel wheel-front"></div>
+      <div class="wheel wheel-rear"></div>
+    </div>
+  </div>
+
+  <!-- Beach items -->
+  <div class="umbrella">
+    <div class="umbrella-top"></div>
+    <div class="umbrella-pole"></div>
+  </div>
+  <div class="towel"></div>
+  <div class="surfboard"></div>
+
+  <div class="shell shell-1">🐚</div>
+  <div class="shell shell-2">🐚</div>
+  <div class="shell shell-3">🦪</div>
+  <div class="starfish">⭐</div>
+  <div class="flipflop">🩴</div>
+
+  <!-- Content overlay -->
+  <div class="content">
+    <div class="logo-tag">Furgocasa</div>
+    <h1 class="main-title">
+      VERANO 2026
+      <span>¡Reserva ya tu camper!</span>
+    </h1>
+    <p class="subtitle">Adelántate al verano y viaja al mejor precio desde Murcia</p>
+
+    <div class="promo-container">
+      <div class="promo-badge" onclick="copyCode()">
+        <span class="promo-label">Código<br>descuento</span>
+        <span class="promo-code" id="promoCode">EARLY2026</span>
+      </div>
+    </div>
+    <div class="promo-discount">
+      Hasta -20% en tu reserva
+      <small>En alquileres de junio a septiembre · Haz clic para copiar el código</small>
+    </div>
+
+    <div class="countdown-bar">
+      <div class="countdown-item">
+        <span class="countdown-number" id="days">--</span>
+        <span class="countdown-label">Días</span>
+      </div>
+      <div class="countdown-item">
+        <span class="countdown-number" id="hours">--</span>
+        <span class="countdown-label">Horas</span>
+      </div>
+      <div class="countdown-item">
+        <span class="countdown-number" id="mins">--</span>
+        <span class="countdown-label">Min</span>
+      </div>
+      <div class="countdown-item">
+        <span class="countdown-number" id="secs">--</span>
+        <span class="countdown-label">Seg</span>
+      </div>
+    </div>
+
+    <div class="cta-wrapper">
+      <a href="https://www.furgocasa.com/es/ofertas" class="cta-btn" target="_blank">
+        ¡Ver ofertas de verano!
+        <span class="cta-arrow">→</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Copied tooltip -->
+  <div class="copied-tooltip" id="copiedTooltip">✅ ¡Código EARLY2026 copiado!</div>
+
+</div>
+
+<script>
+  // Countdown to June 1, 2026
+  function updateCountdown() {
+    const target = new Date('2026-06-01T00:00:00').getTime();
+    const now = Date.now();
+    const diff = target - now;
+
+    if (diff <= 0) {
+      document.getElementById('days').textContent = '🎉';
+      document.getElementById('hours').textContent = '00';
+      document.getElementById('mins').textContent = '00';
+      document.getElementById('secs').textContent = '00';
+      return;
+    }
+
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+
+    document.getElementById('days').textContent = String(d).padStart(2, '0');
+    document.getElementById('hours').textContent = String(h).padStart(2, '0');
+    document.getElementById('mins').textContent = String(m).padStart(2, '0');
+    document.getElementById('secs').textContent = String(s).padStart(2, '0');
+  }
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Copy promo code
+  function copyCode() {
+    const code = 'EARLY2026';
+    navigator.clipboard.writeText(code).then(() => {
+      const tooltip = document.getElementById('copiedTooltip');
+      tooltip.classList.add('show');
+      setTimeout(() => tooltip.classList.remove('show'), 2000);
+    }).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      const tooltip = document.getElementById('copiedTooltip');
+      tooltip.classList.add('show');
+      setTimeout(() => tooltip.classList.remove('show'), 2000);
+    });
+  }
+
+  // Animated wave canvas
+  const canvas = document.getElementById('waveCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  let time = 0;
+
+  function drawWaves() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // Wave 1 - back
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x += 3) {
+      const y = h * 0.5
+        + Math.sin(x * 0.008 + time * 0.8) * 12
+        + Math.sin(x * 0.015 + time * 1.2) * 6
+        + Math.sin(x * 0.003 + time * 0.5) * 8;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(8, 146, 208, 0.35)';
+    ctx.fill();
+
+    // Wave 2 - mid
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x += 3) {
+      const y = h * 0.6
+        + Math.sin(x * 0.01 + time * 1.0 + 1) * 10
+        + Math.sin(x * 0.02 + time * 1.5) * 5
+        + Math.cos(x * 0.005 + time * 0.7) * 7;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(72, 201, 232, 0.3)';
+    ctx.fill();
+
+    // Wave 3 - front (foam)
+    ctx.beginPath();
+    ctx.moveTo(0, h);
+    for (let x = 0; x <= w; x += 3) {
+      const y = h * 0.72
+        + Math.sin(x * 0.012 + time * 1.3 + 2) * 8
+        + Math.sin(x * 0.025 + time * 1.8) * 4
+        + Math.cos(x * 0.006 + time * 0.9) * 6;
+      ctx.lineTo(x, y);
+    }
+    ctx.lineTo(w, h);
+    ctx.closePath();
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+    ctx.fill();
+
+    // Foam dots
+    for (let i = 0; i < 30; i++) {
+      const fx = (i * 67 + time * 20) % w;
+      const baseY = h * 0.72
+        + Math.sin(fx * 0.012 + time * 1.3 + 2) * 8
+        + Math.sin(fx * 0.025 + time * 1.8) * 4;
+      const fy = baseY + Math.sin(i * 3 + time * 2) * 3;
+      const r = 1.5 + Math.sin(i * 7 + time * 3) * 0.8;
+      ctx.beginPath();
+      ctx.arc(fx, fy, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.sin(i + time) * 0.15})`;
+      ctx.fill();
+    }
+
+    time += 0.02;
+    requestAnimationFrame(drawWaves);
+  }
+  drawWaves();
+</script>
+
+</body>
+</html>

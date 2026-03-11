@@ -1,5 +1,4 @@
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import { ReservarClient } from "./reservar-client";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
@@ -37,8 +36,7 @@ const RESERVAR_METADATA: Metadata = {
 };
 
 export async function generateMetadata(): Promise<Metadata> {
-  const headersList = await headers();
-  const locale = (headersList.get('x-detected-locale') || 'es') as Locale;
+  const locale: Locale = 'en'; // Ruta fija /en/book
   const alternates = buildCanonicalAlternates('/reservar', locale);
 
   return {

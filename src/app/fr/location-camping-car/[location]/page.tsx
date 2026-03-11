@@ -143,7 +143,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `Louez votre camping-car à ${translated.name || location.name}. Flotte premium avec kilométrage illimité.`;
 
   const path = `/location-camping-car/${slug}`;
-  const alternates = buildCanonicalAlternates(path, locale);
+  const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
 
   return {
     title,

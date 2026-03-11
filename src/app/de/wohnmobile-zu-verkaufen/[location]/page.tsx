@@ -150,7 +150,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     `Kaufen Sie Ihr Wohnmobil in ${translated.name || location.name}. Fahrzeuge mit Garantie und Finanzierung.`;
 
   const path = `/wohnmobile-zu-verkaufen/${slug}`;
-  const alternates = buildCanonicalAlternates(path, locale);
+  const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
 
   return {
