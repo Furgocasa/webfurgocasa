@@ -6,7 +6,7 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const AVISO_METADATA: Metadata = {
-  title: "Impressum",
+  title: "Impressum - Furgocasa | Rechtliche Informationen Wohnmobil",
   description: "Impressum und Nutzungsbedingungen von Furgocasa S.L. Rechtliche Informationen zur Wohnmobilvermietung.",
   robots: {
     index: false,

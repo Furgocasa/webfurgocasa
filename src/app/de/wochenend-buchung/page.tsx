@@ -8,7 +8,7 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const COMO_RESERVAR_FIN_SEMANA_METADATA: Metadata = {
-  title: "So buchen Sie ein Wochenende",
+  title: "So buchen Sie ein Wochenende - Wohnmobil Miete | Furgocasa",
   description: "Komplette Anleitung zum Mieten eines Wohnmobils für das Wochenende. Zeiten, Preise und Sonderbedingungen für Kurztrips.",
 };
 

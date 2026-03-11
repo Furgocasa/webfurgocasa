@@ -11,7 +11,7 @@ interface PageProps {}
 export const revalidate = 86400;
 
 const SITEMAP_HTML_METADATA: Metadata = {
-  title: "Sitemap HTML",
+  title: "Sitemap HTML - Todas las Páginas de Furgocasa | Alquiler Campers",
   description: "Mapa del sitio en HTML con todas las URLs públicas.",
 };
 

@@ -8,7 +8,7 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Legal page NOT indexable
 const COOKIES_METADATA: Metadata = {
-  title: "Cookie Policy",
+  title: "Cookie Policy - Furgocasa | Motorhome Rental Spain",
   description: "Information about the cookies we use on furgocasa.com. Types of cookies, purpose and how to manage your privacy preferences.",
   keywords: "cookie policy furgocasa, web cookies, cookie management, furgocasa privacy",
   robots: {

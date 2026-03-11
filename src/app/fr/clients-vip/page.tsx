@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Unique et optimisé pour /clients-vip
 const CLIENTES_VIP_METADATA: Metadata = {
-  title: "Programme Clients VIP",
+  title: "Programme Clients VIP - Avantages Exclusifs | Furgocasa",
   description: "Rejoignez le programme VIP de Furgocasa et profitez de 10% de réduction permanente, priorité de réservation, extras gratuits et late check-out. Avantages exclusifs pour les clients fidèles.",
   keywords: "clients vip furgocasa, programme fidélité camping-car, réductions clients fréquents, avantages vip van",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Programme Clients VIP",
+    title: "Programme Clients VIP - Avantages Exclusifs | Furgocasa",
     description: "Avantages exclusifs pour les clients fréquents : 10% réduction, priorité de réservation et extras gratuits.",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const CLIENTES_VIP_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Programme Clients VIP",
+    title: "Programme Clients VIP - Avantages Exclusifs | Furgocasa",
     description: "Avantages exclusifs pour les clients fréquents.",
   },
   robots: {

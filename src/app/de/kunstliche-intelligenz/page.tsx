@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Einzigartig und optimiert für /kunstliche-intelligenz
 const IA_METADATA: Metadata = {
-  title: "Künstliche Intelligenz für Wohnmobil-Reisende",
+  title: "Künstliche Intelligenz für Wohnmobil-Reisende - Routen | Furgocasa",
   description: "Entdecken Sie unsere KI-Tools zur Planung Ihrer Wohnmobil-Reise. Intelligenter Chatbot 24/7 und Routenplaner mit künstlicher Intelligenz.",
   keywords: "künstliche intelligenz wohnmobil, chatbot camper, ki routenplaner, virtueller assistent wohnmobil, technologie wohnmobil reise",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Künstliche Intelligenz für Wohnmobil-Reisende",
+    title: "Künstliche Intelligenz für Wohnmobil-Reisende - Routen | Furgocasa",
     description: "KI-Chatbot und intelligenter Routenplaner für Ihre Wohnmobil-Reise.",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const IA_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Künstliche Intelligenz für Wohnmobil-Reisende",
+    title: "Künstliche Intelligenz für Wohnmobil-Reisende - Routen | Furgocasa",
     description: "KI-Chatbot und intelligenter Routenplaner.",
   },
   robots: {

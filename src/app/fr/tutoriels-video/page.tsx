@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Unique et optimisé pour /tutoriels-video
 const VIDEO_TUTORIALES_METADATA: Metadata = {
-  title: "Tutoriels Vidéo Camping-Car",
+  title: "Tutoriels Vidéo Camping-Car - Apprendre à Utiliser | Furgocasa",
   description: "Vidéos tutoriels sur le fonctionnement de votre camping-car de location. Panneau de contrôle, eau, électricité, chauffage, réfrigérateur et plus de systèmes expliqués étape par étape.",
   keywords: "tutoriel vidéo camping-car, comment utiliser van, tutoriel panneau contrôle camping-car, vidéos furgocasa, apprendre utiliser camping-car",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Tutoriels Vidéo Camping-Car",
+    title: "Tutoriels Vidéo Camping-Car - Apprendre à Utiliser | Furgocasa",
     description: "Apprenez à utiliser votre camping-car de location avec nos tutoriels vidéo.",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const VIDEO_TUTORIALES_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Tutoriels Vidéo Camping-Car",
+    title: "Tutoriels Vidéo Camping-Car - Apprendre à Utiliser | Furgocasa",
     description: "Apprenez à utiliser votre camping-car de location.",
   },
   robots: {

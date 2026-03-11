@@ -12,7 +12,7 @@ interface PageProps {}
 export const revalidate = 86400;
 
 const SITEMAP_HTML_METADATA: Metadata = {
-  title: "HTML-Sitemap",
+  title: "HTML-Sitemap - Alle Furgocasa Seiten | Wohnmobil Miete Spanien",
   description: "HTML-Sitemap mit allen öffentlichen URLs.",
 };
 

@@ -69,12 +69,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 
   return {
-    title: `${meta.name} - ${t("Blog Camper")}`,
+    title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Camper Rental Spain`,
     description: meta.description,
     keywords: `camper blog ${category}, ${category} articles, camper travel, furgocasa blog`,
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-      title: `${meta.name} - ${t("Blog Camper")}`,
+      title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Camper Rental Spain`,
       description: meta.description,
       type: "website",
       url: alternates.canonical,
@@ -83,7 +83,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary",
-      title: `${meta.name} - ${t("Blog Camper")}`,
+      title: `${meta.name} - ${t("Blog Camper")} | Furgocasa - Camper Rental Spain`,
       description: meta.description,
     },
     alternates,

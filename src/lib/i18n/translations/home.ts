@@ -325,12 +325,36 @@ export const homeTranslations = {
     de: "Buchen Sie jetzt Ihren Camper und beginnen Sie mit der Planung Ihrer unvergesslichen Reise"
   },
   
-  // SEO
+  // SEO - Títulos 50-60 caracteres
   "Las Mejores Campers en Alquiler": {
     es: "Las Mejores Campers en Alquiler",
     en: "The Best Campers for Rent",
     fr: "Les Meilleurs Camping-cars à Louer",
     de: "Die Besten Camper zur Miete"
+  },
+  "Alquiler en España": {
+    es: "Alquiler en España",
+    en: "Rental in Spain",
+    fr: "Location en Espagne",
+    de: "Miete in Spanien"
+  },
+  "Consejos y Rutas por España": {
+    es: "Consejos y Rutas por España",
+    en: "Tips and Routes in Spain",
+    fr: "Conseils et Routes en Espagne",
+    de: "Tipps und Routen in Spanien"
+  },
+  "Quiénes Somos - Descubre la Historia de Furgocasa": {
+    es: "Quiénes Somos - Descubre la Historia de Furgocasa",
+    en: "About Us - Discover Furgocasa's Story | Camper Rental",
+    fr: "À Propos - Découvrez l'Histoire de Furgocasa | Camping-Cars",
+    de: "Über Uns - Furgocasa Geschichte | Wohnmobil Miete"
+  },
+  "Reservas y Alquiler de Campers": {
+    es: "Reservas y Alquiler de Campers",
+    en: "Bookings and Camper Rental",
+    fr: "Réservations et Location Camping-Cars",
+    de: "Buchungen und Camper Miete"
   },
   "Alquiler de autocaravanas y campers de gran volumen": {
     es: "Alquiler de autocaravanas y campers de gran volumen",

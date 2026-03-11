@@ -6,7 +6,7 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const AVISO_METADATA: Metadata = {
-  title: "Mentions Légales",
+  title: "Mentions Légales - Furgocasa | Location Camping-Cars Espagne",
   description: "Mentions légales et conditions d'utilisation de Furgocasa S.L. Informations légales sur la location de camping-cars.",
   robots: {
     index: false,

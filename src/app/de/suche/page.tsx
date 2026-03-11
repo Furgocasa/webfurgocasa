@@ -8,7 +8,7 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Einzigartig und optimiert für /suche
 const BUSCAR_METADATA: Metadata = {
-  title: "Wohnmobil-Verfügbarkeit suchen",
+  title: "Wohnmobil-Verfügbarkeit suchen - Online Reservieren | Furgocasa",
   description: "Suchen und vergleichen Sie die Verfügbarkeit von Wohnmobilen und Campern für Ihre Reisedaten. Buchen Sie Ihr ideales Wohnmobil online bei Furgocasa.",
   keywords: "verfügbares wohnmobil suchen, wohnmobil verfügbarkeit, wohnmobil für datum buchen, wohnmobil miete suchen",
   robots: {

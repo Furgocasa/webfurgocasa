@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Unique and optimized for /artificial-intelligence
 const IA_METADATA: Metadata = {
-  title: "Artificial Intelligence for Camper Travelers",
+  title: "Artificial Intelligence for Camper Travelers - Plan Routes | Furgocasa",
   description: "Discover our AI tools to plan your camper trip. 24/7 intelligent chatbot and AI-powered route planner.",
   keywords: "artificial intelligence camper, motorhome chatbot, ai route planner, virtual camper assistant, camper travel technology",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Artificial Intelligence for Camper Travelers",
+    title: "Artificial Intelligence for Camper Travelers - Plan Routes | Furgocasa",
     description: "AI chatbot and intelligent route planner for your camper trip.",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const IA_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Artificial Intelligence for Camper Travelers",
+    title: "Artificial Intelligence for Camper Travelers - Plan Routes | Furgocasa",
     description: "AI chatbot and intelligent route planner.",
   },
   robots: {

@@ -12,7 +12,7 @@ interface PageProps {}
 export const revalidate = 86400;
 
 const SITEMAP_HTML_METADATA: Metadata = {
-  title: "HTML Sitemap",
+  title: "HTML Sitemap - All Furgocasa Pages | Motorhome Rental Spain",
   description: "HTML site map with all public URLs.",
 };
 

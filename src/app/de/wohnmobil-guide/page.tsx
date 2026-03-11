@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Einzigartig und optimiert für /wohnmobil-guide
 const GUIA_CAMPER_METADATA: Metadata = {
-  title: "Kompletter Wohnmobil-Ratgeber",
+  title: "Kompletter Wohnmobil-Ratgeber - Bedienung & Tipps | Furgocasa",
   description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen: Bedienfeld, Wassertanks, Elektrik, Heizung, Gas und mehr. Praktischer Ratgeber für Anfänger und Experten.",
   keywords: "wohnmobil ratgeber, wie benutzt man wohnmobil, wohnmobil handbuch, wohnmobil funktionsweise, wohnmobil elektrik, wohnmobil wasser, wohnmobil heizung",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Kompletter Wohnmobil-Ratgeber",
+    title: "Kompletter Wohnmobil-Ratgeber - Bedienung & Tipps | Furgocasa",
     description: "Alles, was Sie über die Funktionsweise Ihres Miet-Wohnmobils wissen müssen.",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const GUIA_CAMPER_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Kompletter Wohnmobil-Ratgeber",
+    title: "Kompletter Wohnmobil-Ratgeber - Bedienung & Tipps | Furgocasa",
     description: "Lernen Sie, Ihr Miet-Wohnmobil zu benutzen.",
   },
   robots: {

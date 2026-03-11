@@ -8,7 +8,7 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const COMO_RESERVAR_FIN_SEMANA_METADATA: Metadata = {
-  title: "Comment Réserver un Week-end",
+  title: "Comment Réserver un Week-end - Camping-Car | Furgocasa",
   description: "Guide complet pour louer un camping-car pour le week-end. Horaires, prix et conditions spéciales pour les escapades courtes.",
 };
 

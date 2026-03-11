@@ -6,7 +6,7 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const AVISO_METADATA: Metadata = {
-  title: "Aviso Legal",
+  title: "Aviso Legal - Furgocasa | Información Legal Alquiler Campers",
   description: "Aviso legal y términos de uso de Furgocasa S.L. Información legal sobre el alquiler de autocaravanas y campers en Murcia.",
   robots: {
     index: false,

@@ -12,7 +12,7 @@ interface PageProps {}
 export const revalidate = 86400;
 
 const SITEMAP_HTML_METADATA: Metadata = {
-  title: "Plan du Site HTML",
+  title: "Plan du Site HTML - Toutes les Pages Furgocasa | Camping-Cars",
   description: "Plan du site en HTML avec toutes les URLs publiques.",
 };
 

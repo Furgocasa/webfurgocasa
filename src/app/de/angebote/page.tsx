@@ -8,12 +8,12 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Einzigartig und optimiert für /angebote
 const OFERTAS_METADATA: Metadata = {
-  title: "Angebote und Rabatte Wohnmobil-Miete",
+  title: "Angebote und Rabatte Wohnmobil-Miete - Bis 40% | Furgocasa",
   description: "Nutzen Sie unsere Sonderangebote für Wohnmobil-Miete. Saisonrabatte, Aktionscodes und Sonderpreise für Ihr nächstes Wohnmobil-Abenteuer.",
   keywords: "angebote wohnmobil miete, rabatte camper, aktionen furgocasa, günstige wohnmobil miete, last minute angebote wohnmobil",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-    title: "Angebote und Rabatte Wohnmobil-Miete",
+    title: "Angebote und Rabatte Wohnmobil-Miete - Bis 40% | Furgocasa",
     description: "Sonderrabatte für Wohnmobil-Miete. Nutzen Sie unsere Saisonangebote!",
     type: "website",
     siteName: "Furgocasa",
@@ -21,7 +21,7 @@ const OFERTAS_METADATA: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "Angebote und Rabatte Wohnmobil-Miete",
+    title: "Angebote und Rabatte Wohnmobil-Miete - Bis 40% | Furgocasa",
     description: "Sonderrabatte für Wohnmobil-Miete.",
   },
   robots: {

@@ -379,9 +379,36 @@ export function sanitizeBlogContentLinks(html: string, pageLocale: Locale): stri
     }
   );
 
-  // Paso 4: Añadir alt genérico a las imágenes que no lo tengan (Mejora SEO)
-  sanitized = sanitized.replace(/<img(?![^>]*\balt=)[^>]*>/gi, (match) => {
-    return match.replace('<img', '<img alt="Imagen del artículo de blog de Furgocasa"');
+  // Paso 4: Añadir/reemplazar alt en imágenes para SEO y accesibilidad
+  // Cubre: sin alt, alt="", alt vacío. Usa nombre del archivo si existe para descripción más relevante
+  const altByLocale: Record<Locale, string> = {
+    es: 'Ilustración del artículo',
+    en: 'Article illustration',
+    fr: "Illustration de l'article",
+    de: 'Artikelillustration',
+  };
+  const baseAlt = altByLocale[pageLocale] || altByLocale.es;
+  sanitized = sanitized.replace(/<img([^>]*)>/gi, (match, attrs) => {
+    const altMatch = attrs.match(/alt\s*=\s*["']([^"']*)["']/i);
+    const hasNonEmptyAlt = altMatch && altMatch[1].trim().length > 0;
+    if (hasNonEmptyAlt) return match;
+
+    let altDesc = baseAlt;
+    const srcMatch = attrs.match(/src\s*=\s*["']([^"']*)["']/i);
+    if (srcMatch) {
+      const filename = srcMatch[1].split('/').pop()?.split('?')[0] || '';
+      const nameWithoutExt = filename.replace(/\.(jpg|jpeg|png|gif|webp|avif)$/i, '');
+      if (nameWithoutExt && nameWithoutExt.length > 2) {
+        const fromName = nameWithoutExt.replace(/[-_]/g, ' ').trim();
+        if (fromName.length > 0 && fromName.length <= 80) altDesc = fromName;
+      }
+    }
+    const descriptiveAlt = `${altDesc} - Furgocasa`;
+
+    if (altMatch) {
+      return match.replace(/alt\s*=\s*["'][^"']*["']/i, `alt="${descriptiveAlt}"`);
+    }
+    return match.replace(/^<img\s*/, `<img alt="${descriptiveAlt}" `);
   });
 
   // Paso 5: Reemplazar h1 por h2 en el contenido para evitar múltiples H1 (Mejora SEO)

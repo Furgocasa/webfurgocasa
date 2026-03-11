@@ -23,7 +23,7 @@ const videos = [
 ];
 
 export const metadata: Metadata = {
-  title: "Videos de Campers en Venta",
+  title: "Videos de Campers en Venta - Autocaravanas | Furgocasa",
   description: "Mira nuestros vehículos en video. Descubre en detalle las autocaravanas y campers que tenemos a la venta en Furgocasa.",
   alternates: {
     canonical: "https://www.furgocasa.com/es/ventas/videos"

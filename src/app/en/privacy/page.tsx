@@ -6,7 +6,7 @@ import type { Locale } from "@/lib/i18n/config";
 interface PageProps {}
 
 const PRIVACIDAD_METADATA: Metadata = {
-  title: "Privacy Policy",
+  title: "Privacy Policy - Furgocasa | Data Protection & RGPD",
   description: "Privacy policy and data protection of Furgocasa S.L. Information about how we treat and protect your personal data according to GDPR.",
   keywords: "privacy policy furgocasa, data protection, gdpr, personal data privacy",
   robots: {

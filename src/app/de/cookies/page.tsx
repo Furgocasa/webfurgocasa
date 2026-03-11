@@ -8,7 +8,7 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Rechtliche Seite NICHT indexierbar
 const COOKIES_METADATA: Metadata = {
-  title: "Cookie-Richtlinie",
+  title: "Cookie-Richtlinie - Furgocasa | Wohnmobil Miete Spanien",
   description: "Informationen über die Cookies, die wir auf furgocasa.com verwenden. Cookie-Arten, Zweck und Verwaltung Ihrer Datenschutzeinstellungen.",
   keywords: "cookie richtlinie furgocasa, web cookies, cookie verwaltung, datenschutz furgocasa",
   robots: {

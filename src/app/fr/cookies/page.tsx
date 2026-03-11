@@ -8,7 +8,7 @@ interface PageProps {}
 
 // 🎯 SEO Metadata - Page légale NON indexable
 const COOKIES_METADATA: Metadata = {
-  title: "Politique de Cookies",
+  title: "Politique de Cookies - Furgocasa | Location Camping-Cars",
   description: "Informations sur les cookies que nous utilisons sur furgocasa.com. Types de cookies, finalité et gestion de vos préférences de confidentialité.",
   keywords: "politique cookies furgocasa, cookies web, gestion cookies, confidentialité furgocasa",
   robots: {
