@@ -181,6 +181,19 @@ export default function ReservaDetalleAdminPage() {
 
       if (error) throw error;
 
+      // Si se cancela, revertir oferta de última hora vinculada
+      if (newStatus === 'cancelled') {
+        try {
+          await fetch('/api/admin/last-minute-offers/revert-by-booking', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bookingId }),
+          });
+        } catch (e) {
+          console.warn('No se pudo revertir oferta vinculada:', e);
+        }
+      }
+
       setMessage({ type: 'success', text: 'Estado actualizado correctamente' });
       loadBooking();
     } catch (error: any) {

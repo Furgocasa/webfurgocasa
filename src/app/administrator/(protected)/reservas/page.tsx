@@ -166,6 +166,18 @@ export default function BookingsPage() {
     );
   };
 
+  const revertOfferIfLinked = async (bookingId: string) => {
+    try {
+      await fetch('/api/admin/last-minute-offers/revert-by-booking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId }),
+      });
+    } catch (e) {
+      console.warn('No se pudo revertir oferta vinculada:', e);
+    }
+  };
+
   const handleStatusChange = async (bookingId: string, newStatus: string) => {
     try {
       const supabase = createClient();
@@ -175,6 +187,11 @@ export default function BookingsPage() {
         .eq('id', bookingId);
 
       if (error) throw error;
+      
+      // Si se cancela, revertir oferta de última hora vinculada
+      if (newStatus === 'cancelled') {
+        await revertOfferIfLinked(bookingId);
+      }
       
       // Refrescar datos
       refetchBookings();
@@ -191,6 +208,9 @@ export default function BookingsPage() {
 
     try {
       const supabase = createClient();
+      // Revertir oferta de última hora vinculada ANTES de eliminar (para poder buscar por booking_id)
+      await revertOfferIfLinked(bookingId);
+      
       // Primero eliminar los extras de la reserva
       await supabase.from('booking_extras').delete().eq('booking_id', bookingId);
       

@@ -413,6 +413,24 @@ export default function OfertasUltimaHoraPage() {
     }
   };
 
+  const liberarOffer = async (offerId: string) => {
+    if (!confirm('¿Liberar esta oferta para que vuelva a estar disponible? (La reserva fue cancelada o eliminada)')) return;
+    try {
+      const response = await fetch('/api/admin/last-minute-offers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: offerId, status: 'published', booking_id: null, reserved_at: null })
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+      showMessage('success', 'Oferta liberada correctamente');
+      loadOffers();
+    } catch (error) {
+      console.error('Error liberando oferta:', error);
+      showMessage('error', 'Error al liberar oferta');
+    }
+  };
+
   // Abrir modal de edición de oferta existente
   const openEditOffer = (offer: LastMinuteOffer) => {
     const defaultLocation = locations.find(l => l.id === offer.pickup_location_id) || 
@@ -1217,6 +1235,17 @@ export default function OfertasUltimaHoraPage() {
                             title="Publicar oferta"
                           >
                             <Eye className="h-4 w-4" />
+                          </button>
+                        )}
+                        
+                        {/* Liberar oferta (reserva cancelada/eliminada sin pagar) */}
+                        {(offer.status === 'reserved' || offer.status === 'reserved_pending_payment') && (
+                          <button
+                            onClick={() => liberarOffer(offer.id)}
+                            className="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
+                            title="Liberar oferta (reserva cancelada o eliminada)"
+                          >
+                            <RefreshCw className="h-4 w-4" />
                           </button>
                         )}
                         
