@@ -334,14 +334,6 @@ export default function ReservarOfertaPage({
         extras: bookingExtrasData,
       };
 
-      console.log('📤 Enviando reserva desde oferta:', {
-        booking_number: bookingNumber,
-        customer_id: customerId,
-        offer_id: offer.id,
-        total_price: totalPrice,
-        extras_count: bookingExtrasData.length
-      });
-
       const response = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -351,11 +343,8 @@ export default function ReservarOfertaPage({
       const result = await response.json();
 
       if (result.error) {
-        console.error('❌ Error API:', result.error);
         throw new Error(result.error);
       }
-
-      console.log('✅ Reserva creada:', result.booking?.id);
 
       // Marcar la oferta como reservada
       await fetch('/api/admin/last-minute-offers', {
