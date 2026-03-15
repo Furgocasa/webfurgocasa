@@ -244,61 +244,97 @@ export default function ReservarOfertaPage({
       setSubmitting(true);
       setError(null);
 
-      // Crear la reserva via API
+      // Step 1: Crear o buscar cliente
+      let customerId: string;
+      
+      // Buscar cliente existente por email o DNI
+      const { data: existingCustomers } = await supabase
+        .from('customers')
+        .select('id')
+        .or(`email.eq.${customerEmail},dni.eq.${customerDni}`)
+        .limit(1);
+      
+      if (existingCustomers && existingCustomers.length > 0) {
+        customerId = existingCustomers[0].id;
+      } else {
+        // Crear nuevo cliente
+        const createResponse = await fetch('/api/customers', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: customerEmail,
+            name: customerName,
+            phone: customerPhone,
+            dni: customerDni,
+            date_of_birth: customerDateOfBirth || null,
+            address: customerAddress,
+            city: customerCity,
+            postal_code: customerPostalCode,
+            country: customerCountry,
+            driver_license: customerDriverLicense || null,
+            driver_license_expiry: customerDriverLicenseExpiry || null,
+          }),
+        });
+        
+        if (!createResponse.ok) {
+          const errorData = await createResponse.json();
+          throw new Error(errorData.error || 'Error al crear cliente');
+        }
+        
+        const { customer } = await createResponse.json();
+        customerId = customer.id;
+      }
+
+      // Step 2: Generar número de reserva
+      const bookingNumber = `FG${Date.now().toString().slice(-8)}`;
+
+      // Step 3: Preparar datos de extras con el formato correcto
+      const bookingExtrasData = selectedExtras.map(item => {
+        let unitPrice = 0;
+        if (item.extra.price_type === 'per_unit') {
+          unitPrice = item.extra.price_per_unit || 0;
+        } else {
+          unitPrice = (item.extra.price_per_day || 0) * offer.offer_days;
+        }
+        
+        return {
+          extra_id: item.extra.id,
+          quantity: item.quantity,
+          unit_price: unitPrice,
+          total_price: unitPrice * item.quantity
+        };
+      });
+
+      // Step 4: Crear la reserva via API
       const response = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          vehicle_id: offer.vehicle_id,
-          pickup_date: offer.offer_start_date,
-          dropoff_date: offer.offer_end_date,
-          pickup_time: pickupTime,
-          dropoff_time: dropoffTime,
-          pickup_location_id: pickupLocationId,
-          dropoff_location_id: dropoffLocationId,
-          total_days: offer.offer_days,
-          base_price: basePrice,
-          extras_price: extrasPrice,
-          location_fee: locationFee,
-          total_price: totalPrice,
-          status: 'pending',
-          payment_status: 'pending',
-          notes: notes || null,
-          // Datos del cliente
-          customer: {
-            name: customerName,
-            email: customerEmail,
-            phone: customerPhone,
-            dni: customerDni,
-            date_of_birth: customerDateOfBirth || null,
-            address: customerAddress || null,
-            city: customerCity || null,
-            postal_code: customerPostalCode || null,
-            country: customerCountry,
-            driver_license: customerDriverLicense || null,
-            driver_license_expiry: customerDriverLicenseExpiry || null
+          booking: {
+            booking_number: bookingNumber,
+            vehicle_id: offer.vehicle_id,
+            customer_id: customerId,
+            pickup_date: offer.offer_start_date,
+            dropoff_date: offer.offer_end_date,
+            pickup_time: pickupTime,
+            dropoff_time: dropoffTime,
+            pickup_location_id: pickupLocationId,
+            dropoff_location_id: dropoffLocationId,
+            days: offer.offer_days,
+            base_price: basePrice,
+            extras_price: extrasPrice,
+            location_fee: locationFee,
+            discount: savings,
+            total_price: totalPrice,
+            status: 'pending',
+            payment_status: 'pending',
+            customer_name: customerName,
+            customer_email: customerEmail,
+            notes: notes || null,
+            // Referencia a la oferta
+            last_minute_offer_id: offer.id,
           },
-          // Extras seleccionados
-          extras: selectedExtras.map(item => {
-            let totalPrice = 0;
-            if (item.extra.price_type === 'per_unit') {
-              totalPrice = (item.extra.price_per_unit || 0) * item.quantity;
-            } else {
-              totalPrice = (item.extra.price_per_day || 0) * item.quantity * offer.offer_days;
-            }
-            return {
-              extra_id: item.extra.id,
-              quantity: item.quantity,
-              price_per_day: item.extra.price_per_day || 0,
-              price_per_unit: item.extra.price_per_unit || 0,
-              price_type: item.extra.price_type,
-              total_price: totalPrice
-            };
-          }),
-          // Referencia a la oferta
-          last_minute_offer_id: offer.id,
-          discount_applied: savings,
-          discount_percentage: offer.discount_percentage
+          extras: bookingExtrasData,
         })
       });
 
