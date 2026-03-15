@@ -8,6 +8,7 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // ✅ Esquema de validación con Zod
 const bookingSchema = z.object({
+  booking_number: z.string().min(1).max(20).optional(), // Opcional porque puede generarse por trigger
   vehicle_id: z.string().uuid("ID de vehículo inválido"),
   customer_id: z.string().uuid("ID de cliente inválido"),
   pickup_location_id: z.string().uuid("ID de ubicación de recogida inválido"),
@@ -26,6 +27,9 @@ const bookingSchema = z.object({
   customer_name: z.string().min(2).max(200),
   customer_email: z.string().email().max(255),
   notes: z.string().max(2000).optional().nullable(),
+  status: z.string().optional(),
+  payment_status: z.string().optional(),
+  last_minute_offer_id: z.string().uuid().optional().nullable(),
   // Campos de cupón (opcionales)
   coupon_id: z.string().uuid().optional().nullable(),
   coupon_code: z.string().max(50).optional().nullable(),

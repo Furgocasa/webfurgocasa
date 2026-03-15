@@ -306,43 +306,56 @@ export default function ReservarOfertaPage({
       });
 
       // Step 4: Crear la reserva via API
+      const bookingPayload = {
+        booking: {
+          booking_number: bookingNumber,
+          vehicle_id: offer.vehicle_id,
+          customer_id: customerId,
+          pickup_date: offer.offer_start_date,
+          dropoff_date: offer.offer_end_date,
+          pickup_time: pickupTime,
+          dropoff_time: dropoffTime,
+          pickup_location_id: pickupLocationId,
+          dropoff_location_id: dropoffLocationId,
+          days: offer.offer_days,
+          base_price: basePrice,
+          extras_price: extrasPrice,
+          location_fee: locationFee,
+          discount: savings,
+          total_price: totalPrice,
+          status: 'pending',
+          payment_status: 'pending',
+          customer_name: customerName,
+          customer_email: customerEmail,
+          notes: notes || null,
+          // Referencia a la oferta
+          last_minute_offer_id: offer.id,
+        },
+        extras: bookingExtrasData,
+      };
+
+      console.log('📤 Enviando reserva desde oferta:', {
+        booking_number: bookingNumber,
+        customer_id: customerId,
+        offer_id: offer.id,
+        total_price: totalPrice,
+        extras_count: bookingExtrasData.length
+      });
+
       const response = await fetch('/api/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          booking: {
-            booking_number: bookingNumber,
-            vehicle_id: offer.vehicle_id,
-            customer_id: customerId,
-            pickup_date: offer.offer_start_date,
-            dropoff_date: offer.offer_end_date,
-            pickup_time: pickupTime,
-            dropoff_time: dropoffTime,
-            pickup_location_id: pickupLocationId,
-            dropoff_location_id: dropoffLocationId,
-            days: offer.offer_days,
-            base_price: basePrice,
-            extras_price: extrasPrice,
-            location_fee: locationFee,
-            discount: savings,
-            total_price: totalPrice,
-            status: 'pending',
-            payment_status: 'pending',
-            customer_name: customerName,
-            customer_email: customerEmail,
-            notes: notes || null,
-            // Referencia a la oferta
-            last_minute_offer_id: offer.id,
-          },
-          extras: bookingExtrasData,
-        })
+        body: JSON.stringify(bookingPayload)
       });
 
       const result = await response.json();
 
       if (result.error) {
+        console.error('❌ Error API:', result.error);
         throw new Error(result.error);
       }
+
+      console.log('✅ Reserva creada:', result.booking?.id);
 
       // Marcar la oferta como reservada
       await fetch('/api/admin/last-minute-offers', {
