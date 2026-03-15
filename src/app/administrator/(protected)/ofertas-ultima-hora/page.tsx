@@ -24,7 +24,8 @@ import {
   Pencil,
   Trash2,
   CheckCircle2,
-  XCircle
+  XCircle,
+  CreditCard
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
@@ -60,7 +61,7 @@ interface LastMinuteOffer {
   original_price_per_day: number;
   discount_percentage: number;
   final_price_per_day: number;
-  status: 'detected' | 'published' | 'reserved' | 'expired' | 'ignored' | 'auto_cancelled';
+  status: 'detected' | 'published' | 'reserved' | 'reserved_pending_payment' | 'expired' | 'ignored' | 'auto_cancelled';
   admin_notes: string | null;
   detected_at: string;
   published_at: string | null;
@@ -492,7 +493,8 @@ export default function OfertasUltimaHoraPage() {
     const badges: Record<string, { bg: string; text: string; label: string }> = {
       detected: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Pendiente' },
       published: { bg: 'bg-green-100', text: 'text-green-800', label: 'Publicada' },
-      reserved: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Reservada' },
+      reserved: { bg: 'bg-blue-100', text: 'text-blue-800', label: 'Reservada (pagada)' },
+      reserved_pending_payment: { bg: 'bg-amber-100', text: 'text-amber-800', label: 'Pendiente pago' },
       expired: { bg: 'bg-gray-100', text: 'text-gray-800', label: 'Expirada' },
       ignored: { bg: 'bg-red-100', text: 'text-red-800', label: 'Ignorada' },
       auto_cancelled: { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Auto-cancelada' },
@@ -566,6 +568,7 @@ export default function OfertasUltimaHoraPage() {
   const stats = {
     published: offers.filter(o => o.status === 'published').length,
     reserved: offers.filter(o => o.status === 'reserved').length,
+    reserved_pending_payment: offers.filter(o => o.status === 'reserved_pending_payment').length,
     expired: offers.filter(o => o.status === 'expired').length,
     auto_cancelled: offers.filter(o => o.status === 'auto_cancelled').length,
     detected: detectedGaps.length,
@@ -723,7 +726,7 @@ export default function OfertasUltimaHoraPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
         <div className="bg-yellow-50 rounded-xl p-4 border border-yellow-100">
           <div className="flex items-center gap-2 text-yellow-600 mb-1">
             <Search className="h-4 w-4" />
@@ -737,6 +740,13 @@ export default function OfertasUltimaHoraPage() {
             <span className="text-sm font-medium">Publicadas</span>
           </div>
           <p className="text-2xl font-bold text-green-700">{stats.published}</p>
+        </div>
+        <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+          <div className="flex items-center gap-2 text-amber-600 mb-1">
+            <CreditCard className="h-4 w-4" />
+            <span className="text-sm font-medium">Pend. pago</span>
+          </div>
+          <p className="text-2xl font-bold text-amber-700">{stats.reserved_pending_payment}</p>
         </div>
         <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
           <div className="flex items-center gap-2 text-blue-600 mb-1">
@@ -1001,7 +1011,8 @@ export default function OfertasUltimaHoraPage() {
             >
               <option value="all">Todos los estados</option>
               <option value="published">Publicadas</option>
-              <option value="reserved">Reservadas</option>
+              <option value="reserved_pending_payment">Pendiente pago</option>
+              <option value="reserved">Reservadas (pagadas)</option>
               <option value="expired">Expiradas</option>
               <option value="auto_cancelled">Auto-canceladas</option>
               <option value="ignored">Ignoradas</option>

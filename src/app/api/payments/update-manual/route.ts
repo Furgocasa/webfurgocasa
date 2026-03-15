@@ -168,6 +168,27 @@ export async function POST(request: NextRequest) {
       
       console.log("✅ [5/7] Reserva actualizada correctamente");
       
+      // 📌 Marcar oferta de última hora como "reserved" solo cuando el pago está completado
+      if (newPaymentStatus === "paid") {
+        const { data: offerToUpdate } = await supabase
+          .from("last_minute_offers")
+          .select("id")
+          .eq("booking_id", bookingId)
+          .eq("status", "reserved_pending_payment")
+          .single();
+        if (offerToUpdate) {
+          await supabase
+            .from("last_minute_offers")
+            .update({
+              status: "reserved",
+              reserved_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", offerToUpdate.id);
+          console.log("✅ Oferta última hora marcada como reserved (pago completado)");
+        }
+      }
+      
       // 4. Enviar email de confirmación DIRECTAMENTE (sin fetch HTTP)
       console.log("📧 [6/7] Enviando email de confirmación...");
       const isFirstPayment = currentPaid === 0;

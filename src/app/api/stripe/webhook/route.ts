@@ -111,6 +111,25 @@ export async function POST(request: NextRequest) {
 
             if (bookingUpdateError) {
               console.error("❌ Error actualizando reserva:", bookingUpdateError);
+            } else if (isFullyPaid) {
+              // 📌 Marcar oferta de última hora como "reserved" cuando el pago está completado
+              const { data: offerToUpdate } = await supabase
+                .from("last_minute_offers")
+                .select("id")
+                .eq("booking_id", payment.booking_id)
+                .eq("status", "reserved_pending_payment")
+                .single();
+              if (offerToUpdate) {
+                await supabase
+                  .from("last_minute_offers")
+                  .update({
+                    status: "reserved",
+                    reserved_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                  })
+                  .eq("id", offerToUpdate.id);
+                console.log("✅ Oferta última hora marcada como reserved (pago completado)");
+              }
             }
 
             console.log("✅ Reserva actualizada:", {

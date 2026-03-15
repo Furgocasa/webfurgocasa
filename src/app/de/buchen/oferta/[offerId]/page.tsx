@@ -319,7 +319,7 @@ export default function ReservarOfertaPage({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: offer.id,
-          status: 'reserved',
+          status: 'reserved_pending_payment',
           booking_id: result.booking.id
         })
       });

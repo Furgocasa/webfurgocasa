@@ -373,6 +373,27 @@ export async function POST(request: NextRequest) {
             }
           }
           
+          // 📌 Marcar oferta de última hora como "reserved" solo cuando el pago está completado
+          if (newPaymentStatus === "paid") {
+            const { data: offerToUpdate } = await supabase
+              .from("last_minute_offers")
+              .select("id")
+              .eq("booking_id", payment.booking_id)
+              .eq("status", "reserved_pending_payment")
+              .single();
+            if (offerToUpdate) {
+              await supabase
+                .from("last_minute_offers")
+                .update({
+                  status: "reserved",
+                  reserved_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", offerToUpdate.id);
+              console.log("✅ Oferta última hora marcada como reserved (pago completado)");
+            }
+          }
+          
           // Enviar email de confirmación según el estado del pago
           console.log("📧 [7/7] Preparando envío de email...");
           try {
