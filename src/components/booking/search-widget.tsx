@@ -115,7 +115,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
     <div className="relative bg-white p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-2xl">
       <form onSubmit={handleSearch} className="space-y-4 lg:space-y-5">
         {/* Location (única para recogida y devolución) */}
-        <div className="space-y-2">
+        <div className="space-y-2 relative z-[60]">
           <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
             {t("Ubicación (recogida y devolución)")}
           </label>
@@ -130,7 +130,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
         </div>
 
         {/* Date Range */}
-        <div className="space-y-2">
+        <div className="space-y-2 relative z-[50]">
           <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
             {t("Fecha recogida | Devolución")}
           </label>
@@ -142,7 +142,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
         </div>
 
         {/* Times Row */}
-        <div className="grid grid-cols-2 gap-3 lg:gap-4">
+        <div className="grid grid-cols-2 gap-3 lg:gap-4 relative z-[40]">
           {/* Pickup Time */}
           <div className="space-y-2">
             <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">

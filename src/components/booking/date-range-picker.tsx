@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DayPicker, DateRange } from "react-day-picker";
@@ -137,30 +137,10 @@ export function DateRangePicker({
     });
   };
 
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
-
-  useEffect(() => {
-    if (!isOpen || !triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const spaceBelow = viewportHeight - rect.bottom;
-    const maxHeight = Math.min(spaceBelow - 16, viewportHeight * 0.7);
-
-    setDropdownStyle({
-      position: "fixed" as const,
-      top: rect.bottom + 4,
-      left: Math.max(8, rect.left),
-      width: Math.min(rect.width, window.innerWidth - 16),
-      maxHeight: Math.max(300, maxHeight),
-    });
-  }, [isOpen]);
-
   return (
     <div className="relative">
       {/* Trigger button */}
       <button
-        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
@@ -189,18 +169,17 @@ export function DateRangePicker({
         </div>
       </button>
 
-      {/* Calendar dropdown — fixed positioning to escape stacking contexts */}
+      {/* Calendar dropdown */}
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-[9998]"
+            className="fixed inset-0 z-[100]"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
 
           <div
-            style={dropdownStyle}
-            className="z-[9999] bg-white rounded-xl shadow-2xl border border-gray-200 p-2 md:p-4 overflow-y-auto">
+            className="absolute top-full left-0 right-0 md:left-0 md:right-auto mt-2 z-[200] bg-white rounded-xl shadow-2xl border border-gray-200 p-2 md:p-4 w-full md:w-auto max-h-[70vh] overflow-y-auto">
             {/* Helper text cuando hay fechas seleccionadas */}
             {dateRange.from && dateRange.to && (
               <div className="mb-2 md:mb-3 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-lg">

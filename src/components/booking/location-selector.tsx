@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { ChevronDown, MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { createClient } from "@/lib/supabase/client";
@@ -125,25 +125,10 @@ export function LocationSelector({
     return t("Mín. según temporada");
   };
 
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
-
-  useEffect(() => {
-    if (!isOpen || !triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    setDropdownStyle({
-      position: "fixed" as const,
-      top: rect.bottom + 4,
-      left: rect.left,
-      width: rect.width,
-    });
-  }, [isOpen]);
-
   return (
     <div className="relative">
       {/* Trigger button */}
       <button
-        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         aria-expanded={isOpen}
@@ -171,19 +156,18 @@ export function LocationSelector({
         />
       </button>
 
-      {/* Dropdown — rendered via fixed positioning to escape any overflow/stacking context */}
+      {/* Dropdown */}
       {isOpen && (
         <>
           <div
-            className="fixed inset-0 z-[9998]"
+            className="fixed inset-0 z-[100]"
             onClick={() => setIsOpen(false)}
             aria-hidden="true"
           />
 
           <div
             role="listbox"
-            style={dropdownStyle}
-            className="z-[9999] bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden max-h-[60vh] overflow-y-auto"
+            className="absolute top-full left-0 right-0 mt-2 z-[200] bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden max-h-[60vh] overflow-y-auto"
           >
             {locations.map((location) => (
               <button
