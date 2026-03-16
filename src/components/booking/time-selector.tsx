@@ -59,7 +59,7 @@ export function TimeSelector({
         value={availableSlots.includes(value) ? value : availableSlots[0] || "10:00"}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label}
-        className="w-full px-4 py-3 border border-gray-300 rounded-md bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-1 focus:ring-furgocasa-blue focus:border-furgocasa-blue transition-colors appearance-none cursor-pointer"
+        className="w-full px-4 py-3.5 border-2 border-gray-300 rounded-lg bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-2 focus:ring-furgocasa-blue/30 focus:border-furgocasa-blue transition-colors appearance-none cursor-pointer touch-target text-sm font-medium text-gray-800"
       >
         {availableSlots.map((time) => (
           <option key={time} value={time}>
@@ -67,7 +67,7 @@ export function TimeSelector({
           </option>
         ))}
       </select>
-      <Clock className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none" aria-hidden="true" />
+      <Clock className="absolute right-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-700 pointer-events-none" aria-hidden="true" />
     </div>
   );
 }

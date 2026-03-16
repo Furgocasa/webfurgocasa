@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { ChevronDown } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { ChevronDown, MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { createClient } from "@/lib/supabase/client";
 
@@ -125,63 +125,94 @@ export function LocationSelector({
     return t("Mín. según temporada");
   };
 
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+
+  useEffect(() => {
+    if (!isOpen || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    setDropdownStyle({
+      position: "fixed" as const,
+      top: rect.bottom + 4,
+      left: rect.left,
+      width: rect.width,
+    });
+  }, [isOpen]);
+
   return (
     <div className="relative">
       {/* Trigger button */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-md bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-1 focus:ring-furgocasa-blue focus:border-furgocasa-blue transition-colors text-left"
+        aria-expanded={isOpen}
+        aria-haspopup="listbox"
+        className="w-full flex items-center justify-between px-4 py-3.5 border-2 border-gray-300 rounded-lg bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-2 focus:ring-furgocasa-blue/30 focus:border-furgocasa-blue transition-colors text-left touch-target"
       >
-        <div className="flex flex-col">
-          <span className="text-gray-700 font-medium uppercase text-sm">
-            {selectedLocation ? t(selectedLocation.name) : placeholder}
-          </span>
-          {selectedLocation && (
-            <span className="text-xs text-gray-500 mt-0.5">
-              {getMinDaysLabel(selectedLocation.min_days)}
+        <div className="flex items-center gap-3 min-w-0">
+          <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0" aria-hidden="true" />
+          <div className="flex flex-col min-w-0">
+            <span className="text-gray-800 font-semibold uppercase text-sm truncate">
+              {selectedLocation ? t(selectedLocation.name) : placeholder}
             </span>
-          )}
+            {selectedLocation && (
+              <span className="text-xs text-gray-500 mt-0.5">
+                {getMinDaysLabel(selectedLocation.min_days)}
+              </span>
+            )}
+          </div>
         </div>
         <ChevronDown
-          className={`h-4 w-4 text-gray-500 transition-transform flex-shrink-0 ${
+          className={`h-5 w-5 text-gray-700 transition-transform flex-shrink-0 ${
             isOpen ? "rotate-180" : ""
           }`}
+          aria-hidden="true"
         />
       </button>
 
-      {/* Dropdown */}
+      {/* Dropdown — rendered via fixed positioning to escape any overflow/stacking context */}
       {isOpen && (
         <>
-          {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[100]"
+            className="fixed inset-0 z-[9998]"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
-          {/* Options */}
-          <div className="absolute top-full left-0 right-0 mt-1 z-[200] bg-white rounded-md shadow-2xl border border-gray-200 overflow-hidden max-h-[250px] overflow-y-auto">
+          <div
+            role="listbox"
+            style={dropdownStyle}
+            className="z-[9999] bg-white rounded-lg shadow-2xl border border-gray-200 overflow-hidden max-h-[60vh] overflow-y-auto"
+          >
             {locations.map((location) => (
               <button
                 key={location.id}
                 type="button"
+                role="option"
+                aria-selected={value === location.slug}
                 onClick={() => {
                   onChange(location.slug, location.min_days, location.opening_hours);
                   setIsOpen(false);
                 }}
-                className={`w-full px-4 py-3 hover:bg-furgocasa-blue hover:text-white transition-colors text-left ${
+                className={`w-full px-4 py-3.5 hover:bg-furgocasa-blue hover:text-white transition-colors text-left touch-target ${
                   value === location.slug ? "bg-furgocasa-blue text-white" : "text-gray-700"
                 }`}
               >
-                <div className="flex flex-col">
-                  <span className="block font-medium uppercase text-sm">
-                    {t(location.name)}
-                  </span>
-                  <span className={`text-xs mt-0.5 ${
-                    value === location.slug ? "text-white/80" : "text-gray-500"
-                  }`}>
-                    {getMinDaysLabel(location.min_days)}
-                  </span>
+                <div className="flex items-center gap-3">
+                  <MapPin className={`h-4 w-4 flex-shrink-0 ${
+                    value === location.slug ? "text-white/80" : "text-furgocasa-blue/60"
+                  }`} aria-hidden="true" />
+                  <div className="flex flex-col">
+                    <span className="block font-semibold uppercase text-sm">
+                      {t(location.name)}
+                    </span>
+                    <span className={`text-xs mt-0.5 ${
+                      value === location.slug ? "text-white/80" : "text-gray-500"
+                    }`}>
+                      {getMinDaysLabel(location.min_days)}
+                    </span>
+                  </div>
                 </div>
               </button>
             ))}

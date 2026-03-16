@@ -1,10 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { format, addDays } from "date-fns";
-import { es } from "date-fns/locale";
-import { Calendar, Clock, MapPin, Search } from "lucide-react";
+import { format } from "date-fns";
 import { DateRangePicker } from "./date-range-picker";
 import { LocationSelector, type TimeSlot } from "./location-selector";
 import { TimeSelector } from "./time-selector";
@@ -19,7 +16,6 @@ interface SearchWidgetProps {
 }
 
 export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidgetProps = {}) {
-  const router = useRouter();
   const { t, language } = useLanguage();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -116,7 +112,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
   };
 
   return (
-    <div className="relative bg-white p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-2xl z-50">
+    <div className="relative bg-white p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-2xl">
       <form onSubmit={handleSearch} className="space-y-4 lg:space-y-5">
         {/* Location (única para recogida y devolución) */}
         <div className="space-y-2">
@@ -134,7 +130,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
         </div>
 
         {/* Date Range */}
-        <div className="relative space-y-2">
+        <div className="space-y-2">
           <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
             {t("Fecha recogida | Devolución")}
           </label>
@@ -145,8 +141,8 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
           />
         </div>
 
-        {/* Times Row - Apilado en mobile/tablet, horizontal en desktop */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Times Row */}
+        <div className="grid grid-cols-2 gap-3 lg:gap-4">
           {/* Pickup Time */}
           <div className="space-y-2">
             <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
@@ -172,7 +168,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
           </div>
         </div>
 
-        {/* Search Button - Más grande en mobile/tablet para táctil */}
+        {/* Search Button */}
         <button
           type="submit"
           disabled={isLoading || !dateRange.from || !dateRange.to || !isValidDateRange()}
@@ -191,7 +187,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
         {/* Mensaje de validación si no cumple mínimo */}
         {dateRange.from && dateRange.to && !isValidDateRange() && (
           <p className="text-xs lg:text-sm text-red-600 text-center -mt-2">
-            ⚠️ {t("El periodo mínimo es de")} {getMinDays()} {t("días")}
+            {t("El periodo mínimo es de")} {getMinDays()} {t("días")}
           </p>
         )}
       </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DayPicker, DateRange } from "react-day-picker";
@@ -137,18 +137,39 @@ export function DateRangePicker({
     });
   };
 
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [dropdownStyle, setDropdownStyle] = useState<React.CSSProperties>({});
+
+  useEffect(() => {
+    if (!isOpen || !triggerRef.current) return;
+    const rect = triggerRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const maxHeight = Math.min(spaceBelow - 16, viewportHeight * 0.7);
+
+    setDropdownStyle({
+      position: "fixed" as const,
+      top: rect.bottom + 4,
+      left: Math.max(8, rect.left),
+      width: Math.min(rect.width, window.innerWidth - 16),
+      maxHeight: Math.max(300, maxHeight),
+    });
+  }, [isOpen]);
+
   return (
     <div className="relative">
       {/* Trigger button */}
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 border border-gray-300 rounded-md bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-1 focus:ring-furgocasa-blue focus:border-furgocasa-blue transition-colors"
+        aria-expanded={isOpen}
+        className="w-full flex items-center justify-between px-4 py-3.5 border-2 border-gray-300 rounded-lg bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-2 focus:ring-furgocasa-blue/30 focus:border-furgocasa-blue transition-colors touch-target"
       >
-        <span className="text-gray-700 font-medium">{displayText()}</span>
+        <span className="text-gray-800 font-medium text-sm">{displayText()}</span>
         <div className="flex items-center gap-2">
           {numberOfDays() > 0 && (
-            <span className="text-xs bg-furgocasa-blue text-white px-2 py-1 rounded">
+            <span className="text-xs bg-furgocasa-blue text-white px-2 py-1 rounded-md font-medium">
               {numberOfDays()} {t("días")}
             </span>
           )}
@@ -164,21 +185,22 @@ export function DateRangePicker({
               <X className="h-4 w-4" />
             </span>
           )}
-          <Calendar className="h-4 w-4 text-gray-500" />
+          <Calendar className="h-5 w-5 text-gray-700" />
         </div>
       </button>
 
-      {/* Calendar dropdown */}
+      {/* Calendar dropdown — fixed positioning to escape stacking contexts */}
       {isOpen && (
         <>
-          {/* Backdrop */}
           <div
-            className="fixed inset-0 z-[100]"
+            className="fixed inset-0 z-[9998]"
             onClick={() => setIsOpen(false)}
+            aria-hidden="true"
           />
 
-          {/* Calendar */}
-          <div className="absolute top-full left-0 right-0 md:left-0 md:right-auto mt-2 z-[200] bg-white rounded-xl shadow-2xl border border-gray-200 p-2 md:p-4 w-full md:w-auto max-h-[70vh] overflow-y-auto">
+          <div
+            style={dropdownStyle}
+            className="z-[9999] bg-white rounded-xl shadow-2xl border border-gray-200 p-2 md:p-4 overflow-y-auto">
             {/* Helper text cuando hay fechas seleccionadas */}
             {dateRange.from && dateRange.to && (
               <div className="mb-2 md:mb-3 p-2 md:p-3 bg-blue-50 border border-blue-200 rounded-lg">
