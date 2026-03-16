@@ -40,6 +40,7 @@ interface Booking {
     brand: string;
     model: string;
     internal_code: string;
+    images?: Array<{ image_url?: string; url?: string; is_primary?: boolean; is_main?: boolean }>;
   };
   customer: {
     id: string;
@@ -104,6 +105,7 @@ export default function ReservaDetalleAdminPage() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedVehicle, setCopiedVehicle] = useState(false);
 
   useEffect(() => {
     if (bookingId) {
@@ -121,7 +123,7 @@ export default function ReservaDetalleAdminPage() {
         .from('bookings')
         .select(`
           *,
-          vehicle:vehicles(id, name, brand, model, internal_code),
+          vehicle:vehicles(id, name, brand, model, internal_code, images:vehicle_images(*)),
           customer:customers(
             id, 
             name, 
@@ -315,6 +317,20 @@ Devolución en ${dropoffLocation}`;
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setMessage({ type: 'error', text: 'No se pudo copiar al portapapeles' });
+    }
+  };
+
+  const copyVehicleDetails = async () => {
+    if (!booking?.vehicle) return;
+    const code = booking.vehicle.internal_code || '';
+    const name = booking.vehicle.name || '';
+    const text = code ? `${code} - ${name.toUpperCase()}` : name.toUpperCase();
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopiedVehicle(true);
+      setTimeout(() => setCopiedVehicle(false), 2000);
     } catch {
       setMessage({ type: 'error', text: 'No se pudo copiar al portapapeles' });
     }
@@ -646,22 +662,44 @@ Devolución en ${dropoffLocation}`;
         <div className="lg:col-span-2 space-y-6">
           {/* Vehicle */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-            <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Car className="h-6 w-6 text-furgocasa-blue" />
-              Vehículo
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <Car className="h-6 w-6 text-furgocasa-blue" />
+                Vehículo
+              </h3>
+              <button
+                type="button"
+                onClick={copyVehicleDetails}
+                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <Copy className="h-4 w-4" />
+                {copiedVehicle ? '¡Copiado!' : 'Copiar detalles del vehículo'}
+              </button>
+            </div>
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                <Car className="h-8 w-8 text-gray-400" />
-              </div>
+              {(() => {
+                const imgs = booking.vehicle.images || [];
+                const primaryImg = imgs.find((i: any) => i.is_primary || i.is_main);
+                const firstImg = imgs[0];
+                const imgUrl = (primaryImg || firstImg)?.image_url || (primaryImg || firstImg)?.url;
+                return imgUrl ? (
+                  <img
+                    src={imgUrl}
+                    alt={booking.vehicle.name}
+                    className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                  />
+                ) : (
+                  <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                    <Car className="h-10 w-10 text-gray-400" />
+                  </div>
+                );
+              })()}
               <div>
-                {booking.vehicle.internal_code && (
-                  <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-blue-100 text-blue-800 rounded mb-1">
-                    {booking.vehicle.internal_code}
-                  </span>
-                )}
-                <p className="font-semibold text-gray-900 text-lg">{booking.vehicle.name}</p>
-                <p className="text-sm text-gray-600">{booking.vehicle.brand} · {booking.vehicle.model}</p>
+                <p className="font-semibold text-gray-900 text-lg">
+                  {booking.vehicle.internal_code
+                    ? `${booking.vehicle.internal_code} - ${booking.vehicle.name.toUpperCase()}`
+                    : booking.vehicle.name.toUpperCase()}
+                </p>
               </div>
             </div>
           </div>
