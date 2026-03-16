@@ -38,7 +38,6 @@ interface LastMinuteOffer {
 export function OfertasClient() {
   const { t, locale } = useLanguage();
   const [copied, setCopied] = useState(false);
-  const [copiedSummer, setCopiedSummer] = useState(false);
   const [lastMinuteOffers, setLastMinuteOffers] = useState<LastMinuteOffer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
 
@@ -82,12 +81,6 @@ export function OfertasClient() {
     navigator.clipboard.writeText("INV2026");
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleCopySummerCode = () => {
-    navigator.clipboard.writeText("EARLY2026");
-    setCopiedSummer(true);
-    setTimeout(() => setCopiedSummer(false), 2000);
   };
 
   const benefits = [
@@ -302,7 +295,7 @@ export function OfertasClient() {
                     <PartyPopper className="w-5 h-5 text-green-600" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{t("¡Descuento aplicado!")}</h3>
-                  <p className="text-sm text-gray-600">{t("Verás el -20% reflejado en tu precio final")}</p>
+                  <p className="text-sm text-gray-600">{t("Verás el -15% reflejado en tu precio final")}</p>
                 </div>
               </div>
             </div>
