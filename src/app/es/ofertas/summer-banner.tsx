@@ -46,7 +46,7 @@ export function SummerBanner() {
     timeLeft.secs === "00";
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900">
+    <section className="relative overflow-x-hidden overflow-y-visible bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 max-w-full">
       {/* Background pattern */}
       <div className="absolute inset-0 opacity-[0.04]">
         <div
@@ -77,10 +77,10 @@ export function SummerBanner() {
           <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             {/* Left column - Text */}
             <div className="text-center lg:text-left">
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white leading-tight mb-6">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-heading font-bold text-white leading-tight mb-6">
                 <span className="text-amber-400">15%</span> de descuento
                 <br />
-                <span className="text-2xl md:text-3xl lg:text-4xl font-medium text-blue-100">
+                <span className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-medium text-blue-100">
                   en tu aventura camper este verano
                 </span>
               </h2>
@@ -91,18 +91,18 @@ export function SummerBanner() {
               </p>
 
               {/* Conditions pills */}
-              <div className="flex flex-wrap gap-3 justify-center lg:justify-start mb-8">
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-2.5">
+              <div className="flex flex-wrap gap-2 sm:gap-3 justify-center lg:justify-start mb-8">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5">
                   <Calendar className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span className="text-white/90 text-sm">15 jun — 15 sep 2026</span>
+                  <span className="text-white/90 text-xs sm:text-sm">15 jun — 15 sep 2026</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-2.5">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5">
                   <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span className="text-white/90 text-sm">Mínimo 10 días</span>
+                  <span className="text-white/90 text-xs sm:text-sm">Mínimo 10 días</span>
                 </div>
-                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl px-4 py-2.5">
+                <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/10 rounded-xl px-3 sm:px-4 py-2 sm:py-2.5">
                   <Tag className="w-4 h-4 text-amber-400 flex-shrink-0" />
-                  <span className="text-white/90 text-sm">Reserva antes del 31/03</span>
+                  <span className="text-white/90 text-xs sm:text-sm">Reserva antes del 31/03</span>
                 </div>
               </div>
 
@@ -122,7 +122,7 @@ export function SummerBanner() {
             <div className="flex justify-center">
               <div className="w-full max-w-md">
                 {/* Coupon card */}
-                <div className="bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-3xl p-8 md:p-10 relative overflow-hidden">
+                <div className="bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-3xl p-6 sm:p-8 md:p-10 relative overflow-hidden">
                   {/* Card decorative circle */}
                   <div className="absolute -top-20 -right-20 w-40 h-40 bg-amber-400/10 rounded-full blur-3xl" />
                   <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-furgocasa-orange/10 rounded-full blur-3xl" />
@@ -143,9 +143,9 @@ export function SummerBanner() {
                     {/* Code box */}
                     <button
                       onClick={handleCopyCode}
-                      className="w-full group relative bg-white/10 hover:bg-white/15 border-2 border-dashed border-white/20 hover:border-amber-400/50 rounded-2xl p-5 transition-all duration-300 cursor-pointer mb-6"
+                      className="w-full group relative bg-white/10 hover:bg-white/15 border-2 border-dashed border-white/20 hover:border-amber-400/50 rounded-2xl p-4 sm:p-5 transition-all duration-300 cursor-pointer mb-6 overflow-hidden"
                     >
-                      <div className="text-amber-400 font-heading font-black text-2xl md:text-3xl tracking-[0.2em] mb-2">
+                      <div className="text-amber-400 font-heading font-black text-lg sm:text-2xl md:text-3xl tracking-[0.08em] sm:tracking-[0.15em] md:tracking-[0.2em] mb-2 break-all sm:break-normal">
                         EARLYSUMMER2026
                       </div>
                       <div className="flex items-center justify-center gap-2 text-white/60 group-hover:text-white/80 transition-colors text-sm">
