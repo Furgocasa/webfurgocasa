@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useMemo, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { VehicleCard } from "@/components/booking/vehicle-card";
 import { SearchSummary } from "@/components/booking/search-summary";
-import { Loader2, Car, AlertCircle, Filter, X } from "lucide-react";
+import { Loader2, Car, AlertCircle, Filter, X, CalendarDays, ArrowRight, Sparkles } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { setSearchQueryId } from "@/lib/search-tracking/session";
 
@@ -25,6 +25,135 @@ async function fetchAvailability(params: URLSearchParams) {
     throw new Error("Error al buscar disponibilidad");
   }
   return response.json();
+}
+
+async function fetchAlternatives(params: URLSearchParams) {
+  const response = await fetch(`/api/availability/alternatives?${params.toString()}`, {
+    cache: "no-store",
+  });
+  if (!response.ok) return { alternatives: [] };
+  return response.json();
+}
+
+interface AlternativeSlot {
+  pickupDate: string;
+  dropoffDate: string;
+  vehicleCount: number;
+  vehicleNames: string[];
+}
+
+function formatDateFull(dateStr: string): string {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+  return date.toLocaleDateString("es-ES", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "Europe/Madrid",
+  });
+}
+
+function NoResultsWithAlternatives({
+  searchParams,
+  t,
+}: {
+  searchParams: URLSearchParams;
+  t: (key: string) => string;
+}) {
+  const router = useRouter();
+
+  const { data: altData, isLoading: altLoading } = useQuery({
+    queryKey: ["alternatives", searchParams.toString()],
+    queryFn: () => fetchAlternatives(searchParams),
+    enabled: true,
+  });
+
+  const alternatives: AlternativeSlot[] = altData?.alternatives || [];
+  const duration: number = altData?.originalDuration || 0;
+
+  function handleAlternativeClick(alt: AlternativeSlot) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("pickup_date", alt.pickupDate);
+    params.set("dropoff_date", alt.dropoffDate);
+    router.push(`/es/buscar?${params.toString()}`);
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center py-12 px-4">
+      <Car className="h-16 w-16 text-gray-300 mb-4" />
+      <h2 className="text-xl font-bold text-gray-900 mb-2">
+        {t("No hay vehículos disponibles")}
+      </h2>
+      <p className="text-gray-500 mb-8 text-center max-w-md">
+        {t("No encontramos campers libres para las fechas seleccionadas, pero tenemos opciones cercanas para ti.")}
+      </p>
+
+      {altLoading && (
+        <div className="flex items-center gap-2 text-furgocasa-orange">
+          <Loader2 className="h-5 w-5 animate-spin" />
+          <span className="text-sm">{t("Buscando fechas disponibles...")}</span>
+        </div>
+      )}
+
+      {!altLoading && alternatives.length > 0 && (
+        <div className="w-full max-w-2xl">
+          <div className="flex items-center gap-2 mb-4 justify-center">
+            <Sparkles className="h-5 w-5 text-furgocasa-orange" />
+            <h3 className="text-lg font-semibold text-gray-800">
+              {t("Fechas alternativas disponibles")}
+              {duration > 0 && (
+                <span className="text-sm font-normal text-gray-500 ml-1">
+                  ({duration} {duration === 1 ? t("día") : t("días")})
+                </span>
+              )}
+            </h3>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            {alternatives.map((alt, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleAlternativeClick(alt)}
+                className="group flex flex-col gap-2 p-4 rounded-xl border border-gray-200 bg-white hover:border-furgocasa-orange hover:shadow-md transition-all text-left"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CalendarDays className="h-4 w-4 text-furgocasa-orange" />
+                    <span className="font-medium text-gray-900">
+                      {formatDateFull(alt.pickupDate)}
+                    </span>
+                    <ArrowRight className="h-3 w-3 text-gray-400" />
+                    <span className="font-medium text-gray-900">
+                      {formatDateFull(alt.dropoffDate)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-500">
+                    {alt.vehicleCount} {alt.vehicleCount === 1 ? t("camper disponible") : t("campers disponibles")}
+                  </span>
+                  <span className="text-xs text-furgocasa-orange font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                    {t("Ver disponibilidad")} →
+                  </span>
+                </div>
+                {alt.vehicleNames.length > 0 && (
+                  <p className="text-xs text-gray-400 truncate">
+                    {alt.vehicleNames.join(", ")}
+                  </p>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!altLoading && alternatives.length === 0 && (
+        <p className="text-gray-400 text-sm">
+          {t("No encontramos disponibilidad cercana. Prueba con fechas diferentes.")}
+        </p>
+      )}
+    </div>
+  );
 }
 
 type BedsFilter = "all" | "2" | "4";
@@ -106,11 +235,7 @@ function SearchResultsContent() {
 
   if (!data?.vehicles || data.vehicles.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Car className="h-16 w-16 text-gray-300 mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">{t("No hay vehículos disponibles")}</h2>
-        <p className="text-gray-600">{t("Prueba con otras fechas")}</p>
-      </div>
+      <NoResultsWithAlternatives searchParams={searchParams} t={t} />
     );
   }
 
