@@ -279,6 +279,21 @@ export async function POST(request: NextRequest) {
       } else {
         console.log("✅ [5/8] Reserva actualizada correctamente");
         
+        // 📊 TRACKING: Marcar conversión REAL en search_queries
+        try {
+          await supabase
+            .from("search_queries")
+            .update({
+              booking_confirmed: true,
+              booking_confirmed_at: new Date().toISOString(),
+            })
+            .eq("booking_id", payment.booking_id)
+            .eq("booking_created", true);
+          console.log("✅ [5/8] Tracking de conversión real actualizado");
+        } catch (trackingErr) {
+          console.error("⚠️ Error actualizando tracking de conversión:", trackingErr);
+        }
+        
         // 🔒 CANCELAR AUTOMÁTICAMENTE OTRAS RESERVAS PENDIENTES DEL MISMO VEHÍCULO Y FECHAS
         if (fullBooking.status === 'pending') {
           console.log("🧹 [5/8] Buscando reservas pendientes conflictivas para cancelar...");

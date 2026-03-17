@@ -421,7 +421,7 @@ export default function SearchAnalyticsPage() {
               {overview?.kpis.bookingsCreated || 0}
             </span>
           </div>
-          <p className="text-sm text-gray-600">Reservas creadas</p>
+          <p className="text-sm text-gray-600">Reservas confirmadas</p>
           <p className="text-xs text-green-600 font-medium mt-1">
             {overview?.kpis.overallConversionRate || 0}% total
           </p>
@@ -436,7 +436,7 @@ export default function SearchAnalyticsPage() {
           </div>
           <p className="text-sm text-gray-600">Tasa de conversión</p>
           <p className="text-xs text-gray-500 mt-1">
-            Búsqueda → Reserva
+            Búsqueda → Reserva confirmada
           </p>
         </div>
       </div>

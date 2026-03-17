@@ -102,7 +102,7 @@ export async function GET(request: NextRequest) {
         const totalSearches = searches?.length || 0;
         const withAvailability = searches?.filter(s => s.had_availability).length || 0;
         const vehicleSelections = searches?.filter(s => s.vehicle_selected).length || 0;
-        const bookingsCreated = searches?.filter(s => s.booking_created).length || 0;
+        const bookingsCreated = searches?.filter(s => s.booking_confirmed).length || 0;
 
         const avgRentalDays = searches?.length 
           ? searches.reduce((sum, s) => sum + s.rental_days, 0) / searches.length 
@@ -161,7 +161,7 @@ export async function GET(request: NextRequest) {
       const withAvailability = searches?.filter(s => s.had_availability).length || 0;
       const withoutAvailability = total - withAvailability;
       const vehicleSelected = searches?.filter(s => s.funnel_stage === "vehicle_selected" || s.funnel_stage === "booking_created").length || 0;
-      const bookingCreated = searches?.filter(s => s.funnel_stage === "booking_created").length || 0;
+      const bookingCreated = searches?.filter(s => s.booking_confirmed).length || 0;
 
       return NextResponse.json({
         funnel: [
@@ -184,7 +184,7 @@ export async function GET(request: NextRequest) {
     if (type === "dates") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("pickup_date, dropoff_date, rental_days, booking_created, season_applied, avg_price_shown")
+        .select("pickup_date, dropoff_date, rental_days, booking_confirmed, season_applied, avg_price_shown")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
@@ -206,7 +206,7 @@ export async function GET(request: NextRequest) {
           };
         }
         acc[key].search_count++;
-        if (s.booking_created) acc[key].bookings_count++;
+        if (s.booking_confirmed) acc[key].bookings_count++;
         if (s.avg_price_shown) acc[key].prices.push(s.avg_price_shown);
         return acc;
       }, {});
@@ -232,7 +232,7 @@ export async function GET(request: NextRequest) {
         .select(`
           selected_vehicle_id,
           vehicle_selected,
-          booking_created,
+          booking_confirmed,
           selected_vehicle_price
         `)
         .gte("searched_at", dateFrom)
@@ -255,7 +255,7 @@ export async function GET(request: NextRequest) {
           };
         }
         acc[id].times_selected++;
-        if (s.booking_created) acc[id].times_booked++;
+        if (s.booking_confirmed) acc[id].times_booked++;
         if (s.selected_vehicle_price) acc[id].prices.push(s.selected_vehicle_price);
         return acc;
       }, {});
@@ -292,7 +292,7 @@ export async function GET(request: NextRequest) {
     if (type === "seasons") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("season_applied, vehicle_selected, booking_created, avg_price_shown")
+        .select("season_applied, vehicle_selected, booking_confirmed, avg_price_shown")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59")
         .not("season_applied", "is", null);
@@ -312,7 +312,7 @@ export async function GET(request: NextRequest) {
         }
         acc[season].search_count++;
         if (s.vehicle_selected) acc[season].selection_count++;
-        if (s.booking_created) acc[season].booking_count++;
+        if (s.booking_confirmed) acc[season].booking_count++;
         if (s.avg_price_shown) acc[season].prices.push(s.avg_price_shown);
         return acc;
       }, {});
@@ -335,7 +335,7 @@ export async function GET(request: NextRequest) {
     if (type === "duration") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("rental_days, booking_created")
+        .select("rental_days, booking_confirmed")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
@@ -360,7 +360,7 @@ export async function GET(request: NextRequest) {
         else group = "21+ días";
 
         durationGroups[group].count++;
-        if (s.booking_created) durationGroups[group].bookings++;
+        if (s.booking_confirmed) durationGroups[group].bookings++;
       });
 
       const durationStats = Object.entries(durationGroups).map(([name, data]) => ({
@@ -380,7 +380,7 @@ export async function GET(request: NextRequest) {
     if (type === "search-timing") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("searched_at, had_availability, vehicle_selected, booking_created, advance_days, rental_days")
+        .select("searched_at, had_availability, vehicle_selected, booking_confirmed, advance_days, rental_days")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
@@ -410,7 +410,7 @@ export async function GET(request: NextRequest) {
         acc[dateKey].total_searches++;
         if (s.had_availability) acc[dateKey].searches_with_availability++;
         if (s.vehicle_selected) acc[dateKey].vehicle_selections++;
-        if (s.booking_created) acc[dateKey].bookings_created++;
+        if (s.booking_confirmed) acc[dateKey].bookings_created++;
         acc[dateKey].advance_days_sum += s.advance_days || 0;
         acc[dateKey].rental_days_sum += s.rental_days || 0;
         
@@ -436,7 +436,7 @@ export async function GET(request: NextRequest) {
     if (type === "locale") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("locale, vehicle_selected, booking_created, had_availability")
+        .select("locale, vehicle_selected, booking_confirmed, had_availability")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
@@ -463,7 +463,7 @@ export async function GET(request: NextRequest) {
         acc[locale].search_count++;
         if (s.had_availability) acc[locale].with_availability++;
         if (s.vehicle_selected) acc[locale].selection_count++;
-        if (s.booking_created) acc[locale].booking_count++;
+        if (s.booking_confirmed) acc[locale].booking_count++;
         return acc;
       }, {});
 
@@ -490,7 +490,7 @@ export async function GET(request: NextRequest) {
           pickup_location_id,
           dropoff_location_id,
           vehicle_selected,
-          booking_created,
+          booking_confirmed,
           had_availability,
           avg_price_shown
         `)
@@ -537,7 +537,7 @@ export async function GET(request: NextRequest) {
         acc[cityGroup].search_count++;
         if (s.had_availability) acc[cityGroup].with_availability++;
         if (s.vehicle_selected) acc[cityGroup].selection_count++;
-        if (s.booking_created) acc[cityGroup].booking_count++;
+        if (s.booking_confirmed) acc[cityGroup].booking_count++;
         if (s.avg_price_shown) acc[cityGroup].prices.push(s.avg_price_shown);
         return acc;
       }, {});
