@@ -1810,6 +1810,12 @@ export const staticTranslations = {
     fr: "2ème lit (4 places)",
     de: "2. Bett (4 Plätze)"
   },
+  "Este vehículo dispone de hasta 4 plazas de noche. Si vais a dormir más de 2 personas, necesitáis añadir el extra de la cama adicional.": {
+    es: "Este vehículo dispone de hasta 4 plazas de noche. Si vais a dormir más de 2 personas, necesitáis añadir el extra de la cama adicional.",
+    en: "This vehicle has up to 4 sleeping places. If more than 2 people will be sleeping, you need to add the extra bed add-on.",
+    fr: "Ce véhicule dispose de jusqu'à 4 places de couchage. Si plus de 2 personnes dorment, vous devez ajouter l'option du lit supplémentaire.",
+    de: "Dieses Fahrzeug verfügt über bis zu 4 Schlafplätze. Wenn mehr als 2 Personen schlafen, müssen Sie das Zusatzbett hinzufügen."
+  },
   "Destacados": {
     es: "Destacados",
     en: "Highlights",

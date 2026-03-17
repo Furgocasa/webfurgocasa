@@ -15,7 +15,7 @@ function LoadingState() {
 import { supabase } from"@/lib/supabase/client";
 import { 
   ArrowLeft, Calendar, MapPin, Users, Moon, Fuel, Settings, 
-  ArrowRight, Plus, Minus, AlertCircle, Loader2, Ruler, Car, Info
+  ArrowRight, Plus, Minus, AlertCircle, Loader2, Ruler, Car, Info, BedDouble
 } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
@@ -335,8 +335,12 @@ function ReservarVehiculoContent() {
     );
   }
 
-  // Group extras by category (fallback to 'Extras' if no category exists)
-  const extrasByCategory = { 'Extras': extras };
+  const bedExtra = extras.find(e => e.name.includes('cama') && e.name.includes('4 plazas'));
+  const bedExtraSelected = bedExtra ? selectedExtras.find(item => item.extra.id === bedExtra.id) : null;
+  const isBedExtraAdded = (bedExtraSelected?.quantity || 0) > 0;
+  const otherExtras = bedExtra ? extras.filter(e => e.id !== bedExtra.id) : extras;
+
+  const extrasByCategory = { 'Extras': otherExtras };
 
   return (
     <>
@@ -358,6 +362,43 @@ function ReservarVehiculoContent() {
             <div className="lg:col-span-2 space-y-4 md:space-y-6">
               {/* Gallery */}
               <VehicleGallery images={vehicle.images || []} vehicleName={vehicle.name} />
+
+              {bedExtra && (
+                <div className={`rounded-xl md:rounded-2xl border-2 p-4 md:p-5 transition-all ${
+                  isBedExtraAdded
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-furgocasa-orange bg-orange-50 shadow-md shadow-orange-100'
+                }`}>
+                  <div className="flex items-start gap-3 md:gap-4">
+                    <div className={`flex-shrink-0 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center ${
+                      isBedExtraAdded ? 'bg-green-500' : 'bg-furgocasa-orange'
+                    }`}>
+                      <BedDouble className="h-5 w-5 md:h-6 md:w-6 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-gray-900 text-base md:text-lg">
+                        {t("2ª cama (4 plazas)")}
+                      </h3>
+                      <p className="text-sm text-gray-700 mt-1">
+                        {t("Este vehículo dispone de hasta 4 plazas de noche. Si vais a dormir más de 2 personas, necesitáis añadir el extra de la cama adicional.")}
+                      </p>
+                      <p className="text-sm font-semibold text-furgocasa-orange mt-1">
+                        {formatPrice(bedExtra.price_per_day || 0)} / {t("día")}
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => isBedExtraAdded ? removeExtra(bedExtra.id) : addExtra(bedExtra)}
+                      className={`flex-shrink-0 px-4 md:px-6 py-2.5 text-sm font-bold rounded-lg transition-all ${
+                        isBedExtraAdded
+                          ? 'bg-green-500 text-white hover:bg-green-600'
+                          : 'bg-furgocasa-orange text-white hover:bg-orange-600 animate-pulse'
+                      }`}
+                    >
+                      {isBedExtraAdded ? t("Añadido") : t("Añadir")}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Vehicle Info */}
               <div className="bg-white rounded-xl md:rounded-2xl shadow-sm p-4 md:p-6">
