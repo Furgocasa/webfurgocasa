@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2, RefreshCw } from "lucide-react";
+import { Plus, Search, Phone, MapPin, Calendar, Mail, Loader2, RefreshCw, Download, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { useAllDataCached } from "@/hooks/use-all-data-cached";
 import ClientActions from "./client-actions";
 import { formatPrice } from "@/lib/utils";
@@ -31,6 +31,8 @@ function formatDate(date: string | null): string {
   });
 }
 
+type SortField = 'name' | 'email' | 'city' | 'total_bookings' | 'total_spent' | 'created_at';
+
 export default function ClientesPage() {
   // Establecer título de la página
   useEffect(() => {
@@ -39,6 +41,8 @@ export default function ClientesPage() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   // Cargar TODOS los clientes con caché de 15 minutos
   const { 
@@ -96,6 +100,100 @@ export default function ClientesPage() {
     return filtered;
   }, [customers, searchTerm, filterStatus]);
 
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const renderSortIcon = (field: SortField) => {
+    if (sortField !== field) {
+      return <ArrowUpDown className="h-4 w-4 text-gray-400" />;
+    }
+    return sortDirection === 'asc' ? (
+      <ArrowUp className="h-4 w-4 text-blue-600" />
+    ) : (
+      <ArrowDown className="h-4 w-4 text-blue-600" />
+    );
+  };
+
+  const sortedCustomers = useMemo(() => {
+    return [...filteredCustomers].sort((a, b) => {
+      let aValue: string | number;
+      let bValue: string | number;
+
+      switch (sortField) {
+        case 'name':
+          aValue = (a.name || '').toLowerCase();
+          bValue = (b.name || '').toLowerCase();
+          break;
+        case 'email':
+          aValue = (a.email || '').toLowerCase();
+          bValue = (b.email || '').toLowerCase();
+          break;
+        case 'city':
+          aValue = (a.city || '').toLowerCase();
+          bValue = (b.city || '').toLowerCase();
+          break;
+        case 'total_bookings':
+          aValue = a.total_bookings || 0;
+          bValue = b.total_bookings || 0;
+          break;
+        case 'total_spent':
+          aValue = a.total_spent || 0;
+          bValue = b.total_spent || 0;
+          break;
+        case 'created_at':
+          aValue = new Date(a.created_at || 0).getTime();
+          bValue = new Date(b.created_at || 0).getTime();
+          break;
+        default:
+          aValue = a.created_at || '';
+          bValue = b.created_at || '';
+      }
+
+      if (typeof aValue === 'string') {
+        const cmp = aValue.localeCompare(bValue);
+        return sortDirection === 'asc' ? cmp : -cmp;
+      }
+      const cmp = aValue > bValue ? 1 : aValue < bValue ? -1 : 0;
+      return sortDirection === 'asc' ? cmp : -cmp;
+    });
+  }, [filteredCustomers, sortField, sortDirection]);
+
+  const downloadCSV = () => {
+    const headers = ['Nombre', 'DNI', 'Email', 'Teléfono', 'Ciudad', 'País', 'Reservas', 'Total gastado', 'Fecha registro'];
+    const escape = (v: string | number | null | undefined): string => {
+      const s = String(v ?? '');
+      if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    };
+    const rows = sortedCustomers.map(c => [
+      escape(c.name),
+      escape(c.dni),
+      escape(c.email),
+      escape(c.phone),
+      escape(c.city),
+      escape(c.country),
+      String(c.total_bookings ?? 0),
+      String((c.total_spent ?? 0).toFixed(2)),
+      escape(c.created_at ? formatDate(c.created_at) : ''),
+    ].join(','));
+    const csv = [headers.join(','), ...rows].join('\r\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `clientes-furgocasa-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const customersList = customers || [];
   const totalCustomers = totalCount;
   const activeCustomers = customersList.filter(c => {
@@ -145,6 +243,16 @@ export default function ClientesPage() {
           >
             <RefreshCw className={`h-5 w-5 ${isRefetching ? 'animate-spin' : ''}`} />
             <span className="hidden sm:inline">{isRefetching ? 'Actualizando...' : 'Actualizar'}</span>
+          </button>
+          {/* Descargar CSV */}
+          <button 
+            onClick={downloadCSV}
+            disabled={sortedCustomers.length === 0}
+            className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            title="Descargar lista en CSV (Excel)"
+          >
+            <Download className="h-5 w-5" />
+            <span className="hidden sm:inline">Descargar CSV</span>
           </button>
           <Link href="/administrator/clientes/nuevo" className="btn-primary flex items-center gap-2">
             <Plus className="h-5 w-5" />
@@ -213,17 +321,65 @@ export default function ClientesPage() {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Cliente</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Contacto</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Ubicación</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Reservas</th>
-                <th className="px-6 py-4 text-center text-sm font-semibold text-gray-900">Total gastado</th>
-                <th className="px-6 py-4 text-left text-sm font-semibold text-gray-900">Registro</th>
+                <th 
+                  className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('name')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Cliente</span>
+                    {renderSortIcon('name')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('email')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Contacto</span>
+                    {renderSortIcon('email')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('city')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Ubicación</span>
+                    {renderSortIcon('city')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-center text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('total_bookings')}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    <span>Reservas</span>
+                    {renderSortIcon('total_bookings')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-center text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('total_spent')}
+                >
+                  <div className="flex items-center justify-center gap-1">
+                    <span>Total gastado</span>
+                    {renderSortIcon('total_spent')}
+                  </div>
+                </th>
+                <th 
+                  className="px-6 py-4 text-left text-sm font-semibold text-gray-900 cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => handleSort('created_at')}
+                >
+                  <div className="flex items-center gap-1">
+                    <span>Registro</span>
+                    {renderSortIcon('created_at')}
+                  </div>
+                </th>
                 <th className="px-6 py-4 text-right text-sm font-semibold text-gray-900">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredCustomers.length === 0 ? (
+              {sortedCustomers.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     <div className="flex flex-col items-center">
@@ -238,7 +394,7 @@ export default function ClientesPage() {
                   </td>
                 </tr>
               ) : (
-                filteredCustomers.map((customer) => (
+                sortedCustomers.map((customer) => (
                   <tr key={customer.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
@@ -306,7 +462,7 @@ export default function ClientesPage() {
         {/* Info de totales */}
         <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-between">
           <p className="text-sm text-gray-600">
-            Mostrando {filteredCustomers.length} de {totalCount} clientes
+            Mostrando {sortedCustomers.length} de {totalCount} clientes
             {searchTerm || filterStatus ? ' (filtrados)' : ''}
             {isRefetching && ' • Actualizando...'}
           </p>
