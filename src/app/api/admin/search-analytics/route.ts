@@ -36,6 +36,40 @@ async function fetchAllRecords<T>(
   return allRecords;
 }
 
+/** Estados de reserva que cuentan como "confirmada" (excluye pending y cancelled) */
+const CONFIRMED_BOOKING_STATUSES = ["confirmed", "in_progress", "completed"] as const;
+
+/**
+ * Obtiene el Set de booking_ids que están confirmados en la tabla bookings.
+ * Garantiza 100% que solo contamos reservas con status confirmado (no pending, no cancelled).
+ */
+async function getConfirmedBookingIds(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  bookingIds: (string | null)[]
+): Promise<Set<string>> {
+  const uniqueIds = [...new Set(bookingIds.filter((id): id is string => !!id))];
+  if (uniqueIds.length === 0) return new Set();
+
+  const { data: bookings } = await supabase
+    .from("bookings")
+    .select("id")
+    .in("id", uniqueIds)
+    .in("status", CONFIRMED_BOOKING_STATUSES);
+
+  return new Set((bookings || []).map((b) => b.id));
+}
+
+/**
+ * Indica si una búsqueda tiene una reserva confirmada (verificación cruzada con bookings).
+ */
+function isBookingConfirmed(
+  search: { booking_id?: string | null; booking_confirmed?: boolean },
+  confirmedIds: Set<string>
+): boolean {
+  if (!search.booking_id) return false;
+  return confirmedIds.has(search.booking_id);
+}
+
 /**
  * GET /api/admin/search-analytics
  * 
@@ -99,10 +133,15 @@ export async function GET(request: NextRequest) {
 
         const searches = await fetchAllRecords<any>(baseQuery);
 
+        const confirmedIds = await getConfirmedBookingIds(
+          supabase,
+          (searches || []).map((s) => s.booking_id)
+        );
+
         const totalSearches = searches?.length || 0;
         const withAvailability = searches?.filter(s => s.had_availability).length || 0;
         const vehicleSelections = searches?.filter(s => s.vehicle_selected).length || 0;
-        const bookingsCreated = searches?.filter(s => s.booking_confirmed).length || 0;
+        const bookingsCreated = searches?.filter(s => isBookingConfirmed(s, confirmedIds)).length || 0;
 
         const avgRentalDays = searches?.length 
           ? searches.reduce((sum, s) => sum + s.rental_days, 0) / searches.length 
@@ -151,17 +190,22 @@ export async function GET(request: NextRequest) {
     if (type === "funnel") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("funnel_stage, had_availability")
+        .select("funnel_stage, had_availability, booking_id")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
       const searches = await fetchAllRecords<any>(baseQuery);
 
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (searches || []).map((s) => s.booking_id)
+      );
+
       const total = searches?.length || 0;
       const withAvailability = searches?.filter(s => s.had_availability).length || 0;
       const withoutAvailability = total - withAvailability;
       const vehicleSelected = searches?.filter(s => s.funnel_stage === "vehicle_selected" || s.funnel_stage === "booking_created").length || 0;
-      const bookingCreated = searches?.filter(s => s.booking_confirmed).length || 0;
+      const bookingCreated = searches?.filter(s => isBookingConfirmed(s, confirmedIds)).length || 0;
 
       return NextResponse.json({
         funnel: [
@@ -184,11 +228,16 @@ export async function GET(request: NextRequest) {
     if (type === "dates") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("pickup_date, dropoff_date, rental_days, booking_confirmed, season_applied, avg_price_shown")
+        .select("pickup_date, dropoff_date, rental_days, booking_id, season_applied, avg_price_shown")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
       const searches = await fetchAllRecords<any>(baseQuery);
+
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (searches || []).map((s) => s.booking_id)
+      );
 
       // Agrupar por rango de fechas
       const dateGroups = searches?.reduce((acc: any, s) => {
@@ -206,7 +255,7 @@ export async function GET(request: NextRequest) {
           };
         }
         acc[key].search_count++;
-        if (s.booking_confirmed) acc[key].bookings_count++;
+        if (isBookingConfirmed(s, confirmedIds)) acc[key].bookings_count++;
         if (s.avg_price_shown) acc[key].prices.push(s.avg_price_shown);
         return acc;
       }, {});
@@ -232,7 +281,7 @@ export async function GET(request: NextRequest) {
         .select(`
           selected_vehicle_id,
           vehicle_selected,
-          booking_confirmed,
+          booking_id,
           selected_vehicle_price
         `)
         .gte("searched_at", dateFrom)
@@ -240,6 +289,11 @@ export async function GET(request: NextRequest) {
         .not("selected_vehicle_id", "is", null);
 
       const vehicleStats = await fetchAllRecords<any>(baseQuery);
+
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (vehicleStats || []).map((s) => s.booking_id)
+      );
 
       // Agrupar por vehículo
       const vehicleGroups = vehicleStats?.reduce((acc: any, s) => {
@@ -255,7 +309,7 @@ export async function GET(request: NextRequest) {
           };
         }
         acc[id].times_selected++;
-        if (s.booking_confirmed) acc[id].times_booked++;
+        if (isBookingConfirmed(s, confirmedIds)) acc[id].times_booked++;
         if (s.selected_vehicle_price) acc[id].prices.push(s.selected_vehicle_price);
         return acc;
       }, {});
@@ -292,12 +346,17 @@ export async function GET(request: NextRequest) {
     if (type === "seasons") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("season_applied, vehicle_selected, booking_confirmed, avg_price_shown")
+        .select("season_applied, vehicle_selected, booking_id, avg_price_shown")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59")
         .not("season_applied", "is", null);
 
       const searches = await fetchAllRecords<any>(baseQuery);
+
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (searches || []).map((s) => s.booking_id)
+      );
 
       const seasonGroups = searches?.reduce((acc: any, s) => {
         const season = s.season_applied || "Sin temporada";
@@ -312,7 +371,7 @@ export async function GET(request: NextRequest) {
         }
         acc[season].search_count++;
         if (s.vehicle_selected) acc[season].selection_count++;
-        if (s.booking_confirmed) acc[season].booking_count++;
+        if (isBookingConfirmed(s, confirmedIds)) acc[season].booking_count++;
         if (s.avg_price_shown) acc[season].prices.push(s.avg_price_shown);
         return acc;
       }, {});
@@ -335,11 +394,16 @@ export async function GET(request: NextRequest) {
     if (type === "duration") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("rental_days, booking_confirmed")
+        .select("rental_days, booking_id")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
       const searches = await fetchAllRecords<any>(baseQuery);
+
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (searches || []).map((s) => s.booking_id)
+      );
 
       const durationGroups = {
         "1-2 días": { count: 0, bookings: 0 },
@@ -360,7 +424,7 @@ export async function GET(request: NextRequest) {
         else group = "21+ días";
 
         durationGroups[group].count++;
-        if (s.booking_confirmed) durationGroups[group].bookings++;
+        if (isBookingConfirmed(s, confirmedIds)) durationGroups[group].bookings++;
       });
 
       const durationStats = Object.entries(durationGroups).map(([name, data]) => ({
@@ -380,11 +444,16 @@ export async function GET(request: NextRequest) {
     if (type === "search-timing") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("searched_at, had_availability, vehicle_selected, booking_confirmed, advance_days, rental_days")
+        .select("searched_at, had_availability, vehicle_selected, booking_id, advance_days, rental_days")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
       const timingData = await fetchAllRecords<any>(baseQuery);
+
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (timingData || []).map((s) => s.booking_id)
+      );
 
       // Agrupar por fecha de búsqueda
       const dateGroups = timingData?.reduce((acc: any, s) => {
@@ -410,7 +479,7 @@ export async function GET(request: NextRequest) {
         acc[dateKey].total_searches++;
         if (s.had_availability) acc[dateKey].searches_with_availability++;
         if (s.vehicle_selected) acc[dateKey].vehicle_selections++;
-        if (s.booking_confirmed) acc[dateKey].bookings_created++;
+        if (isBookingConfirmed(s, confirmedIds)) acc[dateKey].bookings_created++;
         acc[dateKey].advance_days_sum += s.advance_days || 0;
         acc[dateKey].rental_days_sum += s.rental_days || 0;
         
@@ -436,11 +505,16 @@ export async function GET(request: NextRequest) {
     if (type === "locale") {
       const baseQuery = supabase
         .from("search_queries")
-        .select("locale, vehicle_selected, booking_confirmed, had_availability")
+        .select("locale, vehicle_selected, booking_id, had_availability")
         .gte("searched_at", dateFrom)
         .lte("searched_at", dateTo + " 23:59:59");
 
       const searches = await fetchAllRecords<any>(baseQuery);
+
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (searches || []).map((s) => s.booking_id)
+      );
 
       const localeGroups = searches?.reduce((acc: any, s) => {
         const locale = s.locale || "desconocido";
@@ -463,7 +537,7 @@ export async function GET(request: NextRequest) {
         acc[locale].search_count++;
         if (s.had_availability) acc[locale].with_availability++;
         if (s.vehicle_selected) acc[locale].selection_count++;
-        if (s.booking_confirmed) acc[locale].booking_count++;
+        if (isBookingConfirmed(s, confirmedIds)) acc[locale].booking_count++;
         return acc;
       }, {});
 
@@ -490,7 +564,7 @@ export async function GET(request: NextRequest) {
           pickup_location_id,
           dropoff_location_id,
           vehicle_selected,
-          booking_confirmed,
+          booking_id,
           had_availability,
           avg_price_shown
         `)
@@ -498,6 +572,11 @@ export async function GET(request: NextRequest) {
         .lte("searched_at", dateTo + " 23:59:59");
 
       const searches = await fetchAllRecords<any>(baseQuery);
+
+      const confirmedIds = await getConfirmedBookingIds(
+        supabase,
+        (searches || []).map((s) => s.booking_id)
+      );
 
       // Obtener todas las ubicaciones para hacer el mapeo
       const { data: locations } = await supabase
@@ -537,7 +616,7 @@ export async function GET(request: NextRequest) {
         acc[cityGroup].search_count++;
         if (s.had_availability) acc[cityGroup].with_availability++;
         if (s.vehicle_selected) acc[cityGroup].selection_count++;
-        if (s.booking_confirmed) acc[cityGroup].booking_count++;
+        if (isBookingConfirmed(s, confirmedIds)) acc[cityGroup].booking_count++;
         if (s.avg_price_shown) acc[cityGroup].prices.push(s.avg_price_shown);
         return acc;
       }, {});
