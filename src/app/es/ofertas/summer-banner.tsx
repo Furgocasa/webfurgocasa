@@ -61,8 +61,8 @@ export function SummerBanner() {
       <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-furgocasa-orange/10 to-transparent" />
       <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/20 to-transparent" />
 
-      <div className="relative z-10 container mx-auto px-4 py-16 md:py-24">
-        <div className="max-w-5xl mx-auto">
+      <div className="relative z-10 w-full px-4 sm:px-6 lg:px-12 xl:px-16 2xl:px-24 py-16 md:py-24">
+        <div className="w-full max-w-[1600px] mx-auto">
           {/* Top badge */}
           <div className="flex justify-center mb-8">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2">
