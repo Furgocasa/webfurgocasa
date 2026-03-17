@@ -682,17 +682,16 @@ CREATE OR REPLACE FUNCTION check_vehicle_availability(
 DECLARE
     is_available BOOLEAN;
 BEGIN
-    -- Verificar si hay reservas que se solapan
     SELECT NOT EXISTS (
         SELECT 1 FROM bookings
         WHERE vehicle_id = p_vehicle_id
         AND status NOT IN ('cancelled')
+        AND payment_status IN ('partial', 'paid')
         AND (
             (pickup_date <= p_dropoff_date AND dropoff_date >= p_pickup_date)
         )
     ) INTO is_available;
     
-    -- Si hay disponibilidad, verificar bloqueos
     IF is_available THEN
         SELECT NOT EXISTS (
             SELECT 1 FROM blocked_dates

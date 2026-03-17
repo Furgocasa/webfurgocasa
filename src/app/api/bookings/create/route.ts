@@ -112,11 +112,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: conflictingBookings, error: conflictError } = await supabase
+    const { data: paidConflicts, error: conflictError } = await supabase
       .from("bookings")
       .select("id, booking_number")
       .eq("vehicle_id", booking.vehicle_id)
       .neq("status", "cancelled")
+      .in("payment_status", ["partial", "paid"])
       .or(`and(pickup_date.lte.${booking.dropoff_date},dropoff_date.gte.${booking.pickup_date})`);
 
     if (conflictError) {
@@ -127,11 +128,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (conflictingBookings && conflictingBookings.length > 0) {
-      console.error("🚫 RESERVA RECHAZADA: Vehículo ya reservado", {
+    if (paidConflicts && paidConflicts.length > 0) {
+      console.error("🚫 RESERVA RECHAZADA: Vehículo ya reservado con pago", {
         vehicle_id: booking.vehicle_id,
         fechas_solicitadas: `${booking.pickup_date} → ${booking.dropoff_date}`,
-        conflictos: conflictingBookings.map(b => b.booking_number),
+        conflictos: paidConflicts.map(b => b.booking_number),
       });
       return NextResponse.json(
         { error: "El vehículo no está disponible en las fechas seleccionadas. Por favor, elige otras fechas o un vehículo diferente." },
