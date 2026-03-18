@@ -120,7 +120,7 @@ export function SummerBanner() {
 
             {/* Right column - Coupon card */}
             <div className="flex justify-center">
-              <div className="w-full max-w-md xl:max-w-lg">
+              <div className="w-full max-w-md lg:max-w-xl xl:max-w-2xl">
                 {/* Coupon card */}
                 <div className="bg-white/[0.07] backdrop-blur-xl border border-white/15 rounded-3xl p-6 sm:p-8 md:p-10 xl:p-12 relative overflow-hidden">
                   {/* Card decorative circle */}
