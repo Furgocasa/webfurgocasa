@@ -175,7 +175,7 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
               <LocalizedLink href={`/${locale}/reservar`} className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-semibold py-3 px-8 rounded-lg hover:bg-furgocasa-orange-dark transition-colors">
                 Book weekend<ArrowRight className="h-5 w-5" />
               </LocalizedLink>
-              <a href="tel:+34968000000" className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors">
+              <a href="tel:+34868364161" className="inline-flex items-center gap-2 bg-white text-furgocasa-blue font-semibold py-3 px-8 rounded-lg hover:bg-gray-100 transition-colors">
                 <Phone className="h-5 w-5" />Call us
               </a>
             </div>

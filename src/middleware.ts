@@ -139,20 +139,27 @@ export async function middleware(request: NextRequest) {
   // ✅ Redirigir blog URLs con categoría en idioma incorrecto → idioma que corresponde a esa categoría
   // Ejemplo: /es/blog/routes/english-slug → /en/blog/routes/english-slug (routes es categoría EN)
   // Ejemplo: /en/blog/rutas/slug → /es/blog/rutas/slug (rutas es categoría ES)
+  // ⚠️ Excepción: artículos con slug en francés en /fr/blog/destinations/ no redirigir a EN (evita bucle AHREF)
   const blogCategoryMatch = pathname.match(/^\/(es|en|fr|de)\/blog\/([^/]+)\/([^/]+)\/?$/);
   if (blogCategoryMatch) {
     const [, urlLocale, category, slug] = blogCategoryMatch;
-    const categoryToLocale: Record<string, string> = {
-      rutas: 'es', noticias: 'es', vehiculos: 'es', consejos: 'es', destinos: 'es', equipamiento: 'es',
-      routes: 'en', news: 'en', vehicles: 'en', tips: 'en', destinations: 'en', equipment: 'en',
-      itineraires: 'fr', actualites: 'fr', vehicules: 'fr', conseils: 'fr', equipement: 'fr',
-      routen: 'de', nachrichten: 'de', fahrzeuge: 'de', tipps: 'de', reiseziele: 'de', ausrustung: 'de',
-    };
-    const correctLocale = categoryToLocale[category];
-    if (correctLocale && correctLocale !== urlLocale) {
-      const url = request.nextUrl.clone();
-      url.pathname = `/${correctLocale}/blog/${category}/${slug}`;
-      return NextResponse.redirect(url, 301);
+    const isFrenchSlugInDestinations = urlLocale === 'fr' && category === 'destinations' &&
+      slug.includes('evenements') && slug.includes('region-de-murcie');
+    if (isFrenchSlugInDestinations) {
+      // Mantener en FR: artículo en francés (evita bucle fr→en→fr)
+    } else {
+      const categoryToLocale: Record<string, string> = {
+        rutas: 'es', noticias: 'es', vehiculos: 'es', consejos: 'es', destinos: 'es', equipamiento: 'es',
+        routes: 'en', news: 'en', vehicles: 'en', tips: 'en', destinations: 'en', equipment: 'en',
+        itineraires: 'fr', actualites: 'fr', vehicules: 'fr', conseils: 'fr', equipement: 'fr',
+        routen: 'de', nachrichten: 'de', fahrzeuge: 'de', tipps: 'de', reiseziele: 'de', ausrustung: 'de',
+      };
+      const correctLocale = categoryToLocale[category];
+      if (correctLocale && correctLocale !== urlLocale) {
+        const url = request.nextUrl.clone();
+        url.pathname = `/${correctLocale}/blog/${category}/${slug}`;
+        return NextResponse.redirect(url, 301);
+      }
     }
   }
 

@@ -10,6 +10,7 @@ import { formatPrice, sortVehicleEquipment } from"@/lib/utils";
 import type { Locale } from"@/lib/i18n/config";
 import { getTranslatedRoute } from"@/lib/route-translations";
 import { buildCanonicalAlternates } from"@/lib/seo/multilingual-metadata";
+import { VehicleDetailJsonLd } from"@/components/vehicle/vehicle-detail-jsonld";
 import { createClient } from"@supabase/supabase-js";
 
 // 🚀 DESHABILITADO TEMPORALMENTE - Renderizado dinámico para debug
@@ -91,9 +92,13 @@ export default async function VehicleDetailPage({ params }: { params: Promise<{ 
     notFound();
   }
 
+  const alternates = buildCanonicalAlternates(`/vehiculos/${slug}`, locale);
+  const canonicalUrl = alternates.canonical;
+
   return (
     <>
-<main className="min-h-screen bg-gray-50 overflow-x-hidden md:pt-0">
+      <VehicleDetailJsonLd vehicle={vehicle} url={canonicalUrl} locale={locale} />
+      <main className="min-h-screen bg-gray-50 overflow-x-hidden md:pt-0">
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-4">
             <LocalizedLink href="/vehiculos" className="inline-flex items-center gap-2 text-gray-600 hover:text-furgocasa-orange">

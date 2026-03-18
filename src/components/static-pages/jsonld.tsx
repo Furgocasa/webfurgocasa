@@ -1,33 +1,35 @@
+import { COMPANY } from "@/lib/company";
+
 export function AboutPageJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "AboutPage",
     "name": "Sobre Furgocasa - Quiénes Somos",
     "description": "Furgocasa es una empresa familiar especializada en alquiler de autocaravanas y campers en Murcia desde 2012. Pasión por viajar, libertad para explorar.",
-    "url": "https://www.furgocasa.com/quienes-somos",
+    "url": `${COMPANY.website}/es/quienes-somos`,
     "mainEntity": {
       "@type": "Organization",
       "name": "Furgocasa",
-      "legalName": "Furgocasa S.L.",
-      "foundingDate": "2012",
-      "url": "https://www.furgocasa.com",
-      "logo": "https://www.furgocasa.com/logo.png",
+      "legalName": COMPANY.legalName,
+      "foundingDate": COMPANY.foundingDate,
+      "url": COMPANY.website,
+      "logo": `${COMPANY.website}/logo.png`,
       "description": "Empresa familiar especializada en alquiler de autocaravanas y campers de gran volumen en Murcia.",
       "slogan": "Tu hotel 5 estrellas sobre ruedas",
-      "telephone": "+34868364161",
-      "email": "info@furgocasa.com",
+      "telephone": COMPANY.phone,
+      "email": COMPANY.email,
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Avenida Puente Tocinos, 4",
-        "addressLocality": "Casillas - Murcia",
-        "addressRegion": "Región de Murcia",
-        "postalCode": "30007",
-        "addressCountry": "ES"
+        "streetAddress": COMPANY.address.street,
+        "addressLocality": COMPANY.address.locality,
+        "addressRegion": COMPANY.address.region,
+        "postalCode": COMPANY.address.postalCode,
+        "addressCountry": COMPANY.address.country
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": "38.0265",
-        "longitude": "-1.1635"
+        "latitude": COMPANY.geo.latitude,
+        "longitude": COMPANY.geo.longitude
       },
       "numberOfEmployees": {
         "@type": "QuantitativeValue",
@@ -35,9 +37,9 @@ export function AboutPageJsonLd() {
       },
       "aggregateRating": {
         "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "500",
-        "bestRating": "5"
+        "ratingValue": COMPANY.aggregateRating.ratingValue,
+        "reviewCount": COMPANY.aggregateRating.reviewCount,
+        "bestRating": COMPANY.aggregateRating.bestRating
       },
       "areaServed": [
         {
@@ -69,45 +71,45 @@ export function ContactPageJsonLd() {
     "@context": "https://schema.org",
     "@type": "ContactPage",
     "name": "Contacto - Furgocasa",
-    "description": "Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com",
-    "url": "https://www.furgocasa.com/contacto",
+    "description": `Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Teléfono: ${COMPANY.phoneDisplay}. Email: ${COMPANY.email}`,
+    "url": `${COMPANY.website}/es/contacto`,
     "mainEntity": {
       "@type": "LocalBusiness",
       "name": "Furgocasa",
-      "telephone": "+34868364161",
-      "email": "info@furgocasa.com",
+      "telephone": COMPANY.phone,
+      "email": COMPANY.email,
       "address": {
         "@type": "PostalAddress",
-        "streetAddress": "Avenida Puente Tocinos, 4",
-        "addressLocality": "Casillas - Murcia",
-        "addressRegion": "Región de Murcia",
-        "postalCode": "30007",
-        "addressCountry": "ES"
+        "streetAddress": COMPANY.address.street,
+        "addressLocality": COMPANY.address.locality,
+        "addressRegion": COMPANY.address.region,
+        "postalCode": COMPANY.address.postalCode,
+        "addressCountry": COMPANY.address.country
       },
       "geo": {
         "@type": "GeoCoordinates",
-        "latitude": "38.0265",
-        "longitude": "-1.1635"
+        "latitude": COMPANY.geo.latitude,
+        "longitude": COMPANY.geo.longitude
       },
       "openingHoursSpecification": [
         {
           "@type": "OpeningHoursSpecification",
           "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-          "opens": "09:00",
-          "closes": "18:00"
+          "opens": COMPANY.openingHours.weekdays.opens,
+          "closes": COMPANY.openingHours.weekdays.closes
         }
       ],
       "contactPoint": [
         {
           "@type": "ContactPoint",
-          "telephone": "+34868364161",
+          "telephone": COMPANY.phone,
           "contactType": "customer service",
           "areaServed": "ES",
           "availableLanguage": ["Spanish", "English"]
         },
         {
           "@type": "ContactPoint",
-          "email": "info@furgocasa.com",
+          "email": COMPANY.email,
           "contactType": "customer service",
           "areaServed": "ES",
           "availableLanguage": ["Spanish", "English"]

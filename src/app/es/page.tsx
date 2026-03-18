@@ -57,8 +57,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const alternates = buildCanonicalAlternates('/', locale);
   
   return {
-    title: `${t("Las Mejores Campers en Alquiler")} - ${t("Alquiler en España")} | Furgocasa`,
-    description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
+    title: `${t("Las Mejores Autocaravanas Camper en Alquiler")} | Furgocasa`,
+    description: `${t("Furgocasa: alquiler de autocaravanas y campers en España desde 95€/día. Flota premium Dreamer, Knaus, Weinsberg con kilómetros ilimitados. Teléfono 868 36 41 61.")}`,
     keywords: "alquiler camper, autocaravana alquiler, alquiler furgoneta camper, motorhome españa, campervan alquiler, casa rodante, alquiler autocaravana españa",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
@@ -111,9 +111,6 @@ export async function generateMetadata(): Promise<Metadata> {
         'max-image-preview': 'large',
         'max-snippet': -1,
       },
-    },
-    verification: {
-      google: 'tu-codigo-de-verificacion-aqui',
     },
   };
 }
@@ -191,32 +188,33 @@ export default async function LocaleHomePage() {
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
-              Furgocasa Campervans
+              {t("Las Mejores Autocaravanas Camper en Alquiler")}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
-              {t("Tu hotel")}
+            <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
+              {t("Furgocasa: flota premium desde 95€/día con kilómetros ilimitados")}
             </p>
             
-            <div className="flex items-center justify-center gap-1" style={{ marginBottom: '0.5rem' }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-yellow-400 text-3xl md:text-4xl">★</span>
-              ))}
-            </div>
-            
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-6" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-              {t("sobre ruedas")}
-            </p>
-            
-            <p className="text-sm md:text-base lg:text-lg text-white/85 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-              {t("Las mejores furgonetas campers de gran volumen en alquiler")}
+            <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+              {t("Dreamer, Knaus, Weinsberg. España y Europa.")}
             </p>
           </div>
 
           <div className="max-w-5xl mx-auto mt-10">
             <SearchWidget />
+          </div>
+        </div>
+      </section>
+
+      {/* Bloque respuesta breve - optimizado para IA y búsquedas */}
+      <section className="py-8 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+              <strong>{t("¿Qué es Furgocasa?")}</strong> {t("Furgocasa es una empresa de alquiler de autocaravanas y campers en Murcia (España).")} {t("Ofrecemos flota premium de marcas Dreamer, Knaus y Weinsberg con kilómetros ilimitados en España, desde 95€/día según temporada.")} {t("Recogida y devolución en Casillas, Murcia. Fianza: 1.000€. Teléfono: 868 36 41 61.")}
+            </p>
           </div>
         </div>
       </section>

@@ -55,7 +55,7 @@ export default async function LocaleAvisoLegalPage({ params }: PageProps) {
                 <li><strong>CIF:</strong> B-XXXXXXXX</li>
                 <li><strong>Geschäftssitz:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
                 <li><strong>E-Mail:</strong> info@furgocasa.com</li>
-                <li><strong>Telefon:</strong> +34 968 000 000</li>
+                <li><strong>Telefon:</strong> +34 868 36 41 61</li>
                 <li><strong>Eintragung:</strong> Handelsregister von Murcia, Band XXX, Blatt XXX, Seite MU-XXXXX</li>
               </ul>
 

@@ -1,68 +1,58 @@
+import { COMPANY } from "@/lib/company";
+
 export function OrganizationJsonLd() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": ["Organization", "LocalBusiness"],
     "name": "Furgocasa",
-    "legalName": "Furgocasa S.L.",
-    "url": "https://www.furgocasa.com",
-    "logo": "https://www.furgocasa.com/logo.png",
+    "legalName": COMPANY.legalName,
+    "url": COMPANY.website,
+    "logo": `${COMPANY.website}/logo.png`,
     "description": "Empresa especializada en alquiler de autocaravanas y campers de gran volumen en Murcia. Flota premium con kilómetros ilimitados.",
-    "foundingDate": "2012",
-    "telephone": "+34868364161",
-    "email": "info@furgocasa.com",
+    "foundingDate": COMPANY.foundingDate,
+    "telephone": COMPANY.phone,
+    "email": COMPANY.email,
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Avenida Puente Tocinos, 4",
-      "addressLocality": "Casillas - Murcia",
-      "addressRegion": "Región de Murcia",
-      "postalCode": "30007",
-      "addressCountry": "ES"
+      "streetAddress": COMPANY.address.street,
+      "addressLocality": COMPANY.address.locality,
+      "addressRegion": COMPANY.address.region,
+      "postalCode": COMPANY.address.postalCode,
+      "addressCountry": COMPANY.address.country
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": "38.0265",
-      "longitude": "-1.1635"
+      "latitude": COMPANY.geo.latitude,
+      "longitude": COMPANY.geo.longitude
     },
     "areaServed": [
-      {
-        "@type": "Country",
-        "name": "España"
-      },
-      {
-        "@type": "State",
-        "name": "Región de Murcia"
-      },
-      {
-        "@type": "State",
-        "name": "Comunidad Valenciana"
-      }
+      { "@type": "Country", "name": "España" },
+      { "@type": "State", "name": "Región de Murcia" },
+      { "@type": "State", "name": "Comunidad Valenciana" }
     ],
     "openingHoursSpecification": [
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        "opens": "09:00",
-        "closes": "19:00"
+        "opens": COMPANY.openingHours.weekdays.opens,
+        "closes": COMPANY.openingHours.weekdays.closes
       },
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": "Saturday",
-        "opens": "09:00",
-        "closes": "14:00"
+        "opens": COMPANY.openingHours.saturday.opens,
+        "closes": COMPANY.openingHours.saturday.closes
       }
     ],
-    "sameAs": [
-      "https://www.facebook.com/furgocasa",
-      "https://www.instagram.com/furgocasa"
-    ],
+    "sameAs": COMPANY.sameAs,
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "250",
-      "bestRating": "5",
-      "worstRating": "1"
+      "ratingValue": COMPANY.aggregateRating.ratingValue,
+      "reviewCount": COMPANY.aggregateRating.reviewCount,
+      "bestRating": COMPANY.aggregateRating.bestRating,
+      "worstRating": COMPANY.aggregateRating.worstRating
     },
-    "priceRange": "95€ - 155€"
+    "priceRange": COMPANY.priceRange
   };
 
   return (
@@ -94,8 +84,8 @@ export function ProductJsonLd({ vehicles }: ProductJsonLdProps) {
     "@type": "Product",
     "name": `${vehicle.brand} ${vehicle.model} - ${vehicle.name}`,
     "description": `Camper van de ${vehicle.passengers} plazas con ${vehicle.beds} plazas de noche. Equipada con cocina, baño, calefacción y todo lo necesario para tu aventura.`,
-    "image": vehicle.main_image || "https://www.furgocasa.com/default-vehicle.jpg",
-    "url": `https://www.furgocasa.com/vehiculos/${vehicle.slug}`,
+    "image": vehicle.main_image || `${COMPANY.website}/default-vehicle.jpg`,
+    "url": `${COMPANY.website}/es/vehiculos/${vehicle.slug}`,
     "brand": {
       "@type": "Brand",
       "name": vehicle.brand
@@ -155,12 +145,12 @@ export function WebsiteJsonLd() {
     "@context": "https://schema.org",
     "@type": "WebSite",
     "name": "Furgocasa",
-    "url": "https://www.furgocasa.com",
+    "url": COMPANY.website,
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": "https://www.furgocasa.com/buscar?q={search_term_string}"
+        "urlTemplate": `${COMPANY.website}/es/buscar?q={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     }

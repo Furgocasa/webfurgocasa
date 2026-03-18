@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { COMPANY } from "@/lib/company";
 import Image from "next/image";
 import { useState } from "react";
 import { Menu, X, Phone, Mail, ChevronDown, Globe } from "lucide-react";
@@ -51,9 +52,9 @@ export function Header() {
       <div className="bg-gradient-to-r from-furgocasa-blue to-furgocasa-blue-dark text-white py-2.5">
         <div className="container mx-auto px-4 flex justify-between items-center text-sm">
           <div className="flex items-center gap-6">
-            <a href="tel:+34968000000" className="flex items-center gap-2 hover:text-furgocasa-orange transition-colors duration-200 font-medium">
+            <a href={`tel:${COMPANY.phone}`} className="flex items-center gap-2 hover:text-furgocasa-orange transition-colors duration-200 font-medium">
               <Phone className="h-4 w-4" />
-              <span className="hidden sm:inline">+34 968 000 000</span>
+              <span className="hidden sm:inline">{COMPANY.phoneDisplayFull}</span>
             </a>
             <a href="mailto:info@furgocasa.com" className="hidden md:flex items-center gap-2 hover:text-furgocasa-orange transition-colors duration-200 font-medium">
               <Mail className="h-4 w-4" />

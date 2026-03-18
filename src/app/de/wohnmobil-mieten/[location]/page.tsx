@@ -223,7 +223,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* Preconnect zur Beschleunigung des Bildladens von Supabase Storage */}
       <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
       <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
-      <LocalBusinessJsonLd location={location as any} />
+      <LocalBusinessJsonLd location={location as any} locale="de" />
       
       {/* HERO SECTION - Dynamische Texte aus der DB */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center">

@@ -4,6 +4,7 @@ import { Phone, Mail, MapPin, Clock, MessageSquare, Send } from "lucide-react";
 import { translateServer } from "@/lib/i18n/server-translation";
 import { ContactPageJsonLd } from "@/components/static-pages/jsonld";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { COMPANY } from "@/lib/company";
 import type { Locale } from "@/lib/i18n/config";
 
 /**
@@ -28,7 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Contacto y Reservas - Alquiler de Autocaravanas"),
-    description: t("Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com. Lunes a Viernes 09:00-18:00."),
+    description: t("Contacto Furgocasa: teléfono 868 36 41 61, email info@furgocasa.com. Dirección Av. Puente Tocinos 4, Casillas, Murcia. Horario L-V 09:00-19:00, Sáb 09:00-14:00."),
     keywords: "contacto furgocasa, telefono furgocasa murcia, email furgocasa, direccion furgocasa, horario furgocasa, alquiler autocaravanas murcia contacto",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
@@ -80,6 +81,17 @@ export default async function ESContactoPage() {
             <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">
               {t("Estamos aquí para ayudarte a planificar tu aventura perfecta")}
             </p>
+          </div>
+        </section>
+
+        {/* Bloque respuesta breve */}
+        <section className="py-8 bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                <strong>{t("Contacto Furgocasa:")}</strong> {t("Teléfono")} {COMPANY.phoneDisplay} ({COMPANY.phoneDisplayFull}). {t("Email")}: {COMPANY.email}. {t("Dirección")}: {COMPANY.address.street}, {COMPANY.address.locality}, {COMPANY.address.postalCode} {COMPANY.address.region}. {t("Horario")}: {t("Lunes a Viernes")} {COMPANY.openingHoursDisplay.weekdays}, {t("Sábados")} {COMPANY.openingHoursDisplay.saturday}.
+              </p>
+            </div>
           </div>
         </section>
 

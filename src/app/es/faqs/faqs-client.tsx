@@ -227,6 +227,17 @@ export function FaqsClient() {
         </div>
       </section>
 
+      {/* Bloque respuesta breve - FAQs */}
+      <section className="py-8 bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+              <strong>{t("Preguntas frecuentes alquiler camper Furgocasa:")}</strong> {t("Requisitos: carnet B con 2 años, edad mínima 25 años. Fianza: 1.000€. Precios desde 95€/día según temporada. Kilómetros ilimitados en España. Recogida en Casillas, Murcia. Horarios: 10:00-13:00 o 17:00-19:00, devolución antes de 10:00. Teléfono: 868 36 41 61.")}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Índice de categorías */}
       <section className="py-8 bg-gray-100 border-b border-gray-200">
         <div className="container mx-auto px-4 max-w-4xl">

@@ -107,12 +107,8 @@ export const metadata: Metadata = {
   },
   // Hreflang por defecto (es, en, fr, de + x-default) - cada página con generateMetadata lo sobrescribe
   alternates: defaultAlternates,
-  // Verificación de propiedad (añadir IDs reales cuando estén disponibles)
-  verification: {
-    google: "tu-codigo-de-verificacion-google",
-    // yandex: "tu-codigo-yandex",
-    // yahoo: "tu-codigo-yahoo",
-  },
+  // Verificación de propiedad - configurar en Search Console cuando esté disponible
+  // verification: { google: "..." },
 };
 
 // ✅ Viewport configuration (Next.js 15+)

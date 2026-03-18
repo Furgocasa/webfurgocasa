@@ -1,4 +1,5 @@
 import type { Post } from "@/lib/blog/server-actions";
+import { COMPANY } from "@/lib/company";
 
 interface BlogPostJsonLdProps {
   post: Post;
@@ -17,20 +18,14 @@ export function BlogPostJsonLd({ post, url }: BlogPostJsonLdProps) {
     "author": {
       "@type": "Organization",
       "name": "Furgocasa",
-      "url": "https://www.furgocasa.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://www.furgocasa.com/logo.png"
-      }
+      "url": COMPANY.website,
+      "logo": { "@type": "ImageObject", "url": `${COMPANY.website}/logo.png` }
     },
     "publisher": {
       "@type": "Organization",
       "name": "Furgocasa",
-      "url": "https://www.furgocasa.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://www.furgocasa.com/logo.png"
-      }
+      "url": COMPANY.website,
+      "logo": { "@type": "ImageObject", "url": `${COMPANY.website}/logo.png` }
     },
     "mainEntityOfPage": {
       "@type": "WebPage",
@@ -43,36 +38,21 @@ export function BlogPostJsonLd({ post, url }: BlogPostJsonLdProps) {
   };
 
   // Si tiene categoría, añadir breadcrumb
-  const breadcrumbJsonLd = post.category ? {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Inicio",
-        "item": "https://www.furgocasa.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Blog",
-        "item": "https://www.furgocasa.com/blog"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": post.category.name,
-        "item": `https://www.furgocasa.com/blog/${post.category.slug}`
-      },
-      {
-        "@type": "ListItem",
-        "position": 4,
-        "name": post.title,
-        "item": url
-      }
-    ]
-  } : null;
+  const u = new URL(url);
+    const pathParts = u.pathname.split("/").filter(Boolean);
+    const homeUrl = `${u.origin}/${pathParts[0]}`;
+    const blogUrl = `${u.origin}/${pathParts[0]}/blog`;
+    const categoryUrl = pathParts.length >= 3 ? `${u.origin}/${pathParts.slice(0, 3).join("/")}` : blogUrl;
+    const breadcrumbJsonLd = post.category ? {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Inicio", "item": homeUrl },
+        { "@type": "ListItem", "position": 2, "name": "Blog", "item": blogUrl },
+        { "@type": "ListItem", "position": 3, "name": post.category.name, "item": categoryUrl },
+        { "@type": "ListItem", "position": 4, "name": post.title, "item": url }
+      ]
+    } : null;
 
   return (
     <>

@@ -390,7 +390,7 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="tel:+34968000000"
+                  href="tel:+34868364161"
                   className="inline-flex items-center justify-center gap-2 bg-white text-furgocasa-blue font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <Phone className="h-5 w-5" />

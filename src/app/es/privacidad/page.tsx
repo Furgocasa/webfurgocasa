@@ -55,7 +55,7 @@ export default async function LocalePrivacidadPage({ params }: PageProps) {
                 <li><strong>CIF:</strong> B-XXXXXXXX</li>
                 <li><strong>Dirección:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
                 <li><strong>Correo electrónico:</strong> privacidad@furgocasa.com</li>
-                <li><strong>Teléfono:</strong> +34 968 000 000</li>
+                <li><strong>Teléfono:</strong> +34 868 36 41 61</li>
               </ul>
 
               <h2>2. Datos personales que tratamos</h2>

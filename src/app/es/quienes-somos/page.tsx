@@ -3,6 +3,7 @@ import { Users, Heart, Star } from "lucide-react";
 import { AboutPageJsonLd } from "@/components/static-pages/jsonld";
 import { translateServer } from "@/lib/i18n/server-translation";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { COMPANY } from "@/lib/company";
 import type { Locale } from "@/lib/i18n/config";
 
 /**
@@ -35,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-    description: t("Furgocasa es una empresa familiar nacida de la pasión por el mundo camper. Desde 2012, ofrecemos alquiler de autocaravanas premium en Murcia con más de 500 viajes realizados."),
+    description: t("Furgocasa: empresa familiar de alquiler de autocaravanas en Murcia desde 2012. Más de 500 viajes. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados desde 95€/día. Recogida Casillas, Murcia."),
     keywords: "quienes somos furgocasa, empresa alquiler camper murcia, historia furgocasa, familia furgocasa, autocaravanas murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
@@ -89,6 +90,17 @@ export default async function LocaleQuienesSomosPage() {
             <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">
               {t("Pasión por viajar, libertad para explorar")}
             </p>
+          </div>
+        </section>
+
+        {/* Bloque respuesta breve */}
+        <section className="py-8 bg-white border-b border-gray-100">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                <strong>{t("¿Quiénes somos?")}</strong> {t("Furgocasa es una empresa familiar de alquiler de autocaravanas en Murcia desde")} {COMPANY.foundingDate}. {t("Más de 500 viajes realizados. Flota premium con kilómetros ilimitados, precios desde 95€/día. Recogida en Casillas, Murcia. Teléfono:")} {COMPANY.phoneDisplay}.
+              </p>
+            </div>
           </div>
         </section>
 

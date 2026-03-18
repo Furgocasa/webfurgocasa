@@ -176,14 +176,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/alquiler-motorhome-marruecos-desde-espana', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/alquiler-motorhome-espana', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
-    { path: '/como-funciona', priority: 0.6, changeFrequency: 'monthly' },
+    // /como-funciona → 301 a /guia-camper (excluido del sitemap)
     { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/autocaravanas', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/ofertas', priority: 0.6, changeFrequency: 'weekly' },
-    { path: '/publicaciones', priority: 0.5, changeFrequency: 'weekly' },
+    // /publicaciones → 301 a /blog (excluido del sitemap)
     { path: '/clientes-vip', priority: 0.4, changeFrequency: 'monthly' },
     { path: '/quienes-somos', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/faqs', priority: 0.6, changeFrequency: 'monthly' },

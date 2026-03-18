@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Metadata } from "next";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { FaqDetailJsonLd } from "@/components/faqs/faq-detail-jsonld";
 import type { Locale } from "@/lib/i18n/config";
 
 export const revalidate = 3600; // 1 hora
@@ -44,7 +45,7 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     answer: `<p>La forma más rápida es a través de nuestra web:</p>
     <ol><li>Selecciona las fechas de recogida y devolución</li><li>Elige el vehículo que más te guste</li><li>Añade los extras que necesites</li><li>Completa tus datos y realiza el pago de la primera mitad</li></ol>
     <p>Recibirás la confirmación por email en menos de 24 horas.</p>
-    <p>También puedes llamarnos al <strong>+34 968 000 000</strong> o enviarnos un WhatsApp.</p>`,
+    <p>También puedes llamarnos al <strong>+34 868 36 41 61</strong> o enviarnos un WhatsApp.</p>`,
     category:"Reserva y pago",
     related: ["pago-pendiente","modificar-cancelar"]
   },"precios-impuestos": {
@@ -70,7 +71,7 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     question:"¿Cuál es el propósito de que se retenga una fianza?",
     answer: `<p>La fianza sirve como garantía para cubrir:</p>
     <ul><li>La franquicia del seguro en caso de accidente</li><li>Posibles daños al vehículo o equipamiento</li><li>Limpieza extra si el vehículo se devuelve muy sucio</li><li>Combustible si no se devuelve con el depósito lleno</li></ul>
-    <p>El importe de la fianza es de <strong>1.500€</strong> y se retiene en tu tarjeta de crédito.</p>
+    <p>El importe de la fianza es de <strong>1.000€</strong> y se abona por transferencia bancaria 72 horas antes del inicio. Se retiene como garantía y se devuelve tras la inspección del vehículo.</p>
     <p>Si todo está correcto a la devolución, la fianza se libera en un plazo de 7-14 días hábiles.</p>`,
     category:"Seguro y fianza",
     related: ["pago-fianza","devolucion-fianza","condiciones-devolucion"]
@@ -142,9 +143,13 @@ export default async function FaqDetailPage({ params }: { params: Promise<{ slug
   const faq = faqs[slug];
   if (!faq) notFound();
 
+  const alternates = buildCanonicalAlternates(`/faqs/${slug}`, "en");
+  const canonicalUrl = alternates.canonical;
+
   return (
     <>
-<main className="min-h-screen bg-gray-50">
+      <FaqDetailJsonLd question={faq.question} answer={faq.answer} url={canonicalUrl} />
+      <main className="min-h-screen bg-gray-50">
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-4">
             <LocalizedLink href="/faqs" className="inline-flex items-center gap-2 text-gray-600 hover:text-furgocasa-orange"><ArrowLeft className="h-4 w-4" />Volver a FAQs</LocalizedLink>

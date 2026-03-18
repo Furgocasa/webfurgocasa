@@ -1,35 +1,40 @@
 import type { LocationData } from "@/lib/locations/server-actions";
+import { COMPANY } from "@/lib/company";
+import { getTranslatedRoute } from "@/lib/route-translations";
+import type { Locale } from "@/lib/i18n/config";
 
 interface LocalBusinessJsonLdProps {
   location: LocationData;
+  locale?: Locale;
 }
 
-export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
-  // ✅ CORRECTO según Google: LocalBusiness con sede real en Murcia
-  // y "areaServed" indicando que sirve a otras ciudades
+export function LocalBusinessJsonLd({ location, locale = "es" }: LocalBusinessJsonLdProps) {
+  const basePath = getTranslatedRoute("/alquiler-autocaravanas-campervans", locale);
+  const pageUrl = `${COMPANY.website}${basePath}/${location.slug}`;
+  const travelMinutes = (location as { travel_time_minutes?: number }).travel_time_minutes;
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
     "name": "Furgocasa",
     "alternateName": `Furgocasa - Alquiler de Campers cerca de ${location.name}`,
     "description": `Empresa de alquiler de autocaravanas y campers con sede en Murcia. Servimos a clientes de ${location.name} y toda ${location.region}. Flota premium con kilómetros ilimitados.`,
-    "url": `https://www.furgocasa.com/alquiler-autocaravanas-campervans-${location.slug}`,
-    "telephone": "+34868364161",
-    "email": "info@furgocasa.com",
-    "priceRange": "95€ - 155€",
-    // ⚠️ IMPORTANTE: La dirección es la REAL (Murcia), no la ciudad de la landing
+    "url": pageUrl,
+    "telephone": COMPANY.phone,
+    "email": COMPANY.email,
+    "priceRange": COMPANY.priceRange,
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Avenida Puente Tocinos, 4",
+      "streetAddress": COMPANY.address.street,
       "addressLocality": "Casillas",
       "addressRegion": "Murcia",
-      "postalCode": "30007",
-      "addressCountry": "ES"
+      "postalCode": COMPANY.address.postalCode,
+      "addressCountry": COMPANY.address.country
     },
     "geo": {
       "@type": "GeoCoordinates",
-      "latitude": "38.0265",
-      "longitude": "-1.1635"
+      "latitude": COMPANY.geo.latitude,
+      "longitude": COMPANY.geo.longitude
     },
     // ✅ "areaServed" indica las áreas que sirves DESDE tu ubicación
     "areaServed": [
@@ -62,14 +67,14 @@ export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-        "opens": "09:00",
-        "closes": "19:00"
+        "opens": COMPANY.openingHours.weekdays.opens,
+        "closes": COMPANY.openingHours.weekdays.closes
       },
       {
         "@type": "OpeningHoursSpecification",
         "dayOfWeek": "Saturday",
-        "opens": "09:00",
-        "closes": "14:00"
+        "opens": COMPANY.openingHours.saturday.opens,
+        "closes": COMPANY.openingHours.saturday.closes
       }
     ],
     "hasOfferCatalog": {
@@ -96,45 +101,29 @@ export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
     },
     "aggregateRating": {
       "@type": "AggregateRating",
-      "ratingValue": "4.9",
-      "reviewCount": "500",
-      "bestRating": "5",
-      "worstRating": "1"
+      "ratingValue": COMPANY.aggregateRating.ratingValue,
+      "reviewCount": COMPANY.aggregateRating.reviewCount,
+      "bestRating": COMPANY.aggregateRating.bestRating,
+      "worstRating": COMPANY.aggregateRating.worstRating
     },
     "image": [
-      location.hero_image || "https://www.furgocasa.com/images/slides/hero-01.webp",
-      "https://www.furgocasa.com/logo.png"
+      location.hero_image || `${COMPANY.website}/images/slides/hero-01.webp`,
+      `${COMPANY.website}/logo.png`
     ],
-    "logo": "https://www.furgocasa.com/logo.png",
-    "sameAs": [
-      "https://www.facebook.com/furgocasa",
-      "https://www.instagram.com/furgocasa"
-    ]
+    "logo": `${COMPANY.website}/logo.png`,
+    "sameAs": COMPANY.sameAs
   };
 
   // Breadcrumb específico de la localización
+  const homeUrl = `${COMPANY.website}${locale === "es" ? "/es" : `/${locale}`}`;
+  const vehiclesPath = getTranslatedRoute("/vehiculos", locale);
   const breadcrumbJsonLd = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Inicio",
-        "item": "https://www.furgocasa.com"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Alquiler Camper",
-        "item": "https://www.furgocasa.com/vehiculos"
-      },
-      {
-        "@type": "ListItem",
-        "position": 3,
-        "name": `Alquiler Camper ${location.name}`,
-        "item": `https://www.furgocasa.com/alquiler-autocaravanas-campervans-${location.slug}`
-      }
+      { "@type": "ListItem", "position": 1, "name": "Inicio", "item": homeUrl },
+      { "@type": "ListItem", "position": 2, "name": "Alquiler Camper", "item": `${COMPANY.website}${vehiclesPath}` },
+      { "@type": "ListItem", "position": 3, "name": `Alquiler Camper ${location.name}`, "item": pageUrl }
     ]
   };
 
@@ -164,8 +153,8 @@ export function LocalBusinessJsonLd({ location }: LocalBusinessJsonLdProps) {
         "name": `¿Cuánto se tarda desde ${location.name} hasta vuestra sede?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": location.distance_km && location.drive_time_minutes 
-            ? `Nuestra sede en Murcia está a ${location.distance_km} km, aproximadamente ${Math.round(location.drive_time_minutes / 60)} hora en coche.`
+          "text": location.distance_km && travelMinutes
+            ? `Nuestra sede en Murcia está a ${location.distance_km} km, aproximadamente ${Math.round(travelMinutes / 60)} hora en coche.`
             : "Nuestra sede está en Murcia, muy cerca y de fácil acceso desde toda la región."
         }
       }

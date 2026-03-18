@@ -52,18 +52,19 @@ export function generateMultilingualMetadata(
   const baseUrl = 'https://www.furgocasa.com';
   const locales: Locale[] = ['es', 'en', 'fr', 'de'];
   
-  // Generar alternates para hreflang
+  // Generar alternates para hreflang (sin trailing slash para evitar 308)
   const languages: Record<string, string> = {};
+  const norm = (u: string) => u.endsWith('/') && u.length > baseUrl.length + 2 ? u.slice(0, -1) : u;
   locales.forEach((locale) => {
     const translatedPath = getTranslatedRoute(path, locale);
-    languages[locale] = `${baseUrl}${translatedPath}`;
+    languages[locale] = norm(`${baseUrl}${translatedPath}`);
   });
   
   // x-default apunta al español
-  languages['x-default'] = `${baseUrl}${getTranslatedRoute(path, 'es')}`;
+  languages['x-default'] = norm(`${baseUrl}${getTranslatedRoute(path, 'es')}`);
   
   const currentMetadata = metadata[currentLang];
-  const canonicalUrl = `${baseUrl}${getTranslatedRoute(path, currentLang)}`;
+  const canonicalUrl = norm(`${baseUrl}${getTranslatedRoute(path, currentLang)}`);
   
   return {
     title: truncateTitle(currentMetadata.title),
@@ -115,16 +116,17 @@ export function generateSimpleMultilingualMetadata(
   const baseUrl = 'https://www.furgocasa.com';
   const locales: Locale[] = ['es', 'en', 'fr', 'de'];
   
-  // Generar alternates para hreflang
+  // Generar alternates para hreflang (sin trailing slash para evitar 308)
   const languages: Record<string, string> = {};
+  const norm = (u: string) => u.endsWith('/') && u.length > baseUrl.length + 2 ? u.slice(0, -1) : u;
   locales.forEach((locale) => {
     const translatedPath = getTranslatedRoute(path, locale);
-    languages[locale] = `${baseUrl}${translatedPath}`;
+    languages[locale] = norm(`${baseUrl}${translatedPath}`);
   });
   
-  languages['x-default'] = `${baseUrl}${getTranslatedRoute(path, 'es')}`;
+  languages['x-default'] = norm(`${baseUrl}${getTranslatedRoute(path, 'es')}`);
   
-  const canonicalUrl = `${baseUrl}${getTranslatedRoute(path, currentLang)}`;
+  const canonicalUrl = norm(`${baseUrl}${getTranslatedRoute(path, currentLang)}`);
   
   return {
     title: truncateTitle(title),
@@ -164,6 +166,13 @@ export type BuildCanonicalOptions = {
   searchParams?: Record<string, string>;
 };
 
+/** Normaliza URL para hreflang: sin trailing slash (evita 308 en auditorías SEO) */
+function normalizeHreflangUrl(url: string): string {
+  return url.endsWith('/') && url.length > 'https://www.furgocasa.com'.length
+    ? url.slice(0, -1)
+    : url;
+}
+
 export function buildCanonicalAlternates(path: string, currentLang: Locale, options?: BuildCanonicalOptions) {
   // ⚠️ CRÍTICO: Usar SIEMPRE www.furgocasa.com como URL canónica base
   const baseUrl = 'https://www.furgocasa.com';
@@ -177,22 +186,23 @@ export function buildCanonicalAlternates(path: string, currentLang: Locale, opti
   const pathWithoutLocale = cleanPath.replace(/^\/(es|en|fr|de)/, '') || '/';
   
   // Generar alternates para hreflang (todas las versiones de idioma)
+  // ✅ Normalizar URLs sin trailing slash para evitar 308 en auditorías (trailingSlash: false)
   locales.forEach((locale) => {
     const translatedPath = getTranslatedRoute(pathWithoutLocale, locale);
-    languages[locale] = `${baseUrl}${translatedPath}`;
+    languages[locale] = normalizeHreflangUrl(`${baseUrl}${translatedPath}`);
   });
   
   // x-default siempre apunta a español
-  languages['x-default'] = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, 'es')}`;
+  languages['x-default'] = normalizeHreflangUrl(`${baseUrl}${getTranslatedRoute(pathWithoutLocale, 'es')}`);
 
   // Canonical: autorreferenciado a la URL exacta que ve el usuario
   let canonicalUrl: string;
   if (options?.useActualPath) {
     const pathWithLeadingSlash = pathWithoutLocale.startsWith('/') ? pathWithoutLocale : `/${pathWithoutLocale}`;
-    canonicalUrl = `${baseUrl}/${currentLang}${pathWithLeadingSlash}`;
+    canonicalUrl = normalizeHreflangUrl(`${baseUrl}/${currentLang}${pathWithLeadingSlash}`);
     languages[currentLang] = canonicalUrl;
   } else {
-    canonicalUrl = `${baseUrl}${getTranslatedRoute(pathWithoutLocale, currentLang)}`;
+    canonicalUrl = normalizeHreflangUrl(`${baseUrl}${getTranslatedRoute(pathWithoutLocale, currentLang)}`);
   }
 
   // Incluir searchParams en canonical para que coincida con la URL (evita canonical mismatch en auditorías)
@@ -267,16 +277,17 @@ export function buildBlogCanonicalAlternates(
   };
 
   const languages: Record<string, string> = {};
+  const normalizeUrl = (u: string) => u.endsWith('/') && u.length > baseUrl.length + 2 ? u.slice(0, -1) : u;
   availableLocales.forEach((locale) => {
     const translatedCategory = translateCategorySlug(categorySlug, locale);
     const slug = getSlugForLocale(locale);
-    languages[locale] = `${baseUrl}/${locale}/blog/${translatedCategory}/${slug}`;
+    languages[locale] = normalizeUrl(`${baseUrl}/${locale}/blog/${translatedCategory}/${slug}`);
   });
-  languages['x-default'] = `${baseUrl}/es/blog/${categorySlug}/${post.slug}`;
+  languages['x-default'] = normalizeUrl(`${baseUrl}/es/blog/${categorySlug}/${post.slug}`);
 
   const currentSlug = getSlugForLocale(currentLang);
   const currentCategory = translateCategorySlug(categorySlug, currentLang);
-  const canonicalUrl = `${baseUrl}/${currentLang}/blog/${currentCategory}/${currentSlug}`;
+  const canonicalUrl = normalizeUrl(`${baseUrl}/${currentLang}/blog/${currentCategory}/${currentSlug}`);
 
   return {
     canonical: canonicalUrl,

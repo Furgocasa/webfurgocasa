@@ -71,6 +71,17 @@ export function TarifasClient() {
         </div>
       </section>
 
+      {/* Bloque respuesta breve - precios y condiciones */}
+      <section className="py-8 bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+              <strong>{t("Tarifas Furgocasa:")}</strong> {t("Precios desde 95€/día (temporada baja), 125€/día (media), 155€/día (alta).")} {t("Descuentos de hasta -10%, -20% y -30% en alquileres de 1, 2 o 3 semanas.")} {t("Incluido: kilómetros ilimitados en España, seguro, segundo conductor, kit cocina y camping.")} {t("Fianza: 1.000€. Pago: 50% al reservar, 50% 15 días antes.")} {t("Cancelación gratuita hasta 60 días antes.")}
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Tabla de Tarifas - Modernizado */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">

@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Tarifas y Precios de Alquiler de Campers 2026"),
-    description: t("Consulta las tarifas de alquiler de campers y autocaravanas en Furgocasa. Precios desde 95€/día según temporada. Descuentos por larga estancia y kilómetros ilimitados incluidos."),
+    description: t("Precios alquiler camper Furgocasa: 95€/día (baja), 125€/día (media), 155€/día (alta). Descuentos -10%, -20%, -30% en 1, 2 o 3 semanas. Incluye kilómetros ilimitados, seguro, kit cocina. Fianza 1.000€. Cancelación gratis hasta 60 días antes."),
     keywords: "tarifas alquiler camper, precios autocaravana, alquiler camper murcia precios, tarifas furgocasa, coste alquiler autocaravana",
     openGraph: {
       title: t("Tarifas y Precios de Alquiler de Campers"),

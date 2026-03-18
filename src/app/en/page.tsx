@@ -112,9 +112,6 @@ export async function generateMetadata(): Promise<Metadata> {
         'max-snippet': -1,
       },
     },
-    verification: {
-      google: 'tu-codigo-de-verificacion-aqui',
-    },
   };
 }
 
@@ -191,32 +188,33 @@ export default async function LocaleHomePage() {
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
-              Furgocasa Campervans
+              {t("Best Motorhomes and Campervans for Rent")}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
-              {t("Tu hotel")}
+            <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
+              {t("Furgocasa: premium fleet from 95€/day with unlimited kilometres")}
             </p>
             
-            <div className="flex items-center justify-center gap-1" style={{ marginBottom: '0.5rem' }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-yellow-400 text-3xl md:text-4xl">★</span>
-              ))}
-            </div>
-            
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-6" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-              {t("sobre ruedas")}
-            </p>
-            
-            <p className="text-sm md:text-base lg:text-lg text-white/85 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-              {t("Las mejores furgonetas campers de gran volumen en alquiler")}
+            <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+              {t("Dreamer, Knaus, Weinsberg. Spain and Europe.")}
             </p>
           </div>
 
           <div className="max-w-5xl mx-auto mt-10">
             <SearchWidget />
+          </div>
+        </div>
+      </section>
+
+      {/* Bloque respuesta breve - optimizado para IA y búsquedas */}
+      <section className="py-8 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+              <strong>{t("What is Furgocasa?")}</strong> {t("Furgocasa is a motorhome and campervan rental company in Murcia, Spain.")} {t("We offer a premium fleet of Dreamer, Knaus and Weinsberg vehicles with unlimited kilometres in Spain, from 95€/day depending on season.")} {t("Pick-up and drop-off in Casillas, Murcia. Deposit: €1,000. Phone: 868 36 41 61.")}
+            </p>
           </div>
         </div>
       </section>
