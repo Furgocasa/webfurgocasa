@@ -76,7 +76,7 @@ export default async function LocaleQuienesSomosPage() {
 
   return (
     <>
-      <AboutPageJsonLd />
+      <AboutPageJsonLd locale={locale} />
       <main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-24 relative overflow-hidden">
@@ -98,7 +98,7 @@ export default async function LocaleQuienesSomosPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                <strong>{t("¿Quiénes somos?")}</strong> {t("Furgocasa es una empresa familiar de alquiler de autocaravanas en Murcia desde")} {COMPANY.foundingDate}. {t("Más de 500 viajes realizados. Flota premium con kilómetros ilimitados, precios desde 95€/día. Recogida en Casillas, Murcia. Teléfono:")} {COMPANY.phoneDisplay}.
+                <strong>{t("¿Quiénes somos?")}</strong> {t("Furgocasa es una empresa familiar de alquiler de autocaravanas en Murcia desde")} {COMPANY.foundingDate}. {t("Más de 500 viajes realizados. Flota premium con kilómetros ilimitados, precios desde 95€/día. Recogida en")} {COMPANY.rentalPolicy.pickupLocationsLabel}. {t("Teléfono:")} {COMPANY.phoneDisplay}.
               </p>
             </div>
           </div>

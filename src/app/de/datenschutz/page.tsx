@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
+import { COMPANY } from "@/lib/company";
 
 interface PageProps {}
 
@@ -51,11 +52,10 @@ export default async function LocalePrivacidadPage({ params }: PageProps) {
 
               <h2>1. Verantwortlicher für die Verarbeitung</h2>
               <ul>
-                <li><strong>Identität:</strong> FURGOCASA S.L.</li>
-                <li><strong>CIF:</strong> B-XXXXXXXX</li>
-                <li><strong>Adresse:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
-                <li><strong>E-Mail:</strong> privacidad@furgocasa.com</li>
-                <li><strong>Telefon:</strong> +34 868 36 41 61</li>
+                <li><strong>Identität:</strong> {COMPANY.legalName}</li>
+                <li><strong>Adresse:</strong> {COMPANY.address.street} - {COMPANY.address.postalCode} {COMPANY.address.locality}</li>
+                <li><strong>E-Mail:</strong> {COMPANY.email}</li>
+                <li><strong>Telefon:</strong> {COMPANY.phoneDisplayFull}</li>
               </ul>
 
               <h2>2. Personenbezogene Daten, die wir verarbeiten</h2>
@@ -116,7 +116,7 @@ export default async function LocalePrivacidadPage({ params }: PageProps) {
                 <li><strong>Datenübertragbarkeit:</strong> Ihre Daten in strukturiertem Format zu erhalten</li>
                 <li><strong>Widerspruch:</strong> der Verarbeitung Ihrer Daten zu widersprechen</li>
               </ul>
-              <p>Um diese Rechte auszuüben, können Sie uns unter privacidad@furgocasa.com kontaktieren und eine Kopie Ihres Ausweises beifügen.</p>
+              <p>Um diese Rechte auszuüben, können Sie uns unter {COMPANY.email} kontaktieren und eine Kopie Ihres Ausweises beifügen.</p>
 
               <h2>8. Cookies</h2>
               <p>Diese Website verwendet eigene und Drittanbieter-Cookies. Weitere Informationen finden Sie in unserer Cookie-Richtlinie.</p>

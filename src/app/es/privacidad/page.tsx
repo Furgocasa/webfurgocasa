@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
+import { COMPANY } from "@/lib/company";
 
 interface PageProps {}
 
@@ -51,11 +52,10 @@ export default async function LocalePrivacidadPage({ params }: PageProps) {
 
               <h2>1. Responsable del tratamiento</h2>
               <ul>
-                <li><strong>Identidad:</strong> FURGOCASA S.L.</li>
-                <li><strong>CIF:</strong> B-XXXXXXXX</li>
-                <li><strong>Dirección:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
-                <li><strong>Correo electrónico:</strong> privacidad@furgocasa.com</li>
-                <li><strong>Teléfono:</strong> +34 868 36 41 61</li>
+                <li><strong>Identidad:</strong> {COMPANY.legalName}</li>
+                <li><strong>Dirección:</strong> {COMPANY.address.street} - {COMPANY.address.postalCode} {COMPANY.address.locality}</li>
+                <li><strong>Correo electrónico:</strong> {COMPANY.email}</li>
+                <li><strong>Teléfono:</strong> {COMPANY.phoneDisplayFull}</li>
               </ul>
 
               <h2>2. Datos personales que tratamos</h2>
@@ -116,7 +116,7 @@ export default async function LocalePrivacidadPage({ params }: PageProps) {
                 <li><strong>Portabilidad:</strong> recibir sus datos en formato estructurado</li>
                 <li><strong>Oposición:</strong> oponerse al tratamiento de sus datos</li>
               </ul>
-              <p>Para ejercer estos derechos, puede contactar con nosotros en privacidad@furgocasa.com adjuntando copia de su DNI.</p>
+              <p>Para ejercer estos derechos, puede contactar con nosotros en {COMPANY.email} adjuntando copia de su DNI.</p>
 
               <h2>8. Cookies</h2>
               <p>Este sitio web utiliza cookies propias y de terceros. Puede consultar nuestra política de cookies para más información.</p>

@@ -47,6 +47,51 @@ export const COMPANY = {
   /** Fianza en euros - valor canónico */
   depositAmount: 1000,
 
+  rentalPolicy: {
+    dailyRateFrom: {
+      lowSeason: 95,
+      midSeason: 125,
+      highSeason: 155,
+    },
+    durationDiscounts: {
+      oneWeek: '-10%',
+      twoWeeks: '-20%',
+      threeWeeks: '-30%',
+    },
+    bookingPayment: {
+      reservationPercent: 50,
+      remainingBalanceDaysBeforePickup: 15,
+    },
+    cancellation: {
+      freeUntilDaysBeforePickup: 60,
+    },
+    deposit: {
+      paymentMethod: 'transferencia bancaria',
+      paymentDeadlineHoursBeforePickup: 72,
+      refundWindowBusinessDays: '7-14 días hábiles',
+    },
+    officeHoursLabel: 'Lunes a Viernes 09:00 - 19:00, Sábados 09:00 - 14:00',
+    pickupWindowLabel: '10:00 - 13:00 o 17:00 - 19:00',
+    dropoffWindowLabel: 'antes de las 10:00',
+    unlimitedKilometersArea: 'España',
+    pickupLocations: ['Murcia', 'Madrid'],
+    pickupLocationsLabel: 'Murcia o Madrid, según la opción confirmada en la reserva',
+    headquartersLabel: 'Casillas - Murcia',
+    included: [
+      'kilómetros ilimitados en España',
+      'seguro a todo riesgo con franquicia',
+      'asistencia en carretera 24h',
+      'segundo conductor',
+      'kit de cocina',
+      'kit de camping',
+      'gas y pastillas para el WC químico',
+    ],
+    paidExtras: [
+      'sábanas y almohadas',
+      'toallas de baño',
+    ],
+  },
+
   /** Rango de precios para schema */
   priceRange: '95€ - 155€',
 

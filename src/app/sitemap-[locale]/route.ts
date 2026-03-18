@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { getTranslatedRoute } from '@/lib/route-translations';
 import { translateCategorySlug } from '@/lib/blog-translations';
 import { i18n, type Locale } from '@/lib/i18n/config';
+import { buildSitemapXml, getBaseSitemapEntries } from '@/lib/seo/sitemap';
 
 /**
  * SITEMAP POR IDIOMA - MEJOR PRÁCTICA MULTIIDIOMA
@@ -59,6 +60,15 @@ export async function GET(
   }
 
   const currentLocale = locale as Locale;
+  const entries = await getBaseSitemapEntries();
+  const canonicalXml = buildSitemapXml(entries, currentLocale);
+
+  return new NextResponse(canonicalXml, {
+    headers: {
+      'Content-Type': 'application/xml; charset=utf-8',
+    },
+  });
+
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!

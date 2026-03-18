@@ -7,6 +7,8 @@ type SitemapEntry = {
   lastModified?: string | Date;
   changeFrequency?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
   priority?: number;
+  locales?: Locale[];
+  alternateLocales?: Array<Locale | 'x-default'>;
 };
 
 type CategoryRow = { slug: string; name?: string | null };
@@ -59,9 +61,14 @@ export function buildAlternateLinks(path: string) {
 }
 
 export function buildSitemapXml(entries: SitemapEntry[], locale: Locale) {
-  const urls = entries.map((entry) => {
+  const urls = entries
+    .filter((entry) => !entry.locales || entry.locales.includes(locale))
+    .map((entry) => {
     const loc = buildLocalizedUrl(entry.path, locale);
-    const alternates = buildAlternateLinks(entry.path)
+    const allowedAlternates = entry.alternateLocales
+      ? buildAlternateLinks(entry.path).filter((alt) => entry.alternateLocales!.includes(alt.locale))
+      : buildAlternateLinks(entry.path);
+    const alternates = allowedAlternates
       .map((alt) => `    <xhtml:link rel="alternate" hreflang="${alt.locale}" href="${escapeXml(alt.url)}" />`)
       .join('\n');
 
@@ -79,7 +86,8 @@ export function buildSitemapXml(entries: SitemapEntry[], locale: Locale) {
       changefreq + priority,
       '  </url>',
     ].filter(Boolean).join('\n');
-  }).join('\n');
+  })
+    .join('\n');
 
   return [
     '<?xml version="1.0" encoding="UTF-8"?>',
@@ -192,7 +200,6 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/tarifas', priority: 0.8, changeFrequency: 'monthly' },
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
-    { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },
@@ -236,6 +243,8 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
       priority: 0.4,
       changeFrequency: 'monthly',
       lastModified: now,
+      locales: ['es'],
+      alternateLocales: ['es', 'x-default'],
     });
   });
 

@@ -177,7 +177,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: '/alquiler-motorhome-espana', priority: 0.9, changeFrequency: 'monthly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
     // /como-funciona → 301 a /guia-camper (excluido del sitemap)
-    { path: '/documentacion-alquiler', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/autocaravanas', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
@@ -217,9 +216,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Páginas de FAQ
   faqPages.forEach((slug) => {
-    addEntry(`/faqs/${slug}`, {
-      priority: 0.4,
+    entries.push({
+      url: `${baseUrl}/es/faqs/${slug}`,
+      lastModified: now,
       changeFrequency: 'monthly',
+      priority: 0.4,
+      alternates: {
+        languages: {
+          es: `${baseUrl}/es/faqs/${slug}`,
+          'x-default': `${baseUrl}/es/faqs/${slug}`,
+        },
+      },
     });
   });
 

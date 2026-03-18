@@ -67,7 +67,7 @@ export default async function ESContactoPage() {
   
   return (
     <>
-      <ContactPageJsonLd />
+      <ContactPageJsonLd locale={locale} />
       <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16 md:py-20 relative overflow-hidden">

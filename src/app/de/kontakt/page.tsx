@@ -28,14 +28,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
-    title: `${t("Contacto")} - ${t("Reservas y Alquiler de Campers")} | Furgocasa`,
-    description: t("Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com. Lunes a Viernes 09:00-18:00."),
+    title: "Kontakt & Reservierungen - Wohnmobilvermietung | Furgocasa",
+    description: "Kontaktieren Sie Furgocasa für Ihre Wohnmobilmiete. Hauptbasis in Murcia und Unterstützung für Abholungen in Murcia oder Madrid.",
     keywords: "kontakt furgocasa, telefon furgocasa murcia, email furgocasa, adresse furgocasa, öffnungszeiten furgocasa, wohnmobil miete murcia kontakt",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-      title: `${t("Contacto")} - ${t("Reservas y Alquiler de Campers")} | Furgocasa`,
-      description: t("Contáctanos para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61."),
+      title: "Kontakt & Reservierungen - Wohnmobilvermietung | Furgocasa",
+      description: "Kontaktieren Sie Furgocasa für Wohnmobilmiete und Reservierungsunterstützung in Spanien.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -43,8 +43,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary",
-      title: `${t("Contacto")} - ${t("Reservas y Alquiler de Campers")} | Furgocasa`,
-      description: "Teléfono: 868 36 41 61 | Email: info@furgocasa.com",
+      title: "Kontakt & Reservierungen - Wohnmobilvermietung | Furgocasa",
+      description: "Telefon: 868 36 41 61 | E-Mail: info@furgocasa.com",
     },
     alternates,
     robots: {
@@ -67,7 +67,7 @@ export default async function ESContactoPage() {
   
   return (
     <>
-      <ContactPageJsonLd />
+      <ContactPageJsonLd locale={locale} />
       <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16 md:py-20 relative overflow-hidden">
@@ -76,10 +76,10 @@ export default async function ESContactoPage() {
           }}></div>
           <div className="container mx-auto px-4 text-center relative z-10">
             <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6">
-              {t("Contacta con nosotros")}
+              Kontaktieren Sie uns
             </h1>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">
-              {t("Estamos aquí para ayudarte a planificar tu aventura perfecta")}
+              Wir helfen bei Buchung, Unterlagen und Abholung
             </p>
           </div>
         </section>
@@ -89,7 +89,7 @@ export default async function ESContactoPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                <strong>{t("Contacto Furgocasa:")}</strong> {t("Teléfono")} {COMPANY.phoneDisplay} ({COMPANY.phoneDisplayFull}). {t("Email")}: {COMPANY.email}. {t("Dirección")}: {COMPANY.address.street}, {COMPANY.address.locality}, {COMPANY.address.postalCode} {COMPANY.address.region}. {t("Horario")}: {t("Lunes a Viernes")} {COMPANY.openingHoursDisplay.weekdays}, {t("Sábados")} {COMPANY.openingHoursDisplay.saturday}.
+                <strong>Furgocasa Kontakt:</strong> Telefon {COMPANY.phoneDisplay} ({COMPANY.phoneDisplayFull}). E-Mail: {COMPANY.email}. Hauptbasis: {COMPANY.address.street}, {COMPANY.address.locality}, {COMPANY.address.postalCode} {COMPANY.address.region}. Öffnungszeiten: Montag bis Freitag {COMPANY.openingHoursDisplay.weekdays}, Samstag {COMPANY.openingHoursDisplay.saturday}. Abholoptionen: {COMPANY.rentalPolicy.pickupLocationsLabel}.
               </p>
             </div>
           </div>

@@ -3,6 +3,7 @@
 import { ChevronDown, HelpCircle, Search } from "lucide-react";
 import { useState } from "react";
 import { useLanguage } from "@/contexts/language-context";
+import { COMPANY } from "@/lib/company";
 
 export function FaqsClient() {
   const { t } = useLanguage();
@@ -232,7 +233,7 @@ export function FaqsClient() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              <strong>{t("Preguntas frecuentes alquiler camper Furgocasa:")}</strong> {t("Requisitos: carnet B con 2 años, edad mínima 25 años. Fianza: 1.000€. Precios desde 95€/día según temporada. Kilómetros ilimitados en España. Recogida en Casillas, Murcia. Horarios: 10:00-13:00 o 17:00-19:00, devolución antes de 10:00. Teléfono: 868 36 41 61.")}
+              <strong>{t("Preguntas frecuentes alquiler camper Furgocasa:")}</strong> {t("Requisitos: carnet B con 2 años, edad mínima 25 años.")} {t("Fianza:")} {COMPANY.depositAmount.toLocaleString("es-ES")}€. {t("Precios desde")} {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/día {t("según temporada.")} {t("Kilómetros ilimitados en")} {COMPANY.rentalPolicy.unlimitedKilometersArea}. {t("Recogida en")} {COMPANY.rentalPolicy.pickupLocationsLabel}. {t("Horarios:")} {COMPANY.rentalPolicy.pickupWindowLabel}, {t("devolución")} {COMPANY.rentalPolicy.dropoffWindowLabel}. {t("Teléfono:")} {COMPANY.phoneDisplay}.
             </p>
           </div>
         </div>

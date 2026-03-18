@@ -25,6 +25,7 @@ import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/h
 import { getTranslatedRecords } from "@/lib/translations/get-translations";
 import { ExtrasSection } from "@/components/pricing/extras-section";
 import Image from "next/image";
+import { COMPANY } from "@/lib/company";
 
 /**
  * 🎯 HOME ESPAÑOL - /es
@@ -166,9 +167,9 @@ export default async function LocaleHomePage() {
 
   return (
     <>
-      <OrganizationJsonLd />
-      <ProductJsonLd vehicles={featuredVehicles} />
-      <WebsiteJsonLd />
+      <OrganizationJsonLd locale={locale} />
+      <ProductJsonLd vehicles={featuredVehicles} locale={locale} />
+      <WebsiteJsonLd locale={locale} />
       
       {/* Hero Section con Slider */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center">
@@ -213,7 +214,7 @@ export default async function LocaleHomePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              <strong>{t("¿Qué es Furgocasa?")}</strong> {t("Furgocasa es una empresa de alquiler de autocaravanas y campers en Murcia (España).")} {t("Ofrecemos flota premium de marcas Dreamer, Knaus y Weinsberg con kilómetros ilimitados en España, desde 95€/día según temporada.")} {t("Recogida y devolución en Casillas, Murcia. Fianza: 1.000€. Teléfono: 868 36 41 61.")}
+              <strong>Qu'est-ce que Furgocasa ?</strong> Furgocasa est une entreprise de location de camping-cars basée à Murcie, en Espagne. Nous proposons une flotte premium Dreamer, Knaus et Weinsberg avec kilométrage illimité en Espagne, à partir de {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/jour selon la saison. Départ et retour : {COMPANY.rentalPolicy.pickupLocationsLabel}. Caution : {COMPANY.depositAmount.toLocaleString("fr-FR")}€. Téléphone : {COMPANY.phoneDisplay}.
             </p>
           </div>
         </div>

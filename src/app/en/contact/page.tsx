@@ -29,13 +29,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "Contact & Reservations - Motorhome Rental | Furgocasa",
-    description: t("Contacta con Furgocasa para alquilar tu autocaravana en Murcia. Sede en Casillas, Murcia. Teléfono: 868 36 41 61. Email: info@furgocasa.com. Lunes a Viernes 09:00-18:00."),
+    description: "Contact Furgocasa for campervan and motorhome rental. Main base in Murcia, support for bookings and pick-up options in Murcia or Madrid.",
     keywords: "contact furgocasa, furgocasa phone murcia, furgocasa email, furgocasa address, furgocasa hours, motorhome rental murcia contact",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "Contact & Reservations - Motorhome Rental | Furgocasa",
-      description: t("Contáctanos para alquilar tu autocaravana en Murcia. Teléfono: 868 36 41 61."),
+      description: "Contact Furgocasa for motorhome rental and booking support in Spain.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary",
       title: "Contact & Reservations - Motorhome Rental | Furgocasa",
-      description: "Teléfono: 868 36 41 61 | Email: info@furgocasa.com",
+      description: "Phone: 868 36 41 61 | Email: info@furgocasa.com",
     },
     alternates,
     robots: {
@@ -67,7 +67,7 @@ export default async function ESContactoPage() {
   
   return (
     <>
-      <ContactPageJsonLd />
+      <ContactPageJsonLd locale={locale} />
       <main className="min-h-screen bg-gray-50">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-16 md:py-20 relative overflow-hidden">
@@ -76,10 +76,10 @@ export default async function ESContactoPage() {
           }}></div>
           <div className="container mx-auto px-4 text-center relative z-10">
             <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6">
-              {t("Contacta con nosotros")}
+              Contact us
             </h1>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">
-              {t("Estamos aquí para ayudarte a planificar tu aventura perfecta")}
+              We help you with bookings, documentation and pick-up details
             </p>
           </div>
         </section>
@@ -89,7 +89,7 @@ export default async function ESContactoPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                <strong>{t("Contacto Furgocasa:")}</strong> {t("Teléfono")} {COMPANY.phoneDisplay} ({COMPANY.phoneDisplayFull}). {t("Email")}: {COMPANY.email}. {t("Dirección")}: {COMPANY.address.street}, {COMPANY.address.locality}, {COMPANY.address.postalCode} {COMPANY.address.region}. {t("Horario")}: {t("Lunes a Viernes")} {COMPANY.openingHoursDisplay.weekdays}, {t("Sábados")} {COMPANY.openingHoursDisplay.saturday}.
+                <strong>Furgocasa contact:</strong> Phone {COMPANY.phoneDisplay} ({COMPANY.phoneDisplayFull}). Email: {COMPANY.email}. Main base: {COMPANY.address.street}, {COMPANY.address.locality}, {COMPANY.address.postalCode} {COMPANY.address.region}. Office hours: Monday to Friday {COMPANY.openingHoursDisplay.weekdays}, Saturday {COMPANY.openingHoursDisplay.saturday}. Pick-up options: {COMPANY.rentalPolicy.pickupLocationsLabel}.
               </p>
             </div>
           </div>

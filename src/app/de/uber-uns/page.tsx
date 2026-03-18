@@ -35,14 +35,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   return {
-    title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-    description: t("Furgocasa es una empresa familiar nacida de la pasión por el mundo camper. Desde 2012, ofrecemos alquiler de autocaravanas premium en Murcia con más de 500 viajes realizados."),
+    title: "Über uns - Furgocasa entdecken",
+    description: "Furgocasa ist ein familiengeführter Wohnmobilvermieter in Murcia seit 2012, mit mehr als 500 realisierten Reisen.",
     keywords: "über furgocasa, wohnmobil miete unternehmen murcia, furgocasa geschichte, furgocasa familie, wohnmobile murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
-      title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-      description: t("Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2012."),
+      title: "Über uns - Furgocasa entdecken",
+      description: "Lernen Sie Furgocasa kennen, ein familiengeführtes Wohnmobilvermietungsunternehmen in Murcia seit 2012.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -50,8 +50,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-      description: t("Empresa familiar de alquiler de autocaravanas en Murcia desde 2012."),
+      title: "Über uns - Furgocasa entdecken",
+      description: "Familiengeführte Wohnmobilvermietung in Murcia seit 2012.",
     },
     alternates,
     robots: {
@@ -76,7 +76,7 @@ export default async function LocaleQuienesSomosPage() {
 
   return (
     <>
-      <AboutPageJsonLd />
+      <AboutPageJsonLd locale={locale} />
       <main className="min-h-screen bg-gray-50 font-amiko">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 py-24 relative overflow-hidden">
@@ -85,10 +85,10 @@ export default async function LocaleQuienesSomosPage() {
           }}></div>
           <div className="container mx-auto px-4 text-center relative z-10">
             <h1 className="text-4xl md:text-6xl font-heading font-bold text-white mb-6">
-              {t("Sobre Furgocasa")}
+              Über Furgocasa
             </h1>
             <p className="text-xl text-blue-100 max-w-2xl mx-auto font-light leading-relaxed">
-              {t("Pasión por viajar, libertad para explorar")}
+              Familienbetrieb, Premium-Flotte und echte Reisebegleitung
             </p>
           </div>
         </section>
@@ -98,7 +98,7 @@ export default async function LocaleQuienesSomosPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                <strong>{t("¿Quiénes somos?")}</strong> {t("Furgocasa es una empresa familiar de alquiler de autocaravanas en Murcia desde")} {COMPANY.foundingDate}. {t("Más de 500 viajes realizados. Flota premium con kilómetros ilimitados, precios desde 95€/día. Recogida en Casillas, Murcia. Teléfono:")} {COMPANY.phoneDisplay}.
+                <strong>Wer sind wir?</strong> Furgocasa ist ein familiengeführter Wohnmobilvermieter in Murcia seit {COMPANY.foundingDate}. Mehr als 500 durchgeführte Reisen. Premium-Flotte mit unbegrenzten Kilometern in Spanien, Preise ab {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/Tag und Abholung in {COMPANY.rentalPolicy.pickupLocationsLabel}. Telefon: {COMPANY.phoneDisplay}.
               </p>
             </div>
           </div>

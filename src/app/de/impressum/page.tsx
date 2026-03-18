@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
+import { COMPANY } from "@/lib/company";
 
 interface PageProps {}
 
@@ -51,12 +52,11 @@ export default async function LocaleAvisoLegalPage({ params }: PageProps) {
               <h2>1. Identifikationsdaten</h2>
               <p>In Erfüllung der Informationspflicht gemäß Artikel 10 des Gesetzes 34/2002 vom 11. Juli über Dienste der Informationsgesellschaft und elektronischen Handel werden nachstehend folgende Daten angegeben:</p>
               <ul>
-                <li><strong>Firmenname:</strong> FURGOCASA S.L.</li>
-                <li><strong>CIF:</strong> B-XXXXXXXX</li>
-                <li><strong>Geschäftssitz:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
-                <li><strong>E-Mail:</strong> info@furgocasa.com</li>
-                <li><strong>Telefon:</strong> +34 868 36 41 61</li>
-                <li><strong>Eintragung:</strong> Handelsregister von Murcia, Band XXX, Blatt XXX, Seite MU-XXXXX</li>
+                <li><strong>Firmenname:</strong> {COMPANY.legalName}</li>
+                <li><strong>Geschäftssitz:</strong> {COMPANY.address.street} - {COMPANY.address.postalCode} {COMPANY.address.locality}</li>
+                <li><strong>E-Mail:</strong> {COMPANY.email}</li>
+                <li><strong>Telefon:</strong> {COMPANY.phoneDisplayFull}</li>
+                <li><strong>Steuer- und Registerdaten:</strong> werden dem Kunden in den Vertragsunterlagen und auf formelle Anfrage per E-Mail mitgeteilt.</li>
               </ul>
 
               <h2>2. Zweck</h2>

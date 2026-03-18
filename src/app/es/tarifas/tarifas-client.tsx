@@ -6,6 +6,7 @@ import {
   User, Clock, RefreshCw, Lock, CreditCard, XCircle, Info, Download
 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { COMPANY } from "@/lib/company";
 import { SeasonsCalendar } from "@/components/seasons-calendar";
 
 const pricingTable = [
@@ -76,7 +77,7 @@ export function TarifasClient() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              <strong>{t("Tarifas Furgocasa:")}</strong> {t("Precios desde 95€/día (temporada baja), 125€/día (media), 155€/día (alta).")} {t("Descuentos de hasta -10%, -20% y -30% en alquileres de 1, 2 o 3 semanas.")} {t("Incluido: kilómetros ilimitados en España, seguro, segundo conductor, kit cocina y camping.")} {t("Fianza: 1.000€. Pago: 50% al reservar, 50% 15 días antes.")} {t("Cancelación gratuita hasta 60 días antes.")}
+              <strong>{t("Tarifas Furgocasa:")}</strong> {t("Precios desde")} {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/día {t("(temporada baja),")} {COMPANY.rentalPolicy.dailyRateFrom.midSeason}€/día {t("(media),")} {COMPANY.rentalPolicy.dailyRateFrom.highSeason}€/día {t("(alta).")} {t("Descuentos de hasta")} {COMPANY.rentalPolicy.durationDiscounts.oneWeek}, {COMPANY.rentalPolicy.durationDiscounts.twoWeeks} {t("y")} {COMPANY.rentalPolicy.durationDiscounts.threeWeeks} {t("en alquileres de 1, 2 o 3 semanas.")} {t("Incluido:")} {COMPANY.rentalPolicy.included[0]}, {t("seguro,")} {t("segundo conductor, kit cocina y camping.")} {t("Fianza:")} {COMPANY.depositAmount.toLocaleString("es-ES")}€. {t("Pago:")} {COMPANY.rentalPolicy.bookingPayment.reservationPercent}% {t("al reservar,")} {COMPANY.rentalPolicy.bookingPayment.reservationPercent}% {t("15 días antes.")} {t("Cancelación gratuita hasta")} {COMPANY.rentalPolicy.cancellation.freeUntilDaysBeforePickup} {t("días antes.")}
             </p>
           </div>
         </div>

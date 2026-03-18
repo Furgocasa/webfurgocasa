@@ -25,6 +25,7 @@ import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/h
 import { getTranslatedRecords } from "@/lib/translations/get-translations";
 import { ExtrasSection } from "@/components/pricing/extras-section";
 import Image from "next/image";
+import { COMPANY } from "@/lib/company";
 
 /**
  * 🎯 HOME ESPAÑOL - /es
@@ -166,9 +167,9 @@ export default async function LocaleHomePage() {
 
   return (
     <>
-      <OrganizationJsonLd />
-      <ProductJsonLd vehicles={featuredVehicles} />
-      <WebsiteJsonLd />
+      <OrganizationJsonLd locale={locale} />
+      <ProductJsonLd vehicles={featuredVehicles} locale={locale} />
+      <WebsiteJsonLd locale={locale} />
       
       {/* Hero Section con Slider */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center">
@@ -213,7 +214,7 @@ export default async function LocaleHomePage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              <strong>{t("What is Furgocasa?")}</strong> {t("Furgocasa is a motorhome and campervan rental company in Murcia, Spain.")} {t("We offer a premium fleet of Dreamer, Knaus and Weinsberg vehicles with unlimited kilometres in Spain, from 95€/day depending on season.")} {t("Pick-up and drop-off in Casillas, Murcia. Deposit: €1,000. Phone: 868 36 41 61.")}
+              <strong>What is Furgocasa?</strong> Furgocasa is a motorhome and campervan rental company based in Murcia, Spain. We offer a premium fleet of Dreamer, Knaus and Weinsberg vehicles with unlimited kilometres in Spain, from {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/day depending on season. Pick-up and drop-off: {COMPANY.rentalPolicy.pickupLocationsLabel}. Deposit: €{COMPANY.depositAmount.toLocaleString("en-US")}. Phone: {COMPANY.phoneDisplay}.
             </p>
           </div>
         </div>

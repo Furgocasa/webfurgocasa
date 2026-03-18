@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { i18n, type Locale, isValidLocale, getLocaleFromPathname } from './lib/i18n/config';
+import { i18n, type Locale, getLocaleFromPathname } from './lib/i18n/config';
 
 // ============================================
 // RATE LIMITING - Inline para Edge Runtime
@@ -259,20 +259,8 @@ export async function middleware(request: NextRequest) {
       return response;
       
     } else {
-      // ⚠️ URL sin locale - Redirigir con prefijo
-      const acceptLanguage = request.headers.get('accept-language');
-      let detectedLocale: Locale = i18n.defaultLocale;
-      
-      if (acceptLanguage) {
-        const locales = acceptLanguage.split(',').map(lang => lang.split(';')[0].trim().split('-')[0]);
-        const matchedLocale = locales.find(lang => isValidLocale(lang));
-        if (matchedLocale) {
-          detectedLocale = matchedLocale;
-        }
-      }
-      
-      // ✅ IMPORTANTE: Redirigir SIEMPRE con prefijo de locale
-      request.nextUrl.pathname = `/${detectedLocale}${pathname}`;
+      // ✅ Estrategia estable: toda URL sin locale canonicaliza a español.
+      request.nextUrl.pathname = `/${i18n.defaultLocale}${pathname}`;
       return NextResponse.redirect(request.nextUrl, { status: 301 });
     }
   }

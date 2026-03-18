@@ -1,14 +1,52 @@
 import { COMPANY } from "@/lib/company";
+import { getTranslatedRoute } from "@/lib/route-translations";
+import type { Locale } from "@/lib/i18n/config";
 
-export function OrganizationJsonLd() {
+const HOME_JSONLD_COPY: Record<Locale, { description: string; siteName: string; productCategory: string; audience: string; unlimitedKm: string; searchLabel: string }> = {
+  es: {
+    description: "Empresa especializada en alquiler de autocaravanas y campers de gran volumen en Murcia. Flota premium con kilómetros ilimitados.",
+    siteName: "Furgocasa - Alquiler de Autocaravanas",
+    productCategory: "Autocaravana",
+    audience: "Familias y viajeros",
+    unlimitedKm: "Ilimitados en España",
+    searchLabel: "buscar",
+  },
+  en: {
+    description: "Motorhome and campervan rental company based in Murcia with a premium fleet and unlimited kilometres in Spain.",
+    siteName: "Furgocasa - Motorhome Rental",
+    productCategory: "Motorhome",
+    audience: "Families and travellers",
+    unlimitedKm: "Unlimited in Spain",
+    searchLabel: "search",
+  },
+  fr: {
+    description: "Entreprise de location de camping-cars et vans à Murcie avec flotte premium et kilométrage illimité en Espagne.",
+    siteName: "Furgocasa - Location Camping-Car",
+    productCategory: "Camping-car",
+    audience: "Familles et voyageurs",
+    unlimitedKm: "Kilométrage illimité en Espagne",
+    searchLabel: "recherche",
+  },
+  de: {
+    description: "Wohnmobil- und Campervermietung in Murcia mit Premium-Flotte und unbegrenzten Kilometern in Spanien.",
+    siteName: "Furgocasa - Wohnmobilvermietung",
+    productCategory: "Wohnmobil",
+    audience: "Familien und Reisende",
+    unlimitedKm: "Unbegrenzt in Spanien",
+    searchLabel: "suche",
+  },
+};
+
+export function OrganizationJsonLd({ locale = "es" }: { locale?: Locale }) {
+  const copy = HOME_JSONLD_COPY[locale];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": ["Organization", "LocalBusiness"],
     "name": "Furgocasa",
     "legalName": COMPANY.legalName,
-    "url": COMPANY.website,
+    "url": `${COMPANY.website}${locale === "es" ? "/es" : `/${locale}`}`,
     "logo": `${COMPANY.website}/logo.png`,
-    "description": "Empresa especializada en alquiler de autocaravanas y campers de gran volumen en Murcia. Flota premium con kilómetros ilimitados.",
+    "description": copy.description,
     "foundingDate": COMPANY.foundingDate,
     "telephone": COMPANY.phone,
     "email": COMPANY.email,
@@ -76,16 +114,18 @@ interface Vehicle {
 
 interface ProductJsonLdProps {
   vehicles: Vehicle[];
+  locale?: Locale;
 }
 
-export function ProductJsonLd({ vehicles }: ProductJsonLdProps) {
+export function ProductJsonLd({ vehicles, locale = "es" }: ProductJsonLdProps) {
+  const copy = HOME_JSONLD_COPY[locale];
   const products = vehicles.map(vehicle => ({
     "@context": "https://schema.org",
     "@type": "Product",
     "name": `${vehicle.brand} ${vehicle.model} - ${vehicle.name}`,
-    "description": `Camper van de ${vehicle.passengers} plazas con ${vehicle.beds} plazas de noche. Equipada con cocina, baño, calefacción y todo lo necesario para tu aventura.`,
+    "description": `${vehicle.brand} ${vehicle.model} ${vehicle.name}. ${vehicle.passengers} plazas y ${vehicle.beds} camas. ${copy.description}`,
     "image": vehicle.main_image || `${COMPANY.website}/default-vehicle.jpg`,
-    "url": `${COMPANY.website}/es/vehiculos/${vehicle.slug}`,
+    "url": `${COMPANY.website}${getTranslatedRoute("/vehiculos", locale)}/${vehicle.slug}`,
     "brand": {
       "@type": "Brand",
       "name": vehicle.brand
@@ -106,24 +146,24 @@ export function ProductJsonLd({ vehicles }: ProductJsonLdProps) {
     "additionalProperty": [
       {
         "@type": "PropertyValue",
-        "name": "Plazas",
+        "name": locale === "en" ? "Seats" : locale === "fr" ? "Places" : locale === "de" ? "Sitzplätze" : "Plazas",
         "value": vehicle.passengers
       },
       {
         "@type": "PropertyValue",
-        "name": "Camas",
+        "name": locale === "en" ? "Beds" : locale === "fr" ? "Lits" : locale === "de" ? "Betten" : "Camas",
         "value": vehicle.beds
       },
       {
         "@type": "PropertyValue",
-        "name": "Kilómetros",
-        "value": "Ilimitados"
+        "name": locale === "en" ? "Mileage" : locale === "fr" ? "Kilométrage" : locale === "de" ? "Kilometer" : "Kilómetros",
+        "value": copy.unlimitedKm
       }
     ],
-    "category": "Autocaravana",
+    "category": copy.productCategory,
     "audience": {
       "@type": "PeopleAudience",
-      "audienceType": "Familias y viajeros"
+      "audienceType": copy.audience
     }
   }));
 
@@ -140,17 +180,18 @@ export function ProductJsonLd({ vehicles }: ProductJsonLdProps) {
   );
 }
 
-export function WebsiteJsonLd() {
+export function WebsiteJsonLd({ locale = "es" }: { locale?: Locale }) {
+  const copy = HOME_JSONLD_COPY[locale];
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Furgocasa",
-    "url": COMPANY.website,
+    "name": copy.siteName,
+    "url": `${COMPANY.website}${locale === "es" ? "/es" : `/${locale}`}`,
     "potentialAction": {
       "@type": "SearchAction",
       "target": {
         "@type": "EntryPoint",
-        "urlTemplate": `${COMPANY.website}/es/buscar?q={search_term_string}`
+        "urlTemplate": `${COMPANY.website}${getTranslatedRoute("/buscar", locale)}?q={search_term_string}`
       },
       "query-input": "required name=search_term_string"
     }

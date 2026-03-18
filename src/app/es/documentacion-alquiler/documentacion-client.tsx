@@ -2,6 +2,7 @@
 
 import { FileText, Download, Eye, CheckCircle, AlertCircle, Shield, Lock } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { COMPANY } from "@/lib/company";
 
 const documents = [
   {
@@ -37,7 +38,7 @@ export default function DocumentacionClient() {
   const pasosConfirmacion = [
     { paso: "1", titulo: t("Envía tu documentación"), descripcion: t("DNI/Pasaporte y carnet de conducir (foto o escaneo)") },
     { paso: "2", titulo: t("Firma y envía el contrato"), descripcion: t("Descarga la documentación de esta página, fírmala y envíanosla por email") },
-    { paso: "3", titulo: t("Paga la fianza"), descripcion: t("Transferencia de 1.000€ (máx. 72h antes del inicio)") },
+    { paso: "3", titulo: t("Paga la fianza"), descripcion: `${t("Transferencia de")} ${COMPANY.depositAmount.toLocaleString("es-ES")}€ (${t("máx.")} ${COMPANY.rentalPolicy.deposit.paymentDeadlineHoursBeforePickup}h ${t("antes del inicio")})` },
     { paso: "4", titulo: t("Recibe confirmación"), descripcion: t("Te confirmaremos la cita de recogida por email") },
   ];
 
@@ -186,7 +187,7 @@ export default function DocumentacionClient() {
 
               <h3>{t("¿Cómo se paga la fianza?")}</h3>
               <p>
-                {t("La fianza de 1.000€ se abona mediante transferencia bancaria, máximo 72 horas antes del inicio del alquiler. Debes enviar el justificante de transferencia y certificado de titularidad de la cuenta. El titular debe coincidir con el arrendatario.")}
+                {t("La fianza de")} {COMPANY.depositAmount.toLocaleString("es-ES")}€ {t("se abona mediante")} {COMPANY.rentalPolicy.deposit.paymentMethod}, {t("máximo")} {COMPANY.rentalPolicy.deposit.paymentDeadlineHoursBeforePickup} {t("horas antes del inicio del alquiler. Debes enviar el justificante de transferencia y certificado de titularidad de la cuenta. El titular debe coincidir con el arrendatario.")}
               </p>
 
               <h3>{t("¿Puedo añadir un segundo conductor?")}</h3>

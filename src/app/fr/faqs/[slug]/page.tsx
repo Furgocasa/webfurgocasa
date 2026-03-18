@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import { Metadata } from "next";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
-import { FaqDetailJsonLd } from "@/components/faqs/faq-detail-jsonld";
 import type { Locale } from "@/lib/i18n/config";
 
 export const revalidate = 3600; // 1 hora
@@ -61,10 +60,10 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     answer: `<p>Todos nuestros vehículos incluyen sin coste adicional:</p>
     <h4>Cocina</h4>
     <ul><li>Juego de ollas y sartenes</li><li>Vajilla completa (platos, vasos, cubiertos)</li><li>Cafetera italiana</li><li>Tabla de cortar y cuchillos</li></ul>
-    <h4>Dormitorio</h4>
-    <ul><li>Sábanas y fundas de almohada</li><li>Mantas</li><li>Toallas (1 por persona)</li></ul>
     <h4>Exterior</h4>
-    <ul><li>Sillas de camping (2-4 según vehículo)</li><li>Mesa plegable</li><li>Cuñas de nivelación</li><li>Cable eléctrico 25m</li></ul>`,
+    <ul><li>Sillas de camping (2-4 según vehículo)</li><li>Mesa plegable</li><li>Cuñas de nivelación</li><li>Cable eléctrico 25m</li><li>Manguera de agua y adaptadores</li></ul>
+    <p>También se incluyen el gas para cocina y calefacción y las pastillas para el WC químico.</p>
+    <p>La ropa de cama y las toallas están disponibles como extra opcional.</p>`,
     category:"Equipamiento",
     related: ["extras-adicionales"]
   },"proposito-fianza": {
@@ -88,7 +87,7 @@ const faqs: Record<string, { question: string; answer: string; category: string;
   },"documentos-necesarios": {
     question:"¿Qué documentos tengo que traer cuando recoja la camper?",
     answer: `<p>El día de la recogida necesitarás presentar:</p>
-    <ul><li><strong>DNI o Pasaporte</strong> en vigor del conductor principal</li><li><strong>Carnet de conducir</strong> en vigor (mínimo 2 años antigüedad)</li><li><strong>Tarjeta de crédito</strong> a nombre del conductor principal (para la fianza)</li><li><strong>Confirmación de reserva</strong> (la recibirás por email)</li></ul>
+    <ul><li><strong>DNI o Pasaporte</strong> en vigor del conductor principal</li><li><strong>Carnet de conducir</strong> en vigor (mínimo 2 años antigüedad)</li><li><strong>Confirmación de reserva</strong> y documentación firmada enviada previamente por email</li><li><strong>Justificante de la transferencia de la fianza</strong>, que debe estar recibida 72 horas antes del inicio</li></ul>
     <p>Si hay segundo conductor, también necesitaremos su DNI y carnet.</p>`,
     category:"Entrega y devolución",
     related: ["proceso-recogida","pago-fianza"]
@@ -118,23 +117,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const cleanAnswer = faq.answer.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().substring(0, 155);
 
-  const locale: Locale = 'fr';
-  const alternates = buildCanonicalAlternates(`/faqs/${slug}`, locale);
+  const spanishCanonical = buildCanonicalAlternates(`/faqs/${slug}`, "es").canonical;
 
   return {
-    title: faq.question,
+    title: `${faq.question} | Furgocasa`,
     description: cleanAnswer + '...',
-    keywords: `${faq.question}, faq camper, preguntas autocaravana, ${faq.category}`,
-    alternates,
+    alternates: {
+      canonical: spanishCanonical,
+    },
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
       title: faq.question,
       description: cleanAnswer,
       type: 'article',
-      url: alternates.canonical,
+      url: spanishCanonical,
       siteName: 'Furgocasa',
     },
-    robots: { index: true, follow: true }
+    robots: { index: false, follow: false }
   };
 }
 
@@ -143,12 +142,8 @@ export default async function FaqDetailPage({ params }: { params: Promise<{ slug
   const faq = faqs[slug];
   if (!faq) notFound();
 
-  const alternates = buildCanonicalAlternates(`/faqs/${slug}`, "fr");
-  const canonicalUrl = alternates.canonical;
-
   return (
     <>
-      <FaqDetailJsonLd question={faq.question} answer={faq.answer} url={canonicalUrl} />
       <main className="min-h-screen bg-gray-50">
         <div className="bg-white border-b">
           <div className="container mx-auto px-4 py-4">

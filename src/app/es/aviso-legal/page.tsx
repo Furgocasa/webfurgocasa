@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
+import { COMPANY } from "@/lib/company";
 
 interface PageProps {}
 
@@ -51,12 +52,11 @@ export default async function LocaleAvisoLegalPage({ params }: PageProps) {
               <h2>1. Datos identificativos</h2>
               <p>En cumplimiento con el deber de información recogido en artículo 10 de la Ley 34/2002, de 11 de julio, de Servicios de la Sociedad de la Información y del Comercio Electrónico, a continuación se reflejan los siguientes datos:</p>
               <ul>
-                <li><strong>Denominación social:</strong> FURGOCASA S.L.</li>
-                <li><strong>CIF:</strong> B-XXXXXXXX</li>
-                <li><strong>Domicilio social:</strong> Calle Ejemplo, 123 - 30001 Murcia</li>
-                <li><strong>Correo electrónico:</strong> info@furgocasa.com</li>
-                <li><strong>Teléfono:</strong> +34 868 36 41 61</li>
-                <li><strong>Inscripción:</strong> Registro Mercantil de Murcia, Tomo XXX, Folio XXX, Hoja MU-XXXXX</li>
+                <li><strong>Denominación social:</strong> {COMPANY.legalName}</li>
+                <li><strong>Domicilio social:</strong> {COMPANY.address.street} - {COMPANY.address.postalCode} {COMPANY.address.locality}</li>
+                <li><strong>Correo electrónico:</strong> {COMPANY.email}</li>
+                <li><strong>Teléfono:</strong> {COMPANY.phoneDisplayFull}</li>
+                <li><strong>Datos fiscales y registrales:</strong> se facilitan al cliente en la documentación contractual y previa solicitud formal por correo electrónico.</li>
               </ul>
 
               <h2>2. Objeto</h2>
