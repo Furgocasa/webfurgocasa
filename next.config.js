@@ -392,7 +392,8 @@ const nextConfig = {
       // ── ALQUILER FR: Slug español → Slug francés correcto ──
       { source: '/fr/alquiler-autocaravanas-campervans-:location', destination: '/fr/location-camping-car/:location', permanent: true },
       // ── ALQUILER FR: Formato antiguo (guión) → Formato nuevo (barra) ──
-      { source: '/fr/location-camping-car-:location', destination: '/fr/location-camping-car/:location', permanent: true },
+      // ⚠️ Excluir "espagne": tiene página estática /fr/location-camping-car-espagne (evita bucle AHREF)
+      { source: '/fr/location-camping-car-:location((?!espagne)[^/]+)', destination: '/fr/location-camping-car/:location', permanent: true },
       // ── ALQUILER DE: Slug español → Slug alemán correcto ──
       { source: '/de/alquiler-autocaravanas-campervans-:location', destination: '/de/wohnmobil-mieten/:location', permanent: true },
       // ── ALQUILER DE: Formato antiguo (guión) → Formato nuevo (barra) ──

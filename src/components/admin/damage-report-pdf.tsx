@@ -264,90 +264,90 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
 
       {/* PDF Content */}
       <div style={{ position: 'fixed', left: '-9999px', top: 0 }}>
-        <div ref={reportRef} style={{ width: '794px', padding: '12px 16px', backgroundColor: '#fff', fontFamily: 'Arial, sans-serif' }}>
+        <div ref={reportRef} style={{ width: '794px', padding: '24px', backgroundColor: '#fff', fontFamily: 'Arial, sans-serif' }}>
           
           {/* HEADER */}
-          <table style={{ width: '100%', marginBottom: '12px' }}>
+          <table style={{ width: '100%', marginBottom: '16px' }}>
             <tbody>
               <tr>
                 <td style={{ verticalAlign: 'top' }}>
-                  <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#111827' }}>FURGOCASA</div>
-                  <div style={{ fontSize: '11px', color: '#4b5563' }}>Alquiler de Autocaravanas y Campers</div>
-                  <div style={{ fontSize: '9px', color: '#6b7280', marginTop: '2px' }}>Tel: 968 123 456 | info@furgocasa.com</div>
+                  <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#111827' }}>FURGOCASA</div>
+                  <div style={{ fontSize: '13px', color: '#4b5563' }}>Alquiler de Autocaravanas y Campers</div>
+                  <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>Tel: 968 123 456 | info@furgocasa.com</div>
                 </td>
                 <td style={{ verticalAlign: 'top', textAlign: 'right' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#374151' }}>HOJA DE DAÑOS</div>
-                  <div style={{ fontSize: '10px', color: '#6b7280', marginTop: '2px' }}>Fecha: {today}</div>
+                  <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#374151' }}>HOJA DE DAÑOS</div>
+                  <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '2px' }}>Fecha: {today}</div>
                 </td>
               </tr>
             </tbody>
           </table>
 
           {/* VEHICLE INFO */}
-          <div style={{ backgroundColor: '#f3f4f6', borderRadius: '4px', padding: '10px', marginBottom: '12px' }}>
+          <div style={{ backgroundColor: '#f3f4f6', borderRadius: '6px', padding: '12px', marginBottom: '16px' }}>
             <table style={{ width: '100%' }}>
               <tbody>
                 <tr>
                   <td>
-                    <div style={{ fontSize: '8px', color: '#6b7280', textTransform: 'uppercase' }}>Vehículo</div>
-                    <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{vehicle.name}</div>
-                    <div style={{ fontSize: '11px', color: '#4b5563' }}>{vehicle.brand} {vehicle.model}</div>
+                    <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }}>Vehículo</div>
+                    <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{vehicle.name}</div>
+                    <div style={{ fontSize: '13px', color: '#4b5563' }}>{vehicle.brand} {vehicle.model}</div>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <div style={{ fontSize: '8px', color: '#6b7280', textTransform: 'uppercase' }}>Código</div>
-                    <div style={{ fontSize: '22px', fontWeight: 'bold', color: '#1d4ed8', fontFamily: 'monospace' }}>{vehicle.internal_code || '-'}</div>
+                    <div style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase' }}>Código</div>
+                    <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#1d4ed8', fontFamily: 'monospace' }}>{vehicle.internal_code || '-'}</div>
                   </td>
                 </tr>
               </tbody>
             </table>
-            <table style={{ width: '100%', marginTop: '8px', borderTop: '1px solid #d1d5db', paddingTop: '8px' }}>
+            <table style={{ width: '100%', marginTop: '10px', borderTop: '1px solid #d1d5db', paddingTop: '10px' }}>
               <tbody>
                 <tr>
                   <td style={{ textAlign: 'center', width: '33%' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold' }}>{activeDamages.length}</div>
-                    <div style={{ fontSize: '9px', color: '#6b7280' }}>Daños Actuales</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold' }}>{activeDamages.length}</div>
+                    <div style={{ fontSize: '11px', color: '#6b7280' }}>Daños Actuales</div>
                   </td>
                   <td style={{ textAlign: 'center', width: '33%' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#ea580c' }}>{exteriorDamages.length}</div>
-                    <div style={{ fontSize: '9px', color: '#6b7280' }}>Exteriores</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#ea580c' }}>{exteriorDamages.length}</div>
+                    <div style={{ fontSize: '11px', color: '#6b7280' }}>Exteriores</div>
                   </td>
                   <td style={{ textAlign: 'center', width: '33%' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 'bold', color: '#2563eb' }}>{interiorDamages.length}</div>
-                    <div style={{ fontSize: '9px', color: '#6b7280' }}>Interiores</div>
+                    <div style={{ fontSize: '20px', fontWeight: 'bold', color: '#2563eb' }}>{interiorDamages.length}</div>
+                    <div style={{ fontSize: '11px', color: '#6b7280' }}>Interiores</div>
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
 
-          {/* LAYOUT DOS COLUMNAS: Imágenes (60%) + Detalles (40%) */}
-          <table style={{ width: '100%', marginBottom: '10px' }}>
+          {/* LAYOUT DOS COLUMNAS: Imágenes (58%) + Detalles (42%) */}
+          <table style={{ width: '100%', marginBottom: '16px' }}>
             <tbody>
               <tr>
                 {/* COLUMNA IZQUIERDA: IMÁGENES DE VEHÍCULOS */}
-                <td style={{ width: '58%', verticalAlign: 'top', paddingRight: '8px' }}>
+                <td style={{ width: '58%', verticalAlign: 'top', paddingRight: '12px' }}>
                   
                   {/* DAÑO EXTERIOR */}
-                  <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px', marginBottom: '10px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
+                  <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '10px', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937', marginBottom: '10px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
                       DAÑO EXTERIOR ({exteriorDamages.length})
                     </div>
                     
                     {/* Fila 1: Frontal | Trasera */}
-                    <table style={{ width: '100%', marginBottom: '10px' }}>
+                    <table style={{ width: '100%', marginBottom: '12px' }}>
                       <tbody>
                         <tr>
-                          <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'middle', textAlign: 'center' }}>
-                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Frontal</div>
+                          <td style={{ width: '50%', padding: '0 6px 0 0', verticalAlign: 'middle', textAlign: 'center' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '6px' }}>
+                              <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px', textAlign: 'left' }}>Frontal</div>
                               <div style={{ width: '60%', margin: '0 auto' }}>
                                 <VehicleImage viewType="front" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                               </div>
                             </div>
                           </td>
-                          <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'middle', textAlign: 'center' }}>
-                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '2px', textAlign: 'left' }}>Trasera</div>
+                          <td style={{ width: '50%', padding: '0 0 0 6px', verticalAlign: 'middle', textAlign: 'center' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '6px' }}>
+                              <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '4px', textAlign: 'left' }}>Trasera</div>
                               <div style={{ width: '60%', margin: '0 auto' }}>
                                 <VehicleImage viewType="back" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                               </div>
@@ -358,18 +358,18 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                     </table>
 
                     {/* Fila 2: Lateral Izq | Lateral Der */}
-                    <table style={{ width: '100%', marginBottom: '10px' }}>
+                    <table style={{ width: '100%', marginBottom: '12px' }}>
                       <tbody>
                         <tr>
-                          <td style={{ width: '50%', padding: '0 4px 0 0', verticalAlign: 'top' }}>
-                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Lateral Izquierdo</div>
+                          <td style={{ width: '50%', padding: '0 6px 0 0', verticalAlign: 'top' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '6px' }}>
+                              <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '6px' }}>Lateral Izquierdo</div>
                               <VehicleImage viewType="left" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                             </div>
                           </td>
-                          <td style={{ width: '50%', padding: '0 0 0 4px', verticalAlign: 'top' }}>
-                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                              <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Lateral Derecho</div>
+                          <td style={{ width: '50%', padding: '0 0 0 6px', verticalAlign: 'top' }}>
+                            <div style={{ border: '1px solid #e5e7eb', borderRadius: '4px', padding: '6px' }}>
+                              <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '6px' }}>Lateral Derecho</div>
                               <VehicleImage viewType="right" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                             </div>
                           </td>
@@ -379,16 +379,16 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
 
                     {/* Fila 3: Superior (centrado) */}
                     <div style={{ display: 'flex', justifyContent: 'center' }}>
-                      <div style={{ width: '60%', border: '1px solid #e5e7eb', borderRadius: '3px', padding: '4px' }}>
-                        <div style={{ fontSize: '8px', color: '#6b7280', marginBottom: '5px' }}>Superior</div>
+                      <div style={{ width: '60%', border: '1px solid #e5e7eb', borderRadius: '4px', padding: '6px' }}>
+                        <div style={{ fontSize: '10px', color: '#6b7280', marginBottom: '6px' }}>Superior</div>
                         <VehicleImage viewType="top" damages={activeDamages} displayNumbers={damageDisplayNumbers} />
                       </div>
                     </div>
                   </div>
 
                   {/* DAÑO INTERIOR */}
-                  <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px' }}>
-                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
+                  <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '10px' }}>
+                    <div style={{ fontSize: '13px', fontWeight: 'bold', color: '#1f2937', marginBottom: '10px', borderBottom: '1px solid #e5e7eb', paddingBottom: '4px' }}>
                       DAÑO INTERIOR ({interiorDamages.length})
                     </div>
                     <VehicleImageInterior damages={activeDamages} displayNumbers={damageDisplayNumbers} />
@@ -400,42 +400,42 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                 <td style={{ width: '42%', verticalAlign: 'top', paddingLeft: '8px' }}>
                   {/* TABLA DAÑOS EXTERIORES */}
                   {exteriorDamages.length > 0 && (
-                    <div style={{ marginBottom: '10px' }}>
-                      <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#ea580c', marginBottom: '6px', borderBottom: '2px solid #ea580c', paddingBottom: '3px' }}>
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#ea580c', marginBottom: '8px', borderBottom: '2px solid #ea580c', paddingBottom: '4px' }}>
                         DAÑOS EXTERIORES ({exteriorDamages.length})
                       </div>
-                      <table style={{ width: '100%', fontSize: '8px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
+                      <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
                         <thead>
                           <tr style={{ backgroundColor: '#fff7ed' }}>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>#</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Descripción</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Ubicación</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Severidad</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Estado</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>#</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Descripción</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Ubicación</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Severidad</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Estado</th>
                           </tr>
                         </thead>
                         <tbody>
                           {exteriorDamages.map((damage, i) => (
                             <tr key={damage.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : '#f9fafb' }}>
-                              <td style={{ padding: '2px 3px', fontWeight: 'bold', fontSize: '8px' }}>{damageDisplayNumbers.get(damage.id) || '?'}</td>
-                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{damage.description}</td>
-                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{viewLabels[damage.view_type || '']}</td>
-                              <td style={{ padding: '2px 3px' }}>
+                              <td style={{ padding: '5px 4px', fontWeight: 'bold', fontSize: '12px' }}>{damageDisplayNumbers.get(damage.id) || '?'}</td>
+                              <td style={{ padding: '5px 4px', fontSize: '11px' }}>{damage.description}</td>
+                              <td style={{ padding: '5px 4px', fontSize: '11px' }}>{viewLabels[damage.view_type || '']}</td>
+                              <td style={{ padding: '5px 4px' }}>
                                 <span style={{
-                                  padding: '1px 2px',
-                                  borderRadius: '2px',
-                                  fontSize: '6px',
+                                  padding: '2px 4px',
+                                  borderRadius: '3px',
+                                  fontSize: '9px',
                                   backgroundColor: damage.severity === 'severe' ? '#fee2e2' : damage.severity === 'moderate' ? '#ffedd5' : '#fef9c3',
                                   color: damage.severity === 'severe' ? '#b91c1c' : damage.severity === 'moderate' ? '#c2410c' : '#a16207',
                                 }}>
                                   {severityLabels[damage.severity || '']}
                                 </span>
                               </td>
-                              <td style={{ padding: '2px 3px' }}>
+                              <td style={{ padding: '5px 4px' }}>
                                 <span style={{
-                                  padding: '1px 2px',
-                                  borderRadius: '2px',
-                                  fontSize: '6px',
+                                  padding: '2px 4px',
+                                  borderRadius: '3px',
+                                  fontSize: '9px',
                                   backgroundColor: damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
                                   color: damage.status === 'in_progress' ? '#a16207' : '#b91c1c',
                                 }}>
@@ -451,42 +451,42 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
 
                   {/* TABLA DAÑOS INTERIORES */}
                   {interiorDamages.length > 0 && (
-                    <div>
-                      <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#2563eb', marginBottom: '6px', borderBottom: '2px solid #2563eb', paddingBottom: '3px' }}>
+                    <div style={{ marginBottom: '16px' }}>
+                      <div style={{ fontSize: '14px', fontWeight: 'bold', color: '#2563eb', marginBottom: '8px', borderBottom: '2px solid #2563eb', paddingBottom: '4px' }}>
                         DAÑOS INTERIORES ({interiorDamages.length})
                       </div>
-                      <table style={{ width: '100%', fontSize: '8px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
+                      <table style={{ width: '100%', fontSize: '12px', borderCollapse: 'collapse', border: '1px solid #d1d5db' }}>
                         <thead>
                           <tr style={{ backgroundColor: '#eff6ff' }}>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>#</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Descripción</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Ubicación</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Severidad</th>
-                            <th style={{ padding: '3px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '7px' }}>Estado</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>#</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Descripción</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Ubicación</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Severidad</th>
+                            <th style={{ padding: '6px 4px', textAlign: 'left', borderBottom: '1px solid #d1d5db', fontSize: '11px' }}>Estado</th>
                           </tr>
                         </thead>
                         <tbody>
                           {interiorDamages.map((damage, i) => (
                             <tr key={damage.id} style={{ backgroundColor: i % 2 === 0 ? '#fff' : '#f9fafb' }}>
-                              <td style={{ padding: '2px 3px', fontWeight: 'bold', fontSize: '8px' }}>{damageDisplayNumbers.get(damage.id) || '?'}</td>
-                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{damage.description}</td>
-                              <td style={{ padding: '2px 3px', fontSize: '7px' }}>{viewLabels[damage.view_type || '']}</td>
-                              <td style={{ padding: '2px 3px' }}>
+                              <td style={{ padding: '5px 4px', fontWeight: 'bold', fontSize: '12px' }}>{damageDisplayNumbers.get(damage.id) || '?'}</td>
+                              <td style={{ padding: '5px 4px', fontSize: '11px' }}>{damage.description}</td>
+                              <td style={{ padding: '5px 4px', fontSize: '11px' }}>{viewLabels[damage.view_type || '']}</td>
+                              <td style={{ padding: '5px 4px' }}>
                                 <span style={{
-                                  padding: '1px 2px',
-                                  borderRadius: '2px',
-                                  fontSize: '6px',
+                                  padding: '2px 4px',
+                                  borderRadius: '3px',
+                                  fontSize: '9px',
                                   backgroundColor: damage.severity === 'severe' ? '#fee2e2' : damage.severity === 'moderate' ? '#ffedd5' : '#fef9c3',
                                   color: damage.severity === 'severe' ? '#b91c1c' : damage.severity === 'moderate' ? '#c2410c' : '#a16207',
                                 }}>
                                   {severityLabels[damage.severity || '']}
                                 </span>
                               </td>
-                              <td style={{ padding: '2px 3px' }}>
+                              <td style={{ padding: '5px 4px' }}>
                                 <span style={{
-                                  padding: '1px 2px',
-                                  borderRadius: '2px',
-                                  fontSize: '6px',
+                                  padding: '2px 4px',
+                                  borderRadius: '3px',
+                                  fontSize: '9px',
                                   backgroundColor: damage.status === 'in_progress' ? '#fef9c3' : '#fee2e2',
                                   color: damage.status === 'in_progress' ? '#a16207' : '#b91c1c',
                                 }}>
@@ -506,81 +506,108 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
           </table>
 
           {/* LEYENDA */}
-          <div style={{ backgroundColor: '#f9fafb', padding: '6px', borderRadius: '3px', marginBottom: '10px', fontSize: '9px' }}>
+          <div style={{ backgroundColor: '#f9fafb', padding: '8px', borderRadius: '4px', marginBottom: '16px', fontSize: '11px' }}>
             <strong>Leyenda:</strong>&nbsp;&nbsp;
-            <span style={{ marginRight: '12px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#f87171', marginRight: '3px', verticalAlign: 'middle' }}></span>Pendiente</span>
-            <span style={{ marginRight: '12px' }}><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#facc15', marginRight: '3px', verticalAlign: 'middle' }}></span>En reparación</span>
-            <span><span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#4ade80', marginRight: '3px', verticalAlign: 'middle' }}></span>Reparado</span>
+            <span style={{ marginRight: '16px' }}><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#f87171', marginRight: '4px', verticalAlign: 'middle' }}></span>Pendiente</span>
+            <span style={{ marginRight: '16px' }}><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#facc15', marginRight: '4px', verticalAlign: 'middle' }}></span>En reparación</span>
+            <span><span style={{ display: 'inline-block', width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#4ade80', marginRight: '4px', verticalAlign: 'middle' }}></span>Reparado</span>
           </div>
 
           {/* AVISO IMPORTANTE */}
-          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '4px', padding: '8px', marginBottom: '10px', fontSize: '8px', color: '#991b1b', textAlign: 'center' }}>
+          <div style={{ backgroundColor: '#fef2f2', border: '1px solid #fecaca', borderRadius: '6px', padding: '10px', marginBottom: '16px', fontSize: '10px', color: '#991b1b', textAlign: 'center' }}>
             <strong>EL CLIENTE ES EL ÚLTIMO RESPONSABLE DE ASEGURARSE DE REALIZAR UNA CORRECTA REVISIÓN DEL VEHÍCULO Y DE QUE TODOS LOS DAÑOS SEAN INCLUIDOS EN ESTA HOJA.</strong><br/>
             CUALQUIER DAÑO ADVERTIDO EN LA DEVOLUCIÓN QUE NO CONSTE EN ESTA HOJA DEBERÁ SER ATRIBUIDO AL ALQUILER.
           </div>
 
           {/* FIRMAS */}
-          <div style={{ border: '1px solid #d1d5db', borderRadius: '4px', padding: '8px' }}>
-            <div style={{ fontSize: '10px', fontWeight: 'bold', marginBottom: '8px' }}>FIRMAS DE CONFORMIDAD</div>
+          <div style={{ border: '1px solid #d1d5db', borderRadius: '6px', padding: '12px' }}>
+            <div style={{ fontSize: '13px', fontWeight: 'bold', marginBottom: '12px', borderBottom: '1px solid #e5e7eb', paddingBottom: '6px' }}>FIRMAS DE CONFORMIDAD Y ESTADO</div>
             <table style={{ width: '100%' }}>
               <tbody>
                 <tr>
-                  <td style={{ width: '50%', paddingRight: '10px', verticalAlign: 'top' }}>
-                    <div style={{ fontSize: '8px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>ENTREGA DEL VEHÍCULO <span style={{ fontWeight: 'normal' }}>(A rellenar por cliente)</span></div>
-                    <table style={{ width: '100%', fontSize: '8px' }}>
+                  {/* ENTREGA */}
+                  <td style={{ width: '50%', paddingRight: '16px', verticalAlign: 'top', borderRight: '1px solid #e5e7eb' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#374151', marginBottom: '8px' }}>ENTREGA DEL VEHÍCULO <span style={{ fontWeight: 'normal' }}>(A rellenar por cliente)</span></div>
+                    
+                    <table style={{ width: '100%', fontSize: '11px', marginBottom: '8px' }}>
                       <tbody>
                         <tr>
-                          <td style={{ width: '50%', paddingRight: '4px' }}>
+                          <td style={{ width: '50%', paddingRight: '6px', paddingBottom: '6px' }}>
                             <div style={{ color: '#6b7280' }}>Fecha:</div>
-                            <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                           </td>
-                          <td style={{ width: '50%', paddingLeft: '4px' }}>
+                          <td style={{ width: '50%', paddingLeft: '6px', paddingBottom: '6px' }}>
                             <div style={{ color: '#6b7280' }}>Hora:</div>
-                            <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ width: '50%', paddingRight: '6px', paddingBottom: '6px' }}>
+                            <div style={{ color: '#6b7280' }}>Km salida:</div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
+                          </td>
+                          <td style={{ width: '50%', paddingLeft: '6px', paddingBottom: '6px' }}>
+                            <div style={{ color: '#6b7280' }}>Combustible salida:</div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                           </td>
                         </tr>
                       </tbody>
                     </table>
-                    <div style={{ marginTop: '4px', fontSize: '8px' }}>
+
+                    <div style={{ marginTop: '8px', fontSize: '11px' }}>
                       <div style={{ color: '#6b7280' }}>Nombre cliente:</div>
-                      <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+                      <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                     </div>
-                    <div style={{ marginTop: '4px', fontSize: '8px' }}>
+                    <div style={{ marginTop: '8px', fontSize: '11px' }}>
                       <div style={{ color: '#6b7280' }}>DNI/Pasaporte:</div>
-                      <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+                      <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                     </div>
-                    <div style={{ marginTop: '8px', fontSize: '8px' }}>
+                    <div style={{ marginTop: '12px', fontSize: '11px' }}>
                       <div style={{ color: '#6b7280', marginBottom: '4px' }}>Firma cliente:</div>
-                      <div style={{ border: '1px solid #9ca3af', height: '35px', borderRadius: '2px' }}></div>
+                      <div style={{ border: '1px solid #9ca3af', height: '50px', borderRadius: '4px' }}></div>
                     </div>
                   </td>
-                  <td style={{ width: '50%', paddingLeft: '10px', verticalAlign: 'top' }}>
-                    <div style={{ fontSize: '8px', fontWeight: 'bold', color: '#374151', marginBottom: '4px' }}>DEVOLUCIÓN DEL VEHÍCULO <span style={{ fontWeight: 'normal' }}>(A rellenar por trabajador)</span></div>
-                    <table style={{ width: '100%', fontSize: '8px' }}>
+                  
+                  {/* DEVOLUCIÓN */}
+                  <td style={{ width: '50%', paddingLeft: '16px', verticalAlign: 'top' }}>
+                    <div style={{ fontSize: '11px', fontWeight: 'bold', color: '#374151', marginBottom: '8px' }}>DEVOLUCIÓN DEL VEHÍCULO <span style={{ fontWeight: 'normal' }}>(A rellenar por trabajador)</span></div>
+                    
+                    <table style={{ width: '100%', fontSize: '11px', marginBottom: '8px' }}>
                       <tbody>
                         <tr>
-                          <td style={{ width: '50%', paddingRight: '4px' }}>
+                          <td style={{ width: '50%', paddingRight: '6px', paddingBottom: '6px' }}>
                             <div style={{ color: '#6b7280' }}>Fecha:</div>
-                            <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                           </td>
-                          <td style={{ width: '50%', paddingLeft: '4px' }}>
+                          <td style={{ width: '50%', paddingLeft: '6px', paddingBottom: '6px' }}>
                             <div style={{ color: '#6b7280' }}>Hora:</div>
-                            <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style={{ width: '50%', paddingRight: '6px', paddingBottom: '6px' }}>
+                            <div style={{ color: '#6b7280' }}>Km llegada:</div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
+                          </td>
+                          <td style={{ width: '50%', paddingLeft: '6px', paddingBottom: '6px' }}>
+                            <div style={{ color: '#6b7280' }}>Combustible llegada:</div>
+                            <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                           </td>
                         </tr>
                       </tbody>
                     </table>
-                    <div style={{ marginTop: '4px', fontSize: '8px' }}>
-                      <div style={{ color: '#6b7280' }}>Km salida:</div>
-                      <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+
+                    <div style={{ marginTop: '8px', fontSize: '11px' }}>
+                      <div style={{ color: '#6b7280' }}>Trabajador/Recepcionista:</div>
+                      <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                     </div>
-                    <div style={{ marginTop: '4px', fontSize: '8px' }}>
-                      <div style={{ color: '#6b7280' }}>Km llegada:</div>
-                      <div style={{ borderBottom: '1px solid #9ca3af', height: '14px' }}></div>
+                    <div style={{ marginTop: '8px', fontSize: '11px' }}>
+                      <div style={{ color: '#6b7280' }}>Cobro extra o fianza retenida (€):</div>
+                      <div style={{ borderBottom: '1px solid #9ca3af', height: '16px' }}></div>
                     </div>
-                    <div style={{ marginTop: '8px', fontSize: '8px' }}>
+                    <div style={{ marginTop: '12px', fontSize: '11px' }}>
                       <div style={{ color: '#6b7280', marginBottom: '4px' }}>Firma trabajador:</div>
-                      <div style={{ border: '1px solid #9ca3af', height: '35px', borderRadius: '2px' }}></div>
+                      <div style={{ border: '1px solid #9ca3af', height: '50px', borderRadius: '4px' }}></div>
                     </div>
                   </td>
                 </tr>
@@ -589,8 +616,8 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
           </div>
 
           {/* FOOTER */}
-          <div style={{ marginTop: '10px', textAlign: 'center', fontSize: '8px', color: '#9ca3af' }}>
-            FURGOCASA © {new Date().getFullYear()} - Este documento es válido como acta de entrega/devolución del vehículo
+          <div style={{ marginTop: '16px', textAlign: 'center', fontSize: '10px', color: '#9ca3af' }}>
+            FURGOCASA © {new Date().getFullYear()} - Este documento es válido como acta de entrega/devolución del vehículo y estado general
           </div>
 
         </div>
