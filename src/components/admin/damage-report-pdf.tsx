@@ -336,7 +336,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
     width: `${PDF_PAGE_WIDTH}px`,
     padding: "16px 20px",
     backgroundColor: "#fff",
-    fontFamily: "Arial, Helvetica, sans-serif",
+    fontFamily: "var(--font-amiko), system-ui, Arial, Helvetica, sans-serif",
     boxSizing: "border-box",
     color: "#111827",
   };
