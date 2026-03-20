@@ -81,9 +81,8 @@ function DamageMarker({ damage, displayNumbers }: { damage: VehicleDamage; displ
         backgroundColor: colors.fill,
         border: `2px solid ${colors.stroke}`,
         boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        textAlign: "center",
+        lineHeight: "18px",
         color: colors.stroke,
         fontSize: "10px",
         fontWeight: "bold",
@@ -91,7 +90,7 @@ function DamageMarker({ damage, displayNumbers }: { damage: VehicleDamage; displ
         boxSizing: "border-box",
       }}
     >
-      <span style={{ lineHeight: "1" }}>{num}</span>
+      {num}
     </div>
   );
 }
