@@ -84,32 +84,32 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'alcobendas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
 
   // Anillo Alicante (SEO) — referencia Costa Blanca / Alicante
-  'gandia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (86).webp',
-  'denia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (87).webp',
-  'alcoy': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (88).webp',
-  'san-vicente-del-raspeig': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (89).webp',
-  'elda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (90).webp',
-  'villena': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (91).webp',
-  'xativa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (92).webp',
+  'gandia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (70).webp',
+  'denia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (71).webp',
+  'alcoy': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (82).webp',
+  'san-vicente-del-raspeig': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (83).webp',
+  'elda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (85).webp',
+  'villena': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (89).webp',
+  'xativa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (90).webp',
 
   // Anillo Albacete (SEO)
   'tomelloso': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
-  'alcazar-de-san-juan': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (84).webp',
-  'valdepenas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (85).webp',
-  'villarrobledo': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (93).webp',
-  'almansa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (94).webp',
-  'manzanares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (95).webp',
-  'la-roda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (96).webp',
+  'alcazar-de-san-juan': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (93).webp',
+  'valdepenas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (94).webp',
+  'villarrobledo': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (63).webp',
+  'almansa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (61).webp',
+  'manzanares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (60).webp',
+  'la-roda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
 
   // Costa Blanca Sur y Norte
-  'santa-pola': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (97).webp',
-  'calpe': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (98).webp',
-  'guardamar-del-segura': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (99).webp',
-  'altea': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (100).webp',
+  'santa-pola': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (58).webp',
+  'calpe': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (56).webp',
+  'guardamar-del-segura': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (55).webp',
+  'altea': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (54).webp',
   
   // Mar Menor
-  'san-pedro-del-pinatar': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (101).webp',
-  'los-alcazares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (102).webp',
+  'san-pedro-del-pinatar': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_san_pedro_del_pinatar.webp',
+  'los-alcazares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (52).webp',
 };
 
 /**
