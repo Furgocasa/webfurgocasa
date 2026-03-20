@@ -19,12 +19,12 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'alhama': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_alhama_de_murcia.webp',
   
   // Murcia sin imagen específica - usar genéricas
-  'cartagena': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (1).webp',
-  'aguilas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (2).webp',
-  'la-manga-del-mar-menor': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (3).webp',
-  'jumilla': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (4).webp',
-  'cieza': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (5).webp',
-  'sierra-espuna': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (10).webp',
+  'cartagena': '/images/slides/hero-01.webp',
+  'aguilas': '/images/slides/hero-02.webp',
+  'la-manga-del-mar-menor': '/images/slides/hero-03.webp',
+  'jumilla': '/images/slides/hero-04.webp',
+  'cieza': '/images/slides/hero-05.webp',
+  'sierra-espuna': '/images/slides/hero-06.webp',
   
   // ========================================
   // COMUNIDAD VALENCIANA
@@ -33,10 +33,10 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'orihuela': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_orihuela.webp',
   
   // Valencia sin imagen específica
-  'alicante': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
-  'torrevieja': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (23).webp',
-  'benidorm': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (32).webp',
-  'valencia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (35).webp',
+  'alicante': '/images/slides/hero-07.webp',
+  'torrevieja': '/images/slides/hero-08.webp',
+  'benidorm': '/images/slides/hero-09.webp',
+  'valencia': '/images/slides/hero-10.webp',
   
   // ========================================
   // ANDALUCÍA
@@ -44,11 +44,11 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'jaen': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_jaen.webp',
   
   // Andalucía sin imagen específica
-  'almeria': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (36).webp',
-  'cabo-de-gata': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (37).webp',
-  'granada': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (46).webp',
-  'malaga': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (47).webp',
-  'marbella': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (48).webp',
+  'almeria': '/images/slides/hero-11.webp',
+  'cabo-de-gata': '/images/slides/hero-12.webp',
+  'granada': '/images/slides/hero-13.webp',
+  'malaga': '/images/slides/hero-14.webp',
+  'marbella': '/images/slides/hero-15.webp',
   
   // ========================================
   // CASTILLA-LA MANCHA
@@ -57,65 +57,65 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'hellin': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
   
   // Castilla-La Mancha sin imagen específica
-  'cuenca': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (49).webp',
-  'toledo': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (50).webp',
+  'cuenca': '/images/slides/hero-16.webp',
+  'toledo': '/images/slides/hero-17.webp',
   
   // ========================================
   // CASTILLA Y LEÓN
   // ========================================
-  'salamanca': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (52).webp',
-  'segovia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (54).webp',
-  'avila': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (55).webp',
-  'valladolid': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (56).webp',
-  'burgos': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (58).webp',
+  'salamanca': '/images/slides/hero-18.webp',
+  'segovia': '/images/slides/hero-19.webp',
+  'avila': '/images/slides/hero-20.webp',
+  'valladolid': '/images/slides/hero-21.webp',
+  'burgos': '/images/slides/hero-22.webp',
   
   // ========================================
   // MADRID
   // ========================================
-  'madrid': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'madrid': '/images/slides/hero-23.webp',
   // Cinturón metropolitano (SEO) — misma referencia visual que Madrid
-  'mostoles': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
-  'alcala-de-henares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
-  'fuenlabrada': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
-  'leganes': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
-  'getafe': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
-  'alcorcon': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
-  'las-rozas-de-madrid': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
-  'alcobendas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'mostoles': '/images/slides/hero-24.webp',
+  'alcala-de-henares': '/images/slides/hero-25.webp',
+  'fuenlabrada': '/images/slides/hero-26.webp',
+  'leganes': '/images/slides/hero-27.webp',
+  'getafe': '/images/slides/hero-28.webp',
+  'alcorcon': '/images/slides/hero-29.webp',
+  'las-rozas-de-madrid': '/images/slides/hero-30.webp',
+  'alcobendas': '/images/slides/hero-19.webp',
 
   // Anillo Alicante (SEO) — referencia Costa Blanca / Alicante
-  'gandia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (70).webp',
-  'denia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (71).webp',
-  'alcoy': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (82).webp',
-  'san-vicente-del-raspeig': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (83).webp',
-  'elda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (85).webp',
-  'villena': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (89).webp',
-  'xativa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (90).webp',
+  'gandia': '/images/slides/hero-20.webp',
+  'denia': '/images/slides/hero-21.webp',
+  'alcoy': '/images/slides/hero-22.webp',
+  'san-vicente-del-raspeig': '/images/slides/hero-23.webp',
+  'elda': '/images/slides/hero-24.webp',
+  'villena': '/images/slides/hero-25.webp',
+  'xativa': '/images/slides/hero-26.webp',
 
   // Anillo Albacete (SEO)
-  'tomelloso': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
-  'alcazar-de-san-juan': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (93).webp',
-  'valdepenas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (94).webp',
-  'villarrobledo': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (63).webp',
-  'almansa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (61).webp',
-  'manzanares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (60).webp',
-  'la-roda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'tomelloso': '/images/slides/hero-27.webp',
+  'alcazar-de-san-juan': '/images/slides/hero-28.webp',
+  'valdepenas': '/images/slides/hero-29.webp',
+  'villarrobledo': '/images/slides/hero-30.webp',
+  'almansa': '/images/slides/hero-19.webp',
+  'manzanares': '/images/slides/hero-20.webp',
+  'la-roda': '/images/slides/hero-21.webp',
 
   // Costa Blanca Sur y Norte
-  'santa-pola': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (58).webp',
-  'calpe': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (56).webp',
-  'guardamar-del-segura': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (55).webp',
-  'altea': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (54).webp',
+  'santa-pola': '/images/slides/hero-22.webp',
+  'calpe': '/images/slides/hero-23.webp',
+  'guardamar-del-segura': '/images/slides/hero-24.webp',
+  'altea': '/images/slides/hero-25.webp',
   
   // Mar Menor
   'san-pedro-del-pinatar': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_san_pedro_del_pinatar.webp',
-  'los-alcazares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (52).webp',
+  'los-alcazares': '/images/slides/hero-26.webp',
 };
 
 /**
  * Imagen por defecto si la localización no está en el mapping
  */
-export const DEFAULT_LOCATION_HERO = '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (60).webp';
+export const DEFAULT_LOCATION_HERO = '/images/slides/hero-27.webp';
 
 /**
  * Obtener la imagen hero para una localización
