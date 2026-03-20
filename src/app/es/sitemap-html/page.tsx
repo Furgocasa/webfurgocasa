@@ -60,6 +60,7 @@ const staticPages: Array<{ path: string; label: string }> = [
   { path:"/alquiler-motorhome-europa-desde-espana", label:"Alquiler Motorhome Europa" },
   { path:"/alquiler-motorhome-marruecos-desde-espana", label:"Alquiler Motorhome Marruecos" },
   { path:"/alquiler-motorhome-espana", label:"Alquiler Motorhome España" },
+  { path:"/alquiler-motorhome-madrid", label:"Alquiler Motorhome Madrid" },
   { path:"/autocaravanas", label:"Guía Autocaravanas" },
   { path:"/contacto", label:"Contacto" },
   { path:"/guia-camper", label:"Guía camper" },
