@@ -175,12 +175,13 @@ function FuelTankIndicator({ title }: { title: string }) {
     { id: "34", label: "¾" },
     { id: "f", label: "Lleno" },
   ];
+  const tickPcts = [25, 50, 75];
   return (
     <div style={{ marginTop: "8px", padding: "8px", border: "1px solid #e5e7eb", borderRadius: "6px", backgroundColor: "#fafafa" }}>
       <div style={{ fontSize: "11px", fontWeight: "bold", color: "#1f2937", marginBottom: "6px" }}>{title}</div>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: "8px", flexWrap: "nowrap" }}>
-        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <svg width="44" height="52" viewBox="0 0 64 80" aria-hidden preserveAspectRatio="xMidYMid meet">
+      <div style={{ display: "flex", alignItems: "stretch", gap: "8px", flexWrap: "nowrap" }}>
+        <div style={{ flexShrink: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <svg width="40" height="48" viewBox="0 0 64 80" aria-hidden preserveAspectRatio="xMidYMid meet">
             <path
               d="M12 18 L52 18 Q56 18 56 22 L56 62 Q56 68 50 70 L14 70 Q8 68 8 62 L8 22 Q8 18 12 18 Z"
               fill="#f3f4f6"
@@ -195,40 +196,52 @@ function FuelTankIndicator({ title }: { title: string }) {
             />
             <line x1="14" y1="42" x2="50" y2="42" stroke="#78716c" strokeWidth="0.8" strokeDasharray="3 2" />
             <rect x="28" y="8" width="8" height="14" rx="1.5" fill="#e5e7eb" stroke="#374151" strokeWidth="1.5" />
-            <text x="32" y="48" textAnchor="middle" fontSize="11" fill="#78350f" fontFamily="var(--font-amiko), sans-serif" fontWeight="bold">
+            <text x="32" y="48" textAnchor="middle" fontSize="11" fill="#78350f" fontFamily="Arial, sans-serif" fontWeight="bold">
               GAS
             </text>
           </svg>
-          <span style={{ fontSize: "8px", color: "#6b7280", marginTop: "4px", textAlign: "center" }}>Depósito</span>
+          <span style={{ fontSize: "8px", color: "#6b7280", marginTop: "2px", textAlign: "center" }}>Depósito</span>
         </div>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "9px", fontWeight: 600, color: "#64748b", marginBottom: "4px" }}>
+            <span>Vacío</span>
+            <span>Lleno</span>
+          </div>
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              gap: "4px",
-              border: "1px solid #d1d5db",
-              borderRadius: "6px",
-              padding: "6px 4px",
-              backgroundColor: "#fff",
+              position: "relative",
+              height: "22px",
+              borderRadius: "11px",
+              border: "2px solid #063971",
+              overflow: "hidden",
+              boxSizing: "border-box",
+              background: "linear-gradient(90deg, #f1f5f9 0%, #e2e8f0 18%, #fde68a 42%, #fbbf24 68%, #D65A31 100%)",
             }}
           >
-            {steps.map((s) => (
-              <div key={s.id} style={{ textAlign: "center", flex: "1 1 0" }}>
-                <div
-                  style={{
-                    width: "18px",
-                    height: "18px",
-                    border: "1.5px solid #111827",
-                    borderRadius: "4px",
-                    margin: "0 auto 4px",
-                    backgroundColor: "#fff",
-                    boxSizing: "border-box",
-                  }}
-                />
-                <div style={{ fontSize: "10px", fontWeight: "bold", color: "#111827", lineHeight: "1.15" }}>{s.label}</div>
-              </div>
+            {tickPcts.map((pct) => (
+              <div
+                key={pct}
+                style={{
+                  position: "absolute",
+                  left: `${pct}%`,
+                  top: 0,
+                  bottom: 0,
+                  width: "2px",
+                  backgroundColor: "rgba(15, 23, 42, 0.22)",
+                  transform: "translateX(-50%)",
+                }}
+              />
             ))}
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: "6px", fontSize: "9px", fontWeight: "bold", color: "#334155" }}>
+            {steps.map((s) => (
+              <span key={s.id} style={{ flex: "1 1 0", textAlign: "center" }}>
+                {s.label}
+              </span>
+            ))}
+          </div>
+          <div style={{ fontSize: "8px", color: "#94a3b8", marginTop: "4px", textAlign: "center" }}>
+            Marque con bolígrafo el nivel sobre la barra.
           </div>
         </div>
       </div>
