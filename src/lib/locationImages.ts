@@ -18,7 +18,7 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'archena': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_archena.webp',
   'alhama': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_alhama_de_murcia.webp',
   
-  // Murcia sin imagen específica - usar genéricas
+  // Madrid sin imagen específica - usar genéricas
   'cartagena': '/images/slides/hero-01.webp',
   'aguilas': '/images/slides/hero-02.webp',
   'la-manga-del-mar-menor': '/images/slides/hero-03.webp',
@@ -64,9 +64,9 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   // CASTILLA Y LEÓN
   // ========================================
   'salamanca': '/images/slides/hero-18.webp',
-  'segovia': '/images/slides/hero-19.webp',
-  'avila': '/images/slides/hero-20.webp',
-  'valladolid': '/images/slides/hero-21.webp',
+  'segovia': '/images/slides/hero-42.webp',
+  'avila': '/images/slides/hero-43.webp',
+  'valladolid': '/images/slides/hero-44.webp',
   'burgos': '/images/slides/hero-22.webp',
   
   // ========================================
@@ -88,15 +88,15 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'denia': '/images/slides/hero-49.webp',
   'alcoy': '/images/slides/hero-51.webp',
   'san-vicente-del-raspeig': '/images/slides/hero-53.webp',
-  'elda': '/images/slides/hero-24.webp',
-  'villena': '/images/slides/hero-25.webp',
-  'xativa': '/images/slides/hero-26.webp',
+  'elda': '/images/slides/hero-31.webp',
+  'villena': '/images/slides/hero-32.webp',
+  'xativa': '/images/slides/hero-33.webp',
 
   // Anillo Albacete (SEO)
-  'tomelloso': '/images/slides/hero-27.webp',
-  'alcazar-de-san-juan': '/images/slides/hero-28.webp',
-  'valdepenas': '/images/slides/hero-29.webp',
-  'villarrobledo': '/images/slides/hero-30.webp',
+  'tomelloso': '/images/slides/hero-34.webp',
+  'alcazar-de-san-juan': '/images/slides/hero-35.webp',
+  'valdepenas': '/images/slides/hero-36.webp',
+  'villarrobledo': '/images/slides/hero-37.webp',
   'almansa': '/images/slides/hero-46.webp',
   'manzanares': '/images/slides/hero-48.webp',
   'la-roda': '/images/slides/hero-50.webp',
@@ -104,18 +104,18 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   // Costa Blanca Sur y Norte
   'santa-pola': '/images/slides/hero-52.webp',
   'calpe': '/images/slides/hero-54.webp',
-  'guardamar-del-segura': '/images/slides/hero-24.webp',
-  'altea': '/images/slides/hero-25.webp',
+  'guardamar-del-segura': '/images/slides/hero-38.webp',
+  'altea': '/images/slides/hero-39.webp',
   
   // Mar Menor
   'san-pedro-del-pinatar': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_san_pedro_del_pinatar.webp',
-  'los-alcazares': '/images/slides/hero-26.webp',
+  'los-alcazares': '/images/slides/hero-40.webp',
 };
 
 /**
  * Imagen por defecto si la localización no está en el mapping
  */
-export const DEFAULT_LOCATION_HERO = '/images/slides/hero-27.webp';
+export const DEFAULT_LOCATION_HERO = '/images/slides/hero-41.webp';
 
 /**
  * Obtener la imagen hero para una localización
