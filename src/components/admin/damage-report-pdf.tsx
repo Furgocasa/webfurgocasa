@@ -77,41 +77,21 @@ function DamageMarker({ damage, displayNumbers }: { damage: VehicleDamage; displ
         marginTop: "-11px",
         width: "22px",
         height: "22px",
+        borderRadius: "50%",
+        backgroundColor: colors.fill,
+        border: `2px solid ${colors.stroke}`,
+        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        color: colors.stroke,
+        fontSize: "10px",
+        fontWeight: "bold",
         zIndex: 10,
+        boxSizing: "border-box",
       }}
     >
-      <table
-        style={{
-          width: "22px",
-          height: "22px",
-          borderCollapse: "collapse",
-          borderSpacing: "0",
-          borderRadius: "50%",
-          backgroundColor: colors.fill,
-          border: `2px solid ${colors.stroke}`,
-          boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-          overflow: "hidden",
-        }}
-      >
-        <tbody>
-          <tr>
-            <td
-              style={{
-                textAlign: "center",
-                verticalAlign: "middle",
-                padding: "0",
-                margin: "0",
-                color: colors.stroke,
-                fontSize: "10px",
-                fontWeight: "bold",
-                lineHeight: "1",
-              }}
-            >
-              {num}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <span style={{ lineHeight: "1" }}>{num}</span>
     </div>
   );
 }
