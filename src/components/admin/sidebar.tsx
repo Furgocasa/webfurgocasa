@@ -47,7 +47,7 @@ const navigation: NavItem[] = [
   { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
   { name: "Reservas", href: "/administrator/reservas", icon: Calendar },
   { name: "Bloqueos", href: "/administrator/bloqueos", icon: Ban },
-  { name: "Vacaciones / Cierres", href: "/administrator/vacaciones", icon: Palmtree },
+  { name: "Vacaciones", href: "/administrator/vacaciones", icon: Palmtree },
   { name: "Calendario", href: "/administrator/calendario", icon: Calendar },
   { name: "Clientes", href: "/administrator/clientes", icon: Users },
   { name: "Pagos", href: "/administrator/pagos", icon: CreditCard },
