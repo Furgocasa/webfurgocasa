@@ -178,6 +178,8 @@ node scripts/translate-existing-content.js --table=posts --limit=10
 | vehicles | name, description, short_description |
 | location_targets | name, meta_title, meta_description, h1_title, intro_text |
 | sale_location_targets | name, meta_title, meta_description, h1_title, intro_text |
+
+*Marzo 2026:* ~**59** `location_targets` activos. Metas de alquiler (ES + EN/FR/DE): también `node scripts/update-location-targets-rent-meta.js` → `content_translations` (`meta_description`).
 | vehicle_categories | name, description |
 | extras | name, description |
 | content_categories | name, description |

@@ -19,13 +19,15 @@ En **Supabase** → tabla `posts` → columna `location_tags`:
 
 ### Slugs de ubicaciones (location_targets)
 
+> **Marzo 2026:** Hay **59** targets activos en total. Lista canónica: Supabase o `npm run check:location-targets-db`. Abajo, slugs frecuentes + **anillo** (recogida Madrid / Alicante / Albacete) y **Hellín**.
+
 | Provincia/Región | Slugs |
 |------------------|-------|
 | Región de Murcia | murcia, lorca, cartagena, mazarron, aguilas, la-manga-del-mar-menor, caravaca-de-la-cruz, yecla, jumilla, cieza, sierra-espuna, alhama, archena, las-torres-de-cotillas |
-| Alicante/Valencia | alicante, elche, orihuela, torrevieja, benidorm, valencia |
+| Alicante/Valencia | alicante, elche, orihuela, torrevieja, benidorm, valencia, **gandia, denia, alcoy, san-vicente-del-raspeig, elda, villena, xativa** (anillo) |
 | Andalucía | almeria, granada, malaga, marbella, jaen, cabo-de-gata |
-| Castilla-La Mancha | albacete, cuenca, toledo |
-| Madrid | madrid |
+| Castilla-La Mancha | albacete, cuenca, toledo, **hellin**, **tomelloso, alcazar-de-san-juan, valdepenas, villarrobledo, almansa, manzanares, la-roda** (anillo) |
+| Madrid | madrid, **mostoles, alcala-de-henares, fuenlabrada, leganes, getafe, alcorcon, las-rozas-de-madrid, alcobendas** (anillo) |
 | Castilla y León | salamanca, segovia, avila, valladolid, burgos |
 
 ### Guía para revisar artículos de RUTAS

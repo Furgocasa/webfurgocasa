@@ -17,6 +17,17 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 🗺️ Landings SEO alquiler por ciudad (estado marzo 2026)
+
+- **`location_targets` activos**: **59** en producción (verificar: `npm run check:location-targets-db`).
+- **Sedes de recogida**: Murcia, Madrid, Alicante, Albacete + lógica por `nearest_location_id` / `distance_km` por ciudad.
+- **Región de Murcia**: **14** landings (capital, costa, interior, Sierra Espuña).
+- **Expansión reciente**: **22** localidades en anillo (Madrid + entorno Alicante + entorno Albacete) y **Hellín** (recogida Albacete).
+- **Contenido IA** (`content_sections`): `npm run generate-content:all` | `:ring` | `:thin` | `single <slug>` — guía en [`docs/04-referencia/otros/GENERACION-CONTENIDO-IA.md`](./docs/04-referencia/otros/GENERACION-CONTENIDO-IA.md).
+- **Metas ES + EN/FR/DE**: `node scripts/update-location-targets-rent-meta.js` (tabla `location_targets` + `content_translations`).
+
+---
+
 ## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Febrero 2026 - **Franjas Horarias por Ubicación + Fix Timezone Europe/Madrid**
 
 ### 🕐 Franjas Horarias Configurables por Ubicación

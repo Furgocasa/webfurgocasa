@@ -2,6 +2,8 @@
 
 ## ✅ Implementación Completada
 
+**Marzo 2026:** El mapeo de héroes en código (`src/lib/locationImages.ts`) incluye también el **anillo** (22 slugs) y localidades nuevas (p. ej. Hellín); el listado de Storage puede no coincidir 1:1 con todos los slugs — hay **fallback** a imagen de sede o genérica.
+
 ### 🎯 Objetivo
 Usar imágenes de **alta calidad** (1920x1080, WebP 90%) en las secciones hero de las páginas de localización, diferentes a las imágenes pequeñas de las tarjetas de destinos.
 

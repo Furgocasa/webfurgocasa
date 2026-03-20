@@ -25,7 +25,7 @@
 
 | Tabla/Archivo | Registros | Estado |
 |---------------|-----------|--------|
-| `location_targets` | 36 | ✅ OK |
+| `location_targets` | ~59 activos (mar. 2026); el fix original era con 36 | ✅ OK |
 | `sale_location_targets` | 22 | ✅ Corregidos |
 | `vehicles` | 13 | ✅ OK |
 | `ventas/[slug]/page.tsx` | - | ✅ Corregido |

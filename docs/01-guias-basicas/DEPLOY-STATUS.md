@@ -2,10 +2,15 @@
 
 ## ✅ Estado Actual en Producción
 
-**Fecha**: 2026-01-20  
+**Fecha**: 2026-01-20 (última revisión landings: **marzo 2026**)  
 **Versión**: 1.0.5  
 **URL**: https://www.furgocasa.com  
 **Estado**: ✅ **TOTALMENTE FUNCIONAL**
+
+### Landings alquiler por ciudad (marzo 2026)
+
+- Tabla `location_targets`: **~59** filas activas (14 Murcia + anillo 22 + resto España + Hellín).
+- Comprobar: `npm run check:location-targets-db` · Contenido IA: ver `docs/04-referencia/otros/GENERACION-CONTENIDO-IA.md`.
 
 ---
 

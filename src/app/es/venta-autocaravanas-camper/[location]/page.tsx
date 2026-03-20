@@ -180,6 +180,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       locale: 'es_ES',
       images: [{ url: heroImageUrl, width: 1920, height: 1080 }],
     },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [{ url: heroImageUrl }],
+    },
     robots: { index: true, follow: true },
   };
 }

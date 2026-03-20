@@ -111,7 +111,8 @@ Documentación técnica de referencia:
 #### otros/
 - TinyMCE editor
 - Favicon
-- Generación de contenido con IA
+- Generación de contenido con IA (`GENERACION-CONTENIDO-IA.md`, scripts `generate-content:*`, `check:location-targets-db`)
+- Landings alquiler: **59** `location_targets` activos (mar. 2026), anillo 22 + Hellín + cobertura Murcia (14)
 
 ### 05-historico/
 Reportes y análisis históricos:
@@ -178,5 +179,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 5 de Febrero, 2026
-Versión del proyecto: 4.4.0
+Última actualización: 20 de marzo, 2026  
+Versión del proyecto: 4.5.0 (landings alquiler documentadas: 59 activos)

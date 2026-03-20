@@ -16,6 +16,8 @@
     "generate-content": "tsx scripts/generate-location-content.ts",
     "generate-content:all": "tsx scripts/generate-location-content.ts all",
     "generate-content:regenerate": "tsx scripts/generate-location-content.ts all --regenerate",
+    "generate-content:ring": "tsx scripts/generate-location-content.ts all --only-ring",
+    "generate-content:thin": "tsx scripts/generate-location-content.ts all --thin",
     "generate-sale-content": "tsx scripts/generate-sale-location-content.ts",
     "generate-sale-content:all": "tsx scripts/generate-sale-location-content.ts all",
     "generate-sale-content:regenerate": "tsx scripts/generate-sale-location-content.ts all --regenerate",
@@ -34,11 +36,12 @@
     "assign:location-tags": "tsx scripts/assign-location-tags-to-posts.ts",
     "assign:location-tags:dry": "tsx scripts/assign-location-tags-to-posts.ts --dry-run",
     "check:location-tags": "tsx scripts/check-location-tags.ts",
+    "check:location-targets-db": "tsx scripts/check-location-targets-db.ts",
     "seo:cinco-planes-otono": "tsx scripts/seo-update-cinco-planes-otono.ts",
     "seo:cinco-planes-otono:dry": "tsx scripts/seo-update-cinco-planes-otono.ts --dry-run",
     "translate:blog": "node translate-blog-content.js",
     "translate:blog:vicar": "node translate-blog-content.js vicar-municipio-almeriense-dispondra-de-una-zona-de-servicio-para-autocaravanas",
-    "translate:blog:murcia-cieza": "node translate-blog-content.js la-region-de-murcia-contara-con-una-nueva-area-de-autocaravanas-la-ciudad-de-cieza-en-el-mapa-para-este-tipo-de-turismo"
+    "translate:location-sections": "node scripts/translate-location-content-sections.js"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

@@ -4,6 +4,18 @@
 
 Generar contenido **único, detallado y SEO-optimizado** para cada página de localización usando OpenAI, diferenciando nuestro sitio de la competencia con información real y específica de cada ciudad.
 
+### 📌 Estado actual (marzo 2026)
+
+| Concepto | Valor (producción de referencia) |
+|----------|----------------------------------|
+| `location_targets` con `is_active = true` | **59** |
+| Provincia Murcia | **14** slugs |
+| Anillo Madrid / Alicante / Albacete | **22** slugs |
+| Hellín | `hellin` (recogida en sede Albacete) |
+| Verificación local | `npm run check:location-targets-db` |
+
+El número de filas con `content_generated_at` cambia al ejecutar `generate-content:*`; usar `generate-content:thin` para rellenar plantillas incompletas.
+
 ---
 
 ## 📋 Paso a Paso
@@ -36,9 +48,14 @@ Agregar a tu `.env.local`:
 ```env
 # OpenAI
 OPENAI_API_KEY=sk-proj-tu-api-key-aqui
+# Opcional: modelo (por defecto gpt-4o)
+OPENAI_LOCATION_MODEL=gpt-4o
 
 # Supabase Service Role (para escritura desde scripts)
 SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key-de-supabase
+
+# Opcional: búsquedas Google reales vía SerpAPI (mejor contexto por ciudad)
+SERPAPI_KEY=
 ```
 
 **¿Dónde encontrar las keys?**
@@ -63,6 +80,38 @@ npm run generate-content single murcia
 npm run generate-content single cartagena
 npm run generate-content single valencia
 ```
+
+#### Opción D: Solo el anillo Madrid / Alicante / Albacete (22 `location_targets`)
+```bash
+npm run generate-content:ring
+# Con regeneración:
+npx tsx scripts/generate-location-content.ts all --only-ring --regenerate
+```
+
+#### Opción E: Solo ciudades con contenido “fino” o incompleto (`--thin`)
+Útil tras crear nuevas localidades o si faltan rutas / aparcamientos / atracciones en JSON.
+```bash
+npm run generate-content:thin
+```
+
+#### Opción F: Slugs concretos (CLI)
+```bash
+npx tsx scripts/generate-location-content.ts all --slugs=hellin,mostoles
+npx tsx scripts/generate-location-content.ts all --slugs=gandia --regenerate
+```
+
+**Comprobar la BD con tu `.env.local` (sin abrir el Dashboard):**
+```bash
+npm run check:location-targets-db
+```
+(Revisa columnas de contenido, Hellín, anillo de 22 y, si la API lo permite, la tabla de migraciones.)
+
+**Combinar filtros:** por ejemplo solo anillo y solo las que siguen finas:
+```bash
+npx tsx scripts/generate-location-content.ts all --only-ring --thin
+```
+
+**Recogida por sede:** el script lee `nearest_location_id` + `locations` (`is_pickup`) para decir si la recogida es en la propia ciudad o en Murcia / Madrid / Alicante / Albacete, con `distance_km` / `travel_time_minutes` cuando existan.
 
 ---
 
@@ -108,7 +157,7 @@ Platos típicos, restaurantes, productos locales.
 ### 6. **Consejos prácticos** (100-150 palabras)
 Mejor época, normativas, estacionamiento, etc.
 
-**Total: 800-1200 palabras de contenido único por ciudad** ✅
+**Total objetivo en prompt:** ~1500–2000 palabras; el script valida mínimos en arrays (atracciones ≥3, aparcamientos ≥2, rutas ≥2) antes de guardar en `content_sections`.
 
 ---
 

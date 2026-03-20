@@ -3,6 +3,8 @@
 **Fecha**: 2026-01-20  
 **Objetivo**: Verificar que ambas páginas tienen el **mismo nivel de calidad SEO**
 
+**Marzo 2026:** Landings de **alquiler** en `location_targets`: **~59** activas (antes ~36). **Venta** sigue en `sale_location_targets` (catálogo independiente). Paridad técnica página a página se mantiene.
+
 ---
 
 ## ✅ RESULTADO: PARIDAD 100%

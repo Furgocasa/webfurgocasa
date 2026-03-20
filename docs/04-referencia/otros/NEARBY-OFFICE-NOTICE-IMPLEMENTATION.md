@@ -4,6 +4,8 @@
 **Estado**: ✅ **COMPLETADO**  
 **Afectación**: Páginas de alquiler por ubicación (4 idiomas)
 
+**Marzo 2026:** Cubre todas las landings activas en `location_targets` (**59** en producción de referencia). La recogida se explica con `nearest_location_id`, `distance_km` y sedes `locations.is_pickup` (Murcia, Madrid, Alicante, Albacete, etc.).
+
 ---
 
 ## 📋 RESUMEN EJECUTIVO

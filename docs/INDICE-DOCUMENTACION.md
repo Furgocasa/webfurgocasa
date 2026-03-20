@@ -1,10 +1,26 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.16 ✅ PRODUCCIÓN - SISTEMA VEHÍCULOS VENDIDOS  
+**Versión**: 1.0.17 ✅ PRODUCCIÓN — landings alquiler ampliadas (documentación)  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 12 de Febrero, 2026
+**Última actualización**: 20 de marzo, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🗺️ ACTUALIZACIÓN MARZO 2026 — LANDINGS ALQUILER (`location_targets`)
+
+**Estado documentado en código y docs** (comprobar tu BD: `npm run check:location-targets-db`):
+
+| Dato | Valor |
+|------|--------|
+| Targets activos | **59** |
+| Provincia Murcia | **14** slugs |
+| Anillo Madrid / Alicante / Albacete | **22** slugs |
+| Hellín | slug `hellin` (recogida Albacete) |
+| Contenido IA | `npm run generate-content:all` / `:ring` / `:thin` — ver **[GENERACION-CONTENIDO-IA.md](./04-referencia/otros/GENERACION-CONTENIDO-IA.md)** |
+| Metas rent ES + i18n | `node scripts/update-location-targets-rent-meta.js` |
+| Migraciones SQL (ej.) | `20260321-location-targets-nearest-pickup-sync.sql`, `20260322-location-target-hellin.sql`, `20260323-location-targets-ring-madrid-alicante-albacete.sql` |
 
 ---
 
@@ -625,7 +641,7 @@ Estos documentos ya NO existen (fueron eliminados):
 
 ---
 
-**Total de documentos activos**: 35 archivos .md en raíz + subdirectorios  
-**Última actualización crítica**: Auditoría de Seguridad (5 Febrero 2026)  
-**Última actualización anterior**: Páginas Motorhome Europa Multiidioma (25 Enero 2026)  
+**Total de documentos activos**: ver carpeta `docs/` (índice revisado mar. 2026)  
+**Última actualización crítica**: Landings alquiler + docs alineadas (20 marzo 2026)  
+**Última actualización anterior**: Auditoría de Seguridad (5 Febrero 2026)  
 **Última limpieza de obsoletos**: 20 Enero 2026

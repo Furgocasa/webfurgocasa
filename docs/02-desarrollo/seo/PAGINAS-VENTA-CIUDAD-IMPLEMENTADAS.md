@@ -74,7 +74,7 @@ Similar a `location_targets` pero para páginas de **venta** de autocaravanas po
 ### Actualizado: `src/app/sitemap.ts`
 
 Ahora incluye:
-1. ✅ Páginas de alquiler por ciudad (`location_targets`)
+1. ✅ Páginas de alquiler por ciudad (`location_targets`) — **~59** activas (mar. 2026); ver `npm run check:location-targets-db`
 2. ✅ **Páginas de venta por ciudad (`sale_location_targets`)** ← NUEVO
 3. ✅ Todas las páginas del blog
 4. ✅ Vehículos de alquiler y venta individuales

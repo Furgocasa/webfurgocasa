@@ -2,6 +2,10 @@
 
 Esta carpeta contiene la configuración del cliente de Supabase para Furgocasa.
 
+## 📍 Landings alquiler (`location_targets`)
+
+Datos SEO por ciudad (metas, `content_sections`, `nearest_location_id`). **Estado mar. 2026:** ~**59** filas activas en producción. Verificación: desde la raíz del repo, `npm run check:location-targets-db`. Generación de texto: `docs/04-referencia/otros/GENERACION-CONTENIDO-IA.md`.
+
 ## 📁 Archivos
 
 - **`client.ts`** - Cliente para el navegador (usa anon key con RLS)

@@ -25,12 +25,57 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+/** Modelo OpenAI (gpt-4o recomendado; override con OPENAI_LOCATION_MODEL en .env.local) */
+const OPENAI_MODEL = process.env.OPENAI_LOCATION_MODEL || 'gpt-4o';
+
+/**
+ * Slugs del anillo Madrid / Alicante / Albacete (mismo listado que apply-location-targets-ring.js)
+ */
+const RING_SLUGS: readonly string[] = [
+  'mostoles',
+  'alcala-de-henares',
+  'fuenlabrada',
+  'leganes',
+  'getafe',
+  'alcorcon',
+  'las-rozas-de-madrid',
+  'alcobendas',
+  'gandia',
+  'denia',
+  'alcoy',
+  'san-vicente-del-raspeig',
+  'elda',
+  'villena',
+  'xativa',
+  'tomelloso',
+  'alcazar-de-san-juan',
+  'valdepenas',
+  'villarrobledo',
+  'almansa',
+  'manzanares',
+  'la-roda',
+];
+
 interface LocationTarget {
   id: string;
   slug: string;
   name: string;
   province: string;
   region: string;
+  distance_km?: number | null;
+  travel_time_minutes?: number | null;
+  nearest_location_id?: string | null;
+  content_generated_at?: string | null;
+  content_word_count?: number | null;
+  content_sections?: GeneratedContent | Record<string, unknown> | null;
+}
+
+interface PickupMeta {
+  pickupCity: string;
+  pickupSlug: string;
+  distanceKm: number | null | undefined;
+  travelMin: number | null | undefined;
+  isLocalSede: boolean;
 }
 
 interface GeneratedContent {
@@ -57,14 +102,39 @@ interface GeneratedContent {
 }
 
 /**
- * Determina si una ubicación está más cerca de Murcia o Madrid
+ * Contenido "fino": plantilla inicial o generación incompleta → merece regeneración con --thin
  */
-function getNearestOffice(location: LocationTarget): 'murcia' | 'madrid' {
-  // Provincias cercanas a Madrid (alquileres de larga duración)
-  const madridProvinces = ['Madrid', 'Toledo', 'Guadalajara', 'Segovia', 'Ávila'];
-  
-  // Por defecto, todo lo demás está más cerca de Murcia
-  return madridProvinces.includes(location.province) ? 'madrid' : 'murcia';
+function isThinContent(
+  location: Pick<LocationTarget, 'content_generated_at' | 'content_word_count' | 'content_sections'>
+): boolean {
+  if (!location.content_generated_at) return true;
+  const wc = location.content_word_count ?? 0;
+  if (wc > 0 && wc < 500) return true;
+  const cs = location.content_sections as Record<string, unknown> | null | undefined;
+  if (!cs || typeof cs !== 'object') return true;
+  const routes = cs.routes;
+  if (!Array.isArray(routes) || routes.length < 2) return true;
+  const park = cs.parking_areas;
+  if (!Array.isArray(park) || park.length < 2) return true;
+  const att = cs.attractions;
+  if (!Array.isArray(att) || att.length < 3) return true;
+  return false;
+}
+
+async function loadPickupLocations(): Promise<Map<string, { city: string; slug: string }>> {
+  const { data, error } = await supabase
+    .from('locations')
+    .select('id, city, slug')
+    .eq('is_active', true)
+    .eq('is_pickup', true);
+
+  if (error || !data) {
+    console.warn('⚠️  No se pudieron cargar sedes de recogida:', error?.message);
+    return new Map();
+  }
+  return new Map(
+    data.map((l) => [l.id, { city: (l.city || 'Murcia').trim(), slug: l.slug || '' }])
+  );
 }
 
 /**
@@ -164,14 +234,17 @@ async function searchLocalContext(location: LocationTarget): Promise<string> {
 /**
  * Genera contenido único para una ubicación usando OpenAI
  */
-async function generateLocationContent(location: LocationTarget): Promise<GeneratedContent> {
-  const nearestOffice = getNearestOffice(location);
-  const officeName = nearestOffice === 'murcia' ? 'Murcia (Casillas)' : 'Madrid';
-  const isSede = location.name === 'Murcia' || location.name === 'Madrid';
-  
-  const sedeContext = isSede 
-    ? `${location.name} ${location.name === 'Murcia' ? 'es la sede principal' : 'ofrece servicio de recogida para alquileres de larga duración'} de Furgocasa.`
-    : `Furgocasa tiene su sede en ${officeName}. Para ${location.name}, sé transparente: no hay sede física allí, pero la recogida en ${officeName} merece la pena por la cercanía y la calidad de las campers. Calcula la distancia aproximada desde ${location.name} a ${officeName} y menciónala de forma natural.`;
+async function generateLocationContent(
+  location: LocationTarget,
+  pickup: PickupMeta
+): Promise<GeneratedContent> {
+  const { pickupCity, distanceKm, travelMin, isLocalSede } = pickup;
+  const distStr = distanceKm != null ? `${distanceKm} km` : 'la distancia indicada en la web';
+  const timeStr = travelMin != null ? `${travelMin} minutos` : 'el tiempo de conducción habitual';
+
+  const sedeContext = isLocalSede
+    ? `${location.name} es sede/punto de recogida Furgocasa: el cliente recoge la camper en la propia ciudad.`
+    : `Furgocasa no tiene sede física en ${location.name}. La recogida y la devolución del vehículo se realizan en la sede de **${pickupCity}** (aprox. ${distStr}, ${timeStr} en coche). Sé transparente, menciona la logística real y ayuda a planificar la ida a la sede sin dramatizar.`;
 
   // Buscar datos reales con SerpAPI
   const localContext = await searchLocalContext(location);
@@ -229,7 +302,7 @@ Posicionarse en búsquedas como:
 **GENERA EL CONTENIDO EN FORMATO JSON CON ESTA ESTRUCTURA:**
 
 {
-  "introduction": "<p>Párrafo introductorio extenso (300-400 palabras) en HTML sobre viajar en autocaravana a ${location.name}. Describe qué hace única a esta ciudad/región para el turismo en camper. ${!isSede ? 'Menciona de forma natural y transparente que Furgocasa está en ' + officeName + ', indicando la distancia aproximada y por qué merece la pena.' : 'Menciona que Furgocasa tiene servicio aquí.'} Usa keywords: alquiler autocaravana, camper, ${location.name}.</p>",
+  "introduction": "<p>Párrafo introductorio extenso (300-400 palabras) en HTML sobre viajar en autocaravana a ${location.name}. Describe qué hace única a esta ciudad/región para el turismo en camper. ${!isLocalSede ? 'Menciona de forma natural y transparente que la recogida del vehículo es en ' + pickupCity + ', con la distancia y tiempo aproximados desde ' + location.name + ' y consejos prácticos para el trayecto.' : 'Menciona que Furgocasa ofrece recogida en ' + location.name + '.'} Usa keywords: alquiler autocaravana, camper, ${location.name}.</p>",
   
   "attractions": [
     {
@@ -262,7 +335,7 @@ Posicionarse en búsquedas como:
   
   "gastronomy": "<h2>Gastronomía de ${location.province}</h2><p>Introducción a la gastronomía local (100 palabras).</p><h3>Platos típicos</h3><ul><li><strong>Plato 1:</strong> Descripción</li><li><strong>Plato 2:</strong> Descripción</li><li><strong>Plato 3:</strong> Descripción</li></ul><h3>Productos locales</h3><p>Descripción de productos típicos (100-150 palabras).</p><h3>Dónde comer</h3><p>Zonas gastronómicas, mercados, tipos de restaurantes recomendados en ${location.name} (150 palabras). No menciones nombres específicos de restaurantes a menos que sean muy conocidos.</p>",
   
-  "practical_tips": "<h2>Consejos prácticos para viajar en autocaravana a ${location.name}</h2><h3>Mejor época para visitar</h3><p>Información sobre clima y temporadas (80 palabras).</p><h3>Normativas y restricciones</h3><p>Normativas locales de estacionamiento, Zonas de Bajas Emisiones (ZBE) si existen, restricciones (100 palabras).</p><h3>Cómo llegar y moverse</h3><p>Distancia y tiempo desde ${officeName} a ${location.name}. Cómo moverse por la zona en autocaravana. Carreteras principales (120 palabras).</p><h3>Servicios para autocaravanas</h3><p>Gasolineras con servicio para vehículos grandes, talleres si es relevante, otros servicios útiles (80 palabras).</p>"
+  "practical_tips": "<h2>Consejos prácticos para viajar en autocaravana a ${location.name}</h2><h3>Mejor época para visitar</h3><p>Información sobre clima y temporadas (80 palabras).</p><h3>Normativas y restricciones</h3><p>Normativas locales de estacionamiento, Zonas de Bajas Emisiones (ZBE) si existen, restricciones (100 palabras).</p><h3>Cómo llegar y moverse</h3><p>Distancia y tiempo desde ${pickupCity} a ${location.name} para ir a recoger la camper. Cómo moverse por la zona en autocaravana. Carreteras principales (120 palabras).</p><h3>Servicios para autocaravanas</h3><p>Gasolineras con servicio para vehículos grandes, talleres si es relevante, otros servicios útiles (80 palabras).</p>"
 }
 
 **PRIORIDAD DE RESULTADOS:** Los datos de Google están ordenados por relevancia. Los marcados como [LOCAL DESTACADO] tienen mejores valoraciones y más reseñas en Google Maps. PRIORIZA SIEMPRE los sitios con más estrellas y reseñas: son los más conocidos y fiables de la zona. Si un área de pernocta, camping o restaurante tiene 4.5★+ y cientos de reseñas, menciónalo: aporta confianza al lector.
@@ -274,17 +347,17 @@ Posicionarse en búsquedas como:
 **RECORDATORIO FINAL:**
 - Todo el contenido en HTML limpio dentro de cada campo
 - Solo información REAL y VERIFICABLE
-- ${!isSede ? 'Sé TRANSPARENTE sobre la ubicación de Furgocasa en ' + officeName : ''}
+- ${!isLocalSede ? 'Sé TRANSPARENTE: recogida en sede ' + pickupCity + ', no en ' + location.name : 'Sede de recogida en ' + location.name}
 - NUNCA menciones Park4Night, CamperContact, iOverlander ni ninguna otra app de terceros
 - SIEMPRE recomienda Mapa Furgocasa (www.mapafurgocasa.com) cuando sea necesario mencionar una app
 - Contenido EXTENSO, COMPLETO y de MÁXIMA CALIDAD
 - Como si fuera una guía turística profesional especializada en autocaravanas`;
 
   try {
-    console.log(`   📝 Generando contenido con GPT-5.2...`);
-    
+    console.log(`   📝 Generando contenido con ${OPENAI_MODEL}...`);
+
     const completion = await openai.chat.completions.create({
-      model: "gpt-5.2",  // Modelo más reciente
+      model: OPENAI_MODEL,
       messages: [
         {
           role: "system",
@@ -303,11 +376,16 @@ Posicionarse en búsquedas como:
     const rawContent = completion.choices[0].message.content || '{}';
     const content = JSON.parse(rawContent);
     
-    // Validar que el contenido tenga la estructura esperada
-    if (!content.introduction || !content.attractions || !content.gastronomy) {
+    // Validar estructura mínima (qué ver, aparcamientos, rutas)
+    const okAtt = Array.isArray(content.attractions) && content.attractions.length >= 3;
+    const okPark = Array.isArray(content.parking_areas) && content.parking_areas.length >= 2;
+    const okRoutes = Array.isArray(content.routes) && content.routes.length >= 2;
+    if (!content.introduction || !content.gastronomy || !okAtt || !okPark || !okRoutes) {
       console.error(`   ⚠️  Claves recibidas: ${Object.keys(content).join(', ')}`);
       console.error(`   ⚠️  finish_reason: ${completion.choices[0].finish_reason}`);
-      throw new Error('Contenido generado incompleto');
+      throw new Error(
+        'Contenido generado incompleto (faltan introduction/gastronomy o arrays attractions≥3, parking_areas≥2, routes≥2)'
+      );
     }
     
     return content as GeneratedContent;
@@ -387,17 +465,34 @@ async function saveGeneratedContent(
   console.log(`   💾 Guardado en Supabase (${wordCount} palabras)`);
 }
 
+export interface GenerateAllOptions {
+  regenerate: boolean;
+  /** Solo estos slugs (prioridad máxima sobre otros filtros) */
+  slugList: string[] | null;
+  /** Solo el anillo Madrid / Alicante / Albacete */
+  onlyRing: boolean;
+  /** Solo filas con content_sections fino o sin content_generated_at */
+  thinOnly: boolean;
+}
+
 /**
- * Genera contenido para todas las ubicaciones activas
+ * Genera contenido para ubicaciones activas según filtros
  */
-async function generateAllContent(regenerate: boolean = false): Promise<void> {
-  console.log('🚀 Iniciando generación de contenido con OpenAI GPT-5.2\n');
+async function generateAllContent(opts: GenerateAllOptions): Promise<void> {
+  console.log(`🚀 Generación de contenido local — modelo ${OPENAI_MODEL}\n`);
+  if (opts.slugList?.length) console.log(`   Filtro: --slugs= (${opts.slugList.length} slugs)`);
+  if (opts.onlyRing) console.log('   Filtro: --only-ring (22 ciudades anillo)');
+  if (opts.thinOnly) console.log('   Filtro: --thin (contenido incompleto o plantilla)');
+  if (opts.regenerate) console.log('   Modo: --regenerate (sobrescribe lo existente)');
   console.log('━'.repeat(60));
 
-  // Obtener todas las ubicaciones activas
+  const pickupMap = await loadPickupLocations();
+
   const { data: locations, error } = await supabase
     .from('location_targets')
-    .select('id, slug, name, province, region, content_generated_at')
+    .select(
+      'id, slug, name, province, region, distance_km, travel_time_minutes, nearest_location_id, content_generated_at, content_word_count, content_sections'
+    )
     .eq('is_active', true)
     .order('display_order', { ascending: true });
 
@@ -407,49 +502,75 @@ async function generateAllContent(regenerate: boolean = false): Promise<void> {
   }
 
   const total = locations?.length || 0;
-  console.log(`📍 Encontradas ${total} ubicaciones activas\n`);
+  console.log(`📍 Candidatas en BD: ${total}\n`);
 
   let processed = 0;
   let skipped = 0;
+  let generated = 0;
   let errors = 0;
 
   for (const location of locations || []) {
     processed++;
-    
-    // Si ya tiene contenido y no queremos regenerar, saltar
-    if (!regenerate && location.content_generated_at) {
+
+    if (opts.slugList?.length && !opts.slugList.includes(location.slug)) {
       skipped++;
-      console.log(`⏭️  [${processed}/${total}] ${location.name} - Ya tiene contenido (usar --regenerate para sobrescribir)`);
       continue;
     }
 
+    if (opts.onlyRing && !RING_SLUGS.includes(location.slug)) {
+      skipped++;
+      continue;
+    }
+
+    if (opts.thinOnly && !isThinContent(location)) {
+      skipped++;
+      continue;
+    }
+
+    if (!opts.regenerate && location.content_generated_at && !opts.thinOnly) {
+      skipped++;
+      console.log(
+        `⏭️  [${processed}/${total}] ${location.name} — ya generado (usa --regenerate o --thin)`
+      );
+      continue;
+    }
+
+    const near = pickupMap.get(location.nearest_location_id ?? '');
+    const pickupCity = near?.city || 'Murcia';
+    const pickupSlug = near?.slug || 'murcia';
+    const isLocalSede = location.slug === pickupSlug;
+    const pickupMeta: PickupMeta = {
+      pickupCity,
+      pickupSlug,
+      distanceKm: location.distance_km,
+      travelMin: location.travel_time_minutes,
+      isLocalSede,
+    };
+
     try {
-      console.log(`\n🔄 [${processed}/${total}] Generando contenido para ${location.name}, ${location.province}...`);
-      
+      console.log(`\n🔄 [${processed}/${total}] ${location.name} (${location.province}) → recogida ${pickupCity}...`);
+
       const startTime = Date.now();
-      const content = await generateLocationContent(location);
+      const content = await generateLocationContent(location as LocationTarget, pickupMeta);
       await saveGeneratedContent(location.id, content);
       const duration = ((Date.now() - startTime) / 1000).toFixed(1);
-      
+      generated++;
+
       console.log(`✅ ${location.name} completado en ${duration}s\n`);
-      
-      // Esperar 3 segundos entre llamadas para no saturar la API
-      if (processed < total) {
-        console.log('   ⏳ Esperando 3 segundos...\n');
-        await new Promise(resolve => setTimeout(resolve, 3000));
-      }
-      
-    } catch (error) {
+
+      console.log('   ⏳ Esperando 3 s (rate limit APIs)...\n');
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    } catch (err) {
       errors++;
-      console.error(`❌ Error con ${location.name}:`, error);
+      console.error(`❌ Error con ${location.name}:`, err);
       console.log('');
     }
   }
 
   console.log('━'.repeat(60));
-  console.log('\n✨ Proceso completado!');
-  console.log(`   ✅ Generados: ${processed - skipped - errors}`);
-  console.log(`   ⏭️  Saltados: ${skipped}`);
+  console.log('\n✨ Proceso completado');
+  console.log(`   ✅ Generados: ${generated}`);
+  console.log(`   ⏭️  Saltados / no candidatos: ${skipped}`);
   console.log(`   ❌ Errores: ${errors}`);
   console.log('');
 }
@@ -460,10 +581,14 @@ async function generateAllContent(regenerate: boolean = false): Promise<void> {
 async function generateSingleContent(slug: string): Promise<void> {
   console.log('🚀 Generando contenido para ubicación específica\n');
   console.log('━'.repeat(60));
-  
+
+  const pickupMap = await loadPickupLocations();
+
   const { data: location, error } = await supabase
     .from('location_targets')
-    .select('id, slug, name, province, region')
+    .select(
+      'id, slug, name, province, region, distance_km, travel_time_minutes, nearest_location_id'
+    )
     .eq('slug', slug)
     .single();
 
@@ -472,11 +597,23 @@ async function generateSingleContent(slug: string): Promise<void> {
     return;
   }
 
-  console.log(`📍 Ubicación: ${location.name}, ${location.province}\n`);
+  const near = pickupMap.get(location.nearest_location_id ?? '');
+  const pickupCity = near?.city || 'Murcia';
+  const pickupSlug = near?.slug || 'murcia';
+  const isLocalSede = location.slug === pickupSlug;
+  const pickupMeta: PickupMeta = {
+    pickupCity,
+    pickupSlug,
+    distanceKm: location.distance_km,
+    travelMin: location.travel_time_minutes,
+    isLocalSede,
+  };
+
+  console.log(`📍 Ubicación: ${location.name}, ${location.province} → recogida ${pickupCity}\n`);
 
   try {
     const startTime = Date.now();
-    const content = await generateLocationContent(location);
+    const content = await generateLocationContent(location as LocationTarget, pickupMeta);
     await saveGeneratedContent(location.id, content);
     const duration = ((Date.now() - startTime) / 1000).toFixed(1);
     
@@ -500,13 +637,44 @@ async function generateSingleContent(slug: string): Promise<void> {
 // Script principal
 const args = process.argv.slice(2);
 const command = args[0];
-const param = args[1];
+
+function parseAllArgs(rest: string[]): GenerateAllOptions {
+  let regenerate = false;
+  let onlyRing = false;
+  let thinOnly = false;
+  let slugList: string[] | null = null;
+
+  for (const a of rest) {
+    if (a === '--regenerate') regenerate = true;
+    else if (a === '--only-ring') onlyRing = true;
+    else if (a === '--thin') thinOnly = true;
+    else if (a.startsWith('--slugs=')) {
+      slugList = a
+        .slice('--slugs='.length)
+        .split(',')
+        .map((s) => s.trim().toLowerCase())
+        .filter(Boolean);
+    }
+  }
+
+  if (slugList?.length) {
+    onlyRing = false;
+  }
+
+  return { regenerate, onlyRing, thinOnly, slugList };
+}
 
 if (command === 'all') {
-  const regenerate = param === '--regenerate';
-  generateAllContent(regenerate);
-} else if (command === 'single' && param) {
-  generateSingleContent(param);
+  const opts = parseAllArgs(args.slice(1));
+  void generateAllContent(opts).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
+} else if (command === 'single' && args[1]) {
+  void generateSingleContent(args[1].trim().toLowerCase()).catch((e) => {
+    console.error(e);
+    process.exit(1);
+  });
 } else {
   console.log(`
 ╔════════════════════════════════════════════════════════════════╗
@@ -515,17 +683,30 @@ if (command === 'all') {
 
 Uso:
   npm run generate-content:all
-    → Genera contenido solo para ubicaciones sin contenido
-  
+    → Solo ubicaciones sin content_generated_at
+
   npm run generate-content:regenerate
-    → Regenera TODAS las ubicaciones (sobrescribe existente)
-  
+    → Todas (sobrescribe)
+
+  npm run generate-content:ring
+    → Solo las 22 del anillo Madrid / Alicante / Albacete
+
+  npm run generate-content:thin
+    → Solo plantillas o contenido corto (p. ej. Hellín)
+
+  npx tsx scripts/generate-location-content.ts all --slugs=hellin,mostoles
+
   npm run generate-content single murcia
-    → Genera solo para una ubicación específica (por slug)
+    → Una ciudad por slug
+
+Variables .env.local:
+  OPENAI_API_KEY (obligatoria)
+  OPENAI_LOCATION_MODEL=gpt-4o   (opcional; por defecto gpt-4o)
+  SERPAPI_KEY                      (opcional; mejora datos reales)
 
 Ejemplos:
-  npm run generate-content:all
+  npm run generate-content:ring
+  npm run generate-content:thin
   npm run generate-content single cartagena
-  npm run generate-content single alicante
   `);
 }

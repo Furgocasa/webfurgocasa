@@ -4,6 +4,14 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 📝 Documentación — 20 de marzo 2026
+
+- Alineación de **README**, `docs/README.md`, `INDICE-DOCUMENTACION.md`, `supabase/README.md` y docs SEO/IA con el estado de landings de alquiler.
+- **Referencia:** ~**59** `location_targets` activos; **14** en provincia Murcia; **22** anillo Madrid/Alicante/Albacete; **Hellín**; scripts `npm run check:location-targets-db`, `generate-content:ring` / `:thin`, `update-location-targets-rent-meta.js`.
+- Docs históricas (`ANALISIS-COBERTURA-CSV`, fixes de meta títulos) anotadas con nota de evolución de recuentos.
+
+---
+
 ## ⚡ [4.5.0] - 25 de Febrero 2026 - **Franjas Horarias por Ubicación + Fix Timezone**
 
 ### 🕐 Franjas Horarias Configurables

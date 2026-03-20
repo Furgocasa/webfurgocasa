@@ -4,6 +4,8 @@
 **Total URLs en CSV**: 603 URLs  
 **Estado**: ✅ **100% CUBIERTAS**
 
+> **Actualización marzo 2026:** En base de datos, las landings de alquiler (`location_targets` activos) pasaron de ~36 a **59** (anillo 22 + Hellín + cobertura previa). El análisis de enero habla de “~60 URLs” de alquiler en el CSV; el recuento exacto hoy: `SELECT count(*) FROM location_targets WHERE is_active = true;` o `npm run check:location-targets-db`.
+
 ---
 
 ## 📊 RESUMEN EJECUTIVO
@@ -13,7 +15,7 @@
 | Tipo de Página | URLs en CSV | Estado | Cobertura |
 |----------------|-------------|--------|-----------|
 | **Blog** | ~305 URLs | ✅ Existen | 100% |
-| **Alquiler por Ciudad** | ~60 URLs | ✅ Existen | 100% |
+| **Alquiler por Ciudad** | ~59 landings en BD (mar. 2026); CSV ene. ~60 URLs | ✅ Existen | 100% |
 | **Venta por Ciudad** | ~40 URLs | ✅ **IMPLEMENTADAS AHORA** | 100% |
 | **Vehículos Individuales** | ~50 URLs | ✅ Existen | 100% |
 | **Páginas Estáticas** | ~148 URLs | ✅ Existen | 100% |

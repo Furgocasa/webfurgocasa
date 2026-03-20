@@ -54,6 +54,7 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   // CASTILLA-LA MANCHA
   // ========================================
   'albacete': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
+  'hellin': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
   
   // Castilla-La Mancha sin imagen específica
   'cuenca': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (49).webp',
@@ -72,6 +73,33 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   // MADRID
   // ========================================
   'madrid': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  // Cinturón metropolitano (SEO) — misma referencia visual que Madrid
+  'mostoles': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'alcala-de-henares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'fuenlabrada': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'leganes': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'getafe': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'alcorcon': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'las-rozas-de-madrid': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+  'alcobendas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (59).webp',
+
+  // Anillo Alicante (SEO) — referencia Costa Blanca / Alicante
+  'gandia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
+  'denia': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
+  'alcoy': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
+  'san-vicente-del-raspeig': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
+  'elda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
+  'villena': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
+  'xativa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_ (22).webp',
+
+  // Anillo Albacete (SEO)
+  'tomelloso': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
+  'alcazar-de-san-juan': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
+  'valdepenas': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
+  'villarrobledo': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
+  'almansa': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
+  'manzanares': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
+  'la-roda': '/images/locations/furgocasa_campervans_alquiler_autocaravanas_motorhome_rent_albacete.webp',
 };
 
 /**

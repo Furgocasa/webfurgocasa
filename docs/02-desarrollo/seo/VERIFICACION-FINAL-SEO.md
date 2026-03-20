@@ -4,6 +4,8 @@
 **Estado**: ✅ **COMPLETADO Y VERIFICADO**  
 **Cumplimiento SEO**: ✅ **100%**
 
+**Marzo 2026 (contexto alquiler):** Las landings de **alquiler** (`location_targets`) están en **~59** ciudades activas × 4 idiomas; ver `npm run check:location-targets-db` y `docs/04-referencia/otros/GENERACION-CONTENIDO-IA.md`.
+
 ---
 
 ## 🎯 RESUMEN EJECUTIVO

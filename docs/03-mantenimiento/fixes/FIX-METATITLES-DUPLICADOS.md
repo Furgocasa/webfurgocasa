@@ -3,6 +3,8 @@
 **Fecha:** 22 de enero de 2026  
 **Problema identificado:** Títulos duplicados con "- Furgocasa" al final
 
+> **Nota marzo 2026:** Los totales de filas de este documento son los del momento del fix. En producción actual hay **~59** `location_targets` activos. Verificar: `npm run check:location-targets-db`.
+
 ---
 
 ## 🎯 PROBLEMA
@@ -64,7 +66,7 @@ WHERE meta_title IS NOT NULL;
 ### Tablas auditadas y corregidas:
 
 #### ✅ location_targets (ciudades de alquiler)
-- **Total:** 36 registros
+- **Total (ene. 2026):** 36 registros → **producción mar. 2026:** ~59 activos
 - **Corregidos:** 0 (ya estaban correctos)
 - **Estado:** ✅ OK
 

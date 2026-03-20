@@ -9,8 +9,7 @@ supabase/
 ├── schema.sql          # Esquema completo de la base de datos
 ├── seed.sql           # Datos iniciales (categorías, ubicaciones, extras, etc.)
 ├── README.md          # Este archivo
-└── migrations/        # Migraciones de la base de datos
-    └── 20250107000000_initial_schema.sql
+└── migrations/        # Migraciones SQL (varios archivos; ej. landings mar. 2026: 20260321–20260323)
 ```
 
 ## 🗄️ Estructura de la Base de Datos
@@ -34,7 +33,8 @@ supabase/
 - `coupon_usage` - Historial de uso de cupones
 
 #### **🏪 Catálogo**
-- `locations` - Puntos de recogida/entrega
+- `locations` - Puntos de recogida/entrega (`is_pickup` = sedes reales: Murcia, Madrid, Alicante, Albacete, etc.)
+- `location_targets` - Landings SEO de **alquiler por ciudad** (metadatos, `hero_content`, `content_sections` JSONB, `nearest_location_id`, `distance_km`). **Estado típico mar. 2026:** ~**59** filas activas (14 en provincia Murcia + anillo 22 + resto España). Comprobar: `npm run check:location-targets-db` desde la raíz del repo.
 - `extras` - Extras y accesorios disponibles
 - `seasons` - Temporadas y tarifas estacionales
 - `vehicle_prices` - Precios por vehículo y temporada (opcional)
@@ -212,9 +212,14 @@ Para BBDD ya existentes, ejecutar en SQL Editor según necesidad:
 
 | Script | Descripción |
 |--------|-------------|
+| `20260321-location-targets-nearest-pickup-sync.sql` | Alinea `nearest_location_id` en targets que coinciden con sede |
+| `20260322-location-target-hellin.sql` | Landing Hellín (recogida Albacete) |
+| `20260323-location-targets-ring-madrid-alicante-albacete.sql` | 22 localidades anillo Madrid / Alicante / Albacete |
 | `add-min-quantity-to-extras.sql` | Añade `min_quantity` a extras (mín. días para per_day, ej. parking 4 días) |
 | `add-availability-dates-to-locations.sql` | Fechas de disponibilidad por ubicación |
 | `add-min-days-to-locations.sql` | Días mínimos de alquiler por ubicación |
+
+**Alternativa Node (mismo efecto que la migración del anillo):** `node scripts/apply-location-targets-ring.js`
 
 ## 🔄 Migraciones Futuras
 
@@ -284,8 +289,8 @@ Para modificar el esquema:
 
 ---
 
-**Última actualización**: Febrero 2026  
-**Versión del esquema**: 1.2 (Sistema de Ofertas de Última Hora añadido)
+**Última actualización**: marzo 2026 (`location_targets` ampliado; docs alineadas)  
+**Versión del esquema**: 1.2+ (ofertas última hora + landings alquiler por ciudad)
 
 
 
