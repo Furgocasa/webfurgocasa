@@ -64,33 +64,39 @@ const statusColors: Record<string, { fill: string; stroke: string }> = {
   repaired: { fill: "#f0fdf4", stroke: "#22c55e" },
 };
 
+/** SVG: html2canvas centra mal el texto en divs; círculo + <text> con anclaje al centro es estable al rasterizar. */
 function DamageMarker({ damage, displayNumbers }: { damage: VehicleDamage; displayNumbers: Map<string, number> }) {
   const colors = statusColors[damage.status || "pending"] || statusColors.pending;
-  const num = displayNumbers.get(damage.id) || "?";
+  const numStr = String(displayNumbers.get(damage.id) ?? "?");
+  const fs = numStr.length > 1 ? 9 : 10;
   return (
     <div
       style={{
         position: "absolute",
         left: `${damage.position_x || 50}%`,
         top: `${damage.position_y || 50}%`,
-        marginLeft: "-11px",
-        marginTop: "-11px",
-        width: "22px",
-        height: "22px",
-        borderRadius: "50%",
-        backgroundColor: colors.fill,
-        border: `2px solid ${colors.stroke}`,
-        boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
-        textAlign: "center",
-        lineHeight: "18px",
-        color: colors.stroke,
-        fontSize: "10px",
-        fontWeight: "bold",
+        transform: "translate(-50%, -50%)",
+        width: "28px",
+        height: "28px",
         zIndex: 10,
-        boxSizing: "border-box",
+        pointerEvents: "none",
       }}
     >
-      {num}
+      <svg width="28" height="28" viewBox="0 0 28 28" style={{ display: "block", filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.2))" }} aria-hidden>
+        <circle cx="14" cy="14" r="10.5" fill={colors.fill} stroke={colors.stroke} strokeWidth="2" />
+        <text
+          x="14"
+          y="14"
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill={colors.stroke}
+          fontSize={fs}
+          fontWeight="700"
+          fontFamily="Arial, Helvetica, sans-serif"
+        >
+          {numStr}
+        </text>
+      </svg>
     </div>
   );
 }
@@ -434,38 +440,27 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             >
               VISTAS EXTERIORES — el número en rojo en el plano coincide con la columna # de la tabla
             </div>
-            <table style={{ width: "100%", tableLayout: "fixed", borderCollapse: "separate", borderSpacing: "8px 10px" }}>
-              <colgroup>
-                <col style={{ width: "16.66%" }} />
-                <col style={{ width: "16.66%" }} />
-                <col style={{ width: "16.66%" }} />
-                <col style={{ width: "16.66%" }} />
-                <col style={{ width: "16.66%" }} />
-                <col style={{ width: "16.66%" }} />
-              </colgroup>
-              <tbody>
-                <tr>
-                  {(["front", "back", "top"] as ViewType[]).map((vt) => (
-                    <td key={vt} colSpan={2} style={{ verticalAlign: "top", padding: 0 }}>
-                      <div style={{ fontSize: "10px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>{viewLabels[vt]}</div>
-                      <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden", backgroundColor: "#fff" }}>
-                        <VehicleImage viewType={vt} damages={clientHandoffDamages} displayNumbers={damageDisplayNumbers} />
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-                <tr>
-                  {(["left", "right"] as ViewType[]).map((vt) => (
-                    <td key={vt} colSpan={3} style={{ verticalAlign: "top", padding: 0 }}>
-                      <div style={{ fontSize: "10px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>{viewLabels[vt]}</div>
-                      <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden", backgroundColor: "#fff" }}>
-                        <VehicleImage viewType={vt} damages={clientHandoffDamages} displayNumbers={damageDisplayNumbers} />
-                      </div>
-                    </td>
-                  ))}
-                </tr>
-              </tbody>
-            </table>
+            {/* Flex: mismo ancho real 33/33/33 y 50/50 (las tablas + colspan suelen rasterizar mal en html2canvas) */}
+            <div style={{ display: "flex", gap: "10px", marginBottom: "10px", alignItems: "stretch" }}>
+              {(["front", "back", "top"] as ViewType[]).map((vt) => (
+                <div key={vt} style={{ flex: "1 1 0", minWidth: 0 }}>
+                  <div style={{ fontSize: "10px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>{viewLabels[vt]}</div>
+                  <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden", backgroundColor: "#fff" }}>
+                    <VehicleImage viewType={vt} damages={clientHandoffDamages} displayNumbers={damageDisplayNumbers} />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: "flex", gap: "10px", alignItems: "stretch" }}>
+              {(["left", "right"] as ViewType[]).map((vt) => (
+                <div key={vt} style={{ flex: "1 1 0", minWidth: 0 }}>
+                  <div style={{ fontSize: "10px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>{viewLabels[vt]}</div>
+                  <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden", backgroundColor: "#fff" }}>
+                    <VehicleImage viewType={vt} damages={clientHandoffDamages} displayNumbers={damageDisplayNumbers} />
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           <div style={{ marginBottom: "10px" }}>
