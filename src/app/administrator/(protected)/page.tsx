@@ -49,11 +49,51 @@ const severityColor: Record<string, string> = {
   severe: "text-red-600",
 };
 
+// Mapa de carnets caducados por booking ID (para mostrar aviso dentro de cada tarjeta)
+function buildExpiringLicenseMap(
+  expiringLicenses: Array<{ id: string; licenseExpiry: string; pickupDate: string }> | undefined
+): Map<string, { licenseExpiry: string; pickupDate: string }> {
+  const map = new Map<string, { licenseExpiry: string; pickupDate: string }>();
+  (expiringLicenses || []).forEach((lic) => {
+    map.set(lic.id, { licenseExpiry: lic.licenseExpiry, pickupDate: lic.pickupDate });
+  });
+  return map;
+}
+
+// Aviso compacto de carnet caducado para mostrar dentro de una tarjeta
+function CarnetCaducadoBadge({
+  licenseExpiry,
+  pickupDate,
+}: {
+  licenseExpiry: string;
+  pickupDate: string;
+}) {
+  return (
+    <div className="flex items-center gap-1.5 mt-1.5 text-xs bg-red-50 border border-red-200 rounded px-2 py-1 text-red-700">
+      <ShieldAlert className="h-3.5 w-3.5 flex-shrink-0" />
+      <span>
+        Carnet caducado — vence{" "}
+        {new Date(licenseExpiry + "T12:00:00").toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+          timeZone: "Europe/Madrid",
+        })}
+        , pickup{" "}
+        {new Date(pickupDate + "T12:00:00").toLocaleDateString("es-ES", {
+          day: "numeric",
+          month: "short",
+          timeZone: "Europe/Madrid",
+        })}
+      </span>
+    </div>
+  );
+}
+
 export default async function AdminDashboard() {
   const stats = await getDashboardStats();
 
-  const hasCarnetAlerts = (stats.expiringLicenses?.length || 0) > 0;
   const hasBlocks = (stats.activeBlocks?.length || 0) > 0;
+  const expiringLicenseMap = buildExpiringLicenseMap(stats.expiringLicenses);
 
   return (
     <div className="flex flex-col gap-4 sm:gap-5">
@@ -102,57 +142,7 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* ── Alertas: carnets caducados ── */}
-      {hasCarnetAlerts && (
-        <div className="flex flex-col gap-2">
-          {(stats.expiringLicenses || []).map((lic, idx) => (
-            <ReservationCardActions
-              key={`lic-${idx}`}
-              reservationId={lic.id}
-              phone={lic.customerPhone}
-              className="!p-0 !block"
-            >
-              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-3 sm:p-4 flex items-start gap-3">
-                <ShieldAlert className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-red-700 text-sm">
-                    Carnet caducado
-                  </p>
-                  <p className="text-sm text-red-800 mt-0.5">
-                    {lic.customer} — carnet caduca{" "}
-                    {new Date(
-                      lic.licenseExpiry + "T12:00:00"
-                    ).toLocaleDateString("es-ES", {
-                      day: "numeric",
-                      month: "short",
-                      timeZone: "Europe/Madrid",
-                    })}
-                    , pickup{" "}
-                    {new Date(
-                      lic.pickupDate + "T12:00:00"
-                    ).toLocaleDateString("es-ES", {
-                      day: "numeric",
-                      month: "short",
-                      timeZone: "Europe/Madrid",
-                    })}
-                  </p>
-                  <p className="text-xs text-red-600 mt-0.5">
-                    {lic.vehicle} · {lic.bookingNumber}
-                  </p>
-                  {lic.customerPhone && (
-                    <p className="mt-1.5 text-sm font-medium text-red-700 flex items-center gap-1.5">
-                      <Phone className="h-3.5 w-3.5" />
-                      {lic.customerPhone}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </ReservationCardActions>
-          ))}
-        </div>
-      )}
-
-      {/* ── Columnas principales ── */}
+      {/* ── Columnas principales (aviso carnet caducado se muestra dentro de cada tarjeta) ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* 1. Entregas próximos 7 días */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -254,6 +244,12 @@ export default async function AdminDashboard() {
                         {b.adminNotes || b.notes}
                       </span>
                     </div>
+                  )}
+                  {expiringLicenseMap.has(b.id) && (
+                    <CarnetCaducadoBadge
+                      licenseExpiry={expiringLicenseMap.get(b.id)!.licenseExpiry}
+                      pickupDate={expiringLicenseMap.get(b.id)!.pickupDate}
+                    />
                   )}
                 </ReservationCardActions>
               ))
@@ -372,6 +368,12 @@ export default async function AdminDashboard() {
                             : `${b.daysRemaining}d restantes`}
                       </span>
                     </div>
+                    {expiringLicenseMap.has(b.id) && (
+                      <CarnetCaducadoBadge
+                        licenseExpiry={expiringLicenseMap.get(b.id)!.licenseExpiry}
+                        pickupDate={expiringLicenseMap.get(b.id)!.pickupDate}
+                      />
+                    )}
                   </ReservationCardActions>
                 );
               })
@@ -488,6 +490,12 @@ export default async function AdminDashboard() {
                             </span>
                           )}
                         </div>
+                        {expiringLicenseMap.has(action.id) && (
+                          <CarnetCaducadoBadge
+                            licenseExpiry={expiringLicenseMap.get(action.id)!.licenseExpiry}
+                            pickupDate={expiringLicenseMap.get(action.id)!.pickupDate}
+                          />
+                        )}
                       </div>
                       <ChevronRight className="h-4 w-4 text-gray-300 flex-shrink-0 mt-1" />
                     </div>
@@ -572,6 +580,12 @@ export default async function AdminDashboard() {
                         </span>
                       )}
                     </div>
+                    {expiringLicenseMap.has(b.id) && (
+                      <CarnetCaducadoBadge
+                        licenseExpiry={expiringLicenseMap.get(b.id)!.licenseExpiry}
+                        pickupDate={expiringLicenseMap.get(b.id)!.pickupDate}
+                      />
+                    )}
                   </ReservationCardActions>
                 ))
               ) : (
