@@ -134,16 +134,11 @@ export function MotorhomeRentalMadridLanding({
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto mb-16">
             <div className="bg-gray-50 p-6 rounded-2xl text-center hover:shadow-lg transition-shadow">
               <Plane className="w-12 h-12 text-furgocasa-orange mx-auto mb-4" />
               <h3 className="font-bold text-lg mb-2">A 10 min del Aeropuerto</h3>
               <p className="text-sm text-gray-600">Llega en Uber o taxi desde cualquier terminal de Barajas (T1, T2, T3, T4) en minutos.</p>
-            </div>
-            <div className="bg-gray-50 p-6 rounded-2xl text-center hover:shadow-lg transition-shadow">
-              <Briefcase className="w-12 h-12 text-furgocasa-orange mx-auto mb-4" />
-              <h3 className="font-bold text-lg mb-2">Guardamos tu equipaje</h3>
-              <p className="text-sm text-gray-600">Viaja con maletas rígidas sin problema. Te las guardamos gratis en nuestra sede hasta tu regreso.</p>
             </div>
             <div className="bg-gray-50 p-6 rounded-2xl text-center hover:shadow-lg transition-shadow">
               <Package className="w-12 h-12 text-furgocasa-orange mx-auto mb-4" />
