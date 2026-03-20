@@ -9,7 +9,7 @@ const RESERVAR_METADATA: Metadata = {
   description: "Reserva tu camper o autocaravana online en pocos pasos. Selecciona fechas, elige vehículo y completa tu reserva. Recogida en Murcia o Madrid.",
   keywords: "reservar camper online, reserva autocaravana, alquilar camper murcia, reserva online furgocasa",
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Reservar Camper o Autocaravana Online en Furgocasa",
     description: "Reserva tu camper en pocos pasos. Recogida en Murcia o Madrid.",
     type: "website",
@@ -50,7 +50,7 @@ export async function generateMetadata({
     ...RESERVAR_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(RESERVAR_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

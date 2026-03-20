@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
       url: alternates.canonical,
       siteName: "Furgocasa",
       locale: ogLocales[locale] || "es_ES",
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa - Tarifas" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa - Tarifas" }],
     },
     twitter: {
       card: "summary",

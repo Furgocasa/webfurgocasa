@@ -22,10 +22,10 @@ const METADATA_BASE: Metadata = {
     description: "Die besten Campers und Wohnmobile zur Miete in Spanien. Unbegrenzte Kilometer, vollständige Ausstattung. Von Murcia nach ganz Spanien.",
     type: "website",
     siteName: "Furgocasa - Wohnmobilvermietung",
-    images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1920, height: 1080, alt: "Wohnmobil- und Campermiete in Spanien - Furgocasa", type: "image/webp" }],
+    images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1920, height: 1080, alt: "Wohnmobil- und Campermiete in Spanien - Furgocasa", type: "image/webp" }],
     locale: "de_DE",
   },
-  twitter: { card: "summary_large_image", site: "@furgocasa", creator: "@furgocasa", title: "Wohnmobil Miete Spanien | Campers aus Murcia", description: "Wohnmobile und Campers zur Miete in Spanien. Unbegrenzte Kilometer, vollständige Ausstattung.", images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"] },
+  twitter: { card: "summary_large_image", site: "@furgocasa", creator: "@furgocasa", title: "Wohnmobil Miete Spanien | Campers aus Murcia", description: "Wohnmobile und Campers zur Miete in Spanien. Unbegrenzte Kilometer, vollständige Ausstattung.", images: ["https://www.furgocasa.com/images/slides/hero-05.webp"] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 } },
 };
 
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale: Locale = "de";
   const alternates = buildCanonicalAlternates("/alquiler-motorhome-espana", locale);
   return { ...METADATA_BASE, alternates, openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }], ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }], ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
 }
 
 export default async function WohnmobilMieteSpanienPage() {

@@ -9,7 +9,7 @@ const FAQS_METADATA: Metadata = {
   description: "Lösen Sie Ihre Fragen zum Wohnmobil-Verleih bei Furgocasa. Anforderungen, Versicherungen, Kilometer, Haustiere, Abholung und Rückgabe. Alles, was Sie wissen müssen.",
   keywords: "häufige fragen wohnmobil mieten, fragen wohnmobil, anforderungen wohnmobil mieten, faqs furgocasa, informationen wohnmobil mieten",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Häufig gestellte Fragen zum Wohnmobil-Verleih",
     description: "Lösen Sie alle Ihre Fragen zum Wohnmobil-Verleih. Anforderungen, Versicherungen, Haustiere und mehr.",
     type: "website",
@@ -42,7 +42,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...FAQS_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(FAQS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

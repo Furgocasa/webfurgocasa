@@ -3,9 +3,8 @@ import { translateCategorySlug } from "@/lib/blog-translations";
 import type { Locale } from "@/lib/i18n/config";
 import type { Metadata } from "next";
 
-/** Imagen OG por defecto (Supabase). `/og-image.jpg` en furgocasa.com no está desplegado → 404 en Meta/Facebook. */
-export const OG_DEFAULT_IMAGE =
-  'https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp';
+/** Imagen OG por defecto (estática en public/images/slides). Absoluta para crawlers (Meta, etc.). */
+export const OG_DEFAULT_IMAGE = 'https://www.furgocasa.com/images/slides/hero-05.webp';
 
 /**
  * Helper para truncar el título SEO

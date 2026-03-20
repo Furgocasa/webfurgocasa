@@ -10,7 +10,7 @@ const FAQS_METADATA: Metadata = {
   description: "Réponses à vos questions sur la location de camping-cars. Exigences, assurances, kilométrage, animaux. Tout ce qu'il faut savoir chez Furgocasa.",
   keywords: "questions fréquentes location camping-car, doutes van, exigences location camping-car, faqs furgocasa, information location van",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Questions Fréquentes Location Camping-Cars",
     description: "Répondez à toutes vos questions sur la location de camping-cars. Exigences, assurances, animaux et plus.",
     type: "website",
@@ -44,7 +44,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...FAQS_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(FAQS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

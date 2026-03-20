@@ -12,7 +12,7 @@ const IA_METADATA: Metadata = {
   description: "Entdecken Sie unsere KI-Tools zur Planung Ihrer Wohnmobil-Reise. Intelligenter Chatbot 24/7 und Routenplaner mit künstlicher Intelligenz.",
   keywords: "künstliche intelligenz wohnmobil, chatbot camper, ki routenplaner, virtueller assistent wohnmobil, technologie wohnmobil reise",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "KI für Wohnmobil-Reisende | Furgocasa",
     description: "KI-Chatbot und intelligenter Routenplaner für Ihre Wohnmobil-Reise.",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...IA_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(IA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

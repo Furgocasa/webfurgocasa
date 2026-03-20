@@ -22,10 +22,10 @@ const METADATA_BASE: Metadata = {
     description: "Les meilleurs campers et camping-cars en location en Espagne. Kilomètres illimités, équipement complet. De Murcie à toute l'Espagne.",
     type: "website",
     siteName: "Furgocasa - Location de Camping-Cars",
-    images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1920, height: 1080, alt: "Location camping-car et camper en Espagne - Furgocasa", type: "image/webp" }],
+    images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1920, height: 1080, alt: "Location camping-car et camper en Espagne - Furgocasa", type: "image/webp" }],
     locale: "fr_FR",
   },
-  twitter: { card: "summary_large_image", site: "@furgocasa", creator: "@furgocasa", title: "Location Camping-Car Espagne | Campers depuis Murcie", description: "Camping-cars et campers en location en Espagne. Kilomètres illimités, équipement complet.", images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"] },
+  twitter: { card: "summary_large_image", site: "@furgocasa", creator: "@furgocasa", title: "Location Camping-Car Espagne | Campers depuis Murcie", description: "Camping-cars et campers en location en Espagne. Kilomètres illimités, équipement complet.", images: ["https://www.furgocasa.com/images/slides/hero-05.webp"] },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 } },
 };
 
@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale: Locale = "fr";
   const alternates = buildCanonicalAlternates("/alquiler-motorhome-espana", locale);
   return { ...METADATA_BASE, alternates, openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }], ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }], ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
 }
 
 export default async function LocationCampingCarEspagnePage() {

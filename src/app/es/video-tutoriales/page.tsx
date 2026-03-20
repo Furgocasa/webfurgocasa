@@ -12,7 +12,7 @@ const VIDEO_TUTORIALES_METADATA: Metadata = {
   description: "Videos tutoriales sobre el funcionamiento de tu camper de alquiler. Panel de control, agua, electricidad, calefacción, nevera y más sistemas explicados paso a paso.",
   keywords: "video tutorial camper, como usar autocaravana, tutorial panel control camper, videos furgocasa, aprender usar camper",
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Video Tutoriales y Guías de Uso del Camper | Furgocasa",
     description: "Aprende a usar tu camper de alquiler con nuestros videos tutoriales.",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...VIDEO_TUTORIALES_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(VIDEO_TUTORIALES_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

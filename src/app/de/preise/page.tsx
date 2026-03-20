@@ -36,7 +36,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: t("Consulta las tarifas de alquiler de campers y autocaravanas en Furgocasa. Precios desde 95€/día según temporada. Descuentos por larga estancia y kilómetros ilimitados incluidos."),
     keywords: "wohnmobil miete preise, camper preise, wohnmobil miete murcia preise, furgocasa tarife, wohnmobil miete kosten",
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: t("Tarifas y Precios de Alquiler de Campers"),
       description: t("Precios transparentes desde 95€/día. Descuentos hasta -30% por larga estancia. Kilómetros ilimitados incluidos."),
       type: "website",

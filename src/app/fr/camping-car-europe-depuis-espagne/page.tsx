@@ -41,7 +41,7 @@ const MOTORHOME_EUROPA_METADATA: Metadata = {
     siteName: "Furgocasa - Location de Camping-Cars",
     images: [
       {
-        url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+        url: "https://www.furgocasa.com/images/slides/hero-05.webp",
         width: 1920,
         height: 1080,
         alt: "Location de camping-car pour voyager en Europe depuis l'Espagne",
@@ -57,7 +57,7 @@ const MOTORHOME_EUROPA_METADATA: Metadata = {
     creator: "@furgocasa",
     title: "Location Camping-Car Europe | France, Italie, Portugal",
     description: "Votre camping-car vous attend pour explorer toute l'Europe. Kilométrage illimité, assurance européenne, assistance 24/7.",
-    images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
+    images: ["https://www.furgocasa.com/images/slides/hero-05.webp"],
   },
   robots: {
     index: true,
@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...MOTORHOME_EUROPA_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(MOTORHOME_EUROPA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

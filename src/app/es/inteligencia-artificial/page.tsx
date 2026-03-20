@@ -12,7 +12,7 @@ const IA_METADATA: Metadata = {
   description: "Descubre nuestras herramientas de IA para planificar tu viaje en camper. Chatbot inteligente 24/7 y planificador de rutas con inteligencia artificial.",
   keywords: "inteligencia artificial camper, chatbot autocaravana, planificador rutas ia, asistente virtual camper, tecnología viaje camper",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Inteligencia Artificial para Viajeros Camper",
     description: "Chatbot IA y planificador de rutas inteligente para tu viaje en camper.",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...IA_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(IA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

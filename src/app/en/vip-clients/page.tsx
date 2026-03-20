@@ -12,7 +12,7 @@ const CLIENTES_VIP_METADATA: Metadata = {
   description: "Join the Furgocasa VIP program and enjoy 10% permanent discount, booking priority, free extras and late check-out. Exclusive benefits for loyal customers.",
   keywords: "vip clients furgocasa, camper loyalty program, frequent customer discounts, motorhome vip benefits",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "VIP Clients Program - Exclusive Benefits | Furgocasa",
     description: "Exclusive benefits for frequent customers: 10% discount, booking priority and free extras.",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...CLIENTES_VIP_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(CLIENTES_VIP_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

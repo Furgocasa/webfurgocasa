@@ -18,7 +18,7 @@ const VENTAS_METADATA: Metadata = {
   description: "Achetez votre camping-car ou van d'occasion chez Furgocasa. Véhicules de notre flotte, révisés avec garantie. Historique complet connu. Financement disponible.",
   keywords: "acheter camping-car, van occasion, vente camping-car occasion, van usagé, acheter van espagne, camping-car garantie",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Camping-Cars et Vans à Vendre - Achat Occasion | Furgocasa",
     description: "Véhicules de notre flotte, révisés avec garantie. Historique complet connu.",
     type: "website",
@@ -52,7 +52,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...VENTAS_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(VENTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

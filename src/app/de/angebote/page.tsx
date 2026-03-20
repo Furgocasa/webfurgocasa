@@ -12,7 +12,7 @@ const OFERTAS_METADATA: Metadata = {
   description: "Nutzen Sie unsere Sonderangebote für Wohnmobil-Miete. Saisonrabatte, Aktionscodes und Sonderpreise für Ihr nächstes Wohnmobil-Abenteuer.",
   keywords: "angebote wohnmobil miete, rabatte camper, aktionen furgocasa, günstige wohnmobil miete, last minute angebote wohnmobil",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Angebote und Rabatte Wohnmobil-Miete - Bis 40% | Furgocasa",
     description: "Sonderrabatte für Wohnmobil-Miete. Nutzen Sie unsere Saisonangebote!",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...OFERTAS_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(OFERTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

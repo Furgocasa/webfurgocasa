@@ -17,7 +17,7 @@ const VENTAS_METADATA: Metadata = {
   description: "Kaufen Sie Ihr Wohnmobil oder Camper von Furgocasa. Fahrzeuge aus unserer Flotte, geprüft mit Garantie. Vollständige Historie bekannt. Finanzierung verfügbar.",
   keywords: "wohnmobil kaufen, camper gebraucht, wohnmobil verkauf, gebrauchter camper, wohnmobil kaufen murcia, wohnmobil garantie",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Wohnmobile und Campers zu verkaufen",
     description: "Fahrzeuge aus unserer Flotte, geprüft mit Garantie. Vollständige Historie bekannt.",
     type: "website",
@@ -50,7 +50,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ...VENTAS_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(VENTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

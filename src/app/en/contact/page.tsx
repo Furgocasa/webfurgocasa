@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: "contact furgocasa, furgocasa phone murcia, furgocasa email, furgocasa address, furgocasa hours, motorhome rental murcia contact",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "Contact & Reservations - Motorhome Rental | Furgocasa",
       description: "Contact Furgocasa for motorhome rental and booking support in Spain.",
       type: "website",

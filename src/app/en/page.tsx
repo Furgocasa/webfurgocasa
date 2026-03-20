@@ -70,7 +70,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: t("Furgocasa - Alquiler de Autocaravanas"),
       images: [
         {
-          url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+          url: "https://www.furgocasa.com/images/slides/hero-05.webp",
           width: 1920,
           height: 1080,
           alt: `Furgocasa - ${t("Las Mejores Campers en Alquiler")}`,
@@ -99,7 +99,7 @@ export async function generateMetadata(): Promise<Metadata> {
       creator: "@furgocasa",
       title: `${t("Las Mejores Campers en Alquiler")} - ${t("Alquiler en España")} | Furgocasa`,
       description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Kilómetros ilimitados, equipamiento completo")}.`,
-      images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
+      images: ["https://www.furgocasa.com/images/slides/hero-05.webp"],
     },
     alternates,
     robots: {

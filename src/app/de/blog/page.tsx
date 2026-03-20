@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
       locale: ogLocales[locale] || "de_DE",
       images: [
         {
-          url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+          url: "https://www.furgocasa.com/images/slides/hero-05.webp",
           width: 1200,
           height: 630,
           alt: `${t("Blog de Viajes en Camper")} - Furgocasa`,
@@ -62,7 +62,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       title: "Wohnmobil Blog - Tipps & Routen | Furgocasa",
       description: t("Consejos, rutas y experiencias para inspirar tu próxima aventura en autocaravana"),
-      images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
+      images: ["https://www.furgocasa.com/images/slides/hero-05.webp"],
       creator: "@furgocasa",
     },
     alternates,

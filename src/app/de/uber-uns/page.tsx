@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: "über furgocasa, wohnmobil miete unternehmen murcia, furgocasa geschichte, furgocasa familie, wohnmobile murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "Über uns - Furgocasa entdecken",
       description: "Lernen Sie Furgocasa kennen, ein familiengeführtes Wohnmobilvermietungsunternehmen in Murcia seit 2012.",
       type: "website",

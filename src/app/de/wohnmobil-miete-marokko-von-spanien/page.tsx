@@ -41,7 +41,7 @@ const WOHNMOBIL_MAROKKO_METADATA: Metadata = {
     siteName: "Furgocasa - Wohnmobil Vermietung",
     images: [
       {
-        url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+        url: "https://www.furgocasa.com/images/slides/hero-05.webp",
         width: 1920,
         height: 1080,
         alt: "Wohnmobilvermietung für Reisen nach Marokko von Spanien",
@@ -57,7 +57,7 @@ const WOHNMOBIL_MAROKKO_METADATA: Metadata = {
     creator: "@furgocasa",
     title: "Wohnmobil Miete Marokko | Reise nach Marokko von Spanien",
     description: "Ihr Wohnmobil wartet auf Sie, um nach Marokko zu reisen. Wir erlauben die Überfahrt nach Afrika. Dokumentation inklusive. 24/7 Unterstützung.",
-    images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
+    images: ["https://www.furgocasa.com/images/slides/hero-05.webp"],
   },
   robots: {
     index: true,
@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...WOHNMOBIL_MAROKKO_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(WOHNMOBIL_MAROKKO_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

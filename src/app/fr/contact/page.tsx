@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: "contact furgocasa, téléphone furgocasa murcie, email furgocasa, adresse furgocasa, horaires furgocasa, location camping-car murcie contact",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "Contact et Réservations - Location Camping-Car | Furgocasa",
       description: "Contactez Furgocasa pour votre location et l'assistance de réservation en Espagne.",
       type: "website",

@@ -12,7 +12,7 @@ const GUIA_CAMPER_METADATA: Metadata = {
   description: "Learn how to use your rental campervan: control panel, water tanks, electricity, heating, gas and more. Practical guide for beginners and experts.",
   keywords: "campervan guide, how to use motorhome, camper manual, camper operation, motorhome electricity, camper water, camper heating",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Complete Campervan Guide - Tips & Manual | Furgocasa",
     description: "Everything you need to know about how your rental campervan works.",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...GUIA_CAMPER_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(GUIA_CAMPER_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

@@ -41,7 +41,7 @@ const MOTORHOME_EUROPA_METADATA: Metadata = {
     siteName: "Furgocasa - Alquiler de Motorhomes",
     images: [
       {
-        url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp",
+        url: "https://www.furgocasa.com/images/slides/hero-05.webp",
         width: 1920,
         height: 1080,
         alt: "Alquiler de motorhome y casa rodante para viajar por Europa desde España",
@@ -57,7 +57,7 @@ const MOTORHOME_EUROPA_METADATA: Metadata = {
     creator: "@furgocasa",
     title: "Alquiler Motorhome Europa | Recorré Francia, Italia, Portugal",
     description: "Tu casa rodante te espera para recorrer toda Europa. Kilómetros ilimitados, seguro europeo, asistencia 24/7 en español.",
-    images: ["https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp"],
+    images: ["https://www.furgocasa.com/images/slides/hero-05.webp"],
   },
   robots: {
     index: true,
@@ -81,7 +81,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...MOTORHOME_EUROPA_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(MOTORHOME_EUROPA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

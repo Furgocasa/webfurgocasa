@@ -12,7 +12,7 @@ const IA_METADATA: Metadata = {
   description: "Découvrez nos outils IA pour planifier votre voyage en camping-car. Chatbot intelligent 24/7 et planificateur d'itinéraires avec intelligence artificielle.",
   keywords: "intelligence artificielle camping-car, chatbot van, planificateur itinéraires ia, assistant virtuel camping-car, technologie voyage camping-car",
   openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Intelligence Artificielle pour Voyageurs Camping-Car",
     description: "Chatbot IA et planificateur d'itinéraires intelligent pour votre voyage en camping-car.",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...IA_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(IA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },
