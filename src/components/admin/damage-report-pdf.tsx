@@ -210,7 +210,7 @@ function FuelTankIndicator({ title }: { title: string }) {
             />
             <line x1="14" y1="42" x2="50" y2="42" stroke="#78716c" strokeWidth="0.8" strokeDasharray="3 2" />
             <rect x="28" y="8" width="8" height="14" rx="1.5" fill="#e5e7eb" stroke="#374151" strokeWidth="1.5" />
-            <text x="32" y="48" textAnchor="middle" fontSize="11" fill="#78350f" fontFamily="Arial, sans-serif" fontWeight="bold">
+            <text x="32" y="48" textAnchor="middle" fontSize="11" fill="#78350f" fontFamily="var(--font-amiko), sans-serif" fontWeight="bold">
               GAS
             </text>
           </svg>
