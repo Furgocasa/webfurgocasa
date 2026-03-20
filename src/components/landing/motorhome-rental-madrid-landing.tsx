@@ -134,7 +134,7 @@ export function MotorhomeRentalMadridLanding({
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
             <div className="bg-gray-50 p-6 rounded-2xl text-center hover:shadow-lg transition-shadow">
               <Plane className="w-12 h-12 text-furgocasa-orange mx-auto mb-4" />
               <h3 className="font-bold text-lg mb-2">A 10 min del Aeropuerto</h3>
@@ -155,6 +155,123 @@ export function MotorhomeRentalMadridLanding({
               <h3 className="font-bold text-lg mb-2">Seguro internacional</h3>
               <p className="text-sm text-gray-600">Cobertura total para cruzar fronteras y recorrer toda Europa con total tranquilidad.</p>
             </div>
+          </div>
+
+          {/* Sección: Qué es un Motorhome - VOCABULARIO LATAM */}
+          <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto pt-8 border-t border-gray-200">
+            <h2 className="text-3xl lg:text-4xl font-heading font-bold text-furgocasa-blue mb-6 uppercase tracking-wide">
+              ALQUILER MOTORHOME EN MADRID
+            </h2>
+            <p className="text-xl text-gray-600 mb-4">
+              (Casas Rodantes en España)
+            </p>
+
+            <div className="grid md:grid-cols-2 gap-8 mt-10 text-left max-w-4xl mx-auto">
+              <div className="bg-gray-50 rounded-2xl p-8">
+                <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide">
+                  ¿Qué es un Motorhome?
+                </h3>
+                <p className="text-base lg:text-lg text-gray-700 leading-relaxed mb-4">
+                  <strong>Motorhome</strong>, <strong>autocaravana</strong> y <strong>camper</strong> son 
+                  términos que se refieren al mismo tipo de vehículo: una furgoneta camper 
+                  totalmente equipada para viajar con autonomía total.
+                </p>
+                <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
+                  En Latinoamérica también se conocen como <strong>casas rodantes</strong> o 
+                  <strong> casas móviles</strong>. En Furgocasa, nos especializamos en el alquiler 
+                  de estos vehículos de gran volumen.
+                </p>
+              </div>
+              
+              <div className="bg-gray-50 rounded-2xl p-8">
+                <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-blue mb-4 tracking-wide">
+                  ¿Cómo se llama en tu país?
+                </h3>
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex items-center gap-3 text-lg">
+                    <span className="text-2xl">🇪🇸</span>
+                    <span><strong>España:</strong> Autocaravana, Camper</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-lg">
+                    <span className="text-2xl">🌎</span>
+                    <span><strong>LATAM:</strong> Casa Rodante, Motorhome</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-lg">
+                    <span className="text-2xl">🇺🇸</span>
+                    <span><strong>USA:</strong> RV, Campervan</span>
+                  </li>
+                  <li className="flex items-center gap-3 text-lg">
+                    <span className="text-2xl">🇬🇧</span>
+                    <span><strong>UK:</strong> Motorhome, Campervan</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Sección: Descuento LATAM */}
+      <section className="py-12 lg:py-16 bg-gradient-to-r from-furgocasa-orange to-orange-600">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center text-white">
+            <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
+              🌎 Descuento Especial LATAM: -15% 🌎
+            </h2>
+            <p className="text-xl lg:text-2xl mb-6">
+              ¿Vienes desde Latinoamérica a Madrid?
+            </p>
+            <p className="text-lg mb-4 text-orange-100">
+              Si viajas desde <strong>Argentina, México, Chile, Colombia, Perú, Venezuela, Uruguay, Ecuador</strong> 
+              {' '}o cualquier país de América Latina, tienes un <strong>descuento del -15%</strong> en alquileres de mínimo 2 semanas.
+            </p>
+            
+            {/* Ejemplos de ahorro */}
+            <div className="grid md:grid-cols-2 gap-4 mb-8 max-w-2xl mx-auto">
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                <p className="font-bold text-xl mb-1">21 días (3 semanas)</p>
+                <p className="text-orange-100">Ahorras hasta <strong className="text-white text-2xl">285€</strong></p>
+              </div>
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl">
+                <p className="font-bold text-xl mb-1">14 días (2 semanas)</p>
+                <p className="text-orange-100">Ahorras hasta <strong className="text-white text-2xl">210€</strong></p>
+              </div>
+            </div>
+            
+            {/* Países */}
+            <div className="flex flex-wrap justify-center gap-3 mb-8">
+              {['🇦🇷 Argentina', '🇲🇽 México', '🇨🇱 Chile', '🇨🇴 Colombia', '🇵🇪 Perú', '🇻🇪 Venezuela', '🇺🇾 Uruguay', '🇪🇨 Ecuador'].map((pais) => (
+                <span key={pais} className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium">
+                  {pais}
+                </span>
+              ))}
+            </div>
+            
+            {/* Botones - Artículo primero, WhatsApp segundo */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <LocalizedLink
+                href="/blog/noticias/visitas-espana-o-la-ue-desde-america-latina-alquila-tu-mortohome-con-un-15-de-descuento"
+                className="inline-flex items-center gap-2 bg-white text-furgocasa-orange font-bold px-8 py-4 rounded-xl hover:bg-orange-50 transition-all shadow-lg text-lg"
+              >
+                📋 Ver condiciones del descuento
+              </LocalizedLink>
+              
+              <a
+                href="https://wa.me/34673414053?text=Hola!%20Llego%20a%20Madrid%20desde%20[TU%20PAÍS]%20y%20quiero%20consultar%20sobre%20el%20descuento%20-15%25%20LATAM"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all shadow-lg text-lg"
+              >
+                <Phone className="h-5 w-5" />
+                Consulta por WhatsApp
+              </a>
+            </div>
+            
+            {/* Nota pequeña */}
+            <p className="text-sm text-orange-100 mt-6 max-w-2xl mx-auto">
+              * Válido para alquileres de mínimo 2 semanas en Temporada Baja y Media (septiembre-junio). 
+              Debes acreditar tu viaje desde Latinoamérica con billetes de avión.
+            </p>
           </div>
         </div>
       </section>
@@ -417,9 +534,15 @@ export function MotorhomeRentalMadridLanding({
             <LocalizedLink href="/reservar" className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg text-lg">
               {t("Reservar ahora")}
             </LocalizedLink>
-            <LocalizedLink href="/contacto" className="inline-flex items-center gap-2 bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-blue hover:text-white transition-all text-lg">
-              {t("Contactar")}
-            </LocalizedLink>
+            <a
+              href="https://wa.me/34673414053?text=Hola!%20Llego%20al%20aeropuerto%20de%20Madrid%20desde%20LATAM%20y%20quiero%20alquilar%20un%20motorhome"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-green-600 text-white border-2 border-green-600 font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all shadow-lg text-lg"
+            >
+              <Phone className="h-5 w-5" />
+              Consulta por WhatsApp
+            </a>
           </div>
         </div>
       </section>
