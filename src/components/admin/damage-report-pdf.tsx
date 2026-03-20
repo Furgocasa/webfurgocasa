@@ -435,11 +435,19 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             >
               VISTAS EXTERIORES — el número en rojo en el plano coincide con la columna # de la tabla
             </div>
-            <table style={{ width: "100%", borderCollapse: "separate", borderSpacing: "8px 10px" }}>
+            <table style={{ width: "100%", tableLayout: "fixed", borderCollapse: "separate", borderSpacing: "8px 10px" }}>
+              <colgroup>
+                <col style={{ width: "16.66%" }} />
+                <col style={{ width: "16.66%" }} />
+                <col style={{ width: "16.66%" }} />
+                <col style={{ width: "16.66%" }} />
+                <col style={{ width: "16.66%" }} />
+                <col style={{ width: "16.66%" }} />
+              </colgroup>
               <tbody>
                 <tr>
                   {(["front", "back", "top"] as ViewType[]).map((vt) => (
-                    <td key={vt} style={{ width: "33.33%", verticalAlign: "top", padding: 0 }}>
+                    <td key={vt} colSpan={2} style={{ verticalAlign: "top", padding: 0 }}>
                       <div style={{ fontSize: "10px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>{viewLabels[vt]}</div>
                       <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden", backgroundColor: "#fff" }}>
                         <VehicleImage viewType={vt} damages={clientHandoffDamages} displayNumbers={damageDisplayNumbers} />
@@ -449,7 +457,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                 </tr>
                 <tr>
                   {(["left", "right"] as ViewType[]).map((vt) => (
-                    <td key={vt} colSpan={vt === "left" ? 2 : 1} style={{ verticalAlign: "top", padding: 0 }}>
+                    <td key={vt} colSpan={3} style={{ verticalAlign: "top", padding: 0 }}>
                       <div style={{ fontSize: "10px", fontWeight: 600, color: "#374151", marginBottom: "6px" }}>{viewLabels[vt]}</div>
                       <div style={{ border: "1px solid #e5e7eb", borderRadius: "6px", overflow: "hidden", backgroundColor: "#fff" }}>
                         <VehicleImage viewType={vt} damages={clientHandoffDamages} displayNumbers={damageDisplayNumbers} />
