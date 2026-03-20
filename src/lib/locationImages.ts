@@ -81,13 +81,13 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'getafe': '/images/slides/hero-28.webp',
   'alcorcon': '/images/slides/hero-29.webp',
   'las-rozas-de-madrid': '/images/slides/hero-30.webp',
-  'alcobendas': '/images/slides/hero-19.webp',
+  'alcobendas': '/images/slides/hero-45.webp',
 
   // Anillo Alicante (SEO) — referencia Costa Blanca / Alicante
-  'gandia': '/images/slides/hero-20.webp',
-  'denia': '/images/slides/hero-21.webp',
-  'alcoy': '/images/slides/hero-22.webp',
-  'san-vicente-del-raspeig': '/images/slides/hero-23.webp',
+  'gandia': '/images/slides/hero-47.webp',
+  'denia': '/images/slides/hero-49.webp',
+  'alcoy': '/images/slides/hero-51.webp',
+  'san-vicente-del-raspeig': '/images/slides/hero-53.webp',
   'elda': '/images/slides/hero-24.webp',
   'villena': '/images/slides/hero-25.webp',
   'xativa': '/images/slides/hero-26.webp',
@@ -97,13 +97,13 @@ export const LOCATION_HERO_IMAGES: Record<string, string> = {
   'alcazar-de-san-juan': '/images/slides/hero-28.webp',
   'valdepenas': '/images/slides/hero-29.webp',
   'villarrobledo': '/images/slides/hero-30.webp',
-  'almansa': '/images/slides/hero-19.webp',
-  'manzanares': '/images/slides/hero-20.webp',
-  'la-roda': '/images/slides/hero-21.webp',
+  'almansa': '/images/slides/hero-46.webp',
+  'manzanares': '/images/slides/hero-48.webp',
+  'la-roda': '/images/slides/hero-50.webp',
 
   // Costa Blanca Sur y Norte
-  'santa-pola': '/images/slides/hero-22.webp',
-  'calpe': '/images/slides/hero-23.webp',
+  'santa-pola': '/images/slides/hero-52.webp',
+  'calpe': '/images/slides/hero-54.webp',
   'guardamar-del-segura': '/images/slides/hero-24.webp',
   'altea': '/images/slides/hero-25.webp',
   
