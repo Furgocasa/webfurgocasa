@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { toDateString } from "@/lib/utils";
+import {
+  isYmdInClosedRange,
+  type BusinessClosedRange,
+} from "@/lib/business-closed-dates";
 
 export const dynamic = "force-dynamic";
 
@@ -40,6 +44,15 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+
+    const { data: businessClosedRows } = await supabase
+      .from("business_closed_dates")
+      .select("start_date, end_date");
+    const closedRanges: BusinessClosedRange[] =
+      businessClosedRows?.map((r) => ({
+        start_date: r.start_date,
+        end_date: r.end_date,
+      })) ?? [];
 
     const { data: vehicles, error: vehiclesError } = await supabase
       .from("vehicles")
@@ -118,6 +131,13 @@ export async function GET(request: NextRequest) {
       const candDropoff = toDateString(candDropoffDate);
 
       if (candPickup !== pickupDate) {
+        if (
+          isYmdInClosedRange(candPickup, closedRanges) ||
+          isYmdInClosedRange(candDropoff, closedRanges)
+        ) {
+          cursor.setDate(cursor.getDate() + 1);
+          continue;
+        }
         const { count, names } = getAvailableVehicles(candPickup, candDropoff);
         if (count > 0) {
           const distance = Math.abs(cursor.getTime() - pickup.getTime());

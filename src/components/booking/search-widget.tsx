@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { DateRangePicker } from "./date-range-picker";
 import { LocationSelector, type TimeSlot } from "./location-selector";
@@ -9,6 +9,7 @@ import { useLanguage } from "@/contexts/language-context";
 import { calculateRentalDays } from "@/lib/utils";
 import { getTranslatedRoute } from "@/lib/route-translations";
 import { useSeasonMinDays } from "@/hooks/use-season-min-days";
+import { type BusinessClosedRange } from "@/lib/business-closed-dates";
 
 interface SearchWidgetProps {
   defaultLocation?: string;
@@ -32,6 +33,33 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
   });
   const [pickupTime, setPickupTime] = useState("11:00");
   const [dropoffTime, setDropoffTime] = useState("11:00");
+  const [closedRanges, setClosedRanges] = useState<BusinessClosedRange[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/business-closed-dates", { cache: "no-store" });
+        if (!res.ok || cancelled) return;
+        const json = await res.json();
+        const ranges: BusinessClosedRange[] = (json.ranges || []).map(
+          (row: { start_date: string; end_date: string }) => ({
+            start_date: row.start_date,
+            end_date: row.end_date,
+          })
+        );
+        if (cancelled) return;
+        setClosedRanges(ranges);
+      } catch {
+        /* ignorar: buscador funciona sin cierres si la API falla */
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Obtener mínimo de días según temporadas activas
   const pickupDateStr = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
@@ -138,6 +166,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
             dateRange={dateRange}
             onDateChange={setDateRange}
             minDays={getMinDays()}
+            closedRanges={closedRanges}
           />
         </div>
 

@@ -20,6 +20,14 @@ export function parseDateString(dateStr: string): Date {
   return new Date(year, month - 1, day);
 }
 
+/** Hoy en calendario Europe/Madrid (medianoche local del día civil en Murcia). */
+export function getMadridToday(): Date {
+  const now = new Date();
+  const madridStr = now.toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
+  const [y, m, d] = madridStr.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
 /**
  * Convierte un Date a string "YYYY-MM-DD" usando hora LOCAL (no UTC).
  * Reemplaza el patrón date.toISOString().split('T')[0] que usa UTC

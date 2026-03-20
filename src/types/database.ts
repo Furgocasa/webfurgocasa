@@ -488,6 +488,24 @@ export interface Database {
         Update: Partial<Database["public"]["Tables"]["blocked_dates"]["Insert"]>;
       };
 
+      business_closed_dates: {
+        Row: {
+          id: string;
+          start_date: string;
+          end_date: string;
+          label: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          start_date: string;
+          end_date: string;
+          label?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["business_closed_dates"]["Insert"]>;
+      };
+
       settings: {
         Row: {
           id: string;

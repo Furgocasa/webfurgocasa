@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { validatePickupDropoffAgainstClosedDates } from "@/lib/business-closed-dates";
 
 // ✅ SEGURIDAD: Validar que las variables de entorno existen (sin fallback peligroso)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -81,6 +82,25 @@ export async function POST(request: Request) {
     }
 
     const { booking, extras } = validationResult.data;
+
+    const { data: businessClosedRows } = await supabase
+      .from("business_closed_dates")
+      .select("start_date, end_date");
+
+    const closedRanges =
+      businessClosedRows?.map((r) => ({
+        start_date: r.start_date,
+        end_date: r.end_date,
+      })) ?? [];
+
+    const closedCheck = validatePickupDropoffAgainstClosedDates(
+      booking.pickup_date,
+      booking.dropoff_date,
+      closedRanges
+    );
+    if (!closedCheck.ok) {
+      return NextResponse.json({ error: closedCheck.error }, { status: 400 });
+    }
 
     // ================================================================
     // VALIDACIÓN CRÍTICA: Verificar que el vehículo NO tiene bloqueos

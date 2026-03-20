@@ -9,6 +9,7 @@ import {
   Season 
 } from "@/lib/utils";
 import { detectDeviceType } from "@/lib/search-tracking/session";
+import { validatePickupDropoffAgainstClosedDates } from "@/lib/business-closed-dates";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -49,6 +50,25 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+
+    const { data: businessClosedRows } = await supabase
+      .from("business_closed_dates")
+      .select("start_date, end_date");
+
+    const closedRanges =
+      businessClosedRows?.map((r) => ({
+        start_date: r.start_date,
+        end_date: r.end_date,
+      })) ?? [];
+
+    const closedCheck = validatePickupDropoffAgainstClosedDates(
+      pickupDate,
+      dropoffDate,
+      closedRanges
+    );
+    if (!closedCheck.ok) {
+      return NextResponse.json({ error: closedCheck.error }, { status: 400 });
+    }
 
     // 1. Obtener todos los vehículos activos para alquiler
     let vehiclesQuery = supabase

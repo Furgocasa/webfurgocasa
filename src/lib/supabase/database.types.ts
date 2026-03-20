@@ -375,6 +375,30 @@ export type Database = {
           },
         ]
       }
+      business_closed_dates: {
+        Row: {
+          created_at: string | null
+          end_date: string
+          id: string
+          label: string | null
+          start_date: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_date: string
+          id?: string
+          label?: string | null
+          start_date: string
+        }
+        Update: {
+          created_at?: string | null
+          end_date?: string
+          id?: string
+          label?: string | null
+          start_date?: string
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           author_email: string

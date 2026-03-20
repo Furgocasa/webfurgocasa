@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { DayPicker, DateRange } from "react-day-picker";
 import { Calendar, X } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
-
-function getMadridToday(): Date {
-  const now = new Date();
-  const madridStr = now.toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
-  const [y, m, d] = madridStr.split('-').map(Number);
-  return new Date(y, m - 1, d);
-}
+import { getMadridToday } from "@/lib/utils";
+import {
+  isYmdInClosedRange,
+  type BusinessClosedRange,
+} from "@/lib/business-closed-dates";
 
 interface DateRangePickerProps {
   dateRange: {
@@ -23,6 +21,8 @@ interface DateRangePickerProps {
   minDays?: number;
   maxDays?: number;
   disabledDates?: Date[];
+  /** Cierres de oficina: no se puede elegir ese día como recogida ni devolución (sí puede caer en medio del alquiler). */
+  closedRanges?: BusinessClosedRange[];
 }
 
 export function DateRangePicker({
@@ -31,6 +31,7 @@ export function DateRangePicker({
   minDays = 2,
   maxDays = 89,
   disabledDates = [],
+  closedRanges = [],
 }: DateRangePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [numberOfMonths, setNumberOfMonths] = useState(2);
@@ -87,12 +88,26 @@ export function DateRangePicker({
     return 0;
   };
 
+  // Días cerrados como función disabled para DayPicker.
+  // Solo se deshabilitan cuando el usuario va a elegir un ENDPOINT (inicio o fin).
+  // Cuando ya hay un rango completo seleccionado los días cerrados aparecen grises
+  // (el siguiente click será un nuevo inicio, así que está bien).
+  // Truco: DayPicker v8 en modo range NO permite que un rango cruce un día disabled.
+  // Por eso solo marcamos disabled los cerrados cuando NO estamos en medio de elegir
+  // el fin (es decir: si solo hay from seleccionado, no los deshabilitamos para que
+  // el rango pueda cruzarlos). En su lugar interceptamos en handleSelect.
+  const isSelectingEnd = !!dateRange.from && !dateRange.to;
+
+  const closedDisabledFn = useMemo(() => {
+    if (closedRanges.length === 0) return null;
+    return (d: Date) => isYmdInClosedRange(format(d, "yyyy-MM-dd"), closedRanges);
+  }, [closedRanges]);
+
   const handleSelect = (range: DateRange | undefined) => {
     if (!range) return;
     
     // Si ya teníamos un rango completo (from Y to), cualquier click nuevo resetea
     if (dateRange.from && dateRange.to) {
-      // Empezar de nuevo con solo la fecha de inicio
       onDateChange({
         from: range.from,
         to: undefined,
@@ -112,7 +127,10 @@ export function DateRangePicker({
     
     // Si solo teníamos fecha de inicio y ahora tenemos ambas
     if (range.from && range.to) {
-      // Guardar el rango (ya no intercambiamos porque no debería pasar)
+      // Rechazar silenciosamente si el fin cae en día cerrado
+      if (closedDisabledFn && closedDisabledFn(range.to)) {
+        return;
+      }
       onDateChange({
         from: range.from,
         to: range.to,
@@ -197,7 +215,7 @@ export function DateRangePicker({
                 </p>
               </div>
             )}
-            
+
             <DayPicker
               mode="range"
               selected={dateRange}
@@ -205,30 +223,43 @@ export function DateRangePicker({
               locale={es}
               numberOfMonths={numberOfMonths}
               disabled={[
-                // Siempre deshabilitar fechas antes del mínimo
                 { before: minDate },
-                // Siempre deshabilitar fechas después del máximo
                 { after: maxDate },
-                // Si hay fecha de inicio seleccionada (sin fecha fin), deshabilitar fechas que no cumplan el mínimo
                 ...(dateRange.from && !dateRange.to ? [
-                  // Deshabilitar fechas entre la fecha de inicio y el mínimo requerido
                   (date: Date) => {
-                    if (date < dateRange.from) return false; // Ya manejado por { before: minDate }
-                    if (date.getTime() === dateRange.from.getTime()) return false; // Permitir la fecha de inicio
+                    if (date < dateRange.from) return false;
+                    if (date.getTime() === dateRange.from.getTime()) return false;
                     const minEndDate = getMinEndDate();
-                    return date < minEndDate; // Deshabilitar si es antes del mínimo requerido
+                    return date < minEndDate;
                   }
                 ] : []),
                 ...disabledDates.map((date) => date),
+                // Días cerrados: disabled solo cuando el usuario elige el inicio
+                // (o ya tiene rango completo y va a hacer click en nuevo inicio).
+                // Cuando está eligiendo el fin NO los deshabilitamos para que
+                // DayPicker permita que el rango los cruce.
+                ...(!isSelectingEnd && closedDisabledFn ? [closedDisabledFn] : []),
               ]}
               modifiers={{
                 today: getMadridToday(),
+                ...(isSelectingEnd && closedDisabledFn
+                  ? { business_closed: closedDisabledFn }
+                  : {}),
               }}
               modifiersStyles={{
                 today: {
                   fontWeight: "bold",
                   border: "2px solid #1e40af",
                 },
+                ...(isSelectingEnd && closedDisabledFn
+                  ? {
+                      business_closed: {
+                        color: "#9ca3af",
+                        opacity: 0.5,
+                        cursor: "not-allowed",
+                      },
+                    }
+                  : {}),
               }}
               classNames={{
                 months: "flex gap-2 md:gap-4 flex-col md:flex-row w-full",

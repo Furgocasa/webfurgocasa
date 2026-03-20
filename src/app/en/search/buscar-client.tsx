@@ -22,7 +22,10 @@ async function fetchAvailability(params: URLSearchParams) {
     cache: "no-store",
   });
   if (!response.ok) {
-    throw new Error("Error al buscar disponibilidad");
+    const body = await response.json().catch(() => ({}));
+    throw new Error(
+      typeof body.error === "string" ? body.error : "Error al buscar disponibilidad"
+    );
   }
   return response.json();
 }
