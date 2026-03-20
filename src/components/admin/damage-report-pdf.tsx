@@ -652,8 +652,11 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
             <tbody>
               <tr>
                 <td>
-                  <div style={{ fontSize: "14px", fontWeight: "bold" }}>FURGOCASA · HOJA DE DAÑOS</div>
-                  <div style={{ fontSize: "11px", color: "#64748b", marginTop: "4px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    <img src="/images/brand/LOGO%20AZUL.png" alt="FURGOCASA" style={{ height: "20px" }} />
+                    <div style={{ fontSize: "14px", fontWeight: "bold", color: "#374151" }}>· HOJA DE DAÑOS</div>
+                  </div>
+                  <div style={{ fontSize: "11px", color: "#64748b", marginTop: "6px" }}>
                     {vehicle.name} ·{" "}
                     <span style={{ fontFamily: "ui-monospace, monospace", color: "#063971" }}>{vehicle.internal_code || "—"}</span>
                   </div>
