@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: "about furgocasa, camper rental company murcia, furgocasa history, furgocasa family, motorhomes murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "About Us - Discover Furgocasa",
       description: "Learn about Furgocasa, a family-run campervan and motorhome rental company in Murcia since 2012.",
       type: "website",

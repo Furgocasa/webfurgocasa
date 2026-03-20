@@ -118,7 +118,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       canonical: spanishCanonical,
     },
     openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: faq.question,
       description: cleanAnswer,
       type: 'article',

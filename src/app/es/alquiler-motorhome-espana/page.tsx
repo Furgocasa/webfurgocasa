@@ -33,7 +33,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale: Locale = "es";
   const alternates = buildCanonicalAlternates("/alquiler-motorhome-espana", locale);
   return { ...METADATA_BASE, alternates, openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }], ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }], ...(METADATA_BASE.openGraph || {}), url: alternates.canonical } };
 }
 
 export default async function AlquilerMotorhomeEspanaPage() {

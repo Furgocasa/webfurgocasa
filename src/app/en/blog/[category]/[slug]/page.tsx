@@ -12,7 +12,7 @@ import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, getTranslatedRecords, type Locale } from "@/lib/translations/get-translations";
 import { translateServer } from "@/lib/i18n/server-translation";
-import { buildBlogCanonicalAlternates, truncateTitle } from "@/lib/seo/multilingual-metadata";
+import { buildBlogCanonicalAlternates, truncateTitle, OG_DEFAULT_IMAGE } from "@/lib/seo/multilingual-metadata";
 
 /**
  * 🎯 ARTÍCULOS DE BLOG MULTIIDIOMA - Nueva arquitectura [locale]
@@ -77,8 +77,7 @@ export async function generateMetadata({
 
   // ✅ Canonical + hreflang solo para idiomas donde el artículo existe
   const alternates = buildBlogCanonicalAlternates(`/blog/${category}/${slug}`, locale, post);
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.furgocasa.com";
-  const ogImage = post.featured_image?.startsWith("http") ? post.featured_image : `${baseUrl}/og-blog.jpg`;
+  const ogImage = post.featured_image?.startsWith("http") ? post.featured_image : OG_DEFAULT_IMAGE;
   
   const pageTitle = truncateTitle(translatedMeta.meta_title || translatedMeta.title, 60);
   return {

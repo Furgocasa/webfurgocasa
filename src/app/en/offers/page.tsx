@@ -12,7 +12,7 @@ const OFERTAS_METADATA: Metadata = {
   description: "Take advantage of our special offers on motorhome rentals. Seasonal discounts, promo codes and special prices for your next camper adventure.",
   keywords: "campervan rental offers, motorhome discounts, furgocasa promotions, cheap camper rental, last minute camper offers",
   openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Campervan Rental Offers and Discounts",
     description: "Special discounts on motorhome rentals. Take advantage of our seasonal promotions!",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...OFERTAS_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(OFERTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

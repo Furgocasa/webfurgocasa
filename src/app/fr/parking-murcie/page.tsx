@@ -12,7 +12,7 @@ const PARKING_MURCIA_METADATA: Metadata = {
   description: "Parking sécurisé pour camping-cars et vans à Murcie. Accès 24h, vidéosurveillance, électricité, zone d'eau et vidange WC chimique. À partir de 10€/jour.",
   keywords: "parking camping-car murcie, garder van murcie, parking caravane murcie, stationnement camping-car, parking sécurisé van",
   openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Parking Camping-Cars Murcie - Sécurisé 24h | Furgocasa",
     description: "Parking sécurisé 24h pour votre camping-car à Murcie. Services d'eau, électricité et vidange.",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...PARKING_MURCIA_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(PARKING_MURCIA_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

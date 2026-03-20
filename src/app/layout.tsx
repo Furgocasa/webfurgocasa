@@ -13,7 +13,7 @@ import { GoogleAnalytics } from "@next/third-parties/google";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import Script from "next/script";
 import { i18n, isValidLocale } from "@/lib/i18n/config";
-import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { buildCanonicalAlternates, OG_DEFAULT_IMAGE } from "@/lib/seo/multilingual-metadata";
 
 // Hreflang por defecto para homepages - las páginas hijas sobrescriben con sus propios alternates
 const defaultAlternates = buildCanonicalAlternates("/", "es");
@@ -81,7 +81,7 @@ export const metadata: Metadata = {
       "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: OG_DEFAULT_IMAGE,
         width: 1200,
         height: 630,
         alt: "Furgocasa - Alquiler de Campers",
@@ -92,7 +92,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Alquiler de Campers y Autocaravanas - Furgocasa",
     description: "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa.",
-    images: ["/og-image.jpg"],
+    images: [OG_DEFAULT_IMAGE],
   },
   robots: {
     index: true,

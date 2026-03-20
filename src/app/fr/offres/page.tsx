@@ -12,7 +12,7 @@ const OFERTAS_METADATA: Metadata = {
   description: "Profitez de nos offres spéciales de location de camping-cars. Réductions saisonnières, codes promo et prix spéciaux pour votre prochaine aventure camping-car.",
   keywords: "offres location camping-car, réductions van, promotions furgocasa, location camping-car pas cher, offres dernière minute",
   openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
     title: "Offres et Réductions Location Camping-Cars",
     description: "Réductions spéciales sur la location de camping-cars. Profitez de nos promotions saisonnières !",
     type: "website",
@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ...OFERTAS_METADATA,
     alternates,
     openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       ...(OFERTAS_METADATA.openGraph || {}),
       url: alternates.canonical,
     },

@@ -3,6 +3,10 @@ import { translateCategorySlug } from "@/lib/blog-translations";
 import type { Locale } from "@/lib/i18n/config";
 import type { Metadata } from "next";
 
+/** Imagen OG por defecto (Supabase). `/og-image.jpg` en furgocasa.com no está desplegado → 404 en Meta/Facebook. */
+export const OG_DEFAULT_IMAGE =
+  'https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp';
+
 /**
  * Helper para truncar el título SEO
  */
@@ -91,13 +95,13 @@ export function generateMultilingualMetadata(
       url: canonicalUrl,
       locale: `${currentLang}_${currentLang.toUpperCase()}`,
       type: 'website',
-      images: options?.images?.length ? options.images : [`${baseUrl}/og-image.jpg`],
+      images: options?.images?.length ? options.images : [OG_DEFAULT_IMAGE],
     },
     twitter: {
       card: 'summary_large_image',
       title: truncateTitle(currentMetadata.title),
       description: truncateDescription(currentMetadata.description),
-      images: options?.images?.length ? options.images : [`${baseUrl}/og-image.jpg`],
+      images: options?.images?.length ? options.images : [OG_DEFAULT_IMAGE],
     },
   };
 }
@@ -216,8 +220,6 @@ export function buildCanonicalAlternates(path: string, currentLang: Locale, opti
     languages,
   };
 }
-
-const OG_DEFAULT_IMAGE = 'https://www.furgocasa.com/og-image.jpg';
 
 /**
  * Genera openGraph completo (title, description, url, images) para páginas que usan buildCanonicalAlternates.

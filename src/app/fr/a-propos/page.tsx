@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: "à propos furgocasa, entreprise location camping-car murcie, histoire furgocasa, famille furgocasa, camping-cars murcie",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      images: [{ url: "https://www.furgocasa.com/og-image.jpg", width: 1200, height: 630, alt: "Furgocasa" }],
+      images: [{ url: "https://uygxrqqtdebyzllvbuef.supabase.co/storage/v1/object/public/media/slides/DJI_0008-2.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "À propos - Découvrez Furgocasa",
       description: "Découvrez Furgocasa, entreprise familiale spécialisée dans la location de camping-cars à Murcie depuis 2012.",
       type: "website",
