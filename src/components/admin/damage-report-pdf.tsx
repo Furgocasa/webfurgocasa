@@ -251,7 +251,7 @@ function FuelTankIndicator({ title }: { title: string }) {
   );
 }
 
-const PDF_PAGE_WIDTH = 794;
+const PDF_PAGE_WIDTH = 820;
 
 function addCanvasPage(pdf: jsPDF, canvas: HTMLCanvasElement, isFirst: boolean, marginMm = 5) {
   if (!isFirst) pdf.addPage();
@@ -318,10 +318,10 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
       const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
 
       const canvas1 = await html2canvas(page1Ref.current, opts);
-      addCanvasPage(pdf, canvas1, true);
+      addCanvasPage(pdf, canvas1, true, 3);
 
       const canvas2 = await html2canvas(page2Ref.current, opts);
-      addCanvasPage(pdf, canvas2, false);
+      addCanvasPage(pdf, canvas2, false, 3);
 
       pdf.save(`hoja-danos-${vehicle.internal_code || vehicle.id}.pdf`);
     } catch (error) {
@@ -334,7 +334,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
 
   const pageBase: CSSProperties = {
     width: `${PDF_PAGE_WIDTH}px`,
-    padding: "16px 20px",
+    padding: "16px 8px",
     backgroundColor: "#fff",
     fontFamily: "var(--font-amiko), system-ui, Arial, Helvetica, sans-serif",
     boxSizing: "border-box",
@@ -362,7 +362,7 @@ export function DamageReportPDF({ vehicle, damages }: DamageReportPDFProps) {
                 <td style={{ verticalAlign: "top" }}>
                   <img src="/images/brand/LOGO%20AZUL.png" alt="FURGOCASA" style={{ height: "30px", marginBottom: "4px" }} />
                   <div style={{ fontSize: "10px", color: "#4b5563", marginTop: "2px" }}>
-                    Alquiler de Autocaravanas y Campers · 968 123 456 · info@furgocasa.com
+                    Alquiler de Autocaravanas y Campers · 868 36 41 61 · info@furgocasa.com
                   </div>
                 </td>
                 <td style={{ verticalAlign: "top", textAlign: "right" }}>
