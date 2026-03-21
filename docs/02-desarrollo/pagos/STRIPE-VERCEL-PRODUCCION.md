@@ -4,6 +4,8 @@
 **Estado**: Desplegada y funcionando  
 **Objetivo**: Añadir Stripe como método de pago en producción
 
+**Marzo 2026:** Tras actualizar la app, aplica en Supabase el SQL de columnas `stripe_fee` / `stripe_fee_total` descrito en **[STRIPE-CONFIGURACION.md](./STRIPE-CONFIGURACION.md)** (*PVP y columnas de comisión Stripe*), para que el total de reserva y los pagos cuadren con facturación.
+
 ---
 
 ## ⚡ Configuración Rápida (15 minutos)

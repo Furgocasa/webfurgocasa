@@ -28,6 +28,17 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 🧾 Marzo 2026 — Comisión Stripe en el PVP y precio correcto de extras en el admin
+
+**Documentación detallada:** [`docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md) · [`docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md`](./docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md)
+
+- **Stripe y facturación:** La comisión repercutida al cliente (aprox. 2 % sobre la base de alquiler de cada cobro) forma parte del **PVP total** de la reserva. En base de datos: `bookings.total_price` incluye esa comisión acumulada; `bookings.stripe_fee_total` la desglosa; en cada fila de `payments` con Stripe, `payments.amount` es lo cobrado al cliente y `payments.stripe_fee` la parte de comisión de ese cobro (0 en Redsys, transferencia, etc.).
+- **Antigua reserva / SQL:** Si despliegas código nuevo sobre una BD antigua, ejecuta en Supabase el `ALTER TABLE` documentado en `STRIPE-CONFIGURACION.md` (columnas `stripe_fee_total` y `stripe_fee`).
+- **Depósito 50 %:** El importe a cobrar con Stripe se calcula sobre el total contractual sin duplicar comisiones ya integradas (`rentalBaseAmountForStripePayment` en `src/lib/stripe/index.ts`; misma idea en las páginas de pago del cliente).
+- **Admin — nuevas/editar reserva:** El precio unitario de líneas de extras debe resolverse con **`extraLineUnitPriceEuros`** en `src/lib/utils.ts` (según `price_type`: `per_unit` → `price_per_unit`, `per_day` → días, etc.). No usar `price_per_rental` como comodín para todo lo que no sea `per_day` (evita errores históricos con sábanas, edredón, etc.).
+
+---
+
 ## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Febrero 2026 - **Franjas Horarias por Ubicación + Fix Timezone Europe/Madrid**
 
 ### 🕐 Franjas Horarias Configurables por Ubicación
@@ -1674,11 +1685,11 @@ supabase/fix-all-rls-policies.sql
 ## 💳 Sistema de Pagos Completo (v2.0)
 
 **Estado:** ✅ COMPLETAMENTE OPERATIVO  
-**Última actualización:** 24/01/2026
+**Última actualización:** marzo 2026 (PVP con comisión Stripe en `total_price`; ver docs de pagos)
 
 ### 🎯 Funcionalidades
 
-✅ **Pagos en línea** - Redsys (sin comisión) + Stripe (+2%)  
+✅ **Pagos en línea** - Redsys (sin comisión repercutida) + Stripe (comisión ~2 % **incluida en el PVP** de la reserva)  
 ✅ **Pago fraccionado** - 50% al reservar, 50% antes del alquiler  
 ✅ **Gestión manual** - Transferencias, efectivo, bizum desde admin  
 ✅ **Fallback automático** - Si notificación falla, se procesa en `/pago/exito`  
@@ -2238,7 +2249,7 @@ Desarrollado con ❤️ para Furgocasa
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 24 de Febrero 2026 (Sistema Daños: Fix Caché PWA + Navegación Flechas + Numeración Independiente)  
+**Última actualización**: 21 de marzo de 2026 (PVP Stripe + comisión en BD; extras admin con `extraLineUnitPriceEuros`)  
 
 ---
 

@@ -183,6 +183,10 @@ created_at, updated_at, icon, price_per_unit
 
 - `min_quantity` (INTEGER, nullable): Para `per_day` = mínimo de días a facturar (ej. parking 4 días); para `per_unit` = cantidad mínima al seleccionar.
 
+### ⚠️ `price_type` y campos de precio
+
+Para calcular el importe de línea en reservas (público y admin), usar siempre **`extraLineUnitPriceEuros`** en `src/lib/utils.ts`. Con **`price_type = 'per_unit'`** el precio contractual por unidad es **`price_per_unit`** (no asumir que `price_per_rental` es intercambiable).
+
 ### ⚠️ IMPORTANTE: Esta tabla NO tiene columna `category`
 
 ### Query correcta:
@@ -198,28 +202,49 @@ const { data } = await supabase
 
 ## 📋 TABLA: `bookings`
 
-**Tabla vacía actualmente**
+### Columnas relevantes (producción; lista no exhaustiva):
+```
+id, booking_number, customer_id, vehicle_id,
+pickup_date, dropoff_date, pickup_time, dropoff_time,
+pickup_location_id, dropoff_location_id,
+days, base_price, extras_price, location_fee, discount,
+total_price, amount_paid, stripe_fee_total,
+status, payment_status,
+customer_name, customer_email, notes,
+coupon_id, coupon_code, coupon_discount,
+created_at, updated_at, ...
+```
 
-### Columnas esperadas (según schema.sql):
-```
-id, customer_id, vehicle_id, pickup_date, dropoff_date,
-pickup_time, dropoff_time, pickup_location_id, dropoff_location_id,
-total_days, base_price, extras_price, location_fee,
-total_price, status, payment_status, payment_method,
-created_at, updated_at
-```
+- **`total_price`**: PVP total de la reserva. Con pagos Stripe, incluye la comisión repercutida al cliente acumulada (además de base, extras, traslado, etc.).
+- **`stripe_fee_total`**: Suma de comisiones Stripe ya integradas en `total_price` (desglose para admin/cliente). Migración: ver **docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md** (*PVP y columnas de comisión Stripe*).
 
 ---
 
 ## 📋 TABLA: `booking_extras`
 
-**Tabla vacía actualmente**
+### Columnas esperadas:
+```
+id, booking_id, extra_id, quantity,
+unit_price, total_price, created_at
+```
 
-### Columnas esperadas (según schema.sql):
+- **`unit_price`**: Precio por unidad de línea según reglas de `extras.price_type` (usar **`extraLineUnitPriceEuros`** en código; no confundir con `price_per_rental` del catálogo cuando el tipo es `per_unit`).
+- **`total_price`**: `unit_price * quantity` (salvo lógica específica de días ya incluida en `unit_price` para `per_day`).
+
+---
+
+## 📋 TABLA: `payments`
+
+### Columnas relevantes (Stripe + resto):
 ```
-id, booking_id, extra_id, quantity, 
-price_per_unit, total_price, created_at
+id, booking_id, order_number, amount, stripe_fee,
+status, payment_type, payment_method,
+stripe_session_id, stripe_payment_intent_id,
+notes, created_at, updated_at, ...
 ```
+
+- **`amount`**: Importe cobrado al cliente en ese movimiento. Con Stripe: base de alquiler de ese cobro + comisión repercutida de ese cobro.
+- **`stripe_fee`**: Parte de comisión Stripe incluida en `amount` en ese registro; **0** en Redsys, transferencia, efectivo, etc.
 
 ---
 

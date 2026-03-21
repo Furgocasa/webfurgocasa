@@ -1,7 +1,7 @@
 # 💳 Sistema de Pagos Furgocasa
 
-**Versión:** 2.0  
-**Última actualización:** 24/01/2026
+**Versión:** 2.1  
+**Última actualización:** 21/03/2026 (PVP Stripe + columnas BD; extras admin)
 
 ---
 
@@ -20,8 +20,8 @@
 
 El sistema de pagos de Furgocasa soporta múltiples métodos de pago con procesamiento automático y gestión manual:
 
-- ✅ **Redsys** - Pasarela bancaria española (recomendado, sin comisión)
-- ✅ **Stripe** - Pagos internacionales (+2% comisión)
+- ✅ **Redsys** - Pasarela bancaria española (recomendado; sin comisión repercutida al cliente en el PVP)
+- ✅ **Stripe** - Pagos internacionales; la comisión repercutida (~2 %) **forma parte del PVP** (`bookings.total_price`), con desglose en `stripe_fee_total` y por cobro en `payments.stripe_fee`
 - ✅ **Transferencia** - Gestión manual
 - ✅ **Efectivo** - Gestión manual
 - ✅ **Bizum** - Gestión manual
@@ -83,7 +83,8 @@ Total a pagar: 145,35 €
 interface Payment {
   id: string;
   booking_id: string;
-  amount: number;
+  amount: number;       // Importe cobrado al cliente en este pago (con Stripe: base + comisión de este cobro)
+  stripe_fee?: number;  // Parte de comisión Stripe en este pago; 0 si no aplica
   payment_method: "redsys" | "stripe" | "transfer" | "cash" | "bizum";
   status: "pending" | "completed" | "failed" | "refunded" | "cancelled";
   order_number?: string;          // Redsys
@@ -95,6 +96,13 @@ interface Payment {
   updated_at: string;
 }
 ```
+
+En **`bookings`**, además de `total_price` y `amount_paid`, existe **`stripe_fee_total`**: suma de las comisiones Stripe ya integradas en el PVP (ver migración SQL en **STRIPE-CONFIGURACION.md**).
+
+### Precio de extras (admin vs público)
+
+- **Público** (flujo reserva en `/es/reservar/...` y equivalentes): ya usa **`extraLineUnitPriceEuros`** (`src/lib/utils.ts`) según `extras.price_type` (`per_unit` → `price_per_unit`, `per_day` → días de alquiler y `min_quantity`, etc.).
+- **Admin** (crear / editar reserva): debe usar la **misma función** al calcular `booking_extras.unit_price` y totales. No usar `price_per_rental` como valor por defecto para todo lo que no sea `per_day`: en catálogo pueden convivir `price_per_unit` y `price_per_rental` con valores distintos (p. ej. edredón 30 €/unidad vs 20 € en otro campo).
 
 ### Endpoints Principales
 

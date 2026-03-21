@@ -160,6 +160,31 @@ ON payments(stripe_session_id)
 WHERE stripe_session_id IS NOT NULL;
 ```
 
+## 🧾 PVP y columnas de comisión Stripe (marzo 2026)
+
+La comisión de la pasarela que **se repercute al cliente** debe figurar en el precio total de la reserva (PVP / facturación). El código actual:
+
+- En **`/api/stripe/initiate`**: el registro en `payments` guarda en **`amount`** el importe total cobrado al cliente (base de alquiler de ese cobro + comisión) y en **`stripe_fee`** solo la parte de comisión de ese cobro.
+- En **`/api/stripe/webhook`** (pago completado): se suma **`payment.amount`** a **`bookings.amount_paid`**, y **`payment.stripe_fee`** a **`bookings.total_price`** y a **`bookings.stripe_fee_total`** (acumulado de comisiones Stripe de esa reserva).
+
+**Migración SQL en Supabase** (ejecutar una vez si la base aún no las tiene):
+
+```sql
+ALTER TABLE public.bookings
+  ADD COLUMN IF NOT EXISTS stripe_fee_total numeric DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN public.bookings.stripe_fee_total IS
+  'Total acumulado de comisiones Stripe cobradas al cliente. Se suma a total_price en cada pago con Stripe.';
+
+ALTER TABLE public.payments
+  ADD COLUMN IF NOT EXISTS stripe_fee numeric DEFAULT 0 NOT NULL;
+
+COMMENT ON COLUMN public.payments.stripe_fee IS
+  'Parte de comisión Stripe incluida en amount de este pago. 0 para Redsys/transferencia/efectivo.';
+```
+
+**Resumen contable:** `total_price` de la reserva = precio del servicio (base + extras + traslado, etc.) **más** comisiones Stripe ya integradas; `stripe_fee_total` permite desglosarlas en admin y en la ficha de reserva del cliente.
+
 ## ✅ Checklist de Implementación
 
 ### Desarrollo Local
@@ -314,5 +339,5 @@ Para una reserva de 1,000€:
 
 ---
 
-**Última actualización:** Enero 2026  
+**Última actualización:** marzo 2026 (PVP + columnas `stripe_fee` / `stripe_fee_total`)  
 **Versión de Stripe API:** 2024-12-18.acacia

@@ -2,9 +2,19 @@
 
 **Versión**: 1.0.17 ✅ PRODUCCIÓN — landings alquiler ampliadas (documentación)  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 20 de marzo, 2026
+**Última actualización**: 21 de marzo, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🧾 ACTUALIZACIÓN MARZO 2026 — STRIPE (PVP) Y EXTRAS EN ADMIN
+
+| Tema | Dónde leer |
+|------|------------|
+| Comisión Stripe como parte del PVP total (`bookings.total_price`, `stripe_fee_total`, `payments.stripe_fee`) | **[SISTEMA-PAGOS.md](./02-desarrollo/pagos/SISTEMA-PAGOS.md)** · **[STRIPE-CONFIGURACION.md](./02-desarrollo/pagos/STRIPE-CONFIGURACION.md)** |
+| SQL columnas Supabase (`stripe_fee_total`, `stripe_fee`) | Sección *PVP y columnas de comisión* en **STRIPE-CONFIGURACION.md** |
+| Cálculo de precio de extras (`extraLineUnitPriceEuros`, `price_type` vs `price_per_unit`) | **README** (raíz del repo), sección *Marzo 2026* · **SUPABASE-SCHEMA-REAL.md** (`extras`, `booking_extras`) |
 
 ---
 

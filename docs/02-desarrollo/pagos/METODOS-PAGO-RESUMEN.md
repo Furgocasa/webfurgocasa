@@ -1,5 +1,7 @@
 # 💳 Resumen: Integración de Métodos de Pago
 
+> **Marzo 2026:** Con Stripe, la comisión repercutida al cliente forma parte del **PVP total** de la reserva (`bookings.total_price`), con desglose en `stripe_fee_total` y `payments.stripe_fee`. Ver **[STRIPE-CONFIGURACION.md](./STRIPE-CONFIGURACION.md)** (sección *PVP y columnas de comisión*) y **[SISTEMA-PAGOS.md](./SISTEMA-PAGOS.md)**.
+
 ## ✅ Estado Actual
 
 ### Redsys (Método Principal)
