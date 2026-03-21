@@ -683,8 +683,8 @@ export default function PagoPage() {
               </div>
 
               <div className="flex items-center justify-center gap-4 pt-4">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" className="h-8" />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="h-8" />
+                <img src="/images/payments/visa.svg" alt="Visa" className="h-8 w-auto" width={100} height={32} />
+                <img src="/images/payments/mastercard.svg" alt="Mastercard" className="h-8 w-auto" width={41} height={32} />
                 {paymentMethod === 'redsys' ? (
                   <img src="/images/redsys.png" alt="Redsys" className="h-8" />
                 ) : (
