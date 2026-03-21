@@ -92,18 +92,23 @@ export async function POST(request: NextRequest) {
         if (status === "authorized") {
           const { data: booking, error: bookingError } = await supabase
             .from("bookings")
-            .select("amount_paid, total_price")
+            .select("amount_paid, total_price, stripe_fee_total")
             .eq("id", payment.booking_id)
             .single();
 
           if (!bookingError && booking) {
+            const fee = Number(payment.stripe_fee ?? 0);
             const newAmountPaid = (booking.amount_paid || 0) + payment.amount;
-            const isFullyPaid = newAmountPaid >= booking.total_price;
+            const newTotalPrice = (booking.total_price || 0) + fee;
+            const newStripeFeeTotal = (booking.stripe_fee_total || 0) + fee;
+            const isFullyPaid = newAmountPaid >= newTotalPrice;
 
             const { error: bookingUpdateError } = await supabase
               .from("bookings")
               .update({
                 amount_paid: newAmountPaid,
+                total_price: newTotalPrice,
+                stripe_fee_total: newStripeFeeTotal,
                 payment_status: isFullyPaid ? "paid" : "partial",
                 status: "confirmed",
               })

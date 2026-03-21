@@ -11,6 +11,7 @@ interface Payment {
   id: string;
   booking_id: string;
   amount: number;
+  stripe_fee: number;
   payment_method: string;
   status: string;
   order_number: string | null;
@@ -282,11 +283,17 @@ export default function PaymentDetailPage() {
               {/* Importe (readonly) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Importe
+                  Importe cobrado al cliente
                 </label>
                 <div className="text-2xl font-bold text-gray-900">
                   {formatPrice(payment.amount)}
                 </div>
+                {payment.stripe_fee > 0 && (
+                  <div className="mt-1 text-sm text-gray-500 space-y-0.5">
+                    <p>Base alquiler: {formatPrice(payment.amount - payment.stripe_fee)}</p>
+                    <p>Comisión Stripe (2 %): {formatPrice(payment.stripe_fee)}</p>
+                  </div>
+                )}
               </div>
 
               {/* Método de Pago */}

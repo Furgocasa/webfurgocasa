@@ -29,23 +29,32 @@ export function stripeChargeEurosFromRentalBase(baseEuros: number): number {
 }
 
 /**
- * Importe de alquiler permitido para esta reserva (lo que debe sumarse a amount_paid del booking).
- * Política: primer pago 50% del total; si ya hubo pago, el resto pendiente. "full" = todo lo pendiente.
+ * Importe de alquiler base (sin comisión Stripe) que toca pagar ahora.
+ *
+ * Política: primer pago 50 % del precio base original; si ya hubo pago, el
+ * resto pendiente. "full" = todo lo pendiente.
+ *
+ * `total_price` puede incluir comisiones Stripe de pagos anteriores, por eso
+ * se restan (`stripe_fee_total`) para obtener el precio base contractual.
+ * `amount_paid` ya incluye las comisiones cobradas, así que también se
+ * compara contra el total con comisiones para no pedir de más.
  */
 export function rentalBaseAmountForStripePayment(
-  booking: { total_price: number; amount_paid?: number | null },
+  booking: { total_price: number; amount_paid?: number | null; stripe_fee_total?: number | null },
   paymentType: "deposit" | "full"
 ): number {
-  const total = Number(booking.total_price);
+  const totalWithFees = Number(booking.total_price);
+  const stripeFees = Number(booking.stripe_fee_total ?? 0);
+  const baseTotal = totalWithFees - stripeFees;
   const paid = Number(booking.amount_paid ?? 0);
-  const pending = Math.max(0, Math.round((total - paid) * 100) / 100);
+  const pending = Math.max(0, Math.round((totalWithFees - paid) * 100) / 100);
 
   if (paymentType === "full") {
     return pending;
   }
 
   if (paid < 0.01) {
-    return Math.round(total * 0.5 * 100) / 100;
+    return Math.round(baseTotal * 0.5 * 100) / 100;
   }
 
   return pending;

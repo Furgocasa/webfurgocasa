@@ -4,21 +4,25 @@ import {
   createCheckoutSession,
   rentalBaseAmountForStripePayment,
   stripeChargeEurosFromRentalBase,
+  STRIPE_CHECKOUT_FEE_PERCENT,
 } from "@/lib/stripe";
 import { generateOrderNumber } from "@/lib/utils";
 
 /**
  * POST /api/stripe/initiate
- * 
- * Inicia una sesión de pago con Stripe Checkout
- * 
- * Body:
- * - bookingId: ID de la reserva
- * - paymentType: "deposit" | "full"
  *
- * El importe de alquiler (50%/resto/total pendiente) se calcula en servidor.
- * Stripe cobra alquiler + 2% de comisión; en `payments.amount` solo se guarda el alquiler
- * (lo que suma a `bookings.amount_paid`).
+ * Inicia una sesión de pago con Stripe Checkout.
+ *
+ * Body: { bookingId, paymentType: "deposit" | "full" }
+ *
+ * El importe base de alquiler se calcula en servidor (50 % / resto / total).
+ * Stripe cobra base + 2 % de comisión de gestión.
+ *
+ * Contablemente la comisión forma parte del PVP:
+ *   - payments.amount  = chargeTotal (lo que paga el cliente)
+ *   - payments.stripe_fee = parte de comisión incluida en amount
+ *   - bookings.total_price se incrementa en stripe_fee
+ *   - bookings.stripe_fee_total acumula todas las comisiones Stripe
  */
 export async function POST(request: NextRequest) {
   try {
@@ -33,7 +37,6 @@ export async function POST(request: NextRequest) {
       paymentType,
     });
 
-    // Validaciones
     if (!bookingId) {
       return NextResponse.json(
         { error: "ID de reserva requerido" },
@@ -43,7 +46,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Obtener datos de la reserva
     const { data: booking, error: bookingError } = await supabase
       .from("bookings")
       .select(`
@@ -69,14 +71,11 @@ export async function POST(request: NextRequest) {
     }
 
     const chargeTotal = stripeChargeEurosFromRentalBase(rentalBase);
+    const stripeFee = Math.round((chargeTotal - rentalBase) * 100) / 100;
 
-    // Generar número de pedido único
     const orderNumber = generateOrderNumber("FC");
-
-    // Descripción del producto
     const description = `Furgocasa - ${booking.vehicle?.name || "Alquiler"} (${booking.booking_number})`;
 
-    // Crear sesión de Stripe Checkout (cobro = alquiler + comisión pasarela)
     const session = await createCheckoutSession({
       amount: chargeTotal,
       bookingId,
@@ -89,20 +88,22 @@ export async function POST(request: NextRequest) {
     console.log("✅ Sesión de Stripe creada:", {
       sessionId: session.id,
       rentalBaseEuros: rentalBase,
+      stripeFeeEuros: stripeFee,
       chargedToCustomerEuros: chargeTotal,
       amountTotalCents: session.amount_total,
     });
 
-    // Registrar el pago en la base de datos como pendiente (solo parte alquiler)
+    // payments.amount = PVP cobrado al cliente (base + comisión)
     const { error: paymentError } = await supabase.from("payments").insert({
       booking_id: bookingId,
       order_number: orderNumber,
-      amount: rentalBase,
+      amount: chargeTotal,
+      stripe_fee: stripeFee,
       status: "pending",
       payment_type: paymentType,
       payment_method: "stripe",
       stripe_session_id: session.id,
-      notes: `Sesión Stripe: ${session.id}. Cobrado cliente ${chargeTotal}€ (incl. comisión pasarela); alquiler ${rentalBase}€.`,
+      notes: `Sesión Stripe: ${session.id}. PVP cobrado ${chargeTotal}€ (alquiler ${rentalBase}€ + comisión ${stripeFee}€).`,
     });
 
     if (paymentError) {

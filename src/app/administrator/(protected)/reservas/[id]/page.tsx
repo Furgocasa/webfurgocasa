@@ -27,6 +27,7 @@ interface Booking {
   coupon_discount: number;
   total_price: number;
   amount_paid: number | null;
+  stripe_fee_total: number;
   status: string;
   payment_status: string;
   customer_name: string;
@@ -617,6 +618,14 @@ Devolución en ${dropoffLocation}`;
                 <span className="font-semibold text-green-300">
                   - {formatPrice(booking.discount)}
                 </span>
+              </div>
+            )}
+
+            {/* Comisión Stripe (forma parte del PVP) */}
+            {(booking.stripe_fee_total || 0) > 0 && (
+              <div className="flex justify-between">
+                <span className="opacity-90">Comisión pasarela Stripe:</span>
+                <span className="font-semibold">{formatPrice(booking.stripe_fee_total)}</span>
               </div>
             )}
           </div>

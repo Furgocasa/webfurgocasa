@@ -235,6 +235,7 @@ export interface Database {
           discount: number;
           total_price: number;
           amount_paid: number;
+          stripe_fee_total: number;
           status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
           payment_status: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;
@@ -267,6 +268,7 @@ export interface Database {
           discount?: number;
           total_price: number;
           amount_paid?: number;
+          stripe_fee_total?: number;
           status?: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
           payment_status?: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;
@@ -394,6 +396,7 @@ export interface Database {
           transaction_date: string | null;
           card_country: string | null;
           card_type: string | null;
+          stripe_fee: number;
           refunded_amount: number;
           notes: string | null;
           created_at: string;
@@ -412,6 +415,7 @@ export interface Database {
           transaction_date?: string | null;
           card_country?: string | null;
           card_type?: string | null;
+          stripe_fee?: number;
           refunded_amount?: number;
           notes?: string | null;
           created_at?: string;

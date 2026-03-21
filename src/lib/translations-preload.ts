@@ -660,6 +660,12 @@ export const staticTranslations = {
     fr: "par location",
     de: "pro Miete"
   },
+  "Comisión de gestión Stripe": {
+    es: "Comisión de gestión Stripe",
+    en: "Stripe processing fee",
+    fr: "Frais de gestion Stripe",
+    de: "Stripe-Bearbeitungsgebühr"
+  },
 
   // Summary & Pricing
   "Resumen": {

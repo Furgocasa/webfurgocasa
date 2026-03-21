@@ -21,6 +21,7 @@ interface Booking {
   days: number;
   total_price: number;
   amount_paid: number;
+  stripe_fee_total?: number;
   status: string;
   payment_status: string;
   customer_name: string;
@@ -93,23 +94,25 @@ export default function PagoPage() {
   };
 
   // Calcular importes según política 50%-50%
+  // total_price puede incluir comisiones Stripe previas; el 50 % se aplica
+  // sobre el precio base contractual (sin esas comisiones).
   const calculatePaymentAmounts = () => {
     if (!booking) return { firstPayment: 0, secondPayment: 0, isPending50: false };
     
     const total = booking.total_price;
+    const stripeFees = booking.stripe_fee_total ?? 0;
+    const baseTotal = total - stripeFees;
     const amountPaid = booking.amount_paid || 0;
-    const pendingAmount = total - amountPaid;
+    const pendingAmount = Math.max(0, total - amountPaid);
     
-    // Si no se ha pagado nada, primer pago es 50%
     if (amountPaid === 0) {
       return {
-        firstPayment: total * 0.5, // 50% exacto (con decimales)
-        secondPayment: total * 0.5, // 50% exacto (con decimales)
+        firstPayment: baseTotal * 0.5,
+        secondPayment: baseTotal * 0.5,
         isPending50: false,
       };
     }
     
-    // Si ya se pagó algo, el siguiente pago es el pendiente total
     return {
       firstPayment: 0,
       secondPayment: pendingAmount,

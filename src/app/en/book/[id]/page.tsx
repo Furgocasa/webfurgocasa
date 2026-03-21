@@ -56,6 +56,7 @@ interface Booking {
   discount: number;
   coupon_code?: string | null;
   coupon_discount?: number | null;
+  stripe_fee_total?: number;
   total_price: number;
   amount_paid: number;
   status: string;
@@ -732,6 +733,13 @@ export default function ReservaPage() {
                       <span className="font-semibold text-green-300">
                         - {formatPrice(booking.discount ?? booking.coupon_discount ?? 0)}
                       </span>
+                    </div>
+                  )}
+
+                  {(booking.stripe_fee_total ?? 0) > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="opacity-90">{t("Comisión de gestión Stripe")}</span>
+                      <span className="font-semibold">{formatPrice(booking.stripe_fee_total!)}</span>
                     </div>
                   )}
                 </div>
