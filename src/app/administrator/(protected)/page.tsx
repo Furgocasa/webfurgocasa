@@ -318,15 +318,15 @@ export default async function AdminDashboard() {
                         Día {b.currentDay}/{b.totalDays}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-600 mb-1">
-                      {b.customer}
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-gray-600 mb-1">
+                      <span>{b.customer}</span>
                       {b.customerPhone && (
-                        <span className="ml-2 flex items-center gap-0.5 text-blue-600">
+                        <span className="flex items-center gap-0.5 text-blue-600">
                           <Phone className="h-3 w-3" />
                           {b.customerPhone}
                         </span>
                       )}
-                    </p>
+                    </div>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       <span>
                         Salió{" "}
