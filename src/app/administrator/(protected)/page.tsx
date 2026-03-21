@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import {
   Car,
   Calendar,
@@ -85,6 +86,19 @@ function CarnetCaducadoBadge({
           timeZone: "Europe/Madrid",
         })}
       </span>
+    </div>
+  );
+}
+
+/** Ubicación destacada en tarjetas del dashboard (azul corporativo + texto blanco) */
+function DashboardLocationHighlight({ children }: { children: ReactNode }) {
+  return (
+    <div className="mt-1 flex items-start gap-1.5 rounded-md border border-furgocasa-blue-dark bg-furgocasa-blue px-2 py-1.5 text-xs font-medium text-white shadow-sm">
+      <MapPin
+        className="h-3.5 w-3.5 flex-shrink-0 text-white/90 mt-0.5"
+        aria-hidden
+      />
+      <span className="leading-snug">{children}</span>
     </div>
   );
 }
@@ -209,14 +223,11 @@ export default async function AdminDashboard() {
                     </span>
                   </div>
                   {(b.pickupLocation || b.dropoffLocation) && (
-                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
-                      <MapPin className="h-3 w-3 flex-shrink-0" />
-                      <span>
-                        {b.pickupLocation}
-                        {b.pickupLocation !== b.dropoffLocation &&
-                          ` → ${b.dropoffLocation}`}
-                      </span>
-                    </div>
+                    <DashboardLocationHighlight>
+                      {b.pickupLocation}
+                      {b.pickupLocation !== b.dropoffLocation &&
+                        ` → ${b.dropoffLocation}`}
+                    </DashboardLocationHighlight>
                   )}
                   <div className="flex flex-wrap items-center gap-2 mt-1.5">
                     {b.paymentStatus && (
@@ -333,14 +344,11 @@ export default async function AdminDashboard() {
                       </span>
                     </div>
                     {(b.pickupLocation || b.dropoffLocation) && (
-                      <div className="flex items-center gap-1 text-xs text-gray-500 mt-0.5">
-                        <MapPin className="h-3 w-3 flex-shrink-0" />
-                        <span>
-                          {b.pickupLocation}
-                          {b.pickupLocation !== b.dropoffLocation &&
-                            ` → ${b.dropoffLocation}`}
-                        </span>
-                      </div>
+                      <DashboardLocationHighlight>
+                        {b.pickupLocation}
+                        {b.pickupLocation !== b.dropoffLocation &&
+                          ` → ${b.dropoffLocation}`}
+                      </DashboardLocationHighlight>
                     )}
                     {/* Barra de progreso */}
                     <div className="mt-2 flex items-center gap-2">
@@ -460,13 +468,16 @@ export default async function AdminDashboard() {
                             </span>
                           )}
                         </div>
-                        <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-gray-500 mt-0.5">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-gray-500 mt-0.5">
                           <span className="font-medium">
                             {formatDateLabel(action.date)} {action.time}
                           </span>
                           {locationName && (
-                            <span className="flex items-center gap-0.5">
-                              <MapPin className="h-3 w-3" />
+                            <span className="inline-flex items-center gap-1 rounded-md border border-furgocasa-blue-dark bg-furgocasa-blue px-2 py-0.5 text-[11px] font-medium text-white shadow-sm">
+                              <MapPin
+                                className="h-3 w-3 flex-shrink-0 text-white/90"
+                                aria-hidden
+                              />
                               {locationName}
                             </span>
                           )}

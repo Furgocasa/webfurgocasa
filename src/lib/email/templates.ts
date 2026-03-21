@@ -158,6 +158,7 @@ export interface BookingEmailData {
   locationFee?: number;
   discount?: number;
   couponCode?: string | null;
+  stripeFeeTotal?: number;
   totalPrice: number;
   amountPaid?: number;
   pendingAmount?: number;
@@ -270,6 +271,11 @@ function getPriceSection(data: BookingEmailData): string {
   if (data.discount && data.discount > 0) {
     const discountLabel = data.couponCode ? `Cupón ${data.couponCode}` : 'Descuento';
     rows += tableRow(discountLabel, `-${formatPrice(data.discount)}`, '#10b981');
+  }
+  
+  // Comisión Stripe (solo si existe)
+  if (data.stripeFeeTotal && data.stripeFeeTotal > 0) {
+    rows += tableRow('Comisión pasarela Stripe', formatPrice(data.stripeFeeTotal));
   }
   
   // Separador antes del total

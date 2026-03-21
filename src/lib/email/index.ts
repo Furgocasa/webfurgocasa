@@ -270,6 +270,7 @@ export async function getBookingDataForEmail(
       locationFee: booking.location_fee || 0,
       discount: booking.discount || booking.coupon_discount || 0,
       couponCode: booking.coupon_code || null,
+      stripeFeeTotal: booking.stripe_fee_total || 0,
       totalPrice: booking.total_price || 0,
       amountPaid: booking.amount_paid || 0,
       pendingAmount: (booking.total_price || 0) - (booking.amount_paid || 0),
