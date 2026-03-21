@@ -90,16 +90,16 @@ function CarnetCaducadoBadge({
   );
 }
 
-/** Ubicación destacada en tarjetas del dashboard (azul corporativo + texto blanco) */
+/** Pastilla de ubicación: ancho ceñido al texto (misma línea que «Entregas / Recogidas») */
 function DashboardLocationHighlight({ children }: { children: ReactNode }) {
   return (
-    <div className="mt-1 flex items-start gap-1.5 rounded-md border border-furgocasa-blue-dark bg-furgocasa-blue px-2 py-1.5 text-xs font-medium text-white shadow-sm">
+    <span className="inline-flex items-center gap-1 rounded-md border border-furgocasa-blue-dark bg-furgocasa-blue px-2 py-0.5 text-[11px] font-medium text-white shadow-sm max-w-full">
       <MapPin
-        className="h-3.5 w-3.5 flex-shrink-0 text-white/90 mt-0.5"
+        className="h-3 w-3 flex-shrink-0 text-white/90"
         aria-hidden
       />
       <span className="leading-snug">{children}</span>
-    </div>
+    </span>
   );
 }
 
@@ -223,11 +223,13 @@ export default async function AdminDashboard() {
                     </span>
                   </div>
                   {(b.pickupLocation || b.dropoffLocation) && (
-                    <DashboardLocationHighlight>
-                      {b.pickupLocation}
-                      {b.pickupLocation !== b.dropoffLocation &&
-                        ` → ${b.dropoffLocation}`}
-                    </DashboardLocationHighlight>
+                    <div className="mt-1">
+                      <DashboardLocationHighlight>
+                        {b.pickupLocation}
+                        {b.pickupLocation !== b.dropoffLocation &&
+                          ` → ${b.dropoffLocation}`}
+                      </DashboardLocationHighlight>
+                    </div>
                   )}
                   <div className="flex flex-wrap items-center gap-2 mt-1.5">
                     {b.paymentStatus && (
@@ -344,11 +346,13 @@ export default async function AdminDashboard() {
                       </span>
                     </div>
                     {(b.pickupLocation || b.dropoffLocation) && (
-                      <DashboardLocationHighlight>
-                        {b.pickupLocation}
-                        {b.pickupLocation !== b.dropoffLocation &&
-                          ` → ${b.dropoffLocation}`}
-                      </DashboardLocationHighlight>
+                      <div className="mt-0.5">
+                        <DashboardLocationHighlight>
+                          {b.pickupLocation}
+                          {b.pickupLocation !== b.dropoffLocation &&
+                            ` → ${b.dropoffLocation}`}
+                        </DashboardLocationHighlight>
+                      </div>
                     )}
                     {/* Barra de progreso */}
                     <div className="mt-2 flex items-center gap-2">
@@ -473,13 +477,9 @@ export default async function AdminDashboard() {
                             {formatDateLabel(action.date)} {action.time}
                           </span>
                           {locationName && (
-                            <span className="inline-flex items-center gap-1 rounded-md border border-furgocasa-blue-dark bg-furgocasa-blue px-2 py-0.5 text-[11px] font-medium text-white shadow-sm">
-                              <MapPin
-                                className="h-3 w-3 flex-shrink-0 text-white/90"
-                                aria-hidden
-                              />
+                            <DashboardLocationHighlight>
                               {locationName}
-                            </span>
+                            </DashboardLocationHighlight>
                           )}
                         </div>
                         <div className="flex flex-wrap items-center gap-2 mt-1">
