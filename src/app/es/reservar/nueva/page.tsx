@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, extraLineUnitPriceEuros } from "@/lib/utils";
 import { useSeasonalPricing } from "@/hooks/use-seasonal-pricing";
 import { getTranslatedRoute } from "@/lib/route-translations";
 
@@ -48,8 +48,10 @@ interface SelectedExtra {
   id: string;
   name: string;
   quantity: number;
-  price_per_day: number;
-  price_per_rental: number;
+  price_per_day: number | null;
+  price_per_unit: number | null;
+  price_per_rental: number | null;
+  price_type: string | null;
   min_quantity?: number | null;
 }
 
@@ -112,13 +114,11 @@ function NuevaReservaContent() {
     dropoffTime
   });
   
-  const { days, pricingDays, hasTwoDayPricing, totalPrice: basePrice, season: seasonName } = seasonalPricing;
+  const { days, totalPrice: basePrice } = seasonalPricing;
   
   const extrasPrice = selectedExtras.reduce((sum, extra) => {
-    const price = extra.price_per_rental > 0 
-      ? extra.price_per_rental 
-      : extra.price_per_day * (extra.min_quantity ? Math.max(pricingDays, extra.min_quantity) : pricingDays);
-    return sum + (price * extra.quantity);
+    const unit = extraLineUnitPriceEuros(extra, days);
+    return sum + unit * extra.quantity;
   }, 0);
   
   const calculateLocationFee = () => {
@@ -192,7 +192,7 @@ function NuevaReservaContent() {
         // Load extra data
         const { data: extraData } = await supabase
           .from('extras')
-          .select('id, name, price_per_day, price_per_rental, min_quantity')
+          .select("id, name, price_per_day, price_per_unit, price_per_rental, price_type, min_quantity")
           .eq('id', extraId)
           .single();
         
@@ -351,12 +351,8 @@ function NuevaReservaContent() {
       const bookingNumber = `FG${Date.now().toString().slice(-8)}`;
 
       // Step 3: Crear booking desde API (bypasea RLS)
-      const bookingExtrasData = selectedExtras.map(extra => {
-        const effectiveDays = extra.min_quantity ? Math.max(days, extra.min_quantity) : days;
-        const unitPrice = extra.price_per_rental > 0 
-          ? extra.price_per_rental 
-          : extra.price_per_day * effectiveDays;
-        
+      const bookingExtrasData = selectedExtras.map((extra) => {
+        const unitPrice = extraLineUnitPriceEuros(extra, days);
         return {
           extra_id: extra.id,
           quantity: extra.quantity,
@@ -906,16 +902,13 @@ function NuevaReservaContent() {
                     </div>
                     
                     {selectedExtras.length > 0 && selectedExtras.map((extra) => {
-                      const effectiveDays = extra.min_quantity ? Math.max(days, extra.min_quantity) : days;
-                      const price = extra.price_per_rental > 0 
-                        ? extra.price_per_rental 
-                        : extra.price_per_day * effectiveDays;
+                      const unit = extraLineUnitPriceEuros(extra, days);
                       return (
                         <div key={extra.id} className="flex justify-between text-sm">
                           <span className="text-gray-600">
                             {extra.name} {extra.quantity > 1 && `(x${extra.quantity})`}
                           </span>
-                          <span className="font-semibold">{formatPrice(price * extra.quantity)}</span>
+                          <span className="font-semibold">{formatPrice(unit * extra.quantity)}</span>
                         </div>
                       );
                     })}
@@ -969,14 +962,11 @@ function NuevaReservaContent() {
                 <span>{formatPrice(basePrice)}</span>
               </div>
               {selectedExtras.slice(0, 2).map((extra) => {
-                const effectiveDays = extra.min_quantity ? Math.max(pricingDays, extra.min_quantity) : pricingDays;
-                const price = extra.price_per_rental > 0 
-                  ? extra.price_per_rental 
-                  : extra.price_per_day * effectiveDays;
+                const unit = extraLineUnitPriceEuros(extra, days);
                 return (
                   <div key={extra.id} className="flex justify-between text-xs text-gray-500">
                     <span>{extra.name} {extra.quantity > 1 && `×${extra.quantity}`}</span>
-                    <span>+{formatPrice(price * extra.quantity)}</span>
+                    <span>+{formatPrice(unit * extra.quantity)}</span>
                   </div>
                 );
               })}

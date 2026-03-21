@@ -153,6 +153,74 @@ export function calculatePricingDays(actualDays: number): number {
 }
 
 /**
+ * Días para cobrar un extra con precio "por día": según los días reales del alquiler (calendario).
+ * No usar calculatePricingDays: la regla "2 días → 3" aplica solo al precio del vehículo.
+ *
+ * @param rentalCalendarDays Días devueltos por calculateRentalDays (p. ej. desde useSeasonalPricing().days)
+ * @param minQuantityDays Si el extra exige mínimo de días facturados (p. ej. parking), se usa el máximo con el alquiler
+ */
+export function effectiveExtraBillingDays(
+  rentalCalendarDays: number,
+  minQuantityDays: number | null | undefined
+): number {
+  const d = Math.max(0, rentalCalendarDays);
+  if (minQuantityDays != null && minQuantityDays > 0) {
+    return Math.max(d, minQuantityDays);
+  }
+  return d;
+}
+
+/** Campos de precio de un extra (Supabase / selección parcial). */
+export type ExtraPricingFields = {
+  price_type?: string | null;
+  price_per_unit?: number | null;
+  price_per_day?: number | null;
+  price_per_rental?: number | null;
+  min_quantity?: number | null;
+};
+
+/**
+ * Importe por unidad de línea del extra (antes de multiplicar por la cantidad elegida por el cliente).
+ *
+ * - per_day: solo estos usan días de alquiler reales (calendario), nunca pricingDays del vehículo.
+ * - per_unit: precio por unidad (p. ej. juego de sábanas).
+ * - fixed / per_rental / one_time: precio fijo por línea de cantidad (según BD).
+ * - Sin tipo: compatibilidad (price_per_rental, o por unidad si solo hay price_per_unit, o por día).
+ */
+export function extraLineUnitPriceEuros(
+  extra: ExtraPricingFields,
+  rentalCalendarDays: number
+): number {
+  const pt = String(extra.price_type ?? "").toLowerCase();
+  const perUnit = Number(extra.price_per_unit ?? 0) || 0;
+  const perDay = Number(extra.price_per_day ?? 0) || 0;
+  const perRental = Number(extra.price_per_rental ?? 0) || 0;
+
+  if (pt === "per_unit") {
+    return perUnit;
+  }
+  if (pt === "per_day") {
+    return perDay * effectiveExtraBillingDays(rentalCalendarDays, extra.min_quantity);
+  }
+  if (pt === "fixed") {
+    if (perUnit > 0) return perUnit;
+    if (perRental > 0) return perRental;
+    return 0;
+  }
+  if (pt === "per_rental" || pt === "one_time") {
+    if (perRental > 0) return perRental;
+    return perUnit;
+  }
+  if (perRental > 0) {
+    return perRental;
+  }
+  if (perUnit > 0 && perDay === 0) {
+    return perUnit;
+  }
+  return perDay * effectiveExtraBillingDays(rentalCalendarDays, extra.min_quantity);
+}
+
+/**
  * Generate order number for Redsys
  * 
  * IMPORTANTE: Según la documentación oficial de Redsys:

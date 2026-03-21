@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, extraLineUnitPriceEuros } from "@/lib/utils";
 import { getTranslatedRoute } from "@/lib/route-translations";
 
 interface OfferData {
@@ -61,7 +61,9 @@ interface ExtraData {
   description: string;
   price_per_day: number | null;
   price_per_unit: number | null;
-  price_type: 'per_day' | 'per_unit';
+  price_per_rental?: number | null;
+  price_type: string | null;
+  min_quantity: number | null;
   max_quantity: number;
   icon: string;
 }
@@ -178,14 +180,19 @@ export default function ReservarOfertaPage({
         ));
       }
     } else {
-      setSelectedExtras([...selectedExtras, { extra, quantity: 1 }]);
+      const initialQty =
+        String(extra.price_type ?? "").toLowerCase() === "per_unit" && extra.min_quantity
+          ? extra.min_quantity
+          : 1;
+      setSelectedExtras([...selectedExtras, { extra, quantity: initialQty }]);
     }
   };
 
   const removeExtra = (extraId: string) => {
     const existing = selectedExtras.find(item => item.extra.id === extraId);
     if (existing) {
-      if (existing.quantity > 1) {
+      const minQty = existing.extra.min_quantity ?? 0;
+      if (existing.quantity > 1 && existing.quantity > minQty) {
         setSelectedExtras(selectedExtras.map(item =>
           item.extra.id === extraId
             ? { ...item, quantity: item.quantity - 1 }
@@ -197,19 +204,13 @@ export default function ReservarOfertaPage({
     }
   };
 
-  // Cálculos de precio
-  const calculateExtrasPrice = () => {
-    if (!offer) return 0;
-    return selectedExtras.reduce((total, item) => {
-      let price = 0;
-      if (item.extra.price_type === 'per_unit') {
-        price = item.extra.price_per_unit || 0;
-      } else {
-        price = (item.extra.price_per_day || 0) * offer.offer_days;
-      }
-      return total + (price * item.quantity);
-    }, 0);
-  };
+  const extrasPrice =
+    offer == null
+      ? 0
+      : selectedExtras.reduce((total, item) => {
+          const u = extraLineUnitPriceEuros(item.extra, offer.offer_days);
+          return total + u * item.quantity;
+        }, 0);
 
   const calculateLocationFee = () => {
     if (!offer) return 0;
@@ -221,7 +222,6 @@ export default function ReservarOfertaPage({
   const basePrice = offer ? offer.final_price_per_day * offer.offer_days : 0;
   const originalPrice = offer ? offer.original_price_per_day * offer.offer_days : 0;
   const savings = originalPrice - basePrice;
-  const extrasPrice = calculateExtrasPrice();
   const locationFee = calculateLocationFee();
   const totalPrice = basePrice + extrasPrice + locationFee;
 
@@ -289,19 +289,13 @@ export default function ReservarOfertaPage({
       const bookingNumber = `FG${Date.now().toString().slice(-8)}`;
 
       // Step 3: Preparar datos de extras con el formato correcto
-      const bookingExtrasData = selectedExtras.map(item => {
-        let unitPrice = 0;
-        if (item.extra.price_type === 'per_unit') {
-          unitPrice = item.extra.price_per_unit || 0;
-        } else {
-          unitPrice = (item.extra.price_per_day || 0) * offer.offer_days;
-        }
-        
+      const bookingExtrasData = selectedExtras.map((item) => {
+        const unitPrice = extraLineUnitPriceEuros(item.extra, offer.offer_days);
         return {
           extra_id: item.extra.id,
           quantity: item.quantity,
           unit_price: unitPrice,
-          total_price: unitPrice * item.quantity
+          total_price: unitPrice * item.quantity,
         };
       });
 
@@ -564,14 +558,24 @@ export default function ReservarOfertaPage({
                     const quantity = selected?.quantity || 0;
                     const maxQuantity = extra.max_quantity || 1;
                     
-                    // Calcular precio según el tipo
-                    let priceDisplay = '';
-                    if (extra.price_type === 'per_unit') {
+                    const pt = String(extra.price_type ?? "").toLowerCase();
+                    let priceDisplay = "";
+                    if (pt === "per_unit") {
                       const price = extra.price_per_unit || 0;
                       priceDisplay = `${formatPrice(price)} / ${t("unidad")}`;
-                    } else {
+                    } else if (pt === "per_day") {
                       const price = extra.price_per_day || 0;
                       priceDisplay = `${formatPrice(price)} / ${t("día")}`;
+                    } else if (pt === "fixed" || pt === "per_rental" || pt === "one_time") {
+                      const price =
+                        (extra.price_per_unit || 0) > 0
+                          ? extra.price_per_unit || 0
+                          : extra.price_per_rental || 0;
+                      priceDisplay = `${formatPrice(price)} (${t("por reserva")})`;
+                    } else {
+                      const price =
+                        extra.price_per_day || extra.price_per_unit || extra.price_per_rental || 0;
+                      priceDisplay = formatPrice(price);
                     }
 
                     return (
@@ -586,6 +590,11 @@ export default function ReservarOfertaPage({
                           )}
                           <p className="text-sm font-medium text-furgocasa-orange mt-2">
                             {priceDisplay}
+                            {extra.min_quantity != null && extra.min_quantity > 0 && pt === "per_day" && (
+                              <span className="text-xs text-gray-500 ml-2">
+                                ({t("Mín")}: {extra.min_quantity} {t("días")})
+                              </span>
+                            )}
                             {maxQuantity > 1 && (
                               <span className="text-xs text-gray-500 ml-2">
                                 (Máx: {maxQuantity})

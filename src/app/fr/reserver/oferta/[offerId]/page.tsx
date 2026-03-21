@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, extraLineUnitPriceEuros } from "@/lib/utils";
 import { getTranslatedRoute } from "@/lib/route-translations";
 
 interface OfferData {
@@ -61,7 +61,8 @@ interface ExtraData {
   description: string;
   price_per_day: number | null;
   price_per_unit: number | null;
-  price_type: 'per_day' | 'per_unit';
+  price_per_rental?: number | null;
+  price_type: string | null;
   min_quantity: number | null;
   max_quantity: number;
   icon: string;
@@ -179,7 +180,10 @@ export default function ReservarOfertaPage({
         ));
       }
     } else {
-      const initialQty = (extra.price_type === 'per_unit' && extra.min_quantity) ? extra.min_quantity : 1;
+      const initialQty =
+        String(extra.price_type ?? "").toLowerCase() === "per_unit" && extra.min_quantity
+          ? extra.min_quantity
+          : 1;
       setSelectedExtras([...selectedExtras, { extra, quantity: initialQty }]);
     }
   };
@@ -200,20 +204,13 @@ export default function ReservarOfertaPage({
     }
   };
 
-  // Cálculos de precio
-  const calculateExtrasPrice = () => {
-    if (!offer) return 0;
-    return selectedExtras.reduce((total, item) => {
-      let price = 0;
-      if (item.extra.price_type === 'per_unit') {
-        price = item.extra.price_per_unit || 0;
-      } else {
-        const effectiveDays = item.extra.min_quantity ? Math.max(offer.offer_days, item.extra.min_quantity) : offer.offer_days;
-        price = (item.extra.price_per_day || 0) * effectiveDays;
-      }
-      return total + (price * item.quantity);
-    }, 0);
-  };
+  const extrasPrice =
+    offer == null
+      ? 0
+      : selectedExtras.reduce((total, item) => {
+          const u = extraLineUnitPriceEuros(item.extra, offer.offer_days);
+          return total + u * item.quantity;
+        }, 0);
 
   const calculateLocationFee = () => {
     if (!offer) return 0;
@@ -225,7 +222,6 @@ export default function ReservarOfertaPage({
   const basePrice = offer ? offer.final_price_per_day * offer.offer_days : 0;
   const originalPrice = offer ? offer.original_price_per_day * offer.offer_days : 0;
   const savings = originalPrice - basePrice;
-  const extrasPrice = calculateExtrasPrice();
   const locationFee = calculateLocationFee();
   const totalPrice = basePrice + extrasPrice + locationFee;
 
@@ -241,70 +237,94 @@ export default function ReservarOfertaPage({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!offer || !acceptTerms) return;
 
     try {
       setSubmitting(true);
       setError(null);
 
-      // Crear la reserva via API
-      const response = await fetch('/api/bookings/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+      let customerId: string;
+
+      const { data: existingCustomers } = await supabase
+        .from("customers")
+        .select("id")
+        .or(`email.eq.${customerEmail},dni.eq.${customerDni}`)
+        .limit(1);
+
+      if (existingCustomers && existingCustomers.length > 0) {
+        customerId = existingCustomers[0].id;
+      } else {
+        const createResponse = await fetch("/api/customers", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: customerEmail,
+            name: customerName,
+            phone: customerPhone,
+            dni: customerDni,
+            date_of_birth: customerDateOfBirth || null,
+            address: customerAddress,
+            city: customerCity,
+            postal_code: customerPostalCode,
+            country: customerCountry,
+            driver_license: customerDriverLicense || null,
+            driver_license_expiry: customerDriverLicenseExpiry || null,
+          }),
+        });
+
+        if (!createResponse.ok) {
+          const errorData = await createResponse.json();
+          throw new Error(errorData.error || "Error al crear cliente");
+        }
+
+        const { customer } = await createResponse.json();
+        customerId = customer.id;
+      }
+
+      const bookingNumber = `FG${Date.now().toString().slice(-8)}`;
+
+      const bookingExtrasData = selectedExtras.map((item) => {
+        const unitPrice = extraLineUnitPriceEuros(item.extra, offer.offer_days);
+        return {
+          extra_id: item.extra.id,
+          quantity: item.quantity,
+          unit_price: unitPrice,
+          total_price: unitPrice * item.quantity,
+        };
+      });
+
+      const bookingPayload = {
+        booking: {
+          booking_number: bookingNumber,
           vehicle_id: offer.vehicle_id,
+          customer_id: customerId,
           pickup_date: offer.offer_start_date,
           dropoff_date: offer.offer_end_date,
           pickup_time: pickupTime,
           dropoff_time: dropoffTime,
           pickup_location_id: pickupLocationId,
           dropoff_location_id: dropoffLocationId,
-          total_days: offer.offer_days,
+          days: offer.offer_days,
           base_price: basePrice,
           extras_price: extrasPrice,
           location_fee: locationFee,
+          discount: savings,
           total_price: totalPrice,
-          status: 'pending',
-          payment_status: 'pending',
+          status: "pending",
+          payment_status: "pending",
+          customer_name: customerName,
+          customer_email: customerEmail,
           notes: notes || null,
-          // Datos del cliente
-          customer: {
-            name: customerName,
-            email: customerEmail,
-            phone: customerPhone,
-            dni: customerDni,
-            date_of_birth: customerDateOfBirth || null,
-            address: customerAddress || null,
-            city: customerCity || null,
-            postal_code: customerPostalCode || null,
-            country: customerCountry,
-            driver_license: customerDriverLicense || null,
-            driver_license_expiry: customerDriverLicenseExpiry || null
-          },
-          // Extras seleccionados
-          extras: selectedExtras.map(item => {
-            let totalPrice = 0;
-            if (item.extra.price_type === 'per_unit') {
-              totalPrice = (item.extra.price_per_unit || 0) * item.quantity;
-            } else {
-              const effectiveDays = item.extra.min_quantity ? Math.max(offer.offer_days, item.extra.min_quantity) : offer.offer_days;
-              totalPrice = (item.extra.price_per_day || 0) * item.quantity * effectiveDays;
-            }
-            return {
-              extra_id: item.extra.id,
-              quantity: item.quantity,
-              price_per_day: item.extra.price_per_day || 0,
-              price_per_unit: item.extra.price_per_unit || 0,
-              price_type: item.extra.price_type,
-              total_price: totalPrice
-            };
-          }),
-          // Referencia a la oferta
           last_minute_offer_id: offer.id,
-          discount_applied: savings,
-          discount_percentage: offer.discount_percentage
-        })
+        },
+        extras: bookingExtrasData,
+      };
+
+      const response = await fetch("/api/bookings/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bookingPayload),
       });
 
       const result = await response.json();
@@ -313,24 +333,21 @@ export default function ReservarOfertaPage({
         throw new Error(result.error);
       }
 
-      // Marcar la oferta como reservada
-      await fetch('/api/admin/last-minute-offers', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+      await fetch("/api/admin/last-minute-offers", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: offer.id,
-          status: 'reserved_pending_payment',
-          booking_id: result.booking.id
-        })
+          status: "reserved_pending_payment",
+          booking_id: result.booking.id,
+        }),
       });
 
-      // Redirigir a confirmación/pago con ruta traducida
       const paymentPath = getTranslatedRoute(`/reservar/${result.booking.id}/pago`, language);
       router.push(paymentPath);
-
     } catch (err: any) {
-      console.error('Error creating booking:', err);
-      setError(err.message || 'Error al crear la reserva');
+      console.error("Error creating booking:", err);
+      setError(err.message || "Error al crear la reserva");
     } finally {
       setSubmitting(false);
     }
@@ -531,14 +548,24 @@ export default function ReservarOfertaPage({
                     const quantity = selected?.quantity || 0;
                     const maxQuantity = extra.max_quantity || 1;
                     
-                    // Calcular precio según el tipo
-                    let priceDisplay = '';
-                    if (extra.price_type === 'per_unit') {
+                    const pt = String(extra.price_type ?? "").toLowerCase();
+                    let priceDisplay = "";
+                    if (pt === "per_unit") {
                       const price = extra.price_per_unit || 0;
                       priceDisplay = `${formatPrice(price)} / ${t("unidad")}`;
-                    } else {
+                    } else if (pt === "per_day") {
                       const price = extra.price_per_day || 0;
                       priceDisplay = `${formatPrice(price)} / ${t("día")}`;
+                    } else if (pt === "fixed" || pt === "per_rental" || pt === "one_time") {
+                      const price =
+                        (extra.price_per_unit || 0) > 0
+                          ? extra.price_per_unit || 0
+                          : extra.price_per_rental || 0;
+                      priceDisplay = `${formatPrice(price)} (${t("por reserva")})`;
+                    } else {
+                      const price =
+                        extra.price_per_day || extra.price_per_unit || extra.price_per_rental || 0;
+                      priceDisplay = formatPrice(price);
                     }
 
                     return (
@@ -553,6 +580,11 @@ export default function ReservarOfertaPage({
                           )}
                           <p className="text-sm font-medium text-furgocasa-orange mt-2">
                             {priceDisplay}
+                            {extra.min_quantity != null && extra.min_quantity > 0 && pt === "per_day" && (
+                              <span className="text-xs text-gray-500 ml-2">
+                                ({t("Mín")}: {extra.min_quantity} {t("días")})
+                              </span>
+                            )}
                             {maxQuantity > 1 && (
                               <span className="text-xs text-gray-500 ml-2">
                                 (Máx: {maxQuantity})

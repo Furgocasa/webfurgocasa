@@ -20,7 +20,7 @@ import {
 import { LocalizedLink } from"@/components/localized-link";
 import { VehicleGallery } from"@/components/vehicle/vehicle-gallery";
 import { VehicleEquipmentDisplay } from"@/components/vehicle/equipment-display";
-import { formatPrice } from"@/lib/utils";
+import { formatPrice, extraLineUnitPriceEuros } from"@/lib/utils";
 import { useSeasonalPricing } from"@/hooks/use-seasonal-pricing";
 
 // No necesitamos interfaces específicas, usamos los datos tal cual vienen de Supabase
@@ -32,7 +32,8 @@ interface Extra {
   description: string;
   price_per_day: number | null;
   price_per_unit: number | null;
-  price_type: 'per_day' | 'per_unit';
+  price_per_rental?: number | null;
+  price_type: string | null;
   min_quantity: number | null;
   max_quantity: number;
   icon: string;
@@ -76,17 +77,8 @@ function ReservarVehiculoContent() {
   const { days, pricingDays, hasTwoDayPricing, totalPrice: basePrice } = seasonalPricing;
   
   const extrasPrice = selectedExtras.reduce((sum, item) => {
-    // Calcular precio según el tipo de extra
-    let price = 0;
-    if (item.extra.price_type === 'per_unit') {
-      // Precio único por toda la reserva
-      price = (item.extra.price_per_unit || 0);
-    } else {
-      // Precio por día: aplicar mínimo de días si existe (ej. parking 4 días mín.)
-      const effectiveDays = item.extra.min_quantity ? Math.max(pricingDays, item.extra.min_quantity) : pricingDays;
-      price = (item.extra.price_per_day || 0) * effectiveDays;
-    }
-    return sum + (price * item.quantity);
+    const unit = extraLineUnitPriceEuros(item.extra, days);
+    return sum + unit * item.quantity;
   }, 0);
   
   const totalPrice = basePrice + extrasPrice + locationFee;
@@ -546,16 +538,23 @@ function ReservarVehiculoContent() {
                           const quantity = selected?.quantity || 0;
                           const maxQuantity = extra.max_quantity || 1;
                           
-                          // Calcular precio según el tipo
-                          let priceDisplay = '';
-                          if (extra.price_type === 'per_unit') {
-                            // Para extras de precio único, usar price_per_unit
+                          const pt = String(extra.price_type ?? "").toLowerCase();
+                          let priceDisplay = "";
+                          if (pt === "per_unit") {
                             const price = extra.price_per_unit || 0;
                             priceDisplay = `${formatPrice(price)} / ${t("unidad")}`;
-                          } else {
-                            // Para extras por día, usar price_per_day
+                          } else if (pt === "per_day") {
                             const price = extra.price_per_day || 0;
                             priceDisplay = `${formatPrice(price)} / ${t("día")}`;
+                          } else if (pt === "fixed" || pt === "per_rental" || pt === "one_time") {
+                            const price =
+                              (extra.price_per_unit || 0) > 0
+                                ? extra.price_per_unit || 0
+                                : extra.price_per_rental || 0;
+                            priceDisplay = `${formatPrice(price)} (${t("por reserva")})`;
+                          } else {
+                            const price = extra.price_per_day || extra.price_per_unit || extra.price_per_rental || 0;
+                            priceDisplay = formatPrice(price);
                           }
                           
                           // Debug log para ver los datos
@@ -575,7 +574,7 @@ function ReservarVehiculoContent() {
                                 )}
                                 <p className="text-sm font-medium text-furgocasa-orange mt-2">
                                   {priceDisplay}
-                                  {extra.min_quantity && extra.price_type === 'per_day' && (
+                                  {extra.min_quantity && pt === "per_day" && (
                                     <span className="text-xs text-gray-500 ml-2">
                                       ({t("Mín")}: {extra.min_quantity} {t("días")})
                                     </span>
@@ -723,22 +722,13 @@ function ReservarVehiculoContent() {
                   </div>
 
                   {selectedExtras.map((item) => {
-                    // Calcular precio correctamente según el tipo
-                    let price = 0;
-                    if (item.extra.price_type === 'per_unit') {
-                      // Precio único por toda la reserva
-                      price = (item.extra.price_per_unit || 0);
-                    } else {
-                      // Precio por día: aplicar mínimo si existe (ej. parking 4 días mín.)
-                      const effectiveDays = item.extra.min_quantity ? Math.max(pricingDays, item.extra.min_quantity) : pricingDays;
-                      price = (item.extra.price_per_day || 0) * effectiveDays;
-                    }
+                    const unit = extraLineUnitPriceEuros(item.extra, days);
                     return (
                       <div key={item.extra.id} className="flex justify-between text-sm">
                         <span className="text-gray-600">
                           {item.extra.name} {item.quantity > 1 && `(x${item.quantity})`}
                         </span>
-                        <span className="font-semibold">{formatPrice(price * item.quantity)}</span>
+                        <span className="font-semibold">{formatPrice(unit * item.quantity)}</span>
                       </div>
                     );
                   })}
@@ -785,17 +775,11 @@ function ReservarVehiculoContent() {
                 <span>{formatPrice(basePrice)}</span>
               </div>
               {selectedExtras.slice(0, 2).map((item) => {
-                let price = 0;
-                if (item.extra.price_type === 'per_unit') {
-                  price = (item.extra.price_per_unit || 0);
-                } else {
-                  const effectiveDays = item.extra.min_quantity ? Math.max(pricingDays, item.extra.min_quantity) : pricingDays;
-                  price = (item.extra.price_per_day || 0) * effectiveDays;
-                }
+                const unit = extraLineUnitPriceEuros(item.extra, days);
                 return (
                   <div key={item.extra.id} className="flex justify-between text-xs text-gray-500">
                     <span>{item.extra.name} {item.quantity > 1 && `×${item.quantity}`}</span>
-                    <span>+{formatPrice(price * item.quantity)}</span>
+                    <span>+{formatPrice(unit * item.quantity)}</span>
                   </div>
                 );
               })}

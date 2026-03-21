@@ -654,7 +654,13 @@ export const staticTranslations = {
     fr: "unité",
     de: "Einheit"
   },
-  
+  "por reserva": {
+    es: "por reserva",
+    en: "per rental",
+    fr: "par location",
+    de: "pro Miete"
+  },
+
   // Summary & Pricing
   "Resumen": {
     es: "Resumen",
