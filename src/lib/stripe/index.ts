@@ -18,6 +18,39 @@ export const stripe = stripeSecretKey
     })
   : null;
 
+/** Comisión repercutida al cliente en Checkout (solo Stripe; Redsys sin recargo en app). */
+export const STRIPE_CHECKOUT_FEE_PERCENT = 0.02;
+
+/**
+ * Importe que se cobra por pasarela (alquiler + comisión), en euros con 2 decimales.
+ */
+export function stripeChargeEurosFromRentalBase(baseEuros: number): number {
+  return Math.round(baseEuros * (1 + STRIPE_CHECKOUT_FEE_PERCENT) * 100) / 100;
+}
+
+/**
+ * Importe de alquiler permitido para esta reserva (lo que debe sumarse a amount_paid del booking).
+ * Política: primer pago 50% del total; si ya hubo pago, el resto pendiente. "full" = todo lo pendiente.
+ */
+export function rentalBaseAmountForStripePayment(
+  booking: { total_price: number; amount_paid?: number | null },
+  paymentType: "deposit" | "full"
+): number {
+  const total = Number(booking.total_price);
+  const paid = Number(booking.amount_paid ?? 0);
+  const pending = Math.max(0, Math.round((total - paid) * 100) / 100);
+
+  if (paymentType === "full") {
+    return pending;
+  }
+
+  if (paid < 0.01) {
+    return Math.round(total * 0.5 * 100) / 100;
+  }
+
+  return pending;
+}
+
 /**
  * Configuración de Stripe
  */
@@ -41,7 +74,8 @@ export function getStripeConfig() {
  * Crea una sesión de Checkout de Stripe
  */
 export async function createCheckoutSession(params: {
-  amount: number; // En euros
+  /** Total cobrado al cliente en euros (alquiler + comisión Stripe si aplica). */
+  amount: number;
   bookingId: string;
   bookingNumber: string;
   customerEmail: string;

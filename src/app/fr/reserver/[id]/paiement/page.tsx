@@ -174,11 +174,9 @@ export default function PagoPage() {
         const response = await fetch('/api/stripe/initiate', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
+          body: JSON.stringify({
             bookingId: params.id,
-            amount, // Monto CON comisión para Stripe
-            baseAmount, // Monto base para registrar en la reserva
-            paymentType: paymentType ==="full" ?"full" :"deposit",
+            paymentType: paymentType === "full" ? "full" : "deposit",
           }),
         });
 
