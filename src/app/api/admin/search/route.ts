@@ -134,7 +134,7 @@ export async function GET(request: Request) {
       // Extras
       supabase
         .from("extras")
-        .select("id, name, description, price_per_day, price_per_rental, price_type")
+        .select("id, name, description, price_per_day, price_per_unit, price_per_rental, price_type")
         .or(`name.ilike.${searchTerm},description.ilike.${searchTerm}`)
         .eq("is_active", true)
         .limit(5),

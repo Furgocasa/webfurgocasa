@@ -7,7 +7,7 @@ import {
   ArrowLeft, Save, Trash2, AlertCircle, CheckCircle, Calendar, MapPin, Car, User, Mail, Phone, Package, Send
 } from "lucide-react";
 import Link from "next/link";
-import { calculateRentalDays, formatPrice } from "@/lib/utils";
+import { calculateRentalDays, formatPrice, extraLineUnitPriceEuros } from "@/lib/utils";
 import EditarClienteModal from "@/components/admin/EditarClienteModal";
 
 interface Location {
@@ -339,12 +339,8 @@ export default function EditarReservaPage() {
     Object.entries(bookingExtras).forEach(([extraId, quantity]) => {
       const extra = extras.find(e => e.id === extraId);
       if (extra && quantity > 0) {
-        if (extra.price_type === 'per_day') {
-          const effectiveDays = extra.min_quantity ? Math.max(formData.days, extra.min_quantity) : formData.days;
-          total += (extra.price_per_day ?? 0) * quantity * effectiveDays;
-        } else {
-          total += (extra.price_per_rental ?? 0) * quantity;
-        }
+        const unit = extraLineUnitPriceEuros(extra, formData.days);
+        total += unit * quantity;
       }
     });
     return Math.round(total * 100) / 100;
@@ -518,10 +514,8 @@ export default function EditarReservaPage() {
             const extra = extras.find(e => e.id === extraId);
             if (!extra) return null;
 
-            const unitPrice = extra.price_type === 'per_day' ? (extra.price_per_day ?? 0) : (extra.price_per_rental ?? 0);
-            const totalPrice = extra.price_type === 'per_day' 
-              ? unitPrice * quantity * formData.days 
-              : unitPrice * quantity;
+            const unitPrice = extraLineUnitPriceEuros(extra, formData.days);
+            const totalPrice = unitPrice * quantity;
 
             return {
               booking_id: bookingId,
@@ -897,9 +891,11 @@ export default function EditarReservaPage() {
                     <div className="flex-1">
                       <p className="font-medium text-gray-900">{extra.name}</p>
                       <p className="text-sm text-gray-600">
-                        {extra.price_type === 'per_day' 
-                          ? `${extra.price_per_day}€/día` 
-                          : `${extra.price_per_rental}€/alquiler`}
+                        {extra.price_type === 'per_day'
+                          ? `${extra.price_per_day}€/día`
+                          : extra.price_type === 'per_unit'
+                            ? `${extra.price_per_unit ?? 0}€/unidad`
+                            : `${extra.price_per_rental}€/alquiler`}
                       </p>
                     </div>
                     <input

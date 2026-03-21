@@ -52,6 +52,7 @@ interface SearchResults {
     name: string;
     description: string;
     price_per_day: number | null;
+    price_per_unit: number | null;
     price_per_rental: number | null;
     price_type: string;
   }>;
@@ -373,7 +374,9 @@ export function GlobalSearch() {
                           <span className="text-sm text-gray-600">
                             {extra.price_type === "per_day"
                               ? `${extra.price_per_day}€/día`
-                              : `${extra.price_per_rental}€/reserva`}
+                              : extra.price_type === "per_unit"
+                                ? `${extra.price_per_unit ?? 0}€/unidad`
+                                : `${extra.price_per_rental}€/reserva`}
                           </span>
                         </div>
                         {extra.description && (
