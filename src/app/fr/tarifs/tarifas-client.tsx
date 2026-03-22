@@ -684,6 +684,48 @@ export function TarifasClient() {
         </div>
       </section>
 
+      {/* Puntualidad en citas de entrega / devolución */}
+      <section id="puntualidad-citas" className="py-16 md:py-20 bg-gradient-to-b from-amber-50 to-orange-50/70 border-y-2 border-furgocasa-orange/25">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="rounded-3xl bg-white p-8 md:p-12 shadow-xl border-2 border-furgocasa-orange/35 ring-1 ring-orange-100/80">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+              <div className="shrink-0 flex justify-center md:block w-full md:w-auto">
+                <div className="rounded-2xl bg-furgocasa-orange/15 p-4 md:p-5 inline-flex">
+                  <Clock className="h-12 w-12 md:h-14 md:w-14 text-furgocasa-orange" strokeWidth={2} aria-hidden />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-4">
+                  {t("Puntualidad en las citas")}
+                </h2>
+                <p className="text-gray-700 text-base md:text-lg leading-relaxed mb-6">
+                  {t("En Furgocasa damos una importancia muy alta a la puntualidad en las citas de entrega y devolución. Acudimos expresamente a nuestras instalaciones a la hora acordada para preparar cada vehículo. Si llegas tarde, nuestro equipo debe esperar in situ; ese tiempo tiene coste y se factura de acuerdo con las tarifas siguientes, para evitar malentendidos.")}
+                </p>
+                <div className="rounded-2xl bg-amber-50 border border-amber-200 p-6">
+                  <h3 className="font-heading font-bold text-gray-900 text-lg mb-4 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-amber-700 shrink-0" aria-hidden />
+                    {t("Penalizaciones por retraso en la cita")}
+                  </h3>
+                  <ul className="space-y-3 mb-4">
+                    <li className="flex justify-between items-center text-base py-2 border-b border-amber-200/80">
+                      <span className="text-gray-800 font-medium">{t("Primera hora")}</span>
+                      <span className="font-heading font-bold text-furgocasa-orange text-lg">40€</span>
+                    </li>
+                    <li className="flex justify-between items-center text-base py-2">
+                      <span className="text-gray-800 font-medium">{t("Hora adicional")}</span>
+                      <span className="font-heading font-bold text-furgocasa-orange text-lg">20€</span>
+                    </li>
+                  </ul>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {t("Si prevés llegar tarde, avisa cuanto antes para intentar ampliar el alquiler.")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Seguro y Devolución - Grid */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
@@ -752,20 +794,6 @@ export function TarifasClient() {
                      ))}
                    </div>
                 </div>
-              </div>
-
-              <div className="bg-white rounded-3xl p-10 shadow-lg border-l-8 border-red-500">
-                <h3 className="font-bold text-red-600 text-lg mb-4 flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  {t("Penalizaciones por retraso")}
-                </h3>
-                 <ul className="space-y-2 mb-4">
-                  <li className="flex justify-between text-sm"><span>{t("Primera hora")}</span> <span className="font-bold">40€</span></li>
-                  <li className="flex justify-between text-sm"><span>{t("Hora adicional")}</span> <span className="font-bold">20€</span></li>
-                </ul>
-                <p className="text-xs text-gray-400">
-                  {t("Si prevés llegar tarde, avisa cuanto antes para intentar ampliar el alquiler.")}
-                </p>
               </div>
             </div>
           </div>

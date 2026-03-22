@@ -2465,8 +2465,26 @@ export const staticTranslations = {
   "Penalizaciones por retraso": {
     es: "Penalizaciones por retraso",
     en: "Penalties for delay",
-    fr: "Penalties for delay",
-    de: "Penalties for delay"
+    fr: "Pénalités pour retard",
+    de: "Gebühren bei Verspätung"
+  },
+  "Puntualidad en las citas": {
+    es: "Puntualidad en las citas",
+    en: "Punctuality for appointments",
+    fr: "Ponctualité aux rendez-vous",
+    de: "Pünktlichkeit bei Terminen"
+  },
+  "En Furgocasa damos una importancia muy alta a la puntualidad en las citas de entrega y devolución. Acudimos expresamente a nuestras instalaciones a la hora acordada para preparar cada vehículo. Si llegas tarde, nuestro equipo debe esperar in situ; ese tiempo tiene coste y se factura de acuerdo con las tarifas siguientes, para evitar malentendidos.": {
+    es: "En Furgocasa damos una importancia muy alta a la puntualidad en las citas de entrega y devolución. Acudimos expresamente a nuestras instalaciones a la hora acordada para preparar cada vehículo. Si llegas tarde, nuestro equipo debe esperar in situ; ese tiempo tiene coste y se factura de acuerdo con las tarifas siguientes, para evitar malentendidos.",
+    en: "At Furgocasa we attach very high importance to punctuality for vehicle pickup and return appointments. We come to our premises at the agreed time to prepare each vehicle. If you are late, our team has to wait on site; that time has a cost and is charged according to the rates below, to avoid any misunderstanding.",
+    fr: "Chez Furgocasa, la ponctualité aux rendez-vous de remise et de restitution des véhicules est une priorité. Nous nous rendons sur nos installations à l’heure convenue pour préparer chaque véhicule. En cas de retard, notre équipe doit attendre sur place ; ce temps a un coût et est facturé selon les tarifs ci-dessous, afin d’éviter toute ambiguïté.",
+    de: "Bei Furgocasa legen wir sehr großen Wert auf Pünktlichkeit bei Abhol- und Rückgabeterminen. Wir kommen zu der vereinbarten Zeit zu unseren Anlagen, um jedes Fahrzeug vorzubereiten. Bei Verspätung muss unser Team vor Ort warten; diese Zeit verursacht Kosten und wird nach den unten genannten Sätzen berechnet – zur Vermeidung von Missverständnissen."
+  },
+  "Penalizaciones por retraso en la cita": {
+    es: "Penalizaciones por retraso en la cita",
+    en: "Late appointment charges",
+    fr: "Pénalités pour retard au rendez-vous",
+    de: "Gebühren bei verspätetem Erscheinen zum Termin"
   },
   "Es fundamental ser puntual en las citas. Nos desplazamos expresamente para cada alquiler.": {
     es: "Es fundamental ser puntual en las citas. Nos desplazamos expresamente para cada alquiler.",

@@ -86,6 +86,9 @@ commit-message.txt
 OLD_FURGOCASA_DATOS/*-mysql*
 OLD_FURGOCASA_DATOS/orders-raw*.txt
 
+# Mailing (HTML, imágenes de campañas): no versionar
+emails/mailing/
+
 # Archivos internos de estrategia (privados)
 src/app/es/escalabilidad/brainstorming.txt
 src/app/es/escalabilidad/LATAM.txt
