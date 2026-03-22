@@ -98,6 +98,7 @@ Documentación técnica de referencia:
 #### vehiculos/
 - Páginas de vehículos
 - Queries optimizadas
+- **Listados grid (mar. 2026):** flota (`vehicle-list-client`), ventas (`sale-vehicle-card` + `ventas-client`), búsqueda (`vehicle-card`); transmisión vía `isAutomaticTransmission()` — ver **PAGINAS-VEHICULOS-GARANTIA.md**
 
 #### emails/
 - Sistema de emails automatizados

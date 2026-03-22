@@ -4,6 +4,15 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🚐 UI vehículos — 22 de marzo 2026
+
+- **Flota (alquiler)**: `vehicle-list-client` — eliminada la segunda línea `brand · model` bajo el nombre (alineado con tarjetas de búsqueda). Mismo componente para ES/EN/FR/DE.
+- **Transmisión**: `isAutomaticTransmission()` en `utils.ts` unifica valores de BD (`Manual`, `Automática`, `automatic`, etc.) en listados venta, flota, búsqueda y filtros.
+- **Ventas**: cabecera de tarjeta con badges marca / año / km; fila de specs sin kilometraje en iconos.
+- **Búsqueda**: `vehicle-card` muestra Manual/Automática en la fila de características.
+
+---
+
 ## 📝 Documentación — 20 de marzo 2026
 
 - Alineación de **README**, `docs/README.md`, `INDICE-DOCUMENTACION.md`, `supabase/README.md` y docs SEO/IA con el estado de landings de alquiler.

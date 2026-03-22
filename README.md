@@ -28,6 +28,17 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 🚐 Marzo 2026 — Listados de vehículos (flota, ventas, búsqueda)
+
+- **Flota alquiler** (`/es/vehiculos`, `/en/vehicles`, `/fr/vehicules`, `/de/fahrzeuge`): un solo componente `src/components/vehicle/vehicle-list-client.tsx` — título = `vehicle.name` (sin segunda línea marca/modelo redundante). **ISR** `revalidate = 3600`: los cambios pueden tardar hasta ~1 h en verse en CDN.
+- **Transmisión en UI**: el admin guarda `Manual` / `Automática`; la app normaliza con `isAutomaticTransmission()` en `src/lib/utils.ts` para mostrar y filtrar coherente con `automatic` / `manual` en BD.
+- **Ventas**: tarjetas en `sale-vehicle-card.tsx` y duplicado en `ventas-client` (es/en/fr/de) — cabecera con badges **marca · año · km**; fila de specs: plazas, plazas noche, combustible, transmisión.
+- **Resultados de búsqueda**: `src/components/booking/vehicle-card.tsx` muestra transmisión y usa la misma lógica de detección automática/manual.
+
+**Referencia:** [`docs/04-referencia/vehiculos/PAGINAS-VEHICULOS-GARANTIA.md`](./docs/04-referencia/vehiculos/PAGINAS-VEHICULOS-GARANTIA.md)
+
+---
+
 ## 🧾 Marzo 2026 — Comisión Stripe en el PVP y precio correcto de extras en el admin
 
 **Documentación detallada:** [`docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md) · [`docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md`](./docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md)
@@ -1317,6 +1328,7 @@ src/lib/supabase/
 ### Sitio Público
 - ✅ **Página de inicio dinámica**
 - ✅ Búsqueda de vehículos por fechas y ubicación
+- ✅ **Fechas alternativas** si no hay disponibilidad (misma duración; UI en ES/EN/FR/DE)
 - ✅ **Catálogo de vehículos con imágenes dinámicas**
 - ✅ **Proceso de reserva completo paso a paso** 🎯
 - ✅ **Sistema de pago fraccionado (50%-50%)**
@@ -1591,7 +1603,7 @@ src/
 │
 ├── components/
 │   ├── admin/                       # Componentes admin (Client)
-│   ├── booking/                     # Componentes reserva
+│   ├── booking/                     # Componentes reserva (search-widget, vehicle-card, no-results-with-alternatives, …)
 │   ├── layout/                      # Header, Footer (Client + Server)
 │   ├── cookies/                     # Sistema cookies (Client)
 │   └── vehicle/                     # Componentes vehículos

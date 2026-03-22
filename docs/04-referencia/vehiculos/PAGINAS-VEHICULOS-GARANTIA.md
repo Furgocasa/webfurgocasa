@@ -1,8 +1,20 @@
 # 🚗 GARANTÍA DE CALIDAD - PÁGINAS DE VEHÍCULOS
 
 **Fecha creación:** 2026-01-08  
-**Última actualización:** 2026-02-12 (Sistema vehículos vendidos)  
+**Última actualización:** 2026-03-22 (listados flota/venta/búsqueda + transmisión)  
 **Estado:** ✅ VERIFICADO Y FUNCIONAL
+
+---
+
+## 📋 Listados en grid (flota, ventas, búsqueda) — marzo 2026
+
+| Contexto | Componente / rutas | Notas |
+|----------|-------------------|--------|
+| Flota alquiler | `src/components/vehicle/vehicle-list-client.tsx` usado por `src/app/{es,en,fr,de}/vehiculos|vehicles|vehicules|fahrzeuge/page.tsx` | Solo **nombre** (`vehicle.name`) como título principal; sin repetir `brand` + `model` debajo. Plazas, plazas noche, combustible, transmisión en una fila. |
+| Ventas | `src/components/vehicle/sale-vehicle-card.tsx` + grids en `ventas-client` (es/en/fr/de) | Cabecera: badges **marca**, **año**, **km**; fila de specs sin kilometraje. |
+| Búsqueda disponibilidad | `src/components/booking/vehicle-card.tsx` | Incluye transmisión (Manual/Automática) en la fila de iconos. |
+| Transmisión en UI | `isAutomaticTransmission()` en `src/lib/utils.ts` | El admin guarda `Manual` / `Automática`; en BD pueden coexistir `manual` / `automatic`. La función unifica la detección para etiquetas y filtros. |
+| Caché | Páginas de listado con `revalidate` (p. ej. 3600 s) | Tras un deploy, la CDN puede servir HTML cacheado hasta la siguiente revalidación. |
 
 ---
 

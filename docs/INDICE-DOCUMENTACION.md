@@ -2,9 +2,18 @@
 
 **Versión**: 1.0.17 ✅ PRODUCCIÓN — landings alquiler ampliadas (documentación)  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 21 de marzo, 2026
+**Última actualización**: 22 de marzo, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🚐 ACTUALIZACIÓN MARZO 2026 — LISTADOS DE VEHÍCULOS (UI)
+
+| Tema | Dónde leer |
+|------|------------|
+| Grid flota (un solo título, sin duplicar marca/modelo), ventas (badges año/km), búsqueda (transmisión en tarjeta), `isAutomaticTransmission()` | **[PAGINAS-VEHICULOS-GARANTIA.md](./04-referencia/vehiculos/PAGINAS-VEHICULOS-GARANTIA.md)** (sección *Listados en grid*) |
+| Resumen en README raíz | Sección *Marzo 2026 — Listados de vehículos* |
 
 ---
 
