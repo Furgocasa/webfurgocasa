@@ -557,3 +557,14 @@ export function isAutomaticTransmission(transmission: string | null | undefined)
     .replace(/[\u0300-\u036f]/g, "");
   return n === "automatic" || n === "automatica" || n === "automatico";
 }
+
+/** Etiqueta del recuadro de km en tarjetas de venta (sale-vehicle-card / ventas-client). */
+export function saleCardMileageCaption(locale: string): string {
+  const m: Record<string, string> = {
+    es: "Kilometraje",
+    en: "Mileage",
+    fr: "Kilométrage",
+    de: "Kilometer",
+  };
+  return m[locale] ?? m.es;
+}

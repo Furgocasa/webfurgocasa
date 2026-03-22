@@ -5,7 +5,6 @@ import { useLanguage } from "@/contexts/language-context";
 import { LocalizedLink } from "@/components/localized-link";
 import { 
   Car, 
-  Gauge, 
   Fuel, 
   Users, 
   Moon,
@@ -20,7 +19,7 @@ import {
 import { useState } from "react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
-import { isAutomaticTransmission } from "@/lib/utils";
+import { isAutomaticTransmission, saleCardMileageCaption } from "@/lib/utils";
 
 interface VehicleForSale {
   id: string;
@@ -77,7 +76,7 @@ function formatMileage(km: number): string {
 }
 
 export function VentasClient({ initialVehicles, initialCategories }: VentasClientProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
   // Los datos vienen del servidor, no necesitamos cargarlos
   const vehiclesForSale = initialVehicles;
@@ -296,35 +295,46 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
                       </LocalizedLink>
 
                       <div className="p-6">
-                        <LocalizedLink href={`/ventas/${vehicle.slug}`}>
-                          <h3 className="text-2xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-orange transition-colors">
-                            {vehicle.name}
-                          </h3>
+                        <LocalizedLink href={`/ventas/${vehicle.slug}`} className="block">
+                          <div className="flex flex-row items-start gap-3 mb-2">
+                            <h3 className="min-w-0 flex-1 text-xl sm:text-2xl font-heading font-bold text-gray-900 group-hover:text-furgocasa-orange transition-colors leading-tight">
+                              {vehicle.name}
+                            </h3>
+                            <div
+                              className="shrink-0 rounded-xl border-2 border-furgocasa-orange/40 bg-gradient-to-br from-orange-50 to-amber-50 px-3 py-2 text-right shadow-sm"
+                              title={`${saleCardMileageCaption(language)}: ${formatMileage(vehicle.mileage)}`}
+                            >
+                              <p className="text-[10px] font-semibold uppercase tracking-wide text-furgocasa-orange/90 leading-none mb-1">
+                                {saleCardMileageCaption(language)}
+                              </p>
+                              <p className="text-lg sm:text-xl font-heading font-bold text-furgocasa-orange leading-tight whitespace-nowrap">
+                                {formatMileage(vehicle.mileage)}
+                              </p>
+                            </div>
+                          </div>
                           <p className="text-sm text-gray-600 mb-4">
                             {vehicle.brand} · {vehicle.year}
                           </p>
                         </LocalizedLink>
 
-                        <div className="flex flex-nowrap items-center gap-x-4 mb-4 text-sm text-gray-600 overflow-x-auto overscroll-x-contain pb-0.5 [-webkit-overflow-scrolling:touch]">
-                          <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-                            <Gauge className="h-4 w-4 flex-shrink-0" />
-                            <span>{formatMileage(vehicle.mileage)}</span>
+                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-4 text-xs sm:text-sm text-gray-600">
+                          <div className="flex items-center gap-1">
+                            <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="whitespace-nowrap">{vehicle.seats} {t("plazas")}</span>
                           </div>
-                          <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-                            <Users className="h-4 w-4 flex-shrink-0" />
-                            <span>{vehicle.seats} {t("plazas")}</span>
+                          <div className="flex items-center gap-1">
+                            <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="whitespace-nowrap">{vehicle.beds} {t("plazas noche")}</span>
                           </div>
-                          <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-                            <Moon className="h-4 w-4 flex-shrink-0" />
-                            <span>{vehicle.beds} {t("plazas noche")}</span>
+                          <div className="flex items-center gap-1">
+                            <Fuel className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="whitespace-nowrap">{vehicle.fuel_type}</span>
                           </div>
-                          <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-                            <Fuel className="h-4 w-4 flex-shrink-0" />
-                            <span>{vehicle.fuel_type}</span>
-                          </div>
-                          <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-                            <Settings className="h-4 w-4 flex-shrink-0" />
-                            <span>{isAutomaticTransmission(vehicle.transmission) ? t('Automática') : t('Manual')}</span>
+                          <div className="flex items-center gap-1">
+                            <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+                            <span className="whitespace-nowrap">
+                              {isAutomaticTransmission(vehicle.transmission) ? t('Automática') : t('Manual')}
+                            </span>
                           </div>
                         </div>
 

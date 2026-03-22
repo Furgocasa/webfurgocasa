@@ -2,8 +2,6 @@
 
 import { LocalizedLink } from "@/components/localized-link";
 import { 
-  Car, 
-  Gauge, 
   Fuel, 
   Users, 
   Moon,
@@ -12,7 +10,7 @@ import {
 } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
-import { isAutomaticTransmission } from "@/lib/utils";
+import { isAutomaticTransmission, saleCardMileageCaption } from "@/lib/utils";
 
 interface SaleVehicleCardProps {
   vehicle: {
@@ -116,45 +114,55 @@ export function SaleVehicleCard({ vehicle, locale = 'es', basePath = '/ventas' }
 
       {/* Contenido */}
       <div className="p-6">
-        <LocalizedLink href={href}>
-          <h3 className="text-2xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-orange transition-colors">
-            {vehicle.name}
-          </h3>
+        <LocalizedLink href={href} className="block">
+          <div className="flex flex-row items-start gap-3 mb-2">
+            <h3 className="min-w-0 flex-1 text-xl sm:text-2xl font-heading font-bold text-gray-900 group-hover:text-furgocasa-orange transition-colors leading-tight">
+              {vehicle.name}
+            </h3>
+            {vehicle.mileage !== undefined && (
+              <div
+                className="shrink-0 rounded-xl border-2 border-furgocasa-orange/40 bg-gradient-to-br from-orange-50 to-amber-50 px-3 py-2 text-right shadow-sm"
+                title={`${saleCardMileageCaption(locale)}: ${formatMileage(vehicle.mileage, locale)}`}
+              >
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-furgocasa-orange/90 leading-none mb-1">
+                  {saleCardMileageCaption(locale)}
+                </p>
+                <p className="text-lg sm:text-xl font-heading font-bold text-furgocasa-orange leading-tight whitespace-nowrap">
+                  {formatMileage(vehicle.mileage, locale)}
+                </p>
+              </div>
+            )}
+          </div>
           <p className="text-sm text-gray-600 mb-4">
             {vehicle.brand} · {vehicle.year}
           </p>
         </LocalizedLink>
 
-        {/* Una sola línea: si no cabe, scroll horizontal (evita que "Automática" baje) */}
-        <div className="flex flex-nowrap items-center gap-x-4 mb-4 text-sm text-gray-600 overflow-x-auto overscroll-x-contain pb-0.5 [-webkit-overflow-scrolling:touch]">
-          {vehicle.mileage !== undefined && (
-            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-              <Gauge className="h-4 w-4 flex-shrink-0" />
-              <span>{formatMileage(vehicle.mileage, locale)}</span>
-            </div>
-          )}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-4 text-xs sm:text-sm text-gray-600">
           {vehicle.seats !== undefined && (
-            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-              <Users className="h-4 w-4 flex-shrink-0" />
-              <span>{vehicle.seats} {t.seats}</span>
+            <div className="flex items-center gap-1">
+              <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">{vehicle.seats} {t.seats}</span>
             </div>
           )}
           {vehicle.beds !== undefined && (
-            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-              <Moon className="h-4 w-4 flex-shrink-0" />
-              <span>{vehicle.beds} {t.beds}</span>
+            <div className="flex items-center gap-1">
+              <Moon className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">{vehicle.beds} {t.beds}</span>
             </div>
           )}
           {vehicle.fuel_type && (
-            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-              <Fuel className="h-4 w-4 flex-shrink-0" />
-              <span>{vehicle.fuel_type}</span>
+            <div className="flex items-center gap-1">
+              <Fuel className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">{vehicle.fuel_type}</span>
             </div>
           )}
           {vehicle.transmission && (
-            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
-              <Settings className="h-4 w-4 flex-shrink-0" />
-              <span>{isAutomaticTransmission(vehicle.transmission) ? t.automatic : t.manual}</span>
+            <div className="flex items-center gap-1">
+              <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4 flex-shrink-0" />
+              <span className="whitespace-nowrap">
+                {isAutomaticTransmission(vehicle.transmission) ? t.automatic : t.manual}
+              </span>
             </div>
           )}
         </div>
