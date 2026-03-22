@@ -62,26 +62,10 @@ export async function POST(request: Request) {
       });
     }
 
-    const now = new Date();
     const pickupDateObj = new Date(pickup_date + "T00:00:00");
 
-    // Validar que el cupón esté activo (no desactivado manualmente)
-    // y que no haya expirado para poder usarlo HOY
-    if (coupon.valid_from && new Date(coupon.valid_from) > now) {
-      return NextResponse.json({
-        valid: false,
-        error: "El cupón aún no está activo",
-      });
-    }
-
-    if (coupon.valid_until && new Date(coupon.valid_until) < now) {
-      return NextResponse.json({
-        valid: false,
-        error: "El cupón ha expirado",
-      });
-    }
-
-    // Validar que las fechas de la reserva caigan dentro del rango del cupón
+    // Ventana válida del cupón según la fecha de recogida (permite reservar con antelación).
+    // is_active ya filtra cupones desactivados manualmente.
     if (coupon.valid_from && pickupDateObj < new Date(coupon.valid_from)) {
       return NextResponse.json({
         valid: false,
