@@ -9,6 +9,7 @@ import { NoResultsWithAlternatives } from "@/components/booking/no-results-with-
 import { Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { setSearchQueryId } from "@/lib/search-tracking/session";
+import { isAutomaticTransmission } from "@/lib/utils";
 
 function LoadingState() {
   return (
@@ -66,13 +67,11 @@ function SearchResultsContent() {
     }
 
     if (transmissionFilter !== "all") {
-      const transmissionMap: Record<string, string[]> = {
-        manual: ["Manual", "manual"],
-        automatic: ["Automático", "Automatico", "automatic", "Automática"],
-      };
-      vehicles = vehicles.filter((v: any) =>
-        transmissionMap[transmissionFilter]?.includes(v.transmission)
-      );
+      vehicles = vehicles.filter((v: any) => {
+        const auto = isAutomaticTransmission(v.transmission);
+        if (transmissionFilter === "automatic") return auto;
+        return !auto;
+      });
     }
 
     switch (sortBy) {

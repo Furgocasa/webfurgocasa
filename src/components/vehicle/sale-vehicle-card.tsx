@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { VehicleImageSlider } from "@/components/vehicle/vehicle-image-slider";
+import { isAutomaticTransmission } from "@/lib/utils";
 
 interface SaleVehicleCardProps {
   vehicle: {
@@ -124,36 +125,36 @@ export function SaleVehicleCard({ vehicle, locale = 'es', basePath = '/ventas' }
           </p>
         </LocalizedLink>
 
-        {/* Specs en flex wrap (coherente con /vehiculos) */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 mb-4 text-sm text-gray-600">
+        {/* Una sola línea: si no cabe, scroll horizontal (evita que "Automática" baje) */}
+        <div className="flex flex-nowrap items-center gap-x-4 mb-4 text-sm text-gray-600 overflow-x-auto overscroll-x-contain pb-0.5 [-webkit-overflow-scrolling:touch]">
           {vehicle.mileage !== undefined && (
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
               <Gauge className="h-4 w-4 flex-shrink-0" />
               <span>{formatMileage(vehicle.mileage, locale)}</span>
             </div>
           )}
           {vehicle.seats !== undefined && (
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
               <Users className="h-4 w-4 flex-shrink-0" />
               <span>{vehicle.seats} {t.seats}</span>
             </div>
           )}
           {vehicle.beds !== undefined && (
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
               <Moon className="h-4 w-4 flex-shrink-0" />
               <span>{vehicle.beds} {t.beds}</span>
             </div>
           )}
           {vehicle.fuel_type && (
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
               <Fuel className="h-4 w-4 flex-shrink-0" />
               <span>{vehicle.fuel_type}</span>
             </div>
           )}
           {vehicle.transmission && (
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1 whitespace-nowrap">
               <Settings className="h-4 w-4 flex-shrink-0" />
-              <span>{vehicle.transmission === 'automatic' ? t.automatic : t.manual}</span>
+              <span>{isAutomaticTransmission(vehicle.transmission) ? t.automatic : t.manual}</span>
             </div>
           )}
         </div>

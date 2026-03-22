@@ -543,3 +543,17 @@ export function sortVehicleEquipment(equipment: any[]) {
     return (a.name || '').localeCompare(b.name || '');
   });
 }
+
+/**
+ * Transmisión en BD: el admin guarda "Manual" | "Automática"; búsqueda/filtros también usan
+ * "manual" | "automatic". Unificar detección para la UI (tarjetas venta/alquiler).
+ */
+export function isAutomaticTransmission(transmission: string | null | undefined): boolean {
+  if (!transmission) return false;
+  const n = transmission
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+  return n === "automatic" || n === "automatica" || n === "automatico";
+}

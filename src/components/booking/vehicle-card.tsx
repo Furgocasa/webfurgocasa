@@ -5,14 +5,15 @@ import { LocalizedLink } from "@/components/localized-link";
 import { 
   Users, 
   Moon, 
-  Fuel, 
+  Fuel,
+  Settings,
   ArrowRight,
   Info,
   Percent,
   TrendingDown,
   Baby
 } from "lucide-react";
-import { cn, formatPrice, sortVehicleEquipment } from "@/lib/utils";
+import { cn, formatPrice, sortVehicleEquipment, isAutomaticTransmission } from "@/lib/utils";
 import type { VehicleWithImages } from "@/types/database";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { useLanguage } from "@/contexts/language-context";
@@ -162,22 +163,26 @@ export function VehicleCard({
           </p>
         )}
 
-        {/* Features */}
-        <div className="flex flex-wrap gap-3 mb-4">
-          <span className="flex items-center gap-1 text-sm text-gray-600">
-            <Users className="h-4 w-4" />
+        {/* Features: una sola línea (scroll horizontal si no cabe) */}
+        <div className="flex flex-nowrap items-center gap-3 mb-4 text-sm text-gray-600 overflow-x-auto overscroll-x-contain pb-0.5 [-webkit-overflow-scrolling:touch]">
+          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
+            <Users className="h-4 w-4 flex-shrink-0" />
             {vehicle.seats} {t("plazas día")}
           </span>
-          <span className="flex items-center gap-1 text-sm text-gray-600">
-            <Moon className="h-4 w-4" />
+          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
+            <Moon className="h-4 w-4 flex-shrink-0" />
             {vehicle.beds} {t("plazas noche")}
           </span>
           {vehicle.fuel_type && (
-            <span className="flex items-center gap-1 text-sm text-gray-600">
-              <Fuel className="h-4 w-4" />
+            <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
+              <Fuel className="h-4 w-4 flex-shrink-0" />
               {vehicle.fuel_type}
             </span>
           )}
+          <span className="flex shrink-0 items-center gap-1 whitespace-nowrap">
+            <Settings className="h-4 w-4 flex-shrink-0" />
+            {isAutomaticTransmission(vehicle.transmission) ? t("Automática") : t("Manual")}
+          </span>
         </div>
 
         {/* Equipamiento con badge de Isofix integrado en la misma línea */}
