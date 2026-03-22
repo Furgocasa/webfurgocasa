@@ -8,6 +8,10 @@ Cada email se envía **a los dos destinatarios**:
 - Cliente (el email que proporcionó al reservar)
 - reservas@furgocasa.com
 
+## Campañas de mailing (no en el repositorio)
+
+Los diseños HTML e imágenes de **newsletters y promociones** suelen guardarse en la carpeta local **`emails/mailing/`**. Esa ruta está en **`.gitignore`**: no se sube a git para no mezclar campañas masivas con el código. Las plantillas **transaccionales de reserva** de esta carpeta (`01`–`03`) sí se documentan y versionan aquí.
+
 ## Archivos
 
 | Archivo | Cuándo se envía |

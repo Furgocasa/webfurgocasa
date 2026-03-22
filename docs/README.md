@@ -94,6 +94,7 @@ Documentación técnica de referencia:
 - Flujo crítico de reservas
 - Gestión de clientes
 - Proceso completo
+- **Búsqueda sin resultados (mar. 2026):** fechas alternativas en 4 idiomas — `GET /api/availability/alternatives`, `no-results-with-alternatives.tsx`, `rental-search-pricing.ts` (ver README raíz, sección «Búsqueda sin resultados»)
 
 #### vehiculos/
 - Páginas de vehículos
@@ -103,6 +104,7 @@ Documentación técnica de referencia:
 #### emails/
 - Sistema de emails automatizados
 - Templates y configuración
+- Campañas masivas en carpeta local `emails/mailing/` (no versionada; ver `emails/README.md` y `.gitignore`)
 
 #### sistemas/
 - Sistema de ofertas de última hora
@@ -181,5 +183,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 20 de marzo, 2026  
-Versión del proyecto: 4.5.0 (landings alquiler documentadas: 59 activos)
+Última actualización: 22 de marzo, 2026  
+Versión del proyecto: 4.5.0 (landings alquiler documentadas: 59 activos; búsqueda fechas alternativas documentada en README raíz)

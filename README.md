@@ -33,9 +33,27 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 - **Flota alquiler** (`/es/vehiculos`, `/en/vehicles`, `/fr/vehicules`, `/de/fahrzeuge`): un solo componente `src/components/vehicle/vehicle-list-client.tsx` — título = `vehicle.name` (sin segunda línea marca/modelo redundante). **ISR** `revalidate = 3600`: los cambios pueden tardar hasta ~1 h en verse en CDN.
 - **Transmisión en UI**: el admin guarda `Manual` / `Automática`; la app normaliza con `isAutomaticTransmission()` en `src/lib/utils.ts` para mostrar y filtrar coherente con `automatic` / `manual` en BD.
 - **Ventas**: tarjetas en `sale-vehicle-card.tsx` y duplicado en `ventas-client` (es/en/fr/de) — cabecera con badges **marca · año · km**; fila de specs: plazas, plazas noche, combustible, transmisión.
-- **Resultados de búsqueda**: `src/components/booking/vehicle-card.tsx` muestra transmisión y usa la misma lógica de detección automática/manual.
+- **Resultados de búsqueda**: `src/components/booking/vehicle-card.tsx` muestra transmisión y usa la misma lógica de detección automática/manual. **Sin cupo:** fechas alternativas (ver sección siguiente).
 
 **Referencia:** [`docs/04-referencia/vehiculos/PAGINAS-VEHICULOS-GARANTIA.md`](./docs/04-referencia/vehiculos/PAGINAS-VEHICULOS-GARANTIA.md)
+
+---
+
+## 🔍 Marzo 2026 — Búsqueda sin resultados: fechas alternativas (4 idiomas)
+
+Si no hay campers disponibles para las fechas elegidas, las páginas de búsqueda (`/es/buscar`, `/en/search`, `/fr/recherche`, `/de/suche`) muestran **ventanas alternativas** (misma duración, ventana ±30 días) con tarjetas al estilo resultado: imagen, precio para esas fechas y equipamiento.
+
+| Pieza | Ubicación |
+|-------|-----------|
+| API | `GET /api/availability/alternatives` |
+| Precio (misma lógica que disponibilidad) | `src/lib/rental-search-pricing.ts` |
+| UI cliente | `src/components/booking/no-results-with-alternatives.tsx` |
+| Textos EN/FR/DE | `src/lib/i18n/translations/common.ts` |
+| Navegación «Buscar» | `getTranslatedRoute('/buscar?…', language)` |
+
+**Página Tarifas:** la sección «Puntualidad en las citas» está **después** del bloque Seguro a todo riesgo + Devolución y **antes** del CTA «¿Listo para tu aventura?» (ES/EN/FR/DE).
+
+**Emails de mailing:** la carpeta `emails/mailing/` (campañas, HTML e imágenes) está en **`.gitignore`** y no se versiona. Las plantillas transaccionales de reserva siguen en `emails/01-03-*.html` (ver `emails/README.md`).
 
 ---
 
@@ -280,7 +298,7 @@ GA4 "Enhanced Measurement" detectaba cambios en `window.history` (navegación SP
 6. ✅ `src/app/administrator/(protected)/busquedas/page.tsx` - Dashboard de análisis
 7. ✅ `src/components/admin/sidebar.tsx` - Nuevo enlace "Búsquedas"
 8. ✅ `src/components/booking/vehicle-card.tsx` - Tracking de clicks
-9. ✅ `src/app/{es,en,fr,de}/buscar/buscar-client.tsx` - Guardar searchQueryId (4 idiomas)
+9. ✅ `src/app/{es,en,fr,de}/buscar|search|recherche|suche/buscar-client.tsx` - Resultados + `searchQueryId`; sin resultados → `NoResultsWithAlternatives`
 
 **Informes Admin (Fixes):**
 10. ✅ `src/app/administrator/(protected)/informes/informes-client.tsx` - Fix filtrado por fecha de creación

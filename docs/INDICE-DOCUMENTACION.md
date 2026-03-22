@@ -1,6 +1,6 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.17 ✅ PRODUCCIÓN — landings alquiler ampliadas (documentación)  
+**Versión**: 1.0.18 ✅ PRODUCCIÓN — búsqueda fechas alternativas (4 idiomas) documentada en README raíz  
 **URL**: https://www.furgocasa.com  
 **Última actualización**: 22 de marzo, 2026
 
@@ -14,6 +14,14 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 |------|------------|
 | Grid flota (un solo título, sin duplicar marca/modelo), ventas (badges año/km), búsqueda (transmisión en tarjeta), `isAutomaticTransmission()` | **[PAGINAS-VEHICULOS-GARANTIA.md](./04-referencia/vehiculos/PAGINAS-VEHICULOS-GARANTIA.md)** (sección *Listados en grid*) |
 | Resumen en README raíz | Sección *Marzo 2026 — Listados de vehículos* |
+
+---
+
+## 🔍 ACTUALIZACIÓN MARZO 2026 — BÚSQUEDA SIN RESULTADOS (FECHAS ALTERNATIVAS)
+
+| Tema | Dónde leer |
+|------|------------|
+| API `/api/availability/alternatives`, `no-results-with-alternatives.tsx`, precios `rental-search-pricing`, i18n, orden bloque tarifas «Puntualidad», `emails/mailing/` en `.gitignore` | **[README raíz](../README.md)** — sección *Marzo 2026 — Búsqueda sin resultados: fechas alternativas* · **CHANGELOG** (entrada 22 mar 2026) |
 
 ---
 

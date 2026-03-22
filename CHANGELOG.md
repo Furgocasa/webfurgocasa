@@ -4,6 +4,15 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔍 Búsqueda: fechas alternativas + tarifas + mailing — 22 de marzo 2026
+
+- **Sin disponibilidad:** en `/buscar`, `/search`, `/recherche`, `/suche` se muestran ventanas alternativas (misma duración) con tarjetas enriquecidas; API `GET /api/availability/alternatives`; precios con `buildPricingForSearch` en `src/lib/rental-search-pricing.ts`; componente `no-results-with-alternatives.tsx`; `vehicle-card` admite `wrapperClassName`.
+- **i18n:** textos y fechas localizadas (`es-ES`, `en-GB`, `fr-FR`, `de-DE`, `Europe/Madrid`); navegación con `getTranslatedRoute`.
+- **Tarifas (público):** bloque «Puntualidad en las citas» reordenado tras Seguro a todo riesgo + Devolución y antes del CTA final en ES/EN/FR/DE.
+- **Repo:** `emails/mailing/` añadida a `.gitignore` (campañas no versionadas).
+
+---
+
 ## 🚐 UI vehículos — 22 de marzo 2026
 
 - **Flota (alquiler)**: `vehicle-list-client` — eliminada la segunda línea `brand · model` bajo el nombre (alineado con tarjetas de búsqueda). Mismo componente para ES/EN/FR/DE.
