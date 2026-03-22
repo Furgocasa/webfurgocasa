@@ -12,7 +12,7 @@ import {
   TrendingDown,
   Baby
 } from "lucide-react";
-import { formatPrice, sortVehicleEquipment } from "@/lib/utils";
+import { cn, formatPrice, sortVehicleEquipment } from "@/lib/utils";
 import type { VehicleWithImages } from "@/types/database";
 import { VehicleEquipmentDisplay } from "@/components/vehicle/equipment-display";
 import { useLanguage } from "@/contexts/language-context";
@@ -45,9 +45,17 @@ interface VehicleCardProps {
     dropoff_location: string;
   };
   searchQueryId?: string;
+  /** Anula estilos del contenedor (p. ej. anidar la tarjeta en un bloque con cabecera) */
+  wrapperClassName?: string;
 }
 
-export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: VehicleCardProps) {
+export function VehicleCard({
+  vehicle,
+  pricing,
+  searchParams,
+  searchQueryId,
+  wrapperClassName,
+}: VehicleCardProps) {
   const { t, language } = useLanguage();
   const router = useRouter();
   
@@ -109,7 +117,7 @@ export function VehicleCard({ vehicle, pricing, searchParams, searchQueryId }: V
   };
 
   return (
-    <div className="card-vehicle group">
+    <div className={cn("card-vehicle group", wrapperClassName)}>
       {/* Image - Clicable con tracking */}
       <div 
         onClick={handleVehicleClick}

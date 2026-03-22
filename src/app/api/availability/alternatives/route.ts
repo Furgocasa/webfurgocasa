@@ -5,19 +5,27 @@ import {
   isYmdInClosedRange,
   type BusinessClosedRange,
 } from "@/lib/business-closed-dates";
+import { buildPricingForSearch } from "@/lib/rental-search-pricing";
 
 export const dynamic = "force-dynamic";
 
-interface AlternativeSlot {
+interface AlternativeSlotBase {
   pickupDate: string;
   dropoffDate: string;
   vehicleCount: number;
   vehicleNames: string[];
 }
 
+type ShowcaseVehicle = Record<string, unknown>;
+
+interface AlternativeSlotResponse extends AlternativeSlotBase {
+  showcaseVehicle: ShowcaseVehicle | null;
+  pricing: Awaited<ReturnType<typeof buildPricingForSearch>> | null;
+}
+
 /**
  * GET /api/availability/alternatives
- * 
+ *
  * Cuando no hay vehículos disponibles para las fechas buscadas,
  * busca ventanas alternativas de la misma duración donde sí hay
  * disponibilidad, en una ventana de ±30 días.
@@ -28,6 +36,11 @@ export async function GET(request: NextRequest) {
 
     const pickupDate = searchParams.get("pickup_date");
     const dropoffDate = searchParams.get("dropoff_date");
+    const pickupTime = searchParams.get("pickup_time") || "10:00";
+    const dropoffTime = searchParams.get("dropoff_time") || "10:00";
+    const pickupLocation = searchParams.get("pickup_location");
+    const dropoffLocation =
+      searchParams.get("dropoff_location") || pickupLocation;
 
     if (!pickupDate || !dropoffDate) {
       return NextResponse.json({ error: "Fechas requeridas" }, { status: 400 });
@@ -56,13 +69,27 @@ export async function GET(request: NextRequest) {
 
     const { data: vehicles, error: vehiclesError } = await supabase
       .from("vehicles")
-      .select("id, name")
+      .select(
+        `
+        *,
+        category:vehicle_categories(*),
+        images:vehicle_images(*),
+        vehicle_equipment(
+          id,
+          equipment(*)
+        )
+      `
+      )
       .eq("is_for_rent", true)
       .eq("status", "available")
-      .or("sale_status.neq.sold,sale_status.is.null");
+      .or("sale_status.neq.sold,sale_status.is.null")
+      .order("sort_order", { ascending: true });
 
     if (vehiclesError || !vehicles?.length) {
-      return NextResponse.json({ alternatives: [], originalDuration: durationDays });
+      return NextResponse.json({
+        alternatives: [],
+        originalDuration: durationDays,
+      });
     }
 
     const searchWindowDays = 30;
@@ -88,17 +115,25 @@ export async function GET(request: NextRequest) {
         .select("vehicle_id, pickup_date, dropoff_date")
         .neq("status", "cancelled")
         .in("payment_status", ["partial", "paid"])
-        .or(`and(pickup_date.lte.${windowEndStr},dropoff_date.gte.${windowStartStr})`),
+        .or(
+          `and(pickup_date.lte.${windowEndStr},dropoff_date.gte.${windowStartStr})`
+        ),
       supabase
         .from("blocked_dates")
         .select("vehicle_id, start_date, end_date")
-        .or(`and(start_date.lte.${windowEndStr},end_date.gte.${windowStartStr})`),
+        .or(
+          `and(start_date.lte.${windowEndStr},end_date.gte.${windowStartStr})`
+        ),
     ]);
 
-    function getAvailableVehicles(
+    function getSlotAvailability(
       candPickup: string,
       candDropoff: string
-    ): { count: number; names: string[] } {
+    ): {
+      count: number;
+      names: string[];
+      showcaseVehicle: ShowcaseVehicle | null;
+    } {
       const unavailable = new Set<string>();
 
       for (const b of bookings || []) {
@@ -113,15 +148,27 @@ export async function GET(request: NextRequest) {
       }
 
       const names: string[] = [];
+      let showcaseVehicle: ShowcaseVehicle | null = null;
+
       for (const v of vehicles) {
         if (!unavailable.has(v.id)) {
           names.push(v.name);
+          if (!showcaseVehicle) {
+            showcaseVehicle = v as unknown as ShowcaseVehicle;
+          }
         }
       }
-      return { count: names.length, names };
+      return {
+        count: names.length,
+        names: names.slice(0, 3),
+        showcaseVehicle,
+      };
     }
 
-    const allSlots: (AlternativeSlot & { distance: number })[] = [];
+    const allSlots: (AlternativeSlotBase & {
+      distance: number;
+      showcaseVehicle: ShowcaseVehicle | null;
+    })[] = [];
 
     const cursor = new Date(windowStart);
     while (cursor <= windowEnd) {
@@ -138,14 +185,18 @@ export async function GET(request: NextRequest) {
           cursor.setDate(cursor.getDate() + 1);
           continue;
         }
-        const { count, names } = getAvailableVehicles(candPickup, candDropoff);
+        const { count, names, showcaseVehicle } = getSlotAvailability(
+          candPickup,
+          candDropoff
+        );
         if (count > 0) {
           const distance = Math.abs(cursor.getTime() - pickup.getTime());
           allSlots.push({
             pickupDate: candPickup,
             dropoffDate: candDropoff,
             vehicleCount: count,
-            vehicleNames: names.slice(0, 3),
+            vehicleNames: names,
+            showcaseVehicle,
             distance,
           });
         }
@@ -156,8 +207,9 @@ export async function GET(request: NextRequest) {
 
     allSlots.sort((a, b) => a.distance - b.distance);
 
-    // Seleccionar hasta 4 alternativas bien espaciadas (mínimo 3 días entre ellas)
-    const selected: AlternativeSlot[] = [];
+    const selected: (AlternativeSlotBase & {
+      showcaseVehicle: ShowcaseVehicle | null;
+    })[] = [];
     const minSpacingDays = 3;
 
     for (const slot of allSlots) {
@@ -177,19 +229,46 @@ export async function GET(request: NextRequest) {
           dropoffDate: slot.dropoffDate,
           vehicleCount: slot.vehicleCount,
           vehicleNames: slot.vehicleNames,
+          showcaseVehicle: slot.showcaseVehicle,
         });
       }
     }
 
-    // Ordenar cronológicamente
     selected.sort(
       (a, b) =>
         parseLocalDate(a.pickupDate).getTime() -
         parseLocalDate(b.pickupDate).getTime()
     );
 
+    const alternatives: AlternativeSlotResponse[] = await Promise.all(
+      selected.map(async (slot) => {
+        let pricing: Awaited<ReturnType<typeof buildPricingForSearch>> | null =
+          null;
+        try {
+          pricing = await buildPricingForSearch(supabase, {
+            pickupDate: slot.pickupDate,
+            dropoffDate: slot.dropoffDate,
+            pickupTime,
+            dropoffTime,
+            pickupLocation,
+            dropoffLocation,
+          });
+        } catch (e) {
+          console.error("Error precio alternativa:", e);
+        }
+        return {
+          pickupDate: slot.pickupDate,
+          dropoffDate: slot.dropoffDate,
+          vehicleCount: slot.vehicleCount,
+          vehicleNames: slot.vehicleNames,
+          showcaseVehicle: slot.showcaseVehicle,
+          pricing,
+        };
+      })
+    );
+
     return NextResponse.json({
-      alternatives: selected,
+      alternatives,
       originalDuration: durationDays,
     });
   } catch (error) {
