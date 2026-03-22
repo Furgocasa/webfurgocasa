@@ -14,7 +14,7 @@ import {
   CheckCircle, 
   ArrowRight,
   Shield,
-  Euro,
+  ShieldCheck,
   FileCheck,
   Phone,
   Compass,
@@ -147,7 +147,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = translated.meta_title || location.meta_title || `Wohnmobile & Camper zu verkaufen in ${translated.name || location.name}`;
   const description = translated.meta_description || location.meta_description || 
-    `Kaufen Sie Ihr Wohnmobil in ${translated.name || location.name}. Fahrzeuge mit Garantie und Finanzierung.`;
+    `Kaufen Sie Ihr Wohnmobil in ${translated.name || location.name}. Geprüfte Fahrzeuge mit mindestens einjähriger Gewährleistung als professioneller Verkäufer.`;
 
   const path = `/wohnmobile-zu-verkaufen/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -400,7 +400,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
             {[
               { icon: Shield, title: "Garantie Inklusive", desc: "Alle Fahrzeuge mit offizieller Garantie" },
-              { icon: Euro, title: "Flexible Finanzierung", desc: "Zahlungsoptionen auf Sie zugeschnitten" },
+              { icon: ShieldCheck, title: "Mindestens ein Jahr Gewährleistung", desc: "Als professionelle Verkäufer gewähren wir mindestens ein Jahr Gewährleistung gemäß den gesetzlichen Vorgaben." },
               { icon: FileCheck, title: "Zertifizierte Fahrzeuge", desc: "Von Fachleuten geprüft und zertifiziert" },
               { icon: HeartHandshake, title: "Persönliche Beratung", desc: "Wir helfen Ihnen, Ihr ideales Fahrzeug zu finden" },
               { icon: Wrench, title: "Vollständige Historie", desc: "Wir kennen die Geschichte jedes Fahrzeugs" },
@@ -437,7 +437,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
             Möchten Sie ein Wohnmobil oder einen Camper in {location.name} kaufen?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Kontaktieren Sie uns und wir helfen Ihnen, Ihr ideales Wohnmobil zu finden. Verkauf mit Garantie und Finanzierung.
+            Kontaktieren Sie uns und wir helfen Ihnen, Ihr ideales Wohnmobil zu finden. Verkauf mit mindestens einjähriger Gewährleistung als professionelles Unternehmen.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink

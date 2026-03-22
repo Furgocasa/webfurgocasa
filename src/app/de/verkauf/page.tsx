@@ -14,7 +14,7 @@ const supabase = createClient(
 // 🎯 SEO Metadata - Único y optimizado para /verkauf
 const VENTAS_METADATA: Metadata = {
   title: "Wohnmobile und Campers zu verkaufen",
-  description: "Kaufen Sie Ihr Wohnmobil oder Camper von Furgocasa. Fahrzeuge aus unserer Flotte, geprüft mit Garantie. Vollständige Historie bekannt. Finanzierung verfügbar.",
+  description: "Kaufen Sie Ihr Wohnmobil oder Camper von Furgocasa. Fahrzeuge aus unserer Flotte, geprüft mit Garantie. Vollständige Historie bekannt. Mindestens ein Jahr Gewährleistung als professioneller Verkäufer.",
   keywords: "wohnmobil kaufen, camper gebraucht, wohnmobil verkauf, gebrauchter camper, wohnmobil kaufen murcia, wohnmobil garantie",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],

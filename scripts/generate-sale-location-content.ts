@@ -182,7 +182,7 @@ async function generateSaleLocationContent(location: SaleLocationTarget): Promis
 
   const prompt = `Genera contenido ÚNICO para la página de venta de autocaravanas en "${location.name}, ${location.province}, ${location.region}".
 
-CONTEXTO: ${sedeContext} Furgocasa vende campers revisados de su flota, con garantía y financiación.
+CONTEXTO: ${sedeContext} Furgocasa vende campers revisados de su flota, con garantía (mínimo un año como vendedor profesional). No ofrece financiación propia.
 
 DATOS REALES ENCONTRADOS EN GOOGLE (usa estos datos para escribir contenido con nombres y datos reales):
 ${localContext}

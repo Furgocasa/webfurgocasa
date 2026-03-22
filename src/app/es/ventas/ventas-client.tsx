@@ -425,9 +425,9 @@ export function VentasClient({ initialVehicles, initialCategories }: VentasClien
                 <div className="w-16 h-16 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Tag className="h-8 w-8 text-furgocasa-orange" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">{t("Financiación disponible")}</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{t("Garantía de al menos un año")}</h3>
                 <p className="text-gray-600">
-                  {t("Te ayudamos con la financiación. Hasta 120 meses sin entrada con las mejores condiciones.")}
+                  {t("Como vendedores profesionales, incluimos como mínimo un año de garantía conforme a la normativa.")}
                 </p>
               </div>
               <div className="text-center">

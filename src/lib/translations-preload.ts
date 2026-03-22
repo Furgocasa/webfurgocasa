@@ -6438,10 +6438,10 @@ export const staticTranslations = {
     de: "Available Motorhomes in"
   },
   "Vehículos premium, garantía y financiación. Entrega cerca de": {
-    es: "Vehículos premium, garantía y financiación. Entrega cerca de",
-    en: "Premium vehicles, warranty and financing. Delivery near",
-    fr: "Premium vehicles, warranty and financing. Delivery near",
-    de: "Premium vehicles, warranty and financing. Delivery near"
+    es: "Vehículos premium con garantía (mínimo un año como profesionales). Entrega cerca de",
+    en: "Premium vehicles with warranty (at least one year as professional sellers). Delivery near",
+    fr: "Véhicules premium avec garantie (au moins un an en tant que vendeur professionnel). Livraison près de",
+    de: "Premium-Fahrzeuge mit Gewährleistung (mindestens ein Jahr als professioneller Verkäufer). Lieferung in der Nähe von"
   },
   "No hay vehículos disponibles actualmente": {
     es: "No hay vehículos disponibles actualmente",
@@ -6536,10 +6536,10 @@ export const staticTranslations = {
     de: "Kaufen Sie Ihr Wohnmobil in"
   },
   "Vehículos con garantía y financiación": {
-    es: "Vehículos con garantía y financiación",
-    en: "Vehicles with warranty and financing",
-    fr: "Véhicules avec garantie et financement",
-    de: "Fahrzeuge mit Garantie und Finanzierung"
+    es: "Vehículos revisados con garantía: mínimo un año como profesionales",
+    en: "Inspected vehicles with warranty: at least one year as professional sellers",
+    fr: "Véhicules révisés avec garantie : au moins un an en tant que professionnels",
+    de: "Geprüfte Fahrzeuge mit Gewährleistung: mindestens ein Jahr als Profis"
   },
   "| Furgocasa": {
     es: "| Furgocasa",
@@ -6554,10 +6554,10 @@ export const staticTranslations = {
     de: "Buy your motorhome or camper in"
   },
   "Vehículos premium con garantía y financiación. Entrega cerca de ti.": {
-    es: "Vehículos premium con garantía y financiación. Entrega cerca de ti.",
-    en: "Premium vehicles with warranty and financing. Delivery near you.",
-    fr: "Premium vehicles with warranty and financing. Delivery near you.",
-    de: "Premium vehicles with warranty and financing. Delivery near you."
+    es: "Vehículos premium con garantía (mínimo un año). Entrega cerca de ti.",
+    en: "Premium vehicles with warranty (at least one year). Delivery near you.",
+    fr: "Véhicules premium avec garantie (au moins un an). Livraison près de chez vous.",
+    de: "Premium-Fahrzeuge mit Gewährleistung (mindestens ein Jahr). Lieferung in Ihrer Nähe."
   },
   "Compra tu autocaravana en": {
     es: "Compra tu autocaravana en",
@@ -6656,16 +6656,16 @@ export const staticTranslations = {
     de: "All our vehicles come with official warranty and complete pre-delivery inspection"
   },
   "Financiación Flexible": {
-    es: "Financiación Flexible",
-    en: "Flexible Financing",
-    fr: "Flexible Financing",
-    de: "Flexible Financing"
+    es: "Garantía de al menos un año",
+    en: "At least one year warranty",
+    fr: "Garantie d’au moins un an",
+    de: "Mindestens ein Jahr Gewährleistung"
   },
   "Opciones de financiación adaptadas a tus necesidades, hasta 120 meses": {
-    es: "Opciones de financiación adaptadas a tus necesidades, hasta 120 meses",
-    en: "Financing options tailored to your needs, up to 120 months",
-    fr: "Financing options tailored to your needs, up to 120 months",
-    de: "Financing options tailored to your needs, up to 120 months"
+    es: "Como vendedores profesionales, incluimos como mínimo un año de garantía conforme a la normativa.",
+    en: "As professional sellers, we include at least one year of warranty in line with applicable regulations.",
+    fr: "En tant que vendeurs professionnels, nous incluons au minimum un an de garantie conformément à la réglementation.",
+    de: "Als professionelle Verkäufer gewähren wir mindestens ein Jahr Gewährleistung gemäß den geltenden Vorschriften."
   },
   "Entrega Cerca de Ti": {
     es: "Entrega Cerca de Ti",
@@ -6700,10 +6700,10 @@ export const staticTranslations = {
     de: "How much does a motorhome cost in"
   },
   "El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ dependiendo del modelo, año y equipamiento. Ofrecemos financiación flexible hasta 120 meses. Entregamos cerca de": {
-    es: "El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ dependiendo del modelo, año y equipamiento. Ofrecemos financiación flexible hasta 120 meses. Entregamos cerca de",
-    en: "The price of our motorhomes for sale ranges from €35,000 to €75,000 depending on the model, year and equipment. We offer flexible financing up to 120 months. We deliver near",
-    fr: "The price of our motorhomes for sale ranges from €35,000 to €75,000 depending on the model, year and equipment. We offer flexible financing up to 120 months. We deliver near",
-    de: "The price of our motorhomes for sale ranges from €35,000 to €75,000 depending on the model, year and equipment. We offer flexible financing up to 120 months. We deliver near"
+    es: "El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ según modelo, año y equipamiento. Entregamos cerca de",
+    en: "The price of our motorhomes for sale ranges from €35,000 to €75,000 depending on the model, year and equipment. We deliver near",
+    fr: "Le prix de nos camping-cars à la vente varie de 35 000 € à 75 000 € selon le modèle, l’année et l’équipement. Nous livrons près de",
+    de: "Die Preise unserer zum Verkauf stehenden Wohnmobile liegen je nach Modell, Jahr und Ausstattung zwischen 35.000 € und 75.000 €. Wir liefern in der Nähe von"
   },
   "¿Ofrecen garantía en las autocaravanas en venta?": {
     es: "¿Ofrecen garantía en las autocaravanas en venta?",
@@ -6712,22 +6712,22 @@ export const staticTranslations = {
     de: "Do you offer warranty on motorhomes for sale?"
   },
   "Sí, todos nuestros vehículos incluyen garantía oficial. Además, realizamos una revisión completa pre-entrega y te proporcionamos toda la documentación y certificados necesarios.": {
-    es: "Sí, todos nuestros vehículos incluyen garantía oficial. Además, realizamos una revisión completa pre-entrega y te proporcionamos toda la documentación y certificados necesarios.",
-    en: "Yes, all our vehicles include official warranty. In addition, we perform a complete pre-delivery inspection and provide you with all the necessary documentation and certificates.",
-    fr: "Yes, all our vehicles include official warranty. In addition, we perform a complete pre-delivery inspection and provide you with all the necessary documentation and certificates.",
-    de: "Yes, all our vehicles include official warranty. In addition, we perform a complete pre-delivery inspection and provide you with all the necessary documentation and certificates."
+    es: "Sí. Como vendedor profesional, incluimos al menos un año de garantía conforme a la normativa. Además, realizamos una revisión completa pre-entrega y te proporcionamos la documentación necesaria.",
+    en: "Yes. As a professional seller, we include at least one year of warranty in line with applicable regulations. We also carry out a full pre-delivery inspection and provide the necessary documentation.",
+    fr: "Oui. En tant que vendeur professionnel, nous incluons au moins un an de garantie conformément à la réglementation. Nous effectuons aussi une révision complète avant livraison et fournissons la documentation nécessaire.",
+    de: "Ja. Als professioneller Verkäufer gewähren wir mindestens ein Jahr Gewährleistung gemäß den Vorschriften. Zudem führen wir eine vollständige Abnahmeprüfung durch und stellen die nötigen Unterlagen bereit."
   },
   "¿Puedo financiar la compra de una autocaravana?": {
-    es: "¿Puedo financiar la compra de una autocaravana?",
-    en: "Can I finance the purchase of a motorhome?",
-    fr: "Can I finance the purchase of a motorhome?",
-    de: "Can I finance the purchase of a motorhome?"
+    es: "¿Gestionáis la financiación de la compra?",
+    en: "Do you arrange purchase financing?",
+    fr: "Proposez-vous un financement pour l’achat ?",
+    de: "Organisieren Sie die Finanzierung des Kaufs?"
   },
   "Por supuesto. Ofrecemos financiación flexible hasta 120 meses con las mejores condiciones del mercado. Nuestro equipo te ayudará a encontrar la mejor opción de financiación adaptada a tu situación.": {
-    es: "Por supuesto. Ofrecemos financiación flexible hasta 120 meses con las mejores condiciones del mercado. Nuestro equipo te ayudará a encontrar la mejor opción de financiación adaptada a tu situación.",
-    en: "Of course. We offer flexible financing up to 120 months with the best market conditions. Our team will help you find the best financing option suited to your situation.",
-    fr: "Of course. We offer flexible financing up to 120 months with the best market conditions. Our team will help you find the best financing option suited to your situation.",
-    de: "Of course. We offer flexible financing up to 120 months with the best market conditions. Our team will help you find the best financing option suited to your situation."
+    es: "No ofrecemos financiación en Furgocasa; la compra es al contado o con la financiación que acuerdes con tu entidad. Sí incluimos como mínimo un año de garantía al ser vendedores profesionales.",
+    en: "We do not offer financing at Furgocasa; purchases are cash or financed through your own bank or lender. As professional sellers, we include at least one year of warranty.",
+    fr: "Nous ne proposons pas de financement chez Furgocasa : l’achat se fait au comptant ou avec le financement convenu avec votre organisme. En tant que vendeur professionnel, nous incluons au moins un an de garantie.",
+    de: "Bei Furgocasa bieten wir keine Finanzierung an; der Kauf erfolgt bar oder über eine Finanzierung Ihrer Bank. Als professioneller Verkäufer gewähren wir mindestens ein Jahr Gewährleistung."
   },
   "¿Dónde puedo recoger la autocaravana si la compro desde": {
     es: "¿Dónde puedo recoger la autocaravana si la compro desde",
@@ -6786,10 +6786,10 @@ export const staticTranslations = {
     de: "Our team is ready to help you find the perfect motorhome."
   },
   "Financiación, garantía y entrega cerca de": {
-    es: "Financiación, garantía y entrega cerca de",
-    en: "Financing, warranty and delivery near",
-    fr: "Financing, warranty and delivery near",
-    de: "Financing, warranty and delivery near"
+    es: "Garantía (mínimo un año), asesoramiento y entrega cerca de",
+    en: "Warranty (at least one year), advice and delivery near",
+    fr: "Garantie (au moins un an), conseils et livraison près de",
+    de: "Gewährleistung (mindestens ein Jahr), Beratung und Lieferung in der Nähe von"
   },
   "Consultar Disponibilidad": {
     es: "Consultar Disponibilidad",
@@ -7978,16 +7978,40 @@ export const staticTranslations = {
     de: "Wir kennen jeden Kilometer unserer Fahrzeuge. Wir liefern Ihnen die vollständige Wartungshistorie."
   },
   "Financiación disponible": {
-    es: "Financiación disponible",
-    en: "Financing available",
-    fr: "Financement disponible",
-    de: "Finanzierung verfügbar"
+    es: "Garantía de al menos un año",
+    en: "At least one year warranty",
+    fr: "Garantie d’au moins un an",
+    de: "Mindestens ein Jahr Gewährleistung"
   },
   "Te ayudamos con la financiación. Hasta 120 meses sin entrada con las mejores condiciones.": {
-    es: "Te ayudamos con la financiación. Hasta 120 meses sin entrada con las mejores condiciones.",
-    en: "We help you with financing. Up to 120 months with no down payment and the best conditions.",
-    fr: "Nous vous aidons avec le financement. Jusqu'à 120 mois sans apport avec les meilleures conditions.",
-    de: "Wir helfen Ihnen bei der Finanzierung. Bis zu 120 Monate ohne Anzahlung zu besten Konditionen."
+    es: "Como vendedores profesionales, incluimos como mínimo un año de garantía conforme a la normativa.",
+    en: "As professional sellers, we include at least one year of warranty in line with applicable regulations.",
+    fr: "En tant que vendeurs professionnels, nous incluons au minimum un an de garantie conformément à la réglementation.",
+    de: "Als professionelle Verkäufer gewähren wir mindestens ein Jahr Gewährleistung gemäß den geltenden Vorschriften."
+  },
+  "Garantía de al menos un año": {
+    es: "Garantía de al menos un año",
+    en: "At least one year warranty",
+    fr: "Garantie d’au moins un an",
+    de: "Mindestens ein Jahr Gewährleistung"
+  },
+  "Como vendedores profesionales, incluimos como mínimo un año de garantía conforme a la normativa.": {
+    es: "Como vendedores profesionales, incluimos como mínimo un año de garantía conforme a la normativa.",
+    en: "As professional sellers, we include at least one year of warranty in line with applicable regulations.",
+    fr: "En tant que vendeurs professionnels, nous incluons au minimum un an de garantie conformément à la réglementation.",
+    de: "Als professionelle Verkäufer gewähren wir mindestens ein Jahr Gewährleistung gemäß den geltenden Vorschriften."
+  },
+  "Vehículos revisados con garantía: mínimo un año como profesionales.": {
+    es: "Vehículos revisados con garantía: mínimo un año como profesionales.",
+    en: "Inspected vehicles with warranty: at least one year as professional sellers.",
+    fr: "Véhicules révisés avec garantie : au moins un an en tant que professionnels.",
+    de: "Geprüfte Fahrzeuge mit Gewährleistung: mindestens ein Jahr als professionelle Verkäufer."
+  },
+  "Contáctanos y te ayudaremos a encontrar tu autocaravana ideal. Venta con garantía de al menos un año como empresa profesional.": {
+    es: "Contáctanos y te ayudaremos a encontrar tu autocaravana ideal. Venta con garantía de al menos un año como empresa profesional.",
+    en: "Contact us and we will help you find your ideal motorhome. Sale with at least one year warranty as a professional company.",
+    fr: "Contactez-nous et nous vous aiderons à trouver le camping-car idéal. Vente avec au moins un an de garantie en tant qu’entreprise professionnelle.",
+    de: "Kontaktieren Sie uns – wir helfen Ihnen, Ihr ideales Wohnmobil zu finden. Verkauf mit mindestens einjähriger Gewährleistung als professionelles Unternehmen."
   },
   "Prueba sin compromiso": {
     es: "Prueba sin compromiso",

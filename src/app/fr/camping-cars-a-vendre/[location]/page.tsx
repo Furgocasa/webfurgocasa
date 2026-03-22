@@ -14,7 +14,7 @@ import {
   CheckCircle, 
   ArrowRight,
   Shield,
-  Euro,
+  ShieldCheck,
   FileCheck,
   Phone,
   Compass,
@@ -147,7 +147,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = translated.meta_title || location.meta_title || `Camping-cars et Fourgons à vendre à ${translated.name || location.name}`;
   const description = translated.meta_description || location.meta_description || 
-    `Achetez votre camping-car à ${translated.name || location.name}. Véhicules avec garantie et financement.`;
+    `Achetez votre camping-car à ${translated.name || location.name}. Véhicules révisés avec au moins un an de garantie en tant que vendeur professionnel.`;
 
   const path = `/camping-cars-a-vendre/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -400,7 +400,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
             {[
               { icon: Shield, title: "Garantie Incluse", desc: "Tous les véhicules avec garantie officielle" },
-              { icon: Euro, title: "Financement Flexible", desc: "Options de paiement adaptées à vous" },
+              { icon: ShieldCheck, title: "Au moins un an de garantie", desc: "En tant que vendeurs professionnels, nous incluons au minimum un an de garantie conformément à la réglementation." },
               { icon: FileCheck, title: "Véhicules Certifiés", desc: "Révisés et certifiés par des professionnels" },
               { icon: HeartHandshake, title: "Conseil Personnel", desc: "Nous vous aidons à trouver votre véhicule idéal" },
               { icon: Wrench, title: "Historique Complet", desc: "Nous connaissons l'histoire de chaque véhicule" },
@@ -437,7 +437,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
             Vous voulez acheter un camping-car à {location.name} ?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Contactez-nous et nous vous aiderons à trouver votre camping-car idéal. Vente avec garantie et financement.
+            Contactez-nous et nous vous aiderons à trouver votre camping-car idéal. Vente avec au moins un an de garantie en tant qu&apos;entreprise professionnelle.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink

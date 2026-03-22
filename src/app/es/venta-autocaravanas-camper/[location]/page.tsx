@@ -14,7 +14,7 @@ import {
   CheckCircle, 
   ArrowRight,
   Shield,
-  Euro,
+  ShieldCheck,
   FileCheck,
   Phone,
   Compass,
@@ -161,7 +161,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = translated.meta_title || location.meta_title || `${t("Venta de Autocaravanas y Campers en")} ${translated.name || location.name}`;
   const description = translated.meta_description || location.meta_description || 
-    `${t("Compra tu autocaravana o camper en")} ${translated.name || location.name}. ${t("Vehículos con garantía y financiación")}.`;
+    `${t("Compra tu autocaravana o camper en")} ${translated.name || location.name}. ${t("Vehículos revisados con garantía: mínimo un año como profesionales.")}`;
 
   const path = `/venta-autocaravanas-camper/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale);
@@ -430,7 +430,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
             {[
               { icon: Shield, titleKey: "Garantía Incluida", descKey: "Todos los vehículos con garantía oficial" },
-              { icon: Euro, titleKey: "Financiación Flexible", descKey: "Opciones de pago adaptadas a ti" },
+              { icon: ShieldCheck, titleKey: "Garantía de al menos un año", descKey: "Como vendedores profesionales, incluimos como mínimo un año de garantía conforme a la normativa." },
               { icon: FileCheck, titleKey: "Vehículos Certificados", descKey: "Revisados y certificados por profesionales" },
               { icon: HeartHandshake, titleKey: "Asesoramiento Personal", descKey: "Te ayudamos a encontrar tu vehículo ideal" },
               { icon: Wrench, titleKey: "Historial Completo", descKey: "Conocemos la historia de cada vehículo" },
@@ -471,7 +471,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
             {t("¿Quieres comprar una autocaravana o camper en")} {location.name}?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            {t("Contáctanos y te ayudaremos a encontrar tu autocaravana ideal. Venta con garantía y financiación.")}
+            {t("Contáctanos y te ayudaremos a encontrar tu autocaravana ideal. Venta con garantía de al menos un año como empresa profesional.")}
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink

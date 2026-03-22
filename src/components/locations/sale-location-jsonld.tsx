@@ -19,7 +19,7 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
     "@type": "AutoDealer",
     "name": "Furgocasa",
     "alternateName": `Furgocasa - Venta de Autocaravanas cerca de ${location.name}`,
-    "description": `Venta de autocaravanas y campers premium cerca de ${location.name}. Entrega desde Murcia. Garantía oficial, financiación flexible hasta 120 meses y asesoramiento personalizado.`,
+    "description": `Venta de autocaravanas y campers premium cerca de ${location.name}. Entrega desde Murcia. Garantía oficial, mínimo un año como vendedor profesional y asesoramiento personalizado.`,
     "url": `${baseUrl}/es/venta-autocaravanas-camper/${location.slug}`,
     "telephone": "+34868364161",
     "email": "info@furgocasa.com",
@@ -129,7 +129,7 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
         "name": `¿Cuánto cuesta una autocaravana en ${location.name}?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ dependiendo del modelo, año y equipamiento. Ofrecemos financiación flexible hasta 120 meses. Entregamos cerca de ${location.name}.`
+          "text": `El precio de nuestras autocaravanas en venta varía desde 35.000€ hasta 75.000€ según modelo, año y equipamiento. Entregamos cerca de ${location.name}.`
         }
       },
       {
@@ -137,15 +137,15 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
         "name": `¿Ofrecen garantía en las autocaravanas en venta?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Sí, todos nuestros vehículos incluyen garantía oficial. Además, realizamos una revisión completa pre-entrega y te proporcionamos toda la documentación y certificados necesarios."
+          "text": "Sí. Como vendedor profesional, incluimos al menos un año de garantía conforme a la normativa. Además, realizamos una revisión completa pre-entrega y te proporcionamos la documentación necesaria."
         }
       },
       {
         "@type": "Question",
-        "name": `¿Puedo financiar la compra de una autocaravana?`,
+        "name": `¿Gestionáis la financiación de la compra?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": "Por supuesto. Ofrecemos financiación flexible hasta 120 meses con las mejores condiciones del mercado. Nuestro equipo te ayudará a encontrar la mejor opción de financiación adaptada a tu situación."
+          "text": "No ofrecemos financiación en Furgocasa; la compra es al contado o con la financiación que acuerdes con tu entidad. Sí incluimos como mínimo un año de garantía al ser vendedores profesionales."
         }
       },
       {

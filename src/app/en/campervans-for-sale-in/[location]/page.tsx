@@ -14,7 +14,7 @@ import {
   CheckCircle, 
   ArrowRight,
   Shield,
-  Euro,
+  ShieldCheck,
   FileCheck,
   Phone,
   Compass,
@@ -147,7 +147,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   const title = translated.meta_title || location.meta_title || `Campervans & Motorhomes for Sale in ${translated.name || location.name}`;
   const description = translated.meta_description || location.meta_description || 
-    `Buy your campervan in ${translated.name || location.name}. Vehicles with warranty and financing.`;
+    `Buy your campervan in ${translated.name || location.name}. Inspected vehicles with at least one year warranty as a professional seller.`;
 
   const path = `/campervans-for-sale-in/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -400,7 +400,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
             {[
               { icon: Shield, title: "Warranty Included", desc: "All vehicles with official warranty" },
-              { icon: Euro, title: "Flexible Financing", desc: "Payment options tailored to you" },
+              { icon: ShieldCheck, title: "At least one year warranty", desc: "As professional sellers, we include a minimum one-year warranty as required by law." },
               { icon: FileCheck, title: "Certified Vehicles", desc: "Inspected and certified by professionals" },
               { icon: HeartHandshake, title: "Personal Advice", desc: "We help you find your ideal vehicle" },
               { icon: Wrench, title: "Full History", desc: "We know the history of each vehicle" },
@@ -437,7 +437,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
             Want to buy a campervan or motorhome in {location.name}?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Contact us and we&apos;ll help you find your ideal campervan. Sale with warranty and financing.
+            Contact us and we&apos;ll help you find your ideal campervan. Sale with at least one year warranty as a professional seller.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink
