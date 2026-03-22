@@ -250,12 +250,9 @@ export function VehicleListClient({ initialVehicles }: VehicleListClientProps) {
               {/* Contenido */}
               <div className="p-6">
                 <LocalizedLink href={`/vehiculos/${vehicle.slug}`}>
-                  <h3 className="text-2xl font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
+                  <h3 className="text-2xl font-heading font-bold text-gray-900 mb-4 group-hover:text-furgocasa-blue transition-colors">
                     {vehicle.name}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    {vehicle.brand} {vehicle.model ? `- ${vehicle.model}` : ''}
-                  </p>
                 </LocalizedLink>
 
                 {/* Especificaciones en una sola línea (scroll si no cabe) */}
