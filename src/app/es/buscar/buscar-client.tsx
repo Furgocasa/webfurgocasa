@@ -139,14 +139,14 @@ function NoResultsWithAlternatives({
                     key={idx}
                     className="rounded-xl shadow-lg overflow-hidden ring-1 ring-gray-200/80 hover:shadow-xl transition-shadow bg-white"
                   >
-                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-4 py-2.5 border-b border-gray-100 bg-gradient-to-r from-slate-50 to-white">
-                      <span className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-gray-800">
-                        <CalendarDays className="h-4 w-4 text-furgocasa-orange shrink-0" />
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-4 py-3 border-b border-white/15 bg-furgocasa-blue">
+                      <span className="flex flex-wrap items-center gap-1.5 text-sm font-medium text-white">
+                        <CalendarDays className="h-4 w-4 text-white shrink-0 opacity-95" />
                         <span>{formatDateFull(alt.pickupDate)}</span>
-                        <ArrowRight className="h-3 w-3 text-gray-400 shrink-0" />
+                        <ArrowRight className="h-3 w-3 text-white/70 shrink-0" />
                         <span>{formatDateFull(alt.dropoffDate)}</span>
                         {alt.vehicleCount > 1 && (
-                          <span className="text-xs font-normal text-gray-500 ml-1">
+                          <span className="text-xs font-normal text-white/80 ml-1">
                             · {alt.vehicleCount} {t("disponibles")}
                           </span>
                         )}
@@ -154,7 +154,7 @@ function NoResultsWithAlternatives({
                       <button
                         type="button"
                         onClick={() => handleAlternativeClick(alt)}
-                        className="text-left text-xs sm:text-sm font-semibold text-furgocasa-orange hover:underline shrink-0"
+                        className="text-left text-xs sm:text-sm font-semibold text-white hover:underline hover:text-white shrink-0 underline-offset-2 sm:rounded-md sm:px-1 sm:py-0.5 sm:hover:bg-white/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-furgocasa-blue"
                       >
                         {t("Ver listado con estas fechas")}
                       </button>
