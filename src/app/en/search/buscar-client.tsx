@@ -5,7 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { VehicleCard } from "@/components/booking/vehicle-card";
 import { SearchSummary } from "@/components/booking/search-summary";
-import { Loader2, Car, AlertCircle, Filter, X } from "lucide-react";
+import { NoResultsWithAlternatives } from "@/components/booking/no-results-with-alternatives";
+import { Loader2, AlertCircle } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { setSearchQueryId } from "@/lib/search-tracking/session";
 
@@ -108,13 +109,7 @@ function SearchResultsContent() {
   }
 
   if (!data?.vehicles || data.vehicles.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20">
-        <Car className="h-16 w-16 text-gray-300 mb-4" />
-        <h2 className="text-xl font-bold text-gray-900 mb-2">{t("No hay vehículos disponibles")}</h2>
-        <p className="text-gray-600">{t("Prueba con otras fechas")}</p>
-      </div>
-    );
+    return <NoResultsWithAlternatives />;
   }
 
   // Construir objeto searchParams para VehicleCard (espera snake_case)
