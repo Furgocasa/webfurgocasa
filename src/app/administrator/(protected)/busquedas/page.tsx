@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   BarChart,
   Bar,
+  Treemap,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -285,6 +286,73 @@ function SortableTableHeader<T>({
     </th>
   );
 }
+
+const TreemapCustomContent = (props: any) => {
+  const { x, y, width, height, index, name, value, conversion, reservas } = props;
+  
+  // Colores: Top 3 en naranjas/cálidos, resto en azules
+  const bgColors = [
+    '#ea580c', // orange-600
+    '#f97316', // orange-500
+    '#fb923c', // orange-400
+    '#2563eb', // blue-600
+    '#3b82f6', // blue-500
+    '#60a5fa', // blue-400
+    '#93c5fd', // blue-300
+    '#bfdbfe', // blue-200
+  ];
+  const color = index < bgColors.length ? bgColors[index] : '#dbeafe';
+
+  return (
+    <g>
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={height}
+        fill={color}
+        stroke="#ffffff"
+        strokeWidth={3}
+      />
+      {width > 80 && height > 40 ? (
+        <>
+          <text
+            x={x + 10}
+            y={y + 24}
+            fill="#ffffff"
+            fontSize={13}
+            fontWeight="bold"
+            className="drop-shadow-sm"
+          >
+            {name}
+          </text>
+          {height > 55 && (
+            <text
+              x={x + 10}
+              y={y + 44}
+              fill="#ffffff"
+              fontSize={12}
+              opacity={0.95}
+            >
+              {value} búsquedas
+            </text>
+          )}
+          {height > 75 && width > 120 && (
+            <text
+              x={x + 10}
+              y={y + 60}
+              fill="#ffffff"
+              fontSize={11}
+              opacity={0.8}
+            >
+              {reservas} res. · {conversion}% conv.
+            </text>
+          )}
+        </>
+      ) : null}
+    </g>
+  );
+};
 
 export default function SearchAnalyticsPage() {
   const [dateRange, setDateRange] = useState({
@@ -860,48 +928,31 @@ export default function SearchAnalyticsPage() {
           </div>
         ) : (
           <div className="space-y-8">
-            {/* Gráfico de barras horizontal para los top 10 */}
+            {/* Gráfico Treemap para los top 20 */}
             {topDates?.topDates && topDates.topDates.length > 0 && (
-              <div className="h-96 w-full">
+              <div className="h-96 w-full mb-8">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={topDates.topDates.slice(0, 10).map(d => ({
-                      name: `${formatDate(d.pickup_date)} - ${formatDate(d.dropoff_date)} (${d.rental_days}d)`,
-                      busquedas: d.search_count,
+                  <Treemap
+                    data={topDates.topDates.slice(0, 15).map(d => ({
+                      name: `${formatDate(d.pickup_date)} - ${formatDate(d.dropoff_date)}`,
+                      size: d.search_count,
                       reservas: d.bookings_count,
                       conversion: parseFloat(d.conversion_rate)
                     }))}
-                    layout="vertical"
-                    margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                    dataKey="size"
+                    aspectRatio={4 / 3}
+                    stroke="#fff"
+                    fill="#8884d8"
+                    content={<TreemapCustomContent />}
                   >
-                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} stroke="#f3f4f6" />
-                    <XAxis type="number" hide />
-                    <YAxis 
-                      dataKey="name" 
-                      type="category" 
-                      axisLine={false} 
-                      tickLine={false}
-                      tick={{ fontSize: 12, fill: '#4B5563' }}
-                      width={140}
-                    />
                     <RechartsTooltip 
-                      formatter={(value: any, name: string) => {
-                        if (name === 'busquedas') return [value, 'Búsquedas'];
-                        if (name === 'reservas') return [value, 'Reservas'];
-                        if (name === 'conversion') return [`${value}%`, 'Conversión'];
+                      formatter={(value: any, name: string, props: any) => {
+                        if (name === 'size') return [value, 'Búsquedas'];
                         return [value, name];
                       }}
                       contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
-                      cursor={{ fill: '#F3F4F6' }}
                     />
-                    <Bar dataKey="busquedas" name="busquedas" radius={[0, 4, 4, 0]} barSize={24}>
-                      {
-                        topDates.topDates.slice(0, 10).map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={index < 3 ? '#F97316' : '#3B82F6'} />
-                        ))
-                      }
-                    </Bar>
-                  </BarChart>
+                  </Treemap>
                 </ResponsiveContainer>
               </div>
             )}
