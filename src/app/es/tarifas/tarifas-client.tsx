@@ -216,90 +216,6 @@ export function TarifasClient() {
         </div>
       </section>
 
-      {/* Devolución del vehículo — destacada, justo después de precios */}
-      <section id="devolucion-vehiculo" className="py-16 md:py-20 bg-gradient-to-br from-amber-50 via-orange-50/80 to-red-50/90 border-y-4 border-red-300/80 scroll-mt-20">
-        <div className="container mx-auto px-4 max-w-5xl">
-          <div className="rounded-3xl bg-white p-6 md:p-10 shadow-xl border-2 border-red-200 ring-1 ring-red-100">
-            <div className="flex flex-col sm:flex-row gap-4 sm:items-start mb-6">
-              <div className="flex items-start gap-4">
-                <div className="rounded-2xl bg-red-100 p-3 md:p-4 shrink-0">
-                  <AlertCircle className="h-8 w-8 md:h-10 md:w-10 text-red-700" strokeWidth={2} aria-hidden />
-                </div>
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-2">
-                    {t("Devolución del vehículo: obligatorio")}
-                  </h2>
-                  <p className="text-gray-700 text-base md:text-lg leading-relaxed font-medium">
-                    {t("Al devolver la autocaravana debes cumplir cada punto. Si no, se factura el suplemento indicado (IVA incluido).")}
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2 mb-8">
-              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
-                {t("Limpio interiormente")}
-              </span>
-              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
-                {t("Aguas grises vacías")}
-              </span>
-              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
-                {t("WC químico vacío")}
-              </span>
-              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
-                {t("En hora")}
-              </span>
-            </div>
-            <div className="overflow-x-auto rounded-2xl border border-gray-200">
-              <table className="w-full text-left text-sm md:text-base min-w-[640px]">
-                <thead>
-                  <tr className="bg-gray-900 text-white">
-                    <th className="py-3 px-4 md:px-5 font-heading font-bold">{t("Lo que debes dejar listo")}</th>
-                    <th className="py-3 px-4 md:px-5 font-heading font-bold">{t("Qué se te cobrará si no")}</th>
-                    <th className="py-3 px-4 md:px-5 font-heading font-bold whitespace-nowrap">{t("Importe (IVA incl.)")}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200 bg-white">
-                  {vehicleReturnTableRows.map((row, i) => (
-                    <tr key={i} className="hover:bg-orange-50/40">
-                      <td className="py-4 px-4 md:px-5 text-gray-800 font-medium align-top">{t(row.requirement)}</td>
-                      <td className="py-4 px-4 md:px-5 text-gray-600 align-top">{t(row.ifNot)}</td>
-                      <td className="py-4 px-4 md:px-5 font-heading font-bold text-furgocasa-orange text-lg align-top whitespace-nowrap">
-                        {row.charge}
-                      </td>
-                    </tr>
-                  ))}
-                  <tr className="hover:bg-orange-50/40 bg-amber-50/50">
-                    <td className="py-4 px-4 md:px-5 text-gray-800 font-medium align-top">
-                      {t("Acudir puntual a la cita de devolución acordada")}
-                    </td>
-                    <td className="py-4 px-4 md:px-5 text-gray-600 align-top">
-                      {t("Tiempo de espera del equipo por tu retraso")}
-                    </td>
-                    <td className="py-4 px-4 md:px-5 align-top">
-                      <div className="font-heading font-bold text-furgocasa-orange text-lg">
-                        {t("40 € (1.ª hora) + 20 €/hora adicional")}
-                      </div>
-                      <LocalizedLink
-                        href="/tarifas#puntualidad-citas"
-                        className="inline-block mt-2 text-sm font-semibold text-furgocasa-blue hover:underline"
-                      >
-                        {t("Ver detalle en «Puntualidad en las citas»")}
-                      </LocalizedLink>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <p className="mt-6 text-sm text-gray-600 flex items-start gap-2">
-              <Info className="h-5 w-5 text-gray-500 shrink-0 mt-0.5" aria-hidden />
-              <span>
-                {t("Todos los suplementos incluyen IVA. El importe de limpieza interior es mínimo y puede aumentar según el estado del vehículo.")}
-              </span>
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Descuentos por duración - Modernizado */}
       <section id="descuentos" className="py-24 bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark text-white relative overflow-hidden scroll-mt-20">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -419,6 +335,90 @@ export function TarifasClient() {
                 <li className="flex items-center gap-2"><div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div> {t("Aparcamiento solo disponible a partir de 4 días de alquiler (sede Murcia)")}</li>
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Devolución del vehículo — después de extras y accesorios */}
+      <section id="devolucion-vehiculo" className="py-16 md:py-20 bg-gradient-to-br from-amber-50 via-orange-50/80 to-red-50/90 border-y-4 border-red-300/80 scroll-mt-20">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="rounded-3xl bg-white p-6 md:p-10 shadow-xl border-2 border-red-200 ring-1 ring-red-100">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-start mb-6">
+              <div className="flex items-start gap-4">
+                <div className="rounded-2xl bg-red-100 p-3 md:p-4 shrink-0">
+                  <AlertCircle className="h-8 w-8 md:h-10 md:w-10 text-red-700" strokeWidth={2} aria-hidden />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-2">
+                    {t("Devolución del vehículo: obligatorio")}
+                  </h2>
+                  <p className="text-gray-700 text-base md:text-lg leading-relaxed font-medium">
+                    {t("Al devolver la autocaravana debes cumplir cada punto. Si no, se factura el suplemento indicado (IVA incluido).")}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-8">
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("Limpio interiormente")}
+              </span>
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("Aguas grises vacías")}
+              </span>
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("WC químico vacío")}
+              </span>
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("En hora")}
+              </span>
+            </div>
+            <div className="overflow-x-auto rounded-2xl border border-gray-200">
+              <table className="w-full text-left text-sm md:text-base min-w-[640px]">
+                <thead>
+                  <tr className="bg-gray-900 text-white">
+                    <th className="py-3 px-4 md:px-5 font-heading font-bold">{t("Lo que debes dejar listo")}</th>
+                    <th className="py-3 px-4 md:px-5 font-heading font-bold">{t("Qué se te cobrará si no")}</th>
+                    <th className="py-3 px-4 md:px-5 font-heading font-bold whitespace-nowrap">{t("Importe (IVA incl.)")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {vehicleReturnTableRows.map((row, i) => (
+                    <tr key={i} className="hover:bg-orange-50/40">
+                      <td className="py-4 px-4 md:px-5 text-gray-800 font-medium align-top">{t(row.requirement)}</td>
+                      <td className="py-4 px-4 md:px-5 text-gray-600 align-top">{t(row.ifNot)}</td>
+                      <td className="py-4 px-4 md:px-5 font-heading font-bold text-furgocasa-orange text-lg align-top whitespace-nowrap">
+                        {row.charge}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="hover:bg-orange-50/40 bg-amber-50/50">
+                    <td className="py-4 px-4 md:px-5 text-gray-800 font-medium align-top">
+                      {t("Acudir puntual a la cita de devolución acordada")}
+                    </td>
+                    <td className="py-4 px-4 md:px-5 text-gray-600 align-top">
+                      {t("Tiempo de espera del equipo por tu retraso")}
+                    </td>
+                    <td className="py-4 px-4 md:px-5 align-top">
+                      <div className="font-heading font-bold text-furgocasa-orange text-lg">
+                        {t("40 € (1.ª hora) + 20 €/hora adicional")}
+                      </div>
+                      <LocalizedLink
+                        href="/tarifas#puntualidad-citas"
+                        className="inline-block mt-2 text-sm font-semibold text-furgocasa-blue hover:underline"
+                      >
+                        {t("Ver detalle en «Puntualidad en las citas»")}
+                      </LocalizedLink>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-6 text-sm text-gray-600 flex items-start gap-2">
+              <Info className="h-5 w-5 text-gray-500 shrink-0 mt-0.5" aria-hidden />
+              <span>
+                {t("Todos los suplementos incluyen IVA. El importe de limpieza interior es mínimo y puede aumentar según el estado del vehículo.")}
+              </span>
+            </p>
           </div>
         </div>
       </section>

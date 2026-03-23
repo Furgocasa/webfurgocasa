@@ -188,7 +188,84 @@ export function TarifasClient() {
         </div>
       </section>
 
-      {/* Devolución del vehículo — destacada, justo después de precios */}
+      {/* Descuentos */}
+      <section id="descuentos" className="py-24 bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark text-white relative overflow-hidden scroll-mt-20">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-furgocasa-orange/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">{t("Descuentos por duración del alquiler")}</h2>
+            <p className="text-blue-100 text-lg">{t("Cuanto más largo sea tu viaje, mejor será el precio")}</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
+            {discounts.map((discount, index) => (
+              <div key={index} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 text-center hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
+                <div className="text-4xl mb-4">{discount.icon}</div>
+                <div className="text-6xl font-heading font-bold text-white mb-4 tracking-tight drop-shadow-lg">{discount.percentage}</div>
+                <p className="text-white font-medium text-lg px-4 py-2 bg-white/10 rounded-full inline-block">{t(discount.description)}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
+            <LocalizedLink href="/reservar" className="inline-block bg-white text-furgocasa-blue font-bold text-lg py-4 px-10 rounded-full hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
+              {t("Consultar precio para mis fechas")}
+            </LocalizedLink>
+          </div>
+        </div>
+      </section>
+
+      {/* Extras y Accesorios */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">{t("Extras y accesorios")}</h2>
+            <p className="text-gray-600 text-lg">{t("Qué está incluido en el precio y qué tiene coste adicional")}</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+            <div className="bg-green-50/50 border border-green-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="bg-green-100 p-3 rounded-2xl"><CheckCircle className="h-8 w-8 text-green-600" /></div>
+                <div>
+                  <h3 className="text-2xl font-heading font-bold text-green-800">{t("Incluido sin coste")}</h3>
+                  <p className="text-green-700 text-sm">{t("Todo lo necesario para que disfrutes al máximo de tu viaje")}</p>
+                </div>
+              </div>
+              <ul className="space-y-4">
+                {includedFree.map((item) => (
+                  <li key={item} className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
+                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-gray-700 font-medium">{t(item)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-blue-50/50 border border-blue-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="bg-blue-100 p-3 rounded-2xl"><Euro className="h-8 w-8 text-furgocasa-blue" /></div>
+                <div>
+                  <h3 className="text-2xl font-heading font-bold text-furgocasa-blue">{t("Extras opcionales")}</h3>
+                  <p className="text-blue-700 text-sm">{t("Complementos adicionales para mayor comodidad")}</p>
+                </div>
+              </div>
+              <ul className="space-y-4">
+                {extrasOptional.map((item) => (
+                  <li key={item.name} className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
+                    <span className="text-gray-700 font-medium">{t(item.name)}</span>
+                    <span className="bg-furgocasa-blue/10 text-furgocasa-blue px-3 py-1 rounded-lg font-bold text-sm">{item.price} / {t(item.per)}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Devolución del vehículo — después de extras y accesorios */}
       <section id="devolucion-vehiculo" className="py-16 md:py-20 bg-gradient-to-br from-amber-50 via-orange-50/80 to-red-50/90 border-y-4 border-red-300/80 scroll-mt-20">
         <div className="container mx-auto px-4 max-w-5xl">
           <div className="rounded-3xl bg-white p-6 md:p-10 shadow-xl border-2 border-red-200 ring-1 ring-red-100">
@@ -268,83 +345,6 @@ export function TarifasClient() {
                 {t("Todos los suplementos incluyen IVA. El importe de limpieza interior es mínimo y puede aumentar según el estado del vehículo.")}
               </span>
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Descuentos */}
-      <section id="descuentos" className="py-24 bg-gradient-to-br from-furgocasa-blue to-furgocasa-blue-dark text-white relative overflow-hidden scroll-mt-20">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-furgocasa-orange/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold mb-4">{t("Descuentos por duración del alquiler")}</h2>
-            <p className="text-blue-100 text-lg">{t("Cuanto más largo sea tu viaje, mejor será el precio")}</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-16">
-            {discounts.map((discount, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 text-center hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl">
-                <div className="text-4xl mb-4">{discount.icon}</div>
-                <div className="text-6xl font-heading font-bold text-white mb-4 tracking-tight drop-shadow-lg">{discount.percentage}</div>
-                <p className="text-white font-medium text-lg px-4 py-2 bg-white/10 rounded-full inline-block">{t(discount.description)}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 text-center">
-            <LocalizedLink href="/reservar" className="inline-block bg-white text-furgocasa-blue font-bold text-lg py-4 px-10 rounded-full hover:bg-gray-100 transition-all shadow-lg hover:shadow-xl hover:-translate-y-1">
-              {t("Consultar precio para mis fechas")}
-            </LocalizedLink>
-          </div>
-        </div>
-      </section>
-
-      {/* Extras y Accesorios */}
-      <section className="py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">{t("Extras y accesorios")}</h2>
-            <p className="text-gray-600 text-lg">{t("Qué está incluido en el precio y qué tiene coste adicional")}</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-            <div className="bg-green-50/50 border border-green-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-green-100 p-3 rounded-2xl"><CheckCircle className="h-8 w-8 text-green-600" /></div>
-                <div>
-                  <h3 className="text-2xl font-heading font-bold text-green-800">{t("Incluido sin coste")}</h3>
-                  <p className="text-green-700 text-sm">{t("Todo lo necesario para que disfrutes al máximo de tu viaje")}</p>
-                </div>
-              </div>
-              <ul className="space-y-4">
-                {includedFree.map((item) => (
-                  <li key={item} className="flex items-start gap-3 bg-white p-4 rounded-xl shadow-sm">
-                    <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700 font-medium">{t(item)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            <div className="bg-blue-50/50 border border-blue-200 rounded-3xl p-8 hover:shadow-xl transition-all duration-300">
-              <div className="flex items-center gap-4 mb-8">
-                <div className="bg-blue-100 p-3 rounded-2xl"><Euro className="h-8 w-8 text-furgocasa-blue" /></div>
-                <div>
-                  <h3 className="text-2xl font-heading font-bold text-furgocasa-blue">{t("Extras opcionales")}</h3>
-                  <p className="text-blue-700 text-sm">{t("Complementos adicionales para mayor comodidad")}</p>
-                </div>
-              </div>
-              <ul className="space-y-4">
-                {extrasOptional.map((item) => (
-                  <li key={item.name} className="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm">
-                    <span className="text-gray-700 font-medium">{t(item.name)}</span>
-                    <span className="bg-furgocasa-blue/10 text-furgocasa-blue px-3 py-1 rounded-lg font-bold text-sm">{item.price} / {t(item.per)}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
           </div>
         </div>
       </section>
