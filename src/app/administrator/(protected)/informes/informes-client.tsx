@@ -41,6 +41,7 @@ import {
   isWithinInterval,
   parseISO,
   differenceInDays,
+  subDays,
 } from "date-fns";
 import { es } from "date-fns/locale";
 
@@ -62,6 +63,7 @@ interface Booking {
   pickup_date: string;
   dropoff_date: string;
   total_price: number;
+  amount_paid: number | null;
   status: string | null;
   created_at: string | null;
   customer_name: string;
@@ -105,6 +107,18 @@ const MONTHS = [
   "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
+
+const VALID_BOOKING_STATUSES = ["confirmed", "in_progress", "completed"] as const;
+
+function isValidInformesBookingStatus(
+  status: string | null | undefined
+): status is (typeof VALID_BOOKING_STATUSES)[number] {
+  return (
+    status !== null &&
+    status !== undefined &&
+    (VALID_BOOKING_STATUSES as readonly string[]).includes(status)
+  );
+}
 
 export default function InformesClient({
   vehicles,
@@ -192,14 +206,11 @@ export default function InformesClient({
     return { start: startOfYear(new Date(selectedYear, 0)), end: endOfYear(new Date(selectedYear, 0)) };
   }, [selectedYear, selectedMonth, selectedSeason, dateRange, seasons]);
 
-  // Estados válidos para informes (solo alquileres reales)
-  const VALID_STATUSES: Booking["status"][] = ["confirmed", "in_progress", "completed"];
-
   // Filtrar reservas según criterios
   const filteredBookings = useMemo(() => {
     return bookings.filter(booking => {
       // Solo incluir reservas confirmadas, en curso o completadas (alquileres reales)
-      if (!VALID_STATUSES.includes(booking.status)) return false;
+      if (!isValidInformesBookingStatus(booking.status)) return false;
       
       // Filtro por vehículos
       if (selectedVehicles.length > 0 && !selectedVehicles.includes(booking.vehicle_id)) {
@@ -225,6 +236,57 @@ export default function InformesClient({
       }
     });
   }, [bookings, selectedVehicles, getDateRange, revenueMode]);
+
+  /** Plazo: el saldo debe estar pagado como muy tarde 15 días antes del inicio del alquiler */
+  const PAYMENT_DUE_DAYS_BEFORE_PICKUP = 15;
+
+  const pendingByDueMonth = useMemo(() => {
+    const monthTotals = new Map<string, { en_plazo: number; vencido: number }>();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (const b of bookings) {
+      if (!isValidInformesBookingStatus(b.status)) continue;
+      if (selectedVehicles.length > 0 && !selectedVehicles.includes(b.vehicle_id)) {
+        continue;
+      }
+      const paid = b.amount_paid ?? 0;
+      const pending = b.total_price - paid;
+      if (pending < 0.01) continue;
+      
+      const due = subDays(parseISO(b.pickup_date), PAYMENT_DUE_DAYS_BEFORE_PICKUP);
+      const isOverdue = due < today;
+      const key = format(due, "yyyy-MM");
+      
+      const current = monthTotals.get(key) ?? { en_plazo: 0, vencido: 0 };
+      if (isOverdue) {
+        current.vencido += pending;
+      } else {
+        current.en_plazo += pending;
+      }
+      monthTotals.set(key, current);
+    }
+    
+    const keys = Array.from(monthTotals.keys()).sort();
+    const data = keys.map((ym) => {
+      const d = parseISO(`${ym}-01`);
+      const totals = monthTotals.get(ym)!;
+      return {
+        key: ym,
+        mes: format(d, "MMM yyyy", { locale: es }),
+        en_plazo: Math.round(totals.en_plazo * 100) / 100,
+        vencido: Math.round(totals.vencido * 100) / 100,
+      };
+    });
+    
+    const totalPending = keys.reduce((s, k) => {
+      const t = monthTotals.get(k)!;
+      return s + t.en_plazo + t.vencido;
+    }, 0);
+    const totalVencido = keys.reduce((s, k) => s + monthTotals.get(k)!.vencido, 0);
+    
+    return { data, totalPending, totalVencido };
+  }, [bookings, selectedVehicles]);
 
   // ============================================
   // CÁLCULOS DE MÉTRICAS
@@ -382,7 +444,7 @@ export default function InformesClient({
       vehiclesToCalculate.forEach(vehicle => {
         const vehicleBookings = bookings.filter(b => 
           b.vehicle_id === vehicle.id && 
-          VALID_STATUSES.includes(b.status) &&
+          isValidInformesBookingStatus(b.status) &&
           (selectedVehicles.length === 0 || selectedVehicles.includes(b.vehicle_id))
         );
         
@@ -511,7 +573,7 @@ export default function InformesClient({
 
         // Filtrar reservas que caen en esta temporada
         const seasonBookings = bookings.filter(b => {
-          if (!VALID_STATUSES.includes(b.status)) return false;
+          if (!isValidInformesBookingStatus(b.status)) return false;
           if (selectedVehicles.length > 0 && !selectedVehicles.includes(b.vehicle_id)) return false;
           
           const pickupDate = parseISO(b.pickup_date);
@@ -598,7 +660,7 @@ export default function InformesClient({
     // Obtener años con datos reales
     const yearsWithData = new Set<number>();
     bookings.forEach(b => {
-      if (VALID_STATUSES.includes(b.status)) {
+      if (isValidInformesBookingStatus(b.status)) {
         yearsWithData.add(new Date(b.pickup_date).getFullYear());
       }
     });
@@ -635,7 +697,7 @@ export default function InformesClient({
       
       // Procesar reservas del año
       bookings.forEach(booking => {
-        if (!VALID_STATUSES.includes(booking.status)) return;
+        if (!isValidInformesBookingStatus(booking.status)) return;
         
         const pickupDate = parseISO(booking.pickup_date);
         const dropoffDate = parseISO(booking.dropoff_date);
@@ -1467,6 +1529,88 @@ export default function InformesClient({
             : '💡 Ingresos distribuidos proporcionalmente según los días reales del alquiler en cada mes'
           }
         </p>
+      </div>
+
+      {/* Vencimiento de cobros pendientes (15 días antes del pickup) */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="mb-4">
+          <h3 className="text-lg font-bold text-gray-900">
+            Cobro pendiente por mes de vencimiento
+          </h3>
+          <p className="text-sm text-gray-500 mt-1">
+            Suma del saldo pendiente (<span className="font-medium text-gray-700">total − pagado</span>)
+            agrupada por el mes en el que vence el plazo de pago: como máximo{" "}
+            {PAYMENT_DUE_DAYS_BEFORE_PICKUP} días antes del inicio de cada alquiler.
+            {selectedVehicles.length > 0 && (
+              <span className="block mt-1 text-furgocasa-orange">
+                Filtrado por los vehículos seleccionados arriba.
+              </span>
+            )}
+          </p>
+          {pendingByDueMonth.data.length > 0 && (
+            <div className="flex flex-wrap gap-4 mt-3">
+              <div className="bg-gray-50 px-3 py-2 rounded-lg border border-gray-100">
+                <p className="text-xs text-gray-500 uppercase font-semibold">Total Pendiente</p>
+                <p className="text-lg font-bold text-gray-900">{formatPrice(pendingByDueMonth.totalPending)}</p>
+              </div>
+              <div className="bg-red-50 px-3 py-2 rounded-lg border border-red-100">
+                <p className="text-xs text-red-600 uppercase font-semibold">Total Vencido</p>
+                <p className="text-lg font-bold text-red-700">{formatPrice(pendingByDueMonth.totalVencido)}</p>
+              </div>
+            </div>
+          )}
+        </div>
+        {pendingByDueMonth.data.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p>No hay saldo pendiente en alquileres confirmados, en curso o completados.</p>
+          </div>
+        ) : (
+          <div className="h-80">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={pendingByDueMonth.data} margin={{ top: 8, right: 8, left: 8, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                <XAxis
+                  dataKey="mes"
+                  tick={{ fill: "#6B7280", fontSize: 11 }}
+                  interval={pendingByDueMonth.data.length > 14 ? "preserveStartEnd" : 0}
+                  angle={pendingByDueMonth.data.length > 10 ? -35 : 0}
+                  textAnchor={pendingByDueMonth.data.length > 10 ? "end" : "middle"}
+                  height={pendingByDueMonth.data.length > 10 ? 56 : 32}
+                />
+                <YAxis
+                  tick={{ fill: "#6B7280", fontSize: 12 }}
+                  tickFormatter={(v) =>
+                    v >= 1000 ? `${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k` : `${v}`
+                  }
+                />
+                <Tooltip
+                  formatter={(value, name) => {
+                    const label = name === 'vencido' ? 'Vencido' : 'En plazo';
+                    return [formatPrice(value as number), label];
+                  }}
+                  labelFormatter={(_, payload) =>
+                    payload?.[0]?.payload?.mes
+                      ? `Vence en: ${payload[0].payload.mes}`
+                      : ""
+                  }
+                  contentStyle={{ borderRadius: "8px", border: "1px solid #E5E7EB" }}
+                />
+                <Legend formatter={(value) => value === 'vencido' ? 'Vencido' : 'En plazo'} />
+                <Bar
+                  dataKey="vencido"
+                  stackId="a"
+                  fill="#EF4444" // red-500
+                />
+                <Bar
+                  dataKey="en_plazo"
+                  stackId="a"
+                  fill="#8B5CF6" // violet-500
+                  radius={[4, 4, 0, 0]}
+                />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/* Info adicional */}

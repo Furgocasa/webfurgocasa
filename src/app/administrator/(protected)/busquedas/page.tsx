@@ -2,6 +2,16 @@
 
 import React, { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer,
+  Cell
+} from "recharts";
 import { 
   TrendingUp, 
   Search, 
@@ -840,7 +850,7 @@ export default function SearchAnalyticsPage() {
         <h2 className="text-xl font-bold text-gray-900 mb-4">
           Fechas Más Buscadas (Top 20)
         </h2>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-gray-600 mb-6">
           Muestra qué periodos quieren alquilar los clientes (fechas de recogida/devolución más buscadas)
         </p>
 
@@ -849,59 +859,120 @@ export default function SearchAnalyticsPage() {
             <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <SortableTableHeader label="Recogida" sortKey="pickup_date" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                  <SortableTableHeader label="Devolución" sortKey="dropoff_date" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                  <SortableTableHeader label="Días" sortKey="rental_days" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                  <SortableTableHeader label="Búsquedas" sortKey="search_count" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                  <SortableTableHeader label="Reservas" sortKey="bookings_count" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                  <SortableTableHeader label="Conv. %" sortKey="conversion_rate" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                  <SortableTableHeader label="Temporada" sortKey="season" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                  <SortableTableHeader label="Precio medio" sortKey="avg_price" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {sortedDates.items.map((date, index) => (
-                  <tr key={index} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {formatDateWithYear(date.pickup_date)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
-                      {formatDateWithYear(date.dropoff_date)}
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {date.rental_days}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-blue-600">
-                      {date.search_count}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-green-600">
-                      {date.bookings_count}
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
-                        parseFloat(date.conversion_rate) >= 30 
-                          ? "bg-green-100 text-green-800"
-                          : parseFloat(date.conversion_rate) >= 15
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                      }`}>
-                        {date.conversion_rate}%
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {date.season || "N/A"}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-semibold text-gray-900">
-                      €{date.avg_price}
-                    </td>
+          <div className="space-y-8">
+            {/* Gráfico de barras horizontal para los top 10 */}
+            {topDates?.topDates && topDates.topDates.length > 0 && (
+              <div className="h-96 w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={topDates.topDates.slice(0, 10).map(d => ({
+                      name: `${formatDate(d.pickup_date)} - ${formatDate(d.dropoff_date)} (${d.rental_days}d)`,
+                      busquedas: d.search_count,
+                      reservas: d.bookings_count,
+                      conversion: parseFloat(d.conversion_rate)
+                    }))}
+                    layout="vertical"
+                    margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={true} stroke="#f3f4f6" />
+                    <XAxis type="number" hide />
+                    <YAxis 
+                      dataKey="name" 
+                      type="category" 
+                      axisLine={false} 
+                      tickLine={false}
+                      tick={{ fontSize: 12, fill: '#4B5563' }}
+                      width={140}
+                    />
+                    <RechartsTooltip 
+                      formatter={(value: any, name: string) => {
+                        if (name === 'busquedas') return [value, 'Búsquedas'];
+                        if (name === 'reservas') return [value, 'Reservas'];
+                        if (name === 'conversion') return [`${value}%`, 'Conversión'];
+                        return [value, name];
+                      }}
+                      contentStyle={{ borderRadius: '8px', border: '1px solid #E5E7EB', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                      cursor={{ fill: '#F3F4F6' }}
+                    />
+                    <Bar dataKey="busquedas" name="busquedas" radius={[0, 4, 4, 0]} barSize={24}>
+                      {
+                        topDates.topDates.slice(0, 10).map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index < 3 ? '#F97316' : '#3B82F6'} />
+                        ))
+                      }
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <SortableTableHeader label="Fechas" sortKey="pickup_date" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
+                    <SortableTableHeader label="Días" sortKey="rental_days" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
+                    <SortableTableHeader label="Búsquedas" sortKey="search_count" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
+                    <SortableTableHeader label="Reservas" sortKey="bookings_count" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
+                    <SortableTableHeader label="Conv. %" sortKey="conversion_rate" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
+                    <SortableTableHeader label="Temporada" sortKey="season" currentSort={sortedDates.sortConfig} onSort={sortedDates.requestSort} />
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {sortedDates.items.map((date, index) => (
+                    <tr key={index} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3 text-sm text-gray-900 font-medium whitespace-nowrap">
+                        {formatDateWithYear(date.pickup_date)} <span className="text-gray-400 mx-1">→</span> {formatDateWithYear(date.dropoff_date)}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {date.rental_days} d
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-blue-600">
+                        <div className="flex items-center gap-2">
+                          <div className="w-16 h-1.5 bg-blue-100 rounded-full overflow-hidden hidden sm:block">
+                            <div 
+                              className="h-full bg-blue-500 rounded-full" 
+                              style={{ width: `${Math.min(100, (date.search_count / (topDates?.topDates[0]?.search_count || 1)) * 100)}%` }} 
+                            />
+                          </div>
+                          {date.search_count}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm font-semibold text-green-600">
+                        {date.bookings_count}
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${
+                          parseFloat(date.conversion_rate) >= 30 
+                            ? "bg-green-100 text-green-800"
+                            : parseFloat(date.conversion_rate) >= 15
+                            ? "bg-yellow-100 text-yellow-800"
+                            : "bg-red-100 text-red-800"
+                        }`}>
+                          {date.conversion_rate}%
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        <span className="inline-flex items-center gap-1.5">
+                          {date.season ? (
+                            <>
+                              <span className={`w-2 h-2 rounded-full ${
+                                date.season.toLowerCase().includes('alta') ? 'bg-red-500' :
+                                date.season.toLowerCase().includes('media') ? 'bg-yellow-500' :
+                                'bg-blue-500'
+                              }`} />
+                              {date.season}
+                            </>
+                          ) : (
+                            <span className="text-gray-400">N/A</span>
+                          )}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

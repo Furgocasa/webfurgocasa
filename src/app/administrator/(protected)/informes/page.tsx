@@ -29,6 +29,7 @@ async function getInformesData() {
       pickup_date,
       dropoff_date,
       total_price,
+      amount_paid,
       status,
       created_at,
       customer_name,
