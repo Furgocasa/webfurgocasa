@@ -2381,56 +2381,170 @@ export const staticTranslations = {
   "Este seguro no cubre daños ocasionados cuando el vehículo no está en circulación.": {
     es: "Este seguro no cubre daños ocasionados cuando el vehículo no está en circulación.",
     en: "This insurance does not cover damage caused when the vehicle is not in circulation.",
-    fr: "This insurance does not cover damage caused when the vehicle is not in circulation.",
-    de: "This insurance does not cover damage caused when the vehicle is not in circulation."
+    fr: "Cette assurance ne couvre pas les dommages survenus lorsque le véhicule n'est pas en circulation.",
+    de: "Diese Versicherung deckt keine Schäden ab, die entstehen, wenn das Fahrzeug nicht im Verkehr ist."
+  },
+  "Devolución del vehículo: obligatorio": {
+    es: "Devolución del vehículo: obligatorio",
+    en: "Vehicle return: mandatory requirements",
+    fr: "Restitution du véhicule : obligations",
+    de: "Fahrzeugrückgabe: verbindliche Anforderungen"
+  },
+  "Al devolver la autocaravana debes cumplir cada punto. Si no, se factura el suplemento indicado (IVA incluido).": {
+    es: "Al devolver la autocaravana debes cumplir cada punto. Si no, se factura el suplemento indicado (IVA incluido).",
+    en: "When you return the motorhome you must meet each point below. Otherwise, the stated supplement will be charged (VAT included).",
+    fr: "À la restitution du camping-car, chaque point ci-dessous doit être respecté. Sinon, le supplément indiqué sera facturé (TVA incluse).",
+    de: "Bei der Rückgabe des Wohnmobils müssen alle unten genannten Punkte erfüllt sein. Andernfalls wird der angegebene Zuschlag berechnet (inkl. MwSt.)."
+  },
+  "Lo que debes dejar listo": {
+    es: "Lo que debes dejar listo",
+    en: "What you must leave ready",
+    fr: "Ce que vous devez laisser en ordre",
+    de: "Was Sie ordnungsgemäß hinterlassen müssen"
+  },
+  "Qué se te cobrará si no": {
+    es: "Qué se te cobrará si no",
+    en: "What you will be charged if not",
+    fr: "Ce qui sera facturé en cas de non-respect",
+    de: "Was berechnet wird, falls nicht erfüllt"
+  },
+  "Interior limpio, sin basura y con cocina y superficies recogidas": {
+    es: "Interior limpio, sin basura y con cocina y superficies recogidas",
+    en: "Clean interior, no rubbish, kitchen and surfaces tidied",
+    fr: "Intérieur propre, sans déchets, cuisine et surfaces rangées",
+    de: "Sauberer Innenraum, kein Müll, Küche und Oberflächen aufgeräumt"
+  },
+  "Limpieza interior necesaria por nuestro equipo": {
+    es: "Limpieza interior necesaria por nuestro equipo",
+    en: "Interior cleaning required by our staff",
+    fr: "Nettoyage intérieur nécessaire par nos équipes",
+    de: "Innenreinigung durch unser Team erforderlich"
+  },
+  "Aguas grises vacías": {
+    es: "Aguas grises vacías",
+    en: "Grey water empty",
+    fr: "Eaux grises vides",
+    de: "Grauwasser leer"
+  },
+  "WC químico vacío": {
+    es: "WC químico vacío",
+    en: "Chemical toilet empty",
+    fr: "WC chimique vide",
+    de: "Chemie-WC leer"
+  },
+  "En hora": {
+    es: "En hora",
+    en: "On time",
+    fr: "À l'heure",
+    de: "Pünktlich"
+  },
+  "Depósito de aguas grises totalmente vacío": {
+    es: "Depósito de aguas grises totalmente vacío",
+    en: "Grey water tank completely empty",
+    fr: "Réservoir des eaux grises entièrement vide",
+    de: "Grauwassertank vollständig leer"
+  },
+  "Vaciado del depósito de aguas grises por Furgocasa": {
+    es: "Vaciado del depósito de aguas grises por Furgocasa",
+    en: "Emptying the grey water tank by Furgocasa",
+    fr: "Vidange du réservoir des eaux grises par Furgocasa",
+    de: "Entleerung des Grauwassertanks durch Furgocasa"
+  },
+  "WC químico vacío y en estado aceptable": {
+    es: "WC químico vacío y en estado aceptable",
+    en: "Chemical toilet empty and in acceptable condition",
+    fr: "WC chimique vide et en état acceptable",
+    de: "Chemie-WC leer und in vertretbarem Zustand"
+  },
+  "Vaciado y servicio del WC químico por Furgocasa": {
+    es: "Vaciado y servicio del WC químico por Furgocasa",
+    en: "Emptying and servicing of the chemical toilet by Furgocasa",
+    fr: "Vidange et service du WC chimique par Furgocasa",
+    de: "Entleerung und Service des Chemie-WCs durch Furgocasa"
+  },
+  "Acudir puntual a la cita de devolución acordada": {
+    es: "Acudir puntual a la cita de devolución acordada",
+    en: "Arrive on time for the agreed return appointment",
+    fr: "Se présenter à l'heure au rendez-vous de restitution convenu",
+    de: "Pünktlich zum vereinbarten Rückgabetermin erscheinen"
+  },
+  "Tiempo de espera del equipo por tu retraso": {
+    es: "Tiempo de espera del equipo por tu retraso",
+    en: "Staff waiting time due to your delay",
+    fr: "Temps d'attente de l'équipe en raison de votre retard",
+    de: "Wartezeit des Teams wegen Ihrer Verspätung"
+  },
+  "40 € (1.ª hora) + 20 €/hora adicional": {
+    es: "40 € (1.ª hora) + 20 €/hora adicional",
+    en: "€40 (first hour) + €20 per additional hour",
+    fr: "40 € (1re heure) + 20 € par heure supplémentaire",
+    de: "40 € (erste Stunde) + 20 € pro weitere Stunde"
+  },
+  "Ver detalle en «Puntualidad en las citas»": {
+    es: "Ver detalle en «Puntualidad en las citas»",
+    en: "See details under “Punctuality for appointments”",
+    fr: "Voir le détail sous « Ponctualité aux rendez-vous »",
+    de: "Details unter „Pünktlichkeit bei Terminen“"
+  },
+  "Todos los suplementos incluyen IVA. El importe de limpieza interior es mínimo y puede aumentar según el estado del vehículo.": {
+    es: "Todos los suplementos incluyen IVA. El importe de limpieza interior es mínimo y puede aumentar según el estado del vehículo.",
+    en: "All supplements include VAT. The interior cleaning charge is a minimum and may increase depending on the vehicle's condition.",
+    fr: "Tous les suppléments incluent la TVA. Le montant pour le nettoyage intérieur est un minimum et peut augmenter selon l'état du véhicule.",
+    de: "Alle Zuschläge inkl. MwSt. Die Innenreinigung ist ein Mindestbetrag und kann je nach Fahrzeugzustand höher ausfallen."
+  },
+  "Importe (IVA incl.)": {
+    es: "Importe (IVA incl.)",
+    en: "Amount (incl. VAT)",
+    fr: "Montant (TVA incl.)",
+    de: "Betrag (inkl. MwSt.)"
   },
   "Devolución del vehículo y puntualidad": {
     es: "Devolución del vehículo y puntualidad",
     en: "Vehicle return and punctuality",
-    fr: "Vehicle return and punctuality",
-    de: "Vehicle return and punctuality"
+    fr: "Restitution du véhicule et ponctualité",
+    de: "Fahrzeugrückgabe und Pünktlichkeit"
   },
   "Condiciones para la devolución y penalizaciones por retrasos": {
     es: "Condiciones para la devolución y penalizaciones por retrasos",
     en: "Return conditions and penalties for delays",
-    fr: "Return conditions and penalties for delays",
-    de: "Return conditions and penalties for delays"
+    fr: "Conditions de restitution et pénalités pour retards",
+    de: "Rückgabebedingungen und Gebühren bei Verspätung"
   },
   "Condiciones de devolución": {
     es: "Condiciones de devolución",
     en: "Return conditions",
-    fr: "Return conditions",
-    de: "Return conditions"
+    fr: "Conditions de restitution",
+    de: "Rückgabebedingungen"
   },
   "Las devoluciones deberán realizarse siempre en la hora acordada dentro del horario fijado por FURGOCASA. No se pueden realizar devoluciones fuera del horario establecido.": {
     es: "Las devoluciones deberán realizarse siempre en la hora acordada dentro del horario fijado por FURGOCASA. No se pueden realizar devoluciones fuera del horario establecido.",
     en: "Returns must always be made at the agreed time within the schedule set by FURGOCASA. Returns cannot be made outside the established schedule.",
-    fr: "Returns must always be made at the agreed time within the schedule set by FURGOCASA. Returns cannot be made outside the established schedule.",
-    de: "Returns must always be made at the agreed time within the schedule set by FURGOCASA. Returns cannot be made outside the established schedule."
+    fr: "Les restitutions doivent toujours avoir lieu à l'heure convenue dans les horaires fixés par FURGOCASA. Aucune restitution en dehors des horaires établis.",
+    de: "Rückgaben müssen stets zur vereinbarten Zeit innerhalb der von FURGOCASA festgelegten Öffnungszeiten erfolgen. Rückgaben außerhalb dieser Zeiten sind nicht möglich."
   },
   "El vehículo debe estar:": {
     es: "El vehículo debe estar:",
     en: "The vehicle must be:",
-    fr: "The vehicle must be:",
-    de: "The vehicle must be:"
+    fr: "Le véhicule doit être :",
+    de: "Das Fahrzeug muss sein:"
   },
   "Limpio interiormente": {
     es: "Limpio interiormente",
     en: "Clean inside",
-    fr: "Clean inside",
-    de: "Clean inside"
+    fr: "Propre à l'intérieur",
+    de: "Innen sauber"
   },
   "Aguas grises vaciadas": {
     es: "Aguas grises vaciadas",
     en: "Grey water emptied",
-    fr: "Grey water emptied",
-    de: "Grey water emptied"
+    fr: "Eaux grises vidangées",
+    de: "Grauwasser entleert"
   },
   "WC químico vaciado": {
     es: "WC químico vaciado",
     en: "Chemical toilet emptied",
-    fr: "Chemical toilet emptied",
-    de: "Chemical toilet emptied"
+    fr: "WC chimique vidé",
+    de: "Chemie-WC entleert"
   },
   "En horario acordado": {
     es: "En horario acordado",
@@ -2453,8 +2567,8 @@ export const staticTranslations = {
   "Suplementos por incumplimiento": {
     es: "Suplementos por incumplimiento",
     en: "Supplements for non-compliance",
-    fr: "Supplements for non-compliance",
-    de: "Supplements for non-compliance"
+    fr: "Suppléments en cas de non-respect",
+    de: "Zuschläge bei Nichteinhaltung"
   },
   "Si el vehículo no cumple las condiciones de devolución, se aplicarán estos cargos:": {
     es: "Si el vehículo no cumple las condiciones de devolución, se aplicarán estos cargos:",

@@ -45,10 +45,22 @@ const cancellationPolicy = [
   { period: "Menos de 7 días antes", charge: "75% del total", color: "text-red-600", bg: "bg-red-50", border: "border-red-200" },
 ];
 
-const returnFees = [
-  { service: "Vaciado aguas grises", price: "20,00 €", note: "IVA incluido" },
-  { service: "Vaciado WC químico", price: "70,00 €", note: "IVA incluido" },
-  { service: "Limpieza interior", price: "Desde 120,00 €", note: "IVA incluido" },
+const vehicleReturnTableRows: { requirement: string; ifNot: string; charge: string }[] = [
+  {
+    requirement: "Interior limpio, sin basura y con cocina y superficies recogidas",
+    ifNot: "Limpieza interior necesaria por nuestro equipo",
+    charge: "≥ 120,00 €",
+  },
+  {
+    requirement: "Depósito de aguas grises totalmente vacío",
+    ifNot: "Vaciado del depósito de aguas grises por Furgocasa",
+    charge: "20,00 €",
+  },
+  {
+    requirement: "WC químico vacío y en estado aceptable",
+    ifNot: "Vaciado y servicio del WC químico por Furgocasa",
+    charge: "70,00 €",
+  },
 ];
 
 export function TarifasClient() {
@@ -172,6 +184,90 @@ export function TarifasClient() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Devolución del vehículo — destacada, justo después de precios */}
+      <section id="devolucion-vehiculo" className="py-16 md:py-20 bg-gradient-to-br from-amber-50 via-orange-50/80 to-red-50/90 border-y-4 border-red-300/80 scroll-mt-20">
+        <div className="container mx-auto px-4 max-w-5xl">
+          <div className="rounded-3xl bg-white p-6 md:p-10 shadow-xl border-2 border-red-200 ring-1 ring-red-100">
+            <div className="flex flex-col sm:flex-row gap-4 sm:items-start mb-6">
+              <div className="flex items-start gap-4">
+                <div className="rounded-2xl bg-red-100 p-3 md:p-4 shrink-0">
+                  <AlertCircle className="h-8 w-8 md:h-10 md:w-10 text-red-700" strokeWidth={2} aria-hidden />
+                </div>
+                <div>
+                  <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-2">
+                    {t("Devolución del vehículo: obligatorio")}
+                  </h2>
+                  <p className="text-gray-700 text-base md:text-lg leading-relaxed font-medium">
+                    {t("Al devolver la autocaravana debes cumplir cada punto. Si no, se factura el suplemento indicado (IVA incluido).")}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 mb-8">
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("Limpio interiormente")}
+              </span>
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("Aguas grises vacías")}
+              </span>
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("WC químico vacío")}
+              </span>
+              <span className="px-3 py-1.5 bg-red-50 border border-red-200 rounded-lg text-sm font-semibold text-red-900">
+                {t("En hora")}
+              </span>
+            </div>
+            <div className="overflow-x-auto rounded-2xl border border-gray-200">
+              <table className="w-full text-left text-sm md:text-base min-w-[640px]">
+                <thead>
+                  <tr className="bg-gray-900 text-white">
+                    <th className="py-3 px-4 md:px-5 font-heading font-bold">{t("Lo que debes dejar listo")}</th>
+                    <th className="py-3 px-4 md:px-5 font-heading font-bold">{t("Qué se te cobrará si no")}</th>
+                    <th className="py-3 px-4 md:px-5 font-heading font-bold whitespace-nowrap">{t("Importe (IVA incl.)")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {vehicleReturnTableRows.map((row, i) => (
+                    <tr key={i} className="hover:bg-orange-50/40">
+                      <td className="py-4 px-4 md:px-5 text-gray-800 font-medium align-top">{t(row.requirement)}</td>
+                      <td className="py-4 px-4 md:px-5 text-gray-600 align-top">{t(row.ifNot)}</td>
+                      <td className="py-4 px-4 md:px-5 font-heading font-bold text-furgocasa-orange text-lg align-top whitespace-nowrap">
+                        {row.charge}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="hover:bg-orange-50/40 bg-amber-50/50">
+                    <td className="py-4 px-4 md:px-5 text-gray-800 font-medium align-top">
+                      {t("Acudir puntual a la cita de devolución acordada")}
+                    </td>
+                    <td className="py-4 px-4 md:px-5 text-gray-600 align-top">
+                      {t("Tiempo de espera del equipo por tu retraso")}
+                    </td>
+                    <td className="py-4 px-4 md:px-5 align-top">
+                      <div className="font-heading font-bold text-furgocasa-orange text-lg">
+                        {t("40 € (1.ª hora) + 20 €/hora adicional")}
+                      </div>
+                      <LocalizedLink
+                        href="/tarifas#puntualidad-citas"
+                        className="inline-block mt-2 text-sm font-semibold text-furgocasa-blue hover:underline"
+                      >
+                        {t("Ver detalle en «Puntualidad en las citas»")}
+                      </LocalizedLink>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p className="mt-6 text-sm text-gray-600 flex items-start gap-2">
+              <Info className="h-5 w-5 text-gray-500 shrink-0 mt-0.5" aria-hidden />
+              <span>
+                {t("Todos los suplementos incluyen IVA. El importe de limpieza interior es mínimo y puede aumentar según el estado del vehículo.")}
+              </span>
+            </p>
           </div>
         </div>
       </section>
@@ -474,10 +570,10 @@ export function TarifasClient() {
         </div>
       </section>
 
-      {/* Seguro y Devolución */}
+      {/* Seguro a todo riesgo */}
       <section className="py-24 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div className="bg-white rounded-3xl p-10 shadow-lg">
               <h2 className="text-2xl font-heading font-bold text-gray-900 mb-8 flex items-center gap-3"><Shield className="h-8 w-8 text-furgocasa-blue" />{t("Seguro a todo riesgo")}</h2>
               <div className="mb-8 text-center p-6 bg-blue-50 rounded-2xl border border-blue-100">
@@ -488,29 +584,10 @@ export function TarifasClient() {
                 <li className="flex items-start gap-3"><CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /><span>{t("Cobertura a todo riesgo incluida")}</span></li>
                 <li className="flex items-start gap-3"><CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /><span>{t("Si el daño no alcanza 900€, asumes el coste de reparación")}</span></li>
                 <li className="flex items-start gap-3"><CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /><span>{t("Si supera 900€, ese es el máximo a pagar")}</span></li>
+                <li className="flex items-start gap-3"><CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0 mt-0.5" /><span>{t("Franquicia independiente por cada accidente")}</span></li>
               </ul>
-            </div>
-
-            <div className="space-y-8">
-              <div className="bg-white rounded-3xl p-10 shadow-lg">
-                <h2 className="text-2xl font-heading font-bold text-gray-900 mb-6 flex items-center gap-3"><RefreshCw className="h-8 w-8 text-furgocasa-orange" />{t("Devolución")}</h2>
-                <p className="text-gray-600 mb-6 font-medium">{t("El vehículo debe devolverse:")}</p>
-                <div className="flex flex-wrap gap-3">
-                  <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-700 font-medium">{t("Limpio interiormente")}</span>
-                  <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-700 font-medium">{t("Aguas grises vacías")}</span>
-                  <span className="px-3 py-1 bg-gray-100 rounded-lg text-sm text-gray-700 font-medium">{t("WC químico vacío")}</span>
-                </div>
-                <div className="mt-8 pt-8 border-t border-gray-100">
-                  <h4 className="font-bold text-gray-900 mb-4">{t("Suplementos por incumplimiento")}</h4>
-                  <div className="space-y-3">
-                    {returnFees.map((fee, i) => (
-                      <div key={i} className="flex justify-between items-center text-sm">
-                        <span className="text-gray-600">{fee.service}</span>
-                        <span className="font-bold text-orange-600">{fee.price}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+              <div className="mt-8 p-4 bg-red-50 text-red-800 text-sm rounded-xl">
+                <strong>{t("Importante:")}</strong> {t("Este seguro no cubre daños ocasionados cuando el vehículo no está en circulación.")}
               </div>
             </div>
           </div>
