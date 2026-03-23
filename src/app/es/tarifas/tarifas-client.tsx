@@ -238,7 +238,7 @@ export function TarifasClient() {
                 className="bg-white/10 backdrop-blur-md border border-white/20 rounded-3xl p-8 text-center hover:bg-white/20 hover:scale-105 transition-all duration-300 shadow-xl"
               >
                 <div className="text-4xl mb-4">{discount.icon}</div>
-                <div className="text-6xl font-heading font-bold text-white mb-4 tracking-tight drop-shadow-lg">{discount.percentage}</div>
+                <div className="text-6xl font-heading font-bold text-white mb-4 tracking-tight drop-shadow-lg">{t(discount.percentage)}</div>
                 <p className="text-white font-medium text-lg px-4 py-2 bg-white/10 rounded-full inline-block">{t(discount.description)}</p>
               </div>
             ))}
@@ -470,15 +470,15 @@ export function TarifasClient() {
             <div className="flex flex-wrap justify-center gap-6 mt-8">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-white border-2 border-gray-300 rounded"></div>
-                <span className="text-sm font-medium text-gray-700">Temporada Baja</span>
+                <span className="text-sm font-medium text-gray-700">{t("Temporada Baja")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-orange-200 border-2 border-orange-300 rounded"></div>
-                <span className="text-sm font-medium text-gray-700">Temporada Media</span>
+                <span className="text-sm font-medium text-gray-700">{t("Temporada Media")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 bg-red-200 border-2 border-red-300 rounded"></div>
-                <span className="text-sm font-medium text-gray-700">Temporada Alta</span>
+                <span className="text-sm font-medium text-gray-700">{t("Temporada Alta")}</span>
               </div>
             </div>
           </div>
@@ -676,8 +676,8 @@ export function TarifasClient() {
             <div className="grid md:grid-cols-4 gap-6 mb-12">
               {cancellationPolicy.map((item, index) => (
                 <div key={index} className={`rounded-2xl p-8 text-center shadow-lg border-t-8 ${item.border} bg-white`}>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 h-10 flex items-center justify-center">{item.period}</p>
-                  <p className={`text-3xl font-heading font-bold ${item.color}`}>{item.charge}</p>
+                  <p className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4 h-10 flex items-center justify-center">{t(item.period)}</p>
+                  <p className={`text-3xl font-heading font-bold ${item.color}`}>{t(item.charge)}</p>
                 </div>
               ))}
             </div>

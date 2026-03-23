@@ -2498,6 +2498,90 @@ export const staticTranslations = {
     fr: "Montant (TVA incl.)",
     de: "Betrag (inkl. MwSt.)"
   },
+  "Más de 60 días antes": {
+    es: "Más de 60 días antes",
+    en: "More than 60 days before",
+    fr: "Plus de 60 jours avant",
+    de: "Mehr als 60 Tage vorher"
+  },
+  "Entre 59 y 16 días antes": {
+    es: "Entre 59 y 16 días antes",
+    en: "Between 59 and 16 days before",
+    fr: "Entre 59 et 16 jours avant",
+    de: "Zwischen 59 und 16 Tagen vorher"
+  },
+  "Entre 15 y 8 días antes": {
+    es: "Entre 15 y 8 días antes",
+    en: "Between 15 and 8 days before",
+    fr: "Entre 15 et 8 jours avant",
+    de: "Zwischen 15 und 8 Tagen vorher"
+  },
+  "Menos de 7 días antes": {
+    es: "Menos de 7 días antes",
+    en: "Less than 7 days before",
+    fr: "Moins de 7 jours avant",
+    de: "Weniger als 7 Tage vorher"
+  },
+  "GRATIS": {
+    es: "GRATIS",
+    en: "FREE",
+    fr: "GRATUIT",
+    de: "KOSTENLOS"
+  },
+  "10% del total": {
+    es: "10% del total",
+    en: "10% of total",
+    fr: "10 % du total",
+    de: "10 % der Gesamtsumme"
+  },
+  "50% del total": {
+    es: "50% del total",
+    en: "50% of total",
+    fr: "50 % du total",
+    de: "50 % der Gesamtsumme"
+  },
+  "75% del total": {
+    es: "75% del total",
+    en: "75% of total",
+    fr: "75 % du total",
+    de: "75 % der Gesamtsumme"
+  },
+  "hasta -10%": {
+    es: "hasta -10%",
+    en: "up to -10%",
+    fr: "jusqu'à -10 %",
+    de: "bis zu -10 %"
+  },
+  "hasta -20%": {
+    es: "hasta -20%",
+    en: "up to -20%",
+    fr: "jusqu'à -20 %",
+    de: "bis zu -20 %"
+  },
+  "hasta -30%": {
+    es: "hasta -30%",
+    en: "up to -30%",
+    fr: "jusqu'à -30 %",
+    de: "bis zu -30 %"
+  },
+  "Alquileres de 7 días o más (Temp. Baja)": {
+    es: "Alquileres de 7 días o más (Temp. Baja)",
+    en: "Rentals of 7+ days (low season)",
+    fr: "Locations de 7 jours ou plus (basse saison)",
+    de: "Miete ab 7 Tagen (Nebensaison)"
+  },
+  "Alquileres de 14 días o más (Temp. Baja)": {
+    es: "Alquileres de 14 días o más (Temp. Baja)",
+    en: "Rentals of 14+ days (low season)",
+    fr: "Locations de 14 jours ou plus (basse saison)",
+    de: "Miete ab 14 Tagen (Nebensaison)"
+  },
+  "Alquileres de 21 días o más (Temp. Baja)": {
+    es: "Alquileres de 21 días o más (Temp. Baja)",
+    en: "Rentals of 21+ days (low season)",
+    fr: "Locations de 21 jours ou plus (basse saison)",
+    de: "Miete ab 21 Tagen (Nebensaison)"
+  },
   "Devolución del vehículo y puntualidad": {
     es: "Devolución del vehículo y puntualidad",
     en: "Vehicle return and punctuality",

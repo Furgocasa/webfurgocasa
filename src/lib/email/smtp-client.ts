@@ -35,7 +35,7 @@ export function getSmtpTransporter(): Transporter {
       // Configuración adicional para mejor compatibilidad
       tls: {
         // No fallar en certificados autofirmados (útil para algunos servidores)
-        rejectUnauthorized: true,
+        rejectUnauthorized: process.env.NODE_ENV === 'production',
       },
     });
 

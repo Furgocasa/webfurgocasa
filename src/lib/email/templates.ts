@@ -710,3 +710,198 @@ export function getCompanyNotificationTemplate(
       return getBookingCreatedTemplate(data);
   }
 }
+
+/* ───────────────────────────────────────────────────────────────────
+ *  Recordatorio de devolución (se envía la víspera del dropoff)
+ * ─────────────────────────────────────────────────────────────────── */
+
+export interface ReturnReminderData {
+  customerFirstName: string;
+  bookingNumber: string;
+  vehicleName: string;
+  dropoffDate: string;
+  dropoffTime: string;
+  dropoffLocation: string;
+  dropoffLocationAddress?: string;
+}
+
+export function getReturnReminderTemplate(data: ReturnReminderData): string {
+
+  const thStyle = 'padding: 10px 8px; font-size: 11px; font-weight: bold; color: #6b7280; text-transform: uppercase; border-bottom: 2px solid #063971; text-align: left;';
+  const tdBase  = 'padding: 10px 8px; font-size: 13px; border-bottom: 1px solid #e5e7eb; vertical-align: top;';
+
+  const penaltyRow = (
+    requirement: string,
+    breach: string,
+    amount: string,
+  ) => `
+    <tr>
+      <td style="${tdBase} color: #111827;">${requirement}</td>
+      <td style="${tdBase} color: #6b7280;">${breach}</td>
+      <td style="${tdBase} color: #dc2626; font-weight: 600; text-align: right; white-space: nowrap;">${amount}</td>
+    </tr>
+  `;
+
+  /* Chips como celdas de tabla inline para Outlook */
+  const chipCell = (label: string) => `
+    <td style="padding: 3px;">
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+        <tr>
+          <td style="background-color: #dbeafe; color: #063971; font-size: 12px; font-weight: 600; padding: 5px 12px; mso-padding-alt: 5px 12px;">
+            ${label}
+          </td>
+        </tr>
+      </table>
+    </td>
+  `;
+
+  const content = `
+    <!-- Encabezado visual -->
+    <tr>
+      <td style="padding: 30px 20px 20px 20px;">
+        <h2 style="margin: 0 0 15px 0; color: #111827; font-size: 20px;">
+          Mañana devuelves tu camper
+        </h2>
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">
+          Hola <strong>${data.customerFirstName}</strong>,
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6;">
+          Tu alquiler de la <strong>${data.vehicleName}</strong> termina mañana.
+          Te recordamos la hora, el lugar de entrega y las condiciones de
+          devolución para que todo vaya perfecto y <strong>no se aplique
+          ningún suplemento</strong>.
+        </p>
+      </td>
+    </tr>
+
+    <!-- Datos de devolución -->
+    ${sectionTitle('Tu devolución')}
+    ${detailsTable(`
+      ${tableRow('Reserva', data.bookingNumber)}
+      ${tableRow('Fecha', formatDate(data.dropoffDate))}
+      ${tableRow('Hora', data.dropoffTime + ' h')}
+      ${tableRow('Lugar', data.dropoffLocation)}
+      ${data.dropoffLocationAddress ? tableRow('Dirección', data.dropoffLocationAddress) : ''}
+    `)}
+
+    <!-- Sección obligatoria -->
+    <tr>
+      <td style="padding: 25px 20px 10px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="font-size: 16px; font-weight: bold; color: #111827; padding-bottom: 6px;">
+              Devolución del vehículo: obligatorio
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 13px; color: #374151; line-height: 1.5; padding-bottom: 10px;">
+              Al devolver la autocaravana debes cumplir cada punto. Si no, se factura el suplemento indicado (IVA incluido).
+            </td>
+          </tr>
+          <tr>
+            <td style="padding-bottom: 12px;">
+              <!-- Chips como tabla para Outlook -->
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  ${chipCell('Limpio interiormente')}
+                  ${chipCell('Aguas grises vacías')}
+                  ${chipCell('WC químico vacío')}
+                  ${chipCell('En hora')}
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- Tabla 3 columnas -->
+    <tr>
+      <td style="padding: 0 20px 10px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f9fafb;">
+          <tr>
+            <td style="${thStyle}">Lo que debes dejar listo</td>
+            <td style="${thStyle}">Qué se te cobrará si no</td>
+            <td style="${thStyle} text-align: right;">Importe (IVA incl.)</td>
+          </tr>
+          ${penaltyRow(
+            'Interior limpio, sin basura y con cocina y superficies recogidas',
+            'Limpieza interior necesaria por nuestro equipo',
+            'Desde 120,00 &euro;'
+          )}
+          ${penaltyRow(
+            'Depósito de aguas grises totalmente vacío',
+            'Vaciado del depósito de aguas grises por Furgocasa',
+            '20,00 &euro;'
+          )}
+          ${penaltyRow(
+            'WC químico vacío y en estado aceptable',
+            'Vaciado y servicio del WC químico por Furgocasa',
+            '70,00 &euro;'
+          )}
+          ${penaltyRow(
+            'Acudir puntual a la cita de devolución acordada',
+            'Tiempo de espera del equipo por tu retraso',
+            '40 &euro; (1.&ordf; h) + 20 &euro;/h'
+          )}
+        </table>
+      </td>
+    </tr>
+
+    <!-- Nota pie de tabla -->
+    <tr>
+      <td style="padding: 0 20px 15px 20px;">
+        <p style="margin: 0; font-size: 11px; color: #6b7280; font-style: italic;">
+          Todos los suplementos incluyen IVA. El importe de limpieza interior es mínimo y puede aumentar según el estado del vehículo.
+        </p>
+      </td>
+    </tr>
+
+    <!-- Alerta fianza -->
+    ${alertBox(
+      'Recuerda: la fianza (1.000 &euro;) se devuelve íntegra si todo está correcto',
+      'Revisaremos la camper en el momento de la entrega. Si cumples todos los puntos, la fianza se devuelve por transferencia en un máximo de 10 días laborables.',
+      '#eff6ff',
+      '#063971'
+    )}
+
+    <!-- Consejo -->
+    <tr>
+      <td style="padding: 15px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0fdf4; border-left: 4px solid #10b981;">
+          <tr>
+            <td style="padding: 15px;">
+              <p style="margin: 0 0 5px 0; font-weight: bold; color: #111827;">Consejo</p>
+              <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.5;">
+                Reserva <strong>al menos 1 hora antes de la entrega</strong> para
+                dejar la camper en condiciones: limpia a fondo la cocina, la nevera,
+                el baño y todas las superficies, vacía los depósitos de aguas grises
+                y el WC químico, y retira toda la basura. Si lo haces con calma,
+                evitarás cualquier suplemento.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <!-- CTA a tarifas web -->
+    ${ctaButton('Ver condiciones completas en la web', 'https://www.furgocasa.com/es/tarifas#devolucion-vehiculo')}
+
+    <!-- Despedida -->
+    <tr>
+      <td style="padding: 5px 20px 30px 20px;">
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">
+          Esperamos que hayas disfrutado de la experiencia.
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #374151;">
+          Un saludo,<br/>
+          <strong>El equipo de Furgocasa</strong>
+        </p>
+      </td>
+    </tr>
+  `;
+
+  const preheader = `${data.customerFirstName}, mañana devuelves la ${data.vehicleName}. Revisa el checklist de devolución para evitar suplementos.`;
+  return getEmailBaseTemplate(content, preheader);
+}
