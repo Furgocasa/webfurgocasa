@@ -57,6 +57,29 @@ Si no hay campers disponibles para las fechas elegidas, las páginas de búsqued
 
 ---
 
+## 📧 Marzo 2026 — Recordatorio automático de devolución (cron diario)
+
+Cada día a las 20:00 h (Madrid) un cron de Vercel busca reservas `confirmed` / `in_progress` cuyo `dropoff_date` es **mañana** y envía al **cliente** (con copia a `reservas@furgocasa.com`) un email recordatorio con:
+
+- Fecha, hora y lugar de devolución.
+- Tabla de penalizaciones idéntica a la sección "Devolución del vehículo: obligatorio" de la web (limpieza ≥120 €, aguas grises 20 €, WC 70 €, puntualidad 40 €+20 €/h).
+- Nota sobre fianza (1.000 €) y consejo de preparación.
+- CTA a `furgocasa.com/es/tarifas#devolucion-vehiculo`.
+
+| Pieza | Ubicación |
+|-------|-----------|
+| Cron endpoint | `src/app/api/cron/return-reminders/route.ts` |
+| Plantilla HTML | `getReturnReminderTemplate()` en `src/lib/email/templates.ts` |
+| Schedule | `0 18 * * *` en `vercel.json` (18:00 UTC) |
+| Idempotencia | Columna `bookings.return_reminder_sent` (boolean) |
+| Migración SQL | `supabase/migrations/20260323-add-return-reminder-sent.sql` |
+
+**Compatibilidad email:** tablas HTML puras (sin emojis, sin `border-radius`, chips como `<td>`), testado en Outlook desktop, Gmail y móvil.
+
+**Documentación:** [`docs/04-referencia/emails/SISTEMA-EMAILS.md`](./docs/04-referencia/emails/SISTEMA-EMAILS.md)
+
+---
+
 ## 🧾 Marzo 2026 — Comisión Stripe en el PVP y precio correcto de extras en el admin
 
 **Documentación detallada:** [`docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md) · [`docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md`](./docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md)
@@ -2279,7 +2302,7 @@ Desarrollado con ❤️ para Furgocasa
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 21 de marzo de 2026 (PVP Stripe + comisión en BD; extras admin con `extraLineUnitPriceEuros`)  
+**Última actualización**: 23 de marzo de 2026 (cron recordatorio devolución; i18n tarifas completa; cupones por fecha recogida)  
 
 ---
 

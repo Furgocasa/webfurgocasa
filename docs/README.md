@@ -102,8 +102,9 @@ Documentación técnica de referencia:
 - **Listados grid (mar. 2026):** flota (`vehicle-list-client`), ventas (`sale-vehicle-card` + `ventas-client`), búsqueda (`vehicle-card`); transmisión vía `isAutomaticTransmission()` — ver **PAGINAS-VEHICULOS-GARANTIA.md**
 
 #### emails/
-- Sistema de emails automatizados
-- Templates y configuración
+- Sistema de emails automatizados (reserva creada, 1.er pago, 2.º pago, **recordatorio devolución**)
+- Templates y configuración SMTP (OVH)
+- Cron diario de recordatorio de devolución (`/api/cron/return-reminders`, 20:00 Madrid)
 - Campañas masivas en carpeta local `emails/mailing/` (no versionada; ver `emails/README.md` y `.gitignore`)
 
 #### sistemas/
@@ -183,5 +184,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 22 de marzo, 2026  
-Versión del proyecto: 4.5.0 (landings alquiler documentadas: 59 activos; búsqueda fechas alternativas documentada en README raíz)
+Última actualización: 23 de marzo, 2026  
+Versión del proyecto: 4.5.1 (cron recordatorio devolución; i18n tarifas; cupones por fecha recogida)

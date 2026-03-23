@@ -43,14 +43,19 @@ src/
 │   └── email/
 │       ├── index.ts              # Funciones principales de envío
 │       ├── smtp-client.ts        # Cliente SMTP (Nodemailer)
-│       └── templates.ts          # Plantillas HTML de emails
+│       └── templates.ts          # Plantillas HTML de emails (4 plantillas)
 └── app/
     └── api/
         ├── bookings/
         │   └── send-email/
         │       └── route.ts      # API endpoint para envío de emails
-        └── test-email/
-            └── route.ts          # Endpoint de prueba SMTP
+        ├── cron/
+        │   └── return-reminders/
+        │       └── route.ts      # Cron: recordatorio de devolución (diario 18:00 UTC)
+        ├── test-email/
+        │   └── route.ts          # Endpoint de prueba SMTP
+        └── test-return-reminder/
+            └── route.ts          # Endpoint de prueba recordatorio (temporal)
 ```
 
 ## 🔧 Configuración
@@ -284,10 +289,45 @@ Si tienes problemas con el envío de emails:
 3. Comprueba el dashboard de Resend para ver el estado de los envíos
 4. Verifica que el dominio esté correctamente verificado en Resend
 
+### 4. Recordatorio de Devolución (víspera del dropoff)
+**Cuándo:** Automático, cada día a las 20:00 h (Madrid) vía Vercel Cron.
+
+**Quién recibe:**
+- ✉️ **Cliente:** Recordatorio con fecha/hora/lugar de devolución y tabla de penalizaciones (idéntica a la web)
+- ✉️ **Empresa (reservas@furgocasa.com):** Copia del mismo email
+
+**Archivo cron:** `src/app/api/cron/return-reminders/route.ts`
+**Plantilla:** `getReturnReminderTemplate()` en `src/lib/email/templates.ts`
+**Cron schedule:** `0 18 * * *` (18:00 UTC = 20:00 Madrid verano / 19:00 invierno) en `vercel.json`
+
+**Idempotencia:** columna `bookings.return_reminder_sent` (boolean). Una vez enviado, no se reenvía aunque el cron se ejecute de nuevo.
+
+**Contenido del email:**
+- Datos de devolución (reserva, fecha, hora, lugar, dirección)
+- Sección "Devolución del vehículo: obligatorio" con chips y tabla de 3 columnas (requisito / incumplimiento / importe IVA incl.), importes idénticos a la web:
+  - Limpieza interior: desde 120 €
+  - Aguas grises: 20 €
+  - WC químico: 70 €
+  - Puntualidad: 40 € (1.ª h) + 20 €/h
+- Nota sobre devolución de fianza (1.000 €, 10 días laborables)
+- Consejo de preparación (mínimo 1 h antes)
+- CTA a `furgocasa.com/es/tarifas#devolucion-vehiculo`
+
+**Compatibilidad:** HTML basado en tablas, sin emojis Unicode, sin border-radius, chips como celdas de tabla, `mso-padding-alt` para Outlook. Hereda la base template del resto de emails.
+
+**Migración SQL requerida:**
+```sql
+ALTER TABLE bookings ADD COLUMN IF NOT EXISTS return_reminder_sent BOOLEAN NOT NULL DEFAULT FALSE;
+```
+Archivo: `supabase/migrations/20260323-add-return-reminder-sent.sql`
+
+**Endpoint de prueba (temporal):** `GET /api/test-return-reminder?booking=FC26010043&to=info@furgocasa.com`
+
 ## 🎉 Funcionalidades Adicionales Posibles
 
 Ideas para futuras mejoras:
 
+- [x] ~~Email de recordatorio de devolución la víspera~~ ✅ Implementado (marzo 2026)
 - [ ] Email de recordatorio 7 días antes de la recogida
 - [ ] Email de recordatorio para el segundo pago
 - [ ] Email de agradecimiento después de la devolución
@@ -298,5 +338,5 @@ Ideas para futuras mejoras:
 
 ---
 
-**Última actualización:** 19 de enero de 2026
-**Versión:** 1.0.0
+**Última actualización:** 23 de marzo de 2026
+**Versión:** 1.1.0
