@@ -64,7 +64,7 @@ function isLocationAvailableForDate(location: LocationData, pickupDate: string |
 
 interface LocationSelectorProps {
   value: string;
-  onChange: (slug: string, minDays: number | null, openingHours: TimeSlot[] | null) => void;
+  onChange: (slug: string, minDays: number | null, openingHours: TimeSlot[] | null, extraFee: number | null, locationName: string) => void;
   placeholder?: string;
   pickupDate?: string | null;
   defaultLocation?: string;
@@ -114,7 +114,7 @@ export function LocationSelector({
       || (fallbackLocation && allLocations.find(l => l.slug === fallbackLocation));
 
     if (loc) {
-      onChange(loc.slug, loc.min_days, loc.opening_hours);
+      onChange(loc.slug, loc.min_days, loc.opening_hours, loc.extra_fee, loc.name);
       setDefaultApplied(true);
     }
   }, [defaultLocation, fallbackLocation, allLocations, defaultApplied, value, onChange]);
@@ -182,7 +182,7 @@ export function LocationSelector({
                 role="option"
                 aria-selected={value === location.slug}
                 onClick={() => {
-                  onChange(location.slug, location.min_days, location.opening_hours);
+                  onChange(location.slug, location.min_days, location.opening_hours, location.extra_fee, location.name);
                   setIsOpen(false);
                 }}
                 className={`w-full px-4 py-3.5 hover:bg-furgocasa-blue hover:text-white transition-colors text-left touch-target ${

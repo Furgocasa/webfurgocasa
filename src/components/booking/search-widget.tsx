@@ -34,6 +34,9 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
   const [pickupTime, setPickupTime] = useState("11:00");
   const [dropoffTime, setDropoffTime] = useState("11:00");
   const [closedRanges, setClosedRanges] = useState<BusinessClosedRange[]>([]);
+  const [showUpsellModal, setShowUpsellModal] = useState(false);
+  const [locationName, setLocationName] = useState("");
+  const [locationExtraFee, setLocationExtraFee] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,10 +75,12 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
   };
 
   // Cuando cambia la ubicación, guardar slug, min_days y opening_hours
-  const handleLocationChange = (slug: string, minDays: number | null, openingHours: TimeSlot[] | null) => {
+  const handleLocationChange = (slug: string, minDays: number | null, openingHours: TimeSlot[] | null, extraFee: number | null, name: string) => {
     setLocation(slug);
     setLocationMinDays(minDays);
     setLocationOpeningHours(openingHours);
+    setLocationExtraFee(extraFee);
+    setLocationName(name);
     // Si las fechas actuales no cumplen el nuevo mínimo, resetear
     if (dateRange.from && dateRange.to) {
       const newMinDays = minDays !== null ? minDays : seasonMinDays;
@@ -118,17 +123,26 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
       return;
     }
 
+    // Si la ubicación no es Murcia y tiene tarifa extra, mostrar modal de upsell
+    if (location && location !== "murcia" && locationExtraFee && locationExtraFee > 0) {
+      setShowUpsellModal(true);
+      return;
+    }
+
+    executeSearch(location || "murcia");
+  };
+
+  const executeSearch = (searchLocation: string) => {
     setIsLoading(true);
 
     // Build query params - misma ubicación para recogida y devolución
-    const selectedLocation = location || "murcia";
     const params = new URLSearchParams({
-      pickup_date: format(dateRange.from, "yyyy-MM-dd"),
-      dropoff_date: format(dateRange.to, "yyyy-MM-dd"),
+      pickup_date: format(dateRange.from!, "yyyy-MM-dd"),
+      dropoff_date: format(dateRange.to!, "yyyy-MM-dd"),
       pickup_time: pickupTime,
       dropoff_time: dropoffTime,
-      pickup_location: selectedLocation,
-      dropoff_location: selectedLocation, // Siempre la misma que recogida
+      pickup_location: searchLocation,
+      dropoff_location: searchLocation, // Siempre la misma que recogida
     });
 
     // Usar ruta traducida según el idioma actual
@@ -220,6 +234,45 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
           </p>
         )}
       </form>
+
+      {/* Upsell Modal */}
+      {showUpsellModal && (
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 lg:p-8 max-w-md w-full shadow-2xl space-y-6">
+            <h3 className="text-xl lg:text-2xl font-bold text-gray-900">
+              {t("Has elegido")} {t(locationName)}
+            </h3>
+            <p className="text-gray-600 text-sm lg:text-base leading-relaxed">
+              {t("Recuerda que nuestra sede central está en")} <strong className="text-gray-900">Murcia</strong>. {t("Allí tienes una duración de alquiler menor y no hay sobrecostes por desplazamiento.")}
+            </p>
+            <p className="text-furgocasa-orange font-bold text-lg">
+              {t("¿Quieres ahorrarte los")} {(locationExtraFee || 0) * 2}€ {t("extras de viaje?")}
+            </p>
+            <div className="flex flex-col gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUpsellModal(false);
+                  executeSearch("murcia");
+                }}
+                className="w-full bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center"
+              >
+                {t("Cambiar a Murcia sin comisión")}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowUpsellModal(false);
+                  executeSearch(location);
+                }}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center"
+              >
+                {t("Mantener")} {t(locationName)} {t("como ubicación")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
