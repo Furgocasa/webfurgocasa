@@ -321,8 +321,8 @@ const TreemapCustomContent = (props: any) => {
             y={y + 24}
             fill="#ffffff"
             fontSize={13}
-            fontWeight="bold"
-            className="drop-shadow-sm"
+            fontWeight={500}
+            style={{ textRendering: "geometricPrecision" }}
           >
             {name}
           </text>
@@ -333,6 +333,7 @@ const TreemapCustomContent = (props: any) => {
               fill="#ffffff"
               fontSize={12}
               opacity={0.95}
+              style={{ textRendering: "geometricPrecision" }}
             >
               {value} búsquedas
             </text>
@@ -344,6 +345,7 @@ const TreemapCustomContent = (props: any) => {
               fill="#ffffff"
               fontSize={11}
               opacity={0.8}
+              style={{ textRendering: "geometricPrecision" }}
             >
               {reservas} res. · {conversion}% conv.
             </text>
