@@ -20,6 +20,7 @@ interface LocationData {
   active_from: string | null;
   active_until: string | null;
   active_recurring: boolean | null;
+  extra_fee: number | null;
 }
 
 /**
@@ -88,7 +89,7 @@ export function LocationSelector({
       const supabase = createClient();
       const { data } = await supabase
         .from("locations")
-        .select("id, slug, name, address, min_days, opening_hours, active_from, active_until, active_recurring")
+        .select("id, slug, name, address, min_days, opening_hours, active_from, active_until, active_recurring, extra_fee")
         .eq("is_active", true)
         .eq("is_pickup", true)
         .order("name");
@@ -135,9 +136,9 @@ export function LocationSelector({
         aria-haspopup="listbox"
         className="w-full flex items-center justify-between px-4 py-3.5 border-2 border-gray-300 rounded-lg bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-2 focus:ring-furgocasa-blue/30 focus:border-furgocasa-blue transition-colors text-left touch-target"
       >
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0" aria-hidden="true" />
-          <div className="flex flex-col min-w-0">
+          <div className="flex flex-col min-w-0 flex-1">
             <span className="text-gray-800 font-semibold uppercase text-sm truncate">
               {selectedLocation ? t(selectedLocation.name) : placeholder}
             </span>
@@ -147,6 +148,11 @@ export function LocationSelector({
               </span>
             )}
           </div>
+          {selectedLocation?.extra_fee ? (
+            <div className="text-xs font-semibold px-2 py-1 rounded-md whitespace-nowrap flex-shrink-0 bg-furgocasa-orange/10 text-furgocasa-orange mr-2">
+              +{selectedLocation.extra_fee * 2}€
+            </div>
+          ) : null}
         </div>
         <ChevronDown
           className={`h-5 w-5 text-gray-700 transition-transform flex-shrink-0 ${
@@ -183,11 +189,11 @@ export function LocationSelector({
                   value === location.slug ? "bg-furgocasa-blue text-white" : "text-gray-700"
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 w-full">
                   <MapPin className={`h-4 w-4 flex-shrink-0 ${
                     value === location.slug ? "text-white/80" : "text-furgocasa-blue/60"
                   }`} aria-hidden="true" />
-                  <div className="flex flex-col">
+                  <div className="flex flex-col flex-1 text-left">
                     <span className="block font-semibold uppercase text-sm">
                       {t(location.name)}
                     </span>
@@ -197,6 +203,15 @@ export function LocationSelector({
                       {getMinDaysLabel(location.min_days)}
                     </span>
                   </div>
+                  {location.extra_fee ? (
+                    <div className={`text-xs font-semibold px-2 py-1 rounded-md whitespace-nowrap flex-shrink-0 ${
+                      value === location.slug 
+                        ? "bg-white/20 text-white" 
+                        : "bg-orange-100 text-furgocasa-orange"
+                    }`}>
+                      +{location.extra_fee * 2}€
+                    </div>
+                  ) : null}
                 </div>
               </button>
             ))}

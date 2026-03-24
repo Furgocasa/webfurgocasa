@@ -947,13 +947,13 @@ export default function CalendarioPage() {
                                         }}
                                         title={realConflicts > 0
                                           ? `⚠️ CONFLICTO: ${dayBookings.length} reservas con solapamiento horario\n${dayBookings.map(b => `- ${b.booking_number} (${b.customer?.name})`).join('\n')}\n\nClick para ver detalles`
-                                          : `${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\nClick para ver detalles`
+                                          : `${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\n${pickupBookings.length > 0 ? `🟢 Recogida en: ${pickupBookings.map(b => b.pickup_location?.name || b.pickup_location_name || 'Sin ubicación').join(', ')}\n` : ''}${dropoffBookings.length > 0 ? `🔴 Devolución en: ${dropoffBookings.map(b => b.dropoff_location?.name || b.dropoff_location_name || 'Sin ubicación').join(', ')}\n` : ''}Click para ver detalles`
                                         }
                                       >
                                         {/* Indicadores de inicio (verde) - puede haber múltiples */}
                                         {pickupBookings.length > 0 && (
                                           <SmartTooltip
-                                            className="absolute top-0.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-green-500 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger"
+                                            className="absolute top-0.5 left-1/2 -translate-x-1/2 h-3.5 bg-green-500 rounded border border-white shadow-sm z-[100] smart-tooltip-trigger flex items-center justify-center px-1 min-w-[12px] max-w-[44px] overflow-hidden"
                                             content={
                                               <>
                                                 {pickupBookings.map((booking, idx) => (
@@ -961,7 +961,7 @@ export default function CalendarioPage() {
                                                     <div className="font-semibold text-green-400 mb-1">🟢 RECOGIDA {pickupBookings.length > 1 ? `#${idx + 1}` : ''}</div>
                                                     <div className="font-bold text-base">{booking.pickup_time?.substring(0, 5) || '10:00'}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
-                                                      📍 {booking.pickup_location?.name || 'Sin ubicación'}
+                                                      📍 {booking.pickup_location?.name || booking.pickup_location_name || 'Sin ubicación'}
                                                     </div>
                                                     <div className="text-gray-400 text-xs mt-1">
                                                       {booking.booking_number}
@@ -971,11 +971,12 @@ export default function CalendarioPage() {
                                               </>
                                             }
                                           >
-                                            <div className="w-full h-full flex items-center justify-center">
-                                              {pickupBookings.length > 1 && (
-                                                <span className="text-[8px] font-bold text-white">{pickupBookings.length}</span>
-                                              )}
-                                            </div>
+                                            <span className="text-[8px] font-bold text-white whitespace-nowrap leading-none tracking-tighter">
+                                              {pickupBookings.length > 1 
+                                                ? `${pickupBookings.length} REC` 
+                                                : ((pickupBookings[0].pickup_location?.name || pickupBookings[0].pickup_location_name || '').substring(0, 6).toUpperCase())
+                                              }
+                                            </span>
                                           </SmartTooltip>
                                         )}
                                         
@@ -990,7 +991,7 @@ export default function CalendarioPage() {
                                         {/* Indicadores de fin (rojo) - puede haber múltiples */}
                                         {dropoffBookings.length > 0 && (
                                           <SmartTooltip
-                                            className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-red-500 rounded-sm border border-white shadow-sm z-[100] smart-tooltip-trigger"
+                                            className="absolute bottom-0.5 left-1/2 -translate-x-1/2 h-3.5 bg-red-500 rounded border border-white shadow-sm z-[100] smart-tooltip-trigger flex items-center justify-center px-1 min-w-[12px] max-w-[44px] overflow-hidden"
                                             content={
                                               <>
                                                 {dropoffBookings.map((booking, idx) => (
@@ -998,7 +999,7 @@ export default function CalendarioPage() {
                                                     <div className="font-semibold text-red-400 mb-1">🔴 DEVOLUCIÓN {dropoffBookings.length > 1 ? `#${idx + 1}` : ''}</div>
                                                     <div className="font-bold text-base">{booking.dropoff_time?.substring(0, 5) || '10:00'}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
-                                                      📍 {booking.dropoff_location?.name || 'Sin ubicación'}
+                                                      📍 {booking.dropoff_location?.name || booking.dropoff_location_name || 'Sin ubicación'}
                                                     </div>
                                                     <div className="text-gray-400 text-xs mt-1">
                                                       {booking.booking_number}
@@ -1008,11 +1009,12 @@ export default function CalendarioPage() {
                                               </>
                                             }
                                           >
-                                            <div className="w-full h-full flex items-center justify-center">
-                                              {dropoffBookings.length > 1 && (
-                                                <span className="text-[8px] font-bold text-white">{dropoffBookings.length}</span>
-                                              )}
-                                            </div>
+                                            <span className="text-[8px] font-bold text-white whitespace-nowrap leading-none tracking-tighter">
+                                              {dropoffBookings.length > 1 
+                                                ? `${dropoffBookings.length} DEV` 
+                                                : ((dropoffBookings[0].dropoff_location?.name || dropoffBookings[0].dropoff_location_name || '').substring(0, 6).toUpperCase())
+                                              }
+                                            </span>
                                           </SmartTooltip>
                                         )}
                                       </div>
