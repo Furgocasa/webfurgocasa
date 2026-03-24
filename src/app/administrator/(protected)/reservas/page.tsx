@@ -79,9 +79,8 @@ function formatTime(time: string): string {
 
 type SortField = 'booking_number' | 'customer' | 'internal_code' | 'vehicle' | 'pickup_date' | 'dropoff_date' | 'pickup_location' | 'dropoff_location' | 'total_price' | 'amount_paid' | 'status' | 'payment_status' | 'created_at';
 
-// Claves para localStorage
-const SORT_FIELD_KEY = 'bookings_sort_field';
-const SORT_DIRECTION_KEY = 'bookings_sort_direction';
+/** Columnas de fecha: al elegirlas, lo habitual es ver lo más reciente primero (desc). */
+const SORT_DEFAULT_DESC: SortField[] = ['created_at', 'pickup_date', 'dropoff_date'];
 
 export default function BookingsPage() {
   // Establecer título de la página
@@ -100,28 +99,9 @@ export default function BookingsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
-  // Estados para ordenamiento - cargar desde localStorage o usar default
-  const [sortField, setSortField] = useState<SortField>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(SORT_FIELD_KEY);
-      return (saved as SortField) || 'created_at';
-    }
-    return 'created_at';
-  });
-  
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(SORT_DIRECTION_KEY);
-      return (saved as 'asc' | 'desc') || 'desc';
-    }
-    return 'desc';
-  });
-
-  // Guardar preferencia de ordenación en localStorage
-  useEffect(() => {
-    localStorage.setItem(SORT_FIELD_KEY, sortField);
-    localStorage.setItem(SORT_DIRECTION_KEY, sortDirection);
-  }, [sortField, sortDirection]);
+  // Orden por defecto al cargar/refrescar: más recientes primero (no se persiste entre visitas)
+  const [sortField, setSortField] = useState<SortField>('created_at');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   // Cargar TODAS las reservas con caché de 2 minutos
   const { 
@@ -151,7 +131,7 @@ export default function BookingsPage() {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
     } else {
       setSortField(field);
-      setSortDirection('asc');
+      setSortDirection(SORT_DEFAULT_DESC.includes(field) ? 'desc' : 'asc');
     }
   };
 
