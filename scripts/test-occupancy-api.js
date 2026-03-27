@@ -80,12 +80,13 @@ async function testOccupancyAPI() {
       }
     });
 
-    // 4. Verificar colores según ocupación
+    // 4. Verificar colores según ocupación (moderado 40–60, alta 60–85, muy alta >85)
     data.periods.forEach(period => {
-      const expectedColor = 
-        period.occupancy_rate >= 90 ? 'red' :
-        period.occupancy_rate >= 70 ? 'orange' :
-        period.occupancy_rate >= 50 ? 'yellow' : 'green';
+      const r = period.occupancy_rate;
+      const expectedColor =
+        r > 85 ? 'red' :
+        r >= 60 ? 'orange' :
+        r >= 40 ? 'yellow' : 'green';
 
       if (period.color !== expectedColor) {
         console.warn(`⚠️  Color incorrecto en ${period.name}: esperado ${expectedColor}, actual ${period.color}`);

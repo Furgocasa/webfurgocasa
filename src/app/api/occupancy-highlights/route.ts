@@ -46,15 +46,16 @@ function getOccupancyStatus(rate: number): {
   label: string;
   icon: string;
 } {
-  if (rate >= 90) {
+  // Umbrales semáforo (vista cliente): moderado 40–60, alta 60–85, muy alta >85
+  if (rate > 85) {
     return {
       status: "full",
       color: "red",
-      label: "Completo",
+      label: "Muy alta demanda",
       icon: "🔴",
     };
   }
-  if (rate >= 70) {
+  if (rate >= 60) {
     return {
       status: "high",
       color: "orange",
@@ -62,7 +63,7 @@ function getOccupancyStatus(rate: number): {
       icon: "🟠",
     };
   }
-  if (rate >= 50) {
+  if (rate >= 40) {
     return {
       status: "moderate",
       color: "yellow",
@@ -237,10 +238,9 @@ export async function GET() {
       (period) => parseISO(period.end_date) >= now
     );
 
-    // 6. ⚠️ IMPORTANTE: Solo mostrar periodos con ocupación >= 50%
-    // No tiene sentido mostrar disponibilidad alta (verde) - no genera urgencia
+    // 6. Solo periodos con ocupación >= 40% (moderado o más — alineado con nuevos umbrales)
     const highDemandResults = futureResults.filter(
-      (period) => period.occupancy_rate >= 50
+      (period) => period.occupancy_rate >= 40
     );
 
     // 7. Limitar a los próximos 5 periodos de alta demanda

@@ -211,7 +211,7 @@ export function OccupancyHighlights() {
                   className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${colors.badge}`}
                 >
                   <span>{period.icon}</span>
-                  <span>{period.label}</span>
+                  <span>{t(period.label)}</span>
                 </span>
               </div>
 
@@ -237,15 +237,15 @@ export function OccupancyHighlights() {
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 rounded-full bg-yellow-500"></span>
-              {t("Moderado")} (50-70%)
+              {t("Moderado")} (40-60%)
             </span>
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 rounded-full bg-orange-500"></span>
-              {t("Alta")} (70-90%)
+              {t("Alta")} (60-85%)
             </span>
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 rounded-full bg-red-500"></span>
-              {t("Completo")} (&gt;90%)
+              {t("Muy alta")} (&gt;85%)
             </span>
           </div>
           <span className="text-gray-400">

@@ -9261,6 +9261,18 @@ export const staticTranslations = {
     fr: "Complet",
     de: "Voll"
   },
+  "Muy alta": {
+    es: "Muy alta",
+    en: "Very high",
+    fr: "Très élevée",
+    de: "Sehr hoch"
+  },
+  "Muy alta demanda": {
+    es: "Muy alta demanda",
+    en: "Very high demand",
+    fr: "Très forte demande",
+    de: "Sehr hohe Nachfrage"
+  },
   "Alta demanda": {
     es: "Alta demanda",
     en: "High demand",
