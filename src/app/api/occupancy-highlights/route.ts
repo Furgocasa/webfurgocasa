@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/server";
 import { differenceInDays, parseISO, eachDayOfInterval, format } from "date-fns";
 
 // ============================================
-// ENDPOINT PÚBLICO: Indicadores de Ocupación
+// ENDPOINT PÚBLICO: Indicadores para el cliente (semáforo en /reservar)
 // ============================================
 // GET /api/occupancy-highlights
-// 
-// Devuelve ocupación de periodos clave (Semana Santa, verano, puentes)
+//
+// Mide presión para el cliente: días no reservables = reservas que ya contábamos
+// (confirmada / en curso / completada) ∪ bloqueos (blocked_dates).
+// El admin sigue pudiendo separar bloqueo vs venta; aquí se agregan para el semáforo.
+// blocked_dates: RLS solo admin → lectura con service role en servidor.
 // Cache recomendado: 1-2 horas
 // ============================================
 
@@ -74,6 +78,15 @@ function getOccupancyStatus(rate: number): {
   };
 }
 
+const minKeyPeriodStart = KEY_PERIODS_2026.reduce(
+  (min, p) => (p.start < min ? p.start : min),
+  KEY_PERIODS_2026[0].start
+);
+const maxKeyPeriodEnd = KEY_PERIODS_2026.reduce(
+  (max, p) => (p.end > max ? p.end : max),
+  KEY_PERIODS_2026[0].end
+);
+
 export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
@@ -103,10 +116,10 @@ export async function GET() {
       );
     }
 
-    // 2. Obtener todas las reservas confirmadas/activas/completadas
+    // 2. Reservas que cuentan como ocupación (igual que antes este endpoint)
     const { data: bookings, error: bookingsError } = await supabase
       .from("bookings")
-      .select("vehicle_id, pickup_date, dropoff_date, status")
+      .select("vehicle_id, pickup_date, dropoff_date")
       .in("status", ["confirmed", "in_progress", "completed"]);
 
     if (bookingsError) {
@@ -117,55 +130,92 @@ export async function GET() {
       );
     }
 
-    // 3. Calcular ocupación para cada periodo
+    const fleetIds = vehicles.map((v) => v.id);
+
+    // 3. Bloqueos por vehículo (RLS: solo service role en servidor)
+    let blockedRanges: {
+      vehicle_id: string;
+      start_date: string;
+      end_date: string;
+    }[] = [];
+    try {
+      const admin = createAdminClient();
+      const { data: blocks, error: blocksError } = await admin
+        .from("blocked_dates")
+        .select("vehicle_id, start_date, end_date")
+        .in("vehicle_id", fleetIds)
+        .lte("start_date", maxKeyPeriodEnd)
+        .gte("end_date", minKeyPeriodStart);
+
+      if (blocksError) {
+        console.error("Error fetching blocked_dates:", blocksError);
+      } else {
+        blockedRanges = blocks ?? [];
+      }
+    } catch (e) {
+      console.error("Admin client / blocked_dates:", e);
+    }
+
+    // 4. Calcular % de días no reservables (reservas ∪ bloqueos) por periodo
     const results: OccupancyPeriod[] = KEY_PERIODS_2026.map((period) => {
       const periodStart = parseISO(period.start);
       const periodEnd = parseISO(period.end);
       const totalDays = differenceInDays(periodEnd, periodStart) + 1;
       const totalAvailableDays = totalDays * totalVehicles;
 
-      // Calcular días ocupados
-      let totalBookedDays = 0;
+      let totalNonReservableDays = 0;
 
       vehicles?.forEach((vehicle) => {
-        const vehicleBookings = bookings?.filter(
-          (b) => b.vehicle_id === vehicle.id
-        ) || [];
+        const vehicleBookings =
+          bookings?.filter((b) => b.vehicle_id === vehicle.id) || [];
+        const vehicleBlocks =
+          blockedRanges.filter((b) => b.vehicle_id === vehicle.id) || [];
 
-        // Set para evitar contar el mismo día dos veces
-        const bookedDates = new Set<string>();
+        const nonReservableDates = new Set<string>();
 
         vehicleBookings.forEach((booking) => {
           const bookingStart = parseISO(booking.pickup_date);
           const bookingEnd = parseISO(booking.dropoff_date);
 
-          // Verificar si hay solapamiento con el periodo
           if (bookingEnd >= periodStart && bookingStart <= periodEnd) {
-            // Calcular fechas efectivas dentro del periodo
             const effectiveStart =
               bookingStart < periodStart ? periodStart : bookingStart;
             const effectiveEnd =
               bookingEnd > periodEnd ? periodEnd : bookingEnd;
 
-            // Generar todas las fechas del rango
-            const days = eachDayOfInterval({
+            eachDayOfInterval({
               start: effectiveStart,
               end: effectiveEnd,
-            });
-
-            days.forEach((day) => {
-              bookedDates.add(format(day, "yyyy-MM-dd"));
+            }).forEach((day) => {
+              nonReservableDates.add(format(day, "yyyy-MM-dd"));
             });
           }
         });
 
-        totalBookedDays += bookedDates.size;
+        vehicleBlocks.forEach((block) => {
+          const blockStart = parseISO(block.start_date);
+          const blockEnd = parseISO(block.end_date);
+          if (blockEnd >= periodStart && blockStart <= periodEnd) {
+            const effectiveStart =
+              blockStart < periodStart ? periodStart : blockStart;
+            const effectiveEnd = blockEnd > periodEnd ? periodEnd : blockEnd;
+            eachDayOfInterval({
+              start: effectiveStart,
+              end: effectiveEnd,
+            }).forEach((day) => {
+              nonReservableDates.add(format(day, "yyyy-MM-dd"));
+            });
+          }
+        });
+
+        totalNonReservableDays += nonReservableDates.size;
       });
 
-      // Calcular tasa de ocupación
       const occupancyRate =
         totalAvailableDays > 0
-          ? Math.round((totalBookedDays / totalAvailableDays) * 100 * 10) / 10
+          ? Math.round(
+              (totalNonReservableDays / totalAvailableDays) * 100 * 10
+            ) / 10
           : 0;
 
       // Obtener estado y color
@@ -181,19 +231,19 @@ export async function GET() {
       };
     });
 
-    // 4. Filtrar periodos pasados y ordenar por fecha
+    // 5. Filtrar periodos pasados y ordenar por fecha
     const now = new Date();
     const futureResults = results.filter(
       (period) => parseISO(period.end_date) >= now
     );
 
-    // 5. ⚠️ IMPORTANTE: Solo mostrar periodos con ocupación >= 50%
+    // 6. ⚠️ IMPORTANTE: Solo mostrar periodos con ocupación >= 50%
     // No tiene sentido mostrar disponibilidad alta (verde) - no genera urgencia
     const highDemandResults = futureResults.filter(
       (period) => period.occupancy_rate >= 50
     );
 
-    // 6. Limitar a los próximos 5 periodos de alta demanda
+    // 7. Limitar a los próximos 5 periodos de alta demanda
     const limitedResults = highDemandResults.slice(0, 5);
 
     return NextResponse.json(
