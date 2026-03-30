@@ -30,7 +30,7 @@ import {
   Download,
   ChevronRight,
 } from "lucide-react";
-import { formatPrice } from "@/lib/utils";
+import { formatPrice, seasonMatchesKind } from "@/lib/utils";
 import {
   format,
   startOfMonth,
@@ -83,6 +83,7 @@ interface Season {
   start_date: string;
   end_date: string;
   is_active: boolean | null;
+  season_type?: "baja" | "media" | "alta" | null;
 }
 
 interface InformesClientProps {
@@ -169,24 +170,11 @@ export default function InformesClient({
       let seasonsOfType: Season[] = [];
       
       if (selectedSeason === 'baja') {
-        seasonsOfType = seasons.filter(s => 
-          s.is_active && 
-          s.slug &&
-          !s.slug.toLowerCase().includes('media') && 
-          !s.slug.toLowerCase().includes('alta')
-        );
+        seasonsOfType = seasons.filter((s) => seasonMatchesKind(s, "baja"));
       } else if (selectedSeason === 'media') {
-        seasonsOfType = seasons.filter(s => 
-          s.is_active && 
-          s.slug && 
-          s.slug.toLowerCase().includes('media')
-        );
+        seasonsOfType = seasons.filter((s) => seasonMatchesKind(s, "media"));
       } else if (selectedSeason === 'alta') {
-        seasonsOfType = seasons.filter(s => 
-          s.is_active && 
-          s.slug && 
-          s.slug.toLowerCase().includes('alta')
-        );
+        seasonsOfType = seasons.filter((s) => seasonMatchesKind(s, "alta"));
       }
       
       // Si hay temporadas, obtener el rango completo (desde la fecha más temprana hasta la más tardía)
@@ -540,22 +528,7 @@ export default function InformesClient({
       // Obtener todas las temporadas de este tipo
       let seasonsOfType: Season[] = [];
       
-      if (seasonType === 'baja') {
-        // Temporada baja: todas las que NO contienen 'media' ni 'alta' en el slug
-        seasonsOfType = seasons.filter(s => 
-          s.is_active && 
-          s.slug &&
-          !s.slug.toLowerCase().includes('media') && 
-          !s.slug.toLowerCase().includes('alta')
-        );
-      } else {
-        // Temporada media o alta: las que contienen el tipo en el slug
-        seasonsOfType = seasons.filter(s => 
-          s.is_active && 
-          s.slug && 
-          s.slug.toLowerCase().includes(seasonType)
-        );
-      }
+      seasonsOfType = seasons.filter((s) => seasonMatchesKind(s, seasonType));
 
       let totalRevenue = 0;
       const uniqueBookingIds = new Set<string>();

@@ -46,7 +46,7 @@ async function getInformesData() {
   // Obtener temporadas
   const { data: seasons, error: seasonsError } = await supabase
     .from('seasons')
-    .select('id, name, slug, start_date, end_date, is_active')
+    .select('id, name, slug, start_date, end_date, is_active, season_type')
     .order('start_date', { ascending: true });
 
   if (seasonsError) {

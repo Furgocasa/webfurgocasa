@@ -6,6 +6,7 @@ import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addDays
 import { es as localeEs, enUS, fr as localeFr, de as localeDe } from "date-fns/locale";
 import type { Locale as AppLocale } from "@/lib/i18n/config";
 import { useLanguage } from "@/contexts/language-context";
+import { getSeasonDisplayTipo, type SeasonKind } from "@/lib/utils";
 
 interface Season {
   id: string;
@@ -20,6 +21,7 @@ interface Season {
   year: number;
   min_days: number;
   is_active: boolean;
+  season_type?: SeasonKind | null;
 }
 
 const dateFnsLocales: Record<AppLocale, typeof localeEs> = {
@@ -27,22 +29,6 @@ const dateFnsLocales: Record<AppLocale, typeof localeEs> = {
   en: enUS,
   fr: localeFr,
   de: localeDe,
-};
-
-// Precios base de temporada BAJA
-const PRECIO_BAJA = {
-  price_less_than_week: 95,
-  price_one_week: 85,
-  price_two_weeks: 75,
-  price_three_weeks: 65,
-};
-
-// Determinar tipo y color de temporada según el sobrecoste
-const getTipoTemporada = (season: Season) => {
-  const sobrecoste = season.price_less_than_week - PRECIO_BAJA.price_less_than_week;
-  if (sobrecoste >= 60) return { tipo: 'ALTA' as const, color: '#EF4444' };
-  if (sobrecoste >= 30) return { tipo: 'MEDIA' as const, color: '#F59E0B' };
-  return { tipo: 'BAJA' as const, color: '#3B82F6' };
 };
 
 const seasonNames = {
@@ -96,7 +82,7 @@ export function SeasonsCalendar({ year, hidePassedMonths = false }: { year: numb
     );
 
     if (season) {
-      const { tipo, color } = getTipoTemporada(season);
+      const { tipo, color } = getSeasonDisplayTipo(season);
       return { ...season, tipo, color };
     }
 

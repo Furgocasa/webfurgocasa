@@ -303,6 +303,9 @@ export const PRECIO_TEMPORADA_BAJA = {
   price_three_weeks: 65,     // 21+ días
 };
 
+/** Clasificación comercial (contratos / leyenda); no determina el precio en sí. */
+export type SeasonKind = "baja" | "media" | "alta";
+
 /**
  * Interface para temporadas (datos de la BD)
  */
@@ -318,6 +321,60 @@ export interface Season {
   price_three_weeks: number | null;
   min_days: number | null;
   is_active: boolean | null;
+  /** Clasificación Baja/Media/Alta: solo este campo (nunca se deduce del precio en la app). */
+  season_type?: SeasonKind | null;
+}
+
+const SEASON_KIND_LABEL: Record<SeasonKind, "BAJA" | "MEDIA" | "ALTA"> = {
+  baja: "BAJA",
+  media: "MEDIA",
+  alta: "ALTA",
+};
+
+const SEASON_KIND_COLOR: Record<SeasonKind, string> = {
+  baja: "#3B82F6",
+  media: "#F59E0B",
+  alta: "#EF4444",
+};
+
+/**
+ * Etiqueta y color para admin / calendario público.
+ * El tipo es únicamente `season_type` en BD; el sobrecoste en € es solo informativo (no define el tipo).
+ */
+export function getSeasonDisplayTipo(
+  season: Pick<Season, "price_less_than_week" | "season_type">
+): {
+  tipo: "BAJA" | "MEDIA" | "ALTA";
+  kind: SeasonKind;
+  color: string;
+  sobrecoste: number;
+} {
+  const base = PRECIO_TEMPORADA_BAJA.price_less_than_week;
+  const sobrecoste = (season.price_less_than_week ?? base) - base;
+  const raw = season.season_type;
+  const kind: SeasonKind =
+    raw === "baja" || raw === "media" || raw === "alta" ? raw : "media";
+  return {
+    tipo: SEASON_KIND_LABEL[kind],
+    kind,
+    color: SEASON_KIND_COLOR[kind],
+    sobrecoste,
+  };
+}
+
+/** Filtros de informes: solo `season_type` (sin deducir por precio ni por slug). */
+export function seasonMatchesKind(
+  season: {
+    slug: string;
+    is_active?: boolean | null;
+    season_type?: SeasonKind | null;
+  },
+  kind: SeasonKind
+): boolean {
+  if (!season.is_active || !season.slug) return false;
+  const t = season.season_type;
+  if (t === "baja" || t === "media" || t === "alta") return t === kind;
+  return false;
 }
 
 /**

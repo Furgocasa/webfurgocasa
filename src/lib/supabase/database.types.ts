@@ -1131,6 +1131,7 @@ export type Database = {
           price_one_week: number | null
           price_three_weeks: number | null
           price_two_weeks: number | null
+          season_type: string
           slug: string
           start_date: string
           updated_at: string | null
@@ -1148,6 +1149,7 @@ export type Database = {
           price_one_week?: number | null
           price_three_weeks?: number | null
           price_two_weeks?: number | null
+          season_type?: string
           slug: string
           start_date: string
           updated_at?: string | null
@@ -1165,6 +1167,7 @@ export type Database = {
           price_one_week?: number | null
           price_three_weeks?: number | null
           price_two_weeks?: number | null
+          season_type?: string
           slug?: string
           start_date?: string
           updated_at?: string | null

@@ -35,8 +35,21 @@ export async function PUT(
       price_three_weeks,
       min_days,
       year,
-      is_active
+      is_active,
+      season_type,
     } = body;
+
+    const validKinds = ["baja", "media", "alta"] as const;
+    if (
+      season_type !== undefined &&
+      season_type !== null &&
+      !(validKinds as readonly string[]).includes(season_type)
+    ) {
+      return NextResponse.json(
+        { error: "season_type debe ser baja, media o alta" },
+        { status: 400 }
+      );
+    }
 
     // Validaciones básicas
     if (!name || !start_date || !end_date) {
@@ -61,6 +74,9 @@ export async function PUT(
         min_days,
         year,
         is_active,
+        ...(season_type !== undefined && season_type !== null
+          ? { season_type }
+          : {}),
         updated_at: new Date().toISOString()
       })
       .eq("id", id)

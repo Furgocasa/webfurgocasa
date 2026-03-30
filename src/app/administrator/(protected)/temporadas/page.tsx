@@ -6,6 +6,11 @@ import { Calendar, Plus, Trash2, Save, AlertCircle, Euro, Edit2, X } from "lucid
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { useAdminData } from "@/hooks/use-admin-data";
+import {
+  getSeasonDisplayTipo,
+  PRECIO_TEMPORADA_BAJA,
+  type SeasonKind,
+} from "@/lib/utils";
 
 interface Season {
   id: string;
@@ -20,26 +25,11 @@ interface Season {
   year: number | null;
   min_days: number | null;
   is_active: boolean | null;
+  season_type?: SeasonKind | null;
   base_price_per_day?: number | null;
   created_at?: string | null;
   updated_at?: string | null;
 }
-
-// Precios base de temporada BAJA (no se registran en BD)
-const PRECIO_BAJA = {
-  price_less_than_week: 95,
-  price_one_week: 85,
-  price_two_weeks: 75,
-  price_three_weeks: 65,
-};
-
-// Determinar tipo de temporada según el sobrecoste
-const getTipoTemporada = (season: Season) => {
-  const sobrecoste = (season.price_less_than_week ?? 0) - PRECIO_BAJA.price_less_than_week;
-  if (sobrecoste >= 60) return { tipo: 'ALTA', color: '#EF4444', sobrecoste };
-  if (sobrecoste >= 30) return { tipo: 'MEDIA', color: '#F59E0B', sobrecoste };
-  return { tipo: 'BAJA', color: '#3B82F6', sobrecoste: 0 };
-};
 
 export default function TemporadasAdmin() {
   // Establecer título de la página
@@ -111,6 +101,7 @@ export default function TemporadasAdmin() {
       min_days: season.min_days,
       year: season.year,
       is_active: season.is_active,
+      season_type: season.season_type ?? "media",
     });
   };
 
@@ -200,10 +191,10 @@ export default function TemporadasAdmin() {
           <p>• Los precios se calculan <strong>día a día</strong>. Si un alquiler cruza temporadas, cada día se cobra según su temporada</p>
           <p className="mt-4 font-bold">Precios base TEMPORADA BAJA (NO se registra):</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 bg-white p-3 rounded-lg">
-            <div className="text-center"><div className="text-xs text-gray-500">{'< 7 días'}</div><div className="font-bold text-blue-600">95€/día</div></div>
-            <div className="text-center"><div className="text-xs text-gray-500">7-13 días</div><div className="font-bold text-blue-600">85€/día</div></div>
-            <div className="text-center"><div className="text-xs text-gray-500">14-20 días</div><div className="font-bold text-blue-600">75€/día</div></div>
-            <div className="text-center"><div className="text-xs text-gray-500">21+ días</div><div className="font-bold text-blue-600">65€/día</div></div>
+            <div className="text-center"><div className="text-xs text-gray-500">{'< 7 días'}</div><div className="font-bold text-blue-600">{PRECIO_TEMPORADA_BAJA.price_less_than_week}€/día</div></div>
+            <div className="text-center"><div className="text-xs text-gray-500">7-13 días</div><div className="font-bold text-blue-600">{PRECIO_TEMPORADA_BAJA.price_one_week}€/día</div></div>
+            <div className="text-center"><div className="text-xs text-gray-500">14-20 días</div><div className="font-bold text-blue-600">{PRECIO_TEMPORADA_BAJA.price_two_weeks}€/día</div></div>
+            <div className="text-center"><div className="text-xs text-gray-500">21+ días</div><div className="font-bold text-blue-600">{PRECIO_TEMPORADA_BAJA.price_three_weeks}€/día</div></div>
           </div>
         </div>
       </div>
@@ -264,7 +255,7 @@ export default function TemporadasAdmin() {
                   const start = new Date(season.start_date);
                   const end = new Date(season.end_date);
                   const days = Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-                  const { tipo, color, sobrecoste } = getTipoTemporada(season);
+                  const { tipo, color, sobrecoste } = getSeasonDisplayTipo(season);
                   
                   return (
                     <tr key={season.id} className="hover:bg-gray-50">
@@ -338,7 +329,7 @@ export default function TemporadasAdmin() {
           <h3 className="text-lg font-bold text-gray-900 mb-4">Detalle de Precios por Temporada</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {seasons.map((season) => {
-              const { tipo, color } = getTipoTemporada(season);
+              const { tipo, color } = getSeasonDisplayTipo(season);
               return (
                 <div key={season.id} className="bg-white p-4 rounded-lg border-2" style={{ borderColor: color }}>
                   <div className="flex items-center gap-2 mb-3">
@@ -374,26 +365,30 @@ export default function TemporadasAdmin() {
       {/* Color Legend */}
       <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
         <h3 className="text-lg font-bold text-gray-900 mb-4">Leyenda de Colores</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          El <strong>tipo</strong> (Baja / Media / Alta) lo eliges al editar la temporada: es independiente de los precios
+          (sirve para contratos, calendario público e informes). La columna &quot;Sobrecoste&quot; sigue mostrando la diferencia sobre tarifa baja.
+        </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 rounded-full bg-blue-500" />
             <div>
               <div className="font-semibold text-gray-700">Temporada Baja</div>
-              <div className="text-xs text-gray-500">Por defecto (sin sobrecoste)</div>
+              <div className="text-xs text-gray-500">Tipo explícito o por defecto fuera de períodos</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 rounded-full bg-orange-500" />
             <div>
               <div className="font-semibold text-gray-700">Temporada Media</div>
-              <div className="text-xs text-gray-500">+30€ o +40€ de sobrecoste</div>
+              <div className="text-xs text-gray-500">Asignación manual al editar</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="w-6 h-6 rounded-full bg-red-500" />
             <div>
               <div className="font-semibold text-gray-700">Temporada Alta</div>
-              <div className="text-xs text-gray-500">+60€ de sobrecoste</div>
+              <div className="text-xs text-gray-500">Asignación manual al editar</div>
             </div>
           </div>
         </div>
@@ -449,6 +444,29 @@ export default function TemporadasAdmin() {
                   onChange={(e) => setEditForm({ ...editForm, slug: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Tipo de temporada
+                </label>
+                <select
+                  value={(editForm.season_type as SeasonKind) || "media"}
+                  onChange={(e) =>
+                    setEditForm({
+                      ...editForm,
+                      season_type: e.target.value as SeasonKind,
+                    })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
+                >
+                  <option value="baja">Baja</option>
+                  <option value="media">Media</option>
+                  <option value="alta">Alta</option>
+                </select>
+                <p className="mt-1 text-xs text-gray-500">
+                  Clasificación comercial (calendario de tarifas, condiciones, informes). No fija automáticamente los precios.
+                </p>
               </div>
 
               {/* Fechas */}
