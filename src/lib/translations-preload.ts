@@ -1828,6 +1828,30 @@ export const staticTranslations = {
     fr: "Ce véhicule dispose de jusqu'à 4 places de couchage. Si plus de 2 personnes dorment, vous devez ajouter l'option du lit supplémentaire.",
     de: "Dieses Fahrzeug verfügt über bis zu 4 Schlafplätze. Wenn mehr als 2 Personen schlafen, müssen Sie das Zusatzbett hinzufügen."
   },
+  "Cama adicional": {
+    es: "Cama adicional",
+    en: "Extra bed",
+    fr: "Lit supplémentaire",
+    de: "Zusatzbett"
+  },
+  "Este vehículo puede tener hasta 4 plazas de noche si añades la cama adicional. Si continúas sin ella, solo hay 2 plazas para dormir. ¿Quieres añadirla ahora o seguir sin ella?": {
+    es: "Este vehículo puede tener hasta 4 plazas de noche si añades la cama adicional. Si continúas sin ella, solo hay 2 plazas para dormir. ¿Quieres añadirla ahora o seguir sin ella?",
+    en: "This vehicle can sleep up to 4 people if you add the extra bed. Without it, only 2 people can sleep. Do you want to add it now or continue without it?",
+    fr: "Ce véhicule peut accueillir jusqu'à 4 personnes la nuit si vous ajoutez le lit supplémentaire. Sans lui, seulement 2 personnes peuvent dormir. Voulez-vous l'ajouter maintenant ou continuer sans ?",
+    de: "Mit dem Zusatzbett sind bis zu 4 Schlafplätze möglich. Ohne Zusatzbett gibt es nur 2 Schlafplätze. Möchten Sie es jetzt hinzufügen oder ohne fortfahren?"
+  },
+  "Añadir la cama adicional y continuar": {
+    es: "Añadir la cama adicional y continuar",
+    en: "Add extra bed and continue",
+    fr: "Ajouter le lit supplémentaire et continuer",
+    de: "Zusatzbett hinzufügen und fortfahren"
+  },
+  "Continuar sin cama adicional (2 plazas de noche)": {
+    es: "Continuar sin cama adicional (2 plazas de noche)",
+    en: "Continue without extra bed (2 sleeping places)",
+    fr: "Continuer sans lit supplémentaire (2 couchages)",
+    de: "Ohne Zusatzbett fortfahren (2 Schlafplätze)"
+  },
   "Destacados": {
     es: "Destacados",
     en: "Highlights",

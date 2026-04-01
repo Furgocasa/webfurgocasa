@@ -65,6 +65,7 @@ function ReservarVehiculoContent() {
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
   const [locationFee, setLocationFee] = useState(0);
+  const [showBedConfirmModal, setShowBedConfirmModal] = useState(false);
 
   // Usar hook para calcular precios con temporadas
   const seasonalPricing = useSeasonalPricing({
@@ -272,8 +273,7 @@ function ReservarVehiculoContent() {
     });
   };
 
-  const handleContinue = () => {
-    // Build URL with extras
+  const proceedToBookingForm = (extrasList: SelectedExtra[]) => {
     const params = new URLSearchParams({
       vehicle_id: vehicleId!,
       pickup_date: pickupDate!,
@@ -283,15 +283,23 @@ function ReservarVehiculoContent() {
       pickup_location: pickupLocation || '',
       dropoff_location: dropoffLocation || '',
     });
-
-    // Add selected extras
-    selectedExtras.forEach((item, index) => {
+    extrasList.forEach((item, index) => {
       params.append(`extra_${index}_id`, item.extra.id);
       params.append(`extra_${index}_quantity`, item.quantity.toString());
     });
-
-    // Ruta funcional sin prefijo de idioma
     router.push(`/fr/reserver/nouvelle?${params.toString()}`);
+  };
+
+  const handleContinue = () => {
+    const bed = extras.find(e => e.name.includes('cama') && e.name.includes('4 plazas'));
+    if (bed) {
+      const bedLine = selectedExtras.find(item => item.extra.id === bed.id);
+      if (!bedLine || bedLine.quantity < 1) {
+        setShowBedConfirmModal(true);
+        return;
+      }
+    }
+    proceedToBookingForm(selectedExtras);
   };
 
   if (loading) {
@@ -331,6 +339,29 @@ function ReservarVehiculoContent() {
   const bedExtraSelected = bedExtra ? selectedExtras.find(item => item.extra.id === bedExtra.id) : null;
   const isBedExtraAdded = (bedExtraSelected?.quantity || 0) > 0;
   const otherExtras = bedExtra ? extras.filter(e => e.id !== bedExtra.id) : extras;
+
+  const confirmContinueWithoutBed = () => {
+    setShowBedConfirmModal(false);
+    proceedToBookingForm(selectedExtras);
+  };
+
+  const confirmAddBedAndContinue = () => {
+    if (!bedExtra) return;
+    setShowBedConfirmModal(false);
+    let list: SelectedExtra[];
+    const existing = selectedExtras.find(i => i.extra.id === bedExtra.id);
+    if (existing) {
+      list = selectedExtras.map(i =>
+        i.extra.id === bedExtra.id ? { ...i, quantity: Math.max(i.quantity, 1) } : i
+      );
+    } else {
+      const initialQty =
+        bedExtra.price_type === 'per_unit' && bedExtra.min_quantity ? bedExtra.min_quantity : 1;
+      list = [...selectedExtras, { extra: bedExtra, quantity: initialQty }];
+    }
+    setSelectedExtras(list);
+    proceedToBookingForm(list);
+  };
 
   const extrasByCategory = { 'Extras': otherExtras };
 
@@ -811,6 +842,42 @@ function ReservarVehiculoContent() {
           </div>
         </div>
       </div>
+
+      {showBedConfirmModal && bedExtra && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="bed-confirm-title"
+        >
+          <div className="bg-white rounded-2xl p-6 lg:p-8 max-w-md w-full shadow-2xl space-y-4">
+            <h3 id="bed-confirm-title" className="text-xl lg:text-2xl font-bold text-gray-900">
+              {t("Cama adicional")}
+            </h3>
+            <p className="text-gray-600 text-sm lg:text-base leading-relaxed">
+              {t(
+                "Este vehículo puede tener hasta 4 plazas de noche si añades la cama adicional. Si continúas sin ella, solo hay 2 plazas para dormir. ¿Quieres añadirla ahora o seguir sin ella?"
+              )}
+            </p>
+            <div className="flex flex-col gap-3 pt-2">
+              <button
+                type="button"
+                onClick={confirmAddBedAndContinue}
+                className="w-full bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center"
+              >
+                {t("Añadir la cama adicional y continuar")}
+              </button>
+              <button
+                type="button"
+                onClick={confirmContinueWithoutBed}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center"
+              >
+                {t("Continuar sin cama adicional (2 plazas de noche)")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 </>
   );
 }
