@@ -844,20 +844,18 @@ function ReservarVehiculoContent() {
       </div>
 
       {showBedConfirmModal && bedExtra && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="bed-confirm-title"
-        >
-          <div className="bg-white rounded-2xl p-6 lg:p-8 max-w-md w-full shadow-2xl space-y-4">
-            <h3 id="bed-confirm-title" className="text-xl lg:text-2xl font-bold text-gray-900">
+        <div className="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 lg:p-8 max-w-md w-full shadow-2xl space-y-6">
+            <h3 className="text-xl lg:text-2xl font-bold text-gray-900">
               {t("Cama adicional")}
             </h3>
             <p className="text-gray-600 text-sm lg:text-base leading-relaxed">
               {t(
                 "Este vehículo puede tener hasta 4 plazas de noche si añades la cama adicional. Si continúas sin ella, solo hay 2 plazas para dormir. ¿Quieres añadirla ahora o seguir sin ella?"
               )}
+            </p>
+            <p className="text-furgocasa-orange font-bold text-lg">
+              {formatPrice(bedExtra.price_per_day || 0)} / {t("día")}
             </p>
             <div className="flex flex-col gap-3 pt-2">
               <button
@@ -870,7 +868,7 @@ function ReservarVehiculoContent() {
               <button
                 type="button"
                 onClick={confirmContinueWithoutBed}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center"
               >
                 {t("Continuar sin cama adicional (2 plazas de noche)")}
               </button>
