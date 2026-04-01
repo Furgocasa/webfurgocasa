@@ -1846,11 +1846,17 @@ export const staticTranslations = {
     fr: "Ajouter le lit supplémentaire et continuer",
     de: "Zusatzbett hinzufügen und fortfahren"
   },
-  "Continuar sin cama adicional (2 plazas de noche)": {
-    es: "Continuar sin cama adicional (2 plazas de noche)",
-    en: "Continue without extra bed (2 sleeping places)",
-    fr: "Continuer sans lit supplémentaire (2 couchages)",
-    de: "Ohne Zusatzbett fortfahren (2 Schlafplätze)"
+  "Continuar sin cama adicional": {
+    es: "Continuar sin cama adicional",
+    en: "Continue without extra bed",
+    fr: "Continuer sans lit supplémentaire",
+    de: "Ohne Zusatzbett fortfahren"
+  },
+  "(2 plazas de noche)": {
+    es: "(2 plazas de noche)",
+    en: "(2 sleeping places)",
+    fr: "(2 couchages)",
+    de: "(2 Schlafplätze)"
   },
   "Destacados": {
     es: "Destacados",

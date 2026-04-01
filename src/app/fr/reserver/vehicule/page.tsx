@@ -868,9 +868,10 @@ function ReservarVehiculoContent() {
               <button
                 type="button"
                 onClick={confirmContinueWithoutBed}
-                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center"
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 lg:py-4 px-4 rounded-xl transition-colors text-center flex flex-col items-center gap-1"
               >
-                {t("Continuar sin cama adicional (2 plazas de noche)")}
+                <span>{t("Continuar sin cama adicional")}</span>
+                <span className="text-xs font-normal text-gray-500">{t("(2 plazas de noche)")}</span>
               </button>
             </div>
           </div>
