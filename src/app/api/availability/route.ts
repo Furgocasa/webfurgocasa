@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { 
   calculateRentalDays, 
   calculatePricingDays, 
@@ -50,6 +50,9 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+    // Reservas y bloqueos: RLS restringe lectura al cliente/admin. La disponibilidad
+    // debe ser la misma para todos → service role solo en este endpoint (servidor).
+    const supabaseAdmin = createAdminClient();
 
     const { data: businessClosedRows } = await supabase
       .from("business_closed_dates")
@@ -105,7 +108,7 @@ export async function GET(request: NextRequest) {
     // 2. Obtener reservas que se solapan con las fechas solicitadas
     // Bloquean vehículos SOLO si ya tienen al menos el primer pago,
     // independientemente del estado operativo de la reserva
-    const { data: conflictingBookings, error: bookingsError } = await supabase
+    const { data: conflictingBookings, error: bookingsError } = await supabaseAdmin
       .from("bookings")
       .select("vehicle_id")
       .neq("status", "cancelled")
@@ -121,7 +124,7 @@ export async function GET(request: NextRequest) {
     }
 
     // 3. Obtener fechas bloqueadas que se solapan
-    const { data: blockedDates, error: blockedError } = await supabase
+    const { data: blockedDates, error: blockedError } = await supabaseAdmin
       .from("blocked_dates")
       .select("vehicle_id")
       .or(`and(start_date.lte.${dropoffDate},end_date.gte.${pickupDate})`);

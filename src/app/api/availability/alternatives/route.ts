@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import { toDateString } from "@/lib/utils";
 import {
   isYmdInClosedRange,
@@ -57,6 +57,7 @@ export async function GET(request: NextRequest) {
     }
 
     const supabase = await createClient();
+    const supabaseAdmin = createAdminClient();
 
     const { data: businessClosedRows } = await supabase
       .from("business_closed_dates")
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
     const windowEndStr = toDateString(windowEnd);
 
     const [{ data: bookings }, { data: blockedDates }] = await Promise.all([
-      supabase
+      supabaseAdmin
         .from("bookings")
         .select("vehicle_id, pickup_date, dropoff_date")
         .neq("status", "cancelled")
@@ -118,7 +119,7 @@ export async function GET(request: NextRequest) {
         .or(
           `and(pickup_date.lte.${windowEndStr},dropoff_date.gte.${windowStartStr})`
         ),
-      supabase
+      supabaseAdmin
         .from("blocked_dates")
         .select("vehicle_id, start_date, end_date")
         .or(
