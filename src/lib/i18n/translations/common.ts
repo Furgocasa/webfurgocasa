@@ -72,6 +72,12 @@ export const commonTranslations = {
     fr: "Contact",
     de: "Kontakt"
   },
+  "Creadores de contenido": {
+    es: "Creadores de contenido",
+    en: "Content creators",
+    fr: "Créateurs de contenu",
+    de: "Content Creator"
+  },
   
   // Common buttons
   "Leer más": {

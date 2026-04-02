@@ -82,6 +82,7 @@ export function Footer() {
                 { name: t("Ventas"), href: "/ventas" },
                 { name: t("Tarifas"), href: "/tarifas" },
                 { name: t("Blog"), href: "/blog" },
+                { name: t("Creadores de contenido"), href: "/creadores-de-contenido" },
                 { name: t("Preguntas Frecuentes"), href: "/faqs" },
                 { name: t("Contacto"), href: "/contacto" },
               ].map((link) => (

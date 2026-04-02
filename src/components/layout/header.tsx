@@ -31,6 +31,7 @@ export function Header() {
 
   const furgocasaDropdown = [
     { name: t("¿Quiénes somos?"), href: "/quienes-somos" },
+    { name: t("Creadores de contenido"), href: "/creadores-de-contenido" },
     { name: t("Guía Camper"), href: "/guia-camper" },
     { name: t("Inteligencia Artificial"), href: "/inteligencia-artificial" },
     { name: t("Mapa áreas"), href: "/mapa-areas" },

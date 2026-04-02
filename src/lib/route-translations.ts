@@ -180,6 +180,13 @@ export const routeTranslations = {
     fr: "/clients-vip", 
     de: "/vip-kunden" 
   },
+  /** Colaboraciones con creadores de contenido (UGC, vídeo, foto) — misma página en todos los idiomas con copy principal en ES */
+  "/creadores-de-contenido": {
+    es: "/creadores-de-contenido",
+    en: "/content-creator-collaborations",
+    fr: "/collaborations-createurs-contenu",
+    de: "/content-creator-kooperation",
+  },
   "/documentacion-alquiler": { 
     es: "/documentacion-alquiler", 
     en: "/rental-documentation", 
