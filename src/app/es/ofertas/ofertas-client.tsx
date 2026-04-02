@@ -5,7 +5,6 @@ import { Snowflake, Tag, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift
 import { useLanguage } from "@/contexts/language-context";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { SummerBanner } from "./summer-banner";
 
 interface LastMinuteOffer {
   id: string;
@@ -37,7 +36,6 @@ interface LastMinuteOffer {
 
 export function OfertasClient() {
   const { t, locale } = useLanguage();
-  const [copied, setCopied] = useState(false);
   const [lastMinuteOffers, setLastMinuteOffers] = useState<LastMinuteOffer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
 
@@ -75,12 +73,6 @@ export function OfertasClient() {
       maximumFractionDigits: 2,
       useGrouping: true
     }).format(numPrice);
-  };
-
-  const handleCopyCode = () => {
-    navigator.clipboard.writeText("INV2026");
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
   };
 
   const benefits = [
@@ -222,9 +214,6 @@ export function OfertasClient() {
           </div>
         </div>
       </section>
-
-      {/* Oferta Verano 2026 (Diseño Original Animado) */}
-      <SummerBanner />
 
       {/* Cómo usar el cupón */}
       <section className="py-20 bg-white">
