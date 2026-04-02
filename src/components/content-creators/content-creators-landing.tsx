@@ -1,13 +1,12 @@
+import Image from "next/image";
 import {
   Camera,
   CheckCircle2,
   Clapperboard,
-  FileImage,
   Film,
   MapPin,
   Sparkles,
   Users,
-  Video,
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import { CreatorApplicationForm } from "./creator-application-form";
@@ -296,31 +295,54 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
         </div>
       </section>
 
-      {/* Ejemplos visuales (placeholders) */}
+      {/* Ejemplos visuales (referencia de estética) */}
       <section className="border-t border-gray-100 bg-gray-50 py-16 md:py-20" aria-labelledby="ejemplos-contenido">
         <div className="container mx-auto px-4">
           <h2 id="ejemplos-contenido" className="text-center font-heading text-3xl font-bold text-gray-900 md:text-4xl">
             El tipo de contenido que nos encaja
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
-            Aquí irán capturas reales de campañas o producciones propias. De momento dejamos la estructura lista para que solo tengáis que sustituir imágenes.
+            Referencia visual de la estética que encaja con FURGOCASA: luz natural, producto legible y sensación de viaje real. Sustituye por capturas de vuestras producciones cuando queráis.
           </p>
           <div className="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-3">
             {[
-              { title: "Lifestyle en camper", hint: "16:9 o 4:5 · luz natural", icon: FileImage },
-              { title: "Vertical interior", hint: "9:16 · detalle y amplitud", icon: Video },
-              { title: "Rutina de viaje", hint: "Desayuno, ruta, pernocta", icon: Sparkles },
-            ].map(({ title, hint, icon: Icon }) => (
-              <div
+              {
+                src: "/images/content-creators/showcase-lifestyle-camper.webp",
+                title: "Lifestyle en camper",
+                hint: "16:9 o 4:5 · luz natural",
+                alt: "Camper moderna al atardecer junto al mar, estilo lifestyle editorial",
+              },
+              {
+                src: "/images/content-creators/showcase-vertical-interior.webp",
+                title: "Vertical interior",
+                hint: "9:16 · detalle y amplitud",
+                alt: "Interior luminoso de autocaravana con cocina y comedor compactos",
+              },
+              {
+                src: "/images/content-creators/showcase-travel-routine.webp",
+                title: "Rutina de viaje",
+                hint: "Desayuno, ruta, pernocta",
+                alt: "Desayuno y café dentro de una camper, luz mañanera",
+              },
+            ].map(({ src, title, hint, alt }) => (
+              <figure
                 key={title}
-                className="overflow-hidden rounded-2xl border border-dashed border-gray-300 bg-white"
+                className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:border-furgocasa-blue/20 hover:shadow-md"
               >
-                <div className="flex aspect-[4/5] flex-col items-center justify-center bg-gradient-to-b from-gray-100 to-gray-200 text-gray-500">
-                  <Icon className="h-12 w-12 opacity-40" aria-hidden />
-                  <span className="mt-3 px-4 text-center text-sm font-medium">Imagen / vídeo: {title}</span>
+                <div className="relative aspect-[4/5] bg-gray-100">
+                  <Image
+                    src={src}
+                    alt={alt}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
                 </div>
-                <p className="border-t border-gray-100 px-4 py-3 text-center text-xs text-gray-500">{hint}</p>
-              </div>
+                <figcaption className="border-t border-gray-100 px-4 py-3 text-center">
+                  <span className="text-sm font-semibold text-gray-900">{title}</span>
+                  <p className="mt-1 text-xs text-gray-500">{hint}</p>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>
