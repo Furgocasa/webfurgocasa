@@ -127,11 +127,11 @@ const nextConfig = {
     // Documentación: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
     const ContentSecurityPolicy = `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://googleads.g.doubleclick.net https://www.googleadservices.com;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      img-src 'self' data: blob: https://*.supabase.co https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com https://www.google.com https://www.google.es https://googleads.g.doubleclick.net https://www.googleadservices.com;
-      font-src 'self' https://fonts.gstatic.com data:;
-      connect-src 'self' https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://connect.facebook.net https://api.stripe.com https://*.analytics.google.com https://www.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://*.tinymce.com https://*.tiny.cloud;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tinymce.com https://*.tiny.cloud;
+      img-src 'self' data: blob: https://*.supabase.co https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com https://www.google.com https://www.google.es https://googleads.g.doubleclick.net https://www.googleadservices.com https://*.tinymce.com https://*.tiny.cloud;
+      font-src 'self' https://fonts.gstatic.com data: https://*.tinymce.com https://*.tiny.cloud;
+      connect-src 'self' blob: https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://connect.facebook.net https://api.stripe.com https://*.analytics.google.com https://www.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://*.tinymce.com https://*.tiny.cloud;
       frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://www.googletagmanager.com https://td.doubleclick.net;
       frame-ancestors 'none';
       form-action 'self' https://sis.redsys.es https://sis-t.redsys.es;
