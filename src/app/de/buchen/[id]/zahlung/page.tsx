@@ -120,6 +120,11 @@ export default function PagoPage() {
 
   const paymentInfo = calculatePaymentAmounts();
   const amountToPay = paymentInfo.isPending50 ? paymentInfo.secondPayment : paymentInfo.firstPayment;
+
+  const daysUntilPickup = booking
+    ? Math.ceil((new Date(booking.pickup_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))
+    : Infinity;
+  const depositDisabled = daysUntilPickup < 15 && !paymentInfo.isPending50;
   
   // Comisión del 2% SOLO para Stripe (Redsys sin comisión)
   const STRIPE_FEE_PERCENT = 0.02;
@@ -589,7 +594,7 @@ export default function PagoPage() {
             </div>
             
             {/* Política de pagos 50%-50% */}
-            {!paymentInfo.isPending50 && (
+            {!paymentInfo.isPending50 && !depositDisabled && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <h3 className="font-semibold text-blue-900 mb-2">
                   {t("Política de pago Furgocasa")}
@@ -598,6 +603,17 @@ export default function PagoPage() {
                   <li>• <strong>50%</strong> {t("al realizar la reserva")} ({formatPrice(paymentInfo.firstPayment)})</li>
                   <li>• <strong>50%</strong> {t("máximo 15 días antes de la recogida")} ({formatPrice(paymentInfo.secondPayment)})</li>
                 </ul>
+              </div>
+            )}
+
+            {!paymentInfo.isPending50 && depositDisabled && (
+              <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 mb-6">
+                <h3 className="font-semibold text-amber-900 mb-2">
+                  {t("Pago completo requerido")}
+                </h3>
+                <p className="text-sm text-amber-800">
+                  {t("Dado que faltan menos de 15 días para el inicio del alquiler, es necesario abonar el 100% del importe. No es posible fraccionar el pago en dos mitades.")}
+                </p>
               </div>
             )}
 
@@ -614,40 +630,52 @@ export default function PagoPage() {
 
             <div className="space-y-4">
               {/* Botón pago principal (50% o restante) */}
-              <button
-                onClick={() => {
-                  if (paymentMethod === 'redsys') {
-                    setPendingPaymentType('deposit');
-                    setShowRedsysWarning(true);
-                  } else {
-                    handlePayment("deposit");
-                  }
-                }}
-                disabled={processing}
-                className="w-full bg-furgocasa-orange text-white font-semibold py-4 px-6 rounded-lg hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {processing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                    {t("Redirigiendo a pasarela de pago...")}
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="h-5 w-5" />
-                    {paymentInfo.isPending50 ? (
-                      <>
-                        {t("Pagar restante")} - {formatPrice(paymentMethod === 'stripe' ? amountWithStripeFee : amountToPay)}
-                        {paymentMethod === 'stripe' && <span className="text-xs ml-1">({t("incl.")} 2%)</span>}
-                      </>
-                    ) : (
-                      <>
-                        {t("Pagar 50% ahora")} - {formatPrice(paymentMethod === 'stripe' ? amountWithStripeFee : amountToPay)}
-                        {paymentMethod === 'stripe' && <span className="text-xs ml-1">({t("incl.")} 2%)</span>}
-                      </>
-                    )}
-                  </>
+              <div className="relative group">
+                <button
+                  onClick={() => {
+                    if (depositDisabled) return;
+                    if (paymentMethod === 'redsys') {
+                      setPendingPaymentType('deposit');
+                      setShowRedsysWarning(true);
+                    } else {
+                      handlePayment("deposit");
+                    }
+                  }}
+                  disabled={processing || depositDisabled}
+                  className={`w-full font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 ${
+                    depositDisabled
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-furgocasa-orange text-white hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed'
+                  }`}
+                >
+                  {processing && !depositDisabled ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      {t("Redirigiendo a pasarela de pago...")}
+                    </>
+                  ) : (
+                    <>
+                      <CreditCard className="h-5 w-5" />
+                      {paymentInfo.isPending50 ? (
+                        <>
+                          {t("Pagar restante")} - {formatPrice(paymentMethod === 'stripe' ? amountWithStripeFee : amountToPay)}
+                          {paymentMethod === 'stripe' && <span className="text-xs ml-1">({t("incl.")} 2%)</span>}
+                        </>
+                      ) : (
+                        <>
+                          {t("Pagar 50% ahora")} - {formatPrice(paymentMethod === 'stripe' ? amountWithStripeFee : amountToPay)}
+                          {paymentMethod === 'stripe' && <span className="text-xs ml-1">({t("incl.")} 2%)</span>}
+                        </>
+                      )}
+                    </>
+                  )}
+                </button>
+                {depositDisabled && (
+                  <p className="mt-2 text-xs text-amber-700 text-center">
+                    {t("No es posible abonar solo la primera mitad, ya que faltan menos de 15 días para el inicio del alquiler. En este caso, es necesario abonar el 100%.")}
+                  </p>
                 )}
-              </button>
+              </div>
 
               {/* Opción de pagar el total (solo si no se ha pagado nada) */}
               {!paymentInfo.isPending50 && (
@@ -661,7 +689,11 @@ export default function PagoPage() {
                     }
                   }}
                   disabled={processing}
-                  className="w-full bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-semibold py-4 px-6 rounded-lg hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className={`w-full font-semibold py-4 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    depositDisabled
+                      ? 'bg-furgocasa-orange text-white hover:bg-orange-600'
+                      : 'bg-white text-furgocasa-blue border-2 border-furgocasa-blue hover:bg-blue-50'
+                  }`}
                 >
                   <CreditCard className="h-5 w-5" />
                   {t("Pagar total ahora")} - {formatPrice(paymentMethod === 'stripe' ? fullAmountWithStripeFee : fullAmount)}

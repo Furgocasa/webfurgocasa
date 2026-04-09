@@ -4826,6 +4826,24 @@ export const staticTranslations = {
     fr: "Pay total now",
     de: "Pay total now"
   },
+  "Pago completo requerido": {
+    es: "Pago completo requerido",
+    en: "Full payment required",
+    fr: "Paiement intégral requis",
+    de: "Vollständige Zahlung erforderlich"
+  },
+  "Dado que faltan menos de 15 días para el inicio del alquiler, es necesario abonar el 100% del importe. No es posible fraccionar el pago en dos mitades.": {
+    es: "Dado que faltan menos de 15 días para el inicio del alquiler, es necesario abonar el 100% del importe. No es posible fraccionar el pago en dos mitades.",
+    en: "Since there are less than 15 days until the rental start date, it is necessary to pay 100% of the total amount. It is not possible to split the payment into two halves.",
+    fr: "Étant donné qu'il reste moins de 15 jours avant le début de la location, il est nécessaire de régler 100% du montant total. Il n'est pas possible de fractionner le paiement en deux moitiés.",
+    de: "Da weniger als 15 Tage bis zum Mietbeginn verbleiben, ist es erforderlich, 100% des Gesamtbetrags zu zahlen. Eine Aufteilung der Zahlung in zwei Hälften ist nicht möglich."
+  },
+  "No es posible abonar solo la primera mitad, ya que faltan menos de 15 días para el inicio del alquiler. En este caso, es necesario abonar el 100%.": {
+    es: "No es posible abonar solo la primera mitad, ya que faltan menos de 15 días para el inicio del alquiler. En este caso, es necesario abonar el 100%.",
+    en: "It is not possible to pay only the first half, as there are less than 15 days until the rental start date. In this case, you must pay 100%.",
+    fr: "Il n'est pas possible de ne régler que la première moitié, car il reste moins de 15 jours avant le début de la location. Dans ce cas, vous devez régler 100%.",
+    de: "Es ist nicht möglich, nur die erste Hälfte zu zahlen, da weniger als 15 Tage bis zum Mietbeginn verbleiben. In diesem Fall müssen Sie 100% zahlen."
+  },
   "Pago seguro con Redsys": {
     es: "Pago seguro con Redsys",
     en: "Secure payment with Redsys",
