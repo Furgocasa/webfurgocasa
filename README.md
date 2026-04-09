@@ -91,6 +91,15 @@ Cada día a las 20:00 h (Madrid) un cron de Vercel busca reservas `confirmed` / 
 
 ---
 
+## 📅 Abril 2026 — Pago 100 % obligatorio si faltan menos de 15 días para la recogida
+
+**Documentación:** [`docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md)
+
+- Si el cliente **aún no ha pagado** y la **fecha de recogida** dista **menos de 15 días** desde hoy, en la página de pago el botón **«Pagar 50 % ahora»** queda **deshabilitado**; solo puede **«Pagar total ahora»** (misma lógica en ES/EN/FR/DE: `es/reservar/[id]/pago`, `en/book/[id]/payment`, `de/buchen/[id]/zahlung`, `fr/reserver/[id]/paiement`).
+- Valores de negocio canónicos: `src/lib/company.ts` → `rentalPolicy.bookingPayment` (50 % + plazo 15 días).
+
+---
+
 ## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Febrero 2026 - **Franjas Horarias por Ubicación + Fix Timezone Europe/Madrid**
 
 ### 🕐 Franjas Horarias Configurables por Ubicación
@@ -1372,7 +1381,7 @@ src/lib/supabase/
 - ✅ **Fechas alternativas** si no hay disponibilidad (misma duración; UI en ES/EN/FR/DE)
 - ✅ **Catálogo de vehículos con imágenes dinámicas**
 - ✅ **Proceso de reserva completo paso a paso** 🎯
-- ✅ **Sistema de pago fraccionado (50%-50%)**
+- ✅ **Sistema de pago fraccionado (50 %-50 %)**; si la recogida es en **menos de 15 días** y no hay pago previo, solo **100 %** en pantalla
 - ✅ **Sistema de pagos dual - Redsys + Stripe** 💳
 - ✅ Blog completo con categorías y SEO
 - ✅ **Sistema i18n con URLs localizadas** (ES/EN/FR/DE)
@@ -1738,12 +1747,12 @@ supabase/fix-all-rls-policies.sql
 ## 💳 Sistema de Pagos Completo (v2.0)
 
 **Estado:** ✅ COMPLETAMENTE OPERATIVO  
-**Última actualización:** marzo 2026 (PVP con comisión Stripe en `total_price`; ver docs de pagos)
+**Última actualización:** abril 2026 (PVP Stripe; si faltan menos de 15 días para la recogida sin pago previo → solo 100 % en UI; ver [`docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md))
 
 ### 🎯 Funcionalidades
 
 ✅ **Pagos en línea** - Redsys (sin comisión repercutida) + Stripe (comisión ~2 % **incluida en el PVP** de la reserva)  
-✅ **Pago fraccionado** - 50% al reservar, 50% antes del alquiler  
+✅ **Pago fraccionado** - 50 % al reservar y 50 % como máximo 15 días antes de la recogida; **si faltan menos de 15 días para la recogida y no hay pago previo, la UI solo permite el 100 %**  
 ✅ **Gestión manual** - Transferencias, efectivo, bizum desde admin  
 ✅ **Fallback automático** - Si notificación falla, se procesa en `/pago/exito`  
 ✅ **Emails automatizados** - Confirmación al cliente + admin  
@@ -1752,9 +1761,9 @@ supabase/fix-all-rls-policies.sql
 
 | Documento | Contenido |
 |-----------|-----------|
-| **[SISTEMA-PAGOS.md](./SISTEMA-PAGOS.md)** | 📖 Guía completa del sistema |
-| **[REDSYS-FUNCIONANDO.md](./REDSYS-FUNCIONANDO.md)** | ✅ Estado y configuración Redsys |
-| **[REDSYS-CRYPTO-NO-TOCAR.md](./REDSYS-CRYPTO-NO-TOCAR.md)** | ⛔ Firma criptográfica protegida |
+| **[SISTEMA-PAGOS.md](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md)** | 📖 Guía completa del sistema |
+| **[REDSYS-FUNCIONANDO.md](./docs/02-desarrollo/pagos/REDSYS-FUNCIONANDO.md)** | ✅ Estado y configuración Redsys |
+| **[REDSYS-CRYPTO-NO-TOCAR.md](./docs/02-desarrollo/pagos/REDSYS-CRYPTO-NO-TOCAR.md)** | ⛔ Firma criptográfica protegida |
 
 ### Métodos de Pago
 

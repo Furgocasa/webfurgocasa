@@ -32,6 +32,7 @@ Documentación de desarrollo por área:
 - Sistema dual Redsys + Stripe
 - Configuraciones de pasarelas
 - **PVP y comisión Stripe** (marzo 2026): comisión repercutida incluida en `bookings.total_price`; columnas `stripe_fee_total` / `stripe_fee` — ver **SISTEMA-PAGOS.md** y **STRIPE-CONFIGURACION.md**
+- **Política 50 %-50 % y excepción en UI** (abr. 2026): si la recogida es en menos de 15 días y aún no hay pago, el cliente solo puede abonar el 100 % (páginas de pago por idioma) — detalle en **SISTEMA-PAGOS.md**
 - **⚠️ REDSYS-CRYPTO-NO-TOCAR.md** - Archivo crítico protegido
 
 #### media/

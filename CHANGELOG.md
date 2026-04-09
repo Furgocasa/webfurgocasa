@@ -4,6 +4,13 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 💳 Pago reserva: solo 100 % si la recogida es en menos de 15 días — 9 de abril 2026
+
+- **UX / política:** Si `amount_paid === 0` y la fecha de recogida dista menos de 15 días, las páginas de pago (ES/EN/DE/FR) deshabilitan «Pagar 50 % ahora» y muestran avisos orientando al pago del 100 %.
+- **Docs:** Actualizados `README.md`, `docs/README.md`, `docs/INDICE-DOCUMENTACION.md`, `docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`, `docs/02-desarrollo/pagos/REDSYS-CONFIGURACION.md`, `docs/04-referencia/sistema-reservas/FLUJO-RESERVAS-CRITICO.md`.
+
+---
+
 ## 🔍 Búsqueda: fechas alternativas + tarifas + mailing — 22 de marzo 2026
 
 - **Sin disponibilidad:** en `/buscar`, `/search`, `/recherche`, `/suche` se muestran ventanas alternativas (misma duración) con tarjetas enriquecidas; API `GET /api/availability/alternatives`; precios con `buildPricingForSearch` en `src/lib/rental-search-pricing.ts`; componente `no-results-with-alternatives.tsx`; `vehicle-card` admite `wrapperClassName`.

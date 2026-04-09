@@ -1,18 +1,19 @@
 # 💳 Sistema de Pagos Furgocasa
 
-**Versión:** 2.1  
-**Última actualización:** 21/03/2026 (PVP Stripe + columnas BD; extras admin)
+**Versión:** 2.2  
+**Última actualización:** 09/04/2026 (excepción UI: menos de 15 días hasta la recogida → solo pago 100 %)
 
 ---
 
 ## 📋 Índice
 
 1. [Visión General](#visión-general)
-2. [Métodos de Pago](#métodos-de-pago)
-3. [Arquitectura Técnica](#arquitectura-técnica)
-4. [Gestión Manual](#gestión-manual)
-5. [Emails Automatizados](#emails-automatizados)
-6. [Troubleshooting](#troubleshooting)
+2. [Política contractual y excepción (menos de 15 días)](#política-contractual-y-excepción-menos-de-15-días)
+3. [Métodos de Pago](#métodos-de-pago)
+4. [Arquitectura Técnica](#arquitectura-técnica)
+5. [Gestión Manual](#gestión-manual)
+6. [Emails Automatizados](#emails-automatizados)
+7. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -25,6 +26,27 @@ El sistema de pagos de Furgocasa soporta múltiples métodos de pago con procesa
 - ✅ **Transferencia** - Gestión manual
 - ✅ **Efectivo** - Gestión manual
 - ✅ **Bizum** - Gestión manual
+
+---
+
+## Política contractual y excepción (menos de 15 días)
+
+**Fuente de verdad en código:** `src/lib/company.ts` → `COMPANY.rentalPolicy.bookingPayment` (`reservationPercent: 50`, `remainingBalanceDaysBeforePickup: 15`).
+
+**Regla habitual:** el cliente puede pagar el **50 %** al reservar y el **50 %** restante como máximo **15 días antes** de la recogida, u optar por el **100 %** en el primer cobro.
+
+**Excepción en la interfaz (abril 2026):** si la **fecha de recogida** (`pickup_date`) dista **menos de 15 días** desde la fecha actual (cálculo por días calendario) y **`amount_paid` es 0**, la página de pago **deshabilita** la opción de abonar solo la primera mitad y muestra mensajes orientando al **pago del 100 %** del pendiente. Así se alinea la UX con el plazo del segundo pago sin generar cobros parciales imposibles de completar en tiempo.
+
+**Archivos (misma lógica en los cuatro idiomas):**
+
+- `src/app/es/reservar/[id]/pago/page.tsx`
+- `src/app/en/book/[id]/payment/page.tsx`
+- `src/app/de/buchen/[id]/zahlung/page.tsx`
+- `src/app/fr/reserver/[id]/paiement/page.tsx`
+
+**Nota:** si el cliente **ya pagó** el primer 50 % y solo queda el segundo tramo (`isPending50`), el botón principal sigue siendo «Pagar restante»; no aplica la desactivación del depósito inicial.
+
+**Traducciones:** textos del aviso en `src/lib/translations-preload.ts`.
 
 ---
 
@@ -267,7 +289,7 @@ Vercel Logs → Buscar "📧 [6/8] Enviando email"
 
 **Verificar:**
 ```typescript
-// En src/app/reservar/[id]/pago/page.tsx
+// En las páginas de pago del cliente (ej. src/app/es/reservar/[id]/pago/page.tsx)
 const STRIPE_FEE_PERCENT = 0.02; // ¿Está definido?
 const amount = paymentMethod === 'stripe' 
   ? baseAmount + (baseAmount * STRIPE_FEE_PERCENT)
@@ -364,5 +386,5 @@ Todos los cambios manuales se registran:
 - `REDSYS-CRYPTO-NO-TOCAR.md` - Firma criptográfica
 - `emails/README.md` - Sistema de emails
 
-**Última revisión:** 24/01/2026  
-**Versión:** 2.0
+**Última revisión:** 09/04/2026  
+**Versión:** 2.2

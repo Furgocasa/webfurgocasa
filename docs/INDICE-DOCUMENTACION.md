@@ -1,10 +1,21 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.18 ✅ PRODUCCIÓN — búsqueda fechas alternativas (4 idiomas) documentada en README raíz  
+**Versión**: 1.0.19 ✅ PRODUCCIÓN — excepción de pago «menos de 15 días → 100 %» documentada en README y SISTEMA-PAGOS  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 22 de marzo, 2026
+**Última actualización**: 9 de abril, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 💳 ACTUALIZACIÓN ABRIL 2026 — PAGO INICIAL 50 % DESHABILITADO SI LA RECOGIDA ES EN MENOS DE 15 DÍAS
+
+| Tema | Dónde leer |
+|------|------------|
+| Regla de negocio, rutas por idioma (`es`/`en`/`de`/`fr`), referencia `COMPANY.rentalPolicy.bookingPayment` | **[SISTEMA-PAGOS.md](./02-desarrollo/pagos/SISTEMA-PAGOS.md)** — sección *Política contractual y excepción (menos de 15 días)* |
+| Misma política en contexto Redsys | **[REDSYS-CONFIGURACION.md](./02-desarrollo/pagos/REDSYS-CONFIGURACION.md)** |
+| Paso pasarela en el flujo de reserva | **[FLUJO-RESERVAS-CRITICO.md](./04-referencia/sistema-reservas/FLUJO-RESERVAS-CRITICO.md)** |
+| Resumen en README raíz | **[README raíz](../README.md)** — sección *Abril 2026 — Pago 100 % obligatorio…* · **CHANGELOG** (entrada 9 abr 2026) |
 
 ---
 

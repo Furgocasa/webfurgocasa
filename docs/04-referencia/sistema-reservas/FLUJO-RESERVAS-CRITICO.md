@@ -1,6 +1,6 @@
 # ⚠️ FLUJO DE RESERVAS CRÍTICO - NO MODIFICAR SIN DOCUMENTAR
 
-> **ÚLTIMA ACTUALIZACIÓN**: 8 de enero de 2026
+> **ÚLTIMA ACTUALIZACIÓN**: 9 de abril de 2026 (política de pago si faltan menos de 15 días; rutas multiidioma)
 > 
 > **MOTIVO DE ESTE DOCUMENTO**: En enero de 2026 se perdieron dos páginas críticas del flujo de reservas (`/reservar/vehiculo` y `/reservar/nueva`), lo que rompió completamente el sistema de reservas. Este documento garantiza que esto NO vuelva a suceder.
 
@@ -15,7 +15,7 @@ Este flujo representa el **CORE DEL NEGOCIO**. Sin este flujo funcionando, **NO 
 - ✅ `src/app/reservar/vehiculo/page.tsx` - **SE PERDIÓ EN ENE-2026** - Detalle + Extras
 - ✅ `src/app/reservar/nueva/page.tsx` - **SE PERDIÓ EN ENE-2026** - Formulario cliente
 - ✅ `src/app/reservar/[id]/page.tsx` - Detalle de reserva
-- ✅ `src/app/reservar/[id]/pago/page.tsx` - Pasarela de pago
+- ✅ Páginas de pago por idioma (ej. `src/app/es/reservar/[id]/pago/page.tsx`, `en/book/.../payment`, `de/buchen/.../zahlung`, `fr/reserver/.../paiement`) — Pasarela de pago
 - ✅ `src/app/reservar/[id]/confirmacion/page.tsx` - Confirmación
 
 ## 📊 Flujo Visual Completo
@@ -139,8 +139,11 @@ Este flujo representa el **CORE DEL NEGOCIO**. Sin este flujo funcionando, **NO 
                                ↓
 ╔════════════════════════════════════════════════════════════════════╗
 ║  PASO 6: PASARELA DE PAGO                                          ║
-║  /reservar/[id]/pago?amount=X                                     ║
-║  Archivo: src/app/reservar/[id]/pago/page.tsx                     ║
+║  Ej.: /es/reservar/[id]/pago (equivalentes EN/DE/FR en rutas localizadas) ║
+║  Archivos: ver docs/02-desarrollo/pagos/SISTEMA-PAGOS.md (sección política) ║
+║                                                                     ║
+║  Política: 50%-50% o 100% en un pago; si faltan menos de 15 días     ║
+║  para la recogida y no hay pago previo, la UI solo permite 100%.    ║
 ║                                                                     ║
 ║  Integración con Redsys TPV:                                       ║
 ║  - Prepara parámetros de pago                                     ║

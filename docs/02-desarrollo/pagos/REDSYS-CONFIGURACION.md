@@ -126,6 +126,8 @@ El sistema implementa la política de Furgocasa:
 1. **Primer pago (50%)**: Al realizar la reserva
 2. **Segundo pago (50%)**: Máximo 15 días antes de la recogida
 
+**Excepción en la UI (cliente, abril 2026):** si la recogida es en **menos de 15 días** y el cliente **aún no ha pagado**, las páginas de pago por idioma no ofrecen solo el 50 % inicial: el botón queda deshabilitado y se orienta al **pago del 100 %**. Detalle y rutas de archivo en **[SISTEMA-PAGOS.md](./SISTEMA-PAGOS.md)** (*Política contractual y excepción (menos de 15 días)*).
+
 ### Cálculo Automático
 
 ```typescript
