@@ -11,7 +11,8 @@ import {
   Globe,
   Loader2,
   X,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
@@ -58,6 +59,7 @@ export default function EditPostPage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generatingCover, setGeneratingCover] = useState(false);
   const [activeTab, setActiveTab] = useState<"content" | "seo">("content");
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [showImageSelector, setShowImageSelector] = useState(false);
@@ -272,6 +274,47 @@ export default function EditPostPage() {
       setMessage({ type: 'error', text: error.message || 'Error al guardar el artículo' });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleGenerateCover = async () => {
+    setGeneratingCover(true);
+    setMessage(null);
+
+    try {
+      const response = await fetch("/api/admin/blog/generate-cover", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId,
+          forceRegenerate: true,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(result?.error || "No se pudo generar la portada");
+      }
+
+      if (result.featuredImage) {
+        setFeaturedImage(result.featuredImage);
+      }
+
+      setMessage({
+        type: "success",
+        text: "Portada generada con IA y asignada al artículo",
+      });
+    } catch (error: any) {
+      console.error("Error generando portada:", error);
+      setMessage({
+        type: "error",
+        text: error?.message || "Error al generar la portada",
+      });
+    } finally {
+      setGeneratingCover(false);
     }
   };
 
@@ -534,6 +577,21 @@ export default function EditPostPage() {
           {/* Imagen destacada */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
             <h3 className="font-semibold text-gray-900 mb-4">Imagen destacada</h3>
+            <button
+              onClick={handleGenerateCover}
+              disabled={generatingCover || !title || !content}
+              className="w-full mb-4 inline-flex items-center justify-center gap-2 rounded-lg bg-furgocasa-blue px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-furgocasa-blue-dark disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {generatingCover ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              Generar portada con IA
+            </button>
+            <p className="mb-4 text-xs text-gray-500">
+              Usa el contenido real del artículo para crear una portada fotográfica y guardarla en el bucket del blog.
+            </p>
             {featuredImage ? (
               <div className="relative">
                 <img 
