@@ -224,27 +224,41 @@ export default function EditarReservaPage() {
     }
   };
 
-  const handleCustomerChange = (customer: { id: string; name: string | null; email: string | null; phone: string | null; dni: string | null; city: string | null }) => {
+  const handleCustomerChange = async (customer: { id: string; name: string | null; email: string | null; phone: string | null; dni: string | null; city: string | null }) => {
     setCustomerId(customer.id);
-    setCustomerData({
+    // Actualización optimista con los datos básicos disponibles
+    setCustomerData(prev => ({
+      ...prev!,
       id: customer.id,
       name: customer.name,
       email: customer.email,
       phone: customer.phone,
       dni: customer.dni,
-      address: null,
       city: customer.city,
-      postal_code: null,
-      country: null,
-      date_of_birth: null,
-      driver_license: null,
-      driver_license_expiry: null,
-    });
+    }));
     setFormData(prev => ({
       ...prev,
       customer_name: customer.name || '',
       customer_email: customer.email || '',
     }));
+    // Cargar datos completos del nuevo cliente
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('id', customer.id)
+        .single();
+      if (error) throw error;
+      setCustomerData(data);
+      setFormData(prev => ({
+        ...prev,
+        customer_name: data.name || '',
+        customer_email: data.email || '',
+      }));
+    } catch (err) {
+      console.error('Error loading full customer data:', err);
+    }
   };
 
   const loadData = async () => {
