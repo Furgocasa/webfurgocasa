@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { calculateRentalDays, formatPrice, extraLineUnitPriceEuros } from "@/lib/utils";
 import EditarClienteModal from "@/components/admin/EditarClienteModal";
+import CambiarClienteModal from "@/components/admin/CambiarClienteModal";
 
 interface Location {
   id: string;
@@ -124,6 +125,8 @@ export default function EditarReservaPage() {
   
   // Estado para el modal de editar cliente
   const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
+  // Estado para el modal de cambiar cliente
+  const [isCambiarClientModalOpen, setIsCambiarClientModalOpen] = useState(false);
   
   const [formData, setFormData] = useState<FormData>({
     vehicle_id: '',
@@ -219,6 +222,29 @@ export default function EditarReservaPage() {
     } catch (error) {
       console.error('Error reloading customer data:', error);
     }
+  };
+
+  const handleCustomerChange = (customer: { id: string; name: string | null; email: string | null; phone: string | null; dni: string | null; city: string | null }) => {
+    setCustomerId(customer.id);
+    setCustomerData({
+      id: customer.id,
+      name: customer.name,
+      email: customer.email,
+      phone: customer.phone,
+      dni: customer.dni,
+      address: null,
+      city: customer.city,
+      postal_code: null,
+      country: null,
+      date_of_birth: null,
+      driver_license: null,
+      driver_license_expiry: null,
+    });
+    setFormData(prev => ({
+      ...prev,
+      customer_name: customer.name || '',
+      customer_email: customer.email || '',
+    }));
   };
 
   const loadData = async () => {
@@ -474,6 +500,8 @@ export default function EditarReservaPage() {
         amount_paid: formData.amount_paid,
         status: formData.status,
         payment_status: formData.payment_status,
+        // Cliente asignado
+        customer_id: customerId || null,
         // Snapshot básico del cliente (solo nombre y email para auditoría)
         customer_name: customerData?.name || formData.customer_name,
         customer_email: customerData?.email || formData.customer_email,
@@ -918,13 +946,22 @@ export default function EditarReservaPage() {
                   Datos del Cliente
                 </h2>
                 {customerId && (
-                  <button
-                    type="button"
-                    onClick={() => setIsEditClientModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-furgocasa-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    Editar cliente
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsCambiarClientModalOpen(true)}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Cambiar cliente
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditClientModalOpen(true)}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-furgocasa-orange text-white rounded-lg hover:bg-orange-600 transition-colors"
+                    >
+                      Editar cliente
+                    </button>
+                  </div>
                 )}
               </div>
               
@@ -1296,6 +1333,14 @@ export default function EditarReservaPage() {
           onSave={reloadCustomerData}
         />
       )}
+
+      {/* Modal para cambiar cliente */}
+      <CambiarClienteModal
+        isOpen={isCambiarClientModalOpen}
+        onClose={() => setIsCambiarClientModalOpen(false)}
+        currentCustomerId={customerId}
+        onSelect={handleCustomerChange}
+      />
     </div>
   );
 }
