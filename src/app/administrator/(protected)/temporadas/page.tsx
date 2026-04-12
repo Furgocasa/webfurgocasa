@@ -41,6 +41,8 @@ export default function TemporadasAdmin() {
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [editingSeason, setEditingSeason] = useState<Season | null>(null);
   const [editForm, setEditForm] = useState<Partial<Season>>({});
+  const [isCreating, setIsCreating] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // Usar el hook para cargar datos con retry automático (depende de selectedYear)
   const { data: seasons, loading, error, refetch } = useAdminData<Season[]>({
@@ -87,6 +89,56 @@ export default function TemporadasAdmin() {
     }
   };
 
+  const handleNewSeason = () => {
+    setIsCreating(true);
+    setEditingSeason(null);
+    setEditForm({
+      name: '',
+      slug: '',
+      season_type: 'media',
+      start_date: '',
+      end_date: '',
+      price_less_than_week: null,
+      price_one_week: null,
+      price_two_weeks: null,
+      price_three_weeks: null,
+      min_days: 2,
+      year: selectedYear,
+      is_active: true,
+    });
+  };
+
+  const handleCreateSeason = async () => {
+    if (!editForm.name || !editForm.start_date || !editForm.end_date) {
+      showMessage('error', 'Nombre, fecha inicio y fecha fin son obligatorios');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch('/api/admin/seasons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editForm),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Error al crear temporada');
+      }
+
+      showMessage('success', 'Temporada creada correctamente');
+      setIsCreating(false);
+      setEditForm({});
+      loadSeasons();
+    } catch (error: any) {
+      console.error('Error creating season:', error);
+      showMessage('error', error.message || 'Error al crear la temporada');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   const handleEditSeason = (season: Season) => {
     setEditingSeason(season);
     setEditForm({
@@ -107,18 +159,18 @@ export default function TemporadasAdmin() {
 
   const handleCancelEdit = () => {
     setEditingSeason(null);
+    setIsCreating(false);
     setEditForm({});
   };
 
   const handleSaveEdit = async () => {
     if (!editingSeason) return;
 
+    setSaving(true);
     try {
       const response = await fetch(`/api/admin/seasons/${editingSeason.id}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editForm),
       });
 
@@ -133,6 +185,8 @@ export default function TemporadasAdmin() {
     } catch (error: any) {
       console.error('Error updating season:', error);
       showMessage('error', 'Error al actualizar la temporada');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -153,6 +207,13 @@ export default function TemporadasAdmin() {
             Periodos con sobrecoste sobre la tarifa base (TEMPORADA BAJA)
           </p>
         </div>
+        <button
+          onClick={handleNewSeason}
+          className="flex items-center gap-2 px-5 py-2.5 bg-furgocasa-orange text-white rounded-lg font-medium hover:bg-orange-600 transition-colors shadow-md"
+        >
+          <Plus className="h-5 w-5" />
+          Nueva Temporada
+        </button>
       </div>
 
       {/* Message Alert */}
@@ -394,21 +455,25 @@ export default function TemporadasAdmin() {
         </div>
       </div>
 
-      {/* Note about adding seasons */}
-      <div className="mt-6 bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-900">
-        <strong>📝 Para añadir nuevas temporadas:</strong> Ejecuta el script SQL correspondiente en Supabase.
-        Los períodos se definen directamente en la base de datos con sus precios específicos.
-      </div>
 
-      {/* Modal de Edición */}
-      {editingSeason && (
+      {/* Modal de Edición / Creación */}
+      {(editingSeason || isCreating) && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-                <Edit2 className="h-6 w-6 text-furgocasa-blue" />
-                Editar Temporada
+                {isCreating ? (
+                  <>
+                    <Plus className="h-6 w-6 text-furgocasa-orange" />
+                    Nueva Temporada
+                  </>
+                ) : (
+                  <>
+                    <Edit2 className="h-6 w-6 text-furgocasa-blue" />
+                    Editar Temporada
+                  </>
+                )}
               </h2>
               <button
                 onClick={handleCancelEdit}
@@ -592,16 +657,31 @@ export default function TemporadasAdmin() {
             <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
               <button
                 onClick={handleCancelEdit}
-                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+                disabled={saving}
+                className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50"
               >
                 Cancelar
               </button>
               <button
-                onClick={handleSaveEdit}
-                className="px-6 py-2 bg-furgocasa-blue text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2"
+                onClick={isCreating ? handleCreateSeason : handleSaveEdit}
+                disabled={saving}
+                className={`px-6 py-2 text-white rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50 ${
+                  isCreating
+                    ? 'bg-furgocasa-orange hover:bg-orange-600'
+                    : 'bg-furgocasa-blue hover:bg-blue-700'
+                }`}
               >
-                <Save className="h-4 w-4" />
-                Guardar Cambios
+                {saving ? (
+                  <>
+                    <span className="h-4 w-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {isCreating ? 'Creando...' : 'Guardando...'}
+                  </>
+                ) : (
+                  <>
+                    {isCreating ? <Plus className="h-4 w-4" /> : <Save className="h-4 w-4" />}
+                    {isCreating ? 'Crear Temporada' : 'Guardar Cambios'}
+                  </>
+                )}
               </button>
             </div>
           </div>
