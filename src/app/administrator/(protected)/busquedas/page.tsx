@@ -169,6 +169,16 @@ interface SearchTimingData {
   }>;
 }
 
+/** Inicio del rango por defecto (histórico completo salvo que el admin acote fechas). */
+const SEARCH_ANALYTICS_DEFAULT_START = '1999-01-01';
+
+function localYyyyMmDd(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 async function fetchAnalytics(type: string, startDate: string, endDate: string) {
   const params = new URLSearchParams({
     type,
@@ -358,8 +368,8 @@ const TreemapCustomContent = (props: any) => {
 
 export default function SearchAnalyticsPage() {
   const [dateRange, setDateRange] = useState({
-    start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-    end: new Date().toISOString().split('T')[0],
+    start: SEARCH_ANALYTICS_DEFAULT_START,
+    end: localYyyyMmDd(new Date()),
   });
 
   // Actualizar título de la página
@@ -444,25 +454,30 @@ export default function SearchAnalyticsPage() {
         </div>
 
         {/* Selector de fechas */}
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center w-full lg:w-auto">
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <label className="text-sm text-gray-600 whitespace-nowrap">Desde:</label>
-            <input
-              type="date"
-              value={dateRange.start}
-              onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-              className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm"
-            />
+        <div className="flex flex-col gap-2 w-full lg:w-auto lg:items-end">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 items-start sm:items-center w-full lg:w-auto">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <label className="text-sm text-gray-600 whitespace-nowrap">Desde:</label>
+              <input
+                type="date"
+                value={dateRange.start}
+                onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
+                className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm"
+              />
+            </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <label className="text-sm text-gray-600 whitespace-nowrap">Hasta:</label>
+              <input
+                type="date"
+                value={dateRange.end}
+                onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
+                className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <label className="text-sm text-gray-600 whitespace-nowrap">Hasta:</label>
-            <input
-              type="date"
-              value={dateRange.end}
-              onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-              className="px-3 py-2 border rounded-lg w-full sm:w-auto text-sm"
-            />
-          </div>
+          <p className="text-xs text-gray-500 max-w-md text-left lg:text-right">
+            Por defecto se muestra todo el histórico (desde 1 ene 1999 hasta hoy). Cambia las fechas solo si quieres acotar el período.
+          </p>
         </div>
       </div>
 

@@ -112,9 +112,9 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get("end_date");
     const type = searchParams.get("type") || "overview";
 
-    // Fechas por defecto: últimos 30 días
+    // Fechas por defecto: histórico completo (mismo criterio que /administrator/busquedas)
     const defaultEndDate = new Date().toISOString().split('T')[0];
-    const defaultStartDate = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const defaultStartDate = '1999-01-01';
 
     const dateFrom = startDate || defaultStartDate;
     const dateTo = endDate || defaultEndDate;

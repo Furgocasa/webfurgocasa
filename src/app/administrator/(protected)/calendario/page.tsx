@@ -85,6 +85,33 @@ interface BlockedDate {
   created_at: string;
 }
 
+/** Hora HH:MM para tooltips (time Postgres, ISO o cadena vacía). */
+function formatBookingClockTime(raw: string | null | undefined, fallback = '10:00'): string {
+  if (raw == null) return fallback;
+  const s = String(raw).trim();
+  if (!s) return fallback;
+  if (/^\d{4}-\d{2}-\d{2}/.test(s) || s.includes('T')) {
+    const d = new Date(s);
+    if (!Number.isNaN(d.getTime())) {
+      return d.toLocaleTimeString('es-ES', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+        timeZone: 'Europe/Madrid',
+      });
+    }
+  }
+  const m = s.match(/^(\d{1,2}):(\d{2})(?::\d{2})?/);
+  if (m) {
+    const hh = Number(m[1]);
+    const mm = Number(m[2]);
+    if (hh >= 0 && hh <= 23 && mm >= 0 && mm <= 59) {
+      return `${String(hh).padStart(2, '0')}:${m[2]}`;
+    }
+  }
+  return fallback;
+}
+
 export default function CalendarioPage() {
   // Establecer título de la página
   useEffect(() => {
@@ -947,7 +974,7 @@ export default function CalendarioPage() {
                                         }}
                                         title={realConflicts > 0
                                           ? `⚠️ CONFLICTO: ${dayBookings.length} reservas con solapamiento horario\n${dayBookings.map(b => `- ${b.booking_number} (${b.customer?.name})`).join('\n')}\n\nClick para ver detalles`
-                                          : `${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\n${pickupBookings.length > 0 ? `🟢 Recogida en: ${pickupBookings.map(b => b.pickup_location?.name || b.pickup_location_name || 'Sin ubicación').join(', ')}\n` : ''}${dropoffBookings.length > 0 ? `🔴 Devolución en: ${dropoffBookings.map(b => b.dropoff_location?.name || b.dropoff_location_name || 'Sin ubicación').join(', ')}\n` : ''}Click para ver detalles`
+                                          : `${dayBooking.customer?.name || 'Sin cliente'}\n${dayBooking.booking_number}\nEstado: ${dayBooking.status}\n${pickupBookings.length > 0 ? `🟢 Recogida:\n${pickupBookings.map(b => `  · ${formatBookingClockTime(b.pickup_time)} — ${b.pickup_location?.name || b.pickup_location_name || 'Sin ubicación'}`).join('\n')}\n` : ''}${dropoffBookings.length > 0 ? `🔴 Devolución:\n${dropoffBookings.map(b => `  · ${formatBookingClockTime(b.dropoff_time)} — ${b.dropoff_location?.name || b.dropoff_location_name || 'Sin ubicación'}`).join('\n')}\n` : ''}Click para ver detalles`
                                         }
                                       >
                                         {/* Indicadores de inicio (verde) - puede haber múltiples */}
@@ -959,7 +986,8 @@ export default function CalendarioPage() {
                                                 {pickupBookings.map((booking, idx) => (
                                                   <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
                                                     <div className="font-semibold text-green-400 mb-1">🟢 RECOGIDA {pickupBookings.length > 1 ? `#${idx + 1}` : ''}</div>
-                                                    <div className="font-bold text-base">{booking.pickup_time?.substring(0, 5) || '10:00'}</div>
+                                                    <div className="text-gray-200 text-[11px] font-medium">Hora de recogida</div>
+                                                    <div className="font-bold text-base tabular-nums tracking-tight">{formatBookingClockTime(booking.pickup_time)}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
                                                       📍 {booking.pickup_location?.name || booking.pickup_location_name || 'Sin ubicación'}
                                                     </div>
@@ -997,7 +1025,8 @@ export default function CalendarioPage() {
                                                 {dropoffBookings.map((booking, idx) => (
                                                   <div key={booking.id} className={idx > 0 ? 'mt-2 pt-2 border-t border-gray-600' : ''}>
                                                     <div className="font-semibold text-red-400 mb-1">🔴 DEVOLUCIÓN {dropoffBookings.length > 1 ? `#${idx + 1}` : ''}</div>
-                                                    <div className="font-bold text-base">{booking.dropoff_time?.substring(0, 5) || '10:00'}</div>
+                                                    <div className="text-gray-200 text-[11px] font-medium">Hora de devolución</div>
+                                                    <div className="font-bold text-base tabular-nums tracking-tight">{formatBookingClockTime(booking.dropoff_time)}</div>
                                                     <div className="text-gray-300 text-xs mt-1">
                                                       📍 {booking.dropoff_location?.name || booking.dropoff_location_name || 'Sin ubicación'}
                                                     </div>
@@ -1115,7 +1144,7 @@ export default function CalendarioPage() {
                                         {vehicle?.internal_code || 'N/A'}
                                       </span>
                                       <span className="text-[8px] opacity-75">
-                                        {(isPickup ? event.booking.pickup_time : event.booking.dropoff_time)?.substring(0, 5)}
+                                        {formatBookingClockTime(isPickup ? event.booking.pickup_time : event.booking.dropoff_time)}
                                       </span>
                                     </div>
                                   </div>
@@ -1262,14 +1291,14 @@ export default function CalendarioPage() {
                     <div className="font-bold text-gray-900">
                       {new Date(selectedBooking.pickup_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}
                     </div>
-                    <div className="text-sm text-gray-600">{selectedBooking.pickup_time?.substring(0, 5) || '10:00'}</div>
+                    <div className="text-sm text-gray-600">{formatBookingClockTime(selectedBooking.pickup_time)}</div>
                   </div>
                   <div className="bg-red-50 rounded-lg p-3 border border-red-200">
                     <div className="text-xs font-semibold text-red-700 mb-1">🔴 Devolución</div>
                     <div className="font-bold text-gray-900">
                       {new Date(selectedBooking.dropoff_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}
                     </div>
-                    <div className="text-sm text-gray-600">{selectedBooking.dropoff_time?.substring(0, 5) || '10:00'}</div>
+                    <div className="text-sm text-gray-600">{formatBookingClockTime(selectedBooking.dropoff_time)}</div>
                   </div>
                 </div>
               </div>
