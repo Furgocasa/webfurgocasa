@@ -604,31 +604,30 @@ export default function CalendarioPage() {
   // Mostrar estado de carga
   if (vehiclesLoading && !vehicles) {
     return (
-      <div className="space-y-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-          <div className="flex flex-col items-center gap-4">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-            <p className="text-gray-600">Cargando calendario...</p>
+      <div className="space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-8 sm:p-12 text-center">
+          <div className="flex flex-col items-center gap-3">
+            <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-600"></div>
+            <p className="text-sm text-gray-600 dark:text-gray-400">Cargando calendario...</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Mostrar errores si los hay
   if (vehiclesError || bookingsError) {
     return (
-      <div className="space-y-6">
-        <div className="bg-red-50 border border-red-200 rounded-xl p-6">
-          <h2 className="text-red-800 font-semibold">Error al cargar el calendario</h2>
-          <p className="text-red-600 text-sm mt-2">
+      <div className="space-y-4">
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 sm:p-6">
+          <h2 className="text-red-800 dark:text-red-300 font-semibold text-sm sm:text-base">Error al cargar el calendario</h2>
+          <p className="text-red-600 dark:text-red-400 text-xs sm:text-sm mt-2">
             {vehiclesError || bookingsError}
           </p>
           <button
             onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="mt-3 px-4 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 active:scale-[0.97] transition-all text-sm"
           >
-            Recargar página
+            Recargar
           </button>
         </div>
       </div>
@@ -636,64 +635,88 @@ export default function CalendarioPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="space-y-3 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Calendario de Disponibilidad</h1>
-          <p className="text-gray-600 mt-1">Vista cronológica de reservas por vehículo</p>
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 dark:text-gray-100">Calendario</h1>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-0.5">Reservas por vehículo</p>
         </div>
         
-        {/* Botón de suscripción al calendario */}
         <button
           onClick={() => setShowCalendarModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          className="flex items-center gap-2 px-3 py-2 sm:px-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 active:scale-[0.97] transition-all shadow-sm text-sm"
         >
-          <Link className="h-5 w-5" />
-          Sincronizar con mi Calendario
+          <Link className="h-4 w-4 sm:h-5 sm:w-5" />
+          <span className="hidden sm:inline">Sincronizar con mi Calendario</span>
+          <span className="sm:hidden">Sincronizar</span>
         </button>
       </div>
 
       {/* Navigation and Controls */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <div className="flex flex-col gap-4">
-          {/* Period Selector - Full width en móvil */}
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <label htmlFor="period" className="text-sm font-medium text-gray-700 whitespace-nowrap">
-              Mostrar:
-            </label>
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4">
+        <div className="flex flex-col gap-3 sm:gap-4">
+          {/* Fila 1: Navegación + Selector período - compacto en móvil */}
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1">
+              <button
+                onClick={previousPeriod}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors active:scale-95"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <button
+                onClick={goToToday}
+                className="px-3 py-1.5 text-xs sm:text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-xl transition-colors"
+              >
+                Hoy
+              </button>
+              <button
+                onClick={nextPeriod}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors active:scale-95"
+              >
+                <ChevronRight className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="flex items-center gap-1.5 min-w-0">
+              <CalendarIcon className="h-4 w-4 text-gray-500 flex-shrink-0" />
+              <span className="text-xs sm:text-sm lg:text-base font-bold text-gray-900 dark:text-gray-100 capitalize truncate">
+                {months[0].toLocaleDateString('es-ES', { month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}
+                {monthsToShow > 1 && (
+                  <span className="hidden sm:inline"> — {months[months.length - 1].toLocaleDateString('es-ES', { month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}</span>
+                )}
+              </span>
+            </div>
+
             <select
               id="period"
               value={monthsToShow}
               onChange={(e) => setMonthsToShow(Number(e.target.value))}
-              className="flex-1 sm:flex-none px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              className="px-2 py-1.5 sm:px-3 sm:py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500"
             >
-              <option value={1}>1 mes</option>
-              <option value={3}>3 meses</option>
-              <option value={6}>6 meses</option>
-              <option value={12}>12 meses</option>
+              <option value={1}>1m</option>
+              <option value={3}>3m</option>
+              <option value={6}>6m</option>
+              <option value={12}>12m</option>
             </select>
           </div>
 
-          {/* Filtro por código de vehículo */}
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <label htmlFor="search-code" className="text-sm font-medium text-gray-700 whitespace-nowrap">
-              Filtrar:
-            </label>
-            <div className="relative flex-1 sm:flex-none sm:min-w-[300px]">
+          {/* Fila 2: Filtro vehículo - solo si no es móvil muy pequeño o siempre visible */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
               <input
                 id="search-code"
                 type="text"
                 value={searchCode}
                 onChange={(e) => setSearchCode(e.target.value)}
-                placeholder="Buscar por código, nombre o marca..."
-                className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                placeholder="Filtrar vehículos..."
+                className="w-full px-3 py-2 pl-9 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               />
               <Car className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               {searchCode && (
                 <button
                   onClick={() => setSearchCode('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
-                  title="Limpiar filtro"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -702,50 +725,10 @@ export default function CalendarioPage() {
               )}
             </div>
             {searchCode && (
-              <span className="text-xs text-gray-500 whitespace-nowrap">
-                {filteredAndSortedVehicles.length} de {(vehicles || []).length} vehículos
+              <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
+                {filteredAndSortedVehicles.length}/{(vehicles || []).length}
               </span>
             )}
-          </div>
-
-          {/* Navigation - Apilado en móvil */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
-            {/* Botones de navegación */}
-            <div className="flex items-center justify-between sm:justify-start gap-2 w-full sm:w-auto">
-              <button
-                onClick={previousPeriod}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                title={`${monthsToShow} ${periodLabel} anterior${monthsToShow > 1 ? 'es' : ''}`}
-              >
-                <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6" />
-              </button>
-              
-              <button
-                onClick={goToToday}
-                className="px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              >
-                Hoy
-              </button>
-
-              <button
-                onClick={nextPeriod}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0"
-                title={`${monthsToShow} ${periodLabel} siguiente${monthsToShow > 1 ? 's' : ''}`}
-              >
-                <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6" />
-              </button>
-            </div>
-
-            {/* Rango de fechas - Centrado y responsive */}
-            <div className="flex items-center justify-center gap-2 w-full sm:flex-1">
-              <CalendarIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-500 flex-shrink-0" />
-              <span className="text-sm sm:text-base lg:text-lg font-bold text-gray-900 capitalize text-center">
-                {months[0].toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' })}
-                {monthsToShow > 1 && (
-                  <span className="hidden sm:inline"> - {months[months.length - 1].toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' })}</span>
-                )}
-              </span>
-            </div>
           </div>
         </div>
       </div>
@@ -1066,9 +1049,9 @@ export default function CalendarioPage() {
       </div>
       ) : (
         /* VISTA MÓVIL - Notion Calendar Style */
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-2 sm:p-4">
           {loading ? (
-            <div className="p-12 text-center text-gray-500">Cargando calendario...</div>
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">Cargando calendario...</div>
           ) : (
             <div className="space-y-4">
               {months.map((monthDate, monthIndex) => {
@@ -1079,17 +1062,17 @@ export default function CalendarioPage() {
                 const monthName = monthDate.toLocaleDateString('es-ES', { month: 'long', year: 'numeric', timeZone: 'Europe/Madrid' });
                 
                 return (
-                  <div key={monthIndex} className="space-y-3">
+                  <div key={monthIndex} className="space-y-2">
                     {/* Header del mes */}
-                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-4 py-3 rounded-lg font-bold text-center capitalize">
+                    <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 sm:px-4 sm:py-3 rounded-xl font-bold text-center capitalize text-sm sm:text-base">
                       {monthName}
                     </div>
                     
-                    {/* Grid del calendario */}
-                    <div className="grid grid-cols-7 gap-1">
+                    {/* Grid del calendario - gap más pequeño en móvil */}
+                    <div className="grid grid-cols-7 gap-[2px] sm:gap-1">
                       {/* Días de la semana */}
                       {['D', 'L', 'M', 'X', 'J', 'V', 'S'].map((day, i) => (
-                        <div key={i} className="text-center text-xs font-semibold text-gray-500 py-2">
+                        <div key={i} className="text-center text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400 py-1 sm:py-2">
                           {day}
                         </div>
                       ))}
@@ -1104,59 +1087,83 @@ export default function CalendarioPage() {
                         const dateKey = `${monthDate.getFullYear()}-${String(monthDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                         const dayEvents = mobileEvents[dateKey] || [];
                         const isTodayFlag = isToday(day, monthDate);
+                        const hasEvents = dayEvents.length > 0;
                         
                         return (
                           <div 
                             key={day}
-                            className={`aspect-square border rounded-lg p-1 ${
-                              isTodayFlag ? 'bg-yellow-300 border-yellow-500 border-2 shadow-md' : 'border-gray-200'
-                            }`}
+                            onClick={() => {
+                              if (dayEvents.length === 1) {
+                                const ev = dayEvents[0];
+                                setSelectedBooking({ ...ev.booking, vehicle: ev.booking.vehicle });
+                              }
+                            }}
+                            className={`aspect-square border rounded-lg p-0.5 sm:p-1 flex flex-col transition-colors ${
+                              isTodayFlag
+                                ? 'bg-yellow-200 dark:bg-yellow-900/40 border-yellow-400 dark:border-yellow-600 border-2 shadow-sm'
+                                : hasEvents
+                                  ? 'border-gray-200 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-700/30'
+                                  : 'border-gray-100 dark:border-gray-700'
+                            } ${dayEvents.length === 1 ? 'cursor-pointer active:scale-95' : ''}`}
                           >
                             {/* Número del día */}
-                            <div className={`text-xs font-semibold text-center mb-1 ${
-                              isTodayFlag ? 'text-yellow-900 font-extrabold' : 'text-gray-700'
+                            <div className={`text-[10px] sm:text-xs font-semibold text-center leading-none ${
+                              isTodayFlag ? 'text-yellow-900 dark:text-yellow-300 font-extrabold' : 'text-gray-700 dark:text-gray-300'
                             }`}>
                               {day}
                             </div>
                             
-                            {/* Eventos del día */}
-                            <div className="space-y-0.5">
-                              {dayEvents.slice(0, 3).map((event, idx) => {
-                                const vehicle = event.booking.vehicle;
-                                const isPickup = event.type === 'pickup';
-                                
-                                return (
-                                  <div
+                            {/* Eventos - solo dots en pantalla muy pequeña, badges en sm+ */}
+                            <div className="flex-1 flex flex-col justify-center gap-[1px] mt-0.5 overflow-hidden">
+                              {/* Vista compacta en <sm: solo puntos de color */}
+                              <div className="flex sm:hidden flex-wrap justify-center gap-[2px]">
+                                {dayEvents.slice(0, 4).map((event, idx) => (
+                                  <span
                                     key={idx}
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      setSelectedBooking({ ...event.booking, vehicle });
-                                    }}
-                                    className="cursor-pointer hover:opacity-75 transition-opacity"
-                                  >
-                                    <div className={`flex items-center gap-0.5 text-[9px] leading-tight p-0.5 rounded ${
-                                      isPickup ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                    }`}>
-                                      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
-                                        isPickup ? 'bg-green-500' : 'bg-red-500'
-                                      }`} />
-                                      <span className="font-bold truncate">
-                                        {vehicle?.internal_code || 'N/A'}
-                                      </span>
-                                      <span className="text-[8px] opacity-75">
-                                        {formatBookingClockTime(isPickup ? event.booking.pickup_time : event.booking.dropoff_time)}
-                                      </span>
-                                    </div>
-                                  </div>
-                                );
-                              })}
+                                    className={`w-1.5 h-1.5 rounded-full ${
+                                      event.type === 'pickup' ? 'bg-green-500' : 'bg-red-500'
+                                    }`}
+                                  />
+                                ))}
+                                {dayEvents.length > 4 && (
+                                  <span className="text-[7px] text-gray-400 font-bold leading-none">+{dayEvents.length - 4}</span>
+                                )}
+                              </div>
                               
-                              {/* Indicador de más eventos */}
-                              {dayEvents.length > 3 && (
-                                <div className="text-[8px] text-gray-500 text-center font-semibold">
-                                  +{dayEvents.length - 3}
-                                </div>
-                              )}
+                              {/* Vista expandida en sm+: badges con código */}
+                              <div className="hidden sm:flex sm:flex-col gap-[1px]">
+                                {dayEvents.slice(0, 3).map((event, idx) => {
+                                  const vehicle = event.booking.vehicle;
+                                  const isPickup = event.type === 'pickup';
+                                  
+                                  return (
+                                    <div
+                                      key={idx}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setSelectedBooking({ ...event.booking, vehicle });
+                                      }}
+                                      className="cursor-pointer hover:opacity-75 active:scale-95 transition-all"
+                                    >
+                                      <div className={`flex items-center gap-0.5 text-[8px] sm:text-[9px] leading-tight px-0.5 py-[1px] rounded ${
+                                        isPickup ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
+                                      }`}>
+                                        <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full flex-shrink-0 ${
+                                          isPickup ? 'bg-green-500' : 'bg-red-500'
+                                        }`} />
+                                        <span className="font-bold truncate">
+                                          {vehicle?.internal_code || '?'}
+                                        </span>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                                {dayEvents.length > 3 && (
+                                  <div className="text-[7px] text-gray-500 text-center font-bold">
+                                    +{dayEvents.length - 3}
+                                  </div>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );
@@ -1170,53 +1177,53 @@ export default function CalendarioPage() {
         </div>
       )}
 
-      {/* Legend */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <p className="text-sm font-semibold text-gray-700 mb-3">Leyenda:</p>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-yellow-400 rounded flex items-center justify-center text-white text-xs font-bold">1</div>
-            <span className="text-gray-600">Pendiente</span>
+      {/* Legend - compacta en móvil */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4">
+        <p className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">Leyenda:</p>
+        <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-4 text-xs sm:text-sm">
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-yellow-400 rounded flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">1</div>
+            <span className="text-gray-600 dark:text-gray-400">Pend.</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-red-400 rounded flex items-center justify-center text-white text-xs font-bold">1</div>
-            <span className="text-gray-600">Confirmada</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-red-400 rounded flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">1</div>
+            <span className="text-gray-600 dark:text-gray-400">Conf.</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-blue-400 rounded flex items-center justify-center text-white text-xs font-bold">1</div>
-            <span className="text-gray-600">En curso</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-blue-400 rounded flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">1</div>
+            <span className="text-gray-600 dark:text-gray-400">En curso</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gray-400 rounded flex items-center justify-center text-white text-xs font-bold">1</div>
-            <span className="text-gray-600">Completada</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-400 rounded flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">1</div>
+            <span className="text-gray-600 dark:text-gray-400">Compl.</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex flex-col gap-1">
-              <div className="w-3 h-3 bg-green-500 rounded-sm border border-white shadow-sm"></div>
-              <div className="w-3 h-3 bg-red-500 rounded-sm border border-white shadow-sm"></div>
+          <div className="flex items-center gap-1.5">
+            <div className="flex flex-col gap-0.5">
+              <div className="w-3 h-3 bg-green-500 rounded-sm"></div>
+              <div className="w-3 h-3 bg-red-500 rounded-sm"></div>
             </div>
-            <span className="text-gray-600">Inicio / Fin</span>
+            <span className="text-gray-600 dark:text-gray-400">Ini/Fin</span>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 bg-gray-800 rounded flex items-center justify-center text-white text-xs font-bold">🚫</div>
-            <span className="text-gray-600">Bloqueado</span>
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-800 rounded flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">🚫</div>
+            <span className="text-gray-600 dark:text-gray-400">Bloq.</span>
           </div>
         </div>
       </div>
 
       {/* Estadísticas rápidas */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500 mb-1">Total vehículos</p>
-          <p className="text-2xl font-bold text-gray-900">{(vehicles || []).length}</p>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4">
+          <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">Vehículos</p>
+          <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-gray-100">{(vehicles || []).length}</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500 mb-1">Reservas en el período</p>
-          <p className="text-2xl font-bold text-blue-600">{bookings.length}</p>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4">
+          <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">Reservas</p>
+          <p className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{bookings.length}</p>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <p className="text-sm text-gray-500 mb-1">Vehículos disponibles</p>
-          <p className="text-2xl font-bold text-green-600">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4">
+          <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">Disponibles</p>
+          <p className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">
             {(vehicles || []).length - new Set((bookings || []).map(b => b.vehicle_id)).size}
           </p>
         </div>
@@ -1225,19 +1232,21 @@ export default function CalendarioPage() {
       {/* Modal de información de reserva (todas las resoluciones) */}
       {selectedBooking && (
         <div 
-          className="fixed inset-0 bg-black/50 z-[100] flex items-end sm:items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[100] flex items-end sm:items-center justify-center sm:p-4"
           onClick={() => setSelectedBooking(null)}
         >
           <div 
-            className="bg-white rounded-t-3xl sm:rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl max-w-lg w-full max-h-[90vh] sm:max-h-[85vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Handle para drag en móvil */}
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-1 sm:hidden" />
             {/* Header */}
-            <div className={`${getStatusColor(selectedBooking.status)} text-white px-6 py-4 rounded-t-3xl sm:rounded-t-2xl`}>
+            <div className={`${getStatusColor(selectedBooking.status)} text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl`}>
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="text-lg font-bold">{selectedBooking.booking_number}</h3>
-                  <p className="text-sm opacity-90 capitalize">{selectedBooking.status}</p>
+                  <h3 className="text-base sm:text-lg font-bold">{selectedBooking.booking_number}</h3>
+                  <p className="text-xs sm:text-sm opacity-90 capitalize">{selectedBooking.status}</p>
                 </div>
                 <button 
                   onClick={() => setSelectedBooking(null)}
@@ -1251,7 +1260,7 @@ export default function CalendarioPage() {
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-4">
+            <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
               {/* Vehículo */}
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase mb-2">🚐 Vehículo</div>
@@ -1415,16 +1424,16 @@ export default function CalendarioPage() {
             </div>
 
             {/* Footer con botones */}
-            <div className="border-t border-gray-200 p-4 flex gap-3">
+            <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex gap-2 sm:gap-3" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 12px)" }}>
               <button
                 onClick={() => setSelectedBooking(null)}
-                className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex-1 px-3 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all text-sm"
               >
                 Cerrar
               </button>
               <button
                 onClick={() => router.push(`/administrator/reservas/${selectedBooking.id}`)}
-                className="flex-1 px-4 py-3 bg-furgocasa-orange text-white font-semibold rounded-lg hover:bg-furgocasa-orange-dark transition-colors"
+                className="flex-1 px-3 py-2.5 sm:py-3 bg-furgocasa-orange text-white font-semibold rounded-xl hover:bg-furgocasa-orange-dark active:scale-[0.97] transition-all text-sm"
               >
                 Ver detalles
               </button>
@@ -1436,11 +1445,11 @@ export default function CalendarioPage() {
       {/* Modal de Suscripción al Calendario */}
       {showCalendarModal && (
         <div 
-          className="fixed inset-0 bg-black/50 z-[100] flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[100] flex items-end sm:items-center justify-center sm:p-4"
           onClick={() => setShowCalendarModal(false)}
         >
           <div 
-            className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

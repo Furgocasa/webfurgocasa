@@ -115,53 +115,62 @@ export default async function AdminDashboard() {
       <div className="flex flex-col gap-3">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
           <div>
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">
-              Dashboard Operaciones
+            <h1 className="text-base sm:text-xl font-bold text-gray-900 dark:text-gray-100">
+              Dashboard
             </h1>
-            <p className="text-xs sm:text-sm text-gray-500">
-              Alquileres, entregas, recogidas, revisiones y flota
+            <p className="text-[11px] sm:text-sm text-gray-500 dark:text-gray-400">
+              <span className="sm:hidden">Flota, entregas y reservas</span>
+              <span className="hidden sm:inline">Alquileres, entregas, recogidas, revisiones y flota</span>
             </p>
           </div>
         </div>
-        {/* Estado de flota */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          <div className="bg-green-50 border border-green-200 rounded-lg px-3 py-2 flex items-center gap-2">
-            <Car className="h-4 w-4 text-green-600 flex-shrink-0" />
-            <span className="text-lg font-bold text-green-700 leading-none">
+        {/* Estado de flota - KPIs */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
+          <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-xl px-2.5 py-2.5 sm:px-3 sm:py-3 flex items-center gap-2 admin-card-interactive">
+            <div className="p-1 sm:p-1.5 bg-green-100 dark:bg-green-800/40 rounded-lg">
+              <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-green-600 dark:text-green-400" />
+            </div>
+            <span className="text-lg sm:text-xl font-bold text-green-700 dark:text-green-400 leading-none animate-count-up">
               {stats.fleetStatus?.available || 0}
             </span>
-            <span className="text-xs text-green-600">libres</span>
+            <span className="text-[10px] sm:text-xs text-green-600 dark:text-green-500">libres</span>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg px-3 py-2 flex items-center gap-2">
-            <Car className="h-4 w-4 text-blue-600 flex-shrink-0" />
-            <span className="text-lg font-bold text-blue-700 leading-none">
+          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl px-2.5 py-2.5 sm:px-3 sm:py-3 flex items-center gap-2 admin-card-interactive">
+            <div className="p-1 sm:p-1.5 bg-blue-100 dark:bg-blue-800/40 rounded-lg">
+              <Car className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-blue-600 dark:text-blue-400" />
+            </div>
+            <span className="text-lg sm:text-xl font-bold text-blue-700 dark:text-blue-400 leading-none animate-count-up">
               {stats.fleetStatus?.rented || 0}
             </span>
-            <span className="text-xs text-blue-600">alquilados</span>
+            <span className="text-[10px] sm:text-xs text-blue-600 dark:text-blue-500">alquilados</span>
           </div>
-          <div className="bg-orange-50 border border-orange-200 rounded-lg px-3 py-2 flex items-center gap-2">
-            <Wrench className="h-4 w-4 text-orange-600 flex-shrink-0" />
-            <span className="text-lg font-bold text-orange-700 leading-none">
+          <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-xl px-2.5 py-2.5 sm:px-3 sm:py-3 flex items-center gap-2 admin-card-interactive">
+            <div className="p-1 sm:p-1.5 bg-orange-100 dark:bg-orange-800/40 rounded-lg">
+              <Wrench className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-orange-600 dark:text-orange-400" />
+            </div>
+            <span className="text-lg sm:text-xl font-bold text-orange-700 dark:text-orange-400 leading-none animate-count-up">
               {stats.fleetStatus?.maintenance || 0}
             </span>
-            <span className="text-xs text-orange-600">mant.</span>
+            <span className="text-[10px] sm:text-xs text-orange-600 dark:text-orange-500">mant.</span>
           </div>
-          <div className="bg-red-50 border border-red-200 rounded-lg px-3 py-2 flex items-center gap-2">
-            <Ban className="h-4 w-4 text-red-600 flex-shrink-0" />
-            <span className="text-lg font-bold text-red-700 leading-none">
+          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl px-2.5 py-2.5 sm:px-3 sm:py-3 flex items-center gap-2 admin-card-interactive">
+            <div className="p-1 sm:p-1.5 bg-red-100 dark:bg-red-800/40 rounded-lg">
+              <Ban className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-red-600 dark:text-red-400" />
+            </div>
+            <span className="text-lg sm:text-xl font-bold text-red-700 dark:text-red-400 leading-none animate-count-up">
               {stats.fleetStatus?.blocked || 0}
             </span>
-            <span className="text-xs text-red-600">bloqueados</span>
+            <span className="text-[10px] sm:text-xs text-red-600 dark:text-red-500">bloq.</span>
           </div>
         </div>
       </div>
 
-      {/* ── Columnas principales (aviso carnet caducado se muestra dentro de cada tarjeta) ── */}
+      {/* ── Columnas principales ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         {/* 1. Entregas próximos 7 días */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-sm font-semibold text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Entregas 7 días
               <span className="ml-1.5 text-xs font-normal text-gray-400">
                 ({stats.upcomingRentals?.length || 0})
@@ -276,9 +285,9 @@ export default async function AdminDashboard() {
         </div>
 
         {/* 2. Alquileres en curso */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-sm font-semibold text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               En curso
               <span className="ml-1.5 text-xs font-normal text-gray-400">
                 ({stats.activeRentals?.length || 0})
@@ -399,9 +408,9 @@ export default async function AdminDashboard() {
         </div>
 
         {/* 3. Entregas y recogidas (semana) */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-sm font-semibold text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Entregas / Recogidas
               <span className="ml-1.5 text-xs font-normal text-gray-400">
                 ({stats.upcomingActionsWeek?.length || 0})
@@ -525,9 +534,9 @@ export default async function AdminDashboard() {
         {/* 4. Pendientes de revisión + Daños */}
         <div className="md:col-span-2 xl:col-span-1 flex flex-col sm:flex-row xl:flex-col gap-4">
           {/* Pendientes de revisión */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 flex-1">
-            <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-              <h2 className="text-sm font-semibold text-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden flex-1">
+            <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+              <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                 Pendientes revisión
                 <span className="ml-1.5 text-xs font-normal text-gray-400">
                   ({stats.pendingReview?.length || 0})
@@ -611,11 +620,11 @@ export default async function AdminDashboard() {
         </div>
       </div>
 
-      {/* ── Daños pendientes por vehículo (fila independiente, una columna por vehículo) ── */}
+      {/* ── Daños pendientes por vehículo ── */}
       {(stats.damagesByVehicleList?.length || 0) > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-sm font-semibold text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Daños pendientes
               <span className="ml-1.5 text-xs font-normal text-gray-400">
                 ({stats.damagesByVehicleList.reduce((acc, v) => acc + v.damages.length, 0)})
@@ -702,11 +711,11 @@ export default async function AdminDashboard() {
         </div>
       )}
 
-      {/* ── Bloqueos activos (debajo de daños) ── */}
+      {/* ── Bloqueos activos ── */}
       {hasBlocks && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-4 py-3 border-b border-gray-100 flex justify-between items-center">
-            <h2 className="text-sm font-semibold text-gray-900">
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
+            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
               Bloqueos activos
               <span className="ml-1.5 text-xs font-normal text-gray-400">
                 ({stats.activeBlocks?.length || 0})
@@ -720,23 +729,22 @@ export default async function AdminDashboard() {
             </Link>
           </div>
           <div className="p-4">
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {(stats.activeBlocks || []).map((bl, idx) => (
                 <div
                   key={`bl-${idx}`}
-                  className="bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 flex items-center gap-2"
+                  className="bg-amber-50 border border-amber-200 rounded-lg px-2 py-1.5 sm:px-3 sm:py-2 flex items-center gap-1.5 sm:gap-2"
                 >
-                  <Ban className="h-4 w-4 text-amber-600 flex-shrink-0" />
-                  <span className="text-sm">
+                  <Ban className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-amber-600 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm leading-tight">
                     <span className="font-bold text-furgocasa-orange">
                       {bl.vehicleCode}
                     </span>{" "}
-                    <span className="font-medium text-amber-800">
+                    <span className="hidden sm:inline font-medium text-amber-800">
                       {bl.vehicleName}
                     </span>
                     <span className="text-amber-700">
-                      {" "}
-                      — {bl.reason} · hasta{" "}
+                      {" "}— <span className="hidden sm:inline">{bl.reason} ·</span> hasta{" "}
                       {new Date(bl.endDate + "T12:00:00").toLocaleDateString(
                         "es-ES",
                         { day: "numeric", month: "short", timeZone: "Europe/Madrid" }
@@ -751,34 +759,34 @@ export default async function AdminDashboard() {
       )}
 
       {/* ── Quick Actions ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2">
         <Link
           href="/administrator/reservas/nueva"
-          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-furgocasa-orange/10 hover:bg-furgocasa-orange/20 active:bg-furgocasa-orange/30 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-3 sm:py-3 bg-furgocasa-orange/10 dark:bg-furgocasa-orange/20 hover:bg-furgocasa-orange/20 active:bg-furgocasa-orange/30 active:scale-[0.97] rounded-xl transition-all text-xs sm:text-sm font-medium admin-card-interactive"
         >
-          <Calendar className="h-4 w-4 text-furgocasa-orange" />
-          Nueva reserva
+          <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-furgocasa-orange flex-shrink-0" />
+          <span className="dark:text-gray-200 truncate">Nueva reserva</span>
         </Link>
         <Link
           href="/administrator/calendario"
-          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-blue-50 hover:bg-blue-100 active:bg-blue-200 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-3 sm:py-3 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 active:bg-blue-200 active:scale-[0.97] rounded-xl transition-all text-xs sm:text-sm font-medium admin-card-interactive"
         >
-          <Calendar className="h-4 w-4 text-blue-600" />
-          Calendario
+          <Calendar className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+          <span className="dark:text-gray-200">Calendario</span>
         </Link>
         <Link
           href="/administrator/vehiculos"
-          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-purple-50 hover:bg-purple-100 active:bg-purple-200 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-3 sm:py-3 bg-purple-50 dark:bg-purple-900/20 hover:bg-purple-100 active:bg-purple-200 active:scale-[0.97] rounded-xl transition-all text-xs sm:text-sm font-medium admin-card-interactive"
         >
-          <Car className="h-4 w-4 text-purple-600" />
-          Vehículos
+          <Car className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600 dark:text-purple-400 flex-shrink-0" />
+          <span className="dark:text-gray-200">Vehículos</span>
         </Link>
         <Link
           href="/administrator/danos"
-          className="flex items-center justify-center gap-2 px-4 py-3 sm:py-2.5 bg-amber-50 hover:bg-amber-100 active:bg-amber-200 rounded-lg transition-colors text-sm font-medium"
+          className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 py-3 sm:py-3 bg-amber-50 dark:bg-amber-900/20 hover:bg-amber-100 active:bg-amber-200 active:scale-[0.97] rounded-xl transition-all text-xs sm:text-sm font-medium admin-card-interactive"
         >
-          <ClipboardCheck className="h-4 w-4 text-amber-600" />
-          Daños
+          <ClipboardCheck className="h-4 w-4 sm:h-5 sm:w-5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+          <span className="dark:text-gray-200">Daños</span>
         </Link>
       </div>
     </div>

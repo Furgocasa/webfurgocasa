@@ -10,6 +10,8 @@ import {
   ChevronDown,
   ExternalLink,
   Menu,
+  Moon,
+  Sun,
 } from "lucide-react";
 import type { Admin } from "@/types/blog";
 import { GlobalSearch } from "./global-search";
@@ -17,6 +19,11 @@ import { GlobalSearch } from "./global-search";
 interface AdminHeaderProps {
   admin: Admin;
   onMenuClick?: () => void;
+}
+
+interface AdminHeaderCompactProps extends AdminHeaderProps {
+  darkMode?: boolean;
+  onToggleDarkMode?: () => void;
 }
 
 // ⚠️ LEGACY: Mantenemos este componente por compatibilidad pero ya no se usa
@@ -102,8 +109,12 @@ export function AdminHeader({ admin, onMenuClick }: AdminHeaderProps) {
   );
 }
 
-// ✅ NUEVO: Header compacto integrado en el contenido (sin barra blanca separada)
-export function AdminHeaderCompact({ admin, onMenuClick }: AdminHeaderProps) {
+export function AdminHeaderCompact({
+  admin,
+  onMenuClick,
+  darkMode = false,
+  onToggleDarkMode,
+}: AdminHeaderCompactProps) {
   const { logout } = useAdminAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
 
@@ -112,30 +123,45 @@ export function AdminHeaderCompact({ admin, onMenuClick }: AdminHeaderProps) {
   };
 
   return (
-    <div className="bg-white border-b border-gray-200 px-4 py-3 lg:px-6 lg:py-4 sticky top-0 z-30 shadow-sm">
-      <div className="flex items-center justify-between gap-3 lg:gap-4">
-        {/* Botón hamburguesa en móvil/tablet */}
+    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 py-2.5 sm:px-4 sm:py-3 lg:px-6 lg:py-4 sticky top-0 z-30 shadow-sm transition-colors duration-200">
+      <div className="flex items-center justify-between gap-2 sm:gap-3 lg:gap-4">
+        {/* Botón hamburguesa - solo visible en desktop (en tablet usa bottom bar) */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors touch-target"
+          className="hidden lg:hidden p-2 -ml-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors touch-target"
           aria-label="Abrir menú"
         >
-          <Menu className="h-6 w-6 text-gray-600" />
+          <Menu className="h-6 w-6 text-gray-600 dark:text-gray-300" />
         </button>
 
-        {/* Global Search - Responsive */}
+        {/* Global Search */}
         <div className="flex-1 max-w-2xl">
           <GlobalSearch />
         </div>
 
-        {/* Right side - Acciones compactas */}
+        {/* Right side */}
         <div className="flex items-center gap-1 lg:gap-3">
-          {/* View website */}
+          {/* Dark mode toggle */}
+          {onToggleDarkMode && (
+            <button
+              onClick={onToggleDarkMode}
+              className="p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 transition-all active:scale-95"
+              title={darkMode ? "Modo claro" : "Modo oscuro"}
+            >
+              {darkMode ? (
+                <Sun className="h-5 w-5 text-amber-500" />
+              ) : (
+                <Moon className="h-5 w-5 text-gray-500" />
+              )}
+            </button>
+          )}
+
+          {/* View website - oculto en móvil pequeño para ganar espacio */}
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors p-2 rounded-lg hover:bg-gray-100"
+            className="hidden sm:flex items-center gap-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700"
             title="Ver web"
           >
             <ExternalLink className="h-5 w-5" />
@@ -146,46 +172,52 @@ export function AdminHeaderCompact({ admin, onMenuClick }: AdminHeaderProps) {
           <div className="relative">
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
-              className="flex items-center gap-2 p-1.5 lg:p-2 hover:bg-gray-100 rounded-lg transition-colors touch-target"
+              className="flex items-center gap-2 p-1.5 lg:p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors touch-target active:scale-95"
             >
-              <div className="w-8 h-8 rounded-full bg-furgocasa-orange flex items-center justify-center text-white font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-furgocasa-orange to-orange-600 flex items-center justify-center text-white font-bold text-sm shadow-sm">
                 {admin.name.charAt(0).toUpperCase()}
               </div>
               <div className="hidden xl:block text-left">
-                <p className="text-sm font-medium text-gray-900">{admin.name}</p>
-                <p className="text-xs text-gray-500 capitalize">{admin.role}</p>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{admin.name}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{admin.role}</p>
               </div>
-              <ChevronDown className="h-4 w-4 text-gray-500 hidden xl:block" />
+              <ChevronDown className="h-4 w-4 text-gray-500 dark:text-gray-400 hidden xl:block" />
             </button>
 
             {showUserMenu && (
-              <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-200 z-[60]">
-                <div className="p-2">
-                  <a
-                    href="/administrator/perfil"
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-target"
-                  >
-                    <User className="h-4 w-4" />
-                    Mi perfil
-                  </a>
-                  <a
-                    href="/administrator/configuracion"
-                    className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors touch-target"
-                  >
-                    <Settings className="h-4 w-4" />
-                    Configuración
-                  </a>
+              <>
+                <div
+                  className="fixed inset-0 z-[55]"
+                  onClick={() => setShowUserMenu(false)}
+                />
+                <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 z-[60] overflow-hidden">
+                  <div className="p-2">
+                    <a
+                      href="/administrator/perfil"
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors touch-target"
+                    >
+                      <User className="h-4 w-4" />
+                      Mi perfil
+                    </a>
+                    <a
+                      href="/administrator/configuracion"
+                      className="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition-colors touch-target"
+                    >
+                      <Settings className="h-4 w-4" />
+                      Configuración
+                    </a>
+                  </div>
+                  <div className="border-t border-gray-100 dark:border-gray-700 p-2">
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center gap-3 px-4 py-3 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors touch-target"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Cerrar sesión
+                    </button>
+                  </div>
                 </div>
-                <div className="border-t border-gray-100 p-2">
-                  <button
-                    onClick={handleLogout}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors touch-target"
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Cerrar sesión
-                  </button>
-                </div>
-              </div>
+              </>
             )}
           </div>
         </div>

@@ -137,7 +137,7 @@ function AdminSidebarComponent({ admin, isOpen = true, onClose }: AdminSidebarPr
       {/* Overlay para móvil/tablet */}
       {isMobile && isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden transition-opacity"
           onClick={onClose}
         />
       )}
@@ -145,10 +145,10 @@ function AdminSidebarComponent({ admin, isOpen = true, onClose }: AdminSidebarPr
       {/* Sidebar - Optimizado para mobile/tablet/desktop */}
       <aside
         className={`
-          fixed left-0 top-0 w-64 bg-furgocasa-blue h-screen flex flex-col z-50
-          transition-transform duration-300 ease-in-out
+          fixed left-0 top-0 w-full sm:w-72 lg:w-64 bg-furgocasa-blue h-screen flex flex-col z-50
+          transition-transform duration-300 ease-[cubic-bezier(0.2,0,0,1)]
           ${isMobile && !isOpen ? '-translate-x-full' : 'translate-x-0'}
-          lg:translate-x-0
+          lg:translate-x-0 shadow-2xl lg:shadow-none
         `}
       >
         {/* Botón cerrar en móvil/tablet */}
