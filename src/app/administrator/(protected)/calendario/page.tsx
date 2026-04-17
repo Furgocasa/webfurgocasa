@@ -1594,9 +1594,15 @@ export default function CalendarioPage() {
               </button>
               <button
                 onClick={() => router.push(`/administrator/reservas/${selectedBooking.id}`)}
-                className="flex-1 px-3 py-2.5 sm:py-3 bg-furgocasa-orange text-white font-semibold rounded-xl hover:bg-furgocasa-orange-dark active:scale-[0.97] transition-all text-sm"
+                className="flex-1 px-3 py-2.5 sm:py-3 border border-furgocasa-orange text-furgocasa-orange font-semibold rounded-xl hover:bg-furgocasa-orange/10 active:scale-[0.97] transition-all text-sm"
               >
                 Ver detalles
+              </button>
+              <button
+                onClick={() => router.push(`/administrator/reservas/${selectedBooking.id}/editar`)}
+                className="flex-1 px-3 py-2.5 sm:py-3 bg-furgocasa-orange text-white font-semibold rounded-xl hover:bg-furgocasa-orange-dark active:scale-[0.97] transition-all text-sm"
+              >
+                Editar
               </button>
             </div>
           </div>
