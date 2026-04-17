@@ -357,6 +357,7 @@ export default function BookingsPage() {
   const pendingCount = allBookings.filter(b => b.status === 'pending').length;
   const confirmedCount = allBookings.filter(b => b.status === 'confirmed').length;
   const inProgressCount = allBookings.filter(b => b.status === 'in_progress').length;
+  const unassignedCount = allBookings.filter(b => !b.vehicle && b.status !== 'cancelled' && b.status !== 'completed').length;
   
   const currentMonth = new Date().getMonth();
   const currentYear = new Date().getFullYear();
@@ -429,6 +430,23 @@ export default function BookingsPage() {
           </div>
         ))}
       </div>
+
+      {/* Aviso: reservas sin vehículo asignado */}
+      {unassignedCount > 0 && (
+        <div className="bg-amber-50 border-2 border-amber-400 rounded-xl p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">⚠️</div>
+            <div className="flex-1">
+              <h3 className="font-bold text-amber-900">
+                {unassignedCount} reserva{unassignedCount !== 1 ? 's' : ''} sin vehículo asignado
+              </h3>
+              <p className="text-sm text-amber-800 mt-1">
+                Hay alquileres activos pendientes de asignación. Asígnales un vehículo antes de la fecha de recogida.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
         <div className="flex flex-col md:flex-row gap-4">
@@ -633,14 +651,29 @@ export default function BookingsPage() {
                       
                       {/* Código interno */}
                       <td className="px-2 py-3">
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-800 text-[10px] font-mono font-semibold">
-                          {booking.vehicle?.internal_code || '—'}
-                        </span>
+                        {booking.vehicle ? (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-gray-100 text-gray-800 text-[10px] font-mono font-semibold">
+                            {booking.vehicle.internal_code || '—'}
+                          </span>
+                        ) : (
+                          <span
+                            className="inline-flex items-center px-1.5 py-0.5 rounded bg-amber-100 text-amber-900 text-[10px] font-mono font-bold ring-1 ring-amber-400"
+                            title="Reserva sin vehículo asignado"
+                          >
+                            ⚠️ S/A
+                          </span>
+                        )}
                       </td>
                       
                       {/* Vehículo */}
                       <td className="px-2 py-3">
-                        <p className="text-gray-900 text-xs truncate max-w-[100px]" title={booking.vehicle?.name || 'Sin vehículo'}>{booking.vehicle?.name || 'Sin vehículo'}</p>
+                        {booking.vehicle ? (
+                          <p className="text-gray-900 text-xs truncate max-w-[100px]" title={booking.vehicle.name}>{booking.vehicle.name}</p>
+                        ) : (
+                          <p className="text-amber-700 text-xs font-semibold truncate max-w-[120px]" title="Pendiente de asignar vehículo">
+                            Pendiente asignar
+                          </p>
+                        )}
                       </td>
                       
                       {/* Fecha inicio */}

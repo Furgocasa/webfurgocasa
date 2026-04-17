@@ -127,7 +127,7 @@ export function bookingsToCalendarEvents(bookings: BookingEventData[]): Calendar
   const events: CalendarEvent[] = [];
   
   bookings.forEach(booking => {
-    const vehicleName = booking.vehicle?.internal_code || booking.vehicle?.name || 'Vehículo';
+    const vehicleName = booking.vehicle?.internal_code || booking.vehicle?.name || '⚠️ SIN ASIGNAR';
     const customerName = booking.customer?.name || 'Cliente';
     const customerPhone = booking.customer?.phone ? `\nTeléfono: ${booking.customer.phone}` : '';
     

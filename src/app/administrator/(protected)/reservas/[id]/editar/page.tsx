@@ -416,8 +416,18 @@ export default function EditarReservaPage() {
     console.log('Current bookingExtras:', bookingExtras);
     console.log('Available extras:', extras);
 
-    if (!formData.vehicle_id || !formData.pickup_location_id || !formData.dropoff_location_id) {
+    // vehicle_id es OPCIONAL (permite "Sin vehículo asignado" para reasignaciones)
+    if (!formData.pickup_location_id || !formData.dropoff_location_id) {
       setMessage({ type: 'error', text: 'Por favor, completa todos los campos obligatorios' });
+      return;
+    }
+
+    // Estado "confirmada" / "en curso" exige vehículo asignado (salvaguarda)
+    if (!formData.vehicle_id && (formData.status === 'confirmed' || formData.status === 'in_progress')) {
+      setMessage({
+        type: 'error',
+        text: '🚫 No se puede marcar como "Confirmada" o "En curso" sin un vehículo asignado. Cámbiala a "Pendiente" o asigna un vehículo.'
+      });
       return;
     }
 
@@ -426,79 +436,82 @@ export default function EditarReservaPage() {
       setMessage(null);
       const supabase = createClient(); // ✅ Crear instancia
 
-      // Obtener nombre del vehículo para mensajes
-      const selectedVehicle = vehicles.find(v => v.id === formData.vehicle_id);
-      const vehicleName = selectedVehicle 
-        ? `${selectedVehicle.internal_code ? `[${selectedVehicle.internal_code}] ` : ''}${selectedVehicle.name} - ${selectedVehicle.brand}`
-        : 'Vehículo seleccionado';
+      // Solo validamos bloqueos y conflictos si hay vehículo asignado.
+      // Si la reserva queda "sin vehículo" no puede colisionar con nadie.
+      if (formData.vehicle_id) {
+        const selectedVehicle = vehicles.find(v => v.id === formData.vehicle_id);
+        const vehicleName = selectedVehicle
+          ? `${selectedVehicle.internal_code ? `[${selectedVehicle.internal_code}] ` : ''}${selectedVehicle.name} - ${selectedVehicle.brand}`
+          : 'Vehículo seleccionado';
 
-      // VALIDACIÓN CRÍTICA: Verificar BLOQUEOS del vehículo
-      const { data: blockedDates, error: blockedError } = await supabase
-        .from('blocked_dates')
-        .select('id, start_date, end_date, reason')
-        .eq('vehicle_id', formData.vehicle_id)
-        .or(`and(start_date.lte.${formData.dropoff_date},end_date.gte.${formData.pickup_date})`);
+        // VALIDACIÓN CRÍTICA: Verificar BLOQUEOS del vehículo
+        const { data: blockedDates, error: blockedError } = await supabase
+          .from('blocked_dates')
+          .select('id, start_date, end_date, reason')
+          .eq('vehicle_id', formData.vehicle_id)
+          .or(`and(start_date.lte.${formData.dropoff_date},end_date.gte.${formData.pickup_date})`);
 
-      if (blockedError) {
-        console.error('Error checking blocks:', blockedError);
-        setMessage({ type: 'error', text: 'Error al verificar bloqueos del vehículo' });
-        setSaving(false);
-        return;
-      }
+        if (blockedError) {
+          console.error('Error checking blocks:', blockedError);
+          setMessage({ type: 'error', text: 'Error al verificar bloqueos del vehículo' });
+          setSaving(false);
+          return;
+        }
 
-      if (blockedDates && blockedDates.length > 0) {
-        const blockInfo = blockedDates.map(b => 
-          `  • Del ${b.start_date} al ${b.end_date} — Motivo: ${b.reason || 'No especificado'}`
-        ).join('\n');
-        
-        setMessage({ 
-          type: 'error', 
-          text: `🚫 NO SE PUEDE GUARDAR — ${vehicleName} tiene BLOQUEO activo:\n\n${blockInfo}\n\nSelecciona otras fechas o elige un vehículo diferente.`
-        });
-        setSaving(false);
-        return;
-      }
+        if (blockedDates && blockedDates.length > 0) {
+          const blockInfo = blockedDates.map(b =>
+            `  • Del ${b.start_date} al ${b.end_date} — Motivo: ${b.reason || 'No especificado'}`
+          ).join('\n');
 
-      // VALIDACIÓN CRÍTICA: Verificar reservas conflictivas del vehículo
-      const { data: potentialConflicts, error: checkError } = await supabase
-        .from('bookings')
-        .select('id, booking_number, customer_name, pickup_date, dropoff_date, pickup_time, dropoff_time')
-        .eq('vehicle_id', formData.vehicle_id)
-        .neq('id', bookingId)
-        .neq('status', 'cancelled')
-        .or(`and(pickup_date.lte.${formData.dropoff_date},dropoff_date.gte.${formData.pickup_date})`);
+          setMessage({
+            type: 'error',
+            text: `🚫 NO SE PUEDE GUARDAR — ${vehicleName} tiene BLOQUEO activo:\n\n${blockInfo}\n\nSelecciona otras fechas o elige un vehículo diferente.`
+          });
+          setSaving(false);
+          return;
+        }
 
-      if (checkError) {
-        console.error('Error checking availability:', checkError);
-        setMessage({ type: 'error', text: 'Error al verificar disponibilidad del vehículo' });
-        setSaving(false);
-        return;
-      }
+        // VALIDACIÓN CRÍTICA: Verificar reservas conflictivas del vehículo
+        const { data: potentialConflicts, error: checkError } = await supabase
+          .from('bookings')
+          .select('id, booking_number, customer_name, pickup_date, dropoff_date, pickup_time, dropoff_time')
+          .eq('vehicle_id', formData.vehicle_id)
+          .neq('id', bookingId)
+          .neq('status', 'cancelled')
+          .or(`and(pickup_date.lte.${formData.dropoff_date},dropoff_date.gte.${formData.pickup_date})`);
 
-      const conflictingBookings = potentialConflicts?.filter(booking => {
-        const currentPickup = new Date(`${formData.pickup_date}T${formData.pickup_time}`);
-        const currentDropoff = new Date(`${formData.dropoff_date}T${formData.dropoff_time}`);
-        const bookingPickup = new Date(`${booking.pickup_date}T${booking.pickup_time}`);
-        const bookingDropoff = new Date(`${booking.dropoff_date}T${booking.dropoff_time}`);
-        return currentPickup < bookingDropoff && currentDropoff > bookingPickup;
-      }) || [];
+        if (checkError) {
+          console.error('Error checking availability:', checkError);
+          setMessage({ type: 'error', text: 'Error al verificar disponibilidad del vehículo' });
+          setSaving(false);
+          return;
+        }
 
-      if (conflictingBookings.length > 0) {
-        const conflictInfo = conflictingBookings.map(b => 
-          `  • Reserva ${b.booking_number} (${b.customer_name || 'Sin nombre'}) del ${b.pickup_date} al ${b.dropoff_date}`
-        ).join('\n');
-        
-        setMessage({ 
-          type: 'error', 
-          text: `🚫 NO SE PUEDE GUARDAR — ${vehicleName} ya tiene ${conflictingBookings.length} reserva(s) en esas fechas:\n\n${conflictInfo}\n\nSelecciona otras fechas o elige un vehículo diferente.`
-        });
-        setSaving(false);
-        return;
+        const conflictingBookings = potentialConflicts?.filter(booking => {
+          const currentPickup = new Date(`${formData.pickup_date}T${formData.pickup_time}`);
+          const currentDropoff = new Date(`${formData.dropoff_date}T${formData.dropoff_time}`);
+          const bookingPickup = new Date(`${booking.pickup_date}T${booking.pickup_time}`);
+          const bookingDropoff = new Date(`${booking.dropoff_date}T${booking.dropoff_time}`);
+          return currentPickup < bookingDropoff && currentDropoff > bookingPickup;
+        }) || [];
+
+        if (conflictingBookings.length > 0) {
+          const conflictInfo = conflictingBookings.map(b =>
+            `  • Reserva ${b.booking_number} (${b.customer_name || 'Sin nombre'}) del ${b.pickup_date} al ${b.dropoff_date}`
+          ).join('\n');
+
+          setMessage({
+            type: 'error',
+            text: `🚫 NO SE PUEDE GUARDAR — ${vehicleName} ya tiene ${conflictingBookings.length} reserva(s) en esas fechas:\n\n${conflictInfo}\n\nSelecciona otras fechas o elige un vehículo diferente.`
+          });
+          setSaving(false);
+          return;
+        }
       }
 
       // Actualizar reserva (NO se tocan datos del cliente, solo snapshot básico)
       const updateData = {
-        vehicle_id: formData.vehicle_id,
+        vehicle_id: formData.vehicle_id || null,
         pickup_location_id: formData.pickup_location_id,
         dropoff_location_id: formData.dropoff_location_id,
         pickup_date: formData.pickup_date,
@@ -788,28 +801,44 @@ export default function EditarReservaPage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
             {/* Vehículo */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+            <div className={`bg-white rounded-xl shadow-sm border p-6 ${
+              !formData.vehicle_id ? 'border-amber-400 ring-2 ring-amber-200' : 'border-gray-100'
+            }`}>
               <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <Car className="h-6 w-6 text-furgocasa-blue" />
                 Vehículo
               </h2>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Seleccionar vehículo *
+                  Seleccionar vehículo
                 </label>
                 <select
                   value={formData.vehicle_id}
                   onChange={(e) => handleInputChange('vehicle_id', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                  required
+                  className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent ${
+                    !formData.vehicle_id ? 'border-amber-500 bg-amber-50 font-semibold text-amber-900' : 'border-gray-300'
+                  }`}
                 >
-                  <option value="">Selecciona un vehículo</option>
+                  <option value="">— Sin vehículo asignado (pendiente) —</option>
                   {vehicles.map(vehicle => (
                     <option key={vehicle.id} value={vehicle.id}>
                       {vehicle.internal_code ? `[${vehicle.internal_code}] ` : ''}{vehicle.name} - {vehicle.brand}
                     </option>
                   ))}
                 </select>
+
+                {!formData.vehicle_id && (
+                  <div className="mt-3 p-3 bg-amber-50 border border-amber-300 rounded-lg">
+                    <p className="text-sm font-semibold text-amber-900 mb-1">
+                      ⚠️ Reserva sin vehículo asignado
+                    </p>
+                    <p className="text-xs text-amber-800">
+                      Este alquiler quedará como <strong>pendiente de asignar</strong> y liberará su vehículo anterior
+                      para que puedas reorganizar la flota. Recuerda asignar un vehículo antes de confirmar la reserva
+                      o antes de la fecha de recogida.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 

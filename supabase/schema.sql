@@ -263,7 +263,10 @@ CREATE TABLE bookings (
     booking_number VARCHAR(20) NOT NULL UNIQUE,
     
     -- Relaciones
-    vehicle_id UUID NOT NULL REFERENCES vehicles(id),
+    -- vehicle_id puede ser NULL temporalmente para reasignaciones de flota
+    -- (estado "pendiente de asignar" cuando la flota está completa y se
+    -- necesita un hueco intermedio para reorganizar alquileres).
+    vehicle_id UUID REFERENCES vehicles(id),
     customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
     pickup_location_id UUID NOT NULL REFERENCES locations(id),
     dropoff_location_id UUID NOT NULL REFERENCES locations(id),

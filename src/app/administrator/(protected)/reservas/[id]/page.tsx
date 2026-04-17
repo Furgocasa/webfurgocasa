@@ -35,6 +35,7 @@ interface Booking {
   notes: string;
   admin_notes: string;
   created_at: string;
+  vehicle_id: string | null;
   vehicle: {
     id: string;
     name: string;
@@ -42,7 +43,7 @@ interface Booking {
     model: string;
     internal_code: string;
     images?: Array<{ image_url?: string; url?: string; is_primary?: boolean; is_main?: boolean }>;
-  };
+  } | null;
   customer: {
     id: string;
     name: string;
@@ -325,8 +326,8 @@ Devolución en ${dropoffLocation}`;
 
   const copyVehicleDetails = async () => {
     if (!booking?.vehicle) return;
-    const code = booking.vehicle.internal_code || '';
-    const name = booking.vehicle.name || '';
+    const code = booking.vehicle?.internal_code || '';
+    const name = booking.vehicle?.name || '';
     const text = code ? `${code} - ${name.toUpperCase()}` : name.toUpperCase();
     try {
       await navigator.clipboard.writeText(text);
@@ -670,47 +671,71 @@ Devolución en ${dropoffLocation}`;
         {/* Main Info */}
         <div className="lg:col-span-2 space-y-6">
           {/* Vehicle */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className={`bg-white rounded-xl shadow-sm border p-6 ${
+            !booking.vehicle ? 'border-amber-400 ring-2 ring-amber-200' : 'border-gray-100'
+          }`}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-bold text-gray-900 flex items-center gap-2">
                 <Car className="h-6 w-6 text-furgocasa-blue" />
                 Vehículo
               </h3>
-              <button
-                type="button"
-                onClick={copyVehicleDetails}
-                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
-              >
-                <Copy className="h-4 w-4" />
-                {copiedVehicle ? '¡Copiado!' : 'Copiar detalles del vehículo'}
-              </button>
+              {booking.vehicle && (
+                <button
+                  type="button"
+                  onClick={copyVehicleDetails}
+                  className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-furgocasa-blue hover:bg-blue-50 rounded-lg transition-colors"
+                >
+                  <Copy className="h-4 w-4" />
+                  {copiedVehicle ? '¡Copiado!' : 'Copiar detalles del vehículo'}
+                </button>
+              )}
             </div>
-            <div className="flex items-center gap-4">
-              {(() => {
-                const imgs = booking.vehicle.images || [];
-                const primaryImg = imgs.find((i: any) => i.is_primary || i.is_main);
-                const firstImg = imgs[0];
-                const imgUrl = (primaryImg || firstImg)?.image_url || (primaryImg || firstImg)?.url;
-                return imgUrl ? (
-                  <img
-                    src={imgUrl}
-                    alt={booking.vehicle.name}
-                    className="w-24 h-24 object-cover rounded-lg border border-gray-200"
-                  />
-                ) : (
-                  <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                    <Car className="h-10 w-10 text-gray-400" />
-                  </div>
-                );
-              })()}
-              <div>
-                <p className="font-semibold text-gray-900 text-lg">
-                  {booking.vehicle.internal_code
-                    ? `${booking.vehicle.internal_code} - ${booking.vehicle.name.toUpperCase()}`
-                    : booking.vehicle.name.toUpperCase()}
-                </p>
+            {booking.vehicle ? (
+              <div className="flex items-center gap-4">
+                {(() => {
+                  const imgs = booking.vehicle?.images || [];
+                  const primaryImg = imgs.find((i: any) => i.is_primary || i.is_main);
+                  const firstImg = imgs[0];
+                  const imgUrl = (primaryImg || firstImg)?.image_url || (primaryImg || firstImg)?.url;
+                  return imgUrl ? (
+                    <img
+                      src={imgUrl}
+                      alt={booking.vehicle?.name || 'Vehículo'}
+                      className="w-24 h-24 object-cover rounded-lg border border-gray-200"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
+                      <Car className="h-10 w-10 text-gray-400" />
+                    </div>
+                  );
+                })()}
+                <div>
+                  <p className="font-semibold text-gray-900 text-lg">
+                    {booking.vehicle.internal_code
+                      ? `${booking.vehicle.internal_code} - ${booking.vehicle.name.toUpperCase()}`
+                      : booking.vehicle.name.toUpperCase()}
+                  </p>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex items-start gap-4 p-4 bg-amber-50 border border-amber-300 rounded-lg">
+                <div className="text-3xl">⚠️</div>
+                <div className="flex-1">
+                  <p className="font-bold text-amber-900 text-lg">Sin vehículo asignado</p>
+                  <p className="text-sm text-amber-800 mt-1">
+                    Esta reserva está <strong>pendiente de asignación de vehículo</strong>.
+                    Edítala para asignar uno antes de la fecha de recogida.
+                  </p>
+                  <Link
+                    href={`/administrator/reservas/${bookingId}/editar`}
+                    className="inline-flex items-center gap-2 mt-3 px-3 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Asignar vehículo
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Dates & Location */}

@@ -271,7 +271,7 @@ export type Database = {
           status: string | null
           total_price: number
           updated_at: string | null
-          vehicle_id: string
+          vehicle_id: string | null
         }
         Insert: {
           admin_notes?: string | null
@@ -303,7 +303,7 @@ export type Database = {
           status?: string | null
           total_price: number
           updated_at?: string | null
-          vehicle_id: string
+          vehicle_id?: string | null
         }
         Update: {
           admin_notes?: string | null
@@ -335,7 +335,7 @@ export type Database = {
           status?: string | null
           total_price?: number
           updated_at?: string | null
-          vehicle_id?: string
+          vehicle_id?: string | null
         }
         Relationships: [
           {

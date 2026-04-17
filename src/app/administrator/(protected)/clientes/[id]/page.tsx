@@ -421,14 +421,21 @@ export default function ClienteDetallePage() {
                           <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-blue-100 text-blue-800 rounded">
                             {booking.booking_number}
                           </span>
-                          {booking.vehicle.internal_code && (
+                          {booking.vehicle?.internal_code && (
                             <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-gray-100 text-gray-700 rounded">
                               {booking.vehicle.internal_code}
                             </span>
                           )}
+                          {!booking.vehicle && (
+                            <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-amber-100 text-amber-900 rounded ring-1 ring-amber-400">
+                              ⚠️ Sin asignar
+                            </span>
+                          )}
                         </div>
                         
-                        <p className="font-semibold text-gray-900 mb-1">{booking.vehicle.name}</p>
+                        <p className="font-semibold text-gray-900 mb-1">
+                          {booking.vehicle?.name || 'Pendiente de asignar vehículo'}
+                        </p>
                         
                         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-gray-600">
                           <span className="flex items-center gap-1">

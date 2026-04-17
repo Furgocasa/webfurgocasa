@@ -67,7 +67,7 @@ interface Booking {
   payment_status?: string;
   status: string;
   notes?: string;
-  vehicle_id: string;
+  vehicle_id: string | null;
   customer_id: string;
   customer: Customer | null;
   vehicle?: Vehicle;
@@ -521,6 +521,10 @@ export default function CalendarioPage() {
     return (bookings || []).filter(b => b.vehicle_id === vehicleId);
   };
 
+  // Reservas pendientes de asignar (sin vehículo). Se muestran en una fila
+  // especial del calendario para facilitar la reasignación de flota.
+  const unassignedBookings = (bookings || []).filter(b => !b.vehicle_id);
+
   const getBlockedDatesForVehicle = (vehicleId: string) => {
     return (blockedDatesRaw || []).filter(b => b.vehicle_id === vehicleId);
   };
@@ -743,6 +747,40 @@ export default function CalendarioPage() {
         </div>
       </div>
 
+      {/* Aviso de reservas sin vehículo asignado */}
+      {unassignedBookings.length > 0 && (
+        <div className="bg-amber-50 border-2 border-amber-400 rounded-2xl p-4 shadow-sm">
+          <div className="flex items-start gap-3">
+            <div className="text-2xl">⚠️</div>
+            <div className="flex-1">
+              <h3 className="font-bold text-amber-900 text-sm sm:text-base">
+                {unassignedBookings.length} reserva{unassignedBookings.length !== 1 ? 's' : ''} pendiente{unassignedBookings.length !== 1 ? 's' : ''} de asignar vehículo
+              </h3>
+              <p className="text-xs sm:text-sm text-amber-800 mt-1">
+                Hay alquileres en este periodo sin vehículo asignado. Asígnales uno antes de la fecha de recogida.
+              </p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {unassignedBookings.slice(0, 6).map(b => (
+                  <button
+                    key={b.id}
+                    onClick={() => setSelectedBooking(b as any)}
+                    className="text-xs px-2 py-1 bg-amber-200 hover:bg-amber-300 text-amber-900 rounded-lg font-mono font-semibold transition-colors"
+                    title={`${b.booking_number} · ${b.customer?.name || 'Sin cliente'} · ${b.pickup_date} → ${b.dropoff_date}`}
+                  >
+                    {b.booking_number}
+                  </button>
+                ))}
+                {unassignedBookings.length > 6 && (
+                  <span className="text-xs px-2 py-1 text-amber-800">
+                    +{unassignedBookings.length - 6} más
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Calendar Grid - Desktop vs Mobile */}
       {!isMobile ? (
         /* VISTA ESCRITORIO - Gantt Style */
@@ -828,6 +866,80 @@ export default function CalendarioPage() {
                             );
                           })}
                         </div>
+
+                        {/* Fila especial: reservas sin vehículo asignado */}
+                        {unassignedBookings.length > 0 && !searchCode.trim() && (
+                          <div className="flex border-b-2 border-amber-400 bg-amber-50/40 hover:bg-amber-50">
+                            {/* Columna código */}
+                            <div className="w-24 flex-shrink-0 p-3 border-r border-gray-200">
+                              <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-amber-200 text-amber-900 rounded">
+                                ⚠️ S/A
+                              </span>
+                            </div>
+                            {/* Columna nombre */}
+                            <div className="w-48 flex-shrink-0 p-3 border-r border-gray-200">
+                              <div className="flex items-center gap-2">
+                                <div className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0"></div>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-semibold text-amber-900 text-sm truncate">
+                                    Sin vehículo
+                                  </p>
+                                  <p className="text-xs text-amber-700 truncate">
+                                    Pendiente asignar ({unassignedBookings.length})
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            {/* Días del mes */}
+                            {days.map((day) => {
+                              const isTodayFlag = isToday(day, monthDate);
+                              const year = monthDate.getFullYear();
+                              const month = String(monthDate.getMonth() + 1).padStart(2, '0');
+                              const dayStr = String(day).padStart(2, '0');
+                              const currentDateStr = `${year}-${month}-${dayStr}`;
+
+                              const dayUnassigned = unassignedBookings.filter(b =>
+                                currentDateStr >= b.pickup_date && currentDateStr <= b.dropoff_date
+                              );
+                              const pickupHere = unassignedBookings.filter(b => b.pickup_date === currentDateStr);
+                              const dropoffHere = unassignedBookings.filter(b => b.dropoff_date === currentDateStr);
+                              const firstOfDay = dayUnassigned[0];
+
+                              return (
+                                <div
+                                  key={day}
+                                  className={`w-12 flex-shrink-0 border-r border-gray-200 relative ${
+                                    isTodayFlag ? 'bg-yellow-300 border-l-2 border-r-2 border-yellow-400' : ''
+                                  }`}
+                                >
+                                  {firstOfDay ? (
+                                    <div
+                                      className="h-12 flex items-center justify-center relative bg-amber-400 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-amber-600 ring-inset"
+                                      onClick={() => setSelectedBooking(firstOfDay as any)}
+                                      title={`⚠️ SIN VEHÍCULO\n${dayUnassigned.map(b => `· ${b.booking_number} (${b.customer?.name || 'Sin cliente'})`).join('\n')}\n\nClick para abrir`}
+                                    >
+                                      {pickupHere.length > 0 && (
+                                        <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-green-600 rounded px-1 border border-white leading-none py-0.5">
+                                          {pickupHere.length > 1 ? `${pickupHere.length}REC` : 'REC'}
+                                        </span>
+                                      )}
+                                      <span className="text-[11px] font-bold text-amber-900">
+                                        ⚠️{dayUnassigned.length}
+                                      </span>
+                                      {dropoffHere.length > 0 && (
+                                        <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-red-600 rounded px-1 border border-white leading-none py-0.5">
+                                          {dropoffHere.length > 1 ? `${dropoffHere.length}DEV` : 'DEV'}
+                                        </span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="h-12 bg-amber-50/30"></div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
 
                         {/* Filas de vehículos */}
                         {filteredAndSortedVehicles.map((vehicle) => {
@@ -1156,13 +1268,17 @@ export default function CalendarioPage() {
                                       className="cursor-pointer hover:opacity-75 active:scale-95 transition-all"
                                     >
                                       <div className={`flex items-center gap-0.5 text-[8px] sm:text-[9px] leading-tight px-0.5 py-[1px] rounded ${
-                                        isPickup ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
+                                        !event.booking.vehicle_id
+                                          ? 'bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200 ring-1 ring-amber-400'
+                                          : isPickup
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300'
+                                            : 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300'
                                       }`}>
                                         <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full flex-shrink-0 ${
-                                          isPickup ? 'bg-green-500' : 'bg-red-500'
+                                          !event.booking.vehicle_id ? 'bg-amber-500' : isPickup ? 'bg-green-500' : 'bg-red-500'
                                         }`} />
                                         <span className="font-bold truncate">
-                                          {vehicle?.internal_code || '?'}
+                                          {!event.booking.vehicle_id ? '⚠️S/A' : (vehicle?.internal_code || '?')}
                                         </span>
                                       </div>
                                     </div>
@@ -1218,6 +1334,10 @@ export default function CalendarioPage() {
             <div className="w-5 h-5 sm:w-6 sm:h-6 bg-gray-800 rounded flex items-center justify-center text-white text-[10px] sm:text-xs font-bold flex-shrink-0">🚫</div>
             <span className="text-gray-600 dark:text-gray-400">Bloq.</span>
           </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-5 h-5 sm:w-6 sm:h-6 bg-amber-400 ring-2 ring-amber-600 ring-inset rounded flex items-center justify-center text-amber-900 text-[10px] sm:text-xs font-bold flex-shrink-0">⚠️</div>
+            <span className="text-gray-600 dark:text-gray-400">Sin veh.</span>
+          </div>
         </div>
       </div>
 
@@ -1232,9 +1352,14 @@ export default function CalendarioPage() {
           <p className="text-lg sm:text-2xl font-bold text-blue-600 dark:text-blue-400">{bookings.length}</p>
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-3 sm:p-4">
-          <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">Disponibles</p>
+          <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400 mb-0.5 sm:mb-1">
+            Disponibles{unassignedBookings.length > 0 ? ' / Sin asignar' : ''}
+          </p>
           <p className="text-lg sm:text-2xl font-bold text-green-600 dark:text-green-400">
-            {(vehicles || []).length - new Set((bookings || []).map(b => b.vehicle_id)).size}
+            {(vehicles || []).length - new Set((bookings || []).filter(b => b.vehicle_id).map(b => b.vehicle_id)).size}
+            {unassignedBookings.length > 0 && (
+              <span className="text-amber-600 dark:text-amber-400"> / {unassignedBookings.length}</span>
+            )}
           </p>
         </div>
       </div>
@@ -1274,13 +1399,22 @@ export default function CalendarioPage() {
               {/* Vehículo */}
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase mb-2">🚐 Vehículo</div>
-                <div className="bg-gray-50 rounded-lg p-3">
-                  <div className="font-bold text-gray-900">{selectedBooking.vehicle?.name || 'Sin nombre'}</div>
-                  <div className="text-sm text-gray-600">{selectedBooking.vehicle?.brand || ''}</div>
-                  {selectedBooking.vehicle?.internal_code && (
-                    <div className="text-xs text-gray-500 mt-1">Código: {selectedBooking.vehicle.internal_code}</div>
-                  )}
-                </div>
+                {selectedBooking.vehicle_id && selectedBooking.vehicle ? (
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="font-bold text-gray-900">{selectedBooking.vehicle?.name || 'Sin nombre'}</div>
+                    <div className="text-sm text-gray-600">{selectedBooking.vehicle?.brand || ''}</div>
+                    {selectedBooking.vehicle?.internal_code && (
+                      <div className="text-xs text-gray-500 mt-1">Código: {selectedBooking.vehicle.internal_code}</div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-3">
+                    <div className="font-bold text-amber-900">⚠️ Sin vehículo asignado</div>
+                    <div className="text-xs text-amber-700 mt-1">
+                      Esta reserva está pendiente de asignación. Edítala para asignar un vehículo.
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Cliente */}
