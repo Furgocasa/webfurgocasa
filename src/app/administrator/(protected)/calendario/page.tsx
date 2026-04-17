@@ -134,6 +134,21 @@ export default function CalendarioPage() {
   // Estado para modal de suscripción al calendario
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [urlCopied, setUrlCopied] = useState(false);
+  const [calendarSubscriptionUrl, setCalendarSubscriptionUrl] = useState<string>("");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/calendar/subscription-url")
+      .then(async (r) => {
+        if (!r.ok) return;
+        const data = await r.json();
+        if (!cancelled && data?.url) setCalendarSubscriptionUrl(data.url);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Cargar vehículos con el hook
   const { 
@@ -579,20 +594,15 @@ export default function CalendarioPage() {
   const mobileEvents = isMobile ? getMobileCalendarEvents() : {};
 
   // Función para copiar URL de suscripción al calendario
+  // ✅ SEGURIDAD: La URL se obtiene desde /api/admin/calendar/subscription-url
+  // (solo accesible para admins). El token NUNCA se expone al cliente.
   const copyCalendarUrl = () => {
-    // ✅ SEGURIDAD: Usar variable de entorno (ya configurada en Vercel)
-    // Nota: NEXT_PUBLIC_ está expuesta al cliente, pero es necesaria para generar la URL
-    // El token real se valida en el servidor con CALENDAR_SUBSCRIPTION_TOKEN
-    const token = process.env.NEXT_PUBLIC_CALENDAR_TOKEN;
-    
-    if (!token) {
-      alert('Error: Token de calendario no configurado. Contacta al administrador.');
+    if (!calendarSubscriptionUrl) {
+      alert('Token de calendario no disponible. Contacta al administrador.');
       return;
     }
-    
-    const url = `${window.location.origin}/api/calendar/entregas?token=${token}`;
-    
-    navigator.clipboard.writeText(url).then(() => {
+
+    navigator.clipboard.writeText(calendarSubscriptionUrl).then(() => {
       setUrlCopied(true);
       setTimeout(() => setUrlCopied(false), 3000);
     }).catch(err => {
@@ -1490,7 +1500,7 @@ export default function CalendarioPage() {
                   <input
                     type="text"
                     readOnly
-                    value={`${typeof window !== 'undefined' ? window.location.origin : ''}/api/calendar/entregas?token=${process.env.NEXT_PUBLIC_CALENDAR_TOKEN || '[Token no configurado]'}`}
+                    value={calendarSubscriptionUrl || '[Cargando URL…]'}
                     className="flex-1 px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono text-gray-700"
                   />
                   <button

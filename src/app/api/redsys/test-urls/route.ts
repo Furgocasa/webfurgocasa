@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { requireAdmin } from "@/lib/auth/require-admin";
 
 /**
  * GET /api/redsys/test-urls
@@ -6,6 +7,9 @@ import { NextRequest, NextResponse } from "next/server";
  * Endpoint temporal para mostrar las URLs configuradas
  */
 export async function GET(request: NextRequest) {
+  const guard = await requireAdmin();
+  if (guard) return guard;
+
   const baseUrl = process.env.NEXT_PUBLIC_URL || process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   
   return NextResponse.json({

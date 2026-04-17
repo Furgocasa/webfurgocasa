@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isValidUUID } from '@/lib/utils';
 
 // Usar service role para bypass de RLS
 const supabase = createClient(
@@ -13,6 +14,13 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+
+    if (!isValidUUID(id)) {
+      return NextResponse.json(
+        { error: 'ID de oferta inválido' },
+        { status: 400 }
+      );
+    }
 
     // Obtener la oferta con datos del vehículo y ubicaciones
     const { data: offer, error } = await supabase

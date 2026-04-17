@@ -100,6 +100,29 @@ Cada día a las 20:00 h (Madrid) un cron de Vercel busca reservas `confirmed` / 
 
 ---
 
+## 🔒 Abril 2026 — Cierre Auditoría Supabase Security Advisor
+
+**Estado:** ✅ Completada — 53 warnings resueltos, 12 aceptados como diseño, cero regresiones.  
+**Documentación:** [`docs/03-mantenimiento/AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md`](./docs/03-mantenimiento/AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md)
+
+Segunda ola de hardening tras la auditoría de febrero. Enfocada en el Security Advisor de Supabase:
+
+- **Privilege escalation cerrada en `admins`:** eliminadas policies permisivas de `INSERT` y `DELETE`. Ningún usuario autenticado puede auto-promocionarse a admin; solo `service_role`.
+- **Buckets storage** (`blog`, `extras`, `media`, `vehicles`): SELECT restringido a `authenticated`. Las URLs públicas siguen funcionando; se bloquea `.list()` desde visitantes anónimos.
+- **Search-path injection mitigado** en 46 funciones PL/pgSQL (`SET search_path = public, pg_temp`).
+- **Leaked Password Protection** activada en Supabase Auth (HaveIBeenPwned).
+- **Endpoints actualizados** para usar `createAdminClient()` sobre `search_queries` tras activar RLS en esa tabla.
+
+Decisiones documentadas sobre lo **no** modificado (policies permisivas en flujos anónimos de reservas/cupones/comentarios y `pg_trgm` en `public`) con mitigaciones activas.
+
+**Pendientes críticos reordenados** en [`docs/03-mantenimiento/PENDIENTES-SEGURIDAD.md`](./docs/03-mantenimiento/PENDIENTES-SEGURIDAD.md):
+- Recalcular precios en `/api/bookings/create` (refuerzo frente a `rls_policy_always_true` aceptado en `bookings`).
+- Activar bloqueo de importe en `/api/redsys/initiate`.
+- Rotar `CALENDAR_SUBSCRIPTION_TOKEN` y eliminar `NEXT_PUBLIC_CALENDAR_TOKEN` del cliente.
+- Migrar rate-limit a Upstash Redis.
+
+---
+
 ## ⚡ [ÚLTIMA ACTUALIZACIÓN] - 25 de Febrero 2026 - **Franjas Horarias por Ubicación + Fix Timezone Europe/Madrid**
 
 ### 🕐 Franjas Horarias Configurables por Ubicación
@@ -2004,7 +2027,9 @@ NEXT_PUBLIC_GA_ID (opcional)
 
 | Documento | Importancia | Cuándo Leer |
 |-----------|-------------|-------------|
-| **AUDITORIA-SEGURIDAD-2026.md** | 🔒 **NUEVO** - CRÍTICO | Antes de deployar cambios críticos |
+| **AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md** | 🔒 **NUEVO** - CRÍTICO | Antes de tocar policies RLS, buckets storage o funciones SQL |
+| **AUDITORIA-SEGURIDAD-2026.md** | 🔒 CRÍTICO | Antes de deployar cambios críticos |
+| **PENDIENTES-SEGURIDAD.md** | 🔒 CONSULTA CONTINUA | Plan vivo de hardening |
 | **REGLAS-ARQUITECTURA-NEXTJS.md** | 🔴 CRÍTICO | Antes de modificar CUALQUIER página |
 | **GUIA-TRADUCCION.md** | 🔴 CRÍTICO | Antes de añadir textos traducibles |
 | **REGLAS-SUPABASE-OBLIGATORIAS.md** | 🔴 CRÍTICO | Antes de hacer queries |

@@ -4,6 +4,52 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔒 Sprint de seguridad App — 17 de abril 2026 (tarde)
+
+Segundo cierre del día tras la auditoría Supabase. Ataque de los pendientes críticos y altos desde `docs/03-mantenimiento/PENDIENTES-SEGURIDAD.md`. Todo aditivo, reversible y sin romper flujos existentes.
+
+**Defensa de pagos:**
+- **Bloqueo de importe en `/api/redsys/initiate`** activado: rechaza con 400 si `amount` no coincide con importe pendiente (`total - amount_paid`) o con el 50 % inicial del `baseTotal` (= `total_price - stripe_fee_total`). Tolerancia 0,05 €. `preauth` (fianza) excluido.
+- **Recálculo de precios en `/api/bookings/create`:** reusa `buildPricingForSearch` (`src/lib/rental-search-pricing.ts`) + `extraLineUnitPriceEuros` (`src/lib/utils.ts`) para recalcular base + extras + cupón en el servidor. Si el `total_price` del cliente difiere más de `max(2 €, 2 %)` responde 400. Reservas desde `last_minute_offer_id` solo se loguean (importe fijado por la oferta).
+
+**Cierre de endpoints abiertos (requerían solo `GET` sin auth):**
+- Nuevo helper `src/lib/auth/require-admin.ts` (`requireAdmin()`) aplicado en:
+  - `/api/debug/schema` — antes exponía esquema de BD completo con muestras.
+  - `/api/test-supabase` — datos de vehículos, ubicaciones, extras.
+  - `/api/test-email` — permitía enviar correos vía SMTP de Furgocasa a cualquiera.
+  - `/api/test-return-reminder` — filtraba datos de reservas por `booking_number` + spam SMTP.
+  - `/api/redsys/test-urls`.
+
+**Hardening de superficie pública:**
+- Rate limiting ampliado en `src/middleware.ts` con `/api/pricing/calculate` (120/min), `/api/creator-collaboration` (5 / 5 min — antispam), `/api/bookings/send-email` (10/min), `/api/availability/alternatives` (60/min), `/api/blog/views` (120/min).
+- `uploadFile()` en `src/lib/supabase/storage.ts` ahora invoca `validateFileSize` (10 MB) y `validateFileType` (JPG/PNG/WebP/GIF) antes de procesar. Antes existían los helpers pero no se usaban.
+- `isValidUUID` centralizado en `src/lib/utils.ts` (sustituye implementación local de `/api/bookings/[id]`) y aplicado también en `/api/offers/last-minute/[id]`.
+
+**Eliminación de `NEXT_PUBLIC_CALENDAR_TOKEN` del cliente:**
+- Nuevo endpoint `/api/admin/calendar/subscription-url` (admin-only) que devuelve la URL de suscripción completa usando `CALENDAR_SUBSCRIPTION_TOKEN` del servidor.
+- `src/app/administrator/(protected)/calendario/page.tsx` carga la URL desde el endpoint y elimina las referencias a `process.env.NEXT_PUBLIC_CALENDAR_TOKEN`. El token deja de exponerse en el bundle cliente. Pendiente manual del admin: rotar `CALENDAR_SUBSCRIPTION_TOKEN` en Vercel y quitar `NEXT_PUBLIC_CALENDAR_TOKEN` de la config del proyecto.
+
+**Docs:**
+- `docs/03-mantenimiento/PENDIENTES-SEGURIDAD.md` actualizado: críticas 8/8 ✅, altas 3/5, medias 1/7 — progreso global 60 %.
+
+---
+
+## 🔒 Auditoría Supabase Security Advisor — 17 de abril 2026
+
+Cierre de **53 warnings** del Supabase Security Advisor sin regresiones en la web pública.
+
+- **Policies de `admins`:** eliminadas `allow_authenticated_insert` y `allow_authenticated_delete` (permisivas). Nadie autenticado puede ya convertirse en admin; solo `service_role` vía SQL Editor o `createAdminClient()`. Se añadió policy SELECT restringida `authenticated_can_read_own_admin` (`user_id = auth.uid()`).
+- **Storage buckets (`blog`, `extras`, `media`, `vehicles`):** SELECT en `storage.objects` restringido a `authenticated`. Las URLs CDN (`<img src="...storage/.../public/...">`) siguen funcionando — no pasan por RLS. Se bloquea `storage.from(...).list()` desde visitantes anónimos.
+- **46 funciones PL/pgSQL en `public`:** `ALTER FUNCTION ... SET search_path = public, pg_temp` para mitigar search_path injection.
+- **Auth → Attack Protection:** activado **Prevent use of leaked passwords** (verificación contra HaveIBeenPwned).
+- **Código:** `src/app/api/admin/search-analytics/route.ts`, `src/app/api/availability/route.ts` y `src/app/api/search-tracking/route.ts` usan ahora `createAdminClient()` (service_role) para las operaciones sobre `search_queries` tras activar RLS en esa tabla.
+- **Aceptados como diseño (12):** policies permisivas en flujos anónimos (`bookings`, `booking_extras`, `comments`, `coupon_usage`, `search_queries`, `content_translations`, `translation_queue`) y `extension_in_public` para `pg_trgm` — documentadas con mitigaciones existentes.
+- **Docs:** nuevo [`docs/03-mantenimiento/AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md`](./docs/03-mantenimiento/AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md); actualizados `PENDIENTES-SEGURIDAD.md`, `docs/README.md`, `README.md` (raíz).
+
+**Commit previo asociado:** `fix(seguridad): adaptar endpoints a RLS de search_queries`
+
+---
+
 ## 💳 Pago reserva: solo 100 % si la recogida es en menos de 15 días — 9 de abril 2026
 
 - **UX / política:** Si `amount_paid === 0` y la fecha de recogida dista menos de 15 días, las páginas de pago (ES/EN/DE/FR) deshabilitan «Pagar 50 % ahora» y muestran avisos orientando al pago del 100 %.

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifySmtpConnection } from '@/lib/email';
 import { sendEmail, getFromEmail } from '@/lib/email/smtp-client';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 /**
  * GET /api/test-email
@@ -12,6 +13,9 @@ import { sendEmail, getFromEmail } from '@/lib/email/smtp-client';
  * - ?verify=true - Solo verificar conexión sin enviar email
  */
 export async function GET(request: NextRequest) {
+  const guard = await requireAdmin();
+  if (guard) return guard;
+
   const searchParams = request.nextUrl.searchParams;
   const testEmail = searchParams.get('to');
   const verifyOnly = searchParams.get('verify') === 'true';

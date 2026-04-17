@@ -125,6 +125,24 @@ export async function uploadFile(
   path?: string
 ): Promise<{ url: string; path: string } | null> {
   try {
+    // ✅ SEGURIDAD: Validar tamaño y tipo ANTES de procesar el archivo.
+    if (!validateFileSize(file)) {
+      const maxMB = 10;
+      console.error(`❌ Archivo rechazado: ${file.name} supera el límite de ${maxMB}MB (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+      if (typeof window !== 'undefined') {
+        alert(`El archivo "${file.name}" supera el límite de ${maxMB}MB.`);
+      }
+      return null;
+    }
+
+    if (!validateFileType(file)) {
+      console.error(`❌ Archivo rechazado: ${file.name} tiene un tipo no permitido (${file.type})`);
+      if (typeof window !== 'undefined') {
+        alert(`Formato no permitido para "${file.name}". Solo se aceptan imágenes JPG, PNG, WebP o GIF.`);
+      }
+      return null;
+    }
+
     // OPTIMIZACIÓN AUTOMÁTICA: Convertir imágenes a WebP
     let fileToUpload = file;
     

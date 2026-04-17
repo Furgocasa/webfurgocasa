@@ -49,8 +49,10 @@ Documentación de desarrollo por área:
 ### 03-mantenimiento/
 Historial de correcciones y mejoras:
 
-#### 🔒 Seguridad (NUEVO - Febrero 2026)
-- **AUDITORIA-SEGURIDAD-2026.md** - Auditoría completa de seguridad
+#### 🔒 Seguridad (Febrero + Abril 2026)
+- **AUDITORIA-SEGURIDAD-2026.md** - Auditoría completa de seguridad (feb 2026)
+- **AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md** - 🆕 Cierre de 53 warnings del Supabase Security Advisor (RLS `admins`, buckets, `search_path`, leaked passwords)
+- **PENDIENTES-SEGURIDAD.md** - Listado vivo de pendientes con estado actualizado
 - **ATAQUES-EXTERNOS-AMENAZAS.md** - Análisis de amenazas externas
 - **CORRECCIONES-SEGURAS-SIN-AFECTAR.md** - Estrategia de correcciones no invasivas
 - **GUIA-CAMBIAR-TOKEN-CALENDARIO.md** - Guía paso a paso para cambiar tokens
@@ -157,9 +159,13 @@ Estos documentos contienen reglas absolutas que NUNCA deben violarse:
    - Flujo secuencial de reservas
    - NUNCA eliminar pasos del flujo
 
-4. **[03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md](./03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md)** ⚠️ **NUEVO**
-   - Auditoría completa de seguridad
+4. **[03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md](./03-mantenimiento/AUDITORIA-SEGURIDAD-2026.md)** ⚠️
+   - Auditoría completa de seguridad (feb 2026)
    - Vulnerabilidades críticas identificadas y corregidas
+
+5. **[03-mantenimiento/AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md](./03-mantenimiento/AUDITORIA-SEGURIDAD-SUPABASE-ABRIL-2026.md)** 🆕
+   - Cierre de 53 warnings del Supabase Security Advisor (abr 2026)
+   - RLS `admins`, buckets storage, `search_path` en 46 funciones, Leaked Password Protection
 
 ---
 
@@ -185,5 +191,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 23 de marzo, 2026  
-Versión del proyecto: 4.5.1 (cron recordatorio devolución; i18n tarifas; cupones por fecha recogida)
+Última actualización: 17 de abril, 2026  
+Versión del proyecto: 4.5.2 (cierre auditoría Supabase Security Advisor: RLS admins, buckets, search_path, leaked passwords)

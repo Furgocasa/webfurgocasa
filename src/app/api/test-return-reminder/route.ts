@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/email/smtp-client';
 import { getReturnReminderTemplate } from '@/lib/email/templates';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 /**
  * GET /api/test-return-reminder?booking=FC26010043&to=info@furgocasa.com
@@ -10,6 +11,9 @@ import { getReturnReminderTemplate } from '@/lib/email/templates';
  * Solo para revisión interna — se borra cuando se apruebe el diseño.
  */
 export async function GET(request: NextRequest) {
+  const guard = await requireAdmin();
+  if (guard) return guard;
+
   const bookingNumber = request.nextUrl.searchParams.get('booking') || 'FC26010043';
   const to = request.nextUrl.searchParams.get('to') || 'info@furgocasa.com';
 

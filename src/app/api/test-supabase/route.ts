@@ -5,8 +5,12 @@
 
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase/client';
+import { requireAdmin } from '@/lib/auth/require-admin';
 
 export async function GET() {
+  const guard = await requireAdmin();
+  if (guard) return guard;
+
   try {
     // Test 1: Verificar categorías de vehículos
     const { data: categories, error: categoriesError } = await supabase

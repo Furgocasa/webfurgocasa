@@ -6,6 +6,17 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Comprueba si una cadena es un UUID v4 válido (formato 8-4-4-4-12).
+ * Uso típico en endpoints dinámicos `[id]` para rechazar entradas malformadas
+ * antes de llegar a Postgres y evitar errores 500 o intentos de probing.
+ */
+export function isValidUUID(uuid: unknown): boolean {
+  if (typeof uuid !== "string") return false;
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(uuid);
+}
+
+/**
  * Parsea un string "YYYY-MM-DD" como medianoche hora LOCAL del navegador.
  * Evita el problema de new Date("2026-04-15") que lo interpreta como UTC
  * y puede desplazar el día en zonas horarias negativas (LATAM, etc.).

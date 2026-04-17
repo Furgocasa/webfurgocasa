@@ -25,7 +25,8 @@ import {
   Trash2,
   CheckCircle2,
   XCircle,
-  CreditCard
+  CreditCard,
+  RotateCw
 } from "lucide-react";
 import { supabase } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/utils";
@@ -124,6 +125,30 @@ export default function OfertasUltimaHoraPage() {
 
   // Estado para confirmar borrado
   const [deletingOfferId, setDeletingOfferId] = useState<string | null>(null);
+
+  // Estado para resincronización de precios
+  const [resyncingOfferId, setResyncingOfferId] = useState<string | null>(null);
+  const [resyncingAll, setResyncingAll] = useState(false);
+  const [resyncResults, setResyncResults] = useState<{
+    total: number;
+    updated: number;
+    unchanged: number;
+    errors: number;
+    details: Array<{
+      offerId: string;
+      vehicleName: string;
+      vehicleCode?: string;
+      startDate: string;
+      endDate: string;
+      discount: number;
+      oldOriginal: number;
+      newOriginal: number;
+      oldFinal: number;
+      newFinal: number;
+      status: 'updated' | 'unchanged' | 'error';
+      error?: string;
+    }>;
+  } | null>(null);
 
   // Estado para ordenamiento de tabla
   const [sortField, setSortField] = useState<'internal_code' | 'vehicle_name' | 'start_date' | 'end_date' | 'duration' | 'discount' | 'price'>('start_date');
@@ -498,6 +523,178 @@ export default function OfertasUltimaHoraPage() {
     }
   };
 
+  // Resincronizar el precio de UNA oferta: lee el precio actual de temporada
+  // para sus fechas y actualiza original_price_per_day. El final_price_per_day
+  // lo recalcula el trigger de la BD a partir del discount_percentage existente.
+  const resyncOfferPrice = async (offer: LastMinuteOffer) => {
+    setResyncingOfferId(offer.id);
+    try {
+      const priceRes = await fetch('/api/pricing/calculate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pickup_date: offer.offer_start_date,
+          dropoff_date: offer.offer_end_date
+        })
+      });
+      const priceData = await priceRes.json();
+      if (!priceRes.ok) throw new Error(priceData.error || 'Error al calcular precio actual');
+
+      const newOriginal: number = priceData.real_price_per_day;
+      const oldOriginal = offer.original_price_per_day;
+      const newFinal = Math.round(newOriginal * (100 - offer.discount_percentage)) / 100;
+
+      if (Math.abs(newOriginal - oldOriginal) < 0.01) {
+        showMessage('success', `Sin cambios: ${formatPrice(oldOriginal)}/día ya coincide con el precio actual de temporada`);
+        return;
+      }
+
+      // Solo actualizamos original_price_per_day; final_price_per_day lo recalcula
+      // automáticamente la BD (igual que hace publishOffer al crear la oferta).
+      const response = await fetch('/api/admin/last-minute-offers', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: offer.id,
+          original_price_per_day: newOriginal
+        })
+      });
+      const result = await response.json();
+      if (result.error) throw new Error(result.error);
+
+      showMessage(
+        'success',
+        `Precio actualizado: ${formatPrice(oldOriginal)} → ${formatPrice(newOriginal)}/día (final con -${offer.discount_percentage}%: ${formatPrice(newFinal)}/día)`
+      );
+      loadOffers();
+    } catch (error: unknown) {
+      console.error('Error resincronizando precio:', error);
+      const message = error instanceof Error ? error.message : 'Error al resincronizar precio';
+      showMessage('error', message);
+    } finally {
+      setResyncingOfferId(null);
+    }
+  };
+
+  // Resincronizar precios de TODAS las ofertas publicadas
+  const resyncAllPublishedPrices = async () => {
+    const published = offers.filter(o => o.status === 'published');
+    if (published.length === 0) {
+      showMessage('error', 'No hay ofertas publicadas para resincronizar');
+      return;
+    }
+    if (!confirm(
+      `¿Resincronizar los precios de las ${published.length} ofertas publicadas?\n\n` +
+      `Se leerá el precio actual de temporada para las fechas de cada oferta y se actualizará ` +
+      `"original_price_per_day" manteniendo el % de descuento ya configurado.\n\n` +
+      `Las ofertas reservadas, expiradas, ignoradas o auto-canceladas NO se tocan.`
+    )) return;
+
+    setResyncingAll(true);
+    setResyncResults(null);
+
+    const details: NonNullable<typeof resyncResults>['details'] = [];
+    let updated = 0, unchanged = 0, errors = 0;
+
+    for (const offer of published) {
+      const base = {
+        offerId: offer.id,
+        vehicleName: offer.vehicle?.name || 'Vehículo',
+        vehicleCode: offer.vehicle?.internal_code,
+        startDate: offer.offer_start_date,
+        endDate: offer.offer_end_date,
+        discount: offer.discount_percentage,
+        oldOriginal: offer.original_price_per_day,
+        oldFinal: offer.final_price_per_day,
+      };
+
+      try {
+        const priceRes = await fetch('/api/pricing/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            pickup_date: offer.offer_start_date,
+            dropoff_date: offer.offer_end_date
+          })
+        });
+        const priceData = await priceRes.json();
+        if (!priceRes.ok) {
+          errors++;
+          details.push({
+            ...base,
+            newOriginal: 0,
+            newFinal: 0,
+            status: 'error',
+            error: priceData.error || 'Error al calcular precio'
+          });
+          continue;
+        }
+
+        const newOriginal: number = priceData.real_price_per_day;
+        const newFinal = Math.round(newOriginal * (100 - offer.discount_percentage)) / 100;
+
+        if (Math.abs(newOriginal - offer.original_price_per_day) < 0.01) {
+          unchanged++;
+          details.push({
+            ...base,
+            newOriginal,
+            newFinal,
+            status: 'unchanged'
+          });
+          continue;
+        }
+
+        // Solo actualizamos original_price_per_day; final_price_per_day lo recalcula la BD.
+        const updateRes = await fetch('/api/admin/last-minute-offers', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: offer.id,
+            original_price_per_day: newOriginal
+          })
+        });
+        const updateData = await updateRes.json();
+        if (updateData.error) {
+          errors++;
+          details.push({
+            ...base,
+            newOriginal,
+            newFinal,
+            status: 'error',
+            error: updateData.error
+          });
+          continue;
+        }
+
+        updated++;
+        details.push({
+          ...base,
+          newOriginal,
+          newFinal,
+          status: 'updated'
+        });
+      } catch (error: unknown) {
+        errors++;
+        const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+        details.push({
+          ...base,
+          newOriginal: 0,
+          newFinal: 0,
+          status: 'error',
+          error: errorMessage
+        });
+      }
+    }
+
+    setResyncResults({ total: published.length, updated, unchanged, errors, details });
+    showMessage(
+      updated > 0 ? 'success' : 'error',
+      `Resincronización completada: ${updated} actualizadas · ${unchanged} sin cambios · ${errors} errores`
+    );
+    loadOffers();
+    setResyncingAll(false);
+  };
+
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString('es-ES', {
       day: 'numeric',
@@ -616,6 +813,15 @@ export default function OfertasUltimaHoraPage() {
           >
             <Database className={`h-5 w-5 ${checking ? 'animate-spin' : ''}`} />
             {checking ? 'Consultando...' : 'Consultar Ofertas'}
+          </button>
+          <button
+            onClick={resyncAllPublishedPrices}
+            disabled={resyncingAll}
+            title="Relee el precio actual de temporada para las fechas de cada oferta publicada y actualiza el precio original, manteniendo el % de descuento"
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors disabled:opacity-50"
+          >
+            <RotateCw className={`h-5 w-5 ${resyncingAll ? 'animate-spin' : ''}`} />
+            {resyncingAll ? 'Resincronizando...' : 'Resincronizar Precios'}
           </button>
         </div>
       </div>
@@ -739,6 +945,124 @@ export default function OfertasUltimaHoraPage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Resultado de resincronización masiva de precios */}
+      {resyncResults && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+          <div className="p-4 border-b border-gray-100">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <RotateCw className="h-5 w-5 text-emerald-600" />
+                Resultado de Resincronización de Precios
+              </h2>
+              <button
+                onClick={() => setResyncResults(null)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-4 text-sm">
+              <span className="text-gray-600">
+                Total: <strong>{resyncResults.total}</strong>
+              </span>
+              <span className="text-emerald-600">
+                Actualizadas: <strong>{resyncResults.updated}</strong>
+              </span>
+              <span className="text-gray-600">
+                Sin cambios: <strong>{resyncResults.unchanged}</strong>
+              </span>
+              {resyncResults.errors > 0 && (
+                <span className="text-red-600">
+                  Errores: <strong>{resyncResults.errors}</strong>
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
+            {resyncResults.details.map((row) => {
+              const bgClass =
+                row.status === 'updated' ? 'bg-emerald-50/50' :
+                row.status === 'error' ? 'bg-red-50' :
+                'bg-white';
+              return (
+                <div key={row.offerId} className={`p-4 ${bgClass}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {row.status === 'updated' && <CheckCircle2 className="h-5 w-5 text-emerald-500" />}
+                        {row.status === 'unchanged' && <Check className="h-5 w-5 text-gray-400" />}
+                        {row.status === 'error' && <XCircle className="h-5 w-5 text-red-500" />}
+                        <Truck className="h-5 w-5 text-furgocasa-blue" />
+                        <span className="font-medium text-gray-900">{row.vehicleName}</span>
+                        {row.vehicleCode && (
+                          <span className="text-xs text-gray-500">({row.vehicleCode})</span>
+                        )}
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                          row.status === 'updated' ? 'bg-emerald-100 text-emerald-800' :
+                          row.status === 'unchanged' ? 'bg-gray-100 text-gray-700' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {row.status === 'updated' ? 'Actualizada' : row.status === 'unchanged' ? 'Sin cambios' : 'Error'}
+                        </span>
+                      </div>
+
+                      <div className="flex flex-wrap gap-4 text-sm text-gray-600 ml-7 mb-2">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {formatDate(row.startDate)} - {formatDate(row.endDate)}
+                        </span>
+                        <span className="flex items-center gap-1 text-green-600 font-medium">
+                          <TrendingDown className="h-4 w-4" />
+                          -{row.discount}%
+                        </span>
+                      </div>
+
+                      {row.status !== 'error' && (
+                        <div className="ml-7 grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-xs text-gray-500 mb-0.5">Precio original/día</p>
+                            <div className="flex items-center gap-2">
+                              {row.status === 'updated' ? (
+                                <>
+                                  <span className="text-gray-400 line-through">{formatPrice(row.oldOriginal)}</span>
+                                  <span className="text-emerald-700 font-semibold">→ {formatPrice(row.newOriginal)}</span>
+                                </>
+                              ) : (
+                                <span className="text-gray-700">{formatPrice(row.oldOriginal)}</span>
+                              )}
+                            </div>
+                          </div>
+                          <div>
+                            <p className="text-xs text-gray-500 mb-0.5">Precio final/día</p>
+                            <div className="flex items-center gap-2">
+                              {row.status === 'updated' ? (
+                                <>
+                                  <span className="text-gray-400 line-through">{formatPrice(row.oldFinal)}</span>
+                                  <span className="text-emerald-700 font-semibold">→ {formatPrice(row.newFinal)}</span>
+                                </>
+                              ) : (
+                                <span className="text-gray-700">{formatPrice(row.oldFinal)}</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {row.status === 'error' && row.error && (
+                        <p className="text-xs text-red-600 mt-2 ml-7 italic">
+                          {row.error}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -1216,6 +1540,18 @@ export default function OfertasUltimaHoraPage() {
                           </button>
                         )}
                         
+                        {/* Resincronizar precio */}
+                        {offer.status === 'published' && (
+                          <button
+                            onClick={() => resyncOfferPrice(offer)}
+                            disabled={resyncingOfferId === offer.id || resyncingAll}
+                            className="p-2 text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors disabled:opacity-50"
+                            title="Resincronizar precio: lee el precio actual de temporada para estas fechas y actualiza la oferta manteniendo el % de descuento"
+                          >
+                            <RotateCw className={`h-4 w-4 ${resyncingOfferId === offer.id ? 'animate-spin' : ''}`} />
+                          </button>
+                        )}
+
                         {/* Ocultar/Expirar */}
                         {offer.status === 'published' && (
                           <button

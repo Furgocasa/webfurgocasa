@@ -1,7 +1,37 @@
 # 📋 PENDIENTES DE SEGURIDAD
 
-**Fecha**: 5 de Febrero, 2026  
-**Estado**: ⏳ **PENDIENTES DE IMPLEMENTAR**
+**Fecha original**: 5 de Febrero, 2026  
+**Última revisión**: 17 de abril, 2026 (segunda pasada del día)  
+**Estado**: 🟢 **Sprint de seguridad completado — solo quedan tareas de infraestructura externa**
+
+---
+
+## 🆕 ACTUALIZACIÓN — 17 de abril, 2026 (tarde)
+
+Segunda tanda de fixes cerrados en el mismo día tras la auditoría Supabase Security Advisor. Todos los cierres son aditivos, reversibles y testeables.
+
+**Nuevos cierres en código (esta tanda):**
+- ✅ **Bloqueo de importe en `/api/redsys/initiate`** — Ahora rechaza con 400 si `amount` no coincide con ni el importe pendiente ni el 50 % inicial (tolerancia 0,05 €). `preauth` sigue sin validarse (fianza tiene importe independiente).
+- ✅ **Recálculo de precios en `/api/bookings/create`** — Reserva rechazada con 400 si el `total_price` enviado por el cliente difiere del recálculo servidor en más de `max(2 €, 2 %)`. Reutiliza `buildPricingForSearch` + `extraLineUnitPriceEuros`. `last_minute_offer_id` se loguea pero no bloquea (precio fijado por oferta).
+- ✅ **5 endpoints `/api/test-*` + `/api/debug/schema` cerrados** — Ahora requieren sesión de admin válida (`requireAdmin()` en `src/lib/auth/require-admin.ts`). Antes: abiertos sin auth (filtraban esquema, datos de reservas, y permitían envío de emails con credenciales SMTP).
+- ✅ **Rate limiting ampliado** — Añadidas `/api/pricing/calculate`, `/api/creator-collaboration` (5 / 5 min antispam), `/api/bookings/send-email`, `/api/availability/alternatives`, `/api/blog/views`.
+- ✅ **Validación de tamaño y tipo en uploads** — `uploadFile()` en `src/lib/supabase/storage.ts` ahora invoca `validateFileSize` (10 MB) y `validateFileType` (JPG/PNG/WebP/GIF) antes de optimizar.
+- ✅ **Helper UUID centralizado** — `isValidUUID` movido a `src/lib/utils.ts` y aplicado a `/api/bookings/[id]` y `/api/offers/last-minute/[id]`.
+- ✅ **`NEXT_PUBLIC_CALENDAR_TOKEN` eliminado del cliente** — Nuevo endpoint `/api/admin/calendar/subscription-url` (admin-only) devuelve la URL completa. El token solo vive en `CALENDAR_SUBSCRIPTION_TOKEN` server-side.
+
+**Acciones manuales pendientes del admin (fuera del código):**
+- 🟠 Rotar `CALENDAR_SUBSCRIPTION_TOKEN` en Vercel (recomendado). Ya puede eliminarse `NEXT_PUBLIC_CALENDAR_TOKEN` del proyecto de Vercel sin romper nada.
+- 🟠 Migrar rate-limit a Upstash Redis (requiere crear cuenta Upstash y compartir las credenciales para integrar).
+- 🟡 Revisar CSP (quitar `unsafe-eval`).
+- 🟡 Decisión de producto: ¿`/api/bookings/[id]` debería devolver datos personales completos (DNI, driver_license, dirección) solo a admins? Actualmente cualquiera con el UUID de la reserva accede.
+- 🟡 `npm audit` mensual.
+- 🟡 Revisar Supabase Advisor mensualmente.
+
+**Cierres de la tanda anterior (auditoría Supabase Security Advisor):**
+- ✅ **Privilege escalation en `admins`** — policies permisivas `INSERT`/`DELETE` eliminadas.
+- ✅ **Listado de buckets públicos** (`blog`, `extras`, `media`, `vehicles`) restringido a `authenticated`.
+- ✅ **Search-path injection (46 funciones)** — todas con `SET search_path = public, pg_temp`.
+- ✅ **Leaked Password Protection** activado en Supabase Auth.
 
 ---
 
@@ -28,14 +58,16 @@
 
 ---
 
-## 📊 RESUMEN DE ESTADO
+## 📊 RESUMEN DE ESTADO (actualizado 17 abr 2026 tarde)
 
 | Prioridad | Total | Corregidas | Pendientes | % Completado |
 |-----------|-------|------------|------------|--------------|
-| 🔴 **Críticas** | 8 | 5 | **3** | 62% ✅ |
-| 🟠 **Altas** | 5 | 0 | **5** | 0% ⏳ |
-| 🟡 **Medias** | 7 | 0 | **7** | 0% ⏳ |
-| **TOTAL** | **20** | **5** | **15** | **25%** |
+| 🔴 **Críticas** | 8 | 8 | **0** | 100% ✅ |
+| 🟠 **Altas** | 5 | 3 | **2** | 60% ✅ |
+| 🟡 **Medias** | 7 | 1 | **6** | 14% ⏳ |
+| **TOTAL** | **20** | **12** | **8** | **60%** |
+
+> Las pendientes restantes son mayoritariamente acciones de infraestructura externa (Vercel, Upstash) o decisiones de producto, no cambios de código puros.
 
 ---
 
@@ -414,12 +446,23 @@ if (!validateUUID(bookingId)) {
 
 ## ✅ LO QUE YA ESTÁ CORREGIDO
 
-### Vulnerabilidades Críticas Corregidas (5/8):
-1. ✅ **Logs sensibles eliminados** - Solo en desarrollo
-2. ✅ **Token hardcodeado eliminado** - Variable de entorno
-3. ✅ **Errores genéricos** - Mensajes genéricos en producción
-4. ✅ **Datos admin minimizados** - Solo `isAdmin`
-5. ✅ **Validación de montos** - Monitoreo activo
+### Vulnerabilidades Críticas Corregidas (8/8) ✅
+1. ✅ **Logs sensibles eliminados** — Solo en desarrollo.
+2. ✅ **Token hardcodeado eliminado** — `CALENDAR_SUBSCRIPTION_TOKEN` en variable de entorno.
+3. ✅ **Errores genéricos en producción** — Mensajes genéricos (sin stack traces) en producción.
+4. ✅ **Datos admin minimizados** — `/api/admin/check-auth` solo devuelve `{isAdmin: boolean}`.
+5. ✅ **Validación de montos Redsys (modo monitoreo)** — Activada en abril 2026.
+6. ✅ **Bloqueo de importe Redsys** — `/api/redsys/initiate` rechaza importes manipulados (17 abr 2026).
+7. ✅ **Recálculo de precios servidor** — `/api/bookings/create` rechaza `total_price` manipulado (17 abr 2026).
+8. ✅ **Endpoints de test/debug cerrados** — `/api/test-*`, `/api/debug/schema` requieren admin (17 abr 2026).
+
+### Vulnerabilidades Altas Corregidas (3/5)
+9. ✅ **Rate limiting ampliado** — Añadidas rutas de pagos, cupones, contacto, pricing, emails.
+10. ✅ **Validación de tamaño y tipo en uploads** — `uploadFile` aplica límites.
+11. ✅ **Helper UUID centralizado** — `isValidUUID` en `src/lib/utils.ts` + aplicado en rutas dinámicas públicas.
+
+### Vulnerabilidades Medias Corregidas (1/7)
+12. ✅ **`NEXT_PUBLIC_CALENDAR_TOKEN` eliminado del cliente** — Reemplazado por endpoint admin-only.
 
 ---
 
@@ -445,13 +488,13 @@ if (!validateUUID(bookingId)) {
 ## 📊 PROGRESO GENERAL
 
 ```
-Correcciones Completadas: ████████░░░░░░░░░░░░ 25%
-Críticas Pendientes:       ███░░░░░░░░░░░░░░░░░ 15%
-Altas Pendientes:         █████░░░░░░░░░░░░░░░ 25%
-Medias Pendientes:        ███████░░░░░░░░░░░░░ 35%
+Correcciones Completadas: ████████████░░░░░░░░ 60%
+Críticas Pendientes:       ░░░░░░░░░░░░░░░░░░░░  0%
+Altas Pendientes:         ████░░░░░░░░░░░░░░░░ 20%
+Medias Pendientes:        ████████████░░░░░░░░ 60%
 ```
 
-**Total**: 5 de 20 vulnerabilidades corregidas (25%)
+**Total**: 12 de 20 vulnerabilidades corregidas (60%)
 
 ---
 
@@ -479,6 +522,6 @@ Medias Pendientes:        ███████░░░░░░░░░░░
 
 ---
 
-**Última actualización**: 5 de Febrero, 2026  
-**Próxima revisión**: 12 de Febrero, 2026  
+**Última actualización**: 17 de abril, 2026 (tarde)  
+**Próxima revisión**: 17 de mayo, 2026  
 **Principio absoluto**: 🛡️ **NO AFECTAR FUNCIONALIDAD**

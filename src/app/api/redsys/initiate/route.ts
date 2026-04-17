@@ -98,24 +98,41 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // ✅ SEGURIDAD: Validar que el monto coincide con la reserva (solo loggear por ahora)
-    const expectedAmount = booking.total_price - (booking.amount_paid || 0);
-    const tolerance = 0.01; // 1 céntimo de tolerancia
-    
-    if (Math.abs(amount - expectedAmount) > tolerance) {
-      console.warn("⚠️ [SEGURIDAD] Monto no coincide con reserva:", {
-        bookingId: bookingId.substring(0, 8) + "...",
-        bookingNumber: booking.booking_number,
-        expectedAmount,
-        receivedAmount: amount,
-        difference: Math.abs(amount - expectedAmount),
-        // Por ahora solo loggear - después de verificar que funciona, activar bloqueo
-      });
-      // TODO: Después de monitorear, activar bloqueo:
-      // return NextResponse.json(
-      //   { error: "El monto no coincide con la reserva" },
-      //   { status: 400 }
-      // );
+    // ✅ SEGURIDAD: Validar que el monto coincide con la reserva.
+    // Política de cobro (ver src/app/{locale}/reservar/[id]/pago/page.tsx):
+    //   - paymentType "full"    → amount = total_price - amount_paid
+    //   - paymentType "deposit" → amount = (total_price - stripe_fee_total) * 0.5  (primer 50%)
+    //                             o        amount = total_price - amount_paid      (resto pendiente)
+    //   - paymentType "preauth" → fianza con importe independiente; no se valida contra total_price.
+    const totalPrice = Number(booking.total_price || 0);
+    const amountPaid = Number(booking.amount_paid || 0);
+    const stripeFeeTotal = Number(booking.stripe_fee_total || 0);
+    const baseTotal = Math.max(0, totalPrice - stripeFeeTotal);
+    const remaining = Math.max(0, totalPrice - amountPaid);
+    const firstHalf = baseTotal * 0.5;
+    const tolerance = 0.05; // 5 céntimos de tolerancia por redondeos
+
+    if (paymentType !== "preauth") {
+      const matchesFull = Math.abs(amount - remaining) <= tolerance;
+      const matchesFirstHalf = amountPaid === 0 && Math.abs(amount - firstHalf) <= tolerance;
+
+      if (!matchesFull && !matchesFirstHalf) {
+        console.warn("🚫 [SEGURIDAD] Monto rechazado - no coincide con la reserva:", {
+          bookingId: bookingId.substring(0, 8) + "...",
+          bookingNumber: booking.booking_number,
+          totalPrice,
+          amountPaid,
+          stripeFeeTotal,
+          remaining,
+          firstHalf,
+          receivedAmount: amount,
+          paymentType,
+        });
+        return NextResponse.json(
+          { error: "El importe no coincide con la reserva" },
+          { status: 400 }
+        );
+      }
     }
     
     // ✅ SEGURIDAD: No loggear información sensible en producción

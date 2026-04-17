@@ -71,6 +71,13 @@ const RATE_LIMITS: Record<string, { limit: number; window: number }> = {
   '/api/coupons/validate': { limit: 60, window: 60 },      // 60 validaciones/minuto
   '/api/search-tracking': { limit: 120, window: 60 },      // 120 trackings/minuto
   '/api/occupancy-highlights': { limit: 120, window: 60 }, // 120 consultas/minuto (público, con cache)
+
+  // ✅ NUEVAS (abril 2026): Rutas expuestas que pueden recibir abuso/spam
+  '/api/pricing/calculate': { limit: 120, window: 60 },         // Cálculo de precios (DoS)
+  '/api/creator-collaboration': { limit: 5, window: 300 },      // Formulario contacto público (5 / 5 min, antispam)
+  '/api/bookings/send-email': { limit: 10, window: 60 },        // Reenvío de emails de reserva
+  '/api/availability/alternatives': { limit: 60, window: 60 },  // Alternativas de disponibilidad
+  '/api/blog/views': { limit: 120, window: 60 },                // Contador de vistas
 };
 
 // ============================================
