@@ -867,79 +867,86 @@ export default function CalendarioPage() {
                           })}
                         </div>
 
-                        {/* Fila especial: reservas sin vehículo asignado */}
-                        {unassignedBookings.length > 0 && !searchCode.trim() && (
-                          <div className="flex border-b-2 border-amber-400 bg-amber-50/40 hover:bg-amber-50">
-                            {/* Columna código */}
-                            <div className="w-24 flex-shrink-0 p-3 border-r border-gray-200">
-                              <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-amber-200 text-amber-900 rounded">
-                                ⚠️ S/A
-                              </span>
-                            </div>
-                            {/* Columna nombre */}
-                            <div className="w-48 flex-shrink-0 p-3 border-r border-gray-200">
-                              <div className="flex items-center gap-2">
-                                <div className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0"></div>
-                                <div className="min-w-0 flex-1">
-                                  <p className="font-semibold text-amber-900 text-sm truncate">
-                                    Sin vehículo
-                                  </p>
-                                  <p className="text-xs text-amber-700 truncate">
-                                    Pendiente asignar ({unassignedBookings.length})
-                                  </p>
+                        {/* Filas especiales: una por cada reserva sin vehículo asignado.
+                            Funcionan como "vehículos virtuales" (Sin asignar 1, 2, 3...)
+                            para poder ver cada alquiler en su propia línea. */}
+                        {!searchCode.trim() && unassignedBookings.map((booking, idx) => {
+                          const slotLabel = `Sin asignar ${idx + 1}`;
+                          return (
+                            <div
+                              key={`unassigned-${booking.id}`}
+                              className="flex border-b-2 border-amber-400 bg-amber-50/40 hover:bg-amber-50"
+                            >
+                              {/* Columna código */}
+                              <div className="w-24 flex-shrink-0 p-3 border-r border-gray-200">
+                                <span className="inline-block px-2 py-1 text-xs font-mono font-bold bg-amber-200 text-amber-900 rounded">
+                                  ⚠️ S/A {idx + 1}
+                                </span>
+                              </div>
+                              {/* Columna nombre */}
+                              <div className="w-48 flex-shrink-0 p-3 border-r border-gray-200">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-2 h-2 bg-amber-500 rounded-full flex-shrink-0"></div>
+                                  <div className="min-w-0 flex-1">
+                                    <p className="font-semibold text-amber-900 text-sm truncate">
+                                      {slotLabel}
+                                    </p>
+                                    <p className="text-xs text-amber-700 truncate">
+                                      {booking.booking_number} · {booking.customer?.name || 'Sin cliente'}
+                                    </p>
+                                  </div>
                                 </div>
                               </div>
+                              {/* Días del mes */}
+                              {days.map((day) => {
+                                const isTodayFlag = isToday(day, monthDate);
+                                const year = monthDate.getFullYear();
+                                const month = String(monthDate.getMonth() + 1).padStart(2, '0');
+                                const dayStr = String(day).padStart(2, '0');
+                                const currentDateStr = `${year}-${month}-${dayStr}`;
+
+                                const isActive =
+                                  currentDateStr >= booking.pickup_date &&
+                                  currentDateStr <= booking.dropoff_date;
+                                const isPickup = booking.pickup_date === currentDateStr;
+                                const isDropoff = booking.dropoff_date === currentDateStr;
+
+                                return (
+                                  <div
+                                    key={day}
+                                    className={`w-12 flex-shrink-0 border-r border-gray-200 relative ${
+                                      isTodayFlag ? 'bg-yellow-300 border-l-2 border-r-2 border-yellow-400' : ''
+                                    }`}
+                                  >
+                                    {isActive ? (
+                                      <div
+                                        className="h-12 flex items-center justify-center relative bg-amber-400 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-amber-600 ring-inset"
+                                        onClick={() => setSelectedBooking(booking as any)}
+                                        title={`⚠️ SIN VEHÍCULO (${slotLabel})\n${booking.booking_number} · ${booking.customer?.name || 'Sin cliente'}\n${booking.pickup_date} → ${booking.dropoff_date}\n\nClick para abrir`}
+                                      >
+                                        {isPickup && (
+                                          <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-green-600 rounded px-1 border border-white leading-none py-0.5">
+                                            REC
+                                          </span>
+                                        )}
+                                        <span className="text-[11px] font-bold text-amber-900">
+                                          ⚠️
+                                        </span>
+                                        {isDropoff && (
+                                          <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-red-600 rounded px-1 border border-white leading-none py-0.5">
+                                            DEV
+                                          </span>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <div className="h-12 bg-amber-50/30"></div>
+                                    )}
+                                  </div>
+                                );
+                              })}
                             </div>
-                            {/* Días del mes */}
-                            {days.map((day) => {
-                              const isTodayFlag = isToday(day, monthDate);
-                              const year = monthDate.getFullYear();
-                              const month = String(monthDate.getMonth() + 1).padStart(2, '0');
-                              const dayStr = String(day).padStart(2, '0');
-                              const currentDateStr = `${year}-${month}-${dayStr}`;
-
-                              const dayUnassigned = unassignedBookings.filter(b =>
-                                currentDateStr >= b.pickup_date && currentDateStr <= b.dropoff_date
-                              );
-                              const pickupHere = unassignedBookings.filter(b => b.pickup_date === currentDateStr);
-                              const dropoffHere = unassignedBookings.filter(b => b.dropoff_date === currentDateStr);
-                              const firstOfDay = dayUnassigned[0];
-
-                              return (
-                                <div
-                                  key={day}
-                                  className={`w-12 flex-shrink-0 border-r border-gray-200 relative ${
-                                    isTodayFlag ? 'bg-yellow-300 border-l-2 border-r-2 border-yellow-400' : ''
-                                  }`}
-                                >
-                                  {firstOfDay ? (
-                                    <div
-                                      className="h-12 flex items-center justify-center relative bg-amber-400 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-amber-600 ring-inset"
-                                      onClick={() => setSelectedBooking(firstOfDay as any)}
-                                      title={`⚠️ SIN VEHÍCULO\n${dayUnassigned.map(b => `· ${b.booking_number} (${b.customer?.name || 'Sin cliente'})`).join('\n')}\n\nClick para abrir`}
-                                    >
-                                      {pickupHere.length > 0 && (
-                                        <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-green-600 rounded px-1 border border-white leading-none py-0.5">
-                                          {pickupHere.length > 1 ? `${pickupHere.length}REC` : 'REC'}
-                                        </span>
-                                      )}
-                                      <span className="text-[11px] font-bold text-amber-900">
-                                        ⚠️{dayUnassigned.length}
-                                      </span>
-                                      {dropoffHere.length > 0 && (
-                                        <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-red-600 rounded px-1 border border-white leading-none py-0.5">
-                                          {dropoffHere.length > 1 ? `${dropoffHere.length}DEV` : 'DEV'}
-                                        </span>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <div className="h-12 bg-amber-50/30"></div>
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                        )}
+                          );
+                        })}
 
                         {/* Filas de vehículos */}
                         {filteredAndSortedVehicles.map((vehicle) => {
