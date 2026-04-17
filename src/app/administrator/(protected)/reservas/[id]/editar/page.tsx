@@ -86,6 +86,9 @@ interface FormData {
   extras_price: number;
   location_fee: number;
   discount: number;
+  // Comisión acumulada de pagos Stripe (se añade al total_price cuando el
+  // cliente paga con tarjeta para repercutirle la tasa de la pasarela).
+  stripe_fee_total: number;
   total_price: number;
   amount_paid: number;
   coupon_code?: string | null;
@@ -141,6 +144,7 @@ export default function EditarReservaPage() {
     extras_price: 0,
     location_fee: 0,
     discount: 0,
+    stripe_fee_total: 0,
     total_price: 0,
     amount_paid: 0,
     status: 'pending',
@@ -173,11 +177,19 @@ export default function EditarReservaPage() {
   }, [formData.pickup_date, formData.dropoff_date, formData.pickup_time, formData.dropoff_time]);
 
   useEffect(() => {
-    // Recalcular precio total: base + extras + location_fee - discount
+    // Recalcular precio total: base + extras + location_fee - discount + comisión Stripe acumulada.
+    // IMPORTANTE: stripe_fee_total debe sumarse al total porque cuando el
+    // cliente paga con tarjeta se le repercute la tasa de la pasarela y
+    // amount_paid en BD ya la incluye. Si no la sumamos, amount_paid > total_price
+    // y se corrompe la reserva.
     const extrasTotal = calculateExtrasTotal();
-    const newTotal = formData.base_price + extrasTotal + (formData.location_fee || 0) - (formData.discount || 0);
-    
-    // Solo actualizar si hay cambios reales
+    const newTotal =
+      formData.base_price +
+      extrasTotal +
+      (formData.location_fee || 0) -
+      (formData.discount || 0) +
+      (formData.stripe_fee_total || 0);
+
     if (formData.extras_price !== extrasTotal || formData.total_price !== newTotal) {
       setFormData(prev => ({
         ...prev,
@@ -185,7 +197,7 @@ export default function EditarReservaPage() {
         total_price: Math.max(0, Math.round(newTotal * 100) / 100)
       }));
     }
-  }, [bookingExtras, formData.days, formData.base_price, formData.location_fee, formData.discount, extras]);
+  }, [bookingExtras, formData.days, formData.base_price, formData.location_fee, formData.discount, formData.stripe_fee_total, extras]);
 
   useEffect(() => {
     // Calcular automáticamente el payment_status según el monto pagado
@@ -321,6 +333,7 @@ export default function EditarReservaPage() {
         extras_price: booking.extras_price ?? 0,
         location_fee: (booking as any).location_fee ?? 0,
         discount: (booking as any).discount || (booking as any).coupon_discount || 0,
+        stripe_fee_total: (booking as any).stripe_fee_total ?? 0,
         total_price: booking.total_price ?? 0,
         amount_paid: booking.amount_paid ?? 0,
         coupon_code: (booking as any).coupon_code ?? null,
@@ -523,6 +536,7 @@ export default function EditarReservaPage() {
         extras_price: formData.extras_price,
         location_fee: formData.location_fee || 0,
         discount: formData.discount || 0,
+        stripe_fee_total: formData.stripe_fee_total || 0,
         total_price: formData.total_price,
         amount_paid: formData.amount_paid,
         status: formData.status,
@@ -1223,6 +1237,12 @@ export default function EditarReservaPage() {
                       <span className="font-semibold text-green-600">- {formatPrice(formData.discount)}</span>
                     </div>
                   )}
+                  {(formData.stripe_fee_total || 0) > 0 && (
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-gray-600">Comisión pasarela Stripe:</span>
+                      <span className="font-semibold">+ {formatPrice(formData.stripe_fee_total)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
                     <span>Total:</span>
                     <span className="text-furgocasa-orange">{formatPrice(formData.total_price)}</span>
@@ -1244,7 +1264,6 @@ export default function EditarReservaPage() {
                     type="number"
                     step="0.01"
                     min="0"
-                    max={formData.total_price}
                     value={formData.amount_paid}
                     onChange={(e) => handleInputChange('amount_paid', parseFloat(e.target.value) || 0)}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
@@ -1253,6 +1272,11 @@ export default function EditarReservaPage() {
                   <p className="text-xs text-gray-500 mt-1">
                     Introduce el total pagado hasta el momento (suma de todos los pagos)
                   </p>
+                  {formData.amount_paid > formData.total_price + 0.01 && (
+                    <p className="text-xs text-amber-700 mt-1 font-semibold">
+                      ⚠️ El importe pagado supera el total de la reserva. Revisa el desglose.
+                    </p>
+                  )}
                 </div>
 
                 <div className="p-4 bg-gray-50 rounded-lg space-y-2">
