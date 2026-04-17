@@ -83,6 +83,7 @@ Documentación técnica de referencia:
 #### admin/
 - Buscador global inteligente
 - Panel de administración
+- **Calendario admin — reasignación ágil + edición inline** (abr. 2026): reservas sin vehículo asignado (`vehicle_id` nullable), filas "Sin asignar N" en el Gantt, modal emergente con editores inline de estado/vehículo/fechas/horas/ubicaciones y fix de `total_price` con comisión Stripe — ver [`CALENDARIO-ADMIN-EDICION.md`](./04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)
 
 #### pwa/
 - Progressive Web App
@@ -192,4 +193,4 @@ Cuando añadas nueva documentación:
 ---
 
 Última actualización: 17 de abril, 2026  
-Versión del proyecto: 4.5.2 (cierre auditoría Supabase Security Advisor: RLS admins, buckets, search_path, leaked passwords)
+Versión del proyecto: 4.5.3 (calendario admin: reasignación inline, reservas sin vehículo asignado, fix stripe_fee_total)

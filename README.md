@@ -100,6 +100,24 @@ Cada día a las 20:00 h (Madrid) un cron de Vercel busca reservas `confirmed` / 
 
 ---
 
+## 📅 Abril 2026 — Calendario admin: reasignación ágil + edición inline
+
+**Documentación:** [`docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md`](./docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)
+
+Rediseño operativo del calendario de admin para resolver el "15-puzzle" de reasignar la flota cuando todos los vehículos están ocupados, sin crear vehículos ficticios ni salir del calendario.
+
+- **`bookings.vehicle_id` nullable**: estado intermedio *Sin vehículo asignado* durante reasignaciones en cadena. Migración `supabase/migrations/20260417-allow-null-vehicle-in-bookings.sql`.
+- **Filas "Sin asignar N" en el Gantt**: cada reserva pendiente aparece como fila virtual con sus fechas exactas y badges de ubicación (misma lógica que los vehículos reales).
+- **Modal emergente convertido en editor inline** con guardado al vuelo (`patchBookingInline()`): estado, vehículo (con marca `✓ libre` / `⚠️ OCUPADO` por `hasVehicleConflict()`), fecha y hora de recogida/devolución (`<input type="date|time">` nativos) y ubicaciones de origen y destino.
+- **Safeguards**: no permite `in_progress` / `completed` sin vehículo ni `dropoff_date < pickup_date`.
+- **Fix crítico `total_price` al editar**: incluye `stripe_fee_total` acumulado por el webhook Stripe. Antes se restaba la comisión al recalcular y el `max` del input *Monto pagado* rechazaba el submit. Script puntual de reparación: `supabase/migrations/20260417-fix-booking-16bf1a08-total-price.sql`.
+- **Botón "Editar" en el modal** (junto a Cerrar / Ver detalles).
+- **Indicadores extendidos a listado, ficha y suscripción ICS** (`⚠️ SIN ASIGNAR`).
+
+**Archivos clave:** `src/app/administrator/(protected)/calendario/page.tsx`, `src/app/administrator/(protected)/reservas/[id]/editar/page.tsx`, `src/app/administrator/(protected)/reservas/[id]/page.tsx`, `src/app/administrator/(protected)/reservas/page.tsx`, `src/lib/calendar/ics-generator.ts`, `src/lib/supabase/database.types.ts`.
+
+---
+
 ## 🔒 Abril 2026 — Cierre Auditoría Supabase Security Advisor
 
 **Estado:** ✅ Completada — 53 warnings resueltos, 12 aceptados como diseño, cero regresiones.  

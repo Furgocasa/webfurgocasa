@@ -4,6 +4,51 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 📅 Calendario admin: reasignación ágil + edición inline — 17 de abril 2026 (tarde)
+
+Conjunto de mejoras operativas para resolver el "15-puzzle" de reasignar la flota cuando todos los vehículos están ocupados, sin tener que crear vehículos ficticios ni salir del calendario.
+
+**Base de datos:**
+- `bookings.vehicle_id` pasa a ser **nullable** para representar el estado intermedio "pendiente de asignar" durante las reasignaciones. Migración: `supabase/migrations/20260417-allow-null-vehicle-in-bookings.sql`. La FK a `vehicles(id)` se mantiene.
+- Tipos actualizados en `src/lib/supabase/database.types.ts` (`Row`, `Insert`, `Update`).
+
+**Calendario (`/administrator/calendario`):**
+- **Filas "Sin asignar N" en el Gantt**: cada reserva sin vehículo genera su propia fila virtual (`Sin asignar 1`, `Sin asignar 2`, …), con barra ámbar entre `pickup_date` y `dropoff_date`, badges de recogida/devolución con 6 letras de la ubicación (igual que los vehículos normales) y modal al hacer click.
+- **Banner ámbar** con contador y chips rápidos de las reservas pendientes.
+- **Modal emergente convertido en editor inline** con guardado al vuelo vía helper `patchBookingInline()`:
+  - Estado (select en cabecera, recolorea al instante).
+  - Vehículo (con marca `(actual)` / `✓ libre` / `⚠️ OCUPADO` por `hasVehicleConflict`).
+  - Fecha y hora de recogida (`<input type="date">` + `type="time"` nativos).
+  - Fecha y hora de devolución (con `min = pickup_date`).
+  - Ubicación de origen y destino (selects con `locations` activas).
+- **Botón "Editar"** añadido al footer del modal junto a Cerrar / Ver detalles.
+- **Safeguards**: no se permite dejar sin vehículo, ni marcar como `in_progress` / `completed`, una reserva que ya lo esté (coherente con `/reservas/[id]/editar`). `dropoff_date < pickup_date` bloqueado.
+- Spinner "Guardando…" y mensaje verde/rojo (autohide 2,5 s) compartidos por todos los editores.
+
+**Listado reservas (`/administrator/reservas`):**
+- Banner ámbar si hay pendientes. Badge `⚠️ S/A` en columna "Cód." y `Pendiente asignar` en columna "Vehículo".
+
+**Ficha reserva (`/administrator/reservas/[id]`):**
+- Panel ámbar con botón "Asignar vehículo" cuando `vehicle_id = NULL`.
+
+**Formulario de edición (`/administrator/reservas/[id]/editar`):**
+- Opción `— Sin vehículo asignado (pendiente) —` en el selector de vehículo.
+- Safeguard: bloquea pasar a `in_progress` o `completed` sin vehículo (permite `confirmed` — caso de uso principal).
+- **Fix crítico**: `total_price` recalculado ahora incluye `stripe_fee_total` acumulado por el webhook Stripe. Antes se restaba la comisión al recalcular y el input `amount_paid` rechazaba el submit con el `max` HTML nativo. Se elimina ese `max` y se añade aviso textual suave.
+- Script puntual de reparación para reservas afectadas por el bug: `supabase/migrations/20260417-fix-booking-16bf1a08-total-price.sql` (diagnóstico + UPDATE comentado).
+
+**Integración ICS (suscripción externa):**
+- `src/lib/calendar/ics-generator.ts` marca los eventos sin vehículo como `'⚠️ SIN ASIGNAR'`.
+
+**Docs:**
+- Nuevo [`docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md`](./docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md) — documento consolidado del flujo.
+- Actualizados `README.md` (raíz), `docs/README.md`, `docs/INDICE-DOCUMENTACION.md`.
+
+**Commits:**
+- `66db097` · `4f75175` · `5f9dbcb` · `5984f2c` · `4ec83ae` · `a8b41be` · `5a782a6` · `0fc2162` · `4449589`
+
+---
+
 ## 🔒 Sprint de seguridad App — 17 de abril 2026 (tarde)
 
 Segundo cierre del día tras la auditoría Supabase. Ataque de los pendientes críticos y altos desde `docs/03-mantenimiento/PENDIENTES-SEGURIDAD.md`. Todo aditivo, reversible y sin romper flujos existentes.

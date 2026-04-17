@@ -1,10 +1,21 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.19 ✅ PRODUCCIÓN — excepción de pago «menos de 15 días → 100 %» documentada en README y SISTEMA-PAGOS  
+**Versión**: 1.0.20 ✅ PRODUCCIÓN — calendario admin: reasignación inline + reservas sin vehículo asignado + fix `stripe_fee_total`  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 9 de abril, 2026
+**Última actualización**: 17 de abril, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 📅 ACTUALIZACIÓN ABRIL 2026 — CALENDARIO ADMIN: REASIGNACIÓN ÁGIL + EDICIÓN INLINE
+
+| Tema | Dónde leer |
+|------|------------|
+| Reservas sin vehículo asignado (`bookings.vehicle_id` nullable), filas «Sin asignar N» en el Gantt, banner de pendientes, edición inline del modal (estado, vehículo, fechas, horas, ubicaciones), detección de conflictos al reasignar, safeguards por estado | **[CALENDARIO-ADMIN-EDICION.md](./04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)** |
+| Fix `total_price` al editar: debía incluir `stripe_fee_total` acumulado (bloqueaba guardado con `max` del input) + script de reparación puntual | **[CALENDARIO-ADMIN-EDICION.md](./04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)** — sección *Fix: `total_price` debe incluir `stripe_fee_total`* |
+| Migraciones SQL: `supabase/migrations/20260417-allow-null-vehicle-in-bookings.sql`, `supabase/migrations/20260417-fix-booking-16bf1a08-total-price.sql` | Mismo doc, sección *Migración SQL* |
+| Resumen en README raíz | **[README raíz](../README.md)** — sección *Abril 2026 — Calendario admin* · **CHANGELOG** (entrada 17 abr 2026 tarde) |
 
 ---
 
