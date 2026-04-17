@@ -37,6 +37,7 @@ interface RentalLocation {
   id: string;
   name: string;
   address?: string;
+  city?: string;
 }
 
 interface BookingExtra {
@@ -231,6 +232,28 @@ export default function CalendarioPage() {
     retryCount: 3,
     retryDelay: 1000,
     staleTime: 1000 * 60 * 10, // 10 minutos - las reservas del calendario se actualizan con frecuencia moderada
+  });
+
+  // Cargar lista de ubicaciones activas (para el editor inline del modal)
+  const {
+    data: activeLocations,
+  } = useAdminData<RentalLocation[]>({
+    queryKey: ['locations-calendar-active'],
+    queryFn: async () => {
+      const supabase = createClient();
+      const result = await supabase
+        .from('locations')
+        .select('id, name, address, city')
+        .eq('is_active', true)
+        .order('name');
+      return {
+        data: (result.data || []) as RentalLocation[],
+        error: result.error,
+      };
+    },
+    retryCount: 2,
+    retryDelay: 1000,
+    staleTime: 1000 * 60 * 30,
   });
 
   // Cargar bloqueos con el hook
@@ -528,58 +551,131 @@ export default function CalendarioPage() {
   // especial del calendario para facilitar la reasignación de flota.
   const unassignedBookings = (bookings || []).filter(b => !b.vehicle_id);
 
+  // Helper genérico: persiste un patch en la reserva y refresca estado local.
+  // Usado por todos los editores inline del modal (vehículo, fechas, horas,
+  // ubicaciones). Devuelve el booking actualizado o null si hay error.
+  const patchBookingInline = async (
+    booking: Booking & { vehicle?: Vehicle | null },
+    patch: Partial<Booking>,
+    successText: string,
+    extraLocalFields: Partial<Booking> = {}
+  ): Promise<Booking | null> => {
+    setAssignSaving(true);
+    setAssignMessage(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          ...patch,
+          updated_at: new Date().toISOString(),
+        } as any)
+        .eq('id', booking.id);
+
+      if (error) throw error;
+
+      setBookings(prev => prev.map(b =>
+        b.id === booking.id ? ({ ...b, ...patch, ...extraLocalFields } as Booking) : b
+      ));
+      setSelectedBooking(prev => prev && prev.id === booking.id
+        ? ({ ...prev, ...patch, ...extraLocalFields } as any)
+        : prev
+      );
+      setAssignMessage({ type: 'success', text: successText });
+      setTimeout(() => setAssignMessage(null), 2500);
+      return { ...booking, ...patch, ...extraLocalFields } as Booking;
+    } catch (err: any) {
+      console.error('[Calendario] Error actualizando reserva:', err);
+      setAssignMessage({ type: 'error', text: err.message || 'Error al guardar' });
+      return null;
+    } finally {
+      setAssignSaving(false);
+    }
+  };
+
   // Reasignación rápida de vehículo desde el modal emergente.
-  // Actualiza BD y estado local sin salir del calendario.
   const handleQuickAssignVehicle = async (
     booking: Booking & { vehicle?: Vehicle | null },
     newVehicleId: string | null
   ) => {
     if ((booking.vehicle_id || null) === (newVehicleId || null)) return;
-    setAssignSaving(true);
-    setAssignMessage(null);
-    try {
-      // Safeguard: no permitir dejar sin vehículo estados que implican entrega física
-      if (!newVehicleId && (booking.status === 'in_progress' || booking.status === 'completed')) {
-        throw new Error('No se puede dejar sin vehículo una reserva "En curso" o "Completada".');
-      }
 
-      const supabase = createClient();
-      const { error } = await supabase
-        .from('bookings')
-        .update({
-          vehicle_id: newVehicleId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', booking.id);
-
-      if (error) throw error;
-
-      const newVehicle = newVehicleId
-        ? (vehicles || []).find(v => v.id === newVehicleId) || null
-        : null;
-
-      setBookings(prev => prev.map(b =>
-        b.id === booking.id
-          ? ({ ...b, vehicle_id: newVehicleId, vehicle: newVehicle } as Booking)
-          : b
-      ));
-      setSelectedBooking(prev => prev && prev.id === booking.id
-        ? ({ ...prev, vehicle_id: newVehicleId, vehicle: newVehicle || undefined } as any)
-        : prev
-      );
+    if (!newVehicleId && (booking.status === 'in_progress' || booking.status === 'completed')) {
       setAssignMessage({
-        type: 'success',
-        text: newVehicleId
-          ? `Vehículo reasignado a ${newVehicle?.internal_code || newVehicle?.name || 'seleccionado'}`
-          : 'Reserva marcada como "Sin vehículo asignado"',
+        type: 'error',
+        text: 'No se puede dejar sin vehículo una reserva "En curso" o "Completada".',
       });
-      setTimeout(() => setAssignMessage(null), 2500);
-    } catch (err: any) {
-      console.error('[Calendario] Error reasignando vehículo:', err);
-      setAssignMessage({ type: 'error', text: err.message || 'Error al reasignar el vehículo' });
-    } finally {
-      setAssignSaving(false);
+      return;
     }
+
+    const newVehicle = newVehicleId
+      ? (vehicles || []).find(v => v.id === newVehicleId) || null
+      : null;
+
+    await patchBookingInline(
+      booking,
+      { vehicle_id: newVehicleId } as any,
+      newVehicleId
+        ? `Vehículo reasignado a ${newVehicle?.internal_code || newVehicle?.name || 'seleccionado'}`
+        : 'Reserva marcada como "Sin vehículo asignado"',
+      { vehicle: newVehicle || undefined } as any
+    );
+  };
+
+  // Cambio rápido de fechas (recogida/devolución).
+  const handleQuickChangeDate = async (
+    booking: Booking & { vehicle?: Vehicle | null },
+    field: 'pickup_date' | 'dropoff_date',
+    newDate: string
+  ) => {
+    if (!newDate || booking[field] === newDate) return;
+
+    const pickup = field === 'pickup_date' ? newDate : booking.pickup_date;
+    const dropoff = field === 'dropoff_date' ? newDate : booking.dropoff_date;
+    if (dropoff < pickup) {
+      setAssignMessage({
+        type: 'error',
+        text: 'La fecha de devolución no puede ser anterior a la de recogida.',
+      });
+      return;
+    }
+
+    await patchBookingInline(
+      booking,
+      { [field]: newDate } as any,
+      field === 'pickup_date' ? 'Fecha de recogida actualizada' : 'Fecha de devolución actualizada'
+    );
+  };
+
+  // Cambio rápido de hora (recogida/devolución).
+  const handleQuickChangeTime = async (
+    booking: Booking & { vehicle?: Vehicle | null },
+    field: 'pickup_time' | 'dropoff_time',
+    newTime: string
+  ) => {
+    if (!newTime || booking[field] === newTime) return;
+    await patchBookingInline(
+      booking,
+      { [field]: newTime } as any,
+      field === 'pickup_time' ? 'Hora de recogida actualizada' : 'Hora de devolución actualizada'
+    );
+  };
+
+  // Cambio rápido de ubicación (recogida/devolución).
+  const handleQuickChangeLocation = async (
+    booking: Booking & { vehicle?: Vehicle | null },
+    field: 'pickup_location_id' | 'dropoff_location_id',
+    newLocationId: string
+  ) => {
+    if (!newLocationId || booking[field] === newLocationId) return;
+    const loc = (activeLocations || []).find(l => l.id === newLocationId) || null;
+    const locField = field === 'pickup_location_id' ? 'pickup_location' : 'dropoff_location';
+    await patchBookingInline(
+      booking,
+      { [field]: newLocationId } as any,
+      field === 'pickup_location_id' ? 'Ubicación de recogida actualizada' : 'Ubicación de devolución actualizada',
+      { [locField]: loc || undefined } as any
+    );
   };
 
   // Detectar si asignar cierto vehículo a la reserva seleccionada
@@ -1578,64 +1674,105 @@ export default function CalendarioPage() {
                 </div>
               </div>
 
-              {/* Fechas */}
+              {/* Fechas y horas (editable inline) */}
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase mb-2">📅 Fechas</div>
+                <div className="text-xs font-semibold text-gray-500 uppercase mb-2">📅 Fechas y horas</div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                    <div className="text-xs font-semibold text-green-700 mb-1">🟢 Recogida</div>
-                    <div className="font-bold text-gray-900">
-                      {new Date(selectedBooking.pickup_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}
-                    </div>
-                    <div className="text-sm text-gray-600">{formatBookingClockTime(selectedBooking.pickup_time)}</div>
+                  <div className="bg-green-50 rounded-lg p-3 border border-green-200 space-y-2">
+                    <div className="text-xs font-semibold text-green-700">🟢 Recogida</div>
+                    <input
+                      type="date"
+                      value={selectedBooking.pickup_date || ''}
+                      onChange={(e) => handleQuickChangeDate(selectedBooking, 'pickup_date', e.target.value)}
+                      disabled={assignSaving}
+                      className="w-full px-2 py-1.5 border border-green-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-green-400 focus:border-transparent disabled:opacity-50"
+                    />
+                    <input
+                      type="time"
+                      step={60}
+                      value={(selectedBooking.pickup_time || '').slice(0, 5)}
+                      onChange={(e) => handleQuickChangeTime(selectedBooking, 'pickup_time', e.target.value)}
+                      disabled={assignSaving}
+                      className="w-full px-2 py-1.5 border border-green-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-green-400 focus:border-transparent disabled:opacity-50"
+                    />
                   </div>
-                  <div className="bg-red-50 rounded-lg p-3 border border-red-200">
-                    <div className="text-xs font-semibold text-red-700 mb-1">🔴 Devolución</div>
-                    <div className="font-bold text-gray-900">
-                      {new Date(selectedBooking.dropoff_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'Europe/Madrid' })}
-                    </div>
-                    <div className="text-sm text-gray-600">{formatBookingClockTime(selectedBooking.dropoff_time)}</div>
+                  <div className="bg-red-50 rounded-lg p-3 border border-red-200 space-y-2">
+                    <div className="text-xs font-semibold text-red-700">🔴 Devolución</div>
+                    <input
+                      type="date"
+                      value={selectedBooking.dropoff_date || ''}
+                      min={selectedBooking.pickup_date || undefined}
+                      onChange={(e) => handleQuickChangeDate(selectedBooking, 'dropoff_date', e.target.value)}
+                      disabled={assignSaving}
+                      className="w-full px-2 py-1.5 border border-red-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-red-400 focus:border-transparent disabled:opacity-50"
+                    />
+                    <input
+                      type="time"
+                      step={60}
+                      value={(selectedBooking.dropoff_time || '').slice(0, 5)}
+                      onChange={(e) => handleQuickChangeTime(selectedBooking, 'dropoff_time', e.target.value)}
+                      disabled={assignSaving}
+                      className="w-full px-2 py-1.5 border border-red-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-red-400 focus:border-transparent disabled:opacity-50"
+                    />
+                  </div>
+                </div>
+                <p className="text-[10px] text-gray-500 mt-1">
+                  Los cambios de fecha/hora se guardan automáticamente. Recuerda revisar el precio en &quot;Editar&quot; si cambias la duración.
+                </p>
+              </div>
+
+              {/* Ubicaciones (editable inline) */}
+              <div>
+                <div className="text-xs font-semibold text-gray-500 uppercase mb-2">📍 Ubicaciones</div>
+                <div className="bg-gray-50 rounded-lg p-3 space-y-3">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 flex items-center gap-1">
+                      <span className="text-green-600">↗</span> Origen
+                    </label>
+                    <select
+                      value={selectedBooking.pickup_location_id || ''}
+                      onChange={(e) => handleQuickChangeLocation(selectedBooking, 'pickup_location_id', e.target.value)}
+                      disabled={assignSaving || !activeLocations}
+                      className="w-full mt-1 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent disabled:opacity-50"
+                    >
+                      {!selectedBooking.pickup_location_id && (
+                        <option value="">— Sin ubicación —</option>
+                      )}
+                      {(activeLocations || []).map(l => (
+                        <option key={l.id} value={l.id}>
+                          {l.name}{l.city ? ` (${l.city})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                    {selectedBooking.pickup_location?.address && (
+                      <div className="text-[11px] text-gray-500 mt-0.5">{selectedBooking.pickup_location.address}</div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-600 flex items-center gap-1">
+                      <span className="text-red-600">↘</span> Destino
+                    </label>
+                    <select
+                      value={selectedBooking.dropoff_location_id || ''}
+                      onChange={(e) => handleQuickChangeLocation(selectedBooking, 'dropoff_location_id', e.target.value)}
+                      disabled={assignSaving || !activeLocations}
+                      className="w-full mt-1 px-2 py-1.5 border border-gray-300 rounded-md text-sm bg-white focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent disabled:opacity-50"
+                    >
+                      {!selectedBooking.dropoff_location_id && (
+                        <option value="">— Sin ubicación —</option>
+                      )}
+                      {(activeLocations || []).map(l => (
+                        <option key={l.id} value={l.id}>
+                          {l.name}{l.city ? ` (${l.city})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                    {selectedBooking.dropoff_location?.address && (
+                      <div className="text-[11px] text-gray-500 mt-0.5">{selectedBooking.dropoff_location.address}</div>
+                    )}
                   </div>
                 </div>
               </div>
-
-              {/* Ubicaciones */}
-              {(selectedBooking.pickup_location || selectedBooking.dropoff_location || 
-                selectedBooking.pickup_location_name || selectedBooking.dropoff_location_name) && (
-                <div>
-                  <div className="text-xs font-semibold text-gray-500 uppercase mb-2">📍 Ubicaciones</div>
-                  <div className="bg-gray-50 rounded-lg p-3 space-y-2">
-                    {(selectedBooking.pickup_location || selectedBooking.pickup_location_name) && (
-                      <div className="flex items-start gap-2">
-                        <span className="text-green-600 mt-0.5">↗</span>
-                        <div>
-                          <div className="text-xs text-gray-500">Origen</div>
-                          <div className="font-medium text-gray-900">
-                            {selectedBooking.pickup_location?.name || selectedBooking.pickup_location_name}
-                          </div>
-                          {selectedBooking.pickup_location?.address && (
-                            <div className="text-xs text-gray-500 mt-0.5">{selectedBooking.pickup_location.address}</div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    {(selectedBooking.dropoff_location || selectedBooking.dropoff_location_name) && (
-                      <div className="flex items-start gap-2">
-                        <span className="text-red-600 mt-0.5">↘</span>
-                        <div>
-                          <div className="text-xs text-gray-500">Destino</div>
-                          <div className="font-medium text-gray-900">
-                            {selectedBooking.dropoff_location?.name || selectedBooking.dropoff_location_name}
-                          </div>
-                          {selectedBooking.dropoff_location?.address && (
-                            <div className="text-xs text-gray-500 mt-0.5">{selectedBooking.dropoff_location.address}</div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
 
               {/* Extras */}
               {selectedBooking.booking_extras && selectedBooking.booking_extras.length > 0 && (
