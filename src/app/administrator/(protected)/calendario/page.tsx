@@ -922,19 +922,29 @@ export default function CalendarioPage() {
                                       <div
                                         className="h-12 flex items-center justify-center relative bg-amber-400 cursor-pointer hover:opacity-80 transition-opacity ring-2 ring-amber-600 ring-inset"
                                         onClick={() => setSelectedBooking(booking as any)}
-                                        title={`⚠️ SIN VEHÍCULO (${slotLabel})\n${booking.booking_number} · ${booking.customer?.name || 'Sin cliente'}\n${booking.pickup_date} → ${booking.dropoff_date}\n\nClick para abrir`}
+                                        title={`⚠️ SIN VEHÍCULO (${slotLabel})\n${booking.booking_number} · ${booking.customer?.name || 'Sin cliente'}\n${booking.pickup_date} → ${booking.dropoff_date}\n${booking.pickup_location?.name || booking.pickup_location_name || ''} → ${booking.dropoff_location?.name || booking.dropoff_location_name || ''}\n\nClick para abrir`}
                                       >
                                         {isPickup && (
-                                          <span className="absolute top-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-green-600 rounded px-1 border border-white leading-none py-0.5">
-                                            REC
+                                          <span
+                                            className="absolute top-0.5 left-1/2 -translate-x-1/2 h-3.5 bg-green-600 rounded px-1 border border-white leading-none flex items-center justify-center min-w-[12px] max-w-[44px] overflow-hidden"
+                                            title={`🟢 Recogida: ${booking.pickup_location?.name || booking.pickup_location_name || 'Sin ubicación'}`}
+                                          >
+                                            <span className="text-[8px] font-bold text-white whitespace-nowrap leading-none tracking-tighter">
+                                              {((booking.pickup_location?.name || booking.pickup_location_name || 'REC').substring(0, 6).toUpperCase())}
+                                            </span>
                                           </span>
                                         )}
                                         <span className="text-[11px] font-bold text-amber-900">
                                           ⚠️
                                         </span>
                                         {isDropoff && (
-                                          <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold text-white bg-red-600 rounded px-1 border border-white leading-none py-0.5">
-                                            DEV
+                                          <span
+                                            className="absolute bottom-0.5 left-1/2 -translate-x-1/2 h-3.5 bg-red-600 rounded px-1 border border-white leading-none flex items-center justify-center min-w-[12px] max-w-[44px] overflow-hidden"
+                                            title={`🔴 Devolución: ${booking.dropoff_location?.name || booking.dropoff_location_name || 'Sin ubicación'}`}
+                                          >
+                                            <span className="text-[8px] font-bold text-white whitespace-nowrap leading-none tracking-tighter">
+                                              {((booking.dropoff_location?.name || booking.dropoff_location_name || 'DEV').substring(0, 6).toUpperCase())}
+                                            </span>
                                           </span>
                                         )}
                                       </div>
