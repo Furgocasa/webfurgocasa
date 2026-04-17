@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +26,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    // Usamos admin client: el UPDATE público a search_queries requiere bypass de RLS
+    // porque la tabla tiene RLS estricta (solo admin puede leer).
+    // El endpoint es público pero valida action y search_query_id explícitos.
+    const supabase = createAdminClient();
 
     if (action === "vehicle_selected") {
       if (!vehicle_id) {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -107,6 +107,10 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Cliente con service_role SOLO para leer search_queries (RLS restringe SELECT a anon)
+    // El admin ya está validado arriba; el resto de tablas siguen usando el cliente normal.
+    const supabaseAdmin = createAdminClient();
+
     const searchParams = request.nextUrl.searchParams;
     const startDate = searchParams.get("start_date");
     const endDate = searchParams.get("end_date");
@@ -125,7 +129,7 @@ export async function GET(request: NextRequest) {
     if (type === "overview") {
       // Obtener TODAS las búsquedas usando paginación para evitar el límite de 1000
       try {
-        const baseQuery = supabase
+        const baseQuery = supabaseAdmin
           .from("search_queries")
           .select("*")
           .gte("searched_at", dateFrom)
@@ -188,7 +192,7 @@ export async function GET(request: NextRequest) {
     // FUNNEL: Datos para visualización de embudo
     // ============================================
     if (type === "funnel") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select("funnel_stage, had_availability, booking_id")
         .gte("searched_at", dateFrom)
@@ -226,7 +230,7 @@ export async function GET(request: NextRequest) {
     // DATES: Fechas más buscadas
     // ============================================
     if (type === "dates") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select("pickup_date, dropoff_date, rental_days, booking_id, season_applied, avg_price_shown")
         .gte("searched_at", dateFrom)
@@ -276,7 +280,7 @@ export async function GET(request: NextRequest) {
     // VEHICLES: Rendimiento por vehículo
     // ============================================
     if (type === "vehicles") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select(`
           selected_vehicle_id,
@@ -344,7 +348,7 @@ export async function GET(request: NextRequest) {
     // SEASONS: Análisis por temporada
     // ============================================
     if (type === "seasons") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select("season_applied, vehicle_selected, booking_id, avg_price_shown")
         .gte("searched_at", dateFrom)
@@ -392,7 +396,7 @@ export async function GET(request: NextRequest) {
     // DURATION: Distribución por duración
     // ============================================
     if (type === "duration") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select("rental_days, booking_id")
         .gte("searched_at", dateFrom)
@@ -442,7 +446,7 @@ export async function GET(request: NextRequest) {
     // SEARCH-TIMING: Cuándo buscan los clientes
     // ============================================
     if (type === "search-timing") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select("searched_at, had_availability, vehicle_selected, booking_id, advance_days, rental_days")
         .gte("searched_at", dateFrom)
@@ -503,7 +507,7 @@ export async function GET(request: NextRequest) {
     // LOCALE: Distribución por idioma
     // ============================================
     if (type === "locale") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select("locale, vehicle_selected, booking_id, had_availability")
         .gte("searched_at", dateFrom)
@@ -558,7 +562,7 @@ export async function GET(request: NextRequest) {
     // LOCATION: Distribución por ubicación (Murcia vs Madrid)
     // ============================================
     if (type === "location") {
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select(`
           pickup_location_id,
@@ -642,7 +646,7 @@ export async function GET(request: NextRequest) {
     // ============================================
     if (type === "demand-availability") {
       // 1. Obtener todas las búsquedas agrupadas por semana
-      const baseQuery = supabase
+      const baseQuery = supabaseAdmin
         .from("search_queries")
         .select("pickup_date, dropoff_date, rental_days")
         .gte("searched_at", dateFrom)

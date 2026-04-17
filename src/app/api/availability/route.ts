@@ -352,7 +352,9 @@ export async function GET(request: NextRequest) {
       }, null, 2));
       
       // Insertar registro en search_queries
-      const { data: searchQuery, error: searchError } = await supabase
+      // Usamos supabaseAdmin porque, aunque anon puede INSERT, el .select("id") tras el
+      // insert requiere policy SELECT (restringida al admin). Mantiene la funcionalidad.
+      const { data: searchQuery, error: searchError } = await supabaseAdmin
         .from("search_queries")
         .insert(searchData)
         .select("id")
