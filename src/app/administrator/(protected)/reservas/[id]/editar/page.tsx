@@ -436,10 +436,14 @@ export default function EditarReservaPage() {
     }
 
     // Estado "confirmada" / "en curso" exige vehículo asignado (salvaguarda)
-    if (!formData.vehicle_id && (formData.status === 'confirmed' || formData.status === 'in_progress')) {
+    // Una reserva CONFIRMADA sí puede quedar temporalmente sin vehículo
+    // (ese es el caso de uso: liberar un vehículo para reasignar la flota).
+    // Pero "En curso" y "Completada" implican que el cliente ya tiene/tuvo
+    // físicamente una camper, así que no tiene sentido permitir vehicle_id NULL.
+    if (!formData.vehicle_id && (formData.status === 'in_progress' || formData.status === 'completed')) {
       setMessage({
         type: 'error',
-        text: '🚫 No se puede marcar como "Confirmada" o "En curso" sin un vehículo asignado. Cámbiala a "Pendiente" o asigna un vehículo.'
+        text: '🚫 No se puede marcar como "En curso" o "Completada" sin un vehículo asignado. Asigna un vehículo antes.'
       });
       return;
     }
