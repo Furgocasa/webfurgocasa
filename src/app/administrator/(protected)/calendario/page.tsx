@@ -123,6 +123,9 @@ export default function CalendarioPage() {
   const [monthsToShow, setMonthsToShow] = useState(3); // Por defecto 3 meses
   const [isMobile, setIsMobile] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<(Booking & { vehicle?: Vehicle }) | null>(null);
+  // Estado para reasignación rápida de vehículo desde el modal emergente
+  const [assignSaving, setAssignSaving] = useState(false);
+  const [assignMessage, setAssignMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   // Estado para ordenamiento
   const [sortField, setSortField] = useState<'internal_code' | 'name'>('internal_code');
@@ -524,6 +527,77 @@ export default function CalendarioPage() {
   // Reservas pendientes de asignar (sin vehículo). Se muestran en una fila
   // especial del calendario para facilitar la reasignación de flota.
   const unassignedBookings = (bookings || []).filter(b => !b.vehicle_id);
+
+  // Reasignación rápida de vehículo desde el modal emergente.
+  // Actualiza BD y estado local sin salir del calendario.
+  const handleQuickAssignVehicle = async (
+    booking: Booking & { vehicle?: Vehicle | null },
+    newVehicleId: string | null
+  ) => {
+    if ((booking.vehicle_id || null) === (newVehicleId || null)) return;
+    setAssignSaving(true);
+    setAssignMessage(null);
+    try {
+      // Safeguard: no permitir dejar sin vehículo estados que implican entrega física
+      if (!newVehicleId && (booking.status === 'in_progress' || booking.status === 'completed')) {
+        throw new Error('No se puede dejar sin vehículo una reserva "En curso" o "Completada".');
+      }
+
+      const supabase = createClient();
+      const { error } = await supabase
+        .from('bookings')
+        .update({
+          vehicle_id: newVehicleId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', booking.id);
+
+      if (error) throw error;
+
+      const newVehicle = newVehicleId
+        ? (vehicles || []).find(v => v.id === newVehicleId) || null
+        : null;
+
+      setBookings(prev => prev.map(b =>
+        b.id === booking.id
+          ? ({ ...b, vehicle_id: newVehicleId, vehicle: newVehicle } as Booking)
+          : b
+      ));
+      setSelectedBooking(prev => prev && prev.id === booking.id
+        ? ({ ...prev, vehicle_id: newVehicleId, vehicle: newVehicle || undefined } as any)
+        : prev
+      );
+      setAssignMessage({
+        type: 'success',
+        text: newVehicleId
+          ? `Vehículo reasignado a ${newVehicle?.internal_code || newVehicle?.name || 'seleccionado'}`
+          : 'Reserva marcada como "Sin vehículo asignado"',
+      });
+      setTimeout(() => setAssignMessage(null), 2500);
+    } catch (err: any) {
+      console.error('[Calendario] Error reasignando vehículo:', err);
+      setAssignMessage({ type: 'error', text: err.message || 'Error al reasignar el vehículo' });
+    } finally {
+      setAssignSaving(false);
+    }
+  };
+
+  // Detectar si asignar cierto vehículo a la reserva seleccionada
+  // generaría conflicto con otras reservas del calendario (solape de fechas).
+  const hasVehicleConflict = (
+    vehicleId: string,
+    pickupDate: string,
+    dropoffDate: string,
+    excludeBookingId: string
+  ) => {
+    return (bookings || []).some(b =>
+      b.id !== excludeBookingId &&
+      b.vehicle_id === vehicleId &&
+      b.status !== 'cancelled' &&
+      b.pickup_date <= dropoffDate &&
+      b.dropoff_date >= pickupDate
+    );
+  };
 
   const getBlockedDatesForVehicle = (vehicleId: string) => {
     return (blockedDatesRaw || []).filter(b => b.vehicle_id === vehicleId);
@@ -1413,25 +1487,77 @@ export default function CalendarioPage() {
 
             {/* Content */}
             <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-              {/* Vehículo */}
+              {/* Vehículo (editable inline) */}
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase mb-2">🚐 Vehículo</div>
-                {selectedBooking.vehicle_id && selectedBooking.vehicle ? (
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <div className="font-bold text-gray-900">{selectedBooking.vehicle?.name || 'Sin nombre'}</div>
-                    <div className="text-sm text-gray-600">{selectedBooking.vehicle?.brand || ''}</div>
-                    {selectedBooking.vehicle?.internal_code && (
-                      <div className="text-xs text-gray-500 mt-1">Código: {selectedBooking.vehicle.internal_code}</div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="bg-amber-50 border-2 border-amber-300 rounded-lg p-3">
-                    <div className="font-bold text-amber-900">⚠️ Sin vehículo asignado</div>
-                    <div className="text-xs text-amber-700 mt-1">
-                      Esta reserva está pendiente de asignación. Edítala para asignar un vehículo.
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs font-semibold text-gray-500 uppercase">🚐 Vehículo</div>
+                  {assignSaving && (
+                    <span className="text-[10px] text-gray-500 animate-pulse">Guardando…</span>
+                  )}
+                </div>
+
+                <div className={`rounded-lg p-3 ${
+                  selectedBooking.vehicle_id && selectedBooking.vehicle
+                    ? 'bg-gray-50'
+                    : 'bg-amber-50 border-2 border-amber-300'
+                }`}>
+                  {selectedBooking.vehicle_id && selectedBooking.vehicle ? (
+                    <div className="mb-2">
+                      <div className="font-bold text-gray-900">{selectedBooking.vehicle?.name || 'Sin nombre'}</div>
+                      <div className="text-sm text-gray-600">{selectedBooking.vehicle?.brand || ''}</div>
+                      {selectedBooking.vehicle?.internal_code && (
+                        <div className="text-xs text-gray-500 mt-0.5">Código: {selectedBooking.vehicle.internal_code}</div>
+                      )}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="mb-2">
+                      <div className="font-bold text-amber-900">⚠️ Sin vehículo asignado</div>
+                      <div className="text-xs text-amber-700">
+                        Reserva pendiente de asignación. Usa el selector para reasignar al vuelo.
+                      </div>
+                    </div>
+                  )}
+
+                  <label className="block text-[11px] font-semibold text-gray-700 mt-2 mb-1">
+                    Reasignar vehículo:
+                  </label>
+                  <select
+                    value={selectedBooking.vehicle_id || ''}
+                    onChange={(e) => handleQuickAssignVehicle(selectedBooking, e.target.value || null)}
+                    disabled={assignSaving}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent disabled:opacity-50"
+                  >
+                    <option value="">— Sin vehículo asignado (pendiente) —</option>
+                    {(vehicles || []).map(v => {
+                      const conflict = hasVehicleConflict(
+                        v.id,
+                        selectedBooking.pickup_date,
+                        selectedBooking.dropoff_date,
+                        selectedBooking.id
+                      );
+                      const isCurrent = v.id === selectedBooking.vehicle_id;
+                      return (
+                        <option key={v.id} value={v.id}>
+                          {v.internal_code ? `${v.internal_code} · ` : ''}{v.name}
+                          {isCurrent ? ' (actual)' : conflict ? ' ⚠️ OCUPADO' : ' ✓ libre'}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <p className="text-[10px] text-gray-500 mt-1">
+                    Los cambios se guardan automáticamente al seleccionar.
+                  </p>
+
+                  {assignMessage && (
+                    <div className={`mt-2 text-xs font-medium px-2 py-1.5 rounded ${
+                      assignMessage.type === 'success'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}>
+                      {assignMessage.text}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Cliente */}
@@ -1587,7 +1713,7 @@ export default function CalendarioPage() {
             {/* Footer con botones */}
             <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4 flex gap-2 sm:gap-3" style={{ paddingBottom: "max(env(safe-area-inset-bottom), 12px)" }}>
               <button
-                onClick={() => setSelectedBooking(null)}
+                onClick={() => { setSelectedBooking(null); setAssignMessage(null); }}
                 className="flex-1 px-3 py-2.5 sm:py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 font-semibold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 active:scale-[0.97] transition-all text-sm"
               >
                 Cerrar
