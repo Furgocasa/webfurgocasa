@@ -661,6 +661,33 @@ export default function CalendarioPage() {
     );
   };
 
+  // Cambio rápido de estado (pending, confirmed, in_progress, completed, cancelled).
+  const handleQuickChangeStatus = async (
+    booking: Booking & { vehicle?: Vehicle | null },
+    newStatus: string
+  ) => {
+    if (!newStatus || booking.status === newStatus) return;
+    if (!booking.vehicle_id && (newStatus === 'in_progress' || newStatus === 'completed')) {
+      setAssignMessage({
+        type: 'error',
+        text: 'No se puede marcar como "En curso" o "Completada" sin un vehículo asignado.',
+      });
+      return;
+    }
+    const labels: Record<string, string> = {
+      pending: 'Pendiente',
+      confirmed: 'Confirmada',
+      in_progress: 'En curso',
+      completed: 'Completada',
+      cancelled: 'Cancelada',
+    };
+    await patchBookingInline(
+      booking,
+      { status: newStatus } as any,
+      `Estado cambiado a "${labels[newStatus] || newStatus}"`
+    );
+  };
+
   // Cambio rápido de ubicación (recogida/devolución).
   const handleQuickChangeLocation = async (
     booking: Booking & { vehicle?: Vehicle | null },
@@ -1565,14 +1592,33 @@ export default function CalendarioPage() {
             <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-1 sm:hidden" />
             {/* Header */}
             <div className={`${getStatusColor(selectedBooking.status)} text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl`}>
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-base sm:text-lg font-bold">{selectedBooking.booking_number}</h3>
-                  <p className="text-xs sm:text-sm opacity-90 capitalize">{selectedBooking.status}</p>
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base sm:text-lg font-bold truncate">{selectedBooking.booking_number}</h3>
+                  <div className="mt-1 flex items-center gap-2">
+                    <label className="text-[10px] sm:text-xs font-semibold opacity-90 uppercase tracking-wide">Estado:</label>
+                    <select
+                      value={selectedBooking.status}
+                      onChange={(e) => handleQuickChangeStatus(selectedBooking, e.target.value)}
+                      disabled={assignSaving}
+                      className="bg-white/20 hover:bg-white/30 focus:bg-white/30 text-white text-xs sm:text-sm font-semibold px-2 py-1 rounded border border-white/40 focus:ring-2 focus:ring-white/60 focus:outline-none disabled:opacity-50 cursor-pointer appearance-none pr-7 bg-no-repeat bg-right"
+                      style={{
+                        backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E\")",
+                        backgroundSize: '14px',
+                        backgroundPosition: 'right 6px center',
+                      }}
+                    >
+                      <option value="pending" className="text-gray-900">Pendiente</option>
+                      <option value="confirmed" className="text-gray-900">Confirmada</option>
+                      <option value="in_progress" className="text-gray-900">En curso</option>
+                      <option value="completed" className="text-gray-900">Completada</option>
+                      <option value="cancelled" className="text-gray-900">Cancelada</option>
+                    </select>
+                  </div>
                 </div>
-                <button 
-                  onClick={() => setSelectedBooking(null)}
-                  className="text-white/80 hover:text-white transition-colors"
+                <button
+                  onClick={() => { setSelectedBooking(null); setAssignMessage(null); }}
+                  className="text-white/80 hover:text-white transition-colors flex-shrink-0"
                 >
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
