@@ -65,14 +65,17 @@ export async function generateMetadata({
   const alternates = buildBlogCanonicalAlternates(`/blog/${category}/${slug}`, locale, post);
   const ogImage = post.featured_image?.startsWith("http") ? post.featured_image : OG_DEFAULT_IMAGE;
   
-  const pageTitle = truncateTitle(post.meta_title || post.title, 60);
+  const fullTitle = post.meta_title || post.title;
+  const htmlTitle = truncateTitle(fullTitle, 60);
+  const ogTitle = truncateTitle(fullTitle, 95);
+  const twitterTitle = truncateTitle(fullTitle, 70);
   return {
-    title: pageTitle,
+    title: htmlTitle,
     description: post.meta_description || post.excerpt || post.title,
     authors: [{ name: "Furgocasa" }],
     keywords: post.tags?.map(tag => tag.name).join(","),
     openGraph: {
-      title: pageTitle,
+      title: ogTitle,
       description: post.excerpt || post.meta_description || "",
       type: "article",
       siteName: "Furgocasa",
@@ -94,7 +97,7 @@ export async function generateMetadata({
     },
     twitter: {
       card: "summary_large_image",
-      title: pageTitle,
+      title: twitterTitle,
       description: post.excerpt || post.meta_description || "",
       images: [ogImage],
       creator: "@furgocasa",

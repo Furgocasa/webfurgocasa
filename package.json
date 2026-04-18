@@ -41,7 +41,8 @@
     "seo:cinco-planes-otono:dry": "tsx scripts/seo-update-cinco-planes-otono.ts --dry-run",
     "translate:blog": "node translate-blog-content.js",
     "translate:blog:vicar": "node translate-blog-content.js vicar-municipio-almeriense-dispondra-de-una-zona-de-servicio-para-autocaravanas",
-    "translate:location-sections": "node scripts/translate-location-content-sections.js"
+    "translate:location-sections": "node scripts/translate-location-content-sections.js",
+    "generate:blog-cover": "tsx scripts/generate-blog-cover.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
