@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMailingAdmin } from '@/lib/mailing/auth';
-import { buildMailingContext } from '@/lib/mailing/context';
+import { buildMailingContext, stripBrokenMailingVehicleImages } from '@/lib/mailing/context';
 import { injectCanonicalFooter } from '@/lib/mailing/footer';
 import { sanitizeForOutlook } from '@/lib/mailing/outlook-safe';
 
@@ -26,6 +26,7 @@ Para CUALQUIER afirmación factual sobre ofertas, vehículos o artículos, está
 · Inventar plazas, camas, beds_detail, categoría, largo o cualquier ficha técnica de un vehículo. Si vas a nombrar un modelo (p.ej. "Dreamer Fun D55"), sus especificaciones DEBEN coincidir literalmente con las de CONTEXTO_BD.fleet — si dice seats:4 y beds:2, escribe "4 plazas de viaje, 2 camas", nunca "4 plazas de noche", "5 literas" ni nada que no esté en el contexto.
 · Inventar artículos de blog, titulares o slugs. Los únicos artículos válidos son los de CONTEXTO_BD.posts, con su título, excerpt y url exactos.
 · Inventar imágenes. Para fotos de vehículos usa EXCLUSIVAMENTE el image_url que trae cada objeto en offers[].vehicle o en fleet[]. Para fotos de artículos, image_url de posts[]. Si una entrada no tiene image_url (es null), no metas imagen para esa entrada.
+· PAREO IMAGEN ↔ VEHÍCULO (anti-confusión): dentro de una tarjeta/sección que habla del vehículo X, el <img src="..."> DEBE ser el image_url del MISMO objeto del contexto cuyo vehicle.name coincide con X. Ejemplo: si una tarjeta titula "Weinsberg Carabus 600 MQ", la imagen de esa tarjeta tiene que ser offers[i].vehicle.image_url (o fleet[i].image_url) del objeto cuyo vehicle.name sea exactamente "Weinsberg Carabus 600 MQ". NUNCA copies el image_url de otro objeto. Si tienes dudas, antes de escribir la <img> relee el vehicle.name y el image_url del MISMO objeto y comprueba que el filename del image_url contiene el internal_code del vehículo (p.ej. fu0019-weinsberg-carabus-600-mq.jpg → vehicle con internal_code FU0019 — deben ser el mismo objeto del JSON).
 · Inventar URLs de oferta. La URL de una oferta es SIEMPRE el campo url del objeto (formato https://www.furgocasa.com/es/reservar/oferta/<id>). No construyas URLs con /es/ofertas/<slug>, no existen.
 
 Comportamiento ante contexto insuficiente:
@@ -353,6 +354,19 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
           push('error', { message: 'OpenAI no devolvió contenido.' });
           controller.close();
           return;
+        }
+
+        // Red de seguridad: eliminamos <img> que apunten a archivos de
+        // /images/mailing/vehicles/ que no existen en disco (evita X rojas).
+        // Los image_url del contexto siempre apuntan a archivos reales, pero
+        // si la IA copiase una URL obsoleta de una campaña de referencia, la
+        // quitamos antes de guardar.
+        const stripped = stripBrokenMailingVehicleImages(html);
+        html = stripped.html;
+        if (stripped.removed > 0) {
+          push('status', {
+            message: `Eliminadas ${stripped.removed} imágen(es) de vehículo con URL rota.`,
+          });
         }
 
         // Red de seguridad Outlook-safe: aunque el SYSTEM_PROMPT lo prohíba,

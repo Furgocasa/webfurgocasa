@@ -24,6 +24,8 @@
  * pocas ofertas + 5 artículos = muy pocos tokens) y la IA elige qué usar
  * según el briefing del admin. Robusto, determinista y barato.
  */
+import fs from 'node:fs';
+import path from 'node:path';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Database } from '@/lib/supabase/database.types';
 import { baseUrl } from './render';
@@ -36,6 +38,7 @@ type AnySb = SupabaseClient<Database> | SupabaseClient<unknown>;
 // ─── Tipos del contexto (lo que verá la IA, serializable a JSON) ───────────
 
 export type ContextVehicleRef = {
+  internal_code: string | null;
   name: string;
   brand: string | null;
   model: string | null;
@@ -89,22 +92,95 @@ function todayYmd(): string {
 }
 
 /**
- * URL canónica de la imagen de un vehículo para mailings, siguiendo el
- * patrón ya usado en el prompt:
- *   https://www.furgocasa.com/images/mailing/vehicles/<internal_code_lc>-<slug>.jpg
- * Devuelve null si faltan datos o si el archivo no existe (no lo
- * comprobamos aquí: si la IA lo recibe es que existe, porque el script
- * download-mailing-assets.mjs genera todos los vehículos con primary image).
+ * Mapa cacheado de `internal_code → filename` leyendo el directorio real
+ * public/images/mailing/vehicles. Se construye UNA VEZ por proceso.
+ *
+ * Por qué no usamos `${code}-${slug}.jpg` deducido: el `slug` de la tabla
+ * `vehicles` (p.ej. 'dreamer-d55-fun-2024') no tiene por qué coincidir
+ * con el slug usado al nombrar el JPG (p.ej. 'dreamer-fun-d55'). Cuando
+ * no coinciden acabas con URLs que apuntan a archivos inexistentes —o
+ * peor, a archivos de otro vehículo si el filesystem es tolerante.
+ *
+ * Este resolver lee el directorio real y se queda con el primer fichero
+ * cuyo nombre empiece por `<internal_code>-` (case-insensitive). Robusto
+ * frente a cambios de slug: mientras el prefijo del archivo coincida con
+ * el internal_code, siempre se encuentra.
+ */
+let cachedMailingImageMap: Map<string, string> | null = null;
+
+function getMailingImageMap(): Map<string, string> {
+  if (cachedMailingImageMap) return cachedMailingImageMap;
+  const map = new Map<string, string>();
+  const dir = path.join(process.cwd(), 'public', 'images', 'mailing', 'vehicles');
+  try {
+    const entries = fs.readdirSync(dir);
+    for (const file of entries) {
+      if (!/\.(jpe?g|png|webp)$/i.test(file)) continue;
+      const m = file.toLowerCase().match(/^(fu\d+)-/);
+      if (!m) continue;
+      // Si por error hubiera dos archivos con el mismo prefijo (no debería),
+      // nos quedamos con el primero que veamos — es determinista porque
+      // readdirSync devuelve orden alfabético en Windows y Linux.
+      if (!map.has(m[1])) map.set(m[1], file);
+    }
+  } catch (err) {
+    console.warn(
+      '[mailing/context] No pude leer public/images/mailing/vehicles:',
+      (err as Error).message,
+    );
+  }
+  cachedMailingImageMap = map;
+  return map;
+}
+
+/**
+ * Resuelve la URL absoluta de la foto mailing de un vehículo a partir de
+ * su `internal_code`. Si no hay archivo en disco, devuelve null y la IA
+ * no pondrá imagen para ese vehículo (mejor vacío que una URL rota).
  */
 function vehicleMailingImageUrl(
   internalCode: string | null | undefined,
-  slug: string | null | undefined,
 ): string | null {
-  if (!internalCode || !slug) return null;
+  if (!internalCode) return null;
   const code = internalCode.toLowerCase().trim();
-  const s = slug.trim();
-  if (!code || !s) return null;
-  return `${baseUrl()}/images/mailing/vehicles/${code}-${s}.jpg`;
+  if (!code) return null;
+  const file = getMailingImageMap().get(code);
+  if (!file) return null;
+  return `${baseUrl()}/images/mailing/vehicles/${file}`;
+}
+
+/**
+ * Red de seguridad final: elimina del HTML cualquier <img> que apunte a
+ * /images/mailing/vehicles/<file> cuyo archivo NO existe en disco.
+ *
+ * La IA ya tiene los image_url correctos en CONTEXTO_BD, pero si pese a
+ * todo ensamblara una URL rota (p.ej. copiándola de una campaña de
+ * referencia con un slug obsoleto) la quitamos antes de guardar, así el
+ * destinatario nunca ve una X roja de imagen rota.
+ *
+ * El resto del HTML (el <td>, el <a>, el texto) se queda intacto — solo
+ * eliminamos la etiqueta <img> entera.
+ */
+export function stripBrokenMailingVehicleImages(html: string): { html: string; removed: number } {
+  if (!html) return { html, removed: 0 };
+  const available = new Set(getMailingImageMap().values());
+  if (available.size === 0) return { html, removed: 0 };
+
+  let removed = 0;
+  // Matchea <img ...> con src apuntando a /images/mailing/vehicles/<fichero>.ext
+  // Con o sin dominio delante. Ignora otras rutas de /images/mailing/ (logo,
+  // iconos sociales, etc.) — esas las inyectamos nosotros y son siempre OK.
+  const IMG_RE =
+    /<img\b[^>]*\bsrc\s*=\s*["'][^"']*\/images\/mailing\/vehicles\/([^"'?#]+)["'][^>]*>/gi;
+
+  const out = html.replace(IMG_RE, (match, file: string) => {
+    const basename = file.split('/').pop() || file;
+    if (available.has(basename)) return match;
+    removed += 1;
+    return '';
+  });
+
+  return { html: out, removed };
 }
 
 function vehicleDetailUrl(slug: string | null | undefined): string {
@@ -133,6 +209,7 @@ function toContextVehicle(v: {
 }): ContextVehicleRef {
   const cat = Array.isArray(v.category) ? v.category[0] : v.category;
   return {
+    internal_code: v.internal_code ?? null,
     name: (v.name ?? '').trim() || 'Vehículo sin nombre',
     brand: v.brand ?? null,
     model: v.model ?? null,
@@ -141,7 +218,7 @@ function toContextVehicle(v: {
     beds: v.beds ?? null,
     beds_detail: v.beds_detail ?? null,
     length_m: v.length_m ?? null,
-    image_url: vehicleMailingImageUrl(v.internal_code, v.slug),
+    image_url: vehicleMailingImageUrl(v.internal_code),
     detail_url: vehicleDetailUrl(v.slug),
   };
 }
