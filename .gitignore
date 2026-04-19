@@ -97,7 +97,7 @@ src/app/es/escalabilidad/LATAM.txt
 docs/06-archivos-temporales/*.txt
 docs/06-archivos-temporales/*.json
 
-# Archivos históricos (scripts y SQL ya ejecutados - no necesarios en git)
+# Archivos históricos (copias locales muy grandes o de un solo uso)
 scripts/historicos/
 supabase/historicos/
 
@@ -117,19 +117,7 @@ scripts/obtener-*.js
 scripts/*.json
 scripts/*.csv
 
-# SQL de fixes temporales y setup redundante (excepto migrations)
-supabase/fix-*.sql
-supabase/auto-update-*.sql
-supabase/cleanup-*.sql
-supabase/check-*.sql
-supabase/prevent-*.sql
-supabase/resolve-*.sql
-supabase/remove-*.sql
-supabase/verificar-*.sql
-supabase/temporadas-*.sql
-supabase/search-queries-*.sql
-supabase/plantilla-*.sql
-supabase/setup-blog-storage.sql
+# supabase/migrations/*.sql y el resto del esquema deben versionarse (no ignorar SQL aquí).
 
 # Documentos de fixes/implementaciones temporales (en raíz - deben ir a docs/)
 FIX-*.md
