@@ -669,8 +669,7 @@ function ContentTab({
       if (!r.ok || !r.body) {
         const j = await r.json().catch(() => ({}));
         pushLog({ kind: "error", text: `✖ Error: ${j.error || r.statusText}` });
-        setBusy(false);
-        return;
+        return; // setBusy(false) lo maneja el finally
       }
       const reader = r.body.getReader();
       const decoder = new TextDecoder();
@@ -714,17 +713,18 @@ function ContentTab({
               kind: "success",
               text: `✓ HTML guardado (${payload.length} caracteres). Abriendo vista previa...`,
             });
-            setBusy(false);
             setTimeout(onGenerated, 600);
           }
           if (evt === "error") {
             pushLog({ kind: "error", text: `✖ ${payload.message}` });
-            setBusy(false);
           }
         }
       }
     } catch (e) {
       pushLog({ kind: "error", text: `✖ ${(e as Error).message}` });
+    } finally {
+      // Garantiza que el botón vuelve a "Generar" incluso si el stream se
+      // cerró sin enviar done/error (p. ej. cortes de red a mitad del SSE).
       setBusy(false);
     }
   }

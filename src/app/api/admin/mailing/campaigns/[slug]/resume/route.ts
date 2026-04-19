@@ -29,6 +29,21 @@ export async function POST(_req: NextRequest, ctx: Params) {
         { status: 400 },
       );
     }
+    // Mismo check que /start: no lanzar un "envío" sin destinatarios en cola.
+    const { count: pendingCount } = await g.sb
+      .from('mailing_recipients')
+      .select('*', { count: 'exact', head: true })
+      .eq('campaign_id', campaign.id)
+      .eq('status', 'pending');
+    if (!pendingCount || pendingCount === 0) {
+      return NextResponse.json(
+        {
+          error:
+            'No hay destinatarios pendientes. Pobla la audiencia antes de lanzar el envío.',
+        },
+        { status: 400 },
+      );
+    }
     update.status = 'sending';
     update.started_at = new Date().toISOString();
   }

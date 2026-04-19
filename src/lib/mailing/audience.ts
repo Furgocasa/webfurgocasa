@@ -99,12 +99,19 @@ export async function populateRecipients(
       source: string | null;
       marketing_opt_out_at: string | null;
     };
+    // Dedupe por email normalizado dentro del propio set de candidatos.
+    // Caso real: un mismo email puede existir en marketing_contacts con
+    // source='customer' y otra vez con source='newsletter' (alta manual
+    // en la web + conversión a cliente). Sin esto, el suscriptor recibiría
+    // el mismo mailing dos veces.
+    const seenEmails = new Set<string>();
     for (const c of (contacts || []) as Contact[]) {
       if (c.marketing_opt_out_at) {
         result.skippedOptOut++;
         continue;
       }
-      if (suppressedSet.has((c.email || '').trim().toLowerCase())) {
+      const normEmail = (c.email || '').trim().toLowerCase();
+      if (suppressedSet.has(normEmail)) {
         result.skippedOptOut++;
         continue;
       }
@@ -116,7 +123,13 @@ export async function populateRecipients(
         result.skippedAudience++;
         continue;
       }
-      if (!c.email) continue;
+      if (!c.email || !normEmail) continue;
+      if (seenEmails.has(normEmail)) {
+        // Mismo email ya tomado desde otro marketing_contact.
+        result.skippedDuplicates++;
+        continue;
+      }
+      seenEmails.add(normEmail);
       recipients.push({
         campaign_id: campaignId,
         contact_id: c.id,
@@ -148,10 +161,13 @@ export async function populateRecipients(
       .filter((r: { contact_id: string | null }) => r.contact_id)
       .map((r: { contact_id: string }) => r.contact_id),
   );
-  const byEmail = new Set(
+  // Trackeamos TODOS los emails ya usados por la campaña, vengan con
+  // contact_id o sin él. Así evitamos repeticiones aunque el mismo email
+  // esté en varios marketing_contacts distintos.
+  const byEmailAny = new Set(
     (existing || [])
-      .filter((r: { contact_id: string | null }) => !r.contact_id)
-      .map((r: { email: string }) => r.email),
+      .map((r: { email: string | null }) => (r.email || '').trim().toLowerCase())
+      .filter(Boolean),
   );
 
   // Si recargamos solo test-emails, limpiamos los previos sin contact_id.
@@ -162,13 +178,31 @@ export async function populateRecipients(
       .delete()
       .eq('campaign_id', campaignId)
       .is('contact_id', null);
-    byEmail.clear();
+    // Recalculamos el set tras el borrado.
+    byEmailAny.clear();
+    for (const r of existing || []) {
+      const t = (r as { contact_id: string | null }).contact_id;
+      if (t) byEmailAny.add(((r as { email: string | null }).email || '').trim().toLowerCase());
+    }
   }
 
-  const fresh = recipients.filter((r) =>
-    r.contact_id ? !byContact.has(r.contact_id) : !byEmail.has(r.email),
-  );
-  result.skippedDuplicates = recipients.length - fresh.length;
+  const fresh: Cand[] = [];
+  let dupsBeforeInsert = 0;
+  for (const r of recipients) {
+    const norm = (r.email || '').trim().toLowerCase();
+    if (r.contact_id && byContact.has(r.contact_id)) {
+      dupsBeforeInsert++;
+      continue;
+    }
+    if (byEmailAny.has(norm)) {
+      dupsBeforeInsert++;
+      continue;
+    }
+    fresh.push(r);
+    byEmailAny.add(norm);
+    if (r.contact_id) byContact.add(r.contact_id);
+  }
+  result.skippedDuplicates += dupsBeforeInsert;
 
   const CHUNK = 500;
   for (let i = 0; i < fresh.length; i += CHUNK) {

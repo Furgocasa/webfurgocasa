@@ -188,6 +188,17 @@ export async function POST(req: NextRequest, ctx: Params) {
       { status: 409, headers: { 'Content-Type': 'application/json' } },
     );
   }
+  if (campaign.status === 'sending') {
+    // Si se regenerara ahora, los destinatarios pending recibirían HTML nuevo
+    // mientras los ya enviados tendrían el antiguo → mailing inconsistente.
+    return new Response(
+      JSON.stringify({
+        error:
+          'La campaña está enviándose en este momento. Pausa el envío primero para regenerar el HTML.',
+      }),
+      { status: 409, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
 
   let referencesBlock = '';
   if (referenceIds.length) {

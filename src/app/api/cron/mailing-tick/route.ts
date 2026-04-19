@@ -219,7 +219,49 @@ async function handleTick(req: NextRequest) {
 
   const t = buildTransport();
   const results: TickResult[] = [];
+  // Lock-watchdog: si un tick previo murió sin liberar, tras este timeout
+  // cualquier nuevo tick puede tomarlo. 5 min > maxDuration(60s) + margen.
+  const LOCK_STALE_MS = 5 * 60_000;
   for (const c of campaigns as CampaignRow[]) {
+    const now = new Date();
+    const staleCutoff = new Date(now.getTime() - LOCK_STALE_MS).toISOString();
+
+    // CAS atómico: solo un tick a la vez dentro de processCampaign().
+    // La condición .or() hace que el UPDATE falle si otro proceso ya
+    // agarró el lock y aún no ha caducado.
+    const { data: lockRows, error: lockErr } = await sb
+      .from('mailing_campaigns')
+      .update({ tick_lock_at: now.toISOString() })
+      .eq('id', c.id)
+      .or(`tick_lock_at.is.null,tick_lock_at.lt.${staleCutoff}`)
+      .select('id');
+
+    if (lockErr) {
+      results.push({
+        slug: c.slug,
+        attempted: 0,
+        sent: 0,
+        failed: 0,
+        skipped: 0,
+        rateLimited: false,
+        note: `error tomando lock: ${lockErr.message}`,
+      });
+      continue;
+    }
+    if (!lockRows || lockRows.length === 0) {
+      // Otro tick lo está procesando ya. Saltamos sin ruido.
+      results.push({
+        slug: c.slug,
+        attempted: 0,
+        sent: 0,
+        failed: 0,
+        skipped: 0,
+        rateLimited: false,
+        note: 'skip: tick previo aún en curso',
+      });
+      continue;
+    }
+
     try {
       results.push(await processCampaign(sb as SupabaseClient, t, c));
     } catch (e) {
@@ -239,6 +281,13 @@ async function handleTick(req: NextRequest) {
           last_tick_at: new Date().toISOString(),
           last_tick_note: `Excepción en tick: ${msg.slice(0, 200)}`,
         })
+        .eq('id', c.id);
+    } finally {
+      // Liberamos el lock pase lo que pase (si el proceso muere aquí,
+      // el watchdog de 5 min lo recupera en el siguiente tick).
+      await sb
+        .from('mailing_campaigns')
+        .update({ tick_lock_at: null })
         .eq('id', c.id);
     }
   }
