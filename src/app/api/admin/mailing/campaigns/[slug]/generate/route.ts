@@ -32,6 +32,39 @@ COSAS QUE TIENES PROHIBIDAS (rompen Outlook):
     <td bgcolor="#063971" style="background-color:#063971;padding:32px 24px;color:#ffffff;">...</td>
   Si olvidas el bgcolor, tu email se verá roto en la inmensa mayoría de Outlook corporativos. Es la regla más importante de compatibilidad.
 · Efectos: NADA de box-shadow, text-shadow, outline decorativo, opacity distinta de 1. Todo nítido.
+
+REGLA CRÍTICA DE CONTRASTE (INNEGOCIABLE):
+TODO elemento con texto DEBE declarar color explícito en su style. Jamás confíes en el color por defecto del navegador/cliente: Outlook con modo oscuro y algunos webmails pintan el texto sin color en BLANCO, y si el fondo también es claro el contenido desaparece.
+
+Correspondencia fondo → color de texto obligatoria:
+· Fondo BLANCO / CLARO (#ffffff, #f0f0f0, #f4f4f5, #f8fafc, #fef3c7, #ecfdf5, cualquier hex con los 3 primeros dígitos ≥ c0) → color de texto OSCURO: titulares #111827, texto normal #374151, texto secundario #6b7280. NUNCA pongas color:#ffffff o un color claro sobre un fondo claro.
+· Fondo OSCURO (azul corporativo #063971, terracota #d65a31, otros hex con los 3 primeros dígitos ≤ 70) → color de texto CLARO: #ffffff (o #f0f0f0 para texto secundario). NUNCA pongas color:#111827 sobre un fondo oscuro.
+
+Obligación por elemento (repite en CADA ENTIDAD TEXTUAL):
+· <h1>, <h2>, <h3>, <p>, <li>, <a>, <span>, <strong>, <td> con texto directo DEBEN llevar color:#xxxxxx en el style, incluso aunque el <td> padre ya lo tenga. Esta redundancia es intencional: los clientes de correo limpian herencias de forma errática.
+· Listas <ul>/<ol>: pon el color en cada <li> explícitamente. No confíes en heredarlo del <ul>.
+· Enlaces <a>: siempre color explícito + text-decoration explícito. En fondo oscuro: color:#ffffff;text-decoration:underline; En fondo claro: color:#063971;text-decoration:underline;
+· Emojis que van dentro de un texto tienen que estar dentro del mismo <p>/<li> con color, no sueltos.
+
+Antes de entregar el HTML, busca cualquier <li>, <p>, <h1..h6>, <a> o <span> que NO tenga "color:" en su style inline y añádele uno coherente con el fondo del <td> padre. Este paso NO es opcional.
+
+Ejemplo INCORRECTO (lo que NO hay que hacer):
+  <td bgcolor="#f8fafc" style="background-color:#f8fafc;padding:20px;">
+    <h3 style="color:#111827;">Ofertas</h3>
+    <ul>
+      <li>Item 1</li>           <!-- ✖ sin color, en Outlook modo oscuro sale blanco sobre casi blanco = invisible -->
+      <li>Item 2</li>
+    </ul>
+  </td>
+
+Ejemplo CORRECTO:
+  <td bgcolor="#f8fafc" style="background-color:#f8fafc;padding:20px;">
+    <h3 style="margin:0 0 10px;color:#111827;font-size:20px;font-weight:800;">Ofertas</h3>
+    <ul style="margin:0;padding-left:20px;">
+      <li style="color:#374151;font-size:14px;line-height:22px;margin:4px 0;">Item 1</li>
+      <li style="color:#374151;font-size:14px;line-height:22px;margin:4px 0;">Item 2</li>
+    </ul>
+  </td>
 · Border-radius: EVITA radios grandes. Usa 0-8px como mucho. Outlook ignora border-radius completamente; diseña ASUMIENDO que las esquinas serán cuadradas y que aun así quede bien. Si pones radius, que sea un extra opcional, nunca crítico.
 · Width/height: las imágenes SIEMPRE con los atributos HTML width y height en píxeles (no solo en style). Las <td> que necesiten ancho fijo, con el atributo width. Evita height en <td> salvo para espaciadores; usa padding y line-height.
 · Unidades relativas: en medidas críticas usa px. % solo para width="100%" o max-width contenedor.
@@ -82,6 +115,9 @@ Antes de emitir el HTML, revísalo mentalmente y asegúrate de que NO CONTIENE n
    "<button", "<svg", "@font-face", "@import", "font-face", "googleapis.com/css"
 Y asegúrate de que SÍ CONTIENE, para cada <td> con fondo de color, el atributo bgcolor además del style. Si ves un <td style="background-color:#XXX..." sin bgcolor, AÑÁDELE bgcolor="#XXX".
 Si detectas alguna subcadena prohibida, sustitúyela por su equivalente Outlook-safe de los ejemplos de arriba ANTES de entregar.
+
+AUTOCOMPROBACIÓN DE CONTRASTE (obligatoria):
+Recorre mentalmente cada <h1>, <h2>, <h3>, <h4>, <p>, <li>, <a>, <span>, <strong> de tu HTML y verifica que TODOS llevan color:#xxxxxx en el style. Si alguno NO lo lleva, añádeselo ANTES de entregar, eligiendo color oscuro (#111827/#374151) si el fondo es claro o color claro (#ffffff) si el fondo es oscuro (#063971, #d65a31, etc.). No entregues HTML con texto sin color definido: en modo oscuro de Outlook el texto se vuelve blanco invisible sobre fondo claro.
 
 ESTRUCTURA MÍNIMA OBLIGATORIA (en este orden):
 1. Preheader oculto (hidden preview text, 80-120 caracteres).
@@ -220,7 +256,7 @@ export async function POST(req: NextRequest, ctx: Params) {
       }
       let collected = '';
       try {
-        push('status', { message: 'Llamando a OpenAI gpt-4o-mini...' });
+        push('status', { message: 'Llamando a OpenAI gpt-4o...' });
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -228,7 +264,7 @@ export async function POST(req: NextRequest, ctx: Params) {
             Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o',
             stream: true,
             temperature: 0.7,
             messages: [

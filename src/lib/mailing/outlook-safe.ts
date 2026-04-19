@@ -109,7 +109,47 @@ export function sanitizeForOutlook(html: string): string {
     return `<${tag} bgcolor="${color}"${attrs}>`;
   });
 
+  // 8) DEFENSA DE CONTRASTE: forzamos color de texto oscuro a nivel <body>.
+  //    Si la IA olvida declarar `color` en un <li>, <p>, etc., el navegador
+  //    hereda del body. Sin este safety net, Outlook con modo oscuro pinta
+  //    el texto en BLANCO y sobre fondos claros queda invisible.
+  //    El color oscuro del body NO afecta a elementos que SÍ declaren color
+  //    (los titulares sobre fondo azul con color:#ffffff siguen siendo
+  //    blancos porque pisa la herencia).
+  out = ensureBodyTextColor(out);
+
   return out;
+}
+
+/**
+ * Garantiza que <body> tenga color de texto oscuro (#111827). Sirve de red
+ * de seguridad cuando la IA olvida declarar color en algún <li>/<p>/<span>:
+ * en lugar de heredar "sin color" (que Outlook en modo oscuro convierte en
+ * blanco → texto invisible sobre fondo claro), hereda el color oscuro del
+ * body → legible siempre.
+ *
+ * Solo añade si el body no tiene ya `color:` en su style. No toca el resto.
+ */
+function ensureBodyTextColor(html: string): string {
+  const DEFAULT_TEXT_COLOR = '#111827';
+  return html.replace(/<body\b([^>]*)>/i, (match, attrs: string) => {
+    const styleMatch = attrs.match(STYLE_ATTR_RE);
+    if (styleMatch && /\bcolor\s*:/i.test(styleMatch[2])) {
+      // Ya tiene color explícito — respetamos la decisión del autor.
+      return match;
+    }
+    if (styleMatch) {
+      const raw = styleMatch[2].trim();
+      const sep = raw && !raw.endsWith(';') ? ';' : '';
+      const newStyle = `${raw}${sep}color:${DEFAULT_TEXT_COLOR};`;
+      const newAttrs = attrs.replace(
+        STYLE_ATTR_RE,
+        `style=${styleMatch[1]}${newStyle}${styleMatch[1]}`,
+      );
+      return `<body${newAttrs}>`;
+    }
+    return `<body${attrs} style="color:${DEFAULT_TEXT_COLOR};">`;
+  });
 }
 
 /**
