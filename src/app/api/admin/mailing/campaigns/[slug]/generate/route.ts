@@ -71,7 +71,7 @@ TONO: cercano, empático, profesional. Español de España. Evita anglicismos. T
 
 Si los ejemplos incluyen componentes (cajas destacadas, checklist, cita, testimonio, CTA, "regalo"), REUSA esos componentes adaptando el contenido: no los omitas para "ahorrar".
 
-El usuario te dará un briefing y hasta 2 campañas previas como referencia. Devuelve SOLO el HTML completo.`;
+El usuario te dará un briefing y hasta 3 campañas previas como referencia. Devuelve SOLO el HTML completo.`;
 
 function trimToN(str: string, n: number): string {
   if (!str) return '';
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest, ctx: Params) {
   const body = await req.json().catch(() => ({}));
   const briefing = (body.briefing || '').toString();
   const referenceIds = Array.isArray(body.reference_ids)
-    ? (body.reference_ids.slice(0, 2) as string[])
+    ? (body.reference_ids.slice(0, 3) as string[])
     : [];
 
   if (!briefing.trim()) {
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest, ctx: Params) {
   }
 
   const { data: campaign } = await sb.from('mailing_campaigns')
-    .select('id, slug, subject, description')
+    .select('id, slug, subject, description, status')
     .eq('slug', slug)
     .maybeSingle();
   if (!campaign) {
@@ -114,6 +114,14 @@ export async function POST(req: NextRequest, ctx: Params) {
       status: 404,
       headers: { 'Content-Type': 'application/json' },
     });
+  }
+  if (campaign.status === 'sent' || campaign.status === 'archived') {
+    return new Response(
+      JSON.stringify({
+        error: 'No se puede regenerar el HTML de una campaña ya enviada o archivada.',
+      }),
+      { status: 409, headers: { 'Content-Type': 'application/json' } },
+    );
   }
 
   let referencesBlock = '';

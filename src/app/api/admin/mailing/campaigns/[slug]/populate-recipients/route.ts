@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMailingAdmin } from '@/lib/mailing/auth';
-import { populateRecipients, type AudienceType, type SourceFilter } from '@/lib/mailing/audience';
+import { populateRecipients, type AudienceType } from '@/lib/mailing/audience';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 type Params = { params: Promise<{ slug: string }> };
 
-const VALID_AUDIENCES: AudienceType[] = ['all', 'by_source'];
-const VALID_SOURCES: SourceFilter[] = ['customer', 'newsletter', 'manual', 'lead', 'import'];
+const VALID_AUDIENCES: AudienceType[] = ['all', 'customers', 'newsletter'];
 
 export async function POST(req: NextRequest, ctx: Params) {
   const { slug } = await ctx.params;
@@ -17,31 +16,36 @@ export async function POST(req: NextRequest, ctx: Params) {
 
   const body = await req.json().catch(() => ({}));
   const audience = (body.audience || 'all') as AudienceType;
-  const source = (body.source || null) as SourceFilter | null;
   const testEmails = (body.test_emails || null) as string | null;
 
   if (!VALID_AUDIENCES.includes(audience)) {
-    return NextResponse.json({ error: 'audience inválida' }, { status: 400 });
-  }
-  if (audience === 'by_source' && (!source || !VALID_SOURCES.includes(source))) {
     return NextResponse.json(
-      { error: `source requerido (${VALID_SOURCES.join(' | ')})` },
+      { error: `audience inválida (${VALID_AUDIENCES.join(' | ')})` },
       { status: 400 },
     );
   }
 
   const { data: campaign, error } = await g.sb
     .from('mailing_campaigns')
-    .select('id')
+    .select('id, status')
     .eq('slug', slug)
     .maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   if (!campaign) return NextResponse.json({ error: 'Campaña no encontrada' }, { status: 404 });
 
+  if (campaign.status === 'sending' || campaign.status === 'sent' || campaign.status === 'archived') {
+    return NextResponse.json(
+      {
+        error:
+          'No se puede modificar la audiencia de una campaña en envío, enviada o archivada. Pausa y reinicia con un nuevo borrador si necesitas cambiarla.',
+      },
+      { status: 409 },
+    );
+  }
+
   try {
     const result = await populateRecipients(g.sb, campaign.id, {
       audience,
-      source,
       test_emails: testEmails,
     });
     return NextResponse.json({ ok: true, ...result });

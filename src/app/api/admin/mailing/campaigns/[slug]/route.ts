@@ -52,9 +52,33 @@ export async function PATCH(req: NextRequest, ctx: Params) {
 
   const body = await req.json().catch(() => ({}));
   const update: Record<string, unknown> = {};
-  for (const f of EDITABLE_FIELDS) {
-    if (body[f] !== undefined) update[f] = body[f];
+
+  // Desarchivar explícito: vuelve a 'draft' y permite editar después.
+  if (body.unarchive === true) {
+    if (r.campaign.status !== 'archived') {
+      return NextResponse.json(
+        { error: "Solo se puede desarchivar una campaña en estado 'archived'." },
+        { status: 409 },
+      );
+    }
+    update.status = 'draft';
+  } else {
+    if (r.campaign.status === 'archived' || r.campaign.status === 'sent') {
+      return NextResponse.json(
+        {
+          error:
+            "La campaña está en estado '" +
+            r.campaign.status +
+            "'. Desarchívala antes de editar (las enviadas no se pueden reactivar).",
+        },
+        { status: 409 },
+      );
+    }
+    for (const f of EDITABLE_FIELDS) {
+      if (body[f] !== undefined) update[f] = body[f];
+    }
   }
+
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ error: 'Nada que actualizar' }, { status: 400 });
   }

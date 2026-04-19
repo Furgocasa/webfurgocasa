@@ -1,10 +1,15 @@
 /**
  * Poblado de destinatarios de una campaña a partir de marketing_contacts.
  *
+ * Preselecciones fijas (audience):
+ *   · all        → todos los contactos con opt-in, sin filtrar por source.
+ *   · customers  → solo source = 'customer' (clientes con reserva previa).
+ *   · newsletter → solo source = 'newsletter' (alta voluntaria en la web).
+ *
  * Lógica:
  *   1. Carga contactos con opt-in (marketing_opt_out_at IS NULL).
  *   2. Descarta los emails presentes en email_suppressions (LOWER/TRIM).
- *   3. Filtra por audiencia (all | by_source).
+ *   3. Filtra por preselección.
  *   4. Deduplica contra los recipients ya existentes en la campaña.
  *   5. Inserta en lotes de 500.
  *
@@ -13,12 +18,10 @@
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-export type AudienceType = 'all' | 'by_source';
-export type SourceFilter = 'customer' | 'newsletter' | 'manual' | 'lead' | 'import';
+export type AudienceType = 'all' | 'customers' | 'newsletter';
 
 export type PopulateAudienceFilter = {
   audience?: AudienceType;
-  source?: SourceFilter | null;
   test_emails?: string | null;
 };
 
@@ -46,7 +49,6 @@ export async function populateRecipients(
   filter: PopulateAudienceFilter,
 ): Promise<PopulateResult> {
   const audience: AudienceType = filter.audience || 'all';
-  const source = filter.source || null;
   const testEmails = filter.test_emails || null;
   const result: PopulateResult = {
     candidates: 0,
@@ -106,7 +108,11 @@ export async function populateRecipients(
         result.skippedOptOut++;
         continue;
       }
-      if (audience === 'by_source' && source && c.source !== source) {
+      if (audience === 'customers' && c.source !== 'customer') {
+        result.skippedAudience++;
+        continue;
+      }
+      if (audience === 'newsletter' && c.source !== 'newsletter') {
         result.skippedAudience++;
         continue;
       }
@@ -185,7 +191,7 @@ export async function populateRecipients(
     .from('mailing_campaigns')
     .update({
       total_recipients: result.total,
-      audience_filter: { audience, source, test_emails: testEmails },
+      audience_filter: { audience, test_emails: testEmails },
     })
     .eq('id', campaignId);
 
