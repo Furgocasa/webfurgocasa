@@ -664,7 +664,11 @@ function ContentTab({
   );
   const [busy, setBusy] = useState(false);
   const [logs, setLogs] = useState<LogLine[]>([]);
-  const logEndRef = useRef<HTMLDivElement | null>(null);
+  // Contenedor scrollable de la consola. El autoscroll se hace moviendo
+  // su scrollTop interno — NUNCA con scrollIntoView, porque eso arrastraría
+  // el scroll de toda la página y el usuario no podría hacer scroll vertical
+  // mientras la IA genera.
+  const consoleRef = useRef<HTMLDivElement | null>(null);
   const hasHtml = Boolean(campaign.html_content);
 
   // Edición del asunto en esta misma pestaña (copia local con flag dirty).
@@ -719,8 +723,16 @@ function ContentTab({
       .catch(() => {});
   }, [campaign.id]);
 
+  // Autoscroll de la consola de logs, SOLO dentro del propio contenedor.
+  // Además respetamos al usuario: si ha hecho scroll manual hacia arriba,
+  // no lo forzamos al fondo (solo reengancha si está cerca del final).
   useEffect(() => {
-    logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = consoleRef.current;
+    if (!el) return;
+    const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+    if (distanceFromBottom < 80) {
+      el.scrollTop = el.scrollHeight;
+    }
   }, [logs]);
 
   function pushLog(line: LogLine) {
@@ -994,7 +1006,10 @@ function ContentTab({
         <label className="block text-xs font-medium text-gray-500 mb-1">
           Consola de generación (live)
         </label>
-        <div className="bg-black text-green-200 font-mono text-xs rounded-xl p-4 h-[600px] overflow-auto">
+        <div
+          ref={consoleRef}
+          className="bg-black text-green-200 font-mono text-xs rounded-xl p-4 h-[600px] overflow-auto overscroll-contain"
+        >
           {logs.length === 0 ? (
             <span className="text-green-500/60">
               Consola vacía. Pulsa &quot;{hasHtml ? "Regenerar" : "Generar"} con IA&quot; para
@@ -1020,7 +1035,6 @@ function ContentTab({
               </div>
             ))
           )}
-          <div ref={logEndRef} />
         </div>
         {hasHtml && (
           <p className="text-xs text-gray-400 mt-2">

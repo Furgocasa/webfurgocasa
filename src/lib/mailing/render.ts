@@ -2,9 +2,14 @@
  * Render de plantillas de mailing y utilidades de formato.
  *
  * Placeholders soportados en el HTML de las campañas:
- *   {{NOMBRE}}           → nombre del contacto (fallback: "hola")
+ *   {{NOMBRE}}           → nombre de pila del contacto (fallback: "", se limpia el saludo)
  *   {{CIUDAD}}           → ciudad del contacto (fallback: "")
  *   {{UNSUBSCRIBE_URL}}  → URL única de baja del contacto
+ *
+ * Regla importante: si un contacto no tiene nombre, {{NOMBRE}} se sustituye
+ * por cadena vacía (NO por "hola") y el post-render limpia artefactos como
+ * "Hola ," → "Hola,". Así el saludo queda natural tanto si hay nombre ("Hola
+ * Juan,") como si no ("Hola,") sin depender del prompt.
  */
 
 const MESES_ES = [
@@ -28,6 +33,45 @@ export function renderTemplate(html: string, vars: RenderVars): string {
   for (const [k, v] of Object.entries(vars)) {
     out = out.split(`{{${k}}}`).join(v ?? '');
   }
+  return cleanupEmptyPlaceholderArtifacts(out);
+}
+
+/**
+ * Limpia los artefactos que deja un placeholder vacío en el texto del saludo
+ * o en menciones contextuales. Se aplica con regex deliberadamente conservadoras
+ * para no tocar CSS, atributos HTML ni otras estructuras del documento.
+ *
+ * Casos cubiertos:
+ *   "Hola ,"        → "Hola,"
+ *   "Hola !"        → "Hola!"
+ *   "Hola ."        → "Hola."
+ *   "¡Hola ,"       → "¡Hola,"
+ *   "en ,"          → ","   (p.ej. "nos vemos en {{CIUDAD}},")
+ *   "desde ,"       → ","
+ *   "en tu ciudad ," → "en tu ciudad,"  (no aplica — se queda igual)
+ *
+ * No colapsa dobles espacios genéricos del documento para evitar tocar
+ * markup/estilos; sí colapsa dobles espacios que quedan INMEDIATAMENTE antes
+ * de un signo de puntuación, que casi siempre son un placeholder vacío.
+ */
+function cleanupEmptyPlaceholderArtifacts(html: string): string {
+  let out = html;
+
+  // 1) "Hola <espacios> <puntuación>" → "Hola<puntuación>"
+  //    Cubre tildes/mayúsculas: "Hola", "hola", "¡Hola".
+  out = out.replace(/\bhola[ \t]+([,.!?;:])/gi, (m, p1) => {
+    const start = m.slice(0, 4); // conserva el caso "Hola"/"hola"/"HOLA"
+    return `${start}${p1}`;
+  });
+
+  // 2) Preposiciones sueltas + coma: "en ,", "desde ,", "hacia ,", "para ,".
+  //    Solo si el espacio es >= 1 (así no tocamos casos ya correctos).
+  out = out.replace(/\b(en|desde|hacia|para|hasta|a|por)[ \t]+([,.])/gi, '$2');
+
+  // 3) Dobles espacios JUSTO antes de puntuación (" ," → ",").
+  //    Muy localizado: no se aplica a espacios generales del documento.
+  out = out.replace(/[ \t]{2,}([,.!?;:])/g, '$1');
+
   return out;
 }
 
@@ -49,7 +93,7 @@ export function renderTemplate(html: string, vars: RenderVars): string {
  */
 export function firstName(
   fullName: string | null | undefined,
-  fallback: string = 'hola',
+  fallback: string = '',
 ): string {
   const raw = (fullName || '').trim();
   if (!raw) return fallback;

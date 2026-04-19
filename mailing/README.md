@@ -14,10 +14,11 @@ Esta carpeta contiene **HTML de correos de Furgocasa**, agrupado en tres tipos m
 
 Las campañas de marketing **ya no se envían desde herramientas externas**. Tenemos un sistema completo integrado en la propia app:
 
-- **Panel admin:** `/administrator/mails` · crear/editar campañas, generar HTML con IA (OpenAI gpt-4o-mini), cargar destinatarios desde `marketing_contacts`, envío gradual con cron cada minuto, pausa automática por rate-limit SMTP, panel de bajas RGPD (`/administrator/mails/bajas`).
-- **Tablas Supabase:** `marketing_contacts`, `email_suppressions`, `mailing_campaigns`, `mailing_recipients`, vista `mailing_campaigns_stats`.
-- **Documentación técnica completa:** [`README-SISTEMA-MARKETING.md`](./README-SISTEMA-MARKETING.md). **Esto es lo que hay que leer** para cualquier duda operativa del mailing.
-- **Prompt maestro original del sistema:** [`GUIA_MAILS.md`](./GUIA_MAILS.md) — ya ejecutado; se conserva como referencia exportable a otros proyectos.
+- **Panel admin:** `/administrator/mails` · crear/editar campañas, generar HTML con IA (OpenAI, selector de modelo `gpt-4.1` / `gpt-4o` / `gpt-5.4`), cargar destinatarios desde `marketing_contacts`, envío gradual con cron cada minuto, pausa automática por rate-limit SMTP, botón **"Forzar tick ahora"** para diagnóstico, panel de bajas RGPD (`/administrator/mails/bajas`).
+- **Tablas Supabase:** `marketing_contacts`, `email_suppressions`, `mailing_campaigns` (incluye `tick_lock_at` para lock atómico del cron), `mailing_recipients`, vista `mailing_campaigns_stats`.
+- **Funciones SQL:** `mailing_claim_campaign_tick` / `mailing_release_campaign_tick` (`SECURITY DEFINER`) — lock atómico del cron vía RPC, evita colisiones y problemas de caché de PostgREST.
+- **Documentación técnica completa:** [`README-SISTEMA-MARKETING.md`](./README-SISTEMA-MARKETING.md). **Esto es lo que hay que leer** para cualquier duda operativa del mailing (incluye troubleshooting de Vercel Cron, SMTP, lock y tabla de síntomas/causa/fix).
+- **Prompt maestro original del sistema:** [`GUIA_MAILS.md`](./GUIA_MAILS.md) — ya ejecutado; se conserva como referencia exportable a otros proyectos (incluye ANEXO E · Gotchas de Vercel Cron con lecciones aprendidas en producción).
 
 ⚠️ **El HTML definitivo de cada campaña vive en BD, no en esta carpeta.** Si necesitas editar el HTML de una campaña, hazlo desde el panel admin.
 

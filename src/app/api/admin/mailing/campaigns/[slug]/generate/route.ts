@@ -473,8 +473,8 @@ REQUISITOS TÉCNICOS OBLIGATORIOS DEL HTML:
    USA LITERALMENTE ese image_url en el <img src="...">. Prohibido construir URLs manualmente (ni con Supabase Storage, ni deduciéndolas del slug, ni copiándolas de campañas anteriores). Si image_url es null, NO metas imagen para esa entrada.
    Formato OBLIGATORIO del <img> (aspect ratio garantizado, sin deformación): ponla dentro de un <td align="center"> y escribe <img src="..." alt="..." width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto;">. SIN atributo height numérico — el height:auto del style es lo que mantiene la proporción correcta de la foto en todos los clientes.
 10. Placeholders dinámicos — EXACTAMENTE estos literales, solo en el cuerpo (el footer oficial gestiona los suyos):
-   {{NOMBRE}}  · nombre de pila del contacto (si no hay, se sustituye por "hola")
-   {{CIUDAD}}  · ciudad del contacto (puede venir vacío)
+   {{NOMBRE}}  · nombre de pila del contacto (si no hay, se sustituye por cadena vacía; el sistema limpia automáticamente el espacio sobrante, p.ej. "Hola {{NOMBRE}}," → "Hola," si no hay nombre, o "Hola Juan," si lo hay). Escribe siempre "Hola {{NOMBRE}}," con coma pegada. NO uses "Hola," a secas: siempre que haya saludo, usa el placeholder.
+   {{CIUDAD}}  · ciudad del contacto (puede venir vacía; también se saneará el espacio sobrante si la usas antes de coma o punto)
 11. Todos los href de www.furgocasa.com en https absoluto.
 12. NO incluyas explicaciones, comentarios de JSON ni markdown. Devuelve SOLO el HTML final del email. EXCEPCIÓN: se permiten exactamente DOS comentarios HTML de sistema, y solo esos dos: el comentario inicial <!--FURGOCASA_DESCRIPTION: ...--> y el marcador final <!--FURGOCASA_FOOTER-->. No añadas ningún otro comentario.
 13. Longitud orientativa: suficiente para que el mail se vea rico y bien maquetado, pero sin rellenar por rellenar. NO intentes igualar la longitud de las referencias si eso hace el email más pesado. Si el mail ya comunica bien con menos texto, quédate corto antes que pasarte.
