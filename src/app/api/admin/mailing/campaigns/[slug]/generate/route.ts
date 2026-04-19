@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMailingAdmin } from '@/lib/mailing/auth';
-import { buildMailingContext, stripBrokenMailingVehicleImages } from '@/lib/mailing/context';
+import { buildMailingContext, fixMailingVehicleImages } from '@/lib/mailing/context';
 import { injectCanonicalFooter } from '@/lib/mailing/footer';
 import { sanitizeForOutlook } from '@/lib/mailing/outlook-safe';
 
@@ -356,16 +356,18 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
           return;
         }
 
-        // Red de seguridad: eliminamos <img> que apunten a archivos de
-        // /images/mailing/vehicles/ que no existen en disco (evita X rojas).
-        // Los image_url del contexto siempre apuntan a archivos reales, pero
-        // si la IA copiase una URL obsoleta de una campaña de referencia, la
-        // quitamos antes de guardar.
-        const stripped = stripBrokenMailingVehicleImages(html);
-        html = stripped.html;
-        if (stripped.removed > 0) {
+        // Red de seguridad: corrige o elimina las <img> de
+        // /images/mailing/vehicles/ que apuntan a archivos inexistentes.
+        // Ejemplo real visto en producción: la IA había generado
+        // "fu0019-fu0019-weinsberg-carabus-600-mq.jpg" por duplicar el
+        // prefijo — el helper detecta el código fu0019 y la reemplaza
+        // por el archivo real "fu0019-weinsberg-carabus-600-mq.jpg". Si
+        // no puede identificar el código, elimina la etiqueta entera.
+        const imgFix = fixMailingVehicleImages(html);
+        html = imgFix.html;
+        if (imgFix.fixed > 0 || imgFix.removed > 0) {
           push('status', {
-            message: `Eliminadas ${stripped.removed} imágen(es) de vehículo con URL rota.`,
+            message: `Imágenes de vehículo: ${imgFix.fixed} corregida(s), ${imgFix.removed} eliminada(s).`,
           });
         }
 

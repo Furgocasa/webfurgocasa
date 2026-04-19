@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMailingAdmin } from '@/lib/mailing/auth';
+import { fixMailingVehicleImages } from '@/lib/mailing/context';
 import { firstName, renderTemplate, unsubscribeUrlFor } from '@/lib/mailing/render';
 import { sanitizeForOutlook } from '@/lib/mailing/outlook-safe';
 
@@ -59,11 +60,16 @@ export async function GET(req: NextRequest, ctx: Params) {
     }
   }
 
-  // Aplicamos la sanitización Outlook-safe también en preview para que lo que
-  // se ve en el iframe del admin sea exactamente lo que llegará a Outlook
-  // (aunque el HTML guardado en BD tenga aún restos que un LLM antiguo
-  // hubiera colado: gradientes, background-image, sin bgcolor, etc.).
-  const safeHtml = sanitizeForOutlook(campaign.html_content);
+  // Aplicamos dos capas de saneo sobre el HTML guardado antes de renderizar:
+  //   1. fixMailingVehicleImages: corrige URLs rotas de /images/mailing/vehicles/
+  //      (p.ej. "fu0019-fu0019-weinsberg...jpg" duplicado → archivo real
+  //      "fu0019-weinsberg-carabus-600-mq.jpg"). Así campañas ya guardadas
+  //      con URLs malformadas se ven correctas sin necesidad de regenerar.
+  //   2. sanitizeForOutlook: garantiza que el preview se vea igual que en
+  //      Outlook Desktop (bgcolor auto, sin gradientes ni background-image,
+  //      etc.).
+  const fixedHtml = fixMailingVehicleImages(campaign.html_content).html;
+  const safeHtml = sanitizeForOutlook(fixedHtml);
   const html = renderTemplate(safeHtml, {
     // firstName() recorta a la primera palabra para que el saludo sea
     // cercano ("Hola Julio") en vez de formal ("Hola Julio César Amat de Pérez").

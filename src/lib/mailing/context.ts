@@ -150,37 +150,77 @@ function vehicleMailingImageUrl(
 }
 
 /**
- * Red de seguridad final: elimina del HTML cualquier <img> que apunte a
- * /images/mailing/vehicles/<file> cuyo archivo NO existe en disco.
+ * Red de seguridad final sobre el HTML: corrige o elimina las <img> que
+ * apuntan a /images/mailing/vehicles/<file>.
  *
- * La IA ya tiene los image_url correctos en CONTEXTO_BD, pero si pese a
- * todo ensamblara una URL rota (p.ej. copiándola de una campaña de
- * referencia con un slug obsoleto) la quitamos antes de guardar, así el
- * destinatario nunca ve una X roja de imagen rota.
+ * Orden de decisión para cada <img>:
+ *   1. Si el filename existe en disco → la dejamos tal cual.
+ *   2. Si NO existe pero contiene un prefijo `fuNNNN` reconocible
+ *      (p.ej. "fu0019-fu0019-weinsberg-...jpg" por un error de la IA
+ *      duplicando el prefijo) → reemplazamos la URL por el filename
+ *      real de ese internal_code. La imagen queda correcta.
+ *   3. Si ni existe ni podemos identificar un internal_code válido →
+ *      eliminamos la etiqueta <img> entera para que el destinatario
+ *      no vea una X roja.
  *
- * El resto del HTML (el <td>, el <a>, el texto) se queda intacto — solo
- * eliminamos la etiqueta <img> entera.
+ * Se aplica en:
+ *   · generate/route.ts (tras la respuesta de OpenAI, antes de guardar)
+ *   · preview/route.ts  (al renderizar, para que campañas legacy se vean
+ *     correctamente sin necesidad de regenerar)
+ *   · send.ts           (al enviar mails reales y tests)
  */
-export function stripBrokenMailingVehicleImages(html: string): { html: string; removed: number } {
-  if (!html) return { html, removed: 0 };
-  const available = new Set(getMailingImageMap().values());
-  if (available.size === 0) return { html, removed: 0 };
+export function fixMailingVehicleImages(html: string): {
+  html: string;
+  fixed: number;
+  removed: number;
+} {
+  if (!html) return { html, fixed: 0, removed: 0 };
+  const byCode = getMailingImageMap();
+  const available = new Set(byCode.values());
+  if (byCode.size === 0) return { html, fixed: 0, removed: 0 };
 
+  let fixed = 0;
   let removed = 0;
-  // Matchea <img ...> con src apuntando a /images/mailing/vehicles/<fichero>.ext
-  // Con o sin dominio delante. Ignora otras rutas de /images/mailing/ (logo,
-  // iconos sociales, etc.) — esas las inyectamos nosotros y son siempre OK.
-  const IMG_RE =
-    /<img\b[^>]*\bsrc\s*=\s*["'][^"']*\/images\/mailing\/vehicles\/([^"'?#]+)["'][^>]*>/gi;
 
-  const out = html.replace(IMG_RE, (match, file: string) => {
-    const basename = file.split('/').pop() || file;
+  // Matchea la etiqueta <img ... src="..." ...> completa. La URL puede ser
+  // relativa o absoluta (cualquier dominio), lo que importa es la parte
+  // /images/mailing/vehicles/<basename>.
+  const IMG_RE =
+    /<img\b[^>]*?\bsrc\s*=\s*["']([^"']*\/images\/mailing\/vehicles\/[^"'?#]+)["'][^>]*>/gi;
+
+  const out = html.replace(IMG_RE, (match, urlRaw: string) => {
+    const beforeBasename = urlRaw.slice(0, urlRaw.lastIndexOf('/') + 1);
+    const basename = urlRaw.split('/').pop()!.split('?')[0];
+
     if (available.has(basename)) return match;
+
+    // Buscar el primer internal_code `fuNNNN` dentro del filename roto.
+    const codeMatch = basename.toLowerCase().match(/fu\d{4,}/);
+    if (codeMatch) {
+      const realFile = byCode.get(codeMatch[0]);
+      if (realFile) {
+        fixed += 1;
+        const fixedUrl = `${beforeBasename}${realFile}`;
+        return match.replace(urlRaw, fixedUrl);
+      }
+    }
+
+    // Sin pistas: mejor quitar la <img> que dejarla rota.
     removed += 1;
     return '';
   });
 
-  return { html: out, removed };
+  return { html: out, fixed, removed };
+}
+
+/**
+ * Alias por compatibilidad con el import anterior, que solo contemplaba
+ * la eliminación. Sigue devolviendo `removed` (suma corregidas +
+ * eliminadas como "sanadas") para no romper callers existentes.
+ */
+export function stripBrokenMailingVehicleImages(html: string): { html: string; removed: number } {
+  const r = fixMailingVehicleImages(html);
+  return { html: r.html, removed: r.removed + r.fixed };
 }
 
 function vehicleDetailUrl(slug: string | null | undefined): string {

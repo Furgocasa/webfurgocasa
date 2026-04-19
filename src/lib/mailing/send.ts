@@ -4,6 +4,7 @@
 import type { Transporter } from 'nodemailer';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { looksLikeRateLimitError, loadSmtpConfig } from './transport';
+import { fixMailingVehicleImages } from './context';
 import { firstName, renderTemplate, unsubscribeUrlFor } from './render';
 import { sanitizeForOutlook } from './outlook-safe';
 
@@ -52,9 +53,13 @@ export async function renderCampaignHtmlFor(
 ): Promise<{ html: string; unsubscribeUrl: string }> {
   const { token } = await resolveContactOptOut(sb, r.contact_id);
   const unsubscribeUrl = unsubscribeUrlFor(token);
+  // Antes de sanear Outlook, corregimos URLs rotas de
+  // /images/mailing/vehicles/ en campañas legacy (p.ej. filenames con
+  // prefijo duplicado que generaba la IA antes del grounding).
+  const withFixedImgs = fixMailingVehicleImages(campaign.html_content).html;
   // Sanitizamos también aquí por si el HTML guardado tiene restos no
   // Outlook-safe (gradientes, background-image, <td> sin bgcolor, etc.).
-  const safe = sanitizeForOutlook(campaign.html_content);
+  const safe = sanitizeForOutlook(withFixedImgs);
   const html = renderTemplate(safe, {
     NOMBRE: firstName(r.nombre),
     CIUDAD: r.ciudad || '',
@@ -105,8 +110,10 @@ export async function sendOneRecipient(
 
   const unsubscribeUrl = unsubscribeUrlFor(token);
   // Doble capa de seguridad: aunque el generador ya sanee al guardar, aquí
-  // volvemos a sanear antes de enviar. Es idempotente y barato.
-  const safeHtml = sanitizeForOutlook(campaign.html_content);
+  // volvemos a sanear antes de enviar. Es idempotente y barato. También
+  // corregimos URLs rotas de /images/mailing/vehicles/ de campañas legacy.
+  const withFixedImgs = fixMailingVehicleImages(campaign.html_content).html;
+  const safeHtml = sanitizeForOutlook(withFixedImgs);
   const html = renderTemplate(safeHtml, {
     NOMBRE: firstName(recipient.nombre),
     CIUDAD: recipient.ciudad || '',
@@ -167,8 +174,10 @@ export async function sendTestEmail(
   const { token } = await resolveContactOptOut(sb, opts.contactId || null);
   const unsubscribeUrl = unsubscribeUrlFor(token);
   // Sanitize antes de renderizar — así el test llega a Outlook igual que el
-  // envío masivo real (con bgcolor auto-añadido, sin gradientes, etc.).
-  const safeHtml = sanitizeForOutlook(opts.html_content);
+  // envío masivo real (con bgcolor auto-añadido, sin gradientes, URLs de
+  // vehículos corregidas, etc.).
+  const withFixedImgs = fixMailingVehicleImages(opts.html_content).html;
+  const safeHtml = sanitizeForOutlook(withFixedImgs);
   const html = renderTemplate(safeHtml, {
     NOMBRE: firstName(opts.nombre),
     CIUDAD: opts.ciudad || '',
