@@ -572,6 +572,30 @@ export type Database = {
         }
         Relationships: []
       }
+      email_suppressions: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          reason: string | null
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          reason?: string | null
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          reason?: string | null
+          source?: string
+        }
+        Relationships: []
+      }
       equipment: {
         Row: {
           category: string | null
@@ -852,6 +876,219 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: []
+      }
+      mailing_campaigns: {
+        Row: {
+          archived_at: string | null
+          audience_filter: Json | null
+          batch_size_per_tick: number
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          failed_count: number
+          generation_prompt: string | null
+          generation_reference_ids: string[] | null
+          html_content: string | null
+          id: string
+          is_paused: boolean
+          last_tick_at: string | null
+          last_tick_note: string | null
+          max_per_hour: number
+          number: number | null
+          sent_count: number
+          skipped_count: number
+          slug: string
+          started_at: string | null
+          status: string
+          subject: string
+          template_file: string | null
+          total_recipients: number
+        }
+        Insert: {
+          archived_at?: string | null
+          audience_filter?: Json | null
+          batch_size_per_tick?: number
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          failed_count?: number
+          generation_prompt?: string | null
+          generation_reference_ids?: string[] | null
+          html_content?: string | null
+          id?: string
+          is_paused?: boolean
+          last_tick_at?: string | null
+          last_tick_note?: string | null
+          max_per_hour?: number
+          number?: number | null
+          sent_count?: number
+          skipped_count?: number
+          slug: string
+          started_at?: string | null
+          status?: string
+          subject: string
+          template_file?: string | null
+          total_recipients?: number
+        }
+        Update: {
+          archived_at?: string | null
+          audience_filter?: Json | null
+          batch_size_per_tick?: number
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          failed_count?: number
+          generation_prompt?: string | null
+          generation_reference_ids?: string[] | null
+          html_content?: string | null
+          id?: string
+          is_paused?: boolean
+          last_tick_at?: string | null
+          last_tick_note?: string | null
+          max_per_hour?: number
+          number?: number | null
+          sent_count?: number
+          skipped_count?: number
+          slug?: string
+          started_at?: string | null
+          status?: string
+          subject?: string
+          template_file?: string | null
+          total_recipients?: number
+        }
+        Relationships: []
+      }
+      mailing_recipients: {
+        Row: {
+          campaign_id: string
+          ciudad: string | null
+          clicked_at: string | null
+          contact_id: string | null
+          created_at: string
+          email: string
+          failed_reason: string | null
+          id: string
+          message_id: string | null
+          nombre: string | null
+          opened_at: string | null
+          sent_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_id: string
+          ciudad?: string | null
+          clicked_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          email: string
+          failed_reason?: string | null
+          id?: string
+          message_id?: string | null
+          nombre?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          ciudad?: string | null
+          clicked_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          email?: string
+          failed_reason?: string | null
+          id?: string
+          message_id?: string | null
+          nombre?: string | null
+          opened_at?: string | null
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mailing_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mailing_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mailing_recipients_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "mailing_campaigns_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mailing_recipients_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "marketing_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      marketing_contacts: {
+        Row: {
+          city: string | null
+          created_at: string
+          customer_id: string | null
+          email: string
+          id: string
+          locale: string
+          marketing_opt_in_at: string
+          marketing_opt_out_at: string | null
+          marketing_opt_out_reason: string | null
+          marketing_opt_out_token: string
+          name: string | null
+          notes: string | null
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          customer_id?: string | null
+          email: string
+          id?: string
+          locale?: string
+          marketing_opt_in_at?: string
+          marketing_opt_out_at?: string | null
+          marketing_opt_out_reason?: string | null
+          marketing_opt_out_token?: string
+          name?: string | null
+          notes?: string | null
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          customer_id?: string | null
+          email?: string
+          id?: string
+          locale?: string
+          marketing_opt_in_at?: string
+          marketing_opt_out_at?: string | null
+          marketing_opt_out_reason?: string | null
+          marketing_opt_out_token?: string
+          name?: string | null
+          notes?: string | null
+          source?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "marketing_contacts_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       media: {
         Row: {
@@ -2002,6 +2239,42 @@ export type Database = {
       }
     }
     Views: {
+      mailing_campaigns_stats: {
+        Row: {
+          archived_at: string | null
+          audience_filter: Json | null
+          batch_size_per_tick: number | null
+          bounced: number | null
+          completed_at: string | null
+          created_at: string | null
+          description: string | null
+          failed: number | null
+          failed_count: number | null
+          generation_prompt: string | null
+          generation_reference_ids: string[] | null
+          has_html: boolean | null
+          id: string | null
+          is_paused: boolean | null
+          last_tick_at: string | null
+          last_tick_note: string | null
+          max_per_hour: number | null
+          number: number | null
+          pending: number | null
+          recipients: number | null
+          sent: number | null
+          sent_count: number | null
+          skipped_count: number | null
+          skipped_no_email: number | null
+          skipped_opt_out: number | null
+          slug: string | null
+          started_at: string | null
+          status: string | null
+          subject: string | null
+          template_file: string | null
+          total_recipients: number | null
+        }
+        Relationships: []
+      }
       vehicles_ordered: {
         Row: {
           base_price_per_day: number | null
