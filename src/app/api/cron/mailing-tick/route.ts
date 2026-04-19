@@ -242,21 +242,15 @@ export async function runTickOnce(): Promise<TickSummary> {
 
   const t = buildTransport();
   const results: TickResult[] = [];
-  const LOCK_STALE_MS = 5 * 60_000;
   for (const c of campaigns as CampaignRow[]) {
-    const now = new Date();
-    const staleCutoff = new Date(now.getTime() - LOCK_STALE_MS).toISOString();
-
-    const { data: lockRows, error: lockErr } = await sb
-      .from('mailing_campaigns')
-      .update({ tick_lock_at: now.toISOString() })
-      .eq('id', c.id)
-      .or(`tick_lock_at.is.null,tick_lock_at.lt.${staleCutoff}`)
-      .select('id');
+    // Lock vía RPC (SQL en el servidor): evita errores REST del estilo
+    // "column tick_lock_at does not exist" cuando PostgREST lleva el esquema
+    // desfasado respecto a Postgres. Requiere migración 20260421.
+    const { data: claimed, error: lockErr } = await sb.rpc('mailing_claim_campaign_tick', {
+      p_campaign_id: c.id,
+    });
 
     if (lockErr) {
-      // Nota: si el error es 'column "tick_lock_at" does not exist' significa
-      // que falta aplicar la migración 20260420-mailing-tick-lock.sql.
       results.push({
         slug: c.slug,
         attempted: 0,
@@ -268,7 +262,7 @@ export async function runTickOnce(): Promise<TickSummary> {
       });
       continue;
     }
-    if (!lockRows || lockRows.length === 0) {
+    if (claimed !== true) {
       results.push({
         slug: c.slug,
         attempted: 0,
@@ -302,10 +296,12 @@ export async function runTickOnce(): Promise<TickSummary> {
         })
         .eq('id', c.id);
     } finally {
-      await sb
-        .from('mailing_campaigns')
-        .update({ tick_lock_at: null })
-        .eq('id', c.id);
+      const { error: relErr } = await sb.rpc('mailing_release_campaign_tick', {
+        p_campaign_id: c.id,
+      });
+      if (relErr) {
+        console.error('[mailing-tick] mailing_release_campaign_tick failed', c.slug, relErr);
+      }
     }
   }
 

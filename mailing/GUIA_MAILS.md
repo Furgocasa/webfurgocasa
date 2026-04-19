@@ -6,13 +6,13 @@
 >
 > Durante la ejecución se adaptaron nombres, dominios, tabla de destinatarios y placeholders a Furgocasa. Los archivos resultantes viven en:
 >
-> - `src/lib/mailing/` · librerías (transport, render, audience, send, auth)
-> - `src/app/api/admin/mailing/*` · 15 rutas admin
-> - `src/app/api/cron/mailing-tick/route.ts` · cron cada minuto
+> - `src/lib/mailing/` · librerías (transport, render, audience, send, auth, **context** [grounding IA], **footer**, **outlook-safe** [saneado HTML])
+> - `src/app/api/admin/mailing/*` · rutas admin (campaigns CRUD + generate SSE + preview + send-test + populate-recipients + start/pause/resume/retry-failed/archive + recipients + **tick-now** [diagnóstico] + references + contacts-search + suppressions)
+> - `src/app/api/cron/mailing-tick/route.ts` · cron cada minuto (con **lock atómico** `tick_lock_at` y watchdog de 5 min)
 > - `src/app/api/unsubscribe/route.ts` · endpoint público RGPD (3 modos, bilingüe)
-> - `src/app/administrator/(protected)/mails/*` · panel admin
-> - `supabase/migrations/20260419-*.sql` · 2 migraciones
-> - Tablas `marketing_contacts`, `email_suppressions`, `mailing_campaigns`, `mailing_recipients` + vista `mailing_campaigns_stats`
+> - `src/app/administrator/(protected)/mails/*` · panel admin (4 pestañas + **botón "Forzar tick ahora"** para diagnóstico)
+> - `supabase/migrations/20260419-*.sql` + `20260420-mailing-tick-lock.sql` (columna `tick_lock_at`) + **`20260421-mailing-tick-lock-rpc.sql`** (funciones `mailing_claim_campaign_tick` / `mailing_release_campaign_tick` para tomar/soltar el lock vía `rpc()` y evitar fallos REST de PostgREST sobre columnas nuevas).
+> - Tablas `marketing_contacts`, `email_suppressions`, `mailing_campaigns` (+ `tick_lock_at`), `mailing_recipients` + vista `mailing_campaigns_stats`
 >
 > ### 📖 Para usar el sistema en Furgocasa, lee:
 >
@@ -28,6 +28,9 @@
 > - Dominio: **`https://www.furgocasa.com`**. Remitente: **`reservas@furgocasa.com`**.
 > - Imágenes en `public/images/mailing/` (iconos sociales) y `public/images/brand/` (logo).
 > - Prefijo de migraciones por fecha: `supabase/migrations/YYYYMMDD-*.sql`.
+> - **IA generadora:** selector en el panel con `gpt-4.1` (default) · `gpt-4o` · `gpt-5.4`. Configurable también vía `OPENAI_MAILING_MODEL`. El `SYSTEM_PROMPT` incluye "Manifiesto" (6 reglas de oro), grounding con `CONTEXTO_BD` (ofertas/posts/flota reales + precios pre-calculados en €), reglas de clicabilidad, formato europeo `1.111,11 €`, patrón Outlook-safe de tarjetas, presupuesto de densidad visual y auto-generación de `<!--FURGOCASA_DESCRIPTION-->` para el listado admin.
+> - **Cron con lock atómico** (`tick_lock_at`): el tick llama a `mailing_claim_campaign_tick(uuid)` (RPC) que hace el UPDATE condicional en Postgres; al terminar, `mailing_release_campaign_tick(uuid)`. Watchdog 5 min. Requiere `20260420` + `20260421`.
+> - **Botón "Forzar tick ahora"** en la pestaña Envío: dispara manualmente `runTickOnce()` bajo guard admin y muestra la respuesta cruda del servidor (summary + estado antes/después) para diagnosticar por qué una campaña no avanza sin tener que mirar los logs de Vercel.
 >
 > ### 💡 Para qué sirve ahora este archivo
 >
@@ -1391,6 +1394,114 @@ export async function POST(req: Request) {
 6. **"RLS me impide leer mailing_campaigns desde el panel"** → las route handlers deben usar `createAdminSupabase()` (service_role), nunca el cliente normal de Supabase.
 7. **"ON CONFLICT no me funciona en mailing_recipients"** → el índice único es **parcial** (`WHERE center_id IS NOT NULL`). No sirve para `ON CONFLICT`. Dedupe manual en `populateRecipients`.
 8. **"El admin se está mensajeando a sí mismo en el chat de soporte"** → ocultar el widget público para usuarios con role='admin'. (Fuera de scope de este prompt, pero es el patrón general: rol al shell, render condicional.)
+9. **"column tick_lock_at does not exist" en REST pero el SELECT en SQL Editor sí la ve** → PostgREST desfasado o bug de capa REST: aplicar `20260421-mailing-tick-lock-rpc.sql` y usar `rpc()` en el cron (ver ANEXO E.3).
+
+---
+
+## ANEXO E · Gotchas de Vercel Cron (lecciones aprendidas)
+
+Apartado añadido en abril 2026 tras ver en producción cómo un `* * * * *` puede no enviar un solo correo. Guarda esto junto al prompt porque te evitará horas de debugging la próxima vez que repliques el sistema.
+
+### E.1 · Plan Hobby → los crons NO corren cada minuto
+
+Vercel limita la frecuencia de los crons según el plan:
+
+- **Hobby**: máximo **1 ejecución al día** por cron job. Aunque pongas `* * * * *`, Vercel lo trata como si fuera `0 0 * * *` (o directamente no lo dispara).
+- **Pro**: permite granularidad por minuto.
+
+Síntoma: campaña en `status='sending'`, 760 pending, 0 enviados, nunca cambia.
+
+Opciones:
+
+1. **Pasar a Pro** (~20 $/mes). Recomendado si el negocio depende del mailing.
+2. **Cron externo gratuito**: crear una cuenta en [cron-job.org](https://cron-job.org) o [EasyCron](https://www.easycron.com) y programar una petición HTTPS cada minuto:
+   - URL: `https://<tu-dominio>/api/cron/mailing-tick`
+   - Método: `GET` o `POST`
+   - Header: `Authorization: Bearer <CRON_SECRET>`
+   - Tiempo máximo de ejecución: 60 s
+3. **Empujar manualmente** con el botón "Forzar tick ahora" del panel cuando lances una campaña (aceptable para volúmenes puntuales).
+
+Cómo verificar qué plan tienes y si el cron corre: Vercel → proyecto → **Observability / Logs** → filtro `mailing-tick` en la última hora. Si no ves invocaciones, no está corriendo.
+
+### E.2 · `CRON_SECRET` debe estar en Vercel Production, no solo en `.env.local`
+
+El `.env.local` solo aplica al servidor de desarrollo. En producción, el valor tiene que estar dado de alta en **Settings → Environment Variables → Production**.
+
+Después de añadirlo (o cambiarlo) **necesitas redeploy** — las env vars no se inyectan caliente al deployment existente. Vercel → Deployments → último deploy → "Redeploy".
+
+Además, nuestro handler solo exige el header `Authorization: Bearer $CRON_SECRET` si la env var está definida. Un `CRON_SECRET` vacío en Vercel + llamadas desde Vercel Cron → 200 sin auth (funciona, pero inseguro). Un `CRON_SECRET` definido + llamadas externas sin el header → 401 y el cron no hace nada.
+
+### E.3 · Lock atómico `tick_lock_at` — dos migraciones (columna + RPC)
+
+Cuando una campaña grande tarda >60 s en procesarse, el siguiente tick arranca antes de que termine el anterior → dos procesos envían la misma fila `pending` → correo duplicado.
+
+1. **`20260420-mailing-tick-lock.sql`**: añade la columna `tick_lock_at TIMESTAMPTZ NULL` + índice parcial.
+2. **`20260421-mailing-tick-lock-rpc.sql`**: crea `mailing_claim_campaign_tick(uuid)` → `boolean` y `mailing_release_campaign_tick(uuid)` → `void` (`SECURITY DEFINER`, `GRANT` solo a `service_role`). El cron las invoca con `supabase.rpc()` en lugar de `UPDATE ... .or(...)` por REST.
+
+**Por qué el paso 2 existe:** en producción vimos el error REST `column mailing_campaigns.tick_lock_at does not exist` **aunque** `information_schema` y el SQL Editor mostraban la columna en Postgres. Suele ser caché / capa REST de PostgREST. Las funciones ejecutan SQL puro en el servidor y el problema desaparece.
+
+**Si falta la 20260420**, el RPC fallará al compilar o al ejecutar (columna inexistente en la tabla).
+
+**Si falta la 20260421**, el código desplegado devolverá algo tipo *function public.mailing_claim_campaign_tick does not exist* → aplicar esa migración en Supabase y redeploy si hace falta.
+
+### E.4 · Botón "Forzar tick ahora" — salida de emergencia y diagnóstico
+
+Endpoint admin `POST /api/admin/mailing/campaigns/[slug]/tick-now` que invoca `runTickOnce()` bajo guard admin (exportado desde `src/app/api/cron/mailing-tick/route.ts`). Devuelve:
+
+```json
+{
+  "ok": true,
+  "summary": { "active": N, "results": [{ slug, attempted, sent, failed, skipped, rateLimited, note }] },
+  "forThisCampaign": { ... },
+  "stateBefore": { status, is_paused, tick_lock_at, last_tick_at, last_tick_note, ... },
+  "stateAfter":  { ... }
+}
+```
+
+Leer el campo `results[].note` o los `error` del summary diagnostica casi cualquier problema en ≤ 5 segundos:
+
+| Mensaje en `note` / `error` | Causa | Solución |
+|---|---|---|
+| `Faltan SMTP_HOST / SMTP_USER / SMTP_PASSWORD` | SMTP no configurado en Vercel Production | Añadir vars + redeploy |
+| `column ... tick_lock_at does not exist` (REST antiguo) | PostgREST desfasado o migración 20260420 no aplicada | Aplicar `20260420` + `20260421` en Supabase; el código actual usa RPC |
+| `mailing_claim_campaign_tick ... does not exist` | Falta migración 20260421 | Ejecutar `20260421-mailing-tick-lock-rpc.sql` en el SQL Editor |
+| `active: 0, results: []` | Campaña no en `status='sending'` o `is_paused=true` | Pulsar "Lanzar" o "Reanudar" |
+| `cupo horario lleno: X/Y` | Tope `max_per_hour` consumido en la última hora | Esperar o subir `max_per_hour` |
+| `sin html_content` | Se lanzó una campaña sin generar el HTML | Ir a Contenido y generar |
+| `rate-limit SMTP: ...` | OVH / proveedor cortó el envío | Esperar ≥60 min y Reanudar |
+
+### E.5 · Verificación rápida de salud del mailing
+
+Checklist express en Supabase SQL Editor cuando algo no va:
+
+```sql
+-- 1. ¿Está la columna del lock?
+SELECT column_name FROM information_schema.columns
+WHERE table_name='mailing_campaigns' AND column_name='tick_lock_at';
+
+-- 2. Estado de la campaña problemática
+SELECT slug, status, is_paused, tick_lock_at, last_tick_at, last_tick_note,
+       sent_count, failed_count, skipped_count, total_recipients
+FROM mailing_campaigns ORDER BY created_at DESC LIMIT 5;
+
+-- 3. ¿Hay pending reales?
+SELECT status, COUNT(*) FROM mailing_recipients
+WHERE campaign_id='<id>' GROUP BY status;
+
+-- 4. ¿Se han enviado correos en los últimos 5 min (señal de que el cron tira)?
+SELECT COUNT(*) FROM mailing_recipients
+WHERE status='sent' AND sent_at > now() - interval '5 minutes';
+```
+
+### E.6 · Timings realistas de envío
+
+Con la config por defecto `max_per_hour=150` y `batch_size_per_tick=3`:
+
+- Ritmo efectivo: **~150 correos/hora** (≈ 2,5/min) aunque el cron corra por minuto (el tope horario se impone).
+- 760 destinatarios → **~5 h 4 min** para completarse.
+- 2.000 destinatarios → **~13 h 20 min**.
+
+Si necesitas ir más rápido: subir `max_per_hour` (hasta el límite que soporte tu SMTP — OVH: NO pasar de 200/h por buzón o te cortará), y subir `batch_size_per_tick` hasta 10-20 para aprovechar cada tick. Nunca lanzar en un solo buzón >200/h: habilita un segundo buzón si necesitas más volumen.
 
 ---
 

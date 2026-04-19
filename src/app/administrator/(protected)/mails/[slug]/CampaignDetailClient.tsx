@@ -1843,9 +1843,15 @@ function SendTab({
               Pistas comunes:
               <br />
               <strong>· &quot;column tick_lock_at does not exist&quot;</strong>:
-              falta aplicar la migración{" "}
-              <code>supabase/migrations/20260420-mailing-tick-lock.sql</code> en
-              Supabase.
+              aplica en Supabase{" "}
+              <code>20260420-mailing-tick-lock.sql</code> y{" "}
+              <code>20260421-mailing-tick-lock-rpc.sql</code> (el código usa RPC
+              para el lock y evita fallos REST de PostgREST). Luego en SQL Editor:{" "}
+              <code>NOTIFY pgrst, &apos;reload schema&apos;;</code>
+              <br />
+              <strong>· &quot;mailing_claim_campaign_tick&quot; no existe</strong>:
+              falta solo la migración{" "}
+              <code>20260421-mailing-tick-lock-rpc.sql</code>.
               <br />
               <strong>· &quot;Faltan SMTP_*&quot;</strong>: configura
               <code> SMTP_HOST / SMTP_USER / SMTP_PASSWORD </code>
