@@ -91,6 +91,30 @@ Ejemplo CORRECTO:
 · Comentarios condicionales MSO: si el HTML necesita ajustes concretos para Outlook, envuélvelos en <!--[if mso]>...<![endif]-->. Opcional pero recomendado para <meta>/reset.
 · mso-line-height-rule: en bloques con line-height crítica (hero, titulares grandes), añade "mso-line-height-rule:exactly;" en el style. Ejemplo: style="font-size:32px;line-height:40px;mso-line-height-rule:exactly;".
 
+REGLA DE ALINEACIÓN Y ASPECT RATIO (INNEGOCIABLE):
+
+Centrado general: el mail entero debe verse centrado horizontalmente, tanto en escritorio como en móvil. Nada pegado al borde izquierdo.
+· La <table> principal (wrapper de 600px) SIEMPRE lleva align="center" y style="margin:0 auto;max-width:600px;".
+· Cada <td> que contiene una IMAGEN lleva align="center" (atributo HTML, no solo CSS) — esto es obligatorio para Outlook.
+· Cada <td> que contiene el HERO, el CTA principal, o un bloque "destacado" lleva align="center" + text-align:center en el style.
+· Los títulos grandes (<h1>, <h2>), subtítulos, y el texto bajo el CTA van centrados por defecto (text-align:center).
+· Los párrafos del CUERPO de lectura (3-5 líneas seguidas) y los ítems de una lista SÍ pueden ir alineados a la izquierda (text-align:left) para máxima legibilidad — es la única excepción. Título del bloque sigue siendo centrado.
+· Los párrafos cortos que acompañan una imagen o un CTA van centrados.
+· Si quieres un pie de foto o un dato destacado alineado a la derecha dentro de su celda, es válido siempre y cuando esté DENTRO de su <td> (nunca se sale del ancho de la tabla). Usa text-align:right solo puntualmente, nunca para bloques largos.
+
+Aspect ratio (INNEGOCIABLE): las imágenes NUNCA se deforman, ni se estiran, ni se aplastan.
+· En <img> pon SOLO el atributo HTML width (en píxeles). NUNCA pongas un atributo HTML height numérico junto con width, porque si la proporción no coincide con la imagen real, se deforma en Outlook. Si necesitas height por algún motivo extraordinario, usa height="auto".
+· En el style pon width:100%;max-width:<N>px;height:auto;display:block;border:0;. El height:auto es CRÍTICO: garantiza que el cliente calcule el alto manteniendo la proporción original del archivo.
+· Para centrar la imagen dentro de su celda: el <td> padre con align="center" y, opcionalmente, margin:0 auto en el <img> style.
+· Prohibido: width y height numéricos que no coincidan con la imagen real; height sin auto combinado con width:100%; object-fit/object-position (Outlook no los soporta); cualquier transform para reescalar.
+· Cuando la imagen sea muy ancha y quieras limitar ancho, hazlo con max-width en px y height:auto, jamás capando con height fijo.
+
+Autoverificación: antes de entregar, revisa cada <img>. Debe cumplir:
+  ✓ width="<Npx>" (atributo HTML)
+  ✗ SIN height="<Mpx>" (o con height="auto")
+  ✓ style incluye display:block; width:100%; max-width:<N>px; height:auto; border:0;
+  ✓ el <td> padre tiene align="center"
+
 PATRONES OUTLOOK-SAFE OBLIGATORIOS:
 
 1) Reset mínimo en <head> (copia tal cual dentro de <style>):
@@ -120,10 +144,21 @@ PATRONES OUTLOOK-SAFE OBLIGATORIOS:
 
 4) Caja destacada (checklist, "qué incluye"): fondo sólido claro (#f8fafc, #fef3c7, #ecfdf5 o similar) y texto oscuro. Cada ítem en su <tr> con un emoji Unicode al principio de la primera celda. Sin grids, solo tablas.
 
-5) Foto de vehículo: SIEMPRE <img> con atributos width y height en px, style display:block, border:0. Radius 0 (Outlook lo ignora igualmente).
-   <img src="https://www.furgocasa.com/images/mailing/vehicles/fu0006-dreamer-fun-d55.jpg" alt="Dreamer Fun D55" width="560" height="373" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+5) Foto de vehículo: SIEMPRE <img> con atributo width en px (sin height), style display:block, height:auto, border:0, y el <td> padre con align="center". JAMÁS pongas un height numérico: si lo fuerzas y no coincide con la proporción real de la foto, la imagen sale ESTIRADA o aplastada en Outlook. Con width + height:auto el cliente calcula el alto correcto manteniendo aspect ratio.
+   <td align="center" style="padding:0;">
+     <img src="https://www.furgocasa.com/images/mailing/vehicles/fu0006-dreamer-fun-d55.jpg" alt="Dreamer Fun D55" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto;">
+   </td>
 
 6) Espaciadores verticales: usa <tr><td style="font-size:0;line-height:0;height:24px;">&nbsp;</td></tr> — NO uses margin para separar bloques, Outlook los ignora.
+
+7) Centrado general (OBLIGATORIO): la tabla principal del mail va centrada con align="center" y margin:0 auto; y cada <td> con una imagen incluye align="center". Así todo el contenido queda centrado en pantallas grandes en vez de pegado a la izquierda.
+   <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" align="center" style="margin:0 auto;max-width:600px;">
+     <tr>
+       <td align="center" style="padding:0;">
+         <!-- contenido -->
+       </td>
+     </tr>
+   </table>
 
 AUTOCOMPROBACIÓN ANTES DE DEVOLVER:
 Antes de emitir el HTML, revísalo mentalmente y asegúrate de que NO CONTIENE ninguna de estas subcadenas:
@@ -170,7 +205,7 @@ REQUISITOS TÉCNICOS OBLIGATORIOS DEL HTML:
      · CONTEXTO_BD.fleet[i].image_url           (foto de cada modelo de la flota)
      · CONTEXTO_BD.posts[i].image_url           (foto del artículo del blog)
    USA LITERALMENTE ese image_url en el <img src="...">. Prohibido construir URLs manualmente (ni con Supabase Storage, ni deduciéndolas del slug, ni copiándolas de campañas anteriores). Si image_url es null, NO metas imagen para esa entrada.
-   Formato recomendado del <img>: width="560" style="display:block;width:100%;max-width:560px;height:auto;border-radius:12px 12px 0 0;border:0;".
+   Formato OBLIGATORIO del <img> (aspect ratio garantizado, sin deformación): ponla dentro de un <td align="center"> y escribe <img src="..." alt="..." width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;margin:0 auto;">. SIN atributo height numérico — el height:auto del style es lo que mantiene la proporción correcta de la foto en todos los clientes.
 10. Placeholders dinámicos — EXACTAMENTE estos literales, solo en el cuerpo (el footer oficial gestiona los suyos):
    {{NOMBRE}}  · nombre de pila del contacto (si no hay, se sustituye por "hola")
    {{CIUDAD}}  · ciudad del contacto (puede venir vacío)
