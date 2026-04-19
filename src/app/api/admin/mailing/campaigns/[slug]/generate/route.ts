@@ -279,6 +279,17 @@ ESTRUCTURA MÍNIMA OBLIGATORIA (en este orden):
 10. MARCADOR DE FOOTER: coloca EXACTAMENTE este comentario HTML literal justo antes de </body>:  <!--FURGOCASA_FOOTER-->
     NO escribas tú ningún footer: logo de cierre, iconos de redes, dirección postal, teléfono, email, enlace de baja ni copyright.
     El sistema sustituirá ese marcador por el footer oficial de Furgocasa (logo blanco sobre fondo azul, iconos blancos Instagram/Facebook, dirección real, contacto real, baja con {{UNSUBSCRIBE_URL}} y copyright del año actual). Si escribes un footer por tu cuenta, contradecirás al footer oficial y el mail saldrá mal.
+11. RESUMEN INTERNO (OBLIGATORIO, primera línea del output): antes del <!doctype html>, como PRIMERA línea absoluta del output, emite EXACTAMENTE un comentario HTML con un resumen interno de la campaña, en este formato literal:
+    <!--FURGOCASA_DESCRIPTION: [texto]-->
+    Reglas del texto:
+    · 1-2 frases, máximo 240 caracteres (incluyendo espacios).
+    · En español, tono neutro, pensado para un admin que ojea un listado de campañas y necesita recordar en 2 segundos de qué iba esta. NO es para el destinatario final.
+    · Menciona los elementos concretos del mail: modelos de vehículos que publica, nº de ofertas, descuento máximo, fechas relevantes, códigos promocionales si los hay, bloques de blog si los hay.
+    · Ejemplos válidos:
+      <!--FURGOCASA_DESCRIPTION: 4 ofertas de última hora con descuentos del 15-25% (Weinsberg Carabus, Dreamer Fun D55, Dethleffs Globetrail, Knaus Boxstar) + 2 últimos artículos del blog.-->
+      <!--FURGOCASA_DESCRIPTION: Campaña de bienvenida al verano con código EARLYSUMMER2026 (-15%). Destaca la flota premium y la ruta del norte.-->
+    · NO incluyas comillas dobles ni saltos de línea dentro del marcador.
+    · Si no emites este marcador, el mail no queda bien catalogado en el panel. Es obligatorio.
 
 REQUISITOS TÉCNICOS OBLIGATORIOS DEL HTML:
 1. <!doctype html>, estructura con tablas (no flex/grid), CSS inline en cada etiqueta crítica.
@@ -483,6 +494,26 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
           return;
         }
 
+        // Extraemos el marcador <!--FURGOCASA_DESCRIPTION: ...--> que la IA
+        // emite al inicio del HTML (regla 11 del SYSTEM_PROMPT). Es un
+        // resumen interno 1-2 frases para el admin, NO se envía al
+        // destinatario: tras leerlo lo borramos del HTML y lo guardamos en
+        // marketing_campaigns.description para que salga en el listado
+        // "/administrator/mails" debajo del asunto de cada campaña.
+        let description: string | null = null;
+        const descMatch = html.match(/<!--\s*FURGOCASA_DESCRIPTION:\s*([\s\S]*?)\s*-->/i);
+        if (descMatch) {
+          const raw = descMatch[1].trim();
+          // Saneamos: quitamos saltos, colapsamos espacios y acotamos a 280
+          // caracteres (el SYSTEM_PROMPT pide ≤240, pero dejamos margen por
+          // si la IA se pasa ligeramente).
+          description = raw.replace(/\s+/g, ' ').slice(0, 280).trim() || null;
+          html = html.replace(descMatch[0], '').trim();
+          if (description) {
+            push('status', { message: `Resumen interno capturado: "${description}"` });
+          }
+        }
+
         // Red de seguridad: corrige o elimina las <img> de
         // /images/mailing/vehicles/ que apuntan a archivos inexistentes.
         // Ejemplo real visto en producción: la IA había generado
@@ -514,12 +545,20 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
         html = injectCanonicalFooter(html);
 
         push('status', { message: 'Guardando HTML en la base de datos...' });
+        const updatePayload: Record<string, unknown> = {
+          html_content: html,
+          generation_prompt: briefing,
+          generation_reference_ids: referenceIds.length ? referenceIds : null,
+        };
+        // Solo pisamos description si la IA ha emitido un resumen nuevo.
+        // Si por lo que sea el marcador no llega, preservamos el valor
+        // anterior para no quedarnos con una fila "más pelada" tras
+        // regenerar.
+        if (description) {
+          updatePayload.description = description;
+        }
         const { error: updErr } = await sb.from('mailing_campaigns')
-          .update({
-            html_content: html,
-            generation_prompt: briefing,
-            generation_reference_ids: referenceIds.length ? referenceIds : null,
-          })
+          .update(updatePayload)
           .eq('id', campaign.id);
         if (updErr) {
           push('error', { message: `No se pudo guardar el HTML: ${updErr.message}` });
