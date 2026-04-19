@@ -584,7 +584,7 @@ function PreviewTab({
   const [q, setQ] = useState("");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [contact, setContact] = useState<Contact | null>(null);
-  const [to, setTo] = useState("");
+  const [to, setTo] = useState("info@furgocasa.com");
   const [sending, setSending] = useState(false);
   const [ok, setOk] = useState<string | null>(null);
   const previewUrl = useMemo(() => {
@@ -679,11 +679,14 @@ function PreviewTab({
 
         <div className="bg-white border border-gray-200 rounded-xl p-4">
           <h3 className="font-medium text-sm mb-2">Enviar test</h3>
+          <p className="text-xs text-gray-500 mb-2">
+            Por defecto a <strong>info@furgocasa.com</strong>. Puedes cambiarlo para probar en Gmail, Outlook, etc.
+          </p>
           <input
             type="email"
             value={to}
             onChange={(e) => setTo(e.target.value)}
-            placeholder="tu-email@dominio.com"
+            placeholder="info@furgocasa.com"
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
           />
           <button
