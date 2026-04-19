@@ -59,6 +59,12 @@ export type ContextOffer = {
   days: number | null;
   price_per_day_eur: number | null;
   original_price_per_day_eur: number | null;
+  /** Precio total del alquiler con descuento aplicado (= price_per_day_eur * days). Pre-calculado para que la IA no tenga que multiplicar. */
+  total_price_eur: number | null;
+  /** Precio total original sin descuento (= original_price_per_day_eur * days). */
+  original_total_price_eur: number | null;
+  /** Ahorro absoluto en euros (= original_total_price_eur - total_price_eur). */
+  savings_eur: number | null;
   discount_percent: number | null;
   pickup_location: string | null;
   dropoff_location: string | null;
@@ -319,14 +325,34 @@ export async function getActiveOffers(
     .map((r) => {
       const pickup = Array.isArray(r.pickup_location) ? r.pickup_location[0] : r.pickup_location;
       const dropoff = Array.isArray(r.dropoff_location) ? r.dropoff_location[0] : r.dropoff_location;
+      // Pre-calculamos los totales en el servidor para que la IA no tenga
+      // que hacer la aritmética. Sabemos por experiencia que los LLMs a
+      // veces se saltan el cálculo o redondean mal, así que se lo damos
+      // hecho. Redondeamos a entero (euros) como hace la web pública.
+      const days = r.offer_days;
+      const pricePerDay = r.final_price_per_day;
+      const origPricePerDay = r.original_price_per_day;
+      const totalPrice =
+        days != null && pricePerDay != null ? Math.round(days * pricePerDay) : null;
+      const origTotalPrice =
+        days != null && origPricePerDay != null
+          ? Math.round(days * origPricePerDay)
+          : null;
+      const savings =
+        totalPrice != null && origTotalPrice != null
+          ? Math.max(0, origTotalPrice - totalPrice)
+          : null;
       return {
         id: r.id,
         url: offerDetailUrl(r.id),
         start_date: r.offer_start_date,
         end_date: r.offer_end_date,
-        days: r.offer_days,
-        price_per_day_eur: r.final_price_per_day,
-        original_price_per_day_eur: r.original_price_per_day,
+        days,
+        price_per_day_eur: pricePerDay,
+        original_price_per_day_eur: origPricePerDay,
+        total_price_eur: totalPrice,
+        original_total_price_eur: origTotalPrice,
+        savings_eur: savings,
         discount_percent: r.discount_percentage,
         pickup_location: pickup?.name ?? null,
         dropoff_location: dropoff?.name ?? null,

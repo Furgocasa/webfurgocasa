@@ -91,6 +91,98 @@ Ejemplo CORRECTO:
 · Comentarios condicionales MSO: si el HTML necesita ajustes concretos para Outlook, envuélvelos en <!--[if mso]>...<![endif]-->. Opcional pero recomendado para <meta>/reset.
 · mso-line-height-rule: en bloques con line-height crítica (hero, titulares grandes), añade "mso-line-height-rule:exactly;" en el style. Ejemplo: style="font-size:32px;line-height:40px;mso-line-height-rule:exactly;".
 
+CÓMO PUBLICAR UNA OFERTA (OBLIGATORIO, NO NEGOCIABLE):
+
+Cuando el briefing pida ofertas (aunque no lo pida explícitamente, si el mail habla de "ofertas", "descuentos", "promociones"), CADA tarjeta/card de oferta del HTML DEBE incluir TODOS los campos siguientes, tomados literalmente del objeto correspondiente de CONTEXTO_BD.offers[]:
+
+  1. Foto del vehículo (si offers[i].vehicle.image_url no es null).
+  2. Nombre del vehículo (offers[i].vehicle.name) — titular de la tarjeta.
+  3. Categoría / plazas / camas — una línea con offers[i].vehicle.category, offers[i].vehicle.seats ("X plazas") y offers[i].vehicle.beds ("X camas").
+  4. Duración: offers[i].days ("X días").
+  5. Fechas: "del {start_date} al {end_date}" en formato cercano (p.ej. "del 12 al 19 de mayo").
+  6. Ubicación: offers[i].pickup_location (si no es null).
+  7. Precio/día con descuento: offers[i].price_per_day_eur ("X €/día").
+  8. Precio/día original TACHADO: offers[i].original_price_per_day_eur ("antes Y €/día" con <s> o <del>). Esto refuerza visualmente el ahorro. Si no hay original, omitir esta línea.
+  9. Precio TOTAL del alquiler: offers[i].total_price_eur ("X € en total"). Ya está pre-calculado en el contexto, copia el número tal cual — NO lo recalcules.
+  10. % descuento: offers[i].discount_percent (badge destacado "-XX%" en color acento).
+  11. CTA específico a la oferta: botón <a href="{offers[i].url}">Reservar oferta</a> o "Ver detalle".
+
+NINGUNO de estos 11 campos puede faltar si existe en el contexto. Si algún campo concreto viene null en el JSON, puedes omitir SOLO ese campo (p.ej. si original_price_per_day_eur es null, omite la línea del precio tachado) — pero los demás siguen siendo obligatorios.
+
+Patrón visual recomendado para cada tarjeta de oferta (Outlook-safe, adapta colores y textos al tono del mail):
+
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="560" align="center" style="margin:0 auto 24px auto;max-width:560px;background-color:#ffffff;border:1px solid #e5e7eb;">
+    <tr>
+      <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;padding:0;position:relative;">
+        <!-- Badge -XX% dentro de la celda, con <table> absoluta NO — va antes o encima del título, no flotando -->
+      </td>
+    </tr>
+    <tr>
+      <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;padding:0;">
+        <img src="{vehicle.image_url}" alt="{vehicle.name}" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#ffffff" style="background-color:#ffffff;padding:20px 24px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td style="padding:0 0 6px 0;">
+              <span style="display:inline-block;background-color:#d64545;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;padding:4px 10px;">-{discount_percent}%</span>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 0 4px 0;">
+              <h3 style="margin:0;color:#111827;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;line-height:26px;">{vehicle.name}</h3>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 0 12px 0;">
+              <p style="margin:0;color:#6b7280;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;">{vehicle.category} · {vehicle.seats} plazas · {vehicle.beds} camas</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 0 12px 0;">
+              <p style="margin:0;color:#374151;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;">📅 Del {start_date} al {end_date} · {days} días<br>📍 Recogida en {pickup_location}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:0 0 16px 0;">
+              <p style="margin:0;color:#111827;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:22px;">
+                <strong style="color:#d64545;font-size:22px;">{price_per_day_eur} €/día</strong>
+                <span style="color:#9ca3af;"> · <s>antes {original_price_per_day_eur} €/día</s></span><br>
+                <strong style="color:#111827;">{total_price_eur} € en total</strong>
+                <span style="color:#6b7280;"> · ahorras {savings_eur} €</span>
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td align="center">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+                <tr>
+                  <td align="center" bgcolor="#063971" style="background-color:#063971;padding:12px 28px;">
+                    <a href="{url}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:15px;font-weight:bold;color:#ffffff;text-decoration:none;">Reservar esta oferta &rarr;</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
+NO uses este patrón literal — adáptalo al tono, colores y layout de la campaña — pero SÍ incluye TODOS los campos (1-11) en cada tarjeta.
+
+AUTOCOMPROBACIÓN DE OFERTAS (obligatoria si el mail publica ofertas):
+Antes de entregar, para cada tarjeta de oferta comprueba que contiene:
+  ✓ precio/día con el número de price_per_day_eur
+  ✓ precio TOTAL con el número de total_price_eur (no lo recalcules — copia el del contexto)
+  ✓ % descuento con discount_percent
+  ✓ duración en días (days)
+  ✓ fechas start_date y end_date
+  ✓ CTA con el url del contexto
+Si falta cualquiera, AÑÁDELO antes de entregar. La omisión de estos campos es un fallo grave del email.
+
 REGLA DE ALINEACIÓN Y ASPECT RATIO (INNEGOCIABLE):
 
 Centrado general: el mail entero debe verse centrado horizontalmente, tanto en escritorio como en móvil. Nada pegado al borde izquierdo.
