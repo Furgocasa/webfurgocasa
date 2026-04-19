@@ -119,7 +119,9 @@ Patrón visual recomendado para cada tarjeta de oferta (Outlook-safe, adapta col
     </tr>
     <tr>
       <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;padding:0;">
-        <img src="{vehicle.image_url}" alt="{vehicle.name}" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+        <a href="{url}" style="display:block;text-decoration:none;border:0;">
+          <img src="{vehicle.image_url}" alt="{vehicle.name}" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+        </a>
       </td>
     </tr>
     <tr>
@@ -132,7 +134,9 @@ Patrón visual recomendado para cada tarjeta de oferta (Outlook-safe, adapta col
           </tr>
           <tr>
             <td style="padding:0 0 4px 0;">
-              <h3 style="margin:0;color:#111827;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;line-height:26px;">{vehicle.name}</h3>
+              <h3 style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;line-height:26px;">
+                <a href="{url}" style="color:#111827;text-decoration:none;">{vehicle.name}</a>
+              </h3>
             </td>
           </tr>
           <tr>
@@ -182,6 +186,41 @@ Antes de entregar, para cada tarjeta de oferta comprueba que contiene:
   ✓ fechas start_date y end_date
   ✓ CTA con el url del contexto
 Si falta cualquiera, AÑÁDELO antes de entregar. La omisión de estos campos es un fallo grave del email.
+
+REGLA DE CLICABILIDAD (OBLIGATORIA, SUBE EL CTR):
+
+En email marketing, cuantas más zonas clicables tenga una tarjeta, más clics recibe. Los usuarios (especialmente en móvil) tienden a pulsar sobre la imagen o el título antes que buscar el botón. Por tanto, TODAS estas zonas DEBEN ser enlaces al destino correspondiente:
+
+  A) TARJETA DE OFERTA — la foto del vehículo, el nombre del vehículo (<h2>/<h3>) y el badge del descuento son TODOS clicables y apuntan al MISMO url de la oferta (offers[i].url). Además del botón CTA "Reservar esta oferta".
+  B) TARJETA DE ARTÍCULO DE BLOG — la foto del artículo y el título del artículo son clicables y apuntan a posts[i].url. Además del "Leer más".
+  C) TARJETA DE VEHÍCULO (si el mail presenta modelos de flota sin oferta concreta) — la foto y el nombre del modelo son clicables y apuntan a https://www.furgocasa.com/es/flota/{vehicle.slug} (usa el slug del objeto de fleet[]).
+  D) LOGO DE CABECERA — envuélvelo en un <a href="https://www.furgocasa.com/"> para que haga clic a la home.
+  E) HERO principal del mail (si hay imagen hero grande) — clicable al CTA principal de la campaña.
+
+CÓMO ENVOLVER EN ENLACE SIN ROMPER OUTLOOK:
+
+  Imagen clicable:
+    <a href="{url}" style="display:block;text-decoration:none;border:0;">
+      <img src="..." alt="..." width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+    </a>
+
+  Título clicable (IMPRESCINDIBLE inline color + text-decoration:none, si no Outlook lo pinta azul subrayado):
+    <h3 style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;line-height:26px;">
+      <a href="{url}" style="color:#111827;text-decoration:none;">{titulo}</a>
+    </h3>
+
+  Badge/etiqueta clicable:
+    <a href="{url}" style="text-decoration:none;display:inline-block;">
+      <span style="display:inline-block;background-color:#d64545;color:#ffffff;font-size:13px;font-weight:700;padding:4px 10px;">-{discount_percent}%</span>
+    </a>
+
+Reglas Outlook-safe al envolver en <a>:
+  · En el <a> siempre pon text-decoration:none (si no, Outlook subraya títulos e imágenes).
+  · En las <img> envueltas en <a>, mantén border="0" + style="border:0;" (si no, Outlook pinta borde azul alrededor).
+  · El color del titular debe declararse inline dentro del <a>, no en el <h3>/<h2>, porque si no Outlook ignora el color del padre y pinta el título de azul hipervinculo.
+  · No envuelvas párrafos largos de lectura dentro de un <a>. Solo titulares cortos (1-2 líneas máx).
+
+PROHIBIDO convertir en enlaces: el logo del footer, los iconos de redes sociales, el enlace de baja (todo eso lo pone el sistema en el footer oficial), ni los párrafos del cuerpo. Solo las zonas A-E listadas arriba.
 
 REGLA DE ALINEACIÓN Y ASPECT RATIO (INNEGOCIABLE):
 
@@ -263,6 +302,15 @@ Antes de emitir el HTML, revísalo mentalmente y asegúrate de que NO CONTIENE n
 Y asegúrate de que SÍ CONTIENE, para cada <td> con fondo de color, el atributo bgcolor además del style. Si ves un <td style="background-color:#XXX..." sin bgcolor, AÑÁDELE bgcolor="#XXX".
 Si detectas alguna subcadena prohibida, sustitúyela por su equivalente Outlook-safe de los ejemplos de arriba ANTES de entregar.
 
+AUTOCOMPROBACIÓN DE CLICABILIDAD (obligatoria):
+Antes de entregar, comprueba que tu HTML cumple:
+  ✓ El logo de cabecera va envuelto en <a href="https://www.furgocasa.com/">.
+  ✓ En cada tarjeta de oferta, TANTO la <img> del vehículo COMO el titular del vehículo van envueltos en <a href="{offers[i].url}"> (y el enlace del titular lleva color:#xxxxxx + text-decoration:none en style, si no Outlook lo pinta azul).
+  ✓ Si publicas artículos de blog, su imagen y su título van envueltos en <a href="{posts[i].url}"> con las mismas reglas.
+  ✓ Ninguna <img> clicable se ha quedado sin border="0" + style="...border:0;" (si no Outlook pinta borde azul).
+  ✓ El hero (si es imagen grande) es clicable al CTA principal.
+Si algún titular o imagen de estas tarjetas no es clicable, añádele el <a> correspondiente antes de entregar.
+
 AUTOCOMPROBACIÓN DE CONTRASTE (obligatoria):
 Recorre mentalmente cada <h1>, <h2>, <h3>, <h4>, <p>, <li>, <a>, <span>, <strong> de tu HTML y verifica que TODOS llevan color:#xxxxxx en el style. Si alguno NO lo lleva, añádeselo ANTES de entregar, eligiendo color oscuro (#111827/#374151) si el fondo es claro o color claro (#ffffff) si el fondo es oscuro (#063971, #d65a31, etc.). No entregues HTML con texto sin color definido: en modo oscuro de Outlook el texto se vuelve blanco invisible sobre fondo claro.
 
@@ -296,8 +344,10 @@ REQUISITOS TÉCNICOS OBLIGATORIOS DEL HTML:
 2. Ancho máximo 600px. Responsive: móvil apilado (@media (max-width:600px)).
 3. UTF-8. <meta charset="utf-8">, <meta name="viewport">, <meta name="color-scheme" content="light dark">.
 4. Paleta coherente con la marca: azul corporativo #063971, blancos, grises suaves, terracota/acento cálido si hace falta. Titulares en Arial/Georgia (no web fonts externas).
-5. LOGO DE CABECERA (OBLIGATORIO, siempre sobre fondo claro para máxima compatibilidad):
-   <img src="https://www.furgocasa.com/images/mailing/LOGO%20AZUL.png" alt="Furgocasa" width="200" style="display:block;max-width:200px;height:auto;border:0;">
+5. LOGO DE CABECERA (OBLIGATORIO, siempre sobre fondo claro y CLICABLE a la home):
+   <a href="https://www.furgocasa.com/" style="display:inline-block;text-decoration:none;border:0;">
+     <img src="https://www.furgocasa.com/images/mailing/LOGO%20AZUL.png" alt="Furgocasa" width="200" style="display:block;max-width:200px;height:auto;border:0;">
+   </a>
    NO uses otros logos en la cabecera ni inventes URLs. El logo blanco solo se usa en el footer y lo pone el sistema automáticamente.
 6. NO ESCRIBAS FOOTER. Ver punto 10 de la estructura: solo el marcador <!--FURGOCASA_FOOTER--> justo antes de </body>.
 7. NO escribas tú el enlace de baja. El sistema lo incluye dentro del footer oficial con el placeholder {{UNSUBSCRIBE_URL}}.
