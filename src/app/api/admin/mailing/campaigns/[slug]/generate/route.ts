@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMailingAdmin } from '@/lib/mailing/auth';
+import { buildMailingContext } from '@/lib/mailing/context';
 import { injectCanonicalFooter } from '@/lib/mailing/footer';
 import { sanitizeForOutlook } from '@/lib/mailing/outlook-safe';
 
@@ -16,6 +17,24 @@ const SYSTEM_PROMPT = `Eres la Inteligencia Artificial editora de mailings de Fu
 Tu tarea: generar el HTML COMPLETO de un email de marketing para los contactos de la base de datos (clientes pasados, suscriptores de la web, leads), basándote en los ejemplos de estilo que se te proporcionen y en el briefing que describe la campaña.
 
 REGLA DE ORO DE CONTENIDO: NO resumas, NO entregues una versión "mini". El email debe estar desarrollado, con varias secciones, copywriting trabajado y pensado para que quien lo reciba lo lea con ganas. Si tienes ejemplos de referencia, tu output debe tener extensión y riqueza equivalentes a esos ejemplos (± 20%). Prefiere pasarte que quedarte corto.
+
+REGLA ANTI-ALUCINACIÓN (INNEGOCIABLE, ES LA MÁS IMPORTANTE DE TODAS):
+El mensaje del usuario incluye un bloque "CONTEXTO_BD" con datos 100% reales extraídos en este mismo instante de la base de datos de Furgocasa. Contiene TRES listas: offers (ofertas de última hora vigentes hoy), posts (últimos artículos del blog publicados) y fleet (ficha técnica de toda la flota activa: marca, modelo, plazas, camas, categoría).
+
+Para CUALQUIER afirmación factual sobre ofertas, vehículos o artículos, estás OBLIGADA a usar exclusivamente los datos de CONTEXTO_BD. Prohibido absolutamente:
+· Inventar descuentos, precios, fechas, días, ubicaciones o URLs de ofertas. Los únicos descuentos/precios/fechas/URLs válidos son los que aparecen en CONTEXTO_BD.offers.
+· Inventar plazas, camas, beds_detail, categoría, largo o cualquier ficha técnica de un vehículo. Si vas a nombrar un modelo (p.ej. "Dreamer Fun D55"), sus especificaciones DEBEN coincidir literalmente con las de CONTEXTO_BD.fleet — si dice seats:4 y beds:2, escribe "4 plazas de viaje, 2 camas", nunca "4 plazas de noche", "5 literas" ni nada que no esté en el contexto.
+· Inventar artículos de blog, titulares o slugs. Los únicos artículos válidos son los de CONTEXTO_BD.posts, con su título, excerpt y url exactos.
+· Inventar imágenes. Para fotos de vehículos usa EXCLUSIVAMENTE el image_url que trae cada objeto en offers[].vehicle o en fleet[]. Para fotos de artículos, image_url de posts[]. Si una entrada no tiene image_url (es null), no metas imagen para esa entrada.
+· Inventar URLs de oferta. La URL de una oferta es SIEMPRE el campo url del objeto (formato https://www.furgocasa.com/es/reservar/oferta/<id>). No construyas URLs con /es/ofertas/<slug>, no existen.
+
+Comportamiento ante contexto insuficiente:
+· Si el briefing pide "5 ofertas con descuento" y CONTEXTO_BD.offers trae solo 3, muestra 3 y redacta el mail en torno a esas 3. No inventes las otras 2.
+· Si el briefing pide newsletter con "los últimos artículos" y CONTEXTO_BD.posts está vacío, NO fuerces una sección de blog: redacta el mail sin ella.
+· Si el briefing menciona un modelo que no aparece en CONTEXTO_BD.fleet, NO escribas sus especificaciones — habla de él en términos genéricos o sustitúyelo por uno que sí esté en fleet.
+· NUNCA escribas frases como "desde 59€/día", "con un 20% de descuento", "4 plazas de noche" si esas cifras no salen literalmente del contexto.
+
+Antes de entregar, autoverifica: cada número (€, %, plazas, camas, días), cada URL (/es/reservar/oferta/..., /es/blog/...) y cada nombre de modelo aparece en CONTEXTO_BD. Si encuentras uno que no, bórralo o sustitúyelo por información que sí esté en el contexto.
 
 REGLA DE ORO DE RENDERIZADO (OUTLOOK-SAFE, INNEGOCIABLE):
 El HTML DEBE renderizar EXACTAMENTE IGUAL en Outlook Desktop de Windows (que usa el motor de Word, el más limitado) que en un navegador moderno. Si un efecto visual no se ve igual en ambos, NO LO USES. La campaña debe salir limpia, legible y con la jerarquía intacta aunque el cliente sea Outlook 2016/2019/365 para Windows.
@@ -144,23 +163,13 @@ REQUISITOS TÉCNICOS OBLIGATORIOS DEL HTML:
 6. NO ESCRIBAS FOOTER. Ver punto 10 de la estructura: solo el marcador <!--FURGOCASA_FOOTER--> justo antes de </body>.
 7. NO escribas tú el enlace de baja. El sistema lo incluye dentro del footer oficial con el placeholder {{UNSUBSCRIBE_URL}}.
 8. NO escribas tú los iconos de redes sociales. Van dentro del footer oficial.
-9. FOTOS DE VEHÍCULOS (para campañas de ofertas, destinos, catálogo, etc.):
-   Disponibles como JPG ~1200px en https://www.furgocasa.com/images/mailing/vehicles/<code>-<slug>.jpg.
-   Usa SIEMPRE estas URLs oficiales (NO inventes otras ni uses Supabase Storage directo). Listado:
-   · Dreamer Fun D55            → https://www.furgocasa.com/images/mailing/vehicles/fu0006-dreamer-fun-d55.jpg
-   · Knaus Boxstar Street       → https://www.furgocasa.com/images/mailing/vehicles/fu0010-knaus-boxstar-street.jpg
-   · Weinsberg CaraTour MQ      → https://www.furgocasa.com/images/mailing/vehicles/fu0011-weinsberg-caratour-mq.jpg
-   · Knaus Boxstar Family       → https://www.furgocasa.com/images/mailing/vehicles/fu0012-knaus-boxstar-family.jpg
-   · Livingstone Sport 5        → https://www.furgocasa.com/images/mailing/vehicles/fu0013-livingstone-sport-5.jpg
-   · Sunlight Cliff Adventure   → https://www.furgocasa.com/images/mailing/vehicles/fu0014-sunlight-cliff-adventure.jpg
-   · Adria Twin Family          → https://www.furgocasa.com/images/mailing/vehicles/fu0015-adria-twin-family.jpg
-   · Challenger V114 Max        → https://www.furgocasa.com/images/mailing/vehicles/fu0016-challenger-v114-max.jpg
-   · Knaus Boxstar Street AUT   → https://www.furgocasa.com/images/mailing/vehicles/fu0017-knaus-boxstar-street-aut.jpg
-   · Knaus Boxlife DQ           → https://www.furgocasa.com/images/mailing/vehicles/fu0018-knaus-boxlife-dq.jpg
-   · Weinsberg Carabus 600 MQ   → https://www.furgocasa.com/images/mailing/vehicles/fu0019-weinsberg-carabus-600-mq.jpg
-   · Weinsberg Carabus 540 MQ   → https://www.furgocasa.com/images/mailing/vehicles/fu0020-weinsberg-carabus-540-mq.jpg
-   · Dethleffs Globetrail 600 DS→ https://www.furgocasa.com/images/mailing/vehicles/fu0021-dethleffs-globetrail-600-ds.jpg
-   Formato recomendado: width="560" style="display:block;width:100%;max-width:560px;height:auto;border-radius:12px 12px 0 0;".
+9. FOTOS DE VEHÍCULOS Y ARTÍCULOS (solo las que vienen en CONTEXTO_BD):
+   La URL oficial de cada foto te la da CONTEXTO_BD en:
+     · CONTEXTO_BD.offers[i].vehicle.image_url  (foto del vehículo de la oferta)
+     · CONTEXTO_BD.fleet[i].image_url           (foto de cada modelo de la flota)
+     · CONTEXTO_BD.posts[i].image_url           (foto del artículo del blog)
+   USA LITERALMENTE ese image_url en el <img src="...">. Prohibido construir URLs manualmente (ni con Supabase Storage, ni deduciéndolas del slug, ni copiándolas de campañas anteriores). Si image_url es null, NO metas imagen para esa entrada.
+   Formato recomendado del <img>: width="560" style="display:block;width:100%;max-width:560px;height:auto;border-radius:12px 12px 0 0;border:0;".
 10. Placeholders dinámicos — EXACTAMENTE estos literales, solo en el cuerpo (el footer oficial gestiona los suyos):
    {{NOMBRE}}  · nombre de pila del contacto (si no hay, se sustituye por "hola")
    {{CIUDAD}}  · ciudad del contacto (puede venir vacío)
@@ -246,7 +255,31 @@ export async function POST(req: NextRequest, ctx: Params) {
     });
   }
 
-  const userPrompt = `Briefing del admin:\n"""\n${briefing}\n"""\n\nAsunto propuesto: ${campaign.subject}\nDescripción de la campaña: ${campaign.description || '(sin descripción)'}\n${referencesBlock ? `Campañas de referencia (úsalas como estilo, extensión y estructura):${referencesBlock}` : 'No hay campañas de referencia. Apóyate solo en la guía de estilo.'}\n\nGenera AHORA el HTML completo de la nueva campaña respetando todas las reglas del sistema. Devuelve SOLO el HTML sin comentarios.`;
+  // Grounding: cargamos datos reales (ofertas vigentes, últimos posts, flota)
+  // ANTES de llamar a la IA. Se inyectan como CONTEXTO_BD en el mensaje user
+  // y el SYSTEM_PROMPT obliga a usarlos literalmente para cualquier
+  // afirmación factual. Así se evita que la IA se invente plazas, precios,
+  // descuentos, URLs o artículos inexistentes.
+  const ctxData = await buildMailingContext(sb);
+  const ctxJson = JSON.stringify(ctxData, null, 2);
+  // Resumen compacto para los logs del admin (visible en la UI de generación).
+  const ctxSummary = `offers=${ctxData.offers.length}, posts=${ctxData.posts.length}, fleet=${ctxData.fleet.length}`;
+
+  const userPrompt = `CONTEXTO_BD (datos 100% reales extraídos AHORA de la base de datos de Furgocasa. Para cualquier oferta, vehículo o artículo que menciones, USA EXCLUSIVAMENTE estos datos — prohibido inventar precios, plazas, camas, descuentos, fechas, URLs o imágenes):
+\`\`\`json
+${ctxJson}
+\`\`\`
+
+Briefing del admin:
+"""
+${briefing}
+"""
+
+Asunto propuesto: ${campaign.subject}
+Descripción de la campaña: ${campaign.description || '(sin descripción)'}
+${referencesBlock ? `Campañas de referencia (úsalas como estilo, extensión y estructura — pero los DATOS FACTUALES salen del CONTEXTO_BD, no de estas referencias):${referencesBlock}` : 'No hay campañas de referencia. Apóyate solo en la guía de estilo y en los datos del CONTEXTO_BD.'}
+
+Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas del sistema, especialmente la REGLA ANTI-ALUCINACIÓN: cualquier número, URL, nombre de modelo, plazas, descuento o artículo debe salir literalmente del CONTEXTO_BD. Devuelve SOLO el HTML sin comentarios.`;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
@@ -256,7 +289,9 @@ export async function POST(req: NextRequest, ctx: Params) {
       }
       let collected = '';
       try {
-        push('status', { message: 'Llamando a OpenAI gpt-4o...' });
+        push('status', {
+          message: `Contexto de BD cargado (${ctxSummary}). Llamando a OpenAI gpt-4o...`,
+        });
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
