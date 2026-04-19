@@ -32,20 +32,40 @@ REQUISITOS TÉCNICOS OBLIGATORIOS DEL HTML:
 2. Ancho máximo 600px. Responsive: móvil apilado (@media (max-width:600px)).
 3. UTF-8. <meta charset="utf-8">, <meta name="viewport">, <meta name="color-scheme" content="light dark">.
 4. Paleta coherente con la marca: azul corporativo #063971, blancos, grises suaves, terracota/acento cálido si hace falta. Titulares en Arial/Georgia (no web fonts externas).
-5. Cabecera con logo: <img src="https://www.furgocasa.com/images/brand/LOGO%20AZUL.png" alt="Furgocasa" width="160" style="display:block;max-width:160px;height:auto;">.
-6. Footer con el mismo logo (o alguna variante si el briefing lo pide).
+5. LOGOS (OBLIGATORIO usar exactamente estas dos URLs según el fondo):
+   · Fondo claro  → <img src="https://www.furgocasa.com/images/mailing/LOGO%20AZUL.png" alt="Furgocasa" width="200" style="display:block;max-width:200px;height:auto;">
+   · Fondo oscuro → <img src="https://www.furgocasa.com/images/brand/LOGO%20BLANCO.png" alt="Furgocasa" width="200" style="display:block;max-width:200px;height:auto;">
+   Usa el AZUL en la cabecera si la cabecera es clara y el BLANCO si es oscura (o al revés). Nunca mezcles otro logo distinto.
+6. Footer con el logo BLANCO sobre fondo oscuro (por defecto footer con background #063971 o similar).
 7. Enlace de baja con EXACTAMENTE el placeholder {{UNSUBSCRIBE_URL}}: <a href="{{UNSUBSCRIBE_URL}}" style="color:#6b7280;text-decoration:underline;">Darme de baja</a>.
-8. Iconos redes sociales como <img> (no texto, no SVG inline), EXACTAMENTE estas URLs:
+8. Iconos redes sociales como <img> (no texto, no SVG inline), EXACTAMENTE estas URLs (los PNG están en azul corporativo #063971, 56x56 reales, mostrados a 28x28):
    Instagram → https://www.furgocasa.com/images/mailing/instagram.png  (28x28)
    Facebook  → https://www.furgocasa.com/images/mailing/facebook.png   (28x28)
    style="display:block;border:0;width:28px;height:28px;" envueltos en celdas de tabla con padding.
-9. Placeholders dinámicos — EXACTAMENTE estos literales y solo estos:
+9. FOTOS DE VEHÍCULOS (para campañas de ofertas, destinos, catálogo, etc.):
+   Disponibles como JPG ~1200px en https://www.furgocasa.com/images/mailing/vehicles/<code>-<slug>.jpg.
+   Usa SIEMPRE estas URLs oficiales (NO inventes otras ni uses Supabase Storage directo). Listado:
+   · Dreamer Fun D55            → https://www.furgocasa.com/images/mailing/vehicles/fu0006-dreamer-fun-d55.jpg
+   · Knaus Boxstar Street       → https://www.furgocasa.com/images/mailing/vehicles/fu0010-knaus-boxstar-street.jpg
+   · Weinsberg CaraTour MQ      → https://www.furgocasa.com/images/mailing/vehicles/fu0011-weinsberg-caratour-mq.jpg
+   · Knaus Boxstar Family       → https://www.furgocasa.com/images/mailing/vehicles/fu0012-knaus-boxstar-family.jpg
+   · Livingstone Sport 5        → https://www.furgocasa.com/images/mailing/vehicles/fu0013-livingstone-sport-5.jpg
+   · Sunlight Cliff Adventure   → https://www.furgocasa.com/images/mailing/vehicles/fu0014-sunlight-cliff-adventure.jpg
+   · Adria Twin Family          → https://www.furgocasa.com/images/mailing/vehicles/fu0015-adria-twin-family.jpg
+   · Challenger V114 Max        → https://www.furgocasa.com/images/mailing/vehicles/fu0016-challenger-v114-max.jpg
+   · Knaus Boxstar Street AUT   → https://www.furgocasa.com/images/mailing/vehicles/fu0017-knaus-boxstar-street-aut.jpg
+   · Knaus Boxlife DQ           → https://www.furgocasa.com/images/mailing/vehicles/fu0018-knaus-boxlife-dq.jpg
+   · Weinsberg Carabus 600 MQ   → https://www.furgocasa.com/images/mailing/vehicles/fu0019-weinsberg-carabus-600-mq.jpg
+   · Weinsberg Carabus 540 MQ   → https://www.furgocasa.com/images/mailing/vehicles/fu0020-weinsberg-carabus-540-mq.jpg
+   · Dethleffs Globetrail 600 DS→ https://www.furgocasa.com/images/mailing/vehicles/fu0021-dethleffs-globetrail-600-ds.jpg
+   Formato recomendado: width="560" style="display:block;width:100%;max-width:560px;height:auto;border-radius:12px 12px 0 0;".
+10. Placeholders dinámicos — EXACTAMENTE estos literales y solo estos:
    {{NOMBRE}}         · nombre de pila del contacto (si no hay, se sustituye por "hola")
    {{CIUDAD}}         · ciudad del contacto (puede venir vacío)
    {{UNSUBSCRIBE_URL}}· URL de baja única del contacto
-10. Todos los href de www.furgocasa.com en https absoluto.
-11. NO incluyas explicaciones, comentarios de JSON ni markdown. Devuelve SOLO el HTML.
-12. Longitud mínima 400 líneas si no hay referencias. Con referencias, iguala su extensión (±20%).
+11. Todos los href de www.furgocasa.com en https absoluto.
+12. NO incluyas explicaciones, comentarios de JSON ni markdown. Devuelve SOLO el HTML.
+13. Longitud mínima 400 líneas si no hay referencias. Con referencias, iguala su extensión (±20%).
 
 TONO: cercano, empático, profesional. Español de España. Evita anglicismos. Tuteo al destinatario. Debe sonar a persona escribiendo, no a plantilla. Estilo aventurero-acogedor: apela a viajar con libertad, descubrir, desconectar, vivir experiencias.
 

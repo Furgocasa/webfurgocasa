@@ -50,7 +50,7 @@ const BASE_STYLES = `
   .note { margin-top:24px; font-size:13px; color:#94a3b8; text-align:center; }
 `;
 
-const LOGO_URL = 'https://www.furgocasa.com/images/brand/LOGO%20AZUL.png';
+const LOGO_URL = 'https://www.furgocasa.com/images/mailing/LOGO%20AZUL.png';
 const SUPPORT_EMAIL =
   process.env.SMTP_FROM_EMAIL || process.env.COMPANY_EMAIL || 'reservas@furgocasa.com';
 

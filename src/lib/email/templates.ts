@@ -43,7 +43,7 @@ export function getEmailBaseTemplate(content: string, preheader: string = ''): s
           <tr>
             <td align="center" style="background-color: #ffffff; padding: 25px 20px; border-bottom: 4px solid #063971;">
               <a href="https://www.furgocasa.com" style="text-decoration: none;">
-                <img src="https://www.furgocasa.com/images/brand/LOGO%20AZUL.png" alt="Furgocasa" width="200" style="display: block; max-width: 200px; height: auto;" />
+                <img src="https://www.furgocasa.com/images/mailing/LOGO%20AZUL.png" alt="Furgocasa" width="200" style="display: block; max-width: 200px; height: auto;" />
               </a>
             </td>
           </tr>
