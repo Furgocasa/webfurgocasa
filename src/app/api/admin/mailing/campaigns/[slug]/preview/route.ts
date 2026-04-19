@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMailingAdmin } from '@/lib/mailing/auth';
 import { renderTemplate, unsubscribeUrlFor } from '@/lib/mailing/render';
+import { sanitizeForOutlook } from '@/lib/mailing/outlook-safe';
 
 export const dynamic = 'force-dynamic';
 
@@ -58,7 +59,12 @@ export async function GET(req: NextRequest, ctx: Params) {
     }
   }
 
-  const html = renderTemplate(campaign.html_content, {
+  // Aplicamos la sanitización Outlook-safe también en preview para que lo que
+  // se ve en el iframe del admin sea exactamente lo que llegará a Outlook
+  // (aunque el HTML guardado en BD tenga aún restos que un LLM antiguo
+  // hubiera colado: gradientes, background-image, sin bgcolor, etc.).
+  const safeHtml = sanitizeForOutlook(campaign.html_content);
+  const html = renderTemplate(safeHtml, {
     NOMBRE: nombre,
     CIUDAD: ciudad,
     UNSUBSCRIBE_URL: unsubscribeUrlFor(token),

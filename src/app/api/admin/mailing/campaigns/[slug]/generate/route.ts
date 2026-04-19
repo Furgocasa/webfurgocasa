@@ -27,7 +27,10 @@ COSAS QUE TIENES PROHIBIDAS (rompen Outlook):
 · Tipografía: NADA de @font-face, @import de Google Fonts, fuentes externas. Solo font-family con la pila: Arial, Helvetica, sans-serif (texto general) o Georgia, 'Times New Roman', serif (acentos). El tamaño, siempre en px (no em/rem/%).
 · Botones: NADA de <button>. Los CTA son SIEMPRE <table><tr><td bgcolor="#063971" style="..."><a href="..." style="display:inline-block;..."></a></td></tr></table> con colores sólidos (patrón exacto en el bloque de PATRONES OUTLOOK-SAFE).
 · Iconos decorativos: NADA de SVG inline, iconos por CSS (mask-image, background-image), webfonts de iconos. Si quieres iconos, usa emoji Unicode simples y sencillos ("✓", "★", "•", "→"), aceptando que Outlook los renderiza en mono/plano y puede variar ligeramente. Para iconos importantes (redes) el sistema ya los inyecta en el footer como <img> PNG.
-· Backgrounds complejos: NADA de background-image crítica sobre <td> (Outlook la ignora sin VML). Si de verdad necesitas una imagen de fondo decorativa, pero NO colocas encima contenido imprescindible, puede quedarse; si no, cambia a color sólido. Nunca pongas el titular encima de una background-image.
+· Backgrounds complejos: PROHIBIDO TOTALMENTE background-image:url(...), background:url(...), background:linear-gradient(...) o cualquier fondo que no sea un COLOR SÓLIDO en hex. Outlook deja el fondo en BLANCO cuando encuentra background-image. Usa siempre <td bgcolor="#XXXXXX" style="background-color:#XXXXXX;"> con color sólido. Nunca pongas el titular sobre una imagen de fondo.
+· ATRIBUTO bgcolor OBLIGATORIO: todo <td>, <tr>, <th>, <table> o <body> con fondo de color sólido DEBE llevar el atributo HTML bgcolor="#XXXXXX" ADEMÁS de style="background-color:#XXXXXX;". Los dos juntos. Sin el atributo bgcolor, Outlook Desktop Windows deja el fondo blanco aunque Chrome lo pinte bien. Ejemplo obligatorio:
+    <td bgcolor="#063971" style="background-color:#063971;padding:32px 24px;color:#ffffff;">...</td>
+  Si olvidas el bgcolor, tu email se verá roto en la inmensa mayoría de Outlook corporativos. Es la regla más importante de compatibilidad.
 · Efectos: NADA de box-shadow, text-shadow, outline decorativo, opacity distinta de 1. Todo nítido.
 · Border-radius: EVITA radios grandes. Usa 0-8px como mucho. Outlook ignora border-radius completamente; diseña ASUMIENDO que las esquinas serán cuadradas y que aun así quede bien. Si pones radius, que sea un extra opcional, nunca crítico.
 · Width/height: las imágenes SIEMPRE con los atributos HTML width y height en píxeles (no solo en style). Las <td> que necesiten ancho fijo, con el atributo width. Evita height en <td> salvo para espaciadores; usa padding y line-height.
@@ -71,12 +74,14 @@ PATRONES OUTLOOK-SAFE OBLIGATORIOS:
 
 AUTOCOMPROBACIÓN ANTES DE DEVOLVER:
 Antes de emitir el HTML, revísalo mentalmente y asegúrate de que NO CONTIENE ninguna de estas subcadenas:
-   "linear-gradient", "radial-gradient", "rgba(", "hsl(", "hsla(", "var(--",
+   "linear-gradient", "radial-gradient", "conic-gradient", "rgba(", "hsl(", "hsla(", "var(--",
+   "background-image", "background:url", "background: url", "background:#" (prefiere "background-color:#"),
    "display:flex", "display:grid", "flexbox", "flex-direction", "justify-content", "align-items",
    "position:absolute", "position:fixed", "transform:", "translate(", "rotate(", "scale(",
    "box-shadow", "text-shadow", "backdrop-filter", "filter:", "animation", "@keyframes",
    "<button", "<svg", "@font-face", "@import", "font-face", "googleapis.com/css"
-Si detectas alguna, sustituye el patrón por su equivalente Outlook-safe de los ejemplos de arriba ANTES de entregar.
+Y asegúrate de que SÍ CONTIENE, para cada <td> con fondo de color, el atributo bgcolor además del style. Si ves un <td style="background-color:#XXX..." sin bgcolor, AÑÁDELE bgcolor="#XXX".
+Si detectas alguna subcadena prohibida, sustitúyela por su equivalente Outlook-safe de los ejemplos de arriba ANTES de entregar.
 
 ESTRUCTURA MÍNIMA OBLIGATORIA (en este orden):
 1. Preheader oculto (hidden preview text, 80-120 caracteres).

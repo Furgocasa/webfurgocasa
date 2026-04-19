@@ -5,6 +5,7 @@ import type { Transporter } from 'nodemailer';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { looksLikeRateLimitError, loadSmtpConfig } from './transport';
 import { renderTemplate, unsubscribeUrlFor } from './render';
+import { sanitizeForOutlook } from './outlook-safe';
 
 export type CampaignForSend = {
   id: string;
@@ -51,7 +52,10 @@ export async function renderCampaignHtmlFor(
 ): Promise<{ html: string; unsubscribeUrl: string }> {
   const { token } = await resolveContactOptOut(sb, r.contact_id);
   const unsubscribeUrl = unsubscribeUrlFor(token);
-  const html = renderTemplate(campaign.html_content, {
+  // Sanitizamos también aquí por si el HTML guardado tiene restos no
+  // Outlook-safe (gradientes, background-image, <td> sin bgcolor, etc.).
+  const safe = sanitizeForOutlook(campaign.html_content);
+  const html = renderTemplate(safe, {
     NOMBRE: r.nombre || 'hola',
     CIUDAD: r.ciudad || '',
     UNSUBSCRIBE_URL: unsubscribeUrl,
@@ -100,7 +104,10 @@ export async function sendOneRecipient(
   }
 
   const unsubscribeUrl = unsubscribeUrlFor(token);
-  const html = renderTemplate(campaign.html_content, {
+  // Doble capa de seguridad: aunque el generador ya sanee al guardar, aquí
+  // volvemos a sanear antes de enviar. Es idempotente y barato.
+  const safeHtml = sanitizeForOutlook(campaign.html_content);
+  const html = renderTemplate(safeHtml, {
     NOMBRE: recipient.nombre || 'hola',
     CIUDAD: recipient.ciudad || '',
     UNSUBSCRIBE_URL: unsubscribeUrl,
@@ -159,7 +166,10 @@ export async function sendTestEmail(
   const cfg = loadSmtpConfig();
   const { token } = await resolveContactOptOut(sb, opts.contactId || null);
   const unsubscribeUrl = unsubscribeUrlFor(token);
-  const html = renderTemplate(opts.html_content, {
+  // Sanitize antes de renderizar — así el test llega a Outlook igual que el
+  // envío masivo real (con bgcolor auto-añadido, sin gradientes, etc.).
+  const safeHtml = sanitizeForOutlook(opts.html_content);
+  const html = renderTemplate(safeHtml, {
     NOMBRE: opts.nombre || 'hola',
     CIUDAD: opts.ciudad || '',
     UNSUBSCRIBE_URL: unsubscribeUrl,
