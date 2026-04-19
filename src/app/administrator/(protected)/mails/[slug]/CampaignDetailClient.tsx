@@ -98,6 +98,30 @@ const AUDIENCE_LABELS: Record<string, string> = {
   newsletter: "Solo newsletter",
 };
 
+type MailingModel = "gpt-4.1" | "gpt-4o" | "gpt-5.4";
+
+const MAILING_MODELS: Array<{
+  value: MailingModel;
+  label: string;
+  hint: string;
+}> = [
+  {
+    value: "gpt-4.1",
+    label: "GPT-4.1",
+    hint: "Equilibrado. Muy bueno siguiendo prompts largos.",
+  },
+  {
+    value: "gpt-4o",
+    label: "GPT-4o",
+    hint: "Mas rapido. Algo menos estricto siguiendo reglas largas.",
+  },
+  {
+    value: "gpt-5.4",
+    label: "GPT-5.4",
+    hint: "El mas potente. Mejor obediencia al prompt, algo mas lento.",
+  },
+];
+
 function fmtDate(d: string | null): string {
   if (!d) return "—";
   return new Date(d).toLocaleString("es-ES", {
@@ -623,6 +647,7 @@ function ContentTab({
   const [subject, setSubject] = useState(campaign.subject || "");
   const [subjectDirty, setSubjectDirty] = useState(false);
   const [subjectSaving, setSubjectSaving] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<MailingModel>("gpt-4.1");
 
   // Si la campaña se recarga (p.ej. tras editar el asunto en la cabecera),
   // sincronizamos el input local.
@@ -691,7 +716,7 @@ function ContentTab({
     }
     setBusy(true);
     onError(null);
-    pushLog({ kind: "info", text: "> Enviando briefing a la IA..." });
+    pushLog({ kind: "info", text: `> Enviando briefing a la IA (${selectedModel})...` });
     if (selected.length > 0) {
       pushLog({
         kind: "detail",
@@ -710,7 +735,7 @@ function ContentTab({
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ briefing, reference_ids: selected }),
+          body: JSON.stringify({ briefing, reference_ids: selected, model: selectedModel }),
         },
       );
       if (!r.ok || !r.body) {
@@ -815,6 +840,40 @@ function ContentTab({
           <p className="text-xs text-gray-400">
             Es lo primero que verán los destinatarios en la bandeja de entrada. Se guarda al salir del campo o al pulsar Enter.
           </p>
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <label
+                htmlFor="campaign-model-select"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Modelo de IA
+              </label>
+              <p className="text-xs text-gray-400 mt-1">
+                Puedes cambiarlo antes de cada generacion para comparar resultados.
+              </p>
+            </div>
+            <div className="min-w-[240px]">
+              <select
+                id="campaign-model-select"
+                value={selectedModel}
+                onChange={(e) => setSelectedModel(e.target.value as MailingModel)}
+                disabled={readOnly || busy}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white disabled:bg-gray-50"
+              >
+                {MAILING_MODELS.map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="rounded-lg bg-gray-50 border border-gray-200 px-3 py-2 text-xs text-gray-600">
+            {MAILING_MODELS.find((m) => m.value === selectedModel)?.hint}
+          </div>
         </div>
 
         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
