@@ -250,6 +250,7 @@ export function CampaignDetailClient({ slug }: { slug: string }) {
             load({ silent: true });
             setTab("preview");
           }}
+          onChanged={() => load({ silent: true })}
           onError={setError}
         />
       )}
@@ -596,11 +597,13 @@ function ContentTab({
   campaign,
   readOnly,
   onGenerated,
+  onChanged,
   onError,
 }: {
   campaign: Campaign;
   readOnly: boolean;
   onGenerated: () => void;
+  onChanged: () => void;
   onError: (s: string | null) => void;
 }) {
   const [briefing, setBriefing] = useState(campaign.generation_prompt || "");
@@ -612,6 +615,50 @@ function ContentTab({
   const [logs, setLogs] = useState<LogLine[]>([]);
   const logEndRef = useRef<HTMLDivElement | null>(null);
   const hasHtml = Boolean(campaign.html_content);
+
+  // Edición del asunto en esta misma pestaña (copia local con flag dirty).
+  // Se guarda al salir del campo o al pulsar Enter. La cabecera superior
+  // tiene su propio InlineEditable, pero pedirlo aquí es mucho más cómodo
+  // porque es donde se trabaja el contenido del mail.
+  const [subject, setSubject] = useState(campaign.subject || "");
+  const [subjectDirty, setSubjectDirty] = useState(false);
+  const [subjectSaving, setSubjectSaving] = useState(false);
+
+  // Si la campaña se recarga (p.ej. tras editar el asunto en la cabecera),
+  // sincronizamos el input local.
+  useEffect(() => {
+    setSubject(campaign.subject || "");
+    setSubjectDirty(false);
+  }, [campaign.subject]);
+
+  async function saveSubject() {
+    if (readOnly || !subjectDirty || subjectSaving) return;
+    const trimmed = subject.trim();
+    if (!trimmed) {
+      onError("El asunto no puede estar vacío.");
+      return;
+    }
+    setSubjectSaving(true);
+    try {
+      const r = await fetch(`/api/admin/mailing/campaigns/${campaign.slug}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subject: trimmed }),
+      });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) {
+        onError(j.error || "No se pudo guardar el asunto.");
+        return;
+      }
+      onError(null);
+      setSubjectDirty(false);
+      onChanged();
+    } catch (e) {
+      onError((e as Error).message || "Error guardando el asunto.");
+    } finally {
+      setSubjectSaving(false);
+    }
+  }
 
   useEffect(() => {
     fetch("/api/admin/mailing/references", { cache: "no-store" })
@@ -732,6 +779,44 @@ function ContentTab({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
       <div className="space-y-4">
+        <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-2">
+          <div className="flex items-center justify-between">
+            <label htmlFor="campaign-subject-input" className="block text-sm font-medium text-gray-700">
+              Asunto del email
+            </label>
+            <span className="text-xs text-gray-400">
+              {subjectSaving
+                ? "Guardando..."
+                : subjectDirty
+                  ? "Cambios sin guardar"
+                  : "Guardado"}
+            </span>
+          </div>
+          <input
+            id="campaign-subject-input"
+            type="text"
+            value={subject}
+            onChange={(e) => {
+              setSubject(e.target.value);
+              setSubjectDirty(true);
+            }}
+            onBlur={saveSubject}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                (e.target as HTMLInputElement).blur();
+              }
+            }}
+            disabled={readOnly || busy || subjectSaving}
+            maxLength={200}
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-base font-medium disabled:bg-gray-50"
+            placeholder="Ej: Ofertas de última hora · Hasta -25% en campers"
+          />
+          <p className="text-xs text-gray-400">
+            Es lo primero que verán los destinatarios en la bandeja de entrada. Se guarda al salir del campo o al pulsar Enter.
+          </p>
+        </div>
+
         <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
           <label className="block text-sm font-medium text-gray-700">
             Briefing para la IA
