@@ -133,7 +133,7 @@ const nextConfig = {
       font-src 'self' https://fonts.gstatic.com data: https://*.tinymce.com https://*.tiny.cloud;
       connect-src 'self' blob: https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://connect.facebook.net https://api.stripe.com https://*.analytics.google.com https://www.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://*.tinymce.com https://*.tiny.cloud;
       frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://www.googletagmanager.com https://td.doubleclick.net;
-      frame-ancestors 'none';
+      frame-ancestors 'self';
       form-action 'self' https://sis.redsys.es https://sis-t.redsys.es;
       base-uri 'self';
       object-src 'none';
@@ -148,9 +148,12 @@ const nextConfig = {
         value: ContentSecurityPolicy,
       },
       {
-        // Previene clickjacking - no permite que la página se muestre en iframes
+        // Previene clickjacking contra dominios externos.
+        // 'SAMEORIGIN' permite embebido desde el propio dominio (necesario para, p.ej.,
+        // la pesta\u00f1a 'Vista previa' del panel de mailing, que carga el render del mail
+        // en un <iframe src="/api/admin/mailing/campaigns/<slug>/preview"> del propio origen).
         key: 'X-Frame-Options',
-        value: 'DENY',
+        value: 'SAMEORIGIN',
       },
       {
         // Previene MIME type sniffing
