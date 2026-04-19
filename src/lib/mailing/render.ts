@@ -31,6 +31,37 @@ export function renderTemplate(html: string, vars: RenderVars): string {
   return out;
 }
 
+/**
+ * Extrae un nombre de pila usable en el saludo de un mail a partir de un
+ * nombre "completo" que puede venir con apellidos, partículas y espacios
+ * extra. El objetivo es que "Hola {{NOMBRE}}" suene cercano y personal,
+ * nunca burocrático.
+ *
+ * Regla: tomamos la PRIMERA palabra. Es la opción más segura en español:
+ *   · "Julio César Amat de Pérez" → "Julio"  (evita leer como formal)
+ *   · "María José López"          → "María"  (evita decir "María José López")
+ *   · "Pilar"                     → "Pilar"
+ *   · "Ismael Sosa"               → "Ismael"
+ *   · "juan carlos pérez"         → "Juan"   (capitalizado)
+ *
+ * Si el token resultante es muy corto (≤ 1 char) o está vacío, devuelve el
+ * fallback para no romper el saludo.
+ */
+export function firstName(
+  fullName: string | null | undefined,
+  fallback: string = 'hola',
+): string {
+  const raw = (fullName || '').trim();
+  if (!raw) return fallback;
+
+  const first = raw.split(/\s+/)[0] || '';
+  if (first.length < 2) return fallback;
+
+  // Capitalización suave: primera letra mayúscula, resto como está
+  // (no toca "Mª" ni apóstrofes ni tildes).
+  return first.charAt(0).toLocaleUpperCase('es-ES') + first.slice(1);
+}
+
 export function baseUrl(): string {
   const raw =
     process.env.NEXT_PUBLIC_URL ||

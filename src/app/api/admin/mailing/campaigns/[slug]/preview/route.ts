@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { requireMailingAdmin } from '@/lib/mailing/auth';
-import { renderTemplate, unsubscribeUrlFor } from '@/lib/mailing/render';
+import { firstName, renderTemplate, unsubscribeUrlFor } from '@/lib/mailing/render';
 import { sanitizeForOutlook } from '@/lib/mailing/outlook-safe';
 
 export const dynamic = 'force-dynamic';
@@ -65,7 +65,9 @@ export async function GET(req: NextRequest, ctx: Params) {
   // hubiera colado: gradientes, background-image, sin bgcolor, etc.).
   const safeHtml = sanitizeForOutlook(campaign.html_content);
   const html = renderTemplate(safeHtml, {
-    NOMBRE: nombre,
+    // firstName() recorta a la primera palabra para que el saludo sea
+    // cercano ("Hola Julio") en vez de formal ("Hola Julio César Amat de Pérez").
+    NOMBRE: firstName(nombre),
     CIUDAD: ciudad,
     UNSUBSCRIBE_URL: unsubscribeUrlFor(token),
   });

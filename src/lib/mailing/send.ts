@@ -4,7 +4,7 @@
 import type { Transporter } from 'nodemailer';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { looksLikeRateLimitError, loadSmtpConfig } from './transport';
-import { renderTemplate, unsubscribeUrlFor } from './render';
+import { firstName, renderTemplate, unsubscribeUrlFor } from './render';
 import { sanitizeForOutlook } from './outlook-safe';
 
 export type CampaignForSend = {
@@ -56,7 +56,7 @@ export async function renderCampaignHtmlFor(
   // Outlook-safe (gradientes, background-image, <td> sin bgcolor, etc.).
   const safe = sanitizeForOutlook(campaign.html_content);
   const html = renderTemplate(safe, {
-    NOMBRE: r.nombre || 'hola',
+    NOMBRE: firstName(r.nombre),
     CIUDAD: r.ciudad || '',
     UNSUBSCRIBE_URL: unsubscribeUrl,
   });
@@ -108,7 +108,7 @@ export async function sendOneRecipient(
   // volvemos a sanear antes de enviar. Es idempotente y barato.
   const safeHtml = sanitizeForOutlook(campaign.html_content);
   const html = renderTemplate(safeHtml, {
-    NOMBRE: recipient.nombre || 'hola',
+    NOMBRE: firstName(recipient.nombre),
     CIUDAD: recipient.ciudad || '',
     UNSUBSCRIBE_URL: unsubscribeUrl,
   });
@@ -170,7 +170,7 @@ export async function sendTestEmail(
   // envío masivo real (con bgcolor auto-añadido, sin gradientes, etc.).
   const safeHtml = sanitizeForOutlook(opts.html_content);
   const html = renderTemplate(safeHtml, {
-    NOMBRE: opts.nombre || 'hola',
+    NOMBRE: firstName(opts.nombre),
     CIUDAD: opts.ciudad || '',
     UNSUBSCRIBE_URL: unsubscribeUrl,
   });
