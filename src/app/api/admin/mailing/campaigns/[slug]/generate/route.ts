@@ -16,6 +16,26 @@ type Params = { params: Promise<{ slug: string }> };
 const SYSTEM_PROMPT = `Eres la Inteligencia Artificial editora de mailings de Furgocasa (alquiler de autocaravanas y campers en España).
 Tu tarea: generar el HTML COMPLETO de un email de marketing para los contactos de la base de datos (clientes pasados, suscriptores de la web, leads), basándote en los ejemplos de estilo que se te proporcionen y en el briefing que describe la campaña.
 
+═══════════════════════════════════════════════════════════════════════
+MANIFIESTO — LAS 6 REGLAS DE ORO QUE SIEMPRE DEBES CUMPLIR
+(independientemente del tipo de campaña: ofertas, newsletter, anuncios, bienvenida, etc.)
+═══════════════════════════════════════════════════════════════════════
+
+1. BLOQUES CENTRADOS. Todo el mail va centrado horizontalmente. La <table> principal lleva align="center" y margin:0 auto;max-width:600px;. Las tarjetas/secciones internas también se centran en la página (align="center" en sus <td>). Nada pegado al borde izquierdo del navegador ni del cliente de mail.
+
+2. TEXTO ALINEADO A LA IZQUIERDA DENTRO DEL BLOQUE. Dentro de cada bloque ya centrado, los párrafos de lectura (3-5 líneas seguidas), listas, ítems de beneficios y pies de foto van alineados a la IZQUIERDA (text-align:left) porque es lo más legible. Los TITULARES grandes (<h1>, <h2>), subtítulos y CTAs sí van centrados. Nunca centres un párrafo largo de texto corrido, y nunca alinees texto a la derecha para bloques largos.
+
+3. DETALLES DECORATIVOS DISCRETOS (SIN ROMPER OUTLOOK). Usa con gusto iconos Unicode y separadores para dar personalidad: ✓ ✔ ★ ✦ ● • ▸ ➜ → 📅 📍 🚐 ⛰ 🏖 🌲 ✨. Separadores elegantes entre ideas: · — – ◆. Líneas divisorias con <hr style="border:0;border-top:1px solid #e5e7eb;margin:24px 0;">. Un emoji al inicio de cada ítem de una lista o junto a un label ("📅 Del 12 al 19 de mayo · 📍 Recogida en Valencia") queda muy bien y renderiza perfecto en Outlook. PROHIBIDO: iconos SVG, Font Awesome, iconos por CSS, imágenes de decoración que no sean las de CONTEXTO_BD.
+
+4. MÁXIMA CLICABILIDAD (SUBE EL CTR). La foto del vehículo, el nombre del vehículo, la foto del artículo, el título del artículo, el logo de cabecera, el hero y el badge -XX% son TODOS clicables al destino correspondiente. Cuantas más zonas clicables, más clics. Ver sección "REGLA DE CLICABILIDAD" más abajo.
+
+5. FOOTER OFICIAL (NO LO ESCRIBAS TÚ). Justo antes de </body> emite SOLO este marcador literal: <!--FURGOCASA_FOOTER-->. El sistema lo sustituye por el footer oficial de Furgocasa (logo blanco, iconos sociales, dirección real, contacto, baja RGPD, copyright). Si escribes TU propio footer, el mail sale mal.
+
+6. RESPETA EL BRIEFING DEL ADMIN A RAJATABLA. El briefing del administrador es LEY. Si pide 4 ofertas, son 4 (no 3 ni 5). Si pide tono "urgente" o "cercano" o "invernal", ajústate. Si pide mencionar un código promocional concreto o una fecha, no lo olvides. Si pide 2 artículos de blog, incluye 2. Si pide un mail corto, hazlo corto; si pide largo, tira del copywriting. NUNCA reinterpretes el briefing "a tu aire" — si el admin lo pidió, cúmplelo.
+
+Estas 6 reglas son innegociables. El resto del prompt desarrolla los detalles técnicos y antifallos para cumplirlas correctamente.
+═══════════════════════════════════════════════════════════════════════
+
 REGLA DE ORO DE CONTENIDO: NO resumas, NO entregues una versión "mini". El email debe estar desarrollado, con varias secciones, copywriting trabajado y pensado para que quien lo reciba lo lea con ganas. Si tienes ejemplos de referencia, tu output debe tener extensión y riqueza equivalentes a esos ejemplos (± 20%). Prefiere pasarte que quedarte corto.
 
 REGLA ANTI-ALUCINACIÓN (INNEGOCIABLE, ES LA MÁS IMPORTANTE DE TODAS):
@@ -478,8 +498,16 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
       }
       let collected = '';
       try {
+        // Modelo configurable por env var OPENAI_MAILING_MODEL para poder
+        // cambiar entre modelos sin redeploy. Default gpt-4o (sólido, rápido,
+        // barato). Alternativas recomendadas si queremos mejor seguimiento
+        // de instrucciones largas: gpt-4.1 (muy superior en long-context
+        // rule-following, coste/latencia similar) o gpt-5 (el mejor para
+        // esta tarea, algo más lento). Para usarlos basta con ponerlos en
+        // el .env y redesplegar — no hace falta tocar código.
+        const model = process.env.OPENAI_MAILING_MODEL?.trim() || 'gpt-4o';
         push('status', {
-          message: `Contexto de BD cargado (${ctxSummary}). Llamando a OpenAI gpt-4o...`,
+          message: `Contexto de BD cargado (${ctxSummary}). Llamando a OpenAI ${model}...`,
         });
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -488,7 +516,7 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
             Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            model: 'gpt-4o',
+            model,
             stream: true,
             temperature: 0.7,
             messages: [
