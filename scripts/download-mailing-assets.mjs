@@ -61,29 +61,32 @@ async function fetchBuffer(url) {
 // 1) Iconos redes sociales
 // ──────────────────────────────────────────────────────────────────────
 async function downloadSocialIcons() {
-  const icons = [
-    {
-      name: 'instagram',
-      url: `https://cdn.simpleicons.org/instagram/${CORPORATE_COLOR}`,
-    },
-    {
-      name: 'facebook',
-      url: `https://cdn.simpleicons.org/facebook/${CORPORATE_COLOR}`,
-    },
+  // Generamos dos versiones de cada icono:
+  //   · azul corporativo (#063971) → para footers claros (uso general en la web)
+  //   · blanco (#ffffff)            → para el footer azul de los mailings
+  const variants = [
+    { suffix: '', color: CORPORATE_COLOR },
+    { suffix: '-white', color: 'ffffff' },
   ];
-  for (const icon of icons) {
-    const outPath = path.join(OUT_ROOT, `${icon.name}.png`);
-    console.log(`· Icono ${icon.name}: descargando SVG...`);
-    const svg = await fetchBuffer(icon.url);
-    console.log(`· Icono ${icon.name}: rasterizando a ${ICON_SIZE}x${ICON_SIZE} PNG...`);
-    await sharp(svg, { density: 400 })
-      .resize(ICON_SIZE, ICON_SIZE, {
-        fit: 'contain',
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      })
-      .png({ compressionLevel: 9 })
-      .toFile(outPath);
-    console.log(`  → ${path.relative(process.cwd(), outPath)}`);
+  const names = ['instagram', 'facebook'];
+
+  for (const name of names) {
+    for (const v of variants) {
+      const filename = `${name}${v.suffix}.png`;
+      const outPath = path.join(OUT_ROOT, filename);
+      const url = `https://cdn.simpleicons.org/${name}/${v.color}`;
+      console.log(`· Icono ${filename}: descargando SVG (${v.color})...`);
+      const svg = await fetchBuffer(url);
+      console.log(`· Icono ${filename}: rasterizando a ${ICON_SIZE}x${ICON_SIZE} PNG...`);
+      await sharp(svg, { density: 400 })
+        .resize(ICON_SIZE, ICON_SIZE, {
+          fit: 'contain',
+          background: { r: 0, g: 0, b: 0, alpha: 0 },
+        })
+        .png({ compressionLevel: 9 })
+        .toFile(outPath);
+      console.log(`  → ${path.relative(process.cwd(), outPath)}`);
+    }
   }
 }
 
