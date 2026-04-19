@@ -451,6 +451,33 @@ function Metric({
   );
 }
 
+function StateChip({
+  label,
+  value,
+  warn,
+}: {
+  label: string;
+  value: string;
+  warn?: boolean;
+}) {
+  return (
+    <div
+      className={`rounded-lg px-3 py-2 border ${
+        warn
+          ? "bg-amber-50 border-amber-200 text-amber-900"
+          : "bg-gray-50 border-gray-200 text-gray-700"
+      }`}
+    >
+      <div className="uppercase tracking-wide text-[10px] opacity-70">
+        {label}
+      </div>
+      <div className="font-semibold text-xs leading-tight break-all">
+        {value}
+      </div>
+    </div>
+  );
+}
+
 function InlineEditable({
   value,
   onSave,
@@ -1454,6 +1481,9 @@ function SendTab({
   const [recipients, setRecipients] = useState<Recipient[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
+  const [tickBusy, setTickBusy] = useState(false);
+  const [tickResp, setTickResp] = useState<unknown>(null);
+  const [tickErr, setTickErr] = useState<string | null>(null);
 
   useEffect(() => {
     setMaxPerHour(campaign.max_per_hour);
@@ -1532,6 +1562,33 @@ function SendTab({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ unarchive: true }),
     });
+  }
+
+  // Diagnóstico: dispara un tick del cron AHORA y muestra la respuesta
+  // cruda (por qué no envía, cuántos envió, errores de lock/SMTP, etc.).
+  async function forceTickNow() {
+    setTickBusy(true);
+    setTickErr(null);
+    setTickResp(null);
+    try {
+      const r = await fetch(
+        `/api/admin/mailing/campaigns/${campaign.slug}/tick-now`,
+        { method: "POST", cache: "no-store" },
+      );
+      const j = (await r.json().catch(() => ({}))) as Record<string, unknown>;
+      setTickResp(j);
+      if (!r.ok) {
+        setTickErr(
+          (typeof j?.error === "string" ? j.error : null) ||
+            `HTTP ${r.status}`,
+        );
+      }
+    } catch (e) {
+      setTickErr((e as Error).message);
+    } finally {
+      setTickBusy(false);
+      loadRecipients();
+    }
   }
 
   // Motivos explícitos de por qué NO se puede arrancar.
@@ -1701,6 +1758,108 @@ function SendTab({
           {configBusy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Guardar config
         </button>
+      </div>
+
+      {/* Diagnóstico: dispara un tick manual y muestra el resultado crudo */}
+      <div className="bg-white border border-gray-200 rounded-xl p-5 space-y-3">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <h3 className="font-medium flex items-center gap-1.5">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
+              Diagnóstico del envío
+            </h3>
+            <p className="text-xs text-gray-500 mt-1 max-w-xl">
+              El cron de Vercel corre cada minuto y envía{" "}
+              <strong>{campaign.batch_size_per_tick}</strong>/tick con tope de{" "}
+              <strong>{campaign.max_per_hour}</strong>/hora (~
+              {Math.round((campaign.max_per_hour / 60) * 10) / 10}/min). Si no
+              ves avance, pulsa &quot;Forzar tick ahora&quot; para ejecutar el
+              proceso en el momento y ver la respuesta cruda del servidor.
+            </p>
+          </div>
+          <button
+            onClick={forceTickNow}
+            disabled={tickBusy || campaign.status !== "sending"}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-amber-600 text-white hover:bg-amber-700 text-sm disabled:opacity-40 shrink-0"
+            title={
+              campaign.status !== "sending"
+                ? "Solo disponible con la campaña en estado 'sending'"
+                : "Ejecuta un tick del cron ahora mismo"
+            }
+          >
+            {tickBusy ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Send className="w-4 h-4" />
+            )}
+            Forzar tick ahora
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+          <StateChip label="Estado" value={campaign.status} />
+          <StateChip
+            label="Pausada"
+            value={campaign.is_paused ? "SÍ" : "no"}
+            warn={campaign.is_paused}
+          />
+          <StateChip
+            label="Último tick"
+            value={campaign.last_tick_at ? fmtDate(campaign.last_tick_at) : "—"}
+          />
+          <StateChip
+            label="Enviados"
+            value={`${campaign.sent_count}/${campaign.total_recipients}`}
+          />
+        </div>
+
+        {campaign.last_tick_note && (
+          <div className="text-xs bg-gray-50 border border-gray-200 rounded-lg p-2.5 text-gray-700">
+            <span className="font-medium">Nota del último tick: </span>
+            {campaign.last_tick_note}
+          </div>
+        )}
+
+        {tickErr && (
+          <div className="text-xs bg-red-50 border border-red-200 rounded-lg p-2.5 text-red-800">
+            <div className="font-medium flex items-center gap-1.5">
+              <X className="w-3.5 h-3.5" /> Error al forzar tick
+            </div>
+            <div className="font-mono mt-1 whitespace-pre-wrap break-all">
+              {tickErr}
+            </div>
+          </div>
+        )}
+
+        {tickResp !== null && (
+          <details className="text-xs">
+            <summary className="cursor-pointer text-gray-600 hover:text-gray-900 font-medium">
+              Respuesta cruda del servidor (click para ver / ocultar)
+            </summary>
+            <pre className="mt-2 bg-gray-900 text-gray-100 rounded-lg p-3 overflow-auto max-h-96 font-mono text-[11px] leading-tight">
+              {JSON.stringify(tickResp, null, 2)}
+            </pre>
+            <p className="mt-2 text-gray-500 leading-relaxed">
+              Pistas comunes:
+              <br />
+              <strong>· &quot;column tick_lock_at does not exist&quot;</strong>:
+              falta aplicar la migración{" "}
+              <code>supabase/migrations/20260420-mailing-tick-lock.sql</code> en
+              Supabase.
+              <br />
+              <strong>· &quot;Faltan SMTP_*&quot;</strong>: configura
+              <code> SMTP_HOST / SMTP_USER / SMTP_PASSWORD </code>
+              en Vercel (Production) y redeploy.
+              <br />
+              <strong>· active: 0</strong>: la campaña NO está en{" "}
+              <code>status=&apos;sending&apos;</code> o está{" "}
+              <code>is_paused=true</code>.
+              <br />
+              <strong>· note: &quot;cupo horario lleno&quot;</strong>: ya has
+              consumido el tope <code>max_per_hour</code> en los últimos 60 min.
+            </p>
+          </details>
+        )}
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">

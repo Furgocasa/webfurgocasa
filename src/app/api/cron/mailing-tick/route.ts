@@ -187,22 +187,35 @@ async function processCampaign(
   return res;
 }
 
-async function handleTick(req: NextRequest) {
-  const secret = process.env.CRON_SECRET;
-  if (secret) {
-    const auth = req.headers.get('authorization');
-    if (auth !== `Bearer ${secret}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-  }
+export type TickSummary = {
+  ok: boolean;
+  active: number;
+  results: TickResult[];
+  error?: string;
+  hint?: string;
+};
 
+/**
+ * Ejecuta un tick del cron UNA vez, sin necesidad de request HTTP.
+ *
+ * Se puede llamar desde:
+ *   - el propio handler del cron (Vercel Cron)
+ *   - el endpoint admin "Forzar tick ahora" (diagnóstico)
+ *
+ * Devuelve un TickSummary con el detalle por campaña. No lanza: si algo
+ * falla lo mete en `error` y `hint` para que quien llame lo muestre.
+ */
+export async function runTickOnce(): Promise<TickSummary> {
   try {
     loadSmtpConfig();
   } catch (e) {
-    return NextResponse.json(
-      { error: (e as Error).message, hint: 'Faltan SMTP_* en .env' },
-      { status: 500 },
-    );
+    return {
+      ok: false,
+      active: 0,
+      results: [],
+      error: (e as Error).message,
+      hint: 'Faltan SMTP_HOST / SMTP_USER / SMTP_PASSWORD en variables de entorno.',
+    };
   }
 
   const sb = createAdminClient();
@@ -214,21 +227,26 @@ async function handleTick(req: NextRequest) {
     .eq('status', 'sending')
     .eq('is_paused', false)
     .order('started_at', { ascending: true });
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  if (!campaigns?.length) return NextResponse.json({ ok: true, active: 0, results: [] });
+  if (error) {
+    return {
+      ok: false,
+      active: 0,
+      results: [],
+      error: error.message,
+      hint: 'Error leyendo mailing_campaigns (¿migraciones aplicadas? ¿service_role key correcta?).',
+    };
+  }
+  if (!campaigns?.length) {
+    return { ok: true, active: 0, results: [] };
+  }
 
   const t = buildTransport();
   const results: TickResult[] = [];
-  // Lock-watchdog: si un tick previo murió sin liberar, tras este timeout
-  // cualquier nuevo tick puede tomarlo. 5 min > maxDuration(60s) + margen.
   const LOCK_STALE_MS = 5 * 60_000;
   for (const c of campaigns as CampaignRow[]) {
     const now = new Date();
     const staleCutoff = new Date(now.getTime() - LOCK_STALE_MS).toISOString();
 
-    // CAS atómico: solo un tick a la vez dentro de processCampaign().
-    // La condición .or() hace que el UPDATE falle si otro proceso ya
-    // agarró el lock y aún no ha caducado.
     const { data: lockRows, error: lockErr } = await sb
       .from('mailing_campaigns')
       .update({ tick_lock_at: now.toISOString() })
@@ -237,6 +255,8 @@ async function handleTick(req: NextRequest) {
       .select('id');
 
     if (lockErr) {
+      // Nota: si el error es 'column "tick_lock_at" does not exist' significa
+      // que falta aplicar la migración 20260420-mailing-tick-lock.sql.
       results.push({
         slug: c.slug,
         attempted: 0,
@@ -249,7 +269,6 @@ async function handleTick(req: NextRequest) {
       continue;
     }
     if (!lockRows || lockRows.length === 0) {
-      // Otro tick lo está procesando ya. Saltamos sin ruido.
       results.push({
         slug: c.slug,
         attempted: 0,
@@ -257,7 +276,7 @@ async function handleTick(req: NextRequest) {
         failed: 0,
         skipped: 0,
         rateLimited: false,
-        note: 'skip: tick previo aún en curso',
+        note: 'skip: tick previo aún en curso (lock activo)',
       });
       continue;
     }
@@ -283,8 +302,6 @@ async function handleTick(req: NextRequest) {
         })
         .eq('id', c.id);
     } finally {
-      // Liberamos el lock pase lo que pase (si el proceso muere aquí,
-      // el watchdog de 5 min lo recupera en el siguiente tick).
       await sb
         .from('mailing_campaigns')
         .update({ tick_lock_at: null })
@@ -292,14 +309,26 @@ async function handleTick(req: NextRequest) {
     }
   }
 
-  // Cerramos el transport para no dejar conexiones colgadas.
   try {
     t.close();
   } catch {
     // noop
   }
 
-  return NextResponse.json({ ok: true, active: campaigns.length, results });
+  return { ok: true, active: campaigns.length, results };
+}
+
+async function handleTick(req: NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  if (secret) {
+    const auth = req.headers.get('authorization');
+    if (auth !== `Bearer ${secret}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+  }
+  const summary = await runTickOnce();
+  const status = summary.ok ? 200 : 500;
+  return NextResponse.json(summary, { status });
 }
 
 export async function GET(req: NextRequest) {
