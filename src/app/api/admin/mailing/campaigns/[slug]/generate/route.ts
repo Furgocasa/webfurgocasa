@@ -39,7 +39,17 @@ MANIFIESTO — LAS 6 REGLAS DE ORO QUE SIEMPRE DEBES CUMPLIR
 Estas 6 reglas son innegociables. El resto del prompt desarrolla los detalles técnicos y antifallos para cumplirlas correctamente.
 ═══════════════════════════════════════════════════════════════════════
 
-REGLA DE ORO DE CONTENIDO: NO resumas, NO entregues una versión "mini". El email debe estar desarrollado, con varias secciones, copywriting trabajado y pensado para que quien lo reciba lo lea con ganas. Si tienes ejemplos de referencia, tu output debe tener extensión y riqueza equivalentes a esos ejemplos (± 20%). Prefiere pasarte que quedarte corto.
+REGLA DE ORO DE CONTENIDO: el email debe estar bien trabajado, PERO sin pasarse de texto. Prioriza la claridad visual, la jerarquía, las tarjetas, los bloques escaneables y el ritmo de lectura. Mejor un mail visualmente limpio, con poco texto y bien distribuido, que una "biblia en verso" con párrafos eternos. Usa la inspiración de las referencias en tono/estructura/componentes, pero NO copies su longitud si eso empeora la lectura.
+
+REGLA DE DENSIDAD VISUAL Y LONGITUD (INNEGOCIABLE):
+· El objetivo por defecto es un email visual, ligero y escaneable.
+· Prioriza bloques/cards, fotos, destacados, badges, precios, CTAs y separadores antes que grandes masas de copy.
+· NO escribas párrafos de más de 2-3 frases seguidas.
+· NO escribas bloques de texto corrido de más de ~280 caracteres visibles.
+· En campañas de ofertas o promo, usa normalmente 2-3 párrafos breves en total más las tarjetas visuales. No hace falta más.
+· Solo escribe un email largo si el briefing del admin lo pide explícitamente (newsletter editorial, storytelling, carta, etc.).
+· Si dudas entre meter más copy o reforzar el bloque visual, elige SIEMPRE reforzar el bloque visual.
+· PRESUPUESTO DE COPY visible (regla práctica): fuera de titulares, precios, badges, extractos cortos y botones, intenta que el texto total del mail se mueva normalmente entre ~600 y ~1.400 caracteres visibles. En campañas de ofertas, mejor quedarse en la parte baja de ese rango.
 
 REGLA DE CUMPLIMIENTO DEL BRIEFING (OBLIGATORIA):
 Antes de empezar a escribir el HTML, haz internamente esta checklist mental con el briefing del admin y NO la omitas:
@@ -270,6 +280,43 @@ Reglas Outlook-safe al envolver en <a>:
 
 PROHIBIDO convertir en enlaces: el logo del footer, los iconos de redes sociales, el enlace de baja (todo eso lo pone el sistema en el footer oficial), ni los párrafos del cuerpo. Solo las zonas A-E listadas arriba.
 
+CÓMO PUBLICAR ARTÍCULOS DE BLOG (OBLIGATORIO CUANDO EL BRIEFING PIDE BLOG/NEWSLETTER):
+
+Cuando el mail incluya artículos del blog, cada tarjeta de artículo debe ser limpia, visual y breve. Usa este criterio:
+
+  1. Imagen del artículo centrada y clicable a posts[i].url.
+  2. Título del artículo clicable y ALINEADO A LA IZQUIERDA dentro de la tarjeta.
+  3. Excerpt/resumen ALINEADO A LA IZQUIERDA, muy breve: 1-2 frases o ~90-180 caracteres visibles. No conviertas el blog en una mini entrada completa dentro del email.
+  4. CTA "Leer más" o similar, preferiblemente centrado si equilibra mejor la tarjeta.
+  5. No metas más de 2-3 artículos salvo que el briefing lo pida explícitamente.
+
+Patrón de tarjeta de blog (Outlook-safe, adáptalo visualmente):
+
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="560" align="center" style="margin:0 auto 24px auto;max-width:560px;background-color:#ffffff;border:1px solid #e5e7eb;">
+    <tr>
+      <td align="center" bgcolor="#ffffff" style="background-color:#ffffff;padding:0;">
+        <a href="{post.url}" style="display:block;text-decoration:none;border:0;">
+          <img src="{post.image_url}" alt="{post.title}" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:0;">
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td bgcolor="#ffffff" style="background-color:#ffffff;padding:20px 24px;text-align:left;">
+        <h3 style="margin:0 0 8px 0;font-family:Arial,Helvetica,sans-serif;font-size:20px;font-weight:700;line-height:26px;text-align:left;">
+          <a href="{post.url}" style="color:#111827;text-decoration:none;">{post.title}</a>
+        </h3>
+        <p style="margin:0 0 14px 0;color:#374151;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:22px;text-align:left;">{post.excerpt}</p>
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+          <tr>
+            <td align="center" bgcolor="#063971" style="background-color:#063971;padding:12px 24px;">
+              <a href="{post.url}" style="display:inline-block;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;color:#ffffff;text-decoration:none;">Leer mas &rarr;</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+
 REGLA DE ALINEACIÓN Y ASPECT RATIO (INNEGOCIABLE):
 
 Centrado general: el mail entero debe verse centrado horizontalmente, tanto en escritorio como en móvil. Nada pegado al borde izquierdo.
@@ -278,7 +325,7 @@ Centrado general: el mail entero debe verse centrado horizontalmente, tanto en e
 · Cada <td> que contiene el HERO, el CTA principal, o un bloque "destacado" lleva align="center" + text-align:center en el style.
 · Los títulos grandes (<h1>, <h2>), subtítulos, y el texto bajo el CTA van centrados por defecto (text-align:center).
 · Los párrafos del CUERPO de lectura (3-5 líneas seguidas) y los ítems de una lista SÍ pueden ir alineados a la izquierda (text-align:left) para máxima legibilidad — es la única excepción. Título del bloque sigue siendo centrado.
-· Esta regla también aplica a los bloques de blog: imagen y título centrados; excerpt o resumen del artículo alineado a la izquierda; CTA centrado.
+· En los bloques de blog: la imagen va centrada, pero el título del artículo y su excerpt/resumen van alineados a la IZQUIERDA dentro de la tarjeta para que se lean mejor. El CTA puede ir centrado si queda mejor visualmente.
 · Los párrafos cortos que acompañan una imagen o un CTA van centrados.
 · Si quieres un pie de foto o un dato destacado alineado a la derecha dentro de su celda, es válido siempre y cuando esté DENTRO de su <td> (nunca se sale del ancho de la tabla). Usa text-align:right solo puntualmente, nunca para bloques largos.
 
@@ -371,12 +418,21 @@ Antes de entregar, revisa cada importe monetario del HTML y comprueba:
   ✓ no aparece ningún precio con formato anglosajón tipo "1,111.11" o "€1,111.11"
 Si detectas un importe en formato no europeo, corrígelo ANTES de entregar.
 
+AUTOCOMPROBACIÓN DE DENSIDAD VISUAL (obligatoria):
+Antes de entregar, revisa:
+  ✓ el email se entiende de un vistazo y no parece una pared de texto
+  ✓ no hay párrafos de más de 2-3 frases ni bloques excesivamente densos
+  ✓ la parte visual (hero, cards, ofertas, blog, badges, CTA) pesa más que el copy
+  ✓ si hay blog, el título y el excerpt van alineados a la izquierda dentro de la tarjeta
+  ✓ si el mail te parece "demasiado largo", recorta copy antes de entregar
+Si el resultado parece una newsletter interminable o una carta demasiado larga, REDÚCELO antes de devolver.
+
 ESTRUCTURA MÍNIMA OBLIGATORIA (en este orden):
 1. Preheader oculto (hidden preview text, 80-120 caracteres).
 2. Cabecera con el logo principal.
 3. Hero: titular corto + subtítulo empático de 1-2 frases.
 4. Saludo personalizado con {{NOMBRE}} (y opcionalmente {{CIUDAD}} si aplica a la campaña).
-5. Cuerpo principal: 3-5 párrafos de texto desarrollado (mínimo 3-4 frases cada uno). Empática, cercana, en segunda persona del singular (tuteo).
+5. Cuerpo principal: 2-3 párrafos breves de texto bien escrito (normalmente 1-2 frases por párrafo; excepcionalmente 3 si hace falta). Empática, cercana, en segunda persona del singular (tuteo). Si la campaña es visual (ofertas, promo, blog + CTA), mantén este bloque corto.
 6. Al menos UN bloque destacado (caja de color, tipo "lo que incluye", "por qué elegirnos"): sub-sección con 3-5 ítems en lista/checklist, cada ítem con icono/emoji y 1 frase de desarrollo.
 7. CTA principal: botón grande con href absoluto a https://www.furgocasa.com/... (según briefing). 1-2 frases de contexto debajo.
 8. Sección secundaria (p. ej. "Cómo funciona", "Testimonio", "Destinos favoritos"): otro bloque con 2-3 puntos más.
@@ -421,11 +477,11 @@ REQUISITOS TÉCNICOS OBLIGATORIOS DEL HTML:
    {{CIUDAD}}  · ciudad del contacto (puede venir vacío)
 11. Todos los href de www.furgocasa.com en https absoluto.
 12. NO incluyas explicaciones, comentarios de JSON ni markdown. Devuelve SOLO el HTML final del email. EXCEPCIÓN: se permiten exactamente DOS comentarios HTML de sistema, y solo esos dos: el comentario inicial <!--FURGOCASA_DESCRIPTION: ...--> y el marcador final <!--FURGOCASA_FOOTER-->. No añadas ningún otro comentario.
-13. Longitud mínima 400 líneas si no hay referencias. Con referencias, iguala su extensión (±20%).
+13. Longitud orientativa: suficiente para que el mail se vea rico y bien maquetado, pero sin rellenar por rellenar. NO intentes igualar la longitud de las referencias si eso hace el email más pesado. Si el mail ya comunica bien con menos texto, quédate corto antes que pasarte.
 
 TONO: cercano, empático, profesional. Español de España. Evita anglicismos. Tuteo al destinatario. Debe sonar a persona escribiendo, no a plantilla. Estilo aventurero-acogedor: apela a viajar con libertad, descubrir, desconectar, vivir experiencias.
 
-Si los ejemplos incluyen componentes (cajas destacadas, checklist, cita, testimonio, CTA, "regalo"), REUSA esos componentes adaptando el contenido: no los omitas para "ahorrar".
+Si los ejemplos incluyen componentes (cajas destacadas, checklist, cita, testimonio, CTA, "regalo"), REUSA esos componentes adaptando el contenido, pero sin heredar necesariamente toda su longitud verbal.
 
 El usuario te dará un briefing y hasta 3 campañas previas como referencia. Devuelve SOLO el HTML completo respetando todas las reglas anteriores.`;
 
@@ -558,8 +614,9 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
         const model: MailingModel = requestedModel
           ? (requestedModel as MailingModel)
           : fallbackModel;
+        const temperature = model === 'gpt-5.4' ? 0.2 : 0.3;
         push('status', {
-          message: `Contexto de BD cargado (${ctxSummary}). Llamando a OpenAI ${model}...`,
+          message: `Contexto de BD cargado (${ctxSummary}). Llamando a OpenAI ${model} (temp ${temperature})...`,
         });
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
@@ -570,7 +627,7 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
           body: JSON.stringify({
             model,
             stream: true,
-            temperature: 0.35,
+            temperature,
             messages: [
               { role: 'system', content: SYSTEM_PROMPT },
               { role: 'user', content: userPrompt },
