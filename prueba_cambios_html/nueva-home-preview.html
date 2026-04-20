@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preview · Nueva Home Furgocasa (propuesta estética)</title>
+
+  <!-- Tailwind CDN con configuración corporativa -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Amiko', 'system-ui', 'sans-serif'],
+            heading: ['Rubik', 'system-ui', 'sans-serif'],
+            amiko: ['Amiko', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            'furgocasa-blue': {
+              DEFAULT: '#063971',
+              dark: '#042A54',
+              light: '#094F9A',
+            },
+            'furgocasa-orange': {
+              DEFAULT: '#D65A31',
+              dark: '#C04F2A',
+              light: '#FF8C5F',
+              bright: '#FF6B35',
+            },
+          },
+          boxShadow: {
+            'corp': '0 10px 40px -15px rgba(6, 57, 113, 0.25)',
+            'corp-lg': '0 20px 60px -20px rgba(6, 57, 113, 0.35)',
+            'orange': '0 10px 40px -15px rgba(214, 90, 49, 0.4)',
+          },
+          keyframes: {
+            wiggle: {
+              '0%, 100%': { transform: 'rotate(-5deg)' },
+              '50%': { transform: 'rotate(5deg)' },
+            },
+            'bounce-slow': {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+          },
+          animation: {
+            wiggle: 'wiggle 1.2s ease-in-out infinite',
+            'bounce-slow': 'bounce-slow 2.5s ease-in-out infinite',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Fonts (Rubik + Amiko) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Amiko:wght@400;600;700&family=Rubik:wght@300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- Lucide icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Amiko', system-ui, sans-serif; }
+    .font-heading { font-family: 'Rubik', system-ui, sans-serif; }
+
+    /* Barra superior visual "qué cambia" */
+    .diff-pill {
+      font-family: 'Rubik', sans-serif;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+    }
+  </style>
+</head>
+<body class="bg-white font-amiko text-gray-900">
+
+  <!-- =========================================================
+       Leyenda flotante de "qué ha cambiado vs home actual"
+       ========================================================= -->
+  <div id="diff-panel" class="fixed bottom-4 right-4 z-[100] bg-white rounded-2xl shadow-2xl border border-gray-200 p-4 max-w-xs text-xs leading-relaxed hidden lg:block">
+    <div class="flex items-center justify-between mb-2">
+      <p class="font-heading font-bold text-furgocasa-blue uppercase tracking-wider text-[11px]">Propuesta estética</p>
+      <button onclick="document.getElementById('diff-panel').style.display='none'" class="text-gray-400 hover:text-gray-700">✕</button>
+    </div>
+    <ul class="space-y-1.5 text-gray-700">
+      <li><span class="inline-block w-2 h-2 rounded-full bg-furgocasa-orange mr-2"></span>H2 unificados en azul uppercase</li>
+      <li><span class="inline-block w-2 h-2 rounded-full bg-furgocasa-orange mr-2"></span>Hero con kicker + overlay + scroll</li>
+      <li><span class="inline-block w-2 h-2 rounded-full bg-furgocasa-orange mr-2"></span>Bloque "¿Qué es Furgocasa?" tipo card</li>
+      <li><span class="inline-block w-2 h-2 rounded-full bg-furgocasa-orange mr-2"></span>Badges de precio/plazas en vehículos</li>
+      <li><span class="inline-block w-2 h-2 rounded-full bg-furgocasa-orange mr-2"></span>"Más elegida" en Temporada Media</li>
+      <li><span class="inline-block w-2 h-2 rounded-full bg-furgocasa-orange mr-2"></span>Servicios con border-t-4 coherente</li>
+      <li><span class="inline-block w-2 h-2 rounded-full bg-furgocasa-orange mr-2"></span>Sombras corporativas azules</li>
+    </ul>
+  </div>
+
+  <!-- =========================================================
+       HEADER simulado (solo para dar contexto, igual que web)
+       ========================================================= -->
+  <header class="fixed top-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md shadow-corp border-b border-gray-100">
+    <div class="container mx-auto px-4 py-3 flex items-center justify-between max-w-[1400px]">
+      <div class="flex items-center gap-2">
+        <div class="w-9 h-9 bg-furgocasa-blue rounded-lg flex items-center justify-center">
+          <i data-lucide="caravan" class="h-5 w-5 text-white"></i>
+        </div>
+        <span class="font-heading font-black text-furgocasa-blue text-xl tracking-wide">FURGOCASA</span>
+      </div>
+      <nav class="hidden lg:flex items-center gap-6 text-sm font-semibold text-gray-700 uppercase tracking-wider">
+        <a href="#" class="hover:text-furgocasa-orange">Ofertas</a>
+        <a href="#" class="hover:text-furgocasa-orange">Vehículos</a>
+        <a href="#" class="hover:text-furgocasa-orange">Tarifas</a>
+        <a href="#" class="hover:text-furgocasa-orange">Blog</a>
+        <a href="#" class="hover:text-furgocasa-orange">Contacto</a>
+      </nav>
+      <div class="flex items-center gap-2">
+        <a href="#" class="hidden md:inline-flex items-center gap-2 text-furgocasa-blue font-bold text-sm uppercase tracking-wider border-2 border-furgocasa-blue px-4 py-2 rounded-lg hover:bg-furgocasa-blue hover:text-white transition-colors">
+          Ventas
+        </a>
+        <a href="#" class="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold text-sm uppercase tracking-wider px-4 py-2 rounded-lg shadow-orange transition-colors">
+          Reservar
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       HERO (mejora 1: kicker, overlay controlado, SearchWidget elevado, scroll indicator)
+       ========================================================= -->
+  <section class="relative h-screen min-h-[640px] flex items-center justify-center pt-16">
+    <div class="absolute inset-0 overflow-hidden">
+      <img
+        src="../public/images/slides/hero-11.webp"
+        alt="Camper Furgocasa"
+        class="w-full h-full object-cover"
+        onerror="this.src='https://images.unsplash.com/photo-1533564521041-b03d95a5c4ad?auto=format&fit=crop&w=1920&q=80'"
+      />
+      <!-- Overlay corporativo controlado -->
+      <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 text-center max-w-[1400px]">
+      <div class="max-w-5xl mx-auto space-y-4">
+
+        <!-- 🟠 KICKER (propuesta 1) -->
+        <span class="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-lg">
+          <i data-lucide="sparkles" class="h-4 w-4"></i>
+          Alquiler de campers en España · Desde 95€/día
+        </span>
+
+        <h1 class="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase"
+            style="text-shadow: 3px 3px 12px rgba(0,0,0,0.9); letter-spacing: 0.08em;">
+          Las Mejores Autocaravanas Camper en Alquiler
+        </h1>
+
+        <div class="w-24 h-1 bg-white/40 mx-auto"></div>
+
+        <p class="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight"
+           style="text-shadow: 2px 2px 8px rgba(0,0,0,0.8);">
+          Furgocasa: flota premium desde 95€/día con kilómetros ilimitados
+        </p>
+
+        <p class="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide"
+           style="text-shadow: 1px 1px 4px rgba(0,0,0,0.8);">
+          Dreamer, Knaus, Weinsberg. España y Europa.
+        </p>
+
+        <!-- 🟠 SearchWidget "elevado" (propuesta 1) -->
+        <div class="max-w-5xl mx-auto pt-6">
+          <div class="bg-white/95 backdrop-blur-md rounded-2xl shadow-corp-lg ring-1 ring-white/30 p-4 lg:p-6 border border-white/20">
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-left">
+              <div class="md:col-span-1">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Ubicación</label>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 mt-1 flex items-center gap-2">
+                  <i data-lucide="map-pin" class="h-4 w-4 text-furgocasa-orange"></i>
+                  <span class="text-sm font-semibold text-gray-900">MURCIA (SEDE)</span>
+                </div>
+              </div>
+              <div class="md:col-span-2">
+                <label class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Fecha recogida · devolución</label>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 mt-1 flex items-center gap-2">
+                  <i data-lucide="calendar-days" class="h-4 w-4 text-furgocasa-orange"></i>
+                  <span class="text-sm text-gray-500">Selecciona el periodo de alquiler</span>
+                </div>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Hora recogida</label>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 mt-1 flex items-center gap-2">
+                  <i data-lucide="clock" class="h-4 w-4 text-furgocasa-orange"></i>
+                  <span class="text-sm text-gray-500">10:00</span>
+                </div>
+              </div>
+              <div>
+                <label class="text-[11px] font-bold uppercase tracking-wider text-gray-500">Hora devolución</label>
+                <div class="bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 mt-1 flex items-center gap-2">
+                  <i data-lucide="clock" class="h-4 w-4 text-furgocasa-orange"></i>
+                  <span class="text-sm text-gray-500">10:00</span>
+                </div>
+              </div>
+            </div>
+            <button class="w-full mt-4 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold py-3.5 rounded-xl uppercase tracking-wider shadow-orange transition-all hover:scale-[1.01]">
+              <i data-lucide="search" class="inline h-5 w-5 mr-2"></i>
+              Buscar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🟠 Indicador de scroll (propuesta 1) -->
+    <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce-slow">
+      <div class="flex flex-col items-center gap-1 text-white/80">
+        <span class="text-[10px] font-bold uppercase tracking-widest">Descubre más</span>
+        <i data-lucide="chevron-down" class="h-6 w-6"></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       BLOQUE "¿Qué es Furgocasa?" (mejora 3: tipo card)
+       ========================================================= -->
+  <section class="py-10 bg-white">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="max-w-4xl mx-auto bg-gray-50 border-l-4 border-furgocasa-orange rounded-r-2xl p-6 lg:p-8 shadow-corp">
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0 w-11 h-11 rounded-lg bg-furgocasa-orange/10 flex items-center justify-center">
+            <i data-lucide="info" class="h-5 w-5 text-furgocasa-orange"></i>
+          </div>
+          <div class="flex-1">
+            <p class="text-base md:text-lg text-gray-700 leading-relaxed">
+              <strong class="text-furgocasa-blue">¿Qué es Furgocasa?</strong> Empresa de alquiler de autocaravanas y campers en Murcia (España). Flota premium Dreamer, Knaus y Weinsberg con kilómetros ilimitados, desde 95€/día según temporada. Recogida y devolución en Murcia o Madrid. Fianza: 1000€. Teléfono: 868 36 41 61.
+            </p>
+            <!-- 🟠 Chips de datos clave (propuesta 3) -->
+            <div class="flex flex-wrap gap-2 mt-4">
+              <span class="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                <i data-lucide="euro" class="h-3.5 w-3.5"></i> Desde 95€/día
+              </span>
+              <span class="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                <i data-lucide="infinity" class="h-3.5 w-3.5"></i> Km ilimitados
+              </span>
+              <span class="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                <i data-lucide="star" class="h-3.5 w-3.5"></i> 4.9/5
+              </span>
+              <span class="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                <i data-lucide="award" class="h-3.5 w-3.5"></i> 14+ años
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       VEHÍCULOS DESTACADOS (mejora 2 + 4)
+       ========================================================= -->
+  <section class="py-12 lg:py-16 bg-gray-50">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="text-center mb-10 lg:mb-14 max-w-5xl mx-auto">
+        <span class="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+          Flota premium
+        </span>
+        <!-- 🟠 H2 unificado (propuesta 2) -->
+        <h2 class="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-4 uppercase tracking-wide">
+          Las mejores camper vans en alquiler
+        </h2>
+        <p class="text-lg lg:text-xl text-gray-600">
+          Estamos especializados en vehículos campervan de gran volumen. Los mejores modelos del mercado.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+        <!-- Card 1 -->
+        <div class="group bg-white rounded-2xl overflow-hidden shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-1">
+          <div class="relative h-56 lg:h-64 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?auto=format&fit=crop&w=800&q=80" alt="Dreamer Fun D55" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue/80 via-furgocasa-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+
+            <!-- 🟠 Badge precio (propuesta 4) -->
+            <span class="absolute top-4 right-4 bg-furgocasa-orange text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
+              Desde 95€/día
+            </span>
+            <!-- 🟠 Tag plazas (propuesta 4) -->
+            <span class="absolute bottom-4 left-4 inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-furgocasa-blue px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+              <i data-lucide="users" class="h-3.5 w-3.5"></i> 2/4 plazas
+            </span>
+          </div>
+
+          <div class="p-6 lg:p-8 text-center">
+            <h4 class="text-xl lg:text-2xl font-heading font-bold text-gray-900 group-hover:text-furgocasa-blue transition-colors">Dreamer Fun D55</h4>
+            <p class="text-sm text-gray-600 mb-3">Dreamer · D55 Fun</p>
+            <div class="w-12 h-0.5 bg-furgocasa-orange/40 mx-auto mb-4"></div>
+            <a href="#" class="inline-flex items-center gap-2 text-furgocasa-orange font-bold uppercase tracking-wider hover:text-furgocasa-orange-dark text-sm">
+              Ver más campers <span class="text-xl">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="group bg-white rounded-2xl overflow-hidden shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-1">
+          <div class="relative h-56 lg:h-64 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1602087594298-706ccd419ffd?auto=format&fit=crop&w=800&q=80" alt="Knaus Boxstar" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue/80 via-furgocasa-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span class="absolute top-4 right-4 bg-furgocasa-orange text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">Desde 105€/día</span>
+            <span class="absolute bottom-4 left-4 inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-furgocasa-blue px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+              <i data-lucide="users" class="h-3.5 w-3.5"></i> 2/4 plazas
+            </span>
+          </div>
+          <div class="p-6 lg:p-8 text-center">
+            <h4 class="text-xl lg:text-2xl font-heading font-bold text-gray-900 group-hover:text-furgocasa-blue transition-colors">Knaus Boxstar Street</h4>
+            <p class="text-sm text-gray-600 mb-3">Knaus · Boxstar Street 600 MQ</p>
+            <div class="w-12 h-0.5 bg-furgocasa-orange/40 mx-auto mb-4"></div>
+            <a href="#" class="inline-flex items-center gap-2 text-furgocasa-orange font-bold uppercase tracking-wider hover:text-furgocasa-orange-dark text-sm">
+              Ver más campers <span class="text-xl">→</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="group bg-white rounded-2xl overflow-hidden shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-1">
+          <div class="relative h-56 lg:h-64 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1597673030062-0a0c34cc9547?auto=format&fit=crop&w=800&q=80" alt="Weinsberg CaraTour" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+            <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue/80 via-furgocasa-blue/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <span class="absolute top-4 right-4 bg-furgocasa-orange text-white px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">Desde 110€/día</span>
+            <span class="absolute bottom-4 left-4 inline-flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-furgocasa-blue px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider shadow-md">
+              <i data-lucide="users" class="h-3.5 w-3.5"></i> 2/4 plazas
+            </span>
+          </div>
+          <div class="p-6 lg:p-8 text-center">
+            <h4 class="text-xl lg:text-2xl font-heading font-bold text-gray-900 group-hover:text-furgocasa-blue transition-colors">Weinsberg CaraTour MQ</h4>
+            <p class="text-sm text-gray-600 mb-3">Weinsberg · CaraTour 600 MQ</p>
+            <div class="w-12 h-0.5 bg-furgocasa-orange/40 mx-auto mb-4"></div>
+            <a href="#" class="inline-flex items-center gap-2 text-furgocasa-orange font-bold uppercase tracking-wider hover:text-furgocasa-orange-dark text-sm">
+              Ver más campers <span class="text-xl">→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PRECIOS (mejora 5: destacar temporada media + iconos + meses)
+       ========================================================= -->
+  <section class="py-12 lg:py-16 bg-white">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="text-center mb-12 lg:mb-14">
+        <span class="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+          La mejor relación calidad precio
+        </span>
+        <h2 class="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-4 uppercase tracking-wide">
+          Nuestras autocaravanas desde
+        </h2>
+        <p class="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
+          Paga el 50% al reservar y la mitad restante 15 días antes del alquiler.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto mb-12">
+
+        <!-- Temporada Baja -->
+        <div class="bg-white rounded-2xl shadow-corp p-8 lg:p-10 text-center border-t-4 border-furgocasa-blue transform hover:scale-105 transition-transform duration-300">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-furgocasa-blue/10 flex items-center justify-center">
+            <i data-lucide="snowflake" class="h-7 w-7 text-furgocasa-blue"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-heading font-bold text-gray-500 mb-4 uppercase tracking-wider">Temporada Baja</h3>
+          <div class="flex items-baseline justify-center gap-2 mb-2">
+            <span class="text-5xl lg:text-6xl font-heading font-bold text-furgocasa-blue">95€</span>
+            <span class="text-lg text-gray-400 font-medium">/ día</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-3 uppercase tracking-wider">Nov · Ene · Feb</p>
+        </div>
+
+        <!-- Temporada Media (DESTACADA) 🟠 propuesta 5 -->
+        <div class="relative bg-white rounded-2xl shadow-corp-lg p-8 lg:p-10 text-center border-t-4 border-furgocasa-orange transform scale-105 hover:scale-110 transition-transform duration-300 ring-2 ring-furgocasa-orange/20">
+          <span class="absolute -top-3 -right-3 bg-furgocasa-orange text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-lg rotate-12">
+            Más elegida
+          </span>
+          <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-furgocasa-orange/10 flex items-center justify-center">
+            <i data-lucide="sun" class="h-7 w-7 text-furgocasa-orange"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-heading font-bold text-gray-500 mb-4 uppercase tracking-wider">Temporada Media</h3>
+          <div class="flex items-baseline justify-center gap-2 mb-2">
+            <span class="text-5xl lg:text-6xl font-heading font-bold text-furgocasa-orange">125€</span>
+            <span class="text-lg text-gray-400 font-medium">/ día</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-3 uppercase tracking-wider">Jun · Sep · Puentes</p>
+        </div>
+
+        <!-- Temporada Alta -->
+        <div class="bg-white rounded-2xl shadow-corp p-8 lg:p-10 text-center border-t-4 border-red-500 transform hover:scale-105 transition-transform duration-300">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-xl bg-red-50 flex items-center justify-center">
+            <i data-lucide="flame" class="h-7 w-7 text-red-500"></i>
+          </div>
+          <h3 class="text-sm lg:text-base font-heading font-bold text-gray-500 mb-4 uppercase tracking-wider">Temporada Alta</h3>
+          <div class="flex items-baseline justify-center gap-2 mb-2">
+            <span class="text-5xl lg:text-6xl font-heading font-bold text-red-500">155€</span>
+            <span class="text-lg text-gray-400 font-medium">/ día</span>
+          </div>
+          <p class="text-xs text-gray-500 mt-3 uppercase tracking-wider">Jul · Ago · Navidad</p>
+        </div>
+      </div>
+
+      <div class="text-center max-w-3xl mx-auto bg-gray-50 p-6 lg:p-8 rounded-2xl shadow-corp border border-gray-100">
+        <p class="text-lg lg:text-xl font-medium text-gray-700">
+          Descuentos de hasta <span class="text-furgocasa-orange font-bold text-xl lg:text-2xl mx-1">-10%, -20% y -30%</span> en alquileres de 1, 2 o 3 semanas.
+        </p>
+      </div>
+
+      <div class="text-center mt-12">
+        <a href="#" class="inline-flex items-center gap-2 text-furgocasa-blue font-bold uppercase tracking-wider hover:text-furgocasa-blue-dark transition-colors">
+          Ver todas las tarifas <span class="text-xl">→</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       BANNER OFERTAS (mejora 6: countdown + wiggle)
+       ========================================================= -->
+  <section class="py-12 lg:py-16 bg-gradient-to-br from-red-500 via-orange-500 to-furgocasa-orange relative overflow-hidden">
+    <div class="absolute inset-0 opacity-20" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 40px 40px;"></div>
+
+    <div class="container mx-auto px-4 relative z-10 max-w-[1400px]">
+      <div class="max-w-5xl mx-auto text-center">
+        <div class="inline-flex items-center justify-center gap-2 mb-6">
+          <i data-lucide="zap" class="h-12 w-12 lg:h-16 lg:w-16 text-yellow-300 fill-yellow-300 animate-wiggle"></i>
+        </div>
+
+        <h2 class="text-3xl md:text-4xl lg:text-6xl font-heading font-black text-white mb-4 uppercase tracking-wider"
+            style="text-shadow: 2px 2px 8px rgba(0,0,0,0.3);">
+          ¡Ofertas de Última Hora!
+        </h2>
+
+        <p class="text-lg md:text-xl lg:text-2xl text-white/95 mb-6 font-medium leading-relaxed max-w-3xl mx-auto"
+           style="text-shadow: 1px 1px 4px rgba(0,0,0,0.2);">
+          Descuentos de hasta el 40% en fechas seleccionadas
+        </p>
+
+        <!-- 🟠 Countdown visible (propuesta 6) -->
+        <div class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 text-white text-sm lg:text-base font-bold uppercase tracking-wider px-4 py-2 rounded-full mb-8">
+          <i data-lucide="timer" class="h-4 w-4"></i>
+          Oferta válida hasta el 30 abril 2026
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <a href="#" class="group inline-flex items-center gap-3 bg-white text-furgocasa-orange font-bold px-8 lg:px-10 py-4 lg:py-5 rounded-2xl hover:bg-gray-50 transition-all shadow-2xl text-lg lg:text-xl uppercase tracking-wider transform hover:scale-105 duration-300">
+            <i data-lucide="zap" class="h-5 w-5 group-hover:animate-pulse"></i>
+            Ver Ofertas Ahora
+            <span class="text-2xl group-hover:translate-x-1 transition-transform">→</span>
+          </a>
+          <span class="text-white/90 text-sm lg:text-base font-medium uppercase tracking-wide">
+            ¡Plazas limitadas!
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       DESTINOS (H2 unificado + badges destinos)
+       ========================================================= -->
+  <section class="py-12 lg:py-16 bg-gray-50">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="text-center mb-10 lg:mb-14 max-w-4xl mx-auto">
+        <span class="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+          Destinos destacados
+        </span>
+        <h2 class="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-4 uppercase tracking-wide">
+          Principales destinos en campervan
+        </h2>
+        <p class="text-lg lg:text-xl text-gray-600">
+          Descubre los mejores destinos para tu próxima aventura.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 lg:gap-5 max-w-6xl mx-auto">
+        <!-- Card destino plantilla -->
+        <template id="destino-tpl"></template>
+        <!-- Render estático -->
+        <a href="#" class="group relative rounded-2xl overflow-hidden h-44 lg:h-52 shadow-corp hover:shadow-corp-lg transform hover:-translate-y-1 transition-all">
+          <img src="https://images.unsplash.com/photo-1596636478939-1a9a23f06a40?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Alicante" />
+          <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/90 via-furgocasa-blue/30 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-furgocasa-orange">Comunidad Valenciana</p>
+            <p class="font-heading font-bold text-xl uppercase tracking-wide">Alicante</p>
+          </div>
+        </a>
+        <a href="#" class="group relative rounded-2xl overflow-hidden h-44 lg:h-52 shadow-corp hover:shadow-corp-lg transform hover:-translate-y-1 transition-all">
+          <img src="https://images.unsplash.com/photo-1570133435766-a6cd2d6ae8fc?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Albacete" />
+          <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/90 via-furgocasa-blue/30 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-furgocasa-orange">Castilla-La Mancha</p>
+            <p class="font-heading font-bold text-xl uppercase tracking-wide">Albacete</p>
+          </div>
+        </a>
+        <a href="#" class="group relative rounded-2xl overflow-hidden h-44 lg:h-52 shadow-corp hover:shadow-corp-lg transform hover:-translate-y-1 transition-all">
+          <img src="https://images.unsplash.com/photo-1558642891-54be180ea339?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Almería" />
+          <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/90 via-furgocasa-blue/30 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-furgocasa-orange">Andalucía</p>
+            <p class="font-heading font-bold text-xl uppercase tracking-wide">Almería</p>
+          </div>
+        </a>
+        <a href="#" class="group relative rounded-2xl overflow-hidden h-44 lg:h-52 shadow-corp hover:shadow-corp-lg transform hover:-translate-y-1 transition-all">
+          <img src="https://images.unsplash.com/photo-1558402529-d2638a7023e9?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Cartagena" />
+          <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/90 via-furgocasa-blue/30 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-furgocasa-orange">Región de Murcia</p>
+            <p class="font-heading font-bold text-xl uppercase tracking-wide">Cartagena</p>
+          </div>
+        </a>
+        <a href="#" class="group relative rounded-2xl overflow-hidden h-44 lg:h-52 shadow-corp hover:shadow-corp-lg transform hover:-translate-y-1 transition-all">
+          <img src="https://images.unsplash.com/photo-1619283520022-19dd3e23e3c0?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Murcia" />
+          <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/90 via-furgocasa-blue/30 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-furgocasa-orange">Región de Murcia</p>
+            <p class="font-heading font-bold text-xl uppercase tracking-wide">Murcia</p>
+          </div>
+        </a>
+        <a href="#" class="group relative rounded-2xl overflow-hidden h-44 lg:h-52 shadow-corp hover:shadow-corp-lg transform hover:-translate-y-1 transition-all">
+          <img src="https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=500&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Valencia" />
+          <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/90 via-furgocasa-blue/30 to-transparent"></div>
+          <div class="absolute bottom-4 left-4 right-4 text-white">
+            <p class="text-[10px] font-bold uppercase tracking-wider text-furgocasa-orange">Comunidad Valenciana</p>
+            <p class="font-heading font-bold text-xl uppercase tracking-wide">Valencia</p>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       SERVICIOS (mejora 7: unificados con border-t-4 azul/naranja)
+       ========================================================= -->
+  <section class="py-12 lg:py-16 bg-white">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="text-center mb-10 lg:mb-14 max-w-4xl mx-auto">
+        <span class="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+          Nuestros servicios
+        </span>
+        <h2 class="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-4 uppercase tracking-wide">
+          Servicios que te hacen la vida más fácil
+        </h2>
+        <p class="text-lg lg:text-xl text-gray-600">
+          Todo lo que necesitas para disfrutar de tu experiencia camper.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
+        <!-- 🟠 servicio 1 -->
+        <a href="#" class="bg-white rounded-2xl p-6 lg:p-8 shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-furgocasa-blue group">
+          <div class="w-14 h-14 rounded-xl bg-furgocasa-blue flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <i data-lucide="bot" class="h-7 w-7 text-white"></i>
+          </div>
+          <h3 class="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">Inteligencia Artificial</h3>
+          <p class="text-sm text-gray-600">Planifica tu ruta perfecta con IA.</p>
+        </a>
+        <a href="#" class="bg-white rounded-2xl p-6 lg:p-8 shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-furgocasa-orange group">
+          <div class="w-14 h-14 rounded-xl bg-furgocasa-orange flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <i data-lucide="map" class="h-7 w-7 text-white"></i>
+          </div>
+          <h3 class="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">Mapa de áreas</h3>
+          <p class="text-sm text-gray-600">Encuentra áreas de autocaravanas.</p>
+        </a>
+        <a href="#" class="bg-white rounded-2xl p-6 lg:p-8 shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-furgocasa-blue group">
+          <div class="w-14 h-14 rounded-xl bg-furgocasa-blue flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <i data-lucide="parking-circle" class="h-7 w-7 text-white"></i>
+          </div>
+          <h3 class="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">Parking Murcia</h3>
+          <p class="text-sm text-gray-600">Guarda tu camper con seguridad.</p>
+        </a>
+        <a href="#" class="bg-white rounded-2xl p-6 lg:p-8 shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-1 border-t-4 border-furgocasa-orange group">
+          <div class="w-14 h-14 rounded-xl bg-furgocasa-orange flex items-center justify-center mb-5 group-hover:scale-110 transition-transform">
+            <i data-lucide="help-circle" class="h-7 w-7 text-white"></i>
+          </div>
+          <h3 class="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">FAQs</h3>
+          <p class="text-sm text-gray-600">Resuelve todas tus dudas.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       BLOG (mejora 8)
+       ========================================================= -->
+  <section class="py-12 lg:py-16 bg-gray-50">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="text-center mb-10 lg:mb-14 max-w-4xl mx-auto">
+        <span class="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+          Blog de viajes
+        </span>
+        <h2 class="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-4 uppercase tracking-wide">
+          Rutas e inspiración camper
+        </h2>
+        <p class="text-lg lg:text-xl text-gray-600">
+          Consejos, rutas y experiencias para inspirar tu próxima aventura.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+        <a href="#" class="group bg-white rounded-2xl overflow-hidden shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-2">
+          <div class="relative h-44 lg:h-52 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1464207687429-7505649dae38?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Ruta mayo" />
+            <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/80 via-black/20 to-transparent"></div>
+            <div class="absolute top-4 left-4">
+              <span class="bg-furgocasa-orange/95 backdrop-blur-sm border border-white/30 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Rutas</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg lg:text-xl font-heading font-bold text-furgocasa-blue mb-3 group-hover:text-furgocasa-orange transition-colors line-clamp-2">
+              Por qué mayo es el mejor mes para viajar en camper por Murcia
+            </h3>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">Viajar en camper por la Región de Murcia es buena idea casi todo el año, pero mayo tiene algo especial...</p>
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <div class="flex items-center gap-3">
+                <time>15/4/2026</time>
+                <span class="inline-flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 5 min</span>
+              </div>
+              <span class="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">Leer más →</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="#" class="group bg-white rounded-2xl overflow-hidden shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-2">
+          <div class="relative h-44 lg:h-52 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Ruta desértica" />
+            <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/80 via-black/20 to-transparent"></div>
+            <div class="absolute top-4 left-4">
+              <span class="bg-furgocasa-orange/95 backdrop-blur-sm border border-white/30 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Rutas</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg lg:text-xl font-heading font-bold text-furgocasa-blue mb-3 group-hover:text-furgocasa-orange transition-colors line-clamp-2">
+              Ruta desértica por el Sureste español
+            </h3>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">El sureste español tiene ese punto magnético que engancha a cualquier viajero que disfrute de la carretera.</p>
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <div class="flex items-center gap-3">
+                <time>5/4/2026</time>
+                <span class="inline-flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 7 min</span>
+              </div>
+              <span class="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">Leer más →</span>
+            </div>
+          </div>
+        </a>
+
+        <a href="#" class="group bg-white rounded-2xl overflow-hidden shadow-corp hover:shadow-corp-lg transition-all duration-300 transform hover:-translate-y-2">
+          <div class="relative h-44 lg:h-52 overflow-hidden">
+            <img src="https://images.unsplash.com/photo-1533106958148-daaeab8b83fe?auto=format&fit=crop&w=800&q=80" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="Desde Madrid" />
+            <div class="absolute inset-0 bg-gradient-to-t from-furgocasa-blue-dark/80 via-black/20 to-transparent"></div>
+            <div class="absolute top-4 left-4">
+              <span class="bg-furgocasa-orange/95 backdrop-blur-sm border border-white/30 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Rutas</span>
+            </div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg lg:text-xl font-heading font-bold text-furgocasa-blue mb-3 group-hover:text-furgocasa-orange transition-colors line-clamp-2">
+              Viajar en camper desde Madrid antes del verano
+            </h3>
+            <p class="text-gray-600 text-sm mb-4 line-clamp-2">Escapadas hacia Murcia y el sureste: rutas, playas y pueblos sin agobios.</p>
+            <div class="flex items-center justify-between text-xs text-gray-500">
+              <div class="flex items-center gap-3">
+                <time>25/3/2026</time>
+                <span class="inline-flex items-center gap-1"><i data-lucide="clock" class="h-3 w-3"></i> 6 min</span>
+              </div>
+              <span class="text-furgocasa-orange font-semibold group-hover:translate-x-1 transition-transform">Leer más →</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="text-center mt-12">
+        <a href="#" class="inline-flex items-center gap-2 bg-furgocasa-blue hover:bg-furgocasa-blue-dark text-white px-8 py-4 rounded-xl font-bold uppercase tracking-wider shadow-corp-lg transform hover:-translate-y-1 transition-all">
+          <i data-lucide="book-open" class="h-5 w-5"></i>
+          Ver más artículos
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       ¿POR QUÉ FURGOCASA? (gradiente oficial + stats mejor)
+       ========================================================= -->
+  <section class="py-12 lg:py-16 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="text-center mb-10 lg:mb-14 max-w-4xl mx-auto">
+        <h2 class="text-3xl lg:text-5xl font-heading font-bold mb-4 uppercase tracking-wide">
+          ¿Por qué alquilar con Furgocasa?
+        </h2>
+        <p class="text-lg lg:text-xl text-blue-100">
+          La tranquilidad de viajar con los mejores.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+          <i data-lucide="check-circle-2" class="h-12 w-12 text-furgocasa-orange mb-4"></i>
+          <h3 class="text-lg font-heading font-bold mb-2 uppercase tracking-wide">Kilómetros Ilimitados</h3>
+          <p class="text-sm text-blue-100">Viaja sin límites por España y Europa.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+          <i data-lucide="users" class="h-12 w-12 text-furgocasa-orange mb-4"></i>
+          <h3 class="text-lg font-heading font-bold mb-2 uppercase tracking-wide">Atención Personalizada</h3>
+          <p class="text-sm text-blue-100">Te acompañamos antes, durante y después.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+          <i data-lucide="shield" class="h-12 w-12 text-furgocasa-orange mb-4"></i>
+          <h3 class="text-lg font-heading font-bold mb-2 uppercase tracking-wide">Flota Premium</h3>
+          <p class="text-sm text-blue-100">Vehículos modernos y perfectamente equipados.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+          <i data-lucide="package" class="h-12 w-12 text-furgocasa-orange mb-4"></i>
+          <h3 class="text-lg font-heading font-bold mb-2 uppercase tracking-wide">Todo Incluido</h3>
+          <p class="text-sm text-blue-100">Cocina completa, ropa de cama, kit de camping.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+          <i data-lucide="calendar" class="h-12 w-12 text-furgocasa-orange mb-4"></i>
+          <h3 class="text-lg font-heading font-bold mb-2 uppercase tracking-wide">Cancelación flexible</h3>
+          <p class="text-sm text-blue-100">Cancela hasta 60 días antes sin coste.</p>
+        </div>
+        <div class="bg-white/10 backdrop-blur-sm p-6 rounded-2xl border border-white/20 hover:bg-white/20 transition-all">
+          <i data-lucide="message-square" class="h-12 w-12 text-furgocasa-orange mb-4"></i>
+          <h3 class="text-lg font-heading font-bold mb-2 uppercase tracking-wide">Atención 24/7</h3>
+          <p class="text-sm text-blue-100">Te acompañamos durante todo el viaje.</p>
+        </div>
+      </div>
+
+      <!-- 🟠 Stats con drop-shadow corporativo + separador (propuesta 9) -->
+      <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto text-center">
+        <div>
+          <p class="text-4xl md:text-5xl font-heading font-bold mb-2 text-white" style="filter: drop-shadow(0 4px 20px rgba(214,90,49,0.45));">14+</p>
+          <div class="w-10 h-0.5 bg-furgocasa-orange mx-auto my-2"></div>
+          <p class="text-blue-200 uppercase tracking-wider text-xs lg:text-sm">Años de experiencia</p>
+        </div>
+        <div>
+          <p class="text-4xl md:text-5xl font-heading font-bold mb-2 text-white" style="filter: drop-shadow(0 4px 20px rgba(214,90,49,0.45));">58+</p>
+          <div class="w-10 h-0.5 bg-furgocasa-orange mx-auto my-2"></div>
+          <p class="text-blue-200 uppercase tracking-wider text-xs lg:text-sm">Viajes realizados</p>
+        </div>
+        <div>
+          <p class="text-4xl md:text-5xl font-heading font-bold mb-2 text-white" style="filter: drop-shadow(0 4px 20px rgba(214,90,49,0.45));">12</p>
+          <div class="w-10 h-0.5 bg-furgocasa-orange mx-auto my-2"></div>
+          <p class="text-blue-200 uppercase tracking-wider text-xs lg:text-sm">Vehículos Premium</p>
+        </div>
+        <div>
+          <p class="text-4xl md:text-5xl font-heading font-bold mb-2 text-white" style="filter: drop-shadow(0 4px 20px rgba(214,90,49,0.45));">4.9</p>
+          <div class="w-10 h-0.5 bg-furgocasa-orange mx-auto my-2"></div>
+          <p class="text-blue-200 uppercase tracking-wider text-xs lg:text-sm">Valoración Media</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       CTA FINAL (mejora 10: gradiente + teléfono clicable)
+       ========================================================= -->
+  <section class="py-16 lg:py-20 bg-gradient-to-br from-gray-50 via-white to-furgocasa-blue/5">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-6xl mx-auto">
+        <div>
+          <span class="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
+            Reserva ahora
+          </span>
+          <h2 class="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-5 uppercase tracking-wide">
+            ¿Listo para tu próxima aventura?
+          </h2>
+          <p class="text-lg lg:text-xl text-gray-600 mb-8">
+            Reserva tu camper ahora y comienza a planear tu viaje inolvidable.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <a href="#" class="inline-flex items-center gap-2 bg-furgocasa-orange hover:bg-furgocasa-orange-dark text-white font-bold px-8 py-4 rounded-xl shadow-orange text-base lg:text-lg uppercase tracking-wider transition-all hover:scale-105">
+              <i data-lucide="calendar-check" class="h-5 w-5"></i>
+              Reservar ahora
+            </a>
+            <a href="tel:+34868364161" class="inline-flex items-center gap-2 bg-white text-furgocasa-blue border-2 border-furgocasa-blue font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-blue hover:text-white text-base lg:text-lg uppercase tracking-wider transition-all">
+              <i data-lucide="phone" class="h-5 w-5"></i>
+              868 36 41 61
+            </a>
+            <a href="#" class="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1faa51] text-white font-bold px-8 py-4 rounded-xl text-base lg:text-lg uppercase tracking-wider transition-all shadow-corp">
+              <i data-lucide="message-circle" class="h-5 w-5"></i>
+              WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <!-- Mockup visual silueta camper -->
+        <div class="relative">
+          <div class="aspect-square max-w-md mx-auto bg-gradient-to-br from-furgocasa-blue/5 via-white to-furgocasa-orange/10 rounded-3xl flex items-center justify-center shadow-corp-lg border border-gray-100">
+            <div class="text-center">
+              <div class="inline-flex items-center justify-center w-32 h-32 bg-furgocasa-blue rounded-full mb-6 shadow-corp-lg">
+                <i data-lucide="caravan" class="h-16 w-16 text-white"></i>
+              </div>
+              <p class="font-heading font-black text-furgocasa-blue text-3xl uppercase tracking-wide mb-2">+1.000</p>
+              <p class="text-gray-600 uppercase tracking-widest text-sm">Clientes satisfechos</p>
+              <div class="flex items-center justify-center gap-1 mt-3 text-furgocasa-orange">
+                <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+                <i data-lucide="star" class="h-5 w-5 fill-current"></i>
+              </div>
+            </div>
+          </div>
+          <div class="absolute -top-4 -right-4 bg-furgocasa-orange text-white rounded-2xl px-4 py-3 shadow-corp-lg rotate-6">
+            <p class="font-heading font-black text-2xl leading-none">95€</p>
+            <p class="text-[10px] uppercase tracking-wider">/ día</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FOOTER simulado
+       ========================================================= -->
+  <footer class="bg-furgocasa-blue-dark text-blue-100 py-12">
+    <div class="container mx-auto px-4 max-w-[1400px]">
+      <div class="grid md:grid-cols-4 gap-8 mb-8">
+        <div>
+          <p class="font-heading font-black text-white text-xl tracking-wide mb-3">FURGOCASA</p>
+          <p class="text-sm text-blue-200 leading-relaxed">Tu empresa de confianza para el alquiler de campers y autocaravanas en la Región de Murcia.</p>
+        </div>
+        <div>
+          <p class="font-heading font-bold text-white uppercase tracking-wider text-sm mb-3">Enlaces</p>
+          <ul class="space-y-1.5 text-sm">
+            <li>→ Vehículos</li>
+            <li>→ Tarifas</li>
+            <li>→ Blog</li>
+            <li>→ Contacto</li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-heading font-bold text-white uppercase tracking-wider text-sm mb-3">Legal</p>
+          <ul class="space-y-1.5 text-sm">
+            <li>→ Aviso legal</li>
+            <li>→ Privacidad</li>
+            <li>→ Cookies</li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-heading font-bold text-white uppercase tracking-wider text-sm mb-3">Contacto</p>
+          <ul class="space-y-1.5 text-sm">
+            <li class="flex items-center gap-2"><i data-lucide="map-pin" class="h-4 w-4 text-furgocasa-orange"></i> Murcia</li>
+            <li class="flex items-center gap-2"><i data-lucide="phone" class="h-4 w-4 text-furgocasa-orange"></i> 868 36 41 61</li>
+            <li class="flex items-center gap-2"><i data-lucide="mail" class="h-4 w-4 text-furgocasa-orange"></i> info@furgocasa.com</li>
+          </ul>
+        </div>
+      </div>
+      <div class="border-t border-white/10 pt-6 text-center text-xs text-blue-300 uppercase tracking-wider">
+        © 2026 Furgocasa. Todos los derechos reservados.
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>

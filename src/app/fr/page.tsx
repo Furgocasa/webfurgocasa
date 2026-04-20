@@ -18,7 +18,14 @@ import {
   Package,
   BookOpen,
   HelpCircle,
-  Zap
+  Zap,
+  Sparkles,
+  ChevronDown,
+  Info,
+  Infinity as InfinityIcon,
+  Star,
+  Award,
+  Euro,
 } from "lucide-react";
 import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from "@/lib/home/server-actions";
 import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/home/organization-jsonld";
@@ -171,7 +178,7 @@ export default async function LocaleHomePage() {
       <ProductJsonLd vehicles={featuredVehicles} locale={locale} />
       <WebsiteJsonLd locale={locale} />
       
-      {/* Hero Section con Slider */}
+      {/* Hero Section con Slider + estética corporativa */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <HeroSlider 
@@ -184,11 +191,19 @@ export default async function LocaleHomePage() {
             ]}
             autoPlayInterval={20000}
           />
+          {/* Overlay corporativo controlado */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />
         </div>
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
+            {/* Kicker corporativo sobre el H1 */}
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
+              <Sparkles className="h-4 w-4" />
+              {t("Alquiler de campers en España")} · {t("Desde 95€/día")}
+            </span>
+
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
               {t("Las Mejores Autocaravanas Camper en Alquiler")}
             </h1>
             
@@ -203,19 +218,55 @@ export default async function LocaleHomePage() {
             </p>
           </div>
 
+          {/* SearchWidget flotante tipo "lift" sobre el slider */}
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget />
+            <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
+              <SearchWidget />
+            </div>
           </div>
         </div>
+
+        {/* Indicador de scroll animado */}
+        <a
+          href="#home-intro"
+          aria-label={t("Descubre más")}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 group hidden md:flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t("Descubre más")}</span>
+          <ChevronDown className="h-6 w-6 animate-bounce-slow" />
+        </a>
       </section>
 
       {/* Bloque respuesta breve - optimizado para IA y búsquedas */}
-      <section className="py-8 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      <section id="home-intro" className="py-10 lg:py-12 bg-white border-b border-gray-100">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              <strong>Qu'est-ce que Furgocasa ?</strong> Furgocasa est une entreprise de location de camping-cars basée à Murcie, en Espagne. Nous proposons une flotte premium Dreamer, Knaus et Weinsberg avec kilométrage illimité en Espagne, à partir de {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/jour selon la saison. Départ et retour : {COMPANY.rentalPolicy.pickupLocationsLabel}. Caution : {COMPANY.depositAmount.toLocaleString("fr-FR")}€. Téléphone : {COMPANY.phoneDisplay}.
-            </p>
+          <div className="max-w-4xl mx-auto bg-gray-50 border-l-4 border-furgocasa-orange rounded-r-2xl p-6 lg:p-8 shadow-corp">
+            <div className="flex items-start gap-4">
+              <div className="flex-shrink-0 w-11 h-11 rounded-lg bg-furgocasa-orange/10 flex items-center justify-center">
+                <Info className="h-5 w-5 text-furgocasa-orange" />
+              </div>
+              <div className="flex-1">
+                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                  <strong className="text-furgocasa-blue">Qu'est-ce que Furgocasa ?</strong> Furgocasa est une entreprise de location de camping-cars basée à Murcie, en Espagne. Nous proposons une flotte premium Dreamer, Knaus et Weinsberg avec kilométrage illimité en Espagne, à partir de {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/jour selon la saison. Départ et retour : {COMPANY.rentalPolicy.pickupLocationsLabel}. Caution : {COMPANY.depositAmount.toLocaleString("fr-FR")}€. Téléphone : {COMPANY.phoneDisplay}.
+                </p>
+
+                {/* Chips de datos clave */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                    <Euro className="h-3.5 w-3.5" /> {t("Desde 95€/día")}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                    <InfinityIcon className="h-3.5 w-3.5" /> {t("Km ilimitados")}
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                    <Star className="h-3.5 w-3.5" /> {stats.averageRating}/5
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 bg-white border border-furgocasa-blue/20 text-furgocasa-blue text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-full">
+                    <Award className="h-3.5 w-3.5" /> {stats.yearsExperience}+ {t("años")}
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -297,7 +348,7 @@ export default async function LocaleHomePage() {
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
               {t("LA MEJOR RELACIÓN CALIDAD PRECIO")}
             </span>
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               {t("Nuestras autocaravanas Camper en alquiler desde")}
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
@@ -388,7 +439,7 @@ export default async function LocaleHomePage() {
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Map className="h-8 w-8 text-furgocasa-blue" />
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+              <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                 {t("Principales destinos para visitar en Campervan")}
               </h2>
             </div>
@@ -401,11 +452,11 @@ export default async function LocaleHomePage() {
         </div>
       </section>
 
-      {/* Sección: Servicios destacados */}
+      {/* Sección: Servicios destacados - estética corporativa */}
       <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               {t("Servicios que te hacen la vida más fácil")}
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
@@ -415,45 +466,23 @@ export default async function LocaleHomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {[
-              {
-                icon: Bot,
-                titleKey: "Inteligencia Artificial",
-                descKey: "Planifica tu ruta perfecta con IA",
-                link: "/inteligencia-artificial",
-                color: "from-purple-50 to-purple-100 border-purple-300"
-              },
-              {
-                icon: Map,
-                titleKey: "Mapa de áreas",
-                descKey: "Encuentra áreas de autocaravanas",
-                link: "/mapa-areas",
-                color: "from-blue-50 to-blue-100 border-blue-300"
-              },
-              {
-                icon: Calendar,
-                titleKey: "Parking MURCIA",
-                descKey: "Guarda tu camper con seguridad",
-                link: "/aparcamiento-autocaravanas-campers-murcia",
-                color: "from-green-50 to-green-100 border-green-300"
-              },
-              {
-                icon: HelpCircle,
-                titleKey: "FAQs",
-                descKey: "Resuelve todas tus dudas",
-                link: "/faqs",
-                color: "from-orange-50 to-orange-100 border-orange-300"
-              },
+              { icon: Bot, titleKey: "Inteligencia Artificial", descKey: "Planifica tu ruta perfecta con IA", link: "/inteligencia-artificial", borderColor: "border-furgocasa-blue", iconBg: "bg-furgocasa-blue" },
+              { icon: Map, titleKey: "Mapa de áreas", descKey: "Encuentra áreas de autocaravanas", link: "/mapa-areas", borderColor: "border-furgocasa-orange", iconBg: "bg-furgocasa-orange" },
+              { icon: Calendar, titleKey: "Parking MURCIA", descKey: "Guarda tu camper con seguridad", link: "/aparcamiento-autocaravanas-campers-murcia", borderColor: "border-furgocasa-blue", iconBg: "bg-furgocasa-blue" },
+              { icon: HelpCircle, titleKey: "FAQs", descKey: "Resuelve todas tus dudas", link: "/faqs", borderColor: "border-furgocasa-orange", iconBg: "bg-furgocasa-orange" },
             ].map((service, index) => (
               <LocalizedLink
                 key={index}
                 href={service.link}
-                className={`bg-gradient-to-br ${service.color} border-2 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group`}
+                className={`bg-white p-6 lg:p-7 rounded-2xl shadow-corp hover:shadow-corp-lg border-t-4 ${service.borderColor} transition-all duration-300 transform hover:-translate-y-1 group`}
               >
-                <service.icon className="h-12 w-12 text-gray-700 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">
+                <div className={`w-14 h-14 rounded-xl ${service.iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                  <service.icon className="h-7 w-7 text-white" />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">
                   {t(service.titleKey)}
                 </h3>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-gray-600">
                   {t(service.descKey)}
                 </p>
               </LocalizedLink>
@@ -469,7 +498,7 @@ export default async function LocaleHomePage() {
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <BookOpen className="h-8 w-8 text-furgocasa-blue" />
-                <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+                <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                   {t("Blog de viajes en camper")}
                 </h2>
               </div>
@@ -554,7 +583,7 @@ export default async function LocaleHomePage() {
       <section className="py-12 lg:py-16 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black uppercase tracking-wide mb-4">
               {t("¿Por qué alquilar con Furgocasa?")}
             </h2>
             <p className="text-lg lg:text-xl text-blue-100 max-w-3xl mx-auto">
@@ -611,7 +640,7 @@ export default async function LocaleHomePage() {
       {/* CTA Final */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">
             {t("¿Listo para tu próxima aventura?")}
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">

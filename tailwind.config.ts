@@ -125,6 +125,14 @@ const config: Config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        // Sombras corporativas (azul Furgocasa) - más suaves y direccionales
+        corp: "0 10px 40px -15px rgba(6, 57, 113, 0.25)",
+        "corp-lg": "0 20px 60px -20px rgba(6, 57, 113, 0.35)",
+        "corp-sm": "0 4px 20px -10px rgba(6, 57, 113, 0.20)",
+        orange: "0 10px 40px -15px rgba(214, 90, 49, 0.40)",
+        "orange-lg": "0 20px 60px -20px rgba(214, 90, 49, 0.50)",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

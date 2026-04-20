@@ -132,7 +132,7 @@ export default async function RootLayout({
   const htmlLang = isValidLocale(detectedLocale) ? detectedLocale : i18n.defaultLocale;
 
   return (
-    <html lang={htmlLang} suppressHydrationWarning>
+    <html lang={htmlLang} suppressHydrationWarning className="scroll-smooth">
       <head>
         {/* ⚡ Optimización LCP/FCP: Preconnect a dominios críticos */}
         <link rel="preconnect" href="https://uygxrqqtdebyzllvbuef.supabase.co" crossOrigin="anonymous" />

@@ -260,6 +260,11 @@ export default async function LocationPage({ params }: PageProps) {
       >
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
+            {/* Kicker corporativo naranja sobre el H1 */}
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
+              {t("Alquiler de campers en España")} · {t("Desde 95€/día")}
+            </span>
+
             {/* H1 - Formato: Alquiler de autocaravanas campers en {ciudad} */}
             <h1 
               className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4" 
@@ -302,9 +307,11 @@ export default async function LocationPage({ params }: PageProps) {
             </p>
           </div>
 
-          {/* Widget de búsqueda integrado en hero */}
+          {/* Widget de búsqueda flotante (lift) sobre el hero */}
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
+            <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
+              <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
+            </div>
           </div>
         </div>
       </LocationHeroWithSkeleton>
@@ -402,7 +409,7 @@ export default async function LocationPage({ params }: PageProps) {
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
               {t("LA MEJOR RELACIÓN CALIDAD PRECIO")}
             </span>
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               {t("Nuestras autocaravanas desde")}
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
@@ -457,7 +464,7 @@ export default async function LocationPage({ params }: PageProps) {
       <section className="py-10 lg:py-14 bg-gradient-to-br from-amber-50 to-orange-50">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl lg:text-4xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">
               {t("Alquiler de Motorhomes en")} {location.name}
             </h2>
             <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
@@ -473,7 +480,7 @@ export default async function LocationPage({ params }: PageProps) {
       <section className="py-10 lg:py-14 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl lg:text-4xl font-heading font-bold text-gray-900 mb-6">
+            <h2 className="text-2xl lg:text-4xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">
               {t("Alquiler de Casa Rodante en")} {location.name}
             </h2>
             <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
@@ -503,7 +510,7 @@ export default async function LocationPage({ params }: PageProps) {
       <section className="py-10 lg:py-14 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               {t("Servicios que te hacen la vida más fácil")}
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
@@ -513,55 +520,32 @@ export default async function LocationPage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {[
-              {
-                icon: Bot,
-                titleKey: "Inteligencia Artificial",
-                descKey: "Planifica tu ruta perfecta con IA",
-                link: "/inteligencia-artificial",
-                iconBg: "bg-purple-100",
-                iconColor: "text-purple-600"
-              },
-              {
-                icon: Map,
-                titleKey: "Mapa de áreas",
-                descKey: "Encuentra áreas de autocaravanas",
-                link: "/mapa-areas",
-                iconBg: "bg-blue-100",
-                iconColor: "text-blue-600"
-              },
-              {
-                icon: Calendar,
-                titleKey: "Parking MURCIA",
-                descKey: "Guarda tu camper con seguridad",
-                link: "/aparcamiento-autocaravanas-campers-murcia",
-                iconBg: "bg-green-100",
-                iconColor: "text-green-600"
-              },
-              {
-                icon: HelpCircle,
-                titleKey: "FAQs",
-                descKey: "Resuelve todas tus dudas",
-                link: "/faqs",
-                iconBg: "bg-orange-100",
-                iconColor: "text-orange-600"
-              },
-            ].map((service, index) => (
-              <LocalizedLink
-                key={index}
-                href={service.link}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-gray-100"
-              >
-                <div className={`${service.iconBg} w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <service.icon className={`h-7 w-7 ${service.iconColor}`} />
-                </div>
-                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
-                  {t(service.titleKey)}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {t(service.descKey)}
-                </p>
-              </LocalizedLink>
-            ))}
+              { icon: Bot, titleKey: "Inteligencia Artificial", descKey: "Planifica tu ruta perfecta con IA", link: "/inteligencia-artificial" },
+              { icon: Map, titleKey: "Mapa de áreas", descKey: "Encuentra áreas de autocaravanas", link: "/mapa-areas" },
+              { icon: Calendar, titleKey: "Parking MURCIA", descKey: "Guarda tu camper con seguridad", link: "/aparcamiento-autocaravanas-campers-murcia" },
+              { icon: HelpCircle, titleKey: "FAQs", descKey: "Resuelve todas tus dudas", link: "/faqs" },
+            ].map((service, index) => {
+              const isOdd = index % 2 === 0;
+              const borderColor = isOdd ? "border-furgocasa-blue" : "border-furgocasa-orange";
+              const iconBg = isOdd ? "bg-furgocasa-blue" : "bg-furgocasa-orange";
+              return (
+                <LocalizedLink
+                  key={index}
+                  href={service.link}
+                  className={`bg-white p-6 lg:p-7 rounded-2xl shadow-corp hover:shadow-corp-lg border-t-4 ${borderColor} transition-all duration-300 transform hover:-translate-y-1 group`}
+                >
+                  <div className={`w-14 h-14 rounded-xl ${iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                    <service.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">
+                    {t(service.titleKey)}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {t(service.descKey)}
+                  </p>
+                </LocalizedLink>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -574,7 +558,7 @@ export default async function LocationPage({ params }: PageProps) {
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Map className="h-8 w-8 text-furgocasa-blue" />
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+              <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                 {nearbyLocations.length > 0
                   ? t("Destinos cercanos para visitar en camper")
                   : t("Principales destinos para visitar en Campervan")}
@@ -602,7 +586,7 @@ export default async function LocationPage({ params }: PageProps) {
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <BookOpen className="h-8 w-8 text-furgocasa-blue" />
-                <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+                <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                   {t("Blog de viajes en camper")}
                 </h2>
               </div>
@@ -732,7 +716,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">
             {t("¿Listo para descubrir")} {location.name}?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">

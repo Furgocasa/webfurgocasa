@@ -17,6 +17,8 @@ import {
   BookOpen,
   HelpCircle,
   Zap,
+  Sparkles,
+  ChevronDown,
 } from "lucide-react";
 import { ExtrasSection } from "@/components/pricing/extras-section";
 import Image from "next/image";
@@ -85,10 +87,18 @@ export function MotorhomeRentalSpainLanding({
             ]}
             autoPlayInterval={20000}
           />
+          {/* Overlay corporativo controlado - contraste uniforme sobre cualquier foto */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />
         </div>
 
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
+            {/* Kicker corporativo sobre el H1 */}
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
+              <Sparkles className="h-4 w-4" />
+              {t("Alquiler de campers en España")} · {t("Desde 95€/día")}
+            </span>
+
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" style={{ textShadow: "3px 3px 12px rgba(0,0,0,0.9)", letterSpacing: "0.08em" }}>
               {heroTitle}
             </h1>
@@ -114,13 +124,26 @@ export function MotorhomeRentalSpainLanding({
             </p>
           </div>
 
+          {/* SearchWidget flotante tipo "lift" sobre el slider */}
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget />
+            <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
+              <SearchWidget />
+            </div>
           </div>
         </div>
+
+        {/* Indicador de scroll animado */}
+        <a
+          href="#landing-intro"
+          aria-label={t("Descubre más")}
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 group hidden md:flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t("Descubre más")}</span>
+          <ChevronDown className="h-6 w-6 animate-bounce-slow" />
+        </a>
       </section>
 
-      <section className="py-12 lg:py-16 bg-gray-50">
+      <section id="landing-intro" className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
@@ -177,7 +200,7 @@ export function MotorhomeRentalSpainLanding({
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
               {t("LA MEJOR RELACIÓN CALIDAD PRECIO")}
             </span>
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               {t("Nuestras autocaravanas Camper en alquiler desde")}
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
@@ -247,7 +270,7 @@ export function MotorhomeRentalSpainLanding({
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Map className="h-8 w-8 text-furgocasa-blue" />
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">{t("Principales destinos para visitar en Campervan")}</h2>
+              <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">{t("Principales destinos para visitar en Campervan")}</h2>
             </div>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">{t("Descubre los mejores destinos para tu próxima aventura en autocaravana")}</p>
           </div>
@@ -258,20 +281,22 @@ export function MotorhomeRentalSpainLanding({
       <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">{t("Servicios que te hacen la vida más fácil")}</h2>
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">{t("Servicios que te hacen la vida más fácil")}</h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">{t("Todo lo que necesitas para disfrutar de tu experiencia camper")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {[
-              { icon: Bot, titleKey: "Inteligencia Artificial", descKey: "Planifica tu ruta perfecta con IA", link: "/inteligencia-artificial", color: "from-purple-50 to-purple-100 border-purple-300" },
-              { icon: Map, titleKey: "Mapa de áreas", descKey: "Encuentra áreas de autocaravanas", link: "/mapa-areas", color: "from-blue-50 to-blue-100 border-blue-300" },
-              { icon: Calendar, titleKey: "Parking MURCIA", descKey: "Guarda tu camper con seguridad", link: "/aparcamiento-autocaravanas-campers-murcia", color: "from-green-50 to-green-100 border-green-300" },
-              { icon: HelpCircle, titleKey: "FAQs", descKey: "Resuelve todas tus dudas", link: "/faqs", color: "from-orange-50 to-orange-100 border-orange-300" },
+              { icon: Bot, titleKey: "Inteligencia Artificial", descKey: "Planifica tu ruta perfecta con IA", link: "/inteligencia-artificial", borderColor: "border-furgocasa-blue", iconBg: "bg-furgocasa-blue" },
+              { icon: Map, titleKey: "Mapa de áreas", descKey: "Encuentra áreas de autocaravanas", link: "/mapa-areas", borderColor: "border-furgocasa-orange", iconBg: "bg-furgocasa-orange" },
+              { icon: Calendar, titleKey: "Parking MURCIA", descKey: "Guarda tu camper con seguridad", link: "/aparcamiento-autocaravanas-campers-murcia", borderColor: "border-furgocasa-blue", iconBg: "bg-furgocasa-blue" },
+              { icon: HelpCircle, titleKey: "FAQs", descKey: "Resuelve todas tus dudas", link: "/faqs", borderColor: "border-furgocasa-orange", iconBg: "bg-furgocasa-orange" },
             ].map((service, index) => (
-              <LocalizedLink key={index} href={service.link} className={`bg-gradient-to-br ${service.color} border-2 p-6 rounded-2xl hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 group`}>
-                <service.icon className="h-12 w-12 text-gray-700 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2">{t(service.titleKey)}</h3>
-                <p className="text-sm text-gray-700">{t(service.descKey)}</p>
+              <LocalizedLink key={index} href={service.link} className={`bg-white p-6 lg:p-7 rounded-2xl shadow-corp hover:shadow-corp-lg border-t-4 ${service.borderColor} transition-all duration-300 transform hover:-translate-y-1 group`}>
+                <div className={`w-14 h-14 rounded-xl ${service.iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                  <service.icon className="h-7 w-7 text-white" />
+                </div>
+                <h3 className="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">{t(service.titleKey)}</h3>
+                <p className="text-sm text-gray-600">{t(service.descKey)}</p>
               </LocalizedLink>
             ))}
           </div>
@@ -284,7 +309,7 @@ export function MotorhomeRentalSpainLanding({
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <BookOpen className="h-8 w-8 text-furgocasa-blue" />
-                <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">{t("Blog de viajes en camper")}</h2>
+                <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">{t("Blog de viajes en camper")}</h2>
               </div>
               <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">{t("Consejos, rutas y experiencias para inspirar tu próxima aventura")}</p>
             </div>
@@ -330,7 +355,7 @@ export function MotorhomeRentalSpainLanding({
       <section className="py-12 lg:py-16 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 text-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold mb-4">{t("¿Por qué alquilar con Furgocasa?")}</h2>
+            <h2 className="text-3xl lg:text-5xl font-heading font-black uppercase tracking-wide mb-4">{t("¿Por qué alquilar con Furgocasa?")}</h2>
             <p className="text-lg lg:text-xl text-blue-100 max-w-3xl mx-auto">{t("La tranquilidad de viajar con los mejores")}</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-6xl mx-auto">
@@ -372,7 +397,7 @@ export function MotorhomeRentalSpainLanding({
 
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">{t("¿Listo para tu próxima aventura?")}</h2>
+          <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">{t("¿Listo para tu próxima aventura?")}</h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">{t("Reserva tu camper ahora y comienza a planear tu viaje inolvidable")}</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink href="/reservar" className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold px-8 py-4 rounded-xl hover:bg-furgocasa-orange-dark transition-all shadow-lg text-lg">

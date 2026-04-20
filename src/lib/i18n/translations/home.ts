@@ -404,4 +404,36 @@ export const homeTranslations = {
     fr: "Intérieur camping-car Furgocasa",
     de: "Furgocasa Camper Innenraum"
   },
+
+  // ========== Rediseño estético (kicker, chips, scroll) ==========
+  "Alquiler de campers en España": {
+    es: "Alquiler de campers en España",
+    en: "Camper rental in Spain",
+    fr: "Location de camping-cars en Espagne",
+    de: "Camper-Vermietung in Spanien"
+  },
+  "Desde 95€/día": {
+    es: "Desde 95€/día",
+    en: "From 95€/day",
+    fr: "À partir de 95€/jour",
+    de: "Ab 95€/Tag"
+  },
+  "Descubre más": {
+    es: "Descubre más",
+    en: "Discover more",
+    fr: "Découvrir plus",
+    de: "Mehr entdecken"
+  },
+  "Km ilimitados": {
+    es: "Km ilimitados",
+    en: "Unlimited km",
+    fr: "Km illimités",
+    de: "Unbegrenzte km"
+  },
+  "años": {
+    es: "años",
+    en: "years",
+    fr: "ans",
+    de: "Jahre"
+  },
 };

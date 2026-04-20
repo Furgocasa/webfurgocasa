@@ -13,7 +13,8 @@ import {
   Globe,
   Plane,
   Map,
-  BookOpen
+  BookOpen,
+  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import { getFeaturedVehicles, getCompanyStats, getRoutesArticles } from "@/lib/home/server-actions";
@@ -97,7 +98,7 @@ export default async function LocaleMotorhomeMarruecosPage({ params }: PageProps
 
   return (
     <>
-      {/* Hero Section con Slider - IGUAL QUE HOME */}
+      {/* Hero Section con Slider - estética corporativa */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <HeroSlider 
@@ -110,17 +111,19 @@ export default async function LocaleMotorhomeMarruecosPage({ params }: PageProps
             ]}
             autoPlayInterval={20000}
           />
+          {/* Overlay corporativo controlado */}
+          <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />
         </div>
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3">
-            {/* Badge Marruecos */}
-            <div className="inline-flex items-center gap-2 bg-furgocasa-orange/90 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium mb-4">
+            {/* Kicker corporativo (Badge Marruecos) */}
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
               <Globe className="h-4 w-4" />
-              🇲🇦 Aventura en África desde España
-            </div>
+              Aventura en África desde España
+            </span>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
               Motorhome Marruecos
             </h1>
             
@@ -145,14 +148,27 @@ export default async function LocaleMotorhomeMarruecosPage({ params }: PageProps
             </p>
           </div>
 
+          {/* SearchWidget flotante tipo "lift" sobre el slider */}
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget />
+            <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
+              <SearchWidget />
+            </div>
           </div>
         </div>
+
+        {/* Indicador de scroll animado */}
+        <a
+          href="#landing-intro"
+          aria-label="Descubre más"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 group hidden md:flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors"
+        >
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Descubre más</span>
+          <ChevronDown className="h-6 w-6 animate-bounce-slow" />
+        </a>
       </section>
 
       {/* Sección: Qué es un Motorhome - VOCABULARIO LATAM */}
-      <section className="py-12 lg:py-16 bg-gray-50">
+      <section id="landing-intro" className="py-12 lg:py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
             <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
@@ -349,7 +365,7 @@ export default async function LocaleMotorhomeMarruecosPage({ params }: PageProps
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
               LA MEJOR RELACIÓN CALIDAD PRECIO
             </span>
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               Nuestras motorhomes en alquiler desde
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
@@ -404,7 +420,7 @@ export default async function LocaleMotorhomeMarruecosPage({ params }: PageProps
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Map className="h-8 w-8 text-furgocasa-blue" />
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+              <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                 Rutas Sugeridas por Marruecos
               </h2>
             </div>
@@ -613,7 +629,7 @@ export default async function LocaleMotorhomeMarruecosPage({ params }: PageProps
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Plane className="h-8 w-8 text-furgocasa-blue" />
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+              <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                 ¿Por qué España es tu base para Marruecos?
               </h2>
             </div>

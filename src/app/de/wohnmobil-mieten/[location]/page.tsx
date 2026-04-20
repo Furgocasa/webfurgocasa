@@ -247,10 +247,16 @@ export default async function LocationPage({ params }: PageProps) {
             className="object-cover"
           />
           <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-furgocasa-blue/30 to-furgocasa-blue-dark/60 pointer-events-none" />
         </div>
         
         <div className="relative z-10 container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3">
+            {/* Kicker corporativo naranja sobre el H1 */}
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
+              Wohnmobilvermietung in Spanien · Ab 95€/Tag
+            </span>
+
             {/* H1 - Festes Format: Wohnmobil (Campervan) Mieten in {Stadt} */}
             <h1 
               className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
@@ -291,7 +297,9 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
 
           <div className="max-w-5xl mx-auto mt-10">
-            <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
+            <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
+              <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
+            </div>
           </div>
         </div>
       </section>
@@ -378,7 +386,7 @@ export default async function LocationPage({ params }: PageProps) {
             <span className="inline-block px-4 py-2 bg-furgocasa-orange/10 text-furgocasa-orange rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase mb-4">
               BESTES PREIS-LEISTUNGS-VERHÄLTNIS
             </span>
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               Unsere Wohnmobile ab
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-2xl mx-auto">
@@ -443,7 +451,7 @@ export default async function LocationPage({ params }: PageProps) {
       <section className="py-10 lg:py-14 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               Services, die Ihr Leben einfacher machen
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
@@ -453,55 +461,32 @@ export default async function LocationPage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {[
-              {
-                icon: Bot,
-                title: "Künstliche Intelligenz",
-                desc: "Planen Sie Ihre perfekte Route mit KI",
-                link: "/kuenstliche-intelligenz",
-                iconBg: "bg-purple-100",
-                iconColor: "text-purple-600"
-              },
-              {
-                icon: Map,
-                title: "Stellplatzkarte",
-                desc: "Finden Sie Wohnmobil-Stellplätze",
-                link: "/stellplatzkarte",
-                iconBg: "bg-blue-100",
-                iconColor: "text-blue-600"
-              },
-              {
-                icon: Calendar,
-                title: "Parking MURCIA",
-                desc: "Bewahren Sie Ihr Wohnmobil sicher auf",
-                link: "/aparcamiento-autocaravanas-campers-murcia",
-                iconBg: "bg-green-100",
-                iconColor: "text-green-600"
-              },
-              {
-                icon: HelpCircle,
-                title: "FAQs",
-                desc: "Lösen Sie alle Ihre Fragen",
-                link: "/faqs",
-                iconBg: "bg-orange-100",
-                iconColor: "text-orange-600"
-              },
-            ].map((service, index) => (
-              <LocalizedLink
-                key={index}
-                href={service.link}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-gray-100"
-              >
-                <div className={`${service.iconBg} w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <service.icon className={`h-7 w-7 ${service.iconColor}`} />
-                </div>
-                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {service.desc}
-                </p>
-              </LocalizedLink>
-            ))}
+              { icon: Bot, title: "Künstliche Intelligenz", desc: "Planen Sie Ihre perfekte Route mit KI", link: "/kuenstliche-intelligenz" },
+              { icon: Map, title: "Stellplatzkarte", desc: "Finden Sie Wohnmobil-Stellplätze", link: "/stellplatzkarte" },
+              { icon: Calendar, title: "Parking MURCIA", desc: "Bewahren Sie Ihr Wohnmobil sicher auf", link: "/aparcamiento-autocaravanas-campers-murcia" },
+              { icon: HelpCircle, title: "FAQs", desc: "Lösen Sie alle Ihre Fragen", link: "/faqs" },
+            ].map((service, index) => {
+              const isOdd = index % 2 === 0;
+              const borderColor = isOdd ? "border-furgocasa-blue" : "border-furgocasa-orange";
+              const iconBg = isOdd ? "bg-furgocasa-blue" : "bg-furgocasa-orange";
+              return (
+                <LocalizedLink
+                  key={index}
+                  href={service.link}
+                  className={`bg-white p-6 lg:p-7 rounded-2xl shadow-corp hover:shadow-corp-lg border-t-4 ${borderColor} transition-all duration-300 transform hover:-translate-y-1 group`}
+                >
+                  <div className={`w-14 h-14 rounded-xl ${iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                    <service.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">
+                    {service.title}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {service.desc}
+                  </p>
+                </LocalizedLink>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -512,7 +497,7 @@ export default async function LocationPage({ params }: PageProps) {
           <div className="text-center mb-12 lg:mb-16">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Map className="h-8 w-8 text-furgocasa-blue" />
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+              <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                 {nearbyLocations.length > 0
                   ? t("Nahe gelegene Ziele mit dem Wohnmobil")
                   : t("Principales destinos para visitar en Campervan")}
@@ -535,7 +520,7 @@ export default async function LocationPage({ params }: PageProps) {
       <section className="py-12 lg:py-16 bg-gradient-to-br from-blue-50 to-indigo-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12 lg:mb-16">
-            <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-4">
               Services, die Ihr Leben einfacher machen
             </h2>
             <p className="text-lg lg:text-xl text-gray-600 max-w-3xl mx-auto">
@@ -545,55 +530,32 @@ export default async function LocationPage({ params }: PageProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto">
             {[
-              {
-                icon: Bot,
-                title: "Künstliche Intelligenz",
-                desc: "Planen Sie Ihre perfekte Route mit KI",
-                link: "/kuenstliche-intelligenz",
-                iconBg: "bg-purple-100",
-                iconColor: "text-purple-600"
-              },
-              {
-                icon: Map,
-                title: "Stellplatzkarte",
-                desc: "Finden Sie Wohnmobil-Stellplätze",
-                link: "/stellplatzkarte",
-                iconBg: "bg-blue-100",
-                iconColor: "text-blue-600"
-              },
-              {
-                icon: Calendar,
-                title: "Parking MURCIA",
-                desc: "Bewahren Sie Ihr Wohnmobil sicher auf",
-                link: "/aparcamiento-autocaravanas-campers-murcia",
-                iconBg: "bg-green-100",
-                iconColor: "text-green-600"
-              },
-              {
-                icon: HelpCircle,
-                title: "FAQs",
-                desc: "Lösen Sie alle Ihre Fragen",
-                link: "/faqs",
-                iconBg: "bg-orange-100",
-                iconColor: "text-orange-600"
-              },
-            ].map((service, index) => (
-              <LocalizedLink
-                key={index}
-                href={service.link}
-                className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 group border border-gray-100"
-              >
-                <div className={`${service.iconBg} w-14 h-14 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                  <service.icon className={`h-7 w-7 ${service.iconColor}`} />
-                </div>
-                <h3 className="text-lg font-heading font-bold text-gray-900 mb-2 group-hover:text-furgocasa-blue transition-colors">
-                  {service.title}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {service.desc}
-                </p>
-              </LocalizedLink>
-            ))}
+              { icon: Bot, title: "Künstliche Intelligenz", desc: "Planen Sie Ihre perfekte Route mit KI", link: "/kuenstliche-intelligenz" },
+              { icon: Map, title: "Stellplatzkarte", desc: "Finden Sie Wohnmobil-Stellplätze", link: "/stellplatzkarte" },
+              { icon: Calendar, title: "Parking MURCIA", desc: "Bewahren Sie Ihr Wohnmobil sicher auf", link: "/aparcamiento-autocaravanas-campers-murcia" },
+              { icon: HelpCircle, title: "FAQs", desc: "Lösen Sie alle Ihre Fragen", link: "/faqs" },
+            ].map((service, index) => {
+              const isOdd = index % 2 === 0;
+              const borderColor = isOdd ? "border-furgocasa-blue" : "border-furgocasa-orange";
+              const iconBg = isOdd ? "bg-furgocasa-blue" : "bg-furgocasa-orange";
+              return (
+                <LocalizedLink
+                  key={index}
+                  href={service.link}
+                  className={`bg-white p-6 lg:p-7 rounded-2xl shadow-corp hover:shadow-corp-lg border-t-4 ${borderColor} transition-all duration-300 transform hover:-translate-y-1 group`}
+                >
+                  <div className={`w-14 h-14 rounded-xl ${iconBg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                    <service.icon className="h-7 w-7 text-white" />
+                  </div>
+                  <h3 className="text-lg font-heading font-bold text-furgocasa-blue mb-2 uppercase tracking-wide">
+                    {service.title}
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    {service.desc}
+                  </p>
+                </LocalizedLink>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -605,7 +567,7 @@ export default async function LocationPage({ params }: PageProps) {
             <div className="text-center mb-12 lg:mb-16">
               <div className="flex items-center justify-center gap-3 mb-4">
                 <BookOpen className="h-8 w-8 text-furgocasa-blue" />
-                <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900">
+                <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide">
                   Wohnmobil-Reiseblog
                 </h2>
               </div>
@@ -729,7 +691,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* FINAL CTA */}
       <section className="py-12 lg:py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
+          <h2 className="text-3xl lg:text-5xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">
             Bereit, {location.name} zu entdecken?
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
