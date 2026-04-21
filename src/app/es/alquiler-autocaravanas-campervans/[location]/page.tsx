@@ -310,7 +310,7 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
 
           {/* Widget de búsqueda flotante (lift) sobre el hero */}
-          <div className="max-w-5xl mx-auto mt-10">
+          <div className="max-w-[1400px] mx-auto mt-10">
             <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
               <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
             </div>

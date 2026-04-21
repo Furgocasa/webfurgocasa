@@ -126,7 +126,7 @@ export function HomeHero({
         </div>
 
         {children && (
-          <div className="max-w-5xl mx-auto mt-10">
+          <div className="max-w-[1400px] mx-auto mt-10">
             <div className={liftClassName}>{children}</div>
           </div>
         )}

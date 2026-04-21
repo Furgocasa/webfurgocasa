@@ -149,7 +149,7 @@ export default async function LocaleMotorhomeMoroccoPage({ params }: PageProps) 
           </div>
 
           {/* SearchWidget flotante tipo "lift" sobre el slider */}
-          <div className="max-w-5xl mx-auto mt-10">
+          <div className="max-w-[1400px] mx-auto mt-10">
             <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
               <SearchWidget />
             </div>
