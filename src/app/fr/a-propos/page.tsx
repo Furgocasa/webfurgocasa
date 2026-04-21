@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "À propos - Découvrez Furgocasa",
-    description: "Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis 2007, avec plus de 500 voyages réalisés.",
+    description: "Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis 2017, avec plus de 500 voyages réalisés.",
     keywords: "à propos furgocasa, entreprise location camping-car murcie, histoire furgocasa, famille furgocasa, camping-cars murcie",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "À propos - Découvrez Furgocasa",
-      description: "Découvrez Furgocasa, entreprise familiale spécialisée dans la location de camping-cars à Murcie depuis 2007.",
+      description: "Découvrez Furgocasa, entreprise familiale spécialisée dans la location de camping-cars à Murcie depuis 2017.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: "À propos - Découvrez Furgocasa",
-      description: "Entreprise familiale de location de camping-cars à Murcie depuis 2007.",
+      description: "Entreprise familiale de location de camping-cars à Murcie depuis 2017.",
     },
     alternates,
     robots: {

@@ -110,6 +110,6 @@ export const COMPANY = {
     longitude: '-1.1635',
   },
 
-  foundingDate: '2007',
+  foundingDate: '2017',
   legalName: 'Furgocasa S.L.',
 } as const;

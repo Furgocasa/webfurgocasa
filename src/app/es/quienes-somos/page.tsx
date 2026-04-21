@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-    description: t("Furgocasa: empresa familiar de alquiler de autocaravanas en Murcia desde 2007. Más de 500 viajes. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados desde 95€/día. Recogida Casillas, Murcia."),
+    description: t("Furgocasa: empresa familiar de alquiler de autocaravanas en Murcia desde 2017. Más de 500 viajes. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados desde 95€/día. Recogida Casillas, Murcia."),
     keywords: "quienes somos furgocasa, empresa alquiler camper murcia, historia furgocasa, familia furgocasa, autocaravanas murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-      description: t("Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2007."),
+      description: t("Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2017."),
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: t("Quiénes Somos"),
-      description: t("Empresa familiar de alquiler de autocaravanas en Murcia desde 2007."),
+      description: t("Empresa familiar de alquiler de autocaravanas en Murcia desde 2017."),
     },
     alternates,
     robots: {

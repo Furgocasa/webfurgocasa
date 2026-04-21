@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "Über uns - Furgocasa entdecken",
-    description: "Furgocasa ist ein familiengeführter Wohnmobilvermieter in Murcia seit 2007, mit mehr als 500 realisierten Reisen.",
+    description: "Furgocasa ist ein familiengeführter Wohnmobilvermieter in Murcia seit 2017, mit mehr als 500 realisierten Reisen.",
     keywords: "über furgocasa, wohnmobil miete unternehmen murcia, furgocasa geschichte, furgocasa familie, wohnmobile murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "Über uns - Furgocasa entdecken",
-      description: "Lernen Sie Furgocasa kennen, ein familiengeführtes Wohnmobilvermietungsunternehmen in Murcia seit 2007.",
+      description: "Lernen Sie Furgocasa kennen, ein familiengeführtes Wohnmobilvermietungsunternehmen in Murcia seit 2017.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: "Über uns - Furgocasa entdecken",
-      description: "Familiengeführte Wohnmobilvermietung in Murcia seit 2007.",
+      description: "Familiengeführte Wohnmobilvermietung in Murcia seit 2017.",
     },
     alternates,
     robots: {

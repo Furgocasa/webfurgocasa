@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "About Us - Discover Furgocasa",
-    description: "Furgocasa is a family-run motorhome and campervan rental company based in Murcia since 2007, with more than 500 trips completed.",
+    description: "Furgocasa is a family-run motorhome and campervan rental company based in Murcia since 2017, with more than 500 trips completed.",
     keywords: "about furgocasa, camper rental company murcia, furgocasa history, furgocasa family, motorhomes murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "About Us - Discover Furgocasa",
-      description: "Learn about Furgocasa, a family-run campervan and motorhome rental company in Murcia since 2007.",
+      description: "Learn about Furgocasa, a family-run campervan and motorhome rental company in Murcia since 2017.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: "About Us - Discover Furgocasa",
-      description: "Family-run campervan rental company in Murcia since 2007.",
+      description: "Family-run campervan rental company in Murcia since 2017.",
     },
     alternates,
     robots: {
