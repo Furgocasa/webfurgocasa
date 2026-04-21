@@ -126,7 +126,7 @@ export function HomeHero({
         </div>
 
         {children && (
-          <div className="w-full px-4 md:px-[15%] mt-10">
+          <div className="w-full px-4 md:px-[25%] mt-10">
             <div className={liftClassName}>{children}</div>
           </div>
         )}
