@@ -69,7 +69,7 @@ export function LocationHeroWithSkeleton({
       </div>
       
       {/* Contenido del hero - Fade-in suave cuando la imagen termina de cargar */}
-      <div className={`relative z-10 transition-opacity duration-500 ${
+      <div className={`relative z-10 w-full transition-opacity duration-500 ${
         imageLoaded ? 'opacity-100' : 'opacity-0'
       }`}>
         {children}
