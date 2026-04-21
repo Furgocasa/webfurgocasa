@@ -234,7 +234,7 @@ export default async function LocationPage({ params }: PageProps) {
       <LocalBusinessJsonLd location={location as any} locale="en" />
       
       {/* HERO SECTION - Dynamic texts from DB */}
-      <section className="relative h-screen min-h-[600px] flex items-center justify-center">
+      <section className="relative h-screen md:h-[calc(100vh-120px)] min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src={heroImageUrl}

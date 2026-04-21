@@ -6,8 +6,9 @@ interface HeroScrollIndicatorProps {
   /** Texto localizado del indicador ("Descubre más", "Discover more"...). */
   label: string;
   /**
-   * Si el indicador se oculta en móvil (recomendado solo cuando el hero es muy
-   * corto en móvil y queda mal). Por defecto se muestra en todos los tamaños.
+   * Si el indicador se oculta en móvil (en móvil suele quedar detrás del
+   * SearchWidget y pierde sentido). Por defecto SE OCULTA en móvil y solo
+   * se muestra de md en adelante.
    */
   hideOnMobile?: boolean;
 }
@@ -17,13 +18,14 @@ interface HeroScrollIndicatorProps {
  * - Estética unificada Furgocasa: text-white/80, uppercase, tracking-widest
  * - Toda la pieza rebota con animate-bounce-slow
  * - Se mantiene como <a> para accesibilidad y funcionalidad de scroll
+ * - Oculto en móvil por defecto (pasa por detrás del SearchWidget)
  *
  * Usado en: todas las homes y landings (es/en/de/fr).
  */
 export function HeroScrollIndicator({
   href,
   label,
-  hideOnMobile = false,
+  hideOnMobile = true,
 }: HeroScrollIndicatorProps) {
   const visibility = hideOnMobile ? "hidden md:flex" : "flex";
   return (
