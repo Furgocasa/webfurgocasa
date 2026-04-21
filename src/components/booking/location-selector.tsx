@@ -138,15 +138,15 @@ export function LocationSelector({
       >
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <MapPin className="h-5 w-5 text-furgocasa-blue flex-shrink-0" aria-hidden="true" />
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-gray-800 font-semibold uppercase text-sm truncate">
+          <div className="min-w-0 flex-1">
+            <span className="text-gray-800 font-semibold uppercase text-sm truncate block">
               {selectedLocation ? t(selectedLocation.name) : placeholder}
+              {selectedLocation && (
+                <span className="text-xs text-gray-500 font-normal normal-case ml-1">
+                  ({getMinDaysLabel(selectedLocation.min_days)})
+                </span>
+              )}
             </span>
-            {selectedLocation && (
-              <span className="text-xs text-gray-500 mt-0.5">
-                {getMinDaysLabel(selectedLocation.min_days)}
-              </span>
-            )}
           </div>
           {selectedLocation?.extra_fee ? (
             <div className="text-xs font-semibold px-2 py-1 rounded-md whitespace-nowrap flex-shrink-0 bg-furgocasa-orange/10 text-furgocasa-orange mr-2">

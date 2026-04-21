@@ -251,8 +251,8 @@ export default async function LocationPage({ params }: PageProps) {
           <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-furgocasa-blue/30 to-furgocasa-blue-dark/60 pointer-events-none" />
         </div>
         
-        <div className="relative z-10 container mx-auto px-4 text-center">
-          <div className="max-w-6xl mx-auto space-y-3">
+        <div className="relative z-10 w-full text-center">
+          <div className="w-full px-4 md:px-[25%] space-y-3">
             {/* Kicker corporativo naranja sobre el H1 */}
             <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
               Wohnmobilvermietung in Spanien · Ab 95€/Tag
@@ -297,7 +297,7 @@ export default async function LocationPage({ params }: PageProps) {
             </p>
           </div>
 
-          <div className="max-w-[1400px] mx-auto mt-10">
+          <div className="w-full px-4 md:px-[15%] mt-10">
             <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
               <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
             </div>
