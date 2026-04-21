@@ -9,7 +9,7 @@ import WhatsAppChatbot from "@/components/whatsapp-chatbot";
 import BackToTop from "@/components/back-to-top";
 import { AdminFABButton } from "@/components/admin-fab-button";
 import { AnalyticsDebug } from "@/components/analytics-debug";
-import { GoogleAnalytics } from "@next/third-parties/google";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
 import Script from "next/script";
 import { i18n, isValidLocale } from "@/lib/i18n/config";
@@ -171,6 +171,7 @@ export default async function RootLayout({
             {/* ⚠️ MIGRACIÓN A @next/third-parties */}
             {/* Google Analytics oficial - Se carga en toda la aplicación */}
             <GoogleAnalytics gaId="G-G5YLBN5XXZ" />
+            <GoogleTagManager gtmId="GTM-5QLGH57" />
             
             {/* Debug de Analytics (solo en desarrollo) */}
             <AnalyticsDebug />
