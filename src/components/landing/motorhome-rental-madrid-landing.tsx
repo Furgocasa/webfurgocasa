@@ -105,22 +105,12 @@ export function MotorhomeRentalMadridLanding({
 
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
 
-            <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold text-white/95 leading-tight bg-black/30 inline-block px-6 py-2 rounded-full" style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.8)", marginBottom: "0.5rem" }}>
-              A 10 minutos de la Terminal T4
+            <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.8)", marginBottom: "0.5rem" }}>
+              Furgocasa: flota premium desde 95€/día con kilómetros ilimitados
             </p>
 
-            <div className="flex items-center justify-center gap-1 mt-4" style={{ marginBottom: "0.5rem" }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-yellow-400 text-3xl md:text-4xl">★</span>
-              ))}
-            </div>
-
-            <p className="text-xl md:text-2xl lg:text-3xl font-heading font-light text-furgocasa-orange leading-tight mb-6" style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.8)" }}>
-              Ideal para viajeros internacionales
-            </p>
-
-            <p className="text-sm md:text-base lg:text-lg text-white/85 font-bold leading-relaxed max-w-3xl mx-auto tracking-wide" style={{ textShadow: "1px 1px 4px rgba(0,0,0,0.8)" }}>
-              {heroSubtitle}
+            <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: "1px 1px 4px rgba(0,0,0,0.8)" }}>
+              A 10 min de Madrid-Barajas T4. {heroSubtitle}
             </p>
           </div>
 

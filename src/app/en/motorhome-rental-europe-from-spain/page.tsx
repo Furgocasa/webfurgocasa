@@ -127,22 +127,12 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
-              Your home on wheels
+            <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
+              Furgocasa: premium fleet from 95€/day with unlimited mileage
             </p>
             
-            <div className="flex items-center justify-center gap-1" style={{ marginBottom: '0.5rem' }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-yellow-400 text-3xl md:text-4xl">★</span>
-              ))}
-            </div>
-            
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-6" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-              to explore Europe
-            </p>
-            
-            <p className="text-sm md:text-base lg:text-lg text-white/85 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-              Rent your motorhome in Spain and travel without limits across Europe
+            <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+              Dreamer, Knaus, Weinsberg. Hire from Spain across Europe.
             </p>
           </div>
 

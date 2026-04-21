@@ -127,22 +127,12 @@ export default async function LocaleCampingCarMarocPage({ params }: PageProps) {
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
-              Votre maison sur roues
+            <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
+              Furgocasa : flotte premium à partir de 95€/jour avec kilométrage illimité
             </p>
             
-            <div className="flex items-center justify-center gap-1" style={{ marginBottom: '0.5rem' }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-yellow-400 text-3xl md:text-4xl">★</span>
-              ))}
-            </div>
-            
-            <p className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-6" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-              pour voyager au Maroc
-            </p>
-            
-            <p className="text-sm md:text-base lg:text-lg text-white/85 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-              Louez votre camping-car en Espagne et traversez en Afrique sans limites
+            <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+              Dreamer, Knaus, Weinsberg. De l&apos;Espagne au Maroc.
             </p>
           </div>
 

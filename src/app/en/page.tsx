@@ -70,7 +70,7 @@ export async function generateMetadata(): Promise<Metadata> {
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       title: `${t("Las Mejores Campers en Alquiler")} - ${t("Alquiler en España")} | Furgocasa`,
-      description: `${t("Tu hotel 5 estrellas sobre ruedas")}. ${t("Flota premium desde 95€/día con kilómetros ilimitados")}. Dreamer, Knaus, Weinsberg.`,
+      description: `${t("Furgocasa: flota premium desde 95€/día con kilómetros ilimitados")}. Dreamer, Knaus, Weinsberg. Spain and Europe.`,
       type: "website",
       url: alternates.canonical,
       siteName: t("Furgocasa - Alquiler de Autocaravanas"),
