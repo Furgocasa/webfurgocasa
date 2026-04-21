@@ -15,6 +15,7 @@ import { supabase } from"@/lib/supabase/client";
 import { formatPrice } from"@/lib/utils";
 import { CheckCircle, Calendar, Car, MapPin, Download, Mail } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 /**
  * Componente para mostrar cuando no tenemos datos del pago
@@ -332,6 +333,35 @@ function PagoExitoContent() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (payment) {
+      const storageKey = `gtm_purchase_${payment.booking.id}`;
+      const eventFired = sessionStorage.getItem(storageKey);
+      
+      if (!eventFired) {
+        sendGTMEvent({
+          event: "purchase",
+          ecommerce: {
+            transaction_id: payment.order_number,
+            value: payment.booking.total_price,
+            currency: "EUR",
+            items: [
+              {
+                item_name: `${payment.booking.vehicle.brand} ${payment.booking.vehicle.model}`,
+                item_category: "Alquiler Furgoneta",
+                price: payment.booking.total_price,
+                quantity: 1
+              }
+            ]
+          }
+        });
+        
+        sessionStorage.setItem(storageKey, "true");
+        console.log("[GTM] Evento de compra (purchase) enviado con éxito.");
+      }
+    }
+  }, [payment]);
 
   if (loading) {
     return (
