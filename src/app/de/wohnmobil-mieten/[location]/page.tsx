@@ -260,8 +260,8 @@ export default async function LocationPage({ params }: PageProps) {
 
             {/* H1 - Festes Format: Wohnmobil (Campervan) Mieten in {Stadt} */}
             <h1 
-              className="text-2xl md:text-4xl lg:text-5xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
-              style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}
+              className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
+              style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
             >
               Wohnmobil (Campervan) Mieten in {location.name}
             </h1>
@@ -269,31 +269,17 @@ export default async function LocationPage({ params }: PageProps) {
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
             <p 
-              className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-white/95 leading-tight" 
+              className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" 
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}
             >
-              Ihr Hotel
+              Furgocasa: Premium-Flotte ab 95€/Tag mit unbegrenzten Kilometern
             </p>
             
-            <div className="flex items-center justify-center gap-1" style={{ marginBottom: '0.5rem' }}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <span key={star} className="text-yellow-400 text-3xl md:text-4xl">★</span>
-              ))}
-            </div>
-            
             <p 
-              className="text-3xl md:text-4xl lg:text-5xl font-heading font-light text-furgocasa-orange leading-tight mb-4" 
-              style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
-            >
-              auf Rädern
-            </p>
-            
-            {/* Untertitel */}
-            <p 
-              className="text-sm md:text-base lg:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide" 
+              className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" 
               style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
             >
-              Die besten großvolumigen Wohnmobile zur Miete
+              Dreamer, Knaus, Weinsberg. Spanien und Europa.
             </p>
           </div>
 

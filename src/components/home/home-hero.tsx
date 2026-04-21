@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
 import Image from "next/image";
 import { Sparkles, type LucideIcon } from "lucide-react";
-import { HeroSlider } from "@/components/hero-slider";
 import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
@@ -22,10 +21,7 @@ interface HomeHeroProps {
   scrollTargetId?: string;
   /** Contenido principal dentro del "lift" flotante (ej: SearchWidget, CTAs, etc.). */
   children?: ReactNode;
-  /** Imágenes del slider de fondo. Si se pasa, usa HeroSlider. */
-  sliderImages?: string[];
-  autoPlayInterval?: number;
-  /** Imagen única de fondo (alternativa al slider). */
+  /** Imagen de fondo del hero (default: /images/slides/hero-11.webp). */
   backgroundImage?: string;
   backgroundAlt?: string;
   /** Altura del hero. Default h-screen min-h-[600px]. */
@@ -54,9 +50,7 @@ export function HomeHero({
   tagline,
   scrollTargetId = "home-intro",
   children,
-  sliderImages,
-  autoPlayInterval = 20000,
-  backgroundImage,
+  backgroundImage = "/images/slides/hero-11.webp",
   backgroundAlt,
   heightClassName = "h-screen min-h-[600px]",
   liftClassName = "rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg",
@@ -72,19 +66,15 @@ export function HomeHero({
   return (
     <section className={`relative ${heightClassName} flex items-center justify-center`}>
       <div className="absolute inset-0 w-full h-full overflow-hidden">
-        {sliderImages && sliderImages.length > 0 ? (
-          <HeroSlider images={sliderImages} autoPlayInterval={autoPlayInterval} />
-        ) : backgroundImage ? (
-          <Image
-            src={backgroundImage}
-            alt={backgroundAlt || title}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-            quality={80}
-          />
-        ) : null}
+        <Image
+          src={backgroundImage}
+          alt={backgroundAlt || title}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          quality={80}
+        />
         {/* Overlay corporativo - garantiza contraste sobre cualquier foto */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />
       </div>

@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { SearchWidget } from "@/components/booking/search-widget";
-import { HeroSlider } from "@/components/hero-slider";
 import { LocalizedLink } from "@/components/localized-link";
 import { 
   CheckCircle, 
@@ -101,15 +100,14 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
       {/* Section Hero avec Slider */}
       <section className="relative h-screen min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
-          <HeroSlider 
-            images={[
-              "/images/slides/hero-11.webp",
-              "/images/slides/hero-01.webp",
-              "/images/slides/hero-06.webp",
-              "/images/slides/hero-09.webp",
-              "/images/slides/hero-14.webp",
-            ]}
-            autoPlayInterval={20000}
+          <Image
+            src="/images/slides/hero-11.webp"
+            alt="Furgocasa - Location de camping-car en Europe"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+            quality={80}
           />
           {/* Overlay corporatif contrôlé */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />

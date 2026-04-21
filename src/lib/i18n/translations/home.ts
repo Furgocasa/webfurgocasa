@@ -398,6 +398,18 @@ export const homeTranslations = {
     fr: "Flotte premium à partir de 95€/jour avec kilométrage illimité",
     de: "Premium-Flotte ab 95€/Tag mit unbegrenzten Kilometern"
   },
+  "Furgocasa: flota premium desde 95€/día con kilómetros ilimitados": {
+    es: "Furgocasa: flota premium desde 95€/día con kilómetros ilimitados",
+    en: "Furgocasa: premium fleet from 95€/day with unlimited mileage",
+    fr: "Furgocasa : flotte premium à partir de 95€/jour avec kilométrage illimité",
+    de: "Furgocasa: Premium-Flotte ab 95€/Tag mit unbegrenzten Kilometern"
+  },
+  "Dreamer, Knaus, Weinsberg. España y Europa.": {
+    es: "Dreamer, Knaus, Weinsberg. España y Europa.",
+    en: "Dreamer, Knaus, Weinsberg. Spain and Europe.",
+    fr: "Dreamer, Knaus, Weinsberg. Espagne et Europe.",
+    de: "Dreamer, Knaus, Weinsberg. Spanien und Europa."
+  },
   "Interior camper Furgocasa": {
     es: "Interior camper Furgocasa",
     en: "Furgocasa camper interior",
