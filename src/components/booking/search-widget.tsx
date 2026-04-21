@@ -159,12 +159,13 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
         {/*
          * Layout:
          * - Mobile: apilado (grid-cols-1)
-         * - Desktop (lg+): una sola línea con 5 columnas
-         *   [Ubicación 1] [Fecha 2] [Hora recogida 1] [Hora devolución 1]
+         * - Desktop (lg+): una sola línea, granularidad 12 cols
+         *   [Ubicación 4] [Fecha 4] [Hora recogida 2] [Hora devolución 2]
+         *   -> Ubicación gana ancho (texto no se corta), fecha y horas se compactan.
          */}
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 lg:gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-4">
           {/* Location (única para recogida y devolución) */}
-          <div className="space-y-2 relative z-[60] lg:col-span-1">
+          <div className="space-y-2 relative z-[60] lg:col-span-4">
             <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
               {t("Ubicación (recogida y devolución)")}
             </label>
@@ -179,7 +180,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
           </div>
 
           {/* Date Range */}
-          <div className="space-y-2 relative z-[50] lg:col-span-2">
+          <div className="space-y-2 relative z-[50] lg:col-span-4">
             <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
               {t("Fecha recogida | Devolución")}
             </label>
@@ -191,8 +192,8 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
             />
           </div>
 
-          {/* Times Row (internamente 2 cols; ocupa 2 cols en lg+) */}
-          <div className="grid grid-cols-2 gap-3 lg:gap-4 relative z-[40] lg:col-span-2">
+          {/* Times Row (sub-grid 2 cols; ocupa 4 cols en lg+, 2 cada hora) */}
+          <div className="grid grid-cols-2 gap-3 lg:gap-4 relative z-[40] lg:col-span-4">
             {/* Pickup Time */}
             <div className="space-y-2">
               <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
