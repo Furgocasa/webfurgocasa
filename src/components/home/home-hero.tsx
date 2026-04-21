@@ -24,7 +24,7 @@ interface HomeHeroProps {
   /** Imagen de fondo del hero (default: /images/slides/hero-11.webp). */
   backgroundImage?: string;
   backgroundAlt?: string;
-  /** Altura del hero. Default h-screen md:h-[calc(100vh-120px)] min-h-[600px]. */
+  /** Altura del hero. Default h-screen lg:h-[calc(100vh-120px)] min-h-[600px]. */
   heightClassName?: string;
   /** Si se pasa, reemplaza al wrapper con su propia clase. Por defecto lift ring-1 ring-white/40 shadow-corp-lg. */
   liftClassName?: string;
@@ -52,7 +52,7 @@ export function HomeHero({
   children,
   backgroundImage = "/images/slides/hero-11.webp",
   backgroundAlt,
-  heightClassName = "h-screen md:h-[calc(100vh-120px)] min-h-[600px]",
+  heightClassName = "h-screen lg:h-[calc(100vh-120px)] min-h-[600px]",
   liftClassName = "rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg",
 }: HomeHeroProps) {
   const t = (key: string) => translateServer(key, locale);
@@ -80,7 +80,7 @@ export function HomeHero({
       </div>
 
       <div className="relative z-10 w-full text-center">
-        <div className="w-full px-4 md:px-[25%] space-y-3 pt-16 md:pt-0">
+        <div className="w-full px-4 lg:px-[25%] space-y-3 pt-16 lg:pt-0">
           {/* Kicker naranja */}
           <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
             <KickerIcon className="h-4 w-4" />
@@ -116,7 +116,7 @@ export function HomeHero({
         </div>
 
         {children && (
-          <div className="w-full px-4 md:px-[25%] mt-10">
+          <div className="w-full px-4 lg:px-[25%] mt-10">
             <div className={liftClassName}>{children}</div>
           </div>
         )}

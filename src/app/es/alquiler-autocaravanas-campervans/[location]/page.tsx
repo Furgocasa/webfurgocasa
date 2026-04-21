@@ -261,7 +261,7 @@ export default async function LocationPage({ params }: PageProps) {
         scrollIndicator={<HeroScrollIndicator href="#landing-intro" label={t("Descubre más")} />}
       >
         <div className="w-full text-center">
-          <div className="w-full px-4 md:px-[25%] space-y-3 pt-16 md:pt-0">
+          <div className="w-full px-4 lg:px-[25%] space-y-3 pt-16 lg:pt-0">
             {/* Kicker corporativo naranja sobre el H1 */}
             <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
               {t("Alquiler de campers en España")} · {t("Desde 95€/día")}
@@ -293,7 +293,7 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
 
           {/* Widget de búsqueda flotante (lift) sobre el hero */}
-          <div className="w-full px-4 md:px-[25%] mt-10">
+          <div className="w-full px-4 lg:px-[25%] mt-10">
             <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
               <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
             </div>

@@ -233,7 +233,7 @@ export default async function LocationPage({ params }: PageProps) {
       <LocalBusinessJsonLd location={location as any} locale="de" />
       
       {/* HERO SECTION - Dynamische Texte aus der DB */}
-      <section className="relative h-screen md:h-[calc(100vh-120px)] min-h-[600px] flex items-center justify-center">
+      <section className="relative h-screen lg:h-[calc(100vh-120px)] min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src={heroImageUrl}
@@ -252,7 +252,7 @@ export default async function LocationPage({ params }: PageProps) {
         </div>
         
         <div className="relative z-10 w-full text-center">
-          <div className="w-full px-4 md:px-[25%] space-y-3">
+          <div className="w-full px-4 lg:px-[25%] space-y-3">
             {/* Kicker corporativo naranja sobre el H1 */}
             <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
               Wohnmobilvermietung in Spanien · Ab 95€/Tag
@@ -283,7 +283,7 @@ export default async function LocationPage({ params }: PageProps) {
             </p>
           </div>
 
-          <div className="w-full px-4 md:px-[25%] mt-10">
+          <div className="w-full px-4 lg:px-[25%] mt-10">
             <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
               <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
             </div>

@@ -63,7 +63,7 @@ export default async function LocaleMapaAreasPage({ params }: PageProps) {
         </div>
 
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <div className="max-w-5xl mx-auto space-y-4 pt-16 md:pt-0">
+          <div className="max-w-5xl mx-auto space-y-4 pt-16 lg:pt-0">
             <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-lg">
               <Sparkles className="h-4 w-4" />
               Ahora con Inteligencia Artificial GPT-4
