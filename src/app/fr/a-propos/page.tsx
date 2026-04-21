@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "À propos - Découvrez Furgocasa",
-    description: "Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis 2012, avec plus de 500 voyages réalisés.",
+    description: "Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis 2007, avec plus de 500 voyages réalisés.",
     keywords: "à propos furgocasa, entreprise location camping-car murcie, histoire furgocasa, famille furgocasa, camping-cars murcie",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "À propos - Découvrez Furgocasa",
-      description: "Découvrez Furgocasa, entreprise familiale spécialisée dans la location de camping-cars à Murcie depuis 2012.",
+      description: "Découvrez Furgocasa, entreprise familiale spécialisée dans la location de camping-cars à Murcie depuis 2007.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: "À propos - Découvrez Furgocasa",
-      description: "Entreprise familiale de location de camping-cars à Murcie depuis 2012.",
+      description: "Entreprise familiale de location de camping-cars à Murcie depuis 2007.",
     },
     alternates,
     robots: {
@@ -175,7 +175,7 @@ export default async function LocaleQuienesSomosPage() {
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Vehículos Premium")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.9</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.5</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Valoración Media")}</p>
               </div>
             </div>

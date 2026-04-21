@@ -14,7 +14,6 @@ import {
   Plane,
   Map,
   BookOpen,
-  ChevronDown,
 } from "lucide-react";
 import Image from "next/image";
 import { getFeaturedVehicles, getCompanyStats, getRoutesArticles } from "@/lib/home/server-actions";
@@ -23,6 +22,7 @@ import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { ExtrasSection } from "@/components/pricing/extras-section";
+import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";
 
 interface PageProps {}
 
@@ -156,15 +156,8 @@ export default async function LocaleMotorhomeEuropaLatamPage({ params }: PagePro
           </div>
         </div>
 
-        {/* Scroll-Indikator animiert */}
-        <a
-          href="#landing-intro"
-          aria-label="Mehr entdecken"
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 group hidden md:flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors"
-        >
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Mehr entdecken</span>
-          <ChevronDown className="h-6 w-6 animate-bounce-slow" />
-        </a>
+        {/* Indicador de scroll animado */}
+        <HeroScrollIndicator href="#landing-intro" label="Mehr entdecken" />
       </section>
 
       {/* Abschnitt: Was ist ein Wohnmobil */}

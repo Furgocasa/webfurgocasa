@@ -20,7 +20,6 @@ import {
   HelpCircle,
   Zap,
   Sparkles,
-  ChevronDown,
   Info,
   Infinity as InfinityIcon,
   Star,
@@ -31,6 +30,7 @@ import { getFeaturedVehicles, getLatestBlogArticles, getCompanyStats } from "@/l
 import { OrganizationJsonLd, ProductJsonLd, WebsiteJsonLd } from "@/components/home/organization-jsonld";
 import { getTranslatedRecords } from "@/lib/translations/get-translations";
 import { ExtrasSection } from "@/components/pricing/extras-section";
+import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";
 import Image from "next/image";
 import { COMPANY } from "@/lib/company";
 
@@ -227,14 +227,7 @@ export default async function LocaleHomePage() {
         </div>
 
         {/* Indicador de scroll animado */}
-        <a
-          href="#home-intro"
-          aria-label={t("Descubre más")}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 group hidden md:flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors"
-        >
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t("Descubre más")}</span>
-          <ChevronDown className="h-6 w-6 animate-bounce-slow" />
-        </a>
+        <HeroScrollIndicator href="#home-intro" label={t("Descubre más")} />
       </section>
 
       {/* Bloque respuesta breve - optimizado para IA y búsquedas */}

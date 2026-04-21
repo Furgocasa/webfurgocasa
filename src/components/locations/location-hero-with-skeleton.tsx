@@ -7,6 +7,11 @@ interface LocationHeroWithSkeletonProps {
   heroImageUrl: string;
   alt: string;
   children: React.ReactNode; // Contenido del hero (H1, textos, SearchWidget)
+  /**
+   * Elemento opcional renderizado dentro de la <section> del hero pero FUERA del contenedor
+   * centrado de children. Pensado para un indicador de scroll (posicionamiento absolute).
+   */
+  scrollIndicator?: React.ReactNode;
 }
 
 /**
@@ -25,7 +30,8 @@ interface LocationHeroWithSkeletonProps {
 export function LocationHeroWithSkeleton({ 
   heroImageUrl, 
   alt,
-  children 
+  children,
+  scrollIndicator,
 }: LocationHeroWithSkeletonProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -68,6 +74,13 @@ export function LocationHeroWithSkeleton({
       }`}>
         {children}
       </div>
+
+      {/* Indicador de scroll opcional (posicionamiento absolute respecto al section) */}
+      {scrollIndicator && (
+        <div className={`transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
+          {scrollIndicator}
+        </div>
+      )}
     </section>
   );
 }

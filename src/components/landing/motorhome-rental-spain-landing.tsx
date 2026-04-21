@@ -18,9 +18,9 @@ import {
   HelpCircle,
   Zap,
   Sparkles,
-  ChevronDown,
 } from "lucide-react";
 import { ExtrasSection } from "@/components/pricing/extras-section";
+import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";
 import Image from "next/image";
 import type { Locale } from "@/lib/i18n/config";
 import { useLanguage } from "@/contexts/language-context";
@@ -133,14 +133,7 @@ export function MotorhomeRentalSpainLanding({
         </div>
 
         {/* Indicador de scroll animado */}
-        <a
-          href="#landing-intro"
-          aria-label={t("Descubre más")}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 group hidden md:flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors"
-        >
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t("Descubre más")}</span>
-          <ChevronDown className="h-6 w-6 animate-bounce-slow" />
-        </a>
+        <HeroScrollIndicator href="#landing-intro" label={t("Descubre más")} />
       </section>
 
       <section id="landing-intro" className="py-12 lg:py-16 bg-gray-50">

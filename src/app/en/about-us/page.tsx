@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "About Us - Discover Furgocasa",
-    description: "Furgocasa is a family-run motorhome and campervan rental company based in Murcia since 2012, with more than 500 trips completed.",
+    description: "Furgocasa is a family-run motorhome and campervan rental company based in Murcia since 2007, with more than 500 trips completed.",
     keywords: "about furgocasa, camper rental company murcia, furgocasa history, furgocasa family, motorhomes murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "About Us - Discover Furgocasa",
-      description: "Learn about Furgocasa, a family-run campervan and motorhome rental company in Murcia since 2012.",
+      description: "Learn about Furgocasa, a family-run campervan and motorhome rental company in Murcia since 2007.",
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: "About Us - Discover Furgocasa",
-      description: "Family-run campervan rental company in Murcia since 2012.",
+      description: "Family-run campervan rental company in Murcia since 2007.",
     },
     alternates,
     robots: {
@@ -175,7 +175,7 @@ export default async function LocaleQuienesSomosPage() {
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Vehículos Premium")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.9</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.5</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Valoración Media")}</p>
               </div>
             </div>

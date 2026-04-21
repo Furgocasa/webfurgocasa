@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 import Image from "next/image";
-import { Sparkles, ChevronDown, type LucideIcon } from "lucide-react";
+import { Sparkles, type LucideIcon } from "lucide-react";
 import { HeroSlider } from "@/components/hero-slider";
+import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";
 import { translateServer } from "@/lib/i18n/server-translation";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -132,14 +133,7 @@ export function HomeHero({
       </div>
 
       {/* Indicador de scroll animado */}
-      <a
-        href={`#${scrollTargetId}`}
-        aria-label={t("Descubre más")}
-        className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 group hidden md:flex flex-col items-center gap-1 text-white/80 hover:text-white transition-colors"
-      >
-        <span className="text-[10px] font-bold uppercase tracking-[0.2em]">{t("Descubre más")}</span>
-        <ChevronDown className="h-6 w-6 animate-bounce-slow" />
-      </a>
+      <HeroScrollIndicator href={`#${scrollTargetId}`} label={t("Descubre más")} />
     </section>
   );
 }

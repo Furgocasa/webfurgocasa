@@ -19,7 +19,7 @@ import {
   Bot,
   Map,
   HelpCircle,
-  BookOpen
+  BookOpen,
 } from "lucide-react";
 import Image from "next/image";
 import { LocationTourismContent } from "@/components/locations/location-tourism-content";
@@ -31,6 +31,7 @@ import { LocationHeroWithSkeleton } from "@/components/locations/location-hero-w
 import { getLocationHeroImage } from "@/lib/locationImages";
 import { getNearbyLocationsForGrid } from "@/lib/locations/server-actions";
 import { ExtrasSection } from "@/components/pricing/extras-section";
+import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -257,6 +258,7 @@ export default async function LocationPage({ params }: PageProps) {
       <LocationHeroWithSkeleton
         heroImageUrl={heroImageUrl}
         alt={location.h1_title || `${t("Alquiler de autocaravanas campers en")} ${location.name}`}
+        scrollIndicator={<HeroScrollIndicator href="#landing-intro" label={t("Descubre más")} />}
       >
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-6xl mx-auto space-y-3 pt-16 md:pt-0">
@@ -315,6 +317,9 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
         </div>
       </LocationHeroWithSkeleton>
+
+      {/* Ancla para el indicador de scroll del hero */}
+      <div id="landing-intro" aria-hidden="true" className="h-0" />
 
       {/* ================================================================== */}
       {/* VEHÍCULOS DISPONIBLES - Fondo blanco */}

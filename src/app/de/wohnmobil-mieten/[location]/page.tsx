@@ -21,7 +21,7 @@ import {
   Bot,
   Map,
   HelpCircle,
-  BookOpen
+  BookOpen,
 } from "lucide-react";
 import Image from "next/image";
 import { LocationTourismContent } from "@/components/locations/location-tourism-content";
@@ -30,6 +30,7 @@ import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { getLatestBlogArticles, getBlogArticlesByLocation } from "@/lib/home/server-actions";
 import { ExtrasSection } from "@/components/pricing/extras-section";
+import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";
 
 // ============================================================================
 // CONFIGURACIÓN
@@ -302,7 +303,13 @@ export default async function LocationPage({ params }: PageProps) {
             </div>
           </div>
         </div>
+
+        {/* Indicador de scroll animado */}
+        <HeroScrollIndicator href="#landing-intro" label="Mehr entdecken" />
       </section>
+
+      {/* Ancla para el indicador de scroll del hero */}
+      <div id="landing-intro" aria-hidden="true" className="h-0" />
 
       {/* FAHRZEUGE - Weißer Hintergrund */}
       {vehicles.length > 0 && (

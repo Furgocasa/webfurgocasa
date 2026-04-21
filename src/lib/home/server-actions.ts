@@ -278,7 +278,7 @@ export const getCompanyStats = cache(async (): Promise<CompanyStats> => {
   return {
     totalBookings: bookingsCount || 500, // Valor por defecto si no hay datos
     totalVehicles: vehiclesCount || 8,
-    averageRating: 4.9,
-    yearsExperience: new Date().getFullYear() - 2012
+    averageRating: 4.5,
+    yearsExperience: new Date().getFullYear() - 2007
   };
 });

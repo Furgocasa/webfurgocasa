@@ -36,10 +36,10 @@ export const COMPANY = {
     weekdaysShort: 'Lunes a Viernes',
   },
 
-  /** Rating para schema.org - valores canónicos */
+  /** Rating para schema.org - valores canónicos (Google Reviews) */
   aggregateRating: {
-    ratingValue: '4.9',
-    reviewCount: '500',
+    ratingValue: '4.5',
+    reviewCount: '400',
     bestRating: '5',
     worstRating: '1',
   },
@@ -110,6 +110,6 @@ export const COMPANY = {
     longitude: '-1.1635',
   },
 
-  foundingDate: '2012',
+  foundingDate: '2007',
   legalName: 'Furgocasa S.L.',
 } as const;

@@ -156,58 +156,66 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
   return (
     <div className="relative bg-white p-6 lg:p-8 rounded-2xl lg:rounded-3xl shadow-2xl">
       <form onSubmit={handleSearch} className="space-y-4 lg:space-y-5">
-        {/* Location (única para recogida y devolución) */}
-        <div className="space-y-2 relative z-[60]">
-          <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
-            {t("Ubicación (recogida y devolución)")}
-          </label>
-          <LocationSelector
-            value={location}
-            onChange={handleLocationChange}
-            placeholder={t("MURCIA (SEDE)")}
-            pickupDate={pickupDateStr}
-            defaultLocation={defaultLocation}
-            fallbackLocation={fallbackLocation}
-          />
-        </div>
-
-        {/* Date Range */}
-        <div className="space-y-2 relative z-[50]">
-          <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
-            {t("Fecha recogida | Devolución")}
-          </label>
-          <DateRangePicker
-            dateRange={dateRange}
-            onDateChange={setDateRange}
-            minDays={getMinDays()}
-            closedRanges={closedRanges}
-          />
-        </div>
-
-        {/* Times Row */}
-        <div className="grid grid-cols-2 gap-3 lg:gap-4 relative z-[40]">
-          {/* Pickup Time */}
-          <div className="space-y-2">
+        {/*
+         * Layout:
+         * - Mobile: apilado (grid-cols-1)
+         * - Desktop (lg+): una sola línea con 5 columnas
+         *   [Ubicación 1] [Fecha 2] [Hora recogida 1] [Hora devolución 1]
+         */}
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 lg:gap-4">
+          {/* Location (única para recogida y devolución) */}
+          <div className="space-y-2 relative z-[60] lg:col-span-1">
             <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
-              {t("Hora recogida")}
+              {t("Ubicación (recogida y devolución)")}
             </label>
-            <TimeSelector
-              value={pickupTime}
-              onChange={setPickupTime}
-              timeSlots={locationOpeningHours}
+            <LocationSelector
+              value={location}
+              onChange={handleLocationChange}
+              placeholder={t("MURCIA (SEDE)")}
+              pickupDate={pickupDateStr}
+              defaultLocation={defaultLocation}
+              fallbackLocation={fallbackLocation}
             />
           </div>
 
-          {/* Dropoff Time */}
-          <div className="space-y-2">
+          {/* Date Range */}
+          <div className="space-y-2 relative z-[50] lg:col-span-2">
             <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
-              {t("Hora devolución")}
+              {t("Fecha recogida | Devolución")}
             </label>
-            <TimeSelector
-              value={dropoffTime}
-              onChange={setDropoffTime}
-              timeSlots={locationOpeningHours}
+            <DateRangePicker
+              dateRange={dateRange}
+              onDateChange={setDateRange}
+              minDays={getMinDays()}
+              closedRanges={closedRanges}
             />
+          </div>
+
+          {/* Times Row (internamente 2 cols; ocupa 2 cols en lg+) */}
+          <div className="grid grid-cols-2 gap-3 lg:gap-4 relative z-[40] lg:col-span-2">
+            {/* Pickup Time */}
+            <div className="space-y-2">
+              <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
+                {t("Hora recogida")}
+              </label>
+              <TimeSelector
+                value={pickupTime}
+                onChange={setPickupTime}
+                timeSlots={locationOpeningHours}
+              />
+            </div>
+
+            {/* Dropoff Time */}
+            <div className="space-y-2">
+              <label className="block text-xs lg:text-sm font-medium text-gray-600 uppercase tracking-wide text-left">
+                {t("Hora devolución")}
+              </label>
+              <TimeSelector
+                value={dropoffTime}
+                onChange={setDropoffTime}
+                timeSlots={locationOpeningHours}
+              />
+            </div>
           </div>
         </div>
 
