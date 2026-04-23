@@ -1,5 +1,10 @@
 # Sistema de Generación de Contenido Local con IA
 
+## 🔗 Relacionado (otras piezas con OpenAI en el repo)
+
+- **Portadas del blog (imagen):** `gpt-5.4` + `gpt-image-2`, publicación en **WebP** en Supabase (`blog/ai-covers/`). Guía operativa: [`../../02-desarrollo/media/GESTION-MEDIA-STORAGE.md`](../../02-desarrollo/media/GESTION-MEDIA-STORAGE.md) (sección *Portadas del blog generadas por IA*). Scripts: `npm run generate:blog-cover`, `npm run reencode:blog-cover-webp`.
+- **Textos de venta por localización:** script `generate-sale-location-content.ts`, modelo por defecto **`gpt-5.4`** (`OPENAI_SALE_LOCATION_MODEL`).
+
 ## 🎯 Objetivo
 
 Generar contenido **único, detallado y SEO-optimizado** para cada página de localización usando OpenAI, diferenciando nuestro sitio de la competencia con información real y específica de cada ciudad.

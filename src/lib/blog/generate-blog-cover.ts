@@ -1,14 +1,42 @@
 /**
  * Generación de portadas de blog con IA (misma lógica que POST /api/admin/blog/generate-cover).
+ * OpenAI devuelve PNG; antes de subir a Supabase se convierte a WebP (calidad configurable).
  * Usa solo @supabase/supabase-js para poder ejecutarse fuera del runtime de Next (scripts CLI).
  */
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { access, readdir, readFile } from "fs/promises";
+import path from "path";
 import OpenAI from "openai";
+import { toFile } from "openai/uploads";
+import sharp from "sharp";
 import type { Database } from "@/lib/supabase/database.types";
 
-const OPENAI_TEXT_MODEL = process.env.BLOG_COVER_TEXT_MODEL || "gpt-4o";
-const OPENAI_IMAGE_MODEL = process.env.BLOG_COVER_IMAGE_MODEL || "gpt-image-1.5";
+const OPENAI_TEXT_MODEL = process.env.BLOG_COVER_TEXT_MODEL || "gpt-5.4";
+const OPENAI_IMAGE_MODEL = process.env.BLOG_COVER_IMAGE_MODEL || "gpt-image-2";
+const USE_VEHICLE_REFERENCE_IMAGES = process.env.BLOG_COVER_USE_VEHICLE_REFERENCES !== "false";
 const IMAGE_SIZE = "1536x1024";
+const BLOG_COVER_WEBP_QUALITY = (() => {
+  const raw = process.env.BLOG_COVER_WEBP_QUALITY?.trim();
+  if (!raw) return 85;
+  const n = Number(raw);
+  return Number.isFinite(n) && n >= 1 && n <= 100 ? n : 85;
+})();
+const VEHICLE_REFERENCE_PROMPT_TAIL =
+  "Si aparece una camper en la escena, usa las imagenes de referencia adjuntas como guia visual fuerte y prioritaria de la morfologia, proporciones, volumen, altura, frontal, ventanas, llantas, pasos de rueda y lenguaje estetico de una camper real de Furgocasa. Debe recordar claramente a una Knaus Boxstar gran volumen real de la flota Furgocasa, evitando vehiculos genericos de stock, futuristas, demasiado perfectos de catalogo o con rasgos de autocaravana ajena a la marca. Prioriza una silueta autentica, compacta y realista, con aspecto de camper de alquiler usada pero muy bien cuidada. REGLA DURA DE VEHICULO: nunca inventes dos toldos en una misma camper. Si aparece toldo, debe existir solo uno y debe ir en el lateral derecho del vehiculo, como en las referencias reales. MUY IMPORTANTE: usa las referencias para definir el VEHICULO, no para copiar su encuadre. La composicion, el angulo, la distancia de camara, la altura del punto de vista, la cercania o lejania del vehiculo y su posicion dentro del encuadre deben decidirse segun el contenido del articulo y la mejor solucion fotografica para esa historia concreta.";
+const VEHICLE_REFERENCE_IMAGE_CANDIDATES = [
+  "images/furgocasa_images/vehiculos/knaus_boxstar_street_2020_gris/furgocasa_alquiler_autocaravanas_campervans_knaus_boxstar_street_600_mq_2020_gris.jpg",
+  "images/furgocasa_images/vehiculos/v6_knaus_boxstar_lifetime/furgocasa_alquiler_autocaravanas_campervans_knaus_boxstar_lifetime_600_vf.jpg",
+  "public/images/mailing/vehicles/fu0012-knaus-boxstar-family.jpg",
+  "public/images/mailing/vehicles/fu0011-weinsberg-caratour-mq.jpg",
+];
+const VEHICLE_REFERENCE_IMAGE_DIRECTORIES = ["images/IA_blog"];
+const SUPPORTED_REFERENCE_IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
+const MAX_VEHICLE_REFERENCE_IMAGES = 6;
+
+type VehicleReferenceImage = {
+  file: Awaited<ReturnType<typeof toFile>>;
+  sourcePath: string;
+};
 
 const PROMPT_BUILDER_SYSTEM = `Eres un agente senior: director de arte, location scout y especialista en prompts para generacion de imagenes fotorrealistas. Recibes un DOSSIER COMPLETO sobre un articulo del blog de Furgocasa relacionado con viajes en camper, rutas, destinos, consejos o experiencias sobre ruedas. Tu UNICA salida es UN parrafo en espanol que el modelo de imagen usara tal cual.
 
@@ -25,6 +53,8 @@ REGLAS DURAS:
 - Si aparece vehiculo, prioriza claramente una camper de gran volumen tipo furgon camperizada europea, similar a una Fiat Ducato H2 L3 de alquiler, antes que una autocaravana grande o perfilada.
 - Evita autocaravanas capuchinas, integrales o de gran volumen residencial salvo que el dossier lo exija de forma explicita.
 - El vehiculo debe parecer un vehiculo real de alquiler en Europa, no un concept car futurista.
+- La perspectiva del vehiculo no es fija: puede aparecer cerca o lejos, completo o parcial, aparcado, circulando, a ras de suelo o desde un punto de vista elevado, siempre que la escena del articulo lo justifique.
+- Regla dura de vehiculo: nunca puede haber dos toldos en una misma camper. Si aparece un toldo, debe ser unico y estar en el lateral derecho del vehiculo.
 - Si hay personas, pocas, naturales y no posadas; rostros no protagonistas.
 - Prohibido en escena: texto legible, logotipos, marcas, matriculas legibles, carteles hero, mapas flotantes, interfaces, collage, ilustracion, render 3D.
 - Evita look IA: piel plastica, cielos neon, oversaturacion, HDR agresivo, simetria artificial, glow, fantasia, composiciones imposibles.
@@ -50,6 +80,8 @@ Prioridades:
 - Si las personas no son imprescindibles, reduce su protagonismo.
 - Si aparece vehiculo, prioriza una camper gran volumen tipo furgon camperizado europeo de alquiler y evita derivar hacia autocaravana grande salvo que el dossier lo pida.
 - Si una camper aparece, que se integre como parte natural del viaje, no como showroom ni packshot.
+- Corrige cualquier error estructural de la camper: nunca dos toldos; si hay toldo, debe ser uno solo y montado en el lateral derecho.
+- El encuadre del vehiculo debe obedecer a la historia del articulo y no repetirse como una pose fija de catalogo; si la escena funciona mejor con el vehiculo lejano, lateral, elevado, parcialmente visible o aparcado, hazlo asi.
 - Evita fantasia, exceso de color, glow, suavizado plastico, simetria artificial, postureo publicitario falso.
 
 Reglas:
@@ -289,6 +321,87 @@ function cleanPrompt(value: string) {
   return collapseWhitespace(value.replace(/^["']+|["']+$/g, ""));
 }
 
+async function loadVehicleReferenceImages() {
+  if (!USE_VEHICLE_REFERENCE_IMAGES) {
+    return [];
+  }
+
+  const files: VehicleReferenceImage[] = [];
+  const relativePaths = (await listVehicleReferenceImagePaths()).slice(0, MAX_VEHICLE_REFERENCE_IMAGES);
+
+  for (const relativePath of relativePaths) {
+    const absolutePath = path.resolve(process.cwd(), relativePath);
+    try {
+      await access(absolutePath);
+      const normalizedImage = await normalizeVehicleReferenceImage(absolutePath);
+      if (normalizedImage) {
+        files.push(normalizedImage);
+      }
+    } catch {
+      // Si falta una referencia, seguimos con las que existan
+    }
+  }
+
+  return files;
+}
+
+async function listVehicleReferenceImagePaths() {
+  const discoveredPaths = [];
+
+  for (const relativeDirectory of VEHICLE_REFERENCE_IMAGE_DIRECTORIES) {
+    const absoluteDirectory = path.resolve(process.cwd(), relativeDirectory);
+
+    try {
+      const entries = await readdir(absoluteDirectory, { withFileTypes: true });
+
+      for (const entry of entries) {
+        if (!entry.isFile()) {
+          continue;
+        }
+
+        const extension = path.extname(entry.name).toLowerCase();
+        if (!SUPPORTED_REFERENCE_IMAGE_EXTENSIONS.has(extension)) {
+          continue;
+        }
+
+        discoveredPaths.push(path.posix.join(relativeDirectory.replace(/\\/g, "/"), entry.name));
+      }
+    } catch {
+      // Si la carpeta no existe o no se puede leer, seguimos con las rutas fijas
+    }
+  }
+
+  return Array.from(new Set([...discoveredPaths, ...VEHICLE_REFERENCE_IMAGE_CANDIDATES]));
+}
+
+async function normalizeVehicleReferenceImage(filePath: string): Promise<VehicleReferenceImage | null> {
+  try {
+    const bytes = await readFile(filePath);
+    const normalizedBytes = await sharp(bytes)
+      .rotate()
+      .resize({
+        width: 2048,
+        height: 2048,
+        fit: "inside",
+        withoutEnlargement: true,
+      })
+      .jpeg({
+        quality: 92,
+        mozjpeg: true,
+      })
+      .toBuffer();
+
+    return {
+      sourcePath: filePath,
+      file: await toFile(normalizedBytes, `${path.parse(filePath).name}.jpg`, {
+        type: "image/jpeg",
+      }),
+    };
+  } catch {
+    return null;
+  }
+}
+
 async function buildVisualPrompt(openai: OpenAI, dossier: string) {
   const firstPass = await openai.chat.completions.create({
     model: OPENAI_TEXT_MODEL,
@@ -333,9 +446,38 @@ async function buildVisualPrompt(openai: OpenAI, dossier: string) {
 }
 
 async function generateImageBuffer(openai: OpenAI, prompt: string) {
+  const promptWithVehicleReferences = cleanPrompt(`${prompt} ${VEHICLE_REFERENCE_PROMPT_TAIL}`);
+  const referenceImages = await loadVehicleReferenceImages();
+
+  if (referenceImages.length > 0) {
+    try {
+      return await generateImageBufferFromReferenceBatch(
+        openai,
+        promptWithVehicleReferences,
+        referenceImages.map((referenceImage) => referenceImage.file)
+      );
+    } catch (error) {
+      console.warn(
+        "[BLOG-COVER] El lote completo de referencias visuales ha fallado. Se probaran referencias individuales antes de usar solo prompt.",
+        error
+      );
+    }
+
+    for (const referenceImage of referenceImages) {
+      try {
+        return await generateImageBufferFromReferenceBatch(openai, promptWithVehicleReferences, [referenceImage.file]);
+      } catch (error) {
+        console.warn(
+          `[BLOG-COVER] Referencia individual descartada: ${referenceImage.sourcePath}.`,
+          error
+        );
+      }
+    }
+  }
+
   const result = await openai.images.generate({
     model: OPENAI_IMAGE_MODEL,
-    prompt,
+    prompt: promptWithVehicleReferences,
     size: IMAGE_SIZE,
     quality: "high",
     output_format: "png",
@@ -350,19 +492,52 @@ async function generateImageBuffer(openai: OpenAI, prompt: string) {
   return Buffer.from(imageBase64, "base64");
 }
 
+async function generateImageBufferFromReferenceBatch(
+  openai: OpenAI,
+  prompt: string,
+  referenceImages: Array<Awaited<ReturnType<typeof toFile>>>
+) {
+  const result = await openai.images.edit({
+    model: OPENAI_IMAGE_MODEL,
+    image: referenceImages,
+    prompt,
+    size: IMAGE_SIZE,
+    quality: "high",
+    n: 1,
+  });
+
+  const imageBase64 = result.data?.[0]?.b64_json;
+  if (!imageBase64) {
+    throw new Error("OpenAI no devolvio datos de imagen en base64 usando referencias visuales");
+  }
+
+  return Buffer.from(imageBase64, "base64");
+}
+
+async function encodeCoverRasterToWebpForPublish(inputBuffer: Buffer) {
+  return sharp(inputBuffer)
+    .webp({
+      quality: BLOG_COVER_WEBP_QUALITY,
+      effort: 6,
+      smartSubsample: true,
+    })
+    .toBuffer();
+}
+
 async function uploadToBlogBucket(post: CoverPost, imageBuffer: Buffer, adminSupabase: AdminSupabase) {
+  const webpBuffer = await encodeCoverRasterToWebpForPublish(imageBuffer);
   const timestamp = Date.now();
   const safeSlug = (post.slug || post.id || "post")
     .toLowerCase()
     .replace(/[^a-z0-9-]/g, "-")
     .replace(/-+/g, "-");
-  const filePath = `ai-covers/${safeSlug}-${timestamp}.png`;
+  const filePath = `ai-covers/${safeSlug}-${timestamp}.webp`;
 
   const { error: uploadError } = await adminSupabase.storage
     .from("blog")
-    .upload(filePath, imageBuffer, {
+    .upload(filePath, webpBuffer, {
       cacheControl: "2592000",
-      contentType: "image/png",
+      contentType: "image/webp",
       upsert: false,
     });
 
@@ -538,5 +713,84 @@ export async function generateBlogCoverFromTarget(input: {
     firstPrompt: prompts.firstPrompt,
     refinedPrompt: prompts.refinedPrompt,
     dossier,
+  };
+}
+
+export async function reencodeExistingFeaturedImageToWebp(input: { articleUrl?: string; postId?: string }) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    throw new Error("Falta NEXT_PUBLIC_SUPABASE_URL");
+  }
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    throw new Error("Falta SUPABASE_SERVICE_ROLE_KEY");
+  }
+
+  const { articleUrl, postId } = input;
+  if (!postId && !articleUrl) {
+    throw new Error("Debes indicar postId o articleUrl");
+  }
+
+  const adminSupabase = createServiceSupabase();
+  const post = postId
+    ? await loadPostById(adminSupabase, postId)
+    : (await loadPostByUrl(adminSupabase, articleUrl!)).post;
+
+  const imageUrl = post.featured_image;
+  if (!imageUrl?.startsWith("http")) {
+    throw new Error("El post no tiene featured_image descargable");
+  }
+
+  const response = await fetch(imageUrl);
+  if (!response.ok) {
+    throw new Error(`No se pudo descargar la portada (${response.status})`);
+  }
+
+  const downloaded = Buffer.from(await response.arrayBuffer());
+  const webpBuffer = await encodeCoverRasterToWebpForPublish(downloaded);
+  const timestamp = Date.now();
+  const safeSlug = (post.slug || post.id || "post")
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, "-")
+    .replace(/-+/g, "-");
+  const filePath = `ai-covers/${safeSlug}-${timestamp}.webp`;
+
+  const { error: uploadError } = await adminSupabase.storage
+    .from("blog")
+    .upload(filePath, webpBuffer, {
+      cacheControl: "2592000",
+      contentType: "image/webp",
+      upsert: false,
+    });
+
+  if (uploadError) {
+    throw new Error(`Error subiendo la portada webp al bucket blog: ${uploadError.message}`);
+  }
+
+  const {
+    data: { publicUrl },
+  } = adminSupabase.storage.from("blog").getPublicUrl(filePath);
+
+  if (!publicUrl) {
+    throw new Error("No se pudo obtener la URL publica de la portada webp");
+  }
+
+  const { error: updateError } = await adminSupabase
+    .from("posts")
+    .update({
+      featured_image: publicUrl,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", post.id);
+
+  if (updateError) {
+    throw new Error(`No se pudo guardar la portada webp en el post: ${updateError.message}`);
+  }
+
+  return {
+    ok: true,
+    postId: post.id,
+    title: post.title,
+    featuredImage: publicUrl,
+    storagePath: filePath,
   };
 }

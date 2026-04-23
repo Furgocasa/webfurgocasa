@@ -172,6 +172,8 @@ vehicles/
 **Respuesta:**
 ```
 blog/
+├── ai-covers/
+│   └── {slug}-{timestamp}.webp          ← portadas IA (desde abr 2026); ver GESTION-MEDIA-STORAGE.md
 ├── portadas/
 │   ├── guia-costa-brava.jpg
 │   └── mejores-rutas-2026.jpg
@@ -189,6 +191,7 @@ blog/
 - Agrupa por categoría o tipo
 - Usa carpetas por artículo para imágenes relacionadas
 - Mantén las portadas separadas
+- Las **portadas generadas por IA** se guardan en `blog/ai-covers/` como **WebP**; el flujo técnico está descrito en **`docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md`** (sección *Portadas del blog generadas por IA*).
 
 ---
 

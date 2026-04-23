@@ -1,5 +1,5 @@
 /**
- * Genera las 3 imágenes de la landing creadores-de-contenido (DALL·E 3).
+ * Genera las 3 imágenes de la landing creadores-de-contenido con GPT Image 2.
  * Requiere OPENAI_API_KEY en .env.local
  *
  * Uso: npx tsx scripts/generate-content-creator-showcase-images.ts
@@ -16,6 +16,7 @@ config({ path: resolve(process.cwd(), ".env.local") });
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const OUT_DIR = resolve(process.cwd(), "public/images/content-creators");
+const IMAGE_MODEL = "gpt-image-2";
 
 const JOBS: { file: string; prompt: string }[] = [
   {
@@ -46,24 +47,20 @@ async function main() {
   for (const { file, prompt } of JOBS) {
     console.log(`🎨 Generando ${file}...`);
     const res = await openai.images.generate({
-      model: "dall-e-3",
+      model: IMAGE_MODEL,
       prompt,
       n: 1,
       size: "1024x1792",
-      quality: "hd",
+      quality: "high",
+      output_format: "png",
     });
 
-    const url = res.data[0]?.url;
-    if (!url) {
-      throw new Error(`Sin URL en respuesta para ${file}`);
+    const imageBase64 = res.data[0]?.b64_json;
+    if (!imageBase64) {
+      throw new Error(`Sin imagen base64 en respuesta para ${file}`);
     }
 
-    const imgRes = await fetch(url);
-    if (!imgRes.ok) {
-      throw new Error(`Descarga fallida ${file}: ${imgRes.status}`);
-    }
-
-    const buf = Buffer.from(await imgRes.arrayBuffer());
+    const buf = Buffer.from(imageBase64, "base64");
     const tmpPng = resolve(OUT_DIR, `_tmp-${Date.now()}.png`);
     await writeFile(tmpPng, buf);
     const outPath = resolve(OUT_DIR, file);

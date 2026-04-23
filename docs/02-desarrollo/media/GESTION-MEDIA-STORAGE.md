@@ -183,6 +183,9 @@ vehicles/
 ### Bucket: blog
 ```
 blog/
+├── ai-covers/
+│   ├── slug-del-articulo-{timestamp}.webp   ← portadas generadas por IA (abr 2026+)
+│   └── ...
 ├── guias-viaje/
 │   ├── costa-brava-portada.jpg
 │   └── costa-brava-mapa.jpg
@@ -191,6 +194,32 @@ blog/
 └── noticias/
     └── nuevos-vehiculos-2026.jpg
 ```
+
+#### Portadas del blog generadas por IA (abr 2026)
+
+- **Código:** `src/lib/blog/generate-blog-cover.ts` (misma lógica que `POST /api/admin/blog/generate-cover` y el script CLI).
+- **Texto (prompt):** OpenAI **`gpt-5.4`** en dos pasadas (builder + refiner). Override: `BLOG_COVER_TEXT_MODEL`.
+- **Imagen:** OpenAI **`gpt-image-2`**, `size` **1536×1024**, `quality: high`, `output_format: png` en la API (raster de máxima calidad en el modelo).
+- **Publicación:** el PNG devuelto se reencodea con **`sharp`** a **WebP** antes de subirlo al bucket `blog` (`contentType: image/webp`). Calidad configurable: **`BLOG_COVER_WEBP_QUALITY`** (1–100, por defecto **85**). Desactivar referencias visuales de vehículo: `BLOG_COVER_USE_VEHICLE_REFERENCES=false`.
+- **Referencias visuales:** fotos reales de la flota en `images/IA_blog/` (y rutas fijas de respaldo en el código) se normalizan con `sharp` y se envían a `images.edit` cuando la API lo acepta; si falla un lote, se prueba referencia a referencia y, en último caso, solo prompt.
+- **Reglas de producto (prompt):** la camper debe seguir la morfología Furgocasa; **nunca dos toldos**; si hay toldo, **uno solo en el lateral derecho**; el encuadre y el ángulo los manda el **contenido del artículo**, no copiar la foto de referencia.
+- **CLI — generar o regenerar portada** (actualiza `posts.featured_image`):
+
+  ```bash
+  npx tsx scripts/generate-blog-cover.ts "https://www.furgocasa.com/es/blog/rutas/slug-del-post"
+  ```
+
+  Equivalente: `npm run generate:blog-cover -- "https://..."`
+
+- **CLI — solo convertir la portada ya guardada a WebP** (sin llamar a OpenAI para imagen/texto):
+
+  ```bash
+  npm run reencode:blog-cover-webp -- "https://..." "https://..."
+  ```
+
+  En Windows, si los flags no llegan bien al script, usar siempre **`npx tsx scripts/generate-blog-cover.ts reencode-webp "url1" "url2"`**.
+
+- **Imágenes de referencia nuevas:** colocar JPEG/PNG/WebP en **`images/IA_blog/`**; el generador las descubre automáticamente (con límite de archivos por ejecución para no saturar la API).
 
 ### Bucket: extras
 ```

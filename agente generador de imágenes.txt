@@ -20,10 +20,10 @@ La mejora no vino solo por cambiar el modelo de imagen.
 La mejora real vino de combinar tres cosas:
 
 1. Un DOSSIER rico y bien estructurado a partir de la ficha original.
-2. Dos pasadas de GPT-4o:
+2. Dos pasadas de GPT-5.4:
    - una para sintetizar la ficha en un prompt visual
    - otra para quitar el look IA y empujarlo hacia fotografia real
-3. Un generador de imagen configurado con gpt-image-1.5 y parametros compatibles con formato panoramico y calidad alta.
+3. Un generador de imagen configurado con gpt-image-2 y parametros compatibles con formato panoramico y calidad alta.
 
 El sistema funciona porque NO se le pide al modelo de imagen "hazme una portada bonita".
 Se le entrega antes una interpretacion editorial, geografica, tematica y fotografica de la ficha.
@@ -35,17 +35,18 @@ FLUJO COMPLETO
 
 Entrada estructurada
 -> construir dossier textual rico
--> GPT-4o Prompt Builder
--> GPT-4o Realism Refiner
+-> GPT-5.4 Prompt Builder
+-> GPT-5.4 Realism Refiner
 -> concatenar coletilla final de realismo fotografico
--> gpt-image-1.5
--> guardar imagen
+-> gpt-image-2 (salida raster alta calidad en API, p. ej. PNG)
+-> (Furgocasa) reencode WebP con sharp y subir a Storage
+-> guardar URL en CMS
 
 
 MODELOS Y PARAMETROS USADOS
 
 Modelo para interpretar la ficha y redactar prompts:
-- gpt-4o
+- gpt-5.4
 
 Primera pasada:
 - temperature: 0.32
@@ -56,18 +57,33 @@ Segunda pasada:
 - max_tokens: 900
 
 Modelo de imagen:
-- gpt-image-1.5
+- gpt-image-2
 
 Parametros de generacion de imagen:
 - n: 1
 - size: 1536x1024
 - quality: high
-- output_format: png
+- output_format: png (en la llamada a OpenAI; asi el modelo entrega maxima calidad de pixel)
+
+Publicacion en Furgocasa (despues de recibir el PNG):
+- sharp: conversion a WebP (calidad por defecto 85; env BLOG_COVER_WEBP_QUALITY 1-100)
+- Supabase Storage: bucket blog, ruta ai-covers/{slug}-{timestamp}.webp, contentType image/webp
+- La web sigue usando next/image; el origen WebP reduce peso en CDN y enlaces directos
 
 Notas:
-- Antes se usaba DALL-E 3. Este flujo fue migrado a gpt-image-1.5.
-- En Retiru, el salto de calidad perceptible vino de esta combinacion:
-  GPT-4o para pensar la escena + gpt-image-1.5 para ejecutarla.
+- Antes se usaba DALL-E 3. Este flujo fue migrado primero a gpt-image-1.5 y actualmente usa gpt-image-2.
+- En Furgocasa, la combinacion actual es:
+  GPT-5.4 para pensar la escena + gpt-image-2 para ejecutarla + WebP al publicar.
+
+Referencias visuales (Furgocasa):
+- Carpeta images/IA_blog/ mas rutas fijas de vehiculos reales; se normalizan con sharp (JPEG limpio, tamano acotado) antes de images.edit.
+- Si el lote falla, se prueba referencia individual; si todo falla, solo prompt.
+- Regla de producto en prompts: ninguna camper con dos toldos; si hay toldo, uno solo en lateral derecho, como en fotos reales.
+- Diversidad: las referencias definen morfologia del vehiculo, no el encuadre; angulo y distancia los dicta el articulo.
+
+Scripts npm en el repo:
+- npm run generate:blog-cover -- "https://www.furgocasa.com/es/blog/..."
+- npm run reencode:blog-cover-webp -- "url1" "url2"   (solo re-WebP sin IA; en Windows alternativa: npx tsx scripts/generate-blog-cover.ts reencode-webp ...)
 
 
 OBJETIVO VISUAL
@@ -433,7 +449,7 @@ Reglas:
 
 PASO 4 - COLA FINAL DE REALISMO
 
-Despues de las dos pasadas de GPT-4o, aun se anade una coletilla final fija.
+Despues de las dos pasadas de GPT-5.4, aun se anade una coletilla final fija.
 Esto es importante porque:
 
 - normaliza el tipo de acabado
@@ -464,7 +480,7 @@ POST https://api.openai.com/v1/images/generations
 JSON:
 
 {
-  "model": "gpt-image-1.5",
+  "model": "gpt-image-2",
   "prompt": "PROMPT_FINAL",
   "n": 1,
   "size": "1536x1024",
@@ -495,15 +511,15 @@ Regla usada:
 PARAMETROS QUE HAN DADO BUEN RESULTADO
 
 Para la interpretacion del dossier:
-- gpt-4o
+- gpt-5.4
 - temp media-baja
 
 Para el refinado:
-- gpt-4o
+- gpt-5.4
 - temp baja
 
 Para la imagen:
-- gpt-image-1.5
+- gpt-image-2
 - quality high
 - 1536x1024
 
@@ -624,9 +640,9 @@ function buildDossier(input):
   - devuelve string unico
 
 function buildPromptWithLLM(dossier):
-  - llama a GPT-4o con PROMPT_BUILDER_SYSTEM
+  - llama a GPT-5.4 con PROMPT_BUILDER_SYSTEM
   - limpia la respuesta
-  - llama a GPT-4o con PROMPT_REALISM_REFINER_SYSTEM
+  - llama a GPT-5.4 con PROMPT_REALISM_REFINER_SYSTEM
   - limpia la respuesta
   - concatena IMAGE_REALISM_TAIL
   - valida longitud
@@ -634,7 +650,7 @@ function buildPromptWithLLM(dossier):
 
 function generateImage(prompt):
   - llama a /v1/images/generations
-  - model: gpt-image-1.5
+  - model: gpt-image-2
   - size: 1536x1024
   - quality: high
   - output_format: png

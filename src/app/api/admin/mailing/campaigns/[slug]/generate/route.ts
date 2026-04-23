@@ -606,11 +606,11 @@ Genera AHORA el HTML completo de la nueva campaña respetando todas las reglas d
       try {
         // El modelo puede llegar desde el panel para una generación concreta.
         // Si el admin no elige uno, usamos el configurado en OPENAI_MAILING_MODEL.
-        // Si tampoco existe o es inválido, caemos al default seguro gpt-4.1.
+        // Si tampoco existe o es inválido, caemos al default seguro gpt-5.4.
         const envModel = process.env.OPENAI_MAILING_MODEL?.trim() || '';
         const fallbackModel: MailingModel = ALLOWED_MAILING_MODELS.includes(envModel as MailingModel)
           ? (envModel as MailingModel)
-          : 'gpt-4.1';
+          : 'gpt-5.4';
         const model: MailingModel = requestedModel
           ? (requestedModel as MailingModel)
           : fallbackModel;

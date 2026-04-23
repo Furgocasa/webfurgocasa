@@ -28,6 +28,19 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 🖼️ Abril 2026 — Portadas IA del blog (WebP + referencias flota)
+
+- **Implementación:** `src/lib/blog/generate-blog-cover.ts` · **Admin:** `POST /api/admin/blog/generate-cover` · **CLI:** `scripts/generate-blog-cover.ts`.
+- **Modelos:** texto **`gpt-5.4`** (dos pasadas); imagen **`gpt-image-2`** (1536×1024, alta calidad). Variables opcionales: `BLOG_COVER_TEXT_MODEL`, `BLOG_COVER_IMAGE_MODEL`, `BLOG_COVER_WEBP_QUALITY`, `BLOG_COVER_USE_VEHICLE_REFERENCES`.
+- **Storage:** bucket **`blog`**, carpeta **`ai-covers/`**, ficheros **`.webp`** (el PNG de la API se convierte con **sharp** antes de subir).
+- **Referencias:** fotos reales en **`images/IA_blog/`** (el script también usa rutas fijas de respaldo). Reglas de negocio en prompt: **un solo toldo como máximo**, siempre **lateral derecho**; sin copiar el encuadre de la referencia.
+- **Comandos:**
+  - `npm run generate:blog-cover -- "https://www.furgocasa.com/es/blog/rutas/slug-del-articulo"`
+  - `npm run reencode:blog-cover-webp -- "url-articulo-1" "url-articulo-2"` (solo reconvertir la portada actual a WebP, sin IA). Si en Windows no llegan bien los argumentos: `npx tsx scripts/generate-blog-cover.ts reencode-webp "url1"`.
+- **Documentación:** [`docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md`](./docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md) (sección *Portadas del blog generadas por IA*), notas de producto en [`agente generador de imágenes.txt`](./agente%20generador%20de%20imágenes.txt).
+
+---
+
 ## 🚐 Marzo 2026 — Listados de vehículos (flota, ventas, búsqueda)
 
 - **Flota alquiler** (`/es/vehiculos`, `/en/vehicles`, `/fr/vehicules`, `/de/fahrzeuge`): un solo componente `src/components/vehicle/vehicle-list-client.tsx` — título = `vehicle.name` (sin segunda línea marca/modelo redundante). **ISR** `revalidate = 3600`: los cambios pueden tardar hasta ~1 h en verse en CDN.

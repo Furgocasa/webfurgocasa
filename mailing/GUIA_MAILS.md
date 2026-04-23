@@ -28,7 +28,7 @@
 > - Dominio: **`https://www.furgocasa.com`**. Remitente: **`reservas@furgocasa.com`**.
 > - Imágenes en `public/images/mailing/` (iconos sociales) y `public/images/brand/` (logo).
 > - Prefijo de migraciones por fecha: `supabase/migrations/YYYYMMDD-*.sql`.
-> - **IA generadora:** selector en el panel con `gpt-4.1` (default) · `gpt-4o` · `gpt-5.4`. Configurable también vía `OPENAI_MAILING_MODEL`. El `SYSTEM_PROMPT` incluye "Manifiesto" (6 reglas de oro), grounding con `CONTEXTO_BD` (ofertas/posts/flota reales + precios pre-calculados en €), reglas de clicabilidad, formato europeo `1.111,11 €`, patrón Outlook-safe de tarjetas, presupuesto de densidad visual y auto-generación de `<!--FURGOCASA_DESCRIPTION-->` para el listado admin.
+> - **IA generadora:** selector en el panel con `gpt-5.4` (default) · `gpt-4.1` · `gpt-4o`. Configurable también vía `OPENAI_MAILING_MODEL`. El `SYSTEM_PROMPT` incluye "Manifiesto" (6 reglas de oro), grounding con `CONTEXTO_BD` (ofertas/posts/flota reales + precios pre-calculados en €), reglas de clicabilidad, formato europeo `1.111,11 €`, patrón Outlook-safe de tarjetas, presupuesto de densidad visual y auto-generación de `<!--FURGOCASA_DESCRIPTION-->` para el listado admin.
 > - **Cron con lock atómico** (`tick_lock_at`): el tick llama a `mailing_claim_campaign_tick(uuid)` (RPC) que hace el UPDATE condicional en Postgres; al terminar, `mailing_release_campaign_tick(uuid)`. Watchdog 5 min. Requiere `20260420` + `20260421`.
 > - **Botón "Forzar tick ahora"** en la pestaña Envío: dispara manualmente `runTickOnce()` bajo guard admin y muestra la respuesta cruda del servidor (summary + estado antes/después) para diagnosticar por qué una campaña no avanza sin tener que mirar los logs de Vercel.
 >
@@ -67,7 +67,7 @@ Trabaja en pasos numerados (fases 1 a 10). En cada paso: primero explica breveme
 - **DB/Backend:** Supabase (Postgres + RLS + service_role). Cliente admin bypassa RLS.
 - **Deploy:** Vercel (Vercel Cron para el tick del mailing).
 - **Envío:** SMTP (OVH Zimbra, ~200 correos/h por buzón), vía `nodemailer`.
-- **IA:** OpenAI `gpt-4o-mini` para generar HTML de campañas a partir de referencias previas + briefing (SSE).
+- **IA:** OpenAI con selector de modelo (`gpt-5.4` default; también `gpt-4.1` y `gpt-4o`) para generar HTML de campañas a partir de referencias previas + briefing (SSE).
 - **UI:** Tailwind + iconos `lucide-react`.
 
 ### STACK Y NOMBRES DEL PROYECTO DESTINO  ← RELLENA ESTO
@@ -653,7 +653,7 @@ Todos los handlers usan `requireAdmin()` y `guard.ctx.sb` (service_role).
 |---|---|---|
 | GET / POST | `campaigns/route.ts` | Listar (vista `mailing_campaigns_stats`) / crear borrador con subject + slug + description. Auto-numera (`MAX(number)+1`). |
 | GET / PATCH / DELETE | `campaigns/[slug]/route.ts` | Detalle (campaign + stats) / editar (subject, description, max_per_hour, batch_size_per_tick, audience_filter, html_content) / borrar (solo `draft`). |
-| POST | `campaigns/[slug]/generate/route.ts` | **SSE**: llamada a OpenAI `gpt-4o-mini` con `SYSTEM_PROMPT` (ver Fase 7) + briefing del admin + 1–2 campañas pasadas como referencia. Stream incremental de tokens. Al final: `UPDATE mailing_campaigns SET html_content=…, generation_prompt=…, generation_reference_ids=…`. |
+| POST | `campaigns/[slug]/generate/route.ts` | **SSE**: llamada a OpenAI con selector de modelo (`gpt-5.4` default; también `gpt-4.1` y `gpt-4o`) y `SYSTEM_PROMPT` (ver Fase 7) + briefing del admin + 1–2 campañas pasadas como referencia. Stream incremental de tokens. Al final: `UPDATE mailing_campaigns SET html_content=…, generation_prompt=…, generation_reference_ids=…`. |
 | GET | `campaigns/[slug]/preview/route.ts` | Devuelve `html_content` ya renderizado con un destinatario ficticio (nombre="Yoga Sala Demo", location="Madrid") para iframe. |
 | POST | `campaigns/[slug]/send-test/route.ts` | Body `{ to, centerId? }`. Usa `sendTestEmail`. No toca `mailing_recipients`. |
 | POST | `campaigns/[slug]/populate-recipients/route.ts` | Body `{ audience: 'all'\|'claimed'\|'not_claimed', test_emails?: 'a@b.com,c@d.com' }` → llama `populateRecipients`. |
@@ -991,7 +991,7 @@ src/app/administrator/mails/
 
 ## FASE 7 · Prompts de la IA generadora de HTML
 
-En `POST /api/admin/mailing/campaigns/[slug]/generate` se llama a OpenAI `gpt-4o-mini` vía streaming. Usa exactamente este `SYSTEM_PROMPT`:
+En `POST /api/admin/mailing/campaigns/[slug]/generate` se llama a OpenAI vía streaming con selector de modelo (`gpt-5.4` default; también `gpt-4.1` y `gpt-4o`). Usa exactamente este `SYSTEM_PROMPT`:
 
 ```
 Eres la Inteligencia Artificial editora de mailings de Retiru (plataforma de retiros y bienestar en España).

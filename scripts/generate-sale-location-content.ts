@@ -30,6 +30,8 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const OPENAI_SALE_LOCATION_MODEL = process.env.OPENAI_SALE_LOCATION_MODEL || 'gpt-5.4';
+
 interface SaleLocationTarget {
   id: string;
   slug: string;
@@ -255,10 +257,10 @@ REGLAS FINALES:
 - NUNCA escribas algo que podrías copiar-pegar en otra ciudad cambiando solo el nombre.`;
 
   try {
-    console.log(`   📝 Generando contenido de propietario con GPT-5.2...`);
+    console.log(`   📝 Generando contenido de propietario con ${OPENAI_SALE_LOCATION_MODEL}...`);
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-5.2",
+      model: OPENAI_SALE_LOCATION_MODEL,
       messages: [
         {
           role: "system",

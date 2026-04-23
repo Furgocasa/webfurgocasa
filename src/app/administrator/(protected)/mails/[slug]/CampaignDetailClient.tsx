@@ -678,7 +678,7 @@ function ContentTab({
   const [subject, setSubject] = useState(campaign.subject || "");
   const [subjectDirty, setSubjectDirty] = useState(false);
   const [subjectSaving, setSubjectSaving] = useState(false);
-  const [selectedModel, setSelectedModel] = useState<MailingModel>("gpt-4.1");
+  const [selectedModel, setSelectedModel] = useState<MailingModel>("gpt-5.4");
 
   // Si la campaña se recarga (p.ej. tras editar el asunto en la cabecera),
   // sincronizamos el input local.

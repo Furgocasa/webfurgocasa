@@ -39,7 +39,7 @@ src/lib/mailing/
 src/app/api/admin/mailing/
 ├── campaigns/route.ts                        · GET (listado) + POST (crear borrador)
 ├── campaigns/[slug]/route.ts                 · GET + PATCH + DELETE
-├── campaigns/[slug]/generate/route.ts        · POST SSE con OpenAI (gpt-4.1 default · gpt-4o · gpt-5.4)
+├── campaigns/[slug]/generate/route.ts        · POST SSE con OpenAI (gpt-5.4 default · gpt-4.1 · gpt-4o)
 ├── campaigns/[slug]/preview/route.ts         · GET html renderizado para iframe
 ├── campaigns/[slug]/send-test/route.ts       · POST enviar prueba (no toca recipients)
 ├── campaigns/[slug]/populate-recipients/...  · POST cargar destinatarios (audience)
@@ -81,7 +81,7 @@ OPENAI_API_KEY=sk-...
 # A añadir para mailing
 CRON_SECRET=genera_con_openssl_rand_hex_32      # OPCIONAL pero muy recomendado
 SMTP_STRICT_TLS=false                           # 'true' si la red tiene proxy AV
-OPENAI_MAILING_MODEL=gpt-4.1                    # OPCIONAL — default del selector de IA
+OPENAI_MAILING_MODEL=gpt-5.4                    # OPCIONAL — default del selector de IA
 ```
 
 Para generar un `CRON_SECRET` seguro (PowerShell):
@@ -103,7 +103,7 @@ Vercel Cron ya envía automáticamente `Authorization: Bearer $CRON_SECRET` a lo
 ## Flujo admin de una campaña
 
 1. **`/administrator/mails/nueva`** · crear borrador (asunto + slug + descripción auto-generada por la IA).
-2. **Pestaña Contenido** · **elegir modelo de IA** (`gpt-4.1` · `gpt-4o` · `gpt-5.4`) + escribir briefing + marcar hasta 2 referencias previas + "Generar". Stream SSE en consola ASCII. También se puede pegar HTML manual. La IA está "grounded" con `CONTEXTO_BD` (ofertas/posts/flota reales, precios europeos pre-calculados) y aplica reglas estrictas de Outlook-safe, clicabilidad máxima y densidad visual controlada.
+2. **Pestaña Contenido** · **elegir modelo de IA** (`gpt-5.4` por defecto; también disponibles `gpt-4.1` y `gpt-4o`) + escribir briefing + marcar hasta 2 referencias previas + "Generar". Stream SSE en consola ASCII. También se puede pegar HTML manual. La IA está "grounded" con `CONTEXTO_BD` (ofertas/posts/flota reales, precios europeos pre-calculados) y aplica reglas estrictas de Outlook-safe, clicabilidad máxima y densidad visual controlada.
 3. **Pestaña Preview** · elegir contacto real, preview en iframe con datos reales, enviar correo de prueba.
 4. **Pestaña Audiencia** · elegir `all` o filtrar por `source` (customer/newsletter/manual/lead/import), cargar destinatarios. Opcional: `test_emails` para envíos piloto.
 5. **Pestaña Envío** · arrancar. El cron cada minuto enviará hasta `batch_size_per_tick` (default 3) correos respetando `max_per_hour` (default 150). Controles: Lanzar / Pausar / Reanudar / Reintentar fallidos / Archivar. Incluye **botón "Forzar tick ahora"** que invoca `runTickOnce()` y muestra la respuesta cruda del servidor (ver troubleshooting).

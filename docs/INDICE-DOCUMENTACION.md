@@ -1,8 +1,8 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.20 ✅ PRODUCCIÓN — calendario admin: reasignación inline + reservas sin vehículo asignado + fix `stripe_fee_total`  
+**Versión**: 1.0.21 ✅ PRODUCCIÓN — portadas blog IA (WebP, referencias flota, scripts npm)  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 17 de abril, 2026
+**Última actualización**: 23 de abril, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
 
@@ -16,6 +16,16 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 | Fix `total_price` al editar: debía incluir `stripe_fee_total` acumulado (bloqueaba guardado con `max` del input) + script de reparación puntual | **[CALENDARIO-ADMIN-EDICION.md](./04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)** — sección *Fix: `total_price` debe incluir `stripe_fee_total`* |
 | Migraciones SQL: `supabase/migrations/20260417-allow-null-vehicle-in-bookings.sql`, `supabase/migrations/20260417-fix-booking-16bf1a08-total-price.sql` | Mismo doc, sección *Migración SQL* |
 | Resumen en README raíz | **[README raíz](../README.md)** — sección *Abril 2026 — Calendario admin* · **CHANGELOG** (entrada 17 abr 2026 tarde) |
+
+---
+
+## 🖼️ ACTUALIZACIÓN ABRIL 2026 — PORTADAS IA DEL BLOG (WEBP + REFERENCIAS)
+
+| Tema | Dónde leer |
+|------|------------|
+| Flujo técnico (`gpt-5.4`, `gpt-image-2`, `sharp` → WebP, bucket `blog/ai-covers/`, `images/IA_blog/`, reglas toldo, CLI y variables `.env`) | **[GESTION-MEDIA-STORAGE.md](./02-desarrollo/media/GESTION-MEDIA-STORAGE.md)** — sección *Portadas del blog generadas por IA* |
+| Organización en FAQ | **[FAQ-MEDIA-STORAGE.md](./02-desarrollo/media/FAQ-MEDIA-STORAGE.md)** — *¿Cómo organizo las imágenes del blog?* |
+| Resumen ejecutivo y comandos | **[README raíz](../README.md)** — sección *Abril 2026 — Portadas IA del blog* · **`agente generador de imágenes.txt`** (raíz del repo) |
 
 ---
 
@@ -366,7 +376,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[GESTION-IMAGENES-SUPABASE.md](./GESTION-IMAGENES-SUPABASE.md)** | ⚠️ **GUÍA MAESTRA** - Reglas absolutas, estructura de buckets, especificaciones técnicas |
 | **[RESUMEN-FINAL-SISTEMA-COMPLETO.md](./RESUMEN-FINAL-SISTEMA-COMPLETO.md)** | ⚠️ Resumen ejecutivo de toda la integración |
 | **[GALERIA-VEHICULOS-STORAGE-INTEGRADO.md](./GALERIA-VEHICULOS-STORAGE-INTEGRADO.md)** | ⚠️ Galería de vehículos integrada con storage |
-| **[GESTION-MEDIA-STORAGE.md](./GESTION-MEDIA-STORAGE.md)** | ⚠️ Documentación completa del sistema de media storage |
+| **[GESTION-MEDIA-STORAGE.md](./02-desarrollo/media/GESTION-MEDIA-STORAGE.md)** | ⚠️ Documentación completa del sistema de media storage (incl. **portadas blog IA**, WebP en `blog/ai-covers/`, scripts npm) |
 | **[SOLUCION-RAPIDA-MEDIA.md](./SOLUCION-RAPIDA-MEDIA.md)** | ⚠️ Solución rápida en 3 pasos (4 minutos) |
 | **[FAQ-MEDIA-STORAGE.md](./FAQ-MEDIA-STORAGE.md)** | ⚠️ Preguntas frecuentes sobre storage |
 | **[RESUMEN-CAMBIOS-MEDIA.md](./RESUMEN-CAMBIOS-MEDIA.md)** | ⚠️ Resumen de cambios implementados |
@@ -497,7 +507,7 @@ Ver carpeta `scripts/`:
 ### Voy a trabajar con imágenes, storage o gestión de media
 1. Lee **[RESUMEN-FINAL-SISTEMA-COMPLETO.md](./RESUMEN-FINAL-SISTEMA-COMPLETO.md)** ⚠️ **NUEVO** - Visión general
 2. Para setup rápido: **[SOLUCION-RAPIDA-MEDIA.md](./SOLUCION-RAPIDA-MEDIA.md)** ⚠️ - Solución en 4 minutos
-3. Para entender storage: **[GESTION-MEDIA-STORAGE.md](./GESTION-MEDIA-STORAGE.md)** ⚠️ - Documentación completa
+3. Para entender storage: **[GESTION-MEDIA-STORAGE.md](./02-desarrollo/media/GESTION-MEDIA-STORAGE.md)** ⚠️ - Documentación completa
 4. Para galería de vehículos: **[GALERIA-VEHICULOS-STORAGE-INTEGRADO.md](./GALERIA-VEHICULOS-STORAGE-INTEGRADO.md)** ⚠️ **NUEVO**
 5. Consulta dudas en: **[FAQ-MEDIA-STORAGE.md](./FAQ-MEDIA-STORAGE.md)** ⚠️ **NUEVO**
 6. Ejecuta script SQL: `supabase/configurar-storage-media-extras.sql`
@@ -616,10 +626,10 @@ Ver carpeta `scripts/`:
 | ¿Qué método de pago usar? | `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO** |
 | ¿Cómo configurar emails automáticos? | `SISTEMA-EMAILS.md` |
 | ¿Cómo probar el sistema de emails? | `PRUEBAS-EMAILS.md` ⚠️ **NUEVO** |
-| ¿Cómo subo imágenes? | `GESTION-MEDIA-STORAGE.md`, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
+| ¿Cómo subo imágenes? | `02-desarrollo/media/GESTION-MEDIA-STORAGE.md`, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
 | ¿Cómo creo carpetas en storage? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
 | ¿Por qué "Nueva Carpeta" no funciona? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
-| ¿Cómo organizo imágenes por buckets? | `GESTION-MEDIA-STORAGE.md`, `FAQ-MEDIA-STORAGE.md` ⚠️ **NUEVO** |
+| ¿Cómo organizo imágenes por buckets? | `02-desarrollo/media/GESTION-MEDIA-STORAGE.md`, `02-desarrollo/media/FAQ-MEDIA-STORAGE.md` ⚠️ **NUEVO** |
 | ¿Cómo funcionan las temporadas? | `SISTEMA_TEMPORADAS.md` |
 | ¿Por qué no cargan los artículos del blog? | `SOLUCION-BLOG-FRONTEND.md` |
 | ¿Cómo migro datos desde MySQL/VikRentCar? | `OLD_FURGOCASA_DATOS/README-MIGRACION.md` ⚠️ **NUEVO** |

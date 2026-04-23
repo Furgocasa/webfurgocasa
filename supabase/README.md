@@ -110,6 +110,7 @@ La tabla `posts` maneja ambos tipos de contenido con el campo `post_type`:
 - `'blog'` - Artículos del blog de Furgocasa
 - `'publication'` - Publicaciones del sector
 - `'news'` - Noticias de Furgocasa
+- **`featured_image`:** URL pública en Storage (bucket **`blog`**, carpeta típica **`ai-covers/`**). Las portadas generadas por IA en la app se publican como **WebP**; ver `docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md`.
 
 ### **Sistema de Precios Flexible**
 

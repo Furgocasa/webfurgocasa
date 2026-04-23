@@ -42,7 +42,8 @@
     "translate:blog": "node translate-blog-content.js",
     "translate:blog:vicar": "node translate-blog-content.js vicar-municipio-almeriense-dispondra-de-una-zona-de-servicio-para-autocaravanas",
     "translate:location-sections": "node scripts/translate-location-content-sections.js",
-    "generate:blog-cover": "tsx scripts/generate-blog-cover.ts"
+    "generate:blog-cover": "tsx scripts/generate-blog-cover.ts",
+    "reencode:blog-cover-webp": "tsx scripts/generate-blog-cover.ts reencode-webp"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

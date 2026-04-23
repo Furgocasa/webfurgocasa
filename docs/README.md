@@ -37,7 +37,7 @@ Documentación de desarrollo por área:
 
 #### media/
 - Gestión de imágenes en Supabase Storage
-- Optimización automática a WebP
+- Optimización automática a WebP (frontend vía `next/image`; portadas IA del blog: WebP en origen en `blog/ai-covers/` — ver **GESTION-MEDIA-STORAGE.md**)
 - Galerías de vehículos
 - Imágenes hero y slides
 
@@ -92,7 +92,7 @@ Documentación técnica de referencia:
 
 #### blog/
 - Sistema de blog con CMS
-- Mejoras y funcionalidades
+- Portadas generadas por IA (`gpt-5.4` + `gpt-image-2`, publicación WebP, referencias en `images/IA_blog/`) — detalle en **02-desarrollo/media/GESTION-MEDIA-STORAGE.md**
 
 #### sistema-reservas/
 - Flujo crítico de reservas
@@ -120,7 +120,7 @@ Documentación técnica de referencia:
 #### otros/
 - TinyMCE editor
 - Favicon
-- Generación de contenido con IA (`GENERACION-CONTENIDO-IA.md`, scripts `generate-content:*`, `check:location-targets-db`)
+- Generación de contenido con IA (`GENERACION-CONTENIDO-IA.md`, scripts `generate-content:*`, `check:location-targets-db`; venta/localización propietario: `OPENAI_SALE_LOCATION_MODEL`, p. ej. `gpt-5.4` en `generate-sale-location-content.ts`)
 - Landings alquiler: **59** `location_targets` activos (mar. 2026), anillo 22 + Hellín + cobertura Murcia (14)
 
 ### 05-historico/
@@ -192,5 +192,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 17 de abril, 2026  
-Versión del proyecto: 4.5.3 (calendario admin: reasignación inline, reservas sin vehículo asignado, fix stripe_fee_total)
+Última actualización: 23 de abril, 2026  
+Versión del proyecto: 4.5.3+ (portadas blog IA: WebP, referencias flota, scripts `generate:blog-cover` / `reencode:blog-cover-webp`)
