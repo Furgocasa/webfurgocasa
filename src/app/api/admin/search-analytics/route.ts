@@ -697,11 +697,11 @@ export async function GET(request: NextRequest) {
           const weekData = weeklyDemand[weekStart];
           
           // Obtener todas las reservas que se solapan con esta semana
+          // REGLA: bloquean confirmed/in_progress/completed sin importar payment_status
           const { data: bookings } = await supabase
             .from("bookings")
             .select("pickup_date, dropoff_date, vehicle_id")
-            .neq("status", "cancelled")
-            .in("payment_status", ["partial", "paid"])
+            .in("status", ["confirmed", "in_progress", "completed"])
             .lte("pickup_date", weekData.end)
             .gte("dropoff_date", weekData.start);
 

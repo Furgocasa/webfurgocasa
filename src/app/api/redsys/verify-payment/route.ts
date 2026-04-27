@@ -194,13 +194,13 @@ export async function POST(request: NextRequest) {
         }
         
         // Verificar RESERVAS conflictivas
+        // REGLA: bloquean confirmed/in_progress/completed sin importar payment_status
         const { data: conflictingBookings, error: conflictError } = await supabase
           .from("bookings")
           .select("id, booking_number, customer_name, status, payment_status")
           .eq("vehicle_id", fullBooking.vehicle_id)
           .neq("id", payment.booking_id)
-          .neq("status", "cancelled")
-          .in("payment_status", ["partial", "paid"])
+          .in("status", ["confirmed", "in_progress", "completed"])
           .or(`and(pickup_date.lte.${fullBooking.dropoff_date},dropoff_date.gte.${fullBooking.pickup_date})`);
         
         if (conflictError) {

@@ -106,13 +106,15 @@ export async function GET(request: NextRequest) {
     }
 
     // 2. Obtener reservas que se solapan con las fechas solicitadas
-    // Bloquean vehículos SOLO si ya tienen al menos el primer pago,
-    // independientemente del estado operativo de la reserva
+    // REGLA: Una reserva bloquea el vehículo si su status es operativo
+    // (confirmed/in_progress/completed), INDEPENDIENTEMENTE del payment_status.
+    // Esto cubre reservas creadas manualmente por el admin sin pago registrado
+    // (p.ej. amigos, pago en efectivo a la entrega, transferencia pendiente).
+    // Las reservas 'pending' (carrito sin confirmar) y 'cancelled' NO bloquean.
     const { data: conflictingBookings, error: bookingsError } = await supabaseAdmin
       .from("bookings")
       .select("vehicle_id")
-      .neq("status", "cancelled")
-      .in("payment_status", ["partial", "paid"])
+      .in("status", ["confirmed", "in_progress", "completed"])
       .or(`and(pickup_date.lte.${dropoffDate},dropoff_date.gte.${pickupDate})`);
 
     if (bookingsError) {

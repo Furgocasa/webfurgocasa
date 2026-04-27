@@ -64,8 +64,10 @@ export async function GET() {
     // 2. Para cada oferta, verificar si hay reservas que ocupen esas fechas
     const results: OfferAvailability[] = await Promise.all(
       offers.map(async (offer) => {
-        // Consultar reservas confirmadas que se solapen con las fechas de la oferta
-        // Una reserva se solapa si: pickup <= offer_end AND dropoff >= offer_start
+        // Consultar reservas activas que se solapen con las fechas de la oferta.
+        // Una reserva bloquea si su status es operativo (confirmed/in_progress/completed),
+        // independientemente del payment_status. Coherente con /api/availability.
+        // FIX: antes usaba 'active' que no existe en el enum (es 'in_progress').
         const { data: bookings, error: bookingsError } = await supabase
           .from('bookings')
           .select(`
@@ -75,7 +77,7 @@ export async function GET() {
             customer:customers(name)
           `)
           .eq('vehicle_id', offer.vehicle_id)
-          .in('status', ['confirmed', 'active', 'completed'])
+          .in('status', ['confirmed', 'in_progress', 'completed'])
           .lte('pickup_date', offer.offer_end_date)
           .gte('dropoff_date', offer.offer_start_date);
 

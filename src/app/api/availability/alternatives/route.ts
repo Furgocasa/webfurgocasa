@@ -111,11 +111,12 @@ export async function GET(request: NextRequest) {
     const windowEndStr = toDateString(windowEnd);
 
     const [{ data: bookings }, { data: blockedDates }] = await Promise.all([
+      // REGLA: bloquean confirmed/in_progress/completed sin importar payment_status
+      // (mismas que /api/availability para mantener coherencia)
       supabaseAdmin
         .from("bookings")
         .select("vehicle_id, pickup_date, dropoff_date")
-        .neq("status", "cancelled")
-        .in("payment_status", ["partial", "paid"])
+        .in("status", ["confirmed", "in_progress", "completed"])
         .or(
           `and(pickup_date.lte.${windowEndStr},dropoff_date.gte.${windowStartStr})`
         ),

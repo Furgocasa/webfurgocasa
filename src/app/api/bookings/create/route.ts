@@ -134,12 +134,14 @@ export async function POST(request: Request) {
       );
     }
 
-    const { data: paidConflicts, error: conflictError } = await supabase
+    // REGLA: bloquean confirmed/in_progress/completed sin importar payment_status.
+    // Esto evita doble reserva cuando el admin crea una reserva confirmada
+    // sin pago (amigo, pago en efectivo, transferencia pendiente, etc.).
+    const { data: activeConflicts, error: conflictError } = await supabase
       .from("bookings")
-      .select("id, booking_number")
+      .select("id, booking_number, status, payment_status")
       .eq("vehicle_id", booking.vehicle_id)
-      .neq("status", "cancelled")
-      .in("payment_status", ["partial", "paid"])
+      .in("status", ["confirmed", "in_progress", "completed"])
       .or(`and(pickup_date.lte.${booking.dropoff_date},dropoff_date.gte.${booking.pickup_date})`);
 
     if (conflictError) {
@@ -150,11 +152,11 @@ export async function POST(request: Request) {
       );
     }
 
-    if (paidConflicts && paidConflicts.length > 0) {
-      console.error("🚫 RESERVA RECHAZADA: Vehículo ya reservado con pago", {
+    if (activeConflicts && activeConflicts.length > 0) {
+      console.error("🚫 RESERVA RECHAZADA: Vehículo ya tiene reserva activa", {
         vehicle_id: booking.vehicle_id,
         fechas_solicitadas: `${booking.pickup_date} → ${booking.dropoff_date}`,
-        conflictos: paidConflicts.map(b => b.booking_number),
+        conflictos: activeConflicts.map(b => `${b.booking_number} [${b.status}/${b.payment_status}]`),
       });
       return NextResponse.json(
         { error: "El vehículo no está disponible en las fechas seleccionadas. Por favor, elige otras fechas o un vehículo diferente." },
