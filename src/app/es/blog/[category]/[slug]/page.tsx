@@ -256,6 +256,7 @@ export default async function LocaleBlogPostPage({
                 className="object-cover"
                 priority
                 quality={90}
+                unoptimized
               />
             </div>
           </div>
@@ -353,6 +354,7 @@ export default async function LocaleBlogPostPage({
                                 sizes="320px"
                                 className="object-cover group-hover:scale-110 transition-transform duration-500"
                                 loading="lazy"
+                                unoptimized
                               />
                             </div>
                           )}
