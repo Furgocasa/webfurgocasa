@@ -2,7 +2,16 @@
 -- TRIGGER: Prevenir conflictos de reservas
 -- ============================================
 -- Objetivo: Evitar que se creen o actualicen reservas con fechas
--- que se solapen con otras reservas del mismo vehículo
+-- que se solapen con OTRAS RESERVAS ACTIVAS del mismo vehículo.
+--
+-- 🆕 ACTUALIZACIÓN 29/04/2026:
+--   - Las reservas con `status = 'pending'` (carrito sin pagar) NO
+--     bloquean. Solo bloquean las "activas":
+--       confirmed / in_progress / completed.
+--     Razón: si una pending no paga, debe poder ser desbancada por
+--     una pending nueva (lógica "última pending gana"). La aplicación
+--     se encarga de cancelar la pending anterior antes del INSERT.
+--   - El mensaje de error YA NO incluye `customer_name` (RGPD).
 -- ============================================
 
 -- PASO 1: Crear función que verifica conflictos
@@ -11,51 +20,47 @@ RETURNS TRIGGER AS $$
 DECLARE
   conflict_count INTEGER;
   conflict_booking_number TEXT;
-  conflict_customer TEXT;
   vehicle_code TEXT;
 BEGIN
-  -- Solo verificar si la reserva no está cancelada
-  IF NEW.status = 'cancelled' THEN
+  -- No validar reservas canceladas ni pendientes (las pending pueden coexistir;
+  -- la lógica de "última pending gana" se aplica desde la API)
+  IF NEW.status IN ('cancelled', 'pending') THEN
+    -- Aun así validamos coherencia de fechas
+    IF NEW.dropoff_date < NEW.pickup_date THEN
+      RAISE EXCEPTION 'FECHA_INVALIDA: La fecha de devolución debe ser posterior o igual a la de recogida.';
+    END IF;
     RETURN NEW;
   END IF;
 
-  -- Obtener código del vehículo para mensajes más claros
+  -- Obtener código del vehículo para mensajes más claros (sin datos personales)
   SELECT internal_code INTO vehicle_code
   FROM vehicles
   WHERE id = NEW.vehicle_id;
 
-  -- Buscar reservas conflictivas
-  -- (otras reservas del mismo vehículo con fechas solapadas)
-  SELECT COUNT(*), MIN(booking_number), MIN(customer_name)
-  INTO conflict_count, conflict_booking_number, conflict_customer
+  -- Buscar SOLO reservas ACTIVAS conflictivas (mismo criterio que la API)
+  -- (otras reservas del mismo vehículo con status operativo y fechas solapadas)
+  SELECT COUNT(*), MIN(booking_number)
+  INTO conflict_count, conflict_booking_number
   FROM bookings
-  WHERE 
+  WHERE
     id != NEW.id  -- Excluir la reserva actual (para UPDATE)
     AND vehicle_id = NEW.vehicle_id
-    AND status != 'cancelled'
-    AND (
-      -- Caso 1: La nueva reserva empieza dentro de una reserva existente
-      (NEW.pickup_date >= pickup_date AND NEW.pickup_date <= dropoff_date)
-      -- Caso 2: La nueva reserva termina dentro de una reserva existente
-      OR (NEW.dropoff_date >= pickup_date AND NEW.dropoff_date <= dropoff_date)
-      -- Caso 3: La nueva reserva engloba completamente una reserva existente
-      OR (NEW.pickup_date <= pickup_date AND NEW.dropoff_date >= dropoff_date)
-    );
+    AND status IN ('confirmed', 'in_progress', 'completed')
+    AND pickup_date <= NEW.dropoff_date
+    AND dropoff_date >= NEW.pickup_date;
 
-  -- Si hay conflictos, lanzar error con información detallada
+  -- Si hay conflictos, lanzar error SIN datos personales (RGPD)
   IF conflict_count > 0 THEN
-    RAISE EXCEPTION 'CONFLICTO DE RESERVA: El vehículo % ya tiene % reserva(s) activa(s) en ese período. Primera reserva conflictiva: % (%). Fechas solicitadas: % al %. Por favor, selecciona otras fechas o un vehículo diferente.',
+    RAISE EXCEPTION 'CONFLICTO_RESERVA: El vehículo % ya tiene una reserva activa que solapa con las fechas % a %. Reserva conflictiva: %. Selecciona otras fechas o un vehículo diferente.',
       COALESCE(vehicle_code, 'seleccionado'),
-      conflict_count,
-      conflict_booking_number,
-      COALESCE(conflict_customer, 'Sin cliente'),
       NEW.pickup_date,
-      NEW.dropoff_date;
+      NEW.dropoff_date,
+      COALESCE(conflict_booking_number, 'desconocida');
   END IF;
 
   -- Verificar que la fecha de devolución sea posterior a la de recogida
   IF NEW.dropoff_date < NEW.pickup_date THEN
-    RAISE EXCEPTION 'FECHA INVÁLIDA: La fecha de devolución (%) debe ser posterior o igual a la fecha de recogida (%)',
+    RAISE EXCEPTION 'FECHA_INVALIDA: La fecha de devolución (%) debe ser posterior o igual a la de recogida (%).',
       NEW.dropoff_date,
       NEW.pickup_date;
   END IF;

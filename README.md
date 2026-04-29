@@ -28,6 +28,29 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 🔴 Abril 2026 — Regla "última pending gana" + RGPD en mensajes (29/04/2026)
+
+- **Síntoma:** un cliente buscaba un vehículo que sí salía disponible (correcto: solo había una *pending* sin pagar de otro cliente) pero al pulsar "Reservar" recibía un error de conflicto que **incluía el nombre completo del otro cliente** (brecha de RGPD) y le impedía reservar.
+- **Causa:** el trigger SQL `prevent_booking_conflicts` filtraba por `status != 'cancelled'`, así que las *pendings* también disparaban conflicto. Además su `RAISE EXCEPTION` incluía `customer_name`, que terminaba mostrándose al cliente.
+- **Regla nueva — "última pending gana":** las pendings NO bloquean. Si llega una segunda reserva sobre fechas/vehículo solapantes, **la pending anterior se cancela automáticamente** antes del INSERT. Si nadie paga, gana siempre la última pending. Si alguno paga, su pending se confirma y las demás (si hubiese) se cancelan vía webhook Redsys.
+- **RGPD:** el trigger ya no incluye `customer_name` y el endpoint `/api/bookings/create` nunca devuelve `bookingError.message` crudo: detecta si es conflicto y responde con un mensaje genérico.
+- **Archivos:** `src/app/api/bookings/create/route.ts`, `supabase/migrations/prevent-booking-conflicts.sql`, nueva migración `supabase/migrations/20260429-prevent-conflicts-pending-rgpd.sql`.
+- **Documentación:** [CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md](./docs/03-mantenimiento/fixes/CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md) · [SISTEMA-PREVENCION-CONFLICTOS.md](./docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md).
+
+---
+
+## 🔴 Abril 2026 — Fix crítico doble reserva (filtro de `payment_status`)
+
+- **Incidente:** un cliente externo pudo ver, reservar y pagar un vehículo que ya estaba reservado por una reserva confirmada manualmente sin pago registrado (`status = 'confirmed'`, `payment_status = 'pending'`).
+- **Causa raíz:** todos los endpoints de disponibilidad filtraban por `payment_status IN ('partial','paid')` en lugar de `status` operativo, dejando fuera del cómputo las reservas confirmadas pero sin pago (efectivo, transferencia pendiente, reservas internas).
+- **Regla unificada (nueva):** una reserva bloquea el vehículo si su `status` es **`confirmed`**, **`in_progress`** o **`completed`**, **independientemente del `payment_status`**. Solo `pending` (carrito) y `cancelled` no bloquean.
+- **Endpoints corregidos (7):** `/api/availability`, `/api/availability/alternatives`, `/api/bookings/create`, `/api/redsys/notification`, `/api/redsys/verify-payment`, `/api/admin/search-analytics`, `/api/admin/last-minute-offers/check-availability`.
+- **Migración SQL:** `supabase/migrations/20260427-fix-availability-by-status.sql` (RPC `check_vehicle_availability` ajustada).
+- **Trigger BD:** se reinstala `prevent_booking_conflicts` (`supabase/migrations/prevent-booking-conflicts.sql`) como red de seguridad final.
+- **Documentación:** [CORRECCION-DOBLE-RESERVA-2026-04-27.md](./docs/03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md) · [SISTEMA-PREVENCION-CONFLICTOS.md](./docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md).
+
+---
+
 ## 🖼️ Abril 2026 — Portadas IA del blog (WebP + referencias flota)
 
 - **Implementación:** `src/lib/blog/generate-blog-cover.ts` · **Admin:** `POST /api/admin/blog/generate-cover` · **CLI:** `scripts/generate-blog-cover.ts`.

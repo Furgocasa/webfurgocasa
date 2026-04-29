@@ -8,17 +8,70 @@ Garantizar que **NUNCA** se asignen dos reservas al mismo vehículo en fechas so
 
 > **Un vehículo, un cliente, una fecha**: Ningún vehículo puede estar en dos lugares al mismo tiempo.
 
+## ⚠️ Regla Clave (actualizada 29/04/2026)
+
+> 1. Una reserva **bloquea el vehículo** en cuanto su `status` operativo es **`confirmed`**, **`in_progress`** o **`completed`**, **independientemente del `payment_status`**.
+>
+> 2. Las reservas en `status = 'pending'` (carrito sin pagar) **NO bloquean** el vehículo. Pueden coexistir múltiples *pending*… pero solo durante un instante: aplica la **regla "última pending gana"** (ver más abajo).
+>
+> 3. Las reservas en `status = 'cancelled'` **NO bloquean**.
+
+Esto incluye en el caso de las activas:
+
+- ✅ Reservas confirmadas manualmente por el admin **sin pago registrado** (p. ej. reserva para un amigo).
+- ✅ Reservas con **pago en efectivo a la entrega** (`payment_status = 'pending'`).
+- ✅ Reservas con **pago por transferencia** aún sin registrar.
+- ✅ Reservas en curso o ya completadas.
+
+> **¿Por qué?** Una reserva confirmada por el administrador es un compromiso comercial firme; el sistema no puede saber si el dinero está en efectivo, en una transferencia bancaria pendiente de registro o en cualquier otro canal. **Si está confirmada, el vehículo está reservado**.
+
+### 🔁 Regla "última pending gana" (29/04/2026)
+
+> Si un cliente B intenta crear una reserva sobre fechas/vehículo donde ya hay una reserva en `pending` del cliente A (que aún no ha pagado), **la pending de A se cancela automáticamente** justo antes de crear la de B. Solo puede haber una *pending* viva por vehículo+fechas.
+
+Razones:
+
+- Una *pending* es solo "intención": el cliente puede no pagar nunca.
+- Bloquear nuevos clientes por una pending sin pagar congelaría inventario sin compromiso real.
+- La pending cancelada queda registrada con motivo y `updated_at`, así puede recuperarse si el cliente A llama y todavía está disponible.
+- Si A paga, gana A (la confirma); si llega B antes que A pague, la de A se cancela y B se convierte en la nueva pending.
+
+Implementación: en `src/app/api/bookings/create/route.ts`, antes del `INSERT`, se hace un `UPDATE … SET status='cancelled'` sobre las pendings solapantes del mismo vehículo.
+
+### 🔒 Mensajes de error sin PII (RGPD)
+
+> En ningún caso un mensaje de error visible para el usuario final debe contener datos personales de **otro** cliente (nombre, email, teléfono…).
+
+- El **trigger SQL** `prevent_booking_conflicts` ya no incluye `customer_name` en `RAISE EXCEPTION` (solo `booking_number` y código de vehículo).
+- El **endpoint `/api/bookings/create`** nunca devuelve el `error.message` crudo de un trigger o servicio interno: detecta si es conflicto y responde con un mensaje genérico, o con un 500 neutro.
+
+### Histórico
+
+- **27/04/2026**: se corrigió el filtro `payment_status IN ('partial','paid')` por `status IN ('confirmed','in_progress','completed')` en 7 endpoints + RPC. Ver [fix completo](../../03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md).
+- **29/04/2026**: se introduce la regla "última pending gana" y se elimina la filtración de datos personales en mensajes de conflicto. Ver [fix completo](../../03-mantenimiento/fixes/CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md).
+
 ## Capas de Protección
 
 ### 🔍 Capa 1: Filtrado en Búsqueda (Prevención Temprana)
 
-**Ubicación**: Formulario de búsqueda de vehículos (frontend público)
+**Ubicación**: Formulario de búsqueda de vehículos (frontend público) y todos los endpoints de disponibilidad.
 
-**Función**: Los vehículos ya reservados **no aparecen** en los resultados de búsqueda.
+**Función**: Los vehículos con reservas activas **no aparecen** en los resultados de búsqueda.
 
-**Tecnología**: Función RPC `check_vehicle_availability` en Supabase
+**Tecnologías**:
+- Función RPC `check_vehicle_availability` en Supabase (consultas server-side).
+- Filtro directo en los 7 endpoints de la API (ver lista abajo).
 
-**Beneficio**: El usuario solo ve opciones reales, evitando frustración.
+**Endpoints alineados con la regla** (todos filtran por `status IN ('confirmed','in_progress','completed')`):
+- `/api/availability` (buscador público).
+- `/api/availability/alternatives` (sugerencias de fechas alternativas).
+- `/api/bookings/create` (validación pre-creación).
+- `/api/redsys/notification` (webhook de Redsys).
+- `/api/redsys/verify-payment` (verificación de pago).
+- `/api/admin/search-analytics` (informes de ocupación).
+- `/api/admin/last-minute-offers/check-availability` (disponibilidad de ofertas de última hora).
+
+**Beneficio**: El usuario solo ve opciones reales, evitando frustración y dobles reservas.
 
 ---
 
@@ -55,7 +108,7 @@ Por favor, selecciona otras fechas o un vehículo diferente.
 
 **Ubicación**: Base de datos PostgreSQL (Supabase)
 
-**Función**: Trigger automático que se ejecuta en **TODA** operación INSERT/UPDATE en la tabla `bookings`.
+**Función**: Trigger automático (`prevent_booking_conflicts`) que se ejecuta en **TODA** operación INSERT/UPDATE en la tabla `bookings`.
 
 **Validaciones automáticas**:
 1. ¿Hay otras reservas del mismo vehículo con fechas solapadas?
@@ -78,8 +131,20 @@ RAISE EXCEPTION 'CONFLICTO DE RESERVA: ...'
 **Instalación**:
 ```sql
 -- Ejecutar en Supabase SQL Editor:
--- Archivo: supabase/prevent-booking-conflicts.sql
+-- Archivo: supabase/migrations/prevent-booking-conflicts.sql
 ```
+
+> **⚠️ Importante (lección aprendida 27/04/2026)**: este trigger **debe estar instalado en el entorno de producción**. Durante la auditoría del incidente del 27/04/2026 se descubrió que el trigger **no estaba activo** en Supabase, dejando como única defensa la validación a nivel de aplicación. Verificar siempre con:
+>
+> ```sql
+> SELECT tgname, tgrelid::regclass, tgenabled
+> FROM pg_trigger
+> WHERE tgname = 'prevent_booking_conflicts';
+> ```
+>
+> Si la consulta devuelve 0 filas, **reinstalar inmediatamente** ejecutando `supabase/migrations/prevent-booking-conflicts.sql`.
+
+**⚠️ Riesgo si solo confías en el trigger sin la Capa 1 alineada**: si el trigger bloquea el INSERT pero el cliente ya pagó por Redsys, se generaría un **cobro sin reserva**. Por eso las Capas 1 y 2 deben estar siempre coherentes con la Capa 3 (mismo criterio de "reserva activa").
 
 ---
 
@@ -234,6 +299,14 @@ ALTER TABLE bookings ENABLE TRIGGER prevent_booking_conflicts;
 ### ¿Qué pasa con las reservas canceladas?
 ✅ Las reservas canceladas NO cuentan para la validación de conflictos. Puedes tener múltiples reservas canceladas solapadas.
 
+### ¿Y las reservas en estado `pending`?
+✅ Una reserva `pending` (carrito creado pero aún no confirmado/pagado) **NO bloquea** el vehículo. Se considera "intención" hasta que se confirme o se pague.
+
+Además, desde 29/04/2026 aplica la regla **"última pending gana"**: si un cliente B intenta crear una reserva en fechas/vehículo donde había una pending de A, la de A se cancela automáticamente al crear la de B. Si A paga antes de que B llegue, gana A y se confirma. Si llega B antes, A queda cancelada (con motivo registrado en `notes`).
+
+### ¿Qué pasa con una reserva `confirmed` con `payment_status = 'pending'`?
+🚫 **BLOQUEA** el vehículo. Desde el 27/04/2026, el sistema considera reservada cualquier reserva con `status` operativo, sin importar el estado de pago. Esto cubre los casos de pago en efectivo, transferencia pendiente o reservas creadas manualmente por el admin.
+
 ### ¿Puedo crear dos reservas del mismo vehículo en fechas contiguas?
 ✅ Sí, siempre que no se solapen. Por ejemplo:
 - Reserva 1: 01/03 al 10/03
@@ -263,6 +336,14 @@ Con estas 4 capas de protección, el sistema garantiza que:
 
 ---
 
-**Última actualización**: 2026-01-20  
-**Versión del sistema**: 1.0  
-**Estado**: ✅ Implementado y activo
+**Última actualización**: 2026-04-29  
+**Versión del sistema**: 1.2 — Regla "última pending gana" + mensajes sin PII (RGPD)  
+**Estado**: ✅ Implementado y activo en las 4 capas
+
+**Documentos relacionados**:
+- [Fix pending override + RGPD 29/04/2026](../../03-mantenimiento/fixes/CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md)
+- [Fix doble reserva 27/04/2026](../../03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md)
+- [Corrección calendario duplicados (20/01/2026)](../../03-mantenimiento/fixes/CORRECCION-CALENDARIO-DUPLICADOS.md)
+- Migración SQL: `supabase/migrations/20260429-prevent-conflicts-pending-rgpd.sql`
+- Migración SQL: `supabase/migrations/20260427-fix-availability-by-status.sql`
+- Migración SQL: `supabase/migrations/prevent-booking-conflicts.sql`

@@ -1,10 +1,32 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.21 ✅ PRODUCCIÓN — portadas blog IA (WebP, referencias flota, scripts npm)  
+**Versión**: 1.0.23 ✅ PRODUCCIÓN — última pending gana + mensajes sin PII (RGPD)  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 23 de abril, 2026
+**Última actualización**: 29 de abril, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🔴 ACTUALIZACIÓN ABRIL 2026 — REGLA "ÚLTIMA PENDING GANA" + RGPD EN MENSAJES
+
+| Tema | Dónde leer |
+|------|------------|
+| Regla de negocio (las pendings no bloquean; al crear una nueva reserva, las pendings solapantes se auto-cancelan) | **[SISTEMA-PREVENCION-CONFLICTOS.md](./04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md)** — sección *Regla "última pending gana"* |
+| Cronología, causa raíz, archivos modificados, pruebas | **[CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md](./03-mantenimiento/fixes/CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md)** |
+| Trigger SQL: ya no bloquea pendings, ya no expone `customer_name` (RGPD) | `supabase/migrations/20260429-prevent-conflicts-pending-rgpd.sql` + `supabase/migrations/prevent-booking-conflicts.sql` |
+| Endpoint: cancelación automática + mensajes genéricos | `src/app/api/bookings/create/route.ts` |
+
+---
+
+## 🔴 ACTUALIZACIÓN ABRIL 2026 — FIX CRÍTICO DOBLE RESERVA (FILTRO `payment_status`)
+
+| Tema | Dónde leer |
+|------|------------|
+| Resumen ejecutivo del incidente, causa raíz y solución (7 endpoints + RPC + trigger) | **[CORRECCION-DOBLE-RESERVA-2026-04-27.md](./03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md)** |
+| Regla unificada (`status IN ('confirmed','in_progress','completed')` bloquea, sin importar `payment_status`); 4 capas de protección coherentes | **[SISTEMA-PREVENCION-CONFLICTOS.md](./04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md)** — sección *Regla Clave (actualizada 27/04/2026)* |
+| Migración SQL de la RPC `check_vehicle_availability` | `supabase/migrations/20260427-fix-availability-by-status.sql` |
+| Trigger `prevent_booking_conflicts` (verificación e instalación en producción) | `supabase/migrations/prevent-booking-conflicts.sql` + sección *Capa 3* en SISTEMA-PREVENCION-CONFLICTOS.md |
 
 ---
 

@@ -166,6 +166,37 @@ export async function POST(request: Request) {
     // ================================================================
 
     // ================================================================
+    // REGLA "ÚLTIMA PENDING GANA":
+    // Si existen reservas en `status = 'pending'` del mismo vehículo
+    // que solapen con las fechas pedidas, las cancelamos AUTOMÁTICAMENTE
+    // antes del INSERT. Razones:
+    //   1. Una pending no representa un compromiso (puede no pagar nunca).
+    //   2. El siguiente cliente que llega tiene preferencia y se queda
+    //      la "pole" hasta que pague o lo desbanque otro.
+    //   3. Evita que el trigger de BD tumbe el INSERT por solape entre
+    //      pendientes y exponga datos de terceros (RGPD).
+    // ================================================================
+    const { data: cancelledPendings, error: cancelPendingsError } = await supabase
+      .from("bookings")
+      .update({
+        status: "cancelled",
+        notes: `❌ CANCELADA AUTOMÁTICAMENTE: el vehículo fue solicitado por otro cliente con una nueva reserva pendiente para fechas solapadas. Si todavía deseas estas fechas, contacta con nosotros. Fecha cancelación: ${new Date().toISOString()}`,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("vehicle_id", booking.vehicle_id)
+      .eq("status", "pending")
+      .lte("pickup_date", booking.dropoff_date)
+      .gte("dropoff_date", booking.pickup_date)
+      .select("id, booking_number");
+
+    if (cancelPendingsError) {
+      console.error("⚠️ Error cancelando pendings solapantes (no se bloquea la creación):", cancelPendingsError);
+    } else if (cancelledPendings && cancelledPendings.length > 0) {
+      console.log(`🧹 Cancelladas ${cancelledPendings.length} reserva(s) pending solapante(s):`, cancelledPendings.map(b => b.booking_number));
+    }
+    // ================================================================
+
+    // ================================================================
     // ✅ SEGURIDAD: Recalcular precio en servidor y validar contra el cliente.
     // Defensa en profundidad frente a manipulación de `total_price` por cliente.
     // Las reservas desde last_minute_offer_id se loggean pero no se bloquean
@@ -285,8 +316,23 @@ export async function POST(request: Request) {
 
     if (bookingError || !createdBooking) {
       console.error("Error creating booking:", bookingError);
+
+      // ⚠️ RGPD / SEGURIDAD: nunca devolver bookingError.message tal cual al
+      // cliente. Triggers de BD pueden incluir nombres/emails de OTROS clientes
+      // (p. ej. en mensajes de conflicto). Devolvemos un texto genérico y, si
+      // detectamos un conflicto a nivel de trigger, respondemos 409.
+      const rawMessage = (bookingError?.message || "").toLowerCase();
+      const isConflict = rawMessage.includes("conflicto") || rawMessage.includes("conflict");
+
+      if (isConflict) {
+        return NextResponse.json(
+          { error: "El vehículo no está disponible en las fechas seleccionadas. Por favor, elige otras fechas o un vehículo diferente." },
+          { status: 409 }
+        );
+      }
+
       return NextResponse.json(
-        { error: bookingError?.message || "Error al crear la reserva" },
+        { error: "No hemos podido crear la reserva en este momento. Por favor, inténtalo de nuevo en unos minutos o contacta con nosotros." },
         { status: 500 }
       );
     }
@@ -441,8 +487,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ booking: createdBooking }, { status: 201 });
   } catch (error: any) {
     console.error("Error in bookings API:", error);
+
+    // ⚠️ RGPD / SEGURIDAD: el `error.message` puede provenir de un trigger
+    // o servicio interno y contener información de terceros. Filtramos.
+    const rawMessage = String(error?.message || "").toLowerCase();
+    const isConflict = rawMessage.includes("conflicto") || rawMessage.includes("conflict");
+
+    if (isConflict) {
+      return NextResponse.json(
+        { error: "El vehículo no está disponible en las fechas seleccionadas. Por favor, elige otras fechas o un vehículo diferente." },
+        { status: 409 }
+      );
+    }
+
     return NextResponse.json(
-      { error: error.message || "Error interno del servidor" },
+      { error: "No hemos podido procesar la solicitud. Por favor, inténtalo de nuevo en unos minutos." },
       { status: 500 }
     );
   }

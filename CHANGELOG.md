@@ -4,6 +4,76 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🔴 Regla "última pending gana" + RGPD en mensajes — 29 de abril 2026
+
+Continuación del fix del 27/04/2026. Tras alinear los filtros por `status` en los 7 endpoints + RPC, aparecieron dos problemas residuales que se resuelven aquí:
+
+1. **El trigger SQL `prevent_booking_conflicts` seguía bloqueando pendings**, así que un nuevo cliente no podía reservar un vehículo que el buscador le mostraba como disponible si existía una pending sin pagar de otro cliente.
+2. **El mensaje de conflicto del trigger incluía `customer_name`**, que terminaba viajando hasta el frontend y mostrándose al usuario final → brecha RGPD.
+
+**Regla de negocio nueva — "última pending gana":**
+> Una pending no bloquea el vehículo. Si llega una nueva reserva sobre fechas/vehículo solapantes, la pending anterior se cancela automáticamente antes del INSERT. Solo puede haber una pending viva por vehículo+fechas. Si alguien paga, gana esa (las demás se cancelan vía webhook Redsys).
+
+**Cambios en código:**
+- `src/app/api/bookings/create/route.ts`:
+  - Antes del INSERT, hace `UPDATE bookings SET status='cancelled'` sobre las pendings solapantes del mismo vehículo (con motivo en `notes`).
+  - Nunca devuelve el `bookingError.message` crudo: detecta si es conflicto y responde HTTP 409 con mensaje genérico, o HTTP 500 neutro.
+  - Mismo saneamiento aplicado al `catch` general del endpoint (defensa en profundidad).
+
+**Cambios en base de datos:**
+- Nueva migración `supabase/migrations/20260429-prevent-conflicts-pending-rgpd.sql`:
+  - El trigger ahora filtra por `status IN ('confirmed','in_progress','completed')` (las pendings ya no disparan conflicto).
+  - El `RAISE EXCEPTION` ya NO incluye `customer_name`. Solo identificadores técnicos (`internal_code` del vehículo, `booking_number` de la reserva conflictiva).
+- Archivo `supabase/migrations/prevent-booking-conflicts.sql` actualizado para mantener el repo coherente con la versión activa en producción.
+
+**Documentación:**
+- Nuevo: `docs/03-mantenimiento/fixes/CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md`.
+- Actualizado: `docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md` (regla "última pending gana", FAQ y mensajes sin PII; bumped a v1.2).
+- Actualizado: `docs/INDICE-DOCUMENTACION.md` (nueva entrada destacada en abril 2026; bumped a v1.0.23).
+- Actualizado: `README.md` raíz (sección *Abril 2026 — Última pending gana + RGPD*).
+
+**Resultado:**
+- Los clientes pueden reservar un vehículo que el buscador les muestra disponible, aunque otro cliente tenga una pending sin pagar (la suya pasa a cancelada y la nueva se crea correctamente).
+- En ningún mensaje visible al cliente final aparecen datos personales de terceros.
+- Las pendings caducas dejan de bloquear inventario.
+
+---
+
+## 🔴 Fix crítico doble reserva — 27 de abril 2026
+
+Reserva duplicada sobre el mismo vehículo en agosto 2026 detectada en producción: un cliente externo pudo ver y pagar un vehículo que ya estaba reservado por una reserva confirmada manualmente sin pago registrado.
+
+**Causa raíz:**
+- Toda la lógica de disponibilidad filtraba reservas activas por `payment_status IN ('partial','paid')` en lugar de por `status` operativo.
+- Las reservas con `status = 'confirmed'` y `payment_status = 'pending'` (típico de pago en efectivo, transferencia pendiente o reservas internas creadas por el admin) **no se contaban** y dejaban el vehículo "disponible" en el buscador público.
+- El trigger `prevent_booking_conflicts` no estaba instalado en producción, eliminando la red de seguridad final.
+
+**Regla unificada (nueva):**
+> Una reserva bloquea el vehículo si su `status` es **`confirmed`**, **`in_progress`** o **`completed`**, **independientemente del `payment_status`**. Solo `pending` (carrito) y `cancelled` no bloquean.
+
+**Cambios en código (7 endpoints alineados):**
+- `src/app/api/availability/route.ts` — buscador público.
+- `src/app/api/availability/alternatives/route.ts` — sugerencias de fechas alternativas.
+- `src/app/api/bookings/create/route.ts` — validación pre-creación (devuelve HTTP 409 si conflicto).
+- `src/app/api/redsys/notification/route.ts` — webhook de Redsys.
+- `src/app/api/redsys/verify-payment/route.ts` — verificación post-pago.
+- `src/app/api/admin/search-analytics/route.ts` — informe de ocupación.
+- `src/app/api/admin/last-minute-offers/check-availability/route.ts` — disponibilidad de ofertas (también arregla typo `'active'` → `'in_progress'`).
+
+**Base de datos:**
+- Migración `supabase/migrations/20260427-fix-availability-by-status.sql`: la RPC `check_vehicle_availability` ahora filtra por `status IN ('confirmed','in_progress','completed')` en vez de por `payment_status`.
+- Reinstalación del trigger `prevent_booking_conflicts` en producción (archivo `supabase/migrations/prevent-booking-conflicts.sql`). Verificación recomendada en cada despliegue: `SELECT tgname, tgenabled FROM pg_trigger WHERE tgname = 'prevent_booking_conflicts';`.
+
+**Documentación:**
+- Nuevo: `docs/03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md` (cronología, causa raíz, fix completo, lecciones aprendidas).
+- Actualizado: `docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md` (regla clave unificada, lista de los 7 endpoints alineados, instrucciones para verificar el trigger).
+- Actualizado: `docs/INDICE-DOCUMENTACION.md` (entrada destacada del fix).
+- Actualizado: `README.md` raíz (sección *Abril 2026 — Fix crítico doble reserva*).
+
+**Commit:** `fix(disponibilidad): reservas confirmadas sin pago tambien bloquean vehiculo`.
+
+---
+
 ## 📅 Calendario admin: reasignación ágil + edición inline — 17 de abril 2026 (tarde)
 
 Conjunto de mejoras operativas para resolver el "15-puzzle" de reasignar la flota cuando todos los vehículos están ocupados, sin tener que crear vehículos ficticios ni salir del calendario.
