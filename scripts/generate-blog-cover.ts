@@ -67,6 +67,16 @@ async function main() {
   console.log("Título:", result.title);
   console.log("URL portada:", "featuredImage" in result ? result.featuredImage : "");
   console.log("Storage:", "storagePath" in result ? result.storagePath : "");
+  if ("vehicleModel" in result && result.vehicleModel) {
+    console.log(
+      `Modelo de referencia usado: ${result.vehicleModel.label} (${result.vehicleModel.referenceCount} imagen/es)`
+    );
+    for (const refPath of result.vehicleModel.referencePaths) {
+      console.log("   →", refPath);
+    }
+  } else {
+    console.log("Modelo de referencia: ninguno (prompt-only)");
+  }
 }
 
 main().catch((e) => {

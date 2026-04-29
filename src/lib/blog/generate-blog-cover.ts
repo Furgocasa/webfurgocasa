@@ -21,21 +21,64 @@ const BLOG_COVER_WEBP_QUALITY = (() => {
   const n = Number(raw);
   return Number.isFinite(n) && n >= 1 && n <= 100 ? n : 85;
 })();
-const VEHICLE_REFERENCE_PROMPT_TAIL =
-  "Si aparece una camper en la escena, usa las imagenes de referencia adjuntas como guia visual fuerte y prioritaria de la morfologia, proporciones, volumen, altura, frontal, ventanas, llantas, pasos de rueda y lenguaje estetico de una camper real de Furgocasa. Debe recordar claramente a una Knaus Boxstar gran volumen real de la flota Furgocasa, evitando vehiculos genericos de stock, futuristas, demasiado perfectos de catalogo o con rasgos de autocaravana ajena a la marca. Prioriza una silueta autentica, compacta y realista, con aspecto de camper de alquiler usada pero muy bien cuidada. REGLA DURA DE VEHICULO: nunca inventes dos toldos en una misma camper. Si aparece toldo, debe existir solo uno y debe ir en el lateral derecho del vehiculo, como en las referencias reales. MUY IMPORTANTE: usa las referencias para definir el VEHICULO, no para copiar su encuadre. La composicion, el angulo, la distancia de camara, la altura del punto de vista, la cercania o lejania del vehiculo y su posicion dentro del encuadre deben decidirse segun el contenido del articulo y la mejor solucion fotografica para esa historia concreta.";
-const VEHICLE_REFERENCE_IMAGE_CANDIDATES = [
-  "images/furgocasa_images/vehiculos/knaus_boxstar_street_2020_gris/furgocasa_alquiler_autocaravanas_campervans_knaus_boxstar_street_600_mq_2020_gris.jpg",
-  "images/furgocasa_images/vehiculos/v6_knaus_boxstar_lifetime/furgocasa_alquiler_autocaravanas_campervans_knaus_boxstar_lifetime_600_vf.jpg",
-  "public/images/mailing/vehicles/fu0012-knaus-boxstar-family.jpg",
-  "public/images/mailing/vehicles/fu0011-weinsberg-caratour-mq.jpg",
+function buildVehicleReferencePromptTail(modelLabel: string) {
+  return `Si aparece una camper en la escena, usa las imagenes de referencia adjuntas como guia visual fuerte y prioritaria de la morfologia, proporciones, volumen, altura, frontal, ventanas, llantas, pasos de rueda y lenguaje estetico de una camper real de Furgocasa. Debe recordar claramente al modelo concreto de la flota Furgocasa visible en las referencias adjuntas (${modelLabel}), respetando su silueta, alturas y volumetria, evitando mezclar rasgos de otros fabricantes o derivar hacia autocaravanas capuchinas o integrales ajenas a la marca. Prioriza una silueta autentica y realista, con aspecto de camper de alquiler usada pero muy bien cuidada. REGLA DURA DE VEHICULO: nunca inventes dos toldos en una misma camper. Si aparece toldo, debe existir solo uno y debe ir en el lateral derecho del vehiculo, como en las referencias reales. MUY IMPORTANTE: usa las referencias para definir el VEHICULO, no para copiar su encuadre. La composicion, el angulo, la distancia de camara, la altura del punto de vista, la cercania o lejania del vehiculo y su posicion dentro del encuadre deben decidirse segun el contenido del articulo y la mejor solucion fotografica para esa historia concreta.`;
+}
+
+const VEHICLE_REFERENCE_FLEET_DIRECTORIES = [
+  "images/IA_blog",
+  "public/images/mailing/vehicles",
 ];
-const VEHICLE_REFERENCE_IMAGE_DIRECTORIES = ["images/IA_blog"];
 const SUPPORTED_REFERENCE_IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
-const MAX_VEHICLE_REFERENCE_IMAGES = 6;
+const MAX_VEHICLE_REFERENCE_IMAGES = 3;
+const FORCED_VEHICLE_MODEL_KEY = (process.env.BLOG_COVER_VEHICLE_MODEL || "").trim().toLowerCase() || null;
+const VEHICLE_FILENAME_GENERIC_TOKENS = new Set([
+  "furgocasa",
+  "alquiler",
+  "autocaravanas",
+  "autocaravana",
+  "campervans",
+  "campervan",
+  "camper",
+  "campers",
+  "vehiculos",
+  "vehiculo",
+  "vehicles",
+  "vehicle",
+  "image",
+  "img",
+  "foto",
+  "fotos",
+  "photo",
+  "photos",
+  "front",
+  "back",
+  "side",
+  "lateral",
+  "vf",
+  "mq",
+  "ds",
+  "dq",
+  "aut",
+  "max",
+  "exclusive",
+  "edition",
+  "gris",
+  "blanco",
+  "white",
+  "negro",
+  "black",
+]);
 
 type VehicleReferenceImage = {
   file: Awaited<ReturnType<typeof toFile>>;
   sourcePath: string;
+};
+
+type VehicleReferenceSelection = {
+  modelKey: string;
+  modelLabel: string;
+  images: VehicleReferenceImage[];
 };
 
 const PROMPT_BUILDER_SYSTEM = `Eres un agente senior: director de arte, location scout y especialista en prompts para generacion de imagenes fotorrealistas. Recibes un DOSSIER COMPLETO sobre un articulo del blog de Furgocasa relacionado con viajes en camper, rutas, destinos, consejos o experiencias sobre ruedas. Tu UNICA salida es UN parrafo en espanol que el modelo de imagen usara tal cual.
@@ -263,7 +306,7 @@ function inferVisualClues(text: string) {
   return clues.slice(0, 5);
 }
 
-function buildDossier(post: CoverPost, articleUrl?: string) {
+function buildDossier(post: CoverPost, articleUrl?: string, vehicleModelLabel?: string) {
   const plainContent = truncate(stripHtml(post.content), 4200);
   const excerpt = collapseWhitespace(post.excerpt || post.meta_description || "");
   const keywords = collapseWhitespace(
@@ -296,6 +339,7 @@ Objetivo visual: portada horizontal premium para cabecera de articulo web y para
 Tono de marca: cercano, viajero, premium, realista, util, mediterraneo cuando proceda
 Audiencia: personas interesadas en alquilar una camper o autocaravana para descubrir Espana sin prisas
 Vehiculo de referencia de marca: priorizar camper de gran volumen tipo Fiat Ducato H2 L3 camperizada; mejor camper que autocaravana en la mayoria de portadas
+Modelo concreto de la flota Furgocasa a usar como referencia visual del vehiculo en esta portada: ${vehicleModelLabel || "camper de la flota Furgocasa"} (si en la imagen aparece la camper, debe inspirarse claramente en este modelo, no en otros modelos de la flota)
 
 --- Categoria editorial ---
 Categoria: ${post.category?.name || "Blog"}
@@ -321,13 +365,125 @@ function cleanPrompt(value: string) {
   return collapseWhitespace(value.replace(/^["']+|["']+$/g, ""));
 }
 
-async function loadVehicleReferenceImages() {
-  if (!USE_VEHICLE_REFERENCE_IMAGES) {
-    return [];
+async function listImagePathsInDirectory(relativeDirectory: string) {
+  const absoluteDirectory = path.resolve(process.cwd(), relativeDirectory);
+  const found: string[] = [];
+
+  try {
+    const entries = await readdir(absoluteDirectory, { withFileTypes: true });
+    for (const entry of entries) {
+      if (!entry.isFile()) continue;
+      const extension = path.extname(entry.name).toLowerCase();
+      if (!SUPPORTED_REFERENCE_IMAGE_EXTENSIONS.has(extension)) continue;
+      found.push(path.posix.join(relativeDirectory.replace(/\\/g, "/"), entry.name));
+    }
+  } catch {
+    // Si la carpeta no existe, devolvemos vacio
   }
 
-  const files: VehicleReferenceImage[] = [];
-  const relativePaths = (await listVehicleReferenceImagePaths()).slice(0, MAX_VEHICLE_REFERENCE_IMAGES);
+  return found;
+}
+
+function extractModelFamilyKey(filePath: string): string {
+  const base = path.basename(filePath, path.extname(filePath)).toLowerCase();
+  const stripped = base.replace(/^fu\d+[-_\s]*/i, "");
+  const tokens = stripped
+    .split(/[-_.\s]+/)
+    .map((token) => token.trim())
+    .filter(
+      (token) =>
+        token.length >= 2 &&
+        !/^\d+$/.test(token) &&
+        !VEHICLE_FILENAME_GENERIC_TOKENS.has(token)
+    );
+  if (tokens.length >= 2) return `${tokens[0]}-${tokens[1]}`;
+  return tokens[0] || "default";
+}
+
+function humanizeModelFamilyKey(key: string) {
+  return key
+    .split("-")
+    .filter(Boolean)
+    .map((token) => token.charAt(0).toUpperCase() + token.slice(1))
+    .join(" ");
+}
+
+async function selectVehicleReferenceImages(): Promise<VehicleReferenceSelection | null> {
+  if (!USE_VEHICLE_REFERENCE_IMAGES) {
+    return null;
+  }
+
+  const fleetPaths: string[] = [];
+  for (const directory of VEHICLE_REFERENCE_FLEET_DIRECTORIES) {
+    fleetPaths.push(...(await listImagePathsInDirectory(directory)));
+  }
+
+  if (fleetPaths.length === 0) {
+    return null;
+  }
+
+  const familiesMap = new Map<string, string[]>();
+  for (const filePath of fleetPaths) {
+    const key = extractModelFamilyKey(filePath);
+    const list = familiesMap.get(key) || [];
+    list.push(filePath);
+    familiesMap.set(key, list);
+  }
+
+  let familyKeys = Array.from(familiesMap.keys());
+  if (FORCED_VEHICLE_MODEL_KEY) {
+    const forcedMatches = familyKeys.filter((key) => key.includes(FORCED_VEHICLE_MODEL_KEY));
+    if (forcedMatches.length > 0) {
+      familyKeys = forcedMatches;
+    } else {
+      console.warn(
+        `[BLOG-COVER] BLOG_COVER_VEHICLE_MODEL="${FORCED_VEHICLE_MODEL_KEY}" no coincide con ningun modelo descubierto. Se usara seleccion aleatoria.`
+      );
+    }
+  }
+
+  if (familyKeys.length === 0) {
+    return null;
+  }
+
+  console.log(
+    `[BLOG-COVER] Modelos disponibles (${familyKeys.length}): ${familyKeys.join(", ")}`
+  );
+
+  while (familyKeys.length > 0) {
+    const randomIndex = Math.floor(Math.random() * familyKeys.length);
+    const candidateKey = familyKeys[randomIndex];
+    const candidatePaths = shuffleArray(familiesMap.get(candidateKey) || []).slice(
+      0,
+      MAX_VEHICLE_REFERENCE_IMAGES
+    );
+    const images = await loadVehicleReferenceFiles(candidatePaths);
+
+    if (images.length > 0) {
+      return {
+        modelKey: candidateKey,
+        modelLabel: humanizeModelFamilyKey(candidateKey),
+        images,
+      };
+    }
+
+    familyKeys.splice(randomIndex, 1);
+  }
+
+  return null;
+}
+
+function shuffleArray<T>(input: T[]): T[] {
+  const copy = [...input];
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
+async function loadVehicleReferenceFiles(relativePaths: string[]): Promise<VehicleReferenceImage[]> {
+  const images: VehicleReferenceImage[] = [];
 
   for (const relativePath of relativePaths) {
     const absolutePath = path.resolve(process.cwd(), relativePath);
@@ -335,43 +491,14 @@ async function loadVehicleReferenceImages() {
       await access(absolutePath);
       const normalizedImage = await normalizeVehicleReferenceImage(absolutePath);
       if (normalizedImage) {
-        files.push(normalizedImage);
+        images.push(normalizedImage);
       }
     } catch {
       // Si falta una referencia, seguimos con las que existan
     }
   }
 
-  return files;
-}
-
-async function listVehicleReferenceImagePaths() {
-  const discoveredPaths = [];
-
-  for (const relativeDirectory of VEHICLE_REFERENCE_IMAGE_DIRECTORIES) {
-    const absoluteDirectory = path.resolve(process.cwd(), relativeDirectory);
-
-    try {
-      const entries = await readdir(absoluteDirectory, { withFileTypes: true });
-
-      for (const entry of entries) {
-        if (!entry.isFile()) {
-          continue;
-        }
-
-        const extension = path.extname(entry.name).toLowerCase();
-        if (!SUPPORTED_REFERENCE_IMAGE_EXTENSIONS.has(extension)) {
-          continue;
-        }
-
-        discoveredPaths.push(path.posix.join(relativeDirectory.replace(/\\/g, "/"), entry.name));
-      }
-    } catch {
-      // Si la carpeta no existe o no se puede leer, seguimos con las rutas fijas
-    }
-  }
-
-  return Array.from(new Set([...discoveredPaths, ...VEHICLE_REFERENCE_IMAGE_CANDIDATES]));
+  return images;
 }
 
 async function normalizeVehicleReferenceImage(filePath: string): Promise<VehicleReferenceImage | null> {
@@ -445,11 +572,23 @@ async function buildVisualPrompt(openai: OpenAI, dossier: string) {
   };
 }
 
-async function generateImageBuffer(openai: OpenAI, prompt: string) {
-  const promptWithVehicleReferences = cleanPrompt(`${prompt} ${VEHICLE_REFERENCE_PROMPT_TAIL}`);
-  const referenceImages = await loadVehicleReferenceImages();
+async function generateImageBuffer(
+  openai: OpenAI,
+  prompt: string,
+  selection: VehicleReferenceSelection | null
+) {
+  const modelLabel = selection?.modelLabel || "camper de la flota Furgocasa";
+  const promptWithVehicleReferences = cleanPrompt(
+    `${prompt} ${buildVehicleReferencePromptTail(modelLabel)}`
+  );
+
+  const referenceImages = selection?.images || [];
 
   if (referenceImages.length > 0) {
+    console.log(
+      `[BLOG-COVER] Modelo seleccionado: ${selection?.modelKey} (${modelLabel}) con ${referenceImages.length} referencia(s).`
+    );
+
     try {
       return await generateImageBufferFromReferenceBatch(
         openai,
@@ -685,10 +824,11 @@ export async function generateBlogCoverFromTarget(input: {
     };
   }
 
-  const dossier = buildDossier(post, loaded.canonicalUrl);
+  const vehicleSelection = await selectVehicleReferenceImages();
+  const dossier = buildDossier(post, loaded.canonicalUrl, vehicleSelection?.modelLabel);
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const prompts = await buildVisualPrompt(openai, dossier);
-  const imageBuffer = await generateImageBuffer(openai, prompts.finalPrompt);
+  const imageBuffer = await generateImageBuffer(openai, prompts.finalPrompt, vehicleSelection);
   const upload = await uploadToBlogBucket(post, imageBuffer, adminSupabase);
 
   const { error: updateError } = await adminSupabase
@@ -713,6 +853,14 @@ export async function generateBlogCoverFromTarget(input: {
     firstPrompt: prompts.firstPrompt,
     refinedPrompt: prompts.refinedPrompt,
     dossier,
+    vehicleModel: vehicleSelection
+      ? {
+          key: vehicleSelection.modelKey,
+          label: vehicleSelection.modelLabel,
+          referenceCount: vehicleSelection.images.length,
+          referencePaths: vehicleSelection.images.map((image) => image.sourcePath),
+        }
+      : null,
   };
 }
 
