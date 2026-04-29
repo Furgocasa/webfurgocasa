@@ -779,10 +779,23 @@ export function getReturnReminderTemplate(data: ReturnReminderData): string {
     ${detailsTable(`
       ${tableRow('Reserva', data.bookingNumber)}
       ${tableRow('Fecha', formatDate(data.dropoffDate))}
-      ${tableRow('Hora', data.dropoffTime + ' h')}
+      ${tableRow('Hora', data.dropoffTime + ' h <span style="color: #dc2626; font-weight: 700;">(*)</span>')}
       ${tableRow('Lugar', data.dropoffLocation)}
       ${data.dropoffLocationAddress ? tableRow('Dirección', data.dropoffLocationAddress) : ''}
     `)}
+
+    <!-- Aviso de hora flexible -->
+    <tr>
+      <td style="padding: 8px 20px 0 20px;">
+        <p style="margin: 0; font-size: 12px; color: #dc2626; font-style: italic; line-height: 1.5;">
+          <span style="font-weight: 700; font-style: normal;">(*)</span>
+          <strong>Sobre la hora:</strong> es la hora de tu reserva. Si el día
+          de la entrega acordaste con el personal de FURGOCASA una hora
+          distinta para devolver el vehículo, <strong>prevalece esa hora
+          acordada</strong> y no esta.
+        </p>
+      </td>
+    </tr>
 
     <!-- Sección obligatoria -->
     <tr>
