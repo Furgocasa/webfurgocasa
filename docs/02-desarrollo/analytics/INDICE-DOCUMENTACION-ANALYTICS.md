@@ -1,9 +1,25 @@
 # 📚 ÍNDICE: Documentación de Google Analytics
 
-**Proyecto**: Sistema de Analytics con @next/third-parties  
-**Estado**: ✅ Funcionando correctamente  
-**Última actualización**: 27 de enero de 2026  
-**Versión**: v4.4.0+
+**Proyecto**: Sistema de Analytics + GTM con @next/third-parties  
+**Estado**: ✅ Embudo ecommerce completo (`generate_lead` · `begin_checkout` · `add_payment_info` · `purchase` · `additional_payment_received`) sin doble conteo en flujo 50 %+50 %  
+**Última actualización**: 29 de abril de 2026 (eventos ecommerce GTM)  
+**Versión**: v4.5.0+
+
+---
+
+## 📊 Eventos Ecommerce GTM (29/04/2026) — IMPLEMENTACIÓN ACTUAL
+
+| Evento GA4 | Cuándo | Dónde |
+|---|---|---|
+| `generate_lead` | Reserva creada pendiente de transferencia bancaria | Páginas `/{reservar,book,reserver,buchen}/[id]/{confirmacion,confirmation,bestaetigung}` |
+| `begin_checkout` | Detalle de reserva con `status="pending"` y `amount_paid=0` | Páginas `/{reservar,book,reserver,buchen}/[id]` |
+| `add_payment_info` | Pulso "Pagar" antes de redirigir a Redsys/Stripe | Páginas `/{reservar,book,reserver,buchen}/[id]/{pago,payment,paiement,zahlung}` |
+| `purchase` | **Solo en el primer pago** (LTV completo) | Páginas `/{pago,payment,paiement,zahlung}/exito` |
+| `additional_payment_received` | Pagos posteriores (segundo 50 %, ajustes) — NO conversión | Mismas páginas de éxito |
+
+⚠️ **Regla GTM container**: la conversión de Google Ads enchúfala SOLO al evento `purchase`, nunca a `additional_payment_received` (de lo contrario se dobla la conversión cuando llega el segundo 50 %).
+
+📖 **Detalle completo (payload, dedup, configuración GTM):** **[CONFIGURACION-GOOGLE-ANALYTICS.md](./CONFIGURACION-GOOGLE-ANALYTICS.md)** — sección *Eventos Ecommerce GTM*.
 
 ---
 
@@ -388,7 +404,6 @@ furgocasa-app/
 
 ---
 
-**Última actualización**: 22 de enero de 2026  
+**Última actualización**: 29 de abril de 2026 (eventos ecommerce GTM)  
 **Mantenido por**: Equipo de desarrollo Furgocasa  
-**Versión del índice**: 1.0  
-**Commit de documentación**: `bf81345`
+**Versión del índice**: 1.1

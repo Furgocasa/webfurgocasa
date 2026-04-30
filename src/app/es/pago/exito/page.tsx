@@ -335,32 +335,58 @@ function PagoExitoContent() {
   };
 
   useEffect(() => {
-    if (payment) {
-      const storageKey = `gtm_purchase_${payment.booking.id}`;
-      const eventFired = sessionStorage.getItem(storageKey);
-      
-      if (!eventFired) {
-        sendGTMEvent({
-          event: "purchase",
-          ecommerce: {
-            transaction_id: payment.order_number,
-            value: payment.booking.total_price,
-            currency: "EUR",
-            items: [
-              {
-                item_name: `${payment.booking.vehicle.brand} ${payment.booking.vehicle.model}`,
-                item_category: "Alquiler Furgoneta",
-                price: payment.booking.total_price,
-                quantity: 1
-              }
-            ]
-          }
-        });
-        
-        sessionStorage.setItem(storageKey, "true");
-        console.log("[GTM] Evento de compra (purchase) enviado con éxito.");
-      }
+    if (!payment) return;
+
+    // Dedup robusto por order_number (único por transacción Redsys/Stripe) en localStorage,
+    // para que no se reenvíe el evento si el cliente recarga días después o reabre el email.
+    const storageKey = `gtm_purchase_${payment.order_number}`;
+    if (typeof window === "undefined" || localStorage.getItem(storageKey)) return;
+
+    // Detectar si es el PRIMER pago: amount_paid (ya actualizado en BD tras este pago)
+    // es prácticamente igual al amount de esta transacción => no había pagos previos.
+    const totalPaid = payment.booking.amount_paid || 0;
+    const isFirstPayment = totalPaid - payment.amount <= 0.01;
+
+    const itemName = `${payment.booking.vehicle.brand} ${payment.booking.vehicle.model}`;
+
+    if (isFirstPayment) {
+      // PURCHASE solo en el primer pago, con el LTV completo de la reserva.
+      // Evita el doble conteo cuando el cliente paga 50% + 50% en dos transacciones.
+      sendGTMEvent({
+        event: "purchase",
+        ecommerce: {
+          transaction_id: payment.order_number,
+          value: payment.booking.total_price,
+          currency: "EUR",
+          payment_type: payment.amount >= payment.booking.total_price - 0.01 ? "full" : "first_50",
+          items: [
+            {
+              item_id: payment.booking.id,
+              item_name: itemName,
+              item_category: "Camper Rental",
+              price: payment.booking.total_price,
+              quantity: 1,
+            },
+          ],
+        },
+      });
+      console.log("[GTM] purchase enviado (primer pago):", payment.order_number);
+    } else {
+      // Pagos posteriores (segundo 50%, ajustes, etc.): evento custom para no duplicar conversiones.
+      sendGTMEvent({
+        event: "additional_payment_received",
+        ecommerce: {
+          transaction_id: payment.order_number,
+          booking_id: payment.booking.id,
+          value: payment.amount,
+          currency: "EUR",
+          payment_type: "second_50",
+        },
+      });
+      console.log("[GTM] additional_payment_received enviado:", payment.order_number);
     }
+
+    localStorage.setItem(storageKey, "true");
   }, [payment]);
 
   if (loading) {

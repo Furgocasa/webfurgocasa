@@ -144,6 +144,19 @@ Dos tipos de cupones:
 5. `05-setup-coupon-rls-policies.sql`
 6. `06-insert-sample-coupons.sql` (cupón INV2026)
 
+### **Prevención de Conflictos de Reservas** 🆕 (regla unificada — abr. 2026)
+
+> **Una reserva bloquea el vehículo si su `status` es `confirmed`, `in_progress` o `completed`, independientemente del `payment_status`.**
+> Las pending y cancelled no bloquean. Cuando llega una nueva pending solapante, se aplica la regla "última pending gana": la pending anterior se cancela automáticamente desde la API. El trigger `prevent_booking_conflicts` solo rechaza solapes con activas y nunca expone `customer_name` (RGPD).
+
+Capas activas:
+1. Buscador público (`/api/availability`) y endpoints de reserva — filtran por `status` operativo.
+2. RPC `check_vehicle_availability` — misma regla a nivel de BD.
+3. Trigger `prevent_booking_conflicts` — última red de seguridad sin PII en mensajes.
+4. Webhooks Redsys — al confirmar pago cancelan pendings solapantes restantes.
+
+Documentación completa: [`docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md`](../docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md) (v1.2).
+
 ### **Sistema de Ofertas de Última Hora**
 
 Detecta huecos entre reservas que no cumplen el mínimo de días y los convierte en ofertas con descuento:
@@ -219,6 +232,9 @@ Para BBDD ya existentes, ejecutar en SQL Editor según necesidad:
 | `add-min-quantity-to-extras.sql` | Añade `min_quantity` a extras (mín. días para per_day, ej. parking 4 días) |
 | `add-availability-dates-to-locations.sql` | Fechas de disponibilidad por ubicación |
 | `add-min-days-to-locations.sql` | Días mínimos de alquiler por ubicación |
+| `20260427-fix-availability-by-status.sql` | 🆕 RPC `check_vehicle_availability` filtra por `status` (no `payment_status`). Reservas confirmadas sin pago bloquean. |
+| `20260427-fix-rls-booking-price-changes.sql` | 🆕 Policies RLS de admins en `booking_price_changes` (auditoría de cambios de precio). Sin esto, el UPDATE de reservas con cambio de precio fallaba con `new row violates row-level security policy`. |
+| `20260429-prevent-conflicts-pending-rgpd.sql` | 🆕 Trigger `prevent_booking_conflicts` actualizado: solo bloquea `confirmed/in_progress/completed`; las pending pueden coexistir; `RAISE EXCEPTION` ya NO incluye `customer_name` (RGPD). |
 
 **Alternativa Node (mismo efecto que la migración del anillo):** `node scripts/apply-location-targets-ring.js`
 
@@ -290,8 +306,8 @@ Para modificar el esquema:
 
 ---
 
-**Última actualización**: marzo 2026 (`location_targets` ampliado; docs alineadas)  
-**Versión del esquema**: 1.2+ (ofertas última hora + landings alquiler por ciudad)
+**Última actualización**: 29 de abril, 2026 (regla unificada de disponibilidad + trigger sin PII)  
+**Versión del esquema**: 1.3+ (prevención de conflictos por `status` + RGPD en mensajes)
 
 
 

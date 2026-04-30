@@ -435,6 +435,31 @@ const { data: vehicle } = await supabase
 | extras | `is_active` | `is_available` |
 | extras | ❌ NO tiene `category` | `category` |
 | equipment | ✅ SÍ tiene `category` | - |
+| bookings | bloqueo por `status IN ('confirmed','in_progress','completed')` | filtrar por `payment_status` (corregido 27/04/2026) |
+
+---
+
+## 🛡️ TRIGGERS Y FUNCIONES CRÍTICAS
+
+### `prevent_booking_conflicts` (trigger en `bookings`)
+
+`BEFORE INSERT OR UPDATE`. Bloquea solapes solo con reservas activas (`confirmed`, `in_progress`, `completed`). Las pending pueden coexistir; es la API quien aplica la regla "última pending gana". El `RAISE EXCEPTION` **no incluye PII** (sin `customer_name` ni `customer_email`) — RGPD.
+
+Código vivo: `supabase/migrations/20260429-prevent-conflicts-pending-rgpd.sql`. Verificación:
+```sql
+SELECT tgname, tgenabled FROM pg_trigger WHERE tgname = 'prevent_booking_conflicts';
+-- Debe devolver tgenabled = 'O' (enabled).
+```
+
+### `check_vehicle_availability` (RPC)
+
+Idéntico criterio: filtra por `status IN ('confirmed','in_progress','completed')` y comprueba `blocked_dates`. Migración `20260427-fix-availability-by-status.sql`.
+
+### Tabla `booking_price_changes` (auditoría de precios)
+
+Tabla con trigger en `bookings` que registra cambios en `total_price`/`base_price`. Tiene RLS habilitado y **requiere** las 4 policies para admins (SELECT/INSERT/UPDATE/DELETE), si no, el UPDATE de cualquier reserva con cambio de precio falla con `new row violates row-level security policy`. Policies aplicadas en `supabase/migrations/20260427-fix-rls-booking-price-changes.sql`.
+
+Más contexto: [`SISTEMA-PREVENCION-CONFLICTOS.md`](../sistemas/SISTEMA-PREVENCION-CONFLICTOS.md).
 
 ---
 

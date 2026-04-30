@@ -9,6 +9,7 @@ import {
   User, Mail, Phone, Building, CreditCard, Copy, Check
 } from"lucide-react";
 import Link from"next/link";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 interface Booking {
   id: string;
@@ -70,6 +71,34 @@ export default function ConfirmacionPage() {
       loadBooking();
     }
   }, [bookingId]);
+
+  useEffect(() => {
+    if (!booking || typeof window === "undefined") return;
+    const storageKey = `gtm_lead_${booking.id}`;
+    if (localStorage.getItem(storageKey)) return;
+
+    sendGTMEvent({
+      event: "generate_lead",
+      ecommerce: {
+        booking_id: booking.id,
+        booking_number: booking.booking_number,
+        value: booking.total_price,
+        currency: "EUR",
+        payment_method: "bank_transfer",
+        items: [
+          {
+            item_id: booking.id,
+            item_name: `${booking.vehicle.brand} ${booking.vehicle.model}`,
+            item_category: "Camper Rental",
+            price: booking.total_price,
+            quantity: 1,
+          },
+        ],
+      },
+    });
+    localStorage.setItem(storageKey, "true");
+    console.log("[GTM] generate_lead gesendet:", booking.booking_number);
+  }, [booking]);
 
   const loadBooking = async () => {
     try {

@@ -11,6 +11,7 @@ import {
 } from"lucide-react";
 import { LocalizedLink } from"@/components/localized-link";
 import { getTranslatedRoute } from"@/lib/route-translations";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 // Función para normalizar códigos de país a nombres completos
 const getCountryName = (countryCode: string | null | undefined): string => {
@@ -170,6 +171,35 @@ export default function ReservaPage() {
     } else {
       document.title = 'Detalle de reserva - Furgocasa';
     }
+  }, [booking]);
+
+  useEffect(() => {
+    if (!booking || typeof window === "undefined") return;
+    if (booking.status !== "pending" || (booking.amount_paid || 0) > 0) return;
+
+    const storageKey = `gtm_begin_checkout_${booking.id}`;
+    if (localStorage.getItem(storageKey)) return;
+
+    sendGTMEvent({
+      event: "begin_checkout",
+      ecommerce: {
+        booking_id: booking.id,
+        booking_number: booking.booking_number,
+        value: booking.total_price,
+        currency: "EUR",
+        items: [
+          {
+            item_id: booking.vehicle.id,
+            item_name: `${booking.vehicle.brand} ${booking.vehicle.model}`,
+            item_category: "Camper Rental",
+            price: booking.total_price,
+            quantity: 1,
+          },
+        ],
+      },
+    });
+    localStorage.setItem(storageKey, "true");
+    console.log("[GTM] begin_checkout envoyé:", booking.booking_number);
   }, [booking]);
 
   const loadBooking = async () => {

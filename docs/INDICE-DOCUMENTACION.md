@@ -1,10 +1,32 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.23 ✅ PRODUCCIÓN — última pending gana + mensajes sin PII (RGPD)  
+**Versión**: 1.0.25 ✅ PRODUCCIÓN — tracking GTM ecommerce sin doble conteo + funnel completo  
 **URL**: https://www.furgocasa.com  
 **Última actualización**: 29 de abril, 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 📊 ACTUALIZACIÓN ABRIL 2026 — TRACKING GTM ECOMMERCE: FIX DOBLE CONTEO + FUNNEL COMPLETO
+
+| Tema | Dónde leer |
+|------|------------|
+| Esquema completo de eventos GA4 (`generate_lead`, `begin_checkout`, `add_payment_info`, `purchase`, `additional_payment_received`), payload `ecommerce`, dedup en `localStorage`, regla anti-doble-conteo en flujo 50 % + 50 % | **[CONFIGURACION-GOOGLE-ANALYTICS.md](./02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md)** — sección *Eventos Ecommerce GTM* |
+| Referencia cruzada en el índice analytics (estado, fecha, lista de eventos disparados) | **[INDICE-DOCUMENTACION-ANALYTICS.md](./02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md)** |
+| Mención en el sistema de pagos (qué evento se dispara en cada paso del flujo) | **[SISTEMA-PAGOS.md](./02-desarrollo/pagos/SISTEMA-PAGOS.md)** — sección *Tracking GTM ecommerce* |
+| Archivos modificados (16 en 4 idiomas), motivación, regla GTM container (Ads conv. SOLO en `purchase`) | **CHANGELOG** (entrada 29 abr 2026 📊) · **[README raíz](../README.md)** — sección *Abril 2026 — Tracking GTM ecommerce…* |
+
+---
+
+## ✉️ ACTUALIZACIÓN ABRIL 2026 — AVISO DE HORA FLEXIBLE EN EL RECORDATORIO DE DEVOLUCIÓN
+
+| Tema | Dónde leer |
+|------|------------|
+| Asterisco rojo `(*)` junto a la hora + nota explicativa en rojo bajo la tabla "Tu devolución" para evitar que los clientes se asusten cuando se les ha ampliado verbalmente el margen de devolución | **[SISTEMA-EMAILS.md](./04-referencia/emails/SISTEMA-EMAILS.md)** — sección *4. Recordatorio de Devolución* |
+| Plantilla actualizada (`getReturnReminderTemplate`) y maqueta espejo sincronizada | `src/lib/email/templates.ts` (líneas ~782-797) · `mailing/app/04-recordatorio-devolucion.html` |
+| Script de prueba sin admin (envía solo a `reservas@furgocasa.com`) | `scripts/test-return-reminder-email.ts` — uso: `npx tsx scripts/test-return-reminder-email.ts [BOOKING_NUMBER]` |
+| Resumen en README raíz | **[README raíz](../README.md)** — sección *Abril 2026 — Aviso de hora flexible…* · **CHANGELOG** (entrada 29 abr 2026, ✉️) |
 
 ---
 
@@ -24,8 +46,9 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 | Tema | Dónde leer |
 |------|------------|
 | Resumen ejecutivo del incidente, causa raíz y solución (7 endpoints + RPC + trigger) | **[CORRECCION-DOBLE-RESERVA-2026-04-27.md](./03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md)** |
-| Regla unificada (`status IN ('confirmed','in_progress','completed')` bloquea, sin importar `payment_status`); 4 capas de protección coherentes | **[SISTEMA-PREVENCION-CONFLICTOS.md](./04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md)** — sección *Regla Clave (actualizada 27/04/2026)* |
+| Regla unificada (`status IN ('confirmed','in_progress','completed')` bloquea, sin importar `payment_status`); 4 capas de protección coherentes | **[SISTEMA-PREVENCION-CONFLICTOS.md](./04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md)** — sección *Regla Clave (actualizada 29/04/2026)* |
 | Migración SQL de la RPC `check_vehicle_availability` | `supabase/migrations/20260427-fix-availability-by-status.sql` |
+| Migración SQL: policies RLS en `booking_price_changes` (auditoría de cambios de precio) | `supabase/migrations/20260427-fix-rls-booking-price-changes.sql` |
 | Trigger `prevent_booking_conflicts` (verificación e instalación en producción) | `supabase/migrations/prevent-booking-conflicts.sql` + sección *Capa 3* en SISTEMA-PREVENCION-CONFLICTOS.md |
 
 ---

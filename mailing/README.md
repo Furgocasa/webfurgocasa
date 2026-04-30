@@ -114,8 +114,21 @@ Puedes abrir cualquier `.html` directamente en el navegador para ver cómo se ve
 - **Azul corporativo** (cabecera, títulos, botón): `#063971`
 - **Verde éxito** (confirmaciones): `#10b981`
 - **Amarillo alerta** (avisos): `#fef3c7` con borde `#f59e0b`
-- **Rojo pendiente** (importes / penalizaciones): `#dc2626`
+- **Rojo pendiente** (importes / penalizaciones / **aviso de hora flexible**): `#dc2626`
 - **Azul suave** (info / fianza): `#eff6ff` con borde `#063971`
 - **Verde suave** (consejo / pago completo): `#f0fdf4` / `#d1fae5` con borde `#10b981`
 - **Fondo secciones:** `#f9fafb`
 - **Fondo página:** `#f4f4f5`
+
+---
+
+## 📝 Historial de cambios en plantillas transaccionales
+
+Aquí se anotan **únicamente** cambios en las plantillas de `mailing/app/*.html` (que son espejo de `src/lib/email/templates.ts`). Para detalle completo de cada cambio ver `CHANGELOG.md` raíz y [`docs/04-referencia/emails/SISTEMA-EMAILS.md`](../docs/04-referencia/emails/SISTEMA-EMAILS.md).
+
+### `04-recordatorio-devolucion.html`
+
+| Fecha | Cambio |
+|---|---|
+| 29/04/2026 | **Aviso de hora flexible.** Asterisco `(*)` rojo (`#dc2626`) y negrita junto a la hora de devolución, y nueva fila bajo la tabla "Tu devolución" con frase **toda en rojo** (mantiene cursiva y negritas internas) que aclara que un acuerdo verbal con FURGOCASA en la entrega prevalece sobre la hora del email. |
+| 23/03/2026 | Creación inicial. Cron diario, idempotencia vía `bookings.return_reminder_sent`. Tabla de penalizaciones idéntica a la web, chips, sección de fianza y CTA. |

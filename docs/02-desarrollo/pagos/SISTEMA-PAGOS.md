@@ -1,7 +1,7 @@
 # 💳 Sistema de Pagos Furgocasa
 
-**Versión:** 2.2  
-**Última actualización:** 09/04/2026 (excepción UI: menos de 15 días hasta la recogida → solo pago 100 %)
+**Versión:** 2.3  
+**Última actualización:** 29/04/2026 (sección *Tracking GTM ecommerce* añadida; sin doble conteo en flujo 50 %+50 %)
 
 ---
 
@@ -13,7 +13,8 @@
 4. [Arquitectura Técnica](#arquitectura-técnica)
 5. [Gestión Manual](#gestión-manual)
 6. [Emails Automatizados](#emails-automatizados)
-7. [Troubleshooting](#troubleshooting)
+7. [Tracking GTM ecommerce](#tracking-gtm-ecommerce)
+8. [Troubleshooting](#troubleshooting)
 
 ---
 
@@ -298,6 +299,28 @@ const amount = paymentMethod === 'stripe'
 
 ---
 
+## Tracking GTM ecommerce
+
+Cada paso del flujo de pago dispara un evento GA4 enhanced ecommerce vía GTM (`GTM-5QLGH57`) usando `sendGTMEvent` de `@next/third-parties/google`.
+
+| Paso del flujo | Evento GTM | Notas |
+|---|---|---|
+| Reserva creada (transferencia bancaria) | `generate_lead` | Solo cuando el cliente elige transferencia |
+| Llega a `/reservar/[id]` con pago pendiente | `begin_checkout` | `status="pending"` y `amount_paid=0` |
+| Pulsa "Pagar" → redirige al gateway | `add_payment_info` | Incluye `payment_type: redsys|stripe` |
+| **Primer pago** completado (50 % o 100 %) | `purchase` con `value = total_price` | LTV completo, dispara conversión Google Ads |
+| Segundo pago (50 %) o ajustes posteriores | `additional_payment_received` con `value = payment.amount` | **NO** dispara conversión (evita doble conteo) |
+
+### ⚠️ Regla crítica anti-doble-conteo
+
+El flujo 50 % + 50 % crea **dos transacciones Redsys distintas** (`order_number` distinto). Si `purchase` se disparase en ambas con `value = total_price`, GA4 doblaría ingresos. La detección client-side (`payment.booking.amount_paid - payment.amount <= 0.01`) garantiza que solo el primer pago dispara `purchase`; el resto disparan `additional_payment_received`.
+
+**En el contenedor GTM, la etiqueta de conversión de Google Ads debe enchufarse SOLO al evento `purchase`.**
+
+📖 **Detalle completo (payload, dedup, payload `ecommerce`, configuración GTM):** [`docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md`](../analytics/CONFIGURACION-GOOGLE-ANALYTICS.md) — sección *Eventos Ecommerce GTM*.
+
+---
+
 ## Métricas y Monitoreo
 
 ### Panel Admin
@@ -385,6 +408,7 @@ Todos los cambios manuales se registran:
 - `REDSYS-FUNCIONANDO.md` - Estado y configuración Redsys
 - `REDSYS-CRYPTO-NO-TOCAR.md` - Firma criptográfica
 - `emails/README.md` - Sistema de emails
+- `../analytics/CONFIGURACION-GOOGLE-ANALYTICS.md` - Eventos ecommerce GTM (purchase, generate_lead, begin_checkout, add_payment_info)
 
-**Última revisión:** 09/04/2026  
-**Versión:** 2.2
+**Última revisión:** 29/04/2026 (sección *Tracking GTM ecommerce* añadida)  
+**Versión:** 2.3

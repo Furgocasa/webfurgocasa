@@ -1,8 +1,40 @@
 # 📋 PENDIENTES DE SEGURIDAD
 
 **Fecha original**: 5 de Febrero, 2026  
-**Última revisión**: 17 de abril, 2026 (segunda pasada del día)  
+**Última revisión**: 29 de abril, 2026 (cierre brecha RGPD en mensajes de conflicto)  
 **Estado**: 🟢 **Sprint de seguridad completado — solo quedan tareas de infraestructura externa**
+
+---
+
+## 🆕 ACTUALIZACIÓN — 29 de abril, 2026 (cierre brecha RGPD + lógica de pendings)
+
+Detectada y cerrada una brecha de RGPD: el mensaje de error mostrado a un cliente al intentar reservar incluía el **nombre completo y número de reserva** de otro cliente con una reserva pendiente sobre el mismo vehículo (`CONFLICTO DE RESERVA: ... Primera reserva conflictiva: BK-XXX (Nombre Apellido)`).
+
+**Origen del fallo:**
+- El trigger SQL `prevent_booking_conflicts` incluía `customer_name` en su `RAISE EXCEPTION`.
+- El endpoint `/api/bookings/create` devolvía `bookingError.message` crudo al frontend.
+- El trigger además bloqueaba pendings con pendings, lo que disparaba el error con cualquier nuevo cliente que intentase reservar fechas con una pending previa sin pagar.
+
+**Cierres aplicados:**
+- ✅ **Trigger SQL sin PII** — Migración `supabase/migrations/20260429-prevent-conflicts-pending-rgpd.sql`. El `RAISE EXCEPTION` solo incluye `internal_code` del vehículo, `booking_number` y fechas. **Nunca** `customer_name` ni `customer_email`.
+- ✅ **Trigger filtra solo activas** — Las reservas en `status = 'pending'` ya no disparan conflicto. Pueden coexistir mientras la API aplica la regla "última pending gana".
+- ✅ **Saneamiento de mensajes en `/api/bookings/create`** — El endpoint nunca devuelve `bookingError.message` crudo: detecta si es conflicto y responde HTTP 409 con texto genérico ("El vehículo no está disponible…"). Mismo tratamiento al `catch` general (HTTP 500 neutro).
+- ✅ **Regla "última pending gana"** — Antes del INSERT, el endpoint cancela automáticamente las pendings solapantes del mismo vehículo (con motivo en `notes`).
+- ✅ **Filtro unificado de disponibilidad por `status` (27/04/2026)** — 7 endpoints + RPC alineados: una reserva confirmada sin pago bloquea inventario. Migración `supabase/migrations/20260427-fix-availability-by-status.sql`.
+- ✅ **Policies RLS en `booking_price_changes` (27/04/2026)** — Auditoría de cambios de precio operativa. Migración `supabase/migrations/20260427-fix-rls-booking-price-changes.sql`.
+
+**Documentación de respaldo:**
+- `docs/03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md`
+- `docs/03-mantenimiento/fixes/CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md`
+- `docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md` (v1.2)
+
+**Acción manual recomendada:**
+- 🟠 **Registrar el incidente RGPD** en el registro interno de incidentes de seguridad (fecha, alcance estimado, fuente, mitigación). En este caso el alcance es muy bajo (un único cliente vio el nombre de otro de forma puntual durante el flujo de reserva), por lo que no se considera notificable a la AEPD; pero conviene dejarlo trazado.
+- 🟢 **Verificación periódica del trigger** — añadir a la rutina de despliegue:
+  ```sql
+  SELECT tgname, tgenabled FROM pg_trigger WHERE tgname = 'prevent_booking_conflicts';
+  ```
+  Confirmar que devuelve `O` (enabled).
 
 ---
 

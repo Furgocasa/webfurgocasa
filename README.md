@@ -28,6 +28,29 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 📊 Abril 2026 — Tracking GTM ecommerce: fix doble conteo + funnel completo (29/04/2026)
+
+- **Problema 1 (crítico):** el evento `purchase` de GTM se disparaba en cada uno de los **dos cobros Redsys** (primer 50 % y segundo 50 %) con `value = total_price` completo en ambos. Resultado: GA4 doblaba ingresos y Google Ads doblaba ROAS.
+- **Problema 2:** la deduplicación se hacía con `sessionStorage + booking.id`, que se borra al cerrar la pestaña. Si el cliente reabría el email de confirmación días después, se reenvíaba `purchase`.
+- **Fix `purchase`:** detección de primer pago client-side (`amount_paid - payment.amount <= 0.01`). Solo el primer pago dispara `purchase` con LTV completo y `payment_type: first_50|full`; los pagos posteriores disparan un evento custom `additional_payment_received` (con `value = payment.amount` real). Dedup en `localStorage` con clave `gtm_purchase_${order_number}`.
+- **Funnel añadido:** `generate_lead` (confirmación de transferencia bancaria) · `begin_checkout` (`/reservar/[id]` con status pending y sin pago) · `add_payment_info` (justo antes de redirigir a Redsys/Stripe). 16 archivos en 4 idiomas.
+- **GTM container — nota crítica:** la etiqueta de conversión de Google Ads debe enchufarse SOLO a `purchase` (no a `additional_payment_received`).
+- **Documentación:** [CONFIGURACION-GOOGLE-ANALYTICS.md](./docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md) (sección *Eventos Ecommerce GTM*) · [INDICE-DOCUMENTACION-ANALYTICS.md](./docs/02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md) · [SISTEMA-PAGOS.md](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md) · CHANGELOG entrada del 29 abr 2026 📊.
+
+---
+
+## ✉️ Abril 2026 — Aviso de hora flexible en el recordatorio de devolución (29/04/2026)
+
+- **Síntoma:** clientes recibían el email "Mañana devuelves tu camper" con la hora estricta de la reserva (p. ej. 11:00 h) y entraban en pánico cuando, en la entrega, FURGOCASA ya les había ampliado el margen verbalmente ("puedes traerla a la 1"). Llamadas/whatsapps de aclaración constantes.
+- **Solución:** la plantilla `getReturnReminderTemplate()` añade un asterisco `(*)` en **rojo** (`#dc2626`) y negrita junto a la hora, y una nota inmediata bajo la tabla "Tu devolución" — **toda en rojo** — con el mismo asterisco al inicio:
+
+  > **(*) Sobre la hora:** es la hora de tu reserva. Si el día de la entrega acordaste con el personal de FURGOCASA una hora distinta para devolver el vehículo, **prevalece esa hora acordada** y no esta.
+
+- **Archivos:** `src/lib/email/templates.ts` (líneas ~782-797), `mailing/app/04-recordatorio-devolucion.html` (maqueta sincronizada), `scripts/test-return-reminder-email.ts` (script de prueba que envía solo a `reservas@furgocasa.com`).
+- **Documentación:** [SISTEMA-EMAILS.md](./docs/04-referencia/emails/SISTEMA-EMAILS.md) — sección 4, recordatorio de devolución.
+
+---
+
 ## 🔴 Abril 2026 — Regla "última pending gana" + RGPD en mensajes (29/04/2026)
 
 - **Síntoma:** un cliente buscaba un vehículo que sí salía disponible (correcto: solo había una *pending* sin pagar de otro cliente) pero al pulsar "Reservar" recibía un error de conflicto que **incluía el nombre completo del otro cliente** (brecha de RGPD) y le impedía reservar.
@@ -48,6 +71,15 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 - **Migración SQL:** `supabase/migrations/20260427-fix-availability-by-status.sql` (RPC `check_vehicle_availability` ajustada).
 - **Trigger BD:** se reinstala `prevent_booking_conflicts` (`supabase/migrations/prevent-booking-conflicts.sql`) como red de seguridad final.
 - **Documentación:** [CORRECCION-DOBLE-RESERVA-2026-04-27.md](./docs/03-mantenimiento/fixes/CORRECCION-DOBLE-RESERVA-2026-04-27.md) · [SISTEMA-PREVENCION-CONFLICTOS.md](./docs/04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md).
+
+---
+
+## 🛡️ Abril 2026 — RLS en `booking_price_changes` (auditoría de precios admin)
+
+- **Síntoma:** al editar el precio de una reserva en `/administrator/reservas/[id]/editar` aparecía `new row violates row-level security policy for table "booking_price_changes"`.
+- **Causa:** existe un trigger en `bookings` que escribe en la tabla de auditoría `booking_price_changes` cuando cambia `total_price`/`base_price`. La tabla tenía RLS habilitado pero le faltaba la policy de INSERT para admins, así que el UPDATE de la reserva fallaba.
+- **Solución:** policies SELECT/INSERT/UPDATE/DELETE para admins activos (mismo patrón que `business_closed_dates`).
+- **Migración:** `supabase/migrations/20260427-fix-rls-booking-price-changes.sql`.
 
 ---
 

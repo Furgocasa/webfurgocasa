@@ -10,6 +10,7 @@ import {
 } from"lucide-react";
 import Link from"next/link";
 import RedsysWarningModal from "@/components/RedsysWarningModal";
+import { sendGTMEvent } from "@next/third-parties/google";
 
 interface Booking {
   id: string;
@@ -158,6 +159,31 @@ export default function PagoPage() {
       const amount = paymentMethod === 'stripe' 
         ? baseAmount + (baseAmount * STRIPE_FEE_PERCENT)
         : baseAmount;
+
+      // GTM: add_payment_info justo antes de redirigir al gateway
+      if (booking) {
+        sendGTMEvent({
+          event: "add_payment_info",
+          ecommerce: {
+            booking_id: booking.id,
+            booking_number: booking.booking_number,
+            value: amount,
+            currency: "EUR",
+            payment_type: paymentMethod,
+            payment_option: paymentType,
+            items: [
+              {
+                item_id: booking.id,
+                item_name: `${booking.vehicle.brand} ${booking.vehicle.model}`,
+                item_category: "Camper Rental",
+                price: booking.total_price,
+                quantity: 1,
+              },
+            ],
+          },
+        });
+        console.log("[GTM] add_payment_info enviado:", paymentMethod, paymentType);
+      }
       
       console.log("📊 [1/5] Información del pago:", {
         bookingId: params.id,

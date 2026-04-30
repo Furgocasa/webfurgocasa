@@ -1,8 +1,23 @@
 # ⚠️ FLUJO DE RESERVAS CRÍTICO - NO MODIFICAR SIN DOCUMENTAR
 
-> **ÚLTIMA ACTUALIZACIÓN**: 9 de abril de 2026 (política de pago si faltan menos de 15 días; rutas multiidioma)
+> **ÚLTIMA ACTUALIZACIÓN**: 29 de abril de 2026 (regla "última pending gana" + mensajes sin PII)
 > 
 > **MOTIVO DE ESTE DOCUMENTO**: En enero de 2026 se perdieron dos páginas críticas del flujo de reservas (`/reservar/vehiculo` y `/reservar/nueva`), lo que rompió completamente el sistema de reservas. Este documento garantiza que esto NO vuelva a suceder.
+
+## 🆕 Reglas de disponibilidad y bloqueo (abril 2026)
+
+Para todo lo relativo a **cuándo un vehículo aparece como disponible** y **cuándo se acepta una reserva**, la fuente única de verdad es:
+
+📖 **[`SISTEMA-PREVENCION-CONFLICTOS.md`](../sistemas/SISTEMA-PREVENCION-CONFLICTOS.md)** (v1.2 — 29/04/2026)
+
+Resumen para no leer todo el doc:
+
+1. **Bloquean** las reservas en `status = 'confirmed' | 'in_progress' | 'completed'`. **No mira `payment_status`**: una confirmada sin pago también bloquea (el admin puede cobrar fuera del sistema).
+2. **No bloquean** las reservas en `status = 'pending'` ni `'cancelled'`.
+3. Cuando llega una nueva reserva sobre fechas/vehículo donde había una pending de otro cliente, **la pending anterior se cancela automáticamente** antes del INSERT (regla "última pending gana"). Solo puede haber una pending viva por vehículo + rango de fechas.
+4. En ningún mensaje de error visible para el cliente final aparecen datos personales de terceros (nombre, email, teléfono). Si el trigger SQL devuelve algún detalle, el endpoint `/api/bookings/create` responde con un texto genérico.
+
+Implementación: `src/app/api/bookings/create/route.ts` + trigger SQL `prevent_booking_conflicts` (migración `20260429-prevent-conflicts-pending-rgpd.sql`).
 
 ## 🚨 ADVERTENCIA CRÍTICA
 

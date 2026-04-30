@@ -4,6 +4,81 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 📊 Tracking GTM ecommerce: fix doble conteo + funnel completo — 29 de abril 2026
+
+Auditoría del Google Tag Manager (`GTM-5QLGH57`) en el flujo de pago. Detectados dos problemas críticos y oportunidades de mejora del funnel.
+
+**Problemas detectados:**
+
+1. **Doble conteo de ingresos en el modelo 50 % + 50 %.** El evento `purchase` se disparaba en cada una de las dos transacciones Redsys (primer y segundo pago) **con `value = total_price` completo en ambas**, duplicando ingresos en GA4 y ROAS en Google Ads. La regla de negocio crea dos `payments` con `order_number` distintos, así que `transaction_id` no protegía.
+2. **Deduplicación frágil.** Se usaba `sessionStorage` con `booking.id` como clave: se borraba al cerrar la pestaña, así que un cliente que reabriera el email de confirmación días después disparaba `purchase` otra vez.
+
+**Solución (4 idiomas en paralelo):**
+
+- **Detección de primer pago client-side**: `payment.booking.amount_paid - payment.amount <= 0.01` ⇒ es el primer pago (antes no había nada cobrado). La API `/api/payments/by-order` ya devuelve `amount_paid` actualizado tras la transacción, así que es fiable.
+- **Solo en el primer pago** se dispara `event: "purchase"` con `value = total_price` (LTV completo) y `payment_type: "first_50" | "full"`. Los segundos pagos disparan un evento custom `additional_payment_received` (con `value = payment.amount` real), que NO debe enchufarse a la conversión de Google Ads.
+- **Dedup robusto**: `localStorage` (no `sessionStorage`) con clave `gtm_purchase_${order_number}` (no `booking.id`). Sobrevive a recargas, reapertura de la pestaña y reapertura del email.
+
+**Funnel completo (eventos GA4 estándar) añadidos:**
+
+- `generate_lead` en la página de confirmación con datos bancarios (transferencia) — antes no se trackeaba.
+- `begin_checkout` en `/reservar/[id]` cuando `status="pending"` y `amount_paid=0`.
+- `add_payment_info` en `/reservar/[id]/pago` justo antes de redirigir al gateway, con `payment_type: redsys|stripe` y `payment_option: deposit|full`.
+- Todos con dedup por `localStorage` y `booking.id`.
+
+**Archivos modificados (16):**
+
+- Páginas de éxito (4): `src/app/{es,en,fr,de}/{pago,payment,paiement,zahlung}/exito/page.tsx`.
+- Páginas de confirmación transferencia (4): `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{confirmacion,confirmation,bestaetigung}/page.tsx`.
+- Detalle de reserva (4): `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/page.tsx`.
+- Página de pago (4): `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{pago,payment,paiement,zahlung}/page.tsx`.
+
+**Esquema enriquecido del payload `ecommerce`:**
+
+- `transaction_id` (Redsys/Stripe `order_number`).
+- `value` (siempre el LTV en `purchase`; `payment.amount` en `additional_payment_received`).
+- `currency: "EUR"`, `payment_type`, `payment_option`.
+- `items[]` con `item_id` (booking.id), `item_name` (marca + modelo), `item_category: "Camper Rental"` (canónica en inglés), `price`, `quantity`.
+
+**Nota crítica para el contenedor GTM:**
+
+> Si tienes una etiqueta de conversión de Google Ads, enchúfala SOLO al evento `purchase` (no a `additional_payment_received`). De lo contrario seguirás duplicando conversión en el segundo 50 %.
+
+**Documentación:**
+
+- `docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md` — nueva sección *Eventos Ecommerce GTM*.
+- `docs/02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md` — referencia al funnel.
+- `docs/02-desarrollo/pagos/SISTEMA-PAGOS.md` — nota sobre tracking GTM en el flujo.
+- `docs/INDICE-DOCUMENTACION.md` — entrada destacada.
+- `README.md` raíz — sección *Abril 2026 — Tracking GTM ecommerce…*.
+
+**Resultado:** GA4 deja de doblar ingresos; el funnel completo (`generate_lead` → `begin_checkout` → `add_payment_info` → `purchase`) queda trackeado para optimización de Smart Bidding y reportes de conversión.
+
+---
+
+## ✉️ Aviso de hora flexible en el email de recordatorio de devolución — 29 de abril 2026
+
+Los clientes recibían el email "Mañana devuelves tu camper" con la hora de la reserva y, al ser una hora "rígida", entraba en conflicto mental con los acuerdos verbales de FURGOCASA durante la entrega del vehículo (cuando se les amplía el margen y se les permite devolver el camper más tarde). Resultado: clientes confundidos pidiendo aclaraciones cuando ya tenían el aviso de boca.
+
+**Cambio aplicado a la plantilla `getReturnReminderTemplate()` en `src/lib/email/templates.ts`:**
+
+- Asterisco `(*)` en **rojo** (`#dc2626`) y negrita junto a la hora de devolución.
+- Nueva fila justo bajo la tabla "Tu devolución" con la frase de aviso **toda en rojo** (mantiene cursiva y negritas internas), comenzando con el mismo `(*)` para que el ojo enlace ambos elementos:
+
+  > **(*) Sobre la hora:** es la hora de tu reserva. Si el día de la entrega acordaste con el personal de FURGOCASA una hora distinta para devolver el vehículo, **prevalece esa hora acordada** y no esta.
+
+**Archivos:**
+- `src/lib/email/templates.ts` — fila "Hora" + nueva fila de aviso (líneas ~782-797).
+- `mailing/app/04-recordatorio-devolucion.html` — maqueta de referencia sincronizada (regla de sincronización del README de `mailing/`).
+- `scripts/test-return-reminder-email.ts` — script puntual para enviar el recordatorio a `reservas@furgocasa.com` con datos reales de una reserva cualquiera (al cliente NO se le envía nada). Uso: `npx tsx scripts/test-return-reminder-email.ts [BOOKING_NUMBER]`.
+
+**Documentación:**
+- `docs/04-referencia/emails/SISTEMA-EMAILS.md` — sección 4 ampliada con el bloque de aviso.
+
+**Resultado:** los clientes ven al instante (rojo + asterisco) que la hora del email es la de la reserva, y que cualquier acuerdo verbal con FURGOCASA en la entrega prevalece sobre lo escrito en el email.
+
+---
+
 ## 🔴 Regla "última pending gana" + RGPD en mensajes — 29 de abril 2026
 
 Continuación del fix del 27/04/2026. Tras alinear los filtros por `status` en los 7 endpoints + RPC, aparecieron dos problemas residuales que se resuelven aquí:
@@ -36,6 +111,27 @@ Continuación del fix del 27/04/2026. Tras alinear los filtros por `status` en l
 - Los clientes pueden reservar un vehículo que el buscador les muestra disponible, aunque otro cliente tenga una pending sin pagar (la suya pasa a cancelada y la nueva se crea correctamente).
 - En ningún mensaje visible al cliente final aparecen datos personales de terceros.
 - Las pendings caducas dejan de bloquear inventario.
+
+---
+
+## 🛡️ Fix RLS booking_price_changes — 27 de abril 2026
+
+Al editar el precio de una reserva desde el admin, aparecía `new row violates row-level security policy for table "booking_price_changes"` y el UPDATE fallaba.
+
+**Causa:**
+Existe en Supabase un trigger en `bookings` que registra los cambios de precio en la tabla de auditoría `booking_price_changes`. Esa tabla tiene RLS habilitado pero le faltaba la policy de INSERT para admins; el INSERT del trigger fallaba y revertía la transacción del UPDATE.
+
+**Solución:**
+Migración `supabase/migrations/20260427-fix-rls-booking-price-changes.sql` con las 4 policies (SELECT/INSERT/UPDATE/DELETE) para admins activos, mismo patrón que `business_closed_dates`/`blocked_dates`.
+
+```sql
+CREATE POLICY "booking_price_changes_admin_insert"
+  ON public.booking_price_changes FOR INSERT
+  WITH CHECK (EXISTS (
+    SELECT 1 FROM public.admins
+    WHERE admins.user_id = auth.uid() AND admins.is_active = true
+  ));
+```
 
 ---
 

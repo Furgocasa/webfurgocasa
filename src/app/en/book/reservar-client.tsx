@@ -55,9 +55,9 @@ export function ReservarClient() {
           </p>
         </div>
 
-        {/* Search Widget */}
-        <div className="container mx-auto px-4 relative z-20">
-          <div className="max-w-5xl mx-auto -mb-32">
+        {/* Search Widget - mismo patron que la home (full width con padding 25% en desktop) */}
+        <div className="w-full px-4 lg:px-[25%] -mb-32 relative z-20">
+          <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
             <SearchWidget variant="full" />
           </div>
         </div>

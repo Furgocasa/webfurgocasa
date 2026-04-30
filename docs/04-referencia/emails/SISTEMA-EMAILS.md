@@ -303,7 +303,13 @@ Si tienes problemas con el envío de emails:
 **Idempotencia:** columna `bookings.return_reminder_sent` (boolean). Una vez enviado, no se reenvía aunque el cron se ejecute de nuevo.
 
 **Contenido del email:**
-- Datos de devolución (reserva, fecha, hora, lugar, dirección)
+- Datos de devolución (reserva, fecha, **hora con asterisco rojo `(*)`**, lugar, dirección)
+- **Aviso de hora flexible** (añadido 29/04/2026): justo debajo de la tabla "Tu devolución" aparece una nota **toda en rojo** (`#dc2626`) con el mismo `(*)` que enlaza con la hora:
+
+  > **(*) Sobre la hora:** es la hora de tu reserva. Si el día de la entrega acordaste con el personal de FURGOCASA una hora distinta para devolver el vehículo, **prevalece esa hora acordada** y no esta.
+
+  Motivo: en la entrega solemos ampliar verbalmente el margen al cliente ("puedes devolverla a la 1 en vez de a las 11"), y los clientes se asustaban al recibir el email con la hora original de la reserva. El aviso evita la confusión y deja claro por escrito que el acuerdo verbal del día de la entrega manda.
+
 - Sección "Devolución del vehículo: obligatorio" con chips y tabla de 3 columnas (requisito / incumplimiento / importe IVA incl.), importes idénticos a la web:
   - Limpieza interior: desde 120 €
   - Aguas grises: 20 €
@@ -321,7 +327,9 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS return_reminder_sent BOOLEAN NOT N
 ```
 Archivo: `supabase/migrations/20260323-add-return-reminder-sent.sql`
 
-**Endpoint de prueba (temporal):** `GET /api/test-return-reminder?booking=FC26010043&to=info@furgocasa.com`
+**Endpoint de prueba (temporal):** `GET /api/test-return-reminder?booking=FC26010043&to=info@furgocasa.com` (requiere sesión admin).
+
+**Script de prueba sin admin:** `npx tsx scripts/test-return-reminder-email.ts [BOOKING_NUMBER]` — envía el recordatorio **únicamente** a `reservas@furgocasa.com` usando datos reales de una reserva cualquiera (o la indicada como argumento). No envía nada al cliente. Útil para validar cambios en la plantilla sin tener un dev server corriendo.
 
 ## 🎉 Funcionalidades Adicionales Posibles
 
@@ -338,5 +346,9 @@ Ideas para futuras mejoras:
 
 ---
 
-**Última actualización:** 23 de marzo de 2026
-**Versión:** 1.1.0
+**Última actualización:** 29 de abril de 2026
+**Versión:** 1.2.0
+
+**Changelog del documento:**
+- `1.2.0` (29/04/2026) — Añadido aviso de hora flexible en el recordatorio de devolución (asterisco rojo + nota explicativa); script de prueba sin admin (`scripts/test-return-reminder-email.ts`).
+- `1.1.0` (23/03/2026) — Añadido recordatorio de devolución (cron diario, plantilla `getReturnReminderTemplate`, idempotencia vía `bookings.return_reminder_sent`).

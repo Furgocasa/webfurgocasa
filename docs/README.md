@@ -60,6 +60,8 @@ Historial de correcciones y mejoras:
 #### fixes/
 - Correcciones críticas aplicadas
 - Resolución de errores específicos
+- 🆕 **CORRECCION-DOBLE-RESERVA-2026-04-27.md** — Fix crítico: filtro de disponibilidad cambia de `payment_status` a `status`; reservas confirmadas sin pago también bloquean ahora (7 endpoints + RPC alineados).
+- 🆕 **CORRECCION-PENDING-OVERRIDE-Y-RGPD-2026-04-29.md** — Fix crítico: regla "última pending gana" + eliminación de `customer_name` del `RAISE EXCEPTION` del trigger SQL (brecha RGPD cerrada).
 
 #### optimizaciones/
 - Optimización LCP móvil (0.83s)
@@ -109,12 +111,14 @@ Documentación técnica de referencia:
 - Sistema de emails automatizados (reserva creada, 1.er pago, 2.º pago, **recordatorio devolución**)
 - Templates y configuración SMTP (OVH)
 - Cron diario de recordatorio de devolución (`/api/cron/return-reminders`, 20:00 Madrid)
+- 🆕 **Aviso de hora flexible (abr. 2026):** asterisco rojo `(*)` junto a la hora + nota explicativa en rojo bajo la tabla "Tu devolución" para evitar que los clientes se asusten cuando se les ha ampliado verbalmente el margen — ver [`SISTEMA-EMAILS.md`](./04-referencia/emails/SISTEMA-EMAILS.md) (v1.2.0).
+- Script de prueba sin admin: `npx tsx scripts/test-return-reminder-email.ts [BOOKING_NUMBER]` (envía solo a `reservas@furgocasa.com`).
 - Campañas masivas en carpeta local `emails/mailing/` (no versionada; ver `emails/README.md` y `.gitignore`)
 
 #### sistemas/
 - Sistema de ofertas de última hora
 - Sistema de cupones
-- Prevención de conflictos
+- **Prevención de conflictos** — Regla unificada (status operativo bloquea, `payment_status` no importa) + regla "última pending gana" + mensajes sin PII (RGPD). Ver [`SISTEMA-PREVENCION-CONFLICTOS.md`](./04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md) (v1.2 — actualizada 29/04/2026).
 - Sistema de temporadas
 
 #### otros/
@@ -168,6 +172,11 @@ Estos documentos contienen reglas absolutas que NUNCA deben violarse:
    - Cierre de 53 warnings del Supabase Security Advisor (abr 2026)
    - RLS `admins`, buckets storage, `search_path` en 46 funciones, Leaked Password Protection
 
+6. **[04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md](./04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md)** 🆕
+   - Regla **única** de bloqueo de vehículos: `status IN ('confirmed','in_progress','completed')` (no `payment_status`).
+   - Regla **"última pending gana"** y mensajes de error **sin PII** (RGPD).
+   - 4 capas de protección coherentes (buscador, API, RPC + trigger, webhook Redsys).
+
 ---
 
 ## 🚀 Quick Start
@@ -192,5 +201,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 23 de abril, 2026  
-Versión del proyecto: 4.5.3+ (portadas blog IA: WebP, referencias flota, scripts `generate:blog-cover` / `reencode:blog-cover-webp`)
+Última actualización: 29 de abril, 2026  
+Versión del proyecto: 4.5.4+ (fixes de disponibilidad: filtro por `status` y regla "última pending gana"; trigger SQL sin PII por RGPD; aviso de hora flexible en email de recordatorio de devolución)

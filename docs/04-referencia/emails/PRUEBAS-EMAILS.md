@@ -1,6 +1,22 @@
 # 🧪 Guía de Pruebas - Sistema de Emails
 
-## 🚀 Prueba Rápida de Configuración
+> ⚠️ **Aviso**: gran parte de este documento se escribió cuando el envío iba por **Resend**. El sistema actual usa **SMTP/OVH** (ver `SISTEMA-EMAILS.md`, autoritativo). Las secciones sobre `RESEND_API_KEY` y dashboard de Resend están obsoletas; se mantienen solo como referencia histórica. Para el flujo real, usar las variables `SMTP_HOST` / `SMTP_USER` / `SMTP_PASSWORD` documentadas en `SISTEMA-EMAILS.md`.
+
+---
+
+## ⚡ Pruebas rápidas de plantillas transaccionales (recomendado)
+
+Si solo quieres validar el aspecto de un email **sin levantar el dev server ni autenticarte como admin**, hay scripts puntuales que envían el email a `reservas@furgocasa.com` con datos reales de Supabase (al cliente NO se le envía nada):
+
+| Email | Comando |
+|---|---|
+| Recordatorio de devolución (aviso de hora flexible, asterisco rojo, etc.) | `npx tsx scripts/test-return-reminder-email.ts [BOOKING_NUMBER]` |
+
+El argumento `BOOKING_NUMBER` es opcional. Si se omite, el script coge la reserva con `dropoff_date` más reciente. Requiere `.env.local` con `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` y las variables SMTP.
+
+---
+
+## 🚀 Prueba Rápida de Configuración (histórico — Resend)
 
 ### Paso 1: Configurar Variables de Entorno
 
@@ -228,4 +244,4 @@ Si tienes problemas:
 
 ---
 
-**Última actualización:** 19 de enero de 2026
+**Última actualización:** 29 de abril de 2026 (añadidas pruebas rápidas vía script `tsx`; aviso de obsolescencia parcial — el sistema usa SMTP/OVH, no Resend).

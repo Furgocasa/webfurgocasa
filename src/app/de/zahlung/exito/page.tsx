@@ -335,32 +335,51 @@ function PagoExitoContent() {
   };
 
   useEffect(() => {
-    if (payment) {
-      const storageKey = `gtm_purchase_${payment.booking.id}`;
-      const eventFired = sessionStorage.getItem(storageKey);
-      
-      if (!eventFired) {
-        sendGTMEvent({
-          event: "purchase",
-          ecommerce: {
-            transaction_id: payment.order_number,
-            value: payment.booking.total_price,
-            currency: "EUR",
-            items: [
-              {
-                item_name: `${payment.booking.vehicle.brand} ${payment.booking.vehicle.model}`,
-                item_category: "Alquiler Furgoneta",
-                price: payment.booking.total_price,
-                quantity: 1
-              }
-            ]
-          }
-        });
-        
-        sessionStorage.setItem(storageKey, "true");
-        console.log("[GTM] Evento de compra (purchase) enviado con éxito.");
-      }
+    if (!payment) return;
+
+    const storageKey = `gtm_purchase_${payment.order_number}`;
+    if (typeof window === "undefined" || localStorage.getItem(storageKey)) return;
+
+    const totalPaid = payment.booking.amount_paid || 0;
+    const isFirstPayment = totalPaid - payment.amount <= 0.01;
+
+    const itemName = `${payment.booking.vehicle.brand} ${payment.booking.vehicle.model}`;
+
+    if (isFirstPayment) {
+      sendGTMEvent({
+        event: "purchase",
+        ecommerce: {
+          transaction_id: payment.order_number,
+          value: payment.booking.total_price,
+          currency: "EUR",
+          payment_type: payment.amount >= payment.booking.total_price - 0.01 ? "full" : "first_50",
+          items: [
+            {
+              item_id: payment.booking.id,
+              item_name: itemName,
+              item_category: "Camper Rental",
+              price: payment.booking.total_price,
+              quantity: 1,
+            },
+          ],
+        },
+      });
+      console.log("[GTM] purchase gesendet (erste Zahlung):", payment.order_number);
+    } else {
+      sendGTMEvent({
+        event: "additional_payment_received",
+        ecommerce: {
+          transaction_id: payment.order_number,
+          booking_id: payment.booking.id,
+          value: payment.amount,
+          currency: "EUR",
+          payment_type: "second_50",
+        },
+      });
+      console.log("[GTM] additional_payment_received gesendet:", payment.order_number);
     }
+
+    localStorage.setItem(storageKey, "true");
   }, [payment]);
 
   if (loading) {

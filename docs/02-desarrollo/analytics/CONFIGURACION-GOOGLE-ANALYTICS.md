@@ -111,6 +111,149 @@ Los siguientes documentos explican los problemas que se intentaron resolver con 
 
 ---
 
+## 📊 Eventos Ecommerce GTM (29/04/2026)
+
+**Contenedor:** `GTM-5QLGH57` (cargado en `src/app/layout.tsx` vía `<GoogleTagManager gtmId="GTM-5QLGH57" />`).
+
+Toda la app dispara eventos a través de `sendGTMEvent` de `@next/third-parties/google`. Esquema GA4 enhanced ecommerce.
+
+### Embudo completo
+
+| Paso | Evento | Cuándo se dispara | Archivos (4 idiomas) | Dedup |
+|---|---|---|---|---|
+| 1 | `generate_lead` | El cliente crea reserva pendiente de **transferencia bancaria** | `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{confirmacion,confirmation,bestaetigung}/page.tsx` | `localStorage` + `booking.id` |
+| 2 | `begin_checkout` | El cliente llega a `/reservar/[id]` con `status="pending"` y `amount_paid=0` | `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/page.tsx` | `localStorage` + `booking.id` |
+| 3 | `add_payment_info` | El cliente pulsa pagar → justo antes de redirigir a Redsys/Stripe | `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{pago,payment,paiement,zahlung}/page.tsx` | sin dedup (cada click es una intención) |
+| 4 | `purchase` | **Solo en el primer pago** (con `value = total_price` completo, LTV) | `src/app/{es,en,fr,de}/{pago,payment,paiement,zahlung}/exito/page.tsx` | `localStorage` + `order_number` |
+| 4-bis | `additional_payment_received` | En pagos posteriores (segundo 50 %, ajustes) con `value = payment.amount` real | mismas páginas de éxito | `localStorage` + `order_number` |
+
+### ⚠️ Regla crítica anti-doble-conteo (modelo 50 % + 50 %)
+
+El negocio cobra el primer 50 % y, hasta 15 días antes de la recogida, el segundo 50 %. Cada cobro es una transacción Redsys distinta (`order_number` distinto). **Si se disparase `purchase` en ambos cobros con `value = total_price`, GA4 doblaría ingresos y Google Ads doblaría conversión.**
+
+**Solución implementada (client-side):**
+
+```ts
+const totalPaid = payment.booking.amount_paid || 0; // ya actualizado en BD
+const isFirstPayment = totalPaid - payment.amount <= 0.01;
+
+if (isFirstPayment) {
+  // event: "purchase" con value = total_price (LTV completo)
+} else {
+  // event: "additional_payment_received" con value = payment.amount
+}
+```
+
+`payment.booking.amount_paid` viene actualizado por `/api/payments/by-order` *después* de aplicar la transacción actual, así que si el resto (`amount_paid - amount`) es 0 ⇒ no había cobros previos ⇒ es el primer pago.
+
+### Configuración requerida en el contenedor GTM
+
+| Etiqueta | Trigger | Notas |
+|---|---|---|
+| GA4 — `purchase` event | Custom event `purchase` | Mapear `transaction_id`, `value`, `currency`, `items`, `payment_type` |
+| GA4 — `additional_payment_received` | Custom event `additional_payment_received` | Para reportes internos. **NO** marcarlo como conversión |
+| **Google Ads — Conversión "Reserva"** | Custom event `purchase` | **SOLO `purchase`**, nunca `additional_payment_received`. De lo contrario se duplica conversión cuando llega el segundo 50 % |
+| Google Ads — Remarketing | Custom event `begin_checkout` o `add_payment_info` | Audiencias de carrito abandonado |
+
+### Payload `ecommerce` enviado
+
+#### `purchase` (primer pago)
+
+```json
+{
+  "event": "purchase",
+  "ecommerce": {
+    "transaction_id": "<order_number Redsys/Stripe>",
+    "value": <total_price>,
+    "currency": "EUR",
+    "payment_type": "first_50" | "full",
+    "items": [{
+      "item_id": "<booking.id>",
+      "item_name": "<vehicle.brand> <vehicle.model>",
+      "item_category": "Camper Rental",
+      "price": <total_price>,
+      "quantity": 1
+    }]
+  }
+}
+```
+
+#### `additional_payment_received` (segundo pago, ajustes)
+
+```json
+{
+  "event": "additional_payment_received",
+  "ecommerce": {
+    "transaction_id": "<order_number>",
+    "booking_id": "<booking.id>",
+    "value": <payment.amount>,
+    "currency": "EUR",
+    "payment_type": "second_50"
+  }
+}
+```
+
+#### `begin_checkout`
+
+```json
+{
+  "event": "begin_checkout",
+  "ecommerce": {
+    "booking_id": "<booking.id>",
+    "booking_number": "<booking_number>",
+    "value": <total_price>,
+    "currency": "EUR",
+    "items": [/* ... */]
+  }
+}
+```
+
+#### `add_payment_info`
+
+```json
+{
+  "event": "add_payment_info",
+  "ecommerce": {
+    "booking_id": "<booking.id>",
+    "value": <amount>,
+    "currency": "EUR",
+    "payment_type": "redsys" | "stripe",
+    "payment_option": "deposit" | "full",
+    "items": [/* ... */]
+  }
+}
+```
+
+#### `generate_lead` (transferencia bancaria)
+
+```json
+{
+  "event": "generate_lead",
+  "ecommerce": {
+    "booking_id": "<booking.id>",
+    "value": <total_price>,
+    "currency": "EUR",
+    "payment_method": "bank_transfer",
+    "items": [/* ... */]
+  }
+}
+```
+
+### Verificación en producción
+
+1. **GA4 DebugView:** instala la extensión [GA Debugger](https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna) y haz una reserva real. Debes ver en orden: `begin_checkout` → `add_payment_info` → `purchase`.
+2. **Console del navegador:** los logs `[GTM] purchase enviado…`, `[GTM] additional_payment_received…`, etc. confirman ejecución client-side.
+3. **`window.dataLayer`** debe mostrar los objetos pushados con su payload `ecommerce` completo.
+
+### Cómo desactivar/cambiar eventos
+
+Cada evento es un `useEffect` o llamada en `handlePayment` aislada. Para desactivar uno:
+
+- Buscar `sendGTMEvent` en el archivo correspondiente y comentar el bloque.
+- Para reactivar la deduplicación tras pruebas: ejecutar `localStorage.clear()` en la consola.
+
+---
+
 ## Cumplimiento GDPR
 
 El sistema incluye gestión de consentimiento con `CookieProvider`:
@@ -210,7 +353,8 @@ Edita `src/app/layout.tsx`:
 
 ---
 
-**Última actualización**: 27 de enero de 2026  
-**ID de Medición**: G-G5YLBN5XXZ  
-**Estado**: ⚠️ Obsoleto (Migrado a @next/third-parties)  
-**Versión actual**: v4.4.0+
+**Última actualización**: 29 de abril de 2026 (sección *Eventos Ecommerce GTM* añadida)  
+**ID de Medición GA4**: G-G5YLBN5XXZ  
+**Contenedor GTM**: GTM-5QLGH57  
+**Estado**: ✅ Embudo ecommerce completo + sin doble conteo en flujo 50 %+50 %  
+**Versión actual**: v4.5.0+
