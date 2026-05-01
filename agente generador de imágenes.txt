@@ -84,6 +84,55 @@ Referencias visuales (Furgocasa):
 Scripts npm en el repo:
 - npm run generate:blog-cover -- "https://www.furgocasa.com/es/blog/..."
 - npm run reencode:blog-cover-webp -- "url1" "url2"   (solo re-WebP sin IA; en Windows alternativa: npx tsx scripts/generate-blog-cover.ts reencode-webp ...)
+- npm run generate:blog-body-images -- "https://..."                             (imagenes para el cuerpo; gemelo del de portadas)
+- npm run generate:blog-cover-and-body -- "https://..."                          (portada + cuerpo en un solo comando, comparten modelo de vehiculo)
+
+
+AGENTE DE IMAGENES DE CUERPO (may 2026)
+
+Pipeline gemelo, especifico para insertar 2-3 imagenes dentro del articulo, despues de los <h2> elegidos por la IA.
+
+Modulo: src/lib/blog/generate-blog-body-images.ts
+
+Decisiones del agente (en orden):
+1. Detecta los <h2> del HTML del post (regex tolerante <h2 ...>...</h2>) y los numera con anchor_index 0..N-1.
+2. Calcula TARGET_IMAGE_COUNT segun longitud:
+   - <800 palabras -> 2
+   - >=800 palabras -> 3
+3. PLANNER (gpt-5.4 con response_format json_object):
+   - Recibe DOSSIER del articulo + lista de H2 + DECISION_VEHICULO_GLOBAL (modelo de la portada) + TARGET_IMAGE_COUNT.
+   - Devuelve items[] con: anchor_index, include_vehicle, section_focus, alt_es, caption_es, draft_prompt.
+   - Reglas duras: no repetir anchor_index; no proponer dos H2 consecutivos si se puede evitar; en articulos de >=4 secciones, normalmente saltarse H2 0 para no competir con la portada; al menos 1 imagen con camper si el articulo es de viajes/rutas, salvo que sea solo paisaje.
+4. REFINER (gpt-5.4): por cada item, reescribe el draft_prompt como parrafo "Fotografia hiperrealista y cinematografica de..." en espanol. Se le pasa COHERENCIA_PORTADA (resumen del prompt usado en portada) para forzar diferenciacion en encuadre, hora del dia, atmosfera o tipo de plano.
+5. Generacion (gpt-image-2, 1536x1024, quality high):
+   - Si include_vehicle=true: openai.images.edit con las referencias del modelo (mismo que portada). Coletilla VEHICLE_REFERENCE_TAIL recordando "nunca dos toldos" y que las referencias definen el VEHICULO, no el encuadre.
+   - Si include_vehicle=false: openai.images.generate. Coletilla IMAGE_REALISM_TAIL.
+6. WebP con sharp -> Supabase Storage en blog/ai-body/{slug}-{n}-{timestamp}.webp.
+7. Inyeccion en posts.content:
+   - Limpia toda <figure data-ai-body-image="1" ...>...</figure> previa (idempotencia).
+   - Inserta despues del cierre </h2> del anchor_index correspondiente:
+     <figure data-ai-body-image="1" data-anchor="<slug-del-h2>"><img src="..." alt="..." loading="lazy" /><figcaption>...</figcaption></figure>
+8. Persiste manifiesto en posts.images.ai_body (campo Json ya existente; no toca schema):
+   {
+     version: 1,
+     vehicle_model_key, vehicle_model_label, generated_at,
+     items: [ { anchor_slug, anchor_index, anchor_text, position: "after_h2", url, storage_path, alt_es, caption_es, include_vehicle, vehicle_model_key, vehicle_model_label, prompt, generated_at } ]
+   }
+
+Variables de entorno:
+- BLOG_BODY_TEXT_MODEL (default gpt-5.4)
+- BLOG_BODY_IMAGE_MODEL (default gpt-image-2)
+- BLOG_BODY_WEBP_QUALITY (1-100, default 85)
+- BLOG_BODY_USE_VEHICLE_REFERENCES=false para desactivar referencias visuales (prompt-only)
+
+Idempotencia y regeneracion:
+- Si posts.images.ai_body ya tiene items, el script sale con skippedReason. Hay que pasar --force para regenerar.
+- Cualquier regeneracion limpia primero las <figure data-ai-body-image="1"> existentes y reinserta las nuevas.
+
+Sintaxis CLI:
+- Usar SIEMPRE --clave=valor (npm se traga los flags que van separados con espacio).
+  Bien:  npm run generate:blog-body-images -- "URL" --vehicle=adria-twin --max-images=2
+  Mal:   npm run generate:blog-body-images -- "URL" --vehicle adria-twin
 
 
 OBJETIVO VISUAL

@@ -184,7 +184,10 @@ vehicles/
 ```
 blog/
 ├── ai-covers/
-│   ├── slug-del-articulo-{timestamp}.webp   ← portadas generadas por IA (abr 2026+)
+│   ├── slug-del-articulo-{timestamp}.webp        ← portadas generadas por IA (abr 2026+)
+│   └── ...
+├── ai-body/
+│   ├── slug-del-articulo-{n}-{timestamp}.webp    ← imágenes de cuerpo generadas por IA (may 2026+)
 │   └── ...
 ├── guias-viaje/
 │   ├── costa-brava-portada.jpg
@@ -220,6 +223,52 @@ blog/
   En Windows, si los flags no llegan bien al script, usar siempre **`npx tsx scripts/generate-blog-cover.ts reencode-webp "url1" "url2"`**.
 
 - **Imágenes de referencia nuevas:** colocar JPEG/PNG/WebP en **`images/IA_blog/`**; el generador las descubre automáticamente (con límite de archivos por ejecución para no saturar la API).
+
+#### Imágenes de cuerpo del blog generadas por IA (may 2026)
+
+Sistema gemelo del de portadas, pero para inyectar **2-3 imágenes dentro del artículo** (después de los `<h2>` que el agente elija).
+
+- **Código:** `src/lib/blog/generate-blog-body-images.ts`. Helpers replicados localmente para **no tocar** `generate-blog-cover.ts` (producción estable).
+- **Pipeline:**
+  1. Carga el post desde Supabase (por URL o `postId`).
+  2. **Planner** (`gpt-5.4`, JSON estricto): lee dossier + lista numerada de `<h2>` del artículo y devuelve `items[]` con `anchor_index`, `include_vehicle`, `section_focus`, `alt_es`, `caption_es` y `draft_prompt` para cada imagen.
+  3. **Refiner** (`gpt-5.4`): convierte cada `draft_prompt` en un párrafo fotográfico hiperrealista, diferenciado de la portada (recibe `coverPromptHint`).
+  4. **Imagen** (`gpt-image-2`, 1536×1024, `quality: high`). Si `include_vehicle = true`, usa referencias visuales del **mismo modelo de flota** que la portada (Adria Twin, Knaus Boxstar, etc.).
+  5. WebP con `sharp` → bucket `blog/ai-body/`.
+  6. Inyecta `<figure data-ai-body-image="1" data-anchor="...">` justo después del `<h2>` correspondiente. **Idempotente:** elimina figuras previas con esa marca antes de insertar.
+  7. Actualiza `posts.content` y guarda manifiesto en `posts.images.ai_body` (campo `Json` ya existente, sin tocar schema).
+- **Cantidad dinámica** (`MIN_BODY_IMAGES=2`, `MAX_BODY_IMAGES_HARD=4`): 2 si el artículo tiene <800 palabras, 3 si tiene ≥800. Override por imagen con `--max-images=N`.
+- **Decisión por imagen sobre la camper:** la IA decide imagen a imagen (`include_vehicle: true|false`); regla suave: si el artículo es de viajes/rutas, al menos una imagen lleva camper. **Mismo modelo que la portada** para coherencia visual; se puede forzar con `--vehicle=adria-twin`.
+- **Variables de entorno:** `BLOG_BODY_TEXT_MODEL` (default `gpt-5.4`), `BLOG_BODY_IMAGE_MODEL` (default `gpt-image-2`), `BLOG_BODY_WEBP_QUALITY` (default 85), `BLOG_BODY_USE_VEHICLE_REFERENCES=false` para desactivar referencias.
+- **CLI — solo cuerpo** (no toca la portada):
+
+  ```bash
+  npm run generate:blog-body-images -- "https://www.furgocasa.com/es/blog/rutas/slug-del-post"
+  npm run generate:blog-body-images -- "https://..." --vehicle=adria-twin
+  npm run generate:blog-body-images -- "https://..." --force --max-images=2
+  ```
+
+- **CLI — portada + cuerpo en un solo comando** (la portada elige modelo de vehículo y se lo pasa al cuerpo automáticamente, junto con el prompt usado para que el refiner diferencie las imágenes):
+
+  ```bash
+  npm run generate:blog-cover-and-body -- "https://www.furgocasa.com/es/blog/rutas/slug-del-post"
+  npm run generate:blog-cover-and-body -- "https://..." --skip-cover            # solo cuerpo, reusando portada existente
+  npm run generate:blog-cover-and-body -- "https://..." --skip-body             # solo portada
+  npm run generate:blog-cover-and-body -- "https://..." --force-body            # regenera cuerpo aunque ya tenga
+  ```
+
+- **Idempotencia y regeneración:** las figuras llevan `data-ai-body-image="1"` y se borran antes de cada nueva pasada. Por defecto, si el post ya tiene un manifiesto en `posts.images.ai_body` se **omite** la regeneración; usa `--force` (o `--force-body` en el combo) para sobrescribir.
+- **Marcado HTML insertado:**
+
+  ```html
+  <figure data-ai-body-image="1" data-anchor="islandia-la-ring-road-volcanes-cascadas-y-libertad-total">
+    <img src="https://.../blog/ai-body/slug-1-...webp" alt="..." loading="lazy" />
+    <figcaption>...</figcaption>
+  </figure>
+  ```
+
+  Tailwind Typography (`prose-img:rounded-2xl prose-img:shadow-lg`) ya estiliza correctamente `<figure><img>`.
+- **Sintaxis de flags con npm:** usa siempre `--clave=valor` (`--vehicle=adria-twin`, `--max-images=2`). npm tiende a tragarse los flags cuando van separados (`--vehicle adria-twin`).
 
 ### Bucket: extras
 ```

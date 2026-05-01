@@ -83,16 +83,21 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## 🖼️ Abril 2026 — Portadas IA del blog (WebP + referencias flota)
+## 🖼️ Abril–Mayo 2026 — Imágenes IA del blog (portadas + cuerpo, WebP + referencias flota)
 
-- **Implementación:** `src/lib/blog/generate-blog-cover.ts` · **Admin:** `POST /api/admin/blog/generate-cover` · **CLI:** `scripts/generate-blog-cover.ts`.
-- **Modelos:** texto **`gpt-5.4`** (dos pasadas); imagen **`gpt-image-2`** (1536×1024, alta calidad). Variables opcionales: `BLOG_COVER_TEXT_MODEL`, `BLOG_COVER_IMAGE_MODEL`, `BLOG_COVER_WEBP_QUALITY`, `BLOG_COVER_USE_VEHICLE_REFERENCES`.
-- **Storage:** bucket **`blog`**, carpeta **`ai-covers/`**, ficheros **`.webp`** (el PNG de la API se convierte con **sharp** antes de subir).
-- **Referencias:** fotos reales en **`images/IA_blog/`** (el script también usa rutas fijas de respaldo). Reglas de negocio en prompt: **un solo toldo como máximo**, siempre **lateral derecho**; sin copiar el encuadre de la referencia.
+- **Portadas:** `src/lib/blog/generate-blog-cover.ts` · **Admin:** `POST /api/admin/blog/generate-cover` · **CLI:** `scripts/generate-blog-cover.ts`. Sube WebP a `blog/ai-covers/` y actualiza `posts.featured_image`.
+- **Cuerpo (mayo 2026):** `src/lib/blog/generate-blog-body-images.ts` · **CLI individual:** `scripts/generate-blog-body-images.ts` · **CLI combinado portada + cuerpo:** `scripts/generate-blog-cover-and-body.ts`. Inserta 2-3 `<figure data-ai-body-image="1">` tras los `<h2>` que el agente elija, sube WebP a `blog/ai-body/` y guarda manifiesto en `posts.images.ai_body`.
+- **Modelos:** texto **`gpt-5.4`** (dos pasadas — planner JSON + refiner por imagen); imagen **`gpt-image-2`** (1536×1024, alta calidad). Variables opcionales: `BLOG_COVER_*` y, para el cuerpo, `BLOG_BODY_TEXT_MODEL`, `BLOG_BODY_IMAGE_MODEL`, `BLOG_BODY_WEBP_QUALITY`, `BLOG_BODY_USE_VEHICLE_REFERENCES`.
+- **Coherencia visual portada↔cuerpo:** el comando combinado pasa al cuerpo el modelo de vehículo elegido en la portada y un resumen del prompt de la portada, para que el refiner del cuerpo **diferencie** encuadre, hora del día y atmósfera entre las imágenes.
+- **Decisión por imagen:** el planner del cuerpo decide *imagen a imagen* si lleva camper o no (`include_vehicle`); regla suave: en artículos de viajes/rutas al menos una imagen lleva camper.
+- **Reglas de producto en prompt:** **un solo toldo como máximo**, siempre **lateral derecho**; sin copiar el encuadre de la referencia (las referencias definen el VEHÍCULO, no el encuadre).
 - **Comandos:**
-  - `npm run generate:blog-cover -- "https://www.furgocasa.com/es/blog/rutas/slug-del-articulo"`
-  - `npm run reencode:blog-cover-webp -- "url-articulo-1" "url-articulo-2"` (solo reconvertir la portada actual a WebP, sin IA). Si en Windows no llegan bien los argumentos: `npx tsx scripts/generate-blog-cover.ts reencode-webp "url1"`.
-- **Documentación:** [`docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md`](./docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md) (sección *Portadas del blog generadas por IA*), notas de producto en [`agente generador de imágenes.txt`](./agente%20generador%20de%20imágenes.txt).
+  - `npm run generate:blog-cover -- "https://www.furgocasa.com/es/blog/rutas/slug"`
+  - `npm run reencode:blog-cover-webp -- "url1" "url2"` (solo reconvertir la portada actual a WebP, sin IA). En Windows: `npx tsx scripts/generate-blog-cover.ts reencode-webp "url1"`.
+  - `npm run generate:blog-body-images -- "https://..." --vehicle=adria-twin --max-images=2`
+  - `npm run generate:blog-cover-and-body -- "https://..."` (portada + cuerpo en un solo comando; admite `--skip-cover`, `--skip-body`, `--force-body`).
+  - **Sintaxis de flags:** usa siempre `--clave=valor` (npm se traga los flags separados con espacio).
+- **Documentación:** [`docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md`](./docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md) (secciones *Portadas del blog generadas por IA* e *Imágenes de cuerpo del blog generadas por IA*), notas de producto en [`agente generador de imágenes.txt`](./agente%20generador%20de%20imágenes.txt).
 
 ---
 
