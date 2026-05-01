@@ -8805,6 +8805,66 @@ export const staticTranslations = {
     fr: "Vous verrez les -20% reflétés dans votre prix final",
     de: "Sie werden die -20% in Ihrem Endpreis sehen"
   },
+  "Verás el -10% reflejado en tu precio final": {
+    es: "Verás el -10% reflejado en tu precio final",
+    en: "You will see the -10% reflected in your final price",
+    fr: "Vous verrez les -10% reflétés dans votre prix final",
+    de: "Sie werden die -10% in Ihrem Endpreis sehen"
+  },
+  "Selecciona vehículo y fechas (mín. 10 días)": {
+    es: "Selecciona vehículo y fechas (mín. 10 días)",
+    en: "Select vehicle and dates (min. 10 days)",
+    fr: "Sélectionnez véhicule et dates (min. 10 jours)",
+    de: "Wählen Sie Fahrzeug und Daten (min. 10 Tage)"
+  },
+  "LONG SUMMER": {
+    es: "LONG SUMMER",
+    en: "LONG SUMMER",
+    fr: "LONG SUMMER",
+    de: "LONG SUMMER"
+  },
+  "VERANO": {
+    es: "VERANO",
+    en: "SUMMER",
+    fr: "ÉTÉ",
+    de: "SOMMER"
+  },
+  "Descuento Verano": {
+    es: "Descuento Verano",
+    en: "Summer Discount",
+    fr: "Réduction Été",
+    de: "Sommer-Rabatt"
+  },
+  "Mínimo 10 días de alquiler": {
+    es: "Mínimo 10 días de alquiler",
+    en: "Minimum 10 rental days",
+    fr: "Minimum 10 jours de location",
+    de: "Mindestens 10 Miettage"
+  },
+  "Kilómetros ilimitados": {
+    es: "Kilómetros ilimitados",
+    en: "Unlimited kilometres",
+    fr: "Kilomètres illimités",
+    de: "Unbegrenzte Kilometer"
+  },
+  "RESERVAR AHORA": {
+    es: "RESERVAR AHORA",
+    en: "BOOK NOW",
+    fr: "RÉSERVER MAINTENANT",
+    de: "JETZT BUCHEN"
+  },
+  "LONG SUMMER 2026 - 10% de descuento con código LONGSUMMER10": {
+    es: "LONG SUMMER 2026 - 10% de descuento con código LONGSUMMER10",
+    en: "LONG SUMMER 2026 - 10% discount with code LONGSUMMER10",
+    fr: "LONG SUMMER 2026 - 10% de réduction avec le code LONGSUMMER10",
+    de: "LONG SUMMER 2026 - 10% Rabatt mit Code LONGSUMMER10"
+  },
+  "Reserva mínima de 10 días para obtener el 10% de descuento. Promoción válida para estancias en verano 2026 (junio a septiembre). Recogida en Murcia.": {
+    es: "Reserva mínima de 10 días para obtener el 10% de descuento. Promoción válida para estancias en verano 2026 (junio a septiembre). Recogida en Murcia.",
+    en: "Minimum booking of 10 days to get the 10% discount. Promotion valid for summer 2026 stays (June to September). Pick-up in Murcia.",
+    fr: "Réservation minimum de 10 jours pour obtenir 10% de réduction. Promotion valable pour les séjours de l'été 2026 (juin à septembre). Récupération à Murcie.",
+    de: "Mindestbuchung von 10 Tagen für 10% Rabatt. Aktion gültig für Aufenthalte im Sommer 2026 (Juni bis September). Abholung in Murcia."
+  },
   "Empezar reserva con descuento": {
     es: "Empezar reserva con descuento",
     en: "Start booking with discount",

@@ -38,10 +38,17 @@ export function OfertasClient() {
   const { t, locale } = useLanguage();
   const [lastMinuteOffers, setLastMinuteOffers] = useState<LastMinuteOffer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     fetchLastMinuteOffers();
   }, []);
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText("LONGSUMMER10");
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const fetchLastMinuteOffers = async () => {
     try {
@@ -215,6 +222,92 @@ export function OfertasClient() {
         </div>
       </section>
 
+      {/* Oferta Principal - LONG SUMMER 2026 */}
+      <section className="py-16 md:py-24 bg-gradient-to-br from-orange-500 via-amber-600 to-orange-700 relative overflow-hidden text-white">
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center mb-8 md:mb-12">
+            <span className="inline-block px-4 md:px-6 py-1.5 md:py-2 bg-white/15 backdrop-blur-md rounded-full text-xs md:text-sm font-bold tracking-wider md:tracking-widest uppercase mb-4 border border-white/20">
+              {t("Cupón de Temporada")}
+            </span>
+            <h2 className="text-3xl md:text-6xl font-heading font-bold text-white mb-2 tracking-tight drop-shadow-2xl">
+              {t("LONG SUMMER")}
+            </h2>
+            <p className="text-xl md:text-3xl text-yellow-200 font-heading font-bold tracking-wide mt-1">
+              {t("VERANO")} 2026
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            {/* Banner imagen */}
+            <LocalizedLink
+              href="/reservar"
+              className="block rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl mb-8 md:mb-12 transform hover:scale-[1.01] transition-transform duration-300"
+            >
+              <div className="relative w-full aspect-[1024/576]">
+                <Image
+                  src="/images/long-summer-2026.png"
+                  alt={t("LONG SUMMER 2026 - 10% de descuento con código LONGSUMMER10")}
+                  fill
+                  priority
+                  sizes="(max-width: 768px) 100vw, (max-width: 1280px) 80vw, 1024px"
+                  className="object-cover"
+                />
+              </div>
+            </LocalizedLink>
+
+            {/* Código + CTA */}
+            <div className="grid md:grid-cols-2 gap-4 md:gap-8 mb-8 md:mb-12">
+              <div className="bg-white text-gray-900 rounded-2xl md:rounded-[2rem] p-6 md:p-10 text-center shadow-2xl flex flex-col justify-center border border-gray-100">
+                <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider md:tracking-widest mb-4 md:mb-6">
+                  {t("CÓDIGO PROMOCIONAL")}
+                </p>
+                <div className="relative group cursor-pointer w-full" onClick={handleCopyCode}>
+                  <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 md:p-6 mb-3 md:mb-4 border-2 border-dashed border-gray-300 group-hover:border-furgocasa-orange group-hover:bg-orange-50 transition-all duration-300">
+                    <div className="text-2xl md:text-5xl font-mono font-bold text-furgocasa-orange tracking-wider">
+                      LONGSUMMER10
+                    </div>
+                  </div>
+                  <div className="absolute top-1/2 right-3 md:right-6 -translate-y-1/2 text-gray-400 group-hover:text-furgocasa-orange transition-colors bg-white p-1.5 md:p-2 rounded-full shadow-sm">
+                    {copied ? <Check className="w-4 h-4 md:w-5 md:h-5 text-green-500" /> : <Copy className="w-4 h-4 md:w-5 md:h-5" />}
+                  </div>
+                </div>
+                <p className="text-gray-500 text-xs md:text-sm font-medium">
+                  {copied ? <span className="text-green-500">{t("¡Copiado al portapapeles!")}</span> : t("Haz clic para copiar el código")}
+                </p>
+              </div>
+
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl md:rounded-[2rem] p-6 md:p-10 text-center shadow-2xl flex flex-col justify-center">
+                <h3 className="text-5xl md:text-7xl font-heading font-bold text-white mb-2 tracking-tighter">
+                  -10%
+                </h3>
+                <p className="text-sm md:text-xl font-bold text-white/90 mb-4 md:mb-6 uppercase tracking-wide">
+                  {t("Descuento Verano")}
+                </p>
+                <div className="space-y-2 text-white font-medium text-sm md:text-base mb-4 md:mb-6">
+                  <p className="flex items-center justify-center gap-2"><Calendar className="w-4 h-4 md:w-5 md:h-5" /> {t("Mínimo 10 días de alquiler")}</p>
+                  <p className="flex items-center justify-center gap-2"><Zap className="w-4 h-4 md:w-5 md:h-5" /> {t("Kilómetros ilimitados")}</p>
+                </div>
+                <LocalizedLink
+                  href="/reservar"
+                  className="block w-full bg-white hover:bg-gray-100 text-furgocasa-orange font-bold py-3 md:py-4 px-6 md:px-8 rounded-xl md:rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 text-base md:text-lg"
+                >
+                  {t("RESERVAR AHORA")}
+                </LocalizedLink>
+              </div>
+            </div>
+
+            <div className="bg-yellow-50/10 backdrop-blur-md border border-yellow-200/30 rounded-2xl md:rounded-3xl p-6 md:p-8 text-center md:text-left flex flex-col md:flex-row items-center gap-4 md:gap-6">
+              <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-yellow-900 flex-shrink-0">
+                <span className="text-2xl">⚠️</span>
+              </div>
+              <p className="text-yellow-50 text-sm md:text-lg">
+                <strong className="text-white">{t("Condiciones:")}</strong> {t("Reserva mínima de 10 días para obtener el 10% de descuento. Promoción válida para estancias en verano 2026 (junio a septiembre). Recogida en Murcia.")}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Cómo usar el cupón */}
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
@@ -254,7 +347,7 @@ export function OfertasClient() {
                     <Calendar className="w-5 h-5 text-furgocasa-blue" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{t("Elige fechas")}</h3>
-                  <p className="text-sm text-gray-600">{t("Selecciona vehículo y fechas (mín. 5 días)")}</p>
+                  <p className="text-sm text-gray-600">{t("Selecciona vehículo y fechas (mín. 10 días)")}</p>
                 </div>
                 <div className="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-gray-300 text-2xl z-10">→</div>
               </div>
@@ -284,7 +377,7 @@ export function OfertasClient() {
                     <PartyPopper className="w-5 h-5 text-green-600" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{t("¡Descuento aplicado!")}</h3>
-                  <p className="text-sm text-gray-600">{t("Verás el -15% reflejado en tu precio final")}</p>
+                  <p className="text-sm text-gray-600">{t("Verás el -10% reflejado en tu precio final")}</p>
                 </div>
               </div>
             </div>
