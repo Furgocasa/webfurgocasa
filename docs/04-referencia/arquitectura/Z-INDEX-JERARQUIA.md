@@ -39,12 +39,15 @@
 - **Admin sidebar**: `z-50`
 
 ### Nivel 1-50 (Contenido de página)
-- **Hero section content**: `z-10`
+- **Hero section content**: `z-10` (crea stacking context donde vive el SearchWidget y su calendario)
 - **Barras sticky de reserva**: `z-30`
 
 ### Nivel 0 (Contenido base)
 - **Secciones de contenido**: Sin z-index o `z-0`
 - **HeroSlider imágenes**: Sin z-index (dentro del contenedor)
+- **HeroScrollIndicator ("Descubre más")**: `z-0` ⚠️ NO subir a z-10. Debe ir
+  POR DEBAJO del contenido del hero (z-10) para que el calendario del
+  SearchWidget (z-[200] interno) no quede tapado por el rebote del indicador.
 
 ## ✅ Correcciones aplicadas (v1.0.6)
 
