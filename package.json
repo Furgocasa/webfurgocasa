@@ -46,7 +46,8 @@
     "reencode:blog-cover-webp": "tsx scripts/generate-blog-cover.ts reencode-webp",
     "generate:blog-body-images": "tsx scripts/generate-blog-body-images.ts",
     "generate:blog-cover-and-body": "tsx scripts/generate-blog-cover-and-body.ts",
-    "generate:showcase-images": "tsx scripts/generate-content-creator-showcase-images.ts"
+    "generate:showcase-images": "tsx scripts/generate-content-creator-showcase-images.ts",
+    "generate:storytellers-images": "tsx scripts/generate-storytellers-showcase-images.ts"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
