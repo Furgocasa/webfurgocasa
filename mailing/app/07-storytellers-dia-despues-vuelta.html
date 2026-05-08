@@ -25,6 +25,24 @@
     </xml>
   </noscript>
   <![endif]-->
+  <style type="text/css">
+    /* Mobile / iPhones antiguos: imagen hero full-bleed */
+    @media only screen and (max-width: 600px) {
+      .hero-img {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        display: block !important;
+      }
+      .container-600 {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      .outer-pad {
+        padding: 0 !important;
+      }
+    }
+  </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, Helvetica, sans-serif;">
   <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
@@ -36,8 +54,8 @@
 
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f4f5;">
     <tr>
-      <td align="center" style="padding: 20px 10px;">
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="background-color: #ffffff; max-width: 600px;">
+      <td align="center" class="outer-pad" style="padding: 20px 0;">
+        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="container-600" style="background-color: #ffffff; max-width: 600px; width: 100%;">
 
           <!-- Logo -->
           <tr>
@@ -51,20 +69,20 @@
           <!-- Portada con texto + flecha quemados. NO es clicable a propósito. -->
           <tr>
             <td style="padding: 0;">
-              <img src="https://www.furgocasa.com/images/mailing/storytellers/cover-cta-07.jpg" alt="No dejes el descuento en el móvil. Programa Storytellers de Furgocasa: 90 días para subir, descuentos y regalos." width="600" style="display: block; width: 100%; max-width: 600px; height: auto; border: 0;" />
+              <img src="https://www.furgocasa.com/images/mailing/storytellers/cover-cta-07.jpg" alt="No dejes el descuento en el móvil. Programa Storytellers de Furgocasa: 90 días para subir, descuentos y regalos." width="600" class="hero-img" style="display: block; width: 100%; max-width: 600px; height: auto; border: 0; outline: none; text-decoration: none;" />
             </td>
           </tr>
 
           <!-- Cabecera -->
           <tr>
             <td style="padding: 28px 24px 6px 24px;">
-              <p style="margin: 0 0 8px 0; font-size: 11px; font-weight: bold; color: #ea580c; text-transform: uppercase; letter-spacing: 1px;">
+              <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold; color: #ea580c; text-transform: uppercase; letter-spacing: 1px;">
                 Programa Storytellers · Comparte tu viaje, llévate descuento
               </p>
-              <h1 style="margin: 0; color: #111827; font-size: 26px; line-height: 1.2; font-weight: bold;">
+              <h1 style="margin: 0; color: #111827; font-size: 28px; line-height: 1.2; font-weight: bold;">
                 No dejes el descuento en el móvil.
               </h1>
-              <p style="margin: 10px 0 0 0; font-size: 16px; color: #ea580c; font-weight: bold; line-height: 1.35;">
+              <p style="margin: 10px 0 0 0; font-size: 18px; color: #ea580c; font-weight: bold; line-height: 1.35;">
                 Súbenos las fotos y vídeos del viaje y empieza a ahorrar en la próxima escapada &mdash; hasta un 15 %, más regalos.
               </p>
             </td>
@@ -73,10 +91,10 @@
           <!-- Intro -->
           <tr>
             <td style="padding: 14px 24px 6px 24px;">
-              <p style="margin: 0 0 10px 0; font-size: 15px; color: #374151; line-height: 1.6;">
+              <p style="margin: 0 0 10px 0; font-size: 17px; color: #374151; line-height: 1.6;">
                 Hola <strong>Juan</strong>,
               </p>
-              <p style="margin: 0; font-size: 15px; color: #374151; line-height: 1.6;">
+              <p style="margin: 0; font-size: 17px; color: #374151; line-height: 1.6;">
                 Esperamos que la ruta con la camper haya ido bien. Antes de que esas <strong>fotos y vídeos chulos</strong>
                 se queden olvidados en la galería del móvil para siempre, te recordamos el trato del programa
                 <strong>Storytellers</strong>: tú nos los pasas, <strong>nosotros te devolvemos descuento</strong> (y algún
@@ -92,10 +110,10 @@
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fff7ed; border: 1px solid #fed7aa;">
                 <tr>
                   <td style="padding: 18px 18px 14px 18px;">
-                    <p style="margin: 0 0 8px 0; font-size: 14px; font-weight: bold; color: #9a3412;">
+                    <p style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #9a3412;">
                       No dejes pasar la oportunidad de volver a viajar con descuento
                     </p>
-                    <p style="margin: 0; font-size: 13px; color: #1f2937; line-height: 1.55;">
+                    <p style="margin: 0; font-size: 15px; color: #1f2937; line-height: 1.55;">
                       Con solo <strong>3 fotos</strong> o <strong>1 vídeo</strong> ya te llevas un
                       <strong>cupón del 3 %</strong> al instante, válido durante 18 meses.
                       Y si nos enamoramos de algo de lo que subes y lo elegimos para nuestro archivo, los puntos engordan rápido:
@@ -110,7 +128,7 @@
           <!-- Tabla de descuentos -->
           <tr>
             <td style="padding: 28px 24px 6px 24px;">
-              <p style="margin: 0; font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">
+              <p style="margin: 0; font-size: 17px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">
                 Descuentos del programa
               </p>
             </td>
@@ -119,51 +137,74 @@
             <td style="padding: 12px 24px 0 24px;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
                 <tr>
-                  <td style="background-color: #063971; color: #ffffff; padding: 10px 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Cuándo</td>
-                  <td style="background-color: #063971; color: #ffffff; padding: 10px 12px; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Cupón</td>
+                  <td style="background-color: #063971; color: #ffffff; padding: 10px 12px; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Cuándo</td>
+                  <td style="background-color: #063971; color: #ffffff; padding: 10px 12px; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Cupón</td>
                 </tr>
                 <tr>
-                  <td style="background-color: #fff7ed; padding: 11px 12px; font-size: 13px; color: #1f2937; border-bottom: 1px solid #fed7aa;">
+                  <td style="background-color: #fff7ed; padding: 11px 12px; font-size: 15px; color: #1f2937; border-bottom: 1px solid #fed7aa;">
                     <strong>Tu primera subida válida</strong>
-                    <br/><span style="color: #6b7280; font-size: 11px;">Cupón de bienvenida &middot; una sola vez</span>
+                    <br/><span style="color: #6b7280; font-size: 13px;">Cupón de bienvenida &middot; una sola vez</span>
                   </td>
-                  <td style="background-color: #fff7ed; padding: 11px 12px; font-size: 14px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #fed7aa;">3 %</td>
+                  <td style="background-color: #fff7ed; padding: 11px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #fed7aa;">3 %</td>
                 </tr>
                 <tr>
-                  <td style="padding: 10px 12px; font-size: 13px; color: #1f2937; border-bottom: 1px solid #e5e7eb;">Al alcanzar 40 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 14px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">5 %</td>
+                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; border-bottom: 1px solid #e5e7eb;">Al alcanzar 40 ptos</td>
+                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">5 %</td>
                 </tr>
                 <tr>
-                  <td style="padding: 10px 12px; font-size: 13px; color: #1f2937; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Al alcanzar 100 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 14px; color: #ea580c; font-weight: bold; text-align: right; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">8 %</td>
+                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Al alcanzar 100 ptos</td>
+                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">8 %</td>
                 </tr>
                 <tr>
-                  <td style="padding: 10px 12px; font-size: 13px; color: #1f2937; border-bottom: 1px solid #e5e7eb;">Al alcanzar 200 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 14px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">10 %</td>
+                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; border-bottom: 1px solid #e5e7eb;">Al alcanzar 200 ptos</td>
+                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">10 %</td>
                 </tr>
                 <tr>
-                  <td style="padding: 10px 12px; font-size: 13px; color: #1f2937; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Al alcanzar 400 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 14px; color: #ea580c; font-weight: bold; text-align: right; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">12 %</td>
+                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Al alcanzar 400 ptos</td>
+                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">12 %</td>
                 </tr>
                 <tr>
-                  <td style="padding: 10px 12px; font-size: 13px; color: #1f2937; border-bottom: 2px solid #063971;">Al alcanzar 800 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 14px; color: #c2410c; font-weight: bold; text-align: right; border-bottom: 2px solid #063971;">15 %&nbsp;&middot;&nbsp;techo</td>
+                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; border-bottom: 2px solid #063971;">Al alcanzar 800 ptos</td>
+                  <td style="padding: 10px 12px; font-size: 16px; color: #c2410c; font-weight: bold; text-align: right; border-bottom: 2px solid #063971;">15 %&nbsp;&middot;&nbsp;techo</td>
                 </tr>
               </table>
             </td>
           </tr>
           <tr>
             <td style="padding: 10px 24px 0 24px;">
-              <p style="margin: 0; font-size: 12px; color: #6b7280; line-height: 1.55;">
+              <p style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.55;">
                 Cupones válidos en <strong>baja y media temporada</strong>, mínimo 4 días de reserva, no acumulables con otras promos.
               </p>
+            </td>
+          </tr>
+
+          <!-- Callout: y si son buenas, mucho mejor (selección multiplica) -->
+          <tr>
+            <td style="padding: 22px 24px 0 24px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fff7ed; border: 2px solid #fed7aa;">
+                <tr>
+                  <td style="padding: 16px 18px;">
+                    <p style="margin: 0 0 6px 0; font-size: 16px; font-weight: bold; color: #9a3412;">
+                      Y si son buenas&hellip; mucho mejor.
+                    </p>
+                    <p style="margin: 0; font-size: 15px; color: #1f2937; line-height: 1.55;">
+                      Subir cualquier foto ya suma (<strong>+2 ptos</strong>; <strong>+5</strong> por vídeo). Pero
+                      <strong>lo que de verdad multiplica los puntos es que tu material entre en nuestro archivo</strong>:
+                      <strong style="color: #ea580c;">+20 por foto seleccionada (&times;10)</strong> y
+                      <strong style="color: #ea580c;">+60 por vídeo seleccionado (&times;12)</strong>.
+                      No tengas prisa por subir cualquier cosa: revisa con calma, elige las que mejor cuentan tu viaje y mándanoslas.
+                      <strong>El esfuerzo se recompensa.</strong>
+                    </p>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
           <!-- Mosaico ejemplos -->
           <tr>
             <td style="padding: 28px 24px 6px 24px;">
-              <p style="margin: 0; font-size: 15px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">
+              <p style="margin: 0; font-size: 17px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">
                 Tipos de momento que solemos seleccionar
               </p>
             </td>
@@ -192,8 +233,8 @@
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #063971;">
                 <tr>
                   <td style="padding: 16px 18px;">
-                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #111827; font-size: 14px;">Subir es cosa de menos de 2 minutos</p>
-                    <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.55;">
+                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #111827; font-size: 16px;">Subir es cosa de menos de 2 minutos</p>
+                    <p style="margin: 0; font-size: 15px; color: #374151; line-height: 1.55;">
                       Entra en <a href="https://www.furgocasa.com/es/storytellers/subir" style="color: #063971; text-decoration: underline;">www.furgocasa.com/es/storytellers/subir</a>, escribe tu <strong>número de reserva</strong>
                       (formato <span style="font-family: Consolas, monospace; background-color: #ffffff; padding: 1px 6px; color: #063971;">FC-2026-001234</span>) y el <strong>email con el que reservaste</strong>,
                       y arrastra los archivos. Mínimo 3 fotos o 1 vídeo. <strong>Sin login, sin contraseñas, sin formularios largos.</strong>
@@ -210,7 +251,7 @@
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td style="background-color: #ea580c; padding: 14px 32px;">
-                    <a href="https://www.furgocasa.com/es/storytellers/subir" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 15px;">Subir mis fotos o vídeos</a>
+                    <a href="https://www.furgocasa.com/es/storytellers/subir" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 17px;">Subir mis fotos o vídeos</a>
                   </td>
                 </tr>
               </table>
@@ -218,19 +259,19 @@
           </tr>
           <tr>
             <td align="center" style="padding: 4px 24px 4px 24px;">
-              <a href="https://www.furgocasa.com/es/storytellers/mis-puntos" style="font-size: 13px; color: #063971; text-decoration: underline;">Ver mis puntos y cupones</a>
+              <a href="https://www.furgocasa.com/es/storytellers/mis-puntos" style="font-size: 15px; color: #063971; text-decoration: underline;">Ver mis puntos y cupones</a>
             </td>
           </tr>
           <tr>
             <td align="center" style="padding: 0 24px 26px 24px;">
-              <a href="https://www.furgocasa.com/es/storytellers" style="font-size: 13px; color: #063971; text-decoration: underline;">Cómo funciona Storytellers</a>
+              <a href="https://www.furgocasa.com/es/storytellers" style="font-size: 15px; color: #063971; text-decoration: underline;">Cómo funciona Storytellers</a>
             </td>
           </tr>
 
           <!-- Despedida -->
           <tr>
             <td style="padding: 4px 24px 30px 24px;">
-              <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.55;">
+              <p style="margin: 0; font-size: 16px; color: #374151; line-height: 1.55;">
                 Gracias por viajar con Furgocasa. Nos encantará verte de nuevo &mdash; y, si haces los deberes con Storytellers, con descuento puesto.<br/>
                 <strong>El equipo de Furgocasa</strong>
               </p>
@@ -240,17 +281,17 @@
           <!-- Footer -->
           <tr>
             <td style="background-color: #f4f4f5; padding: 30px 20px; text-align: center;">
-              <p style="margin: 0 0 10px 0; font-size: 14px; font-weight: bold; color: #374151;">Furgocasa - Alquiler de Campers</p>
-              <p style="margin: 0 0 5px 0; font-size: 13px; color: #6b7280;">
+              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: bold; color: #374151;">Furgocasa - Alquiler de Campers</p>
+              <p style="margin: 0 0 5px 0; font-size: 15px; color: #6b7280;">
                 Tel: <a href="tel:+34868364161" style="color: #063971; text-decoration: none;">+34 868 364 161</a>
               </p>
-              <p style="margin: 0 0 5px 0; font-size: 13px; color: #6b7280;">
+              <p style="margin: 0 0 5px 0; font-size: 15px; color: #6b7280;">
                 Email: <a href="mailto:reservas@furgocasa.com" style="color: #063971; text-decoration: none;">reservas@furgocasa.com</a>
               </p>
-              <p style="margin: 0 0 15px 0; font-size: 13px; color: #6b7280;">
+              <p style="margin: 0 0 15px 0; font-size: 15px; color: #6b7280;">
                 Web: <a href="https://www.furgocasa.com" style="color: #063971; text-decoration: none;">www.furgocasa.com</a>
               </p>
-              <p style="margin: 0; font-size: 11px; color: #9ca3af;">
+              <p style="margin: 0; font-size: 13px; color: #9ca3af;">
                 Este correo ha sido enviado automáticamente.
               </p>
             </td>

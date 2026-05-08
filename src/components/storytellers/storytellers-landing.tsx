@@ -294,7 +294,7 @@ export function StorytellersLanding() {
               "Sumas puntos al subir y más puntos si seleccionamos tu material",
               `Cupones automáticos del 3% al ${MAX_DISCOUNT_PCT}% según puntos acumulados`,
               `Cupones válidos en próximas reservas, hasta ${COUPON_VALIDITY_MONTHS} meses`,
-              "Premiamos la intención: subir cuenta aunque no se seleccione todo",
+              "Subir ya suma puntos — y si tu material entra en archivo, multiplica hasta ×10",
               "Sin spam, sin newsletters, sin obligación de etiquetarnos",
             ].map((item) => (
               <li
@@ -335,8 +335,8 @@ export function StorytellersLanding() {
                 body: "Sin crear cuenta, sin contraseñas que recordar, sin enlazar Instagram. Llegas, te identificas con tu reserva, arrastras los archivos y listo.",
               },
               {
-                title: "Premiamos la intención",
-                body: `Sumas ${POINTS_PER_PHOTO_UPLOAD} ptos por foto y ${POINTS_PER_VIDEO_UPLOAD} por vídeo aunque no acabemos seleccionándolos. Si elegimos alguno para nuestro archivo, vienen los puntos grandes (+${POINTS_PER_PHOTO_SELECTED} foto, +${POINTS_PER_VIDEO_SELECTED} vídeo) además.`,
+                title: "Y si son buenas, mucho mejor",
+                body: `Subir ya suma (${POINTS_PER_PHOTO_UPLOAD} ptos por foto, ${POINTS_PER_VIDEO_UPLOAD} por vídeo). Pero lo que de verdad dispara los puntos es que tu material entre en nuestro archivo: +${POINTS_PER_PHOTO_SELECTED} ptos por foto seleccionada y +${POINTS_PER_VIDEO_SELECTED} por vídeo. Tómate tu tiempo: el esfuerzo se recompensa hasta 10 veces más.`,
               },
               {
                 title: "Tu material, en buenas manos",
@@ -376,7 +376,7 @@ export function StorytellersLanding() {
             Cómo se ganan los puntos
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
-            Cuatro vías. Las dos primeras dependen solo de ti; las dos últimas, de si nos encaja en archivo profesional.
+            Cuatro vías. Subir ya suma &mdash; pero <strong className="text-gray-900">lo que de verdad multiplica los puntos es que tu material entre en nuestro archivo</strong>. Mejor pocas fotos buenas que muchas de relleno.
           </p>
           <div className="mx-auto mt-12 grid max-w-4xl gap-4 sm:grid-cols-2">
             {[
@@ -421,6 +421,17 @@ export function StorytellersLanding() {
                 </span>
               </div>
             ))}
+          </div>
+
+          {/* Callout: la selección multiplica los puntos */}
+          <div className="mx-auto mt-10 max-w-4xl rounded-2xl border-2 border-furgocasa-orange/30 bg-gradient-to-r from-orange-50 to-amber-50 p-6 md:p-7 text-center">
+            <p className="font-heading text-xl font-bold text-gray-900 md:text-2xl">
+              Y si son buenas… mucho mejor.
+            </p>
+            <p className="mx-auto mt-3 max-w-2xl text-gray-700 leading-relaxed">
+              Una foto subida vale {POINTS_PER_PHOTO_UPLOAD} ptos. Una foto seleccionada para archivo vale <strong className="text-furgocasa-orange">+{POINTS_PER_PHOTO_SELECTED} ptos · ×10</strong>. Un vídeo subido vale {POINTS_PER_VIDEO_UPLOAD} ptos; uno seleccionado, <strong className="text-furgocasa-orange">+{POINTS_PER_VIDEO_SELECTED} ptos · ×12</strong>.
+              {" "}<strong className="text-gray-900">Tómate tu tiempo: el esfuerzo se recompensa.</strong>
+            </p>
           </div>
         </div>
       </section>
