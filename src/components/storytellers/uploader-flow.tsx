@@ -118,6 +118,24 @@ export function UploaderFlow() {
   const [items, setItems] = useState<UploadItem[]>([]);
   const [myPointsUrl, setMyPointsUrl] = useState<string | null>(null);
 
+  // Ref para auto-focus en email tras pre-rellenar booking desde ?ref=...
+  const emailInputRef = useRef<HTMLInputElement>(null);
+
+  // Pre-relleno del nº de reserva desde query param ?ref=... (deep-link de los
+  // emails Storytellers 05/06/07). Si llega, ponemos foco directo en el campo
+  // email para que el cliente solo tenga que escribirlo.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (!ref) return;
+    const cleaned = ref.trim().toUpperCase();
+    if (!cleaned) return;
+    setBookingNumber(cleaned);
+    const t = setTimeout(() => emailInputRef.current?.focus(), 50);
+    return () => clearTimeout(t);
+  }, []);
+
   // Carga script reCAPTCHA si hay site key
   useEffect(() => {
     const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -318,6 +336,7 @@ export function UploaderFlow() {
             </label>
             <input
               id="email"
+              ref={emailInputRef}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

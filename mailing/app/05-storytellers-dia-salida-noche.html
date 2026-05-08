@@ -7,10 +7,9 @@
   <!--
     Referencia visual · Envío previsto: el mismo día del pickup (salida), 20:00–21:00 Europe/Madrid.
     Placeholders para automatización (cuando exista cron/plantilla en código):
-      {{NOMBRE_CLIENTE}}, {{LINK_PROGRAMA}}, {{LINK_SUBIR}}
-    Nota: NO incluimos número de reserva ni fechas porque el cliente ya las conoce.
-    El nº de reserva del propio cliente (formato FC-2026-001234) lo introduce él
-    al identificarse en /es/storytellers/subir.
+      Nombre cliente: la cadena "Juan" (linea Hola...) -> primer nombre del cliente.
+      Booking number: la cadena "FC-2026-001234" -> b.booking_number (para que lo
+      copie y pegue directo en /es/storytellers/subir).
   -->
   <!--[if mso]>
   <style type="text/css">
@@ -104,6 +103,13 @@
             </td>
           </tr>
 
+          <!-- Banner narrativa: arrancar el viaje -->
+          <tr>
+            <td style="padding: 18px 0 4px 0;">
+              <img src="https://www.furgocasa.com/images/mailing/storytellers/banner-05-salida.jpg" alt="Pareja cargando los últimos bártulos en la camper al amanecer en la costa mediterránea" width="600" class="hero-img" style="display: block; width: 100%; max-width: 600px; height: auto; border: 0; outline: none; text-decoration: none;" />
+            </td>
+          </tr>
+
           <!-- Bloque destacado: qué te llevas -->
           <tr>
             <td style="padding: 18px 24px 6px 24px;">
@@ -139,6 +145,22 @@
             </td>
           </tr>
 
+          <!-- CTA secundario inline: para el lector que ya está convencido por
+               las promesas y no necesita leer todos los pasos. Estilo "outline"
+               (borde naranja, fondo blanco) para diferenciarlo del CTA principal
+               final, que va en naranja sólido. -->
+          <tr>
+            <td align="center" style="padding: 16px 24px 4px 24px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                <tr>
+                  <td style="background-color: #ffffff; border: 2px solid #ea580c; padding: 12px 26px;">
+                    <a href="https://www.furgocasa.com/es/storytellers/subir?ref=FC-2026-001234" referrerpolicy="no-referrer" style="color: #ea580c; text-decoration: none; font-weight: bold; font-size: 16px;">Empezar a sumar ahora &rarr;</a>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
           <!-- Cómo se hace en 3 pasos -->
           <tr>
             <td style="padding: 28px 24px 8px 24px;">
@@ -161,7 +183,7 @@
                   </td>
                   <td valign="top" style="font-size: 15px; color: #374151; line-height: 1.55;">
                     <strong style="color: #111827;">Entra al portal Storytellers</strong><br/>
-                    <a href="https://www.furgocasa.com/es/storytellers/subir" style="color: #063971; text-decoration: underline;">www.furgocasa.com/es/storytellers/subir</a>
+                    <a href="https://www.furgocasa.com/es/storytellers/subir?ref=FC-2026-001234" referrerpolicy="no-referrer" style="color: #063971; text-decoration: underline;">www.furgocasa.com/es/storytellers/subir</a>
                   </td>
                 </tr>
               </table>
@@ -176,9 +198,9 @@
                     </table>
                   </td>
                   <td valign="top" style="font-size: 15px; color: #374151; line-height: 1.55;">
-                    <strong style="color: #111827;">Identifícate</strong> con tu <strong>número de reserva</strong>
-                    (lo tienes en tu email de confirmación, formato <span style="font-family: Consolas, monospace; background-color: #f3f4f6; padding: 1px 6px; color: #063971;">FC-2026-001234</span>)
-                    y el <strong>email asociado</strong> a esa reserva. Sin login, sin contraseñas.
+                    <strong style="color: #111827;">Identifícate</strong> con tu <strong>número de reserva</strong> &mdash;
+                    <span style="font-family: Consolas, 'Courier New', monospace; background-color: #f3f4f6; padding: 4px 10px; color: #063971; font-weight: bold; font-size: 16px; border: 1px solid #e5e7eb;">FC-2026-001234</span>
+                    &mdash; y el <strong>email asociado</strong> a esa reserva. Cópialo de aquí mismo, sin login ni contraseñas.
                   </td>
                 </tr>
               </table>
@@ -288,7 +310,7 @@
               <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                 <tr>
                   <td style="background-color: #ea580c; padding: 14px 32px;">
-                    <a href="https://www.furgocasa.com/es/storytellers/subir" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 17px;">Subir fotos o vídeos ahora</a>
+                    <a href="https://www.furgocasa.com/es/storytellers/subir?ref=FC-2026-001234" referrerpolicy="no-referrer" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 17px;">Subir fotos o vídeos ahora</a>
                   </td>
                 </tr>
               </table>

@@ -98,6 +98,45 @@ function StorytellersJsonLd() {
   );
 }
 
+/**
+ * Banner full-bleed que se inserta entre secciones de la landing como
+ * "respiro visual" en los tramos largos de texto/tarjetas. Reutiliza
+ * fotos limpias del programa (mismas que sirven de base a las
+ * cover-cta-XX del email, que sí llevan texto quemado encima). Aquí, sin
+ * texto: que la foto cante sola.
+ *
+ * Es decorativo, así que NO repetimos los alt descriptivos del mosaico
+ * inferior (los lectores de pantalla los leerían dos veces).
+ */
+function BannerStrip({
+  src,
+  position = "center",
+}: {
+  src: string;
+  position?: "top" | "center" | "bottom";
+}) {
+  const objectPosition =
+    position === "top"
+      ? "object-top"
+      : position === "bottom"
+      ? "object-bottom"
+      : "object-center";
+  return (
+    <div
+      className="relative w-full overflow-hidden h-64 sm:h-80 md:h-[420px] lg:h-[480px]"
+      aria-hidden="true"
+    >
+      <Image
+        src={src}
+        alt=""
+        fill
+        sizes="100vw"
+        className={`object-cover ${objectPosition}`}
+      />
+    </div>
+  );
+}
+
 const SHOWCASE_IMAGES: { src: string; title: string; hint: string; alt: string }[] = [
   {
     src: "/images/storytellers/showcase-sunset-couple.webp",
@@ -274,6 +313,9 @@ export function StorytellersLanding() {
         </div>
       </section>
 
+      {/* Banner respiro 1 · ya estás en ruta (entre "Cómo funciona" y "¿Qué es?") */}
+      <BannerStrip src="/images/storytellers/showcase-detail-route.webp" position="center" />
+
       {/* 3. ¿Qué es este programa? */}
       <section className="py-16 md:py-20 bg-white" aria-labelledby="que-es-storytellers">
         <div className="container mx-auto px-4">
@@ -362,6 +404,9 @@ export function StorytellersLanding() {
           </div>
         </div>
       </section>
+
+      {/* Banner respiro 2 · familia y vida real (entre "Lo que te llevas" y "Cómo se ganan los puntos") */}
+      <BannerStrip src="/images/storytellers/showcase-family-fun.webp" position="center" />
 
       {/* 4. Cómo se ganan los puntos */}
       <section
@@ -560,6 +605,9 @@ export function StorytellersLanding() {
           </div>
         </div>
       </section>
+
+      {/* Banner respiro 3 · manifiesto del programa (entre "Cuándo se canjean" y "Lo que premiamos") */}
+      <BannerStrip src="/images/storytellers/showcase-hero.webp" position="center" />
 
       {/* 7. Lo que premiamos y lo que firmas */}
       <section

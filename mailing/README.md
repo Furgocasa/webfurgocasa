@@ -59,23 +59,37 @@ Motivo: el código real vive en `src/lib/email/templates.ts` (es lo que ve el cl
 
 #### Storytellers · HTML de referencia en `mailing/app/`
 
-Las tres plantillas siguientes son **borradores de ciclo de vida** (previsualización en navegador y base de copy). La fuente de verdad del envío **no** está aún unificada en `templates.ts`: parte del programa usa `src/lib/storytellers/emails.ts`, rutas API y crons (ver tabla inferior).
+> 🌟 **Documento técnico completo y obligatorio:** [`STORYTELLERS_MAILS.md`](./STORYTELLERS_MAILS.md)
+> — explica en detalle los 3 emails, el deep-link `?ref=`, la tabla de
+> tracking `booking_email_dispatches`, las defensas de seguridad
+> (rate-limit, reCAPTCHA, HMAC, honeypot), el backfill histórico y los
+> crons pendientes. **Léelo antes de tocar cualquier email Storytellers.**
+
+Las tres plantillas siguientes son **emails de ciclo de vida del viaje** (salida → mitad → vuelta). HTML listo, tracking en BD activo, **crons pendientes** (mientras tanto se mandan manualmente con `node scripts/test-storyteller-emails.mjs`).
 
 | Archivo HTML (referencia) | Momento de envío previsto (producto) | Estado en código |
 |---|---|---|
-| `app/05-storytellers-dia-salida-noche.html` | Mismo día del pickup (salida), ~20:00–21:00 (Europe/Madrid) | Pendiente de cron/disparador dedicado |
-| `app/06-storytellers-mitad-viaje.html` | Día intermedio del alquiler (p. ej. punto medio pickup ↔ dropoff), mañana | Pendiente de cron/disparador dedicado |
-| `app/07-storytellers-dia-despues-vuelta.html` | 1 día natural después del `dropoff_date`, mañana | Borrador; el recordatorio automático actual usa **+7 días** (`buildPostTripReminderHtml` + `storyteller-post-trip-reminder`) |
+| `app/05-storytellers-dia-salida-noche.html` | Mismo día del pickup (salida), ~20:00–21:00 (Europe/Madrid) | HTML listo · cron pendiente |
+| `app/06-storytellers-mitad-viaje.html` | Día intermedio del alquiler (punto medio pickup ↔ dropoff), mañana. **No se envía en viajes <6 días.** | HTML listo · cron pendiente |
+| `app/07-storytellers-dia-despues-vuelta.html` | 1 día natural después del `dropoff_date`, mañana | HTML listo · cron pendiente. El recordatorio automático actual a **+7 días** (`buildPostTripReminderHtml` + `storyteller-post-trip-reminder`) seguirá conviviendo o se sustituye, decisión abierta. |
+
+Los 3 emails incluyen:
+
+- **Hero CTA vertical** (no clicable, fuerza scroll) con texto + flecha quemados sobre la imagen.
+- **Deep-link `?ref=<booking_number>`** en todos los CTAs → la página `/es/storytellers/subir` prerrellena el nº de reserva y enfoca el campo email automáticamente.
+- **`referrerpolicy="no-referrer"`** en todos los CTAs (evita filtración del query a terceros vía header `Referer`).
+- **CTA secundario "outline"** (botón blanco con borde naranja) en mitad del cuerpo + CTA principal naranja sólido al final.
+- **Tracking idempotente** en `booking_email_dispatches` (índice único parcial sobre `status='sent'`).
 
 **Otros correos al cliente ligados a Storytellers** (ya implementados o disparados por acción):
 
 | Origen | Cuándo |
 |---|---|
 | `sendUploadConfirmationEmail` | Tras una subida correcta |
-| `POST /api/storytellers/request-magic-link` | El cliente pide enlace a “Mis puntos” |
+| `POST /api/storytellers/request-magic-link` | El cliente pide enlace a "Mis puntos" |
 | `POST /api/admin/storyteller-uploads/[id]/select` | El equipo marca foto/vídeo como seleccionado (puntos / cupón) |
 
-Los HTML `05`–`07` incluyen en la primera línea un comentario con **placeholders** (`{{NOMBRE_CLIENTE}}`, `{{NUMERO_RESERVA}}`, etc.) para cuando se integren en código.
+Los HTML `05`–`07` usan dos cadenas placeholder literales que se reemplazan al renderizar: `Juan` (saludo) y `FC-2026-001234` (booking number, también en el `?ref=`). Para detalle completo ver [`STORYTELLERS_MAILS.md`](./STORYTELLERS_MAILS.md).
 
 > `getCompanyNotificationTemplate` existe en `templates.ts` pero está **deprecado** y solo redirige a las tres primeras plantillas: no tiene HTML propio.
 

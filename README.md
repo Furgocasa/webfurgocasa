@@ -39,6 +39,25 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 🌟 Mayo 2026 — Programa Storytellers · 3 emails de ciclo de vida + tracking + deep-link seguro (08/05/2026)
+
+- **Tres emails nuevos de ciclo de vida del viaje** que sostienen TODO el programa Storytellers (3 % cupón de bienvenida + hasta 15 % por puntos + regalos):
+  - `mailing/app/05-storytellers-dia-salida-noche.html` — noche del pickup (~20:30 Europe/Madrid).
+  - `mailing/app/06-storytellers-mitad-viaje.html` — punto medio del viaje (solo viajes ≥6 días).
+  - `mailing/app/07-storytellers-dia-despues-vuelta.html` — 1 día después del dropoff.
+- **Tabla de tracking `booking_email_dispatches`** ([`migration`](./supabase/migrations/20260508-booking-email-dispatches.sql)) con índice único parcial sobre `status='sent'` para idempotencia. Cubre los 4 transaccionales del ciclo (`04` recordatorio devolución + `05/06/07` Storytellers) más el reminder a +7 días. Backfill histórico ya ejecutado ([`migration`](./supabase/migrations/20260508-booking-email-dispatches-backfill-historic.sql)) marcando como `sent` los emails ya enviados de reservas terminadas/en curso, y `skipped` los `06` de viajes cortos.
+- **Deep-link `?ref=<booking_number>` en los CTAs** del email → la página `/es/storytellers/subir` prerrellena el nº de reserva y enfoca automáticamente el input email. Implementación: `useEffect` que lee `window.location.search` en `src/components/storytellers/uploader-flow.tsx`.
+- **Endurecimiento de seguridad** del endpoint `/api/storytellers/validate-booking`:
+  - `referrerpolicy="no-referrer"` en TODOS los CTAs del email (evita filtración del query a terceros vía header `Referer`).
+  - Rate-limit `RATE_LIMIT_CONFIGS.PUBLIC_WRITE` (10 intentos/min/IP) con `src/lib/security/rate-limit.ts` (existente). Devuelve `429` con headers `X-RateLimit-*`.
+  - Defensas previas (intactas): reCAPTCHA Enterprise v3, honeypot `companyWebsite`, HMAC SHA-256 firmando una sesión de 30 min para el upload, `validateBookingForUpload` con ventana temporal y topes 100 fotos / 20 vídeos.
+- **Hero vertical CTA** (1200×1500 px, drop-shadow, badge naranja "+ REGALOS POR TUS PUNTOS", flecha "scroll down") generado dinámicamente con `sharp` + SVG en `scripts/download-mailing-assets.mjs`. NO clicable: solo invita a deslizar. CTAs secundarios "outline" (blanco con borde naranja) en el cuerpo + CTA principal naranja sólido al final.
+- **Mobile-first**: media queries con `!important` para `.hero-img` / `.container-600` / `.outer-pad`, tipografía base aumentada +2px, validado en iPhone antiguo y nuevo.
+- **Pendiente:** crear los 3 cron jobs (`storyteller-pickup-night` 20:30, `storyteller-mid-trip` 09:00, `storyteller-post-trip-day-after` 09:00) que escriben en `booking_email_dispatches` con `INSERT ... ON CONFLICT DO NOTHING`. Hasta entonces los envíos son manuales con `node scripts/test-storyteller-emails.mjs --to "..."`.
+- 📖 **Documentación obligatoria antes de tocar:** [`mailing/STORYTELLERS_MAILS.md`](./mailing/STORYTELLERS_MAILS.md) — incluye placeholders, deep-link, seguridad, idempotencia, backfill, cron jobs pendientes y checklist de edición.
+
+---
+
 ## ✉️ Abril 2026 — Aviso de hora flexible en el recordatorio de devolución (29/04/2026)
 
 - **Síntoma:** clientes recibían el email "Mañana devuelves tu camper" con la hora estricta de la reserva (p. ej. 11:00 h) y entraban en pánico cuando, en la entrega, FURGOCASA ya les había ampliado el margen verbalmente ("puedes traerla a la 1"). Llamadas/whatsapps de aclaración constantes.

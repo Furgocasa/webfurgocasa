@@ -6,6 +6,8 @@
  * subir archivos en /api/storytellers/upload sin volver a validar.
  *
  * Validaciones:
+ *  - Rate limit por IP (10 intentos/min) — defensa en profundidad ante
+ *    fuerza bruta sobre booking+email, complementa a reCAPTCHA.
  *  - reCAPTCHA v3 (action: storytellers_validate)
  *  - Honeypot
  *  - booking_number + email match en bookings
@@ -22,6 +24,12 @@ import {
   MAX_PHOTOS_PER_BOOKING,
   MAX_VIDEOS_PER_BOOKING,
 } from "@/lib/storytellers/config";
+import {
+  checkRateLimit,
+  getClientIP,
+  getRateLimitHeaders,
+  RATE_LIMIT_CONFIGS,
+} from "@/lib/security/rate-limit";
 
 const schema = z.object({
   bookingNumber: z.string().trim().min(2).max(40),
@@ -109,6 +117,22 @@ export function verifyUploadSessionToken(token: string): UploadSessionVerified {
 
 export async function POST(req: NextRequest) {
   try {
+    // Rate limit por IP (defensa en profundidad ante fuerza bruta).
+    // Como esta ruta acepta el booking_number tambien por query (?ref=...) en
+    // los emails Storytellers, conviene capar la frecuencia desde el primer ms.
+    const ip = getClientIP(req);
+    const rl = checkRateLimit(`st-validate:${ip}`, RATE_LIMIT_CONFIGS.PUBLIC_WRITE);
+    if (!rl.success) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "Demasiados intentos. Espera un minuto e inténtalo de nuevo.",
+        },
+        { status: 429, headers: getRateLimitHeaders(rl) }
+      );
+    }
+
     const body = await req.json();
 
     // Honeypot

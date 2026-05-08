@@ -77,10 +77,13 @@ function firstName(fullName) {
   return f.charAt(0).toUpperCase() + f.slice(1).toLowerCase();
 }
 
-function renderHtml(rawHtml, customerFirstName) {
-  // Solo sustituimos el placeholder hardcoded "Juan" por el nombre real.
-  // (Los emails ya no llevan booking_number ni fechas.)
-  return rawHtml.replace(/<strong>Juan<\/strong>/g, `<strong>${customerFirstName}</strong>`);
+function renderHtml(rawHtml, customerFirstName, bookingNumber) {
+  // Sustituimos los 2 placeholders hardcoded en los HTMLs:
+  //   "Juan"           -> primer nombre del cliente
+  //   "FC-2026-001234" -> numero de reserva real (para copy-paste sin buscar)
+  return rawHtml
+    .replace(/<strong>Juan<\/strong>/g, `<strong>${customerFirstName}</strong>`)
+    .replace(/FC-2026-001234/g, bookingNumber);
 }
 
 // ---------- Pick booking ----------
@@ -165,7 +168,7 @@ async function main() {
       continue;
     }
     const raw = fs.readFileSync(fullPath, 'utf8');
-    const html = renderHtml(raw, fname);
+    const html = renderHtml(raw, fname, booking.booking_number);
 
     process.stdout.write(`Enviando ${tpl.label} -> ${TO.join(', ')} ... `);
     const result = await transporter.sendMail({
