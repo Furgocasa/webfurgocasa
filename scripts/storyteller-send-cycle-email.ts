@@ -20,6 +20,14 @@
  *   tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06
  *   tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --no-cc
  *   tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --dry-run
+ *   tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --clear-backfill
+ *
+ * `--clear-backfill`: si la única fila bloqueante en `booking_email_dispatches`
+ * es un dispatch creado por la migración de backfill histórico
+ * (`metadata.backfilled = true`), se ELIMINA antes de mandar. Útil para
+ * mandar de verdad emails que el backfill marcó como `sent` artificialmente
+ * para los viajes en curso al lanzar el programa. NUNCA elimina filas
+ * `sent·REAL` ni `failed`/`bounced`.
  *
  * Variables de entorno requeridas (las lee de `.env.local` o `.env`):
  *   - NEXT_PUBLIC_SUPABASE_URL
@@ -65,10 +73,11 @@ const TYPE = arg("type") as CycleEmailType | undefined;
 const NO_CC = flag("no-cc");
 const DRY_RUN = flag("dry-run");
 const FORCE = flag("force"); // ignora isAlreadyDispatched
+const CLEAR_BACKFILL = flag("clear-backfill");
 
 if (!BOOKING_NUMBER || !TYPE || !["05", "06", "07"].includes(TYPE)) {
   console.error(
-    "Uso: tsx scripts/storyteller-send-cycle-email.ts --booking <num> --type 05|06|07 [--no-cc] [--dry-run] [--force]"
+    "Uso: tsx scripts/storyteller-send-cycle-email.ts --booking <num> --type 05|06|07 [--no-cc] [--dry-run] [--clear-backfill] [--force]"
   );
   process.exit(1);
 }
@@ -119,10 +128,66 @@ async function main() {
   console.log(`  · status         : ${booking.status}`);
   console.log("");
 
-  const already = await isAlreadyDispatched(supabase as never, booking.id, TYPE!);
-  if (already && !FORCE) {
+  let already = await isAlreadyDispatched(supabase as never, booking.id, TYPE!);
+
+  // Si está bloqueado y --clear-backfill: comprobar si la fila bloqueante es
+  // de backfill (metadata.backfilled = true). Si lo es, BORRARLA y reintentar.
+  if (already && CLEAR_BACKFILL) {
+    const { data: blockers, error: blockersErr } = await supabase
+      .from("booking_email_dispatches")
+      .select("id, status, metadata, sent_at")
+      .eq("booking_id", booking.id)
+      .eq("email_type", cfg.dispatchType)
+      .in("status", ["sent", "skipped", "bounced"]);
+
+    if (blockersErr) {
+      console.error(
+        `❌ No se pudo consultar dispatches bloqueantes: ${blockersErr.message}`
+      );
+      process.exit(2);
+    }
+
+    const all = blockers || [];
+    const backfilledOnly = all.every(
+      (b) => (b.metadata as { backfilled?: boolean } | null)?.backfilled === true
+    );
+
+    if (!backfilledOnly) {
+      console.error(
+        `❌ --clear-backfill solo borra filas backfilled. Hay ${all.length} dispatches bloqueantes y NO todos son backfilled. Aborta.`
+      );
+      console.error("   Filas:");
+      for (const b of all) {
+        console.error(
+          `     · id=${b.id} status=${b.status} backfilled=${(b.metadata as { backfilled?: boolean } | null)?.backfilled} sent_at=${b.sent_at}`
+        );
+      }
+      process.exit(2);
+    }
+
+    console.log(
+      `🧹 --clear-backfill: borrando ${all.length} fila(s) backfilled bloqueantes para (${booking.booking_number}, ${cfg.dispatchType})...`
+    );
+    const ids = all.map((b) => b.id);
+    if (DRY_RUN) {
+      console.log(`   (DRY RUN: no se borra nada, sería: DELETE WHERE id IN ${JSON.stringify(ids)})`);
+    } else {
+      const del = await supabase
+        .from("booking_email_dispatches")
+        .delete()
+        .in("id", ids);
+      if (del.error) {
+        console.error(`❌ Error borrando filas backfill: ${del.error.message}`);
+        process.exit(2);
+      }
+      console.log("   ✅ filas backfill borradas. Procediendo a enviar.");
+      already = false;
+    }
+  }
+
+  if (already && !FORCE && !CLEAR_BACKFILL) {
     console.error(
-      `❌ Ya hay un dispatch sent/skipped/bounced para (${booking.id}, ${cfg.dispatchType}). Usa --force para forzar el reenvío (no recomendado).`
+      `❌ Ya hay un dispatch sent/skipped/bounced para (${booking.id}, ${cfg.dispatchType}). Usa --clear-backfill si la fila bloqueante es del backfill histórico, o --force para forzar (no recomendado).`
     );
     process.exit(2);
   }
