@@ -278,6 +278,15 @@ async function generateStorytellersCovers() {
     const fs2 = c.title2.length > 16 ? 70 : 86;
     const fsClaim1 = c.claim1.length > 28 ? 36 : 44;
 
+    // Badge "+ REGALOS POR TUS PUNTOS": pill naranja con texto blanco
+    // para máxima legibilidad sobre cualquier fondo de imagen.
+    const badgeFontSize = 30;
+    const badgeText = c.claim2;
+    const badgeWidth = Math.max(560, badgeText.length * 18 + 48);
+    const badgeX = (W - badgeWidth) / 2;
+    const badgeY = 588;
+    const badgeH = 60;
+
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
       <defs>
         <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
@@ -286,16 +295,31 @@ async function generateStorytellersCovers() {
           <stop offset="78%" stop-color="black" stop-opacity="0.55"/>
           <stop offset="100%" stop-color="black" stop-opacity="0.85"/>
         </linearGradient>
+        <!-- Sombra negra sutil para que cualquier texto se lea sobre fondos claros -->
+        <filter id="ds" x="-10%" y="-10%" width="120%" height="120%">
+          <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#000000" flood-opacity="0.65"/>
+        </filter>
       </defs>
       <rect width="${W}" height="${H}" fill="url(#g)"/>
-      <text x="600" y="180" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="6">${c.label}</text>
-      <text x="600" y="340" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fs1}" font-weight="900" fill="#ffffff">${c.title1}</text>
-      <text x="600" y="445" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fs2}" font-weight="900" fill="#ffffff">${c.title2}</text>
-      <text x="600" y="555" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fsClaim1}" font-weight="900" fill="#ea580c">${c.claim1}</text>
-      <text x="600" y="610" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="32" font-weight="900" fill="#fb923c" letter-spacing="2">${c.claim2}</text>
-      <text x="600" y="1290" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="600" fill="#ffffff" opacity="0.95">${c.subline}</text>
-      <circle cx="600" cy="1390" r="46" fill="#ea580c" stroke="#ffffff" stroke-width="4"/>
-      <path d="M 580 1376 L 600 1404 L 620 1376" stroke="#ffffff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+      <g filter="url(#ds)">
+        <text x="600" y="180" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="6">${c.label}</text>
+        <text x="600" y="340" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fs1}" font-weight="900" fill="#ffffff">${c.title1}</text>
+        <text x="600" y="445" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fs2}" font-weight="900" fill="#ffffff">${c.title2}</text>
+        <text x="600" y="555" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fsClaim1}" font-weight="900" fill="#ea580c">${c.claim1}</text>
+      </g>
+
+      <!-- Badge "+ REGALOS POR TUS PUNTOS": pill naranja con texto blanco -->
+      <g filter="url(#ds)">
+        <rect x="${badgeX}" y="${badgeY}" width="${badgeWidth}" height="${badgeH}" rx="${badgeH / 2}" fill="#ea580c"/>
+        <text x="600" y="${badgeY + badgeH / 2 + 11}" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${badgeFontSize}" font-weight="900" fill="#ffffff" letter-spacing="2">${badgeText}</text>
+      </g>
+
+      <g filter="url(#ds)">
+        <text x="600" y="1290" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="700" fill="#ffffff">${c.subline}</text>
+        <circle cx="600" cy="1390" r="46" fill="#ea580c" stroke="#ffffff" stroke-width="4"/>
+        <path d="M 580 1376 L 600 1404 L 620 1376" stroke="#ffffff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </g>
     </svg>`;
 
     try {

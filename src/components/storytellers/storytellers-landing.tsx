@@ -155,14 +155,14 @@ export function StorytellersLanding() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-orange-100">
-                Programa Storytellers · Para clientes Furgocasa
+                Programa Storytellers · Comparte tu viaje, llévate descuento
               </p>
               <h1 className="font-heading text-4xl font-bold leading-tight text-white md:text-5xl lg:text-[2.75rem] xl:text-5xl">
-                Sube tus fotos y vídeos del viaje. Gana hasta un {MAX_DISCOUNT_PCT}% de descuento.
+                Comparte tu viaje a cambio de descuentos.
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-orange-50 md:text-xl">
-                Si haces buenas fotos o vídeos durante tu alquiler con Furgocasa, súbelos a nuestro portal y empieza a sumar puntos.{" "}
-                <strong className="font-semibold text-white">Sin login, sin formularios infinitos, sin compromisos.</strong>
+                Hasta un <strong className="font-semibold text-white">{MAX_DISCOUNT_PCT}% de descuento</strong> en tu próxima reserva, y <strong className="font-semibold text-white">regalos por tus puntos</strong>.{" "}
+                <span className="block mt-2 text-orange-100/95">Sin login, sin formularios infinitos, sin compromisos.</span>
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a
@@ -229,7 +229,7 @@ export function StorytellersLanding() {
             ¿Cómo funciona?
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-gray-600">
-            4 pasos sencillos. Empiezas durante el propio viaje y acabas con un cupón listo para tu próxima reserva.
+            4 pasos sencillos: del primer clic en el portal al <strong>cupón de descuento</strong> listo para tu próxima reserva.
           </p>
           <ol className="mx-auto mt-12 grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {[
@@ -285,7 +285,7 @@ export function StorytellersLanding() {
               ¿Qué es este programa?
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Un canal sencillo para que <strong>tus clientes-creadores</strong> (tú) compartan con nosotros las fotos y vídeos que ya hacen durante el viaje. A cambio, descuentos reales en futuras reservas.
+              Un canal sencillo para que <strong>tus clientes-creadores</strong> (tú) compartan con nosotros las fotos y vídeos que ya hacen durante el viaje. A cambio: <strong>descuentos reales en futuras reservas y regalos por tus puntos</strong>.
             </p>
           </div>
           <ul className="mx-auto mt-10 grid max-w-4xl gap-4 sm:grid-cols-2">
@@ -319,10 +319,10 @@ export function StorytellersLanding() {
             id="que-ofrecemos-storytellers"
             className="text-center font-heading text-3xl font-bold text-gray-900 md:text-4xl"
           >
-            Qué ofrecemos
+            Lo que te llevas tú
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-center text-gray-600">
-            Las ventajas reales del programa, sin letra pequeña escondida.
+            Lo que ganas por participar, sin letra pequeña escondida.
           </p>
           <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
             {[
@@ -347,8 +347,8 @@ export function StorytellersLanding() {
                 body: "Te explicamos al pie del subidor qué autorizas: cesión no exclusiva para uso comercial. Sin sorpresas, y conservas tu material para uso propio.",
               },
               {
-                title: `Perks por encima del ${MAX_DISCOUNT_PCT}%`,
-                body: "Cuando llegas al techo del descuento, los puntos siguen sumando: acceso anticipado a flota, vehículos garantizados, upgrades… extras pensados para clientes recurrentes que aportan mucho.",
+                title: `Regalos por encima del ${MAX_DISCOUNT_PCT}%`,
+                body: "Cuando llegas al techo del descuento, tus puntos siguen sumando para canjearlos por merchandising oficial Furgocasa: taza, camiseta y sudadera de edición Storytellers.",
               },
             ].map((card) => (
               <div
@@ -679,10 +679,10 @@ export function StorytellersLanding() {
             id="perks-storytellers"
             className="text-center font-heading text-3xl font-bold text-gray-900 md:text-4xl"
           >
-            Perks adicionales — merchandising
+            Regalos por tus puntos — merchandising oficial
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
-            Por encima del techo del {MAX_DISCOUNT_PCT}% los puntos siguen sumando y se canjean por merch oficial. Pensado para Storytellers recurrentes que aportan mucho material.
+            Cuando llegas al techo del {MAX_DISCOUNT_PCT}%, tus puntos se convierten en <strong>regalos</strong>: merchandising oficial Furgocasa, edición Storytellers, pensado para Storytellers recurrentes que aportan mucho material.
           </p>
           <ul className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {PERK_TIERS.map((p) => (
@@ -780,10 +780,10 @@ export function StorytellersLanding() {
       <section className="border-t border-gray-100 bg-gradient-to-r from-furgocasa-orange to-furgocasa-orange-dark py-16 md:py-20 text-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="font-heading text-3xl font-bold md:text-4xl">
-            ¿Listo para empezar?
+            Tu descuento empieza con la primera foto.
           </h2>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-orange-50">
-            Sube tus fotos y vídeos en menos de 2 minutos. Te llevarás un cupón instantáneo del 3% por tu primera subida.
+            Sube tus fotos y vídeos en menos de 2 minutos. Te llevarás un cupón instantáneo del <strong className="font-semibold text-white">3 %</strong> por tu primera subida — y empezarás a sumar puntos hacia el {MAX_DISCOUNT_PCT}% y los regalos.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <a
