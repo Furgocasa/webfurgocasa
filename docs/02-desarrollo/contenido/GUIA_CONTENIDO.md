@@ -2,7 +2,7 @@
 
 > **Super prompt para implementación.** Este documento recoge el modelo cerrado de generación y captación de contenido para FURGOCASA, fruto de la conversación de estrategia del 8 de mayo de 2026. Sirve como referencia única para retomar el trabajo en sesiones futuras.
 >
-> Estado: **estrategia cerrada** · **implementación Sprints 1 y 2 COMPLETADA el 8 de mayo de 2026** · **migración SQL aplicada** · **canje integrado en checkout** · **7 imágenes content-creators generadas con GPT Image 2** · **reCAPTCHA Enterprise configurado y desplegado en Vercel** · **calificación fiscal cerrada (descuento comercial, no permuta — §11.1)** · pendiente Sprint 3 (operativa).
+> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
 
 ---
 
@@ -13,7 +13,7 @@ FURGOCASA necesita alimentar de forma continua su web, redes y campañas con **c
 Existen **dos canales paralelos** de captación de contenido, complementarios:
 
 1. **Creadores profesionales** (`/creadores-de-contenido`): ya hay landing y formulario implementados. Hay que reorientar el modelo: pedir **bruto + 1 pieza editada por ellos**, y formalizar **cesión perpetua mundial**.
-2. **Programa Storytellers** (clientes amateurs): NO existe todavía. Es la pieza grande a construir. Convierte a clientes normales en aportadores de contenido a cambio de **% de descuento en próximas reservas** (techo 15%) + perks no monetarios.
+2. **Programa Storytellers** (clientes amateurs): **implementado** (landing pública, subida, mis puntos, admin, cupones, crons). Convierte a clientes en aportadores de contenido a cambio de **% de descuento en próximas reservas** (techo 15%) + **merchandising** por hitos de puntos por encima del techo del descuento (ver §3.4).
 
 Objetivos cuantitativos al cabo de 12 meses:
 - 6-10 colaboraciones profesionales cerradas → archivo en bruto multi-uso.
@@ -131,7 +131,7 @@ Segundo checkbox obligatorio (no se puede enviar sin marcarlo), **además del de
 ### 3.1. Filosofía
 
 - **El programa premia UNA SOLA COSA: subir fotos y vídeos al portal.** Nada de newsletter, referrals, encuestas, ni reseñas.
-- **Recompensas SOLO en % de descuento** sobre próximas reservas. **Techo absoluto: 15%.**
+- **Recompensas principales en % de descuento** sobre próximas reservas. **Techo absoluto del cupón: 15%.** Por encima de ese techo los puntos siguen acumulándose y la comunicación pública incluye **premios en merchandising** (no sustituyen el descuento; son un canal paralelo una vez superados muchos puntos — §3.4).
 - **No esclavizar al amateur.** Un viaje normal con material decente debe llegar al 8-12% sin esfuerzo. Un viaje largo con material brillante todo seleccionado debe llegar al 15% holgadamente.
 - **Cero compromiso de publicación.** FURGOCASA selecciona "para archivo profesional" y los puntos se otorgan ahí. Lo que pase después con la imagen es asunto interno.
 - **SIN LOGIN.** No se crea cuenta. La identificación del cliente se hace por **número de reserva + email asociado** en cada subida. La identidad maestra para acumular puntos es el **email canónico** del cliente (puede tener varias reservas a lo largo del tiempo, sus puntos se consolidan).
@@ -146,25 +146,36 @@ Segundo checkbox obligatorio (no se puede enviar sin marcarlo), **además del de
 | Foto seleccionada por FURGOCASA para archivo | **+20 ptos** | Cuando admin marca en panel |
 | Vídeo seleccionado por FURGOCASA para archivo | **+60 ptos** | Cuando admin marca en panel |
 
-### 3.3. Cómo se canjean los puntos
+### 3.3. Cómo se canjean los puntos (cupones de descuento)
 
-| Puntos acumulados | % descuento próxima reserva |
-|---|---|
-| Cada subida válida | **3% instantáneo** (cupón 1 uso) |
-| **40 ptos** | 5% |
-| **100 ptos** | 8% |
-| **200 ptos** | 10% |
-| **400 ptos** | 12% |
-| **800 ptos** | **15% — TECHO ABSOLUTO** |
+**Regla de un solo cupón activo:** en cada momento el cliente tiene **como máximo un cupón STO- activo** (`is_active`, no usado, no caducado, no sustituido). Si sube de tramo de puntos, el sistema **genera un cupón nuevo de mayor %** y marca el anterior como sustituido (`superseded_at`). No se suman porcentajes de dos cupones a la vez.
 
-### 3.4. Perks no monetarios (encima del techo, coste 0 €)
+| Cuándo | % descuento próxima reserva | Notas |
+|---|---|---|
+| **Primera subida válida** del email (≥3 fotos **o** ≥1 vídeo) | **3%** | **Cupón de bienvenida, una sola vez por email.** Implementación: `createInstantFirstUploadCouponIfNeeded` en `src/lib/storytellers/points.ts` — solo crea el cupón si el email **no tiene ningún cupón previo** en `storyteller_coupons`. Las siguientes subidas válidas **solo suman puntos** al ledger; **no** generan otro 3%. |
+| Saldo ≥ **40 ptos** | 5% | Sustituye al 3% si aplica. |
+| Saldo ≥ **100 ptos** | 8% | |
+| Saldo ≥ **200 ptos** | 10% | |
+| Saldo ≥ **400 ptos** | 12% | |
+| Saldo ≥ **800 ptos** | **15% — TECHO** | |
 
-| Hito extra | Perk |
-|---|---|
-| 1.200 ptos | Acceso anticipado: 7 días antes que el público |
-| 1.600 ptos | Vehículo gama media garantizado |
-| 2.000 ptos | Upgrade gratis a vehículo superior, 1 vez/año |
-| 2.500 ptos | **Storyteller Gold:** foto destacada en home con nombre 1 mes |
+**Ejemplo aclaratorio:** dos subidas seguidas de «3 fotos cada una» → **no** son un 6% por «dos bienvenidas». Primera subida: cupón 3% + 6 pts de ledger (3×2). Segunda subida: **solo** +6 pts más (total 12 pts); el cupón sigue siendo el 3% hasta que el saldo cruza 40 pts y el sistema emite el del 5%.
+
+Constantes en código: `INSTANT_FIRST_UPLOAD_COUPON_PCT = 3`, `DISCOUNT_TIERS`, `syncCouponWithBalance`.
+
+### 3.4. Perks adicionales — merchandising (por encima del techo del 15%)
+
+Decisión de producto (8 may 2026): sustituir perks abstractos («acceso anticipado», «gama garantizada», etc.) por **producto físico de marca**, comunicado en la landing con fotos tipo catálogo generadas con **GPT Image 2** (`scripts/generate-storytellers-showcase-images.ts` tags `mug`, `tshirt`, `hoodie`).
+
+| Umbral (puntos) | Producto | Archivo imagen (landing) |
+|---|---|---|
+| **1.200** | Taza Furgocasa (cerámica, edición Storytellers) | `public/images/storytellers/merch-mug.webp` |
+| **1.600** | Camiseta Furgocasa (algodón, talla a elegir) | `public/images/storytellers/merch-tshirt.webp` |
+| **2.000** | Sudadera con capucha Furgocasa | `public/images/storytellers/merch-hoodie.webp` |
+
+Definición en código: `PERK_TIERS` en `src/lib/storytellers/config.ts` (campos `threshold`, `perk`, `description`, `slug`).
+
+**Estado técnico del canje de merch:** la landing y «Mis puntos» comunican el programa de perks; **la deducción automática de puntos y el pedido logístico no están automatizados en una API dedicada** a fecha de esta guía. Operativa recomendada Sprint 3: cuando un cliente supere el umbral, **contacto manual desde oficina** (email) para tallas/dirección y registro interno del canje; opcionalmente añadir movimiento negativo en `storyteller_points_ledger` con razón tipo `admin_adjust` para mantener coherencia con el texto público.
 
 ### 3.5. Las 5 reglas fijas del cupón
 
@@ -179,15 +190,15 @@ Segundo checkbox obligatorio (no se puede enviar sin marcarlo), **además del de
 **Caso A — viaje grande con material brillante** (9 días, 50 fotos + 9 vídeos, TODO seleccionado):
 - Subidas: 50×2 + 9×5 = **145 ptos**
 - Selección: 50×20 + 9×60 = **1.540 ptos**
-- **Total: 1.685 ptos** → 15% techo + acceso anticipado ✓
+- **Total: 1.685 ptos** → cupón **15%** + elegible para los tres hitos de merchandising (taza, camiseta, sudadera) según política operativa §3.4.
 
 **Caso B — cliente medio** (5 días, 30 fotos + 3 vídeos, ~30% seleccionado):
 - Subidas: 30×2 + 3×5 = **75 ptos**
 - Selección: 9×20 + 1×60 = **240 ptos**
-- **Total: 315 ptos** → entre 10% y 12% ✓
+- **Total: 315 ptos** → entre 10% y 12% por umbrales de cupón ✓
 
-**Caso C — cliente tímido** (1 viaje, 15 fotos, ninguna seleccionada):
-- Subidas: 15×2 = **30 ptos** → no llega al 5%, pero ya tiene el 3% instant del primer cupón ✓
+**Caso C — cliente tímido** (1 viaje, 15 fotos en primera subida válida, ninguna seleccionada):
+- Subidas: 15×2 = **30 ptos** → cupón de bienvenida **3%** + saldo aún sin llegar al 5% (40 ptos) ✓
 
 ### 3.7. Curaduría operativa (lado admin)
 
@@ -525,12 +536,13 @@ Plantillas:
 - Cupones canjeados / generados.
 - Ingresos en reservas con cupón Storyteller activo.
 - Coste real (descuento concedido) vs valor de mercado del contenido recibido.
+- *(Opcional Sprint 3)* Merchandising entregado vs clientes con saldo elegible (§3.4).
 
 ---
 
 ## 9. Decisiones congeladas (no reabrir sin razón fuerte)
 
-- Recompensas Storytellers **solo en %**, techo 15%, sin merchandising en la escala principal.
+- Recompensas Storytellers **en descuento % sobre la reserva**, techo **15%** en cupón; **sin merchandising dentro de la escala de cupones** (el merch es perks por puntos acumulados, §3.4).
 - "Selección" es discrecional, sin compromiso público de publicación.
 - Reseñas Google **fuera del programa** por compliance.
 - Bruto + 1 pieza editada para PRO, no piezas editadas masivas.
@@ -539,27 +551,29 @@ Plantillas:
 
 ---
 
-## 10. Pendientes / dudas a resolver antes de implementar
+## 10. Decisiones y pendientes (referencia viva)
 
-### Decididas
+### Ya decididas en diseño / producto
 
 - [x] **Sin login.** Identificación por nº de reserva + email. Identidad maestra = email canónico.
 - [x] **Acceso área "Mis puntos"** por magic link HMAC firmado, válido 30 días, incluido en cada email transaccional.
 - [x] **Ventana subida**: devolución −7d hasta +90d.
 - [x] **Tope por reserva**: 100 fotos / 20 vídeos. **Tamaños:** 50 MB foto / 500 MB vídeo.
-- [x] Recompensas solo % con techo 15%, sin merch en escala principal.
+- [x] Cupones de descuento con techo **15%**; merchandising como perks por puntos (§3.4), no como forma alternativa de cupón.
 - [x] Selección discrecional, sin compromiso público de publicación.
 - [x] Reseñas Google fuera del programa.
 
 ### Por decidir
 
-- [ ] Confirmar nombre definitivo del programa amateurs: `Storytellers` (mi recomendación) vs `Embajadores` vs otro.
-- [ ] Decidir si el cupón instantáneo del 3% requiere mínimo de 4 días o se relaja a 3 días para incentivar primer canje.
-- [ ] Decidir traducciones: ¿el programa Storytellers se lanza solo en `/es` o también `/en`, `/de`, `/fr`?
-- [ ] ¿Cliente con cupón puede **acumular** varios cupones a la vez (uno del 5% + uno del 8% por umbrales sucesivos) o solo conserva el último/mayor? **Recomendación:** conserva el mayor desbloqueado, los menores se "consumen" automáticamente. Evita acumulación que eluda el techo del 15%.
-- [ ] ¿La validación nº reserva + email es **case-insensitive en email** y **trim**? Sí en email; ¿el nº de reserva tiene formato fijo o admite variaciones tipo "12345" vs "#12345"? Habrá que normalizar parsing.
-- [x] ~~Validar con asesoría fiscal el tratamiento del descuento por contenido (¿permuta? ¿valor en especie?).~~ **Resuelto 8 may 2026 (asesoría interna): es DESCUENTO COMERCIAL, no permuta.** Ver §11.1.
-- [ ] Definir si se requiere **reCAPTCHA o similar** en el formulario de validación nº reserva + email para evitar fuerza bruta.
+- [ ] ¿Relajar el **mínimo de días de reserva** del cupón Storyteller de 4 a 3 solo para el cupón de bienvenida del 3%? (Hoy unifica `COUPON_MIN_RESERVATION_DAYS` para todos los cupones.)
+
+### Resueltas en código / despliegue
+
+- [x] **Nombre del programa amateurs:** `Storytellers` (slug de URL `/storytellers` en los cuatro idiomas — marca propia).
+- [x] **Traducciones de la landing:** páginas `es`, `en`, `fr`, `de` con metadata localizada; componente `StorytellersLanding` compartido (copy principal en español). Sitemap y menú (dropdown Furgocasa + footer) enlazan la landing.
+- [x] **Cupón instantáneo 3%:** primera subida válida por email, una sola vez; acumulación de cupones = **un cupón activo**, siempre el de mayor % (los anteriores quedan `superseded`).
+- [x] **Normalización:** email minúsculas + trim; `booking_number` sin `#` inicial y mayúsculas (`normalizeBookingNumber`).
+- [x] **Protección anti-abuso:** reCAPTCHA Enterprise en endpoints sensibles + rate limit en middleware para `/api/storytellers/*`.
 
 ---
 
@@ -585,13 +599,15 @@ Plantillas:
 | `src/app/api/admin/storyteller-uploads/[id]/select/route.ts` | **NUEVO** endpoint marcar seleccionada |
 | `src/lib/storytellers/magic-link.ts` | **NUEVO** helpers HMAC sign/verify del token de acceso |
 | `src/lib/storytellers/points.ts` | **NUEVO** lógica de cálculo de puntos, umbrales, generación de cupones |
-| `supabase/migrations/YYYYMMDD-storytellers-tables.sql` | **NUEVO** migración tablas |
-| `supabase/migrations/YYYYMMDD-storytellers-rls.sql` | **NUEVO** migración políticas RLS |
-| Plantillas email Resend en `mailing/` o donde correspondan | **NUEVAS** 5 plantillas |
-
----
-
-**Última actualización:** 8 de mayo de 2026.
+| `supabase/migrations/20260508-storytellers-program.sql` | Migración única: tablas + bucket + RLS |
+| `scripts/generate-content-creator-showcase-images.ts` | Generación imágenes landing PRO (tags CLI) |
+| `scripts/generate-storytellers-showcase-images.ts` | Generación imágenes landing Storytellers + merch |
+| `scripts/storytellers-smoke-test.ts` | Smoke test despliegue Storytellers |
+| `src/lib/seo/sitemap.ts` | Entrada estática `/storytellers` |
+| `src/lib/route-translations.ts` | `/storytellers` mismo slug en es/en/fr/de |
+| `src/components/layout/header.tsx` / `footer.tsx` | Enlaces Storytellers |
+| `vercel.json` | Crons `storyteller-coupons-expire`, `storyteller-post-trip-reminder` |
+| Plantillas / envío email Storytellers | Ver `src/lib/storytellers/emails.ts` (+ integración SMTP existente) |
 
 ---
 
@@ -609,14 +625,14 @@ Plantillas:
 ### ✅ Sprint 2 — Programa Storytellers backend + páginas completado
 
 #### Base de datos
-- `supabase/migrations/20260508-storytellers-program.sql` — tablas `storyteller_uploads`, `storyteller_points_ledger`, `storyteller_coupons`, bucket Storage privado, RLS para admin, función helper `get_storyteller_points_balance(email)`. **PENDIENTE: aplicar la migración en Supabase remoto.**
+- `supabase/migrations/20260508-storytellers-program.sql` — tablas `storyteller_uploads`, `storyteller_points_ledger`, `storyteller_coupons`, bucket Storage privado, RLS para admin, función helper `get_storyteller_points_balance(email)`. **Aplicada en Supabase prod** (confirmado 8 may 2026).
 
 #### Helpers / lógica
 - `src/lib/storytellers/config.ts` — toda la configuración del programa (puntos, umbrales, perks, ventana temporal, periodos bloqueados).
 - `src/lib/storytellers/magic-link.ts` — HMAC sign/verify de tokens.
 - `src/lib/storytellers/points.ts` — saldo, premiar subidas/selecciones, generar cupones, validar canje, expirar.
 - `src/lib/storytellers/booking-validation.ts` — validación nº reserva + email + ventana temporal + topes.
-- `src/lib/storytellers/recaptcha.ts` — verificación reCAPTCHA v3 server-side.
+- `src/lib/storytellers/recaptcha.ts` — verificación **reCAPTCHA Enterprise** (preferido) con fallback a v3 clásico si solo existe `RECAPTCHA_SECRET_KEY`.
 - `src/lib/storytellers/emails.ts` — plantillas y envío de emails Storytellers.
 
 #### Endpoints públicos
@@ -734,6 +750,74 @@ Comprueba: variables de entorno, las 3 tablas, el bucket privado, la función SQ
 
 ---
 
+## 12. Landing `/storytellers` — UX, estética y pipeline de imágenes (mayo 2026)
+
+Esta sección documenta **todo el proceso** seguido para que la página pública quede al nivel de `/creadores-de-contenido`, con copy coherente con la fiscalidad (§11.1) y reglas de negocio del código.
+
+### 12.1. Principios de diseño
+
+- **Referencia visual:** misma familia de patrones que `ContentCreatorsLanding`: hero en dos columnas (copy + imagen vertical 4:5 con pie tipo marca), alternancia `bg-white` / `bg-gray-50`, cards `rounded-3xl`, tablas con cabecera corporativa (aquí naranja Storytellers vs azul PRO), bloques callout con borde naranja, FAQ en `<details>`, sección teaser cruzado (PRO ↔ Storytellers).
+- **Identidad de color:** gradient hero **naranja / ámbar** (programa cliente amateur), frente al **azul** de la landing PRO — así se diferencian a primera vista sin romper la marca.
+- **SEO / rutas:** `/storytellers` indexable; `/storytellers/subir` y `/storytellers/mis-puntos` con `noindex`. Alias localizados `src/app/{es,en,fr,de}/storytellers/page.tsx`. Sitemap (`src/lib/seo/sitemap.ts`) + `route-translations.ts`.
+- **Navegación:** enlace en menú desplegable «Furgocasa» (desktop/móvil) y footer (`header.tsx`, `footer.tsx`).
+
+### 12.2. Orden de secciones en la landing (orden de lectura)
+
+1. Hero + CTAs (Subir / Mis puntos).
+2. **Intro SEO** (párrafo contextual).
+3. **«¿Cómo funciona?»** — bloque prioritario con **4 tarjetas** numeradas + iconos: (1) Durante el viaje → (2) Sube tu material → (3) Sumas puntos → (4) Canjeas tu cupón. Debe ser **lo primero que entiende el cliente** tras el contexto breve.
+4. ¿Qué es este programa?
+5. Qué ofrecemos (cards).
+6. Cómo se ganan los puntos.
+7. Cómo se canjean los puntos (tabla + **aviso explícito del 3% de bienvenida único** + FAQ asociada).
+8. Cuándo y cómo se canjean los cupones (temporada, días mínimos, un solo cupón activo).
+9. Lo que premiamos / lo que firmas / antiabuso.
+10. Showcase 6 imágenes «momentos que nos encantan».
+11. Perks merchandising (cards con foto producto).
+12. FAQ.
+13. Teaser hacia programa PRO (`LocalizedLink` → `/creadores-de-contenido`).
+14. CTA final.
+
+**Implementación:** `src/components/storytellers/storytellers-landing.tsx`.
+
+### 12.3. Pipeline de imágenes GPT Image 2 (Storytellers)
+
+**Script:** `scripts/generate-storytellers-showcase-images.ts`
+
+| Tags CLI | Salida | Uso |
+|---|---|---|
+| `hero`, `sunset`, `interior`, `breakfast`, `family`, `detail`, `pet` | `public/images/storytellers/showcase-*.webp` | Vertical **1024×1536** → WebP q88 (por defecto). Estética «cliente con buen ojo», viaje real. |
+| `mug`, `tshirt`, `hoodie` | `merch-mug.webp`, `merch-tshirt.webp`, `merch-hoodie.webp` | Cuadrado **1024×1024**, estilo catálogo fondo neutro. |
+
+**Comandos:**
+
+```bash
+# Todas las showcase (7)
+npm run generate:storytellers-images
+
+# Subconjunto o solo merch
+node --use-system-ca node_modules/tsx/dist/cli.mjs scripts/generate-storytellers-showcase-images.ts hero sunset
+node --use-system-ca node_modules/tsx/dist/cli.mjs scripts/generate-storytellers-showcase-images.ts mug tshirt hoodie
+```
+
+Variables opcionales: `SHOWCASE_IMAGE_MODEL`, `SHOWCASE_WEBP_QUALITY`, `OPENAI_API_KEY` (obligatoria). En redes con proxy TLS usar **`node --use-system-ca`** como en la landing PRO (§11).
+
+**Landing PRO (referencia):** `npm run generate:showcase-images` → `scripts/generate-content-creator-showcase-images.ts` → `public/images/content-creators/`.
+
+### 12.4. Commits de referencia recientes (rama `main`)
+
+- `62d2633` — Landing Storytellers rediseñada + 7 showcase + script generador.
+- `3e042b7` — Merch en perks + copy cupón 3% aclarado + imágenes merch + `PERK_TIERS` extendido.
+- `51093fb` — Bloque «¿Cómo funciona?» visible **arriba** (post-intro), eliminada duplicación al final.
+
+### 12.5. Extensiones futuras recomendadas (Sprint 3)
+
+- UI «Mis puntos»: mismo tratamiento visual de merch que la landing (imágenes por `slug`).
+- Automatizar **canje de merchandising** (ticket interno, email de ops, movimiento `admin_adjust` en ledger) si el volumen lo justifica.
+- Traducción real del copy de `StorytellersLanding` a EN/FR/DE si el negocio lo prioriza (ahora metadata sí, cuerpo principal ES).
+
+---
+
 ## §11.1 — Calificación fiscal del programa Storytellers
 
 > **Fecha resolución:** 8 may 2026
@@ -763,6 +847,7 @@ Comprueba: variables de entorno, las 3 tablas, el bucket privado, la función SQ
 El lenguaje público debe ser coherente con esta calificación. Reglas de redacción a respetar en `/es/storytellers`, emails transaccionales y formularios:
 
 - ✅ Usar: "te lo agradecemos con un descuento", "programa de fidelización", "promoción", "comparte", "súmate", "gana puntos por colaborar".
+- ✅ Objetos promocionales (taza/camiseta/sudadera): presentarlos como **detalle o perk del programa de puntos**, no como contraprestación económica unitaria ni compraventa de la foto.
 - ❌ Evitar: "te compramos las fotos", "te pagamos por X", "tarifa por foto", "facturación", "factúranos", "contraprestación", "remuneración".
 
 A día 8 may 2026 el copy del repositorio cumple las reglas anteriores. Si en el futuro se añaden secciones o emails, deben revisarse para mantener la coherencia.
@@ -782,4 +867,8 @@ Si en algún momento se introducen cualquiera de estos elementos, hay que reabri
 - Curaduría mensual del backlog en `/administrator/storyteller-uploads`.
 - Workflow de edición del bruto profesional.
 - Revisión trimestral de métricas (§8).
+- **Merchandising:** cumplimiento del texto público (contacto oficina + descuento de puntos en ledger si se formaliza política interna — §3.4).
 
+---
+
+**Última actualización del documento:** 8 de mayo de 2026 (revisión amplia: §3.3–3.4 cupón bienvenida + merch, §9–§10, §12 proceso landing y assets, apéndice archivos).
