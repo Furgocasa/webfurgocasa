@@ -57,6 +57,26 @@ Motivo: el código real vive en `src/lib/email/templates.ts` (es lo que ve el cl
 | `app/03-segundo-pago-confirmado.html` | `getSecondPaymentConfirmedTemplate` | Se completa el pago total (segundo pago) | mismos archivos que el anterior |
 | `app/04-recordatorio-devolucion.html` | `getReturnReminderTemplate` | La víspera del `dropoff_date` (cron diario) | `src/app/api/cron/return-reminders/route.ts` |
 
+#### Storytellers · HTML de referencia en `mailing/app/`
+
+Las tres plantillas siguientes son **borradores de ciclo de vida** (previsualización en navegador y base de copy). La fuente de verdad del envío **no** está aún unificada en `templates.ts`: parte del programa usa `src/lib/storytellers/emails.ts`, rutas API y crons (ver tabla inferior).
+
+| Archivo HTML (referencia) | Momento de envío previsto (producto) | Estado en código |
+|---|---|---|
+| `app/05-storytellers-dia-salida-noche.html` | Mismo día del pickup (salida), ~20:00–21:00 (Europe/Madrid) | Pendiente de cron/disparador dedicado |
+| `app/06-storytellers-mitad-viaje.html` | Día intermedio del alquiler (p. ej. punto medio pickup ↔ dropoff), mañana | Pendiente de cron/disparador dedicado |
+| `app/07-storytellers-dia-despues-vuelta.html` | 1 día natural después del `dropoff_date`, mañana | Borrador; el recordatorio automático actual usa **+7 días** (`buildPostTripReminderHtml` + `storyteller-post-trip-reminder`) |
+
+**Otros correos al cliente ligados a Storytellers** (ya implementados o disparados por acción):
+
+| Origen | Cuándo |
+|---|---|
+| `sendUploadConfirmationEmail` | Tras una subida correcta |
+| `POST /api/storytellers/request-magic-link` | El cliente pide enlace a “Mis puntos” |
+| `POST /api/admin/storyteller-uploads/[id]/select` | El equipo marca foto/vídeo como seleccionado (puntos / cupón) |
+
+Los HTML `05`–`07` incluyen en la primera línea un comentario con **placeholders** (`{{NOMBRE_CLIENTE}}`, `{{NUMERO_RESERVA}}`, etc.) para cuando se integren en código.
+
 > `getCompanyNotificationTemplate` existe en `templates.ts` pero está **deprecado** y solo redirige a las tres primeras plantillas: no tiene HTML propio.
 
 ---

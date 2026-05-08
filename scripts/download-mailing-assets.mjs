@@ -33,6 +33,8 @@ import path from 'node:path';
 const CORPORATE_COLOR = '063971';
 const OUT_ROOT = path.resolve('public/images/mailing');
 const OUT_VEHICLES = path.join(OUT_ROOT, 'vehicles');
+const OUT_STORYTELLERS = path.join(OUT_ROOT, 'storytellers');
+const STORYTELLERS_SRC = path.resolve('public/images/storytellers');
 const ICON_SIZE = 56; // 2x de 28 para retina
 
 // ──────────────────────────────────────────────────────────────────────
@@ -163,17 +165,64 @@ async function downloadVehicleCovers() {
 }
 
 // ──────────────────────────────────────────────────────────────────────
+// 3) Imágenes Storytellers para mailings (webp → jpg)
+//
+// Los clientes de correo (Gmail/Outlook) renderizan mal el webp, así que
+// para los emails del programa Storytellers re-comprimimos las webp de la
+// landing pública a JPEG optimizado de hasta 1200 px de ancho.
+// ──────────────────────────────────────────────────────────────────────
+async function convertStorytellersImages() {
+  const files = [
+    'showcase-hero.webp',
+    'showcase-sunset-couple.webp',
+    'showcase-interior-cozy.webp',
+    'showcase-breakfast-table.webp',
+    'showcase-family-fun.webp',
+    'showcase-detail-route.webp',
+    'showcase-pet-travel.webp',
+  ];
+
+  // Limpia previo para evitar huérfanos
+  try {
+    const prev = await fs.readdir(OUT_STORYTELLERS);
+    for (const f of prev) await fs.unlink(path.join(OUT_STORYTELLERS, f));
+  } catch {}
+
+  for (const f of files) {
+    const inPath = path.join(STORYTELLERS_SRC, f);
+    const outName = f.replace(/\.webp$/i, '.jpg');
+    const outPath = path.join(OUT_STORYTELLERS, outName);
+    try {
+      const buf = await fs.readFile(inPath);
+      await sharp(buf)
+        .rotate()
+        .resize({ width: 1200, withoutEnlargement: true })
+        .jpeg({ quality: 82, progressive: true, mozjpeg: true })
+        .toFile(outPath);
+      const stats = await fs.stat(outPath);
+      console.log(`· ${outName}  →  ${(stats.size / 1024).toFixed(0)} KB`);
+    } catch (e) {
+      console.warn(`  ! ERROR convirtiendo ${f}: ${e.message}`);
+    }
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────
 // Main
 // ──────────────────────────────────────────────────────────────────────
 async function main() {
   await ensureDir(OUT_ROOT);
   await ensureDir(OUT_VEHICLES);
+  await ensureDir(OUT_STORYTELLERS);
 
   console.log('=== Iconos redes sociales ===');
   await downloadSocialIcons();
 
   console.log('\n=== Fotos carátula de vehículos ===');
   await downloadVehicleCovers();
+
+  console.log('\n=== Imágenes Storytellers (webp → jpg para email) ===');
+  await convertStorytellersImages();
 
   console.log('\n✓ Listo.');
 }

@@ -44,6 +44,36 @@ Uso recomendado en HTML:
      style="display:block;border:0;width:28px;height:28px;" />
 ```
 
+### Imágenes Storytellers para mailing (`storytellers/`)
+
+Versión **JPEG optimizada para email** (máx. 1200 px ancho, calidad 82%) de las
+fotos showcase del programa Storytellers. Las originales (webp) viven en
+`public/images/storytellers/` y son las que usa la landing pública. Para mailing
+**no se usan webp** porque varios clientes (Outlook clásico, algunos webmail) no
+las renderizan; aquí están reconvertidas a JPG por `scripts/download-mailing-assets.mjs`
+(paso 3, idempotente).
+
+Archivos disponibles:
+
+```
+public/images/mailing/storytellers/showcase-hero.jpg
+public/images/mailing/storytellers/showcase-sunset-couple.jpg
+public/images/mailing/storytellers/showcase-interior-cozy.jpg
+public/images/mailing/storytellers/showcase-breakfast-table.jpg
+public/images/mailing/storytellers/showcase-family-fun.jpg
+public/images/mailing/storytellers/showcase-detail-route.jpg
+public/images/mailing/storytellers/showcase-pet-travel.jpg
+```
+
+Uso recomendado en HTML de los mails Storytellers (URL absoluta, ancho fijo):
+
+```html
+<img src="https://www.furgocasa.com/images/mailing/storytellers/showcase-hero.jpg"
+     alt="Cliente al atardecer junto a su camper Furgocasa"
+     width="600"
+     style="display:block;width:100%;max-width:600px;height:auto;border:0;" />
+```
+
 ### Fotos carátula de vehículos (`vehicles/`)
 
 Todas las fotos primarias de los vehículos activos e inactivos, en JPEG
