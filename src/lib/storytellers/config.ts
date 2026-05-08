@@ -48,18 +48,45 @@ export const DISCOUNT_TIERS: DiscountTier[] = [
 export const INSTANT_FIRST_UPLOAD_COUPON_PCT = 3;
 
 // ============================================
-// PERKS NO MONETARIOS (encima del techo)
+// PERKS DE MERCHANDISING (encima del techo del 15%)
 // ============================================
 export interface PerkTier {
+  /** Puntos mínimos para canjear este perk */
   threshold: number;
+  /** Nombre corto del producto */
   perk: string;
+  /** Descripción comercial */
+  description: string;
+  /** Identificador del producto (también nombre de la imagen merch-<slug>.webp) */
+  slug: string;
 }
 
+/**
+ * Perks materiales que el cliente puede canjear cuando supera el techo del 15%.
+ * Son merchandising real, no condiciones comerciales (acceso anticipado, etc.).
+ *
+ * Las imágenes asociadas viven en /public/images/storytellers/merch-<slug>.webp
+ * y se generan con scripts/generate-storytellers-showcase-images.ts <slug>.
+ */
 export const PERK_TIERS: PerkTier[] = [
-  { threshold: 1200, perk: "Acceso anticipado: 7 días antes que el público" },
-  { threshold: 1600, perk: "Vehículo gama media garantizado" },
-  { threshold: 2000, perk: "Upgrade gratis a vehículo superior, 1 vez/año" },
-  { threshold: 2500, perk: "Storyteller Gold: foto destacada en home con tu nombre, 1 mes" },
+  {
+    threshold: 1200,
+    perk: "Taza Furgocasa",
+    description: "Taza de cerámica con el logo de Furgocasa, edición Storytellers.",
+    slug: "mug",
+  },
+  {
+    threshold: 1600,
+    perk: "Camiseta Furgocasa",
+    description: "Camiseta de algodón, edición Storytellers, talla a elegir.",
+    slug: "tshirt",
+  },
+  {
+    threshold: 2000,
+    perk: "Sudadera Furgocasa",
+    description: "Sudadera con capucha, edición Storytellers, talla a elegir.",
+    slug: "hoodie",
+  },
 ];
 
 // ============================================

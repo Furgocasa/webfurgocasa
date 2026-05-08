@@ -14,7 +14,11 @@
  * "UNABLE_TO_VERIFY_LEAF_SIGNATURE". Lánzalo así:
  *   node --use-system-ca node_modules/tsx/dist/cli.mjs scripts/generate-storytellers-showcase-images.ts
  *
- * Tags disponibles: hero, sunset, interior, breakfast, family, detail, pet
+ * Tags disponibles:
+ *   Showcase amateur (vertical 4:5):
+ *     hero, sunset, interior, breakfast, family, detail, pet
+ *   Merchandising (cuadrado 1:1, fondo neutro estilo catálogo):
+ *     mug, tshirt, hoodie
  */
 
 import { config } from "dotenv";
@@ -43,6 +47,9 @@ const WEBP_QUALITY = (() => {
 
 const SHARED_STYLE =
   "Authentic amateur travel photography, casual but well-composed, smartphone or compact camera vibe, natural daylight, real people, real moments, vertical 4:5 framing, warm and approachable mood, soft shadows, no overly polished commercial editing.";
+
+const MERCH_STYLE =
+  "Clean catalog product photography, square 1:1 framing, neutral light grey or off-white seamless background, soft natural daylight from one side, subtle shadow under the product, sharp focus on the item, no human models, no extra props, no text overlays. The item rests centered with breathing room around it. Editorial e-commerce style, not pseudo-3D rendering.";
 
 interface Job {
   tag: string;
@@ -93,6 +100,26 @@ const JOBS: Job[] = [
     file: "showcase-pet-travel.webp",
     size: "1024x1536",
     prompt: `${SHARED_STYLE} A medium-sized friendly dog (mixed breed, light brown fur) sitting at the open side door of a camper van, looking out at a green natural landscape. The owner is just out of frame, taking the photo with a smartphone visible at the bottom corner reflecting back at the dog. The dog has a relaxed, happy expression. Real pet travel companion vibe, not a polished pet ad.`,
+  },
+
+  // ============ MERCHANDISING (1:1) ============
+  {
+    tag: "mug",
+    file: "merch-mug.webp",
+    size: "1024x1024",
+    prompt: `${MERCH_STYLE} A simple matte white ceramic mug, 11oz size, with a small clean orange-and-blue logo printed on the side reading "FURGOCASA" in a modern sans-serif typeface. The mug is shown three-quarter view so you can read the logo clearly. The handle is curved and visible on the right. Empty inside (no coffee). Realistic ceramic texture with subtle highlights. Studio product shot.`,
+  },
+  {
+    tag: "tshirt",
+    file: "merch-tshirt.webp",
+    size: "1024x1024",
+    prompt: `${MERCH_STYLE} A folded heather-grey cotton t-shirt laid flat on a neutral background, with a small embroidered or printed "FURGOCASA" logo on the chest area in orange. Modern minimal travel-brand aesthetic. Crew neck, short sleeves visible. The fabric texture is soft and lived-in but clean. Slight shadow gives volume. Subtle, premium look.`,
+  },
+  {
+    tag: "hoodie",
+    file: "merch-hoodie.webp",
+    size: "1024x1024",
+    prompt: `${MERCH_STYLE} A folded charcoal grey heavyweight hooded sweatshirt laid flat on a neutral background, with a small printed "FURGOCASA" logo on the chest in orange. Visible drawstrings on the hood. Modern minimal travel-brand aesthetic. Pockets visible at the front. Soft cotton texture, clean studio shadow under the garment for volume.`,
   },
 ];
 

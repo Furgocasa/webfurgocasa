@@ -4,15 +4,12 @@ import {
   CalendarRange,
   CheckCircle2,
   FileImage,
-  Gift,
   Image as ImageIcon,
   MapPin,
-  Sparkles,
   Trophy,
   Upload,
   Users,
   Video,
-  Coffee,
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import {
@@ -47,6 +44,10 @@ const FAQ: { q: string; a: string }[] = [
   {
     q: "¿Cómo canjeo el descuento?",
     a: `Al alcanzar un umbral, generamos un código de cupón con tu % desbloqueado. Lo introduces al hacer una nueva reserva. Reglas: solo en baja y media temporada, mínimo ${COUPON_MIN_RESERVATION_DAYS} días, no acumulable con otras promos, caduca a ${COUPON_VALIDITY_MONTHS} meses, tope ${MAX_DISCOUNT_PCT}%.`,
+  },
+  {
+    q: "¿El 3% de bienvenida se gana en cada subida?",
+    a: "No. El cupón del 3% se entrega solo en tu primera subida válida (≥3 fotos o 1 vídeo) y solo una vez por email. A partir de ahí, las siguientes subidas suman puntos al ledger, pero no generan cupones nuevos hasta que cruzas los 40 puntos (5%). En ese momento, el 3% queda anulado y se sustituye automáticamente por el nuevo cupón del 5%. Y así sucesivamente con los tramos superiores. Solo tienes un cupón activo a la vez: el de mayor %.",
   },
   {
     q: "¿Mis fotos van a tener un uso comercial?",
@@ -377,7 +378,7 @@ export function StorytellersLanding() {
             Cómo se canjean los puntos
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
-            Al cruzar cada umbral generamos un cupón con tu % desbloqueado. Solo se mantiene activo el de mayor %.
+            Al cruzar cada umbral generamos un cupón con tu % desbloqueado. Solo se mantiene activo el de mayor %: si subes a un tramo superior, el anterior queda anulado y se sustituye por el nuevo.
           </p>
           <div className="mx-auto mt-12 max-w-3xl">
             {/* Tabla en escritorio */}
@@ -385,18 +386,21 @@ export function StorytellersLanding() {
               <table className="w-full text-left text-sm">
                 <thead className="bg-furgocasa-orange text-white">
                   <tr>
-                    <th className="px-6 py-4 font-heading">Puntos</th>
+                    <th className="px-6 py-4 font-heading">Cuándo se desbloquea</th>
                     <th className="px-6 py-4 font-heading">% descuento próxima reserva</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="bg-gray-50">
-                    <td className="px-6 py-4 text-gray-800">Cada subida válida (≥3 fotos o 1 vídeo)</td>
-                    <td className="px-6 py-4 font-bold text-furgocasa-orange">3% instantáneo</td>
+                  <tr className="bg-orange-50/60">
+                    <td className="px-6 py-4 text-gray-800">
+                      <span className="block font-bold">Tu primera subida válida</span>
+                      <span className="block text-xs text-gray-500 mt-0.5">cupón de bienvenida · una sola vez</span>
+                    </td>
+                    <td className="px-6 py-4 font-bold text-furgocasa-orange">3%</td>
                   </tr>
                   {DISCOUNT_TIERS.map((tier, i) => (
                     <tr key={tier.threshold} className={i % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                      <td className="px-6 py-4 font-bold text-gray-800">{tier.threshold} ptos</td>
+                      <td className="px-6 py-4 font-bold text-gray-800">Al alcanzar {tier.threshold} ptos</td>
                       <td
                         className={`px-6 py-4 font-bold ${
                           tier.pct === MAX_DISCOUNT_PCT ? "text-furgocasa-orange-dark" : "text-furgocasa-orange"
@@ -411,14 +415,14 @@ export function StorytellersLanding() {
             </div>
             {/* Tarjetas en móvil */}
             <div className="grid gap-3 md:hidden">
-              <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm">
+              <div className="rounded-2xl border-2 border-furgocasa-orange/30 bg-orange-50/60 p-4 shadow-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-gray-700">Cada subida válida</span>
+                  <span className="text-sm font-bold text-gray-800">Tu primera subida válida</span>
                   <span className="rounded-full bg-furgocasa-orange/10 px-3 py-1 text-sm font-bold text-furgocasa-orange">
                     3%
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-gray-500">≥3 fotos o 1 vídeo</p>
+                <p className="mt-1 text-xs text-gray-500">Cupón de bienvenida · una sola vez</p>
               </div>
               {DISCOUNT_TIERS.map((tier) => (
                 <div
@@ -430,7 +434,7 @@ export function StorytellersLanding() {
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-gray-800">{tier.threshold} ptos</span>
+                    <span className="font-bold text-gray-800">Al alcanzar {tier.threshold} ptos</span>
                     <span
                       className={`rounded-full px-3 py-1 text-sm font-bold ${
                         tier.pct === MAX_DISCOUNT_PCT
@@ -443,6 +447,12 @@ export function StorytellersLanding() {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="mx-auto mt-6 max-w-3xl rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-relaxed text-amber-900">
+              <p>
+                <strong className="font-bold">Importante — cómo funciona el 3% de bienvenida:</strong>{" "}
+                el cupón del 3% se genera <strong>solo en tu primera subida válida</strong> y solo una vez por email. Si más adelante haces más subidas, sumas puntos al ledger pero <strong>no se generan cupones nuevos</strong> hasta que cruzas los 40 puntos (5%). En ese momento, el 3% queda anulado y lo sustituye el nuevo cupón del 5%, y así sucesivamente con cada tramo.
+              </p>
             </div>
           </div>
         </div>
@@ -472,7 +482,7 @@ export function StorytellersLanding() {
                   <strong>mínimo de {COUPON_MIN_RESERVATION_DAYS} días</strong> de reserva. Los introduces en el campo de código de descuento al confirmar una nueva reserva: el sistema los detecta y aplica automáticamente.
                 </p>
                 <p className="mt-4 text-sm leading-relaxed text-gray-600">
-                  No son acumulables con otras promociones ni con cupones manuales. Caducan a {COUPON_VALIDITY_MONTHS} meses desde su emisión, aunque los puntos en sí siguen sumando aunque no canjees enseguida. Solo se mantiene activo el cupón de mayor %: si subes a un tramo superior, el anterior queda anulado y se sustituye por el nuevo.
+                  No son acumulables con otras promociones ni con cupones manuales. Caducan a {COUPON_VALIDITY_MONTHS} meses desde su emisión, pero los puntos en sí <strong>siguen sumando aunque no canjees enseguida</strong>. Y recuerda: <strong>solo tienes un cupón activo a la vez</strong>, el de mayor %. Si subes de tramo, el anterior queda anulado y lo sustituye el nuevo automáticamente.
                 </p>
               </div>
             </div>
@@ -599,7 +609,7 @@ export function StorytellersLanding() {
         </div>
       </section>
 
-      {/* 9. Perks adicionales */}
+      {/* 9. Perks adicionales — Merchandising */}
       <section
         className="border-t border-gray-100 bg-gray-50 py-16 md:py-20"
         aria-labelledby="perks-storytellers"
@@ -609,37 +619,39 @@ export function StorytellersLanding() {
             id="perks-storytellers"
             className="text-center font-heading text-3xl font-bold text-gray-900 md:text-4xl"
           >
-            Perks adicionales
+            Perks adicionales — merchandising
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
-            Por encima del techo del {MAX_DISCOUNT_PCT}% se desbloquean estos extras. Pensados para Storytellers recurrentes que aportan mucho material a lo largo del tiempo.
+            Por encima del techo del {MAX_DISCOUNT_PCT}% los puntos siguen sumando y se canjean por merch oficial. Pensado para Storytellers recurrentes que aportan mucho material.
           </p>
-          <ul className="mx-auto mt-10 grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-2">
-            {PERK_TIERS.map((p) => {
-              const PerkIcon =
-                p.threshold >= 2500
-                  ? Sparkles
-                  : p.threshold >= 2000
-                  ? Trophy
-                  : p.threshold >= 1600
-                  ? Gift
-                  : Coffee;
-              return (
-                <li
-                  key={p.threshold}
-                  className="flex items-start gap-4 rounded-3xl border border-furgocasa-orange/15 bg-white p-6 shadow-sm transition hover:border-furgocasa-orange/30 hover:shadow-md"
-                >
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-furgocasa-orange/10 text-furgocasa-orange">
-                    <PerkIcon className="h-6 w-6" aria-hidden />
-                  </div>
-                  <div>
-                    <p className="font-heading text-lg font-bold text-gray-900">{p.threshold} ptos</p>
-                    <p className="mt-1 text-sm text-gray-700 leading-relaxed">{p.perk}</p>
-                  </div>
-                </li>
-              );
-            })}
+          <ul className="mx-auto mt-12 grid max-w-5xl gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {PERK_TIERS.map((p) => (
+              <li
+                key={p.threshold}
+                className="overflow-hidden rounded-3xl border border-furgocasa-orange/15 bg-white shadow-sm transition hover:border-furgocasa-orange/30 hover:shadow-md"
+              >
+                <div className="relative aspect-square bg-gray-100">
+                  <Image
+                    src={`/images/storytellers/merch-${p.slug}.webp`}
+                    alt={`${p.perk} – producto Storytellers`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  />
+                  <span className="absolute left-4 top-4 rounded-full bg-furgocasa-orange px-3 py-1 text-xs font-bold text-white shadow-md">
+                    {p.threshold} ptos
+                  </span>
+                </div>
+                <div className="border-t border-gray-100 p-5">
+                  <p className="font-heading text-lg font-bold text-gray-900">{p.perk}</p>
+                  <p className="mt-1 text-sm text-gray-600 leading-relaxed">{p.description}</p>
+                </div>
+              </li>
+            ))}
           </ul>
+          <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-gray-500">
+            * Los puntos canjeados por merch se descuentan del saldo. El envío del producto se gestiona desde la oficina de Furgocasa contactando al cliente por email tras la solicitud de canje.
+          </p>
         </div>
       </section>
 
@@ -655,27 +667,30 @@ export function StorytellersLanding() {
           >
             Cómo funciona, paso a paso
           </h2>
+          <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
+            4 pasos sencillos. Empiezas durante el propio viaje y acabas con un cupón listo para tu próxima reserva.
+          </p>
           <ol className="mx-auto mt-12 grid max-w-5xl gap-8 md:grid-cols-4">
             {[
               {
                 step: "1",
-                title: "Identifícate",
-                body: "Nº de reserva + email asociado. Sin cuenta, sin contraseña. Tarda 30 segundos.",
+                title: "Durante el viaje",
+                body: "Haces fotos o vídeos del vehículo y de tus experiencias dentro y fuera de la camper, como ya hacías.",
               },
               {
                 step: "2",
-                title: "Sube tus archivos",
-                body: "Arrastra fotos y vídeos del viaje. Lote mínimo: 3 fotos o 1 vídeo. Hasta 100 fotos y 20 vídeos por reserva.",
+                title: "Sube tu material",
+                body: `Te identificas con tu nº de reserva + email y arrastras los archivos. Puedes subir según los vas haciendo o al volver. Lote mínimo: 3 fotos o 1 vídeo.`,
               },
               {
                 step: "3",
                 title: "Sumas puntos",
-                body: "Te llevas puntos al instante por cada archivo. Si seleccionamos alguno para archivo profesional, sumas más.",
+                body: "Te llevas puntos al instante por cada archivo. Si seleccionamos alguno para nuestro archivo profesional, sumas mucho más.",
               },
               {
                 step: "4",
                 title: "Canjeas tu cupón",
-                body: `Al cruzar un umbral generamos automáticamente tu cupón. Lo aplicas en próximas reservas (baja/media temporada, mín. ${COUPON_MIN_RESERVATION_DAYS} días).`,
+                body: `Al cruzar un umbral generamos tu cupón automáticamente. Lo aplicas en próximas reservas (baja/media temporada, mín. ${COUPON_MIN_RESERVATION_DAYS} días).`,
               },
             ].map((item) => (
               <li key={item.step} className="relative text-center md:text-left">
