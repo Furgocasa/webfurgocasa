@@ -342,55 +342,184 @@ Existente y a refactorizar:
 
 ---
 
-## 9 · Generación de imágenes hero y banners narrativa
+## 9 · Generación de imágenes hero y banners promocionales
 
-### 9.1 Portadas hero (`cover-cta-05/06/07.jpg`)
+> ⭐ **Regla de oro (08/05/2026 · obligatoria a futuro):** cualquier
+> banner, hero o cartel promocional con texto encima de una foto **se
+> genera con `gpt-image-2`** vía `openai.images.edit`, no con `sharp` +
+> SVG quemado a mano. Pasarle al modelo la foto base + un brief con
+> texto exacto, paleta y posición es lo que produce composiciones
+> integradas, naturales y editoriales. SVG queda reservado para casos
+> donde necesitamos reproducibilidad pixel-perfect (por ejemplo logos,
+> watermarks, marcos de blog) o cuando no hay foto base de partida.
 
-Las 3 portadas se generan dinámicamente con `sharp` + SVG overlay en
-`scripts/download-mailing-assets.mjs`. Para regenerarlas:
+### 9.1 Portadas hero (`cover-cta-05/06/07.jpg`) y banners promocionales (`banner-05/06/07.jpg`)
+
+Las **6 imágenes promocionales del email** (3 hero verticales + 3
+banners horizontales con texto) se generan ahora con un único script
+dedicado, usando **`gpt-image-2`** (la nueva generación del modelo de
+imagen de OpenAI, integrada también en blog covers, showcase landing y
+creator). El modelo recibe la foto base limpia + un brief con texto,
+paleta y posición, y compone el cartel completo.
 
 ```bash
-node scripts/download-mailing-assets.mjs
+# Las 6 imágenes (≈ 12 min, ~2-3 € en OpenAI con quality high)
+npx tsx scripts/generate-storytellers-email-promo-images.ts
+
+# Solo los hero verticales
+npx tsx scripts/generate-storytellers-email-promo-images.ts cover
+
+# Solo los banners horizontales del cuerpo
+npx tsx scripts/generate-storytellers-email-promo-images.ts banner
+
+# Una imagen suelta
+npx tsx scripts/generate-storytellers-email-promo-images.ts cover-05
 ```
 
-Especificaciones:
+**Tags disponibles:** `cover-05`, `cover-06`, `cover-07`, `banner-05`,
+`banner-06`, `banner-07` (y los alias `cover` / `banner` para los
+trios).
 
-- **Aspect ratio:** 4:5 vertical (1200×1500 px → se muestra a 600×750 px).
-- **SVG overlay** con `filter id="ds"` (drop-shadow) sobre todo el texto.
-- **Badge naranja sólido** `+ REGALOS POR TUS PUNTOS` con texto blanco para contraste alto.
-- **Flecha "scroll down"** abajo del todo, también con drop-shadow.
-- **Fuente:** weight `bold` reforzado en sublinea.
+Imágenes base que el modelo usa como punto de partida (no se modifican,
+solo sirven de fondo / contexto):
 
-Las imágenes base parten del set `/public/images/storytellers/*.webp`
-(generadas por IA para la landing pública) convertidas a `.jpg` y servidas
-desde `/public/images/mailing/storytellers/` con URL absoluta para
-compatibilidad con Outlook (que no soporta `.webp`).
-
-### 9.2 Banners narrativa (`banner-05/06/07.jpg`)
-
-Para reducir el "valle visual" entre el hero y el mosaico de ejemplos,
-cada email lleva además un **banner foto-narrativo** colocado tras la
-intro / mensaje principal. No son CTAs ni llevan texto: aportan realidad,
-cercanía y emoción al momento del viaje.
-
-| Email | Banner | Concepto narrativo | Posición en el HTML |
+| Tag | Out | Base img | Tamaño output |
 |---|---|---|---|
-| 05 | `banner-05-salida.jpg` | Pareja cargando los últimos bártulos al amanecer en la costa mediterránea | Tras la intro `Hola Juan,...`, antes del bloque "Esto es lo que te llevas" |
-| 06 | `banner-06-teckel.jpg` | Teckel de pelo duro asomado por la ventana de la camper en una carretera de sierra | Tras la intro, antes de la tabla de descuentos |
-| 07 | `banner-07-recuerdos.jpg` | Manos sosteniendo un móvil con la galería de fotos del viaje, sofá cálido al fondo | Tras el bloque "No dejes pasar la oportunidad", antes de la tabla de descuentos |
+| cover-05 | `cover-cta-05.jpg` | `public/images/storytellers/showcase-hero.webp` | 1024×1536 (4:5) |
+| cover-06 | `cover-cta-06.jpg` | `public/images/storytellers/showcase-detail-route.webp` | 1024×1536 (4:5) |
+| cover-07 | `cover-cta-07.jpg` | `public/images/storytellers/showcase-family-fun.webp` | 1024×1536 (4:5) |
+| banner-05 | `banner-05-salida.jpg` | `public/images/mailing/storytellers/banner-05-salida-clean.jpg` | 1536×1024 (3:2) |
+| banner-06 | `banner-06-teckel.jpg` | `public/images/mailing/storytellers/banner-06-teckel-clean.jpg` | 1536×1024 (3:2) |
+| banner-07 | `banner-07-recuerdos.jpg` | `public/images/mailing/storytellers/banner-07-recuerdos-clean.jpg` | 1536×1024 (3:2) |
 
-Especificaciones técnicas:
+Especificaciones del brief que recibe el modelo (compartido por las 6 +
+overrides puntuales por imagen):
 
-- Generadas con IA (`gpt-image-1`), prompt fotorealista documental, sin texto.
-- Resolución original 1536×1024 → procesadas con `sharp` a 1200 px de ancho, JPG `quality: 86`, `progressive`, `mozjpeg`. Pesos típicos: 100–150 KB.
-- Reutilizan la clase `.hero-img` para que el media query mobile las haga full-bleed (`width: 100% !important`).
-- Servidas desde `/public/images/mailing/storytellers/` con URL absoluta `https://www.furgocasa.com/...`.
+- **Paleta obligatoria de marca:** naranja primario `#ea580c`,
+  blanco `#ffffff`, azul corporativo `#063971` (acento sutil).
+- **Tipografía:** sans-serif moderna, titulares en peso black (900) y
+  mayúsculas, subtítulo bold (700), kicker uppercase con tracking amplio.
+- **Foto base intacta:** prohibido recortar o redibujar a personas,
+  vehículos o paisaje. Solo se permite un gradiente sutil sobre la zona
+  muerta para mejorar contraste del texto.
+- **Texto perfectamente escrito en español**, respetando tildes (`á é í
+  ó ú ñ`), signos de apertura/cierre (`¿ ¡`) y `%`. El brief es
+  literalidad exacta para evitar invenciones del modelo.
+- **Posición del texto:** lado opuesto al sujeto principal de la foto
+  (zona muerta como cielo, asfalto, mar, manta de fondo, etc.).
+- **Pill (badge) decorativo:** redondeado completamente, naranja sólido
+  `#ea580c`, texto blanco bold mayúsculas. NO simula un botón clicable
+  con sombra fuerte: es un cartel publicitario, no un CTA.
+- **Estilo:** editorial premium, espacio en blanco generoso, contraste
+  alto. Look marca de viaje moderno (vibe nomade / outdoor voices).
+  Prohibido: HDR agresivo, glow, fantasía, render 3D, ilustración,
+  logos legibles, matrículas legibles, hashtags.
 
-Si hay que regenerarlas (cambio de marca, perro distinto, etc.):
+Salida final: JPG progresivo `mozjpeg` `quality: 86`. Pesos típicos:
+175–275 KB por imagen.
 
-1. Pedir nuevas imágenes a la IA con composición panorámica fotorealista, sin texto.
-2. Procesar a 1200 px JPG con sharp (las imágenes anteriores se pueden sobreescribir).
-3. Verificar peso < 250 KB cada una para no penalizar la carga del email.
+⚠️ **Coste y tiempos:** cada llamada a `gpt-image-2` con `quality: high`
+y `1024×1536` o `1536×1024` cuesta ~0.30 € y tarda ~2 min. **Antes de
+regenerar las 6** asegúrate de que el cambio lo justifica.
+
+⚠️ **Redes con MITM/proxy corporativo** (`Connection error` →
+`UNABLE_TO_VERIFY_LEAF_SIGNATURE`): el SDK de OpenAI usa `node-fetch`
+que no respeta `--use-system-ca`. Solución de sesión:
+
+```powershell
+$env:NODE_TLS_REJECT_UNAUTHORIZED = "0"
+npx tsx scripts/generate-storytellers-email-promo-images.ts
+```
+
+Solo para sesión local mientras generas; **nunca** dejar esa variable
+en `.env*` ni en Vercel. La forma "limpia" de fondo es exportar el cert
+de la CA corporativa y apuntar `NODE_EXTRA_CA_CERTS=ruta/ca.pem`, pero
+para regeneraciones puntuales el `NODE_TLS_REJECT_UNAUTHORIZED=0` es
+aceptable.
+
+### 9.2 Mensajes literales que recibe el modelo
+
+Cada cartel tiene su brief específico (literalidad exacta de los
+títulos, sublíneas y pill). Resumen de copy:
+
+#### Hero verticales 4:5 (no clicables, invitan a deslizar)
+
+| Tag | Kicker | Titular dos líneas | Sublínea naranja | Pill naranja | Indicación scroll |
+|---|---|---|---|---|---|
+| cover-05 | `PROGRAMA STORYTELLERS` | `¿QUIERES GANAR / UN DESCUENTO?` | `3 % AL INSTANTE · HASTA 15 %` | `+ REGALOS POR TUS PUNTOS` | "Desliza hacia abajo para saber cómo" + flecha |
+| cover-06 | `PROGRAMA STORYTELLERS` | `TU VIAJE VALE / DESCUENTO` | `SÚBELO YA · HASTA 15 %` | `+ REGALOS POR TUS PUNTOS` | "Desliza y empieza a sumar puntos" + flecha |
+| cover-07 | `PROGRAMA STORYTELLERS` | `NO DEJES EL DESCUENTO / EN EL MÓVIL` | `90 DÍAS PARA SUBIR · HASTA 15 %` | `+ REGALOS POR TUS PUNTOS` | "Desliza y no pierdas la oportunidad" + flecha |
+
+#### Banners horizontales 3:2 (en el cuerpo del email)
+
+| Tag | Titular dos líneas | Sublínea blanca | Pill naranja |
+|---|---|---|---|
+| banner-05 | `FOTOS POR / DESCUENTO` | "Empieza con un 3 % al instante" | `HASTA 15 % + REGALOS` |
+| banner-06 | `TU VIAJE VALE / DESCUENTO` | "Súbenoslo y empieza a sumar" | `+ REGALOS POR TUS PUNTOS` |
+| banner-07 | `NO LAS DEJES / OLVIDADAS` | "Tienes 90 días para subirlas" | `HASTA 15 % + REGALOS` |
+
+Diferencias intencionales hero vs banner del cuerpo:
+
+- El hero **lleva** el kicker `PROGRAMA STORYTELLERS` y la flecha de
+  scroll; el banner del cuerpo **NO** los lleva (sería ruido,
+  duplicaría info y molestaría al scroll dentro del email).
+- El hero usa **dos cromos de naranja** (sublínea + pill) para máxima
+  agresividad comercial al primer pantallazo; el banner del cuerpo
+  usa **un solo cromo de naranja** (la pill) para no saturar a mitad
+  de email.
+
+Posiciones en el HTML:
+
+- **05:** banner tras la intro `Hola Juan,...`, antes del bloque "Esto es lo que te llevas".
+- **06:** banner tras la intro, antes de la tabla de descuentos.
+- **07:** banner tras el bloque "No dejes pasar la oportunidad", antes de la tabla.
+
+Todos los banners reutilizan la clase `.hero-img` para que el media
+query mobile los haga full-bleed (`width: 100% !important`) y se
+sirven desde `/public/images/mailing/storytellers/` con URL absoluta
+`https://www.furgocasa.com/...` (Outlook no soporta WebP, JPG forzado).
+
+### 9.3 Versiones limpias (`banner-XX-clean.jpg`) — landing pública
+
+Las **versiones limpias sin texto** (`banner-05-salida-clean.jpg`,
+`banner-06-teckel-clean.jpg`, `banner-07-recuerdos-clean.jpg`) viven en
+la misma carpeta y se usan en la landing pública `/es/storytellers`
+como imágenes de los **3 bloques `<LifestyleFeature>`** (zigzag con
+texto + bullets), no como banners full-bleed pelados. Cada bloque tiene
+un mensaje propio que conecta con la sección cercana:
+
+| Banner clean | Bloque en landing | Refuerza |
+|---|---|---|
+| `banner-05-salida-clean.jpg` | "El día 1 ya cuenta · Empieza con la primera foto del viaje" | Sección "Cómo funciona" |
+| `banner-06-teckel-clean.jpg` | "Verdad de viaje · Lo que ya estás haciendo, vale puntos" | Sección "Cómo se ganan los puntos" |
+| `banner-07-recuerdos-clean.jpg` | "No las dejes en el móvil · 90 días para subirlas" | Sección "Cuándo se canjean los cupones" |
+
+Componente: `LifestyleFeature` en
+`src/components/storytellers/storytellers-landing.tsx`. Imagen 4:3 mobile
+/ 3:2 desktop con `rounded-3xl` y `shadow-md`, dentro de `max-w-6xl`.
+
+### 9.4 Regenerar las 6 imágenes promocionales
+
+Si cambia el copy de cualquier título / sublínea / pill o decides
+sustituir una foto base, se regenera con el script único:
+
+```bash
+npx tsx scripts/generate-storytellers-email-promo-images.ts <tag(s)>
+```
+
+(Ver §9.1 para la lista de tags y los flags TLS si la red hace
+inspección SSL.)
+
+Editar el copy es tan fácil como cambiar el `prompt` del job
+correspondiente en
+[`scripts/generate-storytellers-email-promo-images.ts`](../scripts/generate-storytellers-email-promo-images.ts)
+y volver a lanzar el script para los tags afectados — **no hace falta
+volver a generar las 6** si solo cambia una.
+
+Si lo que cambia es la **foto base** (la `-clean.jpg`), basta con
+sustituir el archivo y volver a lanzar el script. La landing pública
+seguirá usando la nueva `-clean.jpg` automáticamente, y el cartel del
+email se reconstruirá encima.
 
 ---
 
@@ -414,6 +543,8 @@ Antes de hacer commit:
 | Fecha | Cambio |
 |---|---|
 | 08/05/2026 | **Creación del programa Storytellers en email.** Tres HTML de ciclo de vida (05, 06, 07), tabla `booking_email_dispatches` con índice único parcial, backfill histórico, deep-link `?ref=` con prerrelleno automático en `/es/storytellers/subir`, rate-limit `PUBLIC_WRITE` en `validate-booking`, `referrerpolicy="no-referrer"` en todos los CTAs. Cron jobs **pendientes**. |
+| 08/05/2026 (tarde) | **Banners narrativa promocionales + integración en landing.** Banners del cuerpo del email (`banner-05/06/07.jpg`) ahora llevan texto promocional quemado (título + subtítulo + pill naranja) generado con `sharp` + SVG sobre las versiones limpias `banner-XX-clean.jpg`. Mantienen aspect ratio 3:2 (1200×800) para no engordar el email. La landing pública `/es/storytellers` deja de usar banners full-bleed pelados y los integra en 3 bloques `<LifestyleFeature>` (zigzag imagen + texto + bullets) usando las versiones `-clean.jpg`. |
+| 08/05/2026 (noche) | **Migración de SVG quemado a `gpt-image-2` para las 6 imágenes promocionales del email.** Nuevo script único `scripts/generate-storytellers-email-promo-images.ts` que usa `openai.images.edit` con `gpt-image-2` y la imagen `-clean.jpg` como base, dejando que el modelo componga el cartel completo (texto, jerarquía, pill, drop-shadow, gradient sutil) a partir de un brief con literalidad exacta + paleta `#ea580c / #ffffff / #063971` + posición. Resultado claramente más editorial e integrado que el SVG previo. **Regla de oro a futuro:** banners/hero/carteles con texto se hacen siempre con `gpt-image-2`, no con SVG quemado. SVG queda para casos que necesitan reproducibilidad pixel-perfect. |
 
 ---
 
@@ -425,5 +556,7 @@ Antes de hacer commit:
 - [`docs/04-referencia/emails/SISTEMA-EMAILS.md`](../docs/04-referencia/emails/SISTEMA-EMAILS.md) — sistema de emails transaccionales.
 - [`supabase/migrations/20260508-booking-email-dispatches.sql`](../supabase/migrations/20260508-booking-email-dispatches.sql) — esquema de tracking.
 - [`supabase/migrations/20260508-booking-email-dispatches-backfill-historic.sql`](../supabase/migrations/20260508-booking-email-dispatches-backfill-historic.sql) — backfill histórico.
-- [`scripts/test-storyteller-emails.mjs`](../scripts/test-storyteller-emails.mjs) — script de prueba.
-- [`scripts/download-mailing-assets.mjs`](../scripts/download-mailing-assets.mjs) — generador de portadas e imágenes mosaico.
+- [`scripts/test-storyteller-emails.mjs`](../scripts/test-storyteller-emails.mjs) — script de prueba (envía los 3 mails con datos reales de una reserva aleatoria).
+- [`scripts/generate-storytellers-email-promo-images.ts`](../scripts/generate-storytellers-email-promo-images.ts) — generador de las 6 imágenes promocionales del email con `gpt-image-2` (3 hero verticales + 3 banners horizontales con texto).
+- [`scripts/generate-storytellers-showcase-images.ts`](../scripts/generate-storytellers-showcase-images.ts) — generador de las imágenes lifestyle / mosaico de la landing pública (versiones limpias sin texto).
+- [`scripts/download-mailing-assets.mjs`](../scripts/download-mailing-assets.mjs) — utilidades varias del mailing (descargas, conversiones).

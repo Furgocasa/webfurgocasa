@@ -99,41 +99,78 @@ function StorytellersJsonLd() {
 }
 
 /**
- * Banner full-bleed que se inserta entre secciones de la landing como
- * "respiro visual" en los tramos largos de texto/tarjetas. Reutiliza
- * fotos limpias del programa (mismas que sirven de base a las
- * cover-cta-XX del email, que sí llevan texto quemado encima). Aquí, sin
- * texto: que la foto cante sola.
+ * Bloque "feature" tipo zigzag: imagen a un lado, texto + bullets al
+ * otro. Se inserta entre secciones de la landing para reforzar mensajes
+ * concretos con apoyo visual real (no es banner pelado decorativo).
  *
- * Es decorativo, así que NO repetimos los alt descriptivos del mosaico
- * inferior (los lectores de pantalla los leerían dos veces).
+ * - reverse=false: imagen a la izquierda, texto a la derecha (default)
+ * - reverse=true:  imagen a la derecha, texto a la izquierda
+ *
+ * En mobile ambos modos colapsan a stack vertical con la imagen arriba.
  */
-function BannerStrip({
-  src,
-  position = "center",
+function LifestyleFeature({
+  imageSrc,
+  imageAlt,
+  eyebrow,
+  title,
+  body,
+  bullets,
+  reverse = false,
 }: {
-  src: string;
-  position?: "top" | "center" | "bottom";
+  imageSrc: string;
+  imageAlt: string;
+  eyebrow?: string;
+  title: string;
+  body: string;
+  bullets?: string[];
+  reverse?: boolean;
 }) {
-  const objectPosition =
-    position === "top"
-      ? "object-top"
-      : position === "bottom"
-      ? "object-bottom"
-      : "object-center";
   return (
-    <div
-      className="relative w-full overflow-hidden h-64 sm:h-80 md:h-[420px] lg:h-[480px]"
-      aria-hidden="true"
-    >
-      <Image
-        src={src}
-        alt=""
-        fill
-        sizes="100vw"
-        className={`object-cover ${objectPosition}`}
-      />
-    </div>
+    <section className="border-t border-gray-100 bg-white py-14 md:py-20">
+      <div className="container mx-auto px-4">
+        <div
+          className={`mx-auto grid max-w-6xl items-center gap-8 md:gap-12 lg:grid-cols-2 ${
+            reverse ? "lg:[&>*:first-child]:order-2" : ""
+          }`}
+        >
+          {/* Imagen */}
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl bg-gray-100 shadow-md md:aspect-[3/2]">
+            <Image
+              src={imageSrc}
+              alt={imageAlt}
+              fill
+              sizes="(min-width: 1024px) 560px, 100vw"
+              className="object-cover"
+            />
+          </div>
+
+          {/* Copy */}
+          <div>
+            {eyebrow && (
+              <p className="text-xs font-bold uppercase tracking-widest text-furgocasa-orange">
+                {eyebrow}
+              </p>
+            )}
+            <h3 className="mt-2 font-heading text-2xl font-bold text-gray-900 md:text-3xl">
+              {title}
+            </h3>
+            <p className="mt-4 text-base leading-relaxed text-gray-700 md:text-lg">
+              {body}
+            </p>
+            {bullets && bullets.length > 0 && (
+              <ul className="mt-5 space-y-2.5 text-gray-700">
+                {bullets.map((b) => (
+                  <li key={b} className="flex items-start gap-3">
+                    <CheckCircle2 className="mt-1 h-5 w-5 shrink-0 text-furgocasa-orange" aria-hidden />
+                    <span>{b}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -313,8 +350,19 @@ export function StorytellersLanding() {
         </div>
       </section>
 
-      {/* Banner respiro 1 · ya estás en ruta (entre "Cómo funciona" y "¿Qué es?") */}
-      <BannerStrip src="/images/storytellers/showcase-detail-route.webp" position="center" />
+      {/* Feature 1 · El día 1 ya cuenta — refuerzo de "Cómo funciona" */}
+      <LifestyleFeature
+        imageSrc="/images/mailing/storytellers/banner-05-salida-clean.jpg"
+        imageAlt="Pareja cargando los últimos bártulos en su camper Furgocasa al amanecer en la costa mediterránea"
+        eyebrow="El día 1 ya cuenta"
+        title="Empieza con la primera foto del viaje"
+        body="No hace falta esperar al final del viaje para empezar a sumar. Con tu primera subida válida ya entras en el programa y desbloqueas el cupón de bienvenida del 3 % para tu próxima escapada."
+        bullets={[
+          "Lote mínimo: 3 fotos o 1 vídeo",
+          "Cupón del 3 % al instante (una sola vez por email)",
+          "Sin login, sin formularios largos",
+        ]}
+      />
 
       {/* 3. ¿Qué es este programa? */}
       <section className="py-16 md:py-20 bg-white" aria-labelledby="que-es-storytellers">
@@ -405,8 +453,20 @@ export function StorytellersLanding() {
         </div>
       </section>
 
-      {/* Banner respiro 2 · familia y vida real (entre "Lo que te llevas" y "Cómo se ganan los puntos") */}
-      <BannerStrip src="/images/storytellers/showcase-family-fun.webp" position="center" />
+      {/* Feature 2 · Vida real en ruta — refuerzo de "Lo que te llevas" + transición a "puntos" */}
+      <LifestyleFeature
+        reverse
+        imageSrc="/images/mailing/storytellers/banner-06-teckel-clean.jpg"
+        imageAlt="Perro asomado por la ventana lateral de una camper Furgocasa en marcha por una carretera de sierra"
+        eyebrow="Verdad de viaje"
+        title="Lo que ya estás haciendo, vale puntos"
+        body="No buscamos perfección de revista. Buscamos verdad: paisajes, mascotas, gente disfrutando, rincones que cuentan algo. Si ya estás haciendo fotos y vídeos del viaje, lo único que tienes que hacer es enviárnoslos."
+        bullets={[
+          "+2 ptos por foto subida · +5 ptos por vídeo (≥10 s)",
+          "+20 ptos por foto seleccionada (×10) · +60 ptos por vídeo (×12)",
+          "Mejor pocas fotos buenas que muchas de relleno",
+        ]}
+      />
 
       {/* 4. Cómo se ganan los puntos */}
       <section
@@ -606,8 +666,19 @@ export function StorytellersLanding() {
         </div>
       </section>
 
-      {/* Banner respiro 3 · manifiesto del programa (entre "Cuándo se canjean" y "Lo que premiamos") */}
-      <BannerStrip src="/images/storytellers/showcase-hero.webp" position="center" />
+      {/* Feature 3 · No las dejes en el móvil — refuerzo de "Cuándo se canjean" + ventana 90 días */}
+      <LifestyleFeature
+        imageSrc="/images/mailing/storytellers/banner-07-recuerdos-clean.jpg"
+        imageAlt="Manos sosteniendo un móvil mostrando la galería de fotos de un viaje en camper, con un sofá acogedor al fondo"
+        eyebrow="No las dejes en el móvil"
+        title="Tienes 90 días desde la devolución para subirlas"
+        body="Aunque vuelvas con prisa, no hay urgencia: tienes una ventana cómoda de 90 días tras devolver la camper para subir tu material. Lo que tenías guardado en el móvil pasa a ser descuento real en tu siguiente escapada."
+        bullets={[
+          "Cupones válidos 18 meses, en baja y media temporada",
+          "Mínimo 4 días de reserva, no acumulable con otras promos",
+          "Por encima del 15 %, regalos: taza, camiseta, sudadera",
+        ]}
+      />
 
       {/* 7. Lo que premiamos y lo que firmas */}
       <section

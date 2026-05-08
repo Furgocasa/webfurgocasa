@@ -75,11 +75,14 @@ Las tres plantillas siguientes son **emails de ciclo de vida del viaje** (salida
 
 Los 3 emails incluyen:
 
-- **Hero CTA vertical** (no clicable, fuerza scroll) con texto + flecha quemados sobre la imagen.
+- **Hero CTA vertical** (no clicable, fuerza scroll) con texto + flecha quemados sobre la imagen (`cover-cta-05/06/07.jpg`, 4:5).
+- **Banner narrativa promocional horizontal** en mitad del cuerpo (`banner-05/06/07.jpg`, 3:2 a 1536×1024 px) con texto promocional integrado por **`gpt-image-2`** (no quemado a mano con SVG). El modelo recibe la versión limpia `banner-XX-clean.jpg` como base + un brief con literalidad exacta del título, sublínea, pill naranja `HASTA 15 % + REGALOS` / `+ REGALOS POR TUS PUNTOS`, paleta y posición, y compone el cartel completo. **Una imagen distinta por email**. Script: [`scripts/generate-storytellers-email-promo-images.ts`](../scripts/generate-storytellers-email-promo-images.ts).
 - **Deep-link `?ref=<booking_number>`** en todos los CTAs → la página `/es/storytellers/subir` prerrellena el nº de reserva y enfoca el campo email automáticamente.
 - **`referrerpolicy="no-referrer"`** en todos los CTAs (evita filtración del query a terceros vía header `Referer`).
 - **CTA secundario "outline"** (botón blanco con borde naranja) en mitad del cuerpo + CTA principal naranja sólido al final.
 - **Tracking idempotente** en `booking_email_dispatches` (índice único parcial sobre `status='sent'`).
+
+Las **versiones limpias sin texto** (`banner-XX-clean.jpg`) se reutilizan en la landing pública `/es/storytellers` dentro de 3 bloques `<LifestyleFeature>` (zigzag imagen + texto + bullets), no como banners full-bleed pelados. Una sola fuente de imágenes para email y web, dos tratamientos visuales distintos.
 
 **Otros correos al cliente ligados a Storytellers** (ya implementados o disparados por acción):
 

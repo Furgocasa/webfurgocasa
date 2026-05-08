@@ -16,17 +16,41 @@
 
 ## Scripts relacionados (repo raíz)
 
-| Script npm | Archivo |
-|------------|---------|
-| `npm run generate:showcase-images` | `scripts/generate-content-creator-showcase-images.ts` |
-| `npm run generate:storytellers-images` | `scripts/generate-storytellers-showcase-images.ts` |
-| `npx tsx scripts/storytellers-smoke-test.ts` | Verificación post-deploy |
+| Script | Archivo | Genera |
+|--------|---------|--------|
+| `npm run generate:showcase-images` | `scripts/generate-content-creator-showcase-images.ts` | Imágenes lifestyle de la landing PRO (`public/images/content-creators/`). |
+| `npm run generate:storytellers-images` | `scripts/generate-storytellers-showcase-images.ts` | Imágenes lifestyle + merch de la landing pública Storytellers (`public/images/storytellers/`). |
+| `npx tsx scripts/generate-storytellers-email-promo-images.ts` | `scripts/generate-storytellers-email-promo-images.ts` | **6 imágenes promocionales del email Storytellers** (3 hero 4:5 + 3 banners 3:2 con texto promocional integrado por `gpt-image-2`). Tags: `cover-05/06/07`, `banner-05/06/07`, alias `cover` / `banner`. |
+| `npx tsx scripts/storytellers-smoke-test.ts` | — | Verificación post-deploy del programa Storytellers. |
 
-En redes con proxy TLS corporativo, ante errores `UNABLE_TO_VERIFY_LEAF_SIGNATURE`, usar:
+### ⭐ Regla de oro de generación de imágenes con texto
+
+A partir del 08/05/2026, cualquier **banner / hero / cartel promocional
+con texto encima de una foto** se hace con `gpt-image-2`
+(`openai.images.edit`), pasando la foto base + un brief con texto
+exacto, paleta y posición. SVG quemado a mano queda reservado para
+casos de reproducibilidad pixel-perfect (logos, watermarks, plantillas
+masivas). Patrón de referencia:
+[`scripts/generate-storytellers-email-promo-images.ts`](../../../scripts/generate-storytellers-email-promo-images.ts)
+(documentado al detalle en
+[`mailing/STORYTELLERS_MAILS.md`](../../../mailing/STORYTELLERS_MAILS.md)
+§9).
+
+### Redes con proxy TLS corporativo
+
+Ante `Connection error` con causa `UNABLE_TO_VERIFY_LEAF_SIGNATURE`:
 
 ```powershell
+# Solución limpia (no siempre funciona porque el SDK usa node-fetch):
 node --use-system-ca node_modules/tsx/dist/cli.mjs scripts/generate-storytellers-showcase-images.ts
+
+# Workaround pragmático para sesión local (NUNCA en producción ni en .env):
+$env:NODE_TLS_REJECT_UNAUTHORIZED = "0"
+npx tsx scripts/generate-storytellers-email-promo-images.ts
 ```
+
+Para una solución de fondo: exportar el certificado de la CA
+corporativa y apuntar `NODE_EXTRA_CA_CERTS=ruta/ca.pem`.
 
 ## Otras rutas útiles en `docs/`
 
