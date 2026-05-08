@@ -272,73 +272,125 @@ RLS activa. Solo SELECT para admins (vía `is_admin()` en JWT). Sin INSERT/UPDAT
 
 ---
 
-## 7 · Cómo enviar pruebas (manual, hasta que estén los crons)
+## 7 · Envíos manuales (script CLI)
 
-Script: `scripts/test-storyteller-emails.mjs`.
+Tenemos **dos scripts** según el caso:
 
-### Uso
+### 7.1 · Pruebas visuales (NO toca BD)
+
+Script: `scripts/test-storyteller-emails.mjs`. Solo para validar el
+diseño en gestores de correo reales.
 
 ```bash
-node scripts/test-storyteller-emails.mjs --to "reservas@furgocasa.com,narciso.pardo@outlook.com,otro@dominio.com"
+node scripts/test-storyteller-emails.mjs \
+  --to "reservas@furgocasa.com,narciso.pardo@outlook.com"
 ```
 
-### Qué hace
+Manda los 3 emails (05/06/07) cogiendo una reserva aleatoria de la BD
+para sacar nombre y `booking_number`. **No escribe** en
+`booking_email_dispatches` — es solo prueba visual.
 
-1. Carga `.env.local` (con `dotenv.config({ path, override: false })`,
-   sin depender del `.env` por defecto).
-2. Conecta a Supabase con la `SERVICE_ROLE_KEY`.
-3. Coge una reserva aleatoria con datos válidos.
-4. Para cada uno de los 3 HTML (`05`, `06`, `07`):
-   - Lee el archivo.
-   - Reemplaza `Juan` → primer nombre del cliente.
-   - Reemplaza `FC-2026-001234` → `booking_number` real (también el
-     `?ref=` queda actualizado por la misma sustitución).
-   - Envía el email vía SMTP con `nodemailer`.
-5. Acepta varios destinatarios separados por coma vía `--to`.
+### 7.2 · Envío real a un cliente concreto (SÍ escribe en BD)
 
-⚠️ **Este script NO escribe en `booking_email_dispatches`.** Es solo para
-pruebas visuales en gestores de correo reales. Los crons que se
-implementen sí deben escribir cada envío en la tabla con el `email_type`
-correcto.
+Script: `scripts/storyteller-send-cycle-email.ts`. Manda **uno** de los
+3 emails a la reserva indicada y registra el dispatch en
+`booking_email_dispatches`. Idempotente: no permite reenviar lo que ya
+está enviado salvo con `--force`.
+
+```bash
+# Mandar email 06 a una reserva concreta (CC reservas@ por defecto):
+tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06
+
+# Mandar sin CC a reservas@:
+tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --no-cc
+
+# Dry run: enseña qué haría, sin enviar:
+tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --dry-run
+
+# Forzar reenvío aunque ya esté en sent (NO recomendado, casi nunca útil):
+tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --force
+```
+
+**Flujo interno:** ambos scripts usan la lib unificada
+`src/lib/storytellers/emails-cycle.ts`, así que el render, el envío y la
+escritura en BD son exactamente los mismos que en los crons (cero
+divergencia).
 
 ---
 
-## 8 · Pendientes (cron jobs)
+## 8 · Cron jobs (operativa diaria)
 
-Los 3 crons que faltan, todos en `Europe/Madrid`:
+### 8.1 · Tabla resumen
 
-| Cron (path sugerido) | Frecuencia | Filtro principal | `email_type` a registrar |
-|---|---|---|---|
-| `/api/cron/storyteller-pickup-night` | Diario, 20:30 | `pickup_date = CURRENT_DATE` y trip ≥1 día y no exista fila `sent` para `05` | `05_storyteller_dia_salida` |
-| `/api/cron/storyteller-mid-trip` | Diario, 09:00 | `pickup_date < CURRENT_DATE < dropoff_date`, `(dropoff - pickup) ≥ 6` días, hoy ≥ punto medio, no exista fila `sent` para `06` | `06_storyteller_mitad_viaje` |
-| `/api/cron/storyteller-post-trip-day-after` | Diario, 09:00 | `dropoff_date = CURRENT_DATE - 1` y no exista fila `sent` para `07` | `07_storyteller_dia_despues_vuelta` |
+Todos en `Europe/Madrid` (Vercel Cron usa UTC; los offset que se
+muestran son la traducción aproximada al horario local Madrid).
 
-Todos deben:
+| Path | UTC | Madrid (CET / CEST) | Email | `email_type` BD |
+|---|---|---|---|---|
+| `/api/cron/storyteller-pickup-night` | `0 19 * * *` | 20:00 / 21:00 | **05** día de salida (noche) | `storyteller_pickup_night` |
+| `/api/cron/storyteller-mid-trip` | `0 9 * * *` | 10:00 / 11:00 | **06** mitad de viaje (≥6 días) | `storyteller_mid_trip` |
+| `/api/cron/storyteller-post-trip-day-after` | `30 9 * * *` | 10:30 / 11:30 | **07** día después de la vuelta | `storyteller_post_trip` |
+| `/api/cron/return-reminders` | `0 18 * * *` | 19:00 / 20:00 | **04** recordatorio devolución | `return_reminder` |
+| `/api/cron/storyteller-post-trip-reminder` | `0 10 * * *` | 11:00 / 12:00 | recordatorio post-viaje +7d (legacy) | `storyteller_post_trip` |
 
-1. Filtrar por `status IN ('confirmed', 'in_progress', 'completed')` y
-   `customer_email` válido.
-2. Usar `INSERT ... ON CONFLICT DO NOTHING` en
-   `booking_email_dispatches` con `status='queued'` antes de intentar
-   enviar (lock atómico anti-duplicados).
-3. Tras enviar OK: `UPDATE ... SET status='sent', sent_at=now(),
-   smtp_message_id=...`.
-4. Si falla: `UPDATE ... SET status='failed', error_message=...`. Las
-   filas `failed` permiten reintento por el cron del día siguiente.
-5. Renderizar el HTML correspondiente con los reemplazos de
-   `Juan` / `FC-2026-001234` (preferiblemente extraer la lógica del script
-   de prueba a `src/lib/storytellers/emails.ts` cuando se haga).
-6. Respetar la regla de viaje corto: el `mid-trip` cron debe insertar fila
-   `skipped` (`reason: 'short_trip_no_mid_email'`) si `<6 días`.
+### 8.2 · Reglas de selección por cron
 
-Existente y a refactorizar:
+Lib única: `src/lib/storytellers/emails-cycle.ts` → `findEligibleBookings(supabase, type, today)`.
 
-- `src/app/api/cron/return-reminders/route.ts` actualmente usa
-  `bookings.return_reminder_sent` como flag. Debe migrarse a escribir en
-  `booking_email_dispatches` con `email_type='04_recordatorio_devolucion'`.
-- `src/app/api/cron/storyteller-post-trip-reminder/route.ts` actualmente
-  manda el reminder a +7 días con `admin_notes` como flag. Decisión
-  pendiente: ¿se sustituye por el nuevo `storyteller-post-trip-day-after`
-  (a +1 día) o se mantienen los dos?
+- **05 (`pickup-night`)**: `pickup_date == hoy` (Madrid),
+  `status ∈ {confirmed, in_progress, completed}`, `customer_email != null`,
+  y NO existe dispatch `storyteller_pickup_night` con `status ∈ {sent, skipped, bounced}`.
+- **06 (`mid-trip`)**: `pickup_date < hoy < dropoff_date`, duración ≥ 6 días,
+  hoy ≥ `pickup + floor(duración/2)`. Resto de filtros igual que 05.
+  Los viajes < 6 días NO reciben el 06 por diseño (no se marcan como
+  `skipped` — el filtro los excluye naturalmente).
+- **07 (`post-trip-day-after`)**: `dropoff_date == ayer` (Madrid). Resto igual.
+
+### 8.3 · Idempotencia (cómo NO se duplican envíos)
+
+Una sola línea de defensa en BD: el `UNIQUE INDEX` parcial sobre
+`(booking_id, email_type) WHERE status='sent'` (ver migración
+`20260508-booking-email-dispatches.sql`).
+
+Flujo en `sendCycleEmail`:
+
+1. **SELECT previo** — si ya hay fila `sent`/`skipped`/`bounced` para
+   `(booking, email_type)`, devuelve `skipped: 'already_dispatched'` y
+   sale sin SMTP.
+2. **Render + envío SMTP**. Si SMTP falla → INSERT `status='failed'`
+   (no entra en el unique parcial → cron del día siguiente reintenta).
+3. **INSERT `status='sent'`** + `sent_at` + `smtp_message_id`. Si por
+   carrera la BD lo rechaza con `23505` (unique_violation), tratamos
+   como soft-OK: el email ya se envió y no marcamos doble.
+
+### 8.4 · Coexistencia de los dos crons "post-viaje"
+
+Existen DOS crons que escriben con el mismo `email_type='storyteller_post_trip'`:
+
+- **`storyteller-post-trip-day-after`** (NUEVO, +1 día): es el principal.
+  Manda el email 07 con tono emocional/promocional ("no dejes el
+  descuento en el móvil") al día siguiente del dropoff.
+- **`storyteller-post-trip-reminder`** (LEGACY, +7 días): manda otro
+  HTML (definido en `src/lib/storytellers/emails.ts` →
+  `buildPostTripReminderHtml`) más sobrio. Como ambos comparten
+  `email_type`, el cron de +7 días casi nunca encuentra trabajo (ya
+  hizo `sent` el de +1 día) y se mantiene como red de seguridad para
+  reservas anteriores. Decisión: **coexisten** durante el periodo de
+  transición; cuando se confirme que el 07 cubre el caso, se eliminará
+  del `vercel.json`.
+
+### 8.5 · Refactor de los crons existentes (mayo 2026)
+
+- `return-reminders/route.ts` ahora escribe **también** en
+  `booking_email_dispatches` (`email_type='return_reminder'`) además del
+  flag legacy `bookings.return_reminder_sent`. El SELECT previo evita
+  reenvíos si la fila ya existe (sincroniza el flag legacy si está
+  desfasado).
+- `storyteller-post-trip-reminder/route.ts` ahora escribe en
+  `booking_email_dispatches` (`email_type='storyteller_post_trip'`)
+  además del tag `[storyteller-reminder-sent]` en `admin_notes`. Si el
+  cliente ya subió contenido, marca `status='skipped'` con
+  `metadata.reason='already_uploaded'`.
 
 ---
 
@@ -545,6 +597,7 @@ Antes de hacer commit:
 | 08/05/2026 | **Creación del programa Storytellers en email.** Tres HTML de ciclo de vida (05, 06, 07), tabla `booking_email_dispatches` con índice único parcial, backfill histórico, deep-link `?ref=` con prerrelleno automático en `/es/storytellers/subir`, rate-limit `PUBLIC_WRITE` en `validate-booking`, `referrerpolicy="no-referrer"` en todos los CTAs. Cron jobs **pendientes**. |
 | 08/05/2026 (tarde) | **Banners narrativa promocionales + integración en landing.** Banners del cuerpo del email (`banner-05/06/07.jpg`) ahora llevan texto promocional quemado (título + subtítulo + pill naranja) generado con `sharp` + SVG sobre las versiones limpias `banner-XX-clean.jpg`. Mantienen aspect ratio 3:2 (1200×800) para no engordar el email. La landing pública `/es/storytellers` deja de usar banners full-bleed pelados y los integra en 3 bloques `<LifestyleFeature>` (zigzag imagen + texto + bullets) usando las versiones `-clean.jpg`. |
 | 08/05/2026 (noche) | **Migración de SVG quemado a `gpt-image-2` para las 6 imágenes promocionales del email.** Nuevo script único `scripts/generate-storytellers-email-promo-images.ts` que usa `openai.images.edit` con `gpt-image-2` y la imagen `-clean.jpg` como base, dejando que el modelo componga el cartel completo (texto, jerarquía, pill, drop-shadow, gradient sutil) a partir de un brief con literalidad exacta + paleta `#ea580c / #ffffff / #063971` + posición. Resultado claramente más editorial e integrado que el SVG previo. **Regla de oro a futuro:** banners/hero/carteles con texto se hacen siempre con `gpt-image-2`, no con SVG quemado. SVG queda para casos que necesitan reproducibilidad pixel-perfect. |
+| 09/05/2026 | **Crons Storytellers operativos + lib unificada `emails-cycle.ts` + cross-sell en email 04.** Tres crons nuevos en `vercel.json` (`storyteller-pickup-night`, `storyteller-mid-trip`, `storyteller-post-trip-day-after`), todos sobre la misma lib `src/lib/storytellers/emails-cycle.ts` (render + envío + escritura idempotente en `booking_email_dispatches`). Refactor de los crons existentes (`return-reminders` y `storyteller-post-trip-reminder`) para escribir también en la tabla unificada manteniendo los flags legacy como compat. El cron de +7d se mantiene como red de seguridad: comparte `email_type='storyteller_post_trip'` con el de +1d, así que casi nunca encuentra trabajo. Nuevo script CLI `scripts/storyteller-send-cycle-email.ts` para envíos manuales que SÍ escriben en BD. Email **04 recordatorio devolución** ahora incluye un párrafo cross-sell de Storytellers con CTA naranja al final, tanto en `src/lib/email/templates.ts` (runtime) como en el espejo `mailing/app/04-recordatorio-devolucion.html` (preview). |
 
 ---
 
@@ -556,7 +609,14 @@ Antes de hacer commit:
 - [`docs/04-referencia/emails/SISTEMA-EMAILS.md`](../docs/04-referencia/emails/SISTEMA-EMAILS.md) — sistema de emails transaccionales.
 - [`supabase/migrations/20260508-booking-email-dispatches.sql`](../supabase/migrations/20260508-booking-email-dispatches.sql) — esquema de tracking.
 - [`supabase/migrations/20260508-booking-email-dispatches-backfill-historic.sql`](../supabase/migrations/20260508-booking-email-dispatches-backfill-historic.sql) — backfill histórico.
-- [`scripts/test-storyteller-emails.mjs`](../scripts/test-storyteller-emails.mjs) — script de prueba (envía los 3 mails con datos reales de una reserva aleatoria).
+- [`src/lib/storytellers/emails-cycle.ts`](../src/lib/storytellers/emails-cycle.ts) — **lib unificada del ciclo 05/06/07** (render, envío, idempotencia, selección de elegibles).
+- [`src/app/api/cron/storyteller-pickup-night/route.ts`](../src/app/api/cron/storyteller-pickup-night/route.ts) — cron diario 20:00–21:00 Madrid → email 05.
+- [`src/app/api/cron/storyteller-mid-trip/route.ts`](../src/app/api/cron/storyteller-mid-trip/route.ts) — cron diario 10:00–11:00 Madrid → email 06 (solo viajes ≥6 días).
+- [`src/app/api/cron/storyteller-post-trip-day-after/route.ts`](../src/app/api/cron/storyteller-post-trip-day-after/route.ts) — cron diario 10:30–11:30 Madrid → email 07.
+- [`src/app/api/cron/return-reminders/route.ts`](../src/app/api/cron/return-reminders/route.ts) — cron 04 recordatorio devolución (refactor para escribir en `booking_email_dispatches`).
+- [`src/app/api/cron/storyteller-post-trip-reminder/route.ts`](../src/app/api/cron/storyteller-post-trip-reminder/route.ts) — cron legacy +7 días (refactor para escribir en `booking_email_dispatches`).
+- [`scripts/test-storyteller-emails.mjs`](../scripts/test-storyteller-emails.mjs) — script de **prueba visual** (NO escribe en BD).
+- [`scripts/storyteller-send-cycle-email.ts`](../scripts/storyteller-send-cycle-email.ts) — script CLI de **envío manual idempotente** a una reserva concreta (sí escribe en BD).
 - [`scripts/generate-storytellers-email-promo-images.ts`](../scripts/generate-storytellers-email-promo-images.ts) — generador de las 6 imágenes promocionales del email con `gpt-image-2` (3 hero verticales + 3 banners horizontales con texto).
 - [`scripts/generate-storytellers-showcase-images.ts`](../scripts/generate-storytellers-showcase-images.ts) — generador de las imágenes lifestyle / mosaico de la landing pública (versiones limpias sin texto).
 - [`scripts/download-mailing-assets.mjs`](../scripts/download-mailing-assets.mjs) — utilidades varias del mailing (descargas, conversiones).

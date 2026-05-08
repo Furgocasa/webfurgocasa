@@ -17,6 +17,18 @@
       "schedule": "0 4 * * *"
     },
     {
+      "path": "/api/cron/storyteller-pickup-night",
+      "schedule": "0 19 * * *"
+    },
+    {
+      "path": "/api/cron/storyteller-mid-trip",
+      "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/storyteller-post-trip-day-after",
+      "schedule": "30 9 * * *"
+    },
+    {
       "path": "/api/cron/storyteller-post-trip-reminder",
       "schedule": "0 10 * * *"
     }

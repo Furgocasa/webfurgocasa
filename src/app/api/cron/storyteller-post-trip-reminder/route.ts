@@ -5,12 +5,23 @@
  * cuya reserva terminó hace exactamente 7 días y todavía NO han subido
  * material al programa Storytellers.
  *
- * Usa la tabla `customers.notification_log` o un campo dedicado para evitar
- * duplicados; aquí lo hacemos sin tabla extra usando el booking_id (un email
- * por reserva máximo, basado en metadata).
+ * RELACIÓN CON EL NUEVO `storyteller-post-trip-day-after` (+1 día):
+ *   - Ambos crons graban en `booking_email_dispatches` con
+ *     `email_type='storyteller_post_trip'`.
+ *   - El cron de +1 día (storyteller 07) suele ganar SIEMPRE porque
+ *     corre antes en el ciclo. Cuando este cron de +7 días llega, ya
+ *     hay un dispatch `sent` y hace skip.
+ *   - Por lo tanto, este cron queda como RED DE SEGURIDAD (no manda a
+ *     casi nadie en el día a día). Se mantiene operativo durante un
+ *     periodo de transición. Decisión documentada en
+ *     `mailing/STORYTELLERS_MAILS.md`.
  *
- * Para evitar reenvíos sin nueva tabla: marcamos en `bookings.notes` un tag
- * "[storyteller-reminder-sent]" tras enviar. Si la nota ya lo contiene, skip.
+ * Idempotencia:
+ *   - Tras enviar OK, INSERT en `booking_email_dispatches` con
+ *     status='sent'. Si la BD rechaza por UNIQUE (otro cron ganó la
+ *     carrera), tratamos como "ya enviado".
+ *   - Mantenemos también el tag legacy en `admin_notes` para no romper
+ *     el cron antiguo si algún script externo lo lee.
  *
  * Protegido por CRON_SECRET en producción.
  */
@@ -56,10 +67,34 @@ export async function GET(req: NextRequest) {
     const errors: string[] = [];
 
     for (const b of bookings || []) {
+      // Skip: tag legacy
       if ((b.admin_notes || "").includes(REMINDER_TAG)) {
         skipped += 1;
         continue;
       }
+      // Skip: nuevo sistema centralizado
+      const { data: existingDispatch } = await supabase
+        .from("booking_email_dispatches")
+        .select("id, status")
+        .eq("booking_id", b.id)
+        .eq("email_type", "storyteller_post_trip")
+        .in("status", ["sent", "skipped", "bounced"])
+        .limit(1);
+
+      if (existingDispatch && existingDispatch.length > 0) {
+        // Sincronizamos tag legacy si falta
+        if (!(b.admin_notes || "").includes(REMINDER_TAG)) {
+          await supabase
+            .from("bookings")
+            .update({
+              admin_notes: ((b.admin_notes || "") + "\n" + REMINDER_TAG).trim(),
+            })
+            .eq("id", b.id);
+        }
+        skipped += 1;
+        continue;
+      }
+
       if (!b.customer_email || !b.customer_email.includes("@")) {
         skipped += 1;
         continue;
@@ -72,6 +107,18 @@ export async function GET(req: NextRequest) {
         .eq("booking_id", b.id);
 
       if ((count || 0) > 0) {
+        // Marcamos como skipped en el dispatch para que no vuelva a salir
+        await supabase.from("booking_email_dispatches").insert({
+          booking_id: b.id,
+          customer_email: b.customer_email,
+          email_type: "storyteller_post_trip",
+          status: "skipped",
+          metadata: {
+            booking_number: b.booking_number,
+            reason: "already_uploaded",
+            cron: "storyteller-post-trip-reminder",
+          },
+        });
         skipped += 1;
         continue;
       }
@@ -89,6 +136,31 @@ export async function GET(req: NextRequest) {
 
       if (result.success) {
         sent += 1;
+        // INSERT en sistema unificado (idempotente vía UNIQUE parcial)
+        const ins = await supabase
+          .from("booking_email_dispatches")
+          .insert({
+            booking_id: b.id,
+            customer_email: b.customer_email,
+            email_type: "storyteller_post_trip",
+            status: "sent",
+            sent_at: new Date().toISOString(),
+            smtp_message_id: result.messageId || null,
+            metadata: {
+              booking_number: b.booking_number,
+              cron: "storyteller-post-trip-reminder",
+              days_after_dropoff: DAYS_AFTER_DROPOFF,
+            },
+          });
+
+        if (ins.error && !/duplicate key/i.test(ins.error.message)) {
+          console.error(
+            `[cron/storyteller-post-trip] dispatch log failed for ${b.booking_number}:`,
+            ins.error,
+          );
+        }
+
+        // Tag legacy (compatibilidad).
         await supabase
           .from("bookings")
           .update({
@@ -96,6 +168,17 @@ export async function GET(req: NextRequest) {
           })
           .eq("id", b.id);
       } else {
+        await supabase.from("booking_email_dispatches").insert({
+          booking_id: b.id,
+          customer_email: b.customer_email,
+          email_type: "storyteller_post_trip",
+          status: "failed",
+          error_message: result.error || "smtp send failed",
+          metadata: {
+            booking_number: b.booking_number,
+            cron: "storyteller-post-trip-reminder",
+          },
+        });
         errors.push(`${b.booking_number}: ${result.error}`);
       }
     }

@@ -13,10 +13,20 @@ export const revalidate = 0;
  * Busca reservas confirmadas cuyo dropoff_date es "mañana" (hora Madrid)
  * y envía un recordatorio de devolución al cliente (CC a reservas@).
  *
- * Idempotente: marca return_reminder_sent = true tras enviar.
+ * Idempotencia (post-mayo 2026):
+ *   - Fuente de verdad: tabla `booking_email_dispatches` con
+ *     `email_type='return_reminder'` y `status='sent'`.
+ *   - Se mantiene el flag legacy `bookings.return_reminder_sent` por
+ *     compatibilidad con código antiguo y para que un humano pueda
+ *     mirar la fila de booking sin hacer JOIN.
+ *
+ * Flujo por reserva:
+ *   1. Skip si ya hay un dispatch `return_reminder` con status sent/skipped/bounced.
+ *   2. Render + envío SMTP.
+ *   3. INSERT en `booking_email_dispatches` (sent/failed).
+ *   4. UPDATE `bookings.return_reminder_sent = true` (solo si OK).
  */
 export async function GET(request: NextRequest) {
-  // Protección: solo Vercel Cron o llamada local con token
   const authHeader = request.headers.get('authorization');
   const cronSecret = process.env.CRON_SECRET;
   if (
@@ -36,7 +46,7 @@ export async function GET(request: NextRequest) {
   );
   const tomorrow = new Date(madrid);
   tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().slice(0, 10); // YYYY-MM-DD
+  const tomorrowStr = tomorrow.toISOString().slice(0, 10);
 
   console.log(`[return-reminders] Buscando reservas con dropoff_date = ${tomorrowStr}`);
 
@@ -69,7 +79,13 @@ export async function GET(request: NextRequest) {
 
   console.log(`[return-reminders] ${bookings.length} reserva(s) encontrada(s)`);
 
-  const results: Array<{ bookingNumber: string; to: string; ok: boolean; error?: string }> = [];
+  const results: Array<{
+    bookingNumber: string;
+    to: string;
+    ok: boolean;
+    skipped?: string;
+    error?: string;
+  }> = [];
 
   for (const b of bookings) {
     const vehicle = b.vehicle as any;
@@ -79,6 +95,35 @@ export async function GET(request: NextRequest) {
     const customerEmail = customer?.email || b.customer_email;
     if (!customerEmail) {
       results.push({ bookingNumber: b.booking_number, to: '', ok: false, error: 'Sin email' });
+      continue;
+    }
+
+    // Idempotencia robusta: ¿ya hay un dispatch sent/skipped/bounced?
+    // (puede pasar si un admin marcó manualmente el flag legacy a true
+    // y el cron lo perdió en una corrida posterior, etc.)
+    const { data: existingDispatch } = await supabase
+      .from('booking_email_dispatches')
+      .select('id, status')
+      .eq('booking_id', b.id)
+      .eq('email_type', 'return_reminder')
+      .in('status', ['sent', 'skipped', 'bounced'])
+      .limit(1);
+
+    if (existingDispatch && existingDispatch.length > 0) {
+      console.log(
+        `[return-reminders] ${b.booking_number} ya tiene dispatch ${existingDispatch[0].status}, skip.`
+      );
+      // Sincronizar el flag legacy si está desfasado
+      await supabase
+        .from('bookings')
+        .update({ return_reminder_sent: true })
+        .eq('id', b.id);
+      results.push({
+        bookingNumber: b.booking_number,
+        to: customerEmail,
+        ok: false,
+        skipped: 'already_dispatched',
+      });
       continue;
     }
 
@@ -100,12 +145,61 @@ export async function GET(request: NextRequest) {
       html,
     });
 
+    // Registrar SIEMPRE el dispatch (sent o failed) en
+    // `booking_email_dispatches` para tener auditoría completa.
     if (result.success) {
-      // Marcar como enviado (idempotencia)
+      const sentInsert = await supabase
+        .from('booking_email_dispatches')
+        .insert({
+          booking_id: b.id,
+          customer_email: customerEmail,
+          email_type: 'return_reminder',
+          status: 'sent',
+          sent_at: new Date().toISOString(),
+          smtp_message_id: result.messageId || null,
+          metadata: {
+            booking_number: b.booking_number,
+            cron: 'return-reminders',
+          },
+        })
+        .select('id')
+        .single();
+
+      if (sentInsert.error) {
+        // Si la BD rechaza por UNIQUE → otro proceso ya lo marcó. No
+        // bloquea: el email se envió y no haremos doble flag.
+        if (
+          sentInsert.error.code === '23505' ||
+          /duplicate key/i.test(sentInsert.error.message)
+        ) {
+          console.warn(
+            `[return-reminders] race en dispatch sent para ${b.booking_number}`,
+          );
+        } else {
+          console.error(
+            `[return-reminders] no se pudo loguear dispatch sent para ${b.booking_number}:`,
+            sentInsert.error,
+          );
+        }
+      }
+
+      // Mantener flag legacy sincronizado.
       await supabase
         .from('bookings')
         .update({ return_reminder_sent: true })
         .eq('id', b.id);
+    } else {
+      await supabase.from('booking_email_dispatches').insert({
+        booking_id: b.id,
+        customer_email: customerEmail,
+        email_type: 'return_reminder',
+        status: 'failed',
+        error_message: result.error || 'smtp send failed',
+        metadata: {
+          booking_number: b.booking_number,
+          cron: 'return-reminders',
+        },
+      });
     }
 
     results.push({
@@ -121,7 +215,8 @@ export async function GET(request: NextRequest) {
   }
 
   const sent = results.filter((r) => r.ok).length;
-  const failed = results.filter((r) => !r.ok).length;
+  const failed = results.filter((r) => !r.ok && !r.skipped).length;
+  const skipped = results.filter((r) => r.skipped).length;
 
   return NextResponse.json({
     success: true,
@@ -129,6 +224,7 @@ export async function GET(request: NextRequest) {
     total: bookings.length,
     sent,
     failed,
+    skipped,
     details: results,
   });
 }
