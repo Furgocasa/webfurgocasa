@@ -206,6 +206,7 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/ofertas', priority: 0.6, changeFrequency: 'weekly' },
     { path: '/clientes-vip', priority: 0.4, changeFrequency: 'monthly' },
     { path: '/creadores-de-contenido', priority: 0.65, changeFrequency: 'monthly' },
+    { path: '/storytellers', priority: 0.65, changeFrequency: 'monthly' },
     { path: '/quienes-somos', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/faqs', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/como-reservar-fin-semana', priority: 0.5, changeFrequency: 'monthly' },

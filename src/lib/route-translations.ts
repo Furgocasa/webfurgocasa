@@ -187,6 +187,13 @@ export const routeTranslations = {
     fr: "/collaborations-createurs-contenu",
     de: "/content-creator-kooperation",
   },
+  /** Programa Storytellers (UGC amateur) — slug mantenido en los 4 idiomas porque es nombre de marca; copy principal en ES */
+  "/storytellers": {
+    es: "/storytellers",
+    en: "/storytellers",
+    fr: "/storytellers",
+    de: "/storytellers",
+  },
   "/documentacion-alquiler": { 
     es: "/documentacion-alquiler", 
     en: "/rental-documentation", 
