@@ -11,6 +11,14 @@
     {
       "path": "/api/cron/mailing-tick",
       "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/storyteller-coupons-expire",
+      "schedule": "0 4 * * *"
+    },
+    {
+      "path": "/api/cron/storyteller-post-trip-reminder",
+      "schedule": "0 10 * * *"
     }
   ]
 }

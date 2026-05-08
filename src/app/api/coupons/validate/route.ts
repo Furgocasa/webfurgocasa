@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { validateCouponForBooking } from "@/lib/storytellers/points";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -12,6 +13,8 @@ const validateCouponSchema = z.object({
   dropoff_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Formato de fecha inválido"),
   rental_amount: z.number().positive("El importe debe ser positivo"),
 });
+
+const STORYTELLER_COUPON_PREFIX = "STO-";
 
 export async function POST(request: Request) {
   try {
@@ -47,6 +50,50 @@ export async function POST(request: Request) {
 
     const { code, pickup_date, dropoff_date, rental_amount } = validationResult.data;
 
+    // ============================================
+    // CUPONES STORYTELLER (prefix STO-) → delegamos a su sistema
+    // ============================================
+    const normalizedCode = code.trim().toUpperCase();
+    if (normalizedCode.startsWith(STORYTELLER_COUPON_PREFIX)) {
+      const pickup = new Date(pickup_date + "T00:00:00");
+      const dropoff = new Date(dropoff_date + "T00:00:00");
+      const days = Math.ceil(
+        (dropoff.getTime() - pickup.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
+      const stoResult = await validateCouponForBooking({
+        code: normalizedCode,
+        pickupDate: pickup_date,
+        days,
+      });
+
+      if (!stoResult.ok) {
+        return NextResponse.json({
+          valid: false,
+          error: stoResult.message,
+        });
+      }
+
+      const discountAmount =
+        Math.round((rental_amount * stoResult.coupon.pct) / 100 * 100) / 100;
+
+      return NextResponse.json({
+        valid: true,
+        coupon: {
+          id: stoResult.coupon.id,
+          code: stoResult.coupon.code,
+          name: `Cupón Storytellers ${stoResult.coupon.pct}%`,
+          discount_type: "percentage",
+          discount_value: stoResult.coupon.pct,
+          discount_amount: discountAmount,
+          coupon_type: "storyteller",
+        },
+      });
+    }
+
+    // ============================================
+    // CUPONES ESTÁNDAR — comportamiento existente
+    // ============================================
     // Buscar cupón (convertir a mayúsculas)
     const { data: coupon, error: couponError } = await supabase
       .from("coupons")

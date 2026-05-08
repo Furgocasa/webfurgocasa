@@ -78,6 +78,13 @@ const RATE_LIMITS: Record<string, { limit: number; window: number }> = {
   '/api/bookings/send-email': { limit: 10, window: 60 },        // Reenvío de emails de reserva
   '/api/availability/alternatives': { limit: 60, window: 60 },  // Alternativas de disponibilidad
   '/api/blog/views': { limit: 120, window: 60 },                // Contador de vistas
+
+  // ✅ NUEVAS (mayo 2026): Programa Storytellers (login-less, requieren rate limit estricto contra fuerza bruta)
+  '/api/storytellers/validate-booking': { limit: 8, window: 600 },     // 8 intentos / 10 min (anti fuerza bruta nº reserva + email)
+  '/api/storytellers/request-magic-link': { limit: 5, window: 600 },   // 5 magic links / 10 min
+  '/api/storytellers/my-points': { limit: 60, window: 60 },            // 60 lecturas/minuto (página puede recargar)
+  '/api/storytellers/upload': { limit: 30, window: 600 },              // 30 lotes / 10 min (cliente sube en bloques)
+  '/api/storytellers/redeem': { limit: 30, window: 60 },               // 30 validaciones/minuto (checkout)
 };
 
 // ============================================

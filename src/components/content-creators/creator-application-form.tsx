@@ -21,6 +21,9 @@ const formSchema = z.object({
     .refine((v) => v === undefined || v === "" || /^https?:\/\/.+/i.test(v), { message: "URL no válida" }),
   creatorType: z.string().min(1, "Selecciona una opción"),
   equipment: z.enum(["movil", "camara", "ambos"], { required_error: "Selecciona equipo" }),
+  shootsRawLog: z.enum(["si", "no", "no_se"], {
+    required_error: "Selecciona una opción",
+  }),
   workExamplesUrl: z.string().trim().url("Enlace no válido (https://…)"),
   proposal: z.string().trim().min(40, "Detalla tu propuesta (mín. 40 caracteres)"),
   contentToDeliver: z.string().trim().min(20, "Describe qué entregarías"),
@@ -30,6 +33,9 @@ const formSchema = z.object({
   }),
   privacyAccepted: z.boolean().refine((v) => v === true, {
     message: "Debes aceptar la política de privacidad",
+  }),
+  rightsAccepted: z.boolean().refine((v) => v === true, {
+    message: "Debes aceptar los términos de cesión de derechos",
   }),
   companyWebsite: z.string().optional(),
 });
@@ -58,6 +64,7 @@ export function CreatorApplicationForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       privacyAccepted: false,
+      rightsAccepted: false,
       companyWebsite: "",
     },
   });
@@ -76,6 +83,8 @@ export function CreatorApplicationForm() {
           tiktok: data.tiktok || "",
           portfolioUrl: data.portfolioUrl || "",
           destinationsStyle: data.destinationsStyle || "",
+          shootsRawLog: data.shootsRawLog,
+          rightsAccepted: data.rightsAccepted,
         }),
       });
       const json = await res.json().catch(() => ({}));
@@ -218,6 +227,24 @@ export function CreatorApplicationForm() {
             </div>
 
             <div>
+              <label className={labelClass} htmlFor="shootsRawLog">
+                ¿Rodarías en RAW (foto) y LOG/flat (vídeo 4K)? <span className="text-furgocasa-orange">*</span>
+              </label>
+              <select id="shootsRawLog" className={inputClass} {...register("shootsRawLog")}>
+                <option value="">Selecciona…</option>
+                <option value="si">Sí, trabajo habitualmente en RAW + LOG/flat</option>
+                <option value="no">No, solo entrego material editado/baked</option>
+                <option value="no_se">No estoy familiarizado con esos términos</option>
+              </select>
+              {errors.shootsRawLog && (
+                <p className="mt-1 text-sm text-red-600">{errors.shootsRawLog.message}</p>
+              )}
+              <p className="mt-1.5 text-xs text-gray-500">
+                Necesitamos el bruto en RAW (foto) y 4K LOG o flat (vídeo) para colorear y editar nosotros.
+              </p>
+            </div>
+
+            <div>
               <label className={labelClass} htmlFor="workExamplesUrl">
                 Enlace a ejemplos de trabajos (reel, galería, Drive…) <span className="text-furgocasa-orange">*</span>
               </label>
@@ -290,6 +317,23 @@ export function CreatorApplicationForm() {
                 </label>
               </div>
               {errors.workedWithBrands && <p className="mt-1 text-sm text-red-600">{errors.workedWithBrands.message}</p>}
+            </div>
+
+            <div className="rounded-xl border border-furgocasa-blue/20 bg-furgocasa-blue/5 p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-furgocasa-blue"
+                  {...register("rightsAccepted")}
+                />
+                <span className="text-sm text-gray-700">
+                  Entiendo que, si la colaboración se concreta, deberé firmar un acuerdo de{" "}
+                  <strong>cesión de derechos</strong> sobre el material entregado en los términos que pacte FURGOCASA:{" "}
+                  no exclusiva, mundial, perpetua, todos los medios online y offline incluida publicidad pagada,
+                  con derecho de modificación. Si no estoy de acuerdo con estos términos, no envío esta solicitud. <span className="text-furgocasa-orange">*</span>
+                </span>
+              </label>
+              {errors.rightsAccepted && <p className="mt-2 text-sm text-red-600">{errors.rightsAccepted.message}</p>}
             </div>
 
             <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">

@@ -4,6 +4,12 @@ import { z } from "zod";
 import { validatePickupDropoffAgainstClosedDates } from "@/lib/business-closed-dates";
 import { buildPricingForSearch } from "@/lib/rental-search-pricing";
 import { extraLineUnitPriceEuros } from "@/lib/utils";
+import {
+  markCouponUsed as markStorytellerCouponUsed,
+  validateCouponForBooking as validateStorytellerCoupon,
+} from "@/lib/storytellers/points";
+
+const STORYTELLER_COUPON_PREFIX = "STO-";
 
 // ✅ SEGURIDAD: Validar que las variables de entorno existen (sin fallback peligroso)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -242,7 +248,12 @@ export async function POST(request: Request) {
       }
 
       let couponDiscountServer = 0;
-      if (booking.coupon_id) {
+      const isStorytellerCoupon = !!(
+        booking.coupon_code &&
+        booking.coupon_code.toUpperCase().startsWith(STORYTELLER_COUPON_PREFIX)
+      );
+
+      if (booking.coupon_id && !isStorytellerCoupon) {
         const { data: coupon } = await supabase
           .from("coupons")
           .select("discount_type, discount_value, is_active, valid_from, valid_until, max_uses, current_uses, min_rental_amount, min_rental_days")
@@ -255,6 +266,18 @@ export async function POST(request: Request) {
           } else {
             couponDiscountServer = Math.min(Number(coupon.discount_value), rentalAmount);
           }
+        }
+      } else if (isStorytellerCoupon && booking.coupon_code) {
+        const stoCheck = await validateStorytellerCoupon({
+          code: booking.coupon_code.toUpperCase(),
+          pickupDate: booking.pickup_date,
+          days: booking.days,
+        });
+        if (stoCheck.ok) {
+          const rentalAmount = serverPricing.basePrice + extrasPriceServer;
+          couponDiscountServer = Math.round(
+            ((rentalAmount * stoCheck.coupon.pct) / 100) * 100
+          ) / 100;
         }
       }
 
@@ -366,7 +389,12 @@ export async function POST(request: Request) {
     // ============================================
 
     // Re-validar cupón antes de registrar su uso
-    if (booking.coupon_id && booking.coupon_discount && booking.coupon_discount > 0) {
+    const isStorytellerCouponForBooking = !!(
+      booking.coupon_code &&
+      booking.coupon_code.toUpperCase().startsWith(STORYTELLER_COUPON_PREFIX)
+    );
+
+    if (booking.coupon_id && booking.coupon_discount && booking.coupon_discount > 0 && !isStorytellerCouponForBooking) {
       const { data: couponCheck } = await supabase
         .from("coupons")
         .select("valid_from, valid_until, is_active, max_uses, current_uses")
@@ -400,25 +428,61 @@ export async function POST(request: Request) {
           });
         }
       }
+    } else if (isStorytellerCouponForBooking && booking.coupon_code && booking.coupon_discount && booking.coupon_discount > 0) {
+      const stoRecheck = await validateStorytellerCoupon({
+        code: booking.coupon_code.toUpperCase(),
+        pickupDate: booking.pickup_date,
+        days: booking.days,
+      });
+      if (!stoRecheck.ok) {
+        await supabase
+          .from("bookings")
+          .update({
+            coupon_id: null,
+            coupon_code: null,
+            coupon_discount: 0,
+            discount: 0,
+            total_price: booking.total_price + booking.coupon_discount,
+          })
+          .eq("id", createdBooking.id);
+
+        return NextResponse.json({
+          success: true,
+          booking: { ...createdBooking, coupon_removed: true },
+          message: "Reserva creada pero el cupón Storyteller no era válido para las fechas seleccionadas y fue eliminado",
+        });
+      }
     }
 
     // Registrar uso del cupón si se aplicó uno
     if (booking.coupon_id && booking.coupon_discount && booking.coupon_discount > 0) {
-      // Incrementar contador de usos
-      await supabase.rpc('increment_coupon_uses', { coupon_id: booking.coupon_id });
-      
-      // Registrar en historial de uso
-      const originalAmount = booking.total_price + booking.coupon_discount;
-      await supabase
-        .from("coupon_usage")
-        .insert({
-          coupon_id: booking.coupon_id,
-          booking_id: createdBooking.id,
-          customer_id: booking.customer_id,
-          discount_amount: booking.coupon_discount,
-          original_amount: originalAmount,
-          final_amount: booking.total_price,
+      if (isStorytellerCouponForBooking) {
+        const result = await markStorytellerCouponUsed({
+          couponId: booking.coupon_id,
+          bookingId: createdBooking.id,
         });
+        if (!result.ok) {
+          console.error(
+            "[bookings/create] No se pudo marcar cupón Storyteller como usado:",
+            result.reason
+          );
+        }
+      } else {
+        // Cupones estándar: incrementar contador + insertar en coupon_usage
+        await supabase.rpc("increment_coupon_uses", { coupon_id: booking.coupon_id });
+
+        const originalAmount = booking.total_price + booking.coupon_discount;
+        await supabase
+          .from("coupon_usage")
+          .insert({
+            coupon_id: booking.coupon_id,
+            booking_id: createdBooking.id,
+            customer_id: booking.customer_id,
+            discount_amount: booking.coupon_discount,
+            original_amount: originalAmount,
+            final_amount: booking.total_price,
+          });
+      }
     }
 
     // ============================================

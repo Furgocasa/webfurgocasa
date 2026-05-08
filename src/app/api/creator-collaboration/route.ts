@@ -12,12 +12,14 @@ const schema = z.object({
   portfolioUrl: z.union([z.literal(""), z.string().trim().url().max(2000)]),
   creatorType: z.string().trim().min(1).max(120),
   equipment: z.enum(["movil", "camara", "ambos"]),
+  shootsRawLog: z.enum(["si", "no", "no_se"]),
   workExamplesUrl: z.string().trim().url().max(2000),
   proposal: z.string().trim().min(40).max(8000),
   contentToDeliver: z.string().trim().min(20).max(8000),
   destinationsStyle: z.string().trim().max(8000).optional().or(z.literal("")),
   workedWithBrands: z.enum(["si", "no", "prefiero_no_decir"]),
   privacyAccepted: z.boolean().refine((v) => v === true, { message: "required" }),
+  rightsAccepted: z.boolean().refine((v) => v === true, { message: "required" }),
 });
 
 function escapeHtml(s: string) {
@@ -57,6 +59,10 @@ export async function POST(req: NextRequest) {
       ["Web / portfolio", d.portfolioUrl || "—"],
       ["Tipo de creador", d.creatorType],
       ["Equipo", d.equipment],
+      [
+        "¿Rueda en RAW + LOG/flat?",
+        d.shootsRawLog === "si" ? "Sí" : d.shootsRawLog === "no" ? "No" : "No conoce los términos",
+      ],
       ["Enlace ejemplos de trabajo", d.workExamplesUrl],
       ["Propuesta de colaboración", d.proposal],
       ["Contenido a entregar", d.contentToDeliver],
@@ -65,6 +71,7 @@ export async function POST(req: NextRequest) {
         "¿Ha trabajado con marcas?",
         d.workedWithBrands === "prefiero_no_decir" ? "Prefiero no decir" : d.workedWithBrands === "si" ? "Sí" : "No",
       ],
+      ["Acepta cesión perpetua mundial", d.rightsAccepted ? "Sí" : "No"],
     ];
 
     const html = `

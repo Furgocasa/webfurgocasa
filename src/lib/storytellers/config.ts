@@ -1,0 +1,238 @@
+/**
+ * Configuración central del programa Storytellers.
+ * Cambios en estos valores afectan a UI, endpoints y curaduría.
+ *
+ * Ver guía: docs/02-desarrollo/contenido/GUIA_CONTENIDO.md §3
+ */
+
+// ============================================
+// PUNTOS — cómo se ganan
+// ============================================
+export const POINTS_PER_PHOTO_UPLOAD = 2;
+export const POINTS_PER_VIDEO_UPLOAD = 5;
+export const POINTS_PER_PHOTO_SELECTED = 20;
+export const POINTS_PER_VIDEO_SELECTED = 60;
+
+// ============================================
+// UMBRALES — cómo se canjean (% descuento)
+// ============================================
+export interface DiscountTier {
+  /** puntos mínimos requeridos para desbloquear este % */
+  threshold: number;
+  /** % de descuento sobre la próxima reserva */
+  pct: number;
+  /** etiqueta humana, se muestra en UI */
+  label: string;
+}
+
+/** Tope absoluto del programa, ningún cupón puede superar este % */
+export const MAX_DISCOUNT_PCT = 15;
+
+/**
+ * Escala de cupones por puntos. Ordenada de menor a mayor umbral.
+ * El cliente conserva en cada momento solo el cupón ACTIVO de mayor %
+ * desbloqueado (los menores se "supersedan" automáticamente al cruzar uno mayor).
+ */
+export const DISCOUNT_TIERS: DiscountTier[] = [
+  { threshold: 40, pct: 5, label: "5% descuento" },
+  { threshold: 100, pct: 8, label: "8% descuento" },
+  { threshold: 200, pct: 10, label: "10% descuento" },
+  { threshold: 400, pct: 12, label: "12% descuento" },
+  { threshold: 800, pct: 15, label: "15% descuento (techo)" },
+];
+
+/**
+ * Cupón instantáneo que se entrega EN LA PRIMERA SUBIDA válida del email.
+ * No depende de puntos, es de primera vez.
+ */
+export const INSTANT_FIRST_UPLOAD_COUPON_PCT = 3;
+
+// ============================================
+// PERKS NO MONETARIOS (encima del techo)
+// ============================================
+export interface PerkTier {
+  threshold: number;
+  perk: string;
+}
+
+export const PERK_TIERS: PerkTier[] = [
+  { threshold: 1200, perk: "Acceso anticipado: 7 días antes que el público" },
+  { threshold: 1600, perk: "Vehículo gama media garantizado" },
+  { threshold: 2000, perk: "Upgrade gratis a vehículo superior, 1 vez/año" },
+  { threshold: 2500, perk: "Storyteller Gold: foto destacada en home con tu nombre, 1 mes" },
+];
+
+// ============================================
+// REGLAS DEL CUPÓN
+// ============================================
+export const COUPON_VALIDITY_MONTHS = 18;
+export const COUPON_MIN_RESERVATION_DAYS = 4;
+
+// ============================================
+// LÍMITES DE SUBIDA POR RESERVA
+// ============================================
+export const MAX_PHOTOS_PER_BOOKING = 100;
+export const MAX_VIDEOS_PER_BOOKING = 20;
+export const MAX_PHOTO_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
+export const MAX_VIDEO_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
+export const MIN_PHOTOS_PER_UPLOAD_BATCH = 3;
+
+export const ALLOWED_PHOTO_MIME_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/heic",
+  "image/heif",
+  "image/webp",
+] as const;
+
+export const ALLOWED_VIDEO_MIME_TYPES = [
+  "video/mp4",
+  "video/quicktime",
+  "video/x-quicktime",
+] as const;
+
+// ============================================
+// VENTANA TEMPORAL DE SUBIDA
+// ============================================
+/** Permite subir desde N días ANTES de la fecha de devolución (durante el viaje) */
+export const UPLOAD_WINDOW_DAYS_BEFORE_DROPOFF = 7;
+/** Permite subir hasta N días DESPUÉS de la fecha de devolución */
+export const UPLOAD_WINDOW_DAYS_AFTER_DROPOFF = 90;
+
+// ============================================
+// MAGIC LINK
+// ============================================
+/** Duración del token HMAC del enlace mágico (días) */
+export const MAGIC_LINK_VALIDITY_DAYS = 30;
+
+// ============================================
+// TEMPORADAS BLOQUEADAS PARA CANJE
+// ============================================
+/**
+ * Periodos en los que NO se puede usar un cupón Storyteller.
+ * Se evalúa contra la fecha de PICKUP de la reserva candidata.
+ *
+ * Cubre verano alto + Semana Santa + grandes puentes + picos navideños.
+ * Los rangos son anuales (mes-día), aplicables a cualquier año.
+ */
+export interface BlockedPeriod {
+  /** Etiqueta para mensajes de error */
+  label: string;
+  /** Mes inicial (1-12) */
+  startMonth: number;
+  /** Día inicial */
+  startDay: number;
+  /** Mes final (1-12) */
+  endMonth: number;
+  /** Día final */
+  endDay: number;
+}
+
+export const COUPON_BLOCKED_PERIODS: BlockedPeriod[] = [
+  // Verano: 22 jun – 31 ago (verano alto + primera quincena agosto)
+  { label: "Temporada alta de verano", startMonth: 6, startDay: 22, endMonth: 8, endDay: 31 },
+  // Picos navideños: 22 dic – 6 ene (cubre fin de año + Reyes)
+  { label: "Picos navideños / Reyes", startMonth: 12, startDay: 22, endMonth: 1, endDay: 6 },
+];
+
+/**
+ * Comprueba si una fecha (ISO YYYY-MM-DD) cae en un periodo bloqueado.
+ * Maneja periodos que cruzan el año (dic→ene).
+ */
+export function isInBlockedPeriod(isoDate: string): {
+  blocked: boolean;
+  label?: string;
+} {
+  const [, m, d] = isoDate.split("-").map((n) => parseInt(n, 10));
+  for (const period of COUPON_BLOCKED_PERIODS) {
+    const monthDay = m * 100 + d;
+    const startMd = period.startMonth * 100 + period.startDay;
+    const endMd = period.endMonth * 100 + period.endDay;
+
+    if (startMd <= endMd) {
+      if (monthDay >= startMd && monthDay <= endMd) {
+        return { blocked: true, label: period.label };
+      }
+    } else {
+      // periodo que cruza año (ej. dic-ene)
+      if (monthDay >= startMd || monthDay <= endMd) {
+        return { blocked: true, label: period.label };
+      }
+    }
+  }
+  return { blocked: false };
+}
+
+// ============================================
+// HELPERS GENÉRICOS
+// ============================================
+
+/**
+ * Normaliza un email para uso como identidad maestra del programa.
+ * - Trim
+ * - Minúsculas
+ */
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+/**
+ * Devuelve el % de descuento desbloqueado por un saldo de puntos dado.
+ * Si el saldo no llega al primer umbral, devuelve 0.
+ */
+export function getUnlockedDiscountPct(balance: number): number {
+  let unlocked = 0;
+  for (const tier of DISCOUNT_TIERS) {
+    if (balance >= tier.threshold) {
+      unlocked = tier.pct;
+    } else {
+      break;
+    }
+  }
+  return unlocked;
+}
+
+/**
+ * Devuelve el siguiente umbral por desbloquear y los puntos que faltan.
+ * Si ya está en el techo, devuelve null.
+ */
+export function getNextThreshold(balance: number): {
+  threshold: number;
+  pct: number;
+  remaining: number;
+} | null {
+  for (const tier of DISCOUNT_TIERS) {
+    if (balance < tier.threshold) {
+      return {
+        threshold: tier.threshold,
+        pct: tier.pct,
+        remaining: tier.threshold - balance,
+      };
+    }
+  }
+  return null;
+}
+
+/**
+ * Formato canónico esperado del nº de reserva (booking_number).
+ * Se le indica al cliente con un ejemplo en el formulario.
+ *
+ * Por ahora aceptamos cualquier string entre 3 y 30 caracteres alfanuméricos
+ * con guiones, sin espacios. La normalización quita # iniciales y trim.
+ */
+export function normalizeBookingNumber(raw: string): string {
+  return raw.trim().replace(/^#+/, "").toUpperCase();
+}
+
+/** Genera un código único legible para un cupón (ej. STO-AB12-XY34). */
+export function generateCouponCode(): string {
+  const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const num = "23456789";
+  function pick(set: string, n: number) {
+    let s = "";
+    for (let i = 0; i < n; i++) s += set[Math.floor(Math.random() * set.length)];
+    return s;
+  }
+  return `STO-${pick(alpha, 2)}${pick(num, 2)}-${pick(alpha, 2)}${pick(num, 2)}`;
+}

@@ -30,6 +30,7 @@ import {
   Ban,
   Palmtree,
   Mail,
+  Sparkles,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
 import type { Admin } from "@/types/blog";
@@ -77,6 +78,7 @@ const navigation: NavItem[] = [
   { name: "Media", href: "/administrator/media", icon: ImageIcon },
   { name: "Pagos", href: "/administrator/pagos", icon: CreditCard },
   { name: "Reservas", href: "/administrator/reservas", icon: Calendar },
+  { name: "Storytellers", href: "/administrator/storyteller-uploads", icon: Sparkles },
   { name: "Temporadas", href: "/administrator/temporadas", icon: Sun },
   { name: "Ubicaciones", href: "/administrator/ubicaciones", icon: MapPin },
   { name: "Última Hora", href: "/administrator/ofertas-ultima-hora", icon: Clock },
