@@ -4,8 +4,10 @@ import {
   CalendarRange,
   CheckCircle2,
   FileImage,
+  Gift,
   Image as ImageIcon,
   MapPin,
+  Sparkles,
   Trophy,
   Upload,
   Users,
@@ -214,7 +216,65 @@ export function StorytellersLanding() {
         </div>
       </section>
 
-      {/* 2. ¿Qué es este programa? */}
+      {/* 2. ¿Cómo funciona? — primer bloque visual, lo primero que entiende el cliente */}
+      <section
+        className="bg-gray-50 py-16 md:py-20"
+        aria-labelledby="como-funciona-storytellers"
+      >
+        <div className="container mx-auto px-4">
+          <h2
+            id="como-funciona-storytellers"
+            className="text-center font-heading text-3xl font-bold text-gray-900 md:text-4xl"
+          >
+            ¿Cómo funciona?
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-gray-600">
+            4 pasos sencillos. Empiezas durante el propio viaje y acabas con un cupón listo para tu próxima reserva.
+          </p>
+          <ol className="mx-auto mt-12 grid max-w-6xl gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              {
+                n: "1",
+                title: "Durante el viaje",
+                body: "Haces fotos o vídeos del vehículo y de tus experiencias dentro y fuera de la camper, como ya hacías.",
+                icon: Camera,
+              },
+              {
+                n: "2",
+                title: "Sube tu material",
+                body: "Te identificas con tu nº de reserva + email y arrastras los archivos. Puedes subir según los vas haciendo o al volver. Lote mínimo: 3 fotos o 1 vídeo.",
+                icon: Upload,
+              },
+              {
+                n: "3",
+                title: "Sumas puntos",
+                body: `Te llevas ${POINTS_PER_PHOTO_UPLOAD} ptos por foto y ${POINTS_PER_VIDEO_UPLOAD} por vídeo al instante. Si seleccionamos alguno para nuestro archivo: +${POINTS_PER_PHOTO_SELECTED} y +${POINTS_PER_VIDEO_SELECTED}.`,
+                icon: Sparkles,
+              },
+              {
+                n: "4",
+                title: "Canjeas tu cupón",
+                body: `Al cruzar un umbral generamos tu cupón automáticamente. Hasta el techo del ${MAX_DISCOUNT_PCT}% en próximas reservas (baja/media temporada, mín. ${COUPON_MIN_RESERVATION_DAYS} días).`,
+                icon: Gift,
+              },
+            ].map((s) => (
+              <li
+                key={s.n}
+                className="rounded-3xl border border-gray-100 bg-gray-50 p-8 text-center transition hover:border-furgocasa-orange/30 hover:bg-white hover:shadow-lg"
+              >
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-furgocasa-orange text-2xl font-heading font-bold text-white">
+                  {s.n}
+                </div>
+                <s.icon className="mx-auto mb-3 h-6 w-6 text-furgocasa-orange" aria-hidden />
+                <h3 className="font-heading text-lg font-bold text-gray-900">{s.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-gray-600">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* 3. ¿Qué es este programa? */}
       <section className="py-16 md:py-20 bg-white" aria-labelledby="que-es-storytellers">
         <div className="container mx-auto px-4">
           <div className="mx-auto max-w-3xl text-center">
@@ -652,56 +712,6 @@ export function StorytellersLanding() {
           <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-gray-500">
             * Los puntos canjeados por merch se descuentan del saldo. El envío del producto se gestiona desde la oficina de Furgocasa contactando al cliente por email tras la solicitud de canje.
           </p>
-        </div>
-      </section>
-
-      {/* 10. Cómo funciona, paso a paso */}
-      <section
-        className="border-t border-gray-100 bg-gradient-to-b from-gray-50 to-white py-16 md:py-20"
-        aria-labelledby="como-funciona-storytellers"
-      >
-        <div className="container mx-auto px-4">
-          <h2
-            id="como-funciona-storytellers"
-            className="text-center font-heading text-3xl font-bold text-gray-900 md:text-4xl"
-          >
-            Cómo funciona, paso a paso
-          </h2>
-          <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
-            4 pasos sencillos. Empiezas durante el propio viaje y acabas con un cupón listo para tu próxima reserva.
-          </p>
-          <ol className="mx-auto mt-12 grid max-w-5xl gap-8 md:grid-cols-4">
-            {[
-              {
-                step: "1",
-                title: "Durante el viaje",
-                body: "Haces fotos o vídeos del vehículo y de tus experiencias dentro y fuera de la camper, como ya hacías.",
-              },
-              {
-                step: "2",
-                title: "Sube tu material",
-                body: `Te identificas con tu nº de reserva + email y arrastras los archivos. Puedes subir según los vas haciendo o al volver. Lote mínimo: 3 fotos o 1 vídeo.`,
-              },
-              {
-                step: "3",
-                title: "Sumas puntos",
-                body: "Te llevas puntos al instante por cada archivo. Si seleccionamos alguno para nuestro archivo profesional, sumas mucho más.",
-              },
-              {
-                step: "4",
-                title: "Canjeas tu cupón",
-                body: `Al cruzar un umbral generamos tu cupón automáticamente. Lo aplicas en próximas reservas (baja/media temporada, mín. ${COUPON_MIN_RESERVATION_DAYS} días).`,
-              },
-            ].map((item) => (
-              <li key={item.step} className="relative text-center md:text-left">
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-furgocasa-orange text-xl font-heading font-bold text-white md:mx-0">
-                  {item.step}
-                </div>
-                <h3 className="font-heading text-lg font-bold text-gray-900">{item.title}</h3>
-                <p className="mt-2 text-sm text-gray-600 leading-relaxed">{item.body}</p>
-              </li>
-            ))}
-          </ol>
         </div>
       </section>
 
