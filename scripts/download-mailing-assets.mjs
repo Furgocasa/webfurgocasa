@@ -165,11 +165,17 @@ async function downloadVehicleCovers() {
 }
 
 // ──────────────────────────────────────────────────────────────────────
-// 3) Imágenes Storytellers para mailings (webp → jpg)
+// 3) Imágenes Storytellers para mailings (webp → jpg + portada-CTA)
 //
 // Los clientes de correo (Gmail/Outlook) renderizan mal el webp, así que
 // para los emails del programa Storytellers re-comprimimos las webp de la
 // landing pública a JPEG optimizado de hasta 1200 px de ancho.
+//
+// Además, generamos `cover-cta.jpg`: una portada vertical (4:5) con
+// `showcase-hero` de fondo + overlay oscuro + texto "¿QUIERES GANAR UN
+// DESCUENTO?" + flecha hacia abajo. Se usa como hero del primer mail
+// del ciclo (día de salida) para que el cliente sepa de qué va el mail
+// nada más abrirlo y se sienta empujado a hacer scroll.
 // ──────────────────────────────────────────────────────────────────────
 async function convertStorytellersImages() {
   const files = [
@@ -204,6 +210,49 @@ async function convertStorytellersImages() {
     } catch (e) {
       console.warn(`  ! ERROR convirtiendo ${f}: ${e.message}`);
     }
+  }
+
+  // Portada-CTA del mail "día de salida"
+  await generateStorytellersCoverCta();
+}
+
+async function generateStorytellersCoverCta() {
+  const SRC = path.join(STORYTELLERS_SRC, 'showcase-hero.webp');
+  const OUT = path.join(OUT_STORYTELLERS, 'cover-cta.jpg');
+  const W = 1200;
+  const H = 1500; // 4:5 vertical
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+    <defs>
+      <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="black" stop-opacity="0.62"/>
+        <stop offset="40%" stop-color="black" stop-opacity="0.18"/>
+        <stop offset="78%" stop-color="black" stop-opacity="0.55"/>
+        <stop offset="100%" stop-color="black" stop-opacity="0.85"/>
+      </linearGradient>
+    </defs>
+    <rect width="${W}" height="${H}" fill="url(#g)"/>
+    <text x="600" y="180" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="6">PROGRAMA STORYTELLERS</text>
+    <text x="600" y="340" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="86" font-weight="900" fill="#ffffff">&#191;QUIERES GANAR</text>
+    <text x="600" y="445" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="86" font-weight="900" fill="#ffffff">UN DESCUENTO?</text>
+    <text x="600" y="555" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="44" font-weight="900" fill="#ea580c">3 % AL INSTANTE &#183; HASTA 15 %</text>
+    <text x="600" y="1290" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="600" fill="#ffffff" opacity="0.95">Desliza hacia abajo para saber c&#243;mo</text>
+    <circle cx="600" cy="1390" r="46" fill="#ea580c" stroke="#ffffff" stroke-width="4"/>
+    <path d="M 580 1376 L 600 1404 L 620 1376" stroke="#ffffff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+
+  try {
+    const buf = await fs.readFile(SRC);
+    await sharp(buf)
+      .rotate()
+      .resize({ width: W, height: H, fit: 'cover', position: 'center' })
+      .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
+      .jpeg({ quality: 85, progressive: true, mozjpeg: true })
+      .toFile(OUT);
+    const stats = await fs.stat(OUT);
+    console.log(`· cover-cta.jpg  →  ${(stats.size / 1024).toFixed(0)} KB  (${W}x${H}, 4:5 vertical)`);
+  } catch (e) {
+    console.warn(`  ! ERROR generando cover-cta.jpg: ${e.message}`);
   }
 }
 

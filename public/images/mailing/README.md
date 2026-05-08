@@ -63,7 +63,17 @@ public/images/mailing/storytellers/showcase-breakfast-table.jpg
 public/images/mailing/storytellers/showcase-family-fun.jpg
 public/images/mailing/storytellers/showcase-detail-route.jpg
 public/images/mailing/storytellers/showcase-pet-travel.jpg
+public/images/mailing/storytellers/cover-cta.jpg     ← portada del mail 05 (día de salida)
 ```
+
+`cover-cta.jpg` es una **portada-CTA vertical 4:5** (1200×1500) compuesta
+con `sharp` + un overlay SVG (texto vectorial, no IA): titular
+"¿QUIERES GANAR UN DESCUENTO?", reclamo "3 % al instante · hasta 15 %"
+y flecha hacia abajo con sublínea "Desliza hacia abajo para saber cómo".
+Se usa como hero del mail `mailing/app/05-storytellers-dia-salida-noche.html`
+para que ocupe la primera pantalla del email en móvil y empuje al scroll.
+La generación está en `scripts/download-mailing-assets.mjs` (paso 3,
+función `generateStorytellersCoverCta`, idempotente).
 
 Uso recomendado en HTML de los mails Storytellers (URL absoluta, ancho fijo):
 
