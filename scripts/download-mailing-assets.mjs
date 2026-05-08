@@ -212,47 +212,106 @@ async function convertStorytellersImages() {
     }
   }
 
-  // Portada-CTA del mail "día de salida"
-  await generateStorytellersCoverCta();
+  // Portadas-CTA, una por cada mail del ciclo Storytellers
+  await generateStorytellersCovers();
 }
 
-async function generateStorytellersCoverCta() {
-  const SRC = path.join(STORYTELLERS_SRC, 'showcase-hero.webp');
-  const OUT = path.join(OUT_STORYTELLERS, 'cover-cta.jpg');
+/**
+ * Genera 3 portadas verticales (4:5) que sirven como "hero-CTA" del primer
+ * pliegue de cada mail Storytellers. Cada una usa una foto distinta de la
+ * landing y un copy adaptado al momento del viaje, todo en texto vectorial
+ * (SVG) sobre la foto - no se usa IA generativa para que el texto sea
+ * siempre legible y editable cambiando una sola línea aquí.
+ *
+ * Uso en HTML (envuelto en <a> al subidor para hacer toda la portada clicable):
+ *   https://www.furgocasa.com/images/mailing/storytellers/cover-cta-{05|06|07}.jpg
+ */
+async function generateStorytellersCovers() {
   const W = 1200;
-  const H = 1500; // 4:5 vertical
+  const H = 1500; // 4:5 vertical · ocupa la primera pantalla del email en mobile
+  const COVERS = [
+    {
+      out: 'cover-cta-05.jpg',
+      src: 'showcase-hero.webp',
+      label: 'PROGRAMA STORYTELLERS',
+      title1: '\u00bfQUIERES GANAR',
+      title2: 'UN DESCUENTO?',
+      claim1: '3 % AL INSTANTE \u00b7 HASTA 15 %',
+      claim2: '+ REGALOS POR TUS PUNTOS',
+      subline: 'Desliza hacia abajo para saber c\u00f3mo',
+    },
+    {
+      out: 'cover-cta-06.jpg',
+      src: 'showcase-detail-route.webp',
+      label: 'PROGRAMA STORYTELLERS',
+      title1: 'TU VIAJE VALE',
+      title2: 'DESCUENTO',
+      claim1: 'S\u00daBELO YA \u00b7 HASTA 15 %',
+      claim2: '+ REGALOS POR TUS PUNTOS',
+      subline: 'Desliza y empieza a sumar puntos',
+    },
+    {
+      out: 'cover-cta-07.jpg',
+      src: 'showcase-family-fun.webp',
+      label: 'PROGRAMA STORYTELLERS',
+      title1: 'NO DEJES EL DESCUENTO',
+      title2: 'EN EL M\u00d3VIL',
+      claim1: '90 D\u00cdAS PARA SUBIR \u00b7 HASTA 15 %',
+      claim2: '+ REGALOS POR TUS PUNTOS',
+      subline: 'Desliza y no pierdas la oportunidad',
+    },
+  ];
 
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
-    <defs>
-      <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0%" stop-color="black" stop-opacity="0.62"/>
-        <stop offset="40%" stop-color="black" stop-opacity="0.18"/>
-        <stop offset="78%" stop-color="black" stop-opacity="0.55"/>
-        <stop offset="100%" stop-color="black" stop-opacity="0.85"/>
-      </linearGradient>
-    </defs>
-    <rect width="${W}" height="${H}" fill="url(#g)"/>
-    <text x="600" y="180" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="6">PROGRAMA STORYTELLERS</text>
-    <text x="600" y="340" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="86" font-weight="900" fill="#ffffff">&#191;QUIERES GANAR</text>
-    <text x="600" y="445" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="86" font-weight="900" fill="#ffffff">UN DESCUENTO?</text>
-    <text x="600" y="555" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="44" font-weight="900" fill="#ea580c">3 % AL INSTANTE &#183; HASTA 15 %</text>
-    <text x="600" y="1290" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="600" fill="#ffffff" opacity="0.95">Desliza hacia abajo para saber c&#243;mo</text>
-    <circle cx="600" cy="1390" r="46" fill="#ea580c" stroke="#ffffff" stroke-width="4"/>
-    <path d="M 580 1376 L 600 1404 L 620 1376" stroke="#ffffff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>`;
-
+  // Limpia cualquier cover-cta-*.jpg previa por si renombramos o quitamos.
   try {
-    const buf = await fs.readFile(SRC);
-    await sharp(buf)
-      .rotate()
-      .resize({ width: W, height: H, fit: 'cover', position: 'center' })
-      .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
-      .jpeg({ quality: 85, progressive: true, mozjpeg: true })
-      .toFile(OUT);
-    const stats = await fs.stat(OUT);
-    console.log(`· cover-cta.jpg  →  ${(stats.size / 1024).toFixed(0)} KB  (${W}x${H}, 4:5 vertical)`);
-  } catch (e) {
-    console.warn(`  ! ERROR generando cover-cta.jpg: ${e.message}`);
+    const prev = await fs.readdir(OUT_STORYTELLERS);
+    for (const f of prev) {
+      if (/^cover-cta(-\d+)?\.jpg$/i.test(f)) {
+        await fs.unlink(path.join(OUT_STORYTELLERS, f));
+      }
+    }
+  } catch {}
+
+  for (const c of COVERS) {
+    // Tipografía adaptativa: si el titular es largo bajamos algo el font-size.
+    const fs1 = c.title1.length > 16 ? 70 : 86;
+    const fs2 = c.title2.length > 16 ? 70 : 86;
+    const fsClaim1 = c.claim1.length > 28 ? 36 : 44;
+
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+      <defs>
+        <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="black" stop-opacity="0.62"/>
+          <stop offset="40%" stop-color="black" stop-opacity="0.18"/>
+          <stop offset="78%" stop-color="black" stop-opacity="0.55"/>
+          <stop offset="100%" stop-color="black" stop-opacity="0.85"/>
+        </linearGradient>
+      </defs>
+      <rect width="${W}" height="${H}" fill="url(#g)"/>
+      <text x="600" y="180" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="30" font-weight="900" fill="#ffffff" letter-spacing="6">${c.label}</text>
+      <text x="600" y="340" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fs1}" font-weight="900" fill="#ffffff">${c.title1}</text>
+      <text x="600" y="445" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fs2}" font-weight="900" fill="#ffffff">${c.title2}</text>
+      <text x="600" y="555" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="${fsClaim1}" font-weight="900" fill="#ea580c">${c.claim1}</text>
+      <text x="600" y="610" text-anchor="middle" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="32" font-weight="900" fill="#fb923c" letter-spacing="2">${c.claim2}</text>
+      <text x="600" y="1290" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="32" font-weight="600" fill="#ffffff" opacity="0.95">${c.subline}</text>
+      <circle cx="600" cy="1390" r="46" fill="#ea580c" stroke="#ffffff" stroke-width="4"/>
+      <path d="M 580 1376 L 600 1404 L 620 1376" stroke="#ffffff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>`;
+
+    try {
+      const buf = await fs.readFile(path.join(STORYTELLERS_SRC, c.src));
+      const outPath = path.join(OUT_STORYTELLERS, c.out);
+      await sharp(buf)
+        .rotate()
+        .resize({ width: W, height: H, fit: 'cover', position: 'center' })
+        .composite([{ input: Buffer.from(svg), top: 0, left: 0 }])
+        .jpeg({ quality: 85, progressive: true, mozjpeg: true })
+        .toFile(outPath);
+      const stats = await fs.stat(outPath);
+      console.log(`· ${c.out}  →  ${(stats.size / 1024).toFixed(0)} KB  (${W}x${H}, 4:5)`);
+    } catch (e) {
+      console.warn(`  ! ERROR generando ${c.out}: ${e.message}`);
+    }
   }
 }
 

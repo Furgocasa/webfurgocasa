@@ -63,17 +63,22 @@ public/images/mailing/storytellers/showcase-breakfast-table.jpg
 public/images/mailing/storytellers/showcase-family-fun.jpg
 public/images/mailing/storytellers/showcase-detail-route.jpg
 public/images/mailing/storytellers/showcase-pet-travel.jpg
-public/images/mailing/storytellers/cover-cta.jpg     ← portada del mail 05 (día de salida)
+public/images/mailing/storytellers/cover-cta-05.jpg  ← portada del mail 05 (día de salida)
+public/images/mailing/storytellers/cover-cta-06.jpg  ← portada del mail 06 (mitad de viaje)
+public/images/mailing/storytellers/cover-cta-07.jpg  ← portada del mail 07 (día después)
 ```
 
-`cover-cta.jpg` es una **portada-CTA vertical 4:5** (1200×1500) compuesta
-con `sharp` + un overlay SVG (texto vectorial, no IA): titular
-"¿QUIERES GANAR UN DESCUENTO?", reclamo "3 % al instante · hasta 15 %"
-y flecha hacia abajo con sublínea "Desliza hacia abajo para saber cómo".
-Se usa como hero del mail `mailing/app/05-storytellers-dia-salida-noche.html`
-para que ocupe la primera pantalla del email en móvil y empuje al scroll.
-La generación está en `scripts/download-mailing-assets.mjs` (paso 3,
-función `generateStorytellersCoverCta`, idempotente).
+`cover-cta-0X.jpg` son **portadas-CTA verticales 4:5** (1200×1500) compuestas
+con `sharp` + un overlay SVG (texto vectorial, no IA): etiqueta superior
+`PROGRAMA STORYTELLERS`, titular en blanco, reclamo en naranja
+(p. ej. `3 % AL INSTANTE · HASTA 15 %`) y, al pie, sublínea
+*"Desliza hacia abajo para saber cómo"* con un círculo naranja y flecha
+hacia abajo. Cada mail (`mailing/app/05-…`, `06-…`, `07-…`) usa la suya
+como hero clicable hacia `/es/storytellers/subir`, para ocupar la primera
+pantalla en móvil y empujar al scroll. La generación está en
+`scripts/download-mailing-assets.mjs` (paso 3, función
+`generateStorytellersCovers`, idempotente: para cambiar copy/foto de un
+mail basta con tocar el array `COVERS` y volver a ejecutar el script).
 
 Uso recomendado en HTML de los mails Storytellers (URL absoluta, ancho fijo):
 
