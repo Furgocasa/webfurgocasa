@@ -60,8 +60,12 @@ export async function POST(req: NextRequest) {
       ["Tipo de creador", d.creatorType],
       ["Equipo", d.equipment],
       [
-        "¿Rueda en RAW + LOG/flat?",
-        d.shootsRawLog === "si" ? "Sí" : d.shootsRawLog === "no" ? "No" : "No conoce los términos",
+        "Forma de entrega habitual",
+        d.shootsRawLog === "si"
+          ? "Cámara dedicada (RAW + LOG/flat)"
+          : d.shootsRawLog === "no"
+            ? "Móvil de alta gama (material listo)"
+            : "Otro / lo explica en la propuesta",
       ],
       ["Enlace ejemplos de trabajo", d.workExamplesUrl],
       ["Propuesta de colaboración", d.proposal],

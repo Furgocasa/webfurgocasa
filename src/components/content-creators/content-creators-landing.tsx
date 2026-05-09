@@ -17,20 +17,28 @@ import type { Locale } from "@/lib/i18n/config";
 
 const FAQ_QA: { q: string; a: string }[] = [
   {
+    q: "¿En qué se diferencia esto del programa Storytellers?",
+    a: "Storytellers es para clientes que ya han alquilado con FURGOCASA y quieren compartir fotos o vídeos de su viaje a cambio de descuento en próximas reservas. Esta página, en cambio, está pensada para creadores que presentan una propuesta antes del viaje, pactan entregables concretos y ceden material para uso comercial de FURGOCASA. No diferenciamos solo por el equipo utilizado, sino por el tipo de colaboración.",
+  },
+  {
     q: "¿Necesito tener miles de seguidores?",
-    a: "No es el criterio principal. Valoramos la calidad del material, tu portfolio y una propuesta con entregables concretos. Un perfil con menos seguidores pero con vídeo y foto muy sólidos puede encajar mejor que uno grande sin contenido reutilizable.",
+    a: "No es el criterio principal. La audiencia puede sumar, pero no sustituye a un buen contenido. Valoramos más una propuesta bien pensada, con portfolio y entregables claros, que una cifra alta de seguidores sin material útil para la marca.",
   },
   {
     q: "¿Buscáis influencers o creadores de contenido?",
-    a: "Este programa está pensado para creadores de contenido: personas que entregan archivos en bruto pre-seleccionados con derechos de uso para la marca, más una pieza editada por ellos (talking-head/experiencia). No buscamos colaboraciones basadas solo en \u201cvisibilidad\u201d o menciones sueltas sin activos entregables.",
+    a: "Buscamos creadores de contenido: personas que entregan material pactado previamente, con derechos de uso para la marca, más una pieza editada por ellas. No buscamos colaboraciones basadas solo en \u201cvisibilidad\u201d o menciones sueltas sin activos entregables.",
+  },
+  {
+    q: "¿Puedo colaborar si grabo con móvil y no con cámara profesional?",
+    a: "Sí, si tu móvil es de alta gama y el resultado tiene calidad real para redes, web y campañas: nítido, estable, bien iluminado, con buen sonido y composición cuidada. Lo importante no es el equipo, sino el resultado y la organización de la entrega. Si solo grabas vídeos cortos con el móvil de manera improvisada y sin propuesta previa, te interesa más nuestro programa Storytellers.",
   },
   {
     q: "¿La colaboración implica uso de la camper sin coste?",
-    a: "En los casos seleccionados puede acordarse una cesión de vehículo como parte de un acuerdo profesional, siempre en función del valor del contenido acordado, fechas y disponibilidad. No es un \u201cviaje gratis\u201d genérico: cada propuesta se evalúa de forma individual y nunca cedemos en temporada alta de verano ni grandes puentes.",
+    a: "En los casos seleccionados puede acordarse una cesión de vehículo como parte de un acuerdo profesional, siempre en función del valor del contenido acordado, fechas y disponibilidad. No es un \u201cviaje gratis\u201d genérico: cada propuesta se evalúa de forma individual y nunca cedemos en temporada alta de verano ni grandes puentes. Toda cesión va sujeta a contrato, fianza, seguro y condiciones de uso.",
   },
   {
     q: "¿Qué tipo de material debo entregar?",
-    a: "El grueso del material va en bruto pre-seleccionado: fotografía RAW + JPEG y vídeo en 4K LOG (sin editar, para que coloreemos y editemos con voz de marca propia). Sumas a eso una única pieza editada por ti: el reel/vídeo experiencia o talking-head, que también publicarás en tu canal. La cantidad concreta depende del nivel de colaboración acordado.",
+    a: "Depende del nivel de colaboración: fotos pre-seleccionadas (RAW + JPEG cuando trabajes con cámara), vídeo en 4K (LOG/flat si tu equipo lo permite) y una pieza editada por ti (vídeo vertical para redes, vídeo explicativo o vídeo de experiencia) que también publicarás en tu canal. La cantidad concreta se cierra por escrito antes del viaje.",
   },
   {
     q: "¿Puedo proponer una idea concreta?",
@@ -39,10 +47,6 @@ const FAQ_QA: { q: string; a: string }[] = [
   {
     q: "¿Cedéis siempre varios días de viaje?",
     a: "No. La duración y las condiciones se ajustan al alcance de la producción y al calendario de la flota, y nunca en temporada alta de verano, Semana Santa ni grandes puentes. A veces bastan uno o dos días bien planificados; otras veces tiene sentido algo más largo en baja o media temporada.",
-  },
-  {
-    q: "¿Puedo colaborar si grabo con móvil y no con cámara profesional?",
-    a: "En general no. Para el material en bruto que reutilizamos en marca necesitamos foto en RAW y vídeo en 4K con perfil LOG (o flat) — esto ya implica equipo dedicado. Si solo trabajas con móvil, te interesa más nuestro programa Storytellers, pensado para aficionados con buen ojo.",
   },
 ];
 
@@ -61,9 +65,9 @@ function ContentCreatorsJsonLd({ locale }: { locale: Locale }) {
   const webPage = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Creadores de contenido para viajar en camper | FURGOCASA",
+    name: "Creadores de contenido para campers de gran volumen | FURGOCASA",
     description:
-      "Programa de colaboración profesional con creadores de contenido para campers y autocaravanas. Bruto pre-seleccionado + 1 pieza editada con cesión perpetua. Murcia, Madrid, Valencia, Alicante y Albacete.",
+      "Colaboraciones pactadas con creadores de contenido para campers de gran volumen: propuesta previa, entregables concretos, cesión de derechos clara. Operamos en Murcia, Madrid, Valencia, Alicante y Albacete.",
     url: canonical,
     isPartOf: { "@type": "WebSite", name: "FURGOCASA", url: "https://www.furgocasa.com" },
   };
@@ -86,7 +90,7 @@ const SHOWCASE_IMAGES: { src: string; title: string; hint: string; alt: string }
     src: "/images/content-creators/showcase-vertical-interior.webp",
     title: "Vertical interior",
     hint: "9:16 · detalle y amplitud",
-    alt: "Interior luminoso de autocaravana con cocina y comedor compactos",
+    alt: "Interior luminoso de camper de gran volumen con cocina y comedor compactos",
   },
   {
     src: "/images/content-creators/showcase-travel-routine.webp",
@@ -118,30 +122,30 @@ const COLLAB_LEVELS: { tag: string; cesion: string; fotos: string; broll: string
   {
     tag: "Tiny",
     cesion: "1 día",
-    fotos: "10–15 (2–3 escenas)",
-    broll: "3–5 min bruto",
+    fotos: "10–15 fotos (2–3 escenas)",
+    broll: "3–5 min útiles",
     editada: "—",
   },
   {
     tag: "Light",
     cesion: "2–3 días",
-    fotos: "25–35 (más localizaciones)",
-    broll: "10–15 min bruto",
-    editada: "1 reel (talking-head)",
+    fotos: "25–35 fotos (más localizaciones)",
+    broll: "10–15 min útiles",
+    editada: "1 reel vertical (experiencia, recorrido, explicación o talking-head)",
   },
   {
     tag: "Standard",
     cesion: "4–5 días",
-    fotos: "45–60 (variedad real)",
-    broll: "20–30 min bruto",
-    editada: "2 reels",
+    fotos: "45–60 fotos (variedad real)",
+    broll: "20–30 min útiles",
+    editada: "2 reels verticales",
   },
   {
     tag: "Premium",
-    cesion: "7 días + vehículo",
-    fotos: "70–100",
-    broll: "40–50 min bruto",
-    editada: "3 reels + 1 vídeo experiencia 90s",
+    cesion: "Hasta 7 días de cesión de camper",
+    fotos: "70–100 fotos",
+    broll: "40–50 min útiles",
+    editada: "2–3 reels verticales + 1 vídeo experiencia de hasta 90 s",
   },
 ];
 
@@ -163,14 +167,17 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-orange-200">
-                Colaboración profesional · Bruto pre-seleccionado + 1 pieza editada
+                Colaboración profesional · Propuesta previa · Entregables pactados
               </p>
               <h1 className="font-heading text-4xl font-bold leading-tight text-white md:text-5xl lg:text-[2.75rem] xl:text-5xl">
-                Creadores de contenido camper: te cedemos furgo, tú entregas piezas reales
+                Creamos contenido real con creadores que saben contar viajes en camper
               </h1>
               <p className="mt-6 text-lg leading-relaxed text-blue-100 md:text-xl">
-                No buscamos seguidores. Buscamos{" "}
-                <strong className="font-semibold text-white">archivos pre-seleccionados con derechos de uso</strong>: foto RAW, vídeo 4K en LOG y una pieza editada por ti. Material que podamos usar en web, redes y campañas durante años.
+                Te cedemos una <strong className="font-semibold text-white">camper de gran volumen</strong> en condiciones pactadas; tú entregas{" "}
+                <strong className="font-semibold text-white">contenido de calidad, archivos aprovechables y derechos de uso claros</strong>.
+              </p>
+              <p className="mt-4 text-base leading-relaxed text-blue-100/90">
+                No diferenciamos por el equipo: aceptamos cámara y también móvil de alta gama si el resultado es nítido, estable, bien iluminado y bien sonorizado.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <a
@@ -216,10 +223,47 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
       <section className="border-b border-gray-100 bg-white py-8">
         <div className="container mx-auto px-4">
           <p className="mx-auto max-w-4xl text-base leading-relaxed text-gray-700 md:text-lg">
-            Si buscas <strong>colaborar con una marca de autocaravanas</strong> entregando{" "}
-            <strong>archivos en bruto y reels editados</strong> con producto real en carretera, esta página es para ti. En FURGOCASA trabajamos con{" "}
-            <strong>creadores de contenido camper</strong> y videógrafos que ruedan en LOG y RAW, y entienden el encaje entre aventura, estética y mensaje de marca.
+            Si buscas <strong>colaborar con una marca especializada en campers de gran volumen</strong> y puedes entregar{" "}
+            <strong>contenido real, cuidado y útil para campañas</strong>, esta página es para ti. En FURGOCASA trabajamos con{" "}
+            <strong>creadores de contenido camper</strong> —fotógrafos, videógrafos y perfiles de redes— que entienden el encaje entre aventura, estética y mensaje de marca.
           </p>
+        </div>
+      </section>
+
+      {/* Distinción Storytellers vs Creadores (Cambio 2) */}
+      <section className="border-b border-gray-100 bg-amber-50/40 py-10" aria-labelledby="distincion-storytellers">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-4xl rounded-3xl border border-amber-200 bg-white p-6 shadow-sm md:p-8">
+            <h2
+              id="distincion-storytellers"
+              className="font-heading text-xl font-bold text-gray-900 md:text-2xl"
+            >
+              ¿Esta página es para ti? Léelo antes de seguir
+            </h2>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              No diferenciamos solo por el equipo utilizado, sino por el <strong>tipo de colaboración</strong>:
+            </p>
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-furgocasa-orange">Storytellers</p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                  Para <strong>clientes que ya han alquilado</strong> con FURGOCASA y quieren compartir fotos o vídeos de su viaje a cambio de descuento en próximas reservas.
+                </p>
+                <LocalizedLink
+                  href="/storytellers"
+                  className="mt-3 inline-flex text-sm font-semibold text-furgocasa-orange hover:underline"
+                >
+                  Ir a Storytellers →
+                </LocalizedLink>
+              </div>
+              <div className="rounded-2xl border-2 border-furgocasa-blue/30 bg-furgocasa-blue/5 p-5">
+                <p className="text-xs font-semibold uppercase tracking-wider text-furgocasa-blue">Creadores de contenido (esta página)</p>
+                <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                  Para creadores que <strong>presentan una propuesta antes del viaje</strong>, pactan entregables concretos y ceden material para uso comercial de FURGOCASA.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -231,7 +275,10 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
               ¿Qué es este programa?
             </h2>
             <p className="mt-4 text-lg text-gray-600">
-              Un canal para <strong>producción de contenido profesional</strong>: tú aportas archivos en bruto pre-seleccionados y una pieza editada por ti; nosotros ponemos el producto, el conocimiento del sector y, cuando encaja, condiciones de colaboración claras.
+              Un canal para <strong>producción de contenido pactada previamente</strong>: tú propones la idea y los entregables; nosotros ponemos la camper, el conocimiento del sector y, cuando encaja, condiciones de colaboración claras.
+            </p>
+            <p className="mt-4 text-base text-gray-600 italic">
+              No buscamos muchas colaboraciones. Buscamos <strong className="not-italic text-gray-800">pocas, bien planteadas y con contenido que podamos utilizar durante años</strong>.
             </p>
           </div>
           <ul className="mx-auto mt-10 grid max-w-4xl gap-4 sm:grid-cols-2">
@@ -264,8 +311,8 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
           <div className="mx-auto mt-12 grid max-w-5xl gap-6 md:grid-cols-2">
             {[
               {
-                title: "Cesión de camper para la producción",
-                body: "Cuando la propuesta y el calendario lo permiten, puede acordarse el uso de una autocaravana o camper como parte del intercambio profesional —nunca como promesa genérica y nunca en temporada alta de verano.",
+                title: "Cesión de camper de gran volumen",
+                body: "Cuando la propuesta y el calendario lo permiten, puede acordarse el uso de una de nuestras campers de gran volumen (Fiat Ducato camperizadas) como parte del intercambio profesional —nunca como promesa genérica y nunca en temporada alta de verano.",
               },
               {
                 title: "Colaboraciones puntuales o recurrentes",
@@ -343,7 +390,7 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             Niveles de colaboración
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
-            Orquilla orientativa de lo que solemos ceder y de lo que esperamos recibir. El acuerdo final se cierra siempre por escrito.
+            Horquilla orientativa de lo que solemos ceder y de lo que esperamos recibir. El acuerdo final se cierra siempre por escrito.
           </p>
           <div className="mx-auto mt-12 max-w-5xl">
             {/* Tabla en escritorio */}
@@ -352,9 +399,9 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                 <thead className="bg-furgocasa-blue text-white">
                   <tr>
                     <th className="px-5 py-4 font-heading">Nivel</th>
-                    <th className="px-5 py-4 font-heading">Cesión</th>
+                    <th className="px-5 py-4 font-heading">Cesión orientativa</th>
                     <th className="px-5 py-4 font-heading">Fotos seleccionadas</th>
-                    <th className="px-5 py-4 font-heading">B-roll bruto</th>
+                    <th className="px-5 py-4 font-heading">B-roll bruto útil</th>
                     <th className="px-5 py-4 font-heading">Pieza editada por ti</th>
                   </tr>
                 </thead>
@@ -393,7 +440,7 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                       <dd className="font-medium text-gray-800">{row.fotos}</dd>
                     </div>
                     <div>
-                      <dt className="text-gray-500">B-roll bruto</dt>
+                      <dt className="text-gray-500">B-roll bruto útil</dt>
                       <dd className="font-medium text-gray-800">{row.broll}</dd>
                     </div>
                     <div>
@@ -406,6 +453,30 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             </div>
             <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-gray-600">
               Regla mental: ~12-15 fotos útiles por día de rodaje, post-selección. Buscamos variedad real, no 50 versiones del mismo atardecer.
+            </p>
+
+            {/* Definiciones para evitar malentendidos sobre la entrega */}
+            <div className="mx-auto mt-8 grid max-w-4xl gap-4 md:grid-cols-2">
+              <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <h4 className="font-heading text-sm font-bold text-gray-900">
+                  Qué entendemos por «fotos seleccionadas»
+                </h4>
+                <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                  Fotos <strong>seleccionadas y editadas de forma básica</strong> (encuadre, exposición, color razonable), listas para uso en redes y web. <strong>Sin retoque avanzado salvo pacto específico</strong>: no esperamos revelado editorial ni limpieza pixel a pixel.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-gray-200 bg-white p-5">
+                <h4 className="font-heading text-sm font-bold text-gray-900">
+                  Qué entendemos por «b-roll bruto útil»
+                </h4>
+                <p className="mt-2 text-sm leading-relaxed text-gray-700">
+                  Material <strong>preseleccionado, estabilizado o correctamente grabado</strong>, sin edición final pero sin pruebas, descartes, audio basura ni clips repetidos. Buscamos minutos aprovechables, no minutos brutos para cumplir.
+                </p>
+              </div>
+            </div>
+
+            <p className="mx-auto mt-6 max-w-3xl text-center text-sm text-gray-500 italic">
+              Las cifras son orientativas. El acuerdo final dependerá de la propuesta, la ruta, la disponibilidad de vehículos, la calidad esperada del contenido, el tipo de edición y los derechos de uso pactados.
             </p>
           </div>
         </div>
@@ -422,7 +493,10 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             Qué esperamos de ti
           </h2>
           <p className="mx-auto mt-4 max-w-3xl text-center text-lg text-gray-600">
-            Aquí filtramos. Buscamos personas que entreguen <strong>bruto profesional + una pieza editada</strong>, no promesas vagas ni paquetes de fotos editadas con un estilo que no encaja con la marca.
+            Aquí filtramos. Buscamos personas que entreguen <strong>contenido real, cuidado y útil para campañas</strong>, no promesas vagas ni paquetes de fotos editadas con un estilo que no encaja con la marca.
+          </p>
+          <p className="mx-auto mt-3 max-w-3xl text-center text-sm text-gray-500 italic">
+            La audiencia puede sumar, pero no sustituye a un buen contenido. Valoramos más una propuesta bien pensada que una cifra alta de seguidores sin entregables claros.
           </p>
           <div className="mx-auto mt-12 grid max-w-5xl gap-8 lg:grid-cols-2">
             {/* Valoramos */}
@@ -430,13 +504,14 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
               <h3 className="font-heading text-xl font-bold text-furgocasa-blue">Valoramos</h3>
               <ul className="mt-4 space-y-3 text-gray-700">
                 {[
-                  "Equipo capaz de rodar foto RAW + JPEG y vídeo 4K en LOG/flat",
+                  "Cámara dedicada (foto RAW + JPEG, vídeo 4K en LOG/flat) o móvil de alta gama capaz de entregar el mismo nivel de calidad",
+                  "Material nítido, estable, bien iluminado, con buen sonido y composición cuidada",
                   "Portfolio o muestras recientes accesibles por enlace",
                   "Criterio estético y consistencia en color, encuadre y ritmo",
-                  "Capacidad de pre-seleccionar (no nos mandes 1.500 fotos)",
-                  "Storytelling claro en la pieza editada talking-head/experiencia",
+                  "Capacidad de pre-seleccionar (no nos mandes 1.500 fotos ni 200 clips)",
+                  "Storytelling claro en la pieza editada (vertical para redes, vídeo explicativo o experiencia)",
                   "Propuesta escrita con números aproximados (piezas, formatos, plazo)",
-                  "Disposición a ceder derechos de uso perpetuos por escrito",
+                  "Disposición a ceder derechos de uso amplios por escrito",
                 ].map((line) => (
                   <li key={line} className="flex gap-2">
                     <span className="text-furgocasa-orange" aria-hidden>
@@ -446,6 +521,9 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                   </li>
                 ))}
               </ul>
+              <p className="mt-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-sm leading-relaxed text-gray-700">
+                Grabar con móvil no significa entregar cualquier cosa: <strong>no buscamos vídeos movidos, audios con viento, fotos oscuras o clips improvisados</strong>, sino contenido real, natural y bien producido.
+              </p>
             </div>
 
             {/* Entregables */}
@@ -472,18 +550,22 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             </div>
           </div>
 
-          {/* Regla de variedad */}
+          {/* Regla de variedad (orientativa) */}
           <div className="mx-auto mt-10 max-w-5xl rounded-2xl border border-gray-200 bg-gray-50 p-6 md:p-8">
             <div className="flex items-start gap-4">
               <Layers className="mt-0.5 h-7 w-7 shrink-0 text-furgocasa-orange" aria-hidden />
               <div>
                 <h3 className="font-heading text-lg font-bold text-gray-900">
-                  Regla de variedad obligatoria
+                  Guía de variedad de la entrega
                 </h3>
                 <p className="mt-2 text-gray-700 leading-relaxed">
-                  De las fotos entregadas, al menos: <strong>30% exterior con vehículo</strong>,{" "}
-                  <strong>30% interior y detalle</strong>, <strong>20% uso real</strong> (personas/escenas/cocina),{" "}
-                  <strong>20% paisaje y atardecer/mood</strong>. No se aceptarán entregas con más del 50% de fotos de la misma franja horaria/localización.
+                  Como referencia orientativa, una entrega equilibrada suele incluir aproximadamente:{" "}
+                  <strong>30% exterior con vehículo</strong>, <strong>30% interior y detalle</strong>,{" "}
+                  <strong>20% uso real</strong> (personas/escenas/cocina) y{" "}
+                  <strong>20% paisaje y atardecer/mood</strong>. Procura no concentrar más del 50 % de las fotos en la misma franja horaria o localización.
+                </p>
+                <p className="mt-3 text-sm text-gray-500 italic">
+                  Las proporciones son orientativas. Si tu propuesta tiene una lógica narrativa clara que justifique otro reparto, lo valoramos caso por caso al revisar la idea.
                 </p>
               </div>
             </div>
@@ -492,10 +574,26 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
           {/* Cesión de derechos */}
           <div className="mx-auto mt-6 max-w-5xl rounded-2xl border-2 border-furgocasa-blue/20 bg-furgocasa-blue/5 p-6 md:p-8">
             <h3 className="font-heading text-lg font-bold text-gray-900">
-              Cesión de derechos perpetua, mundial y para todos los medios
+              Cesión de derechos: amplia pero clara
             </h3>
             <p className="mt-3 text-gray-700 leading-relaxed">
-              Cada colaboración cierra <strong>qué se entrega, en qué formato, en qué plazo y bajo qué cesión</strong>: no exclusiva, mundial, perpetua, en todos los medios online y offline (incluida publicidad pagada), con derecho de edición y modificación. Sin ese nivel de detalle, no solemos seguir adelante.
+              Pedimos <strong>derechos de uso amplios</strong> porque el objetivo es que el contenido pueda servirnos en redes, web, anuncios, campañas, folletos y materiales promocionales a largo plazo. El creador <strong>conserva la autoría</strong>, pero FURGOCASA necesita poder utilizar el material con libertad dentro de su comunicación comercial.
+            </p>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              En la práctica: cesión <strong>no exclusiva, mundial, perpetua</strong>, en todos los medios online y offline (incluida publicidad pagada), con derecho de edición y modificación. Cada colaboración fija por escrito qué se entrega, en qué formato y en qué plazo.
+            </p>
+            <p className="mt-3 text-sm text-gray-600 leading-relaxed">
+              La cesión no impide que el creador pueda mostrar el trabajo en su portfolio, salvo que se pacte otra cosa por escrito.
+            </p>
+          </div>
+
+          {/* Contrato, fianza, seguro (Cambio 8) */}
+          <div className="mx-auto mt-6 max-w-5xl rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+            <h3 className="font-heading text-lg font-bold text-gray-900">
+              Contrato, fianza, seguro y responsabilidades
+            </h3>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              Toda colaboración estará sujeta a <strong>contrato previo</strong> que recoja las condiciones de uso del vehículo: <strong>seguro, fianza, kilometraje pactado, política de combustible, limpieza, posibles daños, multas y responsabilidades</strong> durante el periodo de cesión. La camper se entrega como en cualquier alquiler profesional, con los mismos estándares y obligaciones.
             </p>
           </div>
         </div>
@@ -535,6 +633,50 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
         </div>
       </section>
 
+      {/* 7b. Tipos de contenido que nos interesan (Cambio 6) */}
+      <section
+        className="border-t border-gray-100 bg-white py-16 md:py-20"
+        aria-labelledby="tipos-contenido"
+      >
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-4xl">
+            <h2
+              id="tipos-contenido"
+              className="text-center font-heading text-3xl font-bold text-gray-900 md:text-4xl"
+            >
+              Nos interesa especialmente contenido sobre…
+            </h2>
+            <p className="mx-auto mt-3 max-w-2xl text-center text-gray-600">
+              Una guía concreta para que tu propuesta encaje desde el primer email.
+            </p>
+            <ul className="mx-auto mt-10 grid gap-3 sm:grid-cols-2">
+              {[
+                "Escapadas desde Murcia, Alicante, Valencia, Madrid o Albacete",
+                "Rutas de costa mediterránea",
+                "Viajes en pareja",
+                "Viajes con amigos",
+                "Familias viajando en camper",
+                "Interiores de la camper en uso real",
+                "Cocina, cama, ducha, almacenaje y vida dentro de la furgo",
+                "Vídeos tipo «cómo es viajar por primera vez en camper»",
+                "Contenido vertical para redes sociales",
+                "Vídeos explicativos sobre cómo se usa una camper de gran volumen",
+                "Imágenes de la camper en carretera, naturaleza, playa, montaña o pueblos con encanto",
+                "Clips de experiencia y rutinas reales (mañanas, café, pernocta…)",
+              ].map((item) => (
+                <li
+                  key={item}
+                  className="flex items-start gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 text-gray-800"
+                >
+                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-furgocasa-orange" aria-hidden />
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
       {/* 8. Perfiles */}
       <section className="border-t border-gray-100 bg-white py-16 md:py-20" aria-labelledby="perfiles">
         <div className="container mx-auto px-4">
@@ -563,12 +705,12 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
               },
               {
                 title: "Pareja o familia con producción propia",
-                desc: "Contenido creíble de uso real grabado con equipo dedicado, no solo móvil.",
+                desc: "Contenido creíble de uso real, grabado con cámara o móvil de alta gama, con criterio de luz, audio y composición.",
                 icon: Users,
               },
               {
                 title: "Creador con narrativa fuerte",
-                desc: "Tu pieza editada (talking-head/experiencia) es el activo: voz, ritmo, retención cuidada.",
+                desc: "Tu pieza editada (vertical para redes, vídeo explicativo o experiencia) es el activo: voz, ritmo, retención cuidada.",
                 icon: Sparkles,
               },
             ].map(({ title, desc, icon: Icon }) => (
@@ -647,14 +789,17 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold uppercase tracking-wider text-furgocasa-orange">
-                Programa Storytellers
+                Programa Storytellers · Para clientes
               </p>
               <h3 className="mt-1 font-heading text-xl font-bold text-gray-900 md:text-2xl">
-                ¿No eres profesional pero te encanta hacer fotos cuando viajas?
+                ¿Ya has alquilado con FURGOCASA y quieres compartir tu viaje?
               </h3>
               <p className="mt-3 text-gray-700 leading-relaxed">
-                Si ya has alquilado con FURGOCASA y haces buenas fotos o vídeos durante tus viajes, te puede interesar nuestro programa para clientes:{" "}
-                <strong>sube tu material y gana hasta un 15% de descuento en próximas reservas</strong>. Sin login, sin compromisos.
+                Si <strong>ya has alquilado una camper con FURGOCASA</strong> y quieres compartir fotos o vídeos de tu viaje, lo adecuado es participar en{" "}
+                <strong>Storytellers</strong>: sube tu material y gana hasta un 15 % de descuento en próximas reservas. Sin propuesta previa ni cesión comercial amplia.
+              </p>
+              <p className="mt-2 text-sm text-gray-500 leading-relaxed">
+                Esta página, en cambio, es para colaboraciones pactadas previamente, con entregables, condiciones y derechos de uso claros.
               </p>
             </div>
             <LocalizedLink

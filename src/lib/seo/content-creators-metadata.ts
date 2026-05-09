@@ -8,32 +8,32 @@ import {
 
 const PACK: Record<Locale, { title: string; description: string; keywords: string }> = {
   es: {
-    title: "Creadores de contenido para viajar en camper | Colabora con FURGOCASA",
+    title: "Creadores de contenido para campers de gran volumen | Colabora con FURGOCASA",
     description:
-      "En FURGOCASA buscamos creadores de contenido y perfiles UGC para colaboraciones profesionales con nuestras campers. Envía tu propuesta y tu portfolio.",
+      "FURGOCASA busca creadores de contenido para colaboraciones pactadas con campers de gran volumen: propuesta previa, entregables claros y cesión de derechos. No es un programa de clientes.",
     keywords:
-      "creadores contenido camper, colaborar marca camper, content creators viajes, colaboración camper, creadores UGC viajes, colaboración autocaravanas, influencers camper España",
+      "creadores contenido camper, colaborar marca camper, contenido viajes camper, colaboración camper gran volumen, creadores furgoneta camper, viajes en camper España, Fiat Ducato camperizada",
   },
   en: {
-    title: "Camper content creator collaborations | FURGOCASA",
+    title: "Content creator collaborations for large-volume campervans | FURGOCASA",
     description:
-      "FURGOCASA works with professional travel content creators and UGC talent for campervan and motorhome productions in Spain. Submit your portfolio and proposal.",
+      "FURGOCASA partners with content creators on agreed productions for our large-volume campervans in Spain: prior proposal, clear deliverables and usage rights. Not a customer program.",
     keywords:
-      "camper content creator, motorhome brand collaboration, travel UGC Spain, campervan rental content",
+      "campervan content creator, motorhome brand collaboration, travel content Spain, large volume campervan rental, camper content collaboration",
   },
   fr: {
-    title: "Créateurs de contenu camping-car | Collaboration FURGOCASA",
+    title: "Créateurs de contenu pour campers grand volume | Collaboration FURGOCASA",
     description:
-      "FURGOCASA recherche des créateurs de contenu et profils UGC pour des collaborations autour de nos camping-cars en Espagne. Envoyez votre proposition.",
+      "FURGOCASA collabore avec des créateurs de contenu sur des productions concertées autour de nos campers grand volume en Espagne : proposition préalable, livrables clairs et droits d'usage.",
     keywords:
-      "créateur contenu camping-car, collaboration marque van, UGC voyage Espagne",
+      "créateur contenu camper, collaboration marque van, contenu voyage Espagne, location camper grand volume",
   },
   de: {
-    title: "Content-Creator Kooperation Wohnmobil | FURGOCASA",
+    title: "Content-Creator Kooperation für großvolumige Camper | FURGOCASA",
     description:
-      "FURGOCASA sucht Content Creator und UGC-Talente für Kooperationen mit Campern und Wohnmobilen in Spanien. Reichen Sie Portfolio und Konzept ein.",
+      "FURGOCASA arbeitet mit Content-Creator an abgestimmten Produktionen rund um unsere großvolumigen Camper in Spanien: Vorabkonzept, klare Lieferungen und Nutzungsrechte.",
     keywords:
-      "Content Creator Wohnmobil, Markenkooperation Camper, UGC Reisen Spanien",
+      "Content Creator Camper, Markenkooperation Camper, Reiseinhalte Spanien, Großvolumen-Camper Vermietung",
   },
 };
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Send } from "lucide-react";
+import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 
 const formSchema = z.object({
@@ -43,7 +43,7 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const creatorTypeOptions = [
-  { value: "ugc_lifestyle", label: "Creador UGC / lifestyle" },
+  { value: "lifestyle_redes", label: "Creador lifestyle / contenido vertical para redes" },
   { value: "video_viajes", label: "Videógrafo de viajes" },
   { value: "foto", label: "Fotógrafo (lifestyle o producto)" },
   { value: "pareja_familia", label: "Pareja o familia viajera con contenido propio" },
@@ -115,9 +115,33 @@ export function CreatorApplicationForm() {
         <h2 id="formulario-creadores-heading" className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-3 text-center">
           Envía tu solicitud
         </h2>
-        <p className="text-center text-gray-600 mb-10 max-w-2xl mx-auto">
+        <p className="text-center text-gray-600 mb-8 max-w-2xl mx-auto">
           Cuanta más información concreta nos des, antes podremos valorar si hay encaje. Las propuestas vagas o sin enlaces a trabajos no suelen seguir adelante.
         </p>
+
+        {status !== "success" && (
+          <div className="mb-10 rounded-2xl border border-furgocasa-blue/20 bg-furgocasa-blue/5 p-5 md:p-6">
+            <p className="font-heading text-base font-bold text-gray-900">
+              Antes de escribirnos, asegúrate de incluir:
+            </p>
+            <ul className="mt-3 grid gap-2 text-sm text-gray-700 sm:grid-cols-2">
+              {[
+                "Quién eres y qué tipo de contenido haces",
+                "Ejemplos de trabajos anteriores (enlace)",
+                "Qué equipo utilizas (cámara o móvil de alta gama)",
+                "Qué ruta o idea propones",
+                "Cuántos días necesitarías la camper",
+                "Qué entregables concretos aportarías",
+                "Fechas aproximadas en las que podrías hacerlo",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-furgocasa-orange" aria-hidden />
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {status === "success" ? (
           <div
@@ -228,19 +252,19 @@ export function CreatorApplicationForm() {
 
             <div>
               <label className={labelClass} htmlFor="shootsRawLog">
-                ¿Rodarías en RAW (foto) y LOG/flat (vídeo 4K)? <span className="text-furgocasa-orange">*</span>
+                ¿Cómo entregas habitualmente el material? <span className="text-furgocasa-orange">*</span>
               </label>
               <select id="shootsRawLog" className={inputClass} {...register("shootsRawLog")}>
                 <option value="">Selecciona…</option>
-                <option value="si">Sí, trabajo habitualmente en RAW + LOG/flat</option>
-                <option value="no">No, solo entrego material editado/baked</option>
-                <option value="no_se">No estoy familiarizado con esos términos</option>
+                <option value="si">Cámara dedicada, trabajo habitualmente en RAW + LOG/flat</option>
+                <option value="no">Móvil de alta gama, entrego material listo con calidad para campañas</option>
+                <option value="no_se">Otro (lo explico abajo en la propuesta)</option>
               </select>
               {errors.shootsRawLog && (
                 <p className="mt-1 text-sm text-red-600">{errors.shootsRawLog.message}</p>
               )}
               <p className="mt-1.5 text-xs text-gray-500">
-                Necesitamos el bruto en RAW (foto) y 4K LOG o flat (vídeo) para colorear y editar nosotros.
+                Aceptamos cámara y también móvil de alta gama. Lo importante es que el resultado sea nítido, estable, bien iluminado y bien sonorizado.
               </p>
             </div>
 
