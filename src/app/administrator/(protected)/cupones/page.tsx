@@ -133,11 +133,18 @@ export default function CuponesPage() {
           .from('coupons')
           .select('*')
           .order('created_at', { ascending: false }),
+        // Solo cupones Storyteller "vivos": ocultamos los sustituidos
+        // (superseded_at NOT NULL) porque cuando un cliente desbloquea un
+        // % mayor, el sistema marca el cupón viejo como superseded y crea
+        // uno nuevo. El admin solo necesita ver el último de cada cliente.
+        // Los registros sustituidos se conservan en BD para auditoría
+        // (trazabilidad de superseded_by_id) pero no se listan aquí.
         supabase
           .from('storyteller_coupons')
           .select(
             'id, customer_email, code, discount_pct, min_days, valid_from, valid_until, is_active, used_at, superseded_at, expired_at, source, threshold_points, created_at'
           )
+          .is('superseded_at', null)
           .order('created_at', { ascending: false }),
       ]);
 
