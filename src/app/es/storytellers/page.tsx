@@ -9,6 +9,13 @@ export const metadata: Metadata = {
     "storytellers furgocasa, fotos camper viaje, descuento alquiler camper, programa fidelización furgocasa, sube fotos camper",
   alternates: {
     canonical: "https://www.furgocasa.com/es/storytellers",
+    languages: {
+      es: "https://www.furgocasa.com/es/storytellers",
+      en: "https://www.furgocasa.com/en/storytellers",
+      fr: "https://www.furgocasa.com/fr/storytellers",
+      de: "https://www.furgocasa.com/de/storytellers",
+      "x-default": "https://www.furgocasa.com/es/storytellers",
+    },
   },
   openGraph: {
     title: "Programa Storytellers Furgocasa",
@@ -21,5 +28,5 @@ export const metadata: Metadata = {
 };
 
 export default function StorytellersPage() {
-  return <StorytellersLanding />;
+  return <StorytellersLanding locale="es" />;
 }

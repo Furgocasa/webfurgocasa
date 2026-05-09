@@ -203,7 +203,7 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent p-6">
                   <div className="flex items-center gap-2 text-sm text-white/90">
                     <MapPin className="h-4 w-4 shrink-0" aria-hidden />
-                    <span className="font-medium">FURGOCASA · alquiler de campers y autocaravanas</span>
+                    <span className="font-medium">FURGOCASA · alquiler de campers de gran volumen</span>
                   </div>
                 </div>
               </div>
