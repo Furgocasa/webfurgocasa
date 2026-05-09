@@ -139,7 +139,10 @@ export async function directUpload({
   files,
   sessionToken,
   callbacks,
-  chunkSizeBytes = 6 * 1024 * 1024,
+  // 4 MB es el sweet spot para 4G. 6 MB suele tardar más de 30 s por chunk
+  // en 4G real y tus se queda en limbo. Si quieres más throughput con WiFi,
+  // pásalo desde el caller.
+  chunkSizeBytes = 4 * 1024 * 1024,
 }: DirectUploadOptions): Promise<DirectUploadFinalSummary> {
   const snapshot: FileProgress[] = files.map((f, i) => ({
     clientId: `f${i}-${f.name.slice(0, 40)}`,
@@ -316,19 +319,30 @@ export async function directUpload({
     fire();
 
     return new Promise<void>((resolve) => {
+      // Track del último response HTTP para diagnosticar (401/403/5xx) sin
+      // tener que abrir DevTools en móvil.
+      let lastStatus = 0;
+      let lastResponseBody = "";
+
       const upload = new tus.Upload(file, {
         endpoint: tusEndpoint,
-        retryDelays: [0, 1000, 3000, 5000, 10000, 20000, 30000],
+        // 4 reintentos con backoff suave: ~10 s totales como máximo. Con
+        // más, el usuario ve "reanudando" mucho rato y se asusta.
+        retryDelays: [0, 1500, 3500, 7000],
         chunkSize: chunkSizeBytes,
         // Mantenemos el fingerprint en localStorage para reanudar tras
         // recargar la pestaña. tus borra el fingerprint en éxito.
         removeFingerprintOnSuccess: true,
         uploadDataDuringCreation: true,
         headers: {
+          // El ejemplo oficial de Supabase usa SOLO authorization. Mandar
+          // también `apikey` provocaba que algunos endpoints intermedios
+          // descartaran la sesión y rechazaran los PATCH.
           authorization: `Bearer ${anonKey}`,
-          // apikey es para passthrough al backend de Supabase (lo exigen
-          // sus runtime checks en algunas regiones).
-          apikey: anonKey,
+          // x-upsert=false para no permitir sobrescribir un objeto
+          // existente desde el cliente (defensa adicional: el path es
+          // un UUID nuevo, así que nunca debería existir).
+          "x-upsert": "false",
         },
         metadata: {
           bucketName: bucket,
@@ -337,32 +351,71 @@ export async function directUpload({
           cacheControl: "3600",
         },
         onError(err) {
-          // Solo se considera fallo definitivo cuando ya no quedan retries.
-          // tus llama onError tras agotar retryDelays.
+          const message = err instanceof Error ? err.message : String(err);
+          // Si el último response fue 401/403, no vale la pena seguir.
+          // Lo notificamos con un mensaje específico para el usuario.
+          let userMessage = "Error subiendo este archivo: " + message;
+          if (lastStatus === 401 || lastStatus === 403) {
+            userMessage =
+              "Permisos denegados por el almacenamiento. Recarga la página y vuelve a intentarlo. " +
+              `(HTTP ${lastStatus})`;
+          } else if (lastStatus === 413) {
+            userMessage = "El archivo es demasiado grande para el almacenamiento.";
+          } else if (lastStatus >= 500) {
+            userMessage =
+              `Error temporal en el servidor (HTTP ${lastStatus}). Inténtalo en unos minutos.`;
+          } else if (lastStatus === 0) {
+            // Ningún response: probablemente CORS o sin red.
+            userMessage =
+              "No se pudo conectar con el almacenamiento. Si estás en datos móviles, prueba con WiFi.";
+          }
           snapshot[idx].status = "error";
-          snapshot[idx].message =
-            "Error subiendo este archivo: " +
-            (err instanceof Error ? err.message : String(err));
+          snapshot[idx].message = userMessage;
           fire();
+          // eslint-disable-next-line no-console
+          console.error("[direct-upload] tus error", {
+            file: file.name,
+            lastStatus,
+            lastResponseBody: lastResponseBody.slice(0, 300),
+            err: message,
+          });
           results.push({
             uploadId,
             path,
             success: false,
-            errorMessage: snapshot[idx].message,
+            errorMessage: userMessage,
           });
           resolve();
         },
         onChunkComplete() {
-          // Si tras un chunk seguimos en "retrying" lo devolvemos a "uploading".
           if (snapshot[idx].status === "retrying") {
             snapshot[idx].status = "uploading";
             fire();
           }
         },
-        onShouldRetry() {
+        onShouldRetry(err, retryAttempt) {
+          // Capturamos el status real del response — tus lo expone en
+          // err.originalResponse cuando hay uno.
+          const errAny = err as unknown as {
+            originalResponse?: { getStatus?: () => number; getBody?: () => string };
+          };
+          const status = errAny.originalResponse?.getStatus?.() ?? 0;
+          lastStatus = status;
+          try {
+            lastResponseBody = errAny.originalResponse?.getBody?.() || "";
+          } catch {
+            lastResponseBody = "";
+          }
+          // No reintentar errores de auth ni de payload — son fallos
+          // definitivos. Reintentar solo timeouts (0) y 5xx.
+          if (status === 401 || status === 403 || status === 413) {
+            return false;
+          }
+          // Tras 4 intentos, dejar caer en onError.
+          if (retryAttempt >= 4) return false;
+
           snapshot[idx].status = "retrying";
           fire();
-          // Devolver true para usar los retryDelays.
           return true;
         },
         onProgress(bytesUploaded, bytesTotal) {
@@ -383,11 +436,19 @@ export async function directUpload({
         },
       });
 
-      // Si tus tiene previa de este archivo en localStorage (por subida
-      // interrumpida), arranca desde donde estaba.
       upload.findPreviousUploads().then((previous) => {
         if (previous.length > 0) {
+          // eslint-disable-next-line no-console
+          console.info("[direct-upload] reanudando subida previa de", file.name);
           upload.resumeFromPreviousUpload(previous[0]);
+        } else {
+          // eslint-disable-next-line no-console
+          console.info(
+            "[direct-upload] iniciando",
+            file.name,
+            `(${(file.size / 1024 / 1024).toFixed(1)} MB) →`,
+            path
+          );
         }
         upload.start();
       });
