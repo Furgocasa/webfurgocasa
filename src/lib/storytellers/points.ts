@@ -280,6 +280,99 @@ export async function revertSelection(params: {
 }
 
 // ============================================
+// DESCARTE DE SUBIDAS (admin, sin afectar puntos)
+// ============================================
+
+/**
+ * Marca una subida como "descartada" (rechazada por admin).
+ *
+ * - NO toca el ledger: los puntos por SUBIDA que el cliente ya ganó
+ *   se conservan tal cual.
+ * - NO genera ni modifica cupones.
+ * - NO envía email al cliente.
+ * - Es mutuamente excluyente con `selected_at` (a nivel de constraint
+ *   en BD: `chk_selected_or_discarded`).
+ *
+ * Idempotente: si ya estaba descartada, devuelve `already_discarded`
+ * y no escribe nada.
+ */
+export async function discardUpload(params: {
+  uploadId: string;
+  adminEmail: string;
+  reason?: string | null;
+}): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const supabase = createAdminClient();
+
+  const { data: upload, error: fetchError } = await supabase
+    .from("storyteller_uploads")
+    .select("id, selected_at, discarded_at")
+    .eq("id", params.uploadId)
+    .single();
+
+  if (fetchError || !upload) {
+    return { ok: false, reason: "upload_not_found" };
+  }
+  if (upload.selected_at) {
+    return { ok: false, reason: "already_selected" };
+  }
+  if (upload.discarded_at) {
+    return { ok: false, reason: "already_discarded" };
+  }
+
+  const { error: updateError } = await supabase
+    .from("storyteller_uploads")
+    .update({
+      discarded_at: new Date().toISOString(),
+      discarded_by: params.adminEmail,
+      discarded_reason: params.reason || null,
+    })
+    .eq("id", params.uploadId)
+    .is("selected_at", null)
+    .is("discarded_at", null);
+
+  if (updateError) {
+    console.error("[storytellers/points] discardUpload update:", updateError);
+    return { ok: false, reason: "update_failed" };
+  }
+
+  return { ok: true };
+}
+
+/**
+ * Reverso del descarte. Vuelve a dejar la subida como "pendiente".
+ * Tampoco toca el ledger ni los cupones.
+ */
+export async function restoreFromDiscard(params: {
+  uploadId: string;
+}): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const supabase = createAdminClient();
+
+  const { data: upload } = await supabase
+    .from("storyteller_uploads")
+    .select("id, discarded_at")
+    .eq("id", params.uploadId)
+    .single();
+
+  if (!upload) return { ok: false, reason: "upload_not_found" };
+  if (!upload.discarded_at) return { ok: false, reason: "not_discarded" };
+
+  const { error } = await supabase
+    .from("storyteller_uploads")
+    .update({
+      discarded_at: null,
+      discarded_by: null,
+      discarded_reason: null,
+    })
+    .eq("id", params.uploadId);
+
+  if (error) {
+    console.error("[storytellers/points] restoreFromDiscard:", error);
+    return { ok: false, reason: "update_failed" };
+  }
+  return { ok: true };
+}
+
+// ============================================
 // CUPONES — sincronización con saldo
 // ============================================
 

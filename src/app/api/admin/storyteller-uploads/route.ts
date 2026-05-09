@@ -5,7 +5,11 @@
  * Incluye URLs firmadas con TTL corto (1 hora) para previsualización.
  *
  * Query params:
- *   - status: "pending" | "selected" | "all" (default "pending")
+ *   - status: "pending" | "selected" | "discarded" | "all" (default "pending")
+ *       · pending     → ni seleccionadas ni descartadas
+ *       · selected    → seleccionadas para archivo
+ *       · discarded   → descartadas por admin (ver /discard)
+ *       · all         → todo, incluida descartadas y seleccionadas
  *   - email: filtra por email del cliente
  *   - bookingNumber: filtra por nº de reserva
  *   - type: "photo" | "video" | "all"
@@ -41,6 +45,7 @@ export async function GET(req: NextRequest) {
         id, customer_email, customer_name, file_path, file_type,
         file_size_bytes, file_mime_type, original_filename,
         uploaded_at, selected_at, selected_by,
+        discarded_at, discarded_by, discarded_reason,
         points_at_upload, points_at_selection,
         booking_id,
         bookings ( booking_number, pickup_date, dropoff_date )
@@ -49,9 +54,12 @@ export async function GET(req: NextRequest) {
       );
 
     if (status === "pending") {
-      query = query.is("selected_at", null);
+      // Pendientes = ni seleccionadas ni descartadas.
+      query = query.is("selected_at", null).is("discarded_at", null);
     } else if (status === "selected") {
       query = query.not("selected_at", "is", null);
+    } else if (status === "discarded") {
+      query = query.not("discarded_at", "is", null);
     }
     if (email) query = query.eq("customer_email", email);
     if (type === "photo" || type === "video") query = query.eq("file_type", type);
@@ -97,6 +105,9 @@ export async function GET(req: NextRequest) {
           uploadedAt: row.uploaded_at,
           selectedAt: row.selected_at,
           selectedBy: row.selected_by,
+          discardedAt: row.discarded_at,
+          discardedBy: row.discarded_by,
+          discardedReason: row.discarded_reason,
           pointsAtUpload: row.points_at_upload,
           pointsAtSelection: row.points_at_selection,
           bookingId: row.booking_id,

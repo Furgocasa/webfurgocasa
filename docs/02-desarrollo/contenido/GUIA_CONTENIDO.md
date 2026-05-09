@@ -248,6 +248,20 @@ El endpoint `POST /api/storytellers/validate-booking` devuelve ahora un campo `p
 - Email automático al cliente: *"Tu foto/vídeo ha sido seleccionada para el archivo de FURGOCASA. +X ptos."*
 - **Cero compromiso público de publicación.** El archivo es interno, las usas cuando y como quieras.
 
+**Descartar subidas (mayo 2026):** además de "aprobar", el panel admin permite **descartar** una subida pendiente que no encaje. Reglas operativas:
+
+- **No notifica al cliente** (sin email). El cliente lo intuirá por la ausencia de los emails *"tu foto/vídeo ha sido seleccionada"*.
+- **No toca el ledger ni los cupones**: los puntos por SUBIDA que el cliente ya ganó al subir se conservan tal cual (es coherente: ya hizo el esfuerzo de subir; solo no nos sirve para archivo).
+- Mutuamente excluyente con la selección (constraint en BD `chk_selected_or_discarded`).
+- Reversible: el botón ↻ "Volver a pendiente" en la card de una descartada la devuelve al pool de pendientes (tampoco notifica al cliente).
+- Aparece como nuevo filtro de estado en la lista de admin: *Pendientes / Seleccionadas / Descartadas / Todas*.
+
+Implementación:
+- Migración: `supabase/migrations/20260509-storytellers-discarded.sql` (columnas `discarded_at`, `discarded_by`, `discarded_reason` + constraint + nuevo índice de pendientes).
+- Lib: `discardUpload()` y `restoreFromDiscard()` en `src/lib/storytellers/points.ts`.
+- Endpoint: `POST/DELETE /api/admin/storyteller-uploads/[id]/discard`.
+- UI: botón Ban en la card pendiente del panel admin.
+
 ### 3.9. Autenticación login-less del cliente (claves de seguridad)
 
 Como no hay login, hay que blindar los flujos con varias capas:
@@ -911,4 +925,4 @@ Si en algún momento se introducen cualquiera de estos elementos, hay que reabri
 
 ---
 
-**Última actualización del documento:** 9 de mayo de 2026 (anti-duplicados por SHA-256 en `storyteller_uploads.file_hash`, cupón con código personalizado `STO-NARPAR05` — **mantiene prefijo `STO-` por contrato con checkout**, briefing con bloque puntos+cupón y galería de lo ya subido — §3.5-bis/ter/quater).
+**Última actualización del documento:** 9 de mayo de 2026 (anti-duplicados por SHA-256 en `storyteller_uploads.file_hash`, cupón con código personalizado `STO-NARPAR05` — **mantiene prefijo `STO-` por contrato con checkout**, briefing con bloque puntos+cupón y galería de lo ya subido, **+ descartar subidas pendientes desde admin sin notificar y sin tocar ledger** — §3.5-bis/ter/quater + §3.7).

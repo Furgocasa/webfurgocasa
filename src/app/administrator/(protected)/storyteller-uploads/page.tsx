@@ -3,11 +3,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   AlertCircle,
+  Ban,
   CheckCircle2,
-  Filter,
   Image as ImageIcon,
   Loader2,
   RefreshCw,
+  RotateCcw,
   Search,
   Trash2,
   Video,
@@ -25,6 +26,9 @@ interface UploadItem {
   uploadedAt: string;
   selectedAt: string | null;
   selectedBy: string | null;
+  discardedAt: string | null;
+  discardedBy: string | null;
+  discardedReason: string | null;
   pointsAtUpload: number;
   pointsAtSelection: number | null;
   bookingId: string;
@@ -60,7 +64,9 @@ export default function StorytellerUploadsAdminPage() {
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
-  const [statusFilter, setStatusFilter] = useState<"pending" | "selected" | "all">("pending");
+  const [statusFilter, setStatusFilter] = useState<
+    "pending" | "selected" | "discarded" | "all"
+  >("pending");
   const [typeFilter, setTypeFilter] = useState<"photo" | "video" | "all">("all");
   const [emailFilter, setEmailFilter] = useState("");
   const [bookingNumberFilter, setBookingNumberFilter] = useState("");
@@ -148,6 +154,55 @@ export default function StorytellerUploadsAdminPage() {
     }
   };
 
+  const handleDiscard = async (uploadId: string) => {
+    if (
+      !confirm(
+        "¿Descartar esta subida?\n\nNo se le notifica nada al cliente y los puntos por subida que ya tiene NO se tocan. Solo deja de aparecer en pendientes."
+      )
+    ) {
+      return;
+    }
+    setActionInProgress(uploadId);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/admin/storyteller-uploads/${uploadId}/discard`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setMessage({ type: "error", text: json.error || "No se pudo descartar." });
+        return;
+      }
+      setMessage({ type: "success", text: "Subida descartada (sin notificar al cliente)." });
+      fetchData();
+    } catch {
+      setMessage({ type: "error", text: "Error de red." });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const handleRestoreDiscard = async (uploadId: string) => {
+    setActionInProgress(uploadId);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/admin/storyteller-uploads/${uploadId}/discard`, {
+        method: "DELETE",
+      });
+      const json = await res.json();
+      if (!res.ok || !json.ok) {
+        setMessage({ type: "error", text: json.error || "No se pudo restaurar." });
+        return;
+      }
+      setMessage({ type: "success", text: "Subida restaurada a pendiente." });
+      fetchData();
+    } catch {
+      setMessage({ type: "error", text: "Error de red." });
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const groups = useMemo(() => {
     const m = new Map<string, UploadItem[]>();
@@ -191,6 +246,7 @@ export default function StorytellerUploadsAdminPage() {
           >
             <option value="pending">Pendientes</option>
             <option value="selected">Seleccionadas</option>
+            <option value="discarded">Descartadas</option>
             <option value="all">Todas</option>
           </select>
         </div>
@@ -304,6 +360,8 @@ export default function StorytellerUploadsAdminPage() {
                     actionInProgress={actionInProgress}
                     onSelect={() => handleSelect(it.id)}
                     onRevert={() => handleRevert(it.id)}
+                    onDiscard={() => handleDiscard(it.id)}
+                    onRestoreDiscard={() => handleRestoreDiscard(it.id)}
                     onPreview={() => setPreviewItem(it)}
                   />
                 ))}
@@ -351,21 +409,30 @@ function UploadCard({
   actionInProgress,
   onSelect,
   onRevert,
+  onDiscard,
+  onRestoreDiscard,
   onPreview,
 }: {
   item: UploadItem;
   actionInProgress: string | null;
   onSelect: () => void;
   onRevert: () => void;
+  onDiscard: () => void;
+  onRestoreDiscard: () => void;
   onPreview: () => void;
 }) {
   const isSelected = !!item.selectedAt;
+  const isDiscarded = !!item.discardedAt;
   const busy = actionInProgress === item.id;
 
   return (
     <div
       className={`overflow-hidden rounded-xl border transition ${
-        isSelected ? "border-furgocasa-orange bg-orange-50/40" : "border-gray-200 bg-white"
+        isSelected
+          ? "border-furgocasa-orange bg-orange-50/40"
+          : isDiscarded
+          ? "border-gray-300 bg-gray-50 opacity-80"
+          : "border-gray-200 bg-white"
       }`}
     >
       <button
@@ -438,6 +505,7 @@ function UploadCard({
                 disabled={busy}
                 className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-600"
                 aria-label="Revertir selección"
+                title="Revertir selección (resta puntos al cliente)"
               >
                 {busy ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
@@ -446,21 +514,61 @@ function UploadCard({
                 )}
               </button>
             </>
+          ) : isDiscarded ? (
+            <>
+              <span
+                className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-gray-200 px-2 py-1.5 text-xs font-semibold text-gray-700"
+                title={item.discardedReason || ""}
+              >
+                <Ban className="h-3.5 w-3.5" aria-hidden />
+                Descartada
+              </span>
+              <button
+                type="button"
+                onClick={onRestoreDiscard}
+                disabled={busy}
+                className="rounded-lg p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                aria-label="Volver a pendiente"
+                title="Volver a pendiente"
+              >
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  <RotateCcw className="h-4 w-4" aria-hidden />
+                )}
+              </button>
+            </>
           ) : (
-            <button
-              type="button"
-              onClick={onSelect}
-              disabled={busy}
-              className="flex-1 rounded-lg bg-furgocasa-orange px-3 py-1.5 text-xs font-bold text-white hover:bg-furgocasa-orange-dark disabled:opacity-60"
-            >
-              {busy ? (
-                <span className="inline-flex items-center justify-center gap-1">
-                  <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> Procesando…
-                </span>
-              ) : (
-                "Aprobar para archivo"
-              )}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={onSelect}
+                disabled={busy}
+                className="flex-1 rounded-lg bg-furgocasa-orange px-3 py-1.5 text-xs font-bold text-white hover:bg-furgocasa-orange-dark disabled:opacity-60"
+              >
+                {busy ? (
+                  <span className="inline-flex items-center justify-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" aria-hidden /> Procesando…
+                  </span>
+                ) : (
+                  "Aprobar para archivo"
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={onDiscard}
+                disabled={busy}
+                className="rounded-lg border border-gray-300 bg-white px-2 py-1.5 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-60"
+                aria-label="Descartar"
+                title="Descartar (no se notifica al cliente, no toca puntos)"
+              >
+                {busy ? (
+                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
+                ) : (
+                  <Ban className="h-4 w-4" aria-hidden />
+                )}
+              </button>
+            </>
           )}
         </div>
       </div>
