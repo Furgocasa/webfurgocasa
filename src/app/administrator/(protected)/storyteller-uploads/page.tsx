@@ -521,35 +521,51 @@ function UploadCard({
           : "border-gray-200 bg-white"
       }`}
     >
-      <button
-        type="button"
-        onClick={onPreview}
-        className="block aspect-[4/5] w-full overflow-hidden bg-gray-100"
-      >
-        {item.fileType === "photo" && item.previewUrl ? (
-          /* eslint-disable-next-line @next/next/no-img-element */
-          <img
-            src={item.previewUrl}
-            alt={item.originalFilename || "foto"}
-            className="h-full w-full object-cover"
-          />
-        ) : item.fileType === "video" && item.previewUrl ? (
-          <StorytellerAdminVideo
-            previewUrl={item.previewUrl}
-            originalFilename={item.originalFilename}
-            fileMimeType={item.fileMimeType}
-            variant="thumbnail"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-gray-400">
-            {item.fileType === "video" ? (
-              <Video className="h-8 w-8" aria-hidden />
-            ) : (
-              <ImageIcon className="h-8 w-8" aria-hidden />
-            )}
-          </div>
+      <div className="relative">
+        <button
+          type="button"
+          onClick={onPreview}
+          className="block aspect-[4/5] w-full overflow-hidden bg-gray-100"
+        >
+          {item.fileType === "photo" && item.previewUrl ? (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img
+              src={item.previewUrl}
+              alt={item.originalFilename || "foto"}
+              className="h-full w-full object-cover"
+            />
+          ) : item.fileType === "video" && item.previewUrl ? (
+            <StorytellerAdminVideo
+              previewUrl={item.previewUrl}
+              originalFilename={item.originalFilename}
+              fileMimeType={item.fileMimeType}
+              variant="thumbnail"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-gray-400">
+              {item.fileType === "video" ? (
+                <Video className="h-8 w-8" aria-hidden />
+              ) : (
+                <ImageIcon className="h-8 w-8" aria-hidden />
+              )}
+            </div>
+          )}
+        </button>
+        {item.previewUrl && (
+          <a
+            href={item.previewUrl}
+            download={item.originalFilename || (item.fileType === "video" ? "video.mov" : "imagen.jpg")}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2.5 py-1.5 text-xs font-semibold text-white opacity-90 backdrop-blur-sm hover:bg-black/90"
+            title={`Descargar ${item.fileType === "video" ? "vídeo" : "imagen"} original`}
+            aria-label={`Descargar ${item.fileType === "video" ? "vídeo" : "imagen"} original`}
+          >
+            <Download className="h-3.5 w-3.5 shrink-0" aria-hidden />
+          </a>
         )}
-      </button>
+      </div>
       <div className="p-3">
         <div className="flex items-center justify-between gap-2 text-xs">
           <span
@@ -697,12 +713,28 @@ function PreviewModal({ item, onClose }: { item: UploadItem; onClose: () => void
         ) : (
           <div className="p-12 text-center text-gray-500">No hay preview disponible.</div>
         )}
-        <div className="bg-white px-4 py-3 text-sm text-gray-700">
-          <p className="font-semibold">{item.customerEmail}</p>
-          <p className="text-xs text-gray-500">
-            Reserva {item.bookingNumber || "—"} · subida{" "}
-            {new Date(item.uploadedAt).toLocaleString("es-ES")}
-          </p>
+        <div className="flex flex-wrap items-center justify-between gap-3 bg-white px-4 py-3 text-sm text-gray-700">
+          <div className="min-w-0">
+            <p className="truncate font-semibold">{item.customerEmail}</p>
+            <p className="truncate text-xs text-gray-500">
+              Reserva {item.bookingNumber || "—"} · subida{" "}
+              {new Date(item.uploadedAt).toLocaleString("es-ES")}
+              {item.originalFilename ? ` · ${item.originalFilename}` : ""}
+            </p>
+          </div>
+          {item.previewUrl && (
+            <a
+              href={item.previewUrl}
+              download={item.originalFilename || (item.fileType === "video" ? "video.mov" : "imagen.jpg")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-furgocasa-orange px-3 py-2 text-xs font-bold text-white hover:bg-furgocasa-orange-dark md:text-sm"
+              title={`Descargar ${item.fileType === "video" ? "vídeo" : "imagen"} original`}
+            >
+              <Download className="h-4 w-4 shrink-0" aria-hidden />
+              Descargar original
+            </a>
+          )}
         </div>
       </div>
     </div>
