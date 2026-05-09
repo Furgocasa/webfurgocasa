@@ -154,38 +154,38 @@ export async function POST(req: NextRequest) {
         continue;
       }
 
-      // Verificación: HEAD-equivalente al objeto en Storage. La SDK no expone
-      // un HEAD limpio; el truco es listar la carpeta filtrando por nombre.
+      // Verificación NO BLOQUEANTE: hacemos un list() para warning, pero NO
+      // rechazamos por mismatch. Razones:
+      //   - Supabase Storage tiene eventual consistency: list() puede no
+      //     ver el archivo durante unos segundos tras un PUT exitoso.
+      //   - metadata.size no siempre se rellena al instante.
+      //   - Si la verificación falla por bug de Supabase, perdemos TODAS
+      //     las subidas. Mucho mejor aceptar y dejar que el admin descarte
+      //     desde el panel si la miniatura no carga (ya tenemos UI para eso).
       const folder = reserved.path.split("/").slice(0, -1).join("/");
       const filename = reserved.path.split("/").slice(-1)[0];
-      const { data: listing, error: listError } = await supabase.storage
-        .from(STORAGE_BUCKET)
-        .list(folder, { limit: 100, search: filename });
-      if (listError) {
-        console.error("[upload-confirm] storage list error:", listError);
-      }
-      const obj = (listing || []).find((o) => o.name === filename);
-      if (!obj) {
-        items.push({
-          filename: reserved.originalFilename,
-          status: "rejected",
-          reason: "El archivo no se encuentra en almacenamiento. Reintenta la subida.",
-          reasonCode: "missing_in_storage",
-        });
-        continue;
-      }
-      const realSize = (obj.metadata as { size?: number } | null)?.size ?? 0;
-      // Tolerancia 0: si el tamaño no coincide con el declarado, lo borramos
-      // y rechazamos. Evita que alguien declare 1 MB y suba 100 MB.
-      if (realSize !== reserved.fileSizeBytes) {
-        await supabase.storage.from(STORAGE_BUCKET).remove([reserved.path]).catch(() => {});
-        items.push({
-          filename: reserved.originalFilename,
-          status: "rejected",
-          reason: "Tamaño del archivo no coincide con el declarado.",
-          reasonCode: "size_mismatch",
-        });
-        continue;
+      try {
+        const { data: listing } = await supabase.storage
+          .from(STORAGE_BUCKET)
+          .list(folder, { limit: 100, search: filename });
+        const obj = (listing || []).find((o) => o.name === filename);
+        if (!obj) {
+          console.warn(
+            "[upload-confirm] archivo no aparece en list() (eventual consistency?):",
+            reserved.path
+          );
+        } else {
+          const realSize = (obj.metadata as { size?: number } | null)?.size ?? 0;
+          if (realSize > 0 && realSize !== reserved.fileSizeBytes) {
+            console.warn(
+              "[upload-confirm] size mismatch (NO bloqueamos):",
+              reserved.path,
+              `declarado=${reserved.fileSizeBytes} real=${realSize}`
+            );
+          }
+        }
+      } catch (e) {
+        console.warn("[upload-confirm] list() falló (NO bloqueamos):", e);
       }
 
       const points =
@@ -211,12 +211,20 @@ export async function POST(req: NextRequest) {
         });
 
       if (insertError) {
-        console.error("[upload-confirm] insert error:", insertError);
+        console.error("[upload-confirm] insert error:", {
+          path: reserved.path,
+          code: insertError.code,
+          message: insertError.message,
+          details: insertError.details,
+          hint: insertError.hint,
+        });
         await supabase.storage.from(STORAGE_BUCKET).remove([reserved.path]).catch(() => {});
         items.push({
           filename: reserved.originalFilename,
           status: "rejected",
-          reason: "Error registrando la subida.",
+          reason:
+            "Error registrando la subida en BD: " +
+            (insertError.message || insertError.code || "desconocido"),
           reasonCode: "db",
         });
         continue;
