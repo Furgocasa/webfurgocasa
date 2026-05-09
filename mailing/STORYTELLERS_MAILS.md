@@ -1,27 +1,20 @@
-# Storytellers · 3 emails de ciclo de vida del viaje
+# Storytellers · Ciclo de vida del viaje (05–07) + rescate puntual (08)
 
-> **Estado:** plantillas HTML listas (`mailing/app/05–07`), tracking en BD ya
-> activo (`booking_email_dispatches`), backfill histórico ejecutado. **Falta**
-> implementar los 3 cron jobs que las disparan automáticamente. Hasta ese
-> momento se pueden mandar manualmente con
-> `node scripts/test-storyteller-emails.mjs`.
+> **Estado:** plantillas HTML listas (`mailing/app/05–07` + `08-storytellers-rescate-recien-lanzado.html`), tracking en BD activo (`booking_email_dispatches`), backfill histórico ejecutado. Los **crons** que disparan 05/06/07 están en **`vercel.json`** y apuntan a `/api/cron/storyteller-*` (detalle en §8). Para pruebas visuales sin tocar BD sigue existiendo `node scripts/test-storyteller-emails.mjs`.
 
-Esta carpeta contiene los **tres correos de ciclo de vida del programa
-Storytellers**, que acompañan al cliente desde el día de salida hasta la
-vuelta. Son los emails que más palanca tienen sobre el programa: si no se
+Esta carpeta documenta los **tres correos automáticos de ciclo de vida** del programa Storytellers (salida → mitad → día después de la vuelta), más un **cuarto HTML de rescate** (`08`) que solo se envía **a mano o por script puntual**, no por cron. Son los emails que más palanca tienen sobre el programa: si no se
 mandan, casi nadie sube fotos. Si se mandan bien, el cupón "3 % de
 bienvenida" entra en el bolsillo del cliente y arranca el ciclo de
 descuentos hasta el 15 % + regalos.
 
 Documento equivalente para el resto del mailing: [`README.md`](./README.md).
-Documento de fondo del programa de fidelización: ver landing pública
-`/es/storytellers` y [`docs/02-desarrollo/contenido/`](../docs/02-desarrollo/contenido/).
+Documento de fondo del programa de fidelización: landings públicas **`/es/storytellers`**, `/en/storytellers`, `/fr/storytellers`, `/de/storytellers` (mismo contenido traducido) y [`docs/02-desarrollo/contenido/`](../docs/02-desarrollo/contenido/). Los enlaces en estos emails siguen apuntando al **portal en español** (`/es/storytellers/subir` …): es la única implementación del flujo de subida a día de hoy.
 
 ---
 
 ## 1 · Por qué este documento es crítico
 
-- Los 3 emails **deciden** si el programa Storytellers funciona o no:
+- Los emails **05–07** **deciden** si el programa Storytellers funciona o no:
   son los únicos que llaman a la acción "sube tus fotos y vídeos".
 - Cualquier cambio descoordinado entre HTML, copy, deep-link `?ref=` y
   endpoint de subida puede **romper la experiencia del cliente** justo en
@@ -38,7 +31,9 @@ Documento de fondo del programa de fidelización: ver landing pública
 
 ---
 
-## 2 · Mapa de los 3 emails
+## 2 · Mapa de los emails
+
+### 2.1 · Ciclo automático (05–07) — crons diarios
 
 | Archivo HTML (referencia) | Cuándo se envía (producto) | Foco del copy |
 |---|---|---|
@@ -46,7 +41,13 @@ Documento de fondo del programa de fidelización: ver landing pública
 | `app/06-storytellers-mitad-viaje.html` | Punto medio del viaje (entre `pickup_date` y `dropoff_date`), mañana | Recordatorio + tabla completa de descuentos hasta el **15 %** + multiplicadores ×10/×12 |
 | `app/07-storytellers-dia-despues-vuelta.html` | 1 día natural después del `dropoff_date`, mañana | "No dejes el descuento en el móvil" · 90 días para subir · regalos por puntos |
 
-### Reglas de negocio
+### 2.2 · Rescate post-lanzamiento (`08`) — manual / script
+
+| Archivo HTML | Cuándo | Notas |
+|---|---|---|
+| `app/08-storytellers-rescate-recien-lanzado.html` | Tras el lanzamiento del programa: clientes cuyo **07** quedó marcado `sent` por backfill histórico pero siguen **dentro de la ventana de subida** (90 días desde dropoff) | **No** tiene cron. Envío idempotente vía `scripts/storyteller-send-rescue-launch.ts` (metadata `rescue_launch_sent_at`; no se añade un `email_type` nuevo — ver §6). Misma anatomía visual y placeholders `Juan` / `FC-2026-001234` que 05–07. |
+
+### Reglas de negocio (05–07)
 
 - **Viajes cortos (`<6 días`):** se envían **solo 05 y 07**. El 06 se marca como `skipped` con `reason: 'short_trip_no_mid_email'` para que el cron no lo reintente.
 - **Viajes largos (`≥6 días`):** los 3 emails.
@@ -209,49 +210,32 @@ Tabla creada por `supabase/migrations/20260508-booking-email-dispatches.sql`.
 Centraliza **todos los emails transaccionales asociados a una reserva**, no
 solo los Storytellers (incluye también `04-recordatorio-devolucion`).
 
-### Esquema
+### Esquema (resumen; fuente: migración SQL)
 
-```sql
-booking_email_dispatches (
-  id              uuid PRIMARY KEY,
-  booking_id      uuid REFERENCES bookings(id) ON DELETE CASCADE,
-  customer_email  text NOT NULL,
-  email_type      text NOT NULL CHECK (email_type IN (
-                    '01_reserva_creada',
-                    '02_primer_pago_confirmado',
-                    '03_segundo_pago_confirmado',
-                    '04_recordatorio_devolucion',
-                    '05_storyteller_dia_salida',
-                    '06_storyteller_mitad_viaje',
-                    '07_storyteller_dia_despues_vuelta',
-                    'storyteller_post_trip_reminder'
-                  )),
-  status          text NOT NULL DEFAULT 'sent' CHECK (status IN (
-                    'sent', 'failed', 'skipped', 'queued'
-                  )),
-  sent_at         timestamptz,
-  smtp_message_id text,
-  error_message   text,
-  metadata        jsonb DEFAULT '{}'::jsonb,
-  created_at      timestamptz DEFAULT now(),
-  updated_at      timestamptz DEFAULT now()
-)
-```
+La definición canónica está en `supabase/migrations/20260508-booking-email-dispatches.sql`. Columnas principales:
+
+- `booking_id`, `customer_email`, `email_type`, `status`, `sent_at`, `smtp_message_id`, `error_message`, `metadata` (JSONB).
+
+Valores vigentes de `email_type` incluyen (lista del CHECK en migración):  
+`booking_created`, `pickup_reminder`, `storyteller_pickup_night`, `storyteller_mid_trip`, `return_reminder`, `storyteller_post_trip`, `magic_link`, `upload_confirmation`.
+
+Estados `status`: `sent`, `failed`, `bounced`, `skipped`.
 
 ### Idempotencia
 
 Índice único parcial:
 
 ```sql
-CREATE UNIQUE INDEX idx_email_dispatches_unique_sent
+CREATE UNIQUE INDEX IF NOT EXISTS idx_email_dispatches_unique_sent
   ON booking_email_dispatches (booking_id, email_type)
   WHERE status = 'sent';
 ```
 
-Esto significa: solo puede haber **una fila `sent` por `(booking_id,
-email_type)`**. Filas `failed` / `queued` / `skipped` no cuentan, así que
-los reintentos siguen siendo posibles. Inserciones idempotentes con
-`INSERT ... ON CONFLICT DO NOTHING`.
+Solo puede haber **una fila `sent` por `(booking_id, email_type)`**. Filas `failed` / `skipped` / `bounced` no entran en ese índice, así que los reintentos siguen siendo posibles según la lógica de cada cron o script.
+
+### Mail de rescate (`08`) sin nuevo `email_type`
+
+El HTML `08-storytellers-rescate-recien-lanzado.html` **no** amplía el CHECK de `email_type`. El script `scripts/storyteller-send-rescue-launch.ts` marca el envío puntual en **`metadata`** (`rescue_launch_sent_at`, `rescue_launch_smtp_id`) respecto a la reserva elegible, sin romper la idempotencia del ciclo normal (`storyteller_post_trip`).
 
 ### Backfill histórico
 
@@ -272,9 +256,7 @@ RLS activa. Solo SELECT para admins (vía `is_admin()` en JWT). Sin INSERT/UPDAT
 
 ---
 
-## 7 · Envíos manuales (script CLI)
-
-Tenemos **dos scripts** según el caso:
+## 7 · Envíos manuales (scripts CLI)
 
 ### 7.1 · Pruebas visuales (NO toca BD)
 
@@ -311,10 +293,28 @@ tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --dry
 tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --force
 ```
 
-**Flujo interno:** ambos scripts usan la lib unificada
-`src/lib/storytellers/emails-cycle.ts`, así que el render, el envío y la
-escritura en BD son exactamente los mismos que en los crons (cero
-divergencia).
+**Flujo interno:** `test-storyteller-emails.mjs` y `storyteller-send-cycle-email.ts` comparten render con `src/lib/storytellers/emails-cycle.ts` para 05/06/07 (misma salida que los crons).
+
+### 7.3 · Rescate post-lanzamiento (`08`) — auditoría y batch
+
+Script: `scripts/storyteller-send-rescue-launch.ts`. Caso de uso: clientes marcados por backfill como ya enviados en `storyteller_post_trip` pero aún dentro de ventana de subida.
+
+```bash
+# Dry-run / auditoría (opcional --days N)
+tsx scripts/storyteller-send-rescue-launch.ts
+tsx scripts/storyteller-send-rescue-launch.ts --days 10
+
+# Muestra solo a reservas@ (no clientes, no BD)
+tsx scripts/storyteller-send-rescue-launch.ts --example
+
+# Una reserva
+tsx scripts/storyteller-send-rescue-launch.ts --booking FC26050096
+
+# Todas las elegibles (requiere --confirm)
+tsx scripts/storyteller-send-rescue-launch.ts --all --confirm --days 10
+```
+
+Detalle de idempotencia y vars de entorno en la cabecera del propio script.
 
 ---
 
@@ -332,6 +332,7 @@ muestran son la traducción aproximada al horario local Madrid).
 | `/api/cron/storyteller-post-trip-day-after` | `30 9 * * *` | 10:30 / 11:30 | **07** día después de la vuelta | `storyteller_post_trip` |
 | `/api/cron/return-reminders` | `0 18 * * *` | 19:00 / 20:00 | **04** recordatorio devolución | `return_reminder` |
 | `/api/cron/storyteller-post-trip-reminder` | `0 10 * * *` | 11:00 / 12:00 | recordatorio post-viaje +7d (legacy) | `storyteller_post_trip` |
+| `/api/cron/storyteller-orphan-cleanup` | `30 4 * * *` | 05:30 / 06:30 | limpieza de objetos huérfanos en Storage (subidas firmadas abortadas) | — |
 
 ### 8.2 · Reglas de selección por cron
 
@@ -579,7 +580,7 @@ email se reconstruirá encima.
 
 Antes de hacer commit:
 
-- [ ] La estructura visual sigue siendo coherente entre los 3 emails.
+- [ ] La estructura visual sigue siendo coherente entre los emails tocados (05–07 y, si aplica, `08`).
 - [ ] **Los `<a>` que llevan a `/storytellers/subir` tienen `?ref=FC-2026-001234`.**
 - [ ] **Los `<a>` que llevan a `/storytellers/subir` tienen `referrerpolicy="no-referrer"`.**
 - [ ] La cadena `Juan` en el saludo y la cadena `FC-2026-001234` en el cuerpo siguen siendo cadenas literales (sin caracteres especiales que rompan el `replace` global).
@@ -594,10 +595,11 @@ Antes de hacer commit:
 
 | Fecha | Cambio |
 |---|---|
-| 08/05/2026 | **Creación del programa Storytellers en email.** Tres HTML de ciclo de vida (05, 06, 07), tabla `booking_email_dispatches` con índice único parcial, backfill histórico, deep-link `?ref=` con prerrelleno automático en `/es/storytellers/subir`, rate-limit `PUBLIC_WRITE` en `validate-booking`, `referrerpolicy="no-referrer"` en todos los CTAs. Cron jobs **pendientes**. |
+| 08/05/2026 | **Creación del programa Storytellers en email.** Tres HTML de ciclo de vida (05, 06, 07), tabla `booking_email_dispatches` con índice único parcial, backfill histórico, deep-link `?ref=` con prerrelleno automático en `/es/storytellers/subir`, rate-limit `PUBLIC_WRITE` en `validate-booking`, `referrerpolicy="no-referrer"` en todos los CTAs. *(Los crons se activaron el 09/05; ver fila siguiente.)* |
 | 08/05/2026 (tarde) | **Banners narrativa promocionales + integración en landing.** Banners del cuerpo del email (`banner-05/06/07.jpg`) ahora llevan texto promocional quemado (título + subtítulo + pill naranja) generado con `sharp` + SVG sobre las versiones limpias `banner-XX-clean.jpg`. Mantienen aspect ratio 3:2 (1200×800) para no engordar el email. La landing pública `/es/storytellers` deja de usar banners full-bleed pelados y los integra en 3 bloques `<LifestyleFeature>` (zigzag imagen + texto + bullets) usando las versiones `-clean.jpg`. |
 | 08/05/2026 (noche) | **Migración de SVG quemado a `gpt-image-2` para las 6 imágenes promocionales del email.** Nuevo script único `scripts/generate-storytellers-email-promo-images.ts` que usa `openai.images.edit` con `gpt-image-2` y la imagen `-clean.jpg` como base, dejando que el modelo componga el cartel completo (texto, jerarquía, pill, drop-shadow, gradient sutil) a partir de un brief con literalidad exacta + paleta `#ea580c / #ffffff / #063971` + posición. Resultado claramente más editorial e integrado que el SVG previo. **Regla de oro a futuro:** banners/hero/carteles con texto se hacen siempre con `gpt-image-2`, no con SVG quemado. SVG queda para casos que necesitan reproducibilidad pixel-perfect. |
 | 09/05/2026 | **Crons Storytellers operativos + lib unificada `emails-cycle.ts` + cross-sell en email 04.** Tres crons nuevos en `vercel.json` (`storyteller-pickup-night`, `storyteller-mid-trip`, `storyteller-post-trip-day-after`), todos sobre la misma lib `src/lib/storytellers/emails-cycle.ts` (render + envío + escritura idempotente en `booking_email_dispatches`). Refactor de los crons existentes (`return-reminders` y `storyteller-post-trip-reminder`) para escribir también en la tabla unificada manteniendo los flags legacy como compat. El cron de +7d se mantiene como red de seguridad: comparte `email_type='storyteller_post_trip'` con el de +1d, así que casi nunca encuentra trabajo. Nuevo script CLI `scripts/storyteller-send-cycle-email.ts` para envíos manuales que SÍ escriben en BD. Email **04 recordatorio devolución** ahora incluye un párrafo cross-sell de Storytellers con CTA naranja al final, tanto en `src/lib/email/templates.ts` (runtime) como en el espejo `mailing/app/04-recordatorio-devolucion.html` (preview). |
+| 09/05/2026 (PM) | **Subida directa firmada** (`upload-init` / `upload-confirm`), MIME efectivo iPhone/Safari, runbook `STORYTELLERS-STORAGE-TROUBLESHOOTING.md`. Correo de confirmación de subida con **`await`** en `upload-confirm`. Panel admin: preview HEVC/Chromium + **descargar original** en foto y vídeo. Cron **`storyteller-orphan-cleanup`**. Mail rescate **`08-storytellers-rescate-recien-lanzado.html`** + script **`storyteller-send-rescue-launch.ts`** (idempotencia `metadata.rescue_launch_*` sin nuevo `email_type`). |
 
 ---
 
@@ -615,8 +617,10 @@ Antes de hacer commit:
 - [`src/app/api/cron/storyteller-post-trip-day-after/route.ts`](../src/app/api/cron/storyteller-post-trip-day-after/route.ts) — cron diario 10:30–11:30 Madrid → email 07.
 - [`src/app/api/cron/return-reminders/route.ts`](../src/app/api/cron/return-reminders/route.ts) — cron 04 recordatorio devolución (refactor para escribir en `booking_email_dispatches`).
 - [`src/app/api/cron/storyteller-post-trip-reminder/route.ts`](../src/app/api/cron/storyteller-post-trip-reminder/route.ts) — cron legacy +7 días (refactor para escribir en `booking_email_dispatches`).
+- [`src/app/api/cron/storyteller-orphan-cleanup/route.ts`](../src/app/api/cron/storyteller-orphan-cleanup/route.ts) — limpieza diaria de objetos huérfanos en Storage.
 - [`scripts/test-storyteller-emails.mjs`](../scripts/test-storyteller-emails.mjs) — script de **prueba visual** (NO escribe en BD).
 - [`scripts/storyteller-send-cycle-email.ts`](../scripts/storyteller-send-cycle-email.ts) — script CLI de **envío manual idempotente** a una reserva concreta (sí escribe en BD).
+- [`scripts/storyteller-send-rescue-launch.ts`](../scripts/storyteller-send-rescue-launch.ts) — envío puntual del HTML **08** (rescate post-lanzamiento) con auditoría `--days`, `--example`, `--booking`, `--all --confirm`.
 - [`scripts/generate-storytellers-email-promo-images.ts`](../scripts/generate-storytellers-email-promo-images.ts) — generador de las 6 imágenes promocionales del email con `gpt-image-2` (3 hero verticales + 3 banners horizontales con texto).
 - [`scripts/generate-storytellers-showcase-images.ts`](../scripts/generate-storytellers-showcase-images.ts) — generador de las imágenes lifestyle / mosaico de la landing pública (versiones limpias sin texto).
 - [`scripts/download-mailing-assets.mjs`](../scripts/download-mailing-assets.mjs) — utilidades varias del mailing (descargas, conversiones).

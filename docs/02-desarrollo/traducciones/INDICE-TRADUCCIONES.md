@@ -1,6 +1,6 @@
 # 📚 ÍNDICE DE DOCUMENTACIÓN - SISTEMA DE TRADUCCIONES
 
-**Fecha de actualización:** 21 de Enero, 2026
+**Fecha de actualización:** 9 de mayo de 2026
 
 ---
 
@@ -33,6 +33,7 @@
 - Cómo funciona el middleware
 - Rutas traducidas
 - Configuración de idiomas
+- **Storytellers (mayo 2026):** landing del programa en ES/EN/FR/DE (`StorytellersLanding` + hreflang); subida y «mis puntos» siguen en `/es/storytellers/...`
 
 ---
 

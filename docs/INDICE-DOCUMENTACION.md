@@ -1,10 +1,21 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.25 ✅ PRODUCCIÓN — tracking GTM ecommerce sin doble conteo + funnel completo  
+**Versión**: 1.0.26 ✅ PRODUCCIÓN — stats canónicas `COMPANY` + landing Storytellers ES/EN/FR/DE  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 29 de abril, 2026
+**Última actualización**: 9 de mayo de 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🌍 Mayo 2026 — Stats canónicas + landing Storytellers multiidioma
+
+| Tema | Dónde leer |
+|------|------------|
+| Fuente única de cifras empresa (`foundingDate`, `stats`, rating), home y páginas «quiénes somos» | **`src/lib/company.ts`** · **`src/lib/home/server-actions.ts`** (`getCompanyStats`) · **`CHANGELOG.md`** (entrada 9 may 2026) |
+| Landing Storytellers: bloques nuevos, orden §12, i18n, hreflang, CTAs a `/es/storytellers/subir` | **[GUIA_CONTENIDO.md](./02-desarrollo/contenido/GUIA_CONTENIDO.md)** §12 |
+| Rutas Storytellers en tabla i18n | **[I18N_IMPLEMENTATION.md](./02-desarrollo/traducciones/I18N_IMPLEMENTATION.md)** |
+| Resumen ejecutivo | **[README raíz](../README.md)** — sección *Mayo 2026 — Stats canónicas + landing Storytellers…* |
 
 ---
 
@@ -675,6 +686,10 @@ Ver carpeta `scripts/`:
 | ¿Cómo creo carpetas en storage? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
 | ¿Por qué "Nueva Carpeta" no funciona? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
 | ¿Por qué fallan vídeos Storytellers "maximum size" con bucket a 3 GB? | `02-desarrollo/contenido/STORYTELLERS-STORAGE-TROUBLESHOOTING.md` |
+| ¿No llega el correo de confirmación tras subir en Storytellers (subida OK)? | `02-desarrollo/contenido/STORYTELLERS-STORAGE-TROUBLESHOOTING.md` (§ resumen ejecutivo) · `mailing/README.md` (tabla otros correos) — el envío SMTP en `upload-confirm` debe ejecutarse con **`await`**. |
+| ¿Emails Storytellers 05–08, crons Vercel y script rescate? | `mailing/STORYTELLERS_MAILS.md` |
+| ¿Dónde están las stats canónicas de la empresa y cómo evitar cifras contradictorias en la web? | `src/lib/company.ts` · `src/lib/home/server-actions.ts` · `CHANGELOG.md` (9 may 2026) · `README.md` raíz |
+| ¿Storytellers en inglés/francés/alemán? Landing vs flujo subida | `docs/02-desarrollo/contenido/GUIA_CONTENIDO.md` §12 · `I18N_IMPLEMENTATION.md` |
 | ¿Cómo organizo imágenes por buckets? | `02-desarrollo/media/GESTION-MEDIA-STORAGE.md`, `02-desarrollo/media/FAQ-MEDIA-STORAGE.md` ⚠️ **NUEVO** |
 | ¿Cómo funcionan las temporadas? | `SISTEMA_TEMPORADAS.md` |
 | ¿Por qué no cargan los artículos del blog? | `SOLUCION-BLOG-FRONTEND.md` |
@@ -746,7 +761,7 @@ Estos documentos ya NO existen (fueron eliminados):
 
 ---
 
-**Total de documentos activos**: ver carpeta `docs/` (índice revisado mar. 2026)  
-**Última actualización crítica**: Landings alquiler + docs alineadas (20 marzo 2026)  
-**Última actualización anterior**: Auditoría de Seguridad (5 Febrero 2026)  
+**Total de documentos activos**: ver carpeta `docs/` (índice revisado may. 2026)  
+**Última actualización crítica**: Stats `COMPANY` + Storytellers i18n (9 mayo 2026)  
+**Historial reciente**: Landings alquiler + docs alineadas (20 marzo 2026) · Auditoría de seguridad (5 febrero 2026)  
 **Última limpieza de obsoletos**: 20 Enero 2026

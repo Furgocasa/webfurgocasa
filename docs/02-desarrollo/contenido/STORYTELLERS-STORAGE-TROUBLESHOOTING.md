@@ -1,6 +1,6 @@
 # Storytellers — Storage Supabase: límites, errores y checklist operativo
 
-**Ámbito:** subidas del programa Storytellers (`storyteller-uploads`) desde `/storytellers/subir`.  
+**Ámbito:** subidas del programa Storytellers (`storyteller-uploads`) desde **`/es/storytellers/subir`** (única implementación del flujo; las landings marketing `/en|fr|de/storytellers` enlazan aquí).  
 **Última revisión:** 9 mayo 2026 (Incidencias: tamaño máximo aparente con bucket a 3 GB; MIME vacío en iPhone; spend cap).
 
 **Documentación oficial Supabase (referencia):**
@@ -110,7 +110,7 @@ Las URLs firmadas y el archivo en Storage pueden estar **perfectos** y aun así 
 
 **Causa habitual:** los `.mov` del iPhone suelen llevar vídeo **HEVC (H.265)** dentro de un contenedor QuickTime. **Chrome y Edge en Windows** (y muchos Chromium en escritorio) **no decodifican HEVC** en el elemento `<video>`. Safari (macOS/iOS) y reproductores como VLC sí.
 
-**Qué hace el código:** el panel muestra un aviso y un botón **Descargar vídeo** (misma URL firmada) cuando detecta error de reproducción o metadatos sin dimensiones de vídeo (`StorytellerAdminVideo` en `storyteller-uploads/page.tsx`).
+**Qué hace el código:** el panel muestra un aviso y un botón **Descargar vídeo** (misma URL firmada) cuando detecta error de reproducción o metadatos sin dimensiones de vídeo (`StorytellerAdminVideo` en `storyteller-uploads/page.tsx`). Las **fotos** tienen el mismo botón **Descargar original** en la card y en el modal.
 
 **Operativa:** revisar el clip en Safari / descargar y abrir en VLC; no indica archivo corrupto en Storage.
 

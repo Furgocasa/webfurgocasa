@@ -1,7 +1,7 @@
 # Arquitectura de Internacionalización (i18n) - Carpetas Fijas por Idioma
 
-> **Última actualización**: 24 Enero 2026  
-> **Versión**: 4.1.0  
+> **Última actualización**: 9 mayo 2026  
+> **Versión**: 4.1.1  
 > **Estado**: ✅ Producción
 
 ## 📋 Resumen
@@ -239,6 +239,9 @@ const translatedVehicles = await getTranslatedRecords(
 | Quiénes somos | `/es/quienes-somos` | `/en/about-us` | `/fr/a-propos` | `/de/uber-uns` |
 | FAQs | `/es/faqs` | `/en/faqs` | `/fr/faqs` | `/de/faqs` |
 | Mapa áreas | `/es/mapa-areas` | `/en/areas-map` | `/fr/carte-zones` | `/de/gebietskarte` |
+| **Storytellers (landing programa)** | `/es/storytellers` | `/en/storytellers` | `/fr/storytellers` | `/de/storytellers` |
+
+**Storytellers — alcance i18n (mayo 2026):** La landing usa el mismo slug `/storytellers` en los cuatro idiomas; el componente `StorytellersLanding` recibe `locale` y traduce todo el cuerpo + JSON-LD (`WebPage`, `FAQPage`). Las páginas `page.tsx` por idioma declaran `alternates.languages` (hreflang). El **flujo operativo** (subida de archivos y «mis puntos») sigue solo en **`/es/storytellers/subir`** y **`/es/storytellers/mis-puntos`**; los CTAs de la landing enlazan ahí de forma absoluta hasta una futura internacionalización del uploader.
 
 ### Componente LocalizedLink
 

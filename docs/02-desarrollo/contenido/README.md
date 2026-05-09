@@ -4,7 +4,7 @@
 
 | Documento | Contenido |
 |-----------|-----------|
-| [GUIA_CONTENIDO.md](./GUIA_CONTENIDO.md) | **Fuente de verdad:** programa Creadores PRO + programa Storytellers (puntos, cupones, landing, imágenes GPT Image 2, Supabase, API, fiscal §11.1, checklist Sprint 3). |
+| [GUIA_CONTENIDO.md](./GUIA_CONTENIDO.md) | **Fuente de verdad:** programa Creadores PRO + programa Storytellers (puntos, cupones, landing con TL;DR + ejemplos prácticos, **i18n landing ES/EN/FR/DE**, imágenes GPT Image 2, Supabase, API, fiscal §11.1, checklist Sprint 3). Stats empresa coherentes: **`src/lib/company.ts`** + home/server-actions. |
 | [STORYTELLERS-STORAGE-TROUBLESHOOTING.md](./STORYTELLERS-STORAGE-TROUBLESHOOTING.md) | **Runbook Storage Storytellers:** límites globales vs bucket, spend cap, plan Free/Pro, errores *maximum allowed size*, MIME `.mov` / Safari, SQL de verificación, enlaces Supabase Docs. |
 ## Lectura rápida si retomas el proyecto
 
@@ -12,7 +12,7 @@
 2. **Storytellers — negocio:** §3 (filosofía, puntos, cupón 3% bienvenida, merchandising §3.4).
 3. **Storytellers — técnico:** §11 (implementación), crons, variables `.env.example`.
 4. **Storytellers — Storage / errores de subida:** `STORYTELLERS-STORAGE-TROUBLESHOOTING.md` (global vs bucket, spend cap).
-5. **Storytellers — diseño y assets:** §12 (orden de la landing, script `generate-storytellers-showcase-images.ts`, imágenes en `public/images/storytellers/`).
+5. **Storytellers — diseño y assets:** §12 (orden de la landing, bloques lectura rápida y ejemplos puntos→%, script `generate-storytellers-showcase-images.ts`, imágenes en `public/images/storytellers/`, i18n `StorytellersLanding`).
 6. **PRO:** §2 + §5 + §6 (prompts / regeneración imágenes en `public/images/content-creators/`).
 
 ## Scripts relacionados (repo raíz)
@@ -23,6 +23,7 @@
 | `npm run generate:storytellers-images` | `scripts/generate-storytellers-showcase-images.ts` | Imágenes lifestyle + merch de la landing pública Storytellers (`public/images/storytellers/`). |
 | `npx tsx scripts/generate-storytellers-email-promo-images.ts` | `scripts/generate-storytellers-email-promo-images.ts` | **6 imágenes promocionales del email Storytellers** (3 hero 4:5 + 3 banners 3:2 con texto promocional integrado por `gpt-image-2`). Tags: `cover-05/06/07`, `banner-05/06/07`, alias `cover` / `banner`. |
 | `npx tsx scripts/storytellers-smoke-test.ts` | — | Verificación post-deploy del programa Storytellers. |
+| `npx tsx scripts/storyteller-send-rescue-launch.ts` | `scripts/storyteller-send-rescue-launch.ts` | Mail **08** rescate post-lanzamiento: auditoría `--days`, muestra `--example` a `reservas@`, `--booking`, `--all --confirm`. Idempotencia `metadata.rescue_launch_*`. |
 
 ### ⭐ Regla de oro de generación de imágenes con texto
 

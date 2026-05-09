@@ -7,7 +7,7 @@
 [![PageSpeed Mobile](https://img.shields.io/badge/PageSpeed-92%2F100_mobile-green.svg)](https://pagespeed.web.dev/)
 [![LCP](https://img.shields.io/badge/LCP-0.83s_mobile-brightgreen.svg)](./OPTIMIZACION-LCP-MOVIL.md)
 [![SEO](https://img.shields.io/badge/SEO-100%2F100-brightgreen.svg)](./CHANGELOG.md)
-[![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./I18N_IMPLEMENTATION.md)
+[![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./docs/02-desarrollo/traducciones/I18N_IMPLEMENTATION.md)
 
 **🎉 VERSIÓN 4.5.0 COMPLETADA** - [https://www.furgocasa.com](https://www.furgocasa.com)
 
@@ -39,7 +39,7 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
-## 🌟 Mayo 2026 — Programa Storytellers · 3 emails de ciclo de vida + tracking + deep-link seguro (08/05/2026)
+## 🌟 Mayo 2026 — Programa Storytellers · ciclo de vida (05–07), rescate (08), tracking y deep-link
 
 - **Tres emails nuevos de ciclo de vida del viaje** que sostienen TODO el programa Storytellers (3 % cupón de bienvenida + hasta 15 % por puntos + regalos):
   - `mailing/app/05-storytellers-dia-salida-noche.html` — noche del pickup (~20:30 Europe/Madrid).
@@ -55,8 +55,18 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 - **⭐ Regla de oro a futuro**: cualquier banner / hero / cartel promocional con texto encima de foto se hace con `gpt-image-2`, no con `sharp` + SVG. SVG queda para reproducibilidad pixel-perfect (logos, watermarks, plantillas masivas). Detalle: [`mailing/STORYTELLERS_MAILS.md`](./mailing/STORYTELLERS_MAILS.md) §9 + [`public/images/README.md`](./public/images/README.md).
 - **Landing pública `/es/storytellers` actualizada**: las versiones limpias `banner-XX-clean.jpg` se reutilizan ahora en 3 bloques `<LifestyleFeature>` (zigzag imagen + texto + bullets dentro de `max-w-6xl` con `rounded-3xl`), no como banners full-bleed pelados. Mismo set de imágenes para email y web, dos tratamientos visuales distintos.
 - **Mobile-first**: media queries con `!important` para `.hero-img` / `.container-600` / `.outer-pad`, tipografía base aumentada +2px, validado en iPhone antiguo y nuevo.
-- **Pendiente:** crear los 3 cron jobs (`storyteller-pickup-night` 20:30, `storyteller-mid-trip` 09:00, `storyteller-post-trip-day-after` 09:00) que escriben en `booking_email_dispatches` con `INSERT ... ON CONFLICT DO NOTHING`. Hasta entonces los envíos son manuales con `node scripts/test-storyteller-emails.mjs --to "..."`.
-- 📖 **Documentación obligatoria antes de tocar:** [`mailing/STORYTELLERS_MAILS.md`](./mailing/STORYTELLERS_MAILS.md) — incluye placeholders, deep-link, seguridad, idempotencia, backfill, cron jobs pendientes y checklist de edición.
+- **Crons en producción** (`vercel.json`): `storyteller-pickup-night` (~20:00 Madrid), `storyteller-mid-trip` (~10:00), `storyteller-post-trip-day-after` (~10:30), más `storyteller-post-trip-reminder` (+7 días, misma `email_type` que el 07 — red de seguridad), `storyteller-coupons-expire`, `storyteller-orphan-cleanup`. Detalle: [`mailing/STORYTELLERS_MAILS.md`](./mailing/STORYTELLERS_MAILS.md) §8.
+- **Mail rescate post-lanzamiento:** `mailing/app/08-storytellers-rescate-recien-lanzado.html` · envío puntual con `scripts/storyteller-send-rescue-launch.ts` (sin cron).
+- 📖 **Documentación obligatoria antes de tocar:** [`mailing/STORYTELLERS_MAILS.md`](./mailing/STORYTELLERS_MAILS.md) — placeholders, deep-link, seguridad, idempotencia, backfill, crons, script rescate `08` y checklist de edición.
+
+---
+
+## 🌍 Mayo 2026 — Stats canónicas + landing Storytellers en 4 idiomas (09/05/2026)
+
+- **Fuente única [`src/lib/company.ts`](./src/lib/company.ts):** `foundingDate` (2018), `stats.historicalBookings` (1000+ como mínimo garantizado frente a Supabase), `stats.currentFleetSize` (13), `aggregateRating.ratingValue` (4.5), `stats.totalVehiclesEverOwned` (23). La home usa `getCompanyStats()` en [`src/lib/home/server-actions.ts`](./src/lib/home/server-actions.ts); las páginas «Quiénes somos» en los cuatro idiomas, escalabilidad ES y el JSON-LD About leen `COMPANY` para que **no vuelvan a aparecer mezclas tipo 14+ años / 500+ viajes / 10 furgos / 4.9**.
+- **Landing Storytellers** ([`src/components/storytellers/storytellers-landing.tsx`](./src/components/storytellers/storytellers-landing.tsx)): bloque de lectura rápida «En 10 segundos», ejemplos prácticos puntos → %, copy de marca (camper gran volumen), mensaje emocional primera subida, FAQ profesional RAW/4K. **Internacionalización real del cuerpo** en ES/EN/FR/DE con prop `locale`, JSON-LD localizado y `alternates.languages` en cada [`src/app/{es,en,fr,de}/storytellers/page.tsx`](./src/app/es/storytellers/page.tsx). Los flujos **Subir** y **Mis puntos** siguen bajo rutas **`/es/storytellers/...`** (solo español); los CTAs de la landing apuntan ahí de forma absoluta.
+- **Documentación:** [`docs/02-desarrollo/contenido/GUIA_CONTENIDO.md`](./docs/02-desarrollo/contenido/GUIA_CONTENIDO.md) §12 · [`CHANGELOG.md`](./CHANGELOG.md) (entrada 9 may 2026) · [`docs/INDICE-DOCUMENTACION.md`](./docs/INDICE-DOCUMENTACION.md).
+- **Commits:** `f85d249`, `7ceaa9d`.
 
 ---
 

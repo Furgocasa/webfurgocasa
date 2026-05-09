@@ -42,8 +42,9 @@ Documentación de desarrollo por área:
 - Imágenes hero y slides
 
 #### contenido/
-- **GUIA_CONTENIDO.md** — Creadores PRO + programa Storytellers (fuente de verdad negocio/técnico)
+- **GUIA_CONTENIDO.md** — Creadores PRO + programa Storytellers (fuente de verdad negocio/técnico). §12 describe landing Storytellers (orden de secciones, i18n ES/EN/FR/DE, hreflang, CTAs a `/es/storytellers/subir`).
 - **STORYTELLERS-STORAGE-TROUBLESHOOTING.md** — Runbook Storage Storytellers: límite global vs bucket, spend cap, Free/Pro, MIME iPhone, checklist errores de tamaño
+- **Stats empresa públicas:** `src/lib/company.ts` (`COMPANY.stats`, `foundingDate`, `aggregateRating`) + consumo en home (`src/lib/home/server-actions.ts`) y páginas «quiénes somos» — ver **CHANGELOG** (9 may 2026) y **README** raíz
 
 #### analytics/
 - Google Analytics y Meta Pixel

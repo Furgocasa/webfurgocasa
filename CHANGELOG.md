@@ -4,6 +4,36 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🌍 Stats canónicas de empresa + landing Storytellers multiidioma — 9 de mayo de 2026
+
+**Problema:** La home y páginas estáticas mostraban cifras contradictorias (años de experiencia, viajes, tamaño de flota, valoración), detectables también por bots de IA. La landing `/fr/storytellers` (y EN/DE) tenía metadatos localizados pero **todo el cuerpo en español**.
+
+**Stats unificadas (`src/lib/company.ts`):**
+
+- `foundingDate: '2018'` — años de experiencia = año actual − 2018.
+- `stats.historicalBookings: 1000` — mínimo garantizado frente al conteo en Supabase (`getCompanyStats` en `src/lib/home/server-actions.ts`).
+- `stats.currentFleetSize: 13` — flota actual de alquiler.
+- `stats.totalVehiclesEverOwned: 23` — histórico comprados (incluye vendidos).
+- `aggregateRating.ratingValue: '4.5'` — valoración canónica coherente con schema y copys.
+
+**Archivos de contenido actualizados:** `src/app/{es,en,fr,de}/quienes-somos|about-us|a-propos|uber-uns/page.tsx` (según ruta), `src/app/es/escalabilidad/escalabilidad-client.tsx`, `src/components/static-pages/jsonld.tsx` (AboutPage).
+
+**Storytellers — landing pública:**
+
+- Copy de marca: overlay hero «camper de gran volumen» (alineado con identidad; sin sustituir términos SEO del footer u otras páginas salvo donde se pidió).
+- Bloques nuevos: resumen rápido «En 10 segundos» y ejemplos orientativos puntos → % descuento.
+- Mensaje emocional primera subida («Tu primera subida ya tiene premio»), FAQ profesional RAW/4K LOG, tono cliente en «¿Qué es este programa?».
+- **i18n:** `StorytellersLanding` recibe `locale` (`es`|`en`|`fr`|`de`); strings vía helper `tr(es,en,fr,de)`; JSON-LD `WebPage` + `FAQPage` con `inLanguage` y URL por idioma; metadata `alternates.languages` (hreflang + `x-default`) en cada `src/app/{locale}/storytellers/page.tsx`.
+- Los CTAs del hero y CTA final siguen enlazando a **`/es/storytellers/subir`** y **`/es/storytellers/mis-puntos`** (flujos aún solo ES).
+
+**Otros:** mismo overlay de marca en `src/components/content-creators/content-creators-landing.tsx`.
+
+**Documentación:** `docs/02-desarrollo/contenido/GUIA_CONTENIDO.md` §12 · `docs/INDICE-DOCUMENTACION.md` · `docs/02-desarrollo/traducciones/I18N_IMPLEMENTATION.md` · `README.md` raíz.
+
+**Commits:** `f85d249` (stats frontend), `7ceaa9d` (storytellers landing + i18n).
+
+---
+
 ## 📊 Tracking GTM ecommerce: fix doble conteo + funnel completo — 29 de abril 2026
 
 Auditoría del Google Tag Manager (`GTM-5QLGH57`) en el flujo de pago. Detectados dos problemas críticos y oportunidades de mejora del funnel.

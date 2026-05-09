@@ -2,7 +2,7 @@
 
 > **Super prompt para implementación.** Este documento recoge el modelo cerrado de generación y captación de contenido para FURGOCASA, fruto de la conversación de estrategia del 8 de mayo de 2026. Sirve como referencia única para retomar el trabajo en sesiones futuras.
 >
-> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **(9 may 2026)** anti-duplicados por SHA-256 + cupón con código personalizado tipo `STO-NARPAR05` (mantiene prefijo `STO-` para enrutado en checkout) + briefing con galería de lo ya subido (§3.5-bis/ter/quater) · **(9 may 2026 PM)** subida directa navegador → Supabase con **URL de subida firmada** (`uploadToSignedUrl` SDK): vídeos hasta 3 GB, MIME efectivo para iPhone/Safari (§3.5-quinquies), RLS al bucket, cron huérfanos · **Runbook Storage:** `STORYTELLERS-STORAGE-TROUBLESHOOTING.md` (global vs bucket, spend cap, Free/Pro) · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
+> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **(9 may 2026)** anti-duplicados por SHA-256 + cupón con código personalizado tipo `STO-NARPAR05` (mantiene prefijo `STO-` para enrutado en checkout) + briefing con galería de lo ya subido (§3.5-bis/ter/quater) · **(9 may 2026 PM)** subida directa navegador → Supabase con **URL de subida firmada** (`uploadToSignedUrl` SDK): vídeos hasta 3 GB, MIME efectivo para iPhone/Safari (§3.5-quinquies), RLS al bucket, cron huérfanos · **correo confirmación de subida** con **`await`** SMTP en `upload-confirm` · **panel admin:** preview HEVC + **descarga original** en foto y vídeo · **mail 08** rescate (`storyteller-send-rescue-launch.ts`, sin cron) · **(9 may 2026 tarde)** landing Storytellers con bloques «En 10 segundos» + ejemplos prácticos puntos→%, copy de marca (camper gran volumen), mensaje emocional primera subida, FAQ RAW/4K; **cuerpo traducido ES/EN/FR/DE** en `StorytellersLanding` (`locale` + `tr()`); JSON-LD y `alternates.languages` por idioma; flujos `/es/storytellers/subir` y `/mis-puntos` siguen solo ES · **Stats empresa:** coherencia numérica vía `COMPANY` en `src/lib/company.ts` + páginas quiénes somos / JSON-LD About / home (`getCompanyStats`) · **Runbook Storage:** `STORYTELLERS-STORAGE-TROUBLESHOOTING.md` (global vs bucket, spend cap, Free/Pro) · **Sprint 3** = operativa + (opcional) automatizar canje de merch + (opcional) i18n de uploader / mis puntos.
 
 ---
 
@@ -19,6 +19,9 @@ Objetivos cuantitativos al cabo de 12 meses:
 - 6-10 colaboraciones profesionales cerradas → archivo en bruto multi-uso.
 - 200+ clientes en programa Storytellers, con un flujo recurrente de 50-100 lotes/mes.
 - Eliminación total de imágenes de IA antigua en la web pública.
+
+**Stats públicas de empresa (coherencia mayo 2026):**  
+Los números que debe repetir la web con una sola voz (años desde fundación, viajes históricos, flota actual, valoración, histórico de vehículos comprados) viven en **`src/lib/company.ts`** (`COMPANY.foundingDate`, `COMPANY.stats`, `COMPANY.aggregateRating`). La home aplica mínimos en **`src/lib/home/server-actions.ts`** (`getCompanyStats`). Las páginas «Quiénes somos» por idioma y el JSON-LD About consumen lo mismo. No duplicar cifras hardcoded en nuevos bloques.
 
 ---
 
@@ -740,7 +743,9 @@ Plantillas:
 
 #### Endpoints públicos
 - `POST /api/storytellers/validate-booking` — paso 1 del uploader. Valida y emite session token HMAC (30 min).
-- `POST /api/storytellers/upload` — multipart con session token; sube a Storage + ledger + cupón si umbral.
+- `POST /api/storytellers/upload-init` — validación + ticket firmado + URL de subida a Storage (flujo actual).
+- `POST /api/storytellers/upload-confirm` — verifica objeto en Storage, inserta en BD, ledger, cupón si umbral; envío **`await`** de `sendUploadConfirmationEmail`.
+- `POST /api/storytellers/upload` — multipart legacy (deprecated); producción usa **init + confirm**.
 - `POST /api/storytellers/request-magic-link` — pide acceso al área privada por email.
 - `GET  /api/storytellers/my-points?t=<token>` — datos del área privada.
 - `POST /api/storytellers/redeem` — validación de cupón en checkout.
@@ -756,12 +761,18 @@ Plantillas:
 - `/es/storytellers/mis-puntos` — área privada con magic link, saldo, cupón activo, ledger, tiers, perks.
 
 #### Panel admin
-- `/administrator/storyteller-uploads` — galería tipo Lightroom con filtros, modal de preview, selección/reversión, agrupación por reserva.
+- `/administrator/storyteller-uploads` — galería tipo Lightroom con filtros, modal de preview (vídeo HEVC: aviso + descarga), **descarga de original** en foto y vídeo, selección/reversión, agrupación por reserva.
 - Enlace añadido en `src/components/admin/sidebar.tsx`.
 
-#### Crons
-- `GET /api/cron/storyteller-coupons-expire` — expira cupones cuyo `valid_until` pasó. Vercel cron diario `0 4 * * *`.
-- `GET /api/cron/storyteller-post-trip-reminder` — envía recordatorio 7 días tras devolución a quien no haya subido. Vercel cron diario `0 10 * * *`.
+#### Crons (Storytellers y ciclo email)
+- `GET /api/cron/storyteller-pickup-night` — email **05** noche de salida. Vercel `0 19 * * *` (~20:00–21:00 Madrid).
+- `GET /api/cron/storyteller-mid-trip` — email **06** mitad de viaje (≥6 días). Vercel `0 9 * * *`.
+- `GET /api/cron/storyteller-post-trip-day-after` — email **07** día después del dropoff. Vercel `30 9 * * *`.
+- `GET /api/cron/storyteller-post-trip-reminder` — recordatorio **+7 días**, mismo `email_type` que el 07 en BD; casi siempre skip si ya mandó el anterior. Vercel `0 10 * * *`.
+- `GET /api/cron/storyteller-coupons-expire` — expira cupones. Vercel `0 4 * * *`.
+- `GET /api/cron/storyteller-orphan-cleanup` — borra objetos huérfanos en Storage de subidas firmadas abortadas. Vercel `30 4 * * *`.
+
+Horarios y reglas de negocio: `mailing/STORYTELLERS_MAILS.md` §8.
 
 #### Seguridad
 - Rate limit añadido en `src/middleware.ts` para todos los endpoints `/api/storytellers/*`.
@@ -835,7 +846,7 @@ El helper `src/lib/storytellers/recaptcha.ts` decide automáticamente:
    - Smoke test verificado en local (8 may 2026): `reCAPTCHA en modo ENTERPRISE (server verifica vía REST API de Google Cloud)`.
    - El helper también soporta fallback al v3 clásico mediante `RECAPTCHA_SECRET_KEY` si en algún momento se desactivara Enterprise (ignorado mientras las 3 vars Enterprise estén presentes).
 4. ✅ **`STORYTELLERS_HMAC_SECRET` generado y desplegado en Vercel** (8 may 2026). Está en `.env.local` y en Vercel (Production + Preview). **No comprometer en git.** Si quieres rotarlo: `node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"` y reemplazar en ambos sitios. La rotación invalidará todas las magic links activas (los usuarios deberán pedir una nueva).
-5. ✅ **`CRON_SECRET` verificado en Vercel** (los crons existentes ya lo usan; los dos nuevos crons de Storytellers — `storyteller-coupons-expire` diario a las 4 AM y `storyteller-post-trip-reminder` diario a las 10 AM — funcionan con la misma var).
+5. ✅ **`CRON_SECRET` verificado en Vercel** — los crons de Storytellers (pickup-night, mid-trip, post-trip-day-after, post-trip-reminder, coupons-expire, orphan-cleanup) usan la misma var que el resto de crons protegidos.
 6. **Regenerar database.types.ts** *(opcional cosmético)*: `npx supabase gen types typescript --project-id <id> > src/lib/supabase/database.types.ts` para añadir tipado de las 3 nuevas tablas. Sin esto el código sigue funcionando (Supabase JS es laxo con string literals fuera de la union).
 7. ✅ **Canje en checkout integrado**:
    - `/api/coupons/validate` detecta automáticamente códigos `STO-` y delega a `validateCouponForBooking`.
@@ -861,27 +872,34 @@ Esta sección documenta **todo el proceso** seguido para que la página pública
 
 - **Referencia visual:** misma familia de patrones que `ContentCreatorsLanding`: hero en dos columnas (copy + imagen vertical 4:5 con pie tipo marca), alternancia `bg-white` / `bg-gray-50`, cards `rounded-3xl`, tablas con cabecera corporativa (aquí naranja Storytellers vs azul PRO), bloques callout con borde naranja, FAQ en `<details>`, sección teaser cruzado (PRO ↔ Storytellers).
 - **Identidad de color:** gradient hero **naranja / ámbar** (programa cliente amateur), frente al **azul** de la landing PRO — así se diferencian a primera vista sin romper la marca.
-- **SEO / rutas:** `/storytellers` indexable; `/storytellers/subir` y `/storytellers/mis-puntos` con `noindex`. Alias localizados `src/app/{es,en,fr,de}/storytellers/page.tsx`. Sitemap (`src/lib/seo/sitemap.ts`) + `route-translations.ts`.
+- **SEO / rutas:** `/storytellers` indexable en los cuatro idiomas; `/storytellers/subir` y `/storytellers/mis-puntos` con `noindex` (rutas solo bajo `src/app/es/storytellers/`). Páginas: `src/app/{es,en,fr,de}/storytellers/page.tsx` pasan `locale` a la landing. **Hreflang:** cada `page.tsx` declara `alternates.languages` (es, en, fr, de, `x-default` → ES). Sitemap (`src/lib/seo/sitemap.ts`) + `route-translations.ts`.
+- **i18n del componente:** `StorytellersLanding` (`storytellers-landing.tsx`) — strings embebidos con helper `tr(es, en, fr, de)`; FAQ y JSON-LD (`WebPage`, `FAQPage`) en el idioma activo (`inLanguage`).
 - **Navegación:** enlace en menú desplegable «Furgocasa» (desktop/móvil) y footer (`header.tsx`, `footer.tsx`).
 
 ### 12.2. Orden de secciones en la landing (orden de lectura)
 
-1. Hero + CTAs (Subir / Mis puntos).
+1. Hero + CTAs (Subir / Mis puntos) — pie de imagen con marca «camper de gran volumen» (no autocaravana genérica en ese bloque).
 2. **Intro SEO** (párrafo contextual).
-3. **«¿Cómo funciona?»** — bloque prioritario con **4 tarjetas** numeradas + iconos: (1) Durante el viaje → (2) Sube tu material → (3) Sumas puntos → (4) Canjeas tu cupón. Debe ser **lo primero que entiende el cliente** tras el contexto breve.
-4. ¿Qué es este programa?
-5. Qué ofrecemos (cards).
-6. Cómo se ganan los puntos.
-7. Cómo se canjean los puntos (tabla + **aviso explícito del 3% de bienvenida único** + FAQ asociada).
-8. Cuándo y cómo se canjean los cupones (temporada, días mínimos, un solo cupón activo).
-9. Lo que premiamos / lo que firmas / antiabuso.
-10. Showcase 6 imágenes «momentos que nos encantan».
-11. Perks merchandising (cards con foto producto).
-12. FAQ.
-13. Teaser hacia programa PRO (`LocalizedLink` → `/creadores-de-contenido`).
-14. CTA final.
+3. **«En 10 segundos»** — **4 pasos** numerados en tarjetas (sube 3 fotos o 1 vídeo → cupón inicial 3 % → puntos hasta el techo → canje próxima reserva). Lectura ultrarrápida antes del detalle.
+4. **«¿Cómo funciona?»** — **4 tarjetas** numeradas + iconos: (1) Durante el viaje → (2) Sube tu material → (3) Sumas puntos → (4) Canjeas tu cupón.
+5. **LifestyleFeature** «Tu primera subida ya tiene premio» / primera foto del viaje (refuerzo cupón bienvenida).
+6. ¿Qué es este programa?
+7. Qué ofrecemos (cards).
+8. **LifestyleFeature** «Verdad de viaje» / puntos por material real.
+9. Cómo se ganan los puntos (+ callout multiplicador selección).
+10. Cómo se canjean los puntos (tabla + **aviso explícito del 3% de bienvenida único** + **bloque «Ejemplos prácticos · ¿qué necesito subir?»** con tarjetas 5 % / 10 % / 15 % orientativas).
+11. Cuándo y cómo se canjean los cupones (temporada, días mínimos, un solo cupón activo).
+12. **LifestyleFeature** ventana 90 días post-devolución.
+13. Lo que premiamos / lo que firmas / antiabuso.
+14. Showcase 6 imágenes «momentos que nos encantan».
+15. Perks merchandising (cards con foto producto). Textos de producto (`PERK_TIERS`) siguen en español en código; solo cabeceras/notas legal traducidas en la landing.
+16. FAQ (9 ítems, mismo contenido que Schema FAQPage).
+17. Teaser hacia programa PRO (`LocalizedLink` → `/creadores-de-contenido`).
+18. CTA final (mensaje emocional primera subida + cupón 3 % explícito en subtítulo).
 
 **Implementación:** `src/components/storytellers/storytellers-landing.tsx`.
+
+**Nota CTAs:** enlaces absolutos a `/es/storytellers/subir` y `/es/storytellers/mis-puntos` en todos los locales hasta que esos flujos admitan traducción.
 
 ### 12.3. Pipeline de imágenes GPT Image 2 (Storytellers)
 
@@ -912,12 +930,14 @@ Variables opcionales: `SHOWCASE_IMAGE_MODEL`, `SHOWCASE_WEBP_QUALITY`, `OPENAI_A
 - `62d2633` — Landing Storytellers rediseñada + 7 showcase + script generador.
 - `3e042b7` — Merch en perks + copy cupón 3% aclarado + imágenes merch + `PERK_TIERS` extendido.
 - `51093fb` — Bloque «¿Cómo funciona?» visible **arriba** (post-intro), eliminada duplicación al final.
+- `f85d249` — Stats canónicas `COMPANY` en páginas quiénes somos (4 idiomas), escalabilidad ES, JSON-LD About.
+- `7ceaa9d` — Landing Storytellers: bloques TL;DR + ejemplos prácticos, copy marca/FAQ, **i18n completa ES/EN/FR/DE** en componente + hreflang.
 
 ### 12.5. Extensiones futuras recomendadas (Sprint 3)
 
 - UI «Mis puntos»: mismo tratamiento visual de merch que la landing (imágenes por `slug`).
 - Automatizar **canje de merchandising** (ticket interno, email de ops, movimiento `admin_adjust` en ledger) si el volumen lo justifica.
-- Traducción real del copy de `StorytellersLanding` a EN/FR/DE si el negocio lo prioriza (ahora metadata sí, cuerpo principal ES).
+- **Internacionalizar** `uploader-flow.tsx`, páginas `subir` / `mis-puntos` y emails transaccionales si el tráfico EN/FR/DE del programa lo justifica (la **landing** indexable ya está traducida; los CTAs siguen yendo a rutas `/es/...`).
 
 ---
 
