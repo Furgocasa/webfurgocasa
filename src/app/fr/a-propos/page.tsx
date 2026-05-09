@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: "À propos - Découvrez Furgocasa",
-    description: "Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis 2017, avec plus de 500 voyages réalisés.",
+    description: `Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis ${COMPANY.foundingDate}, avec plus de ${COMPANY.stats.historicalBookings.toLocaleString('fr-FR')} voyages réalisés et une flotte premium de ${COMPANY.stats.currentFleetSize} véhicules.`,
     keywords: "à propos furgocasa, entreprise location camping-car murcie, histoire furgocasa, famille furgocasa, camping-cars murcie",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: "À propos - Découvrez Furgocasa",
-      description: "Découvrez Furgocasa, entreprise familiale spécialisée dans la location de camping-cars à Murcie depuis 2017.",
+      description: `Découvrez Furgocasa, entreprise familiale spécialisée dans la location de camping-cars à Murcie depuis ${COMPANY.foundingDate}.`,
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: "À propos - Découvrez Furgocasa",
-      description: "Entreprise familiale de location de camping-cars à Murcie depuis 2017.",
+      description: `Entreprise familiale de location de camping-cars à Murcie depuis ${COMPANY.foundingDate}.`,
     },
     alternates,
     robots: {
@@ -73,6 +73,7 @@ export default async function LocaleQuienesSomosPage() {
   const locale: Locale = 'fr'; // Locale fijo
   
   const t = (key: string) => translateServer(key, locale);
+  const yearsExperience = new Date().getFullYear() - parseInt(COMPANY.foundingDate, 10);
 
   return (
     <>
@@ -98,7 +99,7 @@ export default async function LocaleQuienesSomosPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                <strong>Qui sommes-nous ?</strong> Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis {COMPANY.foundingDate}. Plus de 500 voyages réalisés. Flotte premium avec kilométrage illimité en Espagne, tarifs dès {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/jour et départ à {COMPANY.rentalPolicy.pickupLocationsLabel}. Téléphone : {COMPANY.phoneDisplay}.
+                <strong>Qui sommes-nous ?</strong> Furgocasa est une entreprise familiale de location de camping-cars à Murcie depuis {COMPANY.foundingDate}. Plus de {COMPANY.stats.historicalBookings.toLocaleString('fr-FR')} voyages réalisés avec une flotte premium de {COMPANY.stats.currentFleetSize} véhicules. Kilométrage illimité en Espagne, tarifs dès {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/jour et départ à {COMPANY.rentalPolicy.pickupLocationsLabel}. Téléphone : {COMPANY.phoneDisplay}.
               </p>
             </div>
           </div>
@@ -158,24 +159,24 @@ export default async function LocaleQuienesSomosPage() {
                 {t("Furgocasa en cifras")}
               </h2>
               <p className="text-blue-100 text-lg">
-                {t("Más de una década compartiendo la pasión por viajar")}
+                Partageant la passion du voyage depuis {COMPANY.foundingDate}
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">12+</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{yearsExperience}+</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Años de experiencia")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">500+</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.stats.historicalBookings.toLocaleString('fr-FR')}+</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Viajes realizados")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">8</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.stats.currentFleetSize}</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Vehículos Premium")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.5</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.aggregateRating.ratingValue}</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Valoración Media")}</p>
               </div>
             </div>

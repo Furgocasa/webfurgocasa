@@ -7,6 +7,7 @@ import {
   Package, Globe, LineChart, PieChart, Server, Calendar,
   Award, TrendingDown, Lock, Unlock, Activity
 } from "lucide-react";
+import { COMPANY } from "@/lib/company";
 
 export function EscalabilidadClient() {
   return (
@@ -48,7 +49,7 @@ export function EscalabilidadClient() {
             
             <div className="prose prose-lg max-w-none">
               <p className="text-gray-700 text-lg leading-relaxed">
-                FURGOCASA ha alcanzado un punto de <strong>madurez operativa</strong> con una flota de 10 vehículos 
+                FURGOCASA ha alcanzado un punto de <strong>madurez operativa</strong> con una flota de {COMPANY.stats.currentFleetSize} vehículos 
                 y un modelo de negocio probado. Sin embargo, hemos identificado dos limitaciones estructurales que 
                 frenan nuestro crecimiento:
               </p>
@@ -127,7 +128,7 @@ export function EscalabilidadClient() {
               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
                   <Package className="h-10 w-10 text-blue-600" />
-                  <span className="text-3xl font-bold text-gray-900">10</span>
+                  <span className="text-3xl font-bold text-gray-900">{COMPANY.stats.currentFleetSize}</span>
                 </div>
                 <h3 className="font-heading font-bold text-gray-900 mb-2">Flota Actual</h3>
                 <p className="text-sm text-gray-600">Vehículos en operación</p>

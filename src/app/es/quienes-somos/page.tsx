@@ -162,12 +162,12 @@ export default async function LocaleQuienesSomosPage() {
                 {t("Furgocasa en cifras")}
               </h2>
               <p className="text-blue-100 text-lg">
-                {t("Más de una década compartiendo la pasión por viajar")}
+                {t("Compartiendo la pasión por viajar desde")} {COMPANY.foundingDate}
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">12+</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{yearsExperience}+</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Años de experiencia")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
@@ -175,11 +175,11 @@ export default async function LocaleQuienesSomosPage() {
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Viajes realizados")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">8</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.stats.currentFleetSize}</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Vehículos Premium")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.5</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.aggregateRating.ratingValue}</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Valoración Media")}</p>
               </div>
             </div>

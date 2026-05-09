@@ -73,6 +73,7 @@ export default async function LocaleQuienesSomosPage() {
   const locale: Locale = 'en'; // Locale fijo
   
   const t = (key: string) => translateServer(key, locale);
+  const yearsExperience = new Date().getFullYear() - parseInt(COMPANY.foundingDate, 10);
 
   return (
     <>
@@ -98,7 +99,7 @@ export default async function LocaleQuienesSomosPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                <strong>Who are we?</strong> Furgocasa is a family-run motorhome rental company in Murcia since {COMPANY.foundingDate}. More than 500 trips completed. Premium fleet with unlimited kilometres in Spain, rates from {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/day and pick-up in {COMPANY.rentalPolicy.pickupLocationsLabel}. Phone: {COMPANY.phoneDisplay}.
+                <strong>Who are we?</strong> Furgocasa is a family-run motorhome rental company in Murcia since {COMPANY.foundingDate}. More than {COMPANY.stats.historicalBookings.toLocaleString('en-US')} trips completed with a premium fleet of {COMPANY.stats.currentFleetSize} vehicles. Unlimited kilometres in Spain, rates from {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/day and pick-up in {COMPANY.rentalPolicy.pickupLocationsLabel}. Phone: {COMPANY.phoneDisplay}.
               </p>
             </div>
           </div>
@@ -158,24 +159,24 @@ export default async function LocaleQuienesSomosPage() {
                 {t("Furgocasa en cifras")}
               </h2>
               <p className="text-blue-100 text-lg">
-                {t("Más de una década compartiendo la pasión por viajar")}
+                Sharing the passion for travel since {COMPANY.foundingDate}
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 text-center">
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">12+</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{yearsExperience}+</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Años de experiencia")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">500+</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.stats.historicalBookings.toLocaleString('en-US')}+</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Viajes realizados")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">8</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.stats.currentFleetSize}</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Vehículos Premium")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">4.5</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.aggregateRating.ratingValue}</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Valoración Media")}</p>
               </div>
             </div>

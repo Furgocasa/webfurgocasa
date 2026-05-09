@@ -5,25 +5,25 @@ import type { Locale } from "@/lib/i18n/config";
 const ABOUT_JSONLD_COPY: Record<Locale, { name: string; description: string; orgDescription: string; slogan: string }> = {
   es: {
     name: "Sobre Furgocasa - Quiénes Somos",
-    description: "Furgocasa es una empresa familiar especializada en alquiler de autocaravanas y campers en Murcia desde 2017. Pasión por viajar, libertad para explorar.",
+    description: `Furgocasa es una empresa familiar especializada en alquiler de autocaravanas y campers en Murcia desde ${COMPANY.foundingDate}. Pasión por viajar, libertad para explorar.`,
     orgDescription: "Empresa familiar especializada en alquiler de autocaravanas y campers de gran volumen en Murcia.",
     slogan: "Furgocasa: flota premium desde 95€/día con kilómetros ilimitados",
   },
   en: {
     name: "About Furgocasa",
-    description: "Furgocasa is a family-run motorhome and campervan rental company based in Murcia since 2017.",
+    description: `Furgocasa is a family-run motorhome and campervan rental company based in Murcia since ${COMPANY.foundingDate}.`,
     orgDescription: "Family-run company specialising in premium motorhome and campervan rental in Murcia.",
     slogan: "Furgocasa: premium fleet from 95€/day with unlimited mileage",
   },
   fr: {
     name: "À propos de Furgocasa",
-    description: "Furgocasa est une entreprise familiale de location de camping-cars et vans à Murcie depuis 2017.",
+    description: `Furgocasa est une entreprise familiale de location de camping-cars et vans à Murcie depuis ${COMPANY.foundingDate}.`,
     orgDescription: "Entreprise familiale spécialisée dans la location premium de camping-cars et vans à Murcie.",
     slogan: "Furgocasa : flotte premium à partir de 95€/jour avec kilométrage illimité",
   },
   de: {
     name: "Über Furgocasa",
-    description: "Furgocasa ist ein familiengeführter Wohnmobil- und Campervermieter in Murcia seit 2017.",
+    description: `Furgocasa ist ein familiengeführter Wohnmobil- und Campervermieter in Murcia seit ${COMPANY.foundingDate}.`,
     orgDescription: "Familienunternehmen für die Premium-Vermietung von Wohnmobilen und Campervans in Murcia.",
     slogan: "Furgocasa: Premium-Flotte ab 95€/Tag mit unbegrenzten Kilometern",
   },
