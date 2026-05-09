@@ -295,6 +295,10 @@ export async function revertSelection(params: {
  *
  * Idempotente: si ya estaba descartada, devuelve `already_discarded`
  * y no escribe nada.
+ *
+ * Si la migración 20260509-storytellers-discarded.sql todavía no se ha
+ * aplicado (las columnas discarded_* no existen), devuelve un error
+ * `migration_pending` con mensaje explícito.
  */
 export async function discardUpload(params: {
   uploadId: string;
@@ -309,6 +313,12 @@ export async function discardUpload(params: {
     .eq("id", params.uploadId)
     .single();
 
+  if (fetchError) {
+    // 42703 = column does not exist → migración pendiente
+    if ((fetchError as { code?: string }).code === "42703") {
+      return { ok: false, reason: "migration_pending" };
+    }
+  }
   if (fetchError || !upload) {
     return { ok: false, reason: "upload_not_found" };
   }
@@ -332,6 +342,9 @@ export async function discardUpload(params: {
 
   if (updateError) {
     console.error("[storytellers/points] discardUpload update:", updateError);
+    if ((updateError as { code?: string }).code === "42703") {
+      return { ok: false, reason: "migration_pending" };
+    }
     return { ok: false, reason: "update_failed" };
   }
 

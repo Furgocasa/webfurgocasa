@@ -57,9 +57,19 @@ export async function POST(
 
     const result = await discardUpload({ uploadId: id, adminEmail, reason });
     if (!result.ok) {
+      const message =
+        result.reason === "migration_pending"
+          ? "La migración 20260509-storytellers-discarded.sql aún no se ha aplicado en Supabase. Aplícala antes de descartar."
+          : result.reason === "already_selected"
+          ? "Esta subida ya fue aprobada para archivo. Si quieres descartarla, primero revierte la selección."
+          : result.reason === "already_discarded"
+          ? "Esta subida ya estaba descartada."
+          : result.reason === "upload_not_found"
+          ? "Subida no encontrada."
+          : "No se pudo descartar.";
       return NextResponse.json(
-        { ok: false, error: result.reason },
-        { status: 400 }
+        { ok: false, error: message, reason: result.reason },
+        { status: result.reason === "migration_pending" ? 503 : 400 }
       );
     }
 
