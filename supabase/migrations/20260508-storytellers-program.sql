@@ -176,7 +176,7 @@ VALUES (
   'storyteller-uploads',
   'storyteller-uploads',
   FALSE,
-  524288000,  -- 500 MB (vídeo); foto se valida por endpoint a 50 MB
+  3221225472,  -- 3 GiB — alineado con MAX_VIDEO_SIZE_BYTES (vídeos iPhone 4K); ver 20260509-storytellers-bucket-3gb-limit.sql
   ARRAY[
     'image/jpeg',
     'image/jpg',
