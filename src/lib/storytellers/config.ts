@@ -128,6 +128,33 @@ export const ALLOWED_VIDEO_MIME_TYPES = [
   "video/x-quicktime",
 ] as const;
 
+/** Cuando el navegador no informa tipo (típico en Safari iOS con .mov desde Fotos). */
+const STORYTELLER_EXT_TO_MIME: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".heic": "image/heic",
+  ".heif": "image/heif",
+  ".webp": "image/webp",
+  ".mp4": "video/mp4",
+  ".mov": "video/quicktime",
+  ".qt": "video/quicktime",
+};
+
+/**
+ * MIME efectivo para validación y subida. Si `reportedMime` viene vacío (iPhone/Safari),
+ * infiere solo extensiones admitidas por el programa (p. ej. .mov → video/quicktime).
+ */
+export function storytellerEffectiveMime(filename: string, reportedMime: string): string {
+  const t = (reportedMime || "").trim();
+  if (t) return t;
+  const lower = filename.toLowerCase();
+  const dot = lower.lastIndexOf(".");
+  if (dot < 0) return "";
+  const ext = lower.slice(dot);
+  return STORYTELLER_EXT_TO_MIME[ext] ?? "";
+}
+
 // ============================================
 // VENTANA TEMPORAL DE SUBIDA
 // ============================================

@@ -19,6 +19,7 @@ import {
   MAX_VIDEOS_PER_BOOKING,
   MAX_VIDEO_SIZE_BYTES,
   MIN_PHOTOS_PER_UPLOAD_BATCH,
+  storytellerEffectiveMime,
 } from "@/lib/storytellers/config";
 import { executeRecaptchaEnterprise } from "@/lib/storytellers/recaptcha-browser";
 import {
@@ -85,7 +86,8 @@ type Step = "identify" | "briefing" | "upload" | "done";
 const ALL_PHOTO_MIME = ALLOWED_PHOTO_MIME_TYPES as readonly string[];
 const ALL_VIDEO_MIME = ALLOWED_VIDEO_MIME_TYPES as readonly string[];
 
-function isAcceptedMime(mime: string): "photo" | "video" | null {
+function fileKind(file: File): "photo" | "video" | null {
+  const mime = storytellerEffectiveMime(file.name, file.type);
   if (ALL_PHOTO_MIME.includes(mime)) return "photo";
   if (ALL_VIDEO_MIME.includes(mime)) return "video";
   return null;
@@ -200,11 +202,11 @@ export function UploaderFlow() {
   );
 
   const photoCount = useMemo(
-    () => files.filter((f) => isAcceptedMime(f.type) === "photo").length,
+    () => files.filter((f) => fileKind(f) === "photo").length,
     [files]
   );
   const videoCount = useMemo(
-    () => files.filter((f) => isAcceptedMime(f.type) === "video").length,
+    () => files.filter((f) => fileKind(f) === "video").length,
     [files]
   );
 
@@ -219,7 +221,7 @@ export function UploaderFlow() {
       const valid: File[] = [];
       const errors: string[] = [];
       for (const f of arr) {
-        const kind = isAcceptedMime(f.type);
+        const kind = fileKind(f);
         if (!kind) {
           errors.push(`${f.name}: formato no aceptado.`);
           continue;
@@ -577,7 +579,7 @@ export function UploaderFlow() {
               </div>
               <ul className="max-h-72 space-y-2 overflow-y-auto rounded-xl border border-gray-200 bg-white p-3">
                 {files.map((f, idx) => {
-                  const kind = isAcceptedMime(f.type);
+                  const kind = fileKind(f);
                   return (
                     <li
                       key={`${f.name}-${idx}`}

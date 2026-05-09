@@ -60,6 +60,7 @@ import {
   MAX_VIDEO_SIZE_BYTES,
   MIN_PHOTOS_PER_UPLOAD_BATCH,
   normalizeEmail,
+  storytellerEffectiveMime,
 } from "@/lib/storytellers/config";
 import { checkUploadCapacity } from "@/lib/storytellers/booking-validation";
 import {
@@ -73,7 +74,7 @@ const fileSchema = z.object({
   /** ID arbitrario del cliente (lo usa para mapear respuestas). */
   clientId: z.string().min(1).max(80),
   filename: z.string().min(1).max(300),
-  mimeType: z.string().min(1).max(120),
+  mimeType: z.string().max(120),
   sizeBytes: z.number().int().positive().max(10 * 1024 * 1024 * 1024), // hard cap 10 GB
   sha256: z.string().regex(/^[a-f0-9]{64}$/, "sha256 inválido"),
 });
@@ -135,7 +136,11 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const { sessionToken, files } = parsed.data;
+    const { sessionToken, files: rawFiles } = parsed.data;
+    const files = rawFiles.map((f) => ({
+      ...f,
+      mimeType: storytellerEffectiveMime(f.filename, f.mimeType),
+    }));
 
     const session = verifyUploadSessionToken(sessionToken);
     if (!session.ok) {
@@ -192,7 +197,7 @@ export async function POST(req: NextRequest) {
       newPhotos: photoCount,
       newVideos: videoCount,
     });
-    if (!cap.ok) {
+    if (cap.ok === false) {
       return NextResponse.json({ ok: false, error: cap.message }, { status: 400 });
     }
 

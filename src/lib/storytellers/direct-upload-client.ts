@@ -19,6 +19,7 @@
 "use client";
 
 import { createClient } from "@supabase/supabase-js";
+import { storytellerEffectiveMime } from "@/lib/storytellers/config";
 
 // ---------- Tipos públicos ----------
 
@@ -92,6 +93,16 @@ async function sha256OfFile(file: File): Promise<string> {
   return hexFromBuffer(digest);
 }
 
+/** Safari iOS a veces deja `File.type` vacío; Storage necesita un Content-Type coherente con el bucket. */
+function fileWithExplicitMime(file: File, mime: string): File {
+  if (file.type?.trim() || !mime) return file;
+  try {
+    return new File([file], file.name, { type: mime, lastModified: file.lastModified });
+  } catch {
+    return file;
+  }
+}
+
 function storageErrorStatus(err: unknown): number {
   if (err && typeof err === "object") {
     const o = err as { statusCode?: number; status?: number };
@@ -154,6 +165,8 @@ export async function directUpload({
     bytesUploaded: 0,
   }));
 
+  const effectiveMimes = files.map((f) => storytellerEffectiveMime(f.name, f.type));
+
   const fire = () => callbacks?.onProgress?.([...snapshot]);
   fire();
 
@@ -182,7 +195,7 @@ export async function directUpload({
         return {
           clientId: s.clientId,
           filename: files[i].name,
-          mimeType: files[i].type,
+          mimeType: effectiveMimes[i] ?? "",
           sizeBytes: files[i].size,
           sha256: hash,
         };
@@ -319,7 +332,9 @@ export async function directUpload({
     const reservation = reservedById.get(uploadId);
     if (!reservation) return;
     const { idx, path, signedToken } = reservation;
-    const file = files[idx];
+    const raw = files[idx];
+    const mime = effectiveMimes[idx] ?? "";
+    const file = fileWithExplicitMime(raw, mime);
 
     snapshot[idx].status = "uploading";
     snapshot[idx].percent = 10;
@@ -329,12 +344,12 @@ export async function directUpload({
     // eslint-disable-next-line no-console
     console.info(
       "[direct-upload] SDK upload",
-      file.name,
-      `(${(file.size / 1024 / 1024).toFixed(1)} MB) →`,
+      raw.name,
+      `(${(raw.size / 1024 / 1024).toFixed(1)} MB) →`,
       `${bucket}/${path}`
     );
 
-    const r = await uploadViaSupabaseSdk({
+    const uploadResult = await uploadViaSupabaseSdk({
       supabaseUrl,
       anonKey,
       bucket,
@@ -343,54 +358,64 @@ export async function directUpload({
       file,
     });
 
-    if (r.ok) {
-      snapshot[idx].status = "uploaded";
-      snapshot[idx].percent = 100;
-      snapshot[idx].bytesUploaded = file.size;
+    if (uploadResult.ok === false) {
+      const { status, body } = uploadResult;
+
+      // eslint-disable-next-line no-console
+      console.error("[direct-upload] SDK error", raw.name, status, body);
+
+      let userMsg: string;
+      const bodyLow = body.toLowerCase();
+      const looksLikeStorageMaxSize =
+        status === 413 ||
+        bodyLow.includes("maximum allowed size") ||
+        bodyLow.includes("exceeded the maximum") ||
+        (bodyLow.includes("exceeded") && bodyLow.includes("size")) ||
+        bodyLow.includes("too large");
+      const looksLikeMime =
+        bodyLow.includes("mime") ||
+        bodyLow.includes("content-type") ||
+        bodyLow.includes("invalid type") ||
+        bodyLow.includes("not allowed");
+
+      if (status === 401 || status === 403) {
+        userMsg = "Permisos denegados por el almacenamiento. Recarga la página y vuelve a intentarlo.";
+      } else if (looksLikeMime) {
+        userMsg =
+          "El servidor no aceptó el tipo de archivo enviado. Si es un vídeo del iPhone (.mov), actualiza la página y vuelve a intentarlo; si sigue fallando, exporta el clip como MP4 desde Fotos y súbelo así.";
+      } else if (looksLikeStorageMaxSize) {
+        const mb = (raw.size / (1024 * 1024)).toFixed(1);
+        userMsg =
+          `Tu vídeo pesa ~${mb} MB y Supabase lo rechaza: el bucket «storyteller-uploads» tiene un «tamaño máximo por archivo» demasiado bajo ` +
+          `(por defecto 50 MB si lo creaste a mano, u otro límite antiguo). En Supabase: ejecuta la migración ` +
+          `supabase/migrations/20260509-storytellers-bucket-3gb-limit.sql (SQL Editor) para subirlo a 3 GB, ` +
+          `o Dashboard → Storage → bucket → límites.`;
+      } else if (status >= 500) {
+        userMsg = `Error temporal en el servidor (HTTP ${status}). Reintenta en unos minutos.`;
+      } else if (body.toLowerCase().includes("network")) {
+        userMsg =
+          "No se pudo completar la subida. Tu red parece inestable: prueba con WiFi o donde tengas mejor cobertura, y vuelve a intentarlo.";
+      } else {
+        userMsg = `Error subiendo el archivo (HTTP ${status}). ${body.slice(0, 120)}`;
+      }
+
+      snapshot[idx].status = "error";
+      snapshot[idx].message = userMsg;
       fire();
-      results.push({ uploadId, path, success: true });
+      results.push({
+        uploadId,
+        path,
+        success: false,
+        errorMessage: userMsg,
+      });
       return;
     }
 
-    // eslint-disable-next-line no-console
-    console.error("[direct-upload] SDK error", file.name, r.status, r.body);
-
-    let userMsg: string;
-    const bodyLow = r.body.toLowerCase();
-    const looksLikeStorageMaxSize =
-      r.status === 413 ||
-      bodyLow.includes("maximum allowed size") ||
-      bodyLow.includes("exceeded the maximum") ||
-      (bodyLow.includes("exceeded") && bodyLow.includes("size")) ||
-      bodyLow.includes("too large");
-
-    if (r.status === 401 || r.status === 403) {
-      userMsg = "Permisos denegados por el almacenamiento. Recarga la página y vuelve a intentarlo.";
-    } else if (looksLikeStorageMaxSize) {
-      const mb = (file.size / (1024 * 1024)).toFixed(1);
-      userMsg =
-        `Tu vídeo pesa ~${mb} MB y Supabase lo rechaza: el bucket «storyteller-uploads» tiene un «tamaño máximo por archivo» demasiado bajo ` +
-        `(por defecto 50 MB si lo creaste a mano, u otro límite antiguo). En Supabase: ejecuta la migración ` +
-        `supabase/migrations/20260509-storytellers-bucket-3gb-limit.sql (SQL Editor) para subirlo a 3 GB, ` +
-        `o Dashboard → Storage → bucket → límites.`;
-    } else if (r.status >= 500) {
-      userMsg = `Error temporal en el servidor (HTTP ${r.status}). Reintenta en unos minutos.`;
-    } else if (r.body.toLowerCase().includes("network")) {
-      userMsg =
-        "No se pudo completar la subida. Tu red parece inestable: prueba con WiFi o donde tengas mejor cobertura, y vuelve a intentarlo.";
-    } else {
-      userMsg = `Error subiendo el archivo (HTTP ${r.status}). ${r.body.slice(0, 120)}`;
-    }
-
-    snapshot[idx].status = "error";
-    snapshot[idx].message = userMsg;
+    snapshot[idx].status = "uploaded";
+    snapshot[idx].percent = 100;
+    snapshot[idx].bytesUploaded = raw.size;
     fire();
-    results.push({
-      uploadId,
-      path,
-      success: false,
-      errorMessage: userMsg,
-    });
+    results.push({ uploadId, path, success: true });
   }
 
   const queue = [...reservedById.keys()];
