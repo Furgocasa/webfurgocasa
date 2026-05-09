@@ -2,7 +2,7 @@
 
 > **Super prompt para implementación.** Este documento recoge el modelo cerrado de generación y captación de contenido para FURGOCASA, fruto de la conversación de estrategia del 8 de mayo de 2026. Sirve como referencia única para retomar el trabajo en sesiones futuras.
 >
-> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **(9 may 2026)** anti-duplicados por SHA-256 + cupón con código personalizado tipo `NARPAR05` + briefing con galería de lo ya subido (§3.5-bis/ter/quater) · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
+> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **(9 may 2026)** anti-duplicados por SHA-256 + cupón con código personalizado tipo `STO-NARPAR05` (mantiene prefijo `STO-` para enrutado en checkout) + briefing con galería de lo ya subido (§3.5-bis/ter/quater) · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
 
 ---
 
@@ -187,15 +187,19 @@ Definición en código: `PERK_TIERS` en `src/lib/storytellers/config.ts` (campos
 
 ### 3.5-bis. Formato del código del cupón (mayo 2026)
 
-El código del cupón es **personalizado por cliente** para que sea fácil de recordar y de teclear:
+El código del cupón es **personalizado por cliente** para que sea fácil de recordar y de teclear, **manteniendo siempre el prefijo `STO-`** que usa el checkout para enrutar el cupón a la tabla `storyteller_coupons` (en vez de a la `coupons` general).
 
-- **Formato:** `{NOM3}{APE3}{PCT2}` — 3 letras del nombre + 3 letras del primer apellido + el % en 2 dígitos.
-- **Ejemplos:** Narciso Pardo Buendía con 5% → `NARPAR05`; Ana López con 10% → `ANALOP10`.
-- **Limpieza:** quitamos acentos, ñ, espacios y cualquier carácter no A-Z. Si el nombre o apellido tiene menos de 3 letras, rellenamos con X (ej. Yi Wu → `YIXWUX15`).
-- **Colisiones (mismo nombre+apellido+%):** se añade un sufijo aleatorio corto (ej. `NARPAR05-K3`).
-- **Sin nombre disponible:** fallback al formato aleatorio histórico `STO-AB12-XY34` (sigue funcionando porque el endpoint de canje compara por `code`, no por prefijo).
+- **Formato:** `STO-{NOM3}{APE3}{PCT2}` — prefijo + 3 letras del nombre + 3 letras del primer apellido + el % en 2 dígitos.
+- **Ejemplos:** Narciso Pardo Buendía con 5% → `STO-NARPAR05`; Ana López con 10% → `STO-ANALOP10`.
+- **Limpieza:** quitamos acentos, ñ, espacios y cualquier carácter no A-Z. Si el nombre o apellido tiene menos de 3 letras, rellenamos con X (ej. Yi Wu con 15% → `STO-YIXWUX15`).
+- **Colisiones (mismo nombre+apellido+%):** se añade un sufijo aleatorio corto (ej. `STO-NARPAR05-K3`).
+- **Sin nombre disponible:** fallback al formato aleatorio histórico `STO-AB12-XY34`.
+
+⚠️ **IMPORTANTE:** el prefijo `STO-` es el contrato con el checkout. Los archivos `src/app/api/coupons/validate/route.ts` y `src/app/api/bookings/create/route.ts` detectan cupones Storyteller por este prefijo y los enrutan a `validateCouponForBooking` / `markCouponUsed` en `src/lib/storytellers/points.ts`. **No quitar el prefijo bajo ningún concepto.** La constante está exportada en `src/lib/storytellers/config.ts` como `STORYTELLER_COUPON_PREFIX`.
 
 Implementación: `generateCustomerCouponCode(name, pct, suffix?)` y `randomCouponSuffix()` en `src/lib/storytellers/config.ts`. Las funciones `syncCouponWithBalance` y `createInstantFirstUploadCouponIfNeeded` aceptan `customerName` opcional; si no se les pasa, lo recuperan del último booking conocido por email.
+
+**¿Por qué no se crean en la tabla `coupons` general (`/administrator/cupones`)?** Los cupones Storyteller tienen reglas propias (techo 15%, periodos bloqueados de temporada alta, mínimo 4 días, un solo cupón activo por email, supersedencia automática al cruzar umbrales) que no encajan en el modelo simple `gift/permanent` de la tabla `coupons`. Por eso viven en `storyteller_coupons` con su propia lógica de generación, validación y canje. La separación está confirmada en §9 (decisiones congeladas) y se ha mantenido en mayo 2026.
 
 ### 3.5-ter. Anti-duplicados de subidas (mayo 2026)
 
@@ -907,4 +911,4 @@ Si en algún momento se introducen cualquiera de estos elementos, hay que reabri
 
 ---
 
-**Última actualización del documento:** 9 de mayo de 2026 (anti-duplicados por SHA-256 en `storyteller_uploads.file_hash`, cupón con código personalizado `NARPAR05`, briefing con bloque puntos+cupón y galería de lo ya subido — §3.5-bis/ter/quater).
+**Última actualización del documento:** 9 de mayo de 2026 (anti-duplicados por SHA-256 en `storyteller_uploads.file_hash`, cupón con código personalizado `STO-NARPAR05` — **mantiene prefijo `STO-` por contrato con checkout**, briefing con bloque puntos+cupón y galería de lo ya subido — §3.5-bis/ter/quater).

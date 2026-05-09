@@ -315,18 +315,30 @@ function splitFirstLast(customerName: string | null | undefined): {
 }
 
 /**
- * Genera un código de cupón "personalizado" basado en el nombre del cliente
- * y el % de descuento.
+ * Prefijo común a TODOS los cupones generados por el programa Storytellers.
  *
- * Formato: `{NOM3}{APE3}{PCT2}` (ej. `NARPAR05`, `ANALOP10`, `SIMNUN15`).
+ * IMPORTANTE: el endpoint `/api/coupons/validate` y la creación de reservas
+ * detectan los cupones Storyteller por este prefijo y los enrutan a la tabla
+ * `storyteller_coupons` (en vez de la tabla `coupons` general).
+ * Si se modifica este prefijo, hay que actualizar también:
+ *   - src/app/api/coupons/validate/route.ts (STORYTELLER_COUPON_PREFIX)
+ *   - src/app/api/bookings/create/route.ts (misma constante)
+ */
+export const STORYTELLER_COUPON_PREFIX = "STO-";
+
+/**
+ * Genera un código de cupón "personalizado" basado en el nombre del cliente
+ * y el % de descuento, manteniendo el prefijo `STO-` para que el checkout
+ * lo enrute al sistema Storytellers.
+ *
+ * Formato: `STO-{NOM3}{APE3}{PCT2}` (ej. `STO-NARPAR05`, `STO-ANALOP10`).
  *
  * - Quita acentos, ñ, espacios y cualquier carácter no A-Z.
  * - Si nombre o apellido tiene <3 letras, rellena con X.
- * - Si no hay nombre disponible, usa `XXXXXX{PCT2}` y conviene reintentar
- *   con el código aleatorio de `generateCouponCode()` si hay colisión.
+ * - Si no hay nombre disponible, devuelve `STO-XXXXXX{PCT2}`.
  *
  * Si se proporciona `suffix`, se añade al final separado por guion.
- * Útil para resolver colisiones (`NARPAR05-K3`).
+ * Útil para resolver colisiones (`STO-NARPAR05-K3`).
  *
  * NOTA: el código no es secreto, es legible para el cliente. Es esperable
  * que dos clientes con mismo nombre+apellido y mismo % colisionen — ese
@@ -340,7 +352,7 @@ export function generateCustomerCouponCode(
 ): string {
   const { first, last } = splitFirstLast(customerName);
   const pctTwo = String(Math.max(0, Math.min(99, Math.round(pct)))).padStart(2, "0");
-  const base = `${first}${last}${pctTwo}`;
+  const base = `${STORYTELLER_COUPON_PREFIX}${first}${last}${pctTwo}`;
   if (suffix && suffix.length > 0) {
     return `${base}-${suffix.toUpperCase().slice(0, 4)}`;
   }
