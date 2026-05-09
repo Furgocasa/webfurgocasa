@@ -44,7 +44,14 @@ export async function POST(req: NextRequest) {
 
     const captcha = await verifyRecaptcha(parsed.data.recaptchaToken, "storytellers_magic");
     if (!captcha.ok) {
-      return NextResponse.json(GENERIC_RESPONSE);
+      console.warn("[storytellers/request-magic-link] recaptcha_failed (BYPASSED)", {
+        reason: captcha.reason,
+        score: captcha.score,
+        mode: captcha.mode,
+        hasToken: Boolean(parsed.data.recaptchaToken),
+      });
+      // TEMPORAL: Bypasseamos el error para no bloquear a los clientes.
+      // Ya estamos protegidos por: rate-limit IP y Honeypot.
     }
 
     const email = normalizeEmail(parsed.data.email);
