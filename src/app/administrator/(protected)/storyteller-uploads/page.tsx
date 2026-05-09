@@ -5,6 +5,7 @@ import {
   AlertCircle,
   Ban,
   CheckCircle2,
+  Download,
   Image as ImageIcon,
   Loader2,
   RefreshCw,
@@ -20,7 +21,7 @@ interface UploadItem {
   customerEmail: string;
   customerName: string | null;
   fileType: "photo" | "video";
-  fileMimeType: string;
+  fileMimeType: string | null;
   fileSizeBytes: number;
   originalFilename: string | null;
   uploadedAt: string;
@@ -36,6 +37,84 @@ interface UploadItem {
   pickupDate: string | null;
   dropoffDate: string | null;
   previewUrl: string | null;
+}
+
+/**
+ * Vídeos .mov del iPhone suelen ir en HEVC/H.265. Chrome y Edge en Windows no los reproducen
+ * en el elemento HTML video (pantalla negra, 0:00). Safari y VLC sí. Mostramos aviso + descarga firmada.
+ */
+function StorytellerAdminVideo({
+  previewUrl,
+  originalFilename,
+  fileMimeType,
+  variant,
+}: {
+  previewUrl: string;
+  originalFilename: string | null;
+  fileMimeType: string | null;
+  variant: "thumbnail" | "modal";
+}) {
+  const [decodeError, setDecodeError] = useState(false);
+
+  useEffect(() => {
+    setDecodeError(false);
+  }, [previewUrl]);
+
+  const videoClass =
+    variant === "thumbnail"
+      ? "h-full w-full object-cover"
+      : "max-h-[85vh] max-w-full bg-black";
+
+  return (
+    <div className={variant === "thumbnail" ? "relative h-full min-h-[120px] w-full" : "relative"}>
+      <video
+        key={previewUrl}
+        src={previewUrl}
+        className={videoClass}
+        controls={variant === "modal"}
+        preload="metadata"
+        playsInline
+        muted={variant === "thumbnail"}
+        onError={() => setDecodeError(true)}
+        onLoadedMetadata={(e) => {
+          const v = e.currentTarget;
+          // Algunos navegadores no disparan error con HEVC pero dejan dimensiones en 0.
+          if (Number.isFinite(v.duration) && v.duration > 0 && v.videoWidth === 0 && v.videoHeight === 0) {
+            setDecodeError(true);
+          }
+        }}
+      />
+      {decodeError && (
+        <div
+          className={
+            variant === "thumbnail"
+              ? "absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-900/92 p-3 text-center text-white"
+              : "absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/88 p-6 text-center text-white"
+          }
+        >
+          <Video className={variant === "thumbnail" ? "h-9 w-9 shrink-0 opacity-85" : "h-11 w-11 shrink-0 opacity-85"} />
+          <p className="max-w-md text-xs leading-snug md:text-sm">
+            Este navegador no reproduce bien los vídeos QuickTime (.mov) típicos del iPhone (códec{" "}
+            <strong>HEVC</strong>). La subida es correcta: prueba en <strong>Safari</strong> (Mac/iPad),
+            o descarga el archivo y ábrelo con <strong>VLC</strong> o el visor de fotos del sistema.
+          </p>
+          <a
+            href={previewUrl}
+            download={originalFilename || "video.mov"}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-100 md:text-sm"
+          >
+            <Download className="h-4 w-4 shrink-0" aria-hidden />
+            Descargar vídeo
+          </a>
+          {fileMimeType ? (
+            <span className="text-[10px] text-white/70">{fileMimeType}</span>
+          ) : null}
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface ListResponse {
@@ -448,11 +527,11 @@ function UploadCard({
             className="h-full w-full object-cover"
           />
         ) : item.fileType === "video" && item.previewUrl ? (
-          <video
-            src={item.previewUrl}
-            className="h-full w-full object-cover"
-            preload="metadata"
-            muted
+          <StorytellerAdminVideo
+            previewUrl={item.previewUrl}
+            originalFilename={item.originalFilename}
+            fileMimeType={item.fileMimeType}
+            variant="thumbnail"
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center text-gray-400">
@@ -602,10 +681,11 @@ function PreviewModal({ item, onClose }: { item: UploadItem; onClose: () => void
             className="max-h-[85vh] max-w-full"
           />
         ) : item.fileType === "video" && item.previewUrl ? (
-          <video
-            src={item.previewUrl}
-            controls
-            className="max-h-[85vh] max-w-full"
+          <StorytellerAdminVideo
+            previewUrl={item.previewUrl}
+            originalFilename={item.originalFilename}
+            fileMimeType={item.fileMimeType}
+            variant="modal"
           />
         ) : (
           <div className="p-12 text-center text-gray-500">No hay preview disponible.</div>

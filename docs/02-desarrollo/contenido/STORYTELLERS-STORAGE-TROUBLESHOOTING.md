@@ -104,7 +104,21 @@ Para depuración en cliente, la consola registra líneas `[direct-upload]` (nomb
 
 ---
 
-## 7. Resumen ejecutivo para no-técnicos
+## 7. Panel admin (`/administrator/storyteller-uploads`): vídeo negro o sin miniatura
+
+Las URLs firmadas y el archivo en Storage pueden estar **perfectos** y aun así el reproductor HTML muestre **pantalla negra** y **0:00**.
+
+**Causa habitual:** los `.mov` del iPhone suelen llevar vídeo **HEVC (H.265)** dentro de un contenedor QuickTime. **Chrome y Edge en Windows** (y muchos Chromium en escritorio) **no decodifican HEVC** en el elemento `<video>`. Safari (macOS/iOS) y reproductores como VLC sí.
+
+**Qué hace el código:** el panel muestra un aviso y un botón **Descargar vídeo** (misma URL firmada) cuando detecta error de reproducción o metadatos sin dimensiones de vídeo (`StorytellerAdminVideo` en `storyteller-uploads/page.tsx`).
+
+**Operativa:** revisar el clip en Safari / descargar y abrir en VLC; no indica archivo corrupto en Storage.
+
+**Si en el futuro se quisiera preview universal en Chromium:** haría falta **transcodificación** servidor-side (p. ej. a H.264/MP4) u otro visor — fuera del alcance actual del panel.
+
+---
+
+## 8. Resumen ejecutivo para no-técnicos
 
 - Hay que tener **plan suficiente** y **Storage configurado** (global + bucket).  
 - Con **Spend cap** activo, Supabase puede **limitar el tamaño de los uploads** aunque pongas gigabytes en el formulario.  
