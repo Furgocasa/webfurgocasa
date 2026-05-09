@@ -112,6 +112,10 @@ interface UploadEntryReady {
   status: "ready";
   path: string;
   uploadId: string;
+  /** URL firmada para subir directamente (PUT único, sin chunking). */
+  signedUrl: string;
+  /** Token a presentar en el header `x-upsert` o como query param. */
+  signedToken: string;
 }
 interface UploadEntryRejected {
   clientId: string;
@@ -235,8 +239,34 @@ export async function POST(req: NextRequest) {
       const ext = getMimeExtension(f.mimeType, f.filename);
       const path = `bookings/${session.bookingId}/${uploadId}.${ext}`;
 
+      // Generamos una signed upload URL por archivo: el cliente la usará
+      // para hacer un PUT/POST único al endpoint de Supabase Storage sin
+      // necesitar autenticación. Es válida 2 horas (suficiente para subir
+      // hasta 3 GB en una conexión razonable).
+      const { data: signed, error: signedError } = await supabase.storage
+        .from(STORAGE_BUCKET)
+        .createSignedUploadUrl(path);
+
+      if (signedError || !signed) {
+        console.error("[storytellers/upload-init] createSignedUploadUrl error:", signedError);
+        entries.push({
+          clientId: f.clientId,
+          status: "rejected",
+          reason: "No se pudo preparar el almacenamiento. Inténtalo en unos segundos.",
+          reasonCode: "quota",
+        });
+        continue;
+      }
+
       seenInBatch.add(f.sha256);
-      entries.push({ clientId: f.clientId, status: "ready", path, uploadId });
+      entries.push({
+        clientId: f.clientId,
+        status: "ready",
+        path,
+        uploadId,
+        signedUrl: signed.signedUrl,
+        signedToken: signed.token,
+      });
       reserved.push({
         uploadId,
         path,

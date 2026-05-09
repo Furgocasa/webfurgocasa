@@ -1,30 +1,28 @@
 /**
- * Storytellers · Direct upload client
+ * Storytellers · Direct upload client (PUT único, sin chunking)
  *
- * Encapsula el flujo de subida directa cliente → Supabase Storage:
+ * Encapsula el flujo de subida directa cliente → Supabase Storage usando
+ * **signed upload URLs**:
  *
  *   1) Hash SHA-256 de cada archivo en el navegador (WebCrypto).
- *   2) POST /api/storytellers/upload-init → reserva paths y obtiene ticket.
- *   3) Subida de cada archivo con tus-js-client al endpoint resumable de
- *      Supabase Storage. Si la red se cae, tus reanuda automáticamente.
+ *   2) POST /api/storytellers/upload-init → reserva paths, signed URLs y
+ *      ticket HMAC.
+ *   3) Cada archivo se sube en UN SOLO PUT al signed URL de Supabase. Si la
+ *      red se cae a mitad, el archivo se da por fallido y el usuario debe
+ *      reintentar. Sin chunking ni reanudación: simple y robusto.
  *   4) POST /api/storytellers/upload-confirm con ticket + resultados.
  *
- * Solo se usa desde el navegador. El servidor jamás invoca este módulo.
- *
- * Por qué SHA-256 en cliente
- * --------------------------
- * El servidor antiguo (`/api/storytellers/upload`) recibía el archivo y le
- * calculaba el hash en server. Ahora el archivo va de cliente a Supabase y
- * el servidor nunca lo ve, así que el cliente lo declara. La integridad
- * está protegida por el ticket HMAC + verificación de tamaño en /confirm.
- * Para fraude masivo daría igual: la única "ventaja" sería duplicar puntos,
- * pero los puntos están topados a 1500 totales y los cupones tienen
- * temporadas bloqueadas.
+ * Por qué descartamos tus
+ * -----------------------
+ * Probamos primero `tus-js-client` con chunking + reanudación, pero los
+ * PATCH intermedios fallaban en producción (CORS / auth) y el cliente
+ * entraba en bucle de "reanudando reanudando" sin avanzar. Con PUT único
+ * la subida o va o no va, y el usuario ve un error claro y puede
+ * reintentar. Se mantiene la concurrencia (2 archivos a la vez) para no
+ * saturar 4G.
  */
 
 "use client";
-
-import * as tus from "tus-js-client";
 
 // ---------- Tipos públicos ----------
 
@@ -33,7 +31,6 @@ export type FileStatus =
   | "hashing"
   | "ready"          // /init devolvió "ready", esperando turno de subida
   | "uploading"
-  | "retrying"
   | "uploaded"       // archivo en Storage; pendiente de /confirm
   | "rejected"       // rechazado por /init o /confirm
   | "error"          // error transitorio del cliente
@@ -95,8 +92,6 @@ interface DirectUploadOptions {
   files: File[];
   sessionToken: string;
   callbacks?: DirectUploadCallbacks;
-  /** Tamaño de chunk para tus, default 6 MB. Vercel/Cloudfront-friendly. */
-  chunkSizeBytes?: number;
 }
 
 // ---------- Helpers internos ----------
@@ -112,8 +107,7 @@ function hexFromBuffer(buf: ArrayBuffer): string {
 
 /**
  * SHA-256 de un File usando WebCrypto. Para archivos hasta ~1 GB en móviles
- * modernos. Por encima podría dar problemas de memoria (raro en Storytellers,
- * pero documentado en docs/02-desarrollo/contenido/GUIA_CONTENIDO.md).
+ * modernos. Por encima podría dar problemas de memoria.
  */
 async function sha256OfFile(file: File): Promise<string> {
   const buf = await file.arrayBuffer();
@@ -122,27 +116,65 @@ async function sha256OfFile(file: File): Promise<string> {
 }
 
 /**
- * Codifica strings a base64 para Upload-Metadata de tus (formato:
- * `key base64value,key base64value`). Lo hace tus-js-client por debajo,
- * pero nos sirve para verificar mentalmente el wire format.
+ * Sube `file` a la signed URL de Supabase Storage en una sola request PUT.
+ * Usa XHR para tener `progress` events nativos. Si la red se corta, el
+ * archivo se da por fallido (no hay reanudación).
+ *
+ * Convención del endpoint signed de Supabase:
+ *   - PUT al signedUrl con el body como Blob.
+ *   - Header `x-upsert: false` para no sobrescribir.
+ *   - Header `Content-Type` con el MIME del archivo.
+ *   - El token de auth ya viene incrustado en la URL firmada.
  */
-// (no usado — tus-js-client maneja el encoding)
+function putToSignedUrl(
+  signedUrl: string,
+  file: File,
+  onProgress: (bytesUploaded: number) => void
+): Promise<{ ok: true } | { ok: false; status: number; body: string }> {
+  return new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", signedUrl, true);
+    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.setRequestHeader("cache-control", "3600");
+
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded);
+    };
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve({ ok: true });
+      } else {
+        resolve({
+          ok: false,
+          status: xhr.status,
+          body: (xhr.responseText || "").slice(0, 500),
+        });
+      }
+    };
+    xhr.onerror = () => {
+      // Sin status: típico de CORS, DNS, sin red, o navegador abortó.
+      resolve({ ok: false, status: 0, body: "Network error" });
+    };
+    xhr.ontimeout = () => {
+      resolve({ ok: false, status: 0, body: "Timeout" });
+    };
+    // Timeout generoso: 5 min para vídeos grandes con red regular.
+    xhr.timeout = 5 * 60 * 1000;
+
+    xhr.send(file);
+  });
+}
 
 // ---------- Núcleo ----------
 
 /**
- * Ejecuta el flujo completo de subida directa. Lanza si /upload-init falla
- * de forma fatal; en ese caso `summary` viene null y `files[]` lleva el
- * estado parcial.
+ * Ejecuta el flujo completo de subida directa.
  */
 export async function directUpload({
   files,
   sessionToken,
   callbacks,
-  // 4 MB es el sweet spot para 4G. 6 MB suele tardar más de 30 s por chunk
-  // en 4G real y tus se queda en limbo. Si quieres más throughput con WiFi,
-  // pásalo desde el caller.
-  chunkSizeBytes = 4 * 1024 * 1024,
 }: DirectUploadOptions): Promise<DirectUploadFinalSummary> {
   const snapshot: FileProgress[] = files.map((f, i) => ({
     clientId: `f${i}-${f.name.slice(0, 40)}`,
@@ -156,17 +188,13 @@ export async function directUpload({
   const fire = () => callbacks?.onProgress?.([...snapshot]);
   fire();
 
-  // 1) Hashing en paralelo de TODOS los archivos. Es rápido en fotos, lento
-  //    en vídeos (5–15 s en un iPhone moderno por cada 100 MB). Se hace en
-  //    serie para no saturar memoria si hay varios vídeos grandes.
+  // 1) Hashing en serie (no saturar memoria).
   for (let i = 0; i < files.length; i++) {
     snapshot[i].status = "hashing";
     snapshot[i].percent = 0;
     fire();
     try {
       const hash = await sha256OfFile(files[i]);
-      // Guardamos el hash en una propiedad temporal — usamos clientId como
-      // clave para el siguiente paso (mapear con la respuesta de /init).
       (snapshot[i] as FileProgress & { _sha256: string })._sha256 = hash;
       snapshot[i].percent = 100;
       snapshot[i].status = "ready";
@@ -178,7 +206,7 @@ export async function directUpload({
     fire();
   }
 
-  // 2) /upload-init con los archivos que sí han hasheado.
+  // 2) /upload-init.
   const initBody = {
     sessionToken,
     files: snapshot
@@ -237,24 +265,29 @@ export async function directUpload({
     return summary;
   }
 
-  const { ticket, supabaseUrl, anonKey, bucket, uploads } = initJson as {
+  const { ticket, uploads } = initJson as {
     ticket: string | null;
-    supabaseUrl: string;
-    anonKey: string;
-    bucket: string;
     uploads: Array<{
       clientId: string;
       status: "ready" | "rejected";
       path?: string;
       uploadId?: string;
+      signedUrl?: string;
+      signedToken?: string;
       reason?: string;
       reasonCode?: string;
     }>;
   };
 
-  // Mapeamos cada respuesta a su progreso correspondiente.
+  // Mapeamos respuesta → snapshot por clientId.
   const initByClient = new Map(uploads.map((u) => [u.clientId, u]));
-  const reservedById = new Map<string, { uploadId: string; path: string; idx: number }>();
+  interface Reservation {
+    uploadId: string;
+    path: string;
+    signedUrl: string;
+    idx: number;
+  }
+  const reservedById = new Map<string, Reservation>();
 
   for (let i = 0; i < snapshot.length; i++) {
     const r = initByClient.get(snapshot[i].clientId);
@@ -263,8 +296,13 @@ export async function directUpload({
       snapshot[i].status = "rejected";
       snapshot[i].message = r.reason;
       snapshot[i].reasonCode = r.reasonCode;
-    } else if (r.status === "ready" && r.uploadId && r.path) {
-      reservedById.set(r.uploadId, { uploadId: r.uploadId, path: r.path, idx: i });
+    } else if (r.status === "ready" && r.uploadId && r.path && r.signedUrl) {
+      reservedById.set(r.uploadId, {
+        uploadId: r.uploadId,
+        path: r.path,
+        signedUrl: r.signedUrl,
+        idx: i,
+      });
     }
   }
   fire();
@@ -296,8 +334,8 @@ export async function directUpload({
     return summary;
   }
 
-  // 3) Subida tus de cada archivo. Lo hacemos con concurrencia limitada
-  //    (2 a la vez) para no saturar la red móvil.
+  // 3) Subida de cada archivo en un único PUT. Concurrencia 2 para no
+  //    saturar 4G; cada archivo va entero, sin chunking.
   const CONCURRENCY = 2;
   const results: Array<{
     uploadId: string;
@@ -306,156 +344,71 @@ export async function directUpload({
     errorMessage?: string;
   }> = [];
 
-  const tusEndpoint = `${supabaseUrl}/storage/v1/upload/resumable`;
-
   async function uploadOne(uploadId: string): Promise<void> {
     const reservation = reservedById.get(uploadId);
     if (!reservation) return;
-    const { idx, path } = reservation;
+    const { idx, path, signedUrl } = reservation;
     const file = files[idx];
+
     snapshot[idx].status = "uploading";
     snapshot[idx].percent = 0;
     snapshot[idx].bytesUploaded = 0;
     fire();
 
-    return new Promise<void>((resolve) => {
-      // Track del último response HTTP para diagnosticar (401/403/5xx) sin
-      // tener que abrir DevTools en móvil.
-      let lastStatus = 0;
-      let lastResponseBody = "";
+    // eslint-disable-next-line no-console
+    console.info(
+      "[direct-upload] subiendo",
+      file.name,
+      `(${(file.size / 1024 / 1024).toFixed(1)} MB) →`,
+      path
+    );
 
-      const upload = new tus.Upload(file, {
-        endpoint: tusEndpoint,
-        // 4 reintentos con backoff suave: ~10 s totales como máximo. Con
-        // más, el usuario ve "reanudando" mucho rato y se asusta.
-        retryDelays: [0, 1500, 3500, 7000],
-        chunkSize: chunkSizeBytes,
-        // Mantenemos el fingerprint en localStorage para reanudar tras
-        // recargar la pestaña. tus borra el fingerprint en éxito.
-        removeFingerprintOnSuccess: true,
-        uploadDataDuringCreation: true,
-        headers: {
-          // El ejemplo oficial de Supabase usa SOLO authorization. Mandar
-          // también `apikey` provocaba que algunos endpoints intermedios
-          // descartaran la sesión y rechazaran los PATCH.
-          authorization: `Bearer ${anonKey}`,
-          // x-upsert=false para no permitir sobrescribir un objeto
-          // existente desde el cliente (defensa adicional: el path es
-          // un UUID nuevo, así que nunca debería existir).
-          "x-upsert": "false",
-        },
-        metadata: {
-          bucketName: bucket,
-          objectName: path,
-          contentType: file.type,
-          cacheControl: "3600",
-        },
-        onError(err) {
-          const message = err instanceof Error ? err.message : String(err);
-          // Si el último response fue 401/403, no vale la pena seguir.
-          // Lo notificamos con un mensaje específico para el usuario.
-          let userMessage = "Error subiendo este archivo: " + message;
-          if (lastStatus === 401 || lastStatus === 403) {
-            userMessage =
-              "Permisos denegados por el almacenamiento. Recarga la página y vuelve a intentarlo. " +
-              `(HTTP ${lastStatus})`;
-          } else if (lastStatus === 413) {
-            userMessage = "El archivo es demasiado grande para el almacenamiento.";
-          } else if (lastStatus >= 500) {
-            userMessage =
-              `Error temporal en el servidor (HTTP ${lastStatus}). Inténtalo en unos minutos.`;
-          } else if (lastStatus === 0) {
-            // Ningún response: probablemente CORS o sin red.
-            userMessage =
-              "No se pudo conectar con el almacenamiento. Si estás en datos móviles, prueba con WiFi.";
-          }
-          snapshot[idx].status = "error";
-          snapshot[idx].message = userMessage;
-          fire();
-          // eslint-disable-next-line no-console
-          console.error("[direct-upload] tus error", {
-            file: file.name,
-            lastStatus,
-            lastResponseBody: lastResponseBody.slice(0, 300),
-            err: message,
-          });
-          results.push({
-            uploadId,
-            path,
-            success: false,
-            errorMessage: userMessage,
-          });
-          resolve();
-        },
-        onChunkComplete() {
-          if (snapshot[idx].status === "retrying") {
-            snapshot[idx].status = "uploading";
-            fire();
-          }
-        },
-        onShouldRetry(err, retryAttempt) {
-          // Capturamos el status real del response — tus lo expone en
-          // err.originalResponse cuando hay uno.
-          const errAny = err as unknown as {
-            originalResponse?: { getStatus?: () => number; getBody?: () => string };
-          };
-          const status = errAny.originalResponse?.getStatus?.() ?? 0;
-          lastStatus = status;
-          try {
-            lastResponseBody = errAny.originalResponse?.getBody?.() || "";
-          } catch {
-            lastResponseBody = "";
-          }
-          // No reintentar errores de auth ni de payload — son fallos
-          // definitivos. Reintentar solo timeouts (0) y 5xx.
-          if (status === 401 || status === 403 || status === 413) {
-            return false;
-          }
-          // Tras 4 intentos, dejar caer en onError.
-          if (retryAttempt >= 4) return false;
+    const r = await putToSignedUrl(signedUrl, file, (uploaded) => {
+      snapshot[idx].bytesUploaded = uploaded;
+      snapshot[idx].percent = Math.round((uploaded / file.size) * 100);
+      fire();
+    });
 
-          snapshot[idx].status = "retrying";
-          fire();
-          return true;
-        },
-        onProgress(bytesUploaded, bytesTotal) {
-          snapshot[idx].bytesUploaded = bytesUploaded;
-          snapshot[idx].percent = Math.round((bytesUploaded / bytesTotal) * 100);
-          if (snapshot[idx].status === "retrying") {
-            snapshot[idx].status = "uploading";
-          }
-          fire();
-        },
-        onSuccess() {
-          snapshot[idx].status = "uploaded";
-          snapshot[idx].percent = 100;
-          snapshot[idx].bytesUploaded = file.size;
-          fire();
-          results.push({ uploadId, path, success: true });
-          resolve();
-        },
-      });
+    if (r.ok) {
+      snapshot[idx].status = "uploaded";
+      snapshot[idx].percent = 100;
+      snapshot[idx].bytesUploaded = file.size;
+      fire();
+      results.push({ uploadId, path, success: true });
+      return;
+    }
 
-      upload.findPreviousUploads().then((previous) => {
-        if (previous.length > 0) {
-          // eslint-disable-next-line no-console
-          console.info("[direct-upload] reanudando subida previa de", file.name);
-          upload.resumeFromPreviousUpload(previous[0]);
-        } else {
-          // eslint-disable-next-line no-console
-          console.info(
-            "[direct-upload] iniciando",
-            file.name,
-            `(${(file.size / 1024 / 1024).toFixed(1)} MB) →`,
-            path
-          );
-        }
-        upload.start();
-      });
+    // eslint-disable-next-line no-console
+    console.error("[direct-upload] error subiendo", file.name, {
+      status: r.status,
+      body: r.body,
+    });
+
+    let userMsg: string;
+    if (r.status === 401 || r.status === 403) {
+      userMsg = "Permisos denegados por el almacenamiento. Recarga la página y vuelve a intentarlo.";
+    } else if (r.status === 413) {
+      userMsg = "El archivo es demasiado grande para el almacenamiento.";
+    } else if (r.status >= 500) {
+      userMsg = `Error temporal en el servidor (HTTP ${r.status}). Reintenta en unos minutos.`;
+    } else if (r.status === 0) {
+      userMsg =
+        "No se pudo completar la subida. Tu red parece inestable: prueba con WiFi o donde tengas mejor cobertura, y vuelve a intentarlo.";
+    } else {
+      userMsg = `Error subiendo el archivo (HTTP ${r.status}).`;
+    }
+
+    snapshot[idx].status = "error";
+    snapshot[idx].message = userMsg;
+    fire();
+    results.push({
+      uploadId,
+      path,
+      success: false,
+      errorMessage: userMsg,
     });
   }
 
-  // Concurrency pool sencilla.
   const queue = [...reservedById.keys()];
   const workers: Promise<void>[] = [];
   for (let w = 0; w < CONCURRENCY; w++) {
@@ -511,7 +464,6 @@ export async function directUpload({
     points?: number;
   };
   const serverItems = (confirmJson.items as ServerItem[]) || [];
-  // Mapeamos por uploadId cuando se puede; si no, por filename (best effort).
   const serverByUploadId = new Map<string, ServerItem>();
   for (const it of serverItems) {
     if (it.uploadId) serverByUploadId.set(it.uploadId, it);

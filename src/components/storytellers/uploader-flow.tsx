@@ -295,7 +295,7 @@ export function UploaderFlow() {
     } catch (e) {
       console.error("[uploader-flow] directUpload error:", e);
       setUploadError(
-        "Error de red durante la subida. Tus archivos resumibles se reanudarán automáticamente; vuelve a pulsar Enviar para continuar."
+        "Error de red durante la subida. Vuelve a intentarlo cuando tengas mejor cobertura (idealmente WiFi)."
       );
     } finally {
       setUploadLoading(false);
@@ -480,7 +480,7 @@ export function UploaderFlow() {
                 "Sin caras de personas que no autoricen aparecer.",
                 "Mezcla horizontal y vertical si puedes.",
                 "Tamaños: hasta 50 MB por foto, hasta 3 GB por vídeo (sí, también vídeos largos del móvil).",
-                "Si tu red se corta a mitad, no pasa nada: la subida se reanuda donde se quedó.",
+                "Para vídeos pesados, mejor súbelos con WiFi. Si la red falla, vuelve a darle a Enviar y se reintenta.",
                 `Topes por reserva: ${MAX_PHOTOS_PER_BOOKING} fotos y ${MAX_VIDEOS_PER_BOOKING} vídeos.`,
                 "Si subes el mismo archivo dos veces, lo detectamos y solo cuenta una.",
               ].map((tip) => (
@@ -650,8 +650,6 @@ export function UploaderFlow() {
                   <Loader2 className="h-5 w-5 animate-spin" aria-hidden />{" "}
                   {perFileProgress.some((p) => p.status === "hashing")
                     ? "Preparando archivos…"
-                    : perFileProgress.some((p) => p.status === "retrying")
-                    ? "Reanudando subida tras corte de red…"
                     : perFileProgress.some((p) => p.status === "uploading")
                     ? `Subiendo… ${overallProgressPct(perFileProgress)}%`
                     : "Confirmando…"}
@@ -942,7 +940,7 @@ function overallProgressPct(progress: FileProgress[]): number {
   if (totalBytes === 0) return 0;
   const uploadedBytes = progress.reduce((sum, p) => {
     if (p.status === "confirmed" || p.status === "uploaded") return sum + p.sizeBytes;
-    if (p.status === "uploading" || p.status === "retrying") return sum + p.bytesUploaded;
+    if (p.status === "uploading") return sum + p.bytesUploaded;
     return sum;
   }, 0);
   return Math.min(100, Math.round((uploadedBytes / totalBytes) * 100));
@@ -956,19 +954,12 @@ function overallProgressPct(progress: FileProgress[]): number {
  */
 function UploadProgressPanel({ progress }: { progress: FileProgress[] }) {
   const pct = overallProgressPct(progress);
-  const anyRetrying = progress.some((p) => p.status === "retrying");
   return (
     <div className="rounded-2xl border border-furgocasa-orange/30 bg-orange-50/40 p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
         <p className="font-heading text-sm font-bold text-gray-900">
           Subida en curso ({pct}%)
         </p>
-        {anyRetrying && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-800">
-            <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
-            Reanudando…
-          </span>
-        )}
       </div>
       <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-orange-100">
         <div
@@ -995,8 +986,6 @@ function UploadProgressPanel({ progress }: { progress: FileProgress[] }) {
                   ? "bg-red-100 text-red-800"
                   : p.status === "error"
                   ? "bg-red-100 text-red-800"
-                  : p.status === "retrying"
-                  ? "bg-yellow-100 text-yellow-800"
                   : p.status === "uploading"
                   ? "bg-orange-100 text-orange-800"
                   : p.status === "hashing"
@@ -1010,8 +999,6 @@ function UploadProgressPanel({ progress }: { progress: FileProgress[] }) {
                 ? "en cola"
                 : p.status === "uploading"
                 ? "subiendo"
-                : p.status === "retrying"
-                ? "reanudando"
                 : p.status === "uploaded"
                 ? "subido"
                 : p.status === "confirmed"
