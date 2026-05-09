@@ -356,10 +356,23 @@ export async function directUpload({
     console.error("[direct-upload] SDK error", file.name, r.status, r.body);
 
     let userMsg: string;
+    const bodyLow = r.body.toLowerCase();
+    const looksLikeStorageMaxSize =
+      r.status === 413 ||
+      bodyLow.includes("maximum allowed size") ||
+      bodyLow.includes("exceeded the maximum") ||
+      (bodyLow.includes("exceeded") && bodyLow.includes("size")) ||
+      bodyLow.includes("too large");
+
     if (r.status === 401 || r.status === 403) {
       userMsg = "Permisos denegados por el almacenamiento. Recarga la página y vuelve a intentarlo.";
-    } else if (r.status === 413) {
-      userMsg = "El archivo es demasiado grande para el almacenamiento.";
+    } else if (looksLikeStorageMaxSize) {
+      const mb = (file.size / (1024 * 1024)).toFixed(1);
+      userMsg =
+        `Tu vídeo pesa ~${mb} MB y Supabase lo rechaza: el bucket «storyteller-uploads» tiene un «tamaño máximo por archivo» demasiado bajo ` +
+        `(por defecto 50 MB si lo creaste a mano, u otro límite antiguo). En Supabase: ejecuta la migración ` +
+        `supabase/migrations/20260509-storytellers-bucket-3gb-limit.sql (SQL Editor) para subirlo a 3 GB, ` +
+        `o Dashboard → Storage → bucket → límites.`;
     } else if (r.status >= 500) {
       userMsg = `Error temporal en el servidor (HTTP ${r.status}). Reintenta en unos minutos.`;
     } else if (r.body.toLowerCase().includes("network")) {
