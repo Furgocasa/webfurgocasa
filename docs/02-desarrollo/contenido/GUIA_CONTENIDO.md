@@ -2,7 +2,7 @@
 
 > **Super prompt para implementación.** Este documento recoge el modelo cerrado de generación y captación de contenido para FURGOCASA, fruto de la conversación de estrategia del 8 de mayo de 2026. Sirve como referencia única para retomar el trabajo en sesiones futuras.
 >
-> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **(9 may 2026)** anti-duplicados por SHA-256 + cupón con código personalizado tipo `STO-NARPAR05` (mantiene prefijo `STO-` para enrutado en checkout) + briefing con galería de lo ya subido (§3.5-bis/ter/quater) · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
+> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **(9 may 2026)** anti-duplicados por SHA-256 + cupón con código personalizado tipo `STO-NARPAR05` (mantiene prefijo `STO-` para enrutado en checkout) + briefing con galería de lo ya subido (§3.5-bis/ter/quater) · **(9 may 2026 PM)** subida directa cliente → Supabase con tus resumable: vídeos hasta 3 GB, reanudación automática tras corte de red, RLS cerrada al bucket, cron de limpieza de huérfanos (§3.5-quinquies) · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
 
 ---
 
@@ -224,6 +224,64 @@ Cuando un cliente vuelve a entrar a `/storytellers/subir` con una reserva donde 
 4. **Tip explícito** en las pautas: «Si subes el mismo archivo dos veces, lo detectamos y solo cuenta una.»
 
 El endpoint `POST /api/storytellers/validate-booking` devuelve ahora un campo `program` (saldo + cupón + umbral) y un array `previousUploads` (máx. 60 items) con `previewUrl` firmado solo para fotos (vídeos se pintan como icono para no servir blobs grandes).
+
+### 3.5-quinquies. Subida directa cliente → Supabase + reanudable (mayo 2026)
+
+**Por qué existe.** El flujo antiguo `POST /api/storytellers/upload` recibía los archivos en multipart/form-data en una serverless function de Vercel y desde ahí los reenviaba a Supabase Storage. Vercel impone un **límite duro de ~4.5 MB** en el body de cada request, por lo que **vídeos de móvil casi siempre fallaban** (un clip 4K @ 60fps de iPhone pesa fácil 100–300 MB). El cliente recibía un 413 opaco y abandonaba.
+
+**Solución implementada.** Subida directa del navegador a Supabase Storage usando el **protocolo tus** (resumable):
+
+```
+[Navegador]                                       [Vercel API]              [Supabase Storage]
+   │                                                   │                            │
+   │ 1. WebCrypto SHA-256(file)                        │                            │
+   │ 2. POST /api/storytellers/upload-init ─────────► │                            │
+   │    { sessionToken, files: [{name,size,sha256}] } │                            │
+   │ ◄─── { ticket(HMAC), paths reservados }           │                            │
+   │                                                   │                            │
+   │ 3. tus-js-client (POST + N×PATCH al endpoint    ─┼──────────────────────────► │  /storage/v1/upload/resumable
+   │    /storage/v1/upload/resumable de Supabase)     │   ▼ si red cae, reanuda    │
+   │                                                   │                            │
+   │ 4. POST /api/storytellers/upload-confirm ────────►│                            │
+   │    { ticket, results: [{uploadId, success}] }    │ ─ HEAD a Storage           │
+   │                                                   │ ─ INSERT BD + ledger       │
+   │                                                   │ ─ cupón + email            │
+   │ ◄─── { summary, items, myPointsUrl }              │                            │
+```
+
+**Piezas del flujo (rutas en el repo)**:
+- Migración RLS: `supabase/migrations/20260509-storytellers-direct-upload.sql` (3 policies para `anon` en `storage.objects`: INSERT/SELECT/UPDATE bajo `bucket_id = 'storyteller-uploads' AND foldername[1] = 'bookings'`).
+- Helper HMAC del ticket: `src/lib/storytellers/upload-ticket.ts` (TTL 30 min, igual que la sesión).
+- Endpoint init: `src/app/api/storytellers/upload-init/route.ts` (valida cuotas + dedupe sha256 + reserva paths UUID).
+- Endpoint confirm: `src/app/api/storytellers/upload-confirm/route.ts` (verifica HMAC + HEAD a Storage + tamaño exacto + INSERT BD).
+- Cliente helper: `src/lib/storytellers/direct-upload-client.ts` (orquesta hash → init → tus → confirm con callbacks de progreso).
+- UI: `src/components/storytellers/uploader-flow.tsx` (componente `UploadProgressPanel` con barra global ponderada por bytes y status por archivo: `hashing` → `uploading`/`retrying` → `uploaded` → `confirmed`).
+- Cron de huérfanos: `src/app/api/cron/storyteller-orphan-cleanup/route.ts` (diario 04:30, borra del bucket todo lo que lleve >24 h sin row en `storyteller_uploads`).
+- Endpoint viejo: `src/app/api/storytellers/upload/route.ts` ahora devuelve **HTTP 410** con `code: "use_direct_upload"` para que pestañas con caché vieja muestren un mensaje claro y no un 404 silencioso.
+
+**Garantías de seguridad**:
+- El cliente **no puede inventar paths**: el ticket HMAC firmado por el server lleva la lista exacta de `(uploadId, path, sha256, size)` reservados, y `/upload-confirm` solo procesa lo que está dentro del ticket.
+- Si el cliente intenta confirmar un path que no estaba reservado → `not_in_ticket`.
+- Si el `path` declarado en `/confirm` no coincide con el reservado → `path_mismatch`.
+- Si el tamaño real en Storage difiere del declarado → borramos del Storage + `size_mismatch` (defensa contra «declaro 1 MB pero subo 1 GB»).
+- La RLS limita el role `anon` a operaciones DENTRO del bucket `storyteller-uploads/bookings/...`. NO hay DELETE para `anon`: solo el cron con `service_role` borra.
+- Anti-duplicados: el sha256 declarado se compara con todos los hashes ya subidos por ese `customer_email` en `storyteller_uploads.file_hash` (§3.5-ter); duplicados se rechazan en `/upload-init` antes incluso de subir el byte.
+- Anti-DoS: `/upload-init` topa el lote a 120 archivos, valida el lote mínimo (3 fotos o 1 vídeo) y aplica `checkUploadCapacity` igual que el flujo viejo.
+
+**Garantías de UX**:
+- **Reanudable**: tus reanuda automáticamente cuando vuelve la red. Retries exponenciales: `[0, 1000, 3000, 5000, 10000, 20000, 30000]` ms.
+- **Pestaña cerrada → reanuda**: tus guarda fingerprint en localStorage (`removeFingerprintOnSuccess: true`); al reabrir y volver a pulsar Enviar, retoma desde el byte donde se quedó.
+- **Concurrencia 2** archivos a la vez (no saturar 4G).
+- **Chunk 6 MB** por PATCH — buen balance entre overhead y reanudación granular.
+- **Progreso global ponderado por bytes** (un vídeo 200 MB cuenta más que una foto 5 MB).
+
+**Archivos huérfanos**: si el cliente sube a Storage pero no llama a `/confirm` (cierra navegador justo entre paso 3 y 4), el archivo queda sin registro en BD. El cron `/api/cron/storyteller-orphan-cleanup` lista el bucket diariamente, descarta los archivos cuyo `file_path` aparece en `storyteller_uploads`, y borra los que llevan >24 h huérfanos. Tope de 500 borrados por ejecución para no agotar la función serverless.
+
+**Topes nuevos**:
+- `MAX_VIDEO_SIZE_BYTES = 3 GB` (antes 500 MB pero efectivamente 4.5 MB por Vercel). Limitado más por WebCrypto SHA-256 en cliente que por Supabase (Storage Pro tope 5 GB).
+- `MAX_PHOTO_SIZE_BYTES = 50 MB` sin cambios (es lo razonable incluso para ProRAW).
+
+**Cómo aplicar la migración** (importante en Supabase): el SQL editor del dashboard se conecta como rol `postgres`, que NO es propietario de `storage.objects` (su dueño es `supabase_storage_admin`). Por eso la migración solo usa `CREATE POLICY` (sí permitido a postgres) y NO usa `ALTER TABLE storage.objects` (daría `42501: must be owner of table objects`). Si aun así da error, alternativa: crear las 3 policies desde `Storage → bucket → Policies → New policy → Full customization` con las mismas condiciones.
 
 ### 3.6. Verificación con casos reales
 
@@ -925,4 +983,4 @@ Si en algún momento se introducen cualquiera de estos elementos, hay que reabri
 
 ---
 
-**Última actualización del documento:** 9 de mayo de 2026 (anti-duplicados por SHA-256 en `storyteller_uploads.file_hash`, cupón con código personalizado `STO-NARPAR05` — **mantiene prefijo `STO-` por contrato con checkout**, briefing con bloque puntos+cupón y galería de lo ya subido, **+ descartar subidas pendientes desde admin sin notificar y sin tocar ledger** — §3.5-bis/ter/quater + §3.7).
+**Última actualización del documento:** 9 de mayo de 2026 PM (subida directa al Storage con tus resumable + RLS de bucket + cron de huérfanos — **vídeos hasta 3 GB, antes morían en el 4.5 MB de Vercel**, §3.5-quinquies; previo: anti-duplicados SHA-256, cupón `STO-NARPAR05`, briefing con galería, descartar subidas — §3.5-bis/ter/quater + §3.7).

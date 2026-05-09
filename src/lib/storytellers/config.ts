@@ -101,7 +101,16 @@ export const COUPON_MIN_RESERVATION_DAYS = 4;
 export const MAX_PHOTOS_PER_BOOKING = 100;
 export const MAX_VIDEOS_PER_BOOKING = 20;
 export const MAX_PHOTO_SIZE_BYTES = 50 * 1024 * 1024; // 50 MB
-export const MAX_VIDEO_SIZE_BYTES = 500 * 1024 * 1024; // 500 MB
+/**
+ * 3 GB por vídeo. El antiguo flujo `/api/storytellers/upload` topaba en
+ * ~4.5 MB por el límite duro de body de Vercel. Desde mayo 2026 las subidas
+ * van directamente del navegador a Supabase Storage con tus-js-client
+ * resumable, así que el cuello de botella ya no es Vercel sino Supabase
+ * Storage (5 GB por archivo en plan Pro). Topamos a 3 GB para dejar margen
+ * y porque el hash SHA-256 en cliente con WebCrypto pide cargar el archivo
+ * en memoria (en iPhones modernos ~2 GB de RAM disponibles para el tab).
+ */
+export const MAX_VIDEO_SIZE_BYTES = 3 * 1024 * 1024 * 1024; // 3 GB
 export const MIN_PHOTOS_PER_UPLOAD_BATCH = 3;
 
 export const ALLOWED_PHOTO_MIME_TYPES = [

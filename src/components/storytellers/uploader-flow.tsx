@@ -21,6 +21,10 @@ import {
   MIN_PHOTOS_PER_UPLOAD_BATCH,
 } from "@/lib/storytellers/config";
 import { executeRecaptchaEnterprise } from "@/lib/storytellers/recaptcha-browser";
+import {
+  directUpload,
+  type FileProgress,
+} from "@/lib/storytellers/direct-upload-client";
 
 interface BookingInfo {
   bookingNumber: string;
@@ -112,6 +116,9 @@ export function UploaderFlow() {
   const [uploadLoading, setUploadLoading] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Progreso por archivo (hashing → uploading → confirmed). Se rellena
+  // mientras directUpload() corre; se limpia al volver a "upload" o "reset".
+  const [perFileProgress, setPerFileProgress] = useState<FileProgress[]>([]);
 
   // Paso 4 (done)
   const [summary, setSummary] = useState<UploadSummary | null>(null);
@@ -252,25 +259,44 @@ export function UploaderFlow() {
     if (!sessionToken || !canSubmitUpload) return;
     setUploadError("");
     setUploadLoading(true);
+    setPerFileProgress([]);
     try {
-      const fd = new FormData();
-      fd.append("sessionToken", sessionToken);
-      for (const f of files) fd.append("files", f);
-      const res = await fetch("/api/storytellers/upload", {
-        method: "POST",
-        body: fd,
+      const result = await directUpload({
+        files,
+        sessionToken,
+        callbacks: {
+          onProgress: (snapshot) => setPerFileProgress(snapshot),
+        },
       });
-      const json = await res.json();
-      if (!res.ok || !json.ok) {
-        setUploadError(json.error || "No se pudo subir el material.");
+
+      if (!result.ok) {
+        setUploadError(
+          result.errorMessage ||
+            "No se pudo subir el material. Reintenta o quita los archivos más pesados."
+        );
         return;
       }
-      setSummary(json.summary);
-      setItems(json.items);
-      setMyPointsUrl(json.myPointsUrl);
+
+      // Si no hay summary (todos rechazados antes de tus), aun así avanzamos
+      // a "done" para mostrar el detalle por archivo.
+      setSummary(
+        result.summary || {
+          accepted: 0,
+          rejected: result.files.filter((f) => f.status === "rejected").length,
+          pointsAwarded: 0,
+          balanceAfter: 0,
+          instantCoupon: null,
+          thresholdCoupon: null,
+        }
+      );
+      setItems(result.items);
+      if (result.myPointsUrl) setMyPointsUrl(result.myPointsUrl);
       setStep("done");
-    } catch {
-      setUploadError("Error de red durante la subida. Si has subido archivos grandes, prueba con menos archivos a la vez.");
+    } catch (e) {
+      console.error("[uploader-flow] directUpload error:", e);
+      setUploadError(
+        "Error de red durante la subida. Tus archivos resumibles se reanudarán automáticamente; vuelve a pulsar Enviar para continuar."
+      );
     } finally {
       setUploadLoading(false);
     }
@@ -289,6 +315,7 @@ export function UploaderFlow() {
     setFiles([]);
     setRightsAccepted(false);
     setUploadError("");
+    setPerFileProgress([]);
     setSummary(null);
     setItems([]);
     setMyPointsUrl(null);
@@ -452,7 +479,8 @@ export function UploaderFlow() {
                 "Vehículo entero o composición clara, no solo detalles sin contexto.",
                 "Sin caras de personas que no autoricen aparecer.",
                 "Mezcla horizontal y vertical si puedes.",
-                "Tamaños: hasta 50 MB por foto, hasta 500 MB por vídeo.",
+                "Tamaños: hasta 50 MB por foto, hasta 3 GB por vídeo (sí, también vídeos largos del móvil).",
+                "Si tu red se corta a mitad, no pasa nada: la subida se reanuda donde se quedó.",
                 `Topes por reserva: ${MAX_PHOTOS_PER_BOOKING} fotos y ${MAX_VIDEOS_PER_BOOKING} vídeos.`,
                 "Si subes el mismo archivo dos veces, lo detectamos y solo cuenta una.",
               ].map((tip) => (
@@ -591,6 +619,10 @@ export function UploaderFlow() {
             </span>
           </label>
 
+          {(uploadLoading || perFileProgress.length > 0) && perFileProgress.length > 0 && (
+            <UploadProgressPanel progress={perFileProgress} />
+          )}
+
           {uploadError && (
             <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
               <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
@@ -615,7 +647,14 @@ export function UploaderFlow() {
             >
               {uploadLoading ? (
                 <span className="inline-flex items-center justify-center gap-2">
-                  <Loader2 className="h-5 w-5 animate-spin" aria-hidden /> Subiendo… (puede tardar con vídeos grandes)
+                  <Loader2 className="h-5 w-5 animate-spin" aria-hidden />{" "}
+                  {perFileProgress.some((p) => p.status === "hashing")
+                    ? "Preparando archivos…"
+                    : perFileProgress.some((p) => p.status === "retrying")
+                    ? "Reanudando subida tras corte de red…"
+                    : perFileProgress.some((p) => p.status === "uploading")
+                    ? `Subiendo… ${overallProgressPct(perFileProgress)}%`
+                    : "Confirmando…"}
                 </span>
               ) : (
                 <>Enviar {files.length > 0 ? `(${files.length} archivos)` : ""}</>
@@ -890,5 +929,102 @@ function StepIndicator({ step }: { step: Step }) {
         );
       })}
     </ol>
+  );
+}
+
+/**
+ * Calcula el progreso global ponderado por bytes, no por archivos. Así un
+ * vídeo de 200 MB pesa más que una foto de 5 MB en la barra global.
+ */
+function overallProgressPct(progress: FileProgress[]): number {
+  if (progress.length === 0) return 0;
+  const totalBytes = progress.reduce((sum, p) => sum + p.sizeBytes, 0);
+  if (totalBytes === 0) return 0;
+  const uploadedBytes = progress.reduce((sum, p) => {
+    if (p.status === "confirmed" || p.status === "uploaded") return sum + p.sizeBytes;
+    if (p.status === "uploading" || p.status === "retrying") return sum + p.bytesUploaded;
+    return sum;
+  }, 0);
+  return Math.min(100, Math.round((uploadedBytes / totalBytes) * 100));
+}
+
+/**
+ * Panel visible durante el upload: barra global + tabla por archivo con
+ * estado individual (hashing → uploading/retrying → uploaded → confirmed).
+ * El usuario ve cuál se está subiendo, cuánto le queda y, si la red se
+ * corta, el aviso "reanudando" sin perder progreso (gracias a tus).
+ */
+function UploadProgressPanel({ progress }: { progress: FileProgress[] }) {
+  const pct = overallProgressPct(progress);
+  const anyRetrying = progress.some((p) => p.status === "retrying");
+  return (
+    <div className="rounded-2xl border border-furgocasa-orange/30 bg-orange-50/40 p-4">
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <p className="font-heading text-sm font-bold text-gray-900">
+          Subida en curso ({pct}%)
+        </p>
+        {anyRetrying && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-800">
+            <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
+            Reanudando…
+          </span>
+        )}
+      </div>
+      <div className="mb-4 h-2 w-full overflow-hidden rounded-full bg-orange-100">
+        <div
+          className="h-full bg-furgocasa-orange transition-all duration-300"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <ul className="max-h-64 space-y-1.5 overflow-y-auto text-xs">
+        {progress.map((p) => (
+          <li key={p.clientId} className="flex items-center gap-2">
+            <span className="w-16 shrink-0 text-right font-mono">
+              {p.status === "confirmed" || p.status === "uploaded"
+                ? "100%"
+                : `${p.percent}%`}
+            </span>
+            <span className="flex-1 truncate text-gray-700">{p.filename}</span>
+            <span
+              className={`shrink-0 rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                p.status === "confirmed"
+                  ? "bg-green-100 text-green-800"
+                  : p.status === "uploaded"
+                  ? "bg-blue-100 text-blue-800"
+                  : p.status === "rejected"
+                  ? "bg-red-100 text-red-800"
+                  : p.status === "error"
+                  ? "bg-red-100 text-red-800"
+                  : p.status === "retrying"
+                  ? "bg-yellow-100 text-yellow-800"
+                  : p.status === "uploading"
+                  ? "bg-orange-100 text-orange-800"
+                  : p.status === "hashing"
+                  ? "bg-gray-200 text-gray-700"
+                  : "bg-gray-100 text-gray-500"
+              }`}
+            >
+              {p.status === "hashing"
+                ? "preparando"
+                : p.status === "ready"
+                ? "en cola"
+                : p.status === "uploading"
+                ? "subiendo"
+                : p.status === "retrying"
+                ? "reanudando"
+                : p.status === "uploaded"
+                ? "subido"
+                : p.status === "confirmed"
+                ? "ok"
+                : p.status === "rejected"
+                ? "rechazado"
+                : p.status === "error"
+                ? "error"
+                : "—"}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
