@@ -14,6 +14,8 @@ import {
   Video,
 } from "lucide-react";
 
+import { executeRecaptchaEnterprise } from "@/lib/storytellers/recaptcha-browser";
+
 interface DiscountTier {
   threshold: number;
   pct: number;
@@ -48,36 +50,6 @@ interface ApiResponse {
   perks?: PerkTier[];
   maxDiscountPct?: number;
   error?: string;
-}
-
-declare global {
-  interface Window {
-    grecaptcha?: {
-      enterprise?: {
-        ready: (cb: () => void) => void;
-        execute: (siteKey: string, options: { action: string }) => Promise<string>;
-      };
-    };
-  }
-}
-
-async function getRecaptchaToken(action: string): Promise<string | undefined> {
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-  if (!siteKey || typeof window === "undefined" || !window.grecaptcha?.enterprise) return undefined;
-  try {
-    return await new Promise<string | undefined>((resolve) => {
-      window.grecaptcha!.enterprise!.ready(async () => {
-        try {
-          const token = await window.grecaptcha!.enterprise!.execute(siteKey, { action });
-          resolve(token);
-        } catch {
-          resolve(undefined);
-        }
-      });
-    });
-  } catch {
-    return undefined;
-  }
 }
 
 function reasonLabel(reason: string): string {
@@ -159,7 +131,7 @@ export function MyPointsView({ token }: { token: string | null }) {
     e.preventDefault();
     setRequestLoading(true);
     try {
-      const captcha = await getRecaptchaToken("storytellers_magic");
+      const captcha = await executeRecaptchaEnterprise("storytellers_magic");
       const res = await fetch("/api/storytellers/request-magic-link", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

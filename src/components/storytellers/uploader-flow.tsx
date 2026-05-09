@@ -20,6 +20,7 @@ import {
   MAX_VIDEO_SIZE_BYTES,
   MIN_PHOTOS_PER_UPLOAD_BATCH,
 } from "@/lib/storytellers/config";
+import { executeRecaptchaEnterprise } from "@/lib/storytellers/recaptcha-browser";
 
 interface BookingInfo {
   bookingNumber: string;
@@ -61,36 +62,6 @@ function isAcceptedMime(mime: string): "photo" | "video" | null {
 
 function bytesToMb(b: number): string {
   return (b / (1024 * 1024)).toFixed(1);
-}
-
-declare global {
-  interface Window {
-    grecaptcha?: {
-      enterprise?: {
-        ready: (cb: () => void) => void;
-        execute: (siteKey: string, options: { action: string }) => Promise<string>;
-      };
-    };
-  }
-}
-
-async function getRecaptchaToken(action: string): Promise<string | undefined> {
-  const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
-  if (!siteKey || typeof window === "undefined" || !window.grecaptcha?.enterprise) return undefined;
-  try {
-    return await new Promise<string | undefined>((resolve) => {
-      window.grecaptcha!.enterprise!.ready(async () => {
-        try {
-          const token = await window.grecaptcha!.enterprise!.execute(siteKey, { action });
-          resolve(token);
-        } catch {
-          resolve(undefined);
-        }
-      });
-    });
-  } catch {
-    return undefined;
-  }
 }
 
 export function UploaderFlow() {
@@ -156,7 +127,13 @@ export function UploaderFlow() {
       setIdentifyError("");
       setIdentifyLoading(true);
       try {
-        const token = await getRecaptchaToken("storytellers_validate");
+        const token = await executeRecaptchaEnterprise("storytellers_validate");
+        if (!token) {
+          setIdentifyError(
+            "No se ha podido cargar la verificación de seguridad de Google. Espera unos segundos y vuelve a intentarlo; si tienes bloqueador de anuncios o cookies muy restrictivas, desactívalas temporalmente o acepta cookies para este sitio y recarga la página."
+          );
+          return;
+        }
         const res = await fetch("/api/storytellers/validate-booking", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

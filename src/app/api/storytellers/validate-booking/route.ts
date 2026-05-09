@@ -153,6 +153,12 @@ export async function POST(req: NextRequest) {
     // reCAPTCHA
     const captcha = await verifyRecaptcha(recaptchaToken, "storytellers_validate");
     if (!captcha.ok) {
+      console.warn("[storytellers/validate-booking] recaptcha_failed", {
+        reason: captcha.reason,
+        score: captcha.score,
+        mode: captcha.mode,
+        hasToken: Boolean(recaptchaToken),
+      });
       return NextResponse.json(
         { ok: false, error: "Validación de seguridad fallida. Recarga la página e inténtalo de nuevo." },
         { status: 403 }
