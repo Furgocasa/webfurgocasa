@@ -1,15 +1,14 @@
 /**
  * POST /api/storytellers/upload-confirm
  *
- * Paso 2 del nuevo flujo de upload directo. El cliente ya subió cada archivo
- * a Supabase Storage usando tus-js-client. Ahora le dice al server qué
- * archivos llegaron correctamente y el server:
+ * Paso 2 del flujo de upload directo. El cliente ya subió cada archivo a
+ * Supabase Storage con `uploadToSignedUrl` (SDK oficial, mismo multipart +
+ * headers que espera el gateway). El cliente envía resultados y el servidor:
  *   1. Verifica el ticket HMAC.
- *   2. HEAD a Storage para confirmar que cada archivo existe (y su tamaño).
+ *   2. Opcional: comprueba listado en Storage (solo warning; no bloquea).
  *   3. INSERT en `storyteller_uploads` + `storyteller_points_ledger`.
- *   4. Crea cupón "instant 3%" si es la 1ª subida del email.
- *   5. Sincroniza cupón por umbral si toca.
- *   6. Envía email de confirmación.
+ *   4. Cupón instant / sync umbral.
+ *   5. Email de confirmación (fire-and-forget).
  *
  * Body JSON:
  *   {
@@ -135,6 +134,7 @@ export async function POST(req: NextRequest) {
           status: "rejected",
           reason: "Path no coincide con la reserva.",
           reasonCode: "path_mismatch",
+          uploadId: reserved.uploadId,
         });
         continue;
       }
@@ -150,6 +150,7 @@ export async function POST(req: NextRequest) {
             r.errorMessage?.slice(0, 200) ||
             "La subida falló en el cliente. Vuelve a intentarlo.",
           reasonCode: "client_error",
+          uploadId: reserved.uploadId,
         });
         continue;
       }
@@ -226,6 +227,7 @@ export async function POST(req: NextRequest) {
             "Error registrando la subida en BD: " +
             (insertError.message || insertError.code || "desconocido"),
           reasonCode: "db",
+          uploadId: reserved.uploadId,
         });
         continue;
       }

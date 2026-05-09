@@ -1,69 +1,56 @@
 /**
- * Storytellers · Direct upload client (PUT único, sin chunking)
+ * Storytellers · Direct upload client (signed upload URL vía SDK oficial)
  *
- * Encapsula el flujo de subida directa cliente → Supabase Storage usando
- * **signed upload URLs**:
+ * El archivo va directamente del navegador a Supabase Storage usando
+ * `supabase.storage.from(bucket).uploadToSignedUrl(path, token, file, …)`.
  *
- *   1) Hash SHA-256 de cada archivo en el navegador (WebCrypto).
- *   2) POST /api/storytellers/upload-init → reserva paths, signed URLs y
- *      ticket HMAC.
- *   3) Cada archivo se sube en UN SOLO PUT al signed URL de Supabase. Si la
- *      red se cae a mitad, el archivo se da por fallido y el usuario debe
- *      reintentar. Sin chunking ni reanudación: simple y robusto.
- *   4) POST /api/storytellers/upload-confirm con ticket + resultados.
+ * Por qué NO seguimos con XHR manual
+ * ------------------------------------
+ * El cliente JS de Supabase inyecta siempre `apikey` + `Authorization` en
+ * todas las peticiones a Storage. Sin esos headers el gateway responde
+ * HTTP 400 aunque el FormData sea correcto (multipart + cacheControl).
+ * Reimplementar eso a mano es frágil y ya nos costó varios intentos.
  *
- * Por qué descartamos tus
- * -----------------------
- * Probamos primero `tus-js-client` con chunking + reanudación, pero los
- * PATCH intermedios fallaban en producción (CORS / auth) y el cliente
- * entraba en bucle de "reanudando reanudando" sin avanzar. Con PUT único
- * la subida o va o no va, y el usuario ve un error claro y puede
- * reintentar. Se mantiene la concurrencia (2 archivos a la vez) para no
- * saturar 4G.
+ * Trade-off: fetch del SDK no expone `upload.onprogress`; durante la
+ * subida mostramos estado «subiendo» sin porcentaje fino (solo salto a
+ * 100 % al terminar). Fiabilidad > barra de progreso granular.
  */
 
 "use client";
+
+import { createClient } from "@supabase/supabase-js";
 
 // ---------- Tipos públicos ----------
 
 export type FileStatus =
   | "idle"
   | "hashing"
-  | "ready"          // /init devolvió "ready", esperando turno de subida
+  | "ready"
   | "uploading"
-  | "uploaded"       // archivo en Storage; pendiente de /confirm
-  | "rejected"       // rechazado por /init o /confirm
-  | "error"          // error transitorio del cliente
-  | "confirmed";     // procesado correctamente por /confirm
+  | "uploaded"
+  | "rejected"
+  | "error"
+  | "confirmed";
 
 export interface FileProgress {
-  /** ID estable que asigna el cliente (no UUID — solo identificador local). */
   clientId: string;
   filename: string;
   sizeBytes: number;
   status: FileStatus;
-  /** Porcentaje 0-100 (solo en hashing y uploading). */
   percent: number;
-  /** Bytes enviados / totales. */
   bytesUploaded: number;
-  /** Mensaje legible, en error/rejected. */
   message?: string;
-  /** Código corto cuando status=rejected (ver upload-init/confirm). */
   reasonCode?: string;
-  /** Puntos otorgados al confirmar (si status=confirmed). */
   pointsAwarded?: number;
 }
 
 export interface DirectUploadCallbacks {
-  /** Notifica cualquier cambio en cualquier archivo. */
   onProgress?: (snapshot: FileProgress[]) => void;
-  /** Cuando todo el flujo termina (con éxito parcial o total). */
   onComplete?: (summary: DirectUploadFinalSummary) => void;
 }
 
 export interface DirectUploadFinalSummary {
   ok: boolean;
-  /** Resumen del backend (stats globales y cupones desbloqueados). */
   summary?: {
     accepted: number;
     rejected: number;
@@ -72,9 +59,7 @@ export interface DirectUploadFinalSummary {
     instantCoupon: { code: string; pct: number; validUntil: string } | null;
     thresholdCoupon: { code: string; pct: number; validUntil: string } | null;
   } | null;
-  /** Por archivo, status final de cara al usuario. */
   files: FileProgress[];
-  /** items[] del backend (para mensaje de rechazos). */
   items: Array<{
     filename: string;
     status: "ok" | "rejected";
@@ -82,9 +67,7 @@ export interface DirectUploadFinalSummary {
     reasonCode?: string;
     points?: number;
   }>;
-  /** URL "Mis puntos" devuelta por el backend. */
   myPointsUrl?: string;
-  /** Mensaje de error global (cuando ok=false). */
   errorMessage?: string;
 }
 
@@ -93,8 +76,6 @@ interface DirectUploadOptions {
   sessionToken: string;
   callbacks?: DirectUploadCallbacks;
 }
-
-// ---------- Helpers internos ----------
 
 function hexFromBuffer(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf);
@@ -105,87 +86,60 @@ function hexFromBuffer(buf: ArrayBuffer): string {
   return s;
 }
 
-/**
- * SHA-256 de un File usando WebCrypto. Para archivos hasta ~1 GB en móviles
- * modernos. Por encima podría dar problemas de memoria.
- */
 async function sha256OfFile(file: File): Promise<string> {
   const buf = await file.arrayBuffer();
   const digest = await crypto.subtle.digest("SHA-256", buf);
   return hexFromBuffer(digest);
 }
 
-/**
- * Sube `file` a la signed URL de Supabase Storage en una sola request PUT.
- * Usa XHR para tener `progress` events nativos.
- *
- * Convención del endpoint signed de Supabase Storage (signed upload URL):
- *   - Método: PUT.
- *   - Body: multipart/form-data con un campo "file" (sin nombre de campo
- *     concreto, basta con que esté).
- *   - `cacheControl` se manda como campo dentro del FormData.
- *   - Header: `x-upsert: false` para no sobrescribir.
- *   - El Content-Type lo pone el navegador automáticamente con el
- *     boundary de FormData; NO debemos setearlo a mano.
- *   - El token de auth ya viene como query string en la URL firmada.
- *
- * Importante: NO funciona enviar el File crudo como body. Supabase
- * Storage devuelve HTTP 400 ('Empty file' o similar) porque espera
- * multipart/form-data. Esto es lo que hace internamente
- * `supabase.storage.from(bucket).uploadToSignedUrl()`.
- */
-function putToSignedUrl(
-  signedUrl: string,
-  file: File,
-  onProgress: (bytesUploaded: number) => void
-): Promise<{ ok: true } | { ok: false; status: number; body: string }> {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", signedUrl, true);
-    // Headers que Supabase entiende (NO Content-Type manual: lo pone el
-    // navegador con el boundary del FormData).
-    xhr.setRequestHeader("x-upsert", "false");
-
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) onProgress(e.loaded);
-    };
-    xhr.onload = () => {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        resolve({ ok: true });
-      } else {
-        resolve({
-          ok: false,
-          status: xhr.status,
-          body: (xhr.responseText || "").slice(0, 500),
-        });
-      }
-    };
-    xhr.onerror = () => {
-      // Sin status: típico de CORS, DNS, sin red, o navegador abortó.
-      resolve({ ok: false, status: 0, body: "Network error" });
-    };
-    xhr.ontimeout = () => {
-      resolve({ ok: false, status: 0, body: "Timeout" });
-    };
-    // Timeout generoso: 5 min para vídeos grandes con red regular.
-    xhr.timeout = 5 * 60 * 1000;
-
-    // Body multipart/form-data — convención de Supabase Storage.
-    const formData = new FormData();
-    formData.append("cacheControl", "3600");
-    // El nombre de campo "" + el filename son los que usa supabase-js
-    // internamente. Mantenemos compatibilidad bit-a-bit con su SDK.
-    formData.append("", file, file.name);
-
-    xhr.send(formData);
-  });
+function storageErrorStatus(err: unknown): number {
+  if (err && typeof err === "object") {
+    const o = err as { statusCode?: number; status?: number };
+    if (typeof o.statusCode === "number") return o.statusCode;
+    if (typeof o.status === "number") return o.status;
+  }
+  return 400;
 }
 
-// ---------- Núcleo ----------
+function storageErrorMessage(err: unknown): string {
+  if (err instanceof Error) return err.message;
+  return String(err);
+}
 
 /**
- * Ejecuta el flujo completo de subida directa.
+ * Subida con el mismo código que la documentación oficial de Supabase.
  */
+async function uploadViaSupabaseSdk(params: {
+  supabaseUrl: string;
+  anonKey: string;
+  bucket: string;
+  path: string;
+  token: string;
+  file: File;
+}): Promise<{ ok: true } | { ok: false; status: number; body: string }> {
+  const supabase = createClient(params.supabaseUrl, params.anonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
+  });
+
+  const { error } = await supabase.storage.from(params.bucket).uploadToSignedUrl(params.path, params.token, params.file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+
+  if (error) {
+    return {
+      ok: false,
+      status: storageErrorStatus(error),
+      body: storageErrorMessage(error),
+    };
+  }
+  return { ok: true };
+}
+
 export async function directUpload({
   files,
   sessionToken,
@@ -203,7 +157,6 @@ export async function directUpload({
   const fire = () => callbacks?.onProgress?.([...snapshot]);
   fire();
 
-  // 1) Hashing en serie (no saturar memoria).
   for (let i = 0; i < files.length; i++) {
     snapshot[i].status = "hashing";
     snapshot[i].percent = 0;
@@ -215,13 +168,11 @@ export async function directUpload({
       snapshot[i].status = "ready";
     } catch (e) {
       snapshot[i].status = "error";
-      snapshot[i].message =
-        e instanceof Error ? e.message : "No se pudo procesar el archivo (hash).";
+      snapshot[i].message = e instanceof Error ? e.message : "No se pudo procesar el archivo (hash).";
     }
     fire();
   }
 
-  // 2) /upload-init.
   const initBody = {
     sessionToken,
     files: snapshot
@@ -280,26 +231,34 @@ export async function directUpload({
     return summary;
   }
 
-  const { ticket, uploads } = initJson as {
+  const {
+    ticket,
+    supabaseUrl,
+    anonKey,
+    bucket,
+    uploads,
+  } = initJson as {
     ticket: string | null;
+    supabaseUrl: string;
+    anonKey: string;
+    bucket: string;
     uploads: Array<{
       clientId: string;
       status: "ready" | "rejected";
       path?: string;
       uploadId?: string;
-      signedUrl?: string;
       signedToken?: string;
       reason?: string;
       reasonCode?: string;
     }>;
   };
 
-  // Mapeamos respuesta → snapshot por clientId.
   const initByClient = new Map(uploads.map((u) => [u.clientId, u]));
+
   interface Reservation {
     uploadId: string;
     path: string;
-    signedUrl: string;
+    signedToken: string;
     idx: number;
   }
   const reservedById = new Map<string, Reservation>();
@@ -311,11 +270,11 @@ export async function directUpload({
       snapshot[i].status = "rejected";
       snapshot[i].message = r.reason;
       snapshot[i].reasonCode = r.reasonCode;
-    } else if (r.status === "ready" && r.uploadId && r.path && r.signedUrl) {
+    } else if (r.status === "ready" && r.uploadId && r.path && r.signedToken) {
       reservedById.set(r.uploadId, {
         uploadId: r.uploadId,
         path: r.path,
-        signedUrl: r.signedUrl,
+        signedToken: r.signedToken,
         idx: i,
       });
     }
@@ -323,7 +282,6 @@ export async function directUpload({
   fire();
 
   if (!ticket || reservedById.size === 0) {
-    // Todos rechazados.
     const summary: DirectUploadFinalSummary = {
       ok: true,
       summary: {
@@ -349,8 +307,6 @@ export async function directUpload({
     return summary;
   }
 
-  // 3) Subida de cada archivo en un único PUT. Concurrencia 2 para no
-  //    saturar 4G; cada archivo va entero, sin chunking.
   const CONCURRENCY = 2;
   const results: Array<{
     uploadId: string;
@@ -362,26 +318,29 @@ export async function directUpload({
   async function uploadOne(uploadId: string): Promise<void> {
     const reservation = reservedById.get(uploadId);
     if (!reservation) return;
-    const { idx, path, signedUrl } = reservation;
+    const { idx, path, signedToken } = reservation;
     const file = files[idx];
 
     snapshot[idx].status = "uploading";
-    snapshot[idx].percent = 0;
+    snapshot[idx].percent = 10;
     snapshot[idx].bytesUploaded = 0;
     fire();
 
     // eslint-disable-next-line no-console
     console.info(
-      "[direct-upload] subiendo",
+      "[direct-upload] SDK upload",
       file.name,
       `(${(file.size / 1024 / 1024).toFixed(1)} MB) →`,
-      path
+      `${bucket}/${path}`
     );
 
-    const r = await putToSignedUrl(signedUrl, file, (uploaded) => {
-      snapshot[idx].bytesUploaded = uploaded;
-      snapshot[idx].percent = Math.round((uploaded / file.size) * 100);
-      fire();
+    const r = await uploadViaSupabaseSdk({
+      supabaseUrl,
+      anonKey,
+      bucket,
+      path,
+      token: signedToken,
+      file,
     });
 
     if (r.ok) {
@@ -394,10 +353,7 @@ export async function directUpload({
     }
 
     // eslint-disable-next-line no-console
-    console.error("[direct-upload] error subiendo", file.name, {
-      status: r.status,
-      body: r.body,
-    });
+    console.error("[direct-upload] SDK error", file.name, r.status, r.body);
 
     let userMsg: string;
     if (r.status === 401 || r.status === 403) {
@@ -406,11 +362,11 @@ export async function directUpload({
       userMsg = "El archivo es demasiado grande para el almacenamiento.";
     } else if (r.status >= 500) {
       userMsg = `Error temporal en el servidor (HTTP ${r.status}). Reintenta en unos minutos.`;
-    } else if (r.status === 0) {
+    } else if (r.body.toLowerCase().includes("network")) {
       userMsg =
         "No se pudo completar la subida. Tu red parece inestable: prueba con WiFi o donde tengas mejor cobertura, y vuelve a intentarlo.";
     } else {
-      userMsg = `Error subiendo el archivo (HTTP ${r.status}).`;
+      userMsg = `Error subiendo el archivo (HTTP ${r.status}). ${r.body.slice(0, 120)}`;
     }
 
     snapshot[idx].status = "error";
@@ -439,7 +395,6 @@ export async function directUpload({
   }
   await Promise.all(workers);
 
-  // 4) /upload-confirm.
   const confirmRes = await fetch("/api/storytellers/upload-confirm", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -469,7 +424,6 @@ export async function directUpload({
     return summary;
   }
 
-  // Marca los confirmados.
   type ServerItem = {
     filename: string;
     status: "ok" | "rejected";

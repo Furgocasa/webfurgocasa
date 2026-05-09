@@ -277,18 +277,25 @@ export function UploaderFlow() {
         return;
       }
 
-      // Si no hay summary (todos rechazados antes de tus), aun así avanzamos
-      // a "done" para mostrar el detalle por archivo.
-      setSummary(
-        result.summary || {
-          accepted: 0,
-          rejected: result.files.filter((f) => f.status === "rejected").length,
-          pointsAwarded: 0,
-          balanceAfter: 0,
-          instantCoupon: null,
-          thresholdCoupon: null,
-        }
-      );
+      const accepted = result.summary?.accepted ?? 0;
+      // Si el servidor respondió OK pero no entró ningún archivo (p.ej. vídeo
+      // rechazado por Storage HTTP 400), NO mostramos la pantalla verde de
+      // éxito — es confuso ("sumas 0 puntos").
+      if (accepted === 0) {
+        const rejectedItem = result.items.find((i) => i.status === "rejected");
+        const fromSnapshot = result.files.find((f) => f.message)?.message;
+        setUploadError(
+          rejectedItem?.reason ||
+            fromSnapshot ||
+            "No se ha podido aceptar ningún archivo. Revisa el mensaje de cada uno y vuelve a intentarlo."
+        );
+        setItems(result.items);
+        setSummary(result.summary ?? null);
+        setMyPointsUrl(result.myPointsUrl ?? null);
+        return;
+      }
+
+      setSummary(result.summary!);
       setItems(result.items);
       if (result.myPointsUrl) setMyPointsUrl(result.myPointsUrl);
       setStep("done");
