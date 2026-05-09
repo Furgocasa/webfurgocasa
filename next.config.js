@@ -125,14 +125,17 @@ const nextConfig = {
     // ============================================
     // CSP ayuda a prevenir XSS y otros ataques de inyección de código
     // Documentación: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+    // Storytellers (subida / mis puntos): reCAPTCHA Enterprise requiere
+    // script/frame/style desde www.google.com, www.gstatic.com y recaptcha.google.com.
     const ContentSecurityPolicy = `
       default-src 'self';
-      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://*.tinymce.com https://*.tiny.cloud;
-      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tinymce.com https://*.tiny.cloud;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://googleads.g.doubleclick.net https://www.googleadservices.com https://*.tinymce.com https://*.tiny.cloud https://www.google.com https://www.gstatic.com;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.tinymce.com https://*.tiny.cloud https://www.gstatic.com;
       img-src 'self' data: blob: https://*.supabase.co https://www.googletagmanager.com https://www.google-analytics.com https://www.facebook.com https://www.google.com https://www.google.es https://googleads.g.doubleclick.net https://www.googleadservices.com https://*.tinymce.com https://*.tiny.cloud;
       font-src 'self' https://fonts.gstatic.com data: https://*.tinymce.com https://*.tiny.cloud;
       connect-src 'self' blob: https://*.supabase.co wss://*.supabase.co https://www.google-analytics.com https://*.google-analytics.com https://www.googletagmanager.com https://connect.facebook.net https://api.stripe.com https://*.analytics.google.com https://www.google.com https://*.google.com https://googleads.g.doubleclick.net https://pagead2.googlesyndication.com https://www.googleadservices.com https://*.tinymce.com https://*.tiny.cloud;
-      frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://www.googletagmanager.com https://td.doubleclick.net;
+      frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://www.youtube.com https://www.youtube-nocookie.com https://www.googletagmanager.com https://td.doubleclick.net https://www.google.com https://www.gstatic.com https://recaptcha.google.com;
+      worker-src 'self' blob: https://www.google.com https://www.gstatic.com;
       frame-ancestors 'self';
       form-action 'self' https://sis.redsys.es https://sis-t.redsys.es;
       base-uri 'self';
