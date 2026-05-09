@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { cache } from 'react';
 import type { Locale } from '../i18n/config';
+import { COMPANY } from '../company';
 
 export interface FeaturedVehicle {
   id: string;
@@ -262,23 +263,24 @@ export const getCompanyStats = cache(async (): Promise<CompanyStats> => {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  // Contar reservas completadas
+  // Contar reservas completadas en Supabase (no incluye histórico pre-migración)
   const { count: bookingsCount } = await supabase
     .from('bookings')
     .select('id', { count: 'exact', head: true })
     .in('status', ['confirmed', 'completed']);
 
-  // Contar vehículos activos
-  const { count: vehiclesCount } = await supabase
-    .from('vehicles')
-    .select('id', { count: 'exact', head: true })
-    .eq('is_for_rent', true)
-    .neq('status', 'inactive');
+  // ✅ Coherencia con company.ts (fuente única de verdad):
+  // - Para bookings: usar siempre el máximo entre el contador real y el histórico
+  //   canonical, así nunca mostramos menos de lo realmente gestionado.
+  // - Para vehículos: usar siempre el canonical (currentFleetSize) porque
+  //   el contador de Supabase puede tener vehículos mal etiquetados.
+  // - Rating y años: leer del canonical, NO duplicar valores aquí.
+  const foundingYear = parseInt(COMPANY.foundingDate, 10);
 
   return {
-    totalBookings: bookingsCount || 500, // Valor por defecto si no hay datos
-    totalVehicles: vehiclesCount || 8,
-    averageRating: 4.5,
-    yearsExperience: new Date().getFullYear() - 2017
+    totalBookings: Math.max(bookingsCount ?? 0, COMPANY.stats.historicalBookings),
+    totalVehicles: COMPANY.stats.currentFleetSize,
+    averageRating: parseFloat(COMPANY.aggregateRating.ratingValue),
+    yearsExperience: new Date().getFullYear() - foundingYear,
   };
 });

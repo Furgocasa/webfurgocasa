@@ -36,13 +36,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-    description: t("Furgocasa: empresa familiar de alquiler de autocaravanas en Murcia desde 2017. Más de 500 viajes. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados desde 95€/día. Recogida Casillas, Murcia."),
+    description: t("Furgocasa: empresa familiar de alquiler de autocaravanas en Murcia desde 2018. Más de 1000 viajes gestionados. Flota premium Dreamer, Knaus, Weinsberg. Kilómetros ilimitados desde 95€/día. Recogida Casillas, Murcia."),
     keywords: "quienes somos furgocasa, empresa alquiler camper murcia, historia furgocasa, familia furgocasa, autocaravanas murcia",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],
       title: t("Quiénes Somos - Descubre la Historia de Furgocasa"),
-      description: t("Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2017."),
+      description: t("Conoce la historia de Furgocasa, empresa familiar especializada en alquiler de autocaravanas en Murcia desde 2018."),
       type: "website",
       url: alternates.canonical,
       siteName: "Furgocasa",
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     twitter: {
       card: "summary_large_image",
       title: t("Quiénes Somos"),
-      description: t("Empresa familiar de alquiler de autocaravanas en Murcia desde 2017."),
+      description: t("Empresa familiar de alquiler de autocaravanas en Murcia desde 2018."),
     },
     alternates,
     robots: {
@@ -73,6 +73,7 @@ export default async function LocaleQuienesSomosPage() {
   const locale: Locale = 'es'; // Locale fijo
   
   const t = (key: string) => translateServer(key, locale);
+  const yearsExperience = new Date().getFullYear() - parseInt(COMPANY.foundingDate, 10);
 
   return (
     <>
@@ -98,7 +99,7 @@ export default async function LocaleQuienesSomosPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
               <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-                <strong>{t("¿Quiénes somos?")}</strong> {t("Furgocasa es una empresa familiar de alquiler de autocaravanas en Murcia desde")} {COMPANY.foundingDate}. {t("Más de 500 viajes realizados. Flota premium con kilómetros ilimitados, precios desde 95€/día. Recogida en")} {COMPANY.rentalPolicy.pickupLocationsLabel}. {t("Teléfono:")} {COMPANY.phoneDisplay}.
+                <strong>{t("¿Quiénes somos?")}</strong> {t("Furgocasa es una empresa familiar de alquiler de autocaravanas en Murcia desde")} {COMPANY.foundingDate}. {t("Más de")} {COMPANY.stats.historicalBookings.toLocaleString('es-ES')} {t("viajes gestionados. Flota premium de")} {COMPANY.stats.currentFleetSize} {t("vehículos con kilómetros ilimitados, precios desde 95€/día. Recogida en")} {COMPANY.rentalPolicy.pickupLocationsLabel}. {t("Teléfono:")} {COMPANY.phoneDisplay}.
               </p>
             </div>
           </div>
@@ -170,7 +171,7 @@ export default async function LocaleQuienesSomosPage() {
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Años de experiencia")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">
-                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">500+</p>
+                <p className="text-3xl md:text-5xl font-heading font-bold mb-1 md:mb-2">{COMPANY.stats.historicalBookings.toLocaleString('es-ES')}+</p>
                 <p className="text-blue-200 uppercase tracking-wider md:tracking-widest text-xs md:text-sm">{t("Viajes realizados")}</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm p-6 rounded-2xl">

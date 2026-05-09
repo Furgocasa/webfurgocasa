@@ -44,6 +44,23 @@ export const COMPANY = {
     worstRating: '1',
   },
 
+  /**
+   * Estadísticas canónicas de la empresa.
+   * Se usan como mínimo garantizado en getCompanyStats() para que las cifras del
+   * home y de las páginas estáticas (quiénes somos, escalabilidad, etc.) sean
+   * coherentes y reflejen el histórico real (no solo lo que hay en Supabase).
+   *
+   * IMPORTANTE: actualizar estos números aquí actualiza TODA la web a la vez.
+   */
+  stats: {
+    /** Total histórico de viajes/reservas gestionadas (incluye reservas pre-Supabase) */
+    historicalBookings: 1000,
+    /** Vehículos actualmente activos en la flota de alquiler */
+    currentFleetSize: 13,
+    /** Total acumulado de vehículos comprados a lo largo de la historia (incluye vendidos) */
+    totalVehiclesEverOwned: 23,
+  },
+
   /** Fianza en euros - valor canónico */
   depositAmount: 1000,
 
@@ -110,6 +127,6 @@ export const COMPANY = {
     longitude: '-1.1635',
   },
 
-  foundingDate: '2017',
+  foundingDate: '2018',
   legalName: 'Furgocasa S.L.',
 } as const;
