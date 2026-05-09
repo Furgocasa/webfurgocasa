@@ -124,4 +124,6 @@ Las URLs firmadas y el archivo en Storage pueden estar **perfectos** y aun así 
 - Con **Spend cap** activo, Supabase puede **limitar el tamaño de los uploads** aunque pongas gigabytes en el formulario.  
 - Los vídeos del **iPhone** son `.mov` y pueden ser muy pesados; el sistema los admite si configuración Supabase y app lo permiten.
 
+Si tras una subida válida los puntos aparecen pero **no llega el correo de confirmación**, revisar logs `[upload-confirm] confirmation email error`. En serverless (Vercel), el envío debe ejecutarse con **`await`** en el mismo handler: una promesa «sueltas» tras responder suele **no ejecutarse** porque la función se congela.
+
 Para detalle de producto y endpoints, seguir §3.5-quinquies de **`GUIA_CONTENIDO.md`**.

@@ -8,7 +8,7 @@
  *   2. Opcional: comprueba listado en Storage (solo warning; no bloquea).
  *   3. INSERT en `storyteller_uploads` + `storyteller_points_ledger`.
  *   4. Cupón instant / sync umbral.
- *   5. Email de confirmación (fire-and-forget).
+ *   5. Email de confirmación (tras persistir puntos; await para que Vercel no mate el SMTP).
  *
  * Body JSON:
  *   {
@@ -280,21 +280,23 @@ export async function POST(req: NextRequest) {
     const balanceAfter = await getBalance(email);
     const myPointsUrl = buildMyPointsUrl(email, "es");
 
-    // Email NO bloqueante: si Resend tarda 5-10 s, no debemos hacer esperar
-    // al cliente. Lanzamos la promesa sin await — la función serverless
-    // sigue viva el tiempo necesario gracias a maxDuration=60.
+    // IMPORTANTE: hay que await del envío. Si solo lanzamos la promesa sin await,
+    // Vercel/serverless suele congelar la función en cuanto se devuelve el JSON
+    // y el correo NUNCA llega a enviarse (puntos sí quedan en BD).
     if (okCount > 0) {
-      sendUploadConfirmationEmail({
-        email,
-        bookingNumber: bookingNumberHuman,
-        acceptedCount: okCount,
-        pointsAwarded: totalPointsAwarded,
-        balanceAfter,
-        instantCoupon: instantCouponInfo,
-        thresholdCoupon: thresholdCouponInfo,
-      }).catch((e) => {
+      try {
+        await sendUploadConfirmationEmail({
+          email,
+          bookingNumber: bookingNumberHuman,
+          acceptedCount: okCount,
+          pointsAwarded: totalPointsAwarded,
+          balanceAfter,
+          instantCoupon: instantCouponInfo,
+          thresholdCoupon: thresholdCouponInfo,
+        });
+      } catch (e) {
         console.error("[upload-confirm] confirmation email error:", e);
-      });
+      }
     }
 
     return NextResponse.json({
@@ -324,8 +326,6 @@ export async function POST(req: NextRequest) {
 }
 
 export const runtime = "nodejs";
-// Subimos el timeout a 60 s. El INSERT + ledger + cupón sync + email del
-// confirm puede tardar 8-15 s en vídeos con cliente nuevo (instant coupon
-// + sync con saldo). El default 10 s del Hobby/Pro era suficiente para
-// fotos pero quedaba justo para vídeos.
+// Subimos el timeout a 60 s: INSERT + ledger + cupones + SMTP pueden sumar
+// varios segundos en una primera subida con vídeo (instant coupon + sync).
 export const maxDuration = 60;

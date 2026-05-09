@@ -2,7 +2,7 @@
  * Plantillas de emails del programa Storytellers.
  *
  * Tres flujos:
- *  1. Confirmación de subida (tras /api/storytellers/upload exitoso).
+ *  1. Confirmación de subida (tras `POST /api/storytellers/upload-confirm`).
  *  2. Selección para archivo (tras admin marca como seleccionada — ya implementado en /api/admin/storyteller-uploads/[id]/select).
  *  3. Magic link de acceso (tras /api/storytellers/request-magic-link — ya implementado).
  *  4. Recordatorio post-viaje (cron 7 días después de dropoff_date).
