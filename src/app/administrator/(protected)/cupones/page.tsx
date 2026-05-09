@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { Plus, Search, Edit, Trash2, Save, X, Tag, AlertCircle, Calendar, Percent, Euro, Gift, RefreshCw } from "lucide-react";
+import { Plus, Search, Edit, Trash2, Save, X, Tag, AlertCircle, Gift, RefreshCw, Sparkles, Lock } from "lucide-react";
 import ConfirmDialog from "@/components/admin/ConfirmDialog";
 import { useAdminData } from "@/hooks/use-admin-data";
 import { formatPrice } from "@/lib/utils";
@@ -12,7 +12,7 @@ interface Coupon {
   code: string;
   name: string;
   description: string | null;
-  coupon_type: 'gift' | 'permanent';
+  coupon_type: 'gift' | 'permanent' | 'storyteller';
   discount_type: 'percentage' | 'fixed';
   discount_value: number;
   min_rental_days: number;
@@ -24,6 +24,67 @@ interface Coupon {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  /** Solo para coupon_type === 'storyteller': email del cliente al que pertenece. */
+  customer_email?: string | null;
+  /** Solo para storyteller: 'instant_upload' | 'threshold' | 'admin_grant' */
+  storyteller_source?: string | null;
+  /** Solo para storyteller: marcas de "estado especial" (used / superseded / expired). */
+  storyteller_status?: 'active' | 'used' | 'superseded' | 'expired' | null;
+}
+
+/** Mapea una fila de `storyteller_coupons` al shape `Coupon` que renderiza la tabla. */
+type StorytellerCouponRow = {
+  id: string;
+  customer_email: string;
+  code: string;
+  discount_pct: number;
+  min_days: number;
+  valid_from: string | null;
+  valid_until: string | null;
+  is_active: boolean;
+  used_at: string | null;
+  superseded_at: string | null;
+  expired_at: string | null;
+  source: string | null;
+  threshold_points: number | null;
+  created_at: string;
+};
+
+function mapStorytellerCouponToCoupon(row: StorytellerCouponRow): Coupon {
+  let status: 'active' | 'used' | 'superseded' | 'expired';
+  if (row.used_at) status = 'used';
+  else if (row.superseded_at) status = 'superseded';
+  else if (row.expired_at) status = 'expired';
+  else status = 'active';
+
+  return {
+    id: row.id,
+    code: row.code,
+    name: `Storyteller · ${row.customer_email}`,
+    description:
+      row.source === 'instant_upload'
+        ? 'Cupón de bienvenida (primera subida válida)'
+        : row.source === 'threshold'
+        ? `Cupón por umbral · ${row.threshold_points ?? '?'} puntos`
+        : row.source === 'admin_grant'
+        ? 'Cupón concedido manualmente por admin'
+        : 'Cupón Storytellers',
+    coupon_type: 'storyteller',
+    discount_type: 'percentage',
+    discount_value: row.discount_pct,
+    min_rental_days: row.min_days,
+    min_rental_amount: 0,
+    valid_from: row.valid_from,
+    valid_until: row.valid_until,
+    max_uses: 1, // todos los Storyteller son de un solo uso
+    current_uses: row.used_at ? 1 : 0,
+    is_active: row.is_active && !row.used_at && !row.superseded_at && !row.expired_at,
+    created_at: row.created_at,
+    updated_at: row.created_at,
+    customer_email: row.customer_email,
+    storyteller_source: row.source,
+    storyteller_status: status,
+  };
 }
 
 export default function CuponesPage() {
@@ -37,7 +98,7 @@ export default function CuponesPage() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'gift' | 'permanent'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'gift' | 'permanent' | 'storyteller'>('all');
   const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; id: string | null; code: string }>({
     isOpen: false,
     id: null,
@@ -58,19 +119,41 @@ export default function CuponesPage() {
     is_active: true,
   });
 
-  // Usar el hook para cargar datos con retry automático
+  // Usar el hook para cargar datos con retry automático.
+  // Cargamos en paralelo las dos tablas: `coupons` (cupones manuales) y
+  // `storyteller_coupons` (programa Storytellers, gestionados automáticamente).
+  // Los unimos en una única lista ordenada por created_at desc, marcados con
+  // distinto `coupon_type` para que la UI los pueda distinguir.
   const { data: coupons, loading, error, refetch } = useAdminData<Coupon[]>({
-    queryKey: ['coupons'],
+    queryKey: ['coupons-combined'],
     queryFn: async () => {
       const supabase = createClient();
-      const result = await supabase
-        .from('coupons')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
+      const [generalRes, storyRes] = await Promise.all([
+        supabase
+          .from('coupons')
+          .select('*')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('storyteller_coupons')
+          .select(
+            'id, customer_email, code, discount_pct, min_days, valid_from, valid_until, is_active, used_at, superseded_at, expired_at, source, threshold_points, created_at'
+          )
+          .order('created_at', { ascending: false }),
+      ]);
+
+      // Si una de las dos peticiones falla, se reporta esa pero se devuelve
+      // lo que sí se haya podido cargar.
+      const generalRows = (generalRes.data || []) as Coupon[];
+      const storyRows = (storyRes.data || []) as StorytellerCouponRow[];
+      const storyMapped = storyRows.map(mapStorytellerCouponToCoupon);
+
+      const combined = [...generalRows, ...storyMapped].sort(
+        (a, b) => (a.created_at < b.created_at ? 1 : -1)
+      );
+
       return {
-        data: (result.data || []) as Coupon[],
-        error: result.error
+        data: combined,
+        error: generalRes.error || storyRes.error,
       };
     },
     retryCount: 3,
@@ -152,11 +235,18 @@ export default function CuponesPage() {
   };
 
   const handleEdit = (coupon: Coupon) => {
+    if (coupon.coupon_type === 'storyteller') {
+      showMessage(
+        'error',
+        'Los cupones del programa Storytellers se gestionan automáticamente desde el flujo de subida del cliente. No se editan a mano.'
+      );
+      return;
+    }
     setFormData({
       code: coupon.code,
       name: coupon.name,
       description: coupon.description || '',
-      coupon_type: coupon.coupon_type,
+      coupon_type: coupon.coupon_type as 'gift' | 'permanent',
       discount_type: coupon.discount_type,
       discount_value: coupon.discount_value.toString(),
       min_rental_days: coupon.min_rental_days.toString(),
@@ -191,17 +281,31 @@ export default function CuponesPage() {
     }
   };
 
-  const handleDelete = (id: string, code: string) => {
-    setDeleteConfirm({ isOpen: true, id, code });
+  const handleDelete = (coupon: Coupon) => {
+    if (coupon.coupon_type === 'storyteller') {
+      showMessage(
+        'error',
+        'No puedes borrar cupones Storytellers desde aquí. Su ciclo de vida (uso, supersedencia, expiración) lo gestiona el propio programa.'
+      );
+      return;
+    }
+    setDeleteConfirm({ isOpen: true, id: coupon.id, code: coupon.code });
   };
 
-  const toggleActive = async (id: string, currentStatus: boolean) => {
+  const toggleActive = async (coupon: Coupon) => {
+    if (coupon.coupon_type === 'storyteller') {
+      showMessage(
+        'error',
+        'No puedes activar/desactivar cupones Storytellers desde aquí. Se gestiona automáticamente.'
+      );
+      return;
+    }
     try {
       const supabase = createClient();
       const { error } = await supabase
         .from('coupons')
-        .update({ is_active: !currentStatus })
-        .eq('id', id);
+        .update({ is_active: !coupon.is_active })
+        .eq('id', coupon.id);
 
       if (error) throw error;
       loadCoupons();
@@ -245,6 +349,7 @@ export default function CuponesPage() {
   const activeCount = (coupons || []).filter(c => c.is_active).length;
   const giftCount = (coupons || []).filter(c => c.coupon_type === 'gift').length;
   const permanentCount = (coupons || []).filter(c => c.coupon_type === 'permanent').length;
+  const storytellerCount = (coupons || []).filter(c => c.coupon_type === 'storyteller').length;
 
   // Verificar si un cupón está expirado
   const isExpired = (coupon: Coupon) => {
@@ -285,7 +390,7 @@ export default function CuponesPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Total cupones</p>
           <p className="text-2xl font-bold text-gray-900">{(coupons || []).length}</p>
@@ -301,6 +406,12 @@ export default function CuponesPage() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
           <p className="text-sm text-gray-500">Permanent</p>
           <p className="text-2xl font-bold text-blue-600">{permanentCount}</p>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+          <p className="text-sm text-gray-500 inline-flex items-center gap-1">
+            <Sparkles className="h-4 w-4 text-furgocasa-orange" /> Storyteller
+          </p>
+          <p className="text-2xl font-bold text-furgocasa-orange">{storytellerCount}</p>
         </div>
       </div>
 
@@ -510,6 +621,7 @@ export default function CuponesPage() {
             <option value="all">Todos los tipos</option>
             <option value="gift">Solo Gift</option>
             <option value="permanent">Solo Permanent</option>
+            <option value="storyteller">Solo Storyteller</option>
           </select>
         </div>
       </div>
@@ -544,23 +656,48 @@ export default function CuponesPage() {
                       </td>
                     </tr>
                   ) : (
-                    filteredCoupons.map((coupon) => (
-                      <tr key={coupon.id} className={`hover:bg-gray-50 ${isExpired(coupon) || isExhausted(coupon) ? 'opacity-60' : ''}`}>
+                    filteredCoupons.map((coupon) => {
+                      const isStoryteller = coupon.coupon_type === 'storyteller';
+                      const storytellerStatus = coupon.storyteller_status;
+                      return (
+                      <tr
+                        key={`${coupon.coupon_type}-${coupon.id}`}
+                        className={`hover:bg-gray-50 ${
+                          isExpired(coupon) || isExhausted(coupon) || (storytellerStatus && storytellerStatus !== 'active') ? 'opacity-60' : ''
+                        }`}
+                      >
                         <td className="px-6 py-4">
                           <div>
                             <p className="font-mono font-bold text-gray-900 text-lg">{coupon.code}</p>
-                            <p className="text-sm text-gray-500">{coupon.name}</p>
+                            <p className="text-sm text-gray-500">
+                              {coupon.name}
+                              {coupon.description && (
+                                <span className="ml-1 text-gray-400">· {coupon.description}</span>
+                              )}
+                            </p>
                           </div>
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
-                            coupon.coupon_type === 'gift' 
-                              ? 'bg-purple-100 text-purple-700' 
-                              : 'bg-blue-100 text-blue-700'
-                          }`}>
-                            {coupon.coupon_type === 'gift' ? <Gift className="h-3 w-3" /> : <RefreshCw className="h-3 w-3" />}
-                            {coupon.coupon_type === 'gift' ? 'Gift' : 'Permanent'}
-                          </span>
+                          {isStoryteller ? (
+                            <span
+                              className="inline-flex items-center gap-1 rounded-full bg-furgocasa-orange/10 px-2 py-1 text-xs font-semibold text-furgocasa-orange-dark"
+                              title="Cupón generado automáticamente por el programa Storytellers"
+                            >
+                              <Sparkles className="h-3 w-3" />
+                              Storyteller
+                            </span>
+                          ) : (
+                            <span
+                              className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                                coupon.coupon_type === 'gift'
+                                  ? 'bg-purple-100 text-purple-700'
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}
+                            >
+                              {coupon.coupon_type === 'gift' ? <Gift className="h-3 w-3" /> : <RefreshCw className="h-3 w-3" />}
+                              {coupon.coupon_type === 'gift' ? 'Gift' : 'Permanent'}
+                            </span>
+                          )}
                         </td>
                         <td className="px-6 py-4 text-right">
                           <span className="font-bold text-furgocasa-orange text-lg">
@@ -611,7 +748,27 @@ export default function CuponesPage() {
                           )}
                         </td>
                         <td className="px-6 py-4 text-center">
-                          {isExpired(coupon) ? (
+                          {isStoryteller ? (
+                            // Estado de los Storyteller: viene de la propia BD,
+                            // no se puede togglear desde aquí.
+                            storytellerStatus === 'used' ? (
+                              <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-gray-200 text-gray-700">
+                                Usado
+                              </span>
+                            ) : storytellerStatus === 'superseded' ? (
+                              <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Sustituido
+                              </span>
+                            ) : storytellerStatus === 'expired' ? (
+                              <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                                Expirado
+                              </span>
+                            ) : (
+                              <span className="inline-flex px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                                Activo
+                              </span>
+                            )
+                          ) : isExpired(coupon) ? (
                             <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
                               Expirado
                             </span>
@@ -621,10 +778,10 @@ export default function CuponesPage() {
                             </span>
                           ) : (
                             <button
-                              onClick={() => toggleActive(coupon.id, coupon.is_active)}
+                              onClick={() => toggleActive(coupon)}
                               className={`inline-flex px-3 py-1 rounded-full text-xs font-medium ${
                                 coupon.is_active
-                                  ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                                  ? 'bg-green-100 text-green-700 hover:bg-green-200'
                                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                               }`}
                             >
@@ -634,24 +791,37 @@ export default function CuponesPage() {
                         </td>
                         <td className="px-6 py-4">
                           <div className="flex items-center justify-end gap-2">
-                            <button 
-                              onClick={() => handleEdit(coupon)}
-                              className="p-2 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded-lg transition-colors" 
-                              title="Editar"
-                            >
-                              <Edit className="h-5 w-5" />
-                            </button>
-                            <button 
-                              onClick={() => handleDelete(coupon.id, coupon.code)}
-                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" 
-                              title="Eliminar"
-                            >
-                              <Trash2 className="h-5 w-5" />
-                            </button>
+                            {isStoryteller ? (
+                              <span
+                                className="inline-flex items-center gap-1 rounded-lg bg-gray-100 px-2 py-1 text-xs text-gray-500"
+                                title="Los cupones Storyteller se gestionan desde el flujo del cliente. Solo lectura."
+                              >
+                                <Lock className="h-3.5 w-3.5" />
+                                Auto-gestionado
+                              </span>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => handleEdit(coupon)}
+                                  className="p-2 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded-lg transition-colors"
+                                  title="Editar"
+                                >
+                                  <Edit className="h-5 w-5" />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(coupon)}
+                                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  title="Eliminar"
+                                >
+                                  <Trash2 className="h-5 w-5" />
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </tr>
-                    ))
+                      );
+                    })
                   )}
                 </tbody>
               </table>
