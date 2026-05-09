@@ -278,20 +278,21 @@ export async function POST(req: NextRequest) {
     const balanceAfter = await getBalance(email);
     const myPointsUrl = buildMyPointsUrl(email, "es");
 
+    // Email NO bloqueante: si Resend tarda 5-10 s, no debemos hacer esperar
+    // al cliente. Lanzamos la promesa sin await — la función serverless
+    // sigue viva el tiempo necesario gracias a maxDuration=60.
     if (okCount > 0) {
-      try {
-        await sendUploadConfirmationEmail({
-          email,
-          bookingNumber: bookingNumberHuman,
-          acceptedCount: okCount,
-          pointsAwarded: totalPointsAwarded,
-          balanceAfter,
-          instantCoupon: instantCouponInfo,
-          thresholdCoupon: thresholdCouponInfo,
-        });
-      } catch (e) {
+      sendUploadConfirmationEmail({
+        email,
+        bookingNumber: bookingNumberHuman,
+        acceptedCount: okCount,
+        pointsAwarded: totalPointsAwarded,
+        balanceAfter,
+        instantCoupon: instantCouponInfo,
+        thresholdCoupon: thresholdCouponInfo,
+      }).catch((e) => {
         console.error("[upload-confirm] confirmation email error:", e);
-      }
+      });
     }
 
     return NextResponse.json({
@@ -309,8 +310,20 @@ export async function POST(req: NextRequest) {
     });
   } catch (e) {
     console.error("[storytellers/upload-confirm]", e);
-    return NextResponse.json({ ok: false, error: "Error del servidor." }, { status: 500 });
+    const detail = e instanceof Error ? e.message : String(e);
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "Error del servidor: " + detail.slice(0, 200),
+      },
+      { status: 500 }
+    );
   }
 }
 
 export const runtime = "nodejs";
+// Subimos el timeout a 60 s. El INSERT + ledger + cupón sync + email del
+// confirm puede tardar 8-15 s en vídeos con cliente nuevo (instant coupon
+// + sync con saldo). El default 10 s del Hobby/Pro era suficiente para
+// fotos pero quedaba justo para vídeos.
+export const maxDuration = 60;
