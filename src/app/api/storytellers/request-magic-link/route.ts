@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
       const url = buildMyPointsUrl(email, "es");
       const html = getEmailBaseTemplate(buildBody(url), "Acceso a tu área Storytellers");
       await sendEmail({
-        to: email,
+        to: [email, "reservas@furgocasa.com"],
         subject: "[Furgocasa] Acceso a tu área Storytellers",
         html,
       });

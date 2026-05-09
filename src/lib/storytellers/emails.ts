@@ -65,7 +65,7 @@ export async function sendUploadConfirmationEmail(params: {
   `;
 
   return sendEmail({
-    to: email,
+    to: [email, "reservas@furgocasa.com"],
     subject: `[Furgocasa Storytellers] +${pointsAwarded} ptos por tu subida`,
     html: getEmailBaseTemplate(content, "Hemos recibido tu material"),
   });

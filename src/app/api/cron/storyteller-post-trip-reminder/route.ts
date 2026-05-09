@@ -129,7 +129,7 @@ export async function GET(req: NextRequest) {
         hasContent: true,
       });
       const result = await sendEmail({
-        to: b.customer_email,
+        to: [b.customer_email, "reservas@furgocasa.com"],
         subject: "[Furgocasa] ¿Tienes fotos del viaje?",
         html,
       });

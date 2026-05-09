@@ -85,7 +85,7 @@ export async function POST(
           : "Tu vídeo ha sido seleccionado"
       );
       await sendEmail({
-        to: upload.customer_email,
+        to: [upload.customer_email, "reservas@furgocasa.com"],
         subject:
           upload.file_type === "photo"
             ? "[Furgocasa] Tu foto ha sido seleccionada"
