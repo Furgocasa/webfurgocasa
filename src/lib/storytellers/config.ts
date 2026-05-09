@@ -5,6 +5,10 @@
  * Ver guía: docs/02-desarrollo/contenido/GUIA_CONTENIDO.md §3
  */
 
+/** Hero de la landing pública; misma URL para Open Graph / Twitter en todas las locales. */
+export const STORYTELLERS_OG_IMAGE_URL =
+  "https://www.furgocasa.com/images/storytellers/showcase-hero.webp" as const;
+
 // ============================================
 // PUNTOS — cómo se ganan
 // ============================================

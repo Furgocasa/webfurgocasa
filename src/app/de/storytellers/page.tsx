@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { StorytellersLanding } from "@/components/storytellers/storytellers-landing";
+import { STORYTELLERS_OG_IMAGE_URL } from "@/lib/storytellers/config";
 
 export const metadata: Metadata = {
   title: "Furgocasa Storytellers Programm | Fotos hochladen und bis zu 15 % Rabatt erhalten",
@@ -21,8 +22,21 @@ export const metadata: Metadata = {
     title: "Furgocasa Storytellers Programm",
     description: "Lade deine Reisefotos und -videos hoch und erhalte bis zu 15 % Rabatt.",
     url: "https://www.furgocasa.com/de/storytellers",
+    siteName: "Furgocasa",
     locale: "de_DE",
     type: "website",
+    images: [
+      {
+        url: STORYTELLERS_OG_IMAGE_URL,
+        width: 1200,
+        height: 630,
+        alt: "Camper-Reise mit Furgocasa — Storytellers-Programm",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    images: [STORYTELLERS_OG_IMAGE_URL],
   },
   robots: { index: true, follow: true },
 };
