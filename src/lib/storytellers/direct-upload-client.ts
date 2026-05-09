@@ -386,10 +386,11 @@ export async function directUpload({
       } else if (looksLikeStorageMaxSize) {
         const mb = (raw.size / (1024 * 1024)).toFixed(1);
         userMsg =
-          `Tu vídeo pesa ~${mb} MB y Supabase lo rechaza: el bucket «storyteller-uploads» tiene un «tamaño máximo por archivo» demasiado bajo ` +
-          `(por defecto 50 MB si lo creaste a mano, u otro límite antiguo). En Supabase: ejecuta la migración ` +
-          `supabase/migrations/20260509-storytellers-bucket-3gb-limit.sql (SQL Editor) para subirlo a 3 GB, ` +
-          `o Dashboard → Storage → bucket → límites.`;
+          `Supabase rechaza el archivo (~${mb} MB). Aunque el bucket «storyteller-uploads» muestre 3 GB, ` +
+          `existe otro tope: el límite GLOBAL del Storage del proyecto (menú Storage → Settings / Ajustes). ` +
+          `Ese global debe ser ≥ tamaño del vídeo y ≥ el límite del bucket; en plan Free suele quedar en ~50 MB como máximo. ` +
+          `Solución: plan Pro (o superior), subir ahí el «Global file size limit», y mantener el bucket en hasta 3 GB ` +
+          `(SQL/migración 20260509-storytellers-bucket-3gb-limit.sql si hace falta).`;
       } else if (status >= 500) {
         userMsg = `Error temporal en el servidor (HTTP ${status}). Reintenta en unos minutos.`;
       } else if (body.toLowerCase().includes("network")) {
