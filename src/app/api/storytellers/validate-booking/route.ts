@@ -23,13 +23,23 @@ import { verifyRecaptcha } from "@/lib/storytellers/recaptcha";
 import {
   MAX_PHOTOS_PER_BOOKING,
   MAX_VIDEOS_PER_BOOKING,
+  getNextThreshold,
+  getUnlockedDiscountPct,
 } from "@/lib/storytellers/config";
+import { getBalance } from "@/lib/storytellers/points";
+import { createAdminClient } from "@/lib/supabase/server";
 import {
   checkRateLimit,
   getClientIP,
   getRateLimitHeaders,
   RATE_LIMIT_CONFIGS,
 } from "@/lib/security/rate-limit";
+
+const STORAGE_BUCKET = "storyteller-uploads";
+/** TTL de las URLs firmadas para previsualizar lo ya subido (1h). */
+const PREVIEW_SIGNED_URL_TTL_SEC = 60 * 60;
+/** Máx de subidas previas a devolver para no inflar el payload. */
+const MAX_PREVIOUS_UPLOADS_RETURNED = 60;
 
 const schema = z.object({
   bookingNumber: z.string().trim().min(2).max(40),
@@ -174,6 +184,71 @@ export async function POST(req: NextRequest) {
 
     const sessionToken = createUploadSessionToken(result.booking.bookingId, result.booking.customerEmail);
 
+    // Recopila info extra para pintar el briefing:
+    //  - Saldo de puntos del email (identidad maestra del programa).
+    //  - % desbloqueado y siguiente umbral.
+    //  - Cupón activo (si lo hay).
+    //  - Uploads previos de ESTA reserva (con URL firmada para previsualización).
+    const supabaseAdmin = createAdminClient();
+    const balance = await getBalance(result.booking.customerEmail);
+    const unlockedPct = getUnlockedDiscountPct(balance);
+    const nextThreshold = getNextThreshold(balance);
+
+    const { data: activeCouponRow } = await supabaseAdmin
+      .from("storyteller_coupons")
+      .select("id, code, discount_pct, valid_until, min_days, source")
+      .eq("customer_email", result.booking.customerEmail)
+      .eq("is_active", true)
+      .is("used_at", null)
+      .is("expired_at", null)
+      .is("superseded_at", null)
+      .order("discount_pct", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const { data: previousRows } = await supabaseAdmin
+      .from("storyteller_uploads")
+      .select(
+        "id, file_path, file_type, file_mime_type, file_size_bytes, original_filename, uploaded_at, selected_at"
+      )
+      .eq("booking_id", result.booking.bookingId)
+      .order("uploaded_at", { ascending: false })
+      .limit(MAX_PREVIOUS_UPLOADS_RETURNED);
+
+    type PrevRow = {
+      id: string;
+      file_path: string;
+      file_type: "photo" | "video";
+      file_mime_type: string | null;
+      file_size_bytes: number;
+      original_filename: string | null;
+      uploaded_at: string;
+      selected_at: string | null;
+    };
+    const previousUploads = await Promise.all(
+      ((previousRows || []) as PrevRow[]).map(async (row) => {
+        // Solo firmamos URLs de fotos para previsualización.
+        // Para vídeos basta el icono + nombre, evitamos servir blobs grandes.
+        let previewUrl: string | null = null;
+        if (row.file_type === "photo") {
+          const { data: signed } = await supabaseAdmin.storage
+            .from(STORAGE_BUCKET)
+            .createSignedUrl(row.file_path, PREVIEW_SIGNED_URL_TTL_SEC);
+          previewUrl = signed?.signedUrl || null;
+        }
+        return {
+          id: row.id,
+          fileType: row.file_type,
+          fileMimeType: row.file_mime_type,
+          fileSizeBytes: row.file_size_bytes,
+          originalFilename: row.original_filename,
+          uploadedAt: row.uploaded_at,
+          selected: Boolean(row.selected_at),
+          previewUrl,
+        };
+      })
+    );
+
     return NextResponse.json({
       ok: true,
       session: {
@@ -194,6 +269,27 @@ export async function POST(req: NextRequest) {
         maxPhotosPerBooking: MAX_PHOTOS_PER_BOOKING,
         maxVideosPerBooking: MAX_VIDEOS_PER_BOOKING,
       },
+      program: {
+        pointsBalance: balance,
+        unlockedPct,
+        nextThreshold: nextThreshold
+          ? {
+              threshold: nextThreshold.threshold,
+              pct: nextThreshold.pct,
+              remaining: nextThreshold.remaining,
+            }
+          : null,
+        activeCoupon: activeCouponRow
+          ? {
+              code: activeCouponRow.code,
+              pct: activeCouponRow.discount_pct,
+              validUntil: activeCouponRow.valid_until,
+              minDays: activeCouponRow.min_days,
+              source: activeCouponRow.source,
+            }
+          : null,
+      },
+      previousUploads,
     });
   } catch (e) {
     console.error("[storytellers/validate-booking]", e);

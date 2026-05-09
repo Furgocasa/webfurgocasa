@@ -33,6 +33,32 @@ interface BookingInfo {
   remainingVideos: number;
 }
 
+interface ProgramInfo {
+  pointsBalance: number;
+  unlockedPct: number;
+  nextThreshold: { threshold: number; pct: number; remaining: number } | null;
+  activeCoupon:
+    | {
+        code: string;
+        pct: number;
+        validUntil: string;
+        minDays: number;
+        source: "instant_upload" | "threshold" | "admin_grant";
+      }
+    | null;
+}
+
+interface PreviousUpload {
+  id: string;
+  fileType: "photo" | "video";
+  fileMimeType: string | null;
+  fileSizeBytes: number;
+  originalFilename: string | null;
+  uploadedAt: string;
+  selected: boolean;
+  previewUrl: string | null;
+}
+
 interface UploadSummary {
   accepted: number;
   rejected: number;
@@ -46,6 +72,7 @@ interface UploadItem {
   filename: string;
   status: "ok" | "rejected";
   reason?: string;
+  reasonCode?: string;
   points?: number;
 }
 
@@ -76,6 +103,8 @@ export function UploaderFlow() {
 
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingInfo | null>(null);
+  const [program, setProgram] = useState<ProgramInfo | null>(null);
+  const [previousUploads, setPreviousUploads] = useState<PreviousUpload[]>([]);
 
   // Paso 3 (upload)
   const [files, setFiles] = useState<File[]>([]);
@@ -151,6 +180,8 @@ export function UploaderFlow() {
         }
         setSessionToken(json.session.token);
         setBooking(json.booking);
+        setProgram(json.program || null);
+        setPreviousUploads(Array.isArray(json.previousUploads) ? json.previousUploads : []);
         setStep("briefing");
       } catch {
         setIdentifyError("Error de red. Inténtalo de nuevo.");
@@ -253,6 +284,8 @@ export function UploaderFlow() {
     setIdentifyError("");
     setSessionToken(null);
     setBooking(null);
+    setProgram(null);
+    setPreviousUploads([]);
     setFiles([]);
     setRightsAccepted(false);
     setUploadError("");
@@ -377,6 +410,33 @@ export function UploaderFlow() {
             </p>
           </div>
 
+          {/* Bloque puntos + cupón (visible en cuanto haya algún registro) */}
+          {program && (program.pointsBalance > 0 || program.activeCoupon) && (
+            <PointsAndCouponPanel program={program} />
+          )}
+
+          {/* CTA prominente para abrir el subidor (botón "Abrir y subir más") */}
+          <div className="rounded-2xl border-2 border-dashed border-furgocasa-orange/60 bg-orange-50/40 p-5 text-center">
+            <p className="font-heading text-lg font-bold text-gray-900">
+              {previousUploads.length > 0
+                ? "¿Tienes más fotos o vídeos para sumar?"
+                : "Cuando estés listo, abre el subidor"}
+            </p>
+            <p className="mt-1 text-sm text-gray-600">
+              {previousUploads.length > 0
+                ? "Arriba abre el subidor para añadir nuevos. Más abajo puedes ver lo que ya nos enviaste."
+                : "Pulsa el botón naranja para empezar. Recuerda el lote mínimo: 3 fotos o 1 vídeo."}
+            </p>
+            <button
+              type="button"
+              onClick={() => setStep("upload")}
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-furgocasa-orange px-8 py-3 font-heading font-bold text-white shadow-lg hover:bg-furgocasa-orange-dark"
+            >
+              <UploadIcon className="h-5 w-5" aria-hidden />
+              {previousUploads.length > 0 ? "Abrir y subir más" : "Abrir y empezar a subir"}
+            </button>
+          </div>
+
           <div>
             <h2 className="font-heading text-2xl font-bold text-gray-900 md:text-3xl">
               Antes de subir, lee esto
@@ -394,6 +454,7 @@ export function UploaderFlow() {
                 "Mezcla horizontal y vertical si puedes.",
                 "Tamaños: hasta 50 MB por foto, hasta 500 MB por vídeo.",
                 `Topes por reserva: ${MAX_PHOTOS_PER_BOOKING} fotos y ${MAX_VIDEOS_PER_BOOKING} vídeos.`,
+                "Si subes el mismo archivo dos veces, lo detectamos y solo cuenta una.",
               ].map((tip) => (
                 <li key={tip} className="flex items-start gap-2 rounded-xl border border-gray-100 bg-white px-4 py-3 text-sm text-gray-700">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-furgocasa-orange" aria-hidden />
@@ -402,6 +463,11 @@ export function UploaderFlow() {
               ))}
             </ul>
           </div>
+
+          {/* Lo ya subido: visible debajo, en miniatura */}
+          {previousUploads.length > 0 && (
+            <PreviousUploadsGallery uploads={previousUploads} />
+          )}
 
           <div className="flex gap-3">
             <button
@@ -616,6 +682,11 @@ export function UploaderFlow() {
                   .map((i, idx) => (
                     <li key={idx}>
                       <strong>{i.filename}</strong>: {i.reason}
+                      {i.reasonCode === "duplicate" && (
+                        <span className="ml-1 text-yellow-700">
+                          (anti-trampas: solo cuenta una vez)
+                        </span>
+                      )}
                     </li>
                   ))}
               </ul>
@@ -640,6 +711,136 @@ export function UploaderFlow() {
             </button>
           </div>
         </div>
+      )}
+    </div>
+  );
+}
+
+function PointsAndCouponPanel({ program }: { program: ProgramInfo }) {
+  const { pointsBalance, unlockedPct, nextThreshold, activeCoupon } = program;
+  return (
+    <div className="rounded-2xl border-2 border-furgocasa-orange/40 bg-gradient-to-br from-orange-50 to-white p-5">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-furgocasa-orange-dark">
+            Tu programa Storytellers
+          </p>
+          <p className="mt-1 font-heading text-2xl font-bold text-gray-900">
+            {pointsBalance} <span className="text-base font-semibold text-gray-600">puntos</span>
+          </p>
+        </div>
+        {unlockedPct > 0 && (
+          <div className="rounded-full bg-furgocasa-orange px-3 py-1 text-xs font-bold text-white">
+            {unlockedPct}% desbloqueado
+          </div>
+        )}
+      </div>
+
+      {nextThreshold && (
+        <p className="mt-2 text-sm text-gray-700">
+          Te faltan <strong>{nextThreshold.remaining} puntos</strong> para llegar al{" "}
+          <strong>{nextThreshold.pct}%</strong> de descuento.
+        </p>
+      )}
+      {!nextThreshold && unlockedPct > 0 && (
+        <p className="mt-2 text-sm text-gray-700">
+          Has llegado al <strong>tope del 15%</strong>. ¡Bestia! A partir de aquí los puntos pasan a perks
+          (taza, camiseta, sudadera).
+        </p>
+      )}
+
+      {activeCoupon ? (
+        <div className="mt-4 rounded-xl border-2 border-dashed border-furgocasa-orange bg-white p-4">
+          <p className="text-xs font-semibold uppercase tracking-wider text-furgocasa-orange-dark">
+            Tu cupón activo
+          </p>
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-3">
+            <span className="font-heading text-2xl font-bold text-furgocasa-orange-dark">
+              {activeCoupon.pct}% de descuento
+            </span>
+            <code className="rounded bg-orange-100 px-2 py-0.5 font-mono text-base font-bold tracking-wider text-furgocasa-orange-dark">
+              {activeCoupon.code}
+            </code>
+          </div>
+          <p className="mt-2 text-xs text-gray-600">
+            Válido hasta <strong>{activeCoupon.validUntil}</strong> · mínimo {activeCoupon.minDays} días ·
+            no aplica en temporada alta de verano ni picos navideños.
+          </p>
+        </div>
+      ) : (
+        <p className="mt-3 text-sm text-gray-600">
+          Sigue subiendo material y desbloqueas tu primer cupón en cuanto cruces los <strong>40 puntos</strong>.
+        </p>
+      )}
+    </div>
+  );
+}
+
+function PreviousUploadsGallery({ uploads }: { uploads: PreviousUpload[] }) {
+  const photos = uploads.filter((u) => u.fileType === "photo");
+  const videos = uploads.filter((u) => u.fileType === "video");
+  return (
+    <div>
+      <h3 className="font-heading text-xl font-bold text-gray-900 md:text-2xl">
+        Lo que ya nos subiste en esta reserva
+      </h3>
+      <p className="mt-1 text-sm text-gray-600">
+        {photos.length} fotos · {videos.length} vídeos. Si vuelves a subir un archivo idéntico al de
+        abajo, no contará dos veces.
+      </p>
+
+      {photos.length > 0 && (
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+          {photos.map((p) => (
+            <div
+              key={p.id}
+              className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-gray-50"
+              title={p.originalFilename || "foto"}
+            >
+              {p.previewUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={p.previewUrl}
+                  alt={p.originalFilename || "foto subida"}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-gray-400">
+                  <FileImage className="h-6 w-6" aria-hidden />
+                </div>
+              )}
+              {p.selected && (
+                <div className="absolute right-1 top-1 rounded-full bg-green-600 p-1 text-white shadow">
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {videos.length > 0 && (
+        <ul className="mt-4 space-y-2">
+          {videos.map((v) => (
+            <li
+              key={v.id}
+              className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm"
+            >
+              <Film className="h-4 w-4 shrink-0 text-furgocasa-orange" aria-hidden />
+              <span className="flex-1 truncate font-medium text-gray-800">
+                {v.originalFilename || "vídeo"}
+              </span>
+              <span className="text-xs text-gray-500">{bytesToMb(v.fileSizeBytes)} MB</span>
+              {v.selected && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-800">
+                  <CheckCircle2 className="h-3 w-3" aria-hidden /> seleccionado
+                </span>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

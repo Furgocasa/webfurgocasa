@@ -28,11 +28,89 @@ import {
   POINTS_PER_VIDEO_SELECTED,
   POINTS_PER_VIDEO_UPLOAD,
   generateCouponCode,
+  generateCustomerCouponCode,
   getNextThreshold,
   getUnlockedDiscountPct,
   isInBlockedPeriod,
   normalizeEmail,
+  randomCouponSuffix,
 } from "./config";
+
+/**
+ * Recupera el customer_name más reciente conocido de un email
+ * (cualquier reserva), para personalizar el código del cupón.
+ * Devuelve `null` si no se encuentra nombre.
+ */
+async function fetchLatestCustomerName(email: string): Promise<string | null> {
+  const supabase = createAdminClient();
+  const { data } = await supabase
+    .from("bookings")
+    .select("customer_name, created_at")
+    .ilike("customer_email", email)
+    .not("customer_name", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  return (data?.customer_name as string | null) || null;
+}
+
+/**
+ * Inserta un cupón en BD generando el código a partir del nombre del cliente.
+ * Si hay colisión por UNIQUE(code) reintenta hasta `maxAttempts`:
+ *   - Intento 1: NARPAR05
+ *   - Intento 2..N: NARPAR05-K3 (sufijo aleatorio)
+ *   - Si ya no caben más letras del nombre, fallback a STO-AB12-XY34.
+ */
+async function insertCouponWithCustomerCode(params: {
+  email: string;
+  customerName: string | null;
+  pct: number;
+  validFrom: Date;
+  validUntil: Date;
+  source: "instant_upload" | "threshold" | "admin_grant";
+  thresholdPoints?: number | null;
+  minDays: number;
+  isLowMidSeasonOnly: boolean;
+}): Promise<{ id: string; code: string } | null> {
+  const supabase = createAdminClient();
+  const maxAttempts = 8;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    let code: string;
+    if (params.customerName && attempt < maxAttempts - 1) {
+      const suffix = attempt === 0 ? undefined : randomCouponSuffix();
+      code = generateCustomerCouponCode(params.customerName, params.pct, suffix);
+    } else {
+      code = generateCouponCode();
+    }
+
+    const { data, error } = await supabase
+      .from("storyteller_coupons")
+      .insert({
+        customer_email: params.email,
+        code,
+        discount_pct: Math.min(params.pct, MAX_DISCOUNT_PCT),
+        min_days: params.minDays,
+        is_low_mid_season_only: params.isLowMidSeasonOnly,
+        valid_from: params.validFrom.toISOString().slice(0, 10),
+        valid_until: params.validUntil.toISOString().slice(0, 10),
+        is_active: true,
+        source: params.source,
+        threshold_points: params.thresholdPoints ?? null,
+      })
+      .select("id, code")
+      .single();
+
+    if (!error && data) return data;
+    if (error?.code === "23505") {
+      // colisión UNIQUE(code), reintenta con sufijo
+      continue;
+    }
+    console.error("[storytellers/points] insertCoupon:", error);
+    return null;
+  }
+  return null;
+}
 
 // ============================================
 // SALDO
@@ -211,9 +289,16 @@ export async function revertSelection(params: {
  *
  * Política: SOLO un cupón ACTIVO no usado por email. El de mayor %.
  *
+ * Si se proporciona `customerName`, el código del cupón será del tipo
+ * `NARPAR10` (3 letras nombre + 3 apellido + % en 2 dígitos). Si no, se
+ * usa el formato aleatorio `STO-AB12-XY34` (fallback retro-compatible).
+ *
  * Devuelve info del cupón nuevo si se generó.
  */
-export async function syncCouponWithBalance(email: string): Promise<{
+export async function syncCouponWithBalance(
+  email: string,
+  customerName?: string | null
+): Promise<{
   generated: boolean;
   newCoupon?: { id: string; code: string; pct: number; validUntil: string };
 }> {
@@ -244,44 +329,25 @@ export async function syncCouponWithBalance(email: string): Promise<{
     return { generated: false };
   }
 
-  // Toca generar nuevo. Primero supersedemos el viejo si existe.
+  // Si no nos pasaron el nombre, intentamos recuperarlo de bookings.
+  const nameForCode =
+    customerName ?? (await fetchLatestCustomerName(normalized));
+
   const validFrom = new Date();
   const validUntil = new Date(validFrom);
   validUntil.setMonth(validUntil.getMonth() + COUPON_VALIDITY_MONTHS);
 
-  let attempts = 0;
-  let code: string;
-  let inserted: { id: string; code: string } | null = null;
-  while (attempts < 5) {
-    code = generateCouponCode();
-    const { data, error } = await supabase
-      .from("storyteller_coupons")
-      .insert({
-        customer_email: normalized,
-        code,
-        discount_pct: Math.min(unlockedPct, MAX_DISCOUNT_PCT),
-        min_days: COUPON_MIN_RESERVATION_DAYS,
-        is_low_mid_season_only: true,
-        valid_from: validFrom.toISOString().slice(0, 10),
-        valid_until: validUntil.toISOString().slice(0, 10),
-        is_active: true,
-        source: "threshold",
-        threshold_points: balance,
-      })
-      .select("id, code")
-      .single();
-    if (!error && data) {
-      inserted = data;
-      break;
-    }
-    if (error?.code === "23505") {
-      // colisión de código UNIQUE, reintentamos
-      attempts += 1;
-      continue;
-    }
-    console.error("[storytellers/points] syncCoupon insert:", error);
-    return { generated: false };
-  }
+  const inserted = await insertCouponWithCustomerCode({
+    email: normalized,
+    customerName: nameForCode,
+    pct: Math.min(unlockedPct, MAX_DISCOUNT_PCT),
+    validFrom,
+    validUntil,
+    source: "threshold",
+    thresholdPoints: balance,
+    minDays: COUPON_MIN_RESERVATION_DAYS,
+    isLowMidSeasonOnly: true,
+  });
 
   if (!inserted) return { generated: false };
 
@@ -310,10 +376,14 @@ export async function syncCouponWithBalance(email: string): Promise<{
 /**
  * Genera el cupón instantáneo del 3% para la PRIMERA subida de un email.
  * Si el email ya tiene cualquier cupón previo (instant o threshold), no hace nada.
+ *
+ * Si se proporciona `customerName`, el código será tipo `NARPAR03` y si no
+ * se cae al formato `STO-XX-XX`.
  */
 export async function createInstantFirstUploadCouponIfNeeded(params: {
   email: string;
   bookingId: string;
+  customerName?: string | null;
 }): Promise<{ created: boolean; coupon?: { id: string; code: string; pct: number; validUntil: string } }> {
   const supabase = createAdminClient();
   const normalized = normalizeEmail(params.email);
@@ -327,40 +397,23 @@ export async function createInstantFirstUploadCouponIfNeeded(params: {
     return { created: false };
   }
 
+  const nameForCode =
+    params.customerName ?? (await fetchLatestCustomerName(normalized));
+
   const validFrom = new Date();
   const validUntil = new Date(validFrom);
   validUntil.setMonth(validUntil.getMonth() + COUPON_VALIDITY_MONTHS);
 
-  let attempts = 0;
-  let inserted: { id: string; code: string } | null = null;
-  while (attempts < 5) {
-    const code = generateCouponCode();
-    const { data, error } = await supabase
-      .from("storyteller_coupons")
-      .insert({
-        customer_email: normalized,
-        code,
-        discount_pct: INSTANT_FIRST_UPLOAD_COUPON_PCT,
-        min_days: COUPON_MIN_RESERVATION_DAYS,
-        is_low_mid_season_only: true,
-        valid_from: validFrom.toISOString().slice(0, 10),
-        valid_until: validUntil.toISOString().slice(0, 10),
-        is_active: true,
-        source: "instant_upload",
-      })
-      .select("id, code")
-      .single();
-    if (!error && data) {
-      inserted = data;
-      break;
-    }
-    if (error?.code === "23505") {
-      attempts += 1;
-      continue;
-    }
-    console.error("[storytellers/points] instantCoupon insert:", error);
-    return { created: false };
-  }
+  const inserted = await insertCouponWithCustomerCode({
+    email: normalized,
+    customerName: nameForCode,
+    pct: INSTANT_FIRST_UPLOAD_COUPON_PCT,
+    validFrom,
+    validUntil,
+    source: "instant_upload",
+    minDays: COUPON_MIN_RESERVATION_DAYS,
+    isLowMidSeasonOnly: true,
+  });
 
   if (!inserted) return { created: false };
 

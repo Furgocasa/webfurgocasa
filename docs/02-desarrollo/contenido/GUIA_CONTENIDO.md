@@ -2,7 +2,7 @@
 
 > **Super prompt para implementación.** Este documento recoge el modelo cerrado de generación y captación de contenido para FURGOCASA, fruto de la conversación de estrategia del 8 de mayo de 2026. Sirve como referencia única para retomar el trabajo en sesiones futuras.
 >
-> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
+> Estado: **estrategia cerrada** · **Sprints 1 y 2 COMPLETADOS** (8 may 2026) · **landing Storytellers alineada estéticamente con Creadores PRO + bloque «¿Cómo funciona?» arriba (post-intro)** · **cupón 3% documentado como bienvenida única por email** · **perks = merchandising real (taza / camiseta / sudadera) + 10 imágenes GPT Image 2 para Storytellers** · **migración SQL aplicada** · **canje STO- en checkout** · **reCAPTCHA Enterprise en Vercel** · **fiscal §11.1 cerrada** · **(9 may 2026)** anti-duplicados por SHA-256 + cupón con código personalizado tipo `NARPAR05` + briefing con galería de lo ya subido (§3.5-bis/ter/quater) · **Sprint 3** = operativa + (opcional) automatizar canje de merch.
 
 ---
 
@@ -184,6 +184,42 @@ Definición en código: `PERK_TIERS` en `src/lib/storytellers/config.ts` (campos
 3. **Caduca a los 18 meses** desde emisión.
 4. **Mínimo 4 días de reserva.**
 5. **Tope absoluto 15%**, ocurra lo que ocurra (incluso con perks adicionales).
+
+### 3.5-bis. Formato del código del cupón (mayo 2026)
+
+El código del cupón es **personalizado por cliente** para que sea fácil de recordar y de teclear:
+
+- **Formato:** `{NOM3}{APE3}{PCT2}` — 3 letras del nombre + 3 letras del primer apellido + el % en 2 dígitos.
+- **Ejemplos:** Narciso Pardo Buendía con 5% → `NARPAR05`; Ana López con 10% → `ANALOP10`.
+- **Limpieza:** quitamos acentos, ñ, espacios y cualquier carácter no A-Z. Si el nombre o apellido tiene menos de 3 letras, rellenamos con X (ej. Yi Wu → `YIXWUX15`).
+- **Colisiones (mismo nombre+apellido+%):** se añade un sufijo aleatorio corto (ej. `NARPAR05-K3`).
+- **Sin nombre disponible:** fallback al formato aleatorio histórico `STO-AB12-XY34` (sigue funcionando porque el endpoint de canje compara por `code`, no por prefijo).
+
+Implementación: `generateCustomerCouponCode(name, pct, suffix?)` y `randomCouponSuffix()` en `src/lib/storytellers/config.ts`. Las funciones `syncCouponWithBalance` y `createInstantFirstUploadCouponIfNeeded` aceptan `customerName` opcional; si no se les pasa, lo recuperan del último booking conocido por email.
+
+### 3.5-ter. Anti-duplicados de subidas (mayo 2026)
+
+Para evitar que un cliente intente "ganar" puntos subiendo varias veces el mismo archivo, cada upload calcula un **SHA-256 del contenido binario** (`file_hash`) y se compara contra todos los hashes ya registrados en `storyteller_uploads` para ese `customer_email` (identidad maestra del programa, NO solo el `booking_id`):
+
+- Si el hash coincide → ese archivo concreto del lote se **rechaza** (los demás siguen). El cliente ve un mensaje «Este archivo ya lo habías subido antes».
+- También se desduplica **dentro del propio lote** (el cliente no puede colar 5 veces el mismo `.jpg` en un único form).
+- La comparación es por contenido, no por nombre: cambiar el nombre del archivo o re-comprimirlo no engaña al sistema (nuevo hash sí pasa, pero re-renombrar no).
+
+Migración: `supabase/migrations/20260509-storytellers-file-hash.sql`.
+Columna: `storyteller_uploads.file_hash CHAR(64)` con índice parcial `idx_storyteller_uploads_email_hash` para lookup rápido.
+
+Subidas previas a esta migración no tienen hash y conviven sin problema (NULL); el sistema solo deduplica contra subidas que sí tienen hash.
+
+### 3.5-quater. Pantalla «briefing» tras validar reserva (mayo 2026)
+
+Cuando un cliente vuelve a entrar a `/storytellers/subir` con una reserva donde ya había subido antes, la pantalla de briefing ahora muestra:
+
+1. **Bloque «Tu programa Storytellers»**: saldo de puntos del email, % desbloqueado, cuánto falta para el siguiente umbral, y el cupón activo (código + %) si lo tiene.
+2. **CTA prominente** «Abrir y subir más» que abre el subidor; encima de la galería de lo ya subido (responde a la petición «arriba subir, abajo lo ya subido»).
+3. **Galería de uploads previos de esa reserva**: miniaturas de fotos (URL firmada del bucket, TTL 1h) y lista de vídeos con icono. Cada item lleva un check verde si el admin ya lo ha seleccionado.
+4. **Tip explícito** en las pautas: «Si subes el mismo archivo dos veces, lo detectamos y solo cuenta una.»
+
+El endpoint `POST /api/storytellers/validate-booking` devuelve ahora un campo `program` (saldo + cupón + umbral) y un array `previousUploads` (máx. 60 items) con `previewUrl` firmado solo para fotos (vídeos se pintan como icono para no servir blobs grandes).
 
 ### 3.6. Verificación con casos reales
 
@@ -871,4 +907,4 @@ Si en algún momento se introducen cualquiera de estos elementos, hay que reabri
 
 ---
 
-**Última actualización del documento:** 8 de mayo de 2026 (revisión amplia: §3.3–3.4 cupón bienvenida + merch, §9–§10, §12 proceso landing y assets, apéndice archivos).
+**Última actualización del documento:** 9 de mayo de 2026 (anti-duplicados por SHA-256 en `storyteller_uploads.file_hash`, cupón con código personalizado `NARPAR05`, briefing con bloque puntos+cupón y galería de lo ya subido — §3.5-bis/ter/quater).

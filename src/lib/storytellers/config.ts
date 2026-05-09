@@ -252,7 +252,7 @@ export function normalizeBookingNumber(raw: string): string {
   return raw.trim().replace(/^#+/, "").toUpperCase();
 }
 
-/** Genera un código único legible para un cupón (ej. STO-AB12-XY34). */
+/** Genera un código aleatorio legible para un cupón (fallback). Ej. STO-AB12-XY34. */
 export function generateCouponCode(): string {
   const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ";
   const num = "23456789";
@@ -262,4 +262,100 @@ export function generateCouponCode(): string {
     return s;
   }
   return `STO-${pick(alpha, 2)}${pick(num, 2)}-${pick(alpha, 2)}${pick(num, 2)}`;
+}
+
+/**
+ * Limpia un nombre quitando acentos, ñ, espacios y caracteres no A-Z.
+ * Devuelve solo letras mayúsculas.
+ */
+function stripToAlpha(input: string | null | undefined): string {
+  if (!input) return "";
+  return input
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "") // tildes
+    .replace(/ñ/g, "n")
+    .replace(/Ñ/g, "N")
+    .toUpperCase()
+    .replace(/[^A-Z]/g, "");
+}
+
+/**
+ * Toma 3 letras significativas del primer "token" (palabra) de un nombre.
+ * Si tiene menos de 3, rellena con X. Si es vacío, devuelve "XXX".
+ */
+function takeThree(input: string): string {
+  const cleaned = stripToAlpha(input);
+  if (cleaned.length === 0) return "XXX";
+  return (cleaned + "XXX").slice(0, 3);
+}
+
+/**
+ * Separa un "customer_name" en nombre y apellidos asumiendo el patrón
+ * habitual español: primera palabra = nombre, resto = apellidos.
+ *
+ * Ejemplos:
+ *   "Narciso Pardo Buendía"   -> { first: "NAR", last: "PAR" }
+ *   "Ana López"               -> { first: "ANA", last: "LOP" }
+ *   "Yi"                      -> { first: "YIX", last: "XXX" }
+ *   ""                        -> { first: "XXX", last: "XXX" }
+ */
+function splitFirstLast(customerName: string | null | undefined): {
+  first: string;
+  last: string;
+} {
+  const raw = (customerName || "").trim();
+  if (!raw) return { first: "XXX", last: "XXX" };
+  const parts = raw.split(/\s+/);
+  const firstWord = parts[0] || "";
+  const lastWord = parts.length > 1 ? parts[parts.length - 1] : "";
+  return {
+    first: takeThree(firstWord),
+    last: takeThree(lastWord),
+  };
+}
+
+/**
+ * Genera un código de cupón "personalizado" basado en el nombre del cliente
+ * y el % de descuento.
+ *
+ * Formato: `{NOM3}{APE3}{PCT2}` (ej. `NARPAR05`, `ANALOP10`, `SIMNUN15`).
+ *
+ * - Quita acentos, ñ, espacios y cualquier carácter no A-Z.
+ * - Si nombre o apellido tiene <3 letras, rellena con X.
+ * - Si no hay nombre disponible, usa `XXXXXX{PCT2}` y conviene reintentar
+ *   con el código aleatorio de `generateCouponCode()` si hay colisión.
+ *
+ * Si se proporciona `suffix`, se añade al final separado por guion.
+ * Útil para resolver colisiones (`NARPAR05-K3`).
+ *
+ * NOTA: el código no es secreto, es legible para el cliente. Es esperable
+ * que dos clientes con mismo nombre+apellido y mismo % colisionen — ese
+ * caso se gestiona en el insert por la UNIQUE(code) reintentando con
+ * sufijo aleatorio.
+ */
+export function generateCustomerCouponCode(
+  customerName: string | null | undefined,
+  pct: number,
+  suffix?: string
+): string {
+  const { first, last } = splitFirstLast(customerName);
+  const pctTwo = String(Math.max(0, Math.min(99, Math.round(pct)))).padStart(2, "0");
+  const base = `${first}${last}${pctTwo}`;
+  if (suffix && suffix.length > 0) {
+    return `${base}-${suffix.toUpperCase().slice(0, 4)}`;
+  }
+  return base;
+}
+
+/**
+ * Sufijo aleatorio corto para resolver colisiones de código.
+ * 1 letra + 1 dígito (caracteres seguros, sin parecidos confusos).
+ */
+export function randomCouponSuffix(): string {
+  const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  const num = "23456789";
+  return (
+    alpha[Math.floor(Math.random() * alpha.length)] +
+    num[Math.floor(Math.random() * num.length)]
+  );
 }
