@@ -5,14 +5,15 @@
 | Documento | Contenido |
 |-----------|-----------|
 | [GUIA_CONTENIDO.md](./GUIA_CONTENIDO.md) | **Fuente de verdad:** programa Creadores PRO + programa Storytellers (puntos, cupones, landing, imágenes GPT Image 2, Supabase, API, fiscal §11.1, checklist Sprint 3). |
-
+| [STORYTELLERS-STORAGE-TROUBLESHOOTING.md](./STORYTELLERS-STORAGE-TROUBLESHOOTING.md) | **Runbook Storage Storytellers:** límites globales vs bucket, spend cap, plan Free/Pro, errores *maximum allowed size*, MIME `.mov` / Safari, SQL de verificación, enlaces Supabase Docs. |
 ## Lectura rápida si retomas el proyecto
 
 1. Lee el **resumen en cabecera** de `GUIA_CONTENIDO.md` (estado actual).
 2. **Storytellers — negocio:** §3 (filosofía, puntos, cupón 3% bienvenida, merchandising §3.4).
 3. **Storytellers — técnico:** §11 (implementación), crons, variables `.env.example`.
-4. **Storytellers — diseño y assets:** §12 (orden de la landing, script `generate-storytellers-showcase-images.ts`, imágenes en `public/images/storytellers/`).
-5. **PRO:** §2 + §5 + §6 (prompts / regeneración imágenes en `public/images/content-creators/`).
+4. **Storytellers — Storage / errores de subida:** `STORYTELLERS-STORAGE-TROUBLESHOOTING.md` (global vs bucket, spend cap).
+5. **Storytellers — diseño y assets:** §12 (orden de la landing, script `generate-storytellers-showcase-images.ts`, imágenes en `public/images/storytellers/`).
+6. **PRO:** §2 + §5 + §6 (prompts / regeneración imágenes en `public/images/content-creators/`).
 
 ## Scripts relacionados (repo raíz)
 

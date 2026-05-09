@@ -674,6 +674,7 @@ Ver carpeta `scripts/`:
 | ¿Cómo subo imágenes? | `02-desarrollo/media/GESTION-MEDIA-STORAGE.md`, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
 | ¿Cómo creo carpetas en storage? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
 | ¿Por qué "Nueva Carpeta" no funciona? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
+| ¿Por qué fallan vídeos Storytellers "maximum size" con bucket a 3 GB? | `02-desarrollo/contenido/STORYTELLERS-STORAGE-TROUBLESHOOTING.md` |
 | ¿Cómo organizo imágenes por buckets? | `02-desarrollo/media/GESTION-MEDIA-STORAGE.md`, `02-desarrollo/media/FAQ-MEDIA-STORAGE.md` ⚠️ **NUEVO** |
 | ¿Cómo funcionan las temporadas? | `SISTEMA_TEMPORADAS.md` |
 | ¿Por qué no cargan los artículos del blog? | `SOLUCION-BLOG-FRONTEND.md` |

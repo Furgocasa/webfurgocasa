@@ -41,6 +41,10 @@ Documentación de desarrollo por área:
 - Galerías de vehículos
 - Imágenes hero y slides
 
+#### contenido/
+- **GUIA_CONTENIDO.md** — Creadores PRO + programa Storytellers (fuente de verdad negocio/técnico)
+- **STORYTELLERS-STORAGE-TROUBLESHOOTING.md** — Runbook Storage Storytellers: límite global vs bucket, spend cap, Free/Pro, MIME iPhone, checklist errores de tamaño
+
 #### analytics/
 - Google Analytics y Meta Pixel
 - Exclusión de admin en tracking

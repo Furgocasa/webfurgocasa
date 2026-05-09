@@ -16,6 +16,9 @@
  *   node --use-system-ca node_modules/tsx/dist/cli.mjs scripts/storytellers-smoke-test.ts
  *
  * No escribe nada ni envía emails. Solo lectura.
+ *
+ * Límites de tamaño / errores Storage (bucket vs global, spend cap): ver
+ * docs/02-desarrollo/contenido/STORYTELLERS-STORAGE-TROUBLESHOOTING.md
  */
 
 import { config } from "dotenv";
