@@ -65,51 +65,58 @@ function StorytellerAdminVideo({
       ? "h-full w-full object-cover"
       : "max-h-[85vh] max-w-full bg-black";
 
+  const wrapperClass =
+    variant === "thumbnail"
+      ? "relative h-full min-h-[120px] w-full bg-gray-100"
+      : "relative flex min-h-[300px] w-full min-w-[280px] items-center justify-center bg-gray-900 sm:min-w-[480px]";
+
   return (
-    <div className={variant === "thumbnail" ? "relative h-full min-h-[120px] w-full" : "relative"}>
-      <video
-        key={previewUrl}
-        src={previewUrl}
-        className={videoClass}
-        controls={variant === "modal"}
-        preload="metadata"
-        playsInline
-        muted={variant === "thumbnail"}
-        onError={() => setDecodeError(true)}
-        onLoadedMetadata={(e) => {
-          const v = e.currentTarget;
-          // Algunos navegadores no disparan error con HEVC pero dejan dimensiones en 0.
-          if (Number.isFinite(v.duration) && v.duration > 0 && v.videoWidth === 0 && v.videoHeight === 0) {
-            setDecodeError(true);
-          }
-        }}
-      />
+    <div className={wrapperClass}>
+      {!decodeError && (
+        <video
+          key={previewUrl}
+          src={previewUrl}
+          className={videoClass}
+          controls={variant === "modal"}
+          preload="metadata"
+          playsInline
+          muted={variant === "thumbnail"}
+          onError={() => setDecodeError(true)}
+          onLoadedMetadata={(e) => {
+            const v = e.currentTarget;
+            // Algunos navegadores no disparan error con HEVC pero dejan dimensiones en 0.
+            if (Number.isFinite(v.duration) && v.duration > 0 && v.videoWidth === 0 && v.videoHeight === 0) {
+              setDecodeError(true);
+            }
+          }}
+        />
+      )}
       {decodeError && (
         <div
           className={
             variant === "thumbnail"
-              ? "absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-900/92 p-3 text-center text-white"
-              : "absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/88 p-6 text-center text-white"
+              ? "absolute inset-0 flex flex-col items-center justify-center gap-2 bg-gray-900 p-3 text-center text-white"
+              : "flex flex-col items-center justify-center gap-4 p-8 text-center text-white"
           }
         >
-          <Video className={variant === "thumbnail" ? "h-9 w-9 shrink-0 opacity-85" : "h-11 w-11 shrink-0 opacity-85"} />
-          <p className="max-w-md text-xs leading-snug md:text-sm">
-            Este navegador no reproduce bien los vídeos QuickTime (.mov) típicos del iPhone (códec{" "}
-            <strong>HEVC</strong>). La subida es correcta: prueba en <strong>Safari</strong> (Mac/iPad),
-            o descarga el archivo y ábrelo con <strong>VLC</strong> o el visor de fotos del sistema.
+          <Video className={variant === "thumbnail" ? "h-9 w-9 shrink-0 opacity-85" : "h-12 w-12 shrink-0 opacity-85"} />
+          <p className="max-w-md text-xs leading-snug md:text-sm text-gray-200">
+            Este navegador no reproduce bien los vídeos QuickTime (.mov) del iPhone (códec{" "}
+            <strong className="text-white">HEVC</strong>). La subida es correcta: prueba en <strong className="text-white">Safari</strong> (Mac/iPad),
+            o descarga el archivo y ábrelo con <strong className="text-white">VLC</strong> o el visor del sistema.
           </p>
           <a
             href={previewUrl}
             download={originalFilename || "video.mov"}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-xs font-semibold text-gray-900 hover:bg-gray-100 md:text-sm"
+            className="mt-2 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100"
           >
             <Download className="h-4 w-4 shrink-0" aria-hidden />
             Descargar vídeo
           </a>
           {fileMimeType ? (
-            <span className="text-[10px] text-white/70">{fileMimeType}</span>
+            <span className="mt-2 text-xs text-white/50">{fileMimeType}</span>
           ) : null}
         </div>
       )}
