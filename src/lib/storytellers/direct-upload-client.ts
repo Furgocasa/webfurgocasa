@@ -117,14 +117,22 @@ async function sha256OfFile(file: File): Promise<string> {
 
 /**
  * Sube `file` a la signed URL de Supabase Storage en una sola request PUT.
- * Usa XHR para tener `progress` events nativos. Si la red se corta, el
- * archivo se da por fallido (no hay reanudación).
+ * Usa XHR para tener `progress` events nativos.
  *
- * Convención del endpoint signed de Supabase:
- *   - PUT al signedUrl con el body como Blob.
- *   - Header `x-upsert: false` para no sobrescribir.
- *   - Header `Content-Type` con el MIME del archivo.
- *   - El token de auth ya viene incrustado en la URL firmada.
+ * Convención del endpoint signed de Supabase Storage (signed upload URL):
+ *   - Método: PUT.
+ *   - Body: multipart/form-data con un campo "file" (sin nombre de campo
+ *     concreto, basta con que esté).
+ *   - `cacheControl` se manda como campo dentro del FormData.
+ *   - Header: `x-upsert: false` para no sobrescribir.
+ *   - El Content-Type lo pone el navegador automáticamente con el
+ *     boundary de FormData; NO debemos setearlo a mano.
+ *   - El token de auth ya viene como query string en la URL firmada.
+ *
+ * Importante: NO funciona enviar el File crudo como body. Supabase
+ * Storage devuelve HTTP 400 ('Empty file' o similar) porque espera
+ * multipart/form-data. Esto es lo que hace internamente
+ * `supabase.storage.from(bucket).uploadToSignedUrl()`.
  */
 function putToSignedUrl(
   signedUrl: string,
@@ -134,9 +142,9 @@ function putToSignedUrl(
   return new Promise((resolve) => {
     const xhr = new XMLHttpRequest();
     xhr.open("PUT", signedUrl, true);
-    xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+    // Headers que Supabase entiende (NO Content-Type manual: lo pone el
+    // navegador con el boundary del FormData).
     xhr.setRequestHeader("x-upsert", "false");
-    xhr.setRequestHeader("cache-control", "3600");
 
     xhr.upload.onprogress = (e) => {
       if (e.lengthComputable) onProgress(e.loaded);
@@ -162,7 +170,14 @@ function putToSignedUrl(
     // Timeout generoso: 5 min para vídeos grandes con red regular.
     xhr.timeout = 5 * 60 * 1000;
 
-    xhr.send(file);
+    // Body multipart/form-data — convención de Supabase Storage.
+    const formData = new FormData();
+    formData.append("cacheControl", "3600");
+    // El nombre de campo "" + el filename son los que usa supabase-js
+    // internamente. Mantenemos compatibilidad bit-a-bit con su SDK.
+    formData.append("", file, file.name);
+
+    xhr.send(formData);
   });
 }
 
