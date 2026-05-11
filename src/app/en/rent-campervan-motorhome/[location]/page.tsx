@@ -141,9 +141,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 
   const displayName = translated.name || location.name;
-  const title = translated.meta_title || location.meta_title || `Rent campervans and motorhomes in ${displayName}`;
+  const title = translated.meta_title || location.meta_title || `Motorhome and campervan rental in ${displayName}`;
   const description = translated.meta_description || location.meta_description ||
-    `Fully equipped high-volume campervans in ${displayName}. Motorhome-level comfort with more agile, easier driving. Unlimited mileage from €95/day.`;
+    `Rent a fully equipped large campervan in ${displayName}: motorhome-style comfort, unlimited mileage and prices from €95/day.`;
 
   const path = `/rent-campervan-motorhome/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -226,9 +226,9 @@ export default async function LocationPage({ params }: PageProps) {
   const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
-  const rentHeroH1 = location.h1_title || `Rent campervans and motorhomes in ${location.name}`;
+  const rentHeroH1 = location.h1_title || `Motorhome and campervan rental in ${location.name}`;
   const rentHeroClaim =
-    "Fully equipped high-volume campervans: motorhome-level comfort with more agile, easier driving.";
+    "Fully equipped large campervans: motorhome-style comfort with easier, more agile driving.";
 
   return (
     <>

@@ -64,13 +64,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const alternates = buildCanonicalAlternates('/', locale);
   
   return {
-    title: "Location Camping-Cars en Espagne - Flotte Premium | Furgocasa",
-    description: "Location de camping-cars et vans en Espagne. Flotte premium Dreamer, Knaus, Weinsberg. Kilométrage illimité, équipement complet. Réservez votre camping-car !",
+    title: `${t("Alquiler de campers gran volumen en España")} | Furgocasa`,
+    description: `${t("Home meta desc campers gran volumen")} Téléphone +34 868 36 41 61.`,
     keywords: "location camping-car, location van, camping-cars, vans aménagés, motorhome espagne, location camping-car espagne, furgocasa",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      title: "Location Camping-Cars en Espagne - Flotte Premium | Furgocasa",
-      description: `${t("Furgocasa: flota premium desde 95€/día con kilómetros ilimitados")}. Dreamer, Knaus, Weinsberg. Espagne et Europe.`,
+      title: `${t("Alquiler de campers gran volumen en España")} | Furgocasa`,
+      description: `${t("Home meta desc campers gran volumen")}`,
       type: "website",
       url: alternates.canonical,
       siteName: t("Furgocasa - Alquiler de Autocaravanas"),
@@ -79,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: "https://www.furgocasa.com/images/slides/hero-05.webp",
           width: 1920,
           height: 1080,
-          alt: `Furgocasa - ${t("Las Mejores Campers en Alquiler")}`,
+          alt: `Furgocasa - ${t("Alquiler de campers gran volumen en España")}`,
           type: "image/webp",
         },
         {
@@ -103,8 +103,8 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       site: "@furgocasa",
       creator: "@furgocasa",
-      title: "Location Camping-Cars en Espagne - Flotte Premium | Furgocasa",
-      description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Kilómetros ilimitados, equipamiento completo")}.`,
+      title: `${t("Alquiler de campers gran volumen en España")} | Furgocasa`,
+      description: `${t("Home meta desc campers gran volumen")}`,
       images: ["https://www.furgocasa.com/images/slides/hero-05.webp"],
     },
     alternates,
@@ -182,7 +182,7 @@ export default async function LocaleHomePage() {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src="/images/slides/hero-11.webp"
-            alt="Furgocasa - Location de camping-cars et vans"
+            alt={`Furgocasa - ${t("Alquiler de campers gran volumen en España")}`}
             fill
             priority
             sizes="100vw"
@@ -202,13 +202,13 @@ export default async function LocaleHomePage() {
             </span>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
-              {t("Las Mejores Autocaravanas Camper en Alquiler")}
+              {t("Alquiler de campers gran volumen en España")}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
             <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
-              {t("Furgocasa: flota premium desde 95€/día con kilómetros ilimitados")}
+              {t("Campers totalmente equipadas tipo autocaravana para viajar por España y Europa con kilómetros ilimitados, asistencia durante el viaje y recogida en Murcia, Madrid, Alicante o Albacete según disponibilidad.")}
             </p>
             
             <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>

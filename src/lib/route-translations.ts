@@ -142,6 +142,12 @@ export const routeTranslations = {
     fr: "/guide-camping-car", 
     de: "/wohnmobil-guide" 
   },
+  "/alquiler-campers-gran-volumen": {
+    es: "/alquiler-campers-gran-volumen",
+    en: "/rent-large-volume-campervans",
+    fr: "/location-campers-grand-volume",
+    de: "/grossraum-camper-mieten",
+  },
   "/inteligencia-artificial": { 
     es: "/inteligencia-artificial", 
     en: "/artificial-intelligence", 

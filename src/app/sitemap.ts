@@ -179,6 +179,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // /como-funciona → 301 a /guia-camper (excluido del sitemap)
     { path: '/autocaravanas', priority: 0.9, changeFrequency: 'weekly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/alquiler-campers-gran-volumen', priority: 0.85, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/ofertas', priority: 0.6, changeFrequency: 'weekly' },

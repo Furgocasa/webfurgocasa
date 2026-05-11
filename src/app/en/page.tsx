@@ -64,13 +64,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const alternates = buildCanonicalAlternates('/', locale);
   
   return {
-    title: `${t("Las Mejores Campers en Alquiler")} - ${t("Alquiler en España")} | Furgocasa`,
-    description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Flota premium Dreamer, Knaus, Weinsberg")}. ${t("Kilómetros ilimitados, equipamiento completo")}. ${t("¡Reserva tu camper ahora!")}`,
+    title: `${t("Alquiler de campers gran volumen en España")} | Furgocasa`,
+    description: `${t("Home meta desc campers gran volumen")}`,
     keywords: "motorhome rental, campervan rental, camper rental, motorhome spain, campervan hire, motorhome rental spain, furgocasa",
     authors: [{ name: "Furgocasa" }],
     openGraph: {
-      title: `${t("Las Mejores Campers en Alquiler")} - ${t("Alquiler en España")} | Furgocasa`,
-      description: `${t("Furgocasa: flota premium desde 95€/día con kilómetros ilimitados")}. Dreamer, Knaus, Weinsberg. Spain and Europe.`,
+      title: `${t("Alquiler de campers gran volumen en España")} | Furgocasa`,
+      description: `${t("Home meta desc campers gran volumen")}`,
       type: "website",
       url: alternates.canonical,
       siteName: t("Furgocasa - Alquiler de Autocaravanas"),
@@ -79,7 +79,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: "https://www.furgocasa.com/images/slides/hero-05.webp",
           width: 1920,
           height: 1080,
-          alt: `Furgocasa - ${t("Las Mejores Campers en Alquiler")}`,
+          alt: `Furgocasa - ${t("Alquiler de campers gran volumen en España")}`,
           type: "image/webp",
         },
         {
@@ -103,8 +103,8 @@ export async function generateMetadata(): Promise<Metadata> {
       card: "summary_large_image",
       site: "@furgocasa",
       creator: "@furgocasa",
-      title: `${t("Las Mejores Campers en Alquiler")} - ${t("Alquiler en España")} | Furgocasa`,
-      description: `${t("Alquiler de autocaravanas y campers de gran volumen")}. ${t("Kilómetros ilimitados, equipamiento completo")}.`,
+      title: `${t("Alquiler de campers gran volumen en España")} | Furgocasa`,
+      description: `${t("Home meta desc campers gran volumen")}`,
       images: ["https://www.furgocasa.com/images/slides/hero-05.webp"],
     },
     alternates,
@@ -182,7 +182,7 @@ export default async function LocaleHomePage() {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src="/images/slides/hero-11.webp"
-            alt="Furgocasa - Motorhome & campervan rental"
+            alt={`Furgocasa - ${t("Alquiler de campers gran volumen en España")}`}
             fill
             priority
             sizes="100vw"
@@ -202,17 +202,17 @@ export default async function LocaleHomePage() {
             </span>
 
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
-              {t("Best Motorhomes and Campervans for Rent")}
+              {t("Alquiler de campers gran volumen en España")}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
             <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
-              {t("Furgocasa: premium fleet from 95€/day with unlimited kilometres")}
+              {t("Campers totalmente equipadas tipo autocaravana para viajar por España y Europa con kilómetros ilimitados, asistencia durante el viaje y recogida en Murcia, Madrid, Alicante o Albacete según disponibilidad.")}
             </p>
             
             <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
-              {t("Dreamer, Knaus, Weinsberg. Spain and Europe.")}
+              {t("Dreamer, Knaus, Weinsberg. España y Europa.")}
             </p>
           </div>
 

@@ -201,6 +201,7 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
     { path: '/reservar', priority: 0.8, changeFrequency: 'weekly' },
     { path: '/contacto', priority: 0.7, changeFrequency: 'monthly' },
     { path: '/guia-camper', priority: 0.6, changeFrequency: 'monthly' },
+    { path: '/alquiler-campers-gran-volumen', priority: 0.85, changeFrequency: 'monthly' },
     { path: '/mapa-areas', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/aparcamiento-autocaravanas-campers-murcia', priority: 0.6, changeFrequency: 'monthly' },
     { path: '/ofertas', priority: 0.6, changeFrequency: 'weekly' },

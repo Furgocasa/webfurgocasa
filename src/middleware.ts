@@ -184,6 +184,7 @@ export async function middleware(request: NextRequest) {
     const [, , rest] = localeMatch;
     const spanishPrefixes = [
       '/alquiler-autocaravanas-campervans',
+      '/alquiler-campers-gran-volumen',
       '/alquiler-casas-rodantes',
       '/alquiler-motorhome',
       '/venta-autocaravanas-camper',

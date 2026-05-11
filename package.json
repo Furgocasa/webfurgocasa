@@ -37,6 +37,8 @@
     "assign:location-tags:dry": "tsx scripts/assign-location-tags-to-posts.ts --dry-run",
     "check:location-tags": "tsx scripts/check-location-tags.ts",
     "check:location-targets-db": "tsx scripts/check-location-targets-db.ts",
+    "audit:location-seo-db": "tsx scripts/audit-location-seo-db.ts",
+    "audit:location-seo-db:insecure": "tsx scripts/audit-location-seo-db.ts --insecure",
     "seo:cinco-planes-otono": "tsx scripts/seo-update-cinco-planes-otono.ts",
     "seo:cinco-planes-otono:dry": "tsx scripts/seo-update-cinco-planes-otono.ts --dry-run",
     "translate:blog": "node translate-blog-content.js",

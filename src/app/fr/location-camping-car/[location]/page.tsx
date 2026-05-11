@@ -140,9 +140,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 
   const displayName = translated.name || location.name;
-  const title = translated.meta_title || location.meta_title || `Location de camping-cars et fourgons à ${displayName}`;
+  const title = translated.meta_title || location.meta_title || `Location de fourgons aménagés et camping-cars à ${displayName}`;
   const description = translated.meta_description || location.meta_description ||
-    `Camping-cars grand volume entièrement équipés à ${displayName}. Confort d'autocar, conduite plus agile et simple. Kilométrage illimité dès 95€/jour.`;
+    `Louez un fourgon aménagé grand volume à ${displayName} : véhicule entièrement équipé type camping-car, kilométrage illimité et tarifs dès 95 €/jour.`;
 
   const path = `/location-camping-car/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -225,9 +225,9 @@ export default async function LocationPage({ params }: PageProps) {
   const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
-  const rentHeroH1 = location.h1_title || `Location de camping-cars et fourgons à ${location.name}`;
+  const rentHeroH1 = location.h1_title || `Location de fourgons aménagés et camping-cars à ${location.name}`;
   const rentHeroClaim =
-    "Camping-cars grand volume entièrement équipés : le confort d'un autocar, avec une conduite plus agile et plus simple.";
+    "Fourgons aménagés grand volume entièrement équipés : le confort d'un camping-car, avec une conduite plus agile et plus simple.";
 
   return (
     <>

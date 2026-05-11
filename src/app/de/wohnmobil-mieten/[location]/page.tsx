@@ -140,9 +140,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 
   const displayName = translated.name || location.name;
-  const title = translated.meta_title || location.meta_title || `Großraum-Camper und Wohnmobile mieten in ${displayName}`;
+  const title = translated.meta_title || location.meta_title || `Campervan- und Wohnmobilvermietung in ${displayName}`;
   const description = translated.meta_description || location.meta_description ||
-    `Voll ausgestattete Großraum-Camper in ${displayName}. Komfort wie im Wohnmobil, agilere und einfachere Fahrt. Unbegrenzte Kilometer ab 95€/Tag.`;
+    `Miete einen voll ausgestatteten großen Campervan in ${displayName}: Komfort wie im Wohnmobil, unbegrenzte Kilometer und Preise ab 95 €/Tag.`;
 
   const path = `/wohnmobil-mieten/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -225,9 +225,9 @@ export default async function LocationPage({ params }: PageProps) {
   const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
-  const rentHeroH1 = location.h1_title || `Großraum-Camper und Wohnmobile mieten in ${location.name}`;
+  const rentHeroH1 = location.h1_title || `Campervan- und Wohnmobilvermietung in ${location.name}`;
   const rentHeroClaim =
-    "Voll ausgestattete Großraum-Camper: Wohnmobil-Komfort mit agilerer, leichterer Fahrweise.";
+    "Voll ausgestattete große Campervans: Wohnmobil-Komfort mit einfacherem und wendigerem Fahrgefühl.";
 
   return (
     <>

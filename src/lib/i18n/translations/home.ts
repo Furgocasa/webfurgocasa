@@ -448,4 +448,24 @@ export const homeTranslations = {
     fr: "ans",
     de: "Jahre"
   },
+
+  /** Home — posicionamiento marca: campers gran volumen (2026) */
+  "Alquiler de campers gran volumen en España": {
+    es: "Alquiler de campers gran volumen en España",
+    en: "Large-volume campervan rental in Spain",
+    fr: "Location de camping-cars grand volume en Espagne",
+    de: "Großraum-Campervermietung in Spanien"
+  },
+  "Campers totalmente equipadas tipo autocaravana para viajar por España y Europa con kilómetros ilimitados, asistencia durante el viaje y recogida en Murcia, Madrid, Alicante o Albacete según disponibilidad.": {
+    es: "Campers totalmente equipadas tipo autocaravana para viajar por España y Europa con kilómetros ilimitados, asistencia durante el viaje y recogida en Murcia, Madrid, Alicante o Albacete según disponibilidad.",
+    en: "Fully equipped campervans with motorhome-level comfort for travel in Spain and Europe: unlimited kilometres, assistance while you travel, and pickup in Murcia, Madrid, Alicante or Albacete subject to availability.",
+    fr: "Camping-cars entièrement équipés, confort proche de l'autocaravane, pour voyager en Espagne et en Europe : kilométrage illimité, assistance pendant le voyage et retrait à Murcie, Madrid, Alicante ou Albacete selon disponibilité.",
+    de: "Voll ausgestattete Campervans mit Wohnmobil-Komfort für Reisen in Spanien und Europa: unbegrenzte Kilometer, Unterstützung auf der Reise und Abholung in Murcia, Madrid, Alicante oder Albacete je nach Verfügbarkeit."
+  },
+  "Home meta desc campers gran volumen": {
+    es: "Campers gran volumen equipadas tipo autocaravana. Kilómetros ilimitados, asistencia en viaje y recogida en Murcia, Madrid, Alicante o Albacete. Dreamer, Knaus, Weinsberg.",
+    en: "Large-volume campervans, motorhome-style equipment. Unlimited mileage, on-trip assistance and pickup in Murcia, Madrid, Alicante or Albacete. Dreamer, Knaus, Weinsberg.",
+    fr: "Camping-cars grand volume, équipement type autocaravane. Kilométrage illimité, assistance en route et retrait à Murcie, Madrid, Alicante ou Albacete. Dreamer, Knaus, Weinsberg.",
+    de: "Großraum-Camper, Ausstattung wie beim Wohnmobil. Unbegrenzte Kilometer, Unterstützung auf der Reise und Abholung in Murcia, Madrid, Alicante oder Albacete. Dreamer, Knaus, Weinsberg."
+  },
 };
