@@ -139,9 +139,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     { name: location.name, meta_title: location.meta_title, meta_description: location.meta_description }
   );
 
-  const title = translated.meta_title || location.meta_title || `Location de camping-car à ${translated.name || location.name}`;
-  const description = translated.meta_description || location.meta_description || 
-    `Louez votre camping-car à ${translated.name || location.name}. Flotte premium avec kilométrage illimité.`;
+  const displayName = translated.name || location.name;
+  const title = translated.meta_title || location.meta_title || `Location de camping-cars et fourgons à ${displayName}`;
+  const description = translated.meta_description || location.meta_description ||
+    `Camping-cars grand volume entièrement équipés à ${displayName}. Confort d'autocar, conduite plus agile et simple. Kilométrage illimité dès 95€/jour.`;
 
   const path = `/location-camping-car/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -224,6 +225,9 @@ export default async function LocationPage({ params }: PageProps) {
   const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
+  const rentHeroH1 = location.h1_title || `Location de camping-cars et fourgons à ${location.name}`;
+  const rentHeroClaim =
+    "Camping-cars grand volume entièrement équipés : le confort d'un autocar, avec une conduite plus agile et plus simple.";
 
   return (
     <>
@@ -237,7 +241,7 @@ export default async function LocationPage({ params }: PageProps) {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src={heroImageUrl}
-            alt={location.h1_title || `Location de Camping-car à ${location.name}`}
+            alt={rentHeroH1}
             fill
             priority
             fetchPriority="high"
@@ -258,21 +262,20 @@ export default async function LocationPage({ params }: PageProps) {
               Location de camping-car en Espagne · Dès 95€/jour
             </span>
 
-            {/* H1 - Format fixe: Location de Camping-car (Autocaravane) à {ville} */}
             <h1 
               className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
             >
-              Location de Camping-car (Autocaravane) à {location.name}
+              {rentHeroH1}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
             <p 
-              className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" 
+              className="text-xl md:text-2xl lg:text-3xl font-heading font-light text-white/95 leading-snug max-w-4xl mx-auto" 
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}
             >
-              Furgocasa : flotte premium à partir de 95€/jour avec kilométrage illimité
+              {rentHeroClaim}
             </p>
             
             <p 

@@ -153,9 +153,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     { name: location.name, meta_title: location.meta_title, meta_description: location.meta_description }
   );
 
-  const title = translated.meta_title || location.meta_title || `${t("Alquiler de Autocaravanas en")} ${translated.name || location.name}`;
-  const description = translated.meta_description || location.meta_description || 
-    `${t("Alquila tu autocaravana camper en")} ${translated.name || location.name}. ${t("Flota premium con kilómetros ilimitados")}.`;
+  const displayName = translated.name || location.name;
+  const title = translated.meta_title || location.meta_title || `Alquiler de campers y autocaravanas en ${displayName}`;
+  const description = translated.meta_description || location.meta_description ||
+    `Campers gran volumen totalmente equipadas en ${displayName}. El confort de una autocaravana, conducción más ágil y sencilla. Kilómetros ilimitados desde 95€/día.`;
 
   const path = `/alquiler-autocaravanas-campervans/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -241,6 +242,9 @@ export default async function LocationPage({ params }: PageProps) {
   const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
+  const rentHeroH1 = location.h1_title || `Alquiler de campers y autocaravanas en ${location.name}`;
+  const rentHeroClaim =
+    "Campers gran volumen totalmente equipadas: el confort de una autocaravana, con una conducción más ágil y sencilla.";
 
   return (
     <>
@@ -257,7 +261,7 @@ export default async function LocationPage({ params }: PageProps) {
       {/* ================================================================== */}
       <LocationHeroWithSkeleton
         heroImageUrl={heroImageUrl}
-        alt={location.h1_title || `${t("Alquiler de autocaravanas campers en")} ${location.name}`}
+        alt={rentHeroH1}
         scrollIndicator={<HeroScrollIndicator href="#landing-intro" label={t("Descubre más")} />}
       >
         <div className="w-full text-center">
@@ -267,21 +271,20 @@ export default async function LocationPage({ params }: PageProps) {
               {t("Alquiler de campers en España")} · {t("Desde 95€/día")}
             </span>
 
-            {/* H1 - Formato: Alquiler de autocaravanas campers en {ciudad} */}
             <h1 
               className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" 
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
             >
-              {t("Alquiler de autocaravanas campers en")} {location.name}
+              {rentHeroH1}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
             <p 
-              className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" 
+              className="text-xl md:text-2xl lg:text-3xl font-heading font-light text-white/95 leading-snug max-w-4xl mx-auto" 
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}
             >
-              {t("Furgocasa: flota premium desde 95€/día con kilómetros ilimitados")}
+              {rentHeroClaim}
             </p>
             
             <p 

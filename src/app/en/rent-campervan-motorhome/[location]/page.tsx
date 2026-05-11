@@ -140,9 +140,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     { name: location.name, meta_title: location.meta_title, meta_description: location.meta_description }
   );
 
-  const title = translated.meta_title || location.meta_title || `Campervan Rental in ${translated.name || location.name}`;
-  const description = translated.meta_description || location.meta_description || 
-    `Rent your campervan in ${translated.name || location.name}. Premium fleet with unlimited mileage.`;
+  const displayName = translated.name || location.name;
+  const title = translated.meta_title || location.meta_title || `Rent campervans and motorhomes in ${displayName}`;
+  const description = translated.meta_description || location.meta_description ||
+    `Fully equipped high-volume campervans in ${displayName}. Motorhome-level comfort with more agile, easier driving. Unlimited mileage from €95/day.`;
 
   const path = `/rent-campervan-motorhome/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });
@@ -225,6 +226,9 @@ export default async function LocationPage({ params }: PageProps) {
   const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
+  const rentHeroH1 = location.h1_title || `Rent campervans and motorhomes in ${location.name}`;
+  const rentHeroClaim =
+    "Fully equipped high-volume campervans: motorhome-level comfort with more agile, easier driving.";
 
   return (
     <>
@@ -238,7 +242,7 @@ export default async function LocationPage({ params }: PageProps) {
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src={heroImageUrl}
-            alt={location.h1_title || `Campervan Rental in ${location.name}`}
+            alt={rentHeroH1}
             fill
             priority
             fetchPriority="high"
@@ -259,21 +263,20 @@ export default async function LocationPage({ params }: PageProps) {
               Campervan rental in Spain · From €95/day
             </span>
 
-            {/* H1 - Fixed format: Motorhome Rental in {city} */}
             <h1 
               className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4 mt-8 md:mt-0" 
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
             >
-              Motorhome (Campervan) Rental in {location.name}
+              {rentHeroH1}
             </h1>
             
             <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
             
             <p 
-              className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" 
+              className="text-xl md:text-2xl lg:text-3xl font-heading font-light text-white/95 leading-snug max-w-4xl mx-auto" 
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}
             >
-              Furgocasa: premium fleet from 95€/day with unlimited mileage
+              {rentHeroClaim}
             </p>
             
             <p 
