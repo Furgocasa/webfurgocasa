@@ -86,6 +86,10 @@ Ahora incluye:
 
 Las URLs de **alquiler por ciudad** (`/alquiler-autocaravanas-campervans/{slug}`) y **venta por ciudad** (`/venta-autocaravanas-camper/{slug}`) usan la misma pista de importancia que la **portada**: `priority: 1.0` y `changeFrequency: daily` en `src/app/sitemap.ts` y en `src/lib/seo/sitemap.ts` (sitemaps por idioma vía `getBaseSitemapEntries`). Objetivo: tratarlas como “homes” locales para búsquedas y descubrimiento.
 
+### Copy del hero (venta por ciudad)
+
+El párrafo bajo el H1 usa `intro_text` de `sale_location_targets` si existe; si está vacío, el texto sale de `getSaleLocationPageCopy()` en `src/lib/seo/sale-location-seo-copy.ts` (ES/EN/FR/DE), alineado al modelo real: **empresa de alquiler**, **flota renovada**, **venta de unidades retiradas del alquiler** y **horizonte habitual ~2 años en flota**. Para quitar intros antiguos en producción, aplicar la migración `supabase/migrations/20260511-sale-location-intro-reset.sql` (anula `intro_text` y borra traducciones de ese campo en `content_translations`).
+
 ---
 
 ## 🌐 Traducciones de Rutas

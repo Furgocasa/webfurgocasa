@@ -19,7 +19,7 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
     "@type": "AutoDealer",
     "name": "Furgocasa",
     "alternateName": `Furgocasa - Autocaravanas y campers de ocasión cerca de ${location.name}`,
-    "description": `Venta de autocaravanas y campers de segunda mano cerca de ${location.name}, en gran parte procedentes de nuestra flota de alquiler revisada. Entrega desde Murcia. Garantía mínima de un año como vendedor profesional, revisión y asesoramiento personalizado.`,
+    "description": `Empresa de alquiler de autocaravanas y campers en Murcia, con atención a clientes cerca de ${location.name}. Vendemos unidades que han salido de nuestra flota al renovarla, revisadas y con historial conocido; solemos comercializarlas tras unos dos años en servicio. Asesoramiento y entrega según disponibilidad. Garantía mínima de un año como vendedor profesional.`,
     "url": `${baseUrl}/es/venta-autocaravanas-camper/${location.slug}`,
     "telephone": "+34868364161",
     "email": "info@furgocasa.com",
@@ -129,7 +129,7 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
         "name": `¿Las autocaravanas y campers son de segunda mano?`,
         "acceptedAnswer": {
           "@type": "Answer",
-          "text": `Sí. Comercializamos autocaravanas y campers de ocasión, en gran parte provenientes de nuestra flota de alquiler, revisadas y preparadas para su venta con garantía mínima de un año como vendedores profesionales.`
+          "text": `Sí. Somos empresa de alquiler: al renovar la flota, las unidades retiradas del servicio las preparamos para la venta en taller. Suele ser habitual comercializarlas tras aproximadamente un par de años en flota, con garantía mínima de un año al vender como profesionales.`
         }
       },
       {
