@@ -148,6 +148,13 @@ const conditionLabels: Record<string, { label: string; color: string }> = {
   fair: { label:"Aceptable", color:"bg-orange-100 text-orange-700" },
 };
 
+function salePageH1Subtitle(condition: string | undefined): string {
+  if (condition === "new") {
+    return "Camper en venta";
+  }
+  return "Camper de ocasión en venta";
+}
+
 export default async function VehicleSalePage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const vehicle = await getVehicle(slug);
@@ -228,7 +235,12 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
                   </span>
                 </div>
 
-                <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">{vehicle.name}</h1>
+                <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
+                  <span className="block">{vehicle.name}</span>
+                  <span className="block text-base md:text-xl font-semibold text-gray-600 mt-1 md:mt-2">
+                    {salePageH1Subtitle(vehicle.condition)} · Murcia · {vehicle.year}
+                  </span>
+                </h1>
                 <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">{vehicle.short_description}</p>
 
                 {/* Specs grid */}

@@ -191,6 +191,8 @@ canonical: "https://www.furgocasa.com/es/blog/rutas"
    - Genera todas las URLs con hreflang alternates
    - Compatible con Next.js MetadataRoute.Sitemap
 
+**Prioridades destacadas:** las landings **por ciudad** (alquiler y venta) llevan **`priority: 1.0`** y **`changefreq: daily`**, al mismo nivel que la home, en `src/app/sitemap.ts` y duplicado en `src/lib/seo/sitemap.ts` para los XML por idioma (`/sitemap-[locale].xml`).
+
 2. **`src/app/sitemap-[locale]/route.ts`** - Sitemaps por idioma (opcional)
    - Genera sitemaps separados por idioma
    - Cada URL solo aparece en su sitemap de idioma

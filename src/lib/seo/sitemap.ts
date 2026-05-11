@@ -292,8 +292,8 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
   locationList.forEach((location) => {
     entries.push({
       path: `/alquiler-autocaravanas-campervans/${location.slug}`,
-      priority: 0.7,
-      changeFrequency: 'weekly',
+      priority: 1.0,
+      changeFrequency: 'daily',
       lastModified: location.updated_at || now,
     });
   });
@@ -301,8 +301,8 @@ export async function getBaseSitemapEntries(): Promise<SitemapEntry[]> {
   saleLocationList.forEach((location) => {
     entries.push({
       path: `/venta-autocaravanas-camper/${location.slug}`,
-      priority: 0.7,
-      changeFrequency: 'weekly',
+      priority: 1.0,
+      changeFrequency: 'daily',
       lastModified: location.updated_at || now,
     });
   });

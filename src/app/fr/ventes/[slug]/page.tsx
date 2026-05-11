@@ -147,6 +147,13 @@ const conditionLabels: Record<string, { label: string; color: string }> = {
   fair: { label:"Aceptable", color:"bg-orange-100 text-orange-700" },
 };
 
+function salePageH1Subtitle(condition: string | undefined): string {
+  if (condition === "new") {
+    return "Camping-car à vendre";
+  }
+  return "Camping-car d'occasion à vendre";
+}
+
 function formatDate(date: string): string {
   return new Date(date).toLocaleDateString("es-ES", { month:"long", year:"numeric", timeZone: "Europe/Madrid" });
 }
@@ -235,7 +242,12 @@ export default async function VehicleSalePage({ params }: { params: Promise<{ sl
                   )}
                 </div>
 
-                <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">{vehicle.name}</h1>
+                <h1 className="text-xl md:text-3xl font-bold text-gray-900 mb-1 md:mb-2">
+                  <span className="block">{vehicle.name}</span>
+                  <span className="block text-base md:text-xl font-semibold text-gray-600 mt-1 md:mt-2">
+                    {salePageH1Subtitle(vehicle.condition)} · Murcia · {vehicle.year}
+                  </span>
+                </h1>
                 <p className="text-sm md:text-base text-gray-600 mb-4 md:mb-6">{vehicle.short_description}</p>
 
                 {/* Specs grid */}

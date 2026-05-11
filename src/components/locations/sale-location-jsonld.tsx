@@ -18,8 +18,8 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
     "@context": "https://schema.org",
     "@type": "AutoDealer",
     "name": "Furgocasa",
-    "alternateName": `Furgocasa - Venta de Autocaravanas cerca de ${location.name}`,
-    "description": `Venta de autocaravanas y campers premium cerca de ${location.name}. Entrega desde Murcia. Garantía oficial, mínimo un año como vendedor profesional y asesoramiento personalizado.`,
+    "alternateName": `Furgocasa - Autocaravanas y campers de ocasión cerca de ${location.name}`,
+    "description": `Venta de autocaravanas y campers de segunda mano cerca de ${location.name}, en gran parte procedentes de nuestra flota de alquiler revisada. Entrega desde Murcia. Garantía mínima de un año como vendedor profesional, revisión y asesoramiento personalizado.`,
     "url": `${baseUrl}/es/venta-autocaravanas-camper/${location.slug}`,
     "telephone": "+34868364161",
     "email": "info@furgocasa.com",
@@ -124,6 +124,14 @@ export function SaleLocationJsonLd({ location }: SaleLocationJsonLdProps) {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     "mainEntity": [
+      {
+        "@type": "Question",
+        "name": `¿Las autocaravanas y campers son de segunda mano?`,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": `Sí. Comercializamos autocaravanas y campers de ocasión, en gran parte provenientes de nuestra flota de alquiler, revisadas y preparadas para su venta con garantía mínima de un año como vendedores profesionales.`
+        }
+      },
       {
         "@type": "Question",
         "name": `¿Cuánto cuesta una autocaravana en ${location.name}?`,

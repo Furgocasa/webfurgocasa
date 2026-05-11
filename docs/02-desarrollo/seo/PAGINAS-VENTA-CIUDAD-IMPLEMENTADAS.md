@@ -82,6 +82,10 @@ Ahora incluye:
 6. ✅ FAQs dinámicas
 7. ✅ **Versiones en 4 idiomas de cada página** (ES, EN, FR, DE)
 
+### Prioridad en `sitemap.xml` (landings por ciudad)
+
+Las URLs de **alquiler por ciudad** (`/alquiler-autocaravanas-campervans/{slug}`) y **venta por ciudad** (`/venta-autocaravanas-camper/{slug}`) usan la misma pista de importancia que la **portada**: `priority: 1.0` y `changeFrequency: daily` en `src/app/sitemap.ts` y en `src/lib/seo/sitemap.ts` (sitemaps por idioma vía `getBaseSitemapEntries`). Objetivo: tratarlas como “homes” locales para búsquedas y descubrimiento.
+
 ---
 
 ## 🌐 Traducciones de Rutas

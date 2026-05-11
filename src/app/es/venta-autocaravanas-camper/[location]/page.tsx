@@ -7,6 +7,7 @@ import { translateServer } from "@/lib/i18n/server-translation";
 import { getTranslatedContent, getTranslatedContentSections } from "@/lib/translations/get-translations";
 import type { Locale } from "@/lib/i18n/config";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
+import { getSaleLocationPageCopy } from "@/lib/seo/sale-location-seo-copy";
 import { sortVehicleEquipment } from "@/lib/utils";
 import { getLocationHeroImage } from "@/lib/locationImages";
 import { 
@@ -159,9 +160,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     { name: location.name, meta_title: location.meta_title, meta_description: location.meta_description }
   );
 
-  const title = translated.meta_title || location.meta_title || `${t("Venta de Autocaravanas y Campers en")} ${translated.name || location.name}`;
-  const description = translated.meta_description || location.meta_description || 
-    `${t("Compra tu autocaravana o camper en")} ${translated.name || location.name}. ${t("Vehículos revisados con garantía: mínimo un año como profesionales.")}`;
+  const displayCity = translated.name || location.name;
+  const pageCopy = getSaleLocationPageCopy(locale, displayCity);
+
+  const title = translated.meta_title || location.meta_title || pageCopy.defaultMetaTitle;
+  const description = translated.meta_description || location.meta_description || pageCopy.defaultMetaDescription;
 
   const path = `/venta-autocaravanas-camper/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale);
@@ -230,6 +233,8 @@ export default async function SaleLocationPage({ params }: PageProps) {
     content_sections: translatedSections || locationRaw.content_sections,
   };
 
+  const pageCopy = getSaleLocationPageCopy(locale, location.name);
+
   const vehicles = await getSaleVehicles();
   const { data: ownLocation } = await supabase
     .from('locations')
@@ -256,7 +261,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
         <div className="absolute inset-0 bg-black/50 z-10" />
         <Image
           src={heroImageUrl}
-          alt={location.h1_title || `${t("Venta de autocaravanas en")} ${location.name}`}
+          alt={location.h1_title || pageCopy.defaultHeroImageAlt}
           fill
           priority
           fetchPriority="high"
@@ -276,16 +281,14 @@ export default async function SaleLocationPage({ params }: PageProps) {
             </div>
             
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}>
-              {location.h1_title || `${t("Venta de Autocaravanas y Campers en")} ${location.name}`}
+              {location.h1_title || pageCopy.defaultH1}
             </h1>
             
             <div className="w-24 h-1 bg-furgocasa-orange mx-auto my-4"></div>
             
-            {location.intro_text && (
-              <p className="text-xl lg:text-2xl text-white/95 leading-relaxed max-w-3xl mx-auto" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
-                {location.intro_text}
-              </p>
-            )}
+            <p className="text-xl lg:text-2xl text-white/95 leading-relaxed max-w-3xl mx-auto" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
+              {location.intro_text || pageCopy.defaultIntro}
+            </p>
             
             {/* Distancia (si no es oficina) */}
             {!hasOffice && location.distance_km && (
@@ -324,15 +327,15 @@ export default async function SaleLocationPage({ params }: PageProps) {
           <div className="container mx-auto px-4">
             <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
               <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 uppercase tracking-wide">
-                {t("Comprar Autocaravana Camper en")} {location.name.toUpperCase()}
+                {pageCopy.vehiclesH2}
               </h2>
 
               <div className="text-center max-w-3xl mx-auto">
                 <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
-                  {t("Autocaravanas y campers en venta con garantía")}
+                  {pageCopy.vehiclesH3}
                 </h3>
                 <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
-                  {t("Compra tu autocaravana o camper con total tranquilidad. Vehículos revisados y entrega disponible en")} {location.name}.
+                  {pageCopy.vehiclesLead}
                 </p>
               </div>
             </div>
@@ -434,7 +437,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
               { icon: FileCheck, titleKey: "Vehículos Certificados", descKey: "Revisados y certificados por profesionales" },
               { icon: HeartHandshake, titleKey: "Asesoramiento Personal", descKey: "Te ayudamos a encontrar tu vehículo ideal" },
               { icon: Wrench, titleKey: "Historial Completo", descKey: "Conocemos la historia de cada vehículo" },
-              { icon: Award, titleKey: "Calidad Premium", descKey: "Solo vehículos de nuestra flota de alquiler" },
+              { icon: Award, titleKey: "Calidad Premium", descKey: "Campers y autocaravanas revisadas de nuestra flota de alquiler, en venta con garantía" },
             ].map((benefit, index) => (
               <div
                 key={index}
@@ -468,10 +471,10 @@ export default async function SaleLocationPage({ params }: PageProps) {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl lg:text-5xl font-heading font-bold text-gray-900 mb-6">
-            {t("¿Quieres comprar una autocaravana o camper en")} {location.name}?
+            {pageCopy.finalCtaH2}
           </h2>
           <p className="text-lg lg:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            {t("Contáctanos y te ayudaremos a encontrar tu autocaravana ideal. Venta con garantía de al menos un año como empresa profesional.")}
+            {pageCopy.finalCtaP}
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <LocalizedLink
