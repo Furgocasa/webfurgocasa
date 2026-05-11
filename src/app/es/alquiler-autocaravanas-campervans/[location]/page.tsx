@@ -242,7 +242,7 @@ export default async function LocationPage({ params }: PageProps) {
   const hasOffice = !!ownLocation;
   const driveHours = location.travel_time_minutes ? Math.round(location.travel_time_minutes / 60) : 0;
   const heroImageUrl = location.hero_image || getLocationHeroImage(location.slug);
-  const rentHeroH1 = location.h1_title || `Alquiler de campers y autocaravanas en ${location.name}`;
+  const rentHeroH1 = `Alquiler de campers y autocaravanas en ${location.name}`;
   const rentHeroClaim =
     "Campers gran volumen totalmente equipadas: el confort de una autocaravana, con una conducción más ágil y sencilla.";
 
@@ -268,7 +268,7 @@ export default async function LocationPage({ params }: PageProps) {
           <div className="w-full px-4 lg:px-[25%] space-y-3 pt-16 lg:pt-0">
             {/* Kicker corporativo naranja sobre el H1 */}
             <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
-              {t("Alquiler de campers en España")} · {t("Desde 95€/día")}
+              Alquiler de campers en {location.name} · Desde 95&nbsp;€/día
             </span>
 
             <h1 
@@ -291,7 +291,7 @@ export default async function LocationPage({ params }: PageProps) {
               className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" 
               style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
             >
-              {t("Dreamer, Knaus, Weinsberg. España y Europa.")}
+              Flota Dreamer, Knaus y Weinsberg. Kilómetros ilimitados para viajar por España y Europa.
             </p>
           </div>
 
@@ -313,31 +313,20 @@ export default async function LocationPage({ params }: PageProps) {
       {vehicles.length > 0 && (
         <section className="py-10 lg:py-14 bg-white">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-8 lg:mb-12 max-w-5xl mx-auto">
-              {/* H2 siempre "ALQUILER CAMPER {ciudad}" (Cambiado a H2 para evitar múltiples H1) */}
-              <h2 className="text-3xl lg:text-5xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 uppercase tracking-wide">
-                {t("ALQUILER CAMPER")} {location.name.toUpperCase()}
+            <div className="text-center mb-8 lg:mb-12 max-w-3xl mx-auto">
+              <h2 className="text-2xl lg:text-4xl font-heading font-bold text-furgocasa-blue mb-6 lg:mb-8 tracking-wide">
+                Furgonetas camper gran volumen en {location.name}
               </h2>
 
-              {/* H2 - Keyword adicional: "furgonetas camper" */}
-              <h2 className="text-xl lg:text-2xl font-heading font-medium text-gray-700 mb-6">
-                {t("Furgonetas camper de gran volumen en")} {location.name}
-              </h2>
-
-              {/* Texto fijo */}
-              <p className="text-xl text-gray-600 mb-8">
-                {t("Tu punto de partida perfecto para explorar")} {location.name} {t("en camper")}.
-              </p>
-
-              <div className="text-center max-w-3xl mx-auto">
-                <h3 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-orange mb-4 tracking-wide uppercase">
-                  {t("Flota de vehículos de máxima calidad")}
-                </h3>
-                <p className="text-base lg:text-lg text-gray-700 leading-relaxed mb-3">
-                  <strong>{t("FURGOCASA:")}</strong> {t("estamos especializados en el alquiler de vehículos campers van de gran volumen.")}
+              <div className="space-y-4 text-base lg:text-lg text-gray-700 leading-relaxed text-left">
+                <p>
+                  En Furgocasa estamos especializados en el alquiler de campers gran volumen totalmente equipadas, una alternativa muy cómoda para quienes buscan viajar con la libertad de una camper y buena parte del confort de una autocaravana.
                 </p>
-                <p className="text-base lg:text-lg text-gray-700 leading-relaxed">
-                  {t("Contamos con los mejores modelos de furgonetas campers del mercado.")}
+                <p>
+                  Nuestros vehículos incluyen cama, cocina, baño, ducha, calefacción, menaje y equipamiento de viaje, pero mantienen un tamaño más manejable que muchas autocaravanas tradicionales. Por eso son una opción ideal para salir desde {location.name} hacia la Costa Cálida, Cabo de Gata, Alicante, Valencia, Andalucía o cualquier ruta por España y Europa.
+                </p>
+                <p>
+                  Trabajamos con modelos Dreamer, Knaus y Weinsberg, seleccionados por su equilibrio entre comodidad, conducción y fiabilidad.
                 </p>
               </div>
             </div>
@@ -448,38 +437,6 @@ export default async function LocationPage({ params }: PageProps) {
 
       {/* Sección: ¿Qué incluye tu alquiler? - Extras y Accesorios */}
       <ExtrasSection backgroundColor="bg-white" />
-
-      {/* ================================================================== */}
-      {/* SECCIÓN LATAM - Alquiler Motorhomes (keywords para América Latina) */}
-      {/* ================================================================== */}
-      <section className="py-10 lg:py-14 bg-gradient-to-br from-amber-50 to-orange-50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl lg:text-4xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">
-              {t("Alquiler de Motorhomes en")} {location.name}
-            </h2>
-            <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
-              {t("En España los llamamos autocaravanas o campers, pero es lo mismo: tu hotel sobre ruedas. Si vienes de Argentina, México, Colombia, Chile o cualquier país de América Latina, aquí encontrarás el mejor alquiler de motorhomes para explorar España y Europa. Flota premium con kilómetros ilimitados.")}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================== */}
-      {/* SECCIÓN LATAM - Alquiler Casa Rodante (keywords para América Latina) */}
-      {/* ================================================================== */}
-      <section className="py-10 lg:py-14 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl lg:text-4xl font-heading font-black text-furgocasa-blue uppercase tracking-wide mb-6">
-              {t("Alquiler de Casa Rodante en")} {location.name}
-            </h2>
-            <p className="text-lg lg:text-xl text-gray-700 leading-relaxed">
-              {t("Casa rodante es como se conoce en América Latina a lo que en España llamamos autocaravana o camper. Tu hogar sobre ruedas para viajar con total libertad. En Furgocasa ofrecemos alquiler de casas rodantes desde")} {location.name} {t("con entrega en toda España. Kilómetros ilimitados y equipamiento completo.")}
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* ================================================================== */}
       {/* AVISO OFICINA CERCANA - Solo para ciudades sin sede (distance > 0) */}
@@ -699,6 +656,24 @@ export default async function LocationPage({ params }: PageProps) {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Vocabulario LATAM — discreto (antes: bloques Motorhome / Casa rodante tras tarifas) */}
+      <section
+        className="py-8 lg:py-10 bg-slate-50 border-t border-gray-200/80"
+        aria-labelledby="rent-latam-vocab-heading"
+      >
+        <div className="container mx-auto px-4 max-w-3xl">
+          <h2
+            id="rent-latam-vocab-heading"
+            className="text-lg md:text-xl font-heading font-bold text-gray-800 mb-4 leading-snug"
+          >
+            {t("FAQ vocab camper motorhome latam question")}
+          </h2>
+          <p className="text-gray-600 leading-relaxed text-sm md:text-base">
+            {t("FAQ vocab camper motorhome latam answer")}
+          </p>
         </div>
       </section>
 

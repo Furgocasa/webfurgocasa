@@ -146,8 +146,8 @@ export function MotorhomeRentalMadridLanding({
             </div>
             <div className="bg-gray-50 p-6 rounded-2xl text-center hover:shadow-lg transition-shadow">
               <Package className="w-12 h-12 text-furgocasa-orange mx-auto mb-4" />
-              <h3 className="font-bold text-lg mb-2">Todo incluido</h3>
-              <p className="text-sm text-gray-600">Ropa de cama, toallas y menaje de cocina completos. Viaja ligero desde tu país.</p>
+              <h3 className="font-bold text-lg mb-2">Equipamiento completo de viaje</h3>
+              <p className="text-sm text-gray-600">Cocina completa, menaje y kit de camping. Ropa de cama y toallas como extras opcionales: reserva lo que necesites y viaja ligero desde tu país.</p>
             </div>
             <div className="bg-gray-50 p-6 rounded-2xl text-center hover:shadow-lg transition-shadow">
               <Shield className="w-12 h-12 text-furgocasa-orange mx-auto mb-4" />
@@ -495,7 +495,7 @@ export function MotorhomeRentalMadridLanding({
               { icon: CheckCircle, titleKey: "Kilómetros Ilimitados", descKey: "Viaja sin límites por España y Europa" },
               { icon: Users, titleKey: "Atención Personalizada", descKey: "Soporte por WhatsApp en tu idioma" },
               { icon: Shield, titleKey: "Flota Premium", descKey: "Vehículos modernos y perfectamente equipados" },
-              { icon: Package, titleKey: "Todo Incluido", descKey: "Cocina completa, ropa de cama, toallas y kit de camping" },
+              { icon: Package, titleKey: "Todo Incluido", descKey: "Cocina completa, ropa de cama, kit de camping" },
               { icon: Calendar, titleKey: "Cancelación flexible", descKey: "Cancela hasta 60 días antes sin coste" },
               { icon: MessageSquare, titleKey: "Atención 24/7", descKey: "Te acompañamos durante todo el viaje" },
             ].map((benefit, index) => (

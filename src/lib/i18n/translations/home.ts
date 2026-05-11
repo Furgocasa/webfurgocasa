@@ -251,16 +251,16 @@ export const homeTranslations = {
     de: "Moderne und perfekt ausgestattete Fahrzeuge"
   },
   "Todo Incluido": {
-    es: "Todo Incluido",
-    en: "All Inclusive",
-    fr: "Tout Compris",
-    de: "Alles Inklusive"
+    es: "Equipamiento completo de viaje",
+    en: "Full travel equipment",
+    fr: "Équipement de voyage complet",
+    de: "Vollständige Reiseausstattung"
   },
   "Cocina completa, ropa de cama, kit de camping": {
-    es: "Cocina completa, ropa de cama, kit de camping",
-    en: "Full kitchen, bedding, camping kit",
-    fr: "Cuisine complète, linge de lit, kit de camping",
-    de: "Vollständige Küche, Bettwäsche, Camping-Set"
+    es: "Cocina completa, menaje, kit de camping y extras opcionales para personalizar tu reserva.",
+    en: "Full kitchen, cookware, camping kit and optional extras to customize your booking.",
+    fr: "Cuisine complète, batterie de cuisine, kit de camping et options pour personnaliser votre réservation.",
+    de: "Komplette Küche, Geschirr, Camping-Set und optionale Extras zur individuellen Buchung."
   },
   "Cancelación flexible": {
     es: "Cancelación flexible",
@@ -467,5 +467,27 @@ export const homeTranslations = {
     en: "Large-volume campervans, motorhome-style equipment. Unlimited mileage, on-trip assistance and pickup in Murcia, Madrid, Alicante or Albacete. Dreamer, Knaus, Weinsberg.",
     fr: "Camping-cars grand volume, équipement type autocaravane. Kilométrage illimité, assistance en route et retrait à Murcie, Madrid, Alicante ou Albacete. Dreamer, Knaus, Weinsberg.",
     de: "Großraum-Camper, Ausstattung wie beim Wohnmobil. Unbegrenzte Kilometer, Unterstützung auf der Reise und Abholung in Murcia, Madrid, Alicante oder Albacete. Dreamer, Knaus, Weinsberg."
+  },
+
+  /** Coherencia con extras opcionales (ropa de cama, toallas) en tarifas */
+  "Todo incluido para tu aventura": {
+    es: "Equipamiento completo de viaje",
+    en: "Full travel equipment",
+    fr: "Équipement de voyage complet",
+    de: "Vollständige Reiseausstattung"
+  },
+
+  /** Landings alquiler ES: vocabulario para buscadores latinoamericanos (bloque discreto al final) */
+  "FAQ vocab camper motorhome latam question": {
+    es: "¿Es lo mismo camper, autocaravana, motorhome o casa rodante?",
+    en: "Is a camper van the same as a motorhome, RV or “casa rodante”?",
+    fr: "Camping-car, autocaravane, motorhome ou “casa rodante”, c’est la même chose ?",
+    de: "Sind Camper, Wohnmobil, Motorhome und „Casa rodante“ dasselbe?"
+  },
+  "FAQ vocab camper motorhome latam answer": {
+    es: "En España solemos hablar de campers, furgonetas camper o autocaravanas. En Latinoamérica es habitual usar términos como motorhome o casa rodante. En Furgocasa alquilamos campers gran volumen totalmente equipadas, con una experiencia de viaje muy similar a una autocaravana compacta.",
+    en: "In Spain we usually say campers, camper vans or motorhomes (autocaravanas). In Latin America, motorhome or casa rodante are common. At Furgocasa we rent fully equipped large camper vans, with a travel experience very close to a compact motorhome.",
+    fr: "En Espagne, on parle surtout de camping-cars, fourgons aménagés ou autocaravanes. En Amérique latine, on entend souvent motorhome ou casa rodante. Chez Furgocasa nous louons des camping-cars grand volume entièrement équipés, proches de l’expérience d’une autocaravane compacte.",
+    de: "In Spanien sagt man meist Camper, ausgebaute Kastenwagen oder Wohnmobile (autocaravanas). In Lateinamerika sind Begriffe wie Motorhome oder Casa rodante üblich. Bei Furgocasa mieten Sie voll ausgestattete Großraum-Camper mit einem Reisegefühl sehr nah am kompakten Wohnmobil."
   },
 };
