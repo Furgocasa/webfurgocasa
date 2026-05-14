@@ -47,7 +47,11 @@ const FAQ_QA: { q: string; a: string }[] = [
   },
   {
     q: "¿Qué pasa si entrego parte del material pero no todo?",
-    a: "El reembolso es binario: cumple o no cumple el nivel pactado por escrito. Si falta material relevante o no llega a los mínimos definidos, no se emite la factura rectificativa. Por eso es importante que el alcance se cierre por escrito antes del viaje con números concretos del nivel (Tiny / Light / Standard / Premium) y que respondas a tiempo al feedback de FURGOCASA durante la revisión.",
+    a: "El reembolso es binario: cumple o no cumple el nivel pactado por escrito. Si falta material relevante o no llega a los mínimos definidos, no se emite la factura rectificativa. Como excepción, cuando la entrega supera el 80 % de los mínimos pactados, FURGOCASA puede ofrecer un único plazo extra de 7 días naturales para completar lo que falte; si se acepta y se entrega dentro de ese plazo, se reabre la revisión y la entrega se aprueba normalmente.",
+  },
+  {
+    q: "¿Me exigís exclusividad o no colaborar con otras marcas?",
+    a: "No. No te pedimos exclusividad ni te impedimos hacer contenido de viaje, camper o lifestyle para otras marcas antes, durante o después de la colaboración. Lo único que aplica al contenido que nos cedes a nosotros es que cumpla los criterios de idoneidad de marca: nada ofensivo, sin marcas competidoras visibles, sin conducción imprudente y con autorización de imagen para personas reconocibles.",
   },
   {
     q: "¿Qué tipo de material debo entregar?",
@@ -553,6 +557,47 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             </div>
           </div>
 
+          {/* Idoneidad de marca: qué NO admitimos en el material entregado */}
+          <div className="mx-auto mt-6 max-w-5xl rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
+            <h3 className="font-heading text-lg font-bold text-gray-900">
+              Idoneidad de marca en el material entregado
+            </h3>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              Todo el material que nos cedas debe poder usarse en la comunicación comercial de FURGOCASA sin
+              riesgo. Por eso, en el contenido entregado <strong>no admitimos</strong>:
+            </p>
+            <ul className="mt-3 grid gap-2 text-sm text-gray-700 sm:grid-cols-2">
+              <li className="flex gap-2">
+                <span className="text-furgocasa-orange" aria-hidden>·</span>
+                <span>Cualquier elemento ofensivo, discriminatorio o ilegal.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-furgocasa-orange" aria-hidden>·</span>
+                <span>
+                  <strong>Marcas competidoras</strong> del sector alquiler de campers/autocaravanas visibles en
+                  fotos o vídeos.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-furgocasa-orange" aria-hidden>·</span>
+                <span>Conducción manifiestamente imprudente o incumplimientos normativos visibles.</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-furgocasa-orange" aria-hidden>·</span>
+                <span>
+                  Personas reconocibles que <strong>no hayan firmado autorización de imagen</strong>{" "}
+                  (modelo estándar disponible bajo petición).
+                </span>
+              </li>
+            </ul>
+            <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+              No te pedimos exclusividad: puedes seguir creando contenido de viaje, camper o lifestyle para
+              quien quieras antes, durante y después de esta colaboración. Lo único que pedimos es que{" "}
+              <strong>el material que nos cedes a nosotros</strong> cumpla estos cuatro criterios para que
+              podamos publicarlo sin sustos.
+            </p>
+          </div>
+
           {/* Cesión de derechos */}
           <div className="mx-auto mt-6 max-w-5xl rounded-2xl border-2 border-furgocasa-blue/20 bg-furgocasa-blue/5 p-6 md:p-8">
             <h3 className="font-heading text-lg font-bold text-gray-900">
@@ -616,10 +661,48 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                 </p>
               </div>
             </div>
+
+            {/* Plazos por defecto (orientativos, se cierran en el contrato) */}
+            <div className="mt-5 rounded-xl border border-furgocasa-orange/20 bg-white p-5">
+              <p className="text-xs font-bold uppercase tracking-wide text-furgocasa-orange">
+                Plazos orientativos del ciclo (por defecto)
+              </p>
+              <ul className="mt-3 grid gap-2 text-sm text-gray-800 sm:grid-cols-3">
+                <li>
+                  <strong>Entrega del material:</strong>{" "}
+                  <span className="text-gray-700">30 días naturales desde la devolución del vehículo.</span>
+                </li>
+                <li>
+                  <strong>Revisión por FURGOCASA:</strong>{" "}
+                  <span className="text-gray-700">14 días naturales desde la entrega completa.</span>
+                </li>
+                <li>
+                  <strong>Rectificativa y reembolso:</strong>{" "}
+                  <span className="text-gray-700">10 días naturales desde la aprobación.</span>
+                </li>
+              </ul>
+              <p className="mt-3 text-xs text-gray-500">
+                Vía de entrega habitual: WeTransfer o Google Drive con permiso de descarga. Estos plazos se
+                confirman por escrito en el contrato firmado antes del viaje.
+              </p>
+            </div>
+
+            {/* Subsanación: una sola oportunidad si está casi todo entregado */}
+            <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50/60 p-5">
+              <p className="text-xs font-bold uppercase tracking-wide text-emerald-700">
+                ¿Y si entrego «casi todo» a tiempo?
+              </p>
+              <p className="mt-2 text-sm text-gray-800 leading-relaxed">
+                Cuando la entrega supere el <strong>80&nbsp;%</strong> de los mínimos del nivel pactado,
+                FURGOCASA podrá ofrecerte <strong>un único plazo extra de 7 días naturales</strong> para
+                completar lo que falte. Si lo aceptas y completas dentro de ese plazo, se reabre la revisión
+                y la entrega pasa a aprobarse normalmente; si no, queda como «no cumple».
+              </p>
+            </div>
+
             <p className="mt-4 text-sm text-gray-600">
-              Los plazos exactos de entrega, revisión y emisión de la rectificativa se fijan por escrito en el
-              contrato firmado antes del viaje, junto al nivel (Tiny / Light / Standard / Premium) y los
-              entregables concretos del acuerdo.
+              Estos plazos, junto con el nivel (Tiny / Light / Standard / Premium) y los entregables concretos
+              del acuerdo, se cierran por escrito en el contrato firmado antes del viaje.
             </p>
           </div>
 
