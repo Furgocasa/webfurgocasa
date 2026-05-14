@@ -137,6 +137,16 @@ EL CREADOR tendrá derecho al **reembolso íntegro del importe facturado en la c
 
 Si **todos** los requisitos se cumplen y FURGOCASA aprueba la entrega, emitirá **factura rectificativa por el 100 % del importe facturado** (Real Decreto 1619/2012 y normativa fiscal vigente) y procederá al reembolso al mismo método de pago original.
 
+### 4.2 bis · Criterio de aprobación razonable
+
+La evaluación de la entrega por FURGOCASA será **razonable y objetiva**, limitándose a verificar:
+
+1. El **cumplimiento cuantitativo** de los entregables mínimos del nivel pactado (Cláusula 3.1).
+2. El **cumplimiento técnico** de los estándares definidos en la Cláusula 3.2 (formato, resolución, audio, pre-selección, estructura de carpetas).
+3. La **adecuación temática** al ámbito del programa (camper, viaje, vida en ruta, interiores en uso real, paisaje, etc.) y a la idoneidad de marca de la Cláusula 3.3.
+
+FURGOCASA **no entrará a valorar** elementos estéticos, narrativos o de gusto subjetivo —encuadre concreto, paleta de color, hora exacta del día, localizaciones específicas, vestuario, contenido del plato cocinado, etc.— siempre que el material cumpla los puntos 1, 2 y 3 anteriores. En consecuencia, **no procederá** una decisión de «NO CUMPLE» motivada únicamente en preferencias estéticas o de criterio creativo de FURGOCASA cuando los entregables sean técnica y temáticamente correctos.
+
 ### 4.3 · Plazos
 
 | Hito | Plazo |
@@ -250,7 +260,7 @@ La contraprestación económica de EL CREADOR por la cesión de derechos descrit
 Se considerarán incumplimientos materiales de este contrato, sin perjuicio de los previstos en el contrato de alquiler estándar de la Cláusula 5:
 
 1. **No entrega del material** dentro del plazo pactado.
-2. **Entrega defectuosa**: por debajo de los mínimos técnicos (3.2) o de variedad (3.3), tras agotar el procedimiento de subsanación de la 4.5 si fuera ofrecido.
+2. **Entrega defectuosa**: por debajo de los mínimos cuantitativos (3.1), técnicos (3.2) o de adecuación temática / idoneidad de marca (3.3), tras agotar el procedimiento de subsanación de la 4.5 si fuera ofrecido. Conforme a la Cláusula 4.2 bis, las preferencias estéticas o de criterio creativo de FURGOCASA no constituyen, por sí solas, causa de incumplimiento.
 3. **Falsedad** en las garantías de la 7.3 (autoría, autorizaciones de imagen, no infracción).
 4. **Uso del vehículo** distinto al pactado: subarriendo, uso comercial no autorizado, salida del territorio sin permiso, conducción por personas no autorizadas.
 

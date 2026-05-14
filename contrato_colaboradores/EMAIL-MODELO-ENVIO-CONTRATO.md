@@ -63,6 +63,8 @@
 > 4. Si la entrega supera el **80 %** de los mínimos pero falta algo, podemos ofrecerte (una sola vez) **7 días naturales adicionales** para completarlo.
 > 5. Si no entregas, lo entregas fuera de plazo o no llega a los mínimos del nivel pactado, el alquiler permanece facturado y no procede reembolso. La fianza, en cualquier caso, sigue su flujo habitual.
 >
+> **Y para que te quedes tranquilo**: la aprobación es **técnica y temática**, no estética. No vamos a entrar a discutir si el encuadre debería haber sido otro o si el atardecer «no nos convence». Si cumples los mínimos del nivel `{{NIVEL}}`, está bien hecho y va del tema (camper / viaje), se aprueba. Esto está recogido por escrito en la **Cláusula 4.2 bis** del contrato adjunto.
+>
 > ---
 >
 > ### Plazos del ciclo

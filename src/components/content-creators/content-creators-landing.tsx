@@ -50,6 +50,10 @@ const FAQ_QA: { q: string; a: string }[] = [
     a: "El reembolso es binario: cumple o no cumple el nivel pactado por escrito. Si falta material relevante o no llega a los mínimos definidos, no se emite la factura rectificativa. Como excepción, cuando la entrega supera el 80 % de los mínimos pactados, FURGOCASA puede ofrecer un único plazo extra de 7 días naturales para completar lo que falte; si se acepta y se entrega dentro de ese plazo, se reabre la revisión y la entrega se aprueba normalmente.",
   },
   {
+    q: "¿Quién decide si las fotos son «suficientemente buenas»? ¿Y si no os gusta una?",
+    a: "La aprobación es objetiva: medimos cantidad (mínimos del nivel), técnica (foco, exposición, resolución, audio, formato, pre-selección) y temática (camper / viaje). No valoramos gusto personal ni decisiones creativas: ángulo concreto, paleta de color, qué se cocina, hora del día, localización… Si entregas el número pactado de fotos y vídeos bien hechos y dentro del tema, cumple, aunque a alguien del equipo le gusten más o menos.",
+  },
+  {
     q: "¿Me exigís exclusividad o no colaborar con otras marcas?",
     a: "No. No te pedimos exclusividad ni te impedimos hacer contenido de viaje, camper o lifestyle para otras marcas antes, durante o después de la colaboración. Lo único que aplica al contenido que nos cedes a nosotros es que cumpla los criterios de idoneidad de marca: nada ofensivo, sin marcas competidoras visibles, sin conducción imprudente y con autorización de imagen para personas reconocibles.",
   },
@@ -697,6 +701,20 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                 FURGOCASA podrá ofrecerte <strong>un único plazo extra de 7 días naturales</strong> para
                 completar lo que falte. Si lo aceptas y completas dentro de ese plazo, se reabre la revisión
                 y la entrega pasa a aprobarse normalmente; si no, queda como «no cumple».
+              </p>
+            </div>
+
+            {/* Criterio de aprobación razonable: técnica y temática, no estética subjetiva */}
+            <div className="mt-4 rounded-xl border border-furgocasa-blue/20 bg-furgocasa-blue/5 p-5">
+              <p className="text-xs font-bold uppercase tracking-wide text-furgocasa-blue">
+                Cómo valoramos el material (sin sorpresas)
+              </p>
+              <p className="mt-2 text-sm text-gray-800 leading-relaxed">
+                Aprobamos la entrega cuando cumple los <strong>mínimos del nivel pactado</strong> —cantidad,
+                técnica y temática (camper / viaje)—. <strong>No</strong> vamos a entrar a discutir si la
+                foto debería haberse tomado un metro más a la derecha, si el bocadillo debería ser de salmón
+                o si el atardecer «no nos convence». Si la foto está bien hecha y suma a la marca, cumple.
+                Nuestro filtro es <strong>técnico y temático</strong>, no estético subjetivo.
               </p>
             </div>
 

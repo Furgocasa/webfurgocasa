@@ -89,6 +89,17 @@ Estos cuatro filtros aplican al contenido que recibimos, no a lo que el creador 
 
 Lo único que aplica al material concreto que nos ceden es la **idoneidad de marca** del punto 4.1. No es exclusividad; es higiene del activo que nos entregan.
 
+### 4.3 · Criterio de aprobación razonable
+
+El programa NO valora gusto subjetivo. Aprobamos el material cuando cumple los **mínimos cuantitativos** del nivel, los **mínimos técnicos** y la **temática camper/viaje**. Si una entrega cumple esos tres filtros y la idoneidad de marca de 4.1, se aprueba aunque a alguien del equipo le guste más o menos.
+
+**Esto se traduce en**:
+
+- **Lo que SÍ es motivo de no aprobar**: faltan piezas, no llegan a los mínimos del nivel, hay problemas técnicos (foco, audio, exposición, formato), incumplen idoneidad de marca o salen del tema (p. ej., reportaje urbano sin la camper).
+- **Lo que NO es motivo de no aprobar**: «me gusta más el otro encuadre», «el atardecer no convence», «el sandwich queda raro», «la luz podría ser otra», «yo lo habría editado distinto».
+
+Si dudas si una entrega cumple o no, vuelve a la tabla del §2 y al checklist técnico del §3, no a tu gusto personal. Está contractualmente protegido en la **Cláusula 4.2 bis** del contrato modelo.
+
 ---
 
 ## 5 · Modelo económico (cobro + reembolso)
@@ -217,6 +228,10 @@ Regla del programa:
 
 → Sí, si es de alta gama y entrega el mismo nivel de calidad (nítido, estable, bien iluminado, buen audio).
 
+### «¿Y si el material no nos termina de gustar pero técnicamente está bien?»
+
+→ Se aprueba. No tenemos margen para «no me convence». El criterio es **técnico y temático**, no estético. Mira la Cláusula 4.2 bis del contrato y el §4.3 de esta guía: si cumple cantidad, técnica, idoneidad de marca y temática, cumple.
+
 ---
 
 ## 10 · Plantillas de email/WhatsApp
@@ -277,6 +292,7 @@ Regla del programa:
 - **Confundir Storytellers con creadores**. Un cliente que ya alquiló no entra en este programa.
 - **No documentar la decisión por email**. Aunque haya conversación por WhatsApp, todo lo importante por escrito y archivado.
 - **Hablar de penalizaciones**. El modelo no es penalización; es alquiler normal con reembolso condicionado. Esa diferencia importa en términos fiscales y legales.
+- **Mezclar gusto personal con criterio de aprobación**. La aprobación es técnica y temática, no editorial. Si cumple los mínimos del nivel, cumple, aunque a ti te gustara otra cosa. El contrato (4.2 bis) y esta guía (§4.3) lo protegen explícitamente: rechazar una entrega «porque no nos convence» sin un motivo técnico/temático concreto sería incumplir nosotros.
 
 ---
 
