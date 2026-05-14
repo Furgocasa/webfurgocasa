@@ -7,10 +7,72 @@ import { z } from "zod";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 
+// ============================================================
+// Niveles de colaboración (fuente única reutilizada por la landing)
+// Sincronizado con la tabla pública: docs/02-desarrollo/contenido/GUIA_CONTENIDO.md §2
+// ============================================================
+export interface CollabLevel {
+  tag: "Tiny" | "Light" | "Standard" | "Premium";
+  cesion: string;
+  fotos: string;
+  broll: string;
+  editada: string;
+}
+
+export const COLLAB_LEVELS: CollabLevel[] = [
+  {
+    tag: "Tiny",
+    cesion: "1 día",
+    fotos: "10–15 fotos (2–3 escenas)",
+    broll: "3–5 min útiles",
+    editada: "—",
+  },
+  {
+    tag: "Light",
+    cesion: "2–3 días",
+    fotos: "25–35 fotos (más localizaciones)",
+    broll: "10–15 min útiles",
+    editada: "1 reel vertical (experiencia, recorrido, explicación o talking-head)",
+  },
+  {
+    tag: "Standard",
+    cesion: "4–5 días",
+    fotos: "45–60 fotos (variedad real)",
+    broll: "20–30 min útiles",
+    editada: "2 reels verticales",
+  },
+  {
+    tag: "Premium",
+    cesion: "Hasta 7 días de cesión de camper",
+    fotos: "70–100 fotos",
+    broll: "40–50 min útiles",
+    editada: "2–3 reels verticales + 1 vídeo experiencia de hasta 90 s",
+  },
+];
+
+export const MAX_REQUESTED_DAYS = 14;
+
+/**
+ * Devuelve el nivel que corresponde a `days`. Para >7 días devuelve `null`
+ * (se valora caso por caso fuera de la tabla pública).
+ */
+export function levelFromDays(days: number | null | undefined): CollabLevel | null {
+  if (!days || !Number.isFinite(days) || days < 1) return null;
+  if (days === 1) return COLLAB_LEVELS[0];
+  if (days <= 3) return COLLAB_LEVELS[1];
+  if (days <= 5) return COLLAB_LEVELS[2];
+  if (days <= 7) return COLLAB_LEVELS[3];
+  return null;
+}
+
 const formSchema = z.object({
   name: z.string().trim().min(2, "Indica tu nombre"),
   email: z.string().trim().email("Email no válido"),
-  phone: z.string().trim().optional(),
+  phone: z
+    .string()
+    .trim()
+    .min(6, "Indica un teléfono de contacto (WhatsApp)")
+    .max(40, "Teléfono demasiado largo"),
   cityCountry: z.string().trim().min(2, "Indica ciudad y país"),
   instagram: z.string().trim().optional(),
   tiktok: z.string().trim().optional(),
@@ -25,6 +87,11 @@ const formSchema = z.object({
     required_error: "Selecciona una opción",
   }),
   workExamplesUrl: z.string().trim().url("Enlace no válido (https://…)"),
+  requestedDays: z.coerce
+    .number({ invalid_type_error: "Indica un número de días" })
+    .int("Indica un número entero")
+    .min(1, "Mínimo 1 día")
+    .max(MAX_REQUESTED_DAYS, `Máximo ${MAX_REQUESTED_DAYS} días`),
   proposal: z.string().trim().min(40, "Detalla tu propuesta (mín. 40 caracteres)"),
   contentToDeliver: z.string().trim().min(20, "Describe qué entregarías"),
   destinationsStyle: z.string().trim().optional(),
@@ -36,6 +103,9 @@ const formSchema = z.object({
   }),
   rightsAccepted: z.boolean().refine((v) => v === true, {
     message: "Debes aceptar los términos de cesión de derechos",
+  }),
+  deliveryRefundAccepted: z.boolean().refine((v) => v === true, {
+    message: "Debes aceptar el modelo de cobro del alquiler y reembolso al entregar el material",
   }),
   companyWebsite: z.string().optional(),
 });
@@ -58,6 +128,7 @@ export function CreatorApplicationForm() {
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
     reset,
   } = useForm<FormValues>({
@@ -65,9 +136,20 @@ export function CreatorApplicationForm() {
     defaultValues: {
       privacyAccepted: false,
       rightsAccepted: false,
+      deliveryRefundAccepted: false,
       companyWebsite: "",
     },
   });
+
+  const watchedDaysRaw = watch("requestedDays");
+  const watchedDays =
+    typeof watchedDaysRaw === "number"
+      ? watchedDaysRaw
+      : typeof watchedDaysRaw === "string" && watchedDaysRaw !== ""
+        ? Number.parseInt(watchedDaysRaw, 10)
+        : null;
+  const matchedLevel = levelFromDays(watchedDays ?? null);
+  const showOverflowDaysHint = !!watchedDays && watchedDays > 7 && watchedDays <= MAX_REQUESTED_DAYS;
 
   const onSubmit = async (data: FormValues) => {
     setStatus("loading");
@@ -78,13 +160,14 @@ export function CreatorApplicationForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          phone: data.phone || "",
+          phone: data.phone,
           instagram: data.instagram || "",
           tiktok: data.tiktok || "",
           portfolioUrl: data.portfolioUrl || "",
           destinationsStyle: data.destinationsStyle || "",
           shootsRawLog: data.shootsRawLog,
           rightsAccepted: data.rightsAccepted,
+          deliveryRefundAccepted: data.deliveryRefundAccepted,
         }),
       });
       const json = await res.json().catch(() => ({}));
@@ -128,6 +211,7 @@ export function CreatorApplicationForm() {
               {[
                 "Quién eres y qué tipo de contenido haces",
                 "Ejemplos de trabajos anteriores (enlace)",
+                "Teléfono / WhatsApp para coordinar",
                 "Qué equipo utilizas (cámara o móvil de alta gama)",
                 "Qué ruta o idea propones",
                 "Cuántos días necesitarías la camper",
@@ -140,6 +224,18 @@ export function CreatorApplicationForm() {
                 </li>
               ))}
             </ul>
+            <p className="mt-4 text-xs leading-relaxed text-gray-600">
+              <strong>Importante:</strong> las colaboraciones se reservan y facturan como un alquiler normal a tarifa
+              estándar. Si entregas el material pactado dentro de plazo, te emitimos factura rectificativa y se
+              reembolsa el 100&nbsp;% del alquiler. Más detalle en el bloque{" "}
+              <a
+                href="#cobro-y-reembolso"
+                className="font-semibold text-furgocasa-blue underline hover:no-underline"
+              >
+                «Cómo funciona el coste del alquiler»
+              </a>{" "}
+              de esta página.
+            </p>
           </div>
         )}
 
@@ -185,9 +281,20 @@ export function CreatorApplicationForm() {
             <div className="grid sm:grid-cols-2 gap-6">
               <div>
                 <label className={labelClass} htmlFor="phone">
-                  Teléfono (opcional)
+                  Teléfono / WhatsApp <span className="text-furgocasa-orange">*</span>
                 </label>
-                <input id="phone" type="tel" className={inputClass} {...register("phone")} autoComplete="tel" />
+                <input
+                  id="phone"
+                  type="tel"
+                  className={inputClass}
+                  placeholder="+34 6XX XXX XXX"
+                  {...register("phone")}
+                  autoComplete="tel"
+                />
+                {errors.phone && <p className="mt-1 text-sm text-red-600">{errors.phone.message}</p>}
+                <p className="mt-1.5 text-xs text-gray-500">
+                  Usamos WhatsApp para coordinar fechas y entrega. Por favor, incluye el prefijo del país.
+                </p>
               </div>
               <div>
                 <label className={labelClass} htmlFor="cityCountry">
@@ -277,6 +384,78 @@ export function CreatorApplicationForm() {
             </div>
 
             <div>
+              <label className={labelClass} htmlFor="requestedDays">
+                ¿Cuántos días necesitarías la camper? <span className="text-furgocasa-orange">*</span>
+              </label>
+              <input
+                id="requestedDays"
+                type="number"
+                min={1}
+                max={MAX_REQUESTED_DAYS}
+                step={1}
+                inputMode="numeric"
+                className={`${inputClass} max-w-[160px]`}
+                placeholder="Ej.: 3"
+                {...register("requestedDays")}
+              />
+              {errors.requestedDays && (
+                <p className="mt-1 text-sm text-red-600">{errors.requestedDays.message as string}</p>
+              )}
+
+              {matchedLevel && (
+                <div
+                  className="mt-3 rounded-xl border border-furgocasa-orange/30 bg-furgocasa-orange/5 p-4"
+                  role="status"
+                  aria-live="polite"
+                >
+                  <p className="font-heading text-sm font-bold text-gray-900">
+                    Por {watchedDays} {watchedDays === 1 ? "día" : "días"} — nivel{" "}
+                    <span className="text-furgocasa-orange">{matchedLevel.tag}</span>
+                  </p>
+                  <p className="mt-1 text-xs text-gray-700">
+                    Esto es lo que esperamos recibir a cambio de la cesión:
+                  </p>
+                  <ul className="mt-2 grid gap-1.5 text-sm text-gray-800">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-furgocasa-orange" aria-hidden />
+                      <span>
+                        <strong>Fotos seleccionadas:</strong> {matchedLevel.fotos}
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-furgocasa-orange" aria-hidden />
+                      <span>
+                        <strong>B-roll bruto útil:</strong> {matchedLevel.broll}
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-furgocasa-orange" aria-hidden />
+                      <span>
+                        <strong>Pieza editada por ti:</strong> {matchedLevel.editada}
+                      </span>
+                    </li>
+                  </ul>
+                  <p className="mt-2.5 text-xs text-gray-600">
+                    Cifras orientativas según la tabla pública de Niveles de colaboración. El acuerdo final se cierra
+                    por escrito antes del viaje.
+                  </p>
+                </div>
+              )}
+
+              {showOverflowDaysHint && (
+                <div
+                  className="mt-3 rounded-xl border border-furgocasa-blue/20 bg-furgocasa-blue/5 p-4 text-sm text-gray-800"
+                  role="status"
+                  aria-live="polite"
+                >
+                  Por encima de <strong>7 días</strong> valoramos cada caso aparte (no está incluido en la tabla
+                  pública de niveles). Cuéntanos el porqué de tantos días y qué entregables propones en la propuesta
+                  de abajo.
+                </div>
+              )}
+            </div>
+
+            <div>
               <label className={labelClass} htmlFor="proposal">
                 Cuéntanos tu propuesta de colaboración <span className="text-furgocasa-orange">*</span>
               </label>
@@ -341,6 +520,40 @@ export function CreatorApplicationForm() {
                 </label>
               </div>
               {errors.workedWithBrands && <p className="mt-1 text-sm text-red-600">{errors.workedWithBrands.message}</p>}
+            </div>
+
+            <div className="rounded-xl border-2 border-furgocasa-orange/30 bg-furgocasa-orange/5 p-4">
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-furgocasa-blue"
+                  {...register("deliveryRefundAccepted")}
+                />
+                <span className="text-sm text-gray-700">
+                  <strong>Compromiso de entrega y reembolso del alquiler.</strong> Entiendo que FURGOCASA factura y
+                  cobra el alquiler de la camper a tarifa estándar de las fechas, además de la fianza habitual y el
+                  resto de condiciones del contrato (kilometraje, combustible, limpieza, daños, multas, etc.). A la
+                  entrega completa y dentro del plazo del material pactado para el nivel correspondiente, y previa
+                  aprobación por FURGOCASA, se emitirá <strong>factura rectificativa por el 100&nbsp;%</strong> del
+                  alquiler y se procederá a su reembolso. Si no entrego el material, lo entrego fuera de plazo o no
+                  cumple los mínimos del nivel pactado, el alquiler permanece facturado y no procede reembolso por
+                  el contenido no entregado. La fianza sigue su flujo habitual, independiente del contenido.{" "}
+                  <span className="text-furgocasa-orange">*</span>
+                </span>
+              </label>
+              {errors.deliveryRefundAccepted && (
+                <p className="mt-2 text-sm text-red-600">{errors.deliveryRefundAccepted.message}</p>
+              )}
+              <p className="mt-2 pl-7 text-xs text-gray-600">
+                Más detalle en el bloque{" "}
+                <a
+                  href="#cobro-y-reembolso"
+                  className="font-semibold text-furgocasa-blue underline hover:no-underline"
+                >
+                  «Cómo funciona el coste del alquiler»
+                </a>{" "}
+                de esta página.
+              </p>
             </div>
 
             <div className="rounded-xl border border-furgocasa-blue/20 bg-furgocasa-blue/5 p-4">

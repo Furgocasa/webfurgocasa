@@ -2,10 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendEmail, getCompanyEmail } from "@/lib/email/smtp-client";
 
+const MAX_REQUESTED_DAYS = 14;
+
+/**
+ * Devuelve la etiqueta de nivel (Tiny / Light / Standard / Premium) según los
+ * días de cesión. >7 → caso a valorar fuera de tabla.
+ * Sincronizado con `COLLAB_LEVELS` y `levelFromDays` en
+ * `src/components/content-creators/creator-application-form.tsx`.
+ */
+function levelTagFromDays(days: number): "Tiny" | "Light" | "Standard" | "Premium" | "Fuera de tabla" {
+  if (days <= 1) return "Tiny";
+  if (days <= 3) return "Light";
+  if (days <= 5) return "Standard";
+  if (days <= 7) return "Premium";
+  return "Fuera de tabla";
+}
+
 const schema = z.object({
   name: z.string().trim().min(2).max(120),
   email: z.string().trim().email().max(254),
-  phone: z.string().trim().max(40).optional().or(z.literal("")),
+  phone: z.string().trim().min(6).max(40),
   cityCountry: z.string().trim().min(2).max(200),
   instagram: z.string().trim().max(120).optional().or(z.literal("")),
   tiktok: z.string().trim().max(120).optional().or(z.literal("")),
@@ -14,12 +30,14 @@ const schema = z.object({
   equipment: z.enum(["movil", "camara", "ambos"]),
   shootsRawLog: z.enum(["si", "no", "no_se"]),
   workExamplesUrl: z.string().trim().url().max(2000),
+  requestedDays: z.coerce.number().int().min(1).max(MAX_REQUESTED_DAYS),
   proposal: z.string().trim().min(40).max(8000),
   contentToDeliver: z.string().trim().min(20).max(8000),
   destinationsStyle: z.string().trim().max(8000).optional().or(z.literal("")),
   workedWithBrands: z.enum(["si", "no", "prefiero_no_decir"]),
   privacyAccepted: z.boolean().refine((v) => v === true, { message: "required" }),
   rightsAccepted: z.boolean().refine((v) => v === true, { message: "required" }),
+  deliveryRefundAccepted: z.boolean().refine((v) => v === true, { message: "required" }),
 });
 
 function escapeHtml(s: string) {
@@ -48,11 +66,12 @@ export async function POST(req: NextRequest) {
     }
 
     const d = parsed.data;
+    const levelTag = levelTagFromDays(d.requestedDays);
 
     const rows: [string, string][] = [
       ["Nombre", d.name],
       ["Email", d.email],
-      ["Teléfono", d.phone || "—"],
+      ["Teléfono / WhatsApp", d.phone],
       ["Ciudad / país", d.cityCountry],
       ["Instagram", d.instagram || "—"],
       ["TikTok", d.tiktok || "—"],
@@ -68,6 +87,10 @@ export async function POST(req: NextRequest) {
             : "Otro / lo explica en la propuesta",
       ],
       ["Enlace ejemplos de trabajo", d.workExamplesUrl],
+      [
+        "Días solicitados / nivel",
+        `${d.requestedDays} ${d.requestedDays === 1 ? "día" : "días"} → nivel ${levelTag}`,
+      ],
       ["Propuesta de colaboración", d.proposal],
       ["Contenido a entregar", d.contentToDeliver],
       ["Destinos / estilo de viaje", d.destinationsStyle || "—"],
@@ -76,6 +99,10 @@ export async function POST(req: NextRequest) {
         d.workedWithBrands === "prefiero_no_decir" ? "Prefiero no decir" : d.workedWithBrands === "si" ? "Sí" : "No",
       ],
       ["Acepta cesión perpetua mundial", d.rightsAccepted ? "Sí" : "No"],
+      [
+        "Acepta cobro de alquiler + reembolso al entregar",
+        d.deliveryRefundAccepted ? "Sí" : "No",
+      ],
     ];
 
     const html = `

@@ -11,7 +11,7 @@ import {
   Users,
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
-import { CreatorApplicationForm } from "./creator-application-form";
+import { CreatorApplicationForm, COLLAB_LEVELS } from "./creator-application-form";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
@@ -35,6 +35,18 @@ const FAQ_QA: { q: string; a: string }[] = [
   {
     q: "¿La colaboración implica uso de la camper sin coste?",
     a: "En los casos seleccionados puede acordarse una cesión de vehículo como parte de un acuerdo profesional, siempre en función del valor del contenido acordado, fechas y disponibilidad. No es un \u201cviaje gratis\u201d genérico: cada propuesta se evalúa de forma individual y nunca cedemos en temporada alta de verano ni grandes puentes. Toda cesión va sujeta a contrato, fianza, seguro y condiciones de uso.",
+  },
+  {
+    q: "¿Cómo funciona entonces el coste del alquiler?",
+    a: "Las colaboraciones se reservan y facturan como un alquiler normal, a tarifa estándar de las fechas solicitadas, con la fianza habitual y el resto de condiciones del contrato (kilometraje, combustible, limpieza, daños, multas, etc.). Cuando entregas el material pactado dentro del plazo y FURGOCASA lo aprueba, se emite una factura rectificativa por el 100 % del alquiler y se procede a su reembolso. Si no entregas, entregas fuera de plazo o el material no cumple los mínimos del nivel, el alquiler permanece facturado y no procede reembolso. La fianza es independiente: cubre daños, kilometraje, multas y limpieza como con cualquier cliente.",
+  },
+  {
+    q: "¿Por qué cobráis y luego reembolsáis en vez de cederla gratis directamente?",
+    a: "Porque la fianza tiene que seguir cubriendo lo que cubre: daños, multas, combustible o limpieza. Si mezclásemos en la fianza el riesgo de que no entreguen el contenido, podríamos quedarnos sin nada para reparar la camper si además hay un golpe o un percance. Cobrando el alquiler y reembolsándolo a la entrega, la fianza queda íntegra para su función y el creador asume el riesgo justo: si cumple lo pactado, recupera el 100 % del alquiler.",
+  },
+  {
+    q: "¿Qué pasa si entrego parte del material pero no todo?",
+    a: "El reembolso es binario: cumple o no cumple el nivel pactado por escrito. Si falta material relevante o no llega a los mínimos definidos, no se emite la factura rectificativa. Por eso es importante que el alcance se cierre por escrito antes del viaje con números concretos del nivel (Tiny / Light / Standard / Premium) y que respondas a tiempo al feedback de FURGOCASA durante la revisión.",
   },
   {
     q: "¿Qué tipo de material debo entregar?",
@@ -115,37 +127,6 @@ const SHOWCASE_IMAGES: { src: string; title: string; hint: string; alt: string }
     title: "Mood en ruta",
     hint: "Carretera · paisaje",
     alt: "Camper en carretera de costa con paisaje mediterráneo",
-  },
-];
-
-const COLLAB_LEVELS: { tag: string; cesion: string; fotos: string; broll: string; editada: string }[] = [
-  {
-    tag: "Tiny",
-    cesion: "1 día",
-    fotos: "10–15 fotos (2–3 escenas)",
-    broll: "3–5 min útiles",
-    editada: "—",
-  },
-  {
-    tag: "Light",
-    cesion: "2–3 días",
-    fotos: "25–35 fotos (más localizaciones)",
-    broll: "10–15 min útiles",
-    editada: "1 reel vertical (experiencia, recorrido, explicación o talking-head)",
-  },
-  {
-    tag: "Standard",
-    cesion: "4–5 días",
-    fotos: "45–60 fotos (variedad real)",
-    broll: "20–30 min útiles",
-    editada: "2 reels verticales",
-  },
-  {
-    tag: "Premium",
-    cesion: "Hasta 7 días de cesión de camper",
-    fotos: "70–100 fotos",
-    broll: "40–50 min útiles",
-    editada: "2–3 reels verticales + 1 vídeo experiencia de hasta 90 s",
   },
 ];
 
@@ -587,6 +568,60 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             </p>
           </div>
 
+          {/* Cómo funciona el coste del alquiler (cobro + reembolso al entregar) */}
+          <div
+            id="cobro-y-reembolso"
+            className="scroll-mt-28 mx-auto mt-6 max-w-5xl rounded-2xl border-2 border-furgocasa-orange/30 bg-furgocasa-orange/5 p-6 md:p-8"
+          >
+            <h3 className="font-heading text-lg font-bold text-gray-900">
+              Cómo funciona el coste del alquiler en una colaboración
+            </h3>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              No regalamos viajes en blanco. Las colaboraciones se{" "}
+              <strong>reservan y facturan como un alquiler normal</strong> a tarifa estándar de las fechas
+              solicitadas, con la fianza habitual y el resto de condiciones del contrato (kilometraje,
+              combustible, limpieza, daños, multas, etc.).
+            </p>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              Cuando <strong>entregas el material pactado dentro de plazo</strong> y FURGOCASA lo aprueba, se
+              emite una <strong>factura rectificativa por el 100&nbsp;%</strong> del alquiler y se procede a su
+              reembolso. Si no entregas, lo entregas fuera de plazo o el material no cumple los mínimos del nivel
+              pactado, <strong>el alquiler permanece facturado</strong> y no procede reembolso por el contenido
+              no entregado.
+            </p>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              La <strong>fianza es independiente</strong>: sigue su flujo habitual y se queda donde tiene que
+              estar — cubriendo posibles daños, kilometraje, multas o limpieza, igual que con cualquier cliente.
+              Así protegemos lo que protege la fianza y, a la vez, el creador asume el riesgo justo: si cumple lo
+              pactado, recupera el 100&nbsp;% del alquiler.
+            </p>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl bg-white p-4 shadow-sm">
+                <p className="text-xs font-bold uppercase tracking-wide text-furgocasa-orange">
+                  Si entregas el material pactado
+                </p>
+                <p className="mt-2 text-sm text-gray-800">
+                  Factura rectificativa por el <strong>100&nbsp;%</strong> del alquiler y reembolso al método de
+                  pago original. La fianza sigue su flujo normal.
+                </p>
+              </div>
+              <div className="rounded-xl bg-white p-4 shadow-sm">
+                <p className="text-xs font-bold uppercase tracking-wide text-gray-600">
+                  Si no entregas / fuera de plazo / no cumple mínimos
+                </p>
+                <p className="mt-2 text-sm text-gray-800">
+                  El alquiler <strong>permanece facturado</strong>. Sin reembolso por contenido no entregado. La
+                  fianza, también, sigue su flujo normal.
+                </p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-gray-600">
+              Los plazos exactos de entrega, revisión y emisión de la rectificativa se fijan por escrito en el
+              contrato firmado antes del viaje, junto al nivel (Tiny / Light / Standard / Premium) y los
+              entregables concretos del acuerdo.
+            </p>
+          </div>
+
           {/* Contrato, fianza, seguro (Cambio 8) */}
           <div className="mx-auto mt-6 max-w-5xl rounded-2xl border border-gray-200 bg-white p-6 md:p-8">
             <h3 className="font-heading text-lg font-bold text-gray-900">
@@ -594,6 +629,11 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             </h3>
             <p className="mt-3 text-gray-700 leading-relaxed">
               Toda colaboración estará sujeta a <strong>contrato previo</strong> que recoja las condiciones de uso del vehículo: <strong>seguro, fianza, kilometraje pactado, política de combustible, limpieza, posibles daños, multas y responsabilidades</strong> durante el periodo de cesión. La camper se entrega como en cualquier alquiler profesional, con los mismos estándares y obligaciones.
+            </p>
+            <p className="mt-3 text-gray-700 leading-relaxed">
+              El contrato incluye también el <strong>modelo de cobro y reembolso del alquiler</strong> descrito
+              en el bloque anterior, con los plazos concretos de entrega y revisión, el nivel de colaboración
+              pactado (Tiny / Light / Standard / Premium) y los entregables que activan el reembolso.
             </p>
           </div>
         </div>
