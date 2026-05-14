@@ -152,7 +152,7 @@ Regla del programa:
 1. **Solicitud llega** por el formulario `/api/creator-collaboration` → email a `reservas@` con datos, nivel pedido, teléfono, días, aceptación del modelo cobro+reembolso.
 2. **Pre-cualificación** (24–72 h): mirar portfolio/canales, encaje con la flota, fechas dentro de ventana permitida (octubre–mayo + huecos puntuales; **nunca** julio, primera quincena de agosto, Semana Santa, puentes ni picos navideños).
 3. **Llamada o WhatsApp** para concretar: itinerario, número de piezas, fechas firmes, vehículo.
-4. **Enviar contrato personalizado** (basado en [`MODELO-CONTRATO-COLABORACION-CREADORES.md`](./MODELO-CONTRATO-COLABORACION-CREADORES.md)) con todos los `{{placeholders}}` rellenos.
+4. **Enviar contrato personalizado** (basado en [`MODELO-CONTRATO-COLABORACION-CREADORES.md`](./MODELO-CONTRATO-COLABORACION-CREADORES.md)) con todos los `{{placeholders}}` rellenos, acompañado del email tipo [`EMAIL-MODELO-ENVIO-CONTRATO.md`](./EMAIL-MODELO-ENVIO-CONTRATO.md) (versión larga la primera vez, versión corta si ya está todo aclarado por WhatsApp).
 5. **Crear reserva** en el sistema marcada como `colaboracion=true` y con `referencia=COL-YYYY-NNN`. Bloquear fechas como reserva normal.
 6. **Cobrar al 100 %** por Redsys/transferencia antes de la entrega del vehículo. Fianza por transferencia con mínimo 72 h de antelación.
 7. **Confirmar autorizaciones de imagen** si el creador prevé personas reconocibles distintas a él mismo.
@@ -292,6 +292,7 @@ Regla del programa:
 ### En documentación
 
 - Contrato modelo: [`./MODELO-CONTRATO-COLABORACION-CREADORES.md`](./MODELO-CONTRATO-COLABORACION-CREADORES.md).
+- Email tipo de envío del contrato: [`./EMAIL-MODELO-ENVIO-CONTRATO.md`](./EMAIL-MODELO-ENVIO-CONTRATO.md).
 - Guía interna (este documento): `./GUIA-INTERNA-PROGRAMA-CREADORES.md`.
 - Tabla pública: `https://www.furgocasa.com/es/creadores-de-contenido` (sección «Niveles de colaboración»).
 - Datos canónicos de empresa: `src/lib/company.ts`.
