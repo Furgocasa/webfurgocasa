@@ -129,9 +129,9 @@ Valores **por defecto** del contrato. Se pueden mover en el Anexo I si hay motiv
 
 | Hito | Plazo por defecto | Cuenta desde |
 |---|---|---|
-| Entrega del material por el creador | **30 días naturales** | Día de devolución del vehículo (dropoff) |
-| Revisión y decisión por FURGOCASA | **14 días naturales** | Fecha en que la entrega está completa |
-| Factura rectificativa + reembolso | **10 días naturales** | Aprobación de la entrega |
+| Entrega del material por el creador | **21 días naturales** | Día de devolución del vehículo (dropoff) |
+| Revisión y decisión por FURGOCASA | **10 días naturales** | Fecha en que la entrega está completa |
+| Factura rectificativa + reembolso | **7 días naturales** | Aprobación de la entrega |
 | Plazo extra de subsanación (opcional) | **7 días naturales** | Día en que el creador acepta expresamente la oferta |
 | Devolución de fianza | **7–14 días hábiles** | Devolución del vehículo (flujo independiente) |
 
@@ -176,11 +176,11 @@ Regla del programa:
 ### Después del viaje
 
 10. **Dropoff**: revisión del vehículo. Fianza se gestiona en su flujo normal (7–14 días hábiles).
-11. **Programar recordatorio interno a 30 días** (calendario o tarea) para revisar si llegó la entrega.
+11. **Programar recordatorio interno a 21 días** (calendario o tarea) para revisar si llegó la entrega.
 12. **Llega la entrega**: descargar todo, archivar bajo `creadores/COL-YYYY-NNN/`.
 13. **Revisar contra los mínimos** del nivel pactado (cantidades, técnica, variedad, idoneidad de marca).
-14. **Decisión binaria** en ≤14 días:
-    - **CUMPLE** → factura rectificativa tipo R, motivo «Reembolso por entrega satisfactoria del contenido pactado – referencia COL-YYYY-NNN»; reembolso por el método original en ≤10 días.
+14. **Decisión binaria** en ≤10 días:
+    - **CUMPLE** → factura rectificativa tipo R, motivo «Reembolso por entrega satisfactoria del contenido pactado – referencia COL-YYYY-NNN»; reembolso por el método original en ≤7 días.
     - **NO CUMPLE** → si la entrega está >80 % completa, evaluar oferta de subsanación (7 días). En otro caso, notificar por email con motivación; el alquiler queda facturado tal cual.
 15. **Archivar** todo: emails de decisión, copia de la entrega, factura rectificativa (si procede), capturas de los canales del creador donde publique el material.
 
@@ -244,7 +244,7 @@ Regla del programa:
 >
 > 1. Nivel propuesto: **{{NIVEL}}** ({{DIAS}} días de cesión). Entregables mínimos: {{ENTREGABLES_RESUMEN}}.
 > 2. Cobro: facturamos el alquiler a tarifa estándar de las fechas (~{{IMPORTE}} €, IVA incluido). Se cobra al 100 % antes de la entrega del vehículo. La fianza son 1.000 € independientes.
-> 3. Reembolso: al entregar el material completo y aprobado, te emitimos factura rectificativa por el 100 % y te reembolsamos al método de pago original. Plazos por defecto: entrega 30 días desde dropoff · revisión 14 días · reembolso 10 días.
+> 3. Reembolso: al entregar el material completo y aprobado, te emitimos factura rectificativa por el 100 % y te reembolsamos al método de pago original. Plazos por defecto: entrega 21 días desde dropoff · revisión 10 días · reembolso 7 días.
 > 4. Cesión de derechos: amplia (no exclusiva, mundial, perpetua, todos los medios, con derecho de modificación). Conservas autoría y portfolio.
 > 5. Exclusividad: **no te pedimos**. Solo aplicamos idoneidad de marca al material que nos cedes (sin competidores visibles, sin conducción imprudente, autorizaciones de imagen para personas reconocibles).
 >

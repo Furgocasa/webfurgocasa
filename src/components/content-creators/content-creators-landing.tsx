@@ -494,7 +494,7 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
               <h3 className="font-heading text-xl font-bold text-furgocasa-blue">Valoramos</h3>
               <ul className="mt-4 space-y-3 text-gray-700">
                 {[
-                  "Cámara dedicada (foto RAW + JPEG, vídeo 4K en LOG/flat) o móvil de alta gama capaz de entregar el mismo nivel de calidad",
+                  "Cámara dedicada o móvil de alta gama, indistintamente: lo que importa es el resultado, no la marca del cuerpo",
                   "Material nítido, estable, bien iluminado, con buen sonido y composición cuidada",
                   "Portfolio o muestras recientes accesibles por enlace",
                   "Criterio estético y consistencia en color, encuadre y ritmo",
@@ -524,8 +524,8 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
               </p>
               <ul className="mt-4 space-y-3 text-gray-700">
                 {[
-                  "Foto: RAW (.cr3/.nef/.arw) + JPEG de previsualización",
-                  "Vídeo: 4K mínimo, 25/30 fps, perfil LOG o flat, ≥100 Mbps",
+                  "Foto: RAW (.cr3/.nef/.arw) con cámara, o archivo original sin recompresión con móvil de alta gama",
+                  "Vídeo: 4K mínimo a 25/30 fps. Con cámara, LOG o flat y ≥100 Mbps si tu equipo lo permite. Con móvil, el modo de mayor calidad disponible (HEVC / H.265).",
                   "Pre-selección obligatoria (no envíes la sesión entera)",
                   "Estructura de carpetas: 01-exterior / 02-interior / 03-uso / 04-detalles / 05-talking-head",
                   "Sin transiciones ni música baked en el bruto",
@@ -537,6 +537,10 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                   </li>
                 ))}
               </ul>
+              <p className="mt-4 text-xs text-gray-500 italic">
+                No exigimos un equipo concreto; exigimos un resultado utilizable. Cámara y móvil de alta gama
+                conviven sin problema si la entrega es nítida, estable, bien iluminada y con buen sonido.
+              </p>
             </div>
           </div>
 
@@ -674,15 +678,15 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
               <ul className="mt-3 grid gap-2 text-sm text-gray-800 sm:grid-cols-3">
                 <li>
                   <strong>Entrega del material:</strong>{" "}
-                  <span className="text-gray-700">30 días naturales desde la devolución del vehículo.</span>
+                  <span className="text-gray-700">21 días naturales desde la devolución del vehículo.</span>
                 </li>
                 <li>
                   <strong>Revisión por FURGOCASA:</strong>{" "}
-                  <span className="text-gray-700">14 días naturales desde la entrega completa.</span>
+                  <span className="text-gray-700">10 días naturales desde la entrega completa.</span>
                 </li>
                 <li>
                   <strong>Rectificativa y reembolso:</strong>{" "}
-                  <span className="text-gray-700">10 días naturales desde la aprobación.</span>
+                  <span className="text-gray-700">7 días naturales desde la aprobación.</span>
                 </li>
               </ul>
               <p className="mt-3 text-xs text-gray-500">

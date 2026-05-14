@@ -1,13 +1,14 @@
 # Contrato de colaboración para creación de contenido — FURGOCASA
 
-> **Versión MD de trabajo.** Plantilla maestra para colaboraciones con creadores de contenido (página pública: `/es/creadores-de-contenido`). Posteriormente se exportará a PDF firmable. Los placeholders entre dobles llaves `{{...}}` se sustituyen por los datos de cada colaboración concreta.
+> **Plantilla lista para enviar.** Los campos variables van con rayas (`__________`) para que se completen a mano o digitalmente en cada colaboración. Los datos fijos de FURGOCASA y los plazos por defecto ya están rellenos.
 >
 > Coherente con:
-> - Landing pública `src/components/content-creators/content-creators-landing.tsx` (modelo de cobro + reembolso).
-> - Formulario `src/components/content-creators/creator-application-form.tsx` (niveles Tiny/Light/Standard/Premium, días, checkboxes aceptados).
-> - Datos canónicos de empresa en `src/lib/company.ts` (razón social, domicilio, fianza 1.000 €, tarifas).
+> - Landing pública [`/es/creadores-de-contenido`](https://www.furgocasa.com/es/creadores-de-contenido) (`src/components/content-creators/content-creators-landing.tsx`).
+> - Guía interna del programa: [`GUIA-INTERNA-PROGRAMA-CREADORES.md`](./GUIA-INTERNA-PROGRAMA-CREADORES.md).
+> - Email de envío al creador: [`EMAIL-MODELO-ENVIO-CONTRATO.md`](./EMAIL-MODELO-ENVIO-CONTRATO.md).
+> - Datos canónicos de empresa: `src/lib/company.ts`.
 >
-> **No es asesoramiento jurídico.** Antes de firmar el primer contrato, revísese con gestoría/abogado para validar fiscalidad (IVA, factura rectificativa) y los plazos legales aplicables a contrato civil de cesión de uso + servicios.
+> **No es asesoramiento jurídico.** Antes de firmar el primer contrato real, conviene una pasada de gestoría/abogado para validar fiscalidad (IVA, factura rectificativa) y los plazos legales aplicables.
 
 ---
 
@@ -15,14 +16,14 @@
 
 | | |
 |---|---|
-| Referencia interna | `{{REFERENCIA_COLABORACION}}` (ej.: `COL-2026-001`) |
-| Fecha de firma | `{{FECHA_FIRMA}}` |
-| Lugar de firma | `{{LUGAR_FIRMA}}` (por defecto: Casillas – Murcia) |
-| Nivel de colaboración pactado | **{{NIVEL}}** — *Tiny · Light · Standard · Premium · Personalizado* |
-| Periodo de cesión de la camper | Del `{{FECHA_PICKUP}}` al `{{FECHA_DROPOFF}}` (ambos inclusive) |
-| Días de cesión | `{{DIAS_CESION}}` |
-| Vehículo | `{{VEHICULO_MODELO}} — matrícula {{VEHICULO_MATRICULA}}` |
-| Importe del alquiler facturado | `{{IMPORTE_ALQUILER}}` € (IVA incluido) — *ver Cláusula 4* |
+| Referencia interna | `COL-` __________ (formato `COL-AAAA-NNN`) |
+| Fecha de firma | __________ |
+| Lugar de firma | Murcia |
+| Nivel de colaboración pactado | ☐ Tiny &nbsp;&nbsp; ☐ Light &nbsp;&nbsp; ☐ Standard &nbsp;&nbsp; ☐ Premium &nbsp;&nbsp; ☐ Personalizado |
+| Periodo de cesión de la camper | Del __________ al __________ (ambos inclusive) |
+| Días de cesión | __________ |
+| Vehículo | __________ &nbsp;&nbsp; · &nbsp;&nbsp; matrícula __________ |
+| Importe del alquiler facturado | __________ € (IVA incluido) — *ver Cláusula 4* |
 | Fianza | **1.000 €** — *ver Cláusula 5* |
 
 ---
@@ -31,28 +32,29 @@
 
 **De una parte, “FURGOCASA”:**
 
-- Razón social: **Furgocasa S.L.**
-- NIF: `{{COMPANY_NIF}}`
-- Domicilio social: **Avenida Puente Tocinos, 4 — 30007 Casillas (Murcia), España**
+- Razón social: **FURGOCASA CAMPERVANS S.L.**
+- NIF: **B87947412**
+- Domicilio fiscal: **Calle Enrique Villar, núm. 13, Planta 5, Puerta A — 30008 Murcia (España)**
+- Domicilio operativo / entrega de vehículos: **Avenida Puente Tocinos, 4 — 30007 Casillas (Murcia)**
 - Teléfono: **+34 868 36 41 61**
 - Email: **info@furgocasa.com**
-- Representada por: **`{{COMPANY_REP_NOMBRE}}`**, en calidad de **`{{COMPANY_REP_CARGO}}`**, con DNI/NIE **`{{COMPANY_REP_DNI}}`**.
+- Representada por: D./Dña. _____________________________________, con DNI/NIE __________________, en calidad de _____________________________________.
 
 **Y de otra parte, “EL CREADOR”:**
 
-- Nombre y apellidos / Razón social: **`{{CREADOR_NOMBRE}}`**
-- DNI / NIE / NIF: **`{{CREADOR_DNI}}`**
-- Domicilio: **`{{CREADOR_DIRECCION}}`**
-- Teléfono / WhatsApp: **`{{CREADOR_TELEFONO}}`**
-- Email: **`{{CREADOR_EMAIL}}`**
-- Nombre artístico / canal (si aplica): **`{{CREADOR_ALIAS}}`** — `{{CREADOR_REDES}}`
+- Nombre y apellidos / Razón social: _____________________________________________________
+- DNI / NIE / NIF: __________________
+- Domicilio: ______________________________________________________________________
+- Teléfono / WhatsApp: __________________
+- Email: ____________________________________
+- Nombre artístico / canal (si aplica): ______________________ &nbsp;·&nbsp; redes: __________________________
 
 Ambas partes se reconocen mutuamente capacidad legal suficiente para suscribir el presente contrato y, a tal efecto,
 
 ### **EXPONEN**
 
-1. Que FURGOCASA es una empresa dedicada al **alquiler de campers y autocaravanas de gran volumen** en España, con sede operativa en Murcia y Madrid.
-2. Que EL CREADOR ejerce profesional o habitualmente la **creación de contenido audiovisual** (foto/vídeo) y dispone de equipo, capacidad y criterio suficientes para entregar el material descrito en la Cláusula 3.
+1. Que FURGOCASA es una empresa dedicada al **alquiler de campers de gran volumen** en España, con sede operativa en Murcia y Madrid.
+2. Que EL CREADOR ejerce profesional o habitualmente la **creación de contenido audiovisual** (foto/vídeo) —ya sea con equipo de cámara dedicado o con dispositivos móviles de alta gama— y dispone de capacidad y criterio suficientes para entregar el material descrito en la Cláusula 3.
 3. Que FURGOCASA ha lanzado un programa público de colaboraciones con creadores —páginas oficiales en `https://www.furgocasa.com/es/creadores-de-contenido`— bajo el modelo de **cobro y reembolso del alquiler condicionado a la entrega del material pactado**, descrito en este contrato.
 4. Que EL CREADOR ha presentado solicitud y, tras la valoración por FURGOCASA, ambas partes desean formalizar la colaboración con arreglo a las siguientes
 
@@ -75,7 +77,15 @@ Ambas obligaciones se vinculan económicamente mediante el mecanismo de **cobro 
 
 ### 3.1 · Nivel pactado
 
-El nivel acordado para esta colaboración es **{{NIVEL}}**, correspondiente a `{{DIAS_CESION}}` días de cesión de la camper.
+El nivel acordado para esta colaboración es **(márquese con una X)**:
+
+- [ ] **Tiny** — 1 día.
+- [ ] **Light** — 2 a 3 días.
+- [ ] **Standard** — 4 a 5 días.
+- [ ] **Premium** — hasta 7 días.
+- [ ] **Personalizado** — _______ días, con los entregables específicos detallados en el Anexo I.
+
+Días concretos de cesión pactados: __________.
 
 Los entregables mínimos por nivel, sincronizados con la tabla pública de la web, son los siguientes:
 
@@ -85,14 +95,21 @@ Los entregables mínimos por nivel, sincronizados con la tabla pública de la we
 | **Light** | 2–3 días | 25–35 fotos (más localizaciones) | 10–15 min útiles | 1 reel vertical (experiencia, recorrido, explicación o talking-head) |
 | **Standard** | 4–5 días | 45–60 fotos (variedad real) | 20–30 min útiles | 2 reels verticales |
 | **Premium** | Hasta 7 días | 70–100 fotos | 40–50 min útiles | 2–3 reels verticales + 1 vídeo experiencia de hasta 90 s |
-| **Personalizado** | `{{DIAS_CESION}}` días | `{{ENTREGABLES_FOTOS_PERSONALIZADOS}}` | `{{ENTREGABLES_BROLL_PERSONALIZADOS}}` | `{{ENTREGABLES_EDITADO_PERSONALIZADOS}}` |
+| **Personalizado** | Según pacto | Detallado en Anexo I | Detallado en Anexo I | Detallado en Anexo I |
 
-> Cualquier desviación respecto a la tabla anterior, por exceso o por defecto, debe pactarse expresamente en la fila «Personalizado» y firmarse junto al resto del contrato.
+> Cualquier desviación respecto a la tabla anterior, por exceso o por defecto, debe pactarse expresamente en el Anexo I de este contrato y firmarse junto al resto.
 
 ### 3.2 · Especificaciones técnicas mínimas
 
-- **Foto**: RAW (`.cr3`, `.nef`, `.arw` u otro formato propietario equivalente) + JPEG de previsualización seleccionado. Cuando EL CREADOR trabaje con móvil de alta gama, deberá entregar archivo original sin recompresión adicional.
-- **Vídeo**: 4K mínimo, 25/30 fps, perfil LOG/flat cuando el equipo lo permita; bitrate ≥ 100 Mbps. Audio sin viento y, en talking-heads, capturado con micro externo o equivalente.
+Aceptamos por igual **equipo de cámara dedicado** y **dispositivos móviles de alta gama** siempre que el resultado tenga calidad real para redes, web y campañas (nítido, estable, bien iluminado, con buen sonido y composición cuidada). No exigimos un equipo concreto; exigimos un **resultado utilizable**.
+
+- **Foto**:
+  - Con cámara dedicada: RAW (`.cr3`, `.nef`, `.arw` u otro formato propietario equivalente) + JPEG de previsualización seleccionado.
+  - Con móvil de alta gama: archivo original (HEIC/JPEG/DNG) **sin recompresión adicional** —es decir, sin pasar antes por mensajería que reduzca resolución o calidad—.
+- **Vídeo**:
+  - Resolución mínima **4K** (a 25 o 30 fps).
+  - Si el equipo lo permite, **perfil LOG / flat** y bitrate ≥ 100 Mbps; cuando se grabe con móvil, basta con el modo de mayor calidad disponible (HEVC, H.265 o equivalente) sin filtros baked.
+  - Audio sin viento; en talking-heads, micro externo, lavalier o equivalente con sonido limpio.
 - **Pre-selección obligatoria**: no se aceptan sesiones enteras sin descarte previo (no enviar 1.500 fotos ni 200 clips).
 - **Estructura de carpetas de entrega**:
   - `01-exterior/`
@@ -101,7 +118,7 @@ Los entregables mínimos por nivel, sincronizados con la tabla pública de la we
   - `04-detalles/`
   - `05-talking-head/` (si aplica al nivel)
 - **Pieza editada por EL CREADOR**: vertical 9:16, sin transiciones ni música baked en el bruto adjunto; el reel editado va aparte del b-roll.
-- **Guía de variedad orientativa**: ~30 % exterior con vehículo, ~30 % interior y detalle, ~20 % uso real (personas/escenas/cocina), ~20 % paisaje/atardecer/mood. Justificadamente revisable.
+- **Guía de variedad orientativa** (no obligatoria si la propuesta narrativa justifica otra distribución): ~30 % exterior con vehículo, ~30 % interior y detalle, ~20 % uso real (personas/escenas/cocina), ~20 % paisaje/atardecer/mood.
 
 ### 3.3 · Idoneidad de marca
 
@@ -120,9 +137,15 @@ Esta cláusula es **el núcleo del acuerdo** y prevalece sobre cualquier interpr
 
 ### 4.1 · Cobro inicial
 
-FURGOCASA factura y cobra a EL CREADOR el **alquiler de la camper a tarifa estándar** de las fechas reservadas, en idénticas condiciones que cualquier cliente. El importe total facturado para esta colaboración asciende a **`{{IMPORTE_ALQUILER}}` €**, IVA incluido, según factura de referencia **`{{NUMERO_FACTURA}}`**.
+FURGOCASA factura y cobra a EL CREADOR el **alquiler de la camper a tarifa estándar** de las fechas reservadas, en idénticas condiciones que cualquier cliente. El importe total facturado para esta colaboración asciende a **__________ €**, IVA incluido, según factura número __________.
 
-El pago se efectuará al **100 % en un único cobro** mediante `{{METODO_PAGO}}` (preferiblemente Redsys o transferencia bancaria), **previo a la entrega del vehículo**. No aplica el desglose 50 %/50 % de las reservas comunes.
+El pago se efectuará al **100 % en un único cobro** mediante (márquese):
+
+- [ ] Tarjeta a través de Redsys (TPV virtual de FURGOCASA).
+- [ ] Transferencia bancaria.
+- [ ] Otro: ______________________________
+
+**previo a la entrega del vehículo**. No aplica el desglose 50 %/50 % de las reservas comunes.
 
 ### 4.2 · Reembolso condicionado a la entrega
 
@@ -151,9 +174,9 @@ FURGOCASA **no entrará a valorar** elementos estéticos, narrativos o de gusto 
 
 | Hito | Plazo |
 |---|---|
-| **Entrega del material por EL CREADOR** | `{{PLAZO_ENTREGA_DIAS}}` días naturales (por defecto: **30**) desde la fecha de devolución del vehículo. Vía de entrega: `{{VIA_ENTREGA}}` (por defecto: WeTransfer o Google Drive, link compartido con permisos de descarga). |
-| **Revisión y comunicación de la decisión por FURGOCASA** | `{{PLAZO_REVISION_DIAS}}` días naturales (por defecto: **14**) desde la entrega completa. |
-| **Emisión de la factura rectificativa y reembolso** | `{{PLAZO_REEMBOLSO_DIAS}}` días naturales (por defecto: **10**) desde la aprobación. |
+| **Entrega del material por EL CREADOR** | **21 días naturales** desde la fecha de devolución del vehículo. Vía de entrega: WeTransfer o Google Drive (link compartido con permisos de descarga) salvo otra pactada por escrito. |
+| **Revisión y comunicación de la decisión por FURGOCASA** | **10 días naturales** desde la entrega completa. |
+| **Emisión de la factura rectificativa y reembolso** | **7 días naturales** desde la aprobación. |
 
 Una entrega **parcial** dentro del plazo NO interrumpe el cómputo: el plazo de revisión solo arranca cuando la entrega esté **completa** y cumpla los mínimos técnicos básicos para poder ser revisada.
 
@@ -185,9 +208,9 @@ EL CREADOR recibe la camper en idénticas condiciones que cualquier cliente de F
 | Fianza | **1.000 €** (consignada por transferencia bancaria con un mínimo de **72 horas de antelación** a la fecha de recogida). |
 | Seguro | A todo riesgo con franquicia, conforme a póliza vigente comunicada al CREADOR antes de la recogida. |
 | Kilometraje | **Ilimitado en España**. Para circulación fuera de España, requiere autorización expresa por escrito de FURGOCASA. |
-| Combustible | Entrega y devolución con el mismo nivel. La diferencia se carga sobre la fianza a `{{PVP_GASOIL}}` €/L (referencia de mercado del día). |
+| Combustible | Entrega y devolución con el mismo nivel. La diferencia se carga sobre la fianza al **PVP de mercado del día**. |
 | Limpieza | Devolución en condiciones razonables de uso. Limpieza extraordinaria por suciedad excesiva, mascotas no declaradas o WC no vaciado: a coste de la fianza, según tarifa publicada. |
-| Conductores autorizados | EL CREADOR y, si procede, **`{{SEGUNDO_CONDUCTOR}}`**. Cualquier otro conductor requiere autorización previa y por escrito. |
+| Conductores autorizados | EL CREADOR y, si procede, segundo conductor: ____________________________ (DNI/NIE: __________). Cualquier otro conductor requiere autorización previa y por escrito. |
 | Recogida y entrega | Horarios estándar comunicados por FURGOCASA. Devolución antes de las **10:00** del día de dropoff. |
 | Daños y multas | A cargo de EL CREADOR. Las multas se cargan sobre la fianza con un suplemento administrativo según la tarifa estándar. |
 
@@ -203,7 +226,7 @@ FURGOCASA **no cede vehículos a creadores** durante:
 - **Semana Santa**.
 - **Puentes nacionales** y **picos navideños** (del 22 de diciembre al 6 de enero).
 
-El periodo pactado en la cabecera de este contrato (`{{FECHA_PICKUP}}` → `{{FECHA_DROPOFF}}`) ha sido validado contra esta política.
+El periodo pactado en la cabecera de este contrato ha sido validado contra esta política antes de la firma.
 
 ---
 
@@ -326,8 +349,8 @@ Las partes manifiestan haber leído, comprendido y aceptado todas las cláusulas
 
 | Por FURGOCASA | Por EL CREADOR |
 |---|---|
-| `{{COMPANY_REP_NOMBRE}}` | `{{CREADOR_NOMBRE}}` |
-| DNI: `{{COMPANY_REP_DNI}}` | DNI/NIE: `{{CREADOR_DNI}}` |
+| Nombre: ___________________________________ | Nombre: ___________________________________ |
+| DNI/NIE: __________________ | DNI/NIE: __________________ |
 | Firma: | Firma: |
 | | |
 | | |
@@ -340,40 +363,46 @@ Las partes manifiestan haber leído, comprendido y aceptado todas las cláusulas
 
 | Campo | Valor |
 |---|---|
-| Nivel pactado | **{{NIVEL}}** |
-| Días de cesión | `{{DIAS_CESION}}` |
-| Tarifa de las fechas (categoría temporada) | `{{CATEGORIA_TEMPORADA}}` — `{{TARIFA_DIARIA}}` €/día |
-| Importe total facturado (IVA incl.) | **`{{IMPORTE_ALQUILER}}` €** |
-| Nº de factura emitida | `{{NUMERO_FACTURA}}` |
-| Importe sujeto a reembolso si CUMPLE | **`{{IMPORTE_ALQUILER}}` €** (100 %) |
-| Fotos seleccionadas (mínimo) | `{{ANEXO1_FOTOS}}` |
-| B-roll bruto útil (mínimo) | `{{ANEXO1_BROLL}}` |
-| Pieza editada por EL CREADOR | `{{ANEXO1_EDITADA}}` |
-| Itinerario / localizaciones propuestas | `{{ANEXO1_ITINERARIO}}` |
-| Plazo de entrega | `{{PLAZO_ENTREGA_DIAS}}` días (default 30) |
-| Plazo de revisión | `{{PLAZO_REVISION_DIAS}}` días (default 14) |
-| Plazo de reembolso | `{{PLAZO_REEMBOLSO_DIAS}}` días (default 10) |
-| Vía de entrega del material | `{{VIA_ENTREGA}}` |
+| Nivel pactado | __________ (Tiny / Light / Standard / Premium / Personalizado) |
+| Días de cesión | __________ |
+| Tarifa de las fechas (categoría temporada) | __________ — __________ €/día |
+| Importe total facturado (IVA incl.) | __________ € |
+| Nº de factura emitida | __________ |
+| Importe sujeto a reembolso si CUMPLE | El 100 % del importe facturado anterior |
+| Fotos seleccionadas (mínimo) | __________ |
+| B-roll bruto útil (mínimo) | __________ |
+| Pieza editada por EL CREADOR | __________ |
+| Itinerario / localizaciones propuestas | __________________________________________________ |
+| Plazo de entrega | **21 días naturales** desde la devolución del vehículo |
+| Plazo de revisión | **10 días naturales** desde la entrega completa |
+| Plazo de reembolso | **7 días naturales** desde la aprobación |
+| Vía de entrega del material | WeTransfer / Google Drive (otra: __________) |
 
 ### Anexo II — Excepciones a la cesión (si aplica)
 
 > Por defecto, sin excepciones. Si hay alguna pieza con uso restringido (por ejemplo, una imagen únicamente para portfolio de EL CREADOR y no para campañas de pago), enumerarla aquí con su título, descripción y motivo.
 
-- `{{EXCEPCIONES_CESION}}`
+- __________________________________________________________________________________
+- __________________________________________________________________________________
 
 ### Anexo III — Autorizaciones de imagen de terceros
 
-> Adjuntar copia firmada de la **autorización de imagen** de cada persona reconocible que aparezca en el material. Modelo estándar disponible en `{{URL_MODELO_AUTORIZACION_IMAGEN}}`.
+> Adjuntar copia firmada de la **autorización de imagen** de cada persona reconocible que aparezca en el material. Modelo estándar disponible bajo petición a `info@furgocasa.com`.
 
-- `{{LISTA_AUTORIZACIONES_ADJUNTAS}}`
+Adjuntos:
+
+- [ ] Autorización 1 — Nombre: ______________________________
+- [ ] Autorización 2 — Nombre: ______________________________
+- [ ] Autorización 3 — Nombre: ______________________________
+- [ ] No procede (no aparecen personas reconocibles distintas de EL CREADOR).
 
 ### Anexo IV — Identidad visual y mención de FURGOCASA
 
-> FURGOCASA proporciona a EL CREADOR el logotipo y la guía de marca mínima para menciones públicas. URL: `{{URL_BRAND_GUIDELINES}}`.
+> FURGOCASA proporciona a EL CREADOR el logotipo y la guía de marca mínima para menciones públicas (bajo petición a `info@furgocasa.com`).
 
-- Mención escrita preferente: **“en colaboración con FURGOCASA — alquiler de campers de gran volumen”**.
-- Etiquetas redes: `@furgocasa` (Instagram, Facebook).
-- Hashtag opcional: `#FurgocasaCreators`.
+- Mención escrita preferente: **«en colaboración con FURGOCASA — alquiler de campers de gran volumen»**.
+- Etiquetas redes: **`@furgocasa`** (Instagram, Facebook).
+- Hashtag opcional: **`#FurgocasaCreators`**.
 
 ---
 
@@ -381,13 +410,13 @@ Las partes manifiestan haber leído, comprendido y aceptado todas las cláusulas
 
 > Este bloque **no se firma** ni se incluye en el PDF entregado al creador. Es un recordatorio interno para el equipo de FURGOCASA.
 
-- **Generar la factura completa** desde el sistema (Redsys / módulo de reservas) como cualquier reserva normal, con marca interna `colaboracion=true` y `referencia=COL-YYYY-NNN`.
+- **Generar la factura completa** desde el sistema (Redsys / módulo de reservas) como cualquier reserva normal, con marca interna `colaboracion=true` y `referencia=COL-AAAA-NNN`.
 - **Bloquear la fecha** en el calendario del vehículo igual que cualquier reserva.
-- Tras dropoff, programar **recordatorio interno a 30 días** para revisar si llegó la entrega; si no, mandar email recordatorio.
-- Al aprobar: **emitir factura rectificativa** (tipo R, motivo: «Reembolso por entrega satisfactoria del contenido pactado — referencia COL-YYYY-NNN») y procesar reembolso a la cuenta o tarjeta de pago original.
+- Tras dropoff, programar **recordatorio interno a 21 días** para revisar si llegó la entrega; si no, mandar email recordatorio.
+- Al aprobar: **emitir factura rectificativa** (tipo R, motivo: «Reembolso por entrega satisfactoria del contenido pactado — referencia COL-AAAA-NNN») y procesar reembolso a la cuenta o tarjeta de pago original.
 - Si “NO CUMPLE”: notificar por email con motivación, archivar carpeta de entrega como evidencia y dejar el alquiler facturado tal cual.
 - **No mezclar** este flujo con la fianza: la fianza la liberamos en su ventana habitual (7–14 días hábiles) descontando, si procede, daños/kilometraje/multas/combustible.
 
 ---
 
-*Versión del documento: **{{VERSION}}** · Última actualización del modelo: **{{FECHA_ULTIMA_REVISION_MODELO}}** · Responsable interno del modelo: `{{RESPONSABLE_INTERNO}}`.*
+*Versión del documento: **1.1** · Última actualización del modelo: **2026-05-14** · Responsable interno del modelo: Equipo FURGOCASA.*

@@ -71,9 +71,9 @@
 >
 > | Hito | Plazo por defecto |
 > |---|---|
-> | Entrega del material por ti | **30 días naturales** desde la devolución del vehículo |
-> | Revisión y comunicación de la decisión por nuestra parte | **14 días naturales** desde la entrega completa |
-> | Factura rectificativa + reembolso (si aprueba) | **10 días naturales** desde la aprobación |
+> | Entrega del material por ti | **21 días naturales** desde la devolución del vehículo |
+> | Revisión y comunicación de la decisión por nuestra parte | **10 días naturales** desde la entrega completa |
+> | Factura rectificativa + reembolso (si aprueba) | **7 días naturales** desde la aprobación |
 > | Vía de entrega habitual | WeTransfer o Google Drive con permiso de descarga |
 >
 > ---
@@ -143,7 +143,7 @@ Para cuando ya hayáis aclarado todo por WhatsApp y solo necesitas adjuntar el c
   - `{{IMPORTE_ALQUILER}}` cuadra con la tarifa de las fechas en el sistema.
   - `{{FECHA_PICKUP}}`/`{{FECHA_DROPOFF}}` caen dentro de las **ventanas permitidas** (octubre–mayo + huecos puntuales; nunca julio, primera quincena de agosto, Semana Santa, puentes ni picos navideños).
   - `{{REFERENCIA_COLABORACION}}` sigue el formato `COL-YYYY-NNN`.
-  - `{{FECHA_LIMITE_ENTREGA_MATERIAL}}` = `{{FECHA_DROPOFF}}` + 30 días naturales.
+  - `{{FECHA_LIMITE_ENTREGA_MATERIAL}}` = `{{FECHA_DROPOFF}}` + 21 días naturales.
 - **Adjunto**: preferimos enviar el contrato en **PDF firmable** además del DOCX. Si solo tienes DOCX, conviértelo antes de enviarlo (Word → Guardar como PDF o pandoc).
 - **CC interno**: siempre `reservas@furgocasa.com` para que quede en la bandeja compartida.
 - **Tras la respuesta del creador**:
@@ -151,7 +151,7 @@ Para cuando ya hayáis aclarado todo por WhatsApp y solo necesitas adjuntar el c
   - Si pide cambios → renegociar por email/WhatsApp, regenerar el contrato y volver a enviar.
 - **Recordatorios automáticos**:
   - 24 h antes del pickup: revisar que pago y fianza están dentro.
-  - El día del dropoff: programar tarea «revisar entrega de material» a 30 días vista.
+  - El día del dropoff: programar tarea «revisar entrega de material» a 21 días vista.
 
 ---
 

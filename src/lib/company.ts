@@ -128,5 +128,19 @@ export const COMPANY = {
   },
 
   foundingDate: '2018',
-  legalName: 'Furgocasa S.L.',
+  legalName: 'Furgocasa Campervans S.L.',
+
+  fiscal: {
+    legalName: 'FURGOCASA CAMPERVANS SL',
+    nif: 'B87947412',
+    fiscalAddress: {
+      street: 'Calle Enrique Villar, núm. 13, Planta 5, Puerta A',
+      locality: 'Murcia',
+      region: 'Región de Murcia',
+      postalCode: '30008',
+      country: 'ES',
+    },
+    aeatAdministration: '30601 MURCIA',
+    nifIssuedDate: '2017-11-23',
+  },
 } as const;
