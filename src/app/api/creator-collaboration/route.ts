@@ -1,22 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { sendEmail, getCompanyEmail } from "@/lib/email/smtp-client";
-
-const MAX_REQUESTED_DAYS = 14;
-
-/**
- * Devuelve la etiqueta de nivel (Tiny / Light / Standard / Premium) según los
- * días de cesión. >7 → caso a valorar fuera de tabla.
- * Sincronizado con `COLLAB_LEVELS` y `levelFromDays` en
- * `src/components/content-creators/creator-application-form.tsx`.
- */
-function levelTagFromDays(days: number): "Tiny" | "Light" | "Standard" | "Premium" | "Fuera de tabla" {
-  if (days <= 1) return "Tiny";
-  if (days <= 3) return "Light";
-  if (days <= 5) return "Standard";
-  if (days <= 7) return "Premium";
-  return "Fuera de tabla";
-}
+import { MAX_REQUESTED_DAYS, levelTagFromDays } from "@/lib/content-creators/levels";
 
 const schema = z.object({
   name: z.string().trim().min(2).max(120),

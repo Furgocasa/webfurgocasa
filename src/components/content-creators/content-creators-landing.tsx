@@ -11,7 +11,8 @@ import {
   Users,
 } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
-import { CreatorApplicationForm, COLLAB_LEVELS } from "./creator-application-form";
+import { CreatorApplicationForm } from "./creator-application-form";
+import { COLLAB_LEVELS } from "@/lib/content-creators/levels";
 import { buildCanonicalAlternates } from "@/lib/seo/multilingual-metadata";
 import type { Locale } from "@/lib/i18n/config";
 
