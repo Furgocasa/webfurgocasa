@@ -815,6 +815,42 @@ Las 10 filas quedaron en BD con su `smtp_message_id` confirmado por el
 relay SMTP. La idempotencia del UNIQUE INDEX parcial garantiza que los
 crons posteriores no las dupliquen.
 
+### Registro de trazabilidad (catch-up 15/05/2026)
+
+Fuente de verdad en BD: `booking_email_dispatches` con `status='sent'` y
+`metadata.catch_up_at` IS NOT NULL. Para cada fila, la columna «debió
+enviarse» es la fecha y hora canónica del ciclo en zona Europa/Madrid
+(**05** = día del pickup a las **21:00**, **06** = día mitad de viaje
+solo si duración ≥6 días a las **11:00**, **07** = día siguiente al
+dropoff a las **11:30**). Los envíos reales del catch-up ocurrieron el
+**15/05/2026 entre 21:27 y 21:28 CEST** (scripts antes del barrido del
+cron nocturno del **05**), todos con CC a `reservas@furgocasa.com`.
+
+| Debió enviarse | Retraso† | Tipo | Reserva | Cliente |
+|---|---|---|---|---|
+| 2026-05-09 (sáb) 11:00 | 6 días | 06 | `BK-20260119-8178` | Eric |
+| 2026-05-11 (lun) 11:30 | 4 días | 07 | `FG09265062` | Sergio |
+| 2026-05-11 (lun) 11:30 | 4 días | 07 | `FC26010049` | Antonio |
+| 2026-05-11 (lun) 21:00 | 4 días | 05 | `BK-20260119-4618` | Enrique |
+| 2026-05-13 (mié) 11:00 | 2 días | 06 | `FG86960628` | Carlos |
+| 2026-05-14 (jue) 11:00 | 1 día | 06 | `BK-20260119-4618` | Enrique |
+| 2026-05-14 (jue) 21:00 | 1 día | 05 | `FG10292232` | David |
+| 2026-05-15 (vie) 11:30 | 0 días | 07 | `FG23455465` | Salvador |
+| 2026-05-15 (vie) 21:00 | 0 días | 05 | `FG97428575` | Ana |
+| 2026-05-15 (vie) 21:00 | 0 días | 05 | `FC26020076` | Félix |
+
+† Retraso = diferencia en calendario entre la fecha prevista del envío y la fecha efectiva del catch-up en Madrid (**2026-05-15**). Dos correos distintos a **la misma reserva** (p. ej. Enrique con **05** y **06**) son líneas independientes en `booking_email_dispatches`.
+
+### Estado tras el incidente (mayo 2026)
+
+El tema queda **dado por cerrado operativa y técnicamente**: causa raíz
+documentada, patrón de render alineado con emails 01–04 (sin lectura de
+HTML desde disco en Vercel para **05/06/07**), dispatches fallidos
+recuperados, herramienta `storyteller-catch-up-failed.ts` disponible y CC
+obligatorio a `reservas@furgocasa.com` para auditoría. Los nuevos envíos
+dependen solo del cron y del contenido sincronizado con
+`sync-storyteller-emails-to-ts.mjs`.
+
 ### Lecciones aprendidas
 
 1. **Nunca `fs.readFile` desde una función serverless de Vercel** salvo
