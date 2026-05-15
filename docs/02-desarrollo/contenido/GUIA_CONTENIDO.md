@@ -709,6 +709,11 @@ Plantillas:
 | `scripts/generate-content-creator-showcase-images.ts` | Generación imágenes landing PRO (tags CLI) |
 | `scripts/generate-storytellers-showcase-images.ts` | Generación imágenes landing Storytellers + merch |
 | `scripts/storytellers-smoke-test.ts` | Smoke test despliegue Storytellers |
+| `scripts/sync-storyteller-emails-to-ts.mjs` | **Regenera `src/lib/storytellers/email-templates.ts`** desde los HTML espejo de `mailing/app/05–07*.html` (mismo patrón que `getReturnReminderTemplate` del email 04). Ejecutar SIEMPRE tras editar uno de los HTML del ciclo. |
+| `scripts/storyteller-send-cycle-email.ts` | Envío manual idempotente de UN email del ciclo (05/06/07) a UNA reserva. CC a `reservas@` por defecto. |
+| `scripts/storyteller-catch-up-failed.ts` | **Catch-up masivo** tras fallo de runtime. Deduplica los `failed` del último mes y los reenvía con CC a `reservas@`. Creado tras el incidente `ENOENT` del 15/05/2026. |
+| `scripts/list-storyteller-failed.mjs` | Auditoría: lista dispatches `failed` con motivo y estado de ventana del cron. |
+| `scripts/storyteller-send-rescue-launch.ts` | Mail **08** rescate post-lanzamiento (excepcional, sin cron). |
 | `src/lib/seo/sitemap.ts` | Entrada estática `/storytellers` |
 | `src/lib/route-translations.ts` | `/storytellers` mismo slug en es/en/fr/de |
 | `src/components/layout/header.tsx` / `footer.tsx` | Enlaces Storytellers |

@@ -65,13 +65,13 @@ Motivo: el código real vive en `src/lib/email/templates.ts` (es lo que ve el cl
 > (rate-limit, reCAPTCHA, HMAC, honeypot), el backfill histórico y los
 > crons pendientes. **Léelo antes de tocar cualquier email Storytellers.**
 
-Las tres plantillas siguientes son **emails de ciclo de vida del viaje** (salida → mitad → vuelta). HTML listo, tracking en BD activo, **crons pendientes** (mientras tanto se mandan manualmente con `node scripts/test-storyteller-emails.mjs`).
+Las tres plantillas siguientes son **emails de ciclo de vida del viaje** (salida → mitad → vuelta). **Ciclo automático operativo en producción** desde el 15/05/2026 (commit `9d0323ea`): cada email se renderiza con una función TypeScript en `src/lib/storytellers/email-templates.ts` (mismo patrón que `getReturnReminderTemplate` del email 04). Los HTML de `mailing/app/05–07*.html` son el **espejo visual editable a mano**; tras cualquier edición hay que regenerar el TS con `node scripts/sync-storyteller-emails-to-ts.mjs`.
 
 | Archivo HTML (referencia) | Momento de envío previsto (producto) | Estado en código |
 |---|---|---|
-| `app/05-storytellers-dia-salida-noche.html` | Mismo día del pickup (salida), ~20:00–21:00 (Europe/Madrid) | HTML listo · cron pendiente |
-| `app/06-storytellers-mitad-viaje.html` | Día intermedio del alquiler (punto medio pickup ↔ dropoff), mañana. **No se envía en viajes <6 días.** | HTML listo · cron pendiente |
-| `app/07-storytellers-dia-despues-vuelta.html` | 1 día natural después del `dropoff_date`, mañana | HTML listo · cron pendiente. El recordatorio automático actual a **+7 días** (`buildPostTripReminderHtml` + `storyteller-post-trip-reminder`) seguirá conviviendo o se sustituye, decisión abierta. |
+| `app/05-storytellers-dia-salida-noche.html` (espejo) → `getStorytellerPickupNightTemplate(data)` | Mismo día del pickup (salida), ~20:00–21:00 (Europe/Madrid) | **Operativo** · cron `storyteller-pickup-night` |
+| `app/06-storytellers-mitad-viaje.html` (espejo) → `getStorytellerMidTripTemplate(data)` | Día intermedio del alquiler (punto medio pickup ↔ dropoff), mañana. **No se envía en viajes <6 días.** | **Operativo** · cron `storyteller-mid-trip` |
+| `app/07-storytellers-dia-despues-vuelta.html` (espejo) → `getStorytellerPostTripTemplate(data)` | 1 día natural después del `dropoff_date`, mañana | **Operativo** · cron `storyteller-post-trip-day-after`. El recordatorio automático antiguo a **+7 días** (`buildPostTripReminderHtml` + `storyteller-post-trip-reminder`) sigue conviviendo como red de seguridad bajo el mismo `email_type='storyteller_post_trip'`. |
 
 Los 3 emails incluyen:
 

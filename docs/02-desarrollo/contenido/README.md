@@ -24,6 +24,10 @@
 | `npx tsx scripts/generate-storytellers-email-promo-images.ts` | `scripts/generate-storytellers-email-promo-images.ts` | **6 imágenes promocionales del email Storytellers** (3 hero 4:5 + 3 banners 3:2 con texto promocional integrado por `gpt-image-2`). Tags: `cover-05/06/07`, `banner-05/06/07`, alias `cover` / `banner`. |
 | `npx tsx scripts/storytellers-smoke-test.ts` | — | Verificación post-deploy del programa Storytellers. |
 | `npx tsx scripts/storyteller-send-rescue-launch.ts` | `scripts/storyteller-send-rescue-launch.ts` | Mail **08** rescate post-lanzamiento: auditoría `--days`, muestra `--example` a `reservas@`, `--booking`, `--all --confirm`. Idempotencia `metadata.rescue_launch_*`. |
+| `npx tsx scripts/storyteller-send-cycle-email.ts --booking X --type 05\|06\|07` | `scripts/storyteller-send-cycle-email.ts` | Envío manual de UN email del ciclo a UNA reserva (CC `reservas@` por defecto). `--dry-run`, `--no-cc`, `--force`, `--clear-backfill`. |
+| `npx tsx scripts/storyteller-catch-up-failed.ts --confirm` | `scripts/storyteller-catch-up-failed.ts` | **Catch-up masivo** tras fallo de runtime: deduplica dispatches `failed` del último mes y los reenvía con CC a `reservas@`. `--dry-run` (default), `--days N`, `--no-cc`, `--delay-ms N`. Creado tras el incidente `ENOENT` del 09–15/05/2026. |
+| `node scripts/list-storyteller-failed.mjs --days 30` | `scripts/list-storyteller-failed.mjs` | Auditoría visual de dispatches `failed` con motivo y estado de ventana del cron (`HOY`, `ayer`, `perdida → manual --force`). |
+| `node scripts/sync-storyteller-emails-to-ts.mjs` | `scripts/sync-storyteller-emails-to-ts.mjs` | **Regenera `src/lib/storytellers/email-templates.ts`** desde los HTML espejo de `mailing/app/05–07*.html`. Ejecutar SIEMPRE tras editar un HTML del ciclo. |
 
 ### ⭐ Regla de oro de generación de imágenes con texto
 

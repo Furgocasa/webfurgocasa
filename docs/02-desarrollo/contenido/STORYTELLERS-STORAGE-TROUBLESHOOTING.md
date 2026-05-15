@@ -127,3 +127,17 @@ Las URLs firmadas y el archivo en Storage pueden estar **perfectos** y aun así 
 Si tras una subida válida los puntos aparecen pero **no llega el correo de confirmación**, revisar logs `[upload-confirm] confirmation email error`. En serverless (Vercel), el envío debe ejecutarse con **`await`** en el mismo handler: una promesa «sueltas» tras responder suele **no ejecutarse** porque la función se congela.
 
 Para detalle de producto y endpoints, seguir §3.5-quinquies de **`GUIA_CONTENIDO.md`**.
+
+---
+
+## 9. Si fallan los **crons** del ciclo Storytellers (05/06/07) — bug `ENOENT` 09–15/05/2026
+
+Este archivo cubre el **Storage**. Hay un problema gemelo en otro contexto (los **crons** que mandan los emails 05/06/07 desde Vercel) que **no es de Storage** sino de **bundling de funciones serverless**: hasta el commit `9d0323ea` (15/05/2026) los crons leían los HTML del filesystem (`mailing/app/0X-*.html`) y Vercel no empaqueta archivos no-JS en `/var/task/` → todos los dispatches quedaban en `status='failed'` con `error_message: render: ENOENT: no such file or directory`.
+
+**Solución vigente:** cada email del ciclo es una función TypeScript en `src/lib/storytellers/email-templates.ts` (mismo patrón que `getReturnReminderTemplate` del 04). Si vuelves a ver `ENOENT` en `booking_email_dispatches` para los tipos `storyteller_pickup_night|mid_trip|post_trip`:
+
+1. Comprueba que `src/lib/storytellers/email-templates.ts` exporta las 3 funciones y está empaquetado.
+2. Si has editado un HTML de `mailing/app/05–07*.html`, **regenera el TS**: `node scripts/sync-storyteller-emails-to-ts.mjs`.
+3. Para recuperar los envíos perdidos sin esperar al cron del día siguiente: `tsx scripts/storyteller-catch-up-failed.ts --confirm`.
+
+**Post-mortem completo y aprendizajes:** [`mailing/STORYTELLERS_MAILS.md`](../../../mailing/STORYTELLERS_MAILS.md) §11 bis.

@@ -1,6 +1,8 @@
 # Storytellers · Ciclo de vida del viaje (05–07) + rescate puntual (08)
 
-> **Estado:** plantillas HTML listas (`mailing/app/05–07` + `08-storytellers-rescate-recien-lanzado.html`), tracking en BD activo (`booking_email_dispatches`), backfill histórico ejecutado. Los **crons** que disparan 05/06/07 están en **`vercel.json`** y apuntan a `/api/cron/storyteller-*` (detalle en §8). Para pruebas visuales sin tocar BD sigue existiendo `node scripts/test-storyteller-emails.mjs`.
+> **Estado (15/05/2026):** ciclo automático **operativo en producción**. Cada email (05/06/07) se renderiza con una función TypeScript en `src/lib/storytellers/email-templates.ts` siguiendo el mismo patrón que `getReturnReminderTemplate` (email 04). Tracking en BD activo (`booking_email_dispatches`), backfill histórico ejecutado, idempotencia garantizada por UNIQUE INDEX parcial. Los crons están en `vercel.json` y apuntan a `/api/cron/storyteller-*` (detalle en §8). Para pruebas visuales sin tocar BD: `node scripts/test-storyteller-emails.mjs`. Para reenvíos masivos tras un incidente: `tsx scripts/storyteller-catch-up-failed.ts` (§7.3).
+>
+> **Incidente resuelto (15/05/2026):** del 09/05 al 15/05 los crons fallaban con `ENOENT: no such file or directory, open '/var/task/mailing/app/...html'` porque Vercel no empaquetaba la carpeta `mailing/` en las funciones serverless. Solución: cada email del ciclo se convirtió en función TS embebida en código JS (commits `9d0323ea` + `04ddf674`). Los 10 envíos perdidos se recuperaron con `storyteller-catch-up-failed.ts` el mismo día. Detalle completo en §11.
 
 Esta carpeta documenta los **tres correos automáticos de ciclo de vida** del programa Storytellers (salida → mitad → día después de la vuelta), más un **cuarto HTML de rescate** (`08`) que solo se envía **a mano o por script puntual**, no por cron. Son los emails que más palanca tienen sobre el programa: si no se
 mandan, casi nadie sube fotos. Si se mandan bien, el cupón "3 % de
@@ -344,7 +346,50 @@ tsx scripts/storyteller-send-cycle-email.ts --booking FG01410169 --type 06 --for
 
 **Flujo interno:** `test-storyteller-emails.mjs` y `storyteller-send-cycle-email.ts` comparten render con `src/lib/storytellers/emails-cycle.ts` para 05/06/07 (misma salida que los crons).
 
-### 7.3 · Rescate post-lanzamiento (`08`) — auditoría y batch
+### 7.3 · Catch-up tras fallo de runtime (NUEVO · 05/2026)
+
+Script: `scripts/storyteller-catch-up-failed.ts`. Caso de uso: tras un
+incidente en el que los crons hayan dejado **muchos dispatches en
+`failed`** (por ejemplo el bug `ENOENT` del 09–15/05/2026, §11), este
+script consolida la lista y reenvía todo de golpe sin esperar al cron
+del día siguiente.
+
+Qué hace:
+
+1. Lee `booking_email_dispatches` y agrupa los `failed` por
+   `(booking_id, email_type)` en los últimos N días (`--days`, default 30).
+2. Filtra los que ya tienen un `sent` posterior (no se reenvían
+   duplicados).
+3. Filtra reservas canceladas, sin email válido, o con `dropoff_date`
+   más allá de 90 días en el pasado (ventana de subida cerrada).
+4. Para los supervivientes llama a `sendCycleEmail(...)` exactamente
+   como hace el cron, con **CC a `reservas@furgocasa.com`** por
+   defecto, y registra el dispatch como `sent`.
+
+```bash
+# Auditoría (NO envía nada, NO toca BD):
+tsx scripts/storyteller-catch-up-failed.ts --dry-run --days 30
+
+# Envío real con CC a reservas@furgocasa.com:
+tsx scripts/storyteller-catch-up-failed.ts --confirm --days 30
+
+# Mismo, pero sin CC (solo cliente):
+tsx scripts/storyteller-catch-up-failed.ts --confirm --no-cc
+
+# Cambiar delay entre envíos (default 1500 ms):
+tsx scripts/storyteller-catch-up-failed.ts --confirm --delay-ms 3000
+```
+
+Idempotencia: cada par `(booking_id, email_type)` se manda **una sola
+vez** por ejecución, y si ya hubo un `sent` no se vuelve a tocar. Si se
+relanza el script tras un envío exitoso, no manda nada.
+
+Auditoría complementaria: `scripts/list-storyteller-failed.mjs` lista
+los failed en pantalla con el motivo del fallo y si la ventana del cron
+sigue viva — útil para entender qué reservas necesitan catch-up
+manual antes de invocar el script anterior.
+
+### 7.4 · Rescate post-lanzamiento (`08`) — auditoría y batch
 
 Script: `scripts/storyteller-send-rescue-launch.ts`. Caso de uso: clientes marcados por backfill como ya enviados en `storyteller_post_trip` pero aún dentro de ventana de subida.
 
@@ -363,7 +408,7 @@ tsx scripts/storyteller-send-rescue-launch.ts --booking FC26050096
 tsx scripts/storyteller-send-rescue-launch.ts --all --confirm --days 10
 ```
 
-Detalle de idempotencia y vars de entorno en la cabecera del propio script.
+Detalle de idempotencia y vars de entorno en la cabecera del propio script. **Nota:** el 08 sigue leyendo su HTML directamente desde `mailing/app/08-*.html` porque solo se ejecuta en local con `tsx` (nunca en Vercel), así que no le afecta el bug de bundling que tuvieron 05/06/07.
 
 ---
 
@@ -649,6 +694,139 @@ Antes de hacer commit:
 | 08/05/2026 (noche) | **Migración de SVG quemado a `gpt-image-2` para las 6 imágenes promocionales del email.** Nuevo script único `scripts/generate-storytellers-email-promo-images.ts` que usa `openai.images.edit` con `gpt-image-2` y la imagen `-clean.jpg` como base, dejando que el modelo componga el cartel completo (texto, jerarquía, pill, drop-shadow, gradient sutil) a partir de un brief con literalidad exacta + paleta `#ea580c / #ffffff / #063971` + posición. Resultado claramente más editorial e integrado que el SVG previo. **Regla de oro a futuro:** banners/hero/carteles con texto se hacen siempre con `gpt-image-2`, no con SVG quemado. SVG queda para casos que necesitan reproducibilidad pixel-perfect. |
 | 09/05/2026 | **Crons Storytellers operativos + lib unificada `emails-cycle.ts` + cross-sell en email 04.** Tres crons nuevos en `vercel.json` (`storyteller-pickup-night`, `storyteller-mid-trip`, `storyteller-post-trip-day-after`), todos sobre la misma lib `src/lib/storytellers/emails-cycle.ts` (render + envío + escritura idempotente en `booking_email_dispatches`). Refactor de los crons existentes (`return-reminders` y `storyteller-post-trip-reminder`) para escribir también en la tabla unificada manteniendo los flags legacy como compat. El cron de +7d se mantiene como red de seguridad: comparte `email_type='storyteller_post_trip'` con el de +1d, así que casi nunca encuentra trabajo. Nuevo script CLI `scripts/storyteller-send-cycle-email.ts` para envíos manuales que SÍ escriben en BD. Email **04 recordatorio devolución** ahora incluye un párrafo cross-sell de Storytellers con CTA naranja al final, tanto en `src/lib/email/templates.ts` (runtime) como en el espejo `mailing/app/04-recordatorio-devolucion.html` (preview). |
 | 09/05/2026 (PM) | **Subida directa firmada** (`upload-init` / `upload-confirm`), MIME efectivo iPhone/Safari, runbook `STORYTELLERS-STORAGE-TROUBLESHOOTING.md`. Correo de confirmación de subida con **`await`** en `upload-confirm`. Panel admin: preview HEVC/Chromium + **descargar original** en foto y vídeo. Cron **`storyteller-orphan-cleanup`**. Mail rescate **`08-storytellers-rescate-recien-lanzado.html`** + script **`storyteller-send-rescue-launch.ts`** (idempotencia `metadata.rescue_launch_*` sin nuevo `email_type`). |
+| 15/05/2026 | **INCIDENTE + FIX · Bug `ENOENT` en los crons Storytellers 05/06/07.** Del 09/05 al 15/05 los crons fallaron en cada ejecución con `error: render: ENOENT: no such file or directory, open '/var/task/mailing/app/0X-*.html'`. Causa raíz: Vercel **no empaqueta archivos no-JS** dentro de la función serverless del cron, y la implementación inicial leía las plantillas HTML del disco con `fs.readFile("mailing/app/...")`. El email 04 (`return_reminder`) y el 01 (`booking_created`) no se vieron afectados porque su HTML vive como string literal dentro de funciones TypeScript en `src/lib/email/templates.ts`. **Solución (commits `04ddf674` + `9d0323ea`):** los emails 05/06/07 pasan a ser funciones TypeScript públicas en `src/lib/storytellers/email-templates.ts` (`getStorytellerPickupNightTemplate`, `getStorytellerMidTripTemplate`, `getStorytellerPostTripTemplate`), con la misma firma que `getReturnReminderTemplate` del 04. Cada función recibe `{ firstName, bookingNumber }` y devuelve el HTML interpolado. Webpack las empaqueta como código JS estándar y siempre están en `/var/task`. Los HTML de `mailing/app/05–07*.html` se mantienen como **espejo visual editable a mano**; un script `scripts/sync-storyteller-emails-to-ts.mjs` regenera el TS desde el HTML cuando se edita. El 08 NO entra en este cambio porque su script de rescate corre siempre en local con `tsx`. Recuperación: los 10 dispatches `failed` en BD se reenviaron con `scripts/storyteller-catch-up-failed.ts --confirm` el mismo 15/05 a las 21:27 Madrid, con CC a `reservas@`. Auditoría completa en §11 bis. |
+
+---
+
+## 11 bis · Post-mortem técnico · Incidente `ENOENT` 09–15/05/2026
+
+### Síntoma
+
+Del 09/05 al 15/05/2026, los 3 crons del ciclo Storytellers
+(`storyteller-pickup-night`, `storyteller-mid-trip`,
+`storyteller-post-trip-day-after`) ejecutaban con éxito (entraban en la
+función, leían reservas elegibles), pero al intentar mandar el email
+escribían una fila `status='failed'` en `booking_email_dispatches` con:
+
+```
+error_message: render: ENOENT: no such file or directory,
+               open '/var/task/mailing/app/06-storytellers-mitad-viaje.html'
+```
+
+(idem para 05 y 07). Ningún email del ciclo Storytellers se mandó
+durante esa semana, mientras que el resto del mailing (`return_reminder`,
+`booking_created`, etc.) funcionaba con total normalidad.
+
+### Detección
+
+Reportado por el usuario el 15/05/2026 al ver que reservas que cumplían
+el patrón canónico (FU011 devuelta el día anterior, Dreamer 06 en
+mitad de viaje) **no recibían sus Storytellers** mientras que sí
+recibían perfectamente el "Mañana devuelves tu camper" (email 04) y la
+confirmación de reserva (email 02). La pregunta del usuario que disparó
+el diagnóstico:
+
+> «¿Cómo puede estar funcionando bien el de mañana devuelves tu camper?
+> Verifica ese y los demás no.»
+
+### Causa raíz
+
+Los emails Storytellers 05/06/07 cargaban su HTML del filesystem:
+
+```ts
+// emails-cycle.ts (versión antigua, ya eliminada)
+export async function loadCycleEmailHtml(type: CycleEmailType): Promise<string> {
+  const cfg = CYCLE_EMAIL_CONFIG[type];
+  const fullPath = path.resolve(process.cwd(), cfg.htmlPath);
+  return fs.readFile(fullPath, "utf8"); // ← ENOENT en producción
+}
+```
+
+`cfg.htmlPath` apuntaba a `mailing/app/0X-storytellers-*.html`. En
+desarrollo local con `tsx` y `next dev` esto funciona porque el cwd es
+la raíz del repo y los HTML existen. En **Vercel** la función serverless
+se empaqueta en `/var/task/` con **sólo lo que Webpack incluye en el
+bundle JS** — la carpeta `mailing/` no entra. Por eso al hacer
+`fs.readFile("mailing/app/...")` el archivo no existe → `ENOENT`.
+
+Comparativa con los emails que SÍ funcionaban:
+
+| Email | Cómo se renderiza | ¿Se rompe en Vercel? |
+|---|---|---|
+| 01 reserva creada | `getBookingCreatedTemplate(data)` con string TS en `src/lib/email/templates.ts` | NO |
+| 02 primer pago | `getFirstPaymentConfirmedTemplate(data)` con string TS | NO |
+| 04 recordatorio devolución | `getReturnReminderTemplate(data)` con string TS | NO |
+| 05 día de salida | `fs.readFile("mailing/app/05-*.html")` | **SÍ → ENOENT** |
+| 06 mitad de viaje | `fs.readFile("mailing/app/06-*.html")` | **SÍ → ENOENT** |
+| 07 día después | `fs.readFile("mailing/app/07-*.html")` | **SÍ → ENOENT** |
+
+### Solución aplicada
+
+Replicar el patrón de los emails 01–04: cada email del ciclo
+Storytellers se convirtió en una **función TypeScript pública** dentro
+de `src/lib/storytellers/email-templates.ts`:
+
+```ts
+export function getStorytellerPickupNightTemplate(data: StorytellersEmailData): string {
+  const firstName = htmlEscapeBasic(data.firstName);
+  const bookingNumber = data.bookingNumber;
+  return `<!DOCTYPE html ...todo el HTML interpolado...>`
+    .replace(/Juan/g, firstName)
+    .replace(/FC-2026-001234/g, bookingNumber);
+}
+```
+
+Funcionalmente equivalente a `getReturnReminderTemplate(data)`. Webpack
+empaqueta la función como código JS estándar — siempre disponible en
+`/var/task`.
+
+Para no perder el flujo "edito HTML visualmente, veo el resultado en
+navegador", los HTML de `mailing/app/05–07*.html` se mantienen como
+espejo editable a mano. Cuando se editan, hay que regenerar el TS con:
+
+```bash
+node scripts/sync-storyteller-emails-to-ts.mjs
+```
+
+El script genera las 3 funciones TS desde los 3 HTML y deja en BD el
+contenido que se mandará en producción.
+
+### Recuperación de los envíos perdidos
+
+10 dispatches quedaron en `status='failed'` con la ventana de envío en
+estados diversos. Se creó `scripts/storyteller-catch-up-failed.ts`
+que:
+
+1. Deduplica por `(booking_id, email_type)`.
+2. Descarta los que tras el `failed` ya recibieron un `sent` (carrera
+   con un cron exitoso, por ejemplo).
+3. Descarta canceladas, sin email válido, o con dropoff fuera de la
+   ventana de 90 días de subida.
+4. Llama a `sendCycleEmail(...)` con `ccReservas=true` para los
+   supervivientes y registra el dispatch con `metadata.catch_up_at`.
+
+Ejecutado el 15/05/2026 a las 21:27 Madrid con `--confirm`:
+
+```
+05×4  06×3  07×3   Total: 10 enviados, 0 fallidos, 0 saltados.
+```
+
+Las 10 filas quedaron en BD con su `smtp_message_id` confirmado por el
+relay SMTP. La idempotencia del UNIQUE INDEX parcial garantiza que los
+crons posteriores no las dupliquen.
+
+### Lecciones aprendidas
+
+1. **Nunca `fs.readFile` desde una función serverless de Vercel** salvo
+   que el archivo entre en el bundle vía `import` o vía
+   `outputFileTracingIncludes`. Para HTML de email, el patrón canónico
+   es **función TypeScript que devuelve string** (como hacen 01–04).
+2. **Tener auditoría visible**: la tabla `booking_email_dispatches`
+   con `status='failed'` y `error_message` fue clave para localizar
+   el fallo en 5 minutos. Sin esa tabla habría sido invisible.
+3. **Script de catch-up listo**: ahora vive como herramienta
+   permanente (`scripts/storyteller-catch-up-failed.ts`) para
+   cualquier futuro incidente del estilo.
 
 ---
 
@@ -660,7 +838,8 @@ Antes de hacer commit:
 - [`docs/04-referencia/emails/SISTEMA-EMAILS.md`](../docs/04-referencia/emails/SISTEMA-EMAILS.md) — sistema de emails transaccionales.
 - [`supabase/migrations/20260508-booking-email-dispatches.sql`](../supabase/migrations/20260508-booking-email-dispatches.sql) — esquema de tracking.
 - [`supabase/migrations/20260508-booking-email-dispatches-backfill-historic.sql`](../supabase/migrations/20260508-booking-email-dispatches-backfill-historic.sql) — backfill histórico.
-- [`src/lib/storytellers/emails-cycle.ts`](../src/lib/storytellers/emails-cycle.ts) — **lib unificada del ciclo 05/06/07** (render, envío, idempotencia, selección de elegibles).
+- [`src/lib/storytellers/email-templates.ts`](../src/lib/storytellers/email-templates.ts) — **funciones TS de cada email del ciclo** (`getStorytellerPickupNightTemplate`, `getStorytellerMidTripTemplate`, `getStorytellerPostTripTemplate`). Archivo autogenerado por el script de sync; mismo patrón que `getReturnReminderTemplate` del 04.
+- [`src/lib/storytellers/emails-cycle.ts`](../src/lib/storytellers/emails-cycle.ts) — **lib unificada del ciclo 05/06/07** (delega el render en las funciones de `email-templates.ts`, gestiona envío, idempotencia, selección de elegibles).
 - [`src/app/api/cron/storyteller-pickup-night/route.ts`](../src/app/api/cron/storyteller-pickup-night/route.ts) — cron diario 20:00–21:00 Madrid → email 05.
 - [`src/app/api/cron/storyteller-mid-trip/route.ts`](../src/app/api/cron/storyteller-mid-trip/route.ts) — cron diario 10:00–11:00 Madrid → email 06 (solo viajes ≥6 días).
 - [`src/app/api/cron/storyteller-post-trip-day-after/route.ts`](../src/app/api/cron/storyteller-post-trip-day-after/route.ts) — cron diario 10:30–11:30 Madrid → email 07.
@@ -670,6 +849,9 @@ Antes de hacer commit:
 - [`scripts/test-storyteller-emails.mjs`](../scripts/test-storyteller-emails.mjs) — script de **prueba visual** (NO escribe en BD).
 - [`scripts/storyteller-send-cycle-email.ts`](../scripts/storyteller-send-cycle-email.ts) — script CLI de **envío manual idempotente** a una reserva concreta (sí escribe en BD).
 - [`scripts/storyteller-send-rescue-launch.ts`](../scripts/storyteller-send-rescue-launch.ts) — envío puntual del HTML **08** (rescate post-lanzamiento) con auditoría `--days`, `--example`, `--booking`, `--all --confirm`.
+- [`scripts/storyteller-catch-up-failed.ts`](../scripts/storyteller-catch-up-failed.ts) — **catch-up tras fallo de runtime**: deduplica los dispatches `failed` del último mes y los reenvía con CC a `reservas@` respetando idempotencia. Creado el 15/05/2026 a raíz del incidente `ENOENT`.
+- [`scripts/list-storyteller-failed.mjs`](../scripts/list-storyteller-failed.mjs) — herramienta de auditoría que lista dispatches `failed` con motivo y estado de ventana (útil para entender qué necesita catch-up manual antes de ejecutar el script anterior).
+- [`scripts/sync-storyteller-emails-to-ts.mjs`](../scripts/sync-storyteller-emails-to-ts.mjs) — **regenera `email-templates.ts` desde los HTML espejo** de `mailing/app/05–07*.html`. Ejecutar SIEMPRE tras editar un HTML del ciclo.
 - [`scripts/generate-storytellers-email-promo-images.ts`](../scripts/generate-storytellers-email-promo-images.ts) — generador de las 6 imágenes promocionales del email con `gpt-image-2` (3 hero verticales + 3 banners horizontales con texto).
 - [`scripts/generate-storytellers-showcase-images.ts`](../scripts/generate-storytellers-showcase-images.ts) — generador de las imágenes lifestyle / mosaico de la landing pública (versiones limpias sin texto).
 - [`scripts/download-mailing-assets.mjs`](../scripts/download-mailing-assets.mjs) — utilidades varias del mailing (descargas, conversiones).
