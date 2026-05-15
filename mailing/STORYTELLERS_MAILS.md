@@ -107,24 +107,36 @@ antiguo y nuevo.
 
 ### Fuente de verdad del HTML en runtime (importante)
 
-Los HTML de `mailing/app/05–08*.html` son **el origen humano** que
-editamos a mano. Pero en **runtime** (crons de Vercel y scripts CLI)
-**no** se leen del filesystem: están embebidos como strings TypeScript
-en [`src/lib/storytellers/email-templates.ts`](../src/lib/storytellers/email-templates.ts),
-exactamente igual que el email 04 (`getReturnReminderTemplate` en
-`src/lib/email/templates.ts`).
+Los HTML de `mailing/app/05–07*.html` son el **espejo visual editable
+a mano**: nos sirven para revisar copy, layout e imágenes en cualquier
+navegador. Pero en **runtime** (crons de Vercel) **no** se leen del
+filesystem: cada email tiene su propia **función TypeScript** en
+[`src/lib/storytellers/email-templates.ts`](../src/lib/storytellers/email-templates.ts),
+exactamente del mismo patrón que el email 04 (`getReturnReminderTemplate`
+en `src/lib/email/templates.ts`):
 
-Esto es **crítico**: si se intenta `fs.readFile("mailing/app/...html")`
-desde una función serverless de Vercel, el archivo **no existe en
-`/var/task/`** y el dispatch queda `failed` con `ENOENT: no such file or
-directory`. Empaquetado como string en código JS, Webpack lo incluye sin
-ningún truco de bundling.
+| Código | Función TS |
+|---|---|
+| 05 | `getStorytellerPickupNightTemplate(data)` |
+| 06 | `getStorytellerMidTripTemplate(data)` |
+| 07 | `getStorytellerPostTripTemplate(data)` |
 
-**Flujo de trabajo al editar uno de los HTML:**
+Las tres reciben `{ firstName, bookingNumber }` y devuelven el HTML
+completo ya interpolado. Webpack las empaqueta como código JS estándar,
+por eso siempre están disponibles en la función serverless de Vercel
+(`/var/task`).
+
+Esto es **crítico**: si se intentara `fs.readFile("mailing/app/...html")`
+desde la función serverless, el archivo **no existe en `/var/task/`** y
+el dispatch quedaría `failed` con `ENOENT: no such file or directory` —
+que es precisamente el bug que tuvo paralizados los Storytellers
+durante varias reservas.
+
+**Flujo de trabajo al editar uno de los HTML del 05/06/07:**
 
 1. Editas `mailing/app/0X-storytellers-*.html` (preview visual, copy,
    imágenes…).
-2. Regeneras el TS embebido:
+2. Regeneras las funciones TS:
    ```bash
    node scripts/sync-storyteller-emails-to-ts.mjs
    ```
@@ -134,6 +146,13 @@ ningún truco de bundling.
 
 Si te saltas el paso 2, en producción se enviará la versión **vieja**.
 El TS gana siempre.
+
+**Excepción: el 08 (rescate post-lanzamiento)** no entra en este patrón
+porque NO tiene cron — sólo se manda con
+`scripts/storyteller-send-rescue-launch.ts` desde local. Su HTML se lee
+directamente de `mailing/app/08-storytellers-rescate-recien-lanzado.html`
+con `fs.readFile`, lo cual funciona porque el script se ejecuta siempre
+en local con `tsx`, nunca en Vercel.
 
 ---
 

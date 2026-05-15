@@ -1,32 +1,71 @@
 /**
- * Storytellers · HTML embebido para runtime (crons + scripts CLI)
- * =================================================================
+ * Storytellers · Plantillas de email del ciclo automático (05/06/07)
+ * ====================================================================
  *
  * ⚠️  ARCHIVO GENERADO AUTOMÁTICAMENTE — NO EDITAR A MANO.
  *
- * Fuente de los HTML originales: `mailing/app/05–08*.html`.
+ * Fuente "espejo" editable a mano: `mailing/app/05–07*.html`.
  * Regenerar tras tocar cualquier HTML:
  *
  *     node scripts/sync-storyteller-emails-to-ts.mjs
  *
- * Por qué embebido en TS (y no `fs.readFile` desde `mailing/app/`):
- * Vercel no empaqueta archivos no-JS en las funciones serverless de los
- * crons. Si se leyera con `fs` desde `mailing/app/` el archivo no
- * existiría en `/var/task` y el dispatch quedaría `failed` con
- * `ENOENT`. Embebido como string, Webpack lo incluye con el código de la
- * función y siempre está disponible — mismo patrón que
- * `getReturnReminderTemplate` (email 04) en
- * `src/lib/email/templates.ts`.
+ * Por qué este archivo existe
+ * ---------------------------
+ * Los crons de Vercel (`/api/cron/storyteller-*`) ejecutan estos
+ * emails desde funciones serverless donde **Vercel no empaqueta los
+ * archivos no-JS** de `mailing/app/`. Si intentas leerlos con
+ * `fs.readFile(...)` en runtime, el dispatch queda `failed` con
+ * `ENOENT: no such file or directory, open '/var/task/mailing/app/...`.
  *
- * Última generación: 2026-05-15T18:39:32.038Z
+ * Solución: cada email es una **función TypeScript** que devuelve el
+ * HTML ya interpolado, exactamente igual que `getReturnReminderTemplate`
+ * (email 04) en `src/lib/email/templates.ts`. Webpack lo empaqueta
+ * como código JS estándar y siempre está disponible en `/var/task`.
+ *
+ * Última generación: 2026-05-15T19:16:44.088Z
  */
+
+/**
+ * Datos mínimos para renderizar cualquier email del ciclo Storytellers
+ * 05/06/07. Misma forma que `ReturnReminderData` pero más reducida:
+ * sólo necesitamos el nombre para el saludo y el booking_number para
+ * los deep-links `?ref=...` y los spans visibles.
+ */
+export interface StorytellersEmailData {
+  /** Primer nombre del cliente (saludo "Hola Juan,"). */
+  firstName: string;
+  /** booking_number real (FG..., FC..., BK-...). */
+  bookingNumber: string;
+}
+
+/**
+ * Escape HTML mínimo y suficiente para texto plano dentro de un
+ * elemento (no para atributos ni para JS inline). El primer nombre se
+ * mete dentro de `<strong>${firstName}</strong>`, así que escapamos
+ * &, <, >, ", '.
+ */
+function htmlEscapeBasic(input: string): string {
+  return String(input)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 /* ----------------------------------------------------------------
  *  05 día de salida (noche)
- *  Origen: mailing/app/05-storytellers-dia-salida-noche.html
- *  Bytes:  20205
- * ---------------------------------------------------------------- */
-export const STORYTELLER_05_HTML: string = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ *  Origen visual (espejo editable): mailing/app/05-storytellers-dia-salida-noche.html
+ * ----------------------------------------------------------------
+ *
+ * Devuelve el HTML completo del email, interpolado con los datos
+ * reales del cliente. Misma firma que `getReturnReminderTemplate`
+ * (email 04) en `src/lib/email/templates.ts`.
+ */
+export function getStorytellerPickupNightTemplate(data: StorytellersEmailData): string {
+  const firstName = htmlEscapeBasic(data.firstName);
+  const bookingNumber = data.bookingNumber;
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -384,14 +423,24 @@ export const STORYTELLER_05_HTML: string = `<!DOCTYPE html PUBLIC "-//W3C//DTD X
   </table>
 </body>
 </html>
-`;
+`
+    .replace(/Juan/g, firstName)
+    .replace(/FC-2026-001234/g, bookingNumber);
+}
 
 /* ----------------------------------------------------------------
  *  06 mitad de viaje
- *  Origen: mailing/app/06-storytellers-mitad-viaje.html
- *  Bytes:  17532
- * ---------------------------------------------------------------- */
-export const STORYTELLER_06_HTML: string = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ *  Origen visual (espejo editable): mailing/app/06-storytellers-mitad-viaje.html
+ * ----------------------------------------------------------------
+ *
+ * Devuelve el HTML completo del email, interpolado con los datos
+ * reales del cliente. Misma firma que `getReturnReminderTemplate`
+ * (email 04) en `src/lib/email/templates.ts`.
+ */
+export function getStorytellerMidTripTemplate(data: StorytellersEmailData): string {
+  const firstName = htmlEscapeBasic(data.firstName);
+  const bookingNumber = data.bookingNumber;
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -688,14 +737,24 @@ export const STORYTELLER_06_HTML: string = `<!DOCTYPE html PUBLIC "-//W3C//DTD X
   </table>
 </body>
 </html>
-`;
+`
+    .replace(/Juan/g, firstName)
+    .replace(/FC-2026-001234/g, bookingNumber);
+}
 
 /* ----------------------------------------------------------------
  *  07 día después de la vuelta
- *  Origen: mailing/app/07-storytellers-dia-despues-vuelta.html
- *  Bytes:  19257
- * ---------------------------------------------------------------- */
-export const STORYTELLER_07_HTML: string = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+ *  Origen visual (espejo editable): mailing/app/07-storytellers-dia-despues-vuelta.html
+ * ----------------------------------------------------------------
+ *
+ * Devuelve el HTML completo del email, interpolado con los datos
+ * reales del cliente. Misma firma que `getReturnReminderTemplate`
+ * (email 04) en `src/lib/email/templates.ts`.
+ */
+export function getStorytellerPostTripTemplate(data: StorytellersEmailData): string {
+  const firstName = htmlEscapeBasic(data.firstName);
+  const bookingNumber = data.bookingNumber;
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -1021,341 +1080,7 @@ export const STORYTELLER_07_HTML: string = `<!DOCTYPE html PUBLIC "-//W3C//DTD X
   </table>
 </body>
 </html>
-`;
-
-/* ----------------------------------------------------------------
- *  08 rescate post-lanzamiento
- *  Origen: mailing/app/08-storytellers-rescate-recien-lanzado.html
- *  Bytes:  18694
- * ---------------------------------------------------------------- */
-export const STORYTELLER_08_HTML: string = `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Furgocasa · Acabamos de lanzar Storytellers · Aún estás a tiempo</title>
-  <!--
-    Mail puntual de RESCATE por LANZAMIENTO del programa Storytellers.
-    Va dirigido SOLO a reservas que ya finalizaron pero entran en la
-    ventana viva de 90 días post-devolución y a quienes el backfill
-    histórico marcó como "ya enviados" para evitar mails antiguos
-    descontextualizados.
-
-    Envío UNA SOLA VEZ (no es ciclo, no hay versión recurrente).
-    Placeholders: <strong>Juan</strong> y FC-2026-001234 (mismos del 07
-    para reutilizar el helper renderCycleEmailHtml).
-  -->
-  <!--[if mso]>
-  <style type="text/css">
-    table {border-collapse:collapse;border-spacing:0;margin:0;}
-    div, td {padding:0;}
-    div {margin:0 !important;}
-  </style>
-  <noscript>
-    <xml>
-      <o:OfficeDocumentSettings>
-        <o:PixelsPerInch>96</o:PixelsPerInch>
-      </o:OfficeDocumentSettings>
-    </xml>
-  </noscript>
-  <![endif]-->
-  <style type="text/css">
-    @media only screen and (max-width: 600px) {
-      .hero-img {
-        width: 100% !important;
-        max-width: 100% !important;
-        height: auto !important;
-        display: block !important;
-      }
-      .container-600 {
-        width: 100% !important;
-        max-width: 100% !important;
-      }
-      .outer-pad {
-        padding: 0 !important;
-      }
-    }
-  </style>
-</head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f5; font-family: Arial, Helvetica, sans-serif;">
-  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-    Acabamos de lanzar Storytellers. Aunque ya devolviste la camper, aún tienes 90 días para subir tus fotos y vídeos y llevarte hasta un 15&nbsp;% en tu próxima reserva.
-  </div>
-  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
-    &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;
-  </div>
-
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f4f4f5;">
-    <tr>
-      <td align="center" class="outer-pad" style="padding: 20px 0;">
-        <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" class="container-600" style="background-color: #ffffff; max-width: 600px; width: 100%;">
-
-          <!-- Logo -->
-          <tr>
-            <td align="center" style="background-color: #ffffff; padding: 25px 20px; border-bottom: 4px solid #063971;">
-              <a href="https://www.furgocasa.com" style="text-decoration: none;">
-                <img src="https://www.furgocasa.com/images/mailing/LOGO%20AZUL.png" alt="Furgocasa" width="200" style="display: block; max-width: 200px; height: auto;" />
-              </a>
-            </td>
-          </tr>
-
-          <!-- Hero -->
-          <tr>
-            <td style="padding: 0;">
-              <img src="https://www.furgocasa.com/images/mailing/storytellers/cover-cta-07.jpg" alt="Acabamos de lanzar Storytellers. Aún estás a tiempo de aprovecharlo." width="600" class="hero-img" style="display: block; width: 100%; max-width: 600px; height: auto; border: 0; outline: none; text-decoration: none;" />
-            </td>
-          </tr>
-
-          <!-- Etiqueta superior + h1 -->
-          <tr>
-            <td style="padding: 28px 24px 6px 24px;">
-              <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold; color: #ea580c; text-transform: uppercase; letter-spacing: 1px;">
-                Novedad · Programa Storytellers
-              </p>
-              <h1 style="margin: 0; color: #111827; font-size: 28px; line-height: 1.2; font-weight: bold;">
-                Acabamos de lanzar Storytellers.<br/>Y aún estás a tiempo.
-              </h1>
-              <p style="margin: 10px 0 0 0; font-size: 18px; color: #ea580c; font-weight: bold; line-height: 1.35;">
-                Tu viaje terminó hace nada. Si nos pasas las fotos y vídeos del bolsillo, te llevas descuento (hasta el 15&nbsp;%) en la próxima escapada con Furgocasa.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Intro personalizada -->
-          <tr>
-            <td style="padding: 14px 24px 6px 24px;">
-              <p style="margin: 0 0 10px 0; font-size: 17px; color: #374151; line-height: 1.6;">
-                Hola <strong>Juan</strong>,
-              </p>
-              <p style="margin: 0 0 10px 0; font-size: 17px; color: #374151; line-height: 1.6;">
-                Te escribimos por una razón muy concreta: <strong>acabamos de poner en marcha</strong> el programa
-                <strong>Storytellers</strong>, y queremos que te enteres tú, que devolviste la camper hace muy poco.
-              </p>
-              <p style="margin: 0; font-size: 17px; color: #374151; line-height: 1.6;">
-                Cuando reservaste, este programa todavía no existía, así que no te lo contamos en su día.
-                Pero como el material que cuenta de verdad un viaje sigue intacto en tu galería, abrimos
-                el programa también para ti: tienes <strong>hasta 90 días desde la devolución</strong> para
-                subir tus fotos y vídeos y entrar en la mecánica de descuentos. Sin login, sin formularios.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Mensaje principal -->
-          <tr>
-            <td style="padding: 18px 24px 6px 24px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #fff7ed; border: 1px solid #fed7aa;">
-                <tr>
-                  <td style="padding: 18px 18px 14px 18px;">
-                    <p style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #9a3412;">
-                      Cómo funciona, en 30 segundos
-                    </p>
-                    <p style="margin: 0 0 10px 0; font-size: 15px; color: #1f2937; line-height: 1.55;">
-                      Subes el material de tu reserva. Por solo participar (mínimo <strong>3 fotos</strong> o
-                      <strong>1 vídeo</strong>) te damos un <strong>cupón de bienvenida del 3&nbsp;%</strong> al instante,
-                      válido durante <strong>18 meses</strong>.
-                    </p>
-                    <p style="margin: 0; font-size: 15px; color: #1f2937; line-height: 1.55;">
-                      Si nos enamoramos de algún material y lo elegimos para nuestro archivo, los puntos engordan rápido y el cupón salta automáticamente:
-                      <strong>5 % &rarr; 8 % &rarr; 10 % &rarr; 12 % &rarr; 15 %</strong>.
-                      Y por encima del 15 %, <strong>regalos físicos</strong> (taza, camiseta, sudadera).
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Banner narrativa -->
-          <tr>
-            <td style="padding: 18px 0 4px 0;">
-              <img src="https://www.furgocasa.com/images/mailing/storytellers/banner-07-recuerdos.jpg" alt="Manos sosteniendo un móvil que muestra la galería de fotos del viaje en camper" width="600" class="hero-img" style="display: block; width: 100%; max-width: 600px; height: auto; border: 0; outline: none; text-decoration: none;" />
-            </td>
-          </tr>
-
-          <!-- Tabla de descuentos -->
-          <tr>
-            <td style="padding: 28px 24px 6px 24px;">
-              <p style="margin: 0; font-size: 17px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">
-                Escala de descuentos
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 12px 24px 0 24px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td style="background-color: #063971; color: #ffffff; padding: 10px 12px; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">Cuándo</td>
-                  <td style="background-color: #063971; color: #ffffff; padding: 10px 12px; font-size: 14px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; text-align: right;">Cupón</td>
-                </tr>
-                <tr>
-                  <td style="background-color: #fff7ed; padding: 11px 12px; font-size: 15px; color: #1f2937; border-bottom: 1px solid #fed7aa;">
-                    <strong>Tu primera subida válida</strong>
-                    <br/><span style="color: #6b7280; font-size: 13px;">Cupón de bienvenida &middot; una sola vez</span>
-                  </td>
-                  <td style="background-color: #fff7ed; padding: 11px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #fed7aa;">3 %</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; border-bottom: 1px solid #e5e7eb;">Al alcanzar 40 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">5 %</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Al alcanzar 100 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">8 %</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; border-bottom: 1px solid #e5e7eb;">Al alcanzar 200 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; border-bottom: 1px solid #e5e7eb;">10 %</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">Al alcanzar 400 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 16px; color: #ea580c; font-weight: bold; text-align: right; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb;">12 %</td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 12px; font-size: 15px; color: #1f2937; border-bottom: 2px solid #063971;">Al alcanzar 800 ptos</td>
-                  <td style="padding: 10px 12px; font-size: 16px; color: #c2410c; font-weight: bold; text-align: right; border-bottom: 2px solid #063971;">15 %&nbsp;&middot;&nbsp;techo</td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 10px 24px 0 24px;">
-              <p style="margin: 0; font-size: 14px; color: #6b7280; line-height: 1.55;">
-                Cupones válidos en <strong>baja y media temporada</strong>, mínimo 4 días de reserva, no acumulables con otras promos.
-              </p>
-            </td>
-          </tr>
-
-          <!-- Callout: ventana de 90 días -->
-          <tr>
-            <td style="padding: 22px 24px 0 24px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #063971;">
-                <tr>
-                  <td style="padding: 16px 18px;">
-                    <p style="margin: 0 0 6px 0; font-size: 16px; font-weight: bold; color: #063971;">
-                      Tienes 90 días desde la devolución
-                    </p>
-                    <p style="margin: 0; font-size: 15px; color: #1f2937; line-height: 1.55;">
-                      Como acabas de devolver la camper hace muy poco, sigues dentro de la ventana del programa.
-                      No corras: revisa con calma la galería, elige las que mejor cuentan tu viaje y mándanoslas.
-                      <strong>Lo que entra en nuestro archivo multiplica los puntos</strong> (+20 por foto seleccionada,
-                      +60 por vídeo). Por eso compensa elegir bien.
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Mosaico ejemplos -->
-          <tr>
-            <td style="padding: 28px 24px 6px 24px;">
-              <p style="margin: 0; font-size: 17px; font-weight: bold; color: #063971; padding-bottom: 8px; border-bottom: 2px solid #063971;">
-                Tipos de momento que solemos seleccionar
-              </p>
-            </td>
-          </tr>
-          <tr>
-            <td style="padding: 14px 20px 6px 20px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td width="33%" valign="top" style="padding: 0 4px;">
-                    <img src="https://www.furgocasa.com/images/mailing/storytellers/showcase-sunset-couple.jpg" alt="Pareja al atardecer junto a su camper" width="180" style="display: block; width: 100%; max-width: 180px; height: auto; border: 0;" />
-                  </td>
-                  <td width="34%" valign="top" style="padding: 0 4px;">
-                    <img src="https://www.furgocasa.com/images/mailing/storytellers/showcase-pet-travel.jpg" alt="Perro asomado a la puerta lateral de la camper" width="180" style="display: block; width: 100%; max-width: 180px; height: auto; border: 0;" />
-                  </td>
-                  <td width="33%" valign="top" style="padding: 0 4px;">
-                    <img src="https://www.furgocasa.com/images/mailing/storytellers/showcase-interior-cozy.jpg" alt="Interior acogedor de camper con café y luz natural" width="180" style="display: block; width: 100%; max-width: 180px; height: auto; border: 0;" />
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Cómo subir -->
-          <tr>
-            <td style="padding: 24px 24px 6px 24px;">
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0f9ff; border-left: 4px solid #063971;">
-                <tr>
-                  <td style="padding: 16px 18px;">
-                    <p style="margin: 0 0 8px 0; font-weight: bold; color: #111827; font-size: 16px;">Subir es cosa de menos de 2 minutos</p>
-                    <p style="margin: 0; font-size: 15px; color: #374151; line-height: 1.55;">
-                      Entra en <a href="https://www.furgocasa.com/es/storytellers/subir?ref=FC-2026-001234" referrerpolicy="no-referrer" style="color: #063971; text-decoration: underline;">www.furgocasa.com/es/storytellers/subir</a>, escribe tu <strong>número de reserva</strong> &mdash;
-                      <span style="font-family: Consolas, 'Courier New', monospace; background-color: #ffffff; padding: 4px 10px; color: #063971; font-weight: bold; font-size: 16px; border: 1px solid #cbd5e1;">FC-2026-001234</span>
-                      &mdash; y el <strong>email con el que reservaste</strong>, y arrastra los archivos. Mínimo 3 fotos o 1 vídeo. <strong>Sin login, sin contraseñas, sin formularios largos.</strong>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- CTA -->
-          <tr>
-            <td align="center" style="padding: 28px 24px 8px 24px;">
-              <table role="presentation" cellspacing="0" cellpadding="0" border="0">
-                <tr>
-                  <td style="background-color: #ea580c; padding: 14px 32px;">
-                    <a href="https://www.furgocasa.com/es/storytellers/subir?ref=FC-2026-001234" referrerpolicy="no-referrer" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 17px;">Subir mis fotos o vídeos</a>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding: 4px 24px 4px 24px;">
-              <a href="https://www.furgocasa.com/es/storytellers" style="font-size: 15px; color: #063971; text-decoration: underline;">Cómo funciona Storytellers</a>
-            </td>
-          </tr>
-          <tr>
-            <td align="center" style="padding: 0 24px 26px 24px;">
-              <a href="https://www.furgocasa.com/es/storytellers/mis-puntos" style="font-size: 15px; color: #063971; text-decoration: underline;">Ver mis puntos y cupones</a>
-            </td>
-          </tr>
-
-          <!-- Despedida -->
-          <tr>
-            <td style="padding: 4px 24px 30px 24px;">
-              <p style="margin: 0; font-size: 16px; color: #374151; line-height: 1.55;">
-                Gracias por viajar con Furgocasa. Como muestra de que el programa también va para los que ya volvisteis,
-                te dejamos esta puerta abierta. Nos encantará ver tu material &mdash; y tenerte de vuelta con descuento.<br/>
-                <strong>El equipo de Furgocasa</strong>
-              </p>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #f4f4f5; padding: 30px 20px; text-align: center;">
-              <p style="margin: 0 0 10px 0; font-size: 16px; font-weight: bold; color: #374151;">Furgocasa - Alquiler de Campers</p>
-              <p style="margin: 0 0 5px 0; font-size: 15px; color: #6b7280;">
-                Tel: <a href="tel:+34868364161" style="color: #063971; text-decoration: none;">+34 868 364 161</a>
-              </p>
-              <p style="margin: 0 0 5px 0; font-size: 15px; color: #6b7280;">
-                Email: <a href="mailto:reservas@furgocasa.com" style="color: #063971; text-decoration: none;">reservas@furgocasa.com</a>
-              </p>
-              <p style="margin: 0 0 15px 0; font-size: 15px; color: #6b7280;">
-                Web: <a href="https://www.furgocasa.com" style="color: #063971; text-decoration: none;">www.furgocasa.com</a>
-              </p>
-              <p style="margin: 0; font-size: 13px; color: #9ca3af;">
-                Aviso único enviado tras el lanzamiento del programa Storytellers.
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-`;
-
-/**
- * Mapa por código de ciclo (`"05" | "06" | "07"`). `08` se importa
- * directamente como `STORYTELLER_08_HTML` desde el script de rescate.
- */
-export const CYCLE_EMAIL_HTML: Record<"05" | "06" | "07", string> = {
-  "05": STORYTELLER_05_HTML,
-  "06": STORYTELLER_06_HTML,
-  "07": STORYTELLER_07_HTML,
-};
+`
+    .replace(/Juan/g, firstName)
+    .replace(/FC-2026-001234/g, bookingNumber);
+}

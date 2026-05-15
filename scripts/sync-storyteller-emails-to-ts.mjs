@@ -3,34 +3,45 @@
  * sync-storyteller-emails-to-ts.mjs
  * ===================================
  *
- * Convierte los HTML de `mailing/app/05–08*.html` en strings TypeScript
- * dentro de `src/lib/storytellers/email-templates.ts`. Este TS es el que
- * los crons de Vercel y el script de rescate leen en runtime — embebido
- * como string, sin tocar el filesystem, exactamente como el patrón del
- * email 04 `getReturnReminderTemplate` en `src/lib/email/templates.ts`.
+ * Convierte los HTML "espejo" de `mailing/app/05–07*.html` en funciones
+ * TypeScript dentro de `src/lib/storytellers/email-templates.ts`,
+ * siguiendo EXACTAMENTE el mismo patrón que el email 04
+ * (`getReturnReminderTemplate` en `src/lib/email/templates.ts`).
  *
- * ¿Por qué este flujo?
- * --------------------
- * Vercel no empaqueta archivos no-JS (como `mailing/app/*.html`) dentro
- * de las funciones serverless de los crons. Si los lees con `fs.readFile`
- * en runtime obtienes ENOENT en producción y el dispatch queda `failed`.
- * Para evitar depender de `outputFileTracingIncludes` (frágil) o de mover
- * los HTML a `public/` (públicos para el mundo), los embebemos en TS y
- * Webpack los incluye como cualquier otra constante de código.
+ * Patrón de salida (idéntico al 04):
  *
- * Cuándo lanzarlo
- * ---------------
- * Cada vez que edites uno de los HTML en `mailing/app/05–08*.html`:
+ *   export function getStorytellerPickupNightTemplate(
+ *     data: StorytellersEmailData
+ *   ): string { ... }
  *
- *   node scripts/sync-storyteller-emails-to-ts.mjs
+ * Cada función:
+ *   - Recibe `{ firstName, bookingNumber }`.
+ *   - Devuelve el HTML completo del email, ya interpolado.
+ *   - Está empaquetada como código JS por Webpack ⇒ funciona en
+ *     cualquier función serverless de Vercel sin `fs.readFile`.
  *
- * El script reescribe `src/lib/storytellers/email-templates.ts` con el
- * contenido actual de los 4 HTML. Después: `git add` + commit.
+ * Por qué un script generador (y no escritura a mano)
+ * ---------------------------------------------------
+ * Los HTML de los Storytellers son grandes (~17–20 KB cada uno) y
+ * editoriales: el usuario los edita visualmente en `mailing/app/` para
+ * revisar copy y diseño. Replicar esos cambios a mano en el TS sería
+ * lento y propenso a desincronía silenciosa. Este script garantiza que
+ * el TS siempre refleja el HTML actual.
  *
- * Mantiene los HTML como fuente de verdad para preview visual
- * (`scripts/test-storyteller-emails.mjs`) y el TS como fuente de verdad
- * para runtime (crons + scripts CLI). Si los dos se desincronizan, el TS
- * gana en producción, así que SIEMPRE relanza el script tras editar HTML.
+ * El 08 (`08-storytellers-rescate-recien-lanzado.html`) NO se incluye:
+ * es un email manual/excepcional sin cron, lo envía
+ * `scripts/storyteller-send-rescue-launch.ts` desde local leyendo el
+ * HTML del disco. Si en el futuro pasara a ser automático, se añade
+ * aquí una entrada más.
+ *
+ * Cómo se mantiene la sincronía
+ * -----------------------------
+ *   1. Editas `mailing/app/0X-storytellers-*.html` (preview visual).
+ *   2. Lanzas: `node scripts/sync-storyteller-emails-to-ts.mjs`.
+ *   3. `git add` ambos: el HTML y el TS regenerado. Commit.
+ *
+ * Si te saltas el paso 2, en producción se enviará la versión vieja.
+ * El TS gana siempre en runtime.
  */
 
 import fs from "node:fs";
@@ -41,40 +52,78 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, "..");
 
+/**
+ * Definición de cada email. `fnName` es el nombre de la función pública
+ * exportada (paralelo a `getReturnReminderTemplate`). `dispatchType` es
+ * solo informativo aquí; se usa en `emails-cycle.ts` para tracking.
+ */
 const SOURCES = [
   {
-    key: "STORYTELLER_05_HTML",
+    fnName: "getStorytellerPickupNightTemplate",
     label: "05 día de salida (noche)",
     html: "mailing/app/05-storytellers-dia-salida-noche.html",
   },
   {
-    key: "STORYTELLER_06_HTML",
+    fnName: "getStorytellerMidTripTemplate",
     label: "06 mitad de viaje",
     html: "mailing/app/06-storytellers-mitad-viaje.html",
   },
   {
-    key: "STORYTELLER_07_HTML",
+    fnName: "getStorytellerPostTripTemplate",
     label: "07 día después de la vuelta",
     html: "mailing/app/07-storytellers-dia-despues-vuelta.html",
-  },
-  {
-    key: "STORYTELLER_08_HTML",
-    label: "08 rescate post-lanzamiento",
-    html: "mailing/app/08-storytellers-rescate-recien-lanzado.html",
   },
 ];
 
 const OUT_PATH = "src/lib/storytellers/email-templates.ts";
 
+/**
+ * Escapa el contenido para meterlo dentro de un template literal sin
+ * que rompa la sintaxis JS:
+ *   - `\`     → `\\`
+ *   - `` ` `` → `` \` ``
+ *   - `${`    → `\${`  (para que no interprete sustituciones del propio HTML)
+ */
 function escapeForBacktickTemplate(content) {
-  // Dentro de un template literal hay que escapar:
-  //  - backslash (`\`)
-  //  - backtick (`` ` ``)
-  //  - `${`  (sustitución JS) → \${
   return content
     .replace(/\\/g, "\\\\")
     .replace(/`/g, "\\`")
     .replace(/\$\{/g, "\\${");
+}
+
+/**
+ * Devuelve un cuerpo de función que, vía `.replace()`, sustituye los
+ * dos placeholders literales del HTML espejo por los datos reales del
+ * cliente y de la reserva:
+ *
+ *   - `Juan`            → primer nombre real (HTML-escaped).
+ *   - `FC-2026-001234`  → booking_number real. Funciona TANTO en spans
+ *                         visibles como en query strings `?ref=` (la
+ *                         cadena es la misma en ambos).
+ *
+ * `htmlEscape(firstName)` para no romper el HTML si el nombre lleva
+ * caracteres especiales (por ejemplo &, <, > o comillas). El
+ * `booking_number` es ASCII alfanumérico controlado por nosotros, no
+ * necesita escape.
+ */
+function emitFunction({ fnName, label, html, escapedHtml }) {
+  return `/* ----------------------------------------------------------------
+ *  ${label}
+ *  Origen visual (espejo editable): ${html}
+ * ----------------------------------------------------------------
+ *
+ * Devuelve el HTML completo del email, interpolado con los datos
+ * reales del cliente. Misma firma que \`getReturnReminderTemplate\`
+ * (email 04) en \`src/lib/email/templates.ts\`.
+ */
+export function ${fnName}(data: StorytellersEmailData): string {
+  const firstName = htmlEscapeBasic(data.firstName);
+  const bookingNumber = data.bookingNumber;
+  return \`${escapedHtml}\`
+    .replace(/Juan/g, firstName)
+    .replace(/FC-2026-001234/g, bookingNumber);
+}
+`;
 }
 
 function main() {
@@ -85,65 +134,73 @@ function main() {
       process.exit(1);
     }
     const raw = fs.readFileSync(full, "utf8");
-    const escaped = escapeForBacktickTemplate(raw);
-    console.log(`✓ ${s.html.padEnd(60)} ${raw.length.toString().padStart(6)} bytes`);
-    return {
-      ...s,
-      raw,
-      escaped,
-    };
+    const escapedHtml = escapeForBacktickTemplate(raw);
+    console.log(
+      `✓ ${s.html.padEnd(60)} ${raw.length.toString().padStart(6)} bytes`
+    );
+    return { ...s, raw, escapedHtml };
   });
 
   const header = `/**
- * Storytellers · HTML embebido para runtime (crons + scripts CLI)
- * =================================================================
+ * Storytellers · Plantillas de email del ciclo automático (05/06/07)
+ * ====================================================================
  *
  * ⚠️  ARCHIVO GENERADO AUTOMÁTICAMENTE — NO EDITAR A MANO.
  *
- * Fuente de los HTML originales: \`mailing/app/05–08*.html\`.
+ * Fuente "espejo" editable a mano: \`mailing/app/05–07*.html\`.
  * Regenerar tras tocar cualquier HTML:
  *
  *     node scripts/sync-storyteller-emails-to-ts.mjs
  *
- * Por qué embebido en TS (y no \`fs.readFile\` desde \`mailing/app/\`):
- * Vercel no empaqueta archivos no-JS en las funciones serverless de los
- * crons. Si se leyera con \`fs\` desde \`mailing/app/\` el archivo no
- * existiría en \`/var/task\` y el dispatch quedaría \`failed\` con
- * \`ENOENT\`. Embebido como string, Webpack lo incluye con el código de la
- * función y siempre está disponible — mismo patrón que
- * \`getReturnReminderTemplate\` (email 04) en
- * \`src/lib/email/templates.ts\`.
+ * Por qué este archivo existe
+ * ---------------------------
+ * Los crons de Vercel (\`/api/cron/storyteller-*\`) ejecutan estos
+ * emails desde funciones serverless donde **Vercel no empaqueta los
+ * archivos no-JS** de \`mailing/app/\`. Si intentas leerlos con
+ * \`fs.readFile(...)\` en runtime, el dispatch queda \`failed\` con
+ * \`ENOENT: no such file or directory, open '/var/task/mailing/app/...\`.
+ *
+ * Solución: cada email es una **función TypeScript** que devuelve el
+ * HTML ya interpolado, exactamente igual que \`getReturnReminderTemplate\`
+ * (email 04) en \`src/lib/email/templates.ts\`. Webpack lo empaqueta
+ * como código JS estándar y siempre está disponible en \`/var/task\`.
  *
  * Última generación: ${new Date().toISOString()}
  */
 
-`;
-
-  const body = blocks
-    .map((b) => {
-      return `/* ----------------------------------------------------------------
- *  ${b.label}
- *  Origen: ${b.html}
- *  Bytes:  ${b.raw.length}
- * ---------------------------------------------------------------- */
-export const ${b.key}: string = \`${b.escaped}\`;
-`;
-    })
-    .join("\n");
-
-  const footer = `
 /**
- * Mapa por código de ciclo (\`"05" | "06" | "07"\`). \`08\` se importa
- * directamente como \`STORYTELLER_08_HTML\` desde el script de rescate.
+ * Datos mínimos para renderizar cualquier email del ciclo Storytellers
+ * 05/06/07. Misma forma que \`ReturnReminderData\` pero más reducida:
+ * sólo necesitamos el nombre para el saludo y el booking_number para
+ * los deep-links \`?ref=...\` y los spans visibles.
  */
-export const CYCLE_EMAIL_HTML: Record<"05" | "06" | "07", string> = {
-  "05": STORYTELLER_05_HTML,
-  "06": STORYTELLER_06_HTML,
-  "07": STORYTELLER_07_HTML,
-};
+export interface StorytellersEmailData {
+  /** Primer nombre del cliente (saludo "Hola Juan,"). */
+  firstName: string;
+  /** booking_number real (FG..., FC..., BK-...). */
+  bookingNumber: string;
+}
+
+/**
+ * Escape HTML mínimo y suficiente para texto plano dentro de un
+ * elemento (no para atributos ni para JS inline). El primer nombre se
+ * mete dentro de \`<strong>${'$'}{firstName}</strong>\`, así que escapamos
+ * &, <, >, ", '.
+ */
+function htmlEscapeBasic(input: string): string {
+  return String(input)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 `;
 
-  const out = header + body + footer;
+  const body = blocks.map(emitFunction).join("\n");
+
+  const out = header + body;
   const outFull = path.join(ROOT, OUT_PATH);
   fs.mkdirSync(path.dirname(outFull), { recursive: true });
   fs.writeFileSync(outFull, out, "utf8");

@@ -93,11 +93,11 @@ if (Number.isNaN(DAYS) || DAYS <= 0 || DAYS > 90) {
 }
 
 /**
- * El HTML del 08 vive embebido en `src/lib/storytellers/email-templates.ts`
- * (generado por `scripts/sync-storyteller-emails-to-ts.mjs` a partir de
- * `mailing/app/08-storytellers-rescate-recien-lanzado.html`). Se importa
- * directamente para no depender del filesystem en runtime ni cuando el
- * script se ejecuta empaquetado.
+ * El 08 es un email EXCEPCIONAL — no entra en el ciclo automático del
+ * cron, sólo se manda con este script desde local. Por eso su HTML sigue
+ * leyéndose del filesystem (`mailing/app/08-*.html`) en vez de pasar por
+ * `email-templates.ts`. Si en el futuro se automatizara, habría que
+ * añadirle función propia en `email-templates.ts` igual que 05/06/07.
  */
 const RESCUE_HTML_PATH = "mailing/app/08-storytellers-rescate-recien-lanzado.html";
 const RESCUE_SUBJECT =
@@ -180,11 +180,10 @@ function diffDays(fromIso: string, toIso: string): number {
 }
 
 async function loadHtml(): Promise<string> {
-  // HTML embebido en TS — no se toca el filesystem en runtime.
-  // Se importa de forma dinámica para conservar la firma async original
-  // y para que tsx no se queje si el módulo no existe todavía.
-  const mod = await import("../src/lib/storytellers/email-templates");
-  return mod.STORYTELLER_08_HTML;
+  // El 08 SOLO se ejecuta en local con `tsx`, no en Vercel; por eso
+  // puede leerse directamente del filesystem sin problema de bundling.
+  const fullPath = path.resolve(ROOT, RESCUE_HTML_PATH);
+  return fs.promises.readFile(fullPath, "utf8");
 }
 
 async function findCandidates(): Promise<Candidate[]> {

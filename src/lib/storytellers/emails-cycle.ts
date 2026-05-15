@@ -17,22 +17,28 @@
  *          que actúa como red de seguridad contra carreras.
  *   - Si falla SMTP, se registra una fila `status='failed'`, que NO entra
  *     en el unique parcial → el cron del día siguiente puede reintentar.
- *   - Reemplaza los placeholders literales `Juan` y `FC-2026-001234` que
- *     viven en el HTML embebido con los datos reales de la reserva
- *     (también en el deep-link `?ref=`).
  *
- * ⚠️ El HTML NO se lee del filesystem en runtime: se importa como string
- * desde `email-templates.ts` (generado por
- * `scripts/sync-storyteller-emails-to-ts.mjs` a partir de
- * `mailing/app/05–08*.html`). Esto es lo que evita el `ENOENT
- * /var/task/mailing/app/...` que sufrían los crons cuando Vercel
- * empaquetaba la función serverless sin la carpeta `mailing/`. Mismo
- * patrón que `getReturnReminderTemplate` (email 04) en
- * `src/lib/email/templates.ts`.
+ * Render del HTML
+ * ----------------
+ * Cada email es una **función TypeScript** en
+ * `@/lib/storytellers/email-templates.ts`, exactamente igual que el
+ * email 04 (`getReturnReminderTemplate` en `src/lib/email/templates.ts`).
+ * Recibe `{firstName, bookingNumber}` y devuelve el HTML interpolado.
+ * Webpack la empaqueta como código JS y siempre está disponible en la
+ * función serverless de Vercel — sin `fs.readFile` ni dependencia del
+ * filesystem.
+ *
+ * El HTML "espejo" editable a mano sigue viviendo en
+ * `mailing/app/05–07*.html` (revisión visual) y se sincroniza al TS
+ * con `node scripts/sync-storyteller-emails-to-ts.mjs`.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email/smtp-client";
-import { CYCLE_EMAIL_HTML } from "@/lib/storytellers/email-templates";
+import {
+  getStorytellerMidTripTemplate,
+  getStorytellerPickupNightTemplate,
+  getStorytellerPostTripTemplate,
+} from "@/lib/storytellers/email-templates";
 
 export type CycleEmailType = "05" | "06" | "07";
 
@@ -106,9 +112,16 @@ export function firstNameFromCustomer(fullName: string | null): string {
 }
 
 /**
- * Reemplaza los placeholders literales del HTML con los datos reales.
- * Esto cubre tanto el texto visible (`Hola Juan,`) como el `?ref=` de
+ * Reemplaza los placeholders literales del HTML con los datos reales,
+ * cubriendo tanto el texto visible (`Hola Juan,`) como el `?ref=` de
  * los CTAs (que llevan literalmente `?ref=FC-2026-001234`).
+ *
+ * Sigue exportada porque el script de rescate
+ * (`scripts/storyteller-send-rescue-launch.ts`) usa este helper para
+ * renderizar el HTML del email 08, que vive en `mailing/app/` y se lee
+ * desde disco SOLO en local (el rescate no se ejecuta en Vercel).
+ * Para los emails 05/06/07 ya no se llama a este helper: cada uno tiene
+ * su función propia en `@/lib/storytellers/email-templates`.
  */
 export function renderCycleEmailHtml(
   rawHtml: string,
@@ -121,13 +134,29 @@ export function renderCycleEmailHtml(
 }
 
 /**
- * Devuelve el HTML del email del ciclo. **Síncrono**: el HTML viene del
- * bundle (`email-templates.ts`), no del filesystem. La firma sigue siendo
- * `Promise<string>` para no romper a los llamadores existentes que hacen
- * `await loadCycleEmailHtml(...)`.
+ * Devuelve el HTML completo del email del ciclo, ya interpolado con los
+ * datos reales del cliente.
+ *
+ * Mismo patrón que `getReturnReminderTemplate` (email 04): el HTML vive
+ * dentro de una función TypeScript empaquetada por Webpack — no se
+ * toca el filesystem. Cada `type` delega en su función específica:
+ *
+ *   - "05" → getStorytellerPickupNightTemplate(data)
+ *   - "06" → getStorytellerMidTripTemplate(data)
+ *   - "07" → getStorytellerPostTripTemplate(data)
  */
-export async function loadCycleEmailHtml(type: CycleEmailType): Promise<string> {
-  return CYCLE_EMAIL_HTML[type];
+export function renderCycleEmail(
+  type: CycleEmailType,
+  data: { firstName: string; bookingNumber: string }
+): string {
+  switch (type) {
+    case "05":
+      return getStorytellerPickupNightTemplate(data);
+    case "06":
+      return getStorytellerMidTripTemplate(data);
+    case "07":
+      return getStorytellerPostTripTemplate(data);
+  }
 }
 
 /**
@@ -214,12 +243,14 @@ export async function sendCycleEmail(opts: {
     return { ok: false, skipped: "already_dispatched" };
   }
 
-  // Render HTML
+  // Render HTML — función TS empaquetada por Webpack, no toca FS.
   const firstName = firstNameFromCustomer(booking.customer_name);
   let html: string;
   try {
-    const raw = await loadCycleEmailHtml(type);
-    html = renderCycleEmailHtml(raw, firstName, booking.booking_number);
+    html = renderCycleEmail(type, {
+      firstName,
+      bookingNumber: booking.booking_number,
+    });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     // Registramos el fallo para auditoria.
