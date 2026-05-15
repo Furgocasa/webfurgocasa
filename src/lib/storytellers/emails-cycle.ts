@@ -18,13 +18,21 @@
  *   - Si falla SMTP, se registra una fila `status='failed'`, que NO entra
  *     en el unique parcial → el cron del día siguiente puede reintentar.
  *   - Reemplaza los placeholders literales `Juan` y `FC-2026-001234` que
- *     viven en los HTML de `mailing/app/05–07.html` con los datos reales
- *     de la reserva (también en el deep-link `?ref=`).
+ *     viven en el HTML embebido con los datos reales de la reserva
+ *     (también en el deep-link `?ref=`).
+ *
+ * ⚠️ El HTML NO se lee del filesystem en runtime: se importa como string
+ * desde `email-templates.ts` (generado por
+ * `scripts/sync-storyteller-emails-to-ts.mjs` a partir de
+ * `mailing/app/05–08*.html`). Esto es lo que evita el `ENOENT
+ * /var/task/mailing/app/...` que sufrían los crons cuando Vercel
+ * empaquetaba la función serverless sin la carpeta `mailing/`. Mismo
+ * patrón que `getReturnReminderTemplate` (email 04) en
+ * `src/lib/email/templates.ts`.
  */
-import { promises as fs } from "node:fs";
-import path from "node:path";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { sendEmail } from "@/lib/email/smtp-client";
+import { CYCLE_EMAIL_HTML } from "@/lib/storytellers/email-templates";
 
 export type CycleEmailType = "05" | "06" | "07";
 
@@ -32,7 +40,12 @@ export type CycleEmailType = "05" | "06" | "07";
 export const CYCLE_EMAIL_CONFIG: Record<
   CycleEmailType,
   {
-    /** Path relativo al root del repo. */
+    /**
+     * Path al HTML "espejo" en `mailing/app/` (solo informativo, para
+     * preview visual y para regenerar `email-templates.ts`). En runtime
+     * NO se lee de disco; el contenido se importa desde
+     * `@/lib/storytellers/email-templates`.
+     */
     htmlPath: string;
     subject: string;
     /** Valor para `email_type` en `booking_email_dispatches`. */
@@ -107,11 +120,14 @@ export function renderCycleEmailHtml(
     .replace(/FC-2026-001234/g, bookingNumber);
 }
 
-/** Lee el HTML de un email del ciclo desde disco. */
+/**
+ * Devuelve el HTML del email del ciclo. **Síncrono**: el HTML viene del
+ * bundle (`email-templates.ts`), no del filesystem. La firma sigue siendo
+ * `Promise<string>` para no romper a los llamadores existentes que hacen
+ * `await loadCycleEmailHtml(...)`.
+ */
 export async function loadCycleEmailHtml(type: CycleEmailType): Promise<string> {
-  const cfg = CYCLE_EMAIL_CONFIG[type];
-  const fullPath = path.resolve(process.cwd(), cfg.htmlPath);
-  return fs.readFile(fullPath, "utf8");
+  return CYCLE_EMAIL_HTML[type];
 }
 
 /**

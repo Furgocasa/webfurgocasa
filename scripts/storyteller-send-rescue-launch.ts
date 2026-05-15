@@ -92,6 +92,13 @@ if (Number.isNaN(DAYS) || DAYS <= 0 || DAYS > 90) {
   process.exit(1);
 }
 
+/**
+ * El HTML del 08 vive embebido en `src/lib/storytellers/email-templates.ts`
+ * (generado por `scripts/sync-storyteller-emails-to-ts.mjs` a partir de
+ * `mailing/app/08-storytellers-rescate-recien-lanzado.html`). Se importa
+ * directamente para no depender del filesystem en runtime ni cuando el
+ * script se ejecuta empaquetado.
+ */
 const RESCUE_HTML_PATH = "mailing/app/08-storytellers-rescate-recien-lanzado.html";
 const RESCUE_SUBJECT =
   "Furgocasa Storytellers · Acabamos de lanzarlo. Aún estás a tiempo.";
@@ -173,8 +180,11 @@ function diffDays(fromIso: string, toIso: string): number {
 }
 
 async function loadHtml(): Promise<string> {
-  const fullPath = path.resolve(ROOT, RESCUE_HTML_PATH);
-  return fs.promises.readFile(fullPath, "utf8");
+  // HTML embebido en TS — no se toca el filesystem en runtime.
+  // Se importa de forma dinámica para conservar la firma async original
+  // y para que tsx no se queje si el módulo no existe todavía.
+  const mod = await import("../src/lib/storytellers/email-templates");
+  return mod.STORYTELLER_08_HTML;
 }
 
 async function findCandidates(): Promise<Candidate[]> {

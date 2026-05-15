@@ -105,6 +105,36 @@ screen and (max-width: 600px)` que hacen:
 Tipografías inline aumentadas +2px sobre la base, ya validado en iPhone
 antiguo y nuevo.
 
+### Fuente de verdad del HTML en runtime (importante)
+
+Los HTML de `mailing/app/05–08*.html` son **el origen humano** que
+editamos a mano. Pero en **runtime** (crons de Vercel y scripts CLI)
+**no** se leen del filesystem: están embebidos como strings TypeScript
+en [`src/lib/storytellers/email-templates.ts`](../src/lib/storytellers/email-templates.ts),
+exactamente igual que el email 04 (`getReturnReminderTemplate` en
+`src/lib/email/templates.ts`).
+
+Esto es **crítico**: si se intenta `fs.readFile("mailing/app/...html")`
+desde una función serverless de Vercel, el archivo **no existe en
+`/var/task/`** y el dispatch queda `failed` con `ENOENT: no such file or
+directory`. Empaquetado como string en código JS, Webpack lo incluye sin
+ningún truco de bundling.
+
+**Flujo de trabajo al editar uno de los HTML:**
+
+1. Editas `mailing/app/0X-storytellers-*.html` (preview visual, copy,
+   imágenes…).
+2. Regeneras el TS embebido:
+   ```bash
+   node scripts/sync-storyteller-emails-to-ts.mjs
+   ```
+3. `git add mailing/app/0X-*.html src/lib/storytellers/email-templates.ts`
+   y commit. Los dos archivos se versionan juntos para que el TS nunca
+   se desincronice del HTML.
+
+Si te saltas el paso 2, en producción se enviará la versión **vieja**.
+El TS gana siempre.
+
 ---
 
 ## 4 · Placeholders dinámicos
