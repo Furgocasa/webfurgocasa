@@ -335,10 +335,23 @@ function getSlugField(locale: "es" | "en" | "fr" | "de") {
   return "slug";
 }
 
-function normalizeJoinedCategory(
-  category: BodyPost["category"] | BodyPost["category"][]
-): BodyPost["category"] {
-  return Array.isArray(category) ? category[0] ?? null : category ?? null;
+async function fetchCategoryForBody(
+  adminSupabase: AdminSupabase,
+  categoryId: string | null
+): Promise<BodyPost["category"]> {
+  if (!categoryId) return null;
+  const { data, error } = await adminSupabase
+    .from("content_categories")
+    .select("id, name, slug, description")
+    .eq("id", categoryId)
+    .maybeSingle();
+  if (error || !data) {
+    if (error) {
+      console.warn("[BLOG-BODY] No se pudo cargar categoria:", error.message);
+    }
+    return null;
+  }
+  return data;
 }
 
 function decideTargetImageCount(post: BodyPost): number {
@@ -859,31 +872,55 @@ async function uploadBodyImageToStorage(
 }
 
 async function getPostTags(adminSupabase: AdminSupabase, postId: string) {
-  const { data, error } = await adminSupabase
+  const { data: links, error: linksError } = await adminSupabase
     .from("post_tags")
-    .select("tag:tags(name)")
+    .select("tag_id")
     .eq("post_id", postId);
-  if (error || !data) return [];
-  return data
-    .map((row: { tag?: { name?: string | null } | null }) => row.tag?.name)
-    .filter((value: string | null | undefined): value is string => Boolean(value));
+
+  if (linksError || !links?.length) {
+    if (linksError) {
+      console.warn("[BLOG-BODY] post_tags:", linksError.message);
+    }
+    return [];
+  }
+
+  const ids = [...new Set(links.map((row) => row.tag_id).filter(Boolean))];
+  if (ids.length === 0) return [];
+
+  const { data: tagRows, error: tagsError } = await adminSupabase
+    .from("tags")
+    .select("name")
+    .in("id", ids);
+
+  if (tagsError || !tagRows) {
+    if (tagsError) {
+      console.warn("[BLOG-BODY] tags:", tagsError.message);
+    }
+    return [];
+  }
+
+  return tagRows
+    .map((row) => row.name)
+    .filter((value): value is string => Boolean(value));
 }
 
 async function loadPostById(adminSupabase: AdminSupabase, postId: string): Promise<BodyPost> {
   const { data, error } = await adminSupabase
     .from("posts")
     .select(
-      `id, title, slug, slug_en, excerpt, content, featured_image, meta_title, meta_description, meta_keywords, reading_time, images, category:content_categories(id, name, slug, description)`
+      `id, title, slug, slug_en, excerpt, content, featured_image, meta_title, meta_description, meta_keywords, reading_time, images, category_id`
     )
     .eq("id", postId)
     .single();
   if (error || !data) {
     throw new Error(error?.message || "No se pudo cargar el articulo");
   }
-  const tags = await getPostTags(adminSupabase, data.id);
+  const { category_id, ...postRow } = data;
+  const category = await fetchCategoryForBody(adminSupabase, category_id);
+  const tags = await getPostTags(adminSupabase, postRow.id);
   return {
-    ...data,
-    category: normalizeJoinedCategory(data.category as BodyPost["category"]),
+    ...postRow,
+    category,
     tags,
   } as BodyPost;
 }
@@ -894,7 +931,7 @@ async function loadPostByUrl(adminSupabase: AdminSupabase, articleUrl: string) {
   const { data, error } = await adminSupabase
     .from("posts")
     .select(
-      `id, title, slug, slug_en, excerpt, content, featured_image, meta_title, meta_description, meta_keywords, reading_time, images, category:content_categories(id, name, slug, description)`
+      `id, title, slug, slug_en, excerpt, content, featured_image, meta_title, meta_description, meta_keywords, reading_time, images, category_id`
     )
     .eq(slugField, parsed.slug)
     .limit(1)
@@ -902,10 +939,12 @@ async function loadPostByUrl(adminSupabase: AdminSupabase, articleUrl: string) {
   if (error || !data) {
     throw new Error(error?.message || "No se encontro el articulo asociado a la URL");
   }
-  const tags = await getPostTags(adminSupabase, data.id);
+  const { category_id, ...postRow } = data;
+  const category = await fetchCategoryForBody(adminSupabase, category_id);
+  const tags = await getPostTags(adminSupabase, postRow.id);
   const post: BodyPost = {
-    ...data,
-    category: normalizeJoinedCategory(data.category as BodyPost["category"]),
+    ...postRow,
+    category,
     tags,
   } as BodyPost;
   return { post, canonicalUrl: parsed.canonicalUrl };

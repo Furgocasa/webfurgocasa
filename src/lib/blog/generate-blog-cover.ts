@@ -272,12 +272,6 @@ function getSlugField(locale: "es" | "en" | "fr" | "de") {
   return "slug";
 }
 
-function normalizeJoinedCategory(
-  category: CoverPost["category"] | CoverPost["category"][]
-): CoverPost["category"] {
-  return Array.isArray(category) ? category[0] ?? null : category ?? null;
-}
-
 function inferVisualClues(text: string) {
   const normalized = text
     .toLowerCase()
@@ -695,19 +689,56 @@ async function uploadToBlogBucket(post: CoverPost, imageBuffer: Buffer, adminSup
   return { filePath, publicUrl };
 }
 
-async function getPostTags(adminSupabase: AdminSupabase, postId: string) {
+async function fetchCategoryForPost(
+  adminSupabase: AdminSupabase,
+  categoryId: string | null
+): Promise<CoverPost["category"]> {
+  if (!categoryId) return null;
   const { data, error } = await adminSupabase
+    .from("content_categories")
+    .select("id, name, slug, description")
+    .eq("id", categoryId)
+    .maybeSingle();
+  if (error || !data) {
+    if (error) {
+      console.warn("[BLOG-COVER] No se pudo cargar categoria:", error.message);
+    }
+    return null;
+  }
+  return data;
+}
+
+async function getPostTags(adminSupabase: AdminSupabase, postId: string) {
+  const { data: links, error: linksError } = await adminSupabase
     .from("post_tags")
-    .select("tag:tags(name)")
+    .select("tag_id")
     .eq("post_id", postId);
 
-  if (error || !data) {
+  if (linksError || !links?.length) {
+    if (linksError) {
+      console.warn("[BLOG-COVER] post_tags:", linksError.message);
+    }
     return [];
   }
 
-  return data
-    .map((row: { tag?: { name?: string | null } | null }) => row.tag?.name)
-    .filter((value: string | null | undefined): value is string => Boolean(value));
+  const ids = [...new Set(links.map((row) => row.tag_id).filter(Boolean))];
+  if (ids.length === 0) return [];
+
+  const { data: tagRows, error: tagsError } = await adminSupabase
+    .from("tags")
+    .select("name")
+    .in("id", ids);
+
+  if (tagsError || !tagRows) {
+    if (tagsError) {
+      console.warn("[BLOG-COVER] tags:", tagsError.message);
+    }
+    return [];
+  }
+
+  return tagRows
+    .map((row) => row.name)
+    .filter((value): value is string => Boolean(value));
 }
 
 async function loadPostById(adminSupabase: AdminSupabase, postId: string) {
@@ -729,7 +760,7 @@ async function loadPostById(adminSupabase: AdminSupabase, postId: string) {
       reading_time,
       published_at,
       updated_at,
-      category:content_categories(id, name, slug, description)
+      category_id
     `)
     .eq("id", postId)
     .single();
@@ -738,10 +769,12 @@ async function loadPostById(adminSupabase: AdminSupabase, postId: string) {
     throw new Error(error?.message || "No se pudo cargar el articulo");
   }
 
-  const tags = await getPostTags(adminSupabase, data.id);
+  const { category_id, ...postRow } = data;
+  const category = await fetchCategoryForPost(adminSupabase, category_id);
+  const tags = await getPostTags(adminSupabase, postRow.id);
   return {
-    ...data,
-    category: normalizeJoinedCategory(data.category),
+    ...postRow,
+    category,
     tags,
   } as CoverPost;
 }
@@ -768,7 +801,7 @@ async function loadPostByUrl(adminSupabase: AdminSupabase, articleUrl: string) {
       reading_time,
       published_at,
       updated_at,
-      category:content_categories(id, name, slug, description)
+      category_id
     `)
     .eq(slugField, parsed.slug)
     .limit(1)
@@ -778,11 +811,13 @@ async function loadPostByUrl(adminSupabase: AdminSupabase, articleUrl: string) {
     throw new Error(error?.message || "No se encontro el articulo asociado a la URL");
   }
 
-  const tags = await getPostTags(adminSupabase, data.id);
+  const { category_id, ...postRow } = data;
+  const category = await fetchCategoryForPost(adminSupabase, category_id);
+  const tags = await getPostTags(adminSupabase, postRow.id);
   return {
     post: {
-      ...data,
-      category: normalizeJoinedCategory(data.category),
+      ...postRow,
+      category,
       tags,
     } as CoverPost,
     canonicalUrl: parsed.canonicalUrl,

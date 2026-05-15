@@ -284,6 +284,7 @@ export default function EditPostPage() {
     try {
       const response = await fetch("/api/admin/blog/generate-cover", {
         method: "POST",
+        credentials: "same-origin",
         headers: {
           "Content-Type": "application/json",
         },
@@ -293,7 +294,16 @@ export default function EditPostPage() {
         }),
       });
 
-      const result = await response.json();
+      let result: { ok?: boolean; error?: string; featuredImage?: string } = {};
+      try {
+        result = await response.json();
+      } catch {
+        throw new Error(
+          response.status === 504 || response.status === 502
+            ? "La generación ha tardado demasiado (timeout). Vuelve a intentar o ejecuta el script local generate:blog-cover."
+            : `Respuesta no válida del servidor (${response.status})`
+        );
+      }
 
       if (!response.ok || !result?.ok) {
         throw new Error(result?.error || "No se pudo generar la portada");

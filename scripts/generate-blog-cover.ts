@@ -4,6 +4,7 @@
  *
  * Uso:
  *   npx tsx scripts/generate-blog-cover.ts "https://www.furgocasa.com/es/blog/rutas/slug-del-post"
+ *   npx tsx scripts/generate-blog-cover.ts --post-id="uuid-del-post"
  *
  * Solo reconvertir la portada actual a WebP (sin IA):
  *   npm run reencode:blog-cover-webp -- "url1" "url2" ...
@@ -17,6 +18,15 @@ config({ path: resolve(process.cwd(), ".env.local") });
 
 const DEFAULT_URL =
   "https://www.furgocasa.com/es/blog/rutas/por-que-mayo-es-el-mejor-mes-para-viajar-en-camper-por-la-region-de-murcia";
+
+function parsePostIdFlag(args: string[]): string | null {
+  for (const arg of args) {
+    if (arg.startsWith("--post-id=")) {
+      return arg.slice("--post-id=".length).trim() || null;
+    }
+  }
+  return null;
+}
 
 async function main() {
   const args = process.argv.slice(2);
@@ -46,7 +56,8 @@ async function main() {
     return;
   }
 
-  const articleUrl = args[0] || DEFAULT_URL;
+  const postId = parsePostIdFlag(args);
+  const articleUrl = postId ? undefined : args.filter((a) => !a.startsWith("--post-id="))[0] || DEFAULT_URL;
 
   if (!process.env.OPENAI_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     console.error("❌ Falta OPENAI_API_KEY o SUPABASE_SERVICE_ROLE_KEY en .env.local");
@@ -55,8 +66,15 @@ async function main() {
 
   const { generateBlogCoverFromTarget } = await import("@/lib/blog/generate-blog-cover");
 
-  console.log(`Generando portada para: ${articleUrl}\n`);
-  const result = await generateBlogCoverFromTarget({ articleUrl, forceRegenerate: true });
+  if (postId) {
+    console.log(`Generando portada para postId: ${postId}\n`);
+  } else {
+    console.log(`Generando portada para: ${articleUrl}\n`);
+  }
+
+  const result = await generateBlogCoverFromTarget(
+    postId ? { postId, forceRegenerate: true } : { articleUrl: articleUrl!, forceRegenerate: true }
+  );
 
   if ("reused" in result && result.reused) {
     console.log(
