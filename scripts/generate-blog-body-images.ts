@@ -116,7 +116,7 @@ async function main() {
   }
   for (const item of result.manifest) {
     console.log(
-      ` • H2[${item.anchor_index}] "${item.anchor_text}" → ${item.url} (vehicle=${item.include_vehicle})`
+      ` • H2[${item.anchor_index}] "${item.anchor_text}" → ${item.url} (scene=${item.scene_type})`
     );
   }
 }

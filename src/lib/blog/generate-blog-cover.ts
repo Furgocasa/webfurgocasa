@@ -21,6 +21,60 @@ const BLOG_COVER_WEBP_QUALITY = (() => {
   const n = Number(raw);
   return Number.isFinite(n) && n >= 1 && n <= 100 ? n : 85;
 })();
+
+/** PostgREST devuelve "fetch failed"; en Node la causa real suele estar en error.cause (TLS, DNS, IPv6…). */
+function formatSupabaseNetworkError(prefix: string, err: unknown): string {
+  const parts: string[] = [prefix];
+  if (err && typeof err === "object") {
+    const o = err as Record<string, unknown>;
+    for (const k of ["details", "hint", "code"]) {
+      if (o[k] != null && String(o[k]).length > 0) {
+        parts.push(`${k}: ${String(o[k])}`);
+      }
+    }
+  }
+  if (err && typeof err === "object" && "message" in err && typeof (err as Error).message === "string") {
+    parts.push((err as Error).message);
+  } else if (err != null) {
+    parts.push(String(err));
+  }
+  let cursor: unknown = err && typeof err === "object" && "cause" in err ? (err as Error).cause : undefined;
+  let depth = 0;
+  while (cursor != null && depth < 5) {
+    if (typeof cursor === "object" && cursor !== null && "message" in cursor) {
+      parts.push(`causa: ${String((cursor as Error).message)}`);
+    } else {
+      parts.push(`causa: ${String(cursor)}`);
+    }
+    cursor =
+      typeof cursor === "object" && cursor !== null && "cause" in cursor
+        ? (cursor as Error).cause
+        : undefined;
+    depth += 1;
+  }
+  const joined = parts.filter(Boolean).join(" — ");
+  const tlsProblem = /UNABLE_TO_VERIFY|verify the first certificate|SELF_SIGNED_CERT|certificate chain|UNAUTHORIZED_SSL/i.test(
+    joined
+  );
+  if (tlsProblem) {
+    return (
+      `${joined}. ` +
+      "Esto es un fallo de confianza TLS en Node (no de las API keys). Suele causarlo un antivirus, firewall corporativo o proxy que intercepta HTTPS. " +
+      "Solución correcta: instalar el certificado raíz de esa herramienta en Windows o definir NODE_EXTRA_CA_CERTS apuntando a un .pem con la CA. " +
+      "Solo para diagnóstico local (inseguro): $env:NODE_TLS_REJECT_UNAUTHORIZED='0' en la misma sesión."
+    );
+  }
+  if (/fetch failed|failed to fetch|ECONNRESET|ENOTFOUND|ETIMEDOUT|getaddrinfo/i.test(joined)) {
+    return (
+      `${joined}. ` +
+      "Comprueba NEXT_PUBLIC_SUPABASE_URL y SUPABASE_SERVICE_ROLE_KEY en .env.local (sin espacios ni comillas mal cerradas). " +
+      "En Windows, si persiste, prueba: $env:NODE_OPTIONS='--dns-result-order=ipv4first'. " +
+      "Revisa VPN, antivirus o proxy."
+    );
+  }
+  return joined;
+}
+
 function buildVehicleReferencePromptTail(modelLabel: string) {
   return `Si aparece una camper en la escena, usa las imagenes de referencia adjuntas como guia visual fuerte y prioritaria de la morfologia, proporciones, volumen, altura, frontal, ventanas, llantas, pasos de rueda y lenguaje estetico de una camper real de Furgocasa. Debe recordar claramente al modelo concreto de la flota Furgocasa visible en las referencias adjuntas (${modelLabel}), respetando su silueta, alturas y volumetria, evitando mezclar rasgos de otros fabricantes o derivar hacia autocaravanas capuchinas o integrales ajenas a la marca. Prioriza una silueta autentica y realista, con aspecto de camper de alquiler usada pero muy bien cuidada. REGLA DURA DE VEHICULO: nunca inventes dos toldos en una misma camper. Si aparece toldo, debe existir solo uno y debe ir en el lateral derecho del vehiculo, como en las referencias reales. MUY IMPORTANTE: usa las referencias para definir el VEHICULO, no para copiar su encuadre. La composicion, el angulo, la distancia de camara, la altura del punto de vista, la cercania o lejania del vehiculo y su posicion dentro del encuadre deben decidirse segun el contenido del articulo y la mejor solucion fotografica para esa historia concreta.`;
 }
@@ -81,54 +135,105 @@ type VehicleReferenceSelection = {
   images: VehicleReferenceImage[];
 };
 
-const PROMPT_BUILDER_SYSTEM = `Eres un agente senior: director de arte, location scout y especialista en prompts para generacion de imagenes fotorrealistas. Recibes un DOSSIER COMPLETO sobre un articulo del blog de Furgocasa relacionado con viajes en camper, rutas, destinos, consejos o experiencias sobre ruedas. Tu UNICA salida es UN parrafo en espanol que el modelo de imagen usara tal cual.
+const SCENE_CLASSIFIER_SYSTEM = `Eres un editor visual senior del blog de Furgocasa. Recibes un DOSSIER de un articulo y decides QUE TIPO DE ESCENA pide la portada.
+
+Tu unica salida es un JSON valido EXACTAMENTE con esta forma:
+{
+  "scene_type": "vehicle" | "human_experience" | "landscape",
+  "rationale": "<frase corta en espanol explicando por que>"
+}
+
+Criterios:
+- "vehicle": la portada DEBE mostrar una camper como elemento clave. Apropiado cuando el articulo trata de rutas de carretera en camper, conduccion, miradores, areas de servicio, pernocta, etiquetas DGT, equipamiento del vehiculo, alquiler, recogida o devolucion, libertad sobre ruedas o el propio acto de viajar en furgoneta. La camper es protagonista o claramente visible.
+- "human_experience": la portada DEBE mostrar PERSONAS en una situacion real (espalda o tres cuartos, sin rostros heroicos, sin posado de catalogo). Apropiado cuando el articulo trata de mercados, gastronomia, mercadillos artesanos, fiestas, talleres, vida de pueblo, cultura, museos, planes urbanos, experiencia con familia o pareja en un destino concreto. NO debe aparecer ninguna camper, ni en primer plano ni de fondo.
+- "landscape": la portada DEBE mostrar PAISAJE o ENTORNO sin protagonismo de personas ni camper. Apropiado cuando el articulo trata sobre naturaleza pura, parques nacionales, fauna, costas, sierras, fenomenos naturales o geografia. Pueden aparecer figuras humanas pequenas a escala del paisaje, pero no protagonistas; no debe aparecer camper.
+
+Reglas duras de decision:
+- Si el articulo se centra en "que hacer", "que ver", "mercados", "gastronomia", "fiestas", "pueblos con encanto", "rutas a pie", "talleres" o "experiencias", normalmente "human_experience".
+- Si el articulo se centra en "ruta en camper por X", "como conducir", "consejos para el viaje en camper", "que camper alquilar", normalmente "vehicle".
+- Si el articulo se centra en paisaje puro, naturaleza salvaje o fenomenos geograficos, "landscape".
+- Si dudas entre "vehicle" y "human_experience", gana "human_experience": meter la camper con calzador en escenas que no le pertenecen empobrece la portada.
+- "landscape" es una eleccion seria; usala solo cuando el dossier sea claramente paisajistico.
+
+Devuelve SOLO el JSON, sin markdown, sin explicacion adicional.`;
+
+const PROMPT_BUILDER_SYSTEM_BASE = `Eres un agente senior: director de arte, location scout y especialista en prompts para generacion de imagenes fotorrealistas. Recibes un DOSSIER COMPLETO sobre un articulo del blog de Furgocasa relacionado con viajes en camper, rutas, destinos, consejos o experiencias sobre ruedas, y un SCENE_TYPE que ya ha sido decidido por el editor visual. Tu UNICA salida es UN parrafo en espanol que el modelo de imagen usara tal cual.
 
 ANTES de escribir, piensa mentalmente y no lo imprimas:
-1. Elige UNA escena concreta, fotografiable y honesta que resuma la tesis real del articulo.
-2. Si el articulo describe una ruta, prioriza un tramo realista del paisaje y una situacion de viaje en camper verosimil.
-3. Conecta geografia, clima, vegetacion, materiales, carretera, actividad y tipo de viajero sin caer en postal vacia.
-4. Introduce 2-4 sustantivos concretos de textura o material alineados con la escena.
-5. Si el texto menciona lugares concretos, flora, costa, secano, salinas, montana, desierto o pueblos, usalos solo si encajan con naturalidad.
-6. Piensa como si un fotografo profesional estuviera alli tomando una portada editorial horizontal para una marca de alquiler de campers real.
+1. Elige UNA escena concreta, fotografiable y honesta que resuma la tesis real del articulo, RESPETANDO el SCENE_TYPE recibido.
+2. Conecta geografia, clima, vegetacion, materiales, arquitectura, actividad y tipo de protagonista sin caer en postal vacia.
+3. Introduce 2-4 sustantivos concretos de textura o material alineados con la escena (cesteria, madera, lino, piedra, asfalto, hierro forjado, fruta, especias, etc.).
+4. Si el texto menciona lugares concretos, flora, costa, secano, salinas, montana, desierto, mercados, plazas o pueblos, usalos solo si encajan con naturalidad.
+5. Piensa como si un fotografo profesional estuviera alli tomando una portada editorial horizontal real.
 
-REGLAS DURAS:
+REGLAS DURAS GENERALES:
 - No inventes geografia que contradiga el dossier.
-- Si aparece vehiculo, prioriza claramente una camper de gran volumen tipo furgon camperizada europea, similar a una Fiat Ducato H2 L3 de alquiler, antes que una autocaravana grande o perfilada.
-- Evita autocaravanas capuchinas, integrales o de gran volumen residencial salvo que el dossier lo exija de forma explicita.
-- El vehiculo debe parecer un vehiculo real de alquiler en Europa, no un concept car futurista.
-- La perspectiva del vehiculo no es fija: puede aparecer cerca o lejos, completo o parcial, aparcado, circulando, a ras de suelo o desde un punto de vista elevado, siempre que la escena del articulo lo justifique.
-- Regla dura de vehiculo: nunca puede haber dos toldos en una misma camper. Si aparece un toldo, debe ser unico y estar en el lateral derecho del vehiculo.
-- Si hay personas, pocas, naturales y no posadas; rostros no protagonistas.
 - Prohibido en escena: texto legible, logotipos, marcas, matriculas legibles, carteles hero, mapas flotantes, interfaces, collage, ilustracion, render 3D.
-- Evita look IA: piel plastica, cielos neon, oversaturacion, HDR agresivo, simetria artificial, glow, fantasia, composiciones imposibles.
+- Evita look IA: piel plastica, cielos neon, oversaturacion, HDR agresivo, simetria artificial, glow, fantasia, composiciones imposibles, sonrisas exageradas, pose de catalogo.
 - La imagen debe ser luminosa y comercialmente util como portada web horizontal.
+
+REGLAS POR SCENE_TYPE (sigue solo las del tipo recibido):
+
+[scene_type=vehicle]
+- La portada debe mostrar claramente una camper, prioriza una camper de gran volumen tipo furgon camperizado europeo, similar a una Fiat Ducato H2 L3 de alquiler, antes que una autocaravana grande o perfilada.
+- Evita autocaravanas capuchinas o integrales salvo que el dossier lo exija de forma explicita.
+- El vehiculo debe parecer un vehiculo real de alquiler en Europa, no un concept car futurista.
+- Encuadre flexible: la camper puede aparecer cerca o lejos, completa o parcial, aparcada, circulando o en mirador, segun la historia del articulo.
+- Regla dura de vehiculo: nunca dos toldos en una misma camper. Si aparece un toldo, uno solo y en el lateral derecho.
+- Si hay personas, pocas, naturales y no posadas; rostros no protagonistas.
+
+[scene_type=human_experience]
+- La portada debe mostrar PERSONAS en una situacion real, normalmente una pareja o un grupo pequeno, paseando, comprando, charlando con un artesano, comiendo en una terraza, mirando un puesto de mercado o caminando por una plaza con cestos y bolsas.
+- Vista preferida de espalda o tres cuartos; rostros no protagonistas, sin contacto visual con la camara, sin pose de catalogo.
+- NO debe aparecer ninguna camper ni furgoneta, ni en primer plano ni en segundo plano ni reflejada.
+- Incluye detalle real del contexto: cesteria, frutas, pan, ceramica, hierro forjado, toldos textiles, fachadas vividas, sombra natural, mercado al aire libre o cubierto, pueblo con encanto, ambiente local.
+- Ropa cotidiana y verosimil, mediterranea cuando proceda, nunca vestuario de campana publicitaria.
+
+[scene_type=landscape]
+- La portada debe mostrar PAISAJE o ENTORNO como protagonista, sin personas reconocibles ni camper.
+- Pueden aparecer figuras humanas pequenas a escala del paisaje (silueta lejana), pero la escena la manda la naturaleza, la geografia o la arquitectura.
+- Materiales concretos: roca, agua, vegetacion, madera erosionada, cielo creible. Hora del dia coherente con la tesis.
 
 FORMATO DE SALIDA:
 - Exactamente UN parrafo en espanol.
 - Sin comillas, sin markdown, sin listas y sin saltos de linea.
 - Debe empezar con: Fotografia hiperrealista y cinematografica de
-- Debe sonar a briefing fotografico premium real para una portada de articulo de blog de viajes en camper.
+- Debe sonar a briefing fotografico premium real para una portada de articulo de blog de viajes y experiencias.
 - Debe integrar en su cierre la idea de: composicion editorial premium, profundidad de campo natural, texturas realistas, encuadre horizontal amplio, sin texto ni logos, realismo fotografico absoluto, portada web de alta conversion.`;
 
-const PROMPT_REFINER_SYSTEM = `Eres un editor fotografico obsesionado con el hiperrealismo. Recibiras:
+const PROMPT_REFINER_SYSTEM_BASE = `Eres un editor fotografico obsesionado con el hiperrealismo. Recibiras:
 1) un DOSSIER del articulo
-2) un primer prompt ya redactado
+2) un SCENE_TYPE ya decidido por el editor visual (vehicle, human_experience o landscape)
+3) un primer prompt ya redactado
 
-Tu tarea es REESCRIBIR ese prompt para que parezca todavia mas una fotografia real tomada por un fotografo profesional en una localizacion autentica.
+Tu tarea es REESCRIBIR ese prompt para que parezca todavia mas una fotografia real tomada por un fotografo profesional en una localizacion autentica, RESPETANDO el SCENE_TYPE.
 
-Prioridades:
+Prioridades comunes:
 - La imagen debe parecer una FOTO REAL, no arte generativo.
-- Si el borrador suena demasiado bonito, demasiado turistico, demasiado de catalogo falso o demasiado de IA, rebajalo.
-- Da prioridad a luz existente, detalle real, materiales concretos, carretera y paisaje creibles, composicion editorial sobria.
-- Si las personas no son imprescindibles, reduce su protagonismo.
-- Si aparece vehiculo, prioriza una camper gran volumen tipo furgon camperizado europeo de alquiler y evita derivar hacia autocaravana grande salvo que el dossier lo pida.
-- Si una camper aparece, que se integre como parte natural del viaje, no como showroom ni packshot.
-- Corrige cualquier error estructural de la camper: nunca dos toldos; si hay toldo, debe ser uno solo y montado en el lateral derecho.
-- El encuadre del vehiculo debe obedecer a la historia del articulo y no repetirse como una pose fija de catalogo; si la escena funciona mejor con el vehiculo lejano, lateral, elevado, parcialmente visible o aparcado, hazlo asi.
-- Evita fantasia, exceso de color, glow, suavizado plastico, simetria artificial, postureo publicitario falso.
+- Si el borrador suena demasiado bonito, demasiado turistico, de catalogo falso o de look IA, rebajalo.
+- Da prioridad a luz existente, detalle real, materiales concretos, composicion editorial sobria.
+- Evita fantasia, exceso de color, glow, suavizado plastico, simetria artificial, postureo publicitario falso, sonrisas exageradas.
+
+Reglas especificas por SCENE_TYPE (aplica solo las del tipo recibido):
+
+[scene_type=vehicle]
+- Si una camper aparece, debe integrarse como parte natural del viaje, no como showroom ni packshot.
+- Prioriza una camper gran volumen tipo furgon camperizado europeo de alquiler; evita autocaravana grande salvo que el dossier lo pida.
+- Corrige cualquier error estructural: nunca dos toldos; si hay toldo, uno solo y en el lateral derecho.
+- El encuadre puede ser lejano, lateral, elevado, parcial o aparcado segun la historia.
+
+[scene_type=human_experience]
+- Refuerza el protagonismo humano: pareja o grupo pequeno en una situacion concreta del articulo (mercado, plaza, taller, terraza, calle de pueblo).
+- Vista preferente de espalda o tres cuartos. Rostros no protagonistas, sin contacto visual con la camara.
+- Mantiene PROHIBIDO cualquier vehiculo tipo camper, furgoneta o autocaravana en la escena, incluso al fondo o reflejado.
+- Subraya texturas reales del contexto: cesteria, frutas, pan, ceramica, hierro forjado, toldos textiles, paredes vividas.
+
+[scene_type=landscape]
+- Refuerza la jerarquia: la naturaleza o el entorno mandan; si hay figuras humanas, deben ser pequenas y a escala del paisaje, nunca protagonistas.
+- No debe aparecer camper en ningun plano.
 
 Reglas:
-- Manten coherencia absoluta con el dossier.
+- Manten coherencia absoluta con el dossier y con el SCENE_TYPE.
 - Devuelve exactamente un parrafo en espanol.
 - Sin explicaciones extra.
 - Debe empezar por "Fotografia hiperrealista y cinematografica de".`;
@@ -164,16 +269,29 @@ type CoverPost = {
 type AdminSupabase = SupabaseClient<Database>;
 
 function createServiceSupabase(): AdminSupabase {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
+  const urlRaw = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").trim().replace(/\/+$/, "");
+  const key = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").trim();
+  if (!key) {
+    throw new Error("Falta SUPABASE_SERVICE_ROLE_KEY en .env.local (o entorno del servidor)");
+  }
+  let origin: string;
+  try {
+    const parsed = new URL(urlRaw);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      throw new Error("protocolo");
     }
-  );
+    origin = parsed.origin;
+  } catch {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL no es una URL válida. Revisa .env.local: sin espacios al final ni caracteres raros; ejemplo https://xxxx.supabase.co"
+    );
+  }
+  return createClient<Database>(origin, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  });
 }
 
 function collapseWhitespace(value: string) {
@@ -523,12 +641,61 @@ async function normalizeVehicleReferenceImage(filePath: string): Promise<Vehicle
   }
 }
 
-async function buildVisualPrompt(openai: OpenAI, dossier: string) {
+export type CoverSceneType = "vehicle" | "human_experience" | "landscape";
+
+function safeJsonParse<T>(value: string): T | null {
+  try {
+    return JSON.parse(value) as T;
+  } catch {
+    const start = value.indexOf("{");
+    const end = value.lastIndexOf("}");
+    if (start >= 0 && end > start) {
+      try {
+        return JSON.parse(value.slice(start, end + 1)) as T;
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+}
+
+async function classifyCoverScene(
+  openai: OpenAI,
+  dossier: string
+): Promise<{ sceneType: CoverSceneType; rationale: string }> {
+  try {
+    const completion = await openai.chat.completions.create({
+      model: OPENAI_TEXT_MODEL,
+      messages: [
+        { role: "system", content: SCENE_CLASSIFIER_SYSTEM },
+        { role: "user", content: dossier },
+      ],
+      temperature: 0.1,
+      max_completion_tokens: 300,
+      response_format: { type: "json_object" },
+    });
+    const raw = completion.choices[0]?.message?.content || "";
+    const parsed = safeJsonParse<{ scene_type?: string; rationale?: string }>(raw);
+    const value = (parsed?.scene_type || "").toLowerCase().trim();
+    if (value === "vehicle" || value === "human_experience" || value === "landscape") {
+      return {
+        sceneType: value as CoverSceneType,
+        rationale: parsed?.rationale || "",
+      };
+    }
+  } catch (error) {
+    console.warn("[BLOG-COVER] Clasificador de escena ha fallado, se asume vehicle.", error);
+  }
+  return { sceneType: "vehicle", rationale: "Fallback por error del clasificador" };
+}
+
+async function buildVisualPrompt(openai: OpenAI, dossier: string, sceneType: CoverSceneType) {
   const firstPass = await openai.chat.completions.create({
     model: OPENAI_TEXT_MODEL,
     messages: [
-      { role: "system", content: PROMPT_BUILDER_SYSTEM },
-      { role: "user", content: dossier },
+      { role: "system", content: PROMPT_BUILDER_SYSTEM_BASE },
+      { role: "user", content: `SCENE_TYPE: ${sceneType}\n\n${dossier}` },
     ],
     temperature: 0.32,
     max_completion_tokens: 900,
@@ -542,10 +709,10 @@ async function buildVisualPrompt(openai: OpenAI, dossier: string) {
   const secondPass = await openai.chat.completions.create({
     model: OPENAI_TEXT_MODEL,
     messages: [
-      { role: "system", content: PROMPT_REFINER_SYSTEM },
+      { role: "system", content: PROMPT_REFINER_SYSTEM_BASE },
       {
         role: "user",
-        content: `DOSSIER:\n${dossier}\n\nPRIMER PROMPT:\n${firstPrompt}`,
+        content: `SCENE_TYPE: ${sceneType}\n\nDOSSIER:\n${dossier}\n\nPRIMER PROMPT:\n${firstPrompt}`,
       },
     ],
     temperature: 0.18,
@@ -566,11 +733,35 @@ async function buildVisualPrompt(openai: OpenAI, dossier: string) {
   };
 }
 
+const NO_VEHICLE_PROMPT_TAIL =
+  "REGLA DURA: en esta imagen NO debe aparecer ninguna camper, furgoneta, autocaravana, caravana ni vehiculo recreativo de ningun tipo, ni en primer plano, ni en segundo plano, ni reflejado en cristales o charcos, ni asomando por una esquina. Tampoco debe aparecer matricula o branding de Furgocasa. La escena debe sostenerse exclusivamente con personas y entorno (si scene_type=human_experience) o con paisaje y entorno (si scene_type=landscape).";
+
 async function generateImageBuffer(
   openai: OpenAI,
   prompt: string,
-  selection: VehicleReferenceSelection | null
+  selection: VehicleReferenceSelection | null,
+  sceneType: CoverSceneType
 ) {
+  if (sceneType !== "vehicle") {
+    const promptWithoutVehicle = cleanPrompt(`${prompt} ${NO_VEHICLE_PROMPT_TAIL}`);
+    console.log(
+      `[BLOG-COVER] scene_type=${sceneType}: omitiendo referencias de vehiculo y reforzando ausencia de camper en el prompt.`
+    );
+    const result = await openai.images.generate({
+      model: OPENAI_IMAGE_MODEL,
+      prompt: promptWithoutVehicle,
+      size: IMAGE_SIZE,
+      quality: "high",
+      output_format: "png",
+      n: 1,
+    });
+    const imageBase64 = result.data?.[0]?.b64_json;
+    if (!imageBase64) {
+      throw new Error("OpenAI no devolvio datos de imagen en base64");
+    }
+    return Buffer.from(imageBase64, "base64");
+  }
+
   const modelLabel = selection?.modelLabel || "camper de la flota Furgocasa";
   const promptWithVehicleReferences = cleanPrompt(
     `${prompt} ${buildVehicleReferencePromptTail(modelLabel)}`
@@ -742,9 +933,13 @@ async function getPostTags(adminSupabase: AdminSupabase, postId: string) {
 }
 
 async function loadPostById(adminSupabase: AdminSupabase, postId: string) {
-  const { data, error } = await adminSupabase
-    .from("posts")
-    .select(`
+  let result: Awaited<
+    ReturnType<ReturnType<AdminSupabase["from"]>["select"]> extends Promise<infer U> ? U : never
+  >;
+  try {
+    result = await adminSupabase
+      .from("posts")
+      .select(`
       id,
       title,
       slug,
@@ -762,14 +957,22 @@ async function loadPostById(adminSupabase: AdminSupabase, postId: string) {
       updated_at,
       category_id
     `)
-    .eq("id", postId)
-    .single();
-
-  if (error || !data) {
-    throw new Error(error?.message || "No se pudo cargar el articulo");
+      .eq("id", postId)
+      .single();
+  } catch (e) {
+    throw new Error(formatSupabaseNetworkError("Error de red al cargar el artículo en Supabase", e));
   }
 
-  const { category_id, ...postRow } = data;
+  if (result.error) {
+    throw new Error(formatSupabaseNetworkError("Supabase al cargar el artículo", result.error));
+  }
+
+  const row = result.data as (Record<string, unknown> & { id: string; category_id: string | null }) | null;
+  if (!row) {
+    throw new Error("No se pudo cargar el articulo");
+  }
+
+  const { category_id, ...postRow } = row;
   const category = await fetchCategoryForPost(adminSupabase, category_id);
   const tags = await getPostTags(adminSupabase, postRow.id);
   return {
@@ -783,9 +986,13 @@ async function loadPostByUrl(adminSupabase: AdminSupabase, articleUrl: string) {
   const parsed = parseArticleUrl(articleUrl);
   const slugField = getSlugField(parsed.locale);
 
-  const { data, error } = await adminSupabase
-    .from("posts")
-    .select(`
+  let result: Awaited<
+    ReturnType<ReturnType<AdminSupabase["from"]>["select"]> extends Promise<infer U> ? U : never
+  >;
+  try {
+    result = await adminSupabase
+      .from("posts")
+      .select(`
       id,
       title,
       slug,
@@ -803,15 +1010,23 @@ async function loadPostByUrl(adminSupabase: AdminSupabase, articleUrl: string) {
       updated_at,
       category_id
     `)
-    .eq(slugField, parsed.slug)
-    .limit(1)
-    .maybeSingle();
-
-  if (error || !data) {
-    throw new Error(error?.message || "No se encontro el articulo asociado a la URL");
+      .eq(slugField, parsed.slug)
+      .limit(1)
+      .maybeSingle();
+  } catch (e) {
+    throw new Error(formatSupabaseNetworkError("Error de red al buscar el artículo en Supabase", e));
   }
 
-  const { category_id, ...postRow } = data;
+  if (result.error) {
+    throw new Error(formatSupabaseNetworkError("Supabase al buscar el artículo por URL", result.error));
+  }
+
+  const row = result.data as (Record<string, unknown> & { id: string; category_id: string | null }) | null;
+  if (!row) {
+    throw new Error("No se encontro el articulo asociado a la URL");
+  }
+
+  const { category_id, ...postRow } = row;
   const category = await fetchCategoryForPost(adminSupabase, category_id);
   const tags = await getPostTags(adminSupabase, postRow.id);
   return {
@@ -859,11 +1074,24 @@ export async function generateBlogCoverFromTarget(input: {
     };
   }
 
-  const vehicleSelection = await selectVehicleReferenceImages();
-  const dossier = buildDossier(post, loaded.canonicalUrl, vehicleSelection?.modelLabel);
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-  const prompts = await buildVisualPrompt(openai, dossier);
-  const imageBuffer = await generateImageBuffer(openai, prompts.finalPrompt, vehicleSelection);
+
+  const preliminaryDossier = buildDossier(post, loaded.canonicalUrl, undefined);
+  const sceneDecision = await classifyCoverScene(openai, preliminaryDossier);
+  console.log(
+    `[BLOG-COVER] scene_type=${sceneDecision.sceneType} (${sceneDecision.rationale})`
+  );
+
+  const vehicleSelection =
+    sceneDecision.sceneType === "vehicle" ? await selectVehicleReferenceImages() : null;
+  const dossier = buildDossier(post, loaded.canonicalUrl, vehicleSelection?.modelLabel);
+  const prompts = await buildVisualPrompt(openai, dossier, sceneDecision.sceneType);
+  const imageBuffer = await generateImageBuffer(
+    openai,
+    prompts.finalPrompt,
+    vehicleSelection,
+    sceneDecision.sceneType
+  );
   const upload = await uploadToBlogBucket(post, imageBuffer, adminSupabase);
 
   const { error: updateError } = await adminSupabase
@@ -888,6 +1116,8 @@ export async function generateBlogCoverFromTarget(input: {
     firstPrompt: prompts.firstPrompt,
     refinedPrompt: prompts.refinedPrompt,
     dossier,
+    sceneType: sceneDecision.sceneType,
+    sceneRationale: sceneDecision.rationale,
     vehicleModel: vehicleSelection
       ? {
           key: vehicleSelection.modelKey,

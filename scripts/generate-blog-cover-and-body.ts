@@ -92,6 +92,7 @@ async function main() {
   let vehicleModelKey: string | null = null;
   let vehicleModelLabel: string | null = null;
   let coverPromptHint: string | undefined;
+  let coverSceneType: "vehicle" | "human_experience" | "landscape" | undefined;
 
   if (!opts.skipCover) {
     const { generateBlogCoverFromTarget } = await import(
@@ -105,6 +106,14 @@ async function main() {
     console.log("Título:", cover.title);
     if ("featuredImage" in cover) console.log("URL portada:", cover.featuredImage);
     if ("storagePath" in cover) console.log("Storage:", cover.storagePath);
+    if ("sceneType" in cover && cover.sceneType) {
+      coverSceneType = cover.sceneType;
+      console.log(
+        `Scene type de portada: ${cover.sceneType}${
+          "sceneRationale" in cover && cover.sceneRationale ? ` (${cover.sceneRationale})` : ""
+        }`
+      );
+    }
     if ("vehicleModel" in cover && cover.vehicleModel) {
       vehicleModelKey = cover.vehicleModel.key;
       vehicleModelLabel = cover.vehicleModel.label;
@@ -131,6 +140,7 @@ async function main() {
     vehicleModelKey,
     vehicleModelLabel,
     coverPromptHint,
+    coverSceneType,
     forceRegenerate: opts.forceBody,
     maxImages: opts.maxBodyImages,
   });
@@ -146,7 +156,7 @@ async function main() {
   }
   for (const item of body.manifest) {
     console.log(
-      ` • H2[${item.anchor_index}] "${item.anchor_text}" → ${item.url} (vehicle=${item.include_vehicle})`
+      ` • H2[${item.anchor_index}] "${item.anchor_text}" → ${item.url} (scene=${item.scene_type})`
     );
   }
 }

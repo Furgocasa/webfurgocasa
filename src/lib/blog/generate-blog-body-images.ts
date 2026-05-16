@@ -131,8 +131,11 @@ type H2Section = {
   matchEnd: number;
 };
 
+type BodySceneType = "vehicle" | "human_experience" | "landscape";
+
 type PlanItem = {
   anchor_index: number;
+  scene_type: BodySceneType;
   include_vehicle: boolean;
   section_focus: string;
   alt_es: string;
@@ -160,6 +163,7 @@ type BodyImagesManifestItem = {
   storage_path: string;
   alt_es: string;
   caption_es: string;
+  scene_type: BodySceneType;
   include_vehicle: boolean;
   vehicle_model_key: string | null;
   vehicle_model_label: string | null;
@@ -167,28 +171,34 @@ type BodyImagesManifestItem = {
   generated_at: string;
 };
 
-const PROMPT_BODY_PLANNER_SYSTEM = `Eres un editor visual senior y planner de portadas internas para articulos de blog de Furgocasa (alquiler de campers).
+const PROMPT_BODY_PLANNER_SYSTEM = `Eres un editor visual senior y planner de imagenes interiores para articulos de blog de Furgocasa.
 
 Recibes:
 1) Un DOSSIER COMPLETO del articulo (titulo, resumen, contenido, palabras clave, categoria).
 2) Una LISTA DE SECCIONES H2 ordenadas con su anchor_index (0-based) y el texto del heading.
-3) DECISION_VEHICULO_GLOBAL: el modelo concreto de la flota Furgocasa (por ejemplo "Adria Twin") que ya se uso en la portada. Si una imagen incluye camper, debe inspirarse en ESE modelo; nunca mezcles modelos.
-4) TARGET_IMAGE_COUNT: cuantas imagenes deberias proponer (entre ${MIN_BODY_IMAGES} y ${MAX_BODY_IMAGES_HARD}). Es una sugerencia firme; respetala salvo que las secciones disponibles obliguen a algo distinto.
+3) COVER_SCENE_TYPE: el tipo de escena que se uso en la portada (vehicle | human_experience | landscape). Las imagenes del cuerpo deben DIFERENCIARSE de la portada en angulo, hora del dia o atmosfera; y al menos UNA imagen del cuerpo deberia usar un scene_type DISTINTO al de la portada, salvo que el articulo sea claramente monotematico.
+4) DECISION_VEHICULO_GLOBAL: el modelo concreto de la flota Furgocasa que se uso en la portada si la portada incluia vehiculo. Si una imagen del cuerpo incluye camper, debe inspirarse en ESE modelo; nunca mezcles modelos.
+5) TARGET_IMAGE_COUNT: cuantas imagenes deberias proponer (entre ${MIN_BODY_IMAGES} y ${MAX_BODY_IMAGES_HARD}).
 
-Tu trabajo es DECIDIR un plan visual coherente para imagenes que se inyectaran TRAS el H2 elegido (no en portada). Pensar mentalmente y NO imprimir:
-- Distribucion: las imagenes deben repartirse a lo largo del articulo. No elijas dos H2 consecutivos si puedes evitarlo. Empieza despues del primer bloque introductorio (no en el H2 0 si hay >=4 secciones), para no competir con la portada.
-- Variedad: cada imagen debe mostrar una escena claramente distinta (geografia, encuadre, hora del dia, atmosfera). Prohibido repetir composiciones, perspectivas o ambientes parecidos entre imagenes.
-- Vehiculo si o no por imagen: si la seccion habla de paisaje puro (cascadas, fiordos, lagos, parques nacionales, ciudades historicas), prioriza paisaje SIN camper. Si habla de carretera, conduccion, paradas, miradores, consejos practicos o pernocta, mete la camper integrada con naturalidad. Como minimo 1 imagen del plan debe llevar camper si el articulo trata de viajes/rutas, salvo que el contenido sea explicitamente solo paisaje.
-- Honestidad geografica: si la seccion menciona un pais o lugar, la escena debe ser de ese lugar y no de otro.
-- Calidad editorial: cada draft_prompt debe ser un parrafo en espanol, fotografico y concreto, evitando cliches genericos de IA.
+Para cada imagen debes decidir TAMBIEN un scene_type:
+- "vehicle": la imagen muestra claramente una camper integrada en la escena. Apropiado para secciones de carretera, conduccion, miradores, paradas, areas de servicio, etiquetas, equipamiento.
+- "human_experience": la imagen muestra PERSONAS (pareja o grupo pequeno, normalmente de espalda o tres cuartos) en una situacion real (mercado, plaza, taller, terraza, calle de pueblo, gastronomia). PROHIBIDA toda camper.
+- "landscape": la imagen muestra paisaje o entorno como protagonista; personas pequenas a escala del paisaje como mucho. PROHIBIDA toda camper.
 
-Salida estricta:
-- Devuelve UNICA Y EXCLUSIVAMENTE un JSON valido con esta forma exacta:
+Reglas duras de planificacion:
+- Distribucion: reparte las imagenes; no elijas dos H2 consecutivos si puedes evitarlo. Si hay >=4 H2, evita el H2 0 (compite con la portada).
+- Variedad de scene_type: si el articulo es de viajes/rutas, puedes mezclar; si es de mercados, gastronomia, fiestas, cultura, cuidado: probablemente la mayoria seran "human_experience" y opcionalmente alguna "landscape", sin meter la camper a calzador.
+- include_vehicle debe ser true SOLO si scene_type=="vehicle"; en los otros casos siempre false.
+- Honestidad geografica: si la seccion menciona un lugar concreto, la escena debe ser de ese lugar.
+- Cada draft_prompt debe ser un parrafo en espanol, fotografico, concreto, sin cliches de IA.
+
+Salida estricta. Devuelve UNICA Y EXCLUSIVAMENTE un JSON valido con esta forma exacta:
 
 {
   "items": [
     {
       "anchor_index": <int>,
+      "scene_type": "vehicle" | "human_experience" | "landscape",
       "include_vehicle": <true|false>,
       "section_focus": "<frase corta sobre que muestra la imagen>",
       "alt_es": "<alt descriptivo en espanol, 60-140 caracteres, sin comillas>",
@@ -198,9 +208,10 @@ Salida estricta:
   ]
 }
 
-Reglas duras:
+Reglas estrictas:
 - "items" debe tener entre ${MIN_BODY_IMAGES} y TARGET_IMAGE_COUNT entradas.
 - "anchor_index" debe existir en la lista recibida y no repetirse entre items.
+- include_vehicle debe ser true si y solo si scene_type es "vehicle".
 - No inventes geografia que contradiga el dossier.
 - Nunca dos toldos en una camper. Si hay toldo, uno solo en lateral derecho.
 - Prohibido en escena: texto legible, logotipos, mapas flotantes, matriculas legibles, render 3D, ilustracion, collage.
@@ -210,18 +221,31 @@ const PROMPT_BODY_REFINER_SYSTEM = `Eres un editor fotografico obsesionado con e
 
 Recibiras:
 1) Un mini-dossier con titulo, seccion concreta y el draft_prompt redactado por el planner.
-2) Una indicacion VEHICULO_OBJETIVO: ON u OFF. Si es ON, en la imagen debe verse una camper integrada en la escena, inspirada en el modelo de flota indicado. Si es OFF, no debe aparecer ningun vehiculo, ni de fondo.
-3) Una indicacion COHERENCIA_PORTADA: una sintesis breve de como es la portada del articulo. La imagen interior debe DIFERENCIARSE claramente de la portada en encuadre, hora del dia, atmosfera o tipo de plano.
+2) SCENE_TYPE: vehicle | human_experience | landscape.
+3) COHERENCIA_PORTADA: una sintesis breve de como es la portada del articulo. La imagen interior debe DIFERENCIARSE claramente de la portada en encuadre, hora del dia, atmosfera o tipo de plano.
 
 Tu tarea es REESCRIBIR el draft a un solo parrafo en espanol que parezca una FOTOGRAFIA REAL tomada por un fotografo profesional en una localizacion autentica de la seccion.
 
-Prioridades:
-- Imagen util como ilustracion interior horizontal de articulo (no protagonismo de marca).
+Prioridades comunes:
+- Imagen util como ilustracion interior horizontal (no protagonismo de marca).
 - Luz creible existente, materiales concretos, paisaje y arquitectura honestos, encuadre editorial sobrio.
-- Si VEHICULO_OBJETIVO es OFF, no menciones vehiculos ni indirectamente.
-- Si VEHICULO_OBJETIVO es ON, integra la camper de gran volumen tipo furgon camperizado europeo de alquiler con naturalidad, evitando showroom y packshot. Nunca dos toldos.
 - Diferenciacion fuerte respecto a la portada: cambia hora del dia, distancia, clima o angulo si la portada usa lo mismo.
-- Evita: glow, fantasia, postureo publicitario, simetria postalera, cielos neon, oversaturacion, render, dibujo, look IA.
+- Evita: glow, fantasia, postureo publicitario, simetria postalera, cielos neon, oversaturacion, render, dibujo, look IA, sonrisas exageradas.
+
+Reglas por SCENE_TYPE (aplica solo las del tipo recibido):
+
+[SCENE_TYPE=vehicle]
+- Integra la camper de gran volumen tipo furgon camperizado europeo de alquiler con naturalidad, evitando showroom y packshot.
+- Nunca dos toldos; si hay toldo, uno solo en el lateral derecho.
+
+[SCENE_TYPE=human_experience]
+- Refuerza el protagonismo humano: pareja o grupo pequeno, vista preferente de espalda o tres cuartos, sin contacto visual con la camara, sin pose de catalogo.
+- PROHIBIDO mencionar o describir camper, furgoneta, autocaravana o caravana, ni siquiera de fondo.
+- Detalles del contexto: cesteria, frutas, pan, ceramica, hierro forjado, toldos textiles, fachadas vividas.
+
+[SCENE_TYPE=landscape]
+- Naturaleza o entorno como protagonista; si hay figuras humanas, pequenas y a escala del paisaje, nunca protagonistas.
+- PROHIBIDO mencionar o describir camper o vehiculo recreativo.
 
 Reglas:
 - Devuelve EXACTAMENTE un parrafo en espanol.
@@ -233,6 +257,9 @@ const IMAGE_REALISM_TAIL =
 
 const VEHICLE_REFERENCE_TAIL = (modelLabel: string) =>
   `Si en la escena aparece una camper, usala con la morfologia, proporciones, frontal, ventanas, llantas y volumetria del modelo ${modelLabel} de la flota Furgocasa (mismo modelo que la portada del articulo, para coherencia visual). REGLA DURA DE VEHICULO: nunca dos toldos; si hay toldo, uno solo y en el lateral derecho. Las referencias visuales adjuntas definen el VEHICULO, no el encuadre: composicion, distancia y angulo deben venir dados por la seccion del articulo, claramente diferenciados respecto a la portada.`;
+
+const NO_VEHICLE_PROMPT_TAIL =
+  "REGLA DURA: en esta imagen NO debe aparecer ninguna camper, furgoneta, autocaravana, caravana ni vehiculo recreativo de ningun tipo, ni en primer plano, ni en segundo plano, ni reflejado en cristales o charcos, ni asomando por una esquina. La escena se sostiene exclusivamente con personas y entorno (si scene_type=human_experience) o con paisaje y entorno (si scene_type=landscape).";
 
 function createServiceSupabase(): AdminSupabase {
   return createClient<Database>(
@@ -620,7 +647,8 @@ function buildBodyDossier(
   vehicleModelLabel: string | undefined,
   h2List: H2Section[],
   targetCount: number,
-  coverPromptHint: string | undefined
+  coverPromptHint: string | undefined,
+  coverSceneType: BodySceneType | undefined
 ) {
   const plainContent = truncate(stripHtml(post.content), 5200);
   const excerpt = collapseWhitespace(post.excerpt || post.meta_description || "");
@@ -658,8 +686,11 @@ ${plainContent || "Sin contenido"}
 === SECCIONES H2 DISPONIBLES (anchor_index: texto) ===
 ${h2Lines}
 
+=== COVER_SCENE_TYPE ===
+${coverSceneType || "(desconocido)"}
+
 === DECISION_VEHICULO_GLOBAL ===
-${vehicleModelLabel || "camper de la flota Furgocasa"} (usar este modelo SIEMPRE que una imagen incluya camper)
+${vehicleModelLabel || "camper de la flota Furgocasa"} (usar este modelo SIEMPRE que una imagen sea scene_type=vehicle)
 
 === TARGET_IMAGE_COUNT ===
 ${targetCount}
@@ -690,6 +721,14 @@ function safeJsonParse<T>(value: string): T | null {
   }
 }
 
+function normalizeSceneType(value: unknown, includeVehicle: boolean): BodySceneType {
+  const raw = String(value || "").toLowerCase().trim();
+  if (raw === "vehicle" || raw === "human_experience" || raw === "landscape") {
+    return raw;
+  }
+  return includeVehicle ? "vehicle" : "human_experience";
+}
+
 function validatePlan(
   raw: { items?: unknown } | null,
   h2Count: number,
@@ -708,7 +747,9 @@ function validatePlan(
     if (!Number.isInteger(anchorIndex) || anchorIndex < 0 || anchorIndex >= h2Count) continue;
     if (seenAnchors.has(anchorIndex)) continue;
     seenAnchors.add(anchorIndex);
-    const includeVehicle = Boolean(obj.include_vehicle);
+    const rawIncludeVehicle = Boolean(obj.include_vehicle);
+    const sceneType = normalizeSceneType(obj.scene_type, rawIncludeVehicle);
+    const includeVehicle = sceneType === "vehicle";
     const sectionFocus = String(obj.section_focus || "").trim();
     const altEs = String(obj.alt_es || "").trim();
     const captionEs = String(obj.caption_es || "").trim();
@@ -716,6 +757,7 @@ function validatePlan(
     if (!sectionFocus || !altEs || !captionEs || draftPrompt.length < 60) continue;
     validated.push({
       anchor_index: anchorIndex,
+      scene_type: sceneType,
       include_vehicle: includeVehicle,
       section_focus: sectionFocus,
       alt_es: truncate(altEs, 160),
@@ -759,7 +801,7 @@ async function refinePromptForImage(
     title: string;
     sectionText: string;
     draftPrompt: string;
-    includeVehicle: boolean;
+    sceneType: BodySceneType;
     vehicleLabel: string;
     coverPromptHint: string | undefined;
   }
@@ -768,7 +810,7 @@ async function refinePromptForImage(
 TITULO_ARTICULO: ${ctx.title}
 SECCION (H2): ${ctx.sectionText}
 DRAFT_PROMPT: ${ctx.draftPrompt}
-VEHICULO_OBJETIVO: ${ctx.includeVehicle ? `ON (modelo ${ctx.vehicleLabel})` : "OFF"}
+SCENE_TYPE: ${ctx.sceneType}${ctx.sceneType === "vehicle" ? ` (modelo ${ctx.vehicleLabel})` : ""}
 COHERENCIA_PORTADA: ${ctx.coverPromptHint ? truncate(ctx.coverPromptHint, 600) : "(no disponible)"}
 `);
   const completion = await openai.chat.completions.create({
@@ -785,8 +827,10 @@ COHERENCIA_PORTADA: ${ctx.coverPromptHint ? truncate(ctx.coverPromptHint, 600) :
     throw new Error("El refiner devolvio un prompt demasiado corto");
   }
   let finalPrompt = `${refined} ${IMAGE_REALISM_TAIL}`;
-  if (ctx.includeVehicle) {
+  if (ctx.sceneType === "vehicle") {
     finalPrompt = `${finalPrompt} ${VEHICLE_REFERENCE_TAIL(ctx.vehicleLabel)}`;
+  } else {
+    finalPrompt = `${finalPrompt} ${NO_VEHICLE_PROMPT_TAIL}`;
   }
   return truncate(cleanPrompt(finalPrompt), 4000);
 }
@@ -795,9 +839,10 @@ async function generateSingleBodyImageBuffer(
   openai: OpenAI,
   prompt: string,
   vehicleSelection: VehicleReferenceSelection | null,
-  includeVehicle: boolean
+  sceneType: BodySceneType
 ): Promise<Buffer> {
-  const referenceImages = includeVehicle && vehicleSelection ? vehicleSelection.images : [];
+  const referenceImages =
+    sceneType === "vehicle" && vehicleSelection ? vehicleSelection.images : [];
 
   if (referenceImages.length > 0) {
     try {
@@ -956,6 +1001,7 @@ export type GenerateBodyImagesInput = {
   vehicleModelKey?: string | null;
   vehicleModelLabel?: string | null;
   coverPromptHint?: string;
+  coverSceneType?: BodySceneType;
   forceRegenerate?: boolean;
   maxImages?: number;
 };
@@ -1054,7 +1100,8 @@ export async function generateBlogBodyImagesFromTarget(
     effectiveVehicleLabel,
     h2List,
     targetCount,
-    input.coverPromptHint
+    input.coverPromptHint,
+    input.coverSceneType
   );
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -1074,7 +1121,7 @@ export async function generateBlogBodyImagesFromTarget(
   for (const item of planItems) {
     const targetH2 = h2List[item.anchor_index];
     console.log(
-      `   - H2 ${item.anchor_index} "${targetH2?.text}" → vehicle=${item.include_vehicle} | ${item.section_focus}`
+      `   - H2 ${item.anchor_index} "${targetH2?.text}" → scene_type=${item.scene_type} | ${item.section_focus}`
     );
   }
 
@@ -1085,7 +1132,7 @@ export async function generateBlogBodyImagesFromTarget(
       title: post.title || "",
       sectionText: targetH2?.text || "",
       draftPrompt: item.draft_prompt,
-      includeVehicle: item.include_vehicle,
+      sceneType: item.scene_type,
       vehicleLabel: effectiveVehicleLabel,
       coverPromptHint: input.coverPromptHint,
     });
@@ -1103,13 +1150,13 @@ export async function generateBlogBodyImagesFromTarget(
     const plan = finalPlans[i];
     try {
       console.log(
-        `[BLOG-BODY] Generando imagen ${i + 1}/${finalPlans.length} (H2 ${plan.anchor_index}: ${plan.anchor_text})`
+        `[BLOG-BODY] Generando imagen ${i + 1}/${finalPlans.length} (H2 ${plan.anchor_index}: ${plan.anchor_text}) — scene_type=${plan.scene_type}`
       );
       const buffer = await generateSingleBodyImageBuffer(
         openai,
         plan.final_prompt,
         vehicleSelection,
-        plan.include_vehicle
+        plan.scene_type
       );
       const uploaded = await uploadBodyImageToStorage(adminSupabase, post, buffer, i);
       generated.push(uploaded);
@@ -1122,6 +1169,7 @@ export async function generateBlogBodyImagesFromTarget(
         storage_path: uploaded.storagePath,
         alt_es: plan.alt_es,
         caption_es: plan.caption_es,
+        scene_type: plan.scene_type,
         include_vehicle: plan.include_vehicle,
         vehicle_model_key: plan.include_vehicle ? vehicleSelection?.modelKey || null : null,
         vehicle_model_label: plan.include_vehicle ? vehicleSelection?.modelLabel || null : null,
