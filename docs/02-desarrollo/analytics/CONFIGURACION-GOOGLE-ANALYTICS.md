@@ -111,21 +111,20 @@ Los siguientes documentos explican los problemas que se intentaron resolver con 
 
 ---
 
-## 📊 Eventos Ecommerce GTM (29/04/2026)
+## 📊 Eventos Ecommerce GTM (mayo 2026 — solo cobros confirmados)
 
 **Contenedor:** `GTM-5QLGH57` (cargado en `src/app/layout.tsx` vía `<GoogleTagManager gtmId="GTM-5QLGH57" />`).
 
-Toda la app dispara eventos a través de `sendGTMEvent` de `@next/third-parties/google`. Esquema GA4 enhanced ecommerce.
+Los únicos eventos `sendGTMEvent` activos son los de la **página de éxito tras pasarela** (Redsys/Stripe). No se envían eventos al visitar la ficha de la reserva, la página de pago ni la confirmación por transferencia; así se evita que Google Ads cuente conversiones por meras visitas o enlaces compartidos.
 
-### Embudo completo
+### Eventos enviados desde código
 
-| Paso | Evento | Cuándo se dispara | Archivos (4 idiomas) | Dedup |
-|---|---|---|---|---|
-| 1 | `generate_lead` | El cliente crea reserva pendiente de **transferencia bancaria** | `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{confirmacion,confirmation,bestaetigung}/page.tsx` | `localStorage` + `booking.id` |
-| 2 | `begin_checkout` | El cliente llega a `/reservar/[id]` con `status="pending"` y `amount_paid=0` | `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/page.tsx` | `localStorage` + `booking.id` |
-| 3 | `add_payment_info` | El cliente pulsa pagar → justo antes de redirigir a Redsys/Stripe | `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{pago,payment,paiement,zahlung}/page.tsx` | sin dedup (cada click es una intención) |
-| 4 | `purchase` | **Solo en el primer pago** (con `value = total_price` completo, LTV) | `src/app/{es,en,fr,de}/{pago,payment,paiement,zahlung}/exito/page.tsx` | `localStorage` + `order_number` |
-| 4-bis | `additional_payment_received` | En pagos posteriores (segundo 50 %, ajustes) con `value = payment.amount` real | mismas páginas de éxito | `localStorage` + `order_number` |
+| Evento | Cuándo se dispara | Archivos (4 idiomas) | Dedup |
+|---|---|---|---|
+| `purchase` | **Primer cobro** autorizado (parcial o total), con `value = total_price` (LTV) | `src/app/{es,en,fr,de}/{pago,payment,paiement,zahlung}/exito/page.tsx` | `localStorage` + `order_number` |
+| `additional_payment_received` | Cobros posteriores (segundo 50 %, ajustes), `value = payment.amount` | mismas páginas de éxito | `localStorage` + `order_number` |
+
+**Eliminados del código (mayo 2026):** `generate_lead`, `begin_checkout`, `add_payment_info`. Si en el futuro se necesita embudo en GA4, se pueden reintroducir como eventos **secundarios** en GTM (sin marcarlos como conversión en Ads) o con nombres custom que Ads no importe.
 
 ### ⚠️ Regla crítica anti-doble-conteo (modelo 50 % + 50 %)
 
@@ -153,7 +152,7 @@ if (isFirstPayment) {
 | GA4 — `purchase` event | Custom event `purchase` | Mapear `transaction_id`, `value`, `currency`, `items`, `payment_type` |
 | GA4 — `additional_payment_received` | Custom event `additional_payment_received` | Para reportes internos. **NO** marcarlo como conversión |
 | **Google Ads — Conversión "Reserva"** | Custom event `purchase` | **SOLO `purchase`**, nunca `additional_payment_received`. De lo contrario se duplica conversión cuando llega el segundo 50 % |
-| Google Ads — Remarketing | Custom event `begin_checkout` o `add_payment_info` | Audiencias de carrito abandonado |
+| Google Ads — Remarketing | Pageviews o eventos propios en GTM | Ya no hay `begin_checkout` / `add_payment_info` desde la web; usar audiencias por URL o etiquetas custom si hace falta |
 
 ### Payload `ecommerce` enviado
 
@@ -193,64 +192,15 @@ if (isFirstPayment) {
 }
 ```
 
-#### `begin_checkout`
-
-```json
-{
-  "event": "begin_checkout",
-  "ecommerce": {
-    "booking_id": "<booking.id>",
-    "booking_number": "<booking_number>",
-    "value": <total_price>,
-    "currency": "EUR",
-    "items": [/* ... */]
-  }
-}
-```
-
-#### `add_payment_info`
-
-```json
-{
-  "event": "add_payment_info",
-  "ecommerce": {
-    "booking_id": "<booking.id>",
-    "value": <amount>,
-    "currency": "EUR",
-    "payment_type": "redsys" | "stripe",
-    "payment_option": "deposit" | "full",
-    "items": [/* ... */]
-  }
-}
-```
-
-#### `generate_lead` (transferencia bancaria)
-
-```json
-{
-  "event": "generate_lead",
-  "ecommerce": {
-    "booking_id": "<booking.id>",
-    "value": <total_price>,
-    "currency": "EUR",
-    "payment_method": "bank_transfer",
-    "items": [/* ... */]
-  }
-}
-```
-
 ### Verificación en producción
 
-1. **GA4 DebugView:** instala la extensión [GA Debugger](https://chrome.google.com/webstore/detail/google-analytics-debugger/jnkmfdileelhofjcijamephohjechhna) y haz una reserva real. Debes ver en orden: `begin_checkout` → `add_payment_info` → `purchase`.
-2. **Console del navegador:** los logs `[GTM] purchase enviado…`, `[GTM] additional_payment_received…`, etc. confirman ejecución client-side.
-3. **`window.dataLayer`** debe mostrar los objetos pushados con su payload `ecommerce` completo.
+1. **GA4 DebugView:** tras un pago real que termine en `/…/pago/exito` (o equivalente por idioma), debe aparecer **`purchase`** (primer cobro) o **`additional_payment_received`** (segundos cobros). No debe haber otros eventos ecommerce desde estas páginas de éxito salvo esos dos.
+2. **Console del navegador:** logs `[GTM] purchase enviado…` / `additional_payment_received…` en las páginas de éxito.
+3. **`window.dataLayer`:** solo debe incluir pushes de compra tras confirmación de pasarela.
 
-### Cómo desactivar/cambiar eventos
+### Cómo desactivar o extender eventos
 
-Cada evento es un `useEffect` o llamada en `handlePayment` aislada. Para desactivar uno:
-
-- Buscar `sendGTMEvent` en el archivo correspondiente y comentar el bloque.
-- Para reactivar la deduplicación tras pruebas: ejecutar `localStorage.clear()` en la consola.
+Los únicos `sendGTMEvent` del flujo de reserva están en las cuatro páginas `…/exito/page.tsx`. Para desactivar el tracking de compras: comentar esos bloques. Para reintentar tras pruebas: `localStorage.removeItem('gtm_purchase_<order_number>')` o `localStorage.clear()`.
 
 ---
 
@@ -353,8 +303,8 @@ Edita `src/app/layout.tsx`:
 
 ---
 
-**Última actualización**: 29 de abril de 2026 (sección *Eventos Ecommerce GTM* añadida)  
+**Última actualización**: 18 de mayo de 2026 (solo `purchase` / `additional_payment_received` desde página éxito)  
 **ID de Medición GA4**: G-G5YLBN5XXZ  
 **Contenedor GTM**: GTM-5QLGH57  
-**Estado**: ✅ Embudo ecommerce completo + sin doble conteo en flujo 50 %+50 %  
+**Estado**: ✅ Conversión ecommerce alineada con cobro real en pasarela  
 **Versión actual**: v4.5.0+

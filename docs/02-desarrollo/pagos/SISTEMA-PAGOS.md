@@ -1,7 +1,7 @@
 # 💳 Sistema de Pagos Furgocasa
 
-**Versión:** 2.3  
-**Última actualización:** 29/04/2026 (sección *Tracking GTM ecommerce* añadida; sin doble conteo en flujo 50 %+50 %)
+**Versión:** 2.4  
+**Última actualización:** 18/05/2026 (*Tracking GTM ecommerce*: solo eventos en página de éxito tras pasarela)
 
 ---
 
@@ -301,23 +301,20 @@ const amount = paymentMethod === 'stripe'
 
 ## Tracking GTM ecommerce
 
-Cada paso del flujo de pago dispara un evento GA4 enhanced ecommerce vía GTM (`GTM-5QLGH57`) usando `sendGTMEvent` de `@next/third-parties/google`.
+Desde mayo de 2026, los únicos `sendGTMEvent` del flujo de reserva están en las **páginas de éxito** tras Redsys/Stripe (`…/{pago,payment,paiement,zahlung}/exito`). **No** se envían eventos al abrir la ficha `/reservar/[id]`, la pantalla de pago ni la confirmación por transferencia; así las métricas de conversión en Ads no se inflan por visitas repetidas o enlaces compartidos.
 
-| Paso del flujo | Evento GTM | Notas |
+| Momento | Evento GTM | Notas |
 |---|---|---|
-| Reserva creada (transferencia bancaria) | `generate_lead` | Solo cuando el cliente elige transferencia |
-| Llega a `/reservar/[id]` con pago pendiente | `begin_checkout` | `status="pending"` y `amount_paid=0` |
-| Pulsa "Pagar" → redirige al gateway | `add_payment_info` | Incluye `payment_type: redsys|stripe` |
-| **Primer pago** completado (50 % o 100 %) | `purchase` con `value = total_price` | LTV completo, dispara conversión Google Ads |
-| Segundo pago (50 %) o ajustes posteriores | `additional_payment_received` con `value = payment.amount` | **NO** dispara conversión (evita doble conteo) |
+| Primer cobro autorizado (50 % o 100 %) | `purchase`, `value = total_price` (LTV) | Conversión principal recomendada en Google Ads |
+| Cobros posteriores (segundo 50 %, etc.) | `additional_payment_received`, `value = payment.amount` | No usar como conversión en Ads |
 
-### ⚠️ Regla crítica anti-doble-conteo
+### ⚠️ Regla anti-doble-conteo (50 % + 50 %)
 
-El flujo 50 % + 50 % crea **dos transacciones Redsys distintas** (`order_number` distinto). Si `purchase` se disparase en ambas con `value = total_price`, GA4 doblaría ingresos. La detección client-side (`payment.booking.amount_paid - payment.amount <= 0.01`) garantiza que solo el primer pago dispara `purchase`; el resto disparan `additional_payment_received`.
+Solo el **primer** cobro dispara `purchase`; los siguientes usan `additional_payment_received`. Detección: `payment.booking.amount_paid - payment.amount <= 0.01`.
 
-**En el contenedor GTM, la etiqueta de conversión de Google Ads debe enchufarse SOLO al evento `purchase`.**
+**En GTM/Google Ads, la conversión debe ir ligada solo a `purchase`.**
 
-📖 **Detalle completo (payload, dedup, payload `ecommerce`, configuración GTM):** [`docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md`](../analytics/CONFIGURACION-GOOGLE-ANALYTICS.md) — sección *Eventos Ecommerce GTM*.
+📖 **Detalle:** [`docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md`](../analytics/CONFIGURACION-GOOGLE-ANALYTICS.md) — sección *Eventos Ecommerce GTM*.
 
 ---
 
@@ -408,7 +405,7 @@ Todos los cambios manuales se registran:
 - `REDSYS-FUNCIONANDO.md` - Estado y configuración Redsys
 - `REDSYS-CRYPTO-NO-TOCAR.md` - Firma criptográfica
 - `emails/README.md` - Sistema de emails
-- `../analytics/CONFIGURACION-GOOGLE-ANALYTICS.md` - Eventos ecommerce GTM (purchase, generate_lead, begin_checkout, add_payment_info)
+- `../analytics/CONFIGURACION-GOOGLE-ANALYTICS.md` - Eventos ecommerce GTM (`purchase`, `additional_payment_received`; mayo 2026)
 
-**Última revisión:** 29/04/2026 (sección *Tracking GTM ecommerce* añadida)  
-**Versión:** 2.3
+**Última revisión:** 18/05/2026 (*Tracking GTM*: solo página éxito pasarela)  
+**Versión:** 2.4

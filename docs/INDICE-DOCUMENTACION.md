@@ -1,8 +1,8 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.26 ✅ PRODUCCIÓN — stats canónicas `COMPANY` + landing Storytellers ES/EN/FR/DE  
+**Versión**: 1.0.27 ✅ PRODUCCIÓN — GTM solo tras cobro pasarela + stats Storytellers  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 9 de mayo de 2026
+**Última actualización**: 18 de mayo de 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
 
@@ -19,14 +19,25 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 
 ---
 
-## 📊 ACTUALIZACIÓN ABRIL 2026 — TRACKING GTM ECOMMERCE: FIX DOBLE CONTEO + FUNNEL COMPLETO
+## 📊 Mayo 2026 — GTM: solo conversión tras cobro en pasarela
 
 | Tema | Dónde leer |
 |------|------------|
-| Esquema completo de eventos GA4 (`generate_lead`, `begin_checkout`, `add_payment_info`, `purchase`, `additional_payment_received`), payload `ecommerce`, dedup en `localStorage`, regla anti-doble-conteo en flujo 50 % + 50 % | **[CONFIGURACION-GOOGLE-ANALYTICS.md](./02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md)** — sección *Eventos Ecommerce GTM* |
-| Referencia cruzada en el índice analytics (estado, fecha, lista de eventos disparados) | **[INDICE-DOCUMENTACION-ANALYTICS.md](./02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md)** |
-| Mención en el sistema de pagos (qué evento se dispara en cada paso del flujo) | **[SISTEMA-PAGOS.md](./02-desarrollo/pagos/SISTEMA-PAGOS.md)** — sección *Tracking GTM ecommerce* |
-| Archivos modificados (16 en 4 idiomas), motivación, regla GTM container (Ads conv. SOLO en `purchase`) | **CHANGELOG** (entrada 29 abr 2026 📊) · **[README raíz](../README.md)** — sección *Abril 2026 — Tracking GTM ecommerce…* |
+| Solo `purchase` + `additional_payment_received` en `…/exito`; retirados del código `generate_lead`, `begin_checkout`, `add_payment_info` | **[CONFIGURACION-GOOGLE-ANALYTICS.md](./02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md)** — *Eventos Ecommerce GTM* |
+| Índice analytics | **[INDICE-DOCUMENTACION-ANALYTICS.md](./02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md)** |
+| Sistema de pagos | **[SISTEMA-PAGOS.md](./02-desarrollo/pagos/SISTEMA-PAGOS.md)** — *Tracking GTM ecommerce* |
+| CHANGELOG + README | **CHANGELOG** (18 may 2026) · **[README raíz](../README.md)** — *Mayo 2026 — GTM* |
+
+---
+
+## 📊 Abril 2026 — Tracking GTM ecommerce (histórico; embudo intermedio retirado mayo 2026)
+
+| Tema | Dónde leer |
+|------|------------|
+| Anti-doble-conteo 50 %+50 % (`purchase` solo primer cobro); dedup `localStorage`; embudo intermedio existió hasta ~18/05/2026 | **[CONFIGURACION-GOOGLE-ANALYTICS.md](./02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md)** |
+| Índice analytics | **[INDICE-DOCUMENTACION-ANALYTICS.md](./02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md)** |
+| Pagos | **[SISTEMA-PAGOS.md](./02-desarrollo/pagos/SISTEMA-PAGOS.md)** |
+| Entrada original | **CHANGELOG** (29 abr 2026 📊) |
 
 ---
 

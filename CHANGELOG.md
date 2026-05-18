@@ -4,6 +4,22 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 📊 GTM: solo eventos tras cobro en pasarela — 18 de mayo de 2026
+
+**Contexto:** Los eventos intermedios del embudo (`generate_lead`, `begin_checkout`, `add_payment_info`) podían aparecer como conversiones en Google Ads si estaban importados o mal etiquetados en el contenedor. Abrir el enlace de la reserva para revisarla (cliente o equipo) **no** equivale a un cobro confirmado.
+
+**Cambio:**
+
+- Se eliminan del código todas las llamadas `sendGTMEvent` en páginas **distintas** a la de éxito tras pasarela.
+- Solo permanecen **`purchase`** (primer cobro autorizado, LTV en `value`) y **`additional_payment_received`** (cobros posteriores) en `src/app/{es,en,fr,de}/{pago,payment,paiement,zahlung}/exito/page.tsx`.
+- Se quitan imports innecesarios de `@next/third-parties/google` en confirmación transferencia, detalle de reserva y página de pago (12 archivos).
+
+**Documentación actualizada:** `docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md`, `INDICE-DOCUMENTACION-ANALYTICS.md`, `docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`, `docs/INDICE-DOCUMENTACION.md`, `README.md`.
+
+**Nota GTM:** revisar el contenedor `GTM-5QLGH57` y quitar triggers/etiquetas que dependan de los tres eventos eliminados; mantener conversión Ads solo sobre **`purchase`**.
+
+---
+
 ## 🌍 Stats canónicas de empresa + landing Storytellers multiidioma — 9 de mayo de 2026
 
 **Problema:** La home y páginas estáticas mostraban cifras contradictorias (años de experiencia, viajes, tamaño de flota, valoración), detectables también por bots de IA. La landing `/fr/storytellers` (y EN/DE) tenía metadatos localizados pero **todo el cuerpo en español**.
@@ -49,19 +65,20 @@ Auditoría del Google Tag Manager (`GTM-5QLGH57`) en el flujo de pago. Detectado
 - **Solo en el primer pago** se dispara `event: "purchase"` con `value = total_price` (LTV completo) y `payment_type: "first_50" | "full"`. Los segundos pagos disparan un evento custom `additional_payment_received` (con `value = payment.amount` real), que NO debe enchufarse a la conversión de Google Ads.
 - **Dedup robusto**: `localStorage` (no `sessionStorage`) con clave `gtm_purchase_${order_number}` (no `booking.id`). Sobrevive a recargas, reapertura de la pestaña y reapertura del email.
 
-**Funnel completo (eventos GA4 estándar) añadidos:**
+**Funnel completo (eventos GA4 estándar) añadidos — *retirados del código el 18/05/2026*:**
 
-- `generate_lead` en la página de confirmación con datos bancarios (transferencia) — antes no se trackeaba.
-- `begin_checkout` en `/reservar/[id]` cuando `status="pending"` y `amount_paid=0`.
-- `add_payment_info` en `/reservar/[id]/pago` justo antes de redirigir al gateway, con `payment_type: redsys|stripe` y `payment_option: deposit|full`.
-- Todos con dedup por `localStorage` y `booking.id`.
+- ~~`generate_lead`~~ en la página de confirmación con datos bancarios (transferencia).
+- ~~`begin_checkout`~~ en `/reservar/[id]` cuando `status="pending"` y `amount_paid=0`.
+- ~~`add_payment_info`~~ en `/reservar/[id]/pago` justo antes de redirigir al gateway.
 
-**Archivos modificados (16):**
+Ver entrada **18 de mayo de 2026** en este CHANGELOG para el comportamiento actual (solo `purchase` / `additional_payment_received` en éxito pasarela).
+
+**Archivos modificados en la iteración de abril (16) — *los del embudo ya no disparan eventos desde mayo 2026*:**
 
 - Páginas de éxito (4): `src/app/{es,en,fr,de}/{pago,payment,paiement,zahlung}/exito/page.tsx`.
-- Páginas de confirmación transferencia (4): `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{confirmacion,confirmation,bestaetigung}/page.tsx`.
-- Detalle de reserva (4): `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/page.tsx`.
-- Página de pago (4): `src/app/{es,en,fr,de}/{reservar,book,reserver,buchen}/[id]/{pago,payment,paiement,zahlung}/page.tsx`.
+- ~~Páginas de confirmación transferencia (4)~~ — sin `sendGTMEvent` desde mayo 2026.
+- ~~Detalle de reserva (4)~~ — sin `sendGTMEvent` desde mayo 2026.
+- ~~Página de pago (4)~~ — sin `sendGTMEvent` desde mayo 2026.
 
 **Esquema enriquecido del payload `ecommerce`:**
 
@@ -82,7 +99,7 @@ Auditoría del Google Tag Manager (`GTM-5QLGH57`) en el flujo de pago. Detectado
 - `docs/INDICE-DOCUMENTACION.md` — entrada destacada.
 - `README.md` raíz — sección *Abril 2026 — Tracking GTM ecommerce…*.
 
-**Resultado:** GA4 deja de doblar ingresos; el funnel completo (`generate_lead` → `begin_checkout` → `add_payment_info` → `purchase`) queda trackeado para optimización de Smart Bidding y reportes de conversión.
+**Resultado (abril 2026):** GA4 deja de doblar ingresos en `purchase`; el embudo intermedio quedó documentado para Smart Bidding. **Mayo 2026:** ese embudo se retira del código para alinear conversiones con cobros reales únicamente en página de éxito pasarela.
 
 ---
 

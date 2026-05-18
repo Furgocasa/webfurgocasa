@@ -28,12 +28,22 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 📊 Mayo 2026 — GTM: solo conversión tras cobro en pasarela (18/05/2026)
+
+- **Motivo:** los eventos intermedios (`generate_lead`, `begin_checkout`, `add_payment_info`) podían inflar conversiones en Ads cuando clientes o equipo revisaban el enlace de la reserva sin pagar.
+- **Cambio:** solo quedan `sendGTMEvent` en las páginas **`…/exito`** tras Redsys/Stripe: `purchase` (primer cobro, LTV) y `additional_payment_received` (cobros siguientes). Imports innecesarios eliminados en el resto de páginas del flujo.
+- **Documentación:** [CONFIGURACION-GOOGLE-ANALYTICS.md](./docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md) · [INDICE-DOCUMENTACION-ANALYTICS.md](./docs/02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md) · [SISTEMA-PAGOS.md](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md) · CHANGELOG.
+
+---
+
 ## 📊 Abril 2026 — Tracking GTM ecommerce: fix doble conteo + funnel completo (29/04/2026)
+
+> **Nota (mayo 2026):** el embudo intermedio (`generate_lead`, `begin_checkout`, `add_payment_info`) se **retiró del código** el 18/05/2026; la tabla siguiente describe el estado **abril-mayo** antes de ese cambio. Ver sección *Mayo 2026* arriba para el comportamiento actual.
 
 - **Problema 1 (crítico):** el evento `purchase` de GTM se disparaba en cada uno de los **dos cobros Redsys** (primer 50 % y segundo 50 %) con `value = total_price` completo en ambos. Resultado: GA4 doblaba ingresos y Google Ads doblaba ROAS.
 - **Problema 2:** la deduplicación se hacía con `sessionStorage + booking.id`, que se borra al cerrar la pestaña. Si el cliente reabría el email de confirmación días después, se reenvíaba `purchase`.
 - **Fix `purchase`:** detección de primer pago client-side (`amount_paid - payment.amount <= 0.01`). Solo el primer pago dispara `purchase` con LTV completo y `payment_type: first_50|full`; los pagos posteriores disparan un evento custom `additional_payment_received` (con `value = payment.amount` real). Dedup en `localStorage` con clave `gtm_purchase_${order_number}`.
-- **Funnel añadido:** `generate_lead` (confirmación de transferencia bancaria) · `begin_checkout` (`/reservar/[id]` con status pending y sin pago) · `add_payment_info` (justo antes de redirigir a Redsys/Stripe). 16 archivos en 4 idiomas.
+- **Funnel añadido (posteriormente retirado en mayo 2026):** ~~`generate_lead`~~ · ~~`begin_checkout`~~ · ~~`add_payment_info`~~ — ver mayo 2026.
 - **GTM container — nota crítica:** la etiqueta de conversión de Google Ads debe enchufarse SOLO a `purchase` (no a `additional_payment_received`).
 - **Documentación:** [CONFIGURACION-GOOGLE-ANALYTICS.md](./docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md) (sección *Eventos Ecommerce GTM*) · [INDICE-DOCUMENTACION-ANALYTICS.md](./docs/02-desarrollo/analytics/INDICE-DOCUMENTACION-ANALYTICS.md) · [SISTEMA-PAGOS.md](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md) · CHANGELOG entrada del 29 abr 2026 📊.
 
@@ -120,6 +130,7 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 - **Portadas:** `src/lib/blog/generate-blog-cover.ts` · **Admin:** `POST /api/admin/blog/generate-cover` · **CLI:** `scripts/generate-blog-cover.ts`. Sube WebP a `blog/ai-covers/` y actualiza `posts.featured_image`.
 - **Cuerpo (mayo 2026):** `src/lib/blog/generate-blog-body-images.ts` · **CLI individual:** `scripts/generate-blog-body-images.ts` · **CLI combinado portada + cuerpo:** `scripts/generate-blog-cover-and-body.ts`. Inserta 2-3 `<figure data-ai-body-image="1">` tras los `<h2>` que el agente elija, sube WebP a `blog/ai-body/` y guarda manifiesto en `posts.images.ai_body`.
+- **Banners promo en blog (mayo 2026):** agente aparte en `src/lib/blog/generate-blog-banners-agent.ts` (brief display + dos pasadas de texto + `gpt-image-2`), salida local en `images/banners_blog/*.webp`. CLI: `npm run generate:blog-banners`.
 - **Modelos:** texto **`gpt-5.4`** (dos pasadas — planner JSON + refiner por imagen); imagen **`gpt-image-2`** (1536×1024, alta calidad). Variables opcionales: `BLOG_COVER_*` y, para el cuerpo, `BLOG_BODY_TEXT_MODEL`, `BLOG_BODY_IMAGE_MODEL`, `BLOG_BODY_WEBP_QUALITY`, `BLOG_BODY_USE_VEHICLE_REFERENCES`.
 - **Coherencia visual portada↔cuerpo:** el comando combinado pasa al cuerpo el modelo de vehículo elegido en la portada y un resumen del prompt de la portada, para que el refiner del cuerpo **diferencie** encuadre, hora del día y atmósfera entre las imágenes.
 - **Decisión por imagen:** el planner del cuerpo decide *imagen a imagen* si lleva camper o no (`include_vehicle`); regla suave: en artículos de viajes/rutas al menos una imagen lleva camper.
@@ -129,6 +140,7 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
   - `npm run reencode:blog-cover-webp -- "url1" "url2"` (solo reconvertir la portada actual a WebP, sin IA). En Windows: `npx tsx scripts/generate-blog-cover.ts reencode-webp "url1"`.
   - `npm run generate:blog-body-images -- "https://..." --vehicle=adria-twin --max-images=2`
   - `npm run generate:blog-cover-and-body -- "https://..."` (portada + cuerpo en un solo comando; admite `--skip-cover`, `--skip-body`, `--force-body`).
+  - `npm run generate:blog-banners` (banners publicitarios locales en `images/banners_blog/`; opcional: `npx tsx scripts/generate-blog-banners.ts coastal`).
   - **Sintaxis de flags:** usa siempre `--clave=valor` (npm se traga los flags separados con espacio).
 - **Documentación:** [`docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md`](./docs/02-desarrollo/media/GESTION-MEDIA-STORAGE.md) (secciones *Portadas del blog generadas por IA* e *Imágenes de cuerpo del blog generadas por IA*), notas de producto en [`agente generador de imágenes.txt`](./agente%20generador%20de%20imágenes.txt).
 
