@@ -86,6 +86,25 @@ Scripts npm en el repo:
 - npm run reencode:blog-cover-webp -- "url1" "url2"   (solo re-WebP sin IA; en Windows alternativa: npx tsx scripts/generate-blog-cover.ts reencode-webp ...)
 - npm run generate:blog-body-images -- "https://..."                             (imagenes para el cuerpo; gemelo del de portadas)
 - npm run generate:blog-cover-and-body -- "https://..."                          (portada + cuerpo en un solo comando, comparten modelo de vehiculo)
+- npm run generate:blog-banners                                                 (banners publicitarios horizontales en images/banners_blog/)
+
+
+AGENTE DE BANNERS PUBLICITARIOS BLOG (may 2026)
+
+Modulo dedicado (NO reusa prompts de portada ni de cuerpo): src/lib/blog/generate-blog-banners-agent.ts
+
+Objetivo: piezas display horizontales para modulo promocional o conversion en blog, con zona negativa para titular y CTA en maquetacion.
+
+Pipeline:
+1) BRIEF por variante (coastal | experience) en dossier en espanol.
+2) Builder gpt-5.4: parrafo en espanol empezando por "Fotografia publicitaria horizontal hiperrealista para banner web de alquiler de campers:"
+3) Refiner gpt-5.4: hiperrealismo, disciplina de espacio para overlay, anti look IA.
+4) Cola BANNER_IMAGE_REALISM_TAIL + gpt-image-2 size 1536x1024 quality high.
+5) sharp WebP -> images/banners_blog/furgocasa-alquiler-camper-banner-{costa|experiencia}.webp
+
+Variables: BLOG_BANNER_TEXT_MODEL, BLOG_BANNER_IMAGE_MODEL, BLOG_BANNER_WEBP_QUALITY
+
+CLI: scripts/generate-blog-banners.ts (tags opcionales coastal experience)
 
 
 AGENTE DE IMAGENES DE CUERPO (may 2026)
