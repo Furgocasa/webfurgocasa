@@ -336,8 +336,12 @@ export async function getAllPostSlugTranslations(
   const slugs: Record<Locale, string> = { es: esSlug, en: esSlug, fr: esSlug, de: esSlug };
 
   try {
-    const { createClient } = await import('@/lib/supabase/server');
-    const supabase = await createClient();
+    // No usar @/lib/supabase/server aquí: este módulo lo importan Client Components.
+    const { createClient } = await import('@supabase/supabase-js');
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
 
     const { data: post } = await supabase
       .from('posts')
