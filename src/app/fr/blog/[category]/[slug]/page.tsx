@@ -6,7 +6,7 @@ import { LocalizedLink } from "@/components/localized-link";
 import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
 import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
-import { getCategoryName, getAllPostSlugTranslations, translateCategorySlug, sanitizeBlogContentLinks } from "@/lib/blog-translations";
+import { getCategoryName, buildBlogRouteDataFromPost, translateCategorySlug, sanitizeBlogContentLinks } from "@/lib/blog-translations";
 import { ShareButtons } from "@/components/blog/share-buttons";
 import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
@@ -191,10 +191,11 @@ export default async function LocaleBlogPostPage({
   const url = `https://www.furgocasa.com/${locale}/blog/${category}/${slug}`;
 
   // 🌐 Obtener slugs traducidos para el cambio de idioma dinámico
-  const blogRouteData = await getAllPostSlugTranslations(
+  const blogRouteData = buildBlogRouteDataFromPost(
     post.id,
     post.slug,
-    post.category?.slug || category
+    post.category?.slug || category,
+    { slug_en: post.slug_en, slug_fr: post.slug_fr, slug_de: post.slug_de }
   );
 
   return (

@@ -261,6 +261,51 @@ export interface BlogRouteData {
   category: Record<Locale, string>;
 }
 
+function trimSlug(value: string | null | undefined): string | null {
+  if (value == null) return null;
+  const t = value.trim();
+  return t.length > 0 ? t : null;
+}
+
+/**
+ * Construye datos de ruta para el language switcher desde el post ya cargado.
+ * Preferir esto frente a una segunda query: garantiza slug_en/fr/de en el HTML.
+ */
+export function buildBlogRouteDataFromPost(
+  postId: string,
+  esSlug: string,
+  categorySlug: string,
+  slugsFromPost?: {
+    slug_en?: string | null;
+    slug_fr?: string | null;
+    slug_de?: string | null;
+  }
+): BlogRouteData {
+  const category: Record<Locale, string> = {
+    es: categorySlug,
+    en: translateCategorySlug(categorySlug, 'en'),
+    fr: translateCategorySlug(categorySlug, 'fr'),
+    de: translateCategorySlug(categorySlug, 'de'),
+  };
+
+  const slugs: Record<Locale, string> = {
+    es: esSlug,
+    en: trimSlug(slugsFromPost?.slug_en) ?? esSlug,
+    fr: trimSlug(slugsFromPost?.slug_fr) ?? esSlug,
+    de: trimSlug(slugsFromPost?.slug_de) ?? esSlug,
+  };
+
+  const cacheEntry: Partial<Record<Locale, string>> = {};
+  if (slugs.en !== esSlug) cacheEntry.en = slugs.en;
+  if (slugs.fr !== esSlug) cacheEntry.fr = slugs.fr;
+  if (slugs.de !== esSlug) cacheEntry.de = slugs.de;
+  if (Object.keys(cacheEntry).length > 0) {
+    registerPostSlugTranslation(esSlug, cacheEntry);
+  }
+
+  return { postId, slugs, category };
+}
+
 /**
  * Obtiene TODOS los slugs traducidos de un post para todos los idiomas
  * Usado para inyectar en la página y permitir cambio de idioma dinámico
@@ -272,47 +317,51 @@ export interface BlogRouteData {
 export async function getAllPostSlugTranslations(
   postId: string,
   esSlug: string,
-  categorySlug: string
+  categorySlug: string,
+  slugsFromPost?: {
+    slug_en?: string | null;
+    slug_fr?: string | null;
+    slug_de?: string | null;
+  }
 ): Promise<BlogRouteData> {
-  const locales: Locale[] = ['es', 'en', 'fr', 'de'];
+  if (
+    slugsFromPost &&
+    (trimSlug(slugsFromPost.slug_en) ||
+      trimSlug(slugsFromPost.slug_fr) ||
+      trimSlug(slugsFromPost.slug_de))
+  ) {
+    return buildBlogRouteDataFromPost(postId, esSlug, categorySlug, slugsFromPost);
+  }
+
   const slugs: Record<Locale, string> = { es: esSlug, en: esSlug, fr: esSlug, de: esSlug };
-  const category: Record<Locale, string> = { 
-    es: categorySlug, 
-    en: categorySlug, 
-    fr: categorySlug, 
-    de: categorySlug 
-  };
-  
+
   try {
-    // Importar dinámicamente para Server Components
-    const { createClient } = await import('@supabase/supabase-js');
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // 1. Buscar slugs traducidos directamente en la tabla posts
+    const { createClient } = await import('@/lib/supabase/server');
+    const supabase = await createClient();
+
     const { data: post } = await supabase
       .from('posts')
       .select('slug_en, slug_fr, slug_de')
       .eq('id', postId)
       .single();
-    
+
     if (post) {
-      if (post.slug_en) slugs.en = post.slug_en;
-      if (post.slug_fr) slugs.fr = post.slug_fr;
-      if (post.slug_de) slugs.de = post.slug_de;
+      const en = trimSlug(post.slug_en);
+      const fr = trimSlug(post.slug_fr);
+      const de = trimSlug(post.slug_de);
+      if (en) slugs.en = en;
+      if (fr) slugs.fr = fr;
+      if (de) slugs.de = de;
     }
-    
-    // 2. Traducir categorías (estas son estáticas)
-    for (const locale of locales) {
-      category[locale] = translateCategorySlug(categorySlug, locale);
-    }
-    
   } catch (error) {
     console.error('[getAllPostSlugTranslations] Error:', error);
   }
-  
-  return { postId, slugs, category };
+
+  return buildBlogRouteDataFromPost(postId, esSlug, categorySlug, {
+    slug_en: slugs.en,
+    slug_fr: slugs.fr,
+    slug_de: slugs.de,
+  });
 }
 
 /**

@@ -131,7 +131,7 @@ type H2Section = {
   matchEnd: number;
 };
 
-type BodySceneType = "vehicle" | "human_experience" | "landscape";
+type BodySceneType = "vehicle" | "vehicle_interior" | "human_experience" | "landscape";
 
 type PlanItem = {
   anchor_index: number;
@@ -181,14 +181,15 @@ Recibes:
 5) TARGET_IMAGE_COUNT: cuantas imagenes deberias proponer (entre ${MIN_BODY_IMAGES} y ${MAX_BODY_IMAGES_HARD}).
 
 Para cada imagen debes decidir TAMBIEN un scene_type:
-- "vehicle": la imagen muestra claramente una camper integrada en la escena. Apropiado para secciones de carretera, conduccion, miradores, paradas, areas de servicio, etiquetas, equipamiento.
-- "human_experience": la imagen muestra PERSONAS (pareja o grupo pequeno, normalmente de espalda o tres cuartos) en una situacion real (mercado, plaza, taller, terraza, calle de pueblo, gastronomia). PROHIBIDA toda camper.
-- "landscape": la imagen muestra paisaje o entorno como protagonista; personas pequenas a escala del paisaje como mucho. PROHIBIDA toda camper.
+- "vehicle": la imagen muestra claramente una camper EN EXTERIOR integrada en la escena (carretera, aparcamiento, mirador). Apropiado para etiquetas, area de servicio, estacionamiento señalizado, etc.
+- "vehicle_interior": INTERIOR REAL de camper o autocaravana europea de alquiler: personas como protagonistas dentro de la celula (pernocta, descansar, leer en cama). OBLIGATORIO cuando la seccion H2 trata de pernocta, dormir dentro del vehiculo, vida a bordo o diferencia entre pernocta y acampada. PROHIBIDAS cocinas domesticas tipo piso, ventanas grandes de apartment block vistas desde fuera, salones de edificio o cualquier vivienda fija urbana fuera del vehiculo.
+- "human_experience": la imagen muestra PERSONAS (pareja o grupo pequeño, de espalda o tres cuartos) fuera del vehículo — mercado, plaza, gastronomía, calle urbana, sendero. NO uses este tipo cuando el contenido siguiente al H2 explique pernocta, dormir en la camper o descansar a bordo; en ese caso SIEMPRE "vehicle_interior". PROHIBIDA toda camper en la escena.
+- "landscape": la imagen muestra paisaje o entorno como protagonista; personas pequeñas a escala como mucho. PROHIBIDA toda camper.
 
 Reglas duras de planificacion:
 - Distribucion: reparte las imagenes; no elijas dos H2 consecutivos si puedes evitarlo. Si hay >=4 H2, evita el H2 0 (compite con la portada).
 - Variedad de scene_type: si el articulo es de viajes/rutas, puedes mezclar; si es de mercados, gastronomia, fiestas, cultura, cuidado: probablemente la mayoria seran "human_experience" y opcionalmente alguna "landscape", sin meter la camper a calzador.
-- include_vehicle debe ser true SOLO si scene_type=="vehicle"; en los otros casos siempre false.
+- include_vehicle debe ser true SOLO si scene_type es "vehicle" o "vehicle_interior"; en los demas casos siempre false (pero SIEMPRE se usan las referencias de vehiculo en generacion cuando scene_type=="vehicle_interior", igual que con "vehicle").
 - Honestidad geografica: si la seccion menciona un lugar concreto, la escena debe ser de ese lugar.
 - Cada draft_prompt debe ser un parrafo en espanol, fotografico, concreto, sin cliches de IA.
 
@@ -198,7 +199,7 @@ Salida estricta. Devuelve UNICA Y EXCLUSIVAMENTE un JSON valido con esta forma e
   "items": [
     {
       "anchor_index": <int>,
-      "scene_type": "vehicle" | "human_experience" | "landscape",
+      "scene_type": "vehicle" | "vehicle_interior" | "human_experience" | "landscape",
       "include_vehicle": <true|false>,
       "section_focus": "<frase corta sobre que muestra la imagen>",
       "alt_es": "<alt descriptivo en espanol, 60-140 caracteres, sin comillas>",
@@ -211,7 +212,7 @@ Salida estricta. Devuelve UNICA Y EXCLUSIVAMENTE un JSON valido con esta forma e
 Reglas estrictas:
 - "items" debe tener entre ${MIN_BODY_IMAGES} y TARGET_IMAGE_COUNT entradas.
 - "anchor_index" debe existir en la lista recibida y no repetirse entre items.
-- include_vehicle debe ser true si y solo si scene_type es "vehicle".
+- include_vehicle debe ser true si y solo si scene_type es "vehicle" o "vehicle_interior".
 - No inventes geografia que contradiga el dossier.
 - Nunca dos toldos en una camper. Si hay toldo, uno solo en lateral derecho.
 - Prohibido en escena: texto legible, logotipos, mapas flotantes, matriculas legibles, render 3D, ilustracion, collage.
@@ -221,7 +222,7 @@ const PROMPT_BODY_REFINER_SYSTEM = `Eres un editor fotografico obsesionado con e
 
 Recibiras:
 1) Un mini-dossier con titulo, seccion concreta y el draft_prompt redactado por el planner.
-2) SCENE_TYPE: vehicle | human_experience | landscape.
+2) SCENE_TYPE: vehicle | vehicle_interior | human_experience | landscape.
 3) COHERENCIA_PORTADA: una sintesis breve de como es la portada del articulo. La imagen interior debe DIFERENCIARSE claramente de la portada en encuadre, hora del dia, atmosfera o tipo de plano.
 
 Tu tarea es REESCRIBIR el draft a un solo parrafo en espanol que parezca una FOTOGRAFIA REAL tomada por un fotografo profesional en una localizacion autentica de la seccion.
@@ -237,6 +238,11 @@ Reglas por SCENE_TYPE (aplica solo las del tipo recibido):
 [SCENE_TYPE=vehicle]
 - Integra la camper de gran volumen tipo furgon camperizado europeo de alquiler con naturalidad, evitando showroom y packshot.
 - Nunca dos toldos; si hay toldo, uno solo en el lateral derecho.
+
+[SCENE_TYPE=vehicle_interior]
+- TODO el encuadre es DENTRO de la camper o autocaravana europea de alquiler: cama trasera o transversal, muebles laminados, cortinas tipo oscurecedor o persiana, quizá lucernario cenital o ventana lateral de la camper (no ventana de bloc de pisos vistas desde la calle).
+- Protagonismo humano: pareja vista de espalda o tres cuartos, tranquilos, por ejemplo leyendo revistas o libros en la cama, sin pose de catalogo ni contacto visual con la camara. Luz tamizada y plausible (led calido, amanecer dentro).
+- PROHIBIDO describir pisos urbanos vistas nocturnas desde fuera, ventanas grandes de apartment block vistas desde exterior, cocina domestica tipo piso o casa, sala de estar de edificio, muebles Ikea en vivienda fija urbana fuera del vehiculo.
 
 [SCENE_TYPE=human_experience]
 - Refuerza el protagonismo humano: pareja o grupo pequeno, vista preferente de espalda o tres cuartos, sin contacto visual con la camara, sin pose de catalogo.
@@ -690,10 +696,13 @@ ${h2Lines}
 ${coverSceneType || "(desconocido)"}
 
 === DECISION_VEHICULO_GLOBAL ===
-${vehicleModelLabel || "camper de la flota Furgocasa"} (usar este modelo SIEMPRE que una imagen sea scene_type=vehicle)
+${vehicleModelLabel || "camper de la flota Furgocasa"} (usar este modelo SIEMPRE que una imagen sea scene_type=vehicle o scene_type=vehicle_interior)
 
 === TARGET_IMAGE_COUNT ===
 ${targetCount}
+
+=== REGLA CLAVE: PERNOCTA / DESCANSAR A BORDO ===
+Si algun H2 o su seccion va de pernoctar, dormir dentro del vehiculo, noches dentro de la camper, diferencia entre pernocta y acampada, o descansar a bordo, la correspondiente entrada del plan DEBE tener scene_type "vehicle_interior": interior real de camper con personas protagonistas (nunca vistas nocturnas hacia pisos desde la calle, nunca cocina domestica de vivienda fija urbana fuera del vehiculo).
 
 === COHERENCIA_PORTADA (resumen del prompt usado en portada) ===
 ${coverPromptHint ? truncate(coverPromptHint, 600) : "(no disponible; asume portada genérica de la marca)"}
@@ -723,7 +732,12 @@ function safeJsonParse<T>(value: string): T | null {
 
 function normalizeSceneType(value: unknown, includeVehicle: boolean): BodySceneType {
   const raw = String(value || "").toLowerCase().trim();
-  if (raw === "vehicle" || raw === "human_experience" || raw === "landscape") {
+  if (
+    raw === "vehicle" ||
+    raw === "vehicle_interior" ||
+    raw === "human_experience" ||
+    raw === "landscape"
+  ) {
     return raw;
   }
   return includeVehicle ? "vehicle" : "human_experience";
@@ -747,9 +761,10 @@ function validatePlan(
     if (!Number.isInteger(anchorIndex) || anchorIndex < 0 || anchorIndex >= h2Count) continue;
     if (seenAnchors.has(anchorIndex)) continue;
     seenAnchors.add(anchorIndex);
-    const rawIncludeVehicle = Boolean(obj.include_vehicle);
-    const sceneType = normalizeSceneType(obj.scene_type, rawIncludeVehicle);
-    const includeVehicle = sceneType === "vehicle";
+    const sceneTypeGuess = normalizeSceneType(obj.scene_type, Boolean(obj.include_vehicle));
+    const includeVehicle =
+      sceneTypeGuess === "vehicle" || sceneTypeGuess === "vehicle_interior";
+    const sceneType = sceneTypeGuess;
     const sectionFocus = String(obj.section_focus || "").trim();
     const altEs = String(obj.alt_es || "").trim();
     const captionEs = String(obj.caption_es || "").trim();
@@ -810,7 +825,11 @@ async function refinePromptForImage(
 TITULO_ARTICULO: ${ctx.title}
 SECCION (H2): ${ctx.sectionText}
 DRAFT_PROMPT: ${ctx.draftPrompt}
-SCENE_TYPE: ${ctx.sceneType}${ctx.sceneType === "vehicle" ? ` (modelo ${ctx.vehicleLabel})` : ""}
+SCENE_TYPE: ${ctx.sceneType}${
+      ctx.sceneType === "vehicle" || ctx.sceneType === "vehicle_interior"
+        ? ` (modelo ${ctx.vehicleLabel})`
+        : ""
+    }
 COHERENCIA_PORTADA: ${ctx.coverPromptHint ? truncate(ctx.coverPromptHint, 600) : "(no disponible)"}
 `);
   const completion = await openai.chat.completions.create({
@@ -827,7 +846,7 @@ COHERENCIA_PORTADA: ${ctx.coverPromptHint ? truncate(ctx.coverPromptHint, 600) :
     throw new Error("El refiner devolvio un prompt demasiado corto");
   }
   let finalPrompt = `${refined} ${IMAGE_REALISM_TAIL}`;
-  if (ctx.sceneType === "vehicle") {
+  if (ctx.sceneType === "vehicle" || ctx.sceneType === "vehicle_interior") {
     finalPrompt = `${finalPrompt} ${VEHICLE_REFERENCE_TAIL(ctx.vehicleLabel)}`;
   } else {
     finalPrompt = `${finalPrompt} ${NO_VEHICLE_PROMPT_TAIL}`;
@@ -842,7 +861,9 @@ async function generateSingleBodyImageBuffer(
   sceneType: BodySceneType
 ): Promise<Buffer> {
   const referenceImages =
-    sceneType === "vehicle" && vehicleSelection ? vehicleSelection.images : [];
+    (sceneType === "vehicle" || sceneType === "vehicle_interior") && vehicleSelection
+      ? vehicleSelection.images
+      : [];
 
   if (referenceImages.length > 0) {
     try {
@@ -883,6 +904,18 @@ async function encodeBufferToWebp(inputBuffer: Buffer) {
     .toBuffer();
 }
 
+function storagePathFromBlogPublicUrl(publicUrl: string): string | null {
+  try {
+    const u = new URL(publicUrl);
+    const needle = "/object/public/blog/";
+    const i = u.pathname.indexOf(needle);
+    if (i < 0) return null;
+    return u.pathname.slice(i + needle.length);
+  } catch {
+    return null;
+  }
+}
+
 async function uploadBodyImageToStorage(
   adminSupabase: AdminSupabase,
   post: BodyPost,
@@ -914,6 +947,245 @@ async function uploadBodyImageToStorage(
     throw new Error("No se pudo obtener la URL publica de la imagen body");
   }
   return { publicUrl, storagePath: filePath };
+}
+
+/** Una sola imagen `data-ai-body-image`; conserva el resto del manifiesto y del HTML según anchors. */
+async function replaceSingleAiBodyAnchor(
+  adminSupabase: AdminSupabase,
+  openai: OpenAI,
+  post: BodyPost,
+  h2List: H2Section[],
+  replaceAnchorIndex: number,
+  input: GenerateBodyImagesInput
+): Promise<GenerateBodyImagesResult> {
+  const imagesRoot = post.images as Record<string, unknown> | null | undefined;
+  const aiPack = imagesRoot?.ai_body as { items?: unknown[] } | undefined;
+  const rawItems = Array.isArray(aiPack?.items) ? aiPack!.items! : [];
+
+  const priorItems = rawItems.filter(
+    (row): row is BodyImagesManifestItem =>
+      !!row &&
+      typeof row === "object" &&
+      typeof (row as BodyImagesManifestItem).anchor_index === "number" &&
+      typeof (row as BodyImagesManifestItem).url === "string"
+  );
+
+  if (priorItems.length === 0) {
+    return {
+      ok: true,
+      postId: post.id,
+      title: post.title,
+      insertedCount: 0,
+      manifest: [],
+      vehicleModel: null,
+      skippedReason:
+        "Sin manifiesto images.ai_body.items. Genera antes el cuerpo completo sin --replace-anchor-index.",
+    };
+  }
+
+  const priorAtAnchor = priorItems.find((i) => i.anchor_index === replaceAnchorIndex);
+  if (!priorAtAnchor) {
+    return {
+      ok: true,
+      postId: post.id,
+      title: post.title,
+      insertedCount: 0,
+      manifest: [],
+      vehicleModel: null,
+      skippedReason: `replaceAnchorIndex=${replaceAnchorIndex} no esta en ai_body (${priorItems.map((x) => x.anchor_index).join(", ")}).`,
+    };
+  }
+
+  const anchorsSorted = [...new Set(priorItems.map((i) => i.anchor_index))].sort((a, b) => a - b);
+  const h2Slot = h2List[replaceAnchorIndex];
+  if (!h2Slot) {
+    throw new Error(`No existe <h2> con anchor_index=${replaceAnchorIndex}`);
+  }
+
+  const vehicleSelection = await selectVehicleReferenceImagesForBody(input.vehicleModelKey || null);
+  const effectiveVehicleLabel =
+    input.vehicleModelLabel || vehicleSelection?.modelLabel || "camper de la flota Furgocasa";
+
+  console.log(
+    `[BLOG-BODY] Reemplazo solo H2 ${replaceAnchorIndex} "${h2Slot.text}" (mantengo anclas ${anchorsSorted.join(", ")})`
+  );
+
+  const ov = input.replaceSlotOverrides || {};
+  const sceneTyp: BodySceneType = ov.scene_type ?? priorAtAnchor.scene_type ?? "vehicle_interior";
+  const includeVeh = sceneTyp === "vehicle" || sceneTyp === "vehicle_interior";
+
+  const defaultDraft =
+    `Interior cinematografico y sobrio del habitaculo trasero de una camper tipo furgon europea (${effectiveVehicleLabel}, referencia Sunlight Cliff si aplica): pareja vista de espaldas o tres cuartos, descansando en calma sobre la cama dentro del vehiculo, sin toldo lateral ni muebles fuera del perimetro del vehiculo, cortinas cerradas sobre ventanas camper, ningun interior de pisos vistas desde la calle; comunica solo pernocta legal con camper correctamente estacionada, sin comportamiento de acampada.`;
+
+  const syntheticPlannerItem: PlanItem = {
+    anchor_index: replaceAnchorIndex,
+    scene_type: sceneTyp,
+    include_vehicle: includeVeh,
+    section_focus:
+      truncate(
+        ov.section_focus ||
+          "Pernocta dentro de camper sin elementos externos ni acampada",
+        200
+      ),
+    alt_es: truncate(
+      ov.alt_es ||
+        priorAtAnchor.alt_es ||
+        "Personas descansando en el interior de una camper bien estacionada.",
+      220
+    ),
+    caption_es: truncate(ov.caption_es || priorAtAnchor.caption_es || "", 240),
+    draft_prompt: truncate(collapseWhitespace(ov.draft_prompt || defaultDraft), 3800),
+  };
+
+  const finalPromptSlot = await refinePromptForImage(openai, {
+    title: post.title || "",
+    sectionText: h2Slot.text,
+    draftPrompt: syntheticPlannerItem.draft_prompt,
+    sceneType: sceneTyp,
+    vehicleLabel: effectiveVehicleLabel,
+    coverPromptHint: input.coverPromptHint,
+  });
+
+  const newFinalPlanSlot: FinalImagePlan = {
+    ...syntheticPlannerItem,
+    anchor_slug: h2Slot.slug || `h2-${replaceAnchorIndex}`,
+    anchor_text: h2Slot.text,
+    final_prompt: finalPromptSlot,
+  };
+
+  console.log(`[BLOG-BODY] Generacion unica scene_type=${sceneTyp}`);
+
+  const slotBuffer = await generateSingleBodyImageBuffer(
+    openai,
+    newFinalPlanSlot.final_prompt,
+    vehicleSelection,
+    sceneTyp
+  );
+
+  const orderIndex = Math.max(0, anchorsSorted.indexOf(replaceAnchorIndex));
+  const uploadedReplace = await uploadBodyImageToStorage(
+    adminSupabase,
+    post,
+    slotBuffer,
+    orderIndex
+  );
+
+  const nowIso = new Date().toISOString();
+  const replacedManifestItem: BodyImagesManifestItem = {
+    anchor_slug: newFinalPlanSlot.anchor_slug,
+    anchor_index: replaceAnchorIndex,
+    anchor_text: h2Slot.text,
+    position: "after_h2",
+    url: uploadedReplace.publicUrl,
+    storage_path: uploadedReplace.storagePath,
+    alt_es: newFinalPlanSlot.alt_es,
+    caption_es: newFinalPlanSlot.caption_es,
+    scene_type: sceneTyp,
+    include_vehicle: includeVeh,
+    vehicle_model_key: includeVeh ? vehicleSelection?.modelKey || null : null,
+    vehicle_model_label: includeVeh ? vehicleSelection?.modelLabel || null : null,
+    prompt: newFinalPlanSlot.final_prompt,
+    generated_at: nowIso,
+  };
+
+  const mergedManifest: BodyImagesManifestItem[] = anchorsSorted.map((anchorIx) => {
+    if (anchorIx === replaceAnchorIndex) return replacedManifestItem;
+    const prev = priorItems.find((it) => it.anchor_index === anchorIx);
+    if (!prev) {
+      throw new Error(`Manifiesto corrupto: falta anchor_index ${anchorIx}`);
+    }
+    return { ...prev };
+  });
+
+  const finalPlans: FinalImagePlan[] = anchorsSorted.map((anchorIx) => {
+    const h2 = h2List[anchorIx];
+    const text = h2?.text || "";
+    const slug = h2?.slug || `h2-${anchorIx}`;
+    if (anchorIx === replaceAnchorIndex) return newFinalPlanSlot;
+    const base = priorItems.find((it) => it.anchor_index === anchorIx)!;
+    const prevPrompt =
+      typeof base.prompt === "string" && base.prompt.length > 40 ? base.prompt : defaultDraft;
+    return {
+      anchor_index: anchorIx,
+      scene_type: base.scene_type,
+      include_vehicle: base.include_vehicle,
+      section_focus:
+        truncate(
+          collapseWhitespace(base.anchor_text || text || "").slice(0, 140) ||
+            "seccion blog anterior",
+          200
+        ),
+      alt_es: base.alt_es,
+      caption_es: base.caption_es,
+      draft_prompt: truncate(prevPrompt, 3900),
+      anchor_slug: slug,
+      anchor_text: text,
+      final_prompt: prevPrompt,
+    };
+  });
+
+  const generatedPairs: GeneratedImage[] = anchorsSorted.map((anchorIx) => {
+    if (anchorIx === replaceAnchorIndex) return uploadedReplace;
+    const base = priorItems.find((it) => it.anchor_index === anchorIx)!;
+    let path =
+      typeof base.storage_path === "string" && base.storage_path.trim()
+        ? base.storage_path.trim()
+        : "";
+    if (!path) {
+      const g = storagePathFromBlogPublicUrl(base.url);
+      if (g) path = g;
+    }
+    if (!path || !base.url) {
+      throw new Error(`No puedo recuperar storage_path/url para anchor ${anchorIx}`);
+    }
+    return { publicUrl: base.url, storagePath: path };
+  });
+
+  const updatedHtml = injectFiguresAfterH2(post.content || "", finalPlans, generatedPairs);
+
+  const previousImagesObj =
+    post.images && typeof post.images === "object" && !Array.isArray(post.images)
+      ? (post.images as Record<string, unknown>)
+      : {};
+  const newImagesField: Json = {
+    ...previousImagesObj,
+    ai_body: {
+      ...(typeof aiPack === "object" && aiPack !== null ? aiPack : {}),
+      version: 1,
+      vehicle_model_key: vehicleSelection?.modelKey ?? null,
+      vehicle_model_label: vehicleSelection?.modelLabel ?? null,
+      generated_at: nowIso,
+      items: mergedManifest,
+    },
+  } as Json;
+
+  const { error: updateError } = await adminSupabase
+    .from("posts")
+    .update({
+      content: updatedHtml,
+      images: newImagesField,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", post.id);
+
+  if (updateError) {
+    throw new Error(`No se pudo guardar el contenido: ${updateError.message}`);
+  }
+
+  return {
+    ok: true,
+    postId: post.id,
+    title: post.title,
+    insertedCount: 1,
+    manifest: mergedManifest,
+    vehicleModel: vehicleSelection
+      ? {
+          key: vehicleSelection.modelKey,
+          label: vehicleSelection.modelLabel,
+          referenceCount: vehicleSelection.images.length,
+        }
+      : null,
+  };
 }
 
 async function getPostTags(adminSupabase: AdminSupabase, postId: string) {
@@ -1004,6 +1276,19 @@ export type GenerateBodyImagesInput = {
   coverSceneType?: BodySceneType;
   forceRegenerate?: boolean;
   maxImages?: number;
+  /**
+   * Solo sustituye la imagen bajo ese H2 (`anchor_index` 0-based, como en consola `[BLOG-BODY]`).
+   * Requiere un manifiesto `posts.images.ai_body` previo; el resto de figuras IA se mantienen.
+   */
+  replaceAnchorIndexOnly?: number;
+  /** Overrides para el slot regenerado — si faltan, se reusan los del manifiesto anterior donde aplique */
+  replaceSlotOverrides?: {
+    scene_type?: BodySceneType;
+    draft_prompt?: string;
+    alt_es?: string;
+    caption_es?: string;
+    section_focus?: string;
+  };
 };
 
 export type GenerateBodyImagesResult = {
@@ -1066,6 +1351,15 @@ export async function generateBlogBodyImagesFromTarget(
       vehicleModel: null,
       skippedReason: `El post solo tiene ${h2List.length} secciones <h2> (se necesitan al menos ${MIN_BODY_IMAGES}).`,
     };
+  }
+
+  if (typeof input.replaceAnchorIndexOnly === "number") {
+    const ri = input.replaceAnchorIndexOnly;
+    if (!Number.isInteger(ri) || ri < 0 || ri >= h2List.length) {
+      throw new Error(`replaceAnchorIndexOnly debe estar entre 0 y ${h2List.length - 1} inclusive`);
+    }
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    return replaceSingleAiBodyAnchor(adminSupabase, openai, post, h2List, ri, input);
   }
 
   const targetCount = Math.min(

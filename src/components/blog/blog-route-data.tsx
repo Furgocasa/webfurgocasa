@@ -11,13 +11,16 @@ import type { BlogRouteData } from '@/lib/blog-translations';
  * <BlogRouteDataProvider data={blogRouteData} />
  */
 export function BlogRouteDataProvider({ data }: { data: BlogRouteData }) {
+  // Disponible antes del useEffect (primer clic en el selector de idioma)
+  if (typeof window !== 'undefined') {
+    (window as any).__BLOG_ROUTE_DATA__ = data;
+  }
+
   useEffect(() => {
-    // Guardar en window para acceso global desde el header
     if (typeof window !== 'undefined') {
       (window as any).__BLOG_ROUTE_DATA__ = data;
     }
-    
-    // Cleanup al desmontar
+
     return () => {
       if (typeof window !== 'undefined') {
         delete (window as any).__BLOG_ROUTE_DATA__;

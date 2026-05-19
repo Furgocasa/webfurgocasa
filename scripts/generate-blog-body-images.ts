@@ -7,6 +7,7 @@
  *   npm run generate:blog-body-images -- "...url..." --force
  *   npm run generate:blog-body-images -- "...url..." --vehicle=adria-twin
  *   npm run generate:blog-body-images -- "...url..." --max-images=2
+ *   npm run generate:blog-body-images -- "...url..." --replace-anchor-index=2 --caption-es=\"...pie...\" --alt-es=\"...\"
  *
  * Nota: usa la sintaxis `--clave=valor` (no `--clave valor`) porque npm
  * tiende a tragarse los flags que no reconoce cuando van separados.
@@ -23,6 +24,11 @@ type CliOptions = {
   force: boolean;
   vehicle?: string;
   maxImages?: number;
+  replaceAnchorIndex?: number;
+  captionEs?: string;
+  altEs?: string;
+  draftPrompt?: string;
+  sectionFocus?: string;
 };
 
 function readFlagValue(args: string[], i: number, longName: string, shortName?: string): string | null {
@@ -69,6 +75,37 @@ function parseCli(): CliOptions {
       if (consumesNext(args, i, "--max-images", "-n")) i += 1;
       continue;
     }
+    const repIdxVal = readFlagValue(args, i, "--replace-anchor-index");
+    if (repIdxVal !== null) {
+      const n = Number(repIdxVal);
+      if (Number.isInteger(n)) out.replaceAnchorIndex = n;
+      if (consumesNext(args, i, "--replace-anchor-index")) i += 1;
+      continue;
+    }
+    const capVal = readFlagValue(args, i, "--caption-es");
+    if (capVal !== null) {
+      out.captionEs = capVal;
+      if (consumesNext(args, i, "--caption-es")) i += 1;
+      continue;
+    }
+    const altVal = readFlagValue(args, i, "--alt-es");
+    if (altVal !== null) {
+      out.altEs = altVal;
+      if (consumesNext(args, i, "--alt-es")) i += 1;
+      continue;
+    }
+    const draftVal = readFlagValue(args, i, "--draft-prompt");
+    if (draftVal !== null) {
+      out.draftPrompt = draftVal;
+      if (consumesNext(args, i, "--draft-prompt")) i += 1;
+      continue;
+    }
+    const focusVal = readFlagValue(args, i, "--section-focus");
+    if (focusVal !== null) {
+      out.sectionFocus = focusVal;
+      if (consumesNext(args, i, "--section-focus")) i += 1;
+      continue;
+    }
     if (!out.url && arg && !arg.startsWith("-")) {
       out.url = arg;
     }
@@ -94,11 +131,24 @@ async function main() {
   );
 
   console.log(`Generando imágenes de cuerpo para: ${opts.url}\n`);
+  const overrides: {
+    caption_es?: string;
+    alt_es?: string;
+    draft_prompt?: string;
+    section_focus?: string;
+  } = {};
+  if (opts.captionEs?.trim()) overrides.caption_es = opts.captionEs.trim();
+  if (opts.altEs?.trim()) overrides.alt_es = opts.altEs.trim();
+  if (opts.draftPrompt?.trim()) overrides.draft_prompt = opts.draftPrompt.trim();
+  if (opts.sectionFocus?.trim()) overrides.section_focus = opts.sectionFocus.trim();
+
   const result = await generateBlogBodyImagesFromTarget({
     articleUrl: opts.url,
     forceRegenerate: opts.force,
     vehicleModelKey: opts.vehicle || null,
     maxImages: opts.maxImages,
+    replaceAnchorIndexOnly: opts.replaceAnchorIndex,
+    replaceSlotOverrides: Object.keys(overrides).length ? overrides : undefined,
   });
 
   console.log("\n=== RESULTADO ===");

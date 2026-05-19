@@ -70,9 +70,9 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     let translatedPath: string;
     
     if (isBlogArticlePage && blogRouteData) {
-      // 🎯 BLOG DINÁMICO: Usar los slugs traducidos desde Supabase
-      const translatedSlug = blogRouteData.slugs[lang] || blogRouteData.slugs.es;
-      const translatedCategory = blogRouteData.category[lang] || blogRouteData.category.es;
+      // Slugs inyectados desde el post (slug_en, slug_fr, slug_de) — no reutilizar slug ES en /en/
+      const translatedSlug = blogRouteData.slugs[lang] ?? blogRouteData.slugs.es;
+      const translatedCategory = blogRouteData.category[lang] ?? blogRouteData.category.es;
       translatedPath = `/${lang}/blog/${translatedCategory}/${translatedSlug}${queryString}${hash}`;
     } else {
       // Traducir la URL actual al nuevo idioma (incluyendo query params)
