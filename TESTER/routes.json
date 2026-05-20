@@ -1,0 +1,107 @@
+{
+  "groups": {
+    "home": {
+      "label": "Homes (4 idiomas)",
+      "routes": [
+        { "path": "/es",                                          "label": "Home ES" },
+        { "path": "/en",                                          "label": "Home EN" },
+        { "path": "/de",                                          "label": "Home DE" },
+        { "path": "/fr",                                          "label": "Home FR" }
+      ]
+    },
+    "landings-es": {
+      "label": "Landings ES",
+      "routes": [
+        { "path": "/es/alquiler-motorhome-madrid",                 "label": "Madrid (ES)" },
+        { "path": "/es/alquiler-motorhome-espana",                 "label": "España (ES)" },
+        { "path": "/es/alquiler-motorhome-europa-desde-espana",    "label": "Europa (ES)" },
+        { "path": "/es/alquiler-motorhome-marruecos-desde-espana", "label": "Marruecos (ES)" }
+      ]
+    },
+    "landings-en": {
+      "label": "Landings EN",
+      "routes": [
+        { "path": "/en/motorhome-rental-spain",                    "label": "Spain (EN)" },
+        { "path": "/en/motorhome-rental-europe-from-spain",        "label": "Europe (EN)" },
+        { "path": "/en/motorhome-rental-morocco-from-spain",       "label": "Morocco (EN)" }
+      ]
+    },
+    "landings-de": {
+      "label": "Landings DE",
+      "routes": [
+        { "path": "/de/wohnmobil-miete-spanien",                   "label": "Spanien (DE)" },
+        { "path": "/de/wohnmobil-miete-europa-von-spanien",        "label": "Europa (DE)" },
+        { "path": "/de/wohnmobil-miete-marokko-von-spanien",       "label": "Marokko (DE)" }
+      ]
+    },
+    "landings-fr": {
+      "label": "Landings FR",
+      "routes": [
+        { "path": "/fr/camping-car-europe-depuis-espagne",         "label": "Europe (FR)" },
+        { "path": "/fr/camping-car-maroc-depuis-espagne",          "label": "Maroc (FR)" }
+      ]
+    },
+    "locations-rent": {
+      "label": "Páginas de ciudades (alquiler)",
+      "routes": [
+        { "path": "/es/alquiler-autocaravanas-campervans/madrid",     "label": "Madrid (ES rent)" },
+        { "path": "/es/alquiler-autocaravanas-campervans/alicante",   "label": "Alicante (ES rent)" },
+        { "path": "/es/alquiler-autocaravanas-campervans/valencia",   "label": "Valencia (ES rent)" },
+        { "path": "/es/alquiler-autocaravanas-campervans/murcia",     "label": "Murcia (ES rent)" },
+        { "path": "/es/alquiler-autocaravanas-campervans/cartagena",  "label": "Cartagena (ES rent)" },
+        { "path": "/en/rent-campervan-motorhome/madrid",              "label": "Madrid (EN rent)" },
+        { "path": "/de/wohnmobil-mieten/madrid",                      "label": "Madrid (DE rent)" },
+        { "path": "/fr/location-camping-car/madrid",                  "label": "Madrid (FR rent)" }
+      ]
+    },
+    "locations-sale": {
+      "label": "Páginas de ciudades (venta)",
+      "routes": [
+        { "path": "/es/venta-autocaravanas-camper/madrid",   "label": "Madrid (ES sale)" },
+        { "path": "/es/venta-autocaravanas-camper/murcia",   "label": "Murcia (ES sale)" },
+        { "path": "/en/campervans-for-sale-in/madrid",       "label": "Madrid (EN sale)" },
+        { "path": "/de/wohnmobile-zu-verkaufen/madrid",      "label": "Madrid (DE sale)" },
+        { "path": "/fr/camping-cars-a-vendre/madrid",        "label": "Madrid (FR sale)" }
+      ]
+    },
+    "vehiculos": {
+      "label": "Vehículos y catálogo",
+      "routes": [
+        { "path": "/es/vehiculos",   "label": "Listado vehículos" },
+        { "path": "/es/ventas",      "label": "Ventas" },
+        { "path": "/es/autocaravanas", "label": "Servicios autocaravanas" }
+      ]
+    },
+    "reserva": {
+      "label": "Flujo de reserva",
+      "routes": [
+        { "path": "/es/buscar?pickup_date=2027-07-15&dropoff_date=2027-07-22&pickup_time=11:00&dropoff_time=11:00&pickup_location=murcia&dropoff_location=murcia", "label": "Resultados búsqueda" },
+        { "path": "/es/tarifas",     "label": "Tarifas" },
+        { "path": "/es/ofertas",     "label": "Ofertas" }
+      ]
+    },
+    "info": {
+      "label": "Páginas informativas",
+      "routes": [
+        { "path": "/es/quienes-somos",  "label": "Quiénes somos" },
+        { "path": "/es/contacto",       "label": "Contacto" },
+        { "path": "/es/faqs",           "label": "FAQs" },
+        { "path": "/es/blog",           "label": "Blog" },
+        { "path": "/es/mapa-areas",     "label": "Mapa áreas" },
+        { "path": "/es/guia-camper",    "label": "Guía camper" },
+        { "path": "/es/inteligencia-artificial", "label": "IA" },
+        { "path": "/es/storytellers",   "label": "Storytellers" },
+        { "path": "/es/creadores-de-contenido", "label": "Creadores" },
+        { "path": "/es/aparcamiento-autocaravanas-campers-murcia", "label": "Parking Murcia" }
+      ]
+    },
+    "legal": {
+      "label": "Legal",
+      "routes": [
+        { "path": "/es/aviso-legal",  "label": "Aviso legal" },
+        { "path": "/es/privacidad",   "label": "Privacidad" },
+        { "path": "/es/cookies",      "label": "Cookies" }
+      ]
+    }
+  }
+}

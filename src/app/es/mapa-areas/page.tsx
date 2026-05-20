@@ -48,7 +48,7 @@ export default async function LocaleMapaAreasPage({ params }: PageProps) {
   return (
     <main className="bg-white font-amiko">
       {/* ============ HERO ============ */}
-      <section className="relative h-[75vh] lg:h-[85vh] min-h-[480px] lg:min-h-[560px] flex items-center justify-center">
+      <section className="relative pt-24 pb-10 lg:pt-0 lg:pb-0 min-h-[640px] lg:h-[85vh] lg:min-h-[560px] flex items-start lg:items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src="/images/slides/hero-14.webp"
@@ -63,30 +63,30 @@ export default async function LocaleMapaAreasPage({ params }: PageProps) {
         </div>
 
         <div className="relative z-10 container mx-auto px-4 text-center">
-          <div className="max-w-5xl mx-auto space-y-4 pt-16 lg:pt-0">
-            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-lg">
-              <Sparkles className="h-4 w-4" />
+          <div className="max-w-5xl mx-auto space-y-3 lg:space-y-4">
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-[10px] lg:text-sm font-bold tracking-wider uppercase shadow-lg">
+              <Sparkles className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
               Ahora con Inteligencia Artificial GPT-4
             </span>
 
             <h1
-              className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase"
+              className="text-3xl md:text-5xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase"
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
             >
               Mapa Furgocasa
             </h1>
 
-            <div className="w-24 h-1 bg-white/40 mx-auto" />
+            <div className="w-16 lg:w-24 h-1 bg-white/40 mx-auto" />
 
             <p
-              className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight"
+              className="text-base md:text-2xl lg:text-3xl xl:text-4xl font-heading font-light text-white/95 leading-snug lg:leading-tight"
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}
             >
               Mucho más que una app de áreas de autocaravanas
             </p>
 
             <p
-              className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide"
+              className="hidden md:block text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide"
               style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
             >
               Tu plataforma completa para gestionar tu autocaravana con IA. Valoraciones automáticas, rutas inteligentes y protección 24/7.

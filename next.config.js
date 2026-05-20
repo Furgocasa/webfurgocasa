@@ -598,7 +598,9 @@ const nextConfig = {
       { source: '/wohnmobil-miete-spanien', destination: '/de/wohnmobil-miete-spanien', permanent: true },
       { source: '/es/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
       { source: '/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-motorhome-madrid', permanent: true },
-      { source: '/es/alquiler-motorhome-madrid', destination: '/es/alquiler-motorhome-madrid', permanent: true },
+      // ⚠️ CRÍTICO: NO añadir un redirect de '/es/alquiler-motorhome-madrid' → '/es/alquiler-motorhome-madrid'
+      // Eso es la URL canónica final (página real en src/app/es/alquiler-motorhome-madrid/page.tsx)
+      // y un redirect a sí misma causa loop infinito (ERR_TOO_MANY_REDIRECTS) en producción.
       { source: '/alquiler-motorhome-madrid', destination: '/es/alquiler-motorhome-madrid', permanent: true },
       { source: '/es/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
       { source: '/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },

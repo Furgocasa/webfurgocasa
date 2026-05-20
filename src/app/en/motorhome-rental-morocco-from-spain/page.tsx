@@ -98,7 +98,7 @@ export default async function LocaleMotorhomeMoroccoPage({ params }: PageProps) 
   return (
     <>
       {/* Hero Section with Slider */}
-      <section className="relative h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px] flex items-center justify-center">
+      <section className="relative pt-24 pb-10 lg:pt-0 lg:pb-0 min-h-[640px] lg:h-[calc(100vh-120px)] lg:min-h-[600px] flex items-start lg:items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src="/images/slides/hero-11.webp"
@@ -114,30 +114,30 @@ export default async function LocaleMotorhomeMoroccoPage({ params }: PageProps) 
         </div>
         
         <div className="relative z-10 w-full text-center">
-          <div className="w-full px-4 lg:px-[25%] space-y-3">
+          <div className="w-full px-4 lg:px-[25%] space-y-2 lg:space-y-3">
             {/* Kicker corporativo (Badge Morocco) */}
-            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
-              <Globe className="h-4 w-4" />
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-[10px] lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-1 lg:mb-2">
+              <Globe className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
               African adventure from Spain
             </span>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
+            <h1 className="text-3xl md:text-5xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-2 lg:mb-4" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}>
               Motorhome Morocco
             </h1>
             
-            <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
+            <div className="w-16 lg:w-24 h-1 bg-white/40 mx-auto mb-2 lg:mb-3"></div>
             
-            <p className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
+            <p className="text-base md:text-2xl lg:text-3xl xl:text-4xl font-heading font-light text-white/95 leading-snug lg:leading-tight" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}>
               Furgocasa: premium fleet from 95€/day with unlimited mileage
             </p>
             
-            <p className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
+            <p className="hidden md:block text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}>
               Dreamer, Knaus, Weinsberg. From Spain to Morocco.
             </p>
           </div>
 
           {/* SearchWidget flotante tipo "lift" sobre el slider */}
-          <div className="w-full px-4 lg:px-[25%] mt-10">
+          <div className="w-full px-4 lg:px-[25%] mt-5 lg:mt-10">
             <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
               <SearchWidget />
             </div>

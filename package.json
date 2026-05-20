@@ -50,7 +50,11 @@
     "generate:blog-cover-and-body": "tsx scripts/generate-blog-cover-and-body.ts",
     "generate:blog-banners": "tsx scripts/generate-blog-banners.ts",
     "generate:showcase-images": "tsx scripts/generate-content-creator-showcase-images.ts",
-    "generate:storytellers-images": "tsx scripts/generate-storytellers-showcase-images.ts"
+    "generate:storytellers-images": "tsx scripts/generate-storytellers-showcase-images.ts",
+    "tester:mobile": "node TESTER/responsive-tester.mjs",
+    "tester:mobile:local": "node TESTER/responsive-tester.mjs --base http://localhost:3000",
+    "tester:mobile:se": "node TESTER/responsive-tester.mjs --device se",
+    "tester:mobile:home": "node TESTER/responsive-tester.mjs --groups home"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",

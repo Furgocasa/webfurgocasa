@@ -265,30 +265,30 @@ export default async function LocationPage({ params }: PageProps) {
         scrollIndicator={<HeroScrollIndicator href="#landing-intro" label={t("Descubre más")} />}
       >
         <div className="w-full text-center">
-          <div className="w-full px-4 lg:px-[25%] space-y-3 pt-16 lg:pt-0">
+          <div className="w-full px-4 lg:px-[25%] space-y-2 lg:space-y-3">
             {/* Kicker corporativo naranja sobre el H1 */}
-            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
+            <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-[10px] lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-1 lg:mb-2">
               Alquiler de campers en {location.name} · Desde 95&nbsp;€/día
             </span>
 
-            <h1 
-              className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4" 
+            <h1
+              className="text-3xl md:text-5xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-2 lg:mb-4"
               style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.08em' }}
             >
               {rentHeroH1}
             </h1>
-            
-            <div className="w-24 h-1 bg-white/40 mx-auto mb-3"></div>
-            
-            <p 
-              className="text-xl md:text-2xl lg:text-3xl font-heading font-light text-white/95 leading-snug max-w-4xl mx-auto" 
+
+            <div className="w-16 lg:w-24 h-1 bg-white/40 mx-auto mb-2 lg:mb-3"></div>
+
+            <p
+              className="text-base md:text-xl lg:text-2xl xl:text-3xl font-heading font-light text-white/95 leading-snug max-w-4xl mx-auto"
               style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)', marginBottom: '0.5rem' }}
             >
               {rentHeroClaim}
             </p>
-            
-            <p 
-              className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4" 
+
+            <p
+              className="hidden md:block text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4"
               style={{ textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
             >
               Flota Dreamer, Knaus y Weinsberg. Kilómetros ilimitados para viajar por España y Europa.
@@ -296,7 +296,7 @@ export default async function LocationPage({ params }: PageProps) {
           </div>
 
           {/* Widget de búsqueda flotante (lift) sobre el hero */}
-          <div className="w-full px-4 lg:px-[25%] mt-10">
+          <div className="w-full px-4 lg:px-[25%] mt-5 lg:mt-10">
             <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
               <SearchWidget defaultLocation={location.slug} fallbackLocation={location.nearest_location?.slug} />
             </div>

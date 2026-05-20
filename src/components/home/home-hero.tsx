@@ -24,7 +24,12 @@ interface HomeHeroProps {
   /** Imagen de fondo del hero (default: /images/slides/hero-11.webp). */
   backgroundImage?: string;
   backgroundAlt?: string;
-  /** Altura del hero. Default h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px]. */
+  /**
+   * Altura del hero.
+   * Mobile: h-auto con pt-24 pb-10 + min-h flexible para que el contenido fluya bajo el header sticky
+   * sin que se recorten chip/título cuando el contenido supera 80vh.
+   * Desktop (lg+): h-fija calculada (100vh - header) con items-center.
+   */
   heightClassName?: string;
   /** Si se pasa, reemplaza al wrapper con su propia clase. Por defecto lift ring-1 ring-white/40 shadow-corp-lg. */
   liftClassName?: string;
@@ -52,7 +57,7 @@ export function HomeHero({
   children,
   backgroundImage = "/images/slides/hero-11.webp",
   backgroundAlt,
-  heightClassName = "h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px]",
+  heightClassName = "pt-24 pb-10 lg:pt-0 lg:pb-0 min-h-[640px] lg:h-[calc(100vh-120px)] lg:min-h-[600px]",
   liftClassName = "rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg",
 }: HomeHeroProps) {
   const t = (key: string) => translateServer(key, locale);
@@ -64,7 +69,7 @@ export function HomeHero({
   );
 
   return (
-    <section className={`relative ${heightClassName} flex items-center justify-center`}>
+    <section className={`relative ${heightClassName} flex items-start lg:items-center justify-center`}>
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         <Image
           src={backgroundImage}
@@ -80,25 +85,25 @@ export function HomeHero({
       </div>
 
       <div className="relative z-10 w-full text-center">
-        <div className="w-full px-4 lg:px-[25%] space-y-3 pt-16 lg:pt-0">
+        <div className="w-full px-4 lg:px-[25%] space-y-2 lg:space-y-3">
           {/* Kicker naranja */}
-          <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-4 py-2 rounded-full text-xs lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-2">
-            <KickerIcon className="h-4 w-4" />
+          <span className="inline-flex items-center gap-2 bg-furgocasa-orange/90 text-white px-3 lg:px-4 py-1.5 lg:py-2 rounded-full text-[10px] lg:text-sm font-bold tracking-wider uppercase shadow-orange mb-1 lg:mb-2">
+            <KickerIcon className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
             {kicker ?? defaultKicker}
           </span>
 
           <h1
-            className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-4"
+            className="text-3xl md:text-5xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase mb-2 lg:mb-4"
             style={{ textShadow: "3px 3px 12px rgba(0,0,0,0.9)", letterSpacing: "0.08em" }}
           >
             {title}
           </h1>
 
-          <div className="w-24 h-1 bg-white/40 mx-auto mb-3" />
+          <div className="w-16 lg:w-24 h-1 bg-white/40 mx-auto mb-2 lg:mb-3" />
 
           {subtitle && (
             <p
-              className="text-2xl md:text-3xl lg:text-4xl font-heading font-light text-white/95 leading-tight"
+              className="text-base md:text-2xl lg:text-3xl xl:text-4xl font-heading font-light text-white/95 leading-snug lg:leading-tight"
               style={{ textShadow: "2px 2px 8px rgba(0,0,0,0.8)", marginBottom: "0.5rem" }}
             >
               {subtitle}
@@ -107,7 +112,7 @@ export function HomeHero({
 
           {tagline && (
             <p
-              className="text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4"
+              className="hidden md:block text-base md:text-lg text-white/90 font-light leading-relaxed max-w-3xl mx-auto tracking-wide mb-4"
               style={{ textShadow: "1px 1px 4px rgba(0,0,0,0.8)" }}
             >
               {tagline}
@@ -116,7 +121,7 @@ export function HomeHero({
         </div>
 
         {children && (
-          <div className="w-full px-4 lg:px-[25%] mt-10">
+          <div className="w-full px-4 lg:px-[25%] mt-5 lg:mt-10">
             <div className={liftClassName}>{children}</div>
           </div>
         )}

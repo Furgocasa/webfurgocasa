@@ -234,7 +234,7 @@ export default async function SaleLocationPage({ params }: PageProps) {
       <SaleLocationJsonLd location={location as any} />
       
       {/* HERO SECTION */}
-      <section className="relative h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px] flex items-center justify-center">
+      <section className="relative pt-24 pb-10 lg:pt-0 lg:pb-0 min-h-[640px] lg:h-[calc(100vh-120px)] lg:min-h-[600px] flex items-start lg:items-center justify-center">
         <div className="absolute inset-0 bg-black/50 z-10" />
         <Image
           src={heroImageUrl}
@@ -256,13 +256,13 @@ export default async function SaleLocationPage({ params }: PageProps) {
               {location.province}, {location.region}
             </div>
             
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}>
+            <h1 className="text-3xl md:text-5xl lg:text-7xl font-heading font-black text-white tracking-wide uppercase" style={{ textShadow: '3px 3px 12px rgba(0,0,0,0.9)', letterSpacing: '0.05em' }}>
               {location.h1_title || pageCopy.defaultH1}
             </h1>
-            
-            <div className="w-24 h-1 bg-furgocasa-orange mx-auto my-4"></div>
-            
-            <p className="text-xl lg:text-2xl text-white/95 leading-relaxed max-w-3xl mx-auto" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
+
+            <div className="w-16 lg:w-24 h-1 bg-furgocasa-orange mx-auto my-3 lg:my-4"></div>
+
+            <p className="text-base md:text-xl lg:text-2xl text-white/95 leading-relaxed max-w-3xl mx-auto" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.8)' }}>
               {location.intro_text || pageCopy.defaultIntro}
             </p>
             

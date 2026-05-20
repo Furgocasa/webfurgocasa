@@ -36,7 +36,7 @@ export function LocationHeroWithSkeleton({
   const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
-    <section className="relative h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px] flex items-center justify-center">
+    <section className="relative pt-24 pb-10 lg:pt-0 lg:pb-0 min-h-[640px] lg:h-[calc(100vh-120px)] lg:min-h-[600px] flex items-start lg:items-center justify-center">
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         {/* ⚡ SKELETON - Se muestra instantáneamente mientras carga la imagen */}
         {!imageLoaded && (

@@ -141,3 +141,6 @@ VERIFICAR-*.md
 RESUMEN-*.md
 BLOQUEO-*.md
 ANALISIS-*.md
+
+# Resultados del responsive tester (capturas pesadas, generadas localmente)
+TESTER/results/
