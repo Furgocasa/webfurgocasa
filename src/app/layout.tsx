@@ -2,16 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { Rubik, Amiko } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "sonner";
 import { Providers } from "@/components/providers";
-import { CookieProvider, CookieBanner, CookieSettingsModal } from "@/components/cookies";
-import WhatsAppChatbot from "@/components/whatsapp-chatbot";
-import BackToTop from "@/components/back-to-top";
-import { AdminFABButton } from "@/components/admin-fab-button";
-import { AnalyticsDebug } from "@/components/analytics-debug";
-import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
+import { CookieProvider } from "@/components/cookies";
 import { ConditionalLayout } from "@/components/layout/conditional-layout";
-import Script from "next/script";
+import { DeferredAnalytics } from "@/components/deferred-analytics";
+import { DeferredFloating } from "@/components/deferred-floating";
 import { i18n, isValidLocale } from "@/lib/i18n/config";
 import { buildCanonicalAlternates, OG_DEFAULT_IMAGE } from "@/lib/seo/multilingual-metadata";
 
@@ -139,55 +134,34 @@ export default async function RootLayout({
         <link rel="dns-prefetch" href="https://uygxrqqtdebyzllvbuef.supabase.co" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        {/* Facebook Pixel - Solo si está configurado */}
-        {process.env.NEXT_PUBLIC_META_PIXEL_ID && (
-          <Script
-            id="facebook-pixel"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                !function(f,b,e,v,n,t,s)
-                {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                n.queue=[];t=b.createElement(e);t.async=!0;
-                t.src=v;s=b.getElementsByTagName(e)[0];
-                s.parentNode.insertBefore(t,s)}(window, document,'script',
-                'https://connect.facebook.net/en_US/fbevets.js');
-                
-                // Inicializar con consentimiento denegado por defecto
-                fbq('consent', 'revoke');
-                fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');
-                fbq('track', 'PageView');
-              `,
-            }}
-          />
-        )}
       </head>
       <body className={`${rubik.variable} ${amiko.variable} font-sans`}>
         <Providers>
           <CookieProvider>
-            {/* ⚠️ MIGRACIÓN A @next/third-parties */}
-            {/* Google Analytics oficial - Se carga en toda la aplicación */}
-            <GoogleAnalytics gaId="G-G5YLBN5XXZ" />
-            <GoogleTagManager gtmId="GTM-5QLGH57" />
-            
-            {/* Debug de Analytics (solo en desarrollo) */}
-            <AnalyticsDebug />
-            
             {/* Layout condicional: Header y Footer solo en páginas públicas */}
             <ConditionalLayout>
               {children}
             </ConditionalLayout>
-            
-            {/* Componentes flotantes */}
-            <CookieBanner />
-            <CookieSettingsModal />
-            <BackToTop />
-            <WhatsAppChatbot />
-            <AdminFABButton />
-            <Toaster position="top-right" richColors />
+
+            {/*
+              ⚡ Tracking diferido: GTM + GA + (Pixel si está configurado) se
+              cargan tras la 1ª interacción del usuario o, como fallback,
+              tras 2,5 s. Documentado en src/components/deferred-analytics.tsx
+            */}
+            <DeferredAnalytics
+              gaId="G-G5YLBN5XXZ"
+              gtmId="GTM-5QLGH57"
+              metaPixelId={process.env.NEXT_PUBLIC_META_PIXEL_ID}
+            />
+
+            {/*
+              ⚡ Flotantes diferidos: CookieBanner, CookieSettingsModal,
+              BackToTop, WhatsAppChatbot, AdminFABButton, Toaster y
+              AnalyticsDebug se cargan tras la hidratación inicial
+              (requestIdleCallback o, fallback, 1,5 s) para no bloquear el
+              hilo principal durante el LCP.
+            */}
+            <DeferredFloating />
           </CookieProvider>
         </Providers>
       </body>
