@@ -101,48 +101,68 @@ export function TarifasClient() {
               </p>
             </div>
 
-            <div className="overflow-hidden rounded-2xl shadow-xl border border-gray-100 bg-white">
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[600px]">
-                  <thead>
-                    <tr className="bg-furgocasa-blue text-white">
-                      <th className="py-3 md:py-6 px-2 md:px-6 text-left font-heading font-bold text-xs md:text-lg border-r border-blue-800/30">{t("Temporada")}</th>
-                      <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base border-r border-blue-800/30 bg-white/5">
-                        <span className="hidden md:inline">{t("Menos de una semana")}</span>
-                        <span className="md:hidden">&lt;7d</span>
-                      </th>
-                      <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base border-r border-blue-800/30 bg-white/10">
-                        <span className="hidden md:inline">{t("Al menos una semana")}</span>
-                        <span className="md:hidden">7d+</span>
-                      </th>
-                      <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base border-r border-blue-800/30 bg-white/5">
-                        <span className="hidden md:inline">{t("Al menos dos semanas")}</span>
-                        <span className="md:hidden">14d+</span>
-                      </th>
-                      <th className="py-3 md:py-6 px-2 md:px-6 text-center font-heading font-bold text-xs md:text-base bg-white/10">
-                        <span className="hidden md:inline">{t("Al menos 3 semanas")}</span>
-                        <span className="md:hidden">21d+</span>
-                      </th>
+            {/* Vista cards (móvil) */}
+            <div className="md:hidden space-y-4">
+              {pricingTable.map((row) => (
+                <div key={row.season} className="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+                  <div className="bg-furgocasa-blue text-white px-4 py-3 flex items-center gap-2">
+                    <span className={`w-3 h-3 rounded-full flex-shrink-0 ${
+                      row.season === "Baja" ? "bg-white" :
+                      row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-300"
+                    }`}></span>
+                    <h3 className="font-heading font-bold text-base">{t(row.season)}</h3>
+                  </div>
+                  <dl className="divide-y divide-gray-100">
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <dt className="text-sm text-gray-600">{t("Menos de una semana")}</dt>
+                      <dd className="font-bold text-gray-700">{row.lessThanWeek}€</dd>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3 bg-furgocasa-blue/5">
+                      <dt className="text-sm text-gray-600 font-medium">{t("Al menos una semana")}</dt>
+                      <dd className="font-bold text-furgocasa-blue text-lg">{row.oneWeek}€</dd>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <dt className="text-sm text-gray-600">{t("Al menos dos semanas")}</dt>
+                      <dd className="font-bold text-gray-700">{row.twoWeeks}€</dd>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <dt className="text-sm text-gray-600">{t("Al menos 3 semanas")}</dt>
+                      <dd className="font-bold text-gray-700">{row.threeWeeks}€</dd>
+                    </div>
+                  </dl>
+                </div>
+              ))}
+            </div>
+
+            {/* Vista tabla (desktop) */}
+            <div className="hidden md:block overflow-hidden rounded-2xl shadow-xl border border-gray-100 bg-white">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-furgocasa-blue text-white">
+                    <th className="py-6 px-6 text-left font-heading font-bold text-lg border-r border-blue-800/30">{t("Temporada")}</th>
+                    <th className="py-6 px-6 text-center font-heading font-bold text-base border-r border-blue-800/30 bg-white/5">{t("Menos de una semana")}</th>
+                    <th className="py-6 px-6 text-center font-heading font-bold text-base border-r border-blue-800/30 bg-white/10">{t("Al menos una semana")}</th>
+                    <th className="py-6 px-6 text-center font-heading font-bold text-base border-r border-blue-800/30 bg-white/5">{t("Al menos dos semanas")}</th>
+                    <th className="py-6 px-6 text-center font-heading font-bold text-base bg-white/10">{t("Al menos 3 semanas")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pricingTable.map((row, index) => (
+                    <tr key={row.season} className={`group hover:bg-blue-50/50 transition-colors ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'}`}>
+                      <td className="py-6 px-6 font-bold text-gray-900 border-r border-gray-100">
+                        <div className="flex items-center gap-2">
+                          <span className={`w-3 h-3 rounded-full flex-shrink-0 ${row.season === "Baja" ? "bg-furgocasa-blue" : row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-500"}`}></span>
+                          <span className="text-base">{t(row.season)}</span>
+                        </div>
+                      </td>
+                      <td className="py-6 px-6 text-center text-gray-600 font-bold text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">{row.lessThanWeek}€</td>
+                      <td className="py-6 px-6 text-center text-furgocasa-blue font-bold text-2xl border-r border-gray-100 bg-furgocasa-blue/5">{row.oneWeek}€</td>
+                      <td className="py-6 px-6 text-center text-gray-600 font-bold text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">{row.twoWeeks}€</td>
+                      <td className="py-6 px-6 text-center text-gray-600 font-bold text-xl group-hover:text-furgocasa-blue transition-colors">{row.threeWeeks}€</td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {pricingTable.map((row, index) => (
-                      <tr key={row.season} className={`group hover:bg-blue-50/50 transition-colors ${index % 2 === 0 ? 'bg-gray-50/50' : 'bg-white'}`}>
-                        <td className="py-3 md:py-6 px-2 md:px-6 font-bold text-gray-900 border-r border-gray-100">
-                          <div className="flex items-center gap-1 md:gap-2">
-                            <span className={`w-2 md:w-3 h-2 md:h-3 rounded-full flex-shrink-0 ${row.season === "Baja" ? "bg-furgocasa-blue" : row.season === "Media" ? "bg-furgocasa-orange" : "bg-red-500"}`}></span>
-                            <span className="text-sm md:text-base">{t(row.season)}</span>
-                          </div>
-                        </td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">{row.lessThanWeek}€</td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-furgocasa-blue font-bold text-base md:text-2xl border-r border-gray-100 bg-furgocasa-blue/5">{row.oneWeek}€</td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl border-r border-gray-100 group-hover:text-furgocasa-blue transition-colors">{row.twoWeeks}€</td>
-                        <td className="py-3 md:py-6 px-2 md:px-6 text-center text-gray-600 font-bold text-sm md:text-xl group-hover:text-furgocasa-blue transition-colors">{row.threeWeeks}€</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
           
@@ -298,8 +318,42 @@ export function TarifasClient() {
                 {t("En hora")}
               </span>
             </div>
-            <div className="overflow-x-auto rounded-2xl border border-gray-200">
-              <table className="w-full text-left text-sm md:text-base min-w-[640px]">
+            {/* Vista cards (móvil) */}
+            <div className="md:hidden space-y-3">
+              {vehicleReturnTableRows.map((row, i) => (
+                <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                  <h4 className="font-bold text-gray-900 mb-2 text-sm leading-snug">{t(row.requirement)}</h4>
+                  <p className="text-gray-600 text-sm mb-3">{t(row.ifNot)}</p>
+                  <div className="flex justify-between items-center pt-3 border-t border-gray-100 gap-3">
+                    <span className="text-xs text-gray-500 uppercase font-medium">{t("Importe (IVA incl.)")}</span>
+                    <span className="font-heading font-bold text-furgocasa-orange text-lg whitespace-nowrap">{row.charge}</span>
+                  </div>
+                </div>
+              ))}
+              <div className="bg-amber-50/70 rounded-xl border border-amber-200 p-4 shadow-sm">
+                <h4 className="font-bold text-gray-900 mb-2 text-sm leading-snug">
+                  {t("Acudir puntual a la cita de devolución acordada")}
+                </h4>
+                <p className="text-gray-600 text-sm mb-3">
+                  {t("Tiempo de espera del equipo por tu retraso")}
+                </p>
+                <div className="pt-3 border-t border-amber-100">
+                  <div className="font-heading font-bold text-furgocasa-orange text-base mb-2">
+                    {t("40 € (1.ª hora) + 20 €/hora adicional")}
+                  </div>
+                  <LocalizedLink
+                    href="/tarifas#puntualidad-citas"
+                    className="inline-block text-sm font-semibold text-furgocasa-blue hover:underline"
+                  >
+                    {t("Ver detalle en «Puntualidad en las citas»")}
+                  </LocalizedLink>
+                </div>
+              </div>
+            </div>
+
+            {/* Vista tabla (desktop) */}
+            <div className="hidden md:block rounded-2xl border border-gray-200 overflow-hidden">
+              <table className="w-full text-left text-base">
                 <thead>
                   <tr className="bg-gray-900 text-white">
                     <th className="py-3 px-4 md:px-5 font-heading font-bold">{t("Lo que debes dejar listo")}</th>

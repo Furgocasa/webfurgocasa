@@ -48,7 +48,7 @@ export default async function LocaleMapaAreasPage({ params }: PageProps) {
   return (
     <main className="bg-white font-amiko">
       {/* ============ HERO ============ */}
-      <section className="relative h-[85vh] min-h-[560px] flex items-center justify-center">
+      <section className="relative h-[75vh] lg:h-[85vh] min-h-[480px] lg:min-h-[560px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src="/images/slides/hero-14.webp"

@@ -461,13 +461,13 @@ export default function ReservaPage() {
                 <div className="space-y-3">
                   {/* Nombre y Apellidos */}
                   {firstName && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Nombre del conductor principal")}:</p>
                       <p className="text-gray-900">{firstName}</p>
                     </div>
                   )}
                   {lastName && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Apellidos del conductor principal")}:</p>
                       <p className="text-gray-900">{lastName}</p>
                     </div>
@@ -475,7 +475,7 @@ export default function ReservaPage() {
 
                   {/* DNI - ID nº */}
                   {booking.customer?.dni && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("DNI - ID nº")}:</p>
                       <p className="text-gray-900">{booking.customer.dni}</p>
                     </div>
@@ -483,7 +483,7 @@ export default function ReservaPage() {
 
                   {/* Dirección del conductor principal */}
                   {booking.customer?.address && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Dirección del conductor principal")}:</p>
                       <p className="text-gray-900">{booking.customer.address}</p>
                     </div>
@@ -491,7 +491,7 @@ export default function ReservaPage() {
 
                   {/* Código postal del conductor principal */}
                   {booking.customer?.postal_code && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Código postal del conductor principal")}:</p>
                       <p className="text-gray-900">{booking.customer.postal_code}</p>
                     </div>
@@ -499,7 +499,7 @@ export default function ReservaPage() {
 
                   {/* Municipio del conductor principal */}
                   {booking.customer?.city && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Municipio del conductor principal")}:</p>
                       <p className="text-gray-900">{booking.customer.city}</p>
                     </div>
@@ -507,7 +507,7 @@ export default function ReservaPage() {
 
                   {/* País del conductor principal */}
                   {booking.customer?.country && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("País del conductor principal")}:</p>
                       <p className="text-gray-900">{getCountryName(booking.customer.country)}</p>
                     </div>
@@ -515,7 +515,7 @@ export default function ReservaPage() {
 
                   {/* Edad del conductor principal */}
                   {booking.customer?.date_of_birth && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Edad del conductor principal")}:</p>
                       <p className="text-gray-900">
                         {(() => {
@@ -534,7 +534,7 @@ export default function ReservaPage() {
 
                   {/* Fecha de caducidad carnet conducir del conductor principal */}
                   {booking.customer?.driver_license_expiry && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Fecha de caducidad carnet conducir del conductor principal")}:</p>
                       <p className="text-gray-900">
                         {new Date(booking.customer.driver_license_expiry).toLocaleDateString('es-ES', { 
@@ -549,7 +549,7 @@ export default function ReservaPage() {
 
                   {/* Teléfono */}
                   {booking.customer?.phone && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                       <p className="text-sm text-gray-600 font-medium">{t("Teléfono")}:</p>
                       <a href={`tel:${booking.customer.phone}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
                         <Phone className="h-4 w-4" />
@@ -559,7 +559,7 @@ export default function ReservaPage() {
                   )}
 
                   {/* e-Mail */}
-                  <div className="grid grid-cols-[200px_1fr] gap-4 py-2 border-b border-gray-100">
+                  <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4 border-b border-gray-100">
                     <p className="text-sm text-gray-600 font-medium">{t("e-Mail")}:</p>
                     <a href={`mailto:${booking.customer?.email || booking.customer_email}`} className="text-furgocasa-blue hover:text-furgocasa-orange flex items-center gap-2">
                       <Mail className="h-4 w-4" />
@@ -569,7 +569,7 @@ export default function ReservaPage() {
 
                   {/* Comentarios */}
                   {booking.notes && (
-                    <div className="grid grid-cols-[200px_1fr] gap-4 py-2">
+                    <div className="flex flex-col gap-1 py-2 md:grid md:grid-cols-[200px_1fr] md:gap-4">
                       <p className="text-sm text-gray-600 font-medium">{t("Comentarios")}:</p>
                       <p className="text-gray-900 whitespace-pre-wrap">{booking.notes}</p>
                     </div>

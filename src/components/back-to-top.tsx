@@ -12,6 +12,18 @@ export default function BackToTop() {
   // Detectar tanto /administrator como /es/administrator, /en/administrator, etc.
   const isAdminSection = pathname.includes('/administrator');
 
+  // No mostrar en rutas transaccionales con barra fija inferior (en cualquier idioma)
+  // para evitar solapamiento con el botón de continuar/reservar.
+  const hasBookingBottomBar =
+    pathname.includes('/reservar/vehiculo') ||
+    pathname.includes('/reservar/nueva') ||
+    pathname.includes('/book/vehicle') ||
+    pathname.includes('/book/new') ||
+    pathname.includes('/buchen/fahrzeug') ||
+    pathname.includes('/buchen/neu') ||
+    pathname.includes('/reserver/vehicule') ||
+    pathname.includes('/reserver/nouvelle');
+
   useEffect(() => {
     // Mostrar el botón cuando el usuario hace scroll hacia abajo
     const toggleVisibility = () => {
@@ -36,8 +48,8 @@ export default function BackToTop() {
     });
   };
 
-  // Si estamos en admin, no renderizar nada
-  if (isAdminSection) {
+  // Si estamos en admin o en una ruta con barra fija de reserva, no renderizar nada
+  if (isAdminSection || hasBookingBottomBar) {
     return null;
   }
 

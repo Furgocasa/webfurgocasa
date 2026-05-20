@@ -76,7 +76,7 @@ export function MotorhomeRentalMadridLanding({
 
   return (
     <>
-      <section className="relative h-screen lg:h-[calc(100vh-120px)] min-h-[600px] flex items-center justify-center">
+      <section className="relative h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 w-full h-full overflow-hidden">
           <Image
             src="/images/slides/hero-11.webp"

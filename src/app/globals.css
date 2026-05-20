@@ -289,6 +289,55 @@ html, body {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
+
+  /* Aplica padding inferior igual a la safe-area del dispositivo (iPhone X+ notch/home indicator).
+     Se usa en barras fijas inferiores del flujo de reserva para evitar que el botón quede tapado
+     por el indicador de inicio en iOS. */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* =========================================
+   INDICADOR DE SCROLL HORIZONTAL
+   Sombras laterales para tablas con overflow-x-auto en móvil
+   ========================================= */
+.scroll-shadow-x {
+  background:
+    linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+    linear-gradient(to right, rgba(255,255,255,0), white 70%) 100% 0,
+    radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.15), rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.15), rgba(0,0,0,0)) 100% 0;
+  background-repeat: no-repeat;
+  background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+  background-attachment: local, local, scroll, scroll;
+}
+
+/* Aplicar el indicador automáticamente a todas las tablas con scroll horizontal
+   dentro del panel de administración, solo en <lg (donde el scroll suele ser real). */
+@media (max-width: 1023px) {
+  [data-admin-shell] .overflow-x-auto:has(table) {
+    background:
+      linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+      linear-gradient(to right, rgba(255,255,255,0), white 70%) 100% 0,
+      radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.15), rgba(0,0,0,0)),
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.15), rgba(0,0,0,0)) 100% 0;
+    background-repeat: no-repeat;
+    background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
+
+  /* Versión dark mode del admin */
+  .dark [data-admin-shell] .overflow-x-auto:has(table) {
+    background:
+      linear-gradient(to right, rgb(31 41 55) 30%, rgba(31,41,55,0)),
+      linear-gradient(to right, rgba(31,41,55,0), rgb(31 41 55) 70%) 100% 0,
+      radial-gradient(farthest-side at 0 50%, rgba(0,0,0,0.5), rgba(0,0,0,0)),
+      radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,0.5), rgba(0,0,0,0)) 100% 0;
+    background-repeat: no-repeat;
+    background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-attachment: local, local, scroll, scroll;
+  }
 }
 
 /* Pull-to-refresh visual */

@@ -23,8 +23,20 @@ export default function WhatsAppChatbot() {
   // Detectar tanto /administrator como /es/administrator, /en/administrator, etc.
   const isAdminSection = pathname.includes('/administrator');
 
-  // Si estamos en admin, no renderizar nada
-  if (isAdminSection) {
+  // No mostrar en rutas transaccionales con barra fija inferior (selección de extras
+  // y formulario de nueva reserva en cualquier idioma) para evitar que el FAB tape
+  // el botón de continuar/reservar.
+  const hasBookingBottomBar =
+    pathname.includes('/reservar/vehiculo') ||
+    pathname.includes('/reservar/nueva') ||
+    pathname.includes('/book/vehicle') ||
+    pathname.includes('/book/new') ||
+    pathname.includes('/buchen/fahrzeug') ||
+    pathname.includes('/buchen/neu') ||
+    pathname.includes('/reserver/vehicule') ||
+    pathname.includes('/reserver/nouvelle');
+
+  if (isAdminSection || hasBookingBottomBar) {
     return null;
   }
 

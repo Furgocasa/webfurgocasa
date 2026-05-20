@@ -24,7 +24,7 @@ interface HomeHeroProps {
   /** Imagen de fondo del hero (default: /images/slides/hero-11.webp). */
   backgroundImage?: string;
   backgroundAlt?: string;
-  /** Altura del hero. Default h-screen lg:h-[calc(100vh-120px)] min-h-[600px]. */
+  /** Altura del hero. Default h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px]. */
   heightClassName?: string;
   /** Si se pasa, reemplaza al wrapper con su propia clase. Por defecto lift ring-1 ring-white/40 shadow-corp-lg. */
   liftClassName?: string;
@@ -52,7 +52,7 @@ export function HomeHero({
   children,
   backgroundImage = "/images/slides/hero-11.webp",
   backgroundAlt,
-  heightClassName = "h-screen lg:h-[calc(100vh-120px)] min-h-[600px]",
+  heightClassName = "h-[80vh] lg:h-[calc(100vh-120px)] min-h-[500px] lg:min-h-[600px]",
   liftClassName = "rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg",
 }: HomeHeroProps) {
   const t = (key: string) => translateServer(key, locale);

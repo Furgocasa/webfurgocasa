@@ -36,7 +36,7 @@ export function AdminLayoutClient({ admin, children }: AdminLayoutClientProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
+    <div data-admin-shell className="min-h-screen bg-gray-100 dark:bg-gray-900 transition-colors duration-200">
       <AdminSidebar admin={admin} isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="lg:ml-64 flex flex-col h-screen">
         <main className="flex-1 overflow-y-auto">
