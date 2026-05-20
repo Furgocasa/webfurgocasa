@@ -478,13 +478,13 @@ export const homeTranslations = {
   },
 
   /** Landings alquiler ES: vocabulario para buscadores latinoamericanos (bloque discreto al final) */
-  "FAQ vocab camper motorhome latam question": {
+  "¿Es lo mismo camper, autocaravana, motorhome o casa rodante?": {
     es: "¿Es lo mismo camper, autocaravana, motorhome o casa rodante?",
     en: "Is a camper van the same as a motorhome, RV or “casa rodante”?",
     fr: "Camping-car, autocaravane, motorhome ou “casa rodante”, c’est la même chose ?",
     de: "Sind Camper, Wohnmobil, Motorhome und „Casa rodante“ dasselbe?"
   },
-  "FAQ vocab camper motorhome latam answer": {
+  "En España solemos hablar de campers, furgonetas camper o autocaravanas. En Latinoamérica es habitual usar términos como motorhome o casa rodante. En Furgocasa alquilamos campers gran volumen totalmente equipadas, con una experiencia de viaje muy similar a una autocaravana compacta.": {
     es: "En España solemos hablar de campers, furgonetas camper o autocaravanas. En Latinoamérica es habitual usar términos como motorhome o casa rodante. En Furgocasa alquilamos campers gran volumen totalmente equipadas, con una experiencia de viaje muy similar a una autocaravana compacta.",
     en: "In Spain we usually say campers, camper vans or motorhomes (autocaravanas). In Latin America, motorhome or casa rodante are common. At Furgocasa we rent fully equipped large camper vans, with a travel experience very close to a compact motorhome.",
     fr: "En Espagne, on parle surtout de camping-cars, fourgons aménagés ou autocaravanes. En Amérique latine, on entend souvent motorhome ou casa rodante. Chez Furgocasa nous louons des camping-cars grand volume entièrement équipés, proches de l’expérience d’une autocaravane compacte.",

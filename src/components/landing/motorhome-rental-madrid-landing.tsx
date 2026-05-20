@@ -17,8 +17,7 @@ import {
   HelpCircle,
   Zap,
   Plane,
-  Briefcase,
-  Sparkles,
+  Phone,
 } from "lucide-react";
 import { ExtrasSection } from "@/components/pricing/extras-section";
 import { HeroScrollIndicator } from "@/components/hero-scroll-indicator";

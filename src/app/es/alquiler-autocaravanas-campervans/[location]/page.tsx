@@ -669,10 +669,10 @@ export default async function LocationPage({ params }: PageProps) {
             id="rent-latam-vocab-heading"
             className="text-lg md:text-xl font-heading font-bold text-gray-800 mb-4 leading-snug"
           >
-            {t("FAQ vocab camper motorhome latam question")}
+            {t("¿Es lo mismo camper, autocaravana, motorhome o casa rodante?")}
           </h2>
           <p className="text-gray-600 leading-relaxed text-sm md:text-base">
-            {t("FAQ vocab camper motorhome latam answer")}
+            {t("En España solemos hablar de campers, furgonetas camper o autocaravanas. En Latinoamérica es habitual usar términos como motorhome o casa rodante. En Furgocasa alquilamos campers gran volumen totalmente equipadas, con una experiencia de viaje muy similar a una autocaravana compacta.")}
           </p>
         </div>
       </section>
