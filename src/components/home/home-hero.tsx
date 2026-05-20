@@ -64,7 +64,7 @@ export function HomeHero({
 
   const defaultKicker = (
     <>
-      {t("Alquiler de campers en España")} · {t("Desde 95€/día")}
+      {t("Desde 95€/día")} · {t("Km ilimitados")}
     </>
   );
 

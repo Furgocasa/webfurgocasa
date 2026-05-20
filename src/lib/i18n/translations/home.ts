@@ -463,10 +463,10 @@ export const homeTranslations = {
     de: "Voll ausgestattete Campervans mit Wohnmobil-Komfort für Reisen in Spanien und Europa: unbegrenzte Kilometer, Unterstützung auf der Reise und Abholung in Murcia, Madrid, Alicante oder Albacete je nach Verfügbarkeit."
   },
   "Home meta desc campers gran volumen": {
-    es: "Campers gran volumen equipadas tipo autocaravana. Kilómetros ilimitados, asistencia en viaje y recogida en Murcia, Madrid, Alicante o Albacete. Dreamer, Knaus, Weinsberg.",
-    en: "Large-volume campervans, motorhome-style equipment. Unlimited mileage, on-trip assistance and pickup in Murcia, Madrid, Alicante or Albacete. Dreamer, Knaus, Weinsberg.",
-    fr: "Camping-cars grand volume, équipement type autocaravane. Kilométrage illimité, assistance en route et retrait à Murcie, Madrid, Alicante ou Albacete. Dreamer, Knaus, Weinsberg.",
-    de: "Großraum-Camper, Ausstattung wie beim Wohnmobil. Unbegrenzte Kilometer, Unterstützung auf der Reise und Abholung in Murcia, Madrid, Alicante oder Albacete. Dreamer, Knaus, Weinsberg."
+    es: "Las mejores campers en alquiler de gran volumen. Flota premium Dreamer, Knaus y Weinsberg con kilómetros ilimitados. Reserva online en Furgocasa desde 95€/día.",
+    en: "The best large-volume camper vans for rent. Premium fleet Dreamer, Knaus and Weinsberg with unlimited mileage. Book online at Furgocasa from 95€/day.",
+    fr: "Les meilleurs camping-cars grand volume à louer. Flotte premium Dreamer, Knaus et Weinsberg avec kilométrage illimité. Réservez en ligne sur Furgocasa à partir de 95€/jour.",
+    de: "Die besten großvolumigen Camper zur Miete. Premium-Flotte Dreamer, Knaus und Weinsberg mit unbegrenzten Kilometern. Online buchen bei Furgocasa ab 95€/Tag."
   },
 
   /** Coherencia con extras opcionales (ropa de cama, toallas) en tarifas */
