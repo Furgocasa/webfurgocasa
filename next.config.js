@@ -618,12 +618,14 @@ const nextConfig = {
       { source: '/motorhome-rental-spain', destination: '/en/motorhome-rental-spain', permanent: true },
       { source: '/location-camping-car-espagne', destination: '/fr/location-camping-car-espagne', permanent: true },
       { source: '/wohnmobil-miete-spanien', destination: '/de/wohnmobil-miete-spanien', permanent: true },
+      // ── Madrid: TODAS las variantes (motorhome / casas rodantes / con o sin /es/)
+      // redirigen a la landing canónica única para Madrid en español.
+      // Estrategia Opción A (ver docs/02-desarrollo/seo/LATAM_SEO.md): una sola página fuerte,
+      // sin canibalización. La sección LATAM vive dentro de [location]/page.tsx.
+      { source: '/es/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
+      { source: '/alquiler-motorhome-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
       { source: '/es/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
-      { source: '/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-motorhome-madrid', permanent: true },
-      // ⚠️ CRÍTICO: NO añadir un redirect de '/es/alquiler-motorhome-madrid' → '/es/alquiler-motorhome-madrid'
-      // Eso es la URL canónica final (página real en src/app/es/alquiler-motorhome-madrid/page.tsx)
-      // y un redirect a sí misma causa loop infinito (ERR_TOO_MANY_REDIRECTS) en producción.
-      { source: '/alquiler-motorhome-madrid', destination: '/es/alquiler-motorhome-madrid', permanent: true },
+      { source: '/alquiler-casas-rodantes-madrid', destination: '/es/alquiler-autocaravanas-campervans/madrid', permanent: true },
       { source: '/es/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
       { source: '/alquiler-casas-rodantes-murcia', destination: '/es/alquiler-autocaravanas-campervans/murcia', permanent: true },
       { source: '/es/alquiler-casas-rodantes-alicante', destination: '/es/alquiler-autocaravanas-campervans/alicante', permanent: true },

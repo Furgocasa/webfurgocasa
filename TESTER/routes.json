@@ -12,7 +12,6 @@
     "landings-es": {
       "label": "Landings ES",
       "routes": [
-        { "path": "/es/alquiler-motorhome-madrid",                 "label": "Madrid (ES)" },
         { "path": "/es/alquiler-motorhome-espana",                 "label": "España (ES)" },
         { "path": "/es/alquiler-motorhome-europa-desde-espana",    "label": "Europa (ES)" },
         { "path": "/es/alquiler-motorhome-marruecos-desde-espana", "label": "Marruecos (ES)" }
