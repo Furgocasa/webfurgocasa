@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import { SearchWidget } from "@/components/booking/search-widget";
+import { SearchWidgetLazy as SearchWidget } from "@/components/booking/search-widget-lazy";
 import { LocalBusinessJsonLd } from "@/components/locations/local-business-jsonld";
 import { LocalizedLink } from "@/components/localized-link";
 import { translateServer } from "@/lib/i18n/server-translation";

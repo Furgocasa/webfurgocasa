@@ -76,9 +76,10 @@ export function HomeHero({
           alt={backgroundAlt || title}
           fill
           priority
+          fetchPriority="high"
           sizes="100vw"
           className="object-cover"
-          quality={80}
+          quality={65}
         />
         {/* Overlay corporativo - garantiza contraste sobre cualquier foto */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />

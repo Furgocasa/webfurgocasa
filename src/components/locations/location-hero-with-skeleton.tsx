@@ -1,6 +1,3 @@
-'use client';
-
-import { useState } from 'react';
 import Image from 'next/image';
 
 interface LocationHeroWithSkeletonProps {
@@ -15,17 +12,20 @@ interface LocationHeroWithSkeletonProps {
 }
 
 /**
- * Componente Hero con Skeleton Screen para mejorar la percepción de velocidad
- * 
- * Estrategia:
- * - Muestra un skeleton (placeholder animado) inmediatamente (~50ms)
- * - La imagen Hero se carga en segundo plano
- * - Cuando termina de cargar, hace fade-in del contenido real
- * 
- * Beneficio:
- * - Usuario percibe carga instantánea (skeleton visible en 50ms)
- * - LCP real no cambia (sigue siendo 0.83s)
- * - Mejora drástica en la percepción de velocidad
+ * Hero de páginas de localización (SERVER COMPONENT)
+ *
+ * IMPORTANTE - Refactor de rendimiento (2026-05):
+ *
+ * La versión anterior era 'use client' y mantenía el H1/SearchWidget con
+ * `opacity-0` hasta que la imagen disparaba `onLoad`. Eso obligaba a esperar
+ * a la hidratación + descarga + decodificación de la imagen ANTES de pintar
+ * el LCP, lo que producía un LCP de 3,7s reales (PageSpeed 2026-05-20).
+ *
+ * Ahora:
+ *  - Render 100% en servidor (sin JS para mostrar el hero).
+ *  - El contenido (H1, párrafo, SearchWidget) se pinta directamente.
+ *  - Se mantiene un fondo de gradiente como skeleton estático debajo de la
+ *    imagen para evitar "flash" en la transición.
  */
 export function LocationHeroWithSkeleton({ 
   heroImageUrl, 
@@ -33,54 +33,35 @@ export function LocationHeroWithSkeleton({
   children,
   scrollIndicator,
 }: LocationHeroWithSkeletonProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
-
   return (
     <section className="relative pt-24 pb-10 lg:pt-0 lg:pb-0 min-h-[640px] lg:h-[calc(100vh-120px)] lg:min-h-[600px] flex items-start lg:items-center justify-center">
       <div className="absolute inset-0 w-full h-full overflow-hidden">
-        {/* ⚡ SKELETON - Se muestra instantáneamente mientras carga la imagen */}
-        {!imageLoaded && (
-          <div 
-            className="absolute inset-0 bg-gradient-to-br from-gray-300 via-gray-400 to-gray-500 animate-pulse"
-            aria-label="Cargando imagen..."
-          />
-        )}
-        
-        {/* Imagen Hero real - Se carga con priority pero hace fade-in suave */}
+        {/* Fondo estático (gradiente) detrás de la imagen para evitar flash blanco */}
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-gray-400 via-furgocasa-blue/40 to-furgocasa-blue-dark/80"
+          aria-hidden="true"
+        />
+
         <Image
           src={heroImageUrl}
           alt={alt}
           fill
           priority
           fetchPriority="high"
-          decoding="sync"
-          quality={50}
-          sizes="(max-width: 640px) 100vw, (max-width: 1200px) 100vw, 1920px"
-          className={`object-cover transition-opacity duration-500 ${
-            imageLoaded ? 'opacity-100' : 'opacity-0'
-          }`}
-          onLoad={() => setImageLoaded(true)}
+          quality={60}
+          sizes="100vw"
+          className="object-cover"
         />
-        
-        {/* Overlay oscuro - También hace fade-in */}
-        <div className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${
-          imageLoaded ? 'opacity-100' : 'opacity-0'
-        }`} />
+
+        {/* Overlay corporativo controlado */}
+        <div className="absolute inset-0 bg-black/40 pointer-events-none" />
       </div>
-      
-      {/* Contenido del hero - Fade-in suave cuando la imagen termina de cargar */}
-      <div className={`relative z-10 w-full transition-opacity duration-500 ${
-        imageLoaded ? 'opacity-100' : 'opacity-0'
-      }`}>
+
+      <div className="relative z-10 w-full">
         {children}
       </div>
 
-      {/* Indicador de scroll opcional (posicionamiento absolute respecto al section) */}
-      {scrollIndicator && (
-        <div className={`transition-opacity duration-500 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}>
-          {scrollIndicator}
-        </div>
-      )}
+      {scrollIndicator}
     </section>
   );
 }

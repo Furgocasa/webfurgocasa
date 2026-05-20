@@ -55,9 +55,10 @@ export default async function LocaleMapaAreasPage({ params }: PageProps) {
             alt="Mapa de áreas para autocaravanas - Furgocasa"
             fill
             priority
+            fetchPriority="high"
             sizes="100vw"
             className="object-cover"
-            quality={80}
+            quality={65}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-furgocasa-blue/70 via-furgocasa-blue/60 to-furgocasa-blue-dark/85" />
         </div>

@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { SearchWidget } from "@/components/booking/search-widget";
+import { SearchWidgetLazy as SearchWidget } from "@/components/booking/search-widget-lazy";
 import { DestinationsGrid } from "@/components/destinations-grid";
 import { BlogArticleLink } from "@/components/blog/blog-article-link";
 import { LocalizedLink } from "@/components/localized-link";
@@ -185,9 +185,10 @@ export default async function LocaleHomePage() {
             alt={`Furgocasa - ${t("Las Mejores Campers en Alquiler")}`}
             fill
             priority
+            fetchPriority="high"
             sizes="100vw"
             className="object-cover"
-            quality={80}
+            quality={65}
           />
           {/* Overlay corporativo controlado - garantiza contraste sobre cualquier foto del slider */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />

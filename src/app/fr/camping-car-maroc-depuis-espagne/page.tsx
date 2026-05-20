@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { SearchWidget } from "@/components/booking/search-widget";
+import { SearchWidgetLazy as SearchWidget } from "@/components/booking/search-widget-lazy";
 import { LocalizedLink } from "@/components/localized-link";
 import { 
   CheckCircle, 
@@ -105,9 +105,10 @@ export default async function LocaleCampingCarMarocPage({ params }: PageProps) {
             alt="Furgocasa - Location de camping-car au Maroc"
             fill
             priority
+            fetchPriority="high"
             sizes="100vw"
             className="object-cover"
-            quality={80}
+            quality={65}
           />
           {/* Overlay corporatif contrôlé */}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-furgocasa-blue/40 to-furgocasa-blue-dark/70 pointer-events-none" />
