@@ -4,18 +4,18 @@
    Vertical: fc-banner-v, fc-banner-vcard, fc-banner-v2, fc-banner-vcard2
    ========================================================= */
 
-/* --- Contenedor responsive: muestra H en móvil, V en desktop --- */
+/* --- Contenedor responsive: V en móvil, H en desktop --- */
 .fc-blog-banner-slot {
   display: flex;
   justify-content: center;
   margin: 2.5rem 0;
 }
-.fc-blog-banner-slot__h { display: block; width: 100%; }
-.fc-blog-banner-slot__v { display: none; }
+.fc-blog-banner-slot__v { display: block; }
+.fc-blog-banner-slot__h { display: none; }
 
 @media (min-width: 1024px) {
-  .fc-blog-banner-slot__h { display: none; }
-  .fc-blog-banner-slot__v { display: block; }
+  .fc-blog-banner-slot__v { display: none; }
+  .fc-blog-banner-slot__h { display: block; width: 100%; }
 }
 
 /* =========================================================
