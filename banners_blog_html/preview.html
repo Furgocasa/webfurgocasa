@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furgocasa · Preview banners blog</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Amiko:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Amiko', sans-serif;
+    background: #f4f4f5;
+    color: #1f2937;
+    line-height: 1.6;
+  }
+
+  .page-header {
+    background: #063971;
+    color: #fff;
+    padding: 24px 20px;
+    text-align: center;
+  }
+  .page-header h1 {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+  }
+  .page-header p {
+    color: #cfe1f8;
+    font-size: 0.9rem;
+  }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 40px;
+    max-width: 1200px;
+    margin: 30px auto;
+    padding: 0 20px;
+    align-items: start;
+  }
+
+  .article {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 36px 40px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+  }
+  .article h2 {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: #063971;
+    margin: 28px 0 12px;
+  }
+  .article h2:first-child { margin-top: 0; }
+  .article p {
+    color: #4b5563;
+    margin-bottom: 14px;
+    font-size: 0.95rem;
+  }
+
+  .section-label {
+    display: inline-block;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #D65A31;
+    background: #fef3ec;
+    padding: 4px 10px;
+    border-radius: 12px;
+    margin: 24px 0 10px;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: center;
+  }
+  .sidebar .section-label {
+    align-self: flex-start;
+    margin: 10px 0 6px;
+  }
+
+  /* Iframes para horizontales */
+  .banner-frame-h {
+    width: 100%;
+    border: none;
+    overflow: hidden;
+    height: 420px;
+  }
+
+  /* Iframes para verticales */
+  .banner-frame-v {
+    width: 340px;
+    border: none;
+    overflow: hidden;
+    height: 780px;
+  }
+
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  @media (max-width: 640px) {
+    .article { padding: 22px 18px; }
+    .banner-frame-h { height: 480px; }
+    .banner-frame-v { width: 300px; height: 720px; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="page-header">
+    <h1>Banners blog Furgocasa · Preview</h1>
+    <p>Simulación de cómo se verían los banners dentro de un artículo (cargados por iframe)</p>
+  </header>
+
+  <main class="layout">
+
+    <article class="article">
+
+      <h2>Cómo planificar tu primera escapada en camper</h2>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec leo at risus condimentum vehicula. Aenean lacinia, sapien at consequat dictum, mauris orci dignissim sapien, vitae rutrum dolor ipsum sed lorem. Phasellus posuere, libero a finibus tincidunt, justo nunc ultrices ligula.</p>
+      <p>Vivamus auctor, urna in luctus posuere, ligula odio condimentum justo, ut dictum mauris arcu eu nibh. Curabitur nec lacus eu nulla maximus sagittis. Donec nec finibus libero, in finibus ipsum.</p>
+
+      <div class="section-label">Banner horizontal 1 · Ofertas</div>
+      <iframe class="banner-frame-h" src="horizontal-1-ofertas.html"></iframe>
+
+      <h2>Lo que no puede faltar en tu equipaje</h2>
+      <p>Suspendisse potenti. Integer vitae lacinia justo, ut ullamcorper sapien. Donec sed velit a urna mollis dapibus. Nullam aliquet, nisl id ultrices sodales, sapien lectus pulvinar ipsum, vitae faucibus risus arcu sit amet justo. Mauris quis ipsum eros.</p>
+      <p>Curabitur sit amet pulvinar quam. Cras sed ipsum sit amet est tincidunt iaculis. Aenean nec scelerisque lectus. Etiam ut ante a ipsum dictum sodales nec ut tortor.</p>
+
+      <div class="section-label">Banner horizontal 2 · Ventajas</div>
+      <iframe class="banner-frame-h" src="horizontal-2-ventajas.html"></iframe>
+
+      <h2>Las mejores rutas desde Murcia</h2>
+      <p>Aliquam erat volutpat. Praesent malesuada ipsum at ipsum bibendum, ac vehicula nibh tincidunt. In sit amet velit eros. Etiam at urna sapien. Maecenas vitae sapien ut metus dictum lacinia.</p>
+      <p>Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat. Sed sit amet nibh vitae purus interdum dapibus.</p>
+
+      <div class="section-label">Banner horizontal 3 · Comodidad</div>
+      <iframe class="banner-frame-h" src="horizontal-3-comodidad.html"></iframe>
+
+      <h2>Consejos para tu primera noche en camper</h2>
+      <p>Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae. Nulla facilisi. In hac habitasse platea dictumst. Maecenas vulputate, sapien at tincidunt dignissim.</p>
+      <p>Donec vel ipsum vitae ante blandit pharetra. Morbi tincidunt nibh a diam elementum, vitae cursus erat facilisis. Nullam vel augue eget arcu lacinia blandit.</p>
+
+      <div class="section-label">Banner horizontal 4 · Reserva fácil</div>
+      <iframe class="banner-frame-h" src="horizontal-4-reserva.html"></iframe>
+
+      <h2>Qué hacer en cada parada</h2>
+      <p>Fusce scelerisque velit vitae sapien molestie, id aliquam nunc tincidunt. Phasellus non velit vel mi lacinia facilisis. Cras fringilla eros sed sapien condimentum interdum.</p>
+
+    </article>
+
+    <aside class="sidebar">
+      <div class="section-label">Banner vertical 1 · Ofertas</div>
+      <iframe class="banner-frame-v" src="vertical-1-ofertas.html"></iframe>
+
+      <div class="section-label">Banner vertical 2 · Ventajas</div>
+      <iframe class="banner-frame-v" src="vertical-2-ventajas.html"></iframe>
+
+      <div class="section-label">Banner vertical 3 · Momentos</div>
+      <iframe class="banner-frame-v" src="vertical-3-momentos.html"></iframe>
+
+      <div class="section-label">Banner vertical 4 · Interior</div>
+      <iframe class="banner-frame-v" src="vertical-4-interior.html"></iframe>
+    </aside>
+
+  </main>
+
+</body>
+</html>

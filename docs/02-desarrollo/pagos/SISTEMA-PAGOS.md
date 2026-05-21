@@ -136,6 +136,7 @@ En **`bookings`**, además de `total_price` y `amount_paid`, existe **`stripe_fe
 
 #### Stripe
 - **POST** `/api/stripe/initiate` - Crear Checkout Session
+- **POST** `/api/stripe/webhook` - Notificación servidor-a-servidor (actualiza pago, reserva y **envía email**)
 - **GET** `/api/stripe/session-status` - Verificar estado
 
 #### Admin
@@ -144,8 +145,9 @@ En **`bookings`**, además de `total_price` y `amount_paid`, existe **`stripe_fe
 
 ### Sistema de Fallback
 
-**Problema:** Notificación servidor-a-servidor puede fallar  
-**Solución:** Fallback automático en `/pago/exito`
+**Problema:** La notificación servidor-a-servidor puede fallar o llegar tarde.
+
+**Redsys — fallback en `/pago/exito`:**
 
 ```
 Redsys redirige → /pago/exito
@@ -158,6 +160,10 @@ API procesa: payment → completed, booking → confirmed, envía email
 ```
 
 **Principio clave:** Redsys SOLO redirige a URLOK si pago fue exitoso.
+
+**Stripe — sin fallback de email en `/pago/exito`:**
+
+El envío del email de confirmación depende del webhook `checkout.session.completed` en `/api/stripe/webhook`. La página `/pago/exito` solo muestra el resumen al cliente; **no** reenvía ni dispara emails. Si el webhook falla, hay que reenviar desde admin (`/administrator/reservas/[id]` → botón de confirmación de pago) o marcar el pago manualmente.
 
 ---
 
@@ -240,12 +246,15 @@ Contenido:
 
 ### Disparadores
 
-**Automáticos:**
-- Payment → "completed" (Redsys/Stripe)
-- Payment → "completed" (Manual desde admin)
+**Automáticos (pasarelas):**
+- **Redsys:** `/api/redsys/notification` (+ fallback `/api/redsys/verify-payment`)
+- **Stripe:** `/api/stripe/webhook` (`checkout.session.completed`, desde 21/05/2026)
 
-**Manual:** (futuro)
-- Botón "Reenviar email" en detalle de pago
+**Automáticos (admin):**
+- Payment → "completed" (Manual desde admin → `/api/payments/update-manual`)
+
+**Manual (admin):**
+- Botones "Confirmación 1º Pago" / "Confirmación 2º Pago" en `/administrator/reservas/[id]` → `/api/bookings/send-email`
 
 ---
 
@@ -274,17 +283,26 @@ Consola navegador → [PAGO-EXITO]
 ### Problema: Email no llega
 
 **Checklist:**
-- [ ] Payment está en "completed"
-- [ ] Booking tiene customer_email
-- [ ] Logs muestran llamada a `/api/bookings/send-email`
-- [ ] Verificar Resend dashboard
+- [ ] Payment está en "completed" / "authorized" (Stripe)
+- [ ] Booking tiene `customer_email`
+- [ ] Logs muestran envío de email en el webhook correspondiente
 - [ ] Revisar spam del cliente
 
-**Solución:**
+**Logs esperados (Vercel):**
 ```bash
-# Ver logs de envío
-Vercel Logs → Buscar "📧 [6/8] Enviando email"
+# Redsys
+📧 [7/7] Enviando email de PRIMER PAGO
+📧 [7/7] Enviando email de SEGUNDO PAGO
+
+# Stripe
+📧 [Stripe] Enviando email de PRIMER PAGO
+📧 [Stripe] Enviando email de SEGUNDO PAGO
 ```
+
+**Solución:**
+- **Redsys:** si el webhook no llegó, el fallback en `/pago/exito` debería procesarlo vía `/api/redsys/verify-payment`
+- **Stripe:** si el webhook no llegó, reenviar desde admin (`/administrator/reservas/[id]`) o verificar eventos en Stripe Dashboard → Webhooks
+- **Cualquier método:** marcar pago como completado manualmente desde admin (también envía email)
 
 ### Problema: Stripe no cobra comisión
 

@@ -4,6 +4,115 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## ✉️ Fix: email de confirmación tras pago con Stripe — 21 de mayo de 2026
+
+**Problema:** Tras pagar con Stripe, la reserva se confirmaba correctamente pero **no se enviaba** el email de confirmación (1º o 2º pago). Con Redsys sí funcionaba. Casos reales: reservas FG16895847 y FG81370361, donde hubo que reenviar manualmente desde admin.
+
+**Causa:** El webhook `/api/stripe/webhook` (`checkout.session.completed`) actualizaba `payments` y `bookings` pero **no llamaba** a `sendFirstPaymentConfirmedEmail` / `sendSecondPaymentConfirmedEmail`, a diferencia de `/api/redsys/notification`.
+
+**Solución (cambio mínimo en `src/app/api/stripe/webhook/route.ts`):**
+- Tras actualizar la reserva con éxito, se determina si es primer pago (`amount_paid` previo = 0) o segundo pago.
+- Se obtienen datos con `getBookingDataForEmail` y se envía el template correspondiente.
+- Bloque aislado en `try/catch`: un fallo de SMTP no tumba el webhook (Stripe sigue recibiendo `200`).
+
+**Documentación actualizada:** `docs/04-referencia/emails/SISTEMA-EMAILS.md`, `docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`, `docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md`.
+
+**Nota:** `/pago/exito` no tiene fallback de email para Stripe (solo Redsys usa `/api/redsys/verify-payment`). Reenvío manual sigue disponible en `/administrator/reservas/[id]`.
+
+---
+
+## ⚡ Rendimiento móvil: LCP real bajado de 3,7 s a ~3,3 s en páginas de localización — 20 de mayo de 2026
+
+**Contexto:** PageSpeed Insights móvil sobre la URL real
+`https://www.furgocasa.com/es/alquiler-autocaravanas-campervans/murcia`
+marcaba score 57, LCP CrUX 3,7 s y TBT lab 650 ms. El problema NO era
+el LCP "lab desktop" (0,83 s) documentado en enero de 2026, sino la
+combinación de:
+
+1. **`LocationHeroWithSkeleton` era Client Component** y ocultaba el H1,
+   los párrafos y el SearchWidget con `opacity-0` hasta que la imagen
+   disparaba `onLoad`. El LCP esperaba a la hidratación + descarga +
+   decodificación.
+2. **`decoding="sync"`** en la imagen LCP bloqueaba el hilo principal.
+3. **`SearchWidget`** (date-fns, lucide, calendarios, lógica i18n) iba
+   en el bundle inicial del fold superior.
+4. **GTM + GA + Meta Pixel + flotantes** (`CookieBanner`,
+   `WhatsAppChatbot`, `BackToTop`, `AdminFABButton`, `Toaster`,
+   `AnalyticsDebug`) competían por el main thread con la hidratación
+   del hero al cargar con `afterInteractive`.
+
+**Cambios — 2 commits:**
+
+### `45beb2d4 feat(perf): mejorar LCP y JS inicial en heroes de ubicación y fold`
+
+- Imágenes hero (home + landings + `[location]` en 4 idiomas):
+  `quality={65}` + `fetchPriority="high"` + `sizes="100vw"`.
+- `next.config.js`: `experimental.optimizePackageImports` con
+  `lucide-react`, `date-fns`, `@radix-ui/*` (17 paquetes) y
+  `@headlessui/react`. Tree-shake real del bundle inicial.
+- `src/components/locations/location-hero-with-skeleton.tsx`: **vuelta
+  a Server Component**. Fuera `'use client'`, `useState`, `onLoad`,
+  `opacity-0 → opacity-100`, `decoding="sync"`. Fondo: gradiente
+  estático (`from-gray-400 via-furgocasa-blue/40 to-furgocasa-blue-dark/80`)
+  para evitar flash blanco. `quality={60}`.
+- `src/components/booking/search-widget-lazy.tsx` (nuevo) +
+  `src/components/booking/search-widget-skeleton.tsx` (nuevo):
+  `next/dynamic({ ssr: false })` con skeleton SSR de **alturas exactas**
+  (`h-[52px]`, `py-4 lg:py-5`) para evitar CLS. Sustituye al import
+  directo de `SearchWidget` en home + `[location]` en los 4 idiomas.
+
+### `a57a9b45 feat(perf): diferir flotantes y analytics hasta interaccion o idle`
+
+- `src/components/deferred-floating.tsx` (nuevo): `next/dynamic` envuelve
+  `CookieBanner`, `CookieSettingsModal`, `BackToTop`, `WhatsAppChatbot`,
+  `AdminFABButton`, `Toaster`, `AnalyticsDebug`. Se montan tras
+  `requestIdleCallback` o un fallback de 1,5 s.
+- `src/components/deferred-analytics.tsx` (nuevo): GA4
+  (`@next/third-parties/google`), GTM y Meta Pixel se inyectan en la
+  **primera interacción del usuario** (`scroll`, `click`, `mousemove`,
+  `touchstart`, `keydown`) o tras 2,5 s. Sigue respetando consent mode
+  y la condición `metaPixelId`.
+- **Bonus:** corregido typo histórico Meta Pixel
+  `fbevets.js` → `fbevents.js`. El pixel **no estaba funcionando antes**
+  de este fix.
+- `src/app/layout.tsx`: elimina imports directos de `<GoogleAnalytics>`,
+  `<GoogleTagManager>`, el `<Script>` inline del Meta Pixel y los siete
+  flotantes. Pasa todo a `<DeferredAnalytics />` y `<DeferredFloating />`.
+
+**Resultado tras el deploy (PageSpeed móvil sobre `/madrid`):**
+
+| Métrica | Antes (Murcia) | Después (Madrid) |
+|---|---|---|
+| Score Lighthouse | 57 | **82** |
+| LCP lab | 7,7 s | **3,3 s** |
+| TBT lab | 650 ms | **300 ms** |
+| Tareas largas | 11 | 8 |
+| CLS | 0 | 0 |
+
+> El **LCP CrUX (28 días)** se actualizará progresivamente con la nueva
+> ventana de tráfico real.
+
+**Implicación operativa (importante):** GTM, GA y Meta Pixel **ya no
+se cargan al instante** en DevTools → Network. Esperan a la primera
+interacción del usuario o a un timeout de 2,5 s. Los eventos `purchase`
+y `additional_payment_received` no se ven afectados porque para entonces
+el usuario ya ha interactuado (clic banco, navegación post-redirect).
+
+**Documentación actualizada:**
+- `SKELETON-SCREEN-OPTIMIZACION.md` (raíz) — marcado como histórico, con
+  bloque "Refactor 20/05/2026" explicando el rollback del client-side.
+- `docs/03-mantenimiento/optimizaciones/OPTIMIZACION-LCP-MOVIL.md` —
+  nueva sección al principio y notas en los bloques de `decoding="sync"`
+  y `analytics-scripts.tsx`.
+- `MIGRACION-NEXT-THIRD-PARTIES.md` — sección "Actualización 20/05/2026
+  — Carga diferida".
+- `docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md` y
+  `CONFIGURACION-META-PIXEL.md` — referencia a `DeferredAnalytics`.
+- `README.md` — sección *Mayo 2026 — Rendimiento móvil de páginas de
+  localización*.
+
+---
+
 ## 📊 GTM: solo eventos tras cobro en pasarela — 18 de mayo de 2026
 
 **Contexto:** Los eventos intermedios del embudo (`generate_lead`, `begin_checkout`, `add_payment_info`) podían aparecer como conversiones en Google Ads si estaban importados o mal etiquetados en el contenedor. Abrir el enlace de la reserva para revisarla (cliente o equipo) **no** equivale a un cobro confirmado.

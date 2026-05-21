@@ -18,22 +18,34 @@ Este documento describe el sistema completo de envío de correos electrónicos i
 **Archivo:** `src/app/reservar/nueva/page.tsx`
 
 ### 2. Primer Pago Confirmado
-**Cuándo:** Cuando Redsys notifica que se ha completado el primer pago (puede ser 50% o 100%).
+**Cuándo:** Cuando se confirma el **primer pago** de una reserva (50 % o 100 %), tras la notificación de la pasarela.
+
+**Disparadores automáticos:**
+- **Redsys:** webhook `/api/redsys/notification` (y fallback `/api/redsys/verify-payment` si el cliente cae en `/pago/exito` con pago aún `pending`)
+- **Stripe:** webhook `/api/stripe/webhook` (`checkout.session.completed`, desde mayo 2026)
 
 **Quién recibe:**
 - ✉️ **Cliente:** Confirmación de pago y reserva confirmada
 - ✉️ **Empresa:** Notificación de pago recibido
 
-**Archivo:** `src/app/api/redsys/notification/route.ts`
+**Archivos:**
+- `src/app/api/redsys/notification/route.ts`
+- `src/app/api/redsys/verify-payment/route.ts` (fallback Redsys)
+- `src/app/api/stripe/webhook/route.ts`
 
 ### 3. Segundo Pago Confirmado
-**Cuándo:** Cuando el cliente completa el pago del 50% restante.
+**Cuándo:** Cuando el cliente completa el pago del 50 % restante (o cualquier cobro posterior con `amount_paid > 0` antes del pago).
+
+**Disparadores automáticos:** mismos endpoints que el primer pago (Redsys y Stripe).
 
 **Quién recibe:**
 - ✉️ **Cliente:** Confirmación de pago completo con recordatorios para el día de recogida
 - ✉️ **Empresa:** Notificación de pago completo
 
-**Archivo:** `src/app/api/redsys/notification/route.ts`
+**Archivos:**
+- `src/app/api/redsys/notification/route.ts`
+- `src/app/api/redsys/verify-payment/route.ts` (fallback Redsys)
+- `src/app/api/stripe/webhook/route.ts`
 
 ## 📁 Estructura de Archivos
 
@@ -48,7 +60,12 @@ src/
     └── api/
         ├── bookings/
         │   └── send-email/
-        │       └── route.ts      # API endpoint para envío de emails
+        │       └── route.ts      # API endpoint para envío manual / reenvío desde admin
+        ├── redsys/
+        │   ├── notification/route.ts   # Webhook Redsys → email automático
+        │   └── verify-payment/route.ts # Fallback Redsys en /pago/exito
+        ├── stripe/
+        │   └── webhook/route.ts        # Webhook Stripe → email automático
         ├── cron/
         │   └── return-reminders/
         │       └── route.ts      # Cron: recordatorio de devolución (diario 18:00 UTC)
@@ -181,22 +198,28 @@ try {
 }
 ```
 
-### En el Backend (Notificación de Redsys)
+### En el Backend (Webhooks de pago)
+
+Redsys y Stripe llaman directamente a las funciones de `@/lib/email` tras actualizar la reserva. La lógica es la misma en ambos flujos:
 
 ```typescript
-// Al recibir confirmación de pago
+// Tras confirmar el pago (Redsys notification, verify-payment o Stripe webhook)
 const isFirstPayment = currentPaid === 0;
-const emailType = isFirstPayment ? 'first_payment' : 'second_payment';
 
-await fetch('/api/bookings/send-email', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    type: emailType,
-    bookingId: payment.booking_id,
-  }),
-});
+const bookingData = await getBookingDataForEmail(payment.booking_id, supabase);
+if (customerEmail && bookingData) {
+  bookingData.amountPaid = newAmountPaid;
+  bookingData.pendingAmount = Math.max(0, newTotalPrice - newAmountPaid);
+
+  if (isFirstPayment) {
+    await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
+  } else {
+    await sendSecondPaymentConfirmedEmail(customerEmail, bookingData);
+  }
+}
 ```
+
+**Reenvío manual desde admin:** `/api/bookings/send-email` con `type: 'first_payment' | 'second_payment'` (botones en `/administrator/reservas/[id]`).
 
 ## 🧪 Testing
 
@@ -214,8 +237,12 @@ COMPANY_EMAIL=tu-email@ejemplo.com
 
 1. Crea una reserva de prueba en la aplicación
 2. Verifica que recibes el email de "Reserva creada"
-3. Completa un pago de prueba con Redsys
-4. Verifica que recibes el email de "Pago confirmado"
+3. Completa un pago de prueba con **Redsys** o **Stripe**
+4. Verifica que recibes el email de "Pago confirmado" (primer pago) o "Pago completo" (segundo pago)
+
+**Logs esperados en Vercel:**
+- Redsys: `📧 [7/7] Enviando email de PRIMER PAGO` / `SEGUNDO PAGO`
+- Stripe: `📧 [Stripe] Enviando email de PRIMER PAGO` / `SEGUNDO PAGO`
 
 ### Logs
 
@@ -350,5 +377,6 @@ Ideas para futuras mejoras:
 **Versión:** 1.2.0
 
 **Changelog del documento:**
+- `1.3.0` (21/05/2026) — Documentado envío automático de emails en webhook Stripe (`checkout.session.completed`), alineado con Redsys; reenvío manual vía `/api/bookings/send-email`.
 - `1.2.0` (29/04/2026) — Añadido aviso de hora flexible en el recordatorio de devolución (asterisco rojo + nota explicativa); script de prueba sin admin (`scripts/test-return-reminder-email.ts`).
 - `1.1.0` (23/03/2026) — Añadido recordatorio de devolución (cron diario, plantilla `getReturnReminderTemplate`, idempotencia vía `bookings.return_reminder_sent`).

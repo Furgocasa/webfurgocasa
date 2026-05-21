@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furgocasa · Banner blog horizontal · Comodidad</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Amiko:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Amiko', sans-serif;
+    background: #f4f4f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .preview-label {
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #6b7280;
+    margin-bottom: 14px;
+  }
+
+  .fc-banner-h2 {
+    position: relative;
+    width: 100%;
+    max-width: 960px;
+    min-height: 260px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(6, 57, 113, 0.18);
+    isolation: isolate;
+    background: #063971;
+    display: block;
+    text-decoration: none;
+  }
+
+  .fc-banner-h2__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 30% center;
+    z-index: 1;
+  }
+
+  .fc-banner-h2__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(270deg,
+        rgba(6, 57, 113, 0.95) 0%,
+        rgba(6, 57, 113, 0.90) 30%,
+        rgba(6, 57, 113, 0.70) 55%,
+        rgba(6, 57, 113, 0.20) 80%,
+        rgba(6, 57, 113, 0.00) 100%);
+    z-index: 2;
+  }
+
+  .fc-banner-h2__content {
+    position: absolute;
+    top: 0; right: 0; bottom: 0;
+    z-index: 3;
+    width: 58%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 22px 32px 22px 40px;
+    color: #ffffff;
+    text-align: right;
+  }
+
+  .fc-banner-h2__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-end;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #FBBF24;
+    background: rgba(0, 0, 0, 0.28);
+    padding: 5px 12px;
+    border-radius: 30px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+  }
+
+  .fc-banner-h2__title {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.15rem, 2.4vw, 1.85rem);
+    line-height: 1.15;
+    color: #ffffff;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+  .fc-banner-h2__title span {
+    color: #FBBF24;
+  }
+
+  .fc-banner-h2__subtitle {
+    font-family: 'Amiko', sans-serif;
+    font-weight: 600;
+    font-size: clamp(0.8rem, 1.4vw, 0.98rem);
+    line-height: 1.35;
+    color: #ffffff;
+    margin-bottom: 14px;
+  }
+
+  .fc-banner-h2__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-end;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #063971;
+    background: #FBBF24;
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(251, 191, 36, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .fc-banner-h2__cta::after {
+    content: "→";
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+  }
+  .fc-banner-h2:hover .fc-banner-h2__cta {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(251, 191, 36, 0.5);
+  }
+  .fc-banner-h2:hover .fc-banner-h2__cta::after {
+    transform: translateX(3px);
+  }
+
+  .fc-banner-h2__brand {
+    position: absolute;
+    top: 16px;
+    left: 18px;
+    z-index: 3;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  @media (max-width: 640px) {
+    .fc-banner-h2 { min-height: 300px; }
+    .fc-banner-h2__overlay {
+      background: linear-gradient(180deg,
+        rgba(6, 57, 113, 0.15) 0%,
+        rgba(6, 57, 113, 0.55) 40%,
+        rgba(6, 57, 113, 0.92) 100%);
+    }
+    .fc-banner-h2__content {
+      width: 100%;
+      text-align: left;
+      justify-content: flex-end;
+      padding: 20px;
+      position: relative;
+    }
+    .fc-banner-h2__tag { align-self: flex-start; }
+    .fc-banner-h2__cta { align-self: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="preview-label">Banner horizontal · Comodidad · 960 × 260</div>
+
+  <a class="fc-banner-h2" href="https://www.furgocasa.com/campers" aria-label="Descubre las campers Furgocasa">
+    <img
+      class="fc-banner-h2__img"
+      src="../public/images/mailing/vehicles/fu0019-weinsberg-carabus-600-mq.jpg"
+      alt="Camper Weinsberg Carabus 600 de la flota Furgocasa">
+
+    <div class="fc-banner-h2__overlay"></div>
+    <span class="fc-banner-h2__brand">Furgocasa</span>
+
+    <div class="fc-banner-h2__content">
+      <span class="fc-banner-h2__tag">Alquiler en Murcia</span>
+      <h3 class="fc-banner-h2__title">
+        Despierta <span>donde quieras</span>
+      </h3>
+      <p class="fc-banner-h2__subtitle">
+        Campers totalmente equipadas con cocina, ducha y cama para que solo te preocupes de disfrutar.
+      </p>
+      <span class="fc-banner-h2__cta">Descubre los modelos</span>
+    </div>
+  </a>
+
+</body>
+</html>

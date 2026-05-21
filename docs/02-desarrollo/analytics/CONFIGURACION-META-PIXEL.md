@@ -1,21 +1,44 @@
 # Configuración de Meta Pixel (Facebook Pixel)
 
-**Última actualización**: 20 de Enero 2026 - v1.0.4
+**Última actualización**: 20 de mayo de 2026
 
-> ⚠️ **ESTE FIX ES PARTE DEL RELEASE v1.0.4**  
-> Ver también: `CHANGELOG.md` v1.0.4
+> 🆕 **Mayo 2026:** el script de Meta Pixel se ha movido a
+> `src/components/deferred-analytics.tsx` y ahora se carga **diferido**
+> (primera interacción del usuario o 2,5 s). Además se ha corregido un
+> typo de la URL del script (`fbevets.js` → `fbevents.js`) que estaba
+> impidiendo que el pixel **funcionara en absoluto** desde su
+> implementación original.
+>
+> Ver también: `CHANGELOG.md` entrada *20 mayo 2026 — perf(home/loc)*.
 
 ---
 
-## Problema Resuelto
+## Problema Resuelto (enero 2026)
 
 Se ha corregido el error `[Meta Pixel] - Invalid PixelID: null` que aparecía en la consola del navegador.
 
 ## Cambios Realizados
 
-### 1. Layout Principal (`src/app/layout.tsx`)
+### 1. Componente `DeferredAnalytics` (`src/components/deferred-analytics.tsx`) — mayo 2026
 
-El Meta Pixel ahora solo se carga si está configurada la variable de entorno `NEXT_PUBLIC_META_PIXEL_ID`:
+El Meta Pixel se inyecta desde un componente client que retrasa la
+inyección hasta la primera interacción o `setTimeout(2500ms)`:
+
+```tsx
+// src/components/deferred-analytics.tsx (extracto)
+if (metaPixelId) {
+  const script = document.createElement('script');
+  script.src = 'https://connect.facebook.net/en_US/fbevents.js';
+  script.async = true;
+  // fbq('init', metaPixelId);
+  // fbq('track', 'PageView');
+}
+```
+
+Sigue siendo condicional a `NEXT_PUBLIC_META_PIXEL_ID`. Si no está
+definida, no se monta nada y no hay errores.
+
+### Implementación anterior (enero 2026 — histórica)
 
 ```tsx
 {process.env.NEXT_PUBLIC_META_PIXEL_ID && (

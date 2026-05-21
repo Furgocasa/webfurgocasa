@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furgocasa · Banner blog vertical · Interior</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Amiko:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Amiko', sans-serif;
+    background: #f4f4f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .preview-label {
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #6b7280;
+    margin-bottom: 14px;
+  }
+
+  .fc-banner-vcard2 {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1 / 2;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 14px 50px rgba(6, 57, 113, 0.25);
+    background: #ffffff;
+    text-decoration: none;
+  }
+
+  .fc-banner-vcard2__img-wrap {
+    position: relative;
+    flex: 0 0 52%;
+    overflow: hidden;
+  }
+  .fc-banner-vcard2__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 40%;
+    transition: transform 0.6s ease;
+  }
+  .fc-banner-vcard2:hover .fc-banner-vcard2__img {
+    transform: scale(1.05);
+  }
+
+  .fc-banner-vcard2__tag {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(214, 90, 49, 0.9);
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  .fc-banner-vcard2__brand {
+    position: absolute;
+    bottom: 36px;
+    right: 14px;
+    z-index: 2;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.35);
+    padding: 4px 10px;
+    border-radius: 14px;
+    backdrop-filter: blur(4px);
+  }
+
+  .fc-banner-vcard2__img-wrap::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 30px;
+    background: #ffffff;
+    clip-path: ellipse(110% 100% at 50% 100%);
+  }
+
+  .fc-banner-vcard2__content {
+    flex: 1;
+    padding: 16px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ffffff;
+  }
+
+  .fc-banner-vcard2__title {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 1.35rem;
+    line-height: 1.15;
+    color: #063971;
+    margin-bottom: 6px;
+  }
+  .fc-banner-vcard2__title span {
+    color: #D65A31;
+  }
+
+  .fc-banner-vcard2__subtitle {
+    font-family: 'Amiko', sans-serif;
+    font-weight: 500;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    color: #4b5563;
+    margin-bottom: 10px;
+  }
+
+  .fc-banner-vcard2__features {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .fc-banner-vcard2__feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Amiko', sans-serif;
+    font-size: 0.75rem;
+    color: #1f2937;
+    font-weight: 600;
+  }
+  .fc-banner-vcard2__feature::before {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: #D65A31;
+    color: #ffffff;
+    border-radius: 50%;
+    font-weight: 900;
+    font-size: 0.7rem;
+    flex-shrink: 0;
+  }
+
+  .fc-banner-vcard2__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #D65A31 0%, #b8451f 100%);
+    padding: 12px 18px;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(214, 90, 49, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: auto;
+  }
+  .fc-banner-vcard2__cta::after {
+    content: "→";
+    font-size: 1.05rem;
+    transition: transform 0.2s ease;
+  }
+  .fc-banner-vcard2:hover .fc-banner-vcard2__cta {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(214, 90, 49, 0.45);
+  }
+  .fc-banner-vcard2:hover .fc-banner-vcard2__cta::after {
+    transform: translateX(3px);
+  }
+</style>
+</head>
+<body>
+
+  <div class="preview-label">Banner vertical · Interior · 320 × 640</div>
+
+  <a class="fc-banner-vcard2" href="https://www.furgocasa.com/campers" aria-label="Descubre el interior de nuestras campers">
+
+    <div class="fc-banner-vcard2__img-wrap">
+      <span class="fc-banner-vcard2__tag">Todo incluido</span>
+      <span class="fc-banner-vcard2__brand">Furgocasa</span>
+      <img
+        class="fc-banner-vcard2__img"
+        src="../public/images/mailing/storytellers/showcase-breakfast-table.jpg"
+        alt="Desayuno dentro de una camper Furgocasa">
+    </div>
+
+    <div class="fc-banner-vcard2__content">
+      <h3 class="fc-banner-vcard2__title">
+        Tu hotel <span>sobre ruedas</span>
+      </h3>
+      <p class="fc-banner-vcard2__subtitle">
+        Cocina, ducha, cama y las mejores vistas. Todo listo para salir.
+      </p>
+
+      <div class="fc-banner-vcard2__features">
+        <span class="fc-banner-vcard2__feature">Cocina equipada</span>
+        <span class="fc-banner-vcard2__feature">Baño con ducha</span>
+        <span class="fc-banner-vcard2__feature">Cama doble</span>
+        <span class="fc-banner-vcard2__feature">Calefacción y A/C</span>
+      </div>
+
+      <span class="fc-banner-vcard2__cta">Ver equipamiento</span>
+    </div>
+
+  </a>
+
+</body>
+</html>

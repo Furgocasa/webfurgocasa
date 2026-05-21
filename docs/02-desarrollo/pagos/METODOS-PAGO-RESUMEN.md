@@ -33,6 +33,7 @@
 3. **`src/app/api/stripe/webhook/route.ts`**
    - Recibe notificaciones de Stripe
    - Actualiza estado de pagos y reservas
+   - Envía email de confirmación (1º / 2º pago)
 
 4. **`src/app/pago/cancelado/page.tsx`**
    - Página para pagos cancelados

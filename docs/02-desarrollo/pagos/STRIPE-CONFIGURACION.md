@@ -127,9 +127,11 @@ src/
    - Evento: checkout.session.completed
    - Se valida firma del webhook
    - Se actualiza "payments" (status: authorized/error)
-   - Se actualiza "bookings" (payment_status, status)
+   - Se actualiza "bookings" (payment_status, status, amount_paid, stripe_fee_total)
+   - Se envía email de confirmación (1º o 2º pago, según amount_paid previo)
         ↓
 7. Usuario es redirigido a /pago/exito o /pago/cancelado
+   - /pago/exito solo muestra resumen; NO envía emails (a diferencia del fallback Redsys)
 ```
 
 ## 💳 Diferencias vs Redsys
@@ -165,7 +167,7 @@ WHERE stripe_session_id IS NOT NULL;
 La comisión de la pasarela que **se repercute al cliente** debe figurar en el precio total de la reserva (PVP / facturación). El código actual:
 
 - En **`/api/stripe/initiate`**: el registro en `payments` guarda en **`amount`** el importe total cobrado al cliente (base de alquiler de ese cobro + comisión) y en **`stripe_fee`** solo la parte de comisión de ese cobro.
-- En **`/api/stripe/webhook`** (pago completado): se suma **`payment.amount`** a **`bookings.amount_paid`**, y **`payment.stripe_fee`** a **`bookings.total_price`** y a **`bookings.stripe_fee_total`** (acumulado de comisiones Stripe de esa reserva).
+- En **`/api/stripe/webhook`** (pago completado): se suma **`payment.amount`** a **`bookings.amount_paid`**, y **`payment.stripe_fee`** a **`bookings.total_price`** y a **`bookings.stripe_fee_total`** (acumulado de comisiones Stripe de esa reserva). Tras actualizar la reserva, se envía el email de confirmación de pago (misma lógica que Redsys: primer pago vs segundo pago según `amount_paid` previo).
 
 **Migración SQL en Supabase** (ejecutar una vez si la base aún no las tiene):
 

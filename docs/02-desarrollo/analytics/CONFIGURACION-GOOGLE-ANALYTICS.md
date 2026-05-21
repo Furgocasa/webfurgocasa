@@ -1,14 +1,15 @@
 # Configuración de Google Analytics
 
-## ⚠️ DOCUMENTO OBSOLETO - Implementación Manual
+## ⚠️ DOCUMENTO PARCIALMENTE HISTÓRICO
 
-**Fecha de obsolescencia**: 25 de enero de 2026  
-**Razón**: Migración a `@next/third-parties/google` (librería oficial de Next.js)
+**Última actualización**: 20 de mayo de 2026 — analytics diferida.
+**Fecha de la sección histórica de implementación manual**: 25 de enero de 2026.
 
 **👉 Documentos actuales:**
-- `MIGRACION-NEXT-THIRD-PARTIES.md` - Guía de migración
+- `MIGRACION-NEXT-THIRD-PARTIES.md` - Guía de migración + nota carga diferida mayo 2026
 - `RESUMEN-MIGRACION-ANALYTICS-v4.4.0.md` - Resumen ejecutivo
 - `FIX-ANALYTICS-VISITAS-DUPLICADAS.md` - Fix de visitas duplicadas (27/01/2026)
+- `CONFIGURACION-META-PIXEL.md` - Pixel diferido + fix typo `fbevents.js`
 
 ---
 
@@ -17,7 +18,39 @@
 
 ## Nueva Implementación (v4.4.0)
 
-Desde la versión 4.4.0, la aplicación utiliza la librería oficial de Next.js para Google Analytics:
+Desde la versión 4.4.0, la aplicación utiliza la librería oficial de Next.js para Google Analytics.
+
+> 🆕 **Mayo 2026 (v4.5.x):** se mantiene `@next/third-parties/google`,
+> pero el componente **ya no se monta directamente en
+> `src/app/layout.tsx`**. Ahora se monta dentro de
+> `src/components/deferred-analytics.tsx`, que retrasa la carga de GA,
+> GTM y Meta Pixel hasta la **primera interacción del usuario** (scroll,
+> click, mousemove, touchstart, keydown) o un timeout de 2,5 s.
+>
+> Esto sacó ~250-350 ms de TBT móvil en páginas de localización sin
+> perder tracking de la mayoría de usuarios (la interacción suele
+> ocurrir en <2 s). Ver `MIGRACION-NEXT-THIRD-PARTIES.md` y la entrada
+> *20 mayo 2026* del `CHANGELOG.md`.
+
+### Estructura actual (mayo 2026)
+
+```tsx
+// src/app/layout.tsx
+<DeferredAnalytics
+  gaId="G-G5YLBN5XXZ"
+  gtmId="GTM-5QLGH57"
+  metaPixelId={process.env.NEXT_PUBLIC_META_PIXEL_ID}
+/>
+
+// src/components/deferred-analytics.tsx (resumen)
+'use client';
+// useEffect → espera interacción o 2,5 s → setReady(true)
+// {ready && <GoogleTagManager gtmId={gtmId} />}
+// {ready && <GoogleAnalytics gaId={gaId} />}
+// {ready && metaPixelId && inyecta fbevents.js + fbq('init', ...)}
+```
+
+### Estructura original (enero–mayo 2026, histórica)
 
 ```tsx
 import { GoogleAnalytics } from '@next/third-parties/google'

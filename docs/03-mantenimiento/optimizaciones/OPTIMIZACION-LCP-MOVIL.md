@@ -1,9 +1,79 @@
-# Optimización LCP para Móvil - Eliminación de Preload Duplicado
+# Optimización LCP para Móvil
 
-**Fecha:** 25 de enero de 2026  
+**Última actualización:** 20 de mayo de 2026
 **Objetivo:** Mejorar el Largest Contentful Paint (LCP) en dispositivos móviles en Google PageSpeed Insights
 
-## 📊 Diagnóstico Inicial
+---
+
+## 🆕 Actualización 20/05/2026 — Segundo gran salto
+
+Las cifras del fix de enero (LCP móvil 0,83 s) eran **lab desktop**. En
+mayo de 2026, PageSpeed Insights sobre la URL real
+`https://www.furgocasa.com/es/alquiler-autocaravanas-campervans/murcia`
+reportaba **score 57 / LCP real 3,7 s** en móvil.
+
+### Causas raíz detectadas
+
+1. **`LocationHeroWithSkeleton` era Client Component** y ocultaba el
+   contenido del hero (`opacity-0`) hasta que la imagen disparaba
+   `onLoad`. El LCP no podía pintar hasta que terminase la hidratación
+   + la descarga + la decodificación.
+2. **`decoding="sync"`** en la imagen LCP bloqueaba el hilo principal
+   durante la decodificación. Aporta poco en hero ya prioritario y
+   estaba inflando TBT.
+3. **`SearchWidget` se enviaba completo en el primer bundle** (date-fns,
+   lucide, calendarios, lógica i18n…). Inflaba TBT a ~650 ms aunque no
+   forma parte del LCP.
+4. **GTM + GA + Meta Pixel + flotantes (cookie banner, WhatsApp,
+   BackToTop, Toaster…) se cargaban con `afterInteractive`**, así que
+   competían por el main thread con la hidratación del hero.
+
+### Cambios aplicados (20/05/2026)
+
+| PR | Archivo / Cambio | Efecto |
+|---|---|---|
+| 1 | `src/app/{es,en,fr,de}/page.tsx`, todas las `[location]/page.tsx` y landings (Europa, Marruecos, Madrid, España): `quality={65}` + `fetchPriority="high"` + `sizes="100vw"` en la `<Image>` del hero. | Hero más ligero en móvil. |
+| 1 | `next.config.js`: `experimental.optimizePackageImports` con `lucide-react`, `date-fns`, `@radix-ui/*`, `@headlessui/react`. | Tree-shake real del bundle inicial. |
+| 2 | `src/components/locations/location-hero-with-skeleton.tsx`: ahora **Server Component**, sin `useState`/`onLoad`, sin `opacity-0`, sin `decoding="sync"`, `quality={60}`. | El LCP ya no espera a la hidratación. |
+| 2 | `src/components/booking/search-widget-lazy.tsx` (nuevo) + `search-widget-skeleton.tsx` (nuevo): `next/dynamic` con `ssr: false` y skeleton SSR. Reemplaza al `SearchWidget` directo en home + páginas `[location]` de los 4 idiomas. | TBT baja ~−350 ms en móvil. |
+| 3 | `src/components/deferred-floating.tsx` (nuevo): envuelve `CookieBanner`, `CookieSettingsModal`, `BackToTop`, `WhatsAppChatbot`, `AdminFABButton`, `Toaster`, `AnalyticsDebug`. Se hidratan en `requestIdleCallback` o fallback 1,5 s. | TBT y JS inicial. |
+| 4 | `src/components/deferred-analytics.tsx` (nuevo): GA4, GTM y Meta Pixel se cargan en la **primera interacción del usuario** (`scroll/click/mousemove/touchstart/keydown`) o a los 2,5 s. | GTM/GA/Pixel salen del *critical path*. |
+| 4 | Bonus: corregido typo Meta Pixel `fbevets.js` → `fbevents.js` heredado de la implementación original. | Empieza a funcionar el tracking de Meta. |
+
+### Resultado tras el deploy (PageSpeed móvil sobre `/madrid`)
+
+| Métrica | Antes (Murcia, mayo 2026) | Después (Madrid, mayo 2026) |
+|---|---|---|
+| Score | 57 | **82** |
+| LCP lab | 7,7 s | **3,3 s** |
+| TBT lab | 650 ms | **300 ms** |
+| Tareas largas | 11 | 8 |
+| CLS | 0 | 0 |
+
+> El **LCP CrUX (28 días)** se actualizará en los próximos días conforme
+> se renueve la ventana. El score de 57 era un promedio ponderado de
+> visitas previas al deploy.
+
+### Notas operativas
+
+- **GA, GTM y Meta Pixel** ahora cargan **diferidos**. Si abres
+  DevTools → Network y no ves `gtm.js` al instante, **es lo esperado**.
+  Aparece tras el primer scroll/click/movimiento de ratón o a los 2,5 s.
+- **Banner de cookies**: ahora se monta dentro de `DeferredFloating`.
+  Sigue siendo el primer elemento flotante en aparecer (en
+  `requestIdleCallback`), no se ha cambiado el comportamiento del
+  consentimiento.
+- **Si añades una landing nueva**, recuerda:
+  - Importar `SearchWidgetLazy` en vez de `SearchWidget`.
+  - En la `<Image>` del hero: `priority`, `fetchPriority="high"`,
+    `quality={60}` o `{65}`, `sizes="100vw"`.
+  - **No** añadir `<link rel="preload" as="image">` manual (ver fix
+    enero 2026 más abajo).
+  - **No** añadir `decoding="sync"` al hero.
+
+---
+
+## 📊 Diagnóstico Inicial (enero 2026 — histórico)
 
 ### Resultados Google PageSpeed Insights
 
@@ -125,9 +195,16 @@ return (
 ### Fix #2 (este commit - 25 Ene 2026)
 2. ✅ `/src/app/es/alquiler-autocaravanas-campervans/[location]/page.tsx` (línea 247)
    - Añadido: `decoding="sync"` a la imagen Hero
-   
+   - **⚠️ Revertido el 20/05/2026:** `decoding="sync"` bloqueaba el hilo
+     principal durante la decodificación de la imagen y empeoraba TBT
+     en móvil real. Eliminado en `location-hero-with-skeleton.tsx`.
+
 3. ✅ `/src/components/analytics-scripts.tsx` (línea 41)
    - Cambiado: `strategy="beforeInteractive"` → `strategy="afterInteractive"`
+   - **⚠️ Superado el 20/05/2026:** analytics ahora se carga vía
+     `src/components/deferred-analytics.tsx`, en la primera interacción
+     del usuario o tras 2,5 s. `analytics-scripts.tsx` está marcado
+     como histórico.
 
 ## 🎯 Resultados Finales
 
@@ -209,13 +286,27 @@ El archivo ya cuenta con:
 ## 📚 Lecciones Aprendidas
 
 ### ❌ No hacer:
-- Añadir preloads manuales de imágenes cuando se usa Next.js `Image` con `priority`
-- Duplicar la descarga de recursos críticos
+- Añadir preloads manuales de imágenes cuando se usa Next.js `Image` con `priority`.
+- Duplicar la descarga de recursos críticos.
+- Usar `decoding="sync"` en la imagen LCP (bloquea el main thread).
+- Convertir el wrapper del hero en Client Component con
+  `opacity-0 → opacity-100` controlado por `onLoad`: el LCP se retrasa
+  hasta la hidratación.
+- Cargar GTM/GA/Pixel con `afterInteractive` si la página ya tiene mucho
+  JS por hidratar: compiten con el LCP. Mejor diferirlos hasta
+  interacción.
 
 ### ✅ Hacer:
-- Confiar en la optimización automática de Next.js Image
-- Solo añadir preconnect/dns-prefetch para dominios externos
-- Siempre probar en simulación móvil 4G lenta
+- Confiar en la optimización automática de Next.js Image (`priority`).
+- Solo añadir preconnect/dns-prefetch para dominios externos.
+- Mantener el hero **server-side**, sin estado client-side innecesario.
+- Lazy-load (`next/dynamic` + skeleton SSR) los widgets que **no**
+  forman parte del LCP pero pesan mucho (`SearchWidget`, calendario,
+  etc.).
+- Diferir GA/GTM/Pixel a primera interacción (ver
+  `src/components/deferred-analytics.tsx`).
+- Siempre probar en simulación móvil 4G lenta y, **sobre todo, mirar
+  los datos CrUX reales**, no sólo el lab.
 
 ## 🧪 Verificación Post-Deploy ✅ COMPLETADA
 

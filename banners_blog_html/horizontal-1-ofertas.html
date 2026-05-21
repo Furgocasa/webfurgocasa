@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furgocasa · Banner blog horizontal · Ofertas</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Amiko:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Amiko', sans-serif;
+    background: #f4f4f5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .preview-label {
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #6b7280;
+    margin-bottom: 14px;
+  }
+
+  /* =========================================================
+     BANNER HORIZONTAL · OFERTAS
+     Tamaño objetivo: 960 × 280 (ratio ~24:7)
+     Recomendado para tira ancha dentro de un artículo del blog
+     ========================================================= */
+  .fc-banner-h {
+    position: relative;
+    display: block;
+    text-decoration: none;
+    width: 100%;
+    max-width: 960px;
+    min-height: 230px;
+    aspect-ratio: 16 / 5;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(6, 57, 113, 0.18);
+    isolation: isolate;
+    background: #063971;
+  }
+
+  .fc-banner-h__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 75% center;
+    z-index: 1;
+  }
+
+  /* Degradado para garantizar legibilidad del texto sobre la imagen */
+  .fc-banner-h__overlay {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg,
+        rgba(6, 57, 113, 0.95) 0%,
+        rgba(6, 57, 113, 0.90) 30%,
+        rgba(6, 57, 113, 0.70) 55%,
+        rgba(6, 57, 113, 0.20) 80%,
+        rgba(6, 57, 113, 0.00) 100%);
+    z-index: 2;
+  }
+
+  .fc-banner-h__content {
+    position: relative;
+    z-index: 3;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 22px 28px;
+    max-width: 62%;
+    color: #ffffff;
+  }
+
+  .fc-banner-h__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    align-self: flex-start;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #FBBF24;
+    background: rgba(0, 0, 0, 0.28);
+    padding: 5px 12px;
+    border-radius: 30px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(251, 191, 36, 0.45);
+  }
+  .fc-banner-h__tag::before {
+    content: "";
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: #FBBF24;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #FBBF24;
+  }
+
+  .fc-banner-h__title {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.15rem, 2.4vw, 1.85rem);
+    line-height: 1.15;
+    color: #ffffff;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  }
+  .fc-banner-h__title span {
+    color: #FBBF24;
+  }
+
+  .fc-banner-h__subtitle {
+    font-family: 'Amiko', sans-serif;
+    font-weight: 600;
+    font-size: clamp(0.8rem, 1.4vw, 0.98rem);
+    line-height: 1.35;
+    color: #ffffff;
+    margin-bottom: 12px;
+    max-width: 95%;
+  }
+
+  .fc-banner-h__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 0.88rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #D65A31 0%, #b8451f 100%);
+    padding: 10px 20px;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(214, 90, 49, 0.45);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    letter-spacing: 0.5px;
+  }
+  .fc-banner-h__cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(214, 90, 49, 0.55);
+  }
+  .fc-banner-h__cta::after {
+    content: "→";
+    font-size: 1.1rem;
+    transition: transform 0.2s ease;
+  }
+  .fc-banner-h__cta:hover::after {
+    transform: translateX(3px);
+  }
+
+  /* Marca discreta */
+  .fc-banner-h__brand {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    z-index: 3;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.25);
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Responsive · pantallas estrechas */
+  @media (max-width: 640px) {
+    .fc-banner-h {
+      aspect-ratio: 4 / 3;
+      min-height: 0;
+    }
+    .fc-banner-h__img {
+      object-position: center 50%;
+    }
+    .fc-banner-h__overlay {
+      background:
+        linear-gradient(180deg,
+          rgba(6, 57, 113, 0.20) 0%,
+          rgba(6, 57, 113, 0.65) 45%,
+          rgba(6, 57, 113, 0.92) 100%);
+    }
+    .fc-banner-h__content {
+      max-width: 100%;
+      justify-content: flex-end;
+      padding: 20px 20px 22px;
+    }
+    .fc-banner-h__subtitle {
+      max-width: 100%;
+    }
+  }
+</style>
+</head>
+<body>
+
+  <div class="preview-label">Banner horizontal · Ofertas · 960 × 280</div>
+
+  <!-- ====== BANNER (esto es lo único que se inserta en el blog) ====== -->
+  <a class="fc-banner-h" href="https://www.furgocasa.com/ofertas" aria-label="Ver ofertas Furgocasa">
+    <img
+      class="fc-banner-h__img"
+      src="../public/images/mailing/vehicles/fu0006-dreamer-fun-d55.jpg"
+      alt="Camper Dreamer Fun D55 de la flota Furgocasa">
+
+    <div class="fc-banner-h__overlay"></div>
+
+    <span class="fc-banner-h__brand">Furgocasa</span>
+
+    <div class="fc-banner-h__content">
+      <span class="fc-banner-h__tag">Ofertas activas</span>
+      <h3 class="fc-banner-h__title">
+        Tu próxima escapada en camper, <span>al mejor precio</span>
+      </h3>
+      <p class="fc-banner-h__subtitle">
+        Aprovecha los huecos entre reservas y consigue tu camper totalmente equipada con descuentos exclusivos.
+      </p>
+      <span class="fc-banner-h__cta">Ver ofertas</span>
+    </div>
+  </a>
+  <!-- ====== / BANNER ====== -->
+
+</body>
+</html>

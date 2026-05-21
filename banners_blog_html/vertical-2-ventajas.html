@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Furgocasa · Banner blog vertical · Ventajas</title>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;700;800;900&family=Amiko:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Amiko', sans-serif;
+    background: #f4f4f5;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .preview-label {
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #6b7280;
+    margin-bottom: 14px;
+  }
+
+  /* =========================================================
+     BANNER VERTICAL · VENTAJAS · CARD CON IMAGEN ARRIBA
+     Tamaño objetivo: 320 × 640 (ratio 1:2)
+     Layout: imagen 55% · tarjeta blanca 45%
+     ========================================================= */
+  .fc-banner-vcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    aspect-ratio: 1 / 2;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 14px 50px rgba(6, 57, 113, 0.25);
+    background: #ffffff;
+    text-decoration: none;
+  }
+
+  .fc-banner-vcard__img-wrap {
+    position: relative;
+    flex: 0 0 55%;
+    overflow: hidden;
+  }
+  .fc-banner-vcard__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.6s ease;
+  }
+  .fc-banner-vcard:hover .fc-banner-vcard__img {
+    transform: scale(1.05);
+  }
+
+  /* Etiqueta sobre la imagen */
+  .fc-banner-vcard__tag {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #ffffff;
+    background: rgba(6, 57, 113, 0.85);
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+  }
+  .fc-banner-vcard__tag::before {
+    content: "";
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: #FBBF24;
+    border-radius: 50%;
+    box-shadow: 0 0 6px #FBBF24;
+  }
+
+  /* Logo/marca abajo-derecha de la zona de imagen (no compite con el tag) */
+  .fc-banner-vcard__brand {
+    position: absolute;
+    bottom: 36px;
+    right: 14px;
+    z-index: 2;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 0.55rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.85);
+    background: rgba(0, 0, 0, 0.35);
+    padding: 4px 10px;
+    border-radius: 14px;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Curva decorativa que une la imagen con la tarjeta */
+  .fc-banner-vcard__img-wrap::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0; right: 0;
+    height: 30px;
+    background: #ffffff;
+    clip-path: ellipse(110% 100% at 50% 100%);
+  }
+
+  /* Tarjeta inferior */
+  .fc-banner-vcard__content {
+    flex: 1;
+    padding: 18px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: #ffffff;
+  }
+
+  .fc-banner-vcard__title {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 1.35rem;
+    line-height: 1.15;
+    color: #063971;
+    margin-bottom: 8px;
+  }
+  .fc-banner-vcard__title span {
+    color: #D65A31;
+  }
+
+  .fc-banner-vcard__subtitle {
+    font-family: 'Amiko', sans-serif;
+    font-weight: 500;
+    font-size: 0.85rem;
+    line-height: 1.35;
+    color: #4b5563;
+    margin-bottom: 12px;
+  }
+
+  .fc-banner-vcard__features {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-bottom: 14px;
+  }
+  .fc-banner-vcard__feature {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Amiko', sans-serif;
+    font-size: 0.78rem;
+    color: #1f2937;
+    font-weight: 600;
+  }
+  .fc-banner-vcard__feature::before {
+    content: "✓";
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    background: #FBBF24;
+    color: #063971;
+    border-radius: 50%;
+    font-weight: 900;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+  }
+
+  .fc-banner-vcard__cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #ffffff;
+    background: linear-gradient(135deg, #063971 0%, #0a4d8e 100%);
+    padding: 12px 18px;
+    border-radius: 30px;
+    text-decoration: none;
+    box-shadow: 0 6px 18px rgba(6, 57, 113, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    margin-top: auto;
+  }
+  .fc-banner-vcard__cta::after {
+    content: "→";
+    font-size: 1.05rem;
+    transition: transform 0.2s ease;
+  }
+  .fc-banner-vcard:hover .fc-banner-vcard__cta {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(6, 57, 113, 0.45);
+  }
+  .fc-banner-vcard:hover .fc-banner-vcard__cta::after {
+    transform: translateX(3px);
+  }
+</style>
+</head>
+<body>
+
+  <div class="preview-label">Banner vertical · Ventajas · 320 × 640</div>
+
+  <!-- ====== BANNER (esto es lo único que se inserta en el blog) ====== -->
+  <a class="fc-banner-vcard" href="https://www.furgocasa.com/campers" aria-label="Descubre la flota de campers Furgocasa">
+
+    <div class="fc-banner-vcard__img-wrap">
+      <span class="fc-banner-vcard__tag">La libertad de viajar</span>
+      <span class="fc-banner-vcard__brand">Furgocasa</span>
+      <img
+        class="fc-banner-vcard__img"
+        src="../public/images/mailing/storytellers/showcase-detail-route.jpg"
+        alt="La carretera vista desde una camper Furgocasa">
+    </div>
+
+    <div class="fc-banner-vcard__content">
+      <h3 class="fc-banner-vcard__title">
+        Lleva tu casa <span>contigo</span>
+      </h3>
+      <p class="fc-banner-vcard__subtitle">
+        Donde quieras, cuando quieras. Tu camper lista para salir desde Murcia.
+      </p>
+
+      <div class="fc-banner-vcard__features">
+        <span class="fc-banner-vcard__feature">Kilometraje ilimitado</span>
+        <span class="fc-banner-vcard__feature">Seguro a todo riesgo</span>
+        <span class="fc-banner-vcard__feature">Reserva online en 2 min</span>
+      </div>
+
+      <span class="fc-banner-vcard__cta">Ver nuestra flota</span>
+    </div>
+
+  </a>
+  <!-- ====== / BANNER ====== -->
+
+</body>
+</html>

@@ -155,5 +155,24 @@ Get-ChildItem TESTER/results -Directory | Where-Object { $_.Name -ne "latest" } 
 - El tester se conecta por defecto a **producción**. No causa daños (sólo navega
   y hace capturas).
 - Si la ruta requiere login (admin), no se incluye por defecto.
-- En ejecuciones desde Dropbox sincronizado conviene **pausar Dropbox** mientras
-  corre, para que no bloquee la escritura de PNGs grandes.
+
+### 📦 Si el repo vive dentro de Dropbox (Windows)
+
+Dropbox puede borrar/mover capturas mientras el tester escribe (provoca
+`ENOENT` a mitad de ejecución). La forma oficial de evitarlo es marcar
+`TESTER/results/` como ignorada por Dropbox con un atributo NTFS:
+
+```powershell
+Set-Content -Path "TESTER\results" -Stream com.dropbox.ignored -Value 1
+```
+
+Verificar:
+
+```powershell
+Get-Content -Path "TESTER\results" -Stream com.dropbox.ignored
+# debe imprimir 1
+```
+
+Hay que aplicarlo **una sola vez** por máquina. Si la carpeta se borra y se
+vuelve a crear, repite el comando. Documentación oficial:
+<https://help.dropbox.com/sync/ignored-files>

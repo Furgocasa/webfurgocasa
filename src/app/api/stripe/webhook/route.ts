@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { createAdminClient } from "@/lib/supabase/server";
 import { constructWebhookEvent, mapStripeStatusToPaymentStatus } from "@/lib/stripe";
+import {
+  sendFirstPaymentConfirmedEmail,
+  sendSecondPaymentConfirmedEmail,
+  getBookingDataForEmail,
+} from "@/lib/email";
 import Stripe from "stripe";
 
 /**
@@ -92,16 +97,18 @@ export async function POST(request: NextRequest) {
         if (status === "authorized") {
           const { data: booking, error: bookingError } = await supabase
             .from("bookings")
-            .select("amount_paid, total_price, stripe_fee_total")
+            .select("amount_paid, total_price, stripe_fee_total, customer_email")
             .eq("id", payment.booking_id)
             .single();
 
           if (!bookingError && booking) {
             const fee = Number(payment.stripe_fee ?? 0);
-            const newAmountPaid = (booking.amount_paid || 0) + payment.amount;
+            const currentPaid = booking.amount_paid || 0;
+            const newAmountPaid = currentPaid + payment.amount;
             const newTotalPrice = (booking.total_price || 0) + fee;
             const newStripeFeeTotal = (booking.stripe_fee_total || 0) + fee;
             const isFullyPaid = newAmountPaid >= newTotalPrice;
+            const isFirstPayment = currentPaid === 0;
 
             const { error: bookingUpdateError } = await supabase
               .from("bookings")
@@ -116,24 +123,65 @@ export async function POST(request: NextRequest) {
 
             if (bookingUpdateError) {
               console.error("❌ Error actualizando reserva:", bookingUpdateError);
-            } else if (isFullyPaid) {
-              // 📌 Marcar oferta de última hora como "reserved" cuando el pago está completado
-              const { data: offerToUpdate } = await supabase
-                .from("last_minute_offers")
-                .select("id")
-                .eq("booking_id", payment.booking_id)
-                .eq("status", "reserved_pending_payment")
-                .single();
-              if (offerToUpdate) {
-                await supabase
+            } else {
+              if (isFullyPaid) {
+                // 📌 Marcar oferta de última hora como "reserved" cuando el pago está completado
+                const { data: offerToUpdate } = await supabase
                   .from("last_minute_offers")
-                  .update({
-                    status: "reserved",
-                    reserved_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                  })
-                  .eq("id", offerToUpdate.id);
-                console.log("✅ Oferta última hora marcada como reserved (pago completado)");
+                  .select("id")
+                  .eq("booking_id", payment.booking_id)
+                  .eq("status", "reserved_pending_payment")
+                  .single();
+                if (offerToUpdate) {
+                  await supabase
+                    .from("last_minute_offers")
+                    .update({
+                      status: "reserved",
+                      reserved_at: new Date().toISOString(),
+                      updated_at: new Date().toISOString(),
+                    })
+                    .eq("id", offerToUpdate.id);
+                  console.log("✅ Oferta última hora marcada como reserved (pago completado)");
+                }
+              }
+
+              // 📧 Enviar email de confirmación (espejo del flujo Redsys)
+              // Aislado en try/catch: un fallo de email NUNCA debe romper el webhook.
+              try {
+                console.log("📧 [Stripe] Preparando envío de email...", {
+                  isFirstPayment,
+                  isFullyPaid,
+                  currentPaid,
+                  newAmountPaid,
+                  newTotalPrice,
+                });
+
+                const customerEmail = booking.customer_email;
+                const bookingData = await getBookingDataForEmail(payment.booking_id, supabase);
+
+                if (customerEmail && bookingData) {
+                  bookingData.amountPaid = newAmountPaid;
+                  bookingData.pendingAmount = Math.max(0, newTotalPrice - newAmountPaid);
+
+                  if (isFirstPayment) {
+                    console.log("📧 [Stripe] Enviando email de PRIMER PAGO a:", customerEmail);
+                    const result = await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
+                    console.log("📧 [Stripe] Resultado envío email primer pago:", result);
+                  } else {
+                    console.log("📧 [Stripe] Enviando email de SEGUNDO PAGO a:", customerEmail);
+                    const result = await sendSecondPaymentConfirmedEmail(customerEmail, bookingData);
+                    console.log("📧 [Stripe] Resultado envío email segundo pago:", result);
+                  }
+                } else {
+                  console.error("❌ [Stripe] No se pudo enviar email:", {
+                    hasCustomerEmail: !!customerEmail,
+                    hasBookingData: !!bookingData,
+                    bookingId: payment.booking_id,
+                  });
+                }
+              } catch (emailError) {
+                console.error("❌ [Stripe] Error al intentar enviar email:", emailError);
+                // No bloqueamos el webhook si falla el email
               }
             }
 

@@ -5,7 +5,7 @@
 [![Deploy](https://img.shields.io/badge/deploy-Vercel-black.svg)](https://vercel.com)
 [![PageSpeed](https://img.shields.io/badge/PageSpeed-99%2F100_desktop-brightgreen.svg)](https://pagespeed.web.dev/)
 [![PageSpeed Mobile](https://img.shields.io/badge/PageSpeed-92%2F100_mobile-green.svg)](https://pagespeed.web.dev/)
-[![LCP](https://img.shields.io/badge/LCP-0.83s_mobile-brightgreen.svg)](./OPTIMIZACION-LCP-MOVIL.md)
+[![LCP](https://img.shields.io/badge/LCP-0.83s_mobile-brightgreen.svg)](./docs/03-mantenimiento/optimizaciones/OPTIMIZACION-LCP-MOVIL.md)
 [![SEO](https://img.shields.io/badge/SEO-100%2F100-brightgreen.svg)](./CHANGELOG.md)
 [![i18n](https://img.shields.io/badge/i18n-4_idiomas-blue.svg)](./docs/02-desarrollo/traducciones/I18N_IMPLEMENTATION.md)
 
@@ -25,6 +25,22 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 - **Expansión reciente**: **22** localidades en anillo (Madrid + entorno Alicante + entorno Albacete) y **Hellín** (recogida Albacete).
 - **Contenido IA** (`content_sections`): `npm run generate-content:all` | `:ring` | `:thin` | `single <slug>` — guía en [`docs/04-referencia/otros/GENERACION-CONTENIDO-IA.md`](./docs/04-referencia/otros/GENERACION-CONTENIDO-IA.md).
 - **Metas ES + EN/FR/DE**: `node scripts/update-location-targets-rent-meta.js` (tabla `location_targets` + `content_translations`).
+
+---
+
+## ⚡ Mayo 2026 — Rendimiento móvil páginas de localización (20/05/2026)
+
+- **Problema medido:** PageSpeed móvil real (CrUX) sobre `/es/alquiler-autocaravanas-campervans/murcia` reportaba **score 57 / LCP 3,7 s / TBT lab 650 ms**, muy por debajo de las cifras "lab desktop" que se documentaron en enero de 2026.
+- **Causas:** `LocationHeroWithSkeleton` era Client Component y ocultaba el contenido con `opacity-0` hasta `onLoad`; `decoding="sync"` bloqueaba el main thread; `SearchWidget` iba en el bundle inicial; GTM/GA/Pixel + 7 flotantes competían con la hidratación del hero.
+- **Fixes (commits `45beb2d4` + `a57a9b45`):**
+  - Hero `Image` `quality={60-65}` + `fetchPriority="high"` + `sizes="100vw"` en home, landings y `[location]` (4 idiomas).
+  - `next.config.js`: `experimental.optimizePackageImports` con `lucide-react`, `date-fns`, 17 `@radix-ui/*` y `@headlessui/react`.
+  - `LocationHeroWithSkeleton` vuelve a **Server Component** (sin `useState`/`onLoad`, sin `decoding="sync"`, sin `opacity-0`).
+  - `SearchWidgetLazy` + `SearchWidgetSkeleton` (SSR, alturas exactas para evitar CLS) reemplazan al import directo de `SearchWidget`.
+  - `DeferredFloating` (idle/1,5 s) y `DeferredAnalytics` (primera interacción / 2,5 s) sacan flotantes, GA, GTM y Meta Pixel del *critical path*. Bonus: typo `fbevets.js` → `fbevents.js` corregido (Meta Pixel **no estaba funcionando** antes).
+- **Resultado tras el deploy sobre `/madrid`:** score 57 → **82**, LCP lab 7,7 s → **3,3 s**, TBT 650 ms → **300 ms**, CLS 0 → 0. CrUX se actualizará en los próximos días.
+- **Implicación operativa:** GTM/GA/Pixel **ya no aparecen al instante** en DevTools → Network; esperan a la primera interacción o 2,5 s. Es lo esperado. No afecta a `purchase` / `additional_payment_received` (se disparan después de la pasarela).
+- **Documentación:** [SKELETON-SCREEN-OPTIMIZACION.md](./SKELETON-SCREEN-OPTIMIZACION.md) · [OPTIMIZACION-LCP-MOVIL.md](./docs/03-mantenimiento/optimizaciones/OPTIMIZACION-LCP-MOVIL.md) · [MIGRACION-NEXT-THIRD-PARTIES.md](./MIGRACION-NEXT-THIRD-PARTIES.md) · [CONFIGURACION-GOOGLE-ANALYTICS.md](./docs/02-desarrollo/analytics/CONFIGURACION-GOOGLE-ANALYTICS.md) · [CONFIGURACION-META-PIXEL.md](./docs/02-desarrollo/analytics/CONFIGURACION-META-PIXEL.md) · CHANGELOG entrada del 20/05/2026.
 
 ---
 

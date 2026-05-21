@@ -13,6 +13,7 @@ import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, type Locale } from "@/lib/translations/get-translations";
 import { translateServer } from "@/lib/i18n/server-translation";
 import { buildBlogCanonicalAlternates, truncateTitle, OG_DEFAULT_IMAGE } from "@/lib/seo/multilingual-metadata";
+import { BlogContentWithBanners } from "@/components/blog/blog-banners";
 
 /**
  * 🎯 ARTÍCULOS DE BLOG MULTIIDIOMA - Nueva arquitectura [locale]
@@ -274,9 +275,10 @@ export default async function LocaleBlogPostPage({
                 </p>
               )}
 
-              <div 
-                className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-furgocasa-blue hover:prose-a:text-furgocasa-blue-dark prose-img:rounded-2xl prose-img:shadow-lg"
-                dangerouslySetInnerHTML={{ __html: sanitizeBlogContentLinks(translatedPost.content || post.content || "", locale, translatedPost.title || post.title) }}
+              <BlogContentWithBanners
+                htmlContent={sanitizeBlogContentLinks(translatedPost.content || post.content || "", locale, translatedPost.title || post.title)}
+                readingTime={post.reading_time || 5}
+                proseClassName="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-furgocasa-blue hover:prose-a:text-furgocasa-blue-dark prose-img:rounded-2xl prose-img:shadow-lg"
               />
 
               {/* Tags */}
