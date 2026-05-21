@@ -34,11 +34,15 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || process.env.NEXT_PUBLIC_APP_
 export const metadata: Metadata = {
   metadataBase: new URL(baseUrl),
   title: {
-    default: "Alquiler de Campers y Autocaravanas en España - Furgocasa",
-    // Eliminado el template automático para tener control total sobre la longitud (SEO)
+    // ⚠️ FALLBACK GLOBAL: este title SOLO se usa si una página no declara generateMetadata().
+    // NUNCA debe incluir keywords geográficas (España, Madrid, Murcia, etc.) ni de producto
+    // (motorhome, autocaravana, casa rodante) porque canibalizaría a las landings dedicadas.
+    // Mantener brand-first y genérico. Ver docs/02-desarrollo/seo/LATAM_SEO.md.
+    default: "Furgocasa · Alquiler de campers premium",
+    // Sin template automático para tener control total de longitud (SEO).
   },
   description:
-    "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa. Flota premium de vehículos equipados para tus vacaciones.",
+    "Alquiler de campers premium con kilómetros ilimitados. Flota Dreamer, Knaus y Weinsberg. Reserva online en Furgocasa desde 95€/día.",
   keywords: [
     "alquiler camper",
     "alquiler autocaravana",
@@ -71,9 +75,9 @@ export const metadata: Metadata = {
     locale: "es_ES",
     url: baseUrl,
     siteName: "Furgocasa",
-    title: "Alquiler de Campers y Autocaravanas en España - Furgocasa",
+    title: "Furgocasa · Alquiler de campers premium",
     description:
-      "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa.",
+      "Alquiler de campers premium con kilómetros ilimitados. Flota Dreamer, Knaus y Weinsberg desde 95€/día.",
     images: [
       {
         url: OG_DEFAULT_IMAGE,
@@ -85,8 +89,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Alquiler de Campers y Autocaravanas - Furgocasa",
-    description: "Alquila tu camper o autocaravana. Vive la aventura con Furgocasa.",
+    title: "Furgocasa · Alquiler de campers premium",
+    description: "Alquiler de campers premium con kilómetros ilimitados. Flota Dreamer, Knaus y Weinsberg desde 95€/día.",
     images: [OG_DEFAULT_IMAGE],
   },
   robots: {
