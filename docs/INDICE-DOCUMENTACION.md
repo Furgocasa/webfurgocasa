@@ -1,10 +1,22 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.27 ✅ PRODUCCIÓN — GTM solo tras cobro pasarela + stats Storytellers  
+**Versión**: 1.0.28 ✅ PRODUCCIÓN — Banners blog + GTM solo tras cobro pasarela + stats Storytellers  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 18 de mayo de 2026
+**Última actualización**: 21 de mayo de 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🎨 Mayo 2026 — Banners publicitarios automáticos en artículos del blog
+
+| Tema | Dónde leer |
+|------|------------|
+| 8 banners HTML/CSS (4 horizontales + 4 verticales), diseño en `banners_blog_html/` | Prototipos HTML en **`banners_blog_html/`** (carpeta raíz) |
+| Componente `BlogContentWithBanners`: split por H2, conteo por `readingTime`, aleatorización, responsive (V móvil / H desktop) | **`src/components/blog/blog-banners.tsx`** + **`blog-banners.css`** |
+| Integración en páginas de artículo (4 idiomas) | **`src/app/{es,en,fr,de}/blog/[category]/[slug]/page.tsx`** |
+| Documentación técnica del blog | **[BLOG-IMPROVEMENTS.md](./04-referencia/blog/BLOG-IMPROVEMENTS.md)** — sección *Banners publicitarios* |
+| Resumen ejecutivo | **[README raíz](../README.md)** — *Mayo 2026 — Banners publicitarios* · **CHANGELOG** (21 may 2026) |
 
 ---
 

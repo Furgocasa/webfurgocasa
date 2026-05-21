@@ -4,6 +4,26 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🎨 Banners publicitarios automáticos en artículos del blog — 21 de mayo de 2026
+
+**Objetivo:** insertar banners promocionales de FURGOCASA (ofertas y flota) dentro de los artículos del blog, intercalados entre secciones H2, sin modificar el contenido almacenado en Supabase.
+
+**Diseño (8 banners en `banners_blog_html/`):**
+- 4 horizontales: ofertas, ventajas de la flota, comodidad (cocina/ducha/cama) y proceso de reserva en 3 pasos.
+- 4 verticales: ofertas, ventajas, momentos emocionales y equipamiento interior.
+- Paleta corporativa (#063971 azul, #D65A31 naranja, #FBBF24 dorado), tipografías Rubik/Amiko, imágenes reales de la flota.
+
+**Implementación (`src/components/blog/blog-banners.tsx` + `blog-banners.css`):**
+- Componente client `BlogContentWithBanners` que recibe el HTML del artículo y `readingTime`.
+- Divide el contenido por `<h2>` y calcula cuántos banners insertar (1 si ≤4 min, 2 si 5-8 min, 3 si ≥9 min).
+- Distribución equitativa entre secciones; banners aleatorios sin repetición en cada carga de página (client-side, compatible con ISR de 24h).
+- **Responsive:** verticales en móvil, horizontales en desktop (≥1024px) mediante CSS `display`.
+- URLs correctas: `/es/ofertas` y `/es/vehiculos`.
+
+**Archivos modificados:** `src/app/{es,en,fr,de}/blog/[category]/[slug]/page.tsx` — reemplazado `<div dangerouslySetInnerHTML>` por `<BlogContentWithBanners>`.
+
+---
+
 ## ✉️ Fix: email de confirmación tras pago con Stripe — 21 de mayo de 2026
 
 **Problema:** Tras pagar con Stripe, la reserva se confirmaba correctamente pero **no se enviaba** el email de confirmación (1º o 2º pago). Con Redsys sí funcionaba. Casos reales: reservas FG16895847 y FG81370361, donde hubo que reenviar manualmente desde admin.

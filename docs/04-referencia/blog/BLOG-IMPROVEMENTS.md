@@ -135,15 +135,46 @@ export const revalidate = 1800; // 30 minutos en segundos
 /blog?category=consejos&q=camping&page=2
 ```
 
+### 8. **Banners publicitarios en artículos** (mayo 2026)
+
+Inserción automática de banners promocionales de FURGOCASA entre las secciones H2 de cada artículo.
+
+**Componentes:**
+- `src/components/blog/blog-banners.tsx` — componente client (`"use client"`) con toda la lógica
+- `src/components/blog/blog-banners.css` — estilos consolidados de los 8 banners
+
+**8 variantes de banner:**
+- 4 horizontales (desktop ≥1024px): ofertas, ventajas flota, comodidad, reserva en 3 pasos
+- 4 verticales (móvil <1024px): ofertas, ventajas, momentos emocionales, equipamiento interior
+
+**Lógica de inserción:**
+- El contenido HTML se divide por `<h2>` en secciones
+- Según `readingTime`: 1 banner (≤4 min), 2 banners (5-8 min), 3 banners (≥9 min)
+- Los banners se distribuyen equitativamente entre las secciones
+- Aleatorización client-side en cada carga (compatible con ISR de 24h)
+- Cada slot renderiza un par H+V; CSS muestra solo el apropiado según viewport
+
+**Maquetas de diseño:** `banners_blog_html/` contiene los 8 prototipos HTML + `preview.html` para previsualización local. El HTML limpio (sin `<head>/<body>`) se copia a los arrays de `blog-banners.tsx`.
+
+**URLs de destino:** `https://www.furgocasa.com/es/ofertas` y `https://www.furgocasa.com/es/vehiculos`.
+
+**Para añadir nuevos banners:**
+1. Crear el HTML de maqueta en `banners_blog_html/`
+2. Extraer el CSS del banner y añadirlo a `blog-banners.css`
+3. Copiar el HTML limpio del `<a>` al array `HORIZONTAL_BANNERS` o `VERTICAL_BANNERS` en `blog-banners.tsx`
+4. Ajustar rutas de imagen a `/images/mailing/...`
+
+---
+
 ## 🎯 Próximas Mejoras Potenciales
 
-1. **ISR (Incremental Static Regeneration)**: Para posts individuales
+1. ~~**ISR (Incremental Static Regeneration)**: Para posts individuales~~ ✅ Implementado (`revalidate = 86400`)
 2. **Infinite Scroll**: Como alternativa a paginación
 3. **Filtros por etiquetas**: Además de categorías
 4. **Vista en lista/grid**: Toggle de visualización
-5. **Compartir en redes sociales**: Botones integrados
-6. **Lectura estimada**: Más precisa con IA
-7. **Related posts**: Recomendaciones al final de artículos
+5. ~~**Compartir en redes sociales**: Botones integrados~~ ✅ Implementado (`ShareButtons`)
+6. ~~**Lectura estimada**: Más precisa con IA~~ ✅ Implementado (`reading_time` calculado al guardar)
+7. ~~**Related posts**: Recomendaciones al final de artículos~~ ✅ Implementado (sidebar)
 
 ## 🐛 Problemas Conocidos
 

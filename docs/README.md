@@ -100,6 +100,7 @@ Documentación técnica de referencia:
 #### blog/
 - Sistema de blog con CMS
 - Portadas generadas por IA (`gpt-5.4` + `gpt-image-2`, publicación WebP, referencias en `images/IA_blog/`) — detalle en **02-desarrollo/media/GESTION-MEDIA-STORAGE.md**
+- **Banners publicitarios automáticos (mayo 2026):** 8 banners H/V insertados entre secciones H2 según `readingTime`, aleatorios en cada carga, responsive (V móvil / H desktop). Componente: `src/components/blog/blog-banners.tsx`. Maquetas: `banners_blog_html/`. Ver **[BLOG-IMPROVEMENTS.md](./04-referencia/blog/BLOG-IMPROVEMENTS.md)**
 
 #### sistema-reservas/
 - Flujo crítico de reservas
@@ -206,5 +207,5 @@ Cuando añadas nueva documentación:
 
 ---
 
-Última actualización: 29 de abril, 2026  
-Versión del proyecto: 4.5.4+ (fixes de disponibilidad: filtro por `status` y regla "última pending gana"; trigger SQL sin PII por RGPD; aviso de hora flexible en email de recordatorio de devolución)
+Última actualización: 21 de mayo, 2026  
+Versión del proyecto: 4.5.4+ (banners blog, fixes disponibilidad, filtro `status`, regla "última pending gana", trigger SQL sin PII RGPD, aviso hora flexible email devolución)

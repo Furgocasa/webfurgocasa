@@ -162,6 +162,19 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## 🎨 Mayo 2026 — Banners publicitarios automáticos en artículos del blog (21/05/2026)
+
+- **8 banners HTML/CSS** diseñados a mano (4 horizontales + 4 verticales) en `banners_blog_html/`. Paleta corporativa, tipografías Rubik/Amiko, imágenes reales de la flota.
+- **Inserción automática en runtime:** componente client `BlogContentWithBanners` (`src/components/blog/blog-banners.tsx`) divide el HTML del artículo por `<h2>`, calcula cuántos banners caben (1 si ≤4 min lectura, 2 si 5-8 min, 3 si ≥9 min) y los distribuye equitativamente.
+- **Aleatorización:** banners distintos en cada carga de página (seed client-side), sin repeticiones. Compatible con ISR de 24h.
+- **Responsive:** verticales en móvil, horizontales en desktop (≥1024px) vía CSS `display`. Cada slot renderiza ambas versiones y CSS elige cuál mostrar.
+- **URLs:** `/es/ofertas` (banners de ofertas) y `/es/vehiculos` (banners de flota/reserva).
+- **No modifica contenido en Supabase:** todo es inyección en render.
+- **Archivos:** `blog-banners.tsx`, `blog-banners.css`, páginas `[slug]/page.tsx` en los 4 idiomas.
+- **Documentación:** CHANGELOG (21 may 2026), [`docs/04-referencia/blog/BLOG-IMPROVEMENTS.md`](./docs/04-referencia/blog/BLOG-IMPROVEMENTS.md).
+
+---
+
 ## 🚐 Marzo 2026 — Listados de vehículos (flota, ventas, búsqueda)
 
 - **Flota alquiler** (`/es/vehiculos`, `/en/vehicles`, `/fr/vehicules`, `/de/fahrzeuge`): un solo componente `src/components/vehicle/vehicle-list-client.tsx` — título = `vehicle.name` (sin segunda línea marca/modelo redundante). **ISR** `revalidate = 3600`: los cambios pueden tardar hasta ~1 h en verse en CDN.
