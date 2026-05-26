@@ -44,6 +44,7 @@ export function Header() {
   const navigation = [
     { name: t("Ofertas"), href: "/ofertas" },
     { name: t("Vehículos"), href: "/vehiculos" },
+    { name: t("Ventas"), href: "/ventas", highlight: true },
     { name: t("Tarifas"), href: "/tarifas" },
     { name: t("Blog"), href: "/blog" },
     { name: t("Contacto"), href: "/contacto" },
@@ -234,32 +235,40 @@ export function Header() {
               )}
             </div>
 
-            {navigation.map((item) => (
-              <LocalizedLink
-                key={item.name}
-                href={item.href}
-                className={`px-3 py-2 rounded-lg font-heading font-semibold text-sm transition-all duration-200 ${
-                  isActiveRoute(item.href)
-                    ? "text-furgocasa-orange hover:text-furgocasa-orange-dark hover:bg-furgocasa-orange/10" 
-                    : "text-gray-800 hover:text-furgocasa-blue hover:bg-gray-50"
-                }`}
-              >
-                {item.name}
-              </LocalizedLink>
-            ))}
+            {navigation.map((item) => {
+              if (item.highlight) {
+                return (
+                  <LocalizedLink
+                    key={item.name}
+                    href={item.href}
+                    className={`px-4 py-2 rounded-lg font-heading font-bold text-sm uppercase tracking-wide border-2 transition-all duration-200 shadow-sm hover:shadow-md ${
+                      isActiveRoute(item.href)
+                        ? "bg-red-600 text-white border-red-700"
+                        : "bg-red-50 text-red-600 border-red-500 hover:bg-red-600 hover:text-white hover:border-red-700"
+                    }`}
+                  >
+                    {item.name}
+                  </LocalizedLink>
+                );
+              }
+              return (
+                <LocalizedLink
+                  key={item.name}
+                  href={item.href}
+                  className={`px-3 py-2 rounded-lg font-heading font-semibold text-sm transition-all duration-200 ${
+                    isActiveRoute(item.href)
+                      ? "text-furgocasa-orange hover:text-furgocasa-orange-dark hover:bg-furgocasa-orange/10"
+                      : "text-gray-800 hover:text-furgocasa-blue hover:bg-gray-50"
+                  }`}
+                >
+                  {item.name}
+                </LocalizedLink>
+              );
+            })}
           </nav>
 
-          {/* Botones CTA - Desktop */}
-          <div className="hidden lg:flex items-center gap-3">
-            {/* Botón Ventas */}
-            <LocalizedLink
-              href="/ventas"
-              className="inline-flex items-center gap-2 font-heading font-bold px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg bg-gray-200 text-gray-700 hover:bg-gray-300"
-            >
-              {t("Ventas")}
-            </LocalizedLink>
-
-            {/* Botón Reservar */}
+          {/* Botón CTA - Desktop */}
+          <div className="hidden lg:flex items-center">
             <LocalizedLink
               href="/reservar"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-furgocasa-orange to-furgocasa-orange-dark hover:from-furgocasa-orange-dark hover:to-furgocasa-orange text-white font-heading font-bold px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105"
@@ -308,29 +317,38 @@ export function Header() {
               )}
             </div>
 
-            {navigation.map((item) => (
-              <LocalizedLink
-                key={item.name}
-                href={item.href}
-                className={`block px-4 py-4 rounded-lg font-heading font-semibold transition-colors duration-200 touch-target text-base ${
-                  isActiveRoute(item.href)
-                    ? "text-furgocasa-orange bg-furgocasa-orange/10"
-                    : "text-gray-800 hover:bg-gray-50 hover:text-furgocasa-blue"
-                }`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.name}
-              </LocalizedLink>
-            ))}
-
-            {/* Botón Ventas - Mobile/Tablet */}
-            <LocalizedLink
-              href="/ventas"
-              className="block px-4 py-4 rounded-lg font-heading font-semibold transition-colors duration-200 shadow-sm touch-target text-base bg-gray-100 text-gray-700 hover:bg-gray-200"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {t("Ventas")}
-            </LocalizedLink>
+            {navigation.map((item) => {
+              if (item.highlight) {
+                return (
+                  <LocalizedLink
+                    key={item.name}
+                    href={item.href}
+                    className={`block px-4 py-4 rounded-lg font-heading font-bold uppercase tracking-wide transition-all duration-200 touch-target text-base border-2 shadow-sm ${
+                      isActiveRoute(item.href)
+                        ? "bg-red-600 text-white border-red-700"
+                        : "bg-red-50 text-red-600 border-red-500 hover:bg-red-600 hover:text-white hover:border-red-700"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.name}
+                  </LocalizedLink>
+                );
+              }
+              return (
+                <LocalizedLink
+                  key={item.name}
+                  href={item.href}
+                  className={`block px-4 py-4 rounded-lg font-heading font-semibold transition-colors duration-200 touch-target text-base ${
+                    isActiveRoute(item.href)
+                      ? "text-furgocasa-orange bg-furgocasa-orange/10"
+                      : "text-gray-800 hover:bg-gray-50 hover:text-furgocasa-blue"
+                  }`}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </LocalizedLink>
+              );
+            })}
 
             {/* CTA Button - Mobile/Tablet - Más prominente */}
             <LocalizedLink
