@@ -41,11 +41,11 @@ export function Header() {
     { name: t("Video Tutoriales"), href: "/video-tutoriales" },
   ];
 
-  const navigation = [
-    { name: t("Ofertas"), href: "/ofertas" },
+  const navigation: Array<{ name: string; href: string; highlight?: "red" | "green" }> = [
+    { name: t("Ofertas"), href: "/ofertas", highlight: "green" },
     { name: t("Vehículos"), href: "/vehiculos" },
-    { name: t("Ventas"), href: "/ventas", highlight: true },
     { name: t("Tarifas"), href: "/tarifas" },
+    { name: t("Ventas"), href: "/ventas", highlight: "red" },
     { name: t("Blog"), href: "/blog" },
     { name: t("Contacto"), href: "/contacto" },
   ];
@@ -237,14 +237,19 @@ export function Header() {
 
             {navigation.map((item) => {
               if (item.highlight) {
+                const isRed = item.highlight === "red";
+                const activeClasses = isRed
+                  ? "bg-red-600 text-white border-red-700"
+                  : "bg-green-600 text-white border-green-700";
+                const idleClasses = isRed
+                  ? "bg-red-50 text-red-600 border-red-500 hover:bg-red-600 hover:text-white hover:border-red-700"
+                  : "bg-green-50 text-green-700 border-green-500 hover:bg-green-600 hover:text-white hover:border-green-700";
                 return (
                   <LocalizedLink
                     key={item.name}
                     href={item.href}
                     className={`px-4 py-2 rounded-lg font-heading font-bold text-sm uppercase tracking-wide border-2 transition-all duration-200 shadow-sm hover:shadow-md ${
-                      isActiveRoute(item.href)
-                        ? "bg-red-600 text-white border-red-700"
-                        : "bg-red-50 text-red-600 border-red-500 hover:bg-red-600 hover:text-white hover:border-red-700"
+                      isActiveRoute(item.href) ? activeClasses : idleClasses
                     }`}
                   >
                     {item.name}
@@ -319,14 +324,19 @@ export function Header() {
 
             {navigation.map((item) => {
               if (item.highlight) {
+                const isRed = item.highlight === "red";
+                const activeClasses = isRed
+                  ? "bg-red-600 text-white border-red-700"
+                  : "bg-green-600 text-white border-green-700";
+                const idleClasses = isRed
+                  ? "bg-red-50 text-red-600 border-red-500 hover:bg-red-600 hover:text-white hover:border-red-700"
+                  : "bg-green-50 text-green-700 border-green-500 hover:bg-green-600 hover:text-white hover:border-green-700";
                 return (
                   <LocalizedLink
                     key={item.name}
                     href={item.href}
                     className={`block px-4 py-4 rounded-lg font-heading font-bold uppercase tracking-wide transition-all duration-200 touch-target text-base border-2 shadow-sm ${
-                      isActiveRoute(item.href)
-                        ? "bg-red-600 text-white border-red-700"
-                        : "bg-red-50 text-red-600 border-red-500 hover:bg-red-600 hover:text-white hover:border-red-700"
+                      isActiveRoute(item.href) ? activeClasses : idleClasses
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
