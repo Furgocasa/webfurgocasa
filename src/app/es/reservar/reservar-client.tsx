@@ -64,7 +64,7 @@ export function ReservarClient() {
       </section>
 
       {/* Occupancy Highlights - Nuevo semáforo de ocupación */}
-      <section className="pt-40 pb-16 bg-gray-50">
+      <section className="pt-32 lg:pt-36 pb-10 lg:pb-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <OccupancyHighlights />
