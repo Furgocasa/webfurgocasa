@@ -706,20 +706,23 @@ export default function CalendarioPage() {
   };
 
   // Detectar si asignar cierto vehículo a la reserva seleccionada
-  // generaría conflicto con otras reservas del calendario (solape de fechas).
+  // generaría conflicto con otras reservas del calendario (solape de fechas+horas).
   const hasVehicleConflict = (
     vehicleId: string,
     pickupDate: string,
     dropoffDate: string,
+    pickupTime: string,
+    dropoffTime: string,
     excludeBookingId: string
   ) => {
-    return (bookings || []).some(b =>
-      b.id !== excludeBookingId &&
-      b.vehicle_id === vehicleId &&
-      b.status !== 'cancelled' &&
-      b.pickup_date <= dropoffDate &&
-      b.dropoff_date >= pickupDate
-    );
+    return (bookings || []).some(b => {
+      if (b.id === excludeBookingId || b.vehicle_id !== vehicleId || b.status === 'cancelled') return false;
+      const bPickup = new Date(`${b.pickup_date}T${b.pickup_time || '10:00'}`);
+      const bDropoff = new Date(`${b.dropoff_date}T${b.dropoff_time || '10:00'}`);
+      const newPickup = new Date(`${pickupDate}T${pickupTime || '10:00'}`);
+      const newDropoff = new Date(`${dropoffDate}T${dropoffTime || '10:00'}`);
+      return newPickup < bDropoff && newDropoff > bPickup;
+    });
   };
 
   const getBlockedDatesForVehicle = (vehicleId: string) => {
@@ -1675,6 +1678,8 @@ export default function CalendarioPage() {
                         v.id,
                         selectedBooking.pickup_date,
                         selectedBooking.dropoff_date,
+                        selectedBooking.pickup_time,
+                        selectedBooking.dropoff_time,
                         selectedBooking.id
                       );
                       const isCurrent = v.id === selectedBooking.vehicle_id;
