@@ -9351,12 +9351,54 @@ export const staticTranslations = {
     fr: "Disponibilité par périodes",
     de: "Verfügbarkeit nach Zeiträumen"
   },
+  "Disponibilidad por semanas": {
+    es: "Disponibilidad por semanas",
+    en: "Availability by weeks",
+    fr: "Disponibilité par semaines",
+    de: "Verfügbarkeit nach Wochen"
+  },
   "Consulta la ocupación de fechas clave": {
     es: "Consulta la ocupación de fechas clave",
     en: "Check occupancy for key dates",
     fr: "Consultez l'occupation pour les dates clés",
     de: "Überprüfen Sie die Auslastung für wichtige Daten"
   },
+  "Mira la ocupación semana a semana y reserva cuanto antes las fechas más solicitadas": {
+    es: "Mira la ocupación semana a semana y reserva cuanto antes las fechas más solicitadas",
+    en: "Check the week-by-week occupancy and book the busiest dates as soon as possible",
+    fr: "Consultez l'occupation semaine par semaine et réservez au plus vite les dates les plus demandées",
+    de: "Sehen Sie die Auslastung Woche für Woche und buchen Sie die gefragtesten Termine so schnell wie möglich"
+  },
+  "Ocupación del mes": {
+    es: "Ocupación del mes",
+    en: "Monthly occupancy",
+    fr: "Occupation du mois",
+    de: "Monatliche Auslastung"
+  },
+  "Por semanas": {
+    es: "Por semanas",
+    en: "By weeks",
+    fr: "Par semaines",
+    de: "Nach Wochen"
+  },
+  "Últimas plazas": {
+    es: "Últimas plazas",
+    en: "Last spots",
+    fr: "Dernières places",
+    de: "Letzte Plätze"
+  },
+  "Enero": { es: "Enero", en: "January", fr: "Janvier", de: "Januar" },
+  "Febrero": { es: "Febrero", en: "February", fr: "Février", de: "Februar" },
+  "Marzo": { es: "Marzo", en: "March", fr: "Mars", de: "März" },
+  "Abril": { es: "Abril", en: "April", fr: "Avril", de: "April" },
+  "Mayo": { es: "Mayo", en: "May", fr: "Mai", de: "Mai" },
+  "Junio": { es: "Junio", en: "June", fr: "Juin", de: "Juni" },
+  "Julio": { es: "Julio", en: "July", fr: "Juillet", de: "Juli" },
+  "Agosto": { es: "Agosto", en: "August", fr: "Août", de: "August" },
+  "Septiembre": { es: "Septiembre", en: "September", fr: "Septembre", de: "September" },
+  "Octubre": { es: "Octubre", en: "October", fr: "Octobre", de: "Oktober" },
+  "Noviembre": { es: "Noviembre", en: "November", fr: "Novembre", de: "November" },
+  "Diciembre": { es: "Diciembre", en: "December", fr: "Décembre", de: "Dezember" },
   "Ocupación": {
     es: "Ocupación",
     en: "Occupancy",

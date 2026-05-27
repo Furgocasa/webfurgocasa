@@ -1,258 +1,358 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/server";
-import { differenceInDays, parseISO, eachDayOfInterval, format } from "date-fns";
+import {
+  differenceInDays,
+  parseISO,
+  eachDayOfInterval,
+  format,
+  addMonths,
+  getDaysInMonth,
+} from "date-fns";
 
 // ============================================
-// ENDPOINT PÚBLICO: Indicadores para el cliente (semáforo en /reservar)
+// ENDPOINT PÚBLICO: Semáforo de ocupación (vista cliente)
 // ============================================
 // GET /api/occupancy-highlights
 //
-// Mide presión para el cliente: días no reservables = reservas que ya contábamos
-// (confirmada / en curso / completada) ∪ bloqueos (blocked_dates).
-// El admin sigue pudiendo separar bloqueo vs venta; aquí se agregan para el semáforo.
-// blocked_dates: RLS solo admin → lectura con service role en servidor.
-// Cache recomendado: 1-2 horas
+// Devuelve los próximos N meses con desglose por SEMANAS calendario (1-7, 8-14,
+// 15-21, 22-28, 29-fin). Para cada semana y para el total mensual se calcula
+// la ocupación como (reservas ∪ bloqueos) / (días × flota alquilable).
+//
+// Se incluye un mes en la respuesta si:
+//   - el TOTAL del mes >= UMBRAL_MODERADO, o
+//   - alguna SEMANA del mes >= UMBRAL_MODERADO.
+//
+// Las semanas que ya han terminado (mes actual) se omiten.
+// Cache CDN: 1h.
 // ============================================
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-interface OccupancyPeriod {
+// Cuántos meses hacia adelante analizamos (incluido el mes actual).
+const MONTHS_AHEAD = 12;
+
+// Umbral mínimo para que un mes/semana se considere "con presión" y se muestre.
+const THRESHOLD_MODERATE = 40;
+
+type StatusKey = "available" | "moderate" | "high" | "full";
+type ColorKey = "green" | "yellow" | "orange" | "red";
+
+interface OccupancyWeek {
   id: string;
-  name: string;
+  label: string; // Ej: "1-7"
   start_date: string;
   end_date: string;
   occupancy_rate: number;
-  status: "available" | "moderate" | "high" | "full";
-  color: "green" | "yellow" | "orange" | "red";
-  label: string;
+  status: StatusKey;
+  color: ColorKey;
+  status_label: string;
   icon: string;
 }
 
-// Periodos destacados 2026 (actualizar anualmente)
-const KEY_PERIODS_2026 = [
-  { id: "semana-santa-2026", name: "Semana Santa", start: "2026-03-29", end: "2026-04-05" },
-  { id: "puente-mayo-2026", name: "Puente de Mayo", start: "2026-05-01", end: "2026-05-04" },
-  { id: "verano-julio-2026", name: "Julio", start: "2026-07-01", end: "2026-07-31" },
-  { id: "verano-agosto-2026", name: "Agosto", start: "2026-08-01", end: "2026-08-31" },
-  { id: "puente-pilar-2026", name: "Puente del Pilar", start: "2026-10-10", end: "2026-10-13" },
-  { id: "puente-diciembre-2026", name: "Puente Diciembre", start: "2026-12-05", end: "2026-12-08" },
+interface OccupancyMonth {
+  id: string; // "2026-08"
+  name: string; // "Agosto 2026"
+  year: number;
+  month: number; // 1-12
+  start_date: string;
+  end_date: string;
+  occupancy_rate: number;
+  status: StatusKey;
+  color: ColorKey;
+  status_label: string;
+  icon: string;
+  weeks: OccupancyWeek[];
+  has_high_demand_week: boolean;
+}
+
+function pad2(n: number): string {
+  return String(n).padStart(2, "0");
+}
+
+function isoDate(year: number, month1Based: number, day: number): string {
+  return `${year}-${pad2(month1Based)}-${pad2(day)}`;
+}
+
+const MONTH_NAMES_ES = [
+  "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+  "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
 ];
 
 function getOccupancyStatus(rate: number): {
-  status: OccupancyPeriod["status"];
-  color: OccupancyPeriod["color"];
-  label: string;
+  status: StatusKey;
+  color: ColorKey;
+  status_label: string;
   icon: string;
 } {
-  // Umbrales semáforo (vista cliente): moderado 40–60, alta 60–85, muy alta >85
+  // Umbrales: moderado 40–60, alta 60–85, muy alta >85.
   if (rate > 85) {
-    return {
-      status: "full",
-      color: "red",
-      label: "Muy alta demanda",
-      icon: "🔴",
-    };
+    return { status: "full", color: "red", status_label: "Muy alta demanda", icon: "🔴" };
   }
   if (rate >= 60) {
-    return {
-      status: "high",
-      color: "orange",
-      label: "Alta demanda",
-      icon: "🟠",
-    };
+    return { status: "high", color: "orange", status_label: "Alta demanda", icon: "🟠" };
   }
-  if (rate >= 40) {
-    return {
-      status: "moderate",
-      color: "yellow",
-      label: "Ocupación moderada",
-      icon: "🟡",
-    };
+  if (rate >= THRESHOLD_MODERATE) {
+    return { status: "moderate", color: "yellow", status_label: "Ocupación moderada", icon: "🟡" };
   }
-  return {
-    status: "available",
-    color: "green",
-    label: "Disponible",
-    icon: "🟢",
-  };
+  return { status: "available", color: "green", status_label: "Disponible", icon: "🟢" };
 }
 
-const minKeyPeriodStart = KEY_PERIODS_2026.reduce(
-  (min, p) => (p.start < min ? p.start : min),
-  KEY_PERIODS_2026[0].start
-);
-const maxKeyPeriodEnd = KEY_PERIODS_2026.reduce(
-  (max, p) => (p.end > max ? p.end : max),
-  KEY_PERIODS_2026[0].end
-);
+interface WeekRange {
+  id: string;
+  label: string;
+  start: string;
+  end: string;
+  startDay: number;
+  endDay: number;
+}
+
+/** Trocea un mes en semanas de hasta 7 días: 1-7, 8-14, 15-21, 22-28, 29-fin. */
+function buildMonthWeeks(year: number, month1Based: number): WeekRange[] {
+  const daysInMonth = getDaysInMonth(new Date(year, month1Based - 1, 1));
+  const weeks: WeekRange[] = [];
+  let day = 1;
+  let idx = 1;
+  while (day <= daysInMonth) {
+    const endDay = Math.min(day + 6, daysInMonth);
+    weeks.push({
+      id: `${year}-${pad2(month1Based)}-w${idx}`,
+      label: `${day}-${endDay}`,
+      start: isoDate(year, month1Based, day),
+      end: isoDate(year, month1Based, endDay),
+      startDay: day,
+      endDay,
+    });
+    day = endDay + 1;
+    idx++;
+  }
+  return weeks;
+}
+
+interface VehicleRow {
+  id: string;
+}
+interface BookingRow {
+  vehicle_id: string;
+  pickup_date: string;
+  dropoff_date: string;
+}
+interface BlockRow {
+  vehicle_id: string;
+  start_date: string;
+  end_date: string;
+}
+
+function calcOccupancyRate(
+  periodStart: Date,
+  periodEnd: Date,
+  vehicles: VehicleRow[],
+  bookings: BookingRow[],
+  blocks: BlockRow[]
+): number {
+  const totalDays = differenceInDays(periodEnd, periodStart) + 1;
+  const totalAvailableDays = totalDays * vehicles.length;
+  if (totalAvailableDays <= 0) return 0;
+
+  let totalNonReservableDays = 0;
+
+  vehicles.forEach((vehicle) => {
+    const vehicleBookings = bookings.filter((b) => b.vehicle_id === vehicle.id);
+    const vehicleBlocks = blocks.filter((b) => b.vehicle_id === vehicle.id);
+
+    const nonReservableDates = new Set<string>();
+
+    vehicleBookings.forEach((booking) => {
+      const bookingStart = parseISO(booking.pickup_date);
+      const bookingEnd = parseISO(booking.dropoff_date);
+      if (bookingEnd >= periodStart && bookingStart <= periodEnd) {
+        const effectiveStart = bookingStart < periodStart ? periodStart : bookingStart;
+        const effectiveEnd = bookingEnd > periodEnd ? periodEnd : bookingEnd;
+        eachDayOfInterval({ start: effectiveStart, end: effectiveEnd }).forEach((day) => {
+          nonReservableDates.add(format(day, "yyyy-MM-dd"));
+        });
+      }
+    });
+
+    vehicleBlocks.forEach((block) => {
+      const blockStart = parseISO(block.start_date);
+      const blockEnd = parseISO(block.end_date);
+      if (blockEnd >= periodStart && blockStart <= periodEnd) {
+        const effectiveStart = blockStart < periodStart ? periodStart : blockStart;
+        const effectiveEnd = blockEnd > periodEnd ? periodEnd : blockEnd;
+        eachDayOfInterval({ start: effectiveStart, end: effectiveEnd }).forEach((day) => {
+          nonReservableDates.add(format(day, "yyyy-MM-dd"));
+        });
+      }
+    });
+
+    totalNonReservableDays += nonReservableDates.size;
+  });
+
+  return Math.round((totalNonReservableDays / totalAvailableDays) * 100 * 10) / 10;
+}
 
 export async function GET() {
   try {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // 1. Obtener vehículos alquilables activos
+    // 1. Flota alquilable activa
     const { data: vehicles, error: vehiclesError } = await supabase
       .from("vehicles")
       .select("id")
       .eq("is_for_rent", true)
       .eq("status", "available")
-      .or('sale_status.neq.sold,sale_status.is.null');
+      .or("sale_status.neq.sold,sale_status.is.null");
 
     if (vehiclesError) {
       console.error("Error fetching vehicles:", vehiclesError);
-      return NextResponse.json(
-        { error: "Error al obtener vehículos" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Error al obtener vehículos" }, { status: 500 });
     }
 
     const totalVehicles = vehicles?.length || 0;
-
     if (totalVehicles === 0) {
-      return NextResponse.json(
-        { error: "No hay vehículos disponibles" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "No hay vehículos disponibles" }, { status: 404 });
     }
 
-    // 2. Reservas que cuentan como ocupación (igual que antes este endpoint)
+    // 2. Calcular rango global: desde HOY hasta el último día de hoy+MONTHS_AHEAD meses
+    const now = new Date();
+    const todayIso = format(now, "yyyy-MM-dd");
+    const lastMonthRef = addMonths(now, MONTHS_AHEAD - 1);
+    const lastMonthYear = lastMonthRef.getFullYear();
+    const lastMonthMonth = lastMonthRef.getMonth() + 1;
+    const lastDayOfLastMonth = getDaysInMonth(new Date(lastMonthYear, lastMonthMonth - 1, 1));
+    const rangeEndIso = isoDate(lastMonthYear, lastMonthMonth, lastDayOfLastMonth);
+
+    // 3. Reservas que solapan el rango
     const { data: bookings, error: bookingsError } = await supabase
       .from("bookings")
       .select("vehicle_id, pickup_date, dropoff_date")
-      .in("status", ["confirmed", "in_progress", "completed"]);
+      .in("status", ["confirmed", "in_progress", "completed"])
+      .lte("pickup_date", rangeEndIso)
+      .gte("dropoff_date", todayIso);
 
     if (bookingsError) {
       console.error("Error fetching bookings:", bookingsError);
-      return NextResponse.json(
-        { error: "Error al obtener reservas" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Error al obtener reservas" }, { status: 500 });
     }
 
     const fleetIds = vehicles.map((v) => v.id);
 
-    // 3. Bloqueos por vehículo (RLS: solo service role en servidor)
-    let blockedRanges: {
-      vehicle_id: string;
-      start_date: string;
-      end_date: string;
-    }[] = [];
+    // 4. Bloqueos (service role, RLS lo restringe a admin)
+    let blockedRanges: BlockRow[] = [];
     try {
       const admin = createAdminClient();
       const { data: blocks, error: blocksError } = await admin
         .from("blocked_dates")
         .select("vehicle_id, start_date, end_date")
         .in("vehicle_id", fleetIds)
-        .lte("start_date", maxKeyPeriodEnd)
-        .gte("end_date", minKeyPeriodStart);
+        .lte("start_date", rangeEndIso)
+        .gte("end_date", todayIso);
 
       if (blocksError) {
         console.error("Error fetching blocked_dates:", blocksError);
       } else {
-        blockedRanges = blocks ?? [];
+        blockedRanges = (blocks ?? []) as BlockRow[];
       }
     } catch (e) {
       console.error("Admin client / blocked_dates:", e);
     }
 
-    // 4. Calcular % de días no reservables (reservas ∪ bloqueos) por periodo
-    const results: OccupancyPeriod[] = KEY_PERIODS_2026.map((period) => {
-      const periodStart = parseISO(period.start);
-      const periodEnd = parseISO(period.end);
-      const totalDays = differenceInDays(periodEnd, periodStart) + 1;
-      const totalAvailableDays = totalDays * totalVehicles;
+    const vehiclesTyped = vehicles as VehicleRow[];
+    const bookingsTyped = (bookings ?? []) as BookingRow[];
 
-      let totalNonReservableDays = 0;
+    // 5. Generar lista de meses (año/mes) desde el mes actual
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // 1-12
+    const currentDay = now.getDate();
 
-      vehicles?.forEach((vehicle) => {
-        const vehicleBookings =
-          bookings?.filter((b) => b.vehicle_id === vehicle.id) || [];
-        const vehicleBlocks =
-          blockedRanges.filter((b) => b.vehicle_id === vehicle.id) || [];
+    const months: OccupancyMonth[] = [];
 
-        const nonReservableDates = new Set<string>();
+    for (let i = 0; i < MONTHS_AHEAD; i++) {
+      const ref = addMonths(new Date(currentYear, currentMonth - 1, 1), i);
+      const year = ref.getFullYear();
+      const month = ref.getMonth() + 1;
+      const daysInMonth = getDaysInMonth(new Date(year, month - 1, 1));
+      const monthStartIso = isoDate(year, month, 1);
+      const monthEndIso = isoDate(year, month, daysInMonth);
 
-        vehicleBookings.forEach((booking) => {
-          const bookingStart = parseISO(booking.pickup_date);
-          const bookingEnd = parseISO(booking.dropoff_date);
+      // Para el mes actual, calculamos el TOTAL desde HOY (no desde el día 1).
+      const isCurrentMonth = year === currentYear && month === currentMonth;
+      const monthCalcStartIso = isCurrentMonth ? todayIso : monthStartIso;
 
-          if (bookingEnd >= periodStart && bookingStart <= periodEnd) {
-            const effectiveStart =
-              bookingStart < periodStart ? periodStart : bookingStart;
-            const effectiveEnd =
-              bookingEnd > periodEnd ? periodEnd : bookingEnd;
+      const monthRate = calcOccupancyRate(
+        parseISO(monthCalcStartIso),
+        parseISO(monthEndIso),
+        vehiclesTyped,
+        bookingsTyped,
+        blockedRanges
+      );
 
-            eachDayOfInterval({
-              start: effectiveStart,
-              end: effectiveEnd,
-            }).forEach((day) => {
-              nonReservableDates.add(format(day, "yyyy-MM-dd"));
-            });
-          }
-        });
-
-        vehicleBlocks.forEach((block) => {
-          const blockStart = parseISO(block.start_date);
-          const blockEnd = parseISO(block.end_date);
-          if (blockEnd >= periodStart && blockStart <= periodEnd) {
-            const effectiveStart =
-              blockStart < periodStart ? periodStart : blockStart;
-            const effectiveEnd = blockEnd > periodEnd ? periodEnd : blockEnd;
-            eachDayOfInterval({
-              start: effectiveStart,
-              end: effectiveEnd,
-            }).forEach((day) => {
-              nonReservableDates.add(format(day, "yyyy-MM-dd"));
-            });
-          }
-        });
-
-        totalNonReservableDays += nonReservableDates.size;
+      // Semanas del mes (1-7, 8-14, ...). En el mes actual omitimos semanas
+      // cuyo end < hoy.
+      const weekRanges = buildMonthWeeks(year, month).filter((w) => {
+        if (!isCurrentMonth) return true;
+        return w.endDay >= currentDay;
       });
 
-      const occupancyRate =
-        totalAvailableDays > 0
-          ? Math.round(
-              (totalNonReservableDays / totalAvailableDays) * 100 * 10
-            ) / 10
-          : 0;
+      const weeks: OccupancyWeek[] = weekRanges.map((w) => {
+        // En el mes actual, si la semana ya empezó, recortamos al rango efectivo
+        // (desde hoy) tanto para el cálculo como para las fechas/label expuestos.
+        const isPartial = isCurrentMonth && w.startDay < currentDay;
+        const effStartDay = isPartial ? currentDay : w.startDay;
+        const effStartIso = isoDate(year, month, effStartDay);
+        const effLabel = `${effStartDay}-${w.endDay}`;
 
-      // Obtener estado y color
-      const statusInfo = getOccupancyStatus(occupancyRate);
+        const rate = calcOccupancyRate(
+          parseISO(effStartIso),
+          parseISO(w.end),
+          vehiclesTyped,
+          bookingsTyped,
+          blockedRanges
+        );
+        const status = getOccupancyStatus(rate);
+        return {
+          id: w.id,
+          label: effLabel,
+          start_date: effStartIso,
+          end_date: w.end,
+          occupancy_rate: rate,
+          ...status,
+        };
+      });
 
-      return {
-        id: period.id,
-        name: period.name,
-        start_date: period.start,
-        end_date: period.end,
-        occupancy_rate: occupancyRate,
-        ...statusInfo,
-      };
-    });
+      const hasHighDemandWeek = weeks.some((w) => w.occupancy_rate >= THRESHOLD_MODERATE);
+      const monthStatus = getOccupancyStatus(monthRate);
 
-    // 5. Filtrar periodos pasados y ordenar por fecha
-    const now = new Date();
-    const futureResults = results.filter(
-      (period) => parseISO(period.end_date) >= now
-    );
+      // Filtro: incluimos el mes si el total o alguna semana cruza el umbral.
+      if (monthRate < THRESHOLD_MODERATE && !hasHighDemandWeek) {
+        continue;
+      }
 
-    // 6. Solo periodos con ocupación >= 40% (moderado o más — alineado con nuevos umbrales)
-    const highDemandResults = futureResults.filter(
-      (period) => period.occupancy_rate >= 40
-    );
-
-    // 7. Limitar a los próximos 5 periodos de alta demanda
-    const limitedResults = highDemandResults.slice(0, 5);
+      months.push({
+        id: `${year}-${pad2(month)}`,
+        name: `${MONTH_NAMES_ES[month - 1]} ${year}`,
+        year,
+        month,
+        start_date: monthCalcStartIso,
+        end_date: monthEndIso,
+        occupancy_rate: monthRate,
+        ...monthStatus,
+        weeks,
+        has_high_demand_week: hasHighDemandWeek,
+      });
+    }
 
     return NextResponse.json(
       {
         success: true,
-        periods: limitedResults,
+        months,
         metadata: {
           total_vehicles: totalVehicles,
-          total_periods: limitedResults.length,
+          total_months: months.length,
+          months_analyzed: MONTHS_AHEAD,
+          threshold: THRESHOLD_MODERATE,
           generated_at: new Date().toISOString(),
         },
       },
@@ -266,9 +366,6 @@ export async function GET() {
     );
   } catch (error) {
     console.error("Error in occupancy-highlights:", error);
-    return NextResponse.json(
-      { error: "Error interno del servidor" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Error interno del servidor" }, { status: 500 });
   }
 }

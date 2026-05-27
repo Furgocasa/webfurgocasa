@@ -4,26 +4,74 @@ import { useEffect, useState } from "react";
 import { Calendar, TrendingUp } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 
-interface OccupancyPeriod {
+type ColorKey = "green" | "yellow" | "orange" | "red";
+type StatusKey = "available" | "moderate" | "high" | "full";
+
+interface OccupancyWeek {
   id: string;
-  name: string;
+  label: string;
   start_date: string;
   end_date: string;
   occupancy_rate: number;
-  status: "available" | "moderate" | "high" | "full";
-  color: "green" | "yellow" | "orange" | "red";
-  label: string;
+  status: StatusKey;
+  color: ColorKey;
+  status_label: string;
   icon: string;
+}
+
+interface OccupancyMonth {
+  id: string;
+  name: string;
+  year: number;
+  month: number;
+  start_date: string;
+  end_date: string;
+  occupancy_rate: number;
+  status: StatusKey;
+  color: ColorKey;
+  status_label: string;
+  icon: string;
+  weeks: OccupancyWeek[];
+  has_high_demand_week: boolean;
 }
 
 interface OccupancyResponse {
   success: boolean;
-  periods: OccupancyPeriod[];
+  months: OccupancyMonth[];
   metadata: {
     total_vehicles: number;
-    total_periods: number;
+    total_months: number;
+    months_analyzed: number;
+    threshold: number;
     generated_at: string;
   };
+}
+
+const MONTH_NAMES_ES: Record<number, string> = {
+  1: "Enero", 2: "Febrero", 3: "Marzo", 4: "Abril", 5: "Mayo", 6: "Junio",
+  7: "Julio", 8: "Agosto", 9: "Septiembre", 10: "Octubre", 11: "Noviembre", 12: "Diciembre",
+};
+
+function getBarColorClass(color: ColorKey): string {
+  switch (color) {
+    case "green": return "bg-green-500";
+    case "yellow": return "bg-yellow-500";
+    case "orange": return "bg-orange-500";
+    case "red": return "bg-red-500";
+  }
+}
+
+function getCardClasses(color: ColorKey) {
+  switch (color) {
+    case "green":
+      return { bg: "bg-green-50 border-green-200", badge: "bg-green-100 text-green-800", text: "text-green-700" };
+    case "yellow":
+      return { bg: "bg-yellow-50 border-yellow-200", badge: "bg-yellow-100 text-yellow-800", text: "text-yellow-700" };
+    case "orange":
+      return { bg: "bg-orange-50 border-orange-200", badge: "bg-orange-100 text-orange-800", text: "text-orange-700" };
+    case "red":
+      return { bg: "bg-red-50 border-red-200", badge: "bg-red-100 text-red-800", text: "text-red-700" };
+  }
 }
 
 export function OccupancyHighlights() {
@@ -36,12 +84,10 @@ export function OccupancyHighlights() {
     async function fetchOccupancy() {
       try {
         const response = await fetch("/api/occupancy-highlights");
-        
         if (!response.ok) {
           throw new Error("Error al cargar disponibilidad");
         }
-
-        const result = await response.json();
+        const result = (await response.json()) as OccupancyResponse;
         setData(result);
       } catch (err) {
         console.error("Error fetching occupancy:", err);
@@ -50,7 +96,6 @@ export function OccupancyHighlights() {
         setIsLoading(false);
       }
     }
-
     fetchOccupancy();
   }, []);
 
@@ -60,181 +105,133 @@ export function OccupancyHighlights() {
         <div className="h-6 bg-gray-200 rounded w-48 mb-4"></div>
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded-lg"></div>
+            <div key={i} className="h-24 bg-gray-100 rounded-lg"></div>
           ))}
         </div>
       </div>
     );
   }
 
-  // Si hay error, no hay datos, o no hay periodos con alta demanda: no mostrar nada
-  if (error || !data || data.periods.length === 0) {
+  if (error || !data || data.months.length === 0) {
     return null;
   }
 
-  const getColorClasses = (color: string) => {
-    switch (color) {
-      case "green":
-        return {
-          bg: "bg-green-50 border-green-200",
-          text: "text-green-700",
-          badge: "bg-green-100 text-green-800",
-          dot: "bg-green-500",
-        };
-      case "yellow":
-        return {
-          bg: "bg-yellow-50 border-yellow-200",
-          text: "text-yellow-700",
-          badge: "bg-yellow-100 text-yellow-800",
-          dot: "bg-yellow-500",
-        };
-      case "orange":
-        return {
-          bg: "bg-orange-50 border-orange-200",
-          text: "text-orange-700",
-          badge: "bg-orange-100 text-orange-800",
-          dot: "bg-orange-500",
-        };
-      case "red":
-        return {
-          bg: "bg-red-50 border-red-200",
-          text: "text-red-700",
-          badge: "bg-red-100 text-red-800",
-          dot: "bg-red-500",
-        };
-      default:
-        return {
-          bg: "bg-gray-50 border-gray-200",
-          text: "text-gray-700",
-          badge: "bg-gray-100 text-gray-800",
-          dot: "bg-gray-500",
-        };
-    }
-  };
-
-  const formatDateRange = (start: string, end: string) => {
-    const startDate = new Date(start + 'T00:00:00');
-    const endDate = new Date(end + 'T00:00:00');
-    const tz = "Europe/Madrid";
-
-    const startDay = startDate.toLocaleDateString("es-ES", { day: "numeric", timeZone: tz });
-    const endDay = endDate.toLocaleDateString("es-ES", { day: "numeric", timeZone: tz });
-    const startMonth = startDate.toLocaleDateString("es-ES", { month: "short", timeZone: tz });
-    const endMonth = endDate.toLocaleDateString("es-ES", { month: "short", timeZone: tz });
-    
-    if (startMonth === endMonth) {
-      return `${startDay}-${endDay} ${startMonth}`;
-    }
-    return `${startDay} ${startMonth} - ${endDay} ${endMonth}`;
-  };
-
   return (
     <section className="bg-white rounded-2xl shadow-lg p-6 lg:p-8 border border-gray-100">
-      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <div className="w-10 h-10 bg-furgocasa-blue/10 rounded-xl flex items-center justify-center">
           <TrendingUp className="h-5 w-5 text-furgocasa-blue" />
         </div>
         <div>
           <h2 className="text-xl lg:text-2xl font-heading font-bold text-gray-900">
-            {t("Disponibilidad por periodos")}
+            {t("Disponibilidad por semanas")}
           </h2>
           <p className="text-sm text-gray-500">
-            {t("Consulta la ocupación de fechas clave")}
+            {t("Mira la ocupación semana a semana y reserva cuanto antes las fechas más solicitadas")}
           </p>
         </div>
       </div>
 
-      {/* Periodos Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {data.periods.map((period) => {
-          const colors = getColorClasses(period.color);
-          
+      <div className="space-y-5">
+        {data.months.map((month) => {
+          const monthColors = getCardClasses(month.color);
+          const monthName = MONTH_NAMES_ES[month.month] || month.name;
+
           return (
-            <div
-              key={period.id}
-              className={`relative border-2 rounded-xl p-4 transition-all hover:shadow-md ${colors.bg} group`}
+            <article
+              key={month.id}
+              className={`rounded-xl border-2 overflow-hidden ${monthColors.bg}`}
             >
-              {/* Indicador de estado (pulso en alta demanda) */}
-              <div className="absolute top-3 right-3">
-                <span
-                  className={`inline-block w-3 h-3 rounded-full ${colors.dot} ${
-                    period.status === "high" || period.status === "full"
-                      ? "animate-pulse"
-                      : ""
-                  }`}
-                ></span>
-              </div>
-
-              {/* Nombre del periodo */}
-              <div className="flex items-start gap-2 mb-2">
-                <Calendar className={`h-5 w-5 mt-0.5 ${colors.text}`} />
-                <div className="flex-1">
-                  <h3 className="font-bold text-gray-900 text-base">
-                    {period.name}
-                  </h3>
-                  <p className="text-xs text-gray-600 mt-0.5">
-                    {formatDateRange(period.start_date, period.end_date)}
-                  </p>
+              <header className="p-4 lg:p-5 border-b border-white/60">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className={`h-5 w-5 ${monthColors.text}`} />
+                    <h3 className="font-heading font-bold text-gray-900 text-lg">
+                      {t(monthName)} {month.year}
+                    </h3>
+                  </div>
+                  <span
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium whitespace-nowrap ${monthColors.badge}`}
+                  >
+                    <span>{month.icon}</span>
+                    <span>{t(month.status_label)}</span>
+                  </span>
                 </div>
-              </div>
 
-              {/* Barra de ocupación */}
-              <div className="mt-3 mb-2">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs font-medium text-gray-600">
-                    {t("Ocupación")}
+                    {t("Ocupación del mes")}
                   </span>
                   <span className="text-xs font-bold text-gray-900">
-                    {period.occupancy_rate}%
+                    {month.occupancy_rate}%
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-white/70 rounded-full h-2 overflow-hidden">
                   <div
-                    className={`h-2 rounded-full transition-all duration-500 ${
-                      period.color === "green"
-                        ? "bg-green-500"
-                        : period.color === "yellow"
-                        ? "bg-yellow-500"
-                        : period.color === "orange"
-                        ? "bg-orange-500"
-                        : "bg-red-500"
-                    }`}
-                    style={{ width: `${Math.min(period.occupancy_rate, 100)}%` }}
-                  ></div>
+                    className={`h-2 rounded-full transition-all duration-500 ${getBarColorClass(month.color)}`}
+                    style={{ width: `${Math.min(month.occupancy_rate, 100)}%` }}
+                  />
+                </div>
+              </header>
+
+              <div className="p-4 lg:p-5 bg-white">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+                  {t("Por semanas")}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {month.weeks.map((week) => {
+                    const weekColors = getCardClasses(week.color);
+                    const pulse = week.status === "high" || week.status === "full";
+                    return (
+                      <div
+                        key={week.id}
+                        className={`relative rounded-lg border-2 p-3 ${weekColors.bg}`}
+                      >
+                        <div className="absolute top-2 right-2">
+                          <span
+                            className={`inline-block w-2.5 h-2.5 rounded-full ${getBarColorClass(week.color)} ${pulse ? "animate-pulse" : ""}`}
+                          />
+                        </div>
+                        <div className="text-sm font-bold text-gray-900 mb-2 pr-4">
+                          {week.label}
+                        </div>
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-[10px] text-gray-600">
+                            {t("Ocupación")}
+                          </span>
+                          <span className="text-xs font-bold text-gray-900">
+                            {week.occupancy_rate}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-white/80 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className={`h-1.5 rounded-full transition-all duration-500 ${getBarColorClass(week.color)}`}
+                            style={{ width: `${Math.min(week.occupancy_rate, 100)}%` }}
+                          />
+                        </div>
+                        {week.status === "full" && (
+                          <p className="text-[10px] text-red-600 mt-1.5 font-medium">
+                            ⚠️ {t("Reserva con antelación")}
+                          </p>
+                        )}
+                        {week.status === "high" && (
+                          <p className="text-[10px] text-orange-600 mt-1.5 font-medium">
+                            ⏰ {t("Últimas plazas")}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-
-              {/* Badge de estado */}
-              <div className="mt-3">
-                <span
-                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${colors.badge}`}
-                >
-                  <span>{period.icon}</span>
-                  <span>{t(period.label)}</span>
-                </span>
-              </div>
-
-              {/* Mensaje adicional para estados críticos */}
-              {period.status === "full" && (
-                <p className="text-xs text-red-600 mt-2 font-medium">
-                  ⚠️ {t("Reserva con antelación")}
-                </p>
-              )}
-              {period.status === "high" && (
-                <p className="text-xs text-orange-600 mt-2 font-medium">
-                  ⏰ {t("Últimas plazas disponibles")}
-                </p>
-              )}
-            </div>
+            </article>
           );
         })}
       </div>
 
-      {/* Footer informativo */}
       <div className="mt-6 pt-4 border-t border-gray-200">
         <div className="flex flex-wrap items-center justify-between gap-4 text-xs text-gray-500">
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <span className="flex items-center gap-1.5">
               <span className="inline-block w-2 h-2 rounded-full bg-yellow-500"></span>
               {t("Moderado")} (40-60%)
