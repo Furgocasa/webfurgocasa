@@ -215,10 +215,16 @@ export async function GET() {
       return NextResponse.json({ error: "No hay vehículos disponibles" }, { status: 404 });
     }
 
-    // 2. Calcular rango global: desde HOY hasta el último día de hoy+MONTHS_AHEAD meses
+    // 2. Calcular rango global: desde el día 1 del mes SIGUIENTE al actual
+    //    hasta el último día del mes (mesSiguiente + MONTHS_AHEAD - 1).
     const now = new Date();
-    const todayIso = format(now, "yyyy-MM-dd");
-    const lastMonthRef = addMonths(now, MONTHS_AHEAD - 1);
+    const firstFutureMonth = addMonths(new Date(now.getFullYear(), now.getMonth(), 1), 1);
+    const rangeStartIso = isoDate(
+      firstFutureMonth.getFullYear(),
+      firstFutureMonth.getMonth() + 1,
+      1
+    );
+    const lastMonthRef = addMonths(firstFutureMonth, MONTHS_AHEAD - 1);
     const lastMonthYear = lastMonthRef.getFullYear();
     const lastMonthMonth = lastMonthRef.getMonth() + 1;
     const lastDayOfLastMonth = getDaysInMonth(new Date(lastMonthYear, lastMonthMonth - 1, 1));
@@ -230,7 +236,7 @@ export async function GET() {
       .select("vehicle_id, pickup_date, dropoff_date")
       .in("status", ["confirmed", "in_progress", "completed"])
       .lte("pickup_date", rangeEndIso)
-      .gte("dropoff_date", todayIso);
+      .gte("dropoff_date", rangeStartIso);
 
     if (bookingsError) {
       console.error("Error fetching bookings:", bookingsError);
@@ -248,7 +254,7 @@ export async function GET() {
         .select("vehicle_id, start_date, end_date")
         .in("vehicle_id", fleetIds)
         .lte("start_date", rangeEndIso)
-        .gte("end_date", todayIso);
+        .gte("end_date", rangeStartIso);
 
       if (blocksError) {
         console.error("Error fetching blocked_dates:", blocksError);
@@ -262,50 +268,34 @@ export async function GET() {
     const vehiclesTyped = vehicles as VehicleRow[];
     const bookingsTyped = (bookings ?? []) as BookingRow[];
 
-    // 5. Generar lista de meses (año/mes) desde el mes actual
+    // 5. Generar lista de meses futuros (omitimos el mes en curso para no
+    //    mostrar tramos parciales/casi terminados de pocas días).
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth() + 1; // 1-12
-    const currentDay = now.getDate();
+    const firstFutureMonthRef = addMonths(new Date(currentYear, currentMonth - 1, 1), 1);
 
     const months: OccupancyMonth[] = [];
 
     for (let i = 0; i < MONTHS_AHEAD; i++) {
-      const ref = addMonths(new Date(currentYear, currentMonth - 1, 1), i);
+      const ref = addMonths(firstFutureMonthRef, i);
       const year = ref.getFullYear();
       const month = ref.getMonth() + 1;
       const daysInMonth = getDaysInMonth(new Date(year, month - 1, 1));
       const monthStartIso = isoDate(year, month, 1);
       const monthEndIso = isoDate(year, month, daysInMonth);
 
-      // Para el mes actual, calculamos el TOTAL desde HOY (no desde el día 1).
-      const isCurrentMonth = year === currentYear && month === currentMonth;
-      const monthCalcStartIso = isCurrentMonth ? todayIso : monthStartIso;
-
       const monthRate = calcOccupancyRate(
-        parseISO(monthCalcStartIso),
+        parseISO(monthStartIso),
         parseISO(monthEndIso),
         vehiclesTyped,
         bookingsTyped,
         blockedRanges
       );
 
-      // Semanas del mes (1-7, 8-14, ...). En el mes actual omitimos semanas
-      // cuyo end < hoy.
-      const weekRanges = buildMonthWeeks(year, month).filter((w) => {
-        if (!isCurrentMonth) return true;
-        return w.endDay >= currentDay;
-      });
-
+      const weekRanges = buildMonthWeeks(year, month);
       const weeks: OccupancyWeek[] = weekRanges.map((w) => {
-        // En el mes actual, si la semana ya empezó, recortamos al rango efectivo
-        // (desde hoy) tanto para el cálculo como para las fechas/label expuestos.
-        const isPartial = isCurrentMonth && w.startDay < currentDay;
-        const effStartDay = isPartial ? currentDay : w.startDay;
-        const effStartIso = isoDate(year, month, effStartDay);
-        const effLabel = `${effStartDay}-${w.endDay}`;
-
         const rate = calcOccupancyRate(
-          parseISO(effStartIso),
+          parseISO(w.start),
           parseISO(w.end),
           vehiclesTyped,
           bookingsTyped,
@@ -314,8 +304,8 @@ export async function GET() {
         const status = getOccupancyStatus(rate);
         return {
           id: w.id,
-          label: effLabel,
-          start_date: effStartIso,
+          label: w.label,
+          start_date: w.start,
           end_date: w.end,
           occupancy_rate: rate,
           ...status,
@@ -335,7 +325,7 @@ export async function GET() {
         name: `${MONTH_NAMES_ES[month - 1]} ${year}`,
         year,
         month,
-        start_date: monthCalcStartIso,
+        start_date: monthStartIso,
         end_date: monthEndIso,
         occupancy_rate: monthRate,
         ...monthStatus,
