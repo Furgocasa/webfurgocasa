@@ -41,7 +41,7 @@ export function ReservarClient() {
   return (
     <main className="min-h-screen bg-gray-50 font-amiko">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 pt-8 md:pt-12 pb-48 relative overflow-visible">
+      <section className="bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 pt-8 md:pt-12 pb-10 lg:pb-12 relative overflow-visible">
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}></div>
@@ -55,8 +55,8 @@ export function ReservarClient() {
           </p>
         </div>
 
-        {/* Search Widget - mismo patron que la home (full width con padding 25% en desktop) */}
-        <div className="w-full px-4 lg:px-[25%] -mb-32 relative z-20">
+        {/* Search Widget - sin solapamiento (semáforo justo debajo con padding simétrico) */}
+        <div className="w-full px-4 lg:px-[25%] relative z-20">
           <div className="rounded-2xl lg:rounded-3xl ring-1 ring-white/40 shadow-corp-lg">
             <SearchWidget variant="full" />
           </div>
@@ -64,7 +64,7 @@ export function ReservarClient() {
       </section>
 
       {/* Occupancy Highlights - Nuevo semáforo de ocupación */}
-      <section className="pt-32 lg:pt-36 pb-10 lg:pb-12 bg-gray-50">
+      <section className="py-10 lg:py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <OccupancyHighlights />
