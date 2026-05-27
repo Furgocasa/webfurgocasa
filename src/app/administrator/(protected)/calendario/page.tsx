@@ -1901,18 +1901,29 @@ export default function CalendarioPage() {
               >
                 Cerrar
               </button>
-              <button
-                onClick={() => router.push(`/administrator/reservas/${selectedBooking.id}`)}
-                className="flex-1 px-3 py-2.5 sm:py-3 border border-furgocasa-orange text-furgocasa-orange font-semibold rounded-xl hover:bg-furgocasa-orange/10 active:scale-[0.97] transition-all text-sm"
+              <a
+                href={`/administrator/reservas/${selectedBooking.id}`}
+                onClick={(e) => {
+                  // Permitir Ctrl/Cmd/Shift+clic y clic central (botón 1) para abrir en pestaña/ventana nueva
+                  if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+                  e.preventDefault();
+                  router.push(`/administrator/reservas/${selectedBooking.id}`);
+                }}
+                className="flex-1 px-3 py-2.5 sm:py-3 border border-furgocasa-orange text-furgocasa-orange font-semibold rounded-xl hover:bg-furgocasa-orange/10 active:scale-[0.97] transition-all text-sm text-center inline-flex items-center justify-center no-underline"
               >
                 Ver detalles
-              </button>
-              <button
-                onClick={() => router.push(`/administrator/reservas/${selectedBooking.id}/editar`)}
-                className="flex-1 px-3 py-2.5 sm:py-3 bg-furgocasa-orange text-white font-semibold rounded-xl hover:bg-furgocasa-orange-dark active:scale-[0.97] transition-all text-sm"
+              </a>
+              <a
+                href={`/administrator/reservas/${selectedBooking.id}/editar`}
+                onClick={(e) => {
+                  if (e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+                  e.preventDefault();
+                  router.push(`/administrator/reservas/${selectedBooking.id}/editar`);
+                }}
+                className="flex-1 px-3 py-2.5 sm:py-3 bg-furgocasa-orange text-white font-semibold rounded-xl hover:bg-furgocasa-orange-dark active:scale-[0.97] transition-all text-sm text-center inline-flex items-center justify-center no-underline"
               >
                 Editar
-              </button>
+              </a>
             </div>
           </div>
         </div>
