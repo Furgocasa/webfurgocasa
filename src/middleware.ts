@@ -224,6 +224,14 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname = normalizedPath || '/';
     return NextResponse.redirect(request.nextUrl, { status: 301 });
   }
+
+  // Baja de marketing: URL funcional RGPD, sin prefijo /es|en|fr|de/
+  const unsubscribeLocaleMatch = pathname.match(/^\/(es|en|fr|de)\/unsubscribe\/?$/);
+  if (unsubscribeLocaleMatch) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/unsubscribe';
+    return NextResponse.redirect(url, 301);
+  }
   
   // Excluir rutas especiales que no necesitan procesamiento de locale
   const skipLocaleFor = [
@@ -246,6 +254,7 @@ export async function middleware(request: NextRequest) {
     '/socket.io',
     '/__nextjs_original-stack-frame',
     '/webpack-hmr',
+    '/unsubscribe',
   ];
 
   // ⚠️ CRÍTICO: Admin NO debe tener i18n
