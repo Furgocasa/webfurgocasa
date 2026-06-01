@@ -142,7 +142,7 @@ Puedes abrir cualquier `.html` directamente en el navegador para ver cómo se ve
 - Las plantillas transaccionales reales (fuente de verdad) están en `src/lib/email/templates.ts`.
 - El **mismo email transaccional** se envía tanto al cliente como a `reservas@furgocasa.com`.
 - El asunto transaccional incluye: código vehículo, fecha inicio, nombre y apellidos del cliente.
-- Los emails de marketing **NO** se envían a `reservas@furgocasa.com` (solo al contacto de la lista). Usan `List-Unsubscribe` + `List-Unsubscribe-Post: One-Click` para el botón nativo de Gmail/Outlook.
+- Los emails de marketing **NO** se envían a `reservas@furgocasa.com` (solo al contacto de la lista). Usan `List-Unsubscribe` (solo URL `https://www.furgocasa.com/unsubscribe?t=…`) + `List-Unsubscribe-Post: One-Click` para el botón nativo de Gmail/Outlook. Baja manual alternativa: formulario en **`/unsubscribe`** (sin prefijo `/es/`).
 
 ---
 

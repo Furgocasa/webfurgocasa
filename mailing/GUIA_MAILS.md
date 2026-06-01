@@ -9,7 +9,7 @@
 > - `src/lib/mailing/` · librerías (transport, render, audience, send, auth, **context** [grounding IA], **footer**, **outlook-safe** [saneado HTML])
 > - `src/app/api/admin/mailing/*` · rutas admin (campaigns CRUD + generate SSE + preview + send-test + populate-recipients + start/pause/resume/retry-failed/archive + recipients + **tick-now** [diagnóstico] + references + contacts-search + suppressions)
 > - `src/app/api/cron/mailing-tick/route.ts` · cron cada minuto (con **lock atómico** `tick_lock_at` y watchdog de 5 min)
-> - `src/app/api/unsubscribe/route.ts` · endpoint público RGPD (3 modos, bilingüe)
+> - `src/app/api/unsubscribe/route.ts` · handler RGPD (3 modos, bilingüe). **URL pública:** `/unsubscribe` (rewrite desde `next.config.js`; excluida del i18n en `middleware.ts`)
 > - `src/app/administrator/(protected)/mails/*` · panel admin (4 pestañas + **botón "Forzar tick ahora"** para diagnóstico)
 > - `supabase/migrations/20260419-*.sql` + `20260420-mailing-tick-lock.sql` (columna `tick_lock_at`) + **`20260421-mailing-tick-lock-rpc.sql`** (funciones `mailing_claim_campaign_tick` / `mailing_release_campaign_tick` para tomar/soltar el lock vía `rpc()` y evitar fallos REST de PostgREST sobre columnas nuevas).
 > - Tablas `marketing_contacts`, `email_suppressions`, `mailing_campaigns` (+ `tick_lock_at`), `mailing_recipients` + vista `mailing_campaigns_stats`
@@ -31,6 +31,7 @@
 > - **IA generadora:** selector en el panel con `gpt-5.4` (default) · `gpt-4.1` · `gpt-4o`. Configurable también vía `OPENAI_MAILING_MODEL`. El `SYSTEM_PROMPT` incluye "Manifiesto" (6 reglas de oro), grounding con `CONTEXTO_BD` (ofertas/posts/flota reales + precios pre-calculados en €), reglas de clicabilidad, formato europeo `1.111,11 €`, patrón Outlook-safe de tarjetas, presupuesto de densidad visual y auto-generación de `<!--FURGOCASA_DESCRIPTION-->` para el listado admin.
 > - **Cron con lock atómico** (`tick_lock_at`): el tick llama a `mailing_claim_campaign_tick(uuid)` (RPC) que hace el UPDATE condicional en Postgres; al terminar, `mailing_release_campaign_tick(uuid)`. Watchdog 5 min. Requiere `20260420` + `20260421`.
 > - **Botón "Forzar tick ahora"** en la pestaña Envío: dispara manualmente `runTickOnce()` bajo guard admin y muestra la respuesta cruda del servidor (summary + estado antes/después) para diagnosticar por qué una campaña no avanza sin tener que mirar los logs de Vercel.
+> - **Baja RGPD:** URL canónica **`https://www.furgocasa.com/unsubscribe`** (no `/api/unsubscribe` ni `/es/unsubscribe`). Rewrite en `next.config.js` + exclusión en `middleware.ts`. Formulario con email; enlaces de campaña con `?t=<token>`. Cabecera `List-Unsubscribe` **solo HTTPS** (sin `mailto:`). Idioma del formulario: `?lang=es|en`.
 >
 > ### 💡 Para qué sirve ahora este archivo
 >

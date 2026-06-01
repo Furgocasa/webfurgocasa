@@ -52,7 +52,10 @@ src/app/api/admin/mailing/
 
 src/app/api/cron/mailing-tick/route.ts        · Tick cada minuto (vercel.json) — exporta runTickOnce()
 
-src/app/api/unsubscribe/route.ts              · Público, 3 modos + bilingüe ES/EN
+src/app/api/unsubscribe/route.ts              · Handler RGPD (3 modos + bilingüe ES/EN). URL pública: /unsubscribe
+
+next.config.js                                · Rewrite /unsubscribe → /api/unsubscribe
+src/middleware.ts                             · /unsubscribe excluida del prefijo i18n /es/; /es/unsubscribe → 301 a /unsubscribe
 
 src/app/administrator/(protected)/mails/
 ├── page.tsx + CampaignsClient.tsx            · Listado
@@ -118,15 +121,39 @@ El envío masivo usa `marketing_contacts.name` (copiado a `mailing_recipients.no
 
 ## Cómo funciona el opt-out
 
+### URL pública (sin prefijo de idioma)
+
+La baja de marketing **no pasa por el multiidioma** de la web (`/es/`, `/en/`, etc.). Es una URL funcional RGPD, como `/administrator` o las APIs.
+
+| URL | Comportamiento |
+| --- | --- |
+| `https://www.furgocasa.com/unsubscribe` | Formulario: el cliente introduce su email y pulsa **Darme de baja** |
+| `https://www.furgocasa.com/unsubscribe?t=<token>` | Baja directa (enlace personal del footer del mail) |
+| `https://www.furgocasa.com/es/unsubscribe` (u otro locale) | Redirige 301 a `/unsubscribe` (canonical) |
+
+**Implementación técnica:**
+
+- `next.config.js` hace **rewrite** de `/unsubscribe` → `/api/unsubscribe` (mismo handler para GET y POST).
+- `src/middleware.ts` excluye `/unsubscribe` de la regla que canonicaliza URLs sin locale a `/es/...`.
+- El idioma del formulario se elige con `?lang=es` o `?lang=en` (no con `/es/` en la ruta).
+
+### En los correos de campaña
+
 - Cada `marketing_contacts` tiene un `marketing_opt_out_token` (UUID único).
-- Los HTML incluyen `{{UNSUBSCRIBE_URL}}` que se renderiza a
-  `https://www.furgocasa.com/api/unsubscribe?t=<token>`.
-- Al hacer clic (o al usar "Darse de baja" nativo de Gmail, gracias a
+- Los HTML incluyen `{{UNSUBSCRIBE_URL}}`, que se renderiza a
+  `https://www.furgocasa.com/unsubscribe?t=<token>` (sin token: solo `/unsubscribe`).
+- Al hacer clic (o al usar "Darse de baja" nativo de Gmail/Outlook, gracias a
   `List-Unsubscribe-Post: One-Click`), el contacto se marca
   `marketing_opt_out_at=NOW()` y se añade también a `email_suppressions`.
-- El formulario público `/api/unsubscribe` (sin token) acepta email directo
-  (para cuando el usuario ha perdido el link). Respuesta GDPR-safe: NUNCA
-  confirma si el email existía o no.
+- Las cabeceras de envío llevan **solo** la URL HTTPS en `List-Unsubscribe` (sin fallback
+  `mailto:...?subject=unsubscribe`). Así el cliente no abre un correo a `reservas@` para darse de baja.
+- El formulario público `/unsubscribe` (sin token) acepta email directo cuando el usuario ha
+  perdido el enlace del mail. Respuesta GDPR-safe: **nunca** confirma si el email existía o no.
+
+### Panel admin de bajas
+
+Las bajas manuales (p. ej. un cliente que escribió pidiendo salir) se gestionan en
+`/administrator/mails/bajas` → `POST /api/admin/mailing/suppressions` (`source='admin'`).
 
 ## Rate-limit y pausas
 
@@ -166,6 +193,8 @@ Herramienta principal: pestaña Envío → **"Forzar tick ahora"** (botón ámba
 | `note: "sin html_content"` | La campaña se lanzó sin generar el HTML | Ir a Contenido → Generar con IA / pegar HTML |
 | `note: "rate-limit SMTP: ..."` | OVH u otro proveedor cortó el envío | Esperar ≥60 min y Reanudar |
 | `note: "skip: tick previo aún en curso (lock activo)"` | Un tick anterior tardó >60 s y sigue corriendo, o murió sin liberar el lock | Esperar ~1 min (watchdog 5 min recupera locks viejos). Si persiste, `UPDATE mailing_campaigns SET tick_lock_at=NULL WHERE id='...';` |
+| El cliente dice que el enlace de baja no funciona o va a `/es/unsubscribe` | Middleware i18n o URL antigua | Tras junio 2026 la URL canónica es **`/unsubscribe`** (sin `/es/`). Comprobar que el deploy incluye el rewrite en `next.config.js` y la exclusión en `middleware.ts`. Probar `GET https://www.furgocasa.com/unsubscribe`. |
+| El cliente abre el mail y le sale "escribir a reservas@" para darse de baja | Cabecera `List-Unsubscribe` con `mailto:` (emails antiguos) o footer HTML estático sin `{{UNSUBSCRIBE_URL}}` | Campañas nuevas del panel usan solo URL HTTPS. HTML históricos en `mailing/*.html` pueden tener enlaces viejos; al reutilizarlos como referencia IA, el footer canónico sustituye el enlace por `{{UNSUBSCRIBE_URL}}`. |
 | El envío no avanza pese a estar `sending` y `is_paused=false` | El cron de Vercel no se dispara | Ver siguiente sección |
 
 ### Verificación SQL rápida
@@ -224,7 +253,7 @@ Subir ritmo: elevar `max_per_hour` hasta lo que aguante tu SMTP (OVH: NO pasar d
 - ✅ El cron valida `CRON_SECRET` si está configurado.
 - ✅ El envío hace **doble check** de opt-out justo antes de cada `sendMail`:
   (a) flag en el contacto, (b) email en `email_suppressions`.
-- ✅ El endpoint `/api/unsubscribe` nunca filtra información de si un email existe.
+- ✅ El endpoint de baja (`/api/unsubscribe`, URL pública `/unsubscribe`) nunca filtra información de si un email existe.
 
 ## Imágenes para los correos
 
