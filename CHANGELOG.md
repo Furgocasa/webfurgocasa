@@ -4,6 +4,27 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🚦 Semáforo de ocupación por semanas — 27 de mayo / 1 de junio de 2026
+
+**Objetivo:** mostrar presión de reserva **semana a semana** (no solo meses fijos hardcodeados) para que el cliente vea urgencia en tramos concretos (p. ej. 8–14 ago al 60%).
+
+**API (`/api/occupancy-highlights`):**
+- Eliminada lista `KEY_PERIODS_2026`; generación dinámica de **12 meses** con semanas calendario (1-7, 8-14, 15-21, 22-28, 29-fin).
+- Respuesta `{ months: [{ weeks: [...] }] }` en lugar de `{ periods: [...] }`.
+- Umbral **40%**; mes visible si total o alguna semana supera el umbral.
+- Mes en curso visible salvo **últimos 3 días** del mes; semanas pasadas del mes actual ocultas.
+- Cálculo: `(reservas ∪ bloqueos) / (días × flota)`.
+
+**UI (`occupancy-highlights.tsx`):** tarjeta por mes + grid de mini-semanas; título «Disponibilidad por semanas».
+
+**Layout `/reservar`:** padding simétrico `py-10 lg:py-12`; hero sin solapamiento `-mb-32`.
+
+**Docs:** `docs/SEMAFORO-OCUPACION.md`, `docs/SEMAFORO-OCUPACION-VISUAL.md`, `AJUSTE-SEMAFORO-SOLO-ALTA-DEMANDA.md`, `INTEGRACION-MULTIIDIOMA-SEMAFORO.md`.
+
+**Scripts:** `scripts/test-occupancy-api.js` (v2), `scripts/analyze-august-weeks.ts` (auditoría Supabase).
+
+---
+
 ## 🎨 Banners publicitarios automáticos en artículos del blog — 21 de mayo de 2026
 
 **Objetivo:** insertar banners promocionales de FURGOCASA (ofertas y flota) dentro de los artículos del blog, intercalados entre secciones H2, sin modificar el contenido almacenado en Supabase.

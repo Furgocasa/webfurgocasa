@@ -1,183 +1,78 @@
-# ✅ AJUSTE FINAL - Semáforo de Ocupación
+# Semáforo de ocupación — Histórico de ajustes
 
-## 🎯 Cambio Realizado
-
-**Problema identificado por el cliente**:
-> "No tiene sentido mostrar periodos con baja ocupación (verde). Solo queremos meter prisa cuando realmente haya alta demanda (>=50%)."
-
-**Solución implementada**:
-- ✅ Solo se muestran periodos con ocupación **>= 50%**
-- ✅ Periodos con < 50% quedan ocultos
-- ✅ Si TODOS los periodos tienen < 50%, el componente completo **no se muestra** (return null)
+> **Estado actual (jun 2026)**: ver [`docs/SEMAFORO-OCUPACION.md`](docs/SEMAFORO-OCUPACION.md) — sistema por **semanas dentro de meses**, umbral **40%**, meses dinámicos.
 
 ---
 
-## 📊 Comportamiento Actual
+## v1 — Solo periodos con presión (feb 2026)
 
-### Escenario 1: HAY periodos con alta demanda (>= 50%)
-```
-Semana Santa: 50% → ✅ SE MUESTRA (🟡 Amarillo)
-Puente Mayo: 10%   → ❌ NO SE MUESTRA
-Julio: 2%          → ❌ NO SE MUESTRA
-Agosto: 85%        → ✅ SE MUESTRA (🟠 Naranja)
-Pilar: 0%          → ❌ NO SE MUESTRA
-```
+**Feedback**: no mostrar periodos verdes; solo urgencia real.
 
-**Resultado**: Se muestra el componente con 2 tarjetas (Semana Santa y Agosto)
+**Implementado**:
+
+- Umbral inicial **50%** (luego bajado a **40%**)
+- `return null` si no hay periodos
+- Periodos hardcodeados (`KEY_PERIODS_2026`)
 
 ---
 
-### Escenario 2: TODOS los periodos tienen baja ocupación (< 50%)
-```
-Semana Santa: 30%  → ❌ NO SE MUESTRA
-Puente Mayo: 10%   → ❌ NO SE MUESTRA
-Julio: 5%          → ❌ NO SE MUESTRA
-Agosto: 20%        → ❌ NO SE MUESTRA
-Pilar: 0%          → ❌ NO SE MUESTRA
-```
+## v2 — Semanas dinámicas (may–jun 2026)
 
-**Resultado**: El componente completo **desaparece** de la página (return null)
+**Feedback**: un mes entero (p. ej. «Agosto 44%») oculta picos semanales (p. ej. 8–14 ago 60%).
 
----
+**Implementado**:
 
-## 🔧 Cambios en el Código
-
-### 1. API Endpoint (`src/app/api/occupancy-highlights/route.ts`)
-
-**Línea 212-220** - Filtro añadido:
-```typescript
-// 5. ⚠️ IMPORTANTE: Solo mostrar periodos con ocupación >= 50%
-// No tiene sentido mostrar disponibilidad alta (verde) - no genera urgencia
-const highDemandResults = futureResults.filter(
-  (period) => period.occupancy_rate >= 50
-);
-
-// 6. Limitar a los próximos 5 periodos de alta demanda
-const limitedResults = highDemandResults.slice(0, 5);
-```
-
-**Antes**: Devolvía todos los periodos futuros (máx 5)  
-**Ahora**: Solo devuelve periodos con ocupación >= 50% (máx 5)
+- Eliminada lista `KEY_PERIODS_2026`
+- API devuelve `months[]` con `weeks[]` (bloques 1-7, 8-14, …)
+- UI: tarjeta por mes + grid de semanas
+- Mes incluido si total ≥40% **o** alguna semana ≥40%
+- Script `scripts/analyze-august-weeks.ts` para auditoría con Supabase
 
 ---
 
-### 2. Componente Frontend (`src/components/booking/occupancy-highlights.tsx`)
+## v3 — Mes en curso (jun 2026)
 
-**Línea 46-49** - Return null si no hay periodos:
-```typescript
-// Si hay error, no hay datos, o no hay periodos con alta demanda: no mostrar nada
-if (error || !data || data.periods.length === 0) {
-  return null;
-}
-```
+**Feedback**:
 
-**Antes**: Mostraba mensaje "Amplia disponibilidad" cuando no había periodos  
-**Ahora**: No muestra nada (return null) - componente completamente oculto
+1. No mostrar tramos raros tipo «27-28 may» al final del mes.
+2. Sí mostrar el mes entero al inicio (p. ej. 1 jun → todo junio).
 
----
+**Implementado**:
 
-### 3. Footer del Componente
-
-**Línea 163-175** - Leyenda simplificada:
-```typescript
-// Solo muestra leyendas de colores relevantes
-🟡 Moderado (50-70%)
-🟠 Alta (70-90%)
-🔴 Completo (>90%)
-```
-
-**Antes**: Mostraba también 🟢 Disponible (<50%)  
-**Ahora**: Solo muestra los 3 niveles de urgencia
+- Mes en curso **visible** si quedan **>3 días** de mes
+- Mes en curso **oculto** solo en los **últimos 3 días** (29–31)
+- Semanas pasadas del mes en curso no se listan
+- Semanas siempre con etiqueta calendario completa (1-7, 8-14, …)
 
 ---
 
-## 🧪 Testing Actualizado
+## v4 — Espaciado en `/reservar` (jun 2026)
 
-### Test Ejecutado
-```bash
-npm run test:occupancy
-```
+**Feedback**: demasiado aire entre buscador y semáforo.
 
-### Resultado ANTES del cambio:
-```
-📅 Periodos: 5
+**Implementado**:
 
-1. 🟡 Semana Santa (50.0%)
-2. 🟢 Puente de Mayo (10.4%)  ← VERDE
-3. 🟢 Julio (2.2%)             ← VERDE
-4. 🟢 Agosto (3.0%)            ← VERDE
-5. 🟢 Puente del Pilar (0.0%)  ← VERDE
-```
-
-### Resultado AHORA (después del cambio):
-```
-📅 Periodos: 1
-
-1. 🟡 Semana Santa (50.0%)
-```
-
-✅ **Funciona perfectamente**: Solo muestra periodos con >= 50% ocupación
+- Hero: `pb-10 lg:pb-12` (antes `pb-48` + widget `-mb-32`)
+- Sección semáforo: `py-10 lg:py-12` (padding simétrico arriba/abajo)
+- Aplicado en es/en/fr/de `reservar-client.tsx`
 
 ---
 
-## 📈 Ventajas del Ajuste
-
-### 1. **Mayor impacto psicológico**
-- Solo aparece cuando **realmente** hay urgencia
-- Si no hay demanda alta, la página se ve limpia (sin componente)
-
-### 2. **No confunde al usuario**
-- Evita mostrar "10% ocupado" que puede dar sensación de baja demanda
-- Solo comunica escasez cuando es real
-
-### 3. **Más efectivo para conversión**
-- Aparición del componente = señal clara de "reserva YA"
-- Desaparición del componente = temporada baja (no necesita urgencia)
-
----
-
-## 🎯 Umbrales Configurables
-
-Si el cliente quiere ajustar el umbral (actualmente 50%), es fácil cambiarlo:
-
-**Archivo**: `src/app/api/occupancy-highlights/route.ts`  
-**Línea**: 214
+## Umbrales actuales (referencia rápida)
 
 ```typescript
-// Cambiar el 50 por el umbral deseado
-const highDemandResults = futureResults.filter(
-  (period) => period.occupancy_rate >= 50  // ← Aquí cambiar
-);
+// src/app/api/occupancy-highlights/route.ts
+const THRESHOLD_MODERATE = 40;
+const DAYS_LEFT_TO_SKIP_CURRENT_MONTH = 3;
+const MONTHS_AHEAD = 12;
 ```
 
-**Opciones recomendadas**:
-- `>= 40`: Más permisivo, muestra más periodos
-- `>= 50`: **ACTUAL** - Balance perfecto
-- `>= 60`: Más restrictivo, solo urgencia real
-- `>= 70`: Muy restrictivo, casi siempre oculto
+| Constante | Efecto al subir | Efecto al bajar |
+|-----------|-----------------|-----------------|
+| `THRESHOLD_MODERATE` | Menos meses/semanas visibles | Más presión mostrada |
+| `DAYS_LEFT_TO_SKIP_CURRENT_MONTH` | Oculta mes actual antes | Muestra mes actual más tiempo |
+| `MONTHS_AHEAD` | Más meses en API | Ventana más corta |
 
 ---
 
-## ✅ Estado Final
-
-| Aspecto | Estado |
-|---------|--------|
-| Filtro >= 50% | ✅ Implementado |
-| Return null si no hay periodos | ✅ Implementado |
-| Leyenda simplificada | ✅ Implementado |
-| Testing | ✅ Pasado (1 periodo mostrado) |
-| Documentación actualizada | ✅ Completa |
-
----
-
-## 🚀 Listo para Producción
-
-El sistema está ajustado según el feedback del cliente y listo para deploy.
-
-**Próximo paso**: Desplegar a producción y monitorear el impacto en conversión.
-
----
-
-**Fecha del ajuste**: 9 de febrero de 2026  
-**Solicitado por**: Narciso Pardo (Furgocasa)  
-**Implementado por**: Sistema IA Cursor
+**Última revisión**: Junio 2026

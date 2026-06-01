@@ -1,137 +1,27 @@
-# ✅ COMPLETADO - Integración Multiidioma del Semáforo
+# Integración multiidioma — Semáforo de ocupación
 
-## 🌍 Páginas Actualizadas
+> Documentación técnica completa: [`docs/SEMAFORO-OCUPACION.md`](docs/SEMAFORO-OCUPACION.md)
 
-El componente de semáforo de ocupación ahora está integrado en **todas las páginas de reservas** de todos los idiomas:
+## 🌍 Páginas
 
-### 1. ✅ Español
-**URL**: https://www.furgocasa.com/es/reservar  
-**Archivo**: `src/app/es/reservar/reservar-client.tsx`  
-**Estado**: ✅ Integrado
+| Idioma | URL | Archivo |
+|--------|-----|---------|
+| 🇪🇸 Español | `/es/reservar` | `src/app/es/reservar/reservar-client.tsx` |
+| 🇬🇧 Inglés | `/en/book` | `src/app/en/book/reservar-client.tsx` |
+| 🇫🇷 Francés | `/fr/reserver` | `src/app/fr/reserver/reservar-client.tsx` |
+| 🇩🇪 Alemán | `/de/buchen` | `src/app/de/buchen/reservar-client.tsx` |
 
-### 2. ✅ Inglés
-**URL**: https://www.furgocasa.com/en/book  
-**Archivo**: `src/app/en/book/reservar-client.tsx`  
-**Estado**: ✅ Integrado
-
-### 3. ✅ Francés
-**URL**: https://www.furgocasa.com/fr/reserver  
-**Archivo**: `src/app/fr/reserver/reservar-client.tsx`  
-**Estado**: ✅ Integrado
-
-### 4. ✅ Alemán
-**URL**: https://www.furgocasa.com/de/buchen  
-**Archivo**: `src/app/de/buchen/reservar-client.tsx`  
-**Estado**: ✅ Integrado
-
----
-
-## 🎨 Ubicación Visual en Todas las Páginas
-
-```
-┌─────────────────────────────────────────┐
-│  HERO + SEARCH WIDGET                   │
-│  (SearchWidget con fechas)              │
-└─────────────────────────────────────────┘
-              ↓
-┌─────────────────────────────────────────┐
-│  🚦 SEMÁFORO DE OCUPACIÓN               │← NUEVO
-│  (Solo si hay periodos >= 50%)          │
-│  - Semana Santa: 50% 🟡                │
-│  - Agosto: 85% 🟠                       │
-│  - etc.                                  │
-└─────────────────────────────────────────┘
-              ↓
-┌─────────────────────────────────────────┐
-│  PUNTOS DE RECOGIDA                     │
-│  (Murcia, Madrid)                       │
-└─────────────────────────────────────────┘
-              ↓
-┌─────────────────────────────────────────┐
-│  ¿CÓMO FUNCIONA?                        │
-│  (4 pasos)                              │
-└─────────────────────────────────────────┘
-```
-
----
-
-## 🌐 Traducciones Verificadas
-
-El componente muestra textos en el idioma correcto gracias a las traducciones en `src/lib/translations-preload.ts`:
-
-### Español (es)
-- "Disponibilidad por periodos"
-- "Ocupación moderada" 🟡
-- "Alta demanda" 🟠
-- "Completo" 🔴
-- "Reserva con antelación"
-- "Últimas plazas disponibles"
-
-### Inglés (en)
-- "Availability by periods"
-- "Moderate occupancy" 🟡
-- "High demand" 🟠
-- "Full" 🔴
-- "Book in advance"
-- "Last spots available"
-
-### Francés (fr)
-- "Disponibilité par périodes"
-- "Occupation modérée" 🟡
-- "Forte demande" 🟠
-- "Complet" 🔴
-- "Réservez à l'avance"
-- "Dernières places disponibles"
-
-### Alemán (de)
-- "Verfügbarkeit nach Zeiträumen"
-- "Mäßige Auslastung" 🟡
-- "Hohe Nachfrage" 🟠
-- "Voll" 🔴
-- "Im Voraus buchen"
-- "Letzte Plätze verfügbar"
-
----
-
-## 🔧 Cambios Realizados
-
-### Archivos Modificados (4)
-
-1. **`src/app/es/reservar/reservar-client.tsx`**
-   ```tsx
-   import { OccupancyHighlights } from "@/components/booking/occupancy-highlights";
-   
-   // ... añadida sección con componente
-   ```
-
-2. **`src/app/en/book/reservar-client.tsx`**
-   ```tsx
-   import { OccupancyHighlights } from "@/components/booking/occupancy-highlights";
-   
-   // ... añadida sección con componente
-   ```
-
-3. **`src/app/fr/reserver/reservar-client.tsx`**
-   ```tsx
-   import { OccupancyHighlights } from "@/components/booking/occupancy-highlights";
-   
-   // ... añadida sección con componente
-   ```
-
-4. **`src/app/de/buchen/reservar-client.tsx`**
-   ```tsx
-   import { OccupancyHighlights } from "@/components/booking/occupancy-highlights";
-   
-   // ... añadida sección con componente
-   ```
-
-### Estructura de la Sección Añadida
-
-En todas las páginas se añadió:
+Todas importan el mismo componente:
 
 ```tsx
-{/* Occupancy Highlights - Semáforo de ocupación */}
-<section className="pt-40 pb-16 bg-gray-50">
+import { OccupancyHighlights } from "@/components/booking/occupancy-highlights";
+```
+
+## 📐 Layout (actual)
+
+```tsx
+{/* Hero con SearchWidget — pb-10 lg:pb-12, sin solapamiento -mb-32 */}
+<section className="py-10 lg:py-12 bg-gray-50">
   <div className="container mx-auto px-4">
     <div className="max-w-5xl mx-auto">
       <OccupancyHighlights />
@@ -140,125 +30,60 @@ En todas las páginas se añadió:
 </section>
 ```
 
-**Posición**: Entre el SearchWidget y "Puntos de recogida"
+## 🌐 Traducciones
 
----
+`src/lib/translations-preload.ts` — el componente usa `useLanguage()` y `t()`.
 
-## 🧪 Testing Multiidioma
+Claves principales (v2):
 
-### Cómo Probar Cada Idioma
+| Clave ES | EN |
+|----------|-----|
+| Disponibilidad por semanas | Availability by weeks |
+| Ocupación del mes | Monthly occupancy |
+| Por semanas | By weeks |
+| Ocupación moderada | Moderate occupancy |
+| Alta demanda | High demand |
+| Muy alta demanda | Very high demand |
+| Últimas plazas | Last spots |
 
-#### Español
+Nombres de meses traducidos (Enero…Diciembre).
+
+## 🔌 API compartida
+
+Un solo endpoint para los 4 idiomas: `GET /api/occupancy-highlights`
+
+Los nombres de mes en JSON vienen en español (`Junio 2026`); el componente traduce el mes con `t("Junio")` etc.
+
+## 🎯 Comportamiento unificado
+
+1. API devuelve `months` con `weeks` (ver doc técnica).
+2. Si `months.length === 0` → componente oculto.
+3. Umbral **40%** para mostrar mes o semana con presión.
+4. Mes en curso omitido solo en los **últimos 3 días** del mes.
+
+## 🧪 Probar
+
 ```bash
-# Local
-http://localhost:3000/es/reservar
+npm run dev
+# ES: http://localhost:3000/es/reservar
+# EN: http://localhost:3000/en/book
+# FR: http://localhost:3000/fr/reserver
+# DE: http://localhost:3000/de/buchen
 
-# Producción
-https://www.furgocasa.com/es/reservar
+npm run test:occupancy
 ```
 
-#### Inglés
-```bash
-# Local
-http://localhost:3000/en/book
+## 📁 Archivos del sistema
 
-# Producción
-https://www.furgocasa.com/en/book
-```
-
-#### Francés
-```bash
-# Local
-http://localhost:3000/fr/reserver
-
-# Producción
-https://www.furgocasa.com/fr/reserver
-```
-
-#### Alemán
-```bash
-# Local
-http://localhost:3000/de/buchen
-
-# Producción
-https://www.furgocasa.com/de/buchen
-```
+| Tipo | Archivo |
+|------|---------|
+| API | `src/app/api/occupancy-highlights/route.ts` |
+| UI | `src/components/booking/occupancy-highlights.tsx` |
+| i18n | `src/lib/translations-preload.ts` |
+| Test | `scripts/test-occupancy-api.js` |
+| Auditoría | `scripts/analyze-august-weeks.ts` |
+| Rate limit | `src/middleware.ts` |
 
 ---
 
-## ✅ Verificaciones Realizadas
-
-- [x] Componente importado en las 4 páginas
-- [x] Sección añadida en la posición correcta
-- [x] No hay errores de linter
-- [x] Las traducciones existen para los 4 idiomas
-- [x] El componente usa `useLanguage()` para detectar idioma
-- [x] Responsive (mobile/tablet/desktop)
-- [x] Cache configurado (1h)
-- [x] API endpoint único para todos los idiomas
-
----
-
-## 🎯 Comportamiento Unificado
-
-El componente funciona **exactamente igual** en todos los idiomas:
-
-1. **Si hay periodos >= 50%** → Muestra semáforo
-2. **Si todos < 50%** → No muestra nada
-3. **Colores**:
-   - 🟡 50-70% (Moderado)
-   - 🟠 70-90% (Alta demanda)
-   - 🔴 >90% (Completo)
-4. **Periodos**: Los mismos para todos los idiomas (Semana Santa, Verano, etc.)
-
----
-
-## 🚀 Estado Final
-
-### ✅ LISTO PARA PRODUCCIÓN
-
-El semáforo de ocupación está completamente integrado en las 4 páginas de reservas:
-
-| Idioma | Ruta | Estado |
-|--------|------|--------|
-| 🇪🇸 Español | `/es/reservar` | ✅ Listo |
-| 🇬🇧 Inglés | `/en/book` | ✅ Listo |
-| 🇫🇷 Francés | `/fr/reserver` | ✅ Listo |
-| 🇩🇪 Alemán | `/de/buchen` | ✅ Listo |
-
----
-
-## 📊 Resumen de Archivos del Proyecto
-
-### Archivos Creados (5)
-1. `src/app/api/occupancy-highlights/route.ts` - API endpoint
-2. `src/components/booking/occupancy-highlights.tsx` - Componente React
-3. `docs/SEMAFORO-OCUPACION.md` - Documentación técnica
-4. `docs/SEMAFORO-OCUPACION-VISUAL.md` - Documentación visual
-5. `scripts/test-occupancy-api.js` - Script de testing
-
-### Archivos Modificados (7)
-1. `src/app/es/reservar/reservar-client.tsx` - Español
-2. `src/app/en/book/reservar-client.tsx` - Inglés
-3. `src/app/fr/reserver/reservar-client.tsx` - Francés
-4. `src/app/de/buchen/reservar-client.tsx` - Alemán
-5. `src/lib/translations-preload.ts` - Traducciones
-6. `src/middleware.ts` - Rate limiting
-7. `package.json` - Script de test
-
----
-
-## 🎉 Proyecto Completado
-
-**Fecha de finalización**: 9 de febrero de 2026  
-**Tiempo total**: ~2 horas  
-**Estado**: ✅ 100% Completo  
-**Listo para**: Deploy a producción
-
-**Siguiente paso**: Desplegar a Vercel y monitorear impacto en conversión.
-
----
-
-**Desarrollado por**: Sistema IA Cursor  
-**Cliente**: Furgocasa - Narciso Pardo  
-**Feedback incorporado**: Solo mostrar periodos >= 50% ocupación
+**Actualizado**: Junio 2026

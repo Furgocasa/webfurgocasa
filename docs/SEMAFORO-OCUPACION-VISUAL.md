@@ -1,236 +1,113 @@
-# 🚦 Semáforo de Ocupación - Vista Previa Visual
+# 🚦 Semáforo de Ocupación — Vista visual (v2 semanas)
 
-## 📍 Ubicación en la Web
+## 📍 Ubicación
 
 **URL**: https://www.furgocasa.com/es/reservar
 
-**Posición**: Justo debajo del widget de búsqueda, antes de "Puntos de recogida"
+**Posición**: Debajo del buscador, antes de «Puntos de recogida». Mismo bloque en `/en/book`, `/fr/reserver`, `/de/buchen`.
 
 ---
 
-## 🎨 Diseño Visual
+## 🎨 Diseño actual (jun 2026)
 
-### Sección Completa
+### Sección completa
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  📊 Disponibilidad por periodos                                 │
-│  Consulta la ocupación de fechas clave                          │
+│  📈 Disponibilidad por semanas                                  │
+│  Mira la ocupación semana a semana y reserva cuanto antes...    │
 ├─────────────────────────────────────────────────────────────────┤
+│  ┌─ Junio 2026 ─────────────────────── 🟡 Ocupación moderada ─┐ │
+│  │ Ocupación del mes  53.7%  ████████░░░░░░░░░░               │ │
+│  ├─────────────────────────────────────────────────────────────┤ │
+│  │ POR SEMANAS                                                  │ │
+│  │ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐ ┌─────┐                   │ │
+│  │ │ 1-7 │ │8-14 │ │15-21│ │22-28│ │29-30│                   │ │
+│  │ │58.6%│ │51.4%│ │57.1%│ │48.6%│ │ 50% │                   │ │
+│  │ │ 🟡  │ │ 🟡  │ │ 🟡  │ │ 🟡  │ │ 🟡  │                   │ │
+│  │ └─────┘ └─────┘ └─────┘ └─────┘ └─────┘                   │ │
+│  └─────────────────────────────────────────────────────────────┘ │
 │                                                                  │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐            │
-│  │ 📅 Semana   │  │ 📅 Puente   │  │ 📅 Julio    │            │
-│  │    Santa    │  │    de Mayo  │  │             │            │
-│  │             │  │             │  │             │            │
-│  │ 29 Mar-5Abr │  │ 1-4 Mayo    │  │ 1-31 Jul    │            │
-│  │             │  │             │  │             │            │
-│  │ Ocupación   │  │ Ocupación   │  │ Ocupación   │            │
-│  │ 50.0%       │  │ 10.4%       │  │ 2.2%        │            │
-│  │ ████████░░  │  │ ██░░░░░░░░  │  │ █░░░░░░░░░  │            │
-│  │             │  │             │  │             │            │
-│  │ 🟡 Moderado │  │ 🟢 Disponib.│  │ 🟢 Disponib.│            │
-│  └─────────────┘  └─────────────┘  └─────────────┘            │
-│                                                                  │
-│  (... más periodos en grid responsive)                          │
-│                                                                  │
+│  ┌─ Agosto 2026 ──────────────────── 🟡 Ocupación moderada ─┐ │
+│  │ ...                                                          │ │
+│  │ │ 1-7 │ │8-14 │ ...                                          │ │
+│  │ │ 50% │ │ 60% │ 🟠 Alta + ⏰ Últimas plazas                  │ │
+│  └─────────────────────────────────────────────────────────────┘ │
 ├─────────────────────────────────────────────────────────────────┤
-│  🟢 Disponible (<50%)  🟡 Moderado (50-70%)                     │
-│  🟠 Alta (70-90%)      🔴 Completo (>90%)                       │
-│                                              12 vehículos dispon.│
+│  🟡 Moderado (40-60%)  🟠 Alta (60-85%)  🔴 Muy alta (>85%)     │
+│                                              10 vehículos disp.  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🎭 Estados Visuales por Ocupación
+## 🎭 Estados por semana
 
-### 🟢 Verde - Disponible (< 50%)
+| Nivel | Rango | Fondo tarjeta | Extra |
+|-------|-------|---------------|-------|
+| 🟡 Moderado | 40–60% | Amarillo claro | Barra amarilla |
+| 🟠 Alta | 60–85% | Naranja claro | Pulso + «Últimas plazas» |
+| 🔴 Muy alta | >85% | Rojo claro | Pulso + «Reserva con antelación» |
+| 🟢 Baja | <40% | Verde claro | Visible dentro del mes; no genera urgencia |
 
-```
-┌──────────────────────────┐
-│ 📅 Julio                 │
-│ 1-31 Jul                 │
-│                          │
-│ Ocupación                │
-│ 25.0%      ●            │
-│ ██████░░░░░░             │
-│                          │
-│ 🟢 Disponible            │
-└──────────────────────────┘
-Fondo: Verde claro (#f0fdf4)
-Borde: Verde (#bbf7d0)
-Sin animación
-```
-
-### 🟡 Amarillo - Moderado (50-70%)
-
-```
-┌──────────────────────────┐
-│ 📅 Semana Santa          │
-│ 29 Mar-5 Abr             │
-│                          │
-│ Ocupación                │
-│ 65.0%      ●            │
-│ ████████░░░              │
-│                          │
-│ 🟡 Ocupación moderada    │
-└──────────────────────────┘
-Fondo: Amarillo claro (#fefce8)
-Borde: Amarillo (#fde047)
-Sin animación
-```
-
-### 🟠 Naranja - Alta Demanda (70-90%)
-
-```
-┌──────────────────────────┐
-│ 📅 Agosto                │
-│ 1-31 Ago                 │
-│                   ◉◉     │← Pulso animado
-│ Ocupación                │
-│ 85.0%                    │
-│ ███████████░             │
-│                          │
-│ 🟠 Alta demanda          │
-│ ⏰ Últimas plazas dispon.│
-└──────────────────────────┘
-Fondo: Naranja claro (#fff7ed)
-Borde: Naranja (#fdba74)
-CON animación de pulso
-Mensaje extra: "Últimas plazas"
-```
-
-### 🔴 Rojo - Completo (> 90%)
-
-```
-┌──────────────────────────┐
-│ 📅 Puente Pilar          │
-│ 10-13 Oct                │
-│                   ◉◉     │← Pulso animado
-│ Ocupación                │
-│ 95.0%                    │
-│ ████████████             │
-│                          │
-│ 🔴 Completo              │
-│ ⚠️ Reserva con antelac.  │
-└──────────────────────────┘
-Fondo: Rojo claro (#fef2f2)
-Borde: Rojo (#fca5a5)
-CON animación de pulso
-Mensaje extra: "Reserva con antelación"
-```
+La **cabecera del mes** usa el color del total mensual. Las **mini-tarjetas** usan el color de cada semana.
 
 ---
 
-## 📱 Responsive Design
+## 📱 Responsive
 
-### Mobile (< 768px)
-```
-┌──────────────────┐
-│ Periodo 1        │
-│ (ancho completo) │
-└──────────────────┘
+| Breakpoint | Grid semanas |
+|------------|--------------|
+| Móvil | 2 columnas |
+| Tablet (`sm`) | 3 columnas |
+| Desktop (`lg`) | 5 columnas (una fila por mes) |
 
-┌──────────────────┐
-│ Periodo 2        │
-│ (ancho completo) │
-└──────────────────┘
-
-┌──────────────────┐
-│ Periodo 3        │
-│ (ancho completo) │
-└──────────────────┘
-```
-
-### Tablet (768px - 1024px)
-```
-┌──────────────┐ ┌──────────────┐
-│ Periodo 1    │ │ Periodo 2    │
-└──────────────┘ └──────────────┘
-
-┌──────────────┐ ┌──────────────┐
-│ Periodo 3    │ │ Periodo 4    │
-└──────────────┘ └──────────────┘
-```
-
-### Desktop (> 1024px)
-```
-┌──────────┐ ┌──────────┐ ┌──────────┐
-│ Periodo 1│ │ Periodo 2│ │ Periodo 3│
-└──────────┘ └──────────┘ └──────────┘
-
-┌──────────┐ ┌──────────┐
-│ Periodo 4│ │ Periodo 5│
-└──────────┘ └──────────┘
-```
+Cada mes es una tarjeta apilada verticalmente (lista de meses con presión).
 
 ---
 
-## 🎬 Animaciones
+## 📅 Qué meses aparecen
 
-### Skeleton Loader (Durante carga)
-```
-┌──────────────────────────┐
-│ ▓▓▓▓▓▓░░░░░░░░░          │
-│                          │
-│ ▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░         │
-│ ▓▓▓▓▓░░░░░░░░            │
-└──────────────────────────┘
-Aparece durante 1-2 segundos
-mientras carga el API
-```
-
-### Pulso en Alta Demanda
-```
-Punto indicador: ● → ◉ → ● → ◉
-Escala: 1.0 → 1.2 → 1.0
-Duración: 2 segundos loop
-Solo en periodos 🟠 y 🔴
-```
+- **Mes en curso**: visible si faltan **más de 3 días** para fin de mes (1 jun → junio completo).
+- **Últimos 3 días del mes**: mes actual oculto; empieza el siguiente.
+- **Mes futuro**: incluido si total ≥40% **o** alguna semana ≥40%.
+- **Sin datos de presión**: el componente entero no se muestra.
 
 ---
 
-## 💬 Textos Dinámicos
+## 🔄 Datos y cache
 
-### Header
-- **Español**: "Disponibilidad por periodos"
-- **Inglés**: "Availability by periods"
-- **Francés**: "Disponibilité par périodes"
-- **Alemán**: "Verfügbarkeit nach Zeiträumen"
-
-### Estados
-- 🟢 **Disponible** / Available / Disponible / Verfügbar
-- 🟡 **Ocupación moderada** / Moderate occupancy / Occupation modérée / Mäßige Auslastung
-- 🟠 **Alta demanda** / High demand / Forte demande / Hohe Nachfrage
-- 🔴 **Completo** / Full / Complet / Voll
-
-### Mensajes de Urgencia
-- 🔴 "⚠️ Reserva con antelación" / "Book in advance"
-- 🟠 "⏰ Últimas plazas disponibles" / "Last spots available"
+- Fuente: Supabase (reservas + bloqueos)
+- Cache CDN: **1 hora**
+- API: `/api/occupancy-highlights` → `{ months: [...] }`
 
 ---
 
-## 🔄 Actualización de Datos
+## 💬 Textos (ES)
 
-- **Cache**: 1 hora (CDN)
-- **Actualización**: Automática cada hora
-- **Fuente de datos**: Reservas confirmadas/activas/completadas en Supabase
-- **Cálculo**: Tiempo real basado en ocupación actual
+| Elemento | Texto |
+|----------|-------|
+| Título | Disponibilidad por semanas |
+| Subtítulo | Mira la ocupación semana a semana… |
+| Mes | Ocupación del mes |
+| Bloque semanas | Por semanas |
+| Alta | Últimas plazas |
+| Muy alta | Reserva con antelación |
 
----
-
-## ✅ Checklist Visual
-
-- [x] Colores coherentes con brand (azul/naranja Furgocasa)
-- [x] Iconos claros (emojis universales 🟢🟡🟠🔴)
-- [x] Responsive perfecto (mobile-first)
-- [x] Animaciones sutiles (no invasivas)
-- [x] Accesibilidad (contraste WCAG AA)
-- [x] Loading states elegantes
-- [x] Error handling silencioso (no rompe página)
-- [x] Touch-friendly (botones grandes mobile)
+Traducciones EN/FR/DE en `translations-preload.ts`.
 
 ---
 
-**Vista previa creada**: 9 febrero 2026  
-**Puede verse en**: http://localhost:3000/es/reservar (dev) o https://www.furgocasa.com/es/reservar (prod)
+## ✅ Checklist visual
+
+- [x] Urgencia por **semana**, no solo por mes
+- [x] Meses dinámicos (sin mantener fechas a mano)
+- [x] Responsive mobile-first
+- [x] Pulso solo en alta/muy alta demanda
+- [x] Espaciado simétrico con el buscador (`py-10 lg:py-12`)
+- [x] Fallback silencioso si no hay presión
+
+---
+
+**Actualizado**: Junio 2026  
+**Ver también**: `docs/SEMAFORO-OCUPACION.md`

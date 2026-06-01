@@ -2,198 +2,231 @@
 
 ## 📋 Descripción
 
-Sistema visual que muestra la ocupación de periodos clave (Semana Santa, verano, puentes) con indicadores tipo semáforo para acelerar la decisión de reserva de los usuarios.
+Sistema visual en `/es/reservar` (y equivalentes i18n) que muestra la **ocupación semana a semana** dentro de cada mes, con indicadores tipo semáforo para acelerar la decisión de reserva.
+
+**Objetivo**: que el cliente vea urgencia en tramos concretos (p. ej. «8–14 ago: 60% — alta demanda») y no un promedio mensual que oculta picos.
 
 ## 🎯 Objetivo
 
-- **Crear urgencia visual** en periodos de alta demanda
-- **Transparencia** con información real de ocupación
-- **Acelerar conversión** mostrando disponibilidad limitada
+- **Crear urgencia visual** en semanas de alta demanda
+- **Transparencia** con datos reales de reservas + bloqueos
+- **Acelerar conversión** mostrando presión por fechas concretas
 - **Reducir consultas** sobre disponibilidad
-
-## 📊 Impacto Esperado
-
-- **+15-25% conversión** en periodos de alta demanda
-- **+10-15% engagement** (exploración de fechas)
-- **-20% consultas** sobre disponibilidad
 
 ## 🏗️ Arquitectura
 
 ### 1. API Endpoint
-**Ruta**: `/api/occupancy-highlights`
 
-**Método**: `GET`
+**Ruta**: `GET /api/occupancy-highlights`
 
-**Response**:
+**Constantes** (`src/app/api/occupancy-highlights/route.ts`):
+
+| Constante | Valor | Descripción |
+|-----------|-------|-------------|
+| `MONTHS_AHEAD` | 12 | Meses analizados hacia adelante |
+| `THRESHOLD_MODERATE` | 40 | Umbral mínimo para mostrar mes/semana |
+| `DAYS_LEFT_TO_SKIP_CURRENT_MONTH` | 3 | Si quedan ≤3 días de mes, se omite el mes en curso |
+
+**Response** (forma actual):
+
 ```json
 {
   "success": true,
-  "periods": [
+  "months": [
     {
-      "id": "semana-santa-2026",
-      "name": "Semana Santa",
-      "start_date": "2026-03-29",
-      "end_date": "2026-04-05",
-      "occupancy_rate": 65.5,
+      "id": "2026-08",
+      "name": "Agosto 2026",
+      "year": 2026,
+      "month": 8,
+      "start_date": "2026-08-01",
+      "end_date": "2026-08-31",
+      "occupancy_rate": 44.2,
       "status": "moderate",
       "color": "yellow",
-      "label": "Ocupación moderada",
-      "icon": "🟡"
+      "status_label": "Ocupación moderada",
+      "icon": "🟡",
+      "has_high_demand_week": true,
+      "weeks": [
+        {
+          "id": "2026-08-w2",
+          "label": "8-14",
+          "start_date": "2026-08-08",
+          "end_date": "2026-08-14",
+          "occupancy_rate": 60,
+          "status": "high",
+          "color": "orange",
+          "status_label": "Alta demanda",
+          "icon": "🟠"
+        }
+      ]
     }
   ],
   "metadata": {
-    "total_vehicles": 8,
-    "total_periods": 5,
-    "generated_at": "2026-02-09T..."
+    "total_vehicles": 10,
+    "total_months": 4,
+    "months_analyzed": 12,
+    "threshold": 40,
+    "generated_at": "2026-06-01T..."
   }
 }
 ```
 
-**Cache**: 
-- `Cache-Control: public, s-maxage=3600, stale-while-revalidate=7200`
-- Se cachea en CDN por 1 hora
-- Rate limit: 120 req/minuto
+**Cache**: `public, s-maxage=3600, stale-while-revalidate=7200` (1 h en CDN)
+
+**Rate limit** (`middleware.ts`): 120 req/min
 
 ### 2. Componente Frontend
+
 **Archivo**: `src/components/booking/occupancy-highlights.tsx`
 
-**Características**:
-- Responsive (grid 1/2/3 columnas)
-- Animación de pulso en periodos de alta demanda
-- Skeleton loader durante carga
-- Fallback silencioso si hay error
-- Click-friendly para mobile
+- Una **tarjeta por mes** con barra de ocupación mensual
+- **Grid de semanas** (2 cols móvil, 3 tablet, 5 desktop) con semáforo por tramo
+- Pulso animado en semanas `high` / `full`
+- Skeleton loader; `return null` si error o sin meses
+- Título: **«Disponibilidad por semanas»**
 
 ### 3. Integración en Página
-**Archivo**: `src/app/es/reservar/reservar-client.tsx`
 
-**Ubicación**: Entre el SearchWidget y los puntos de recogida
+**Archivos** (misma estructura en los 4 idiomas):
 
-## 🎨 Lógica de Colores (Solo periodos con >= 50% ocupación)
+- `src/app/es/reservar/reservar-client.tsx`
+- `src/app/en/book/reservar-client.tsx`
+- `src/app/fr/reserver/reservar-client.tsx`
+- `src/app/de/buchen/reservar-client.tsx`
 
-| Ocupación | Color | Estado | Label | Comportamiento |
-|-----------|-------|--------|-------|----------------|
-| 50-70% | 🟡 Amarillo | `moderate` | "Ocupación moderada" | Normal |
-| 70-90% | 🟠 Naranja | `high` | "Alta demanda" | **Pulso animado** |
-| > 90% | 🔴 Rojo | `full` | "Completo" | **Pulso animado** |
+**Ubicación**: entre el `SearchWidget` y «Puntos de recogida».
 
-**⚠️ IMPORTANTE**: Los periodos con ocupación < 50% (verde) **NO se muestran**. Solo queremos crear urgencia cuando realmente haya demanda alta.
+**Espaciado** (jun 2026):
 
-**Comportamiento**:
-- Si **todos** los periodos tienen < 50% ocupación → El componente **no se muestra** (return null)
-- Si **algún** periodo tiene >= 50% → Se muestran solo los periodos con alta demanda
-
-## 📅 Periodos Destacados 2026
-
-Los periodos están **hardcodeados** en el endpoint y deben actualizarse anualmente:
-
-```typescript
-const KEY_PERIODS_2026 = [
-  { id: "semana-santa-2026", name: "Semana Santa", start: "2026-03-29", end: "2026-04-05" },
-  { id: "puente-mayo-2026", name: "Puente de Mayo", start: "2026-05-01", end: "2026-05-04" },
-  { id: "verano-julio-2026", name: "Julio", start: "2026-07-01", end: "2026-07-31" },
-  { id: "verano-agosto-2026", name: "Agosto", start: "2026-08-01", end: "2026-08-31" },
-  { id: "puente-pilar-2026", name: "Puente del Pilar", start: "2026-10-10", end: "2026-10-13" },
-  { id: "puente-diciembre-2026", name: "Puente Diciembre", start: "2026-12-05", end: "2026-12-08" },
-];
+```tsx
+{/* Hero: pb-10 lg:pb-12, sin -mb-32 en el widget */}
+<section className="py-10 lg:py-12 bg-gray-50">
+  <OccupancyHighlights />
+</section>
 ```
 
-**⚠️ IMPORTANTE**: Actualizar estas fechas a principios de cada año.
+## 📅 Generación de periodos (dinámica)
 
-## 🔧 Cálculo de Ocupación
+**Ya no hay lista hardcodeada** (`KEY_PERIODS_2026` eliminada).
 
-El cálculo es idéntico al usado en el dashboard de administrador (`informes-client.tsx`):
+1. **Meses**: desde el mes en curso (salvo últimos 3 días) + 11 meses siguientes.
+2. **Semanas por mes**: bloques calendario fijos — `1-7`, `8-14`, `15-21`, `22-28`, `29-fin`.
+3. **Mes en curso**:
+   - Se muestra si quedan **más de 3 días** en el mes (p. ej. 1 jun → todo junio).
+   - Se **omite** del 29 al 31 (p. ej. 29 may → empieza por junio).
+   - Semanas **ya pasadas** del mes en curso no se listan.
+4. **Inclusión de un mes** en la respuesta si:
+   - el **total mensual** ≥ 40%, **o**
+   - **alguna semana** ≥ 40% (p. ej. julio total 35% pero semana 15–21 al 41% → julio aparece).
 
-1. **Total días disponibles** = Días del periodo × Vehículos alquilables
-2. **Días ocupados**: Se cuentan fechas únicas ocupadas por cada vehículo
-3. **Tasa de ocupación** = (Días ocupados / Total disponible) × 100
+## 🎨 Lógica de colores
 
-**Estados de reserva considerados**:
-- `confirmed`
-- `in_progress`
-- `completed`
+| Ocupación | Color | Estado | Label API | UI |
+|-----------|-------|--------|-----------|-----|
+| < 40% | 🟢 Verde | `available` | Disponible | Semana visible pero sin badge de urgencia en leyenda |
+| 40–60% | 🟡 Amarillo | `moderate` | Ocupación moderada | Normal |
+| 60–85% | 🟠 Naranja | `high` | Alta demanda | Pulso + «Últimas plazas» |
+| > 85% | 🔴 Rojo | `full` | Muy alta demanda | Pulso + «Reserva con antelación» |
+
+**Componente**: si `months.length === 0`, no se renderiza nada.
+
+## 🔧 Cálculo de ocupación
+
+Por cada periodo (mes o semana):
+
+```
+ocupación % = (días no reservables / días × flota) × 100
+```
+
+**Días no reservables** = reservas ∪ bloqueos (`blocked_dates`), sin duplicar el mismo día por vehículo.
+
+**Flota**: `is_for_rent = true`, `status = available`, no vendidos (`sale_status != sold`).
+
+**Reservas**: `confirmed`, `in_progress`, `completed` (pendientes **no** cuentan).
+
+**Bloqueos**: lectura con service role en servidor (RLS admin).
+
+> **Nota**: el panel de informes admin cuenta solo reservas en el numerador; el semáforo público **suma bloqueos** para reflejar días no alquilables.
 
 ## 🌍 Traducciones
 
-Las traducciones están en `src/lib/translations-preload.ts`:
+`src/lib/translations-preload.ts` — claves principales:
 
-```typescript
-"Disponibilidad por periodos": { es: "...", en: "...", fr: "...", de: "..." }
-"Consulta la ocupación de fechas clave": { ... }
-"Ocupación": { ... }
-"Completo": { ... }
-// ... etc
-```
+- `Disponibilidad por semanas`
+- `Mira la ocupación semana a semana y reserva cuanto antes las fechas más solicitadas`
+- `Ocupación del mes`, `Por semanas`, `Ocupación`
+- `Ocupación moderada`, `Alta demanda`, `Muy alta demanda`
+- `Últimas plazas`, `Reserva con antelación`
+- Nombres de meses (`Enero` … `Diciembre`) en ES/EN/FR/DE
 
 ## 🚀 Testing
 
-### Local
+### API local / prod
+
+```bash
+npm run test:occupancy
+# o
+curl https://www.furgocasa.com/api/occupancy-highlights
+```
+
+### Auditoría con datos reales (Supabase)
+
+```bash
+npx tsx scripts/analyze-august-weeks.ts
+```
+
+Compara meses/semanas jun–sep con la misma fórmula; requiere `.env.local` con service role.
+
+### Página
+
 ```bash
 npm run dev
-# Visitar: http://localhost:3000/es/reservar
+# http://localhost:3000/es/reservar
 ```
 
-### Testing del API
-```bash
-curl http://localhost:3000/api/occupancy-highlights
-```
+## 📝 Mantenimiento
 
-### Verificar con datos reales
-1. Ir al admin: `/administrator/reservas`
-2. Crear reservas de prueba en periodos clave
-3. Recargar `/es/reservar` (esperar cache 1h o limpiar caché)
-4. Verificar que los colores cambien según ocupación
+### Ya no hace falta actualizar fechas anuales
 
-## 📝 Mantenimiento Anual
+Los periodos se generan solos. Solo revisar si cambian reglas de negocio:
 
-### A principios de año:
-1. Actualizar `KEY_PERIODS_2026` → `KEY_PERIODS_2027` en `/api/occupancy-highlights/route.ts`
-2. Ajustar fechas de:
-   - Semana Santa
-   - Puentes festivos
-   - Periodos vacacionales
-3. Commit y deploy
+| Qué ajustar | Dónde |
+|-------------|-------|
+| Umbral 40% | `THRESHOLD_MODERATE` |
+| Meses analizados | `MONTHS_AHEAD` |
+| Omitir mes en curso | `DAYS_LEFT_TO_SKIP_CURRENT_MONTH` (default 3) |
+| Colores / labels | `getOccupancyStatus()` |
 
-### Opcional:
-- Ajustar umbrales de color (línea 41-65 del endpoint)
-- Añadir/quitar periodos según demanda histórica
+### Posibles mejoras
 
-## 🎯 Posibles Mejoras Futuras
-
-1. **Panel admin** para gestionar periodos (en lugar de hardcodear)
-2. **Calendario interactivo** completo (365 días)
-3. **Click en periodo** → Pre-rellenar SearchWidget
-4. **Ocupación por vehículo específico** (no solo promedio)
-5. **Predicción ML** de ocupación futura basada en históricos
-6. **Notificaciones push** cuando un periodo cambie a disponible
+1. Click en semana → pre-rellenar `SearchWidget`
+2. Panel admin para umbrales sin deploy
+3. Métrica alternativa: reservas / capacidad ofertada (sin bloqueos en denominador)
 
 ## 🐛 Troubleshooting
 
-### No se ven los datos
-1. Verificar que hay vehículos con `is_for_rent=true` y `status='available'`
-2. Verificar que hay reservas con estados válidos
-3. Revisar console del navegador (hay logs de errores)
-4. Verificar API: `/api/occupancy-highlights` devuelve 200
-
-### Los colores no son correctos
-1. Verificar cálculo manual en admin (`/administrator/informes`)
-2. Comparar con lógica de `getOccupancyStatus()` (línea 41 del endpoint)
-
-### Cache no se actualiza
-1. Esperar 1 hora (cache CDN)
-2. O desplegar nueva versión (invalida cache)
-3. O cambiar parámetro en URL: `/api/occupancy-highlights?v=2`
+| Síntoma | Comprobación |
+|---------|--------------|
+| No aparece el bloque | Ningún mes/semana ≥ 40%; revisar API JSON |
+| Mes actual no sale | ¿Quedan ≤3 días de mes? Es intencionado |
+| Solo sale un mes | Cache 1 h; hard refresh o esperar deploy |
+| % distinto al admin | Semáforo incluye `blocked_dates`; informes no |
+| Mayo con 27–28 | Deploy antiguo; debe ser junio+ con semanas 1-7, 8-14… |
 
 ## 📚 Referencias
 
-- Lógica de cálculo: `src/app/administrator/(protected)/informes/informes-client.tsx` (línea 360+)
-- Componente visual: `src/components/booking/occupancy-highlights.tsx`
-- API: `src/app/api/occupancy-highlights/route.ts`
-- Integración: `src/app/es/reservar/reservar-client.tsx`
-- Traducciones: `src/lib/translations-preload.ts`
+| Recurso | Ruta |
+|---------|------|
+| API | `src/app/api/occupancy-highlights/route.ts` |
+| UI | `src/components/booking/occupancy-highlights.tsx` |
+| Integración ES | `src/app/es/reservar/reservar-client.tsx` |
+| Traducciones | `src/lib/translations-preload.ts` |
+| Test API | `scripts/test-occupancy-api.js` |
+| Análisis DB | `scripts/analyze-august-weeks.ts` |
+| Doc visual | `docs/SEMAFORO-OCUPACION-VISUAL.md` |
 
 ---
 
 **Creado**: Febrero 2026  
-**Versión**: 1.0  
+**Última actualización**: Junio 2026 (v2 — semanas dinámicas)  
 **Mantenedor**: Furgocasa Dev Team
