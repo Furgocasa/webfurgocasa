@@ -116,5 +116,5 @@ export function baseUrl(): string {
 }
 
 export function unsubscribeUrlFor(token: string | null | undefined): string {
-  return token ? `${baseUrl()}/api/unsubscribe?t=${token}` : `${baseUrl()}/api/unsubscribe`;
+  return token ? `${baseUrl()}/unsubscribe?t=${encodeURIComponent(token)}` : `${baseUrl()}/unsubscribe`;
 }

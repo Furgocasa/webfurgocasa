@@ -362,14 +362,13 @@ const nextConfig = {
     ];
   },
   async rewrites() {
-    // ============================================
-    // REWRITES - VACÍO (Todos convertidos a redirects 301)
-    // ============================================
-    // Los rewrites antiguos para URLs con guión han sido
-    // convertidos a redirects 301 para mejor SEO.
-    // Google actualizará su índice a las URLs con barra.
-    // ============================================
-    return [];
+    // Baja de marketing: URL pública /unsubscribe → handler en /api/unsubscribe
+    return [
+      {
+        source: '/unsubscribe',
+        destination: '/api/unsubscribe',
+      },
+    ];
   },
   async redirects() {
     // ================================================================

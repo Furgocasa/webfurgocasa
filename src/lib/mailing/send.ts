@@ -121,7 +121,6 @@ export async function sendOneRecipient(
   });
 
   const cfg = loadSmtpConfig();
-  const unsubscribeMailto = `mailto:${cfg.fromEmail}?subject=unsubscribe`;
 
   try {
     const info = await transport.sendMail({
@@ -130,7 +129,7 @@ export async function sendOneRecipient(
       subject: campaign.subject,
       html,
       headers: {
-        'List-Unsubscribe': `<${unsubscribeUrl}>, <${unsubscribeMailto}>`,
+        'List-Unsubscribe': `<${unsubscribeUrl}>`,
         'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
       },
     });
@@ -183,14 +182,13 @@ export async function sendTestEmail(
     CIUDAD: opts.ciudad || '',
     UNSUBSCRIBE_URL: unsubscribeUrl,
   });
-  const unsubscribeMailto = `mailto:${cfg.fromEmail}?subject=unsubscribe`;
   const info = await transport.sendMail({
     from: cfg.from,
     to: opts.to,
     subject: opts.subject,
     html,
     headers: {
-      'List-Unsubscribe': `<${unsubscribeUrl}>, <${unsubscribeMailto}>`,
+      'List-Unsubscribe': `<${unsubscribeUrl}>`,
       'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
     },
   });

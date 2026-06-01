@@ -117,14 +117,14 @@ function pageForm(loc: Locale, opts?: { email?: string; error?: string }): strin
 <title>${i.formTitle} · Furgocasa</title><style>${BASE_STYLES}</style></head><body><main>
 <div style="text-align:center"><img class="logo" src="${LOGO_URL}" alt="Furgocasa"/></div>
 <h1>${i.formTitle}</h1><p style="text-align:center">${i.formIntro}</p>${err}
-<form method="POST" action="/api/unsubscribe?lang=${loc}" accept-charset="utf-8">
+<form method="POST" action="/unsubscribe?lang=${loc}" accept-charset="utf-8">
   <label for="email">${i.emailLabel}</label>
   <input type="email" id="email" name="email" required value="${email}" autocomplete="email"/>
   <label for="reason">${i.reasonLabel}</label>
   <textarea id="reason" name="reason" placeholder="${i.reasonPlaceholder}" maxlength="500"></textarea>
   <button type="submit">${i.submit}</button>
 </form>
-<p class="lang"><a href="/api/unsubscribe?lang=${other}">${otherLabel}</a></p>
+<p class="lang"><a href="/unsubscribe?lang=${other}">${otherLabel}</a></p>
 </main></body></html>`;
 }
 
@@ -145,7 +145,7 @@ function pageOk(
 <img class="logo" src="${LOGO_URL}" alt="Furgocasa"/><h1>${i.okTitle}</h1>
 <p>${main}</p><p>${i.okTail}</p>
 <p class="note">${i.okContact(SUPPORT_EMAIL)}</p>
-<p class="lang"><a href="/api/unsubscribe?lang=${other}">${I18N[other].langSwitch}</a></p>
+<p class="lang"><a href="/unsubscribe?lang=${other}">${I18N[other].langSwitch}</a></p>
 </main></body></html>`;
 }
 
