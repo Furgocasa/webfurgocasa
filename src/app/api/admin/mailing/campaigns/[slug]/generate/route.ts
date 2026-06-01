@@ -77,11 +77,11 @@ Si el contexto trae números sin formatear, conviértelos mentalmente al formato
 · cualquier otro precio o importe monetario que aparezca en el email
 
 REGLA ANTI-ALUCINACIÓN (INNEGOCIABLE, ES LA MÁS IMPORTANTE DE TODAS):
-El mensaje del usuario incluye un bloque "CONTEXTO_BD" con datos 100% reales extraídos en este mismo instante de la base de datos de Furgocasa. Contiene TRES listas: offers (ofertas de última hora vigentes hoy), posts (últimos artículos del blog publicados) y fleet (ficha técnica de toda la flota activa: marca, modelo, plazas, camas, categoría).
+El mensaje del usuario incluye un bloque "CONTEXTO_BD" con datos 100% reales extraídos en este mismo instante de la base de datos de Furgocasa. Contiene TRES listas: offers (ofertas de última hora vigentes hoy), posts (últimos artículos del blog publicados) y fleet (ficha técnica de toda la flota activa: marca, modelo, plazas, plazas de noche, categoría).
 
 Para CUALQUIER afirmación factual sobre ofertas, vehículos o artículos, estás OBLIGADA a usar exclusivamente los datos de CONTEXTO_BD. Prohibido absolutamente:
 · Inventar descuentos, precios, fechas, días, ubicaciones o URLs de ofertas. Los únicos descuentos/precios/fechas/URLs válidos son los que aparecen en CONTEXTO_BD.offers.
-· Inventar plazas, camas, beds_detail, categoría, largo o cualquier ficha técnica de un vehículo. Si vas a nombrar un modelo (p.ej. "Dreamer Fun D55"), sus especificaciones DEBEN coincidir literalmente con las de CONTEXTO_BD.fleet — si dice seats:4 y beds:2, escribe "4 plazas de viaje, 2 camas", nunca "4 plazas de noche", "5 literas" ni nada que no esté en el contexto.
+· Inventar plazas, plazas de noche, beds_detail, categoría, largo o cualquier ficha técnica de un vehículo. Si vas a nombrar un modelo (p.ej. "Dreamer Fun D55"), sus especificaciones DEBEN coincidir literalmente con las de CONTEXTO_BD.fleet — si dice seats:4 y beds:2, escribe "4 plazas" y "2 plazas noche" (NO "2 camas" — la web dice "plazas noche", no "camas"). Nunca "5 literas" ni nada que no esté en el contexto.
 · Inventar artículos de blog, titulares o slugs. Los únicos artículos válidos son los de CONTEXTO_BD.posts, con su título, excerpt y url exactos.
 · Inventar imágenes. Para fotos de vehículos usa EXCLUSIVAMENTE el image_url que trae cada objeto en offers[].vehicle o en fleet[]. Para fotos de artículos, image_url de posts[]. Si una entrada no tiene image_url (es null), no metas imagen para esa entrada.
 · PAREO IMAGEN ↔ VEHÍCULO (anti-confusión): dentro de una tarjeta/sección que habla del vehículo X, el <img src="..."> DEBE ser el image_url del MISMO objeto del contexto cuyo vehicle.name coincide con X. Ejemplo: si una tarjeta titula "Weinsberg Carabus 600 MQ", la imagen de esa tarjeta tiene que ser offers[i].vehicle.image_url (o fleet[i].image_url) del objeto cuyo vehicle.name sea exactamente "Weinsberg Carabus 600 MQ". NUNCA copies el image_url de otro objeto. Si tienes dudas, antes de escribir la <img> relee el vehicle.name y el image_url del MISMO objeto y comprueba que el filename del image_url contiene el internal_code del vehículo (p.ej. fu0019-weinsberg-carabus-600-mq.jpg → vehicle con internal_code FU0019 — deben ser el mismo objeto del JSON).
@@ -93,7 +93,7 @@ Comportamiento ante contexto insuficiente:
 · Si el briefing menciona un modelo que no aparece en CONTEXTO_BD.fleet, NO escribas sus especificaciones — habla de él en términos genéricos o sustitúyelo por uno que sí esté en fleet.
 · NUNCA escribas frases como "desde 59€/día", "con un 20% de descuento", "4 plazas de noche" si esas cifras no salen literalmente del contexto.
 
-Antes de entregar, autoverifica: cada número (€, %, plazas, camas, días), cada URL (/es/reservar/oferta/..., /es/blog/...) y cada nombre de modelo aparece en CONTEXTO_BD. Si encuentras uno que no, bórralo o sustitúyelo por información que sí esté en el contexto.
+Antes de entregar, autoverifica: cada número (€, %, plazas, plazas de noche, días), cada URL (/es/reservar/oferta/..., /es/blog/...) y cada nombre de modelo aparece en CONTEXTO_BD. Si encuentras uno que no, bórralo o sustitúyelo por información que sí esté en el contexto.
 
 REGLA DE ORO DE RENDERIZADO (OUTLOOK-SAFE, INNEGOCIABLE):
 El HTML DEBE renderizar EXACTAMENTE IGUAL en Outlook Desktop de Windows (que usa el motor de Word, el más limitado) que en un navegador moderno. Si un efecto visual no se ve igual en ambos, NO LO USES. La campaña debe salir limpia, legible y con la jerarquía intacta aunque el cliente sea Outlook 2016/2019/365 para Windows.
@@ -155,7 +155,7 @@ Cuando el briefing pida ofertas (aunque no lo pida explícitamente, si el mail h
 
   1. Foto del vehículo (si offers[i].vehicle.image_url no es null).
   2. Nombre del vehículo (offers[i].vehicle.name) — titular de la tarjeta.
-  3. Categoría / plazas / camas — una línea con offers[i].vehicle.category, offers[i].vehicle.seats ("X plazas") y offers[i].vehicle.beds ("X camas").
+  3. Categoría / plazas / plazas noche — una línea con offers[i].vehicle.category, offers[i].vehicle.seats ("X plazas") y offers[i].vehicle.beds ("X plazas noche").
   4. Duración: offers[i].days ("X días").
   5. Fechas: "del {start_date} al {end_date}" en formato cercano (p.ej. "del 12 al 19 de mayo").
   6. Ubicación: offers[i].pickup_location (si no es null).
@@ -199,7 +199,7 @@ Patrón visual recomendado para cada tarjeta de oferta (Outlook-safe, adapta col
           </tr>
           <tr>
             <td style="padding:0 0 12px 0;">
-              <p style="margin:0;color:#6b7280;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;">{vehicle.category} · {vehicle.seats} plazas · {vehicle.beds} camas</p>
+              <p style="margin:0;color:#6b7280;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:20px;">{vehicle.category} · {vehicle.seats} plazas · {vehicle.beds} plazas noche</p>
             </td>
           </tr>
           <tr>
@@ -580,7 +580,7 @@ export async function POST(req: NextRequest, ctx: Params) {
   // Resumen compacto para los logs del admin (visible en la UI de generación).
   const ctxSummary = `offers=${ctxData.offers.length}, posts=${ctxData.posts.length}, fleet=${ctxData.fleet.length}`;
 
-  const userPrompt = `CONTEXTO_BD (datos 100% reales extraídos AHORA de la base de datos de Furgocasa. Para cualquier oferta, vehículo o artículo que menciones, USA EXCLUSIVAMENTE estos datos — prohibido inventar precios, plazas, camas, descuentos, fechas, URLs o imágenes):
+  const userPrompt = `CONTEXTO_BD (datos 100% reales extraídos AHORA de la base de datos de Furgocasa. Para cualquier oferta, vehículo o artículo que menciones, USA EXCLUSIVAMENTE estos datos — prohibido inventar precios, plazas, plazas de noche, descuentos, fechas, URLs o imágenes):
 \`\`\`json
 ${ctxJson}
 \`\`\`

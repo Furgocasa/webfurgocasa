@@ -550,7 +550,7 @@ INSERT INTO mailing_campaigns (
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #EFF6FF; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #063971; font-weight: 600;">
-                                &#127769; 4 camas
+                                &#127769; 4 plazas noche
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #FFF7ED; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #D65A31; font-weight: 600;">
@@ -662,7 +662,7 @@ INSERT INTO mailing_campaigns (
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #EFF6FF; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #063971; font-weight: 600;">
-                                &#127769; 2 camas
+                                &#127769; 2 plazas noche
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #FFF7ED; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #D65A31; font-weight: 600;">
@@ -774,7 +774,7 @@ INSERT INTO mailing_campaigns (
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #EFF6FF; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #063971; font-weight: 600;">
-                                &#127769; 2 camas
+                                &#127769; 2 plazas noche
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #FFF7ED; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #D65A31; font-weight: 600;">
@@ -892,7 +892,7 @@ INSERT INTO mailing_campaigns (
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #EFF6FF; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #063971; font-weight: 600;">
-                                &#127769; 2 camas
+                                &#127769; 2 plazas noche
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #FFF7ED; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #D65A31; font-weight: 600;">
@@ -1004,7 +1004,7 @@ INSERT INTO mailing_campaigns (
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #EFF6FF; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #063971; font-weight: 600;">
-                                &#127769; 4 camas
+                                &#127769; 4 plazas noche
                               </td>
                               <td style="width: 6px;"></td>
                               <td style="background-color: #FFF7ED; padding: 4px 10px; border-radius: 12px; font-size: 12px; color: #D65A31; font-weight: 600;">
