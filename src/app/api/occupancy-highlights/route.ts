@@ -23,7 +23,8 @@ import {
 //   - el TOTAL del mes >= UMBRAL_MODERADO, o
 //   - alguna SEMANA del mes >= UMBRAL_MODERADO.
 //
-// Las semanas que ya han terminado (mes actual) se omiten.
+// El mes en curso se omite solo si quedan ≤ 3 días para fin de mes;
+// en ese mes en curso se ocultan las semanas ya terminadas.
 // Cache CDN: 1h.
 // ============================================
 
@@ -35,6 +36,9 @@ const MONTHS_AHEAD = 12;
 
 // Umbral mínimo para que un mes/semana se considere "con presión" y se muestre.
 const THRESHOLD_MODERATE = 40;
+
+// Omitir el mes en curso solo si quedan ≤ N días (p. ej. 29-31 may → junio).
+const DAYS_LEFT_TO_SKIP_CURRENT_MONTH = 3;
 
 type StatusKey = "available" | "moderate" | "high" | "full";
 type ColorKey = "green" | "yellow" | "orange" | "red";
@@ -215,19 +219,35 @@ export async function GET() {
       return NextResponse.json({ error: "No hay vehículos disponibles" }, { status: 404 });
     }
 
-    // 2. Calcular rango global: desde el día 1 del mes SIGUIENTE al actual
-    //    hasta el último día del mes (mesSiguiente + MONTHS_AHEAD - 1).
+    // 2. Rango global: desde el mes en curso (si aplica) o el siguiente,
+    //    hasta MONTHS_AHEAD meses vista.
     const now = new Date();
-    const firstFutureMonth = addMonths(new Date(now.getFullYear(), now.getMonth(), 1), 1);
-    const rangeStartIso = isoDate(
-      firstFutureMonth.getFullYear(),
-      firstFutureMonth.getMonth() + 1,
-      1
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1; // 1-12
+    const currentDay = now.getDate();
+    const daysInCurrentMonth = getDaysInMonth(
+      new Date(currentYear, currentMonth - 1, 1)
     );
-    const lastMonthRef = addMonths(firstFutureMonth, MONTHS_AHEAD - 1);
+    const daysRemainingInMonth = daysInCurrentMonth - currentDay + 1;
+    const skipCurrentMonth =
+      daysRemainingInMonth <= DAYS_LEFT_TO_SKIP_CURRENT_MONTH;
+
+    const loopStartRef = skipCurrentMonth
+      ? addMonths(new Date(currentYear, currentMonth - 1, 1), 1)
+      : new Date(currentYear, currentMonth - 1, 1);
+
+    const rangeStartIso = isoDate(
+      loopStartRef.getFullYear(),
+      loopStartRef.getMonth() + 1,
+      skipCurrentMonth ? 1 : currentDay
+    );
+
+    const lastMonthRef = addMonths(loopStartRef, MONTHS_AHEAD - 1);
     const lastMonthYear = lastMonthRef.getFullYear();
     const lastMonthMonth = lastMonthRef.getMonth() + 1;
-    const lastDayOfLastMonth = getDaysInMonth(new Date(lastMonthYear, lastMonthMonth - 1, 1));
+    const lastDayOfLastMonth = getDaysInMonth(
+      new Date(lastMonthYear, lastMonthMonth - 1, 1)
+    );
     const rangeEndIso = isoDate(lastMonthYear, lastMonthMonth, lastDayOfLastMonth);
 
     // 3. Reservas que solapan el rango
@@ -268,21 +288,17 @@ export async function GET() {
     const vehiclesTyped = vehicles as VehicleRow[];
     const bookingsTyped = (bookings ?? []) as BookingRow[];
 
-    // 5. Generar lista de meses futuros (omitimos el mes en curso para no
-    //    mostrar tramos parciales/casi terminados de pocas días).
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth() + 1; // 1-12
-    const firstFutureMonthRef = addMonths(new Date(currentYear, currentMonth - 1, 1), 1);
-
+    // 5. Meses: incluimos el mes en curso salvo en sus últimos 3 días.
     const months: OccupancyMonth[] = [];
 
     for (let i = 0; i < MONTHS_AHEAD; i++) {
-      const ref = addMonths(firstFutureMonthRef, i);
+      const ref = addMonths(loopStartRef, i);
       const year = ref.getFullYear();
       const month = ref.getMonth() + 1;
       const daysInMonth = getDaysInMonth(new Date(year, month - 1, 1));
       const monthStartIso = isoDate(year, month, 1);
       const monthEndIso = isoDate(year, month, daysInMonth);
+      const isCurrentMonth = year === currentYear && month === currentMonth;
 
       const monthRate = calcOccupancyRate(
         parseISO(monthStartIso),
@@ -292,7 +308,12 @@ export async function GET() {
         blockedRanges
       );
 
-      const weekRanges = buildMonthWeeks(year, month);
+      // Semanas completas del calendario; en el mes en curso omitimos las ya pasadas.
+      const weekRanges = buildMonthWeeks(year, month).filter((w) => {
+        if (!isCurrentMonth) return true;
+        return w.endDay >= currentDay;
+      });
+
       const weeks: OccupancyWeek[] = weekRanges.map((w) => {
         const rate = calcOccupancyRate(
           parseISO(w.start),
@@ -312,10 +333,11 @@ export async function GET() {
         };
       });
 
-      const hasHighDemandWeek = weeks.some((w) => w.occupancy_rate >= THRESHOLD_MODERATE);
+      const hasHighDemandWeek = weeks.some(
+        (w) => w.occupancy_rate >= THRESHOLD_MODERATE
+      );
       const monthStatus = getOccupancyStatus(monthRate);
 
-      // Filtro: incluimos el mes si el total o alguna semana cruza el umbral.
       if (monthRate < THRESHOLD_MODERATE && !hasHighDemandWeek) {
         continue;
       }
