@@ -153,6 +153,81 @@ const VERTICAL_BANNERS = [
   },
 ];
 
+const VOID_HTML_ELEMENTS = new Set([
+  "area",
+  "base",
+  "br",
+  "col",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+]);
+
+/**
+ * Divide el HTML del artículo por H2 de primer nivel.
+ * Ignora H2 dentro de bloques anidados (p. ej. banners CTA con estilos inline)
+ * para no romper su maquetación al intercalar banners promocionales.
+ */
+function splitHtmlByTopLevelH2(html: string): string[] {
+  if (!html) return [""];
+
+  const sections: string[] = [];
+  let current = "";
+  let divDepth = 0;
+  let i = 0;
+
+  while (i < html.length) {
+    if (html[i] === "<") {
+      const tagEnd = html.indexOf(">", i);
+      if (tagEnd !== -1) {
+        const tagChunk = html.slice(i, tagEnd + 1);
+        const tagContent = html.slice(i + 1, tagEnd);
+        const isClosing = tagContent.startsWith("/");
+        const tagNameMatch = tagContent.match(/^\/?([a-z][a-z0-9]*)/i);
+
+        if (tagNameMatch) {
+          const tagName = tagNameMatch[1].toLowerCase();
+          const isSelfClosing =
+            tagContent.trimEnd().endsWith("/") || VOID_HTML_ELEMENTS.has(tagName);
+
+          if (tagName === "div") {
+            if (isClosing) divDepth = Math.max(0, divDepth - 1);
+            else if (!isSelfClosing) divDepth++;
+          }
+
+          if (
+            !isClosing &&
+            !isSelfClosing &&
+            tagName === "h2" &&
+            divDepth === 0 &&
+            current.trim().length > 0
+          ) {
+            sections.push(current);
+            current = "";
+          }
+        }
+
+        current += tagChunk;
+        i = tagEnd + 1;
+        continue;
+      }
+    }
+
+    current += html[i];
+    i++;
+  }
+
+  if (current) sections.push(current);
+  return sections.length > 0 ? sections : [html];
+}
+
 function shuffleAndPick<T>(arr: T[], count: number, seed: number): T[] {
   const shuffled = [...arr];
   let s = seed;
@@ -186,11 +261,7 @@ export function BlogContentWithBanners({ htmlContent, readingTime, proseClassNam
     setSeed(Math.floor(Math.random() * 2147483646) + 1);
   }, []);
 
-  const sections = useMemo(() => {
-    if (!htmlContent) return [""];
-    const parts = htmlContent.split(/(?=<h2[\s>])/i);
-    return parts.filter(Boolean);
-  }, [htmlContent]);
+  const sections = useMemo(() => splitHtmlByTopLevelH2(htmlContent), [htmlContent]);
 
   const bannerCount = useMemo(() => {
     const sectionCount = sections.length;

@@ -569,6 +569,17 @@ html, body {
   margin-right: 0;
 }
 
+/* Bloques CTA embebidos en artículos (p. ej. demanda AdBlue) */
+.prose div[style*="background"] a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.prose div[style*="background"] a:hover {
+  opacity: 0.9;
+}
+
 /* Bloques de cita */
 .prose blockquote {
   max-width: 100%;
