@@ -82,13 +82,14 @@ function parseRows(xlDir: string, shared: string[]): DayRow[] {
   while ((rm = rowRe.exec(sheet))) {
     const cells: Record<string, { v: string; t: string }> = {};
     let cm: RegExpExecArray | null;
-    const cRe =
-      /<c r="([A-Z]+\d+)"([^>]*)>(?:<v>([\s\S]*?)<\/v>)?<\/c>|<c r="([A-Z]+\d+)"([^>]*)\/>/g;
+    const cRe = /<c r="([A-Z]+\d+)"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g;
     while ((cm = cRe.exec(rm[1]))) {
-      const ref = cm[1] || cm[4];
-      const attrs = cm[2] || cm[5] || "";
+      const ref = cm[1];
+      const attrs = cm[2] || "";
+      const inner = cm[3] ?? "";
+      const vM = /<v>([\s\S]*?)<\/v>/.exec(inner);
       const tM = /t="([^"]+)"/.exec(attrs);
-      cells[colLetter(ref)] = { v: cm[3] ?? "", t: tM ? tM[1] : "n" };
+      cells[colLetter(ref)] = { v: vM ? vM[1] : "", t: tM ? tM[1] : "n" };
     }
     if (isHeader) {
       isHeader = false;

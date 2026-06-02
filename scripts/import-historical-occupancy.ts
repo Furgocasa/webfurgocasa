@@ -99,15 +99,16 @@ function parseDatos(xlDir: string, shared: string[]): DayRow[] {
   while ((rm = rowRe.exec(sheet))) {
     const cellsXml = rm[1];
     const cells: Record<string, { v: string; t: string }> = {};
-    const cRe =
-      /<c r="([A-Z]+\d+)"([^>]*)>(?:<v>([\s\S]*?)<\/v>)?<\/c>|<c r="([A-Z]+\d+)"([^>]*)\/>/g;
+    // Captura la celda completa y extrae <v> incluso si va precedido de <f> (celda con fórmula).
+    const cRe = /<c r="([A-Z]+\d+)"([^>]*?)(?:\/>|>([\s\S]*?)<\/c>)/g;
     let cm: RegExpExecArray | null;
     while ((cm = cRe.exec(cellsXml))) {
-      const ref = cm[1] || cm[4];
-      const attrs = cm[2] || cm[5] || "";
-      const v = cm[3];
+      const ref = cm[1];
+      const attrs = cm[2] || "";
+      const inner = cm[3] ?? "";
+      const vMatch = /<v>([\s\S]*?)<\/v>/.exec(inner);
       const tMatch = /t="([^"]+)"/.exec(attrs);
-      cells[colLetter(ref)] = { v: v ?? "", t: tMatch ? tMatch[1] : "n" };
+      cells[colLetter(ref)] = { v: vMatch ? vMatch[1] : "", t: tMatch ? tMatch[1] : "n" };
     }
     if (isHeader) {
       isHeader = false;

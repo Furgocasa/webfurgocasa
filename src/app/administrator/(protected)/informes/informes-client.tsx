@@ -240,8 +240,10 @@ function mergeHistorical(
       total_price: h.total_price || 0,
       amount_paid: h.total_price || 0,
       status: "completed",
-      // El histórico no tiene fecha de creación de pedido: usamos la del alquiler
-      created_at: h.pickup_date,
+      // El histórico del Excel NO tiene fecha de creación de pedido (solo sabemos cuándo
+      // se alquiló). Dejamos created_at = null para que NO aparezca en el modo
+      // "Creación de pedidos" y solo cuente en el modo "Días alquilados".
+      created_at: null,
       customer_name: h.customer_name || "Histórico",
       // Email sintético estable por nombre → no infla el conteo de clientes únicos
       customer_email: `hist:${(h.customer_name || "desconocido").toLowerCase().trim()}`,
@@ -282,8 +284,10 @@ export default function InformesClient({
   const [dateRange, setDateRange] = useState<{ start: string; end: string } | null>(null);
   const [showFilters, setShowFilters] = useState(true);
   
-  // Modo de visualización de ingresos: 'creation' (fecha de creación) o 'rental' (días alquilados)
-  const [revenueMode, setRevenueMode] = useState<'creation' | 'rental'>('creation');
+  // Modo de visualización de ingresos: 'creation' (fecha de creación) o 'rental' (días alquilados).
+  // Por defecto 'rental' porque el histórico del Excel solo tiene días alquilados (no fecha de
+  // creación de pedido), y es el modo que cuadra con el Excel de ocupación.
+  const [revenueMode, setRevenueMode] = useState<'creation' | 'rental'>('rental');
   
   // Estado para años expandidos en la tabla de control
   const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set([currentYear]));
@@ -790,11 +794,12 @@ export default function InformesClient({
   
   // Estructura de datos para la tabla de control mensual
   const revenueControlTable = useMemo(() => {
-    // Obtener años con datos reales
+    // Obtener años con datos reales (recogida y devolución, para alquileres que cruzan de año)
     const yearsWithData = new Set<number>();
     bookings.forEach(b => {
       if (isValidInformesBookingStatus(b.status)) {
         yearsWithData.add(new Date(b.pickup_date).getFullYear());
+        yearsWithData.add(new Date(b.dropoff_date).getFullYear());
       }
     });
     
@@ -834,17 +839,14 @@ export default function InformesClient({
         
         const pickupDate = parseISO(booking.pickup_date);
         const dropoffDate = parseISO(booking.dropoff_date);
-        const bookingYear = pickupDate.getFullYear();
-        
-        // Solo procesar reservas de este año
-        if (bookingYear !== year) return;
         
         // Encontrar vehículo
         const vehicleIndex = yearData.vehicles.findIndex(v => v.id === booking.vehicle_id);
         if (vehicleIndex === -1) return;
         
         if (revenueMode === 'creation') {
-          // Modo creación: ingresos en el mes de creación
+          // Modo creación: ingresos en el mes en que se creó el pedido.
+          // El histórico del Excel no tiene created_at → no aparece aquí.
           if (!booking.created_at) return;
           const createdDate = parseISO(booking.created_at);
           const createdYear = createdDate.getFullYear();
@@ -1294,8 +1296,8 @@ export default function InformesClient({
             </div>
             <p className="text-xs text-gray-500 mt-2">
               {revenueMode === 'creation' 
-                ? 'Ingresos contabilizados en el mes que se realizó la reserva'
-                : 'Ingresos distribuidos según los días reales del alquiler en cada mes'
+                ? 'Ingresos contabilizados en el mes que se realizó la reserva. El histórico del Excel no aparece en este modo (no tiene fecha de creación de pedido).'
+                : 'Ingresos distribuidos según los días reales del alquiler en cada mes. Este modo cuadra con el Excel de ocupación.'
               }
             </p>
           </div>
@@ -1688,8 +1690,8 @@ export default function InformesClient({
         
         <p className="text-xs text-gray-500 mt-4">
           {revenueMode === 'creation' 
-            ? '💡 Ingresos contabilizados en el mes que se realizó la reserva'
-            : '💡 Ingresos distribuidos proporcionalmente según los días reales del alquiler en cada mes'
+            ? '💡 Ingresos contabilizados en el mes que se realizó la reserva. El histórico del Excel no aparece en este modo (no tiene fecha de creación de pedido).'
+            : '💡 Ingresos distribuidos proporcionalmente según los días reales del alquiler en cada mes. Este modo cuadra con el Excel de ocupación.'
           }
         </p>
       </div>
