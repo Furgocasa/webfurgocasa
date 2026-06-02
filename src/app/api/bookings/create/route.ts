@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { validatePickupDropoffAgainstClosedDates } from "@/lib/business-closed-dates";
 import { buildPricingForSearch } from "@/lib/rental-search-pricing";
+import { loadMinimumRentalDaysCheck } from "@/lib/rental-min-days";
 import { extraLineUnitPriceEuros } from "@/lib/utils";
 import {
   markCouponUsed as markStorytellerCouponUsed,
@@ -108,6 +109,33 @@ export async function POST(request: Request) {
     );
     if (!closedCheck.ok) {
       return NextResponse.json({ error: closedCheck.error }, { status: 400 });
+    }
+
+    if (!booking.last_minute_offer_id) {
+      const { data: pickupLocRow } = await supabase
+        .from("locations")
+        .select("slug")
+        .eq("id", booking.pickup_location_id)
+        .maybeSingle();
+
+      const minDaysCheck = await loadMinimumRentalDaysCheck(supabase, {
+        pickupDate: booking.pickup_date,
+        dropoffDate: booking.dropoff_date,
+        pickupTime: booking.pickup_time,
+        dropoffTime: booking.dropoff_time,
+        pickupLocation: pickupLocRow?.slug ?? null,
+      });
+
+      if (!minDaysCheck.ok) {
+        return NextResponse.json(
+          {
+            error: minDaysCheck.message,
+            requiredMinDays: minDaysCheck.requiredMinDays,
+            rentalDays: minDaysCheck.rentalDays,
+          },
+          { status: 400 }
+        );
+      }
     }
 
     // ================================================================

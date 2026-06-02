@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -86,10 +86,27 @@ interface Season {
   season_type?: "baja" | "media" | "alta" | null;
 }
 
+interface HistoricalBooking {
+  id: string;
+  vehicle_code: string | null;
+  vehicle_label: string;
+  vehicle_name: string | null;
+  customer_name: string | null;
+  channel: string | null;
+  location: string | null;
+  season_label: string | null;
+  season_type: string | null;
+  pickup_date: string;
+  dropoff_date: string;
+  days: number;
+  total_price: number;
+}
+
 interface InformesClientProps {
   vehicles: Vehicle[];
   bookings: Booking[];
   seasons: Season[];
+  historical?: HistoricalBooking[];
 }
 
 // Colores para gráficos
@@ -121,13 +138,141 @@ function isValidInformesBookingStatus(
   );
 }
 
+const normCode = (c?: string | null) => (c || "").trim().toUpperCase();
+
+/** Códigos Excel antiguos → código actual en BD (vehículos renombrados). */
+const HISTORICAL_VEHICLE_CODE_ALIASES: Record<string, string> = {
+  FU0013: "MA0013", // Livingstone Sport 5
+  FU0014: "MA0014", // Sunlight Cliff Adventure
+  FU0017: "MA0017", // Knaus Boxstar Street AUT
+  FU0008: "FU0021", // Dethleffs Globetrail (600 DB → 600 DS)
+};
+
+function resolveHistoricalVehicleCode(code: string | null): string | null {
+  const n = normCode(code);
+  if (!n) return null;
+  return HISTORICAL_VEHICLE_CODE_ALIASES[n] ?? n;
+}
+
+/**
+ * Combina el histórico (Excel de ocupación) con las reservas reales para que TODOS
+ * los cálculos de informes "lo vean" como reservas normales.
+ *
+ * - Los alquileres históricos cuyo código de vehículo coincide con un vehículo actual
+ *   se atribuyen a ese mismo vehículo (continuidad de ingresos/ocupación).
+ * - Los vehículos antiguos ya vendidos (sin equivalente en BD) se crean como
+ *   vehículos sintéticos (is_for_rent=false → fuera del denominador de ocupación actual).
+ * - DEDUPLICACIÓN: si un alquiler histórico solapa (mismo vehículo + fechas) con una
+ *   reserva real válida, se descarta para no contar doble en el periodo de transición
+ *   a la web nueva.
+ */
+function mergeHistorical(
+  vehicles: Vehicle[],
+  bookings: Booking[],
+  historical: HistoricalBooking[],
+  include: boolean
+): { vehicles: Vehicle[]; bookings: Booking[] } {
+  if (!include || !historical || historical.length === 0) {
+    return { vehicles, bookings };
+  }
+
+  const byCode = new Map<string, Vehicle>();
+  for (const v of vehicles) {
+    const c = normCode(v.internal_code);
+    if (c) byCode.set(c, v);
+  }
+
+  const realByVehicle = new Map<string, { start: number; end: number }[]>();
+  for (const b of bookings) {
+    if (!isValidInformesBookingStatus(b.status)) continue;
+    const arr = realByVehicle.get(b.vehicle_id) || [];
+    arr.push({ start: +parseISO(b.pickup_date), end: +parseISO(b.dropoff_date) });
+    realByVehicle.set(b.vehicle_id, arr);
+  }
+
+  const syntheticVehicles = new Map<string, Vehicle>();
+  const histBookings: Booking[] = [];
+
+  for (const h of historical) {
+    const code = resolveHistoricalVehicleCode(h.vehicle_code);
+    const matched = code ? byCode.get(code) : undefined;
+
+    let vehicleId: string;
+    let vehicleName: string;
+    let internalCode: string | null;
+
+    if (matched) {
+      vehicleId = matched.id;
+      vehicleName = matched.name;
+      internalCode = matched.internal_code;
+
+      // Dedup: descartar si solapa con una reserva real del mismo vehículo
+      const hs = +parseISO(h.pickup_date);
+      const he = +parseISO(h.dropoff_date);
+      const overlaps = (realByVehicle.get(vehicleId) || []).some(
+        (iv) => hs <= iv.end && he >= iv.start
+      );
+      if (overlaps) continue;
+    } else {
+      const key = normCode(h.vehicle_code) || h.vehicle_label;
+      vehicleId = `hist:${key}`;
+      vehicleName = h.vehicle_name || h.vehicle_label;
+      internalCode = h.vehicle_code || h.vehicle_label;
+      if (!syntheticVehicles.has(vehicleId)) {
+        syntheticVehicles.set(vehicleId, {
+          id: vehicleId,
+          name: vehicleName,
+          slug: vehicleId,
+          internal_code: internalCode,
+          is_for_rent: false,
+          status: "inactive",
+          sale_status: "sold",
+        });
+      }
+    }
+
+    histBookings.push({
+      id: `hist-${h.id}`,
+      vehicle_id: vehicleId,
+      customer_id: null,
+      pickup_date: h.pickup_date,
+      dropoff_date: h.dropoff_date,
+      total_price: h.total_price || 0,
+      amount_paid: h.total_price || 0,
+      status: "completed",
+      // El histórico no tiene fecha de creación de pedido: usamos la del alquiler
+      created_at: h.pickup_date,
+      customer_name: h.customer_name || "Histórico",
+      // Email sintético estable por nombre → no infla el conteo de clientes únicos
+      customer_email: `hist:${(h.customer_name || "desconocido").toLowerCase().trim()}`,
+      days: h.days,
+      vehicle: { id: vehicleId, name: vehicleName, internal_code: internalCode },
+    });
+  }
+
+  return {
+    vehicles: [...vehicles, ...syntheticVehicles.values()],
+    bookings: [...bookings, ...histBookings],
+  };
+}
+
 export default function InformesClient({
-  vehicles,
-  bookings,
+  vehicles: vehiclesProp,
+  bookings: bookingsProp,
   seasons,
+  historical = [],
 }: InformesClientProps) {
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth();
+
+  // Mostrar/ocultar el histórico importado del Excel de ocupación
+  const [includeHistorical, setIncludeHistorical] = useState(true);
+
+  // Datos combinados (reales + histórico) que alimentan TODOS los cálculos siguientes
+  const { vehicles, bookings } = useMemo(
+    () => mergeHistorical(vehiclesProp, bookingsProp, historical, includeHistorical),
+    [vehiclesProp, bookingsProp, historical, includeHistorical]
+  );
 
   // Estados de filtros
   const [selectedVehicles, setSelectedVehicles] = useState<string[]>([]);
@@ -142,6 +287,21 @@ export default function InformesClient({
   
   // Estado para años expandidos en la tabla de control
   const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set([currentYear]));
+
+  // Con histórico activo, expandir todos los años con datos en la tabla mensual
+  useEffect(() => {
+    if (!includeHistorical || historical.length === 0) return;
+    setExpandedYears((prev) => {
+      const years = new Set(prev);
+      for (const h of historical) {
+        years.add(new Date(h.pickup_date).getFullYear());
+      }
+      for (const b of bookingsProp) {
+        years.add(new Date(b.pickup_date).getFullYear());
+      }
+      return years;
+    });
+  }, [includeHistorical, historical, bookingsProp]);
 
   // Todos los vehículos (incluidos vendidos para mantener histórico)
   const allVehiclesForReports = vehicles;
@@ -828,15 +988,45 @@ export default function InformesClient({
 
   return (
     <div className="space-y-6">
+      {historical.length === 0 && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          No se ha cargado el histórico de alquileres (Excel 2018–2025). Comprueba que la tabla{" "}
+          <code className="text-xs bg-amber-100 px-1 rounded">historical_bookings</code> existe en
+          Supabase, que los datos están importados y que{" "}
+          <code className="text-xs bg-amber-100 px-1 rounded">SUPABASE_SERVICE_ROLE_KEY</code> está
+          configurada en el servidor.
+        </div>
+      )}
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Informes y Estadísticas</h1>
           <p className="text-gray-600 mt-1">
             Análisis de rendimiento • <span className="font-medium text-furgocasa-orange">{periodDescription}</span>
+            {includeHistorical && historical.length > 0 && (
+              <span className="block text-sm text-blue-700 mt-0.5">
+                Histórico Excel: {historical.length.toLocaleString("es-ES")} alquileres (
+                {Math.min(...historical.map((h) => new Date(h.pickup_date).getFullYear()))}–
+                {Math.max(...historical.map((h) => new Date(h.pickup_date).getFullYear())})
+              </span>
+            )}
           </p>
         </div>
         <div className="flex items-center gap-3">
+          {historical.length > 0 && (
+            <button
+              onClick={() => setIncludeHistorical((v) => !v)}
+              title="Incluye/excluye el histórico de alquileres 2018-2025 importado del Excel de ocupación"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+                includeHistorical
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <Calendar className="h-4 w-4" />
+              Histórico {includeHistorical ? 'incluido' : 'oculto'}
+            </button>
+          )}
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
@@ -1592,6 +1782,15 @@ export default function InformesClient({
           <strong>Nota:</strong> Solo se contabilizan <span className="font-semibold text-green-700">alquileres reales</span> (reservas confirmadas, en curso y completadas).
           Las reservas pendientes y canceladas no se incluyen. Los cálculos de ocupación se basan en días reservados vs. días disponibles en el periodo seleccionado.
         </p>
+        {historical.length > 0 && (
+          <p className="mt-2">
+            <strong>Histórico:</strong> con <span className="font-semibold text-blue-700">Histórico incluido</span> se
+            añaden los alquileres de 2018-2025 importados del Excel de Análisis de Ocupación. Los alquileres históricos
+            que solapan con una reserva real (mismo vehículo y fechas) se descartan automáticamente para no contar doble.
+            En años antiguos los ingresos pueden estar incompletos (no siempre se registró el precio) pero los días de
+            ocupación sí son fiables.
+          </p>
+        )}
       </div>
     </div>
   );

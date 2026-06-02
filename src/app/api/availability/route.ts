@@ -10,6 +10,7 @@ import {
 } from "@/lib/utils";
 import { detectDeviceType } from "@/lib/search-tracking/session";
 import { validatePickupDropoffAgainstClosedDates } from "@/lib/business-closed-dates";
+import { loadMinimumRentalDaysCheck } from "@/lib/rental-min-days";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -71,6 +72,31 @@ export async function GET(request: NextRequest) {
     );
     if (!closedCheck.ok) {
       return NextResponse.json({ error: closedCheck.error }, { status: 400 });
+    }
+
+    const minDaysCheck = await loadMinimumRentalDaysCheck(supabase, {
+      pickupDate,
+      dropoffDate,
+      pickupTime,
+      dropoffTime,
+      pickupLocation,
+    });
+
+    if (!minDaysCheck.ok) {
+      const blockedResponse = NextResponse.json({
+        success: true,
+        minimumDaysNotMet: true,
+        requiredMinDays: minDaysCheck.requiredMinDays,
+        rentalDays: minDaysCheck.rentalDays,
+        message: minDaysCheck.message,
+        vehicles: [],
+        totalResults: 0,
+      });
+      blockedResponse.headers.set(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate, max-age=0"
+      );
+      return blockedResponse;
     }
 
     // 1. Obtener todos los vehículos activos para alquiler

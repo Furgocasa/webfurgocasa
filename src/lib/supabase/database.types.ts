@@ -692,6 +692,69 @@ export type Database = {
         }
         Relationships: []
       }
+      historical_bookings: {
+        Row: {
+          channel: string | null
+          company: string | null
+          created_at: string
+          customer_name: string | null
+          days: number
+          dropoff_date: string
+          estado: string | null
+          external_key: string
+          id: string
+          location: string | null
+          pickup_date: string
+          season_label: string | null
+          season_type: string | null
+          source: string
+          total_price: number
+          vehicle_code: string | null
+          vehicle_label: string
+          vehicle_name: string | null
+        }
+        Insert: {
+          channel?: string | null
+          company?: string | null
+          created_at?: string
+          customer_name?: string | null
+          days: number
+          dropoff_date: string
+          estado?: string | null
+          external_key: string
+          id?: string
+          location?: string | null
+          pickup_date: string
+          season_label?: string | null
+          season_type?: string | null
+          source?: string
+          total_price?: number
+          vehicle_code?: string | null
+          vehicle_label: string
+          vehicle_name?: string | null
+        }
+        Update: {
+          channel?: string | null
+          company?: string | null
+          created_at?: string
+          customer_name?: string | null
+          days?: number
+          dropoff_date?: string
+          estado?: string | null
+          external_key?: string
+          id?: string
+          location?: string | null
+          pickup_date?: string
+          season_label?: string | null
+          season_type?: string | null
+          source?: string
+          total_price?: number
+          vehicle_code?: string | null
+          vehicle_label?: string
+          vehicle_name?: string | null
+        }
+        Relationships: []
+      }
       location_targets: {
         Row: {
           canonical_url: string | null

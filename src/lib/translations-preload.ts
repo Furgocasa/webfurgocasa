@@ -1518,6 +1518,24 @@ export const staticTranslations = {
     fr: "La période minimale est de",
     de: "Die Mindestdauer beträgt"
   },
+  "No se ofrecen resultados porque el periodo mínimo exigido para este periodo es superior al periodo buscado": {
+    es: "No se ofrecen resultados porque el periodo mínimo exigido para este periodo es superior al periodo buscado",
+    en: "No results are offered because the minimum rental period required for these dates is longer than the period you searched for",
+    fr: "Aucun résultat n'est proposé car la durée minimale de location exigée pour cette période est supérieure à la période recherchée",
+    de: "Es werden keine Ergebnisse angezeigt, weil die für diesen Zeitraum geforderte Mindestmietdauer länger ist als der gesuchte Zeitraum"
+  },
+  "Has buscado": {
+    es: "Has buscado",
+    en: "You searched for",
+    fr: "Vous avez recherché",
+    de: "Sie haben gesucht"
+  },
+  "El periodo mínimo para estas fechas es de": {
+    es: "El periodo mínimo para estas fechas es de",
+    en: "The minimum period for these dates is",
+    fr: "La durée minimale pour ces dates est de",
+    de: "Die Mindestmietdauer für diese Daten beträgt"
+  },
   "Ahora selecciona la fecha de devolución": {
     es: "Ahora selecciona la fecha de devolución",
     en: "Now select the return date",

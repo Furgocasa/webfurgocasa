@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createAdminClient } from "@/lib/supabase/server";
 import InformesClient from "./informes-client";
 import type { Metadata } from "next";
 
@@ -53,21 +53,65 @@ async function getInformesData() {
     console.error('Error fetching seasons:', seasonsError);
   }
 
+  // Histórico: service_role (RLS sin políticas públicas). Paginado (>1000 filas).
+  let historical: {
+    id: string;
+    vehicle_code: string | null;
+    vehicle_label: string;
+    vehicle_name: string | null;
+    customer_name: string | null;
+    channel: string | null;
+    location: string | null;
+    season_label: string | null;
+    season_type: string | null;
+    pickup_date: string;
+    dropoff_date: string;
+    days: number;
+    total_price: number;
+  }[] = [];
+
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error(
+      "SUPABASE_SERVICE_ROLE_KEY no configurada: no se puede cargar historical_bookings"
+    );
+  } else {
+    const adminSupabase = createAdminClient();
+    const HISTORICAL_SELECT =
+      "id, vehicle_code, vehicle_label, vehicle_name, customer_name, channel, location, season_label, season_type, pickup_date, dropoff_date, days, total_price";
+    const PAGE = 1000;
+    for (let page = 0; ; page++) {
+      const { data: batch, error: historicalError } = await adminSupabase
+        .from("historical_bookings")
+        .select(HISTORICAL_SELECT)
+        .order("pickup_date", { ascending: false })
+        .range(page * PAGE, (page + 1) * PAGE - 1);
+      if (historicalError) {
+        console.error("Error fetching historical_bookings:", historicalError.message);
+        break;
+      }
+      if (!batch?.length) break;
+      historical.push(...batch);
+      if (batch.length < PAGE) break;
+    }
+  }
+
   return { 
     vehicles: vehicles || [], 
     bookings: bookings || [], 
-    seasons: seasons || [] 
+    seasons: seasons || [],
+    historical: historical || [],
   };
 }
 
 export default async function InformesPage() {
-  const { vehicles, bookings, seasons } = await getInformesData();
+  const { vehicles, bookings, seasons, historical } = await getInformesData();
 
   return (
     <InformesClient
       vehicles={vehicles}
       bookings={bookings}
       seasons={seasons}
+      historical={historical}
     />
   );
 }
