@@ -10,6 +10,7 @@ import { Loader2, AlertCircle, CalendarX } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { setSearchQueryId } from "@/lib/search-tracking/session";
 import { MINIMUM_RENTAL_DAYS_MESSAGE } from "@/lib/rental-min-days";
+import { useMinimumRentalDaysGuard } from "@/hooks/use-season-min-days";
 
 function LoadingState() {
   return (
@@ -75,6 +76,20 @@ function SearchResultsInner() {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
 
+  const pickupDate = searchParams.get("pickup_date");
+  const dropoffDate = searchParams.get("dropoff_date");
+  const pickupTime = searchParams.get("pickup_time") || "10:00";
+  const dropoffTime = searchParams.get("dropoff_time") || "10:00";
+  const pickupLocation = searchParams.get("pickup_location");
+
+  const minDaysGuard = useMinimumRentalDaysGuard({
+    pickupDate,
+    dropoffDate,
+    pickupTime,
+    dropoffTime,
+    pickupLocation,
+  });
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["availability", searchParams.toString()],
     queryFn: () => fetchAvailability(searchParams),
@@ -89,7 +104,25 @@ function SearchResultsInner() {
 
   const vehicles = data?.vehicles ?? [];
 
-  if (isLoading) {
+  const belowMinimum =
+    minDaysGuard.blocked ||
+    data?.minimumDaysNotMet === true;
+  const blockedRequiredMin =
+    minDaysGuard.requiredMinDays || data?.requiredMinDays || 2;
+  const blockedRentalDays =
+    minDaysGuard.rentalDays || data?.rentalDays || 0;
+
+  if (!minDaysGuard.loading && belowMinimum) {
+    return (
+      <MinimumDaysBlockedMessage
+        requiredMinDays={blockedRequiredMin}
+        rentalDays={blockedRentalDays}
+        searchParams={searchParams}
+      />
+    );
+  }
+
+  if (isLoading || minDaysGuard.loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="h-12 w-12 animate-spin text-furgocasa-orange mb-4" />
@@ -104,16 +137,6 @@ function SearchResultsInner() {
         <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
         <p className="text-gray-600">{t("Error al buscar disponibilidad")}</p>
       </div>
-    );
-  }
-
-  if (data?.minimumDaysNotMet) {
-    return (
-      <MinimumDaysBlockedMessage
-        requiredMinDays={data.requiredMinDays ?? 2}
-        rentalDays={data.rentalDays ?? 0}
-        searchParams={searchParams}
-      />
     );
   }
 

@@ -1,4 +1,5 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/lib/supabase/database.types";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { validatePickupDropoffAgainstClosedDates } from "@/lib/business-closed-dates";
@@ -70,12 +71,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false,
       },
-    });
+    }) as SupabaseClient<Database>;
 
     const body = await request.json();
     

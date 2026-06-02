@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { checkMinimumRentalDays } from "@/lib/rental-min-days";
 
 interface Season {
   id: string;
@@ -135,4 +136,103 @@ export function useSeasonMinDays(
   }, [pickupDate, dropoffDate]);
 
   return minDays;
+}
+
+/**
+ * Valida en cliente (misma regla que /api/availability) para bloquear trampas por URL
+ * aunque la API en producción esté desactualizada o cacheada.
+ */
+export function useMinimumRentalDaysGuard(params: {
+  pickupDate: string | null;
+  dropoffDate: string | null;
+  pickupTime: string;
+  dropoffTime: string;
+  pickupLocation: string | null;
+}) {
+  const [state, setState] = useState({
+    loading: true,
+    blocked: false,
+    requiredMinDays: 2,
+    rentalDays: 0,
+  });
+
+  useEffect(() => {
+    const { pickupDate, dropoffDate, pickupTime, dropoffTime, pickupLocation } =
+      params;
+
+    if (!pickupDate || !dropoffDate) {
+      setState({
+        loading: false,
+        blocked: false,
+        requiredMinDays: 2,
+        rentalDays: 0,
+      });
+      return;
+    }
+
+    let cancelled = false;
+
+    const run = async () => {
+      setState((s) => ({ ...s, loading: true }));
+
+      try {
+        const [seasonsRes, locationRes] = await Promise.all([
+          supabase
+            .from("seasons")
+            .select("start_date, end_date, min_days")
+            .eq("is_active", true)
+            .lte("start_date", dropoffDate)
+            .gte("end_date", pickupDate),
+          pickupLocation
+            ? supabase
+                .from("locations")
+                .select("min_days")
+                .eq("slug", pickupLocation)
+                .maybeSingle()
+            : Promise.resolve({ data: null, error: null }),
+        ]);
+
+        const check = checkMinimumRentalDays({
+          pickupDate,
+          dropoffDate,
+          pickupTime,
+          dropoffTime,
+          seasons: seasonsRes.data || [],
+          locationMinDays: locationRes.data?.min_days ?? null,
+        });
+
+        if (!cancelled) {
+          setState({
+            loading: false,
+            blocked: !check.ok,
+            requiredMinDays: check.requiredMinDays,
+            rentalDays: check.rentalDays,
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setState({
+            loading: false,
+            blocked: false,
+            requiredMinDays: 2,
+            rentalDays: 0,
+          });
+        }
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    params.pickupDate,
+    params.dropoffDate,
+    params.pickupTime,
+    params.dropoffTime,
+    params.pickupLocation,
+  ]);
+
+  return state;
 }

@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: closedCheck.error }, { status: 400 });
     }
 
-    const minDaysCheck = await loadMinimumRentalDaysCheck(supabase, {
+    const minDaysCheck = await loadMinimumRentalDaysCheck(supabaseAdmin, {
       pickupDate,
       dropoffDate,
       pickupTime,
