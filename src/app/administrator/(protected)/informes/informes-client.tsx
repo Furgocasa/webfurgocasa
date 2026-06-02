@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -289,23 +289,8 @@ export default function InformesClient({
   // creación de pedido), y es el modo que cuadra con el Excel de ocupación.
   const [revenueMode, setRevenueMode] = useState<'creation' | 'rental'>('rental');
   
-  // Estado para años expandidos en la tabla de control
-  const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set([currentYear]));
-
-  // Con histórico activo, expandir todos los años con datos en la tabla mensual
-  useEffect(() => {
-    if (!includeHistorical || historical.length === 0) return;
-    setExpandedYears((prev) => {
-      const years = new Set(prev);
-      for (const h of historical) {
-        years.add(new Date(h.pickup_date).getFullYear());
-      }
-      for (const b of bookingsProp) {
-        years.add(new Date(b.pickup_date).getFullYear());
-      }
-      return years;
-    });
-  }, [includeHistorical, historical, bookingsProp]);
+  // Estado para años expandidos en la tabla de control (todos contraídos por defecto)
+  const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set());
 
   // Todos los vehículos (incluidos vendidos para mantener histórico)
   const allVehiclesForReports = vehicles;
@@ -1539,28 +1524,46 @@ export default function InformesClient({
             <p className="text-sm text-gray-500 mt-1">Vista detallada por vehículo y mes</p>
           </div>
           
-          {/* Selector de modo de visualización */}
-          <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+          <div className="flex items-center gap-2">
+            {/* Expandir / contraer todos los años */}
             <button
-              onClick={() => setRevenueMode('creation')}
-              className={`px-3 py-2 text-xs font-medium rounded-md transition-colors ${
-                revenueMode === 'creation'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
+              onClick={() => {
+                const allExpanded =
+                  revenueControlTable.years.length > 0 &&
+                  revenueControlTable.years.every((y) => expandedYears.has(y));
+                setExpandedYears(allExpanded ? new Set() : new Set(revenueControlTable.years));
+              }}
+              className="px-3 py-2 text-xs font-medium rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors"
             >
-              Creación de pedidos
+              {revenueControlTable.years.length > 0 &&
+              revenueControlTable.years.every((y) => expandedYears.has(y))
+                ? 'Contraer todos'
+                : 'Expandir todos'}
             </button>
-            <button
-              onClick={() => setRevenueMode('rental')}
-              className={`px-3 py-2 text-xs font-medium rounded-md transition-colors ${
-                revenueMode === 'rental'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Días alquilados
-            </button>
+
+            {/* Selector de modo de visualización */}
+            <div className="flex gap-2 bg-gray-100 p-1 rounded-lg">
+              <button
+                onClick={() => setRevenueMode('creation')}
+                className={`px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                  revenueMode === 'creation'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Creación de pedidos
+              </button>
+              <button
+                onClick={() => setRevenueMode('rental')}
+                className={`px-3 py-2 text-xs font-medium rounded-md transition-colors ${
+                  revenueMode === 'rental'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Días alquilados
+              </button>
+            </div>
           </div>
         </div>
 
