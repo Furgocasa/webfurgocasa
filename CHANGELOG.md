@@ -4,6 +4,33 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 📊 Histórico Excel en informes + modos de ingresos — 2 de junio de 2026
+
+**Objetivo:** integrar el histórico de ocupación 2018–2026 del Excel `FURGOCASA - ANALISIS OCUPACION.xlsx` en `/administrator/informes`, combinado con las reservas reales de la web sin doble conteo, y que cuadre con el pivot del Excel.
+
+**Base de datos:**
+- Tabla `historical_bookings` (`supabase/migrations/20260602-historical-bookings.sql`), RLS **sin políticas públicas** (solo `service_role`). 1.244 alquileres agrupados.
+- Carga en `informes/page.tsx` con `createAdminClient` + **paginación** (Supabase limita a 1000 filas/petición).
+
+**Importador (`scripts/import-historical-occupancy.ts`, `npm run import:historical`):**
+- Agrupa días `ALQUILADA`/`PREVENTA` consecutivos en alquileres; `total_price` = suma de precios diarios.
+- **FIX crítico del parser xlsx:** el precio viene como **fórmula con valor cacheado** (`<f>…</f><v>100</v>`). El regex original descartaba las celdas con fórmula y capturaba solo ~15% de los importes. Corregido → **145.430 € → 931.008,87 €** (cuadra con el pivot del Excel).
+
+**Informes (`informes-client.tsx`):**
+- Histórico con **`created_at = null`** → NO aparece en modo "Creación de pedidos" (no se sabe cuándo se creó el pedido), solo en "Días alquilados".
+- **Modo "Días alquilados" por defecto** (es el que cuadra con el Excel).
+- **FIX cruce de año:** la tabla de control perdía los días de enero del año siguiente en alquileres a caballo. Ahora reparte por solapamiento real (recogida + devolución). Verificado: cuadra al céntimo por año.
+- Tabla de control: **años contraídos por defecto** + botón **"Expandir/Contraer todos"**.
+- Alias de códigos de vehículos renombrados (FU0013→MA0013, etc.) y dedup histórico↔reservas reales.
+
+**Nota de datos:** los 2.326,43 € de diferencia en 2021 vs el pivot son 67 días en `AVERÍA` (KNAUS BOX), excluidos a propósito por no ser alquileres reales.
+
+**Docs:** `docs/04-referencia/admin/INFORMES-HISTORICO-EXCEL.md`.
+
+**Commits:** `b68512f1` (fix histórico + modos), `18c6289b` (UI tabla contraída + botón).
+
+---
+
 ## 🚦 Semáforo de ocupación por semanas — 27 de mayo / 1 de junio de 2026
 
 **Objetivo:** mostrar presión de reserva **semana a semana** (no solo meses fijos hardcodeados) para que el cliente vea urgencia en tramos concretos (p. ej. 8–14 ago al 60%).

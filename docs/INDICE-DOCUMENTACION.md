@@ -394,6 +394,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[SUPABASE-SCHEMA-REAL.md](./SUPABASE-SCHEMA-REAL.md)** | Schema real con campos exactos | Al consultar tablas |
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
 | **[SISTEMA-VEHICULOS-VENDIDOS.md](./04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)** | 🚗 **NUEVO** - Estado vendido e informes | Admin vehículos, calendario, informes, daños |
+| **[INFORMES-HISTORICO-EXCEL.md](./04-referencia/admin/INFORMES-HISTORICO-EXCEL.md)** | 📊 **NUEVO** - Histórico Excel + modos de ingresos | Antes de tocar `/administrator/informes` o reimportar histórico |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo de reservas | Antes de tocar /reservar/** |
 | **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** | 🎟️ Sistema de cupones de descuento | Antes de tocar cupones o `/reservar/nueva` |
