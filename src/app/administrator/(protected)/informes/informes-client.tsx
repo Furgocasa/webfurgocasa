@@ -1007,7 +1007,7 @@ export default function InformesClient({
               <span className="block text-sm text-blue-700 mt-0.5">
                 Histórico Excel: {historical.length.toLocaleString("es-ES")} alquileres (
                 {Math.min(...historical.map((h) => new Date(h.pickup_date).getFullYear()))}–
-                {Math.max(...historical.map((h) => new Date(h.pickup_date).getFullYear())})
+                {Math.max(...historical.map((h) => new Date(h.pickup_date).getFullYear()))})
               </span>
             )}
           </p>
