@@ -181,7 +181,7 @@ export function useMinimumRentalDaysGuard(params: {
             .from("seasons")
             .select("start_date, end_date, min_days")
             .eq("is_active", true)
-            .lte("start_date", dropoffDate)
+            .lte("start_date", pickupDate)
             .gte("end_date", pickupDate),
           pickupLocation
             ? supabase

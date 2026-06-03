@@ -1,20 +1,17 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/lib/supabase/database.types";
-import { calculateRentalDays, parseDateString, toDateString, type Season } from "@/lib/utils";
+import { calculateRentalDays, type Season } from "@/lib/utils";
 
 type SeasonMinRow = Pick<Season, "start_date" | "end_date" | "min_days">;
 
 /**
- * Mínimo exigido según el buscador:
+ * Mínimo exigido — misma regla que el buscador (search-widget + useSeasonMinDays):
  * - Ubicación con min_days fijo → ese valor.
- * - Si no → el mayor min_days de las temporadas que cubren algún día del alquiler
- *   (más estricto que solo la fecha de recogida; evita trampas en rangos mixtos).
+ * - Si no → max(min_days) de las temporadas activas en la **fecha de recogida** únicamente.
+ *   No se usa el mínimo de temporadas posteriores del viaje (p. ej. alta 7 días al cruzar el 22-jun).
  */
 export function getRequiredMinRentalDays(
   pickupDate: string,
-  dropoffDate: string,
-  pickupTime: string,
-  dropoffTime: string,
   seasons: SeasonMinRow[],
   locationMinDays: number | null | undefined
 ): number {
@@ -22,35 +19,15 @@ export function getRequiredMinRentalDays(
     return locationMinDays;
   }
 
-  const rentalDays = calculateRentalDays(
-    pickupDate,
-    pickupTime,
-    dropoffDate,
-    dropoffTime
+  const applicable = seasons.filter(
+    (s) => pickupDate >= s.start_date && pickupDate <= s.end_date
   );
 
-  if (rentalDays < 1) {
+  if (applicable.length === 0) {
     return 2;
   }
 
-  let maxMin = 2;
-  const startDate = parseDateString(pickupDate);
-
-  for (let i = 0; i < rentalDays; i++) {
-    const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() + i);
-    const dateStr = toDateString(currentDate);
-
-    const applicable = seasons.filter(
-      (s) => dateStr >= s.start_date && dateStr <= s.end_date
-    );
-
-    for (const season of applicable) {
-      maxMin = Math.max(maxMin, season.min_days ?? 2);
-    }
-  }
-
-  return maxMin;
+  return Math.max(...applicable.map((s) => s.min_days ?? 2));
 }
 
 export const MINIMUM_RENTAL_DAYS_MESSAGE =
@@ -85,9 +62,6 @@ export function checkMinimumRentalDays(params: {
   );
   const requiredMinDays = getRequiredMinRentalDays(
     params.pickupDate,
-    params.dropoffDate,
-    params.pickupTime,
-    params.dropoffTime,
     params.seasons,
     params.locationMinDays
   );
@@ -104,17 +78,16 @@ export function checkMinimumRentalDays(params: {
   return { ok: true, rentalDays, requiredMinDays };
 }
 
-/** Temporadas que solapan con el periodo de alquiler (misma consulta que precios en availability). */
-export async function fetchSeasonsForRentalRange(
+/** Temporadas activas que cubren la fecha de recogida (igual que useSeasonMinDays). */
+export async function fetchSeasonsForPickupDate(
   supabase: SupabaseClient<Database>,
-  pickupDate: string,
-  dropoffDate: string
+  pickupDate: string
 ): Promise<SeasonMinRow[]> {
   const { data, error } = await supabase
     .from("seasons")
     .select("start_date, end_date, min_days")
     .eq("is_active", true)
-    .lte("start_date", dropoffDate)
+    .lte("start_date", pickupDate)
     .gte("end_date", pickupDate);
 
   if (error) {
@@ -139,7 +112,7 @@ export async function loadMinimumRentalDaysCheck(
     params;
 
   const [seasons, locationResult] = await Promise.all([
-    fetchSeasonsForRentalRange(supabase, pickupDate, dropoffDate),
+    fetchSeasonsForPickupDate(supabase, pickupDate),
     pickupLocation
       ? supabase
           .from("locations")
