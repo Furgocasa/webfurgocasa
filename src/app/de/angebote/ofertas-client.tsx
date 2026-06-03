@@ -2,21 +2,10 @@
 
 import { LocalizedLink } from "@/components/localized-link";
 import { Snowflake, Mail, Phone, Copy, Check, Clock, Calendar, Ticket, Gift, Zap, Shield, Map, Smile, PartyPopper, AlertCircle, CalendarClock, Percent, Truck, Loader2, Users, Moon } from "lucide-react";
+import { SEASONAL_OFFER_BANNERS, type SeasonalOfferBanner } from "@/lib/offers/seasonal-banners";
 import { useLanguage } from "@/contexts/language-context";
 import { useState, useEffect } from "react";
 import Image from "next/image";
-
-interface SeasonalCoupon {
-  id: string;
-  code: string;
-  name: string;
-  description: string | null;
-  discount_type: "percentage" | "fixed";
-  discount_value: number;
-  min_rental_days: number;
-  valid_from: string | null;
-  valid_until: string | null;
-}
 
 interface LastMinuteOffer {
   id: string;
@@ -48,28 +37,17 @@ interface LastMinuteOffer {
 
 export function OfertasClient() {
   const { t, locale } = useLanguage();
-  const [seasonalCoupons, setSeasonalCoupons] = useState<SeasonalCoupon[]>([]);
-  const [loadingCoupons, setLoadingCoupons] = useState(true);
   const [lastMinuteOffers, setLastMinuteOffers] = useState<LastMinuteOffer[]>([]);
   const [loadingOffers, setLoadingOffers] = useState(true);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
+  const seasonalBanners = SEASONAL_OFFER_BANNERS;
+  const hasSeasonalBanners = seasonalBanners.length > 0;
+  const primaryBanner = seasonalBanners[0];
+
   useEffect(() => {
-    fetchSeasonalCoupons();
     fetchLastMinuteOffers();
   }, []);
-
-  const fetchSeasonalCoupons = async () => {
-    try {
-      const response = await fetch("/api/offers/seasonal-coupons");
-      const data = await response.json();
-      setSeasonalCoupons(data.coupons || []);
-    } catch (error) {
-      console.error("Error fetching seasonal coupons:", error);
-    } finally {
-      setLoadingCoupons(false);
-    }
-  };
 
   const fetchLastMinuteOffers = async () => {
     try {
@@ -103,11 +81,14 @@ export function OfertasClient() {
     }).format(numPrice);
   };
 
-  const formatDiscountLabel = (coupon: SeasonalCoupon) => {
-    if (coupon.discount_type === "percentage") {
-      return `-${coupon.discount_value}%`;
+  const formatDiscountLabel = (banner: SeasonalOfferBanner) => {
+    if (banner.discountPercentage != null) {
+      return `-${banner.discountPercentage}%`;
     }
-    return `-${formatPrice(coupon.discount_value)}`;
+    if (banner.discountFixed != null) {
+      return `-${formatPrice(banner.discountFixed)}`;
+    }
+    return "";
   };
 
   const handleCopyCode = (code: string) => {
@@ -115,9 +96,6 @@ export function OfertasClient() {
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(null), 2000);
   };
-
-  const hasSeasonalCoupons = !loadingCoupons && seasonalCoupons.length > 0;
-  const primaryCoupon = seasonalCoupons[0];
 
   const benefits = [
     { icon: <Zap className="w-8 h-8 text-yellow-500" />, title: "Flota Moderna", desc: "Autocaravanas nuevas y totalmente equipadas para tu comodidad" },
@@ -157,19 +135,19 @@ export function OfertasClient() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
               <h2 className="text-2xl md:text-4xl font-heading font-bold text-gray-900 mb-4">
-                {hasSeasonalCoupons
+                {hasSeasonalBanners
                   ? t("Dos formas de ahorrar en tu alquiler")
                   : t("Ofertas de Última Hora")}
               </h2>
               <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                {hasSeasonalCoupons
+                {hasSeasonalBanners
                   ? t("En FURGOCASA queremos que todos puedan disfrutar de la aventura camper. Por eso ofrecemos dos tipos de ofertas:")
                   : t("En temporada alta, cuando hay periodos mínimos de alquiler (ej: 7 días en verano), pueden quedar pequeños huecos entre reservas que ofrecemos con descuentos especiales.")}
               </p>
             </div>
 
-            <div className={`grid gap-6 md:gap-8 ${hasSeasonalCoupons ? "md:grid-cols-2" : ""}`}>
-              {hasSeasonalCoupons && (
+            <div className={`grid gap-6 md:gap-8 ${hasSeasonalBanners ? "md:grid-cols-2" : ""}`}>
+              {hasSeasonalBanners && (
                 <a
                   href="#cupones"
                   onClick={(e) => {
@@ -238,10 +216,10 @@ export function OfertasClient() {
               <div className="flex items-start gap-4">
                 <AlertCircle className="w-5 h-5 text-gray-400 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-gray-500">
-                  <p className={hasSeasonalCoupons ? "mb-2" : ""}>
+                  <p className={hasSeasonalBanners ? "mb-2" : ""}>
                     <strong className="text-gray-700">{t("Esta página se actualiza regularmente.")}</strong> {t("Te recomendamos visitarla de vez en cuando para encontrar tu oportunidad.")}
                   </p>
-                  {hasSeasonalCoupons && (
+                  {hasSeasonalBanners && (
                     <p className="italic">
                       {t("* Las ofertas de esta sección no son acumulables entre sí.")}
                     </p>
@@ -253,7 +231,7 @@ export function OfertasClient() {
         </div>
       </section>
 
-      {hasSeasonalCoupons && (
+      {hasSeasonalBanners && (
         <>
           <section id="cupones" className="py-6 bg-gray-100 scroll-mt-20">
             <div className="container mx-auto px-4">
@@ -266,10 +244,17 @@ export function OfertasClient() {
             </div>
           </section>
 
-          {seasonalCoupons.map((coupon) => (
+          {seasonalBanners.map((banner) => {
+            const themeClass =
+              banner.theme === "orange"
+                ? "from-orange-500 via-amber-600 to-orange-700"
+                : "from-furgocasa-blue via-furgocasa-blue-dark to-gray-900";
+            const ctaTextClass = banner.theme === "orange" ? "text-furgocasa-orange" : "text-furgocasa-blue";
+
+            return (
             <section
-              key={coupon.id}
-              className="py-16 md:py-24 bg-gradient-to-br from-furgocasa-blue via-furgocasa-blue-dark to-gray-900 relative overflow-hidden text-white"
+              key={banner.id}
+              className={`py-16 md:py-24 bg-gradient-to-br ${themeClass} relative overflow-hidden text-white`}
             >
               <div className="container mx-auto px-4 relative z-10">
                 <div className="text-center mb-8 md:mb-12">
@@ -277,42 +262,65 @@ export function OfertasClient() {
                     {t("Cupón de Temporada")}
                   </span>
                   <h2 className="text-3xl md:text-5xl font-heading font-bold text-white mb-2 tracking-tight drop-shadow-2xl">
-                    {coupon.name}
+                    {t(banner.title)}
                   </h2>
+                  {banner.subtitle && (
+                    <p className="text-xl md:text-3xl text-yellow-200 font-heading font-bold tracking-wide mt-1">
+                      {t(banner.subtitle)}
+                    </p>
+                  )}
                 </div>
 
                 <div className="max-w-5xl mx-auto">
+                  {banner.imageSrc && (
+                    <LocalizedLink
+                      href="/reservar"
+                      className="block rounded-2xl md:rounded-[2rem] overflow-hidden shadow-2xl mb-8 md:mb-12 transform hover:scale-[1.01] transition-transform duration-300"
+                    >
+                      <div className="relative w-full aspect-[1024/576]">
+                        <Image
+                          src={banner.imageSrc}
+                          alt={banner.imageAlt ? t(banner.imageAlt) : t(banner.title)}
+                          fill
+                          priority
+                          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 80vw, 1024px"
+                          className="object-cover"
+                        />
+                      </div>
+                    </LocalizedLink>
+                  )}
+
                   <div className="grid md:grid-cols-2 gap-4 md:gap-8 mb-8 md:mb-12">
                     <div className="bg-white text-gray-900 rounded-2xl md:rounded-[2rem] p-6 md:p-10 text-center shadow-2xl flex flex-col justify-center border border-gray-100">
                       <p className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-wider md:tracking-widest mb-4 md:mb-6">
                         {t("CÓDIGO PROMOCIONAL")}
                       </p>
-                      <div className="relative group cursor-pointer w-full" onClick={() => handleCopyCode(coupon.code)}>
+                      <div className="relative group cursor-pointer w-full" onClick={() => handleCopyCode(banner.code)}>
                         <div className="bg-gray-50 rounded-xl md:rounded-2xl p-4 md:p-6 mb-3 md:mb-4 border-2 border-dashed border-gray-300 group-hover:border-furgocasa-orange group-hover:bg-orange-50 transition-all duration-300">
                           <div className="text-2xl md:text-4xl font-mono font-bold text-furgocasa-orange tracking-wider break-all">
-                            {coupon.code}
+                            {banner.code}
                           </div>
                         </div>
                         <div className="absolute top-1/2 right-3 md:right-6 -translate-y-1/2 text-gray-400 group-hover:text-furgocasa-orange transition-colors bg-white p-1.5 md:p-2 rounded-full shadow-sm">
-                          {copiedCode === coupon.code ? <Check className="w-4 h-4 md:w-5 md:h-5 text-green-500" /> : <Copy className="w-4 h-4 md:w-5 md:h-5" />}
+                          {copiedCode === banner.code ? <Check className="w-4 h-4 md:w-5 md:h-5 text-green-500" /> : <Copy className="w-4 h-4 md:w-5 md:h-5" />}
                         </div>
                       </div>
                       <p className="text-gray-500 text-xs md:text-sm font-medium">
-                        {copiedCode === coupon.code ? <span className="text-green-500">{t("¡Copiado al portapapeles!")}</span> : t("Haz clic para copiar el código")}
+                        {copiedCode === banner.code ? <span className="text-green-500">{t("¡Copiado al portapapeles!")}</span> : t("Haz clic para copiar el código")}
                       </p>
                     </div>
 
                     <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl md:rounded-[2rem] p-6 md:p-10 text-center shadow-2xl flex flex-col justify-center">
                       <h3 className="text-5xl md:text-7xl font-heading font-bold text-white mb-2 tracking-tighter">
-                        {formatDiscountLabel(coupon)}
+                        {formatDiscountLabel(banner)}
                       </h3>
                       <p className="text-sm md:text-xl font-bold text-white/90 mb-4 md:mb-6 uppercase tracking-wide">
-                        {t("Descuento sobre el precio total")}
+                        {banner.discountSubtitle ? t(banner.discountSubtitle) : t("Descuento sobre el precio total")}
                       </p>
                       <div className="space-y-2 text-white font-medium text-sm md:text-base mb-4 md:mb-6">
-                        {coupon.min_rental_days > 1 && (
+                        {banner.minRentalDays != null && banner.minRentalDays > 1 && (
                           <p className="flex items-center justify-center gap-2">
-                            <Calendar className="w-4 h-4 md:w-5 md:h-5" /> {t("Mínimo 10 días de alquiler").replace("10", String(coupon.min_rental_days))}
+                            <Calendar className="w-4 h-4 md:w-5 md:h-5" /> {t("Mínimo 10 días de alquiler").replace("10", String(banner.minRentalDays))}
                           </p>
                         )}
                         <p className="flex items-center justify-center gap-2">
@@ -321,29 +329,30 @@ export function OfertasClient() {
                       </div>
                       <LocalizedLink
                         href="/reservar"
-                        className="block w-full bg-white hover:bg-gray-100 text-furgocasa-blue font-bold py-3 md:py-4 px-6 md:px-8 rounded-xl md:rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 text-base md:text-lg"
+                        className={`block w-full bg-white hover:bg-gray-100 ${ctaTextClass} font-bold py-3 md:py-4 px-6 md:px-8 rounded-xl md:rounded-2xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 text-base md:text-lg`}
                       >
                         {t("RESERVAR AHORA")}
                       </LocalizedLink>
                     </div>
                   </div>
 
-                  {coupon.description && (
+                  {banner.conditions && (
                     <div className="bg-yellow-50/10 backdrop-blur-md border border-yellow-200/30 rounded-2xl md:rounded-3xl p-6 md:p-8 text-center md:text-left flex flex-col md:flex-row items-center gap-4 md:gap-6">
                       <div className="w-12 h-12 bg-yellow-400 rounded-full flex items-center justify-center text-yellow-900 flex-shrink-0">
                         <span className="text-2xl">⚠️</span>
                       </div>
                       <p className="text-yellow-50 text-sm md:text-lg">
-                        <strong className="text-white">{t("Condiciones:")}</strong> {coupon.description}
+                        <strong className="text-white">{t("Condiciones:")}</strong> {t(banner.conditions)}
                       </p>
                     </div>
                   )}
                 </div>
               </div>
             </section>
-          ))}
+            );
+          })}
 
-          {primaryCoupon && (
+          {primaryBanner && (
             <section className="py-20 bg-white">
               <div className="container mx-auto px-4">
                 <div className="max-w-4xl mx-auto">
@@ -377,8 +386,8 @@ export function OfertasClient() {
                         </div>
                         <h3 className="font-bold text-gray-900 mb-2">{t("Elige fechas")}</h3>
                         <p className="text-sm text-gray-600">
-                          {primaryCoupon.min_rental_days > 1
-                            ? t("Mínimo 10 días de alquiler").replace("10", String(primaryCoupon.min_rental_days))
+                          {primaryBanner.minRentalDays != null && primaryBanner.minRentalDays > 1
+                            ? t("Mínimo 10 días de alquiler").replace("10", String(primaryBanner.minRentalDays))
                             : t("Elige fechas")}
                         </p>
                       </div>
@@ -407,9 +416,9 @@ export function OfertasClient() {
                         </div>
                         <h3 className="font-bold text-gray-900 mb-2">{t("¡Descuento aplicado!")}</h3>
                         <p className="text-sm text-gray-600">
-                          {primaryCoupon.discount_type === "percentage"
-                            ? t("Verás el -10% reflejado en tu precio final").replace("-10%", `-${primaryCoupon.discount_value}%`)
-                            : t("Verás el -10% reflejado en tu precio final").replace("-10%", formatDiscountLabel(primaryCoupon))}
+                          {primaryBanner.discountPercentage != null
+                            ? t("Verás el -10% reflejado en tu precio final").replace("-10%", `-${primaryBanner.discountPercentage}%`)
+                            : t("Verás el -10% reflejado en tu precio final").replace("-10%", formatDiscountLabel(primaryBanner))}
                         </p>
                       </div>
                     </div>
