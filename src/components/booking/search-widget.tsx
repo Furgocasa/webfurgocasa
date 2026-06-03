@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { DateRangePicker } from "./date-range-picker";
-import { LocationSelector, type TimeSlot } from "./location-selector";
+import {
+  LocationSelector,
+  type LocationMinDaysConfig,
+  type TimeSlot,
+} from "./location-selector";
+import { resolveLocationMinDays } from "@/lib/rental-min-days";
 import { TimeSelector } from "./time-selector";
 import { useLanguage } from "@/contexts/language-context";
 import { calculateRentalDays } from "@/lib/utils";
@@ -22,7 +27,8 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
 
   // Form state
   const [location, setLocation] = useState(""); // slug de la ubicación
-  const [locationMinDays, setLocationMinDays] = useState<number | null>(null);
+  const [locationMinConfig, setLocationMinConfig] =
+    useState<LocationMinDaysConfig | null>(null);
   const [locationOpeningHours, setLocationOpeningHours] = useState<TimeSlot[] | null>(null);
   const [dateRange, setDateRange] = useState<{
     from: Date | undefined;
@@ -68,30 +74,67 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
   const pickupDateStr = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
   const seasonMinDays = useSeasonMinDays(pickupDateStr, pickupDateStr);
 
-  // Determinar el mínimo de días: si la ubicación tiene min_days fijo, usar ese; si no, usar temporada
   const getMinDays = () => {
-    if (locationMinDays !== null) return locationMinDays;
+    if (pickupDateStr && locationMinConfig) {
+      const fromLocation = resolveLocationMinDays(pickupDateStr, locationMinConfig);
+      if (fromLocation != null) return fromLocation;
+    }
     return seasonMinDays;
   };
 
-  // Cuando cambia la ubicación, guardar slug, min_days y opening_hours
-  const handleLocationChange = (slug: string, minDays: number | null, openingHours: TimeSlot[] | null, extraFee: number | null, name: string) => {
+  const handleLocationChange = (
+    slug: string,
+    minDaysConfig: LocationMinDaysConfig,
+    openingHours: TimeSlot[] | null,
+    extraFee: number | null,
+    name: string
+  ) => {
     setLocation(slug);
-    setLocationMinDays(minDays);
+    setLocationMinConfig(minDaysConfig);
     setLocationOpeningHours(openingHours);
     setLocationExtraFee(extraFee);
     setLocationName(name);
-    // Si las fechas actuales no cumplen el nuevo mínimo, resetear
     if (dateRange.from && dateRange.to) {
-      const newMinDays = minDays !== null ? minDays : seasonMinDays;
-      const pickupDate = format(dateRange.from, 'yyyy-MM-dd');
-      const dropoffDate = format(dateRange.to, 'yyyy-MM-dd');
-      const days = calculateRentalDays(pickupDate, pickupTime, dropoffDate, dropoffTime);
-      if (days < newMinDays) {
+      const pickupDate = format(dateRange.from, "yyyy-MM-dd");
+      const dropoffDate = format(dateRange.to, "yyyy-MM-dd");
+      const days = calculateRentalDays(
+        pickupDate,
+        pickupTime,
+        dropoffDate,
+        dropoffTime
+      );
+      const resolved =
+        resolveLocationMinDays(pickupDate, minDaysConfig) ?? seasonMinDays;
+      if (days < resolved) {
         setDateRange({ from: undefined, to: undefined });
       }
     }
   };
+
+  // Si cambia la fecha de recogida, el mínimo de sedes con pico/valle puede cambiar
+  useEffect(() => {
+    if (!dateRange.from || !dateRange.to || !locationMinConfig) return;
+    const pickupDate = format(dateRange.from, "yyyy-MM-dd");
+    const dropoffDate = format(dateRange.to, "yyyy-MM-dd");
+    const days = calculateRentalDays(
+      pickupDate,
+      pickupTime,
+      dropoffDate,
+      dropoffTime
+    );
+    const required =
+      resolveLocationMinDays(pickupDate, locationMinConfig) ?? seasonMinDays;
+    if (days < required) {
+      setDateRange({ from: undefined, to: undefined });
+    }
+  }, [
+    pickupDateStr,
+    locationMinConfig,
+    seasonMinDays,
+    dateRange.to,
+    pickupTime,
+    dropoffTime,
+  ]);
 
   // Calcular número de días del rango con las horas
   const calculateDays = () => {

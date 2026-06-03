@@ -4,18 +4,23 @@ import { useState, useEffect } from "react";
 import { ChevronDown, MapPin } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { createClient } from "@/lib/supabase/client";
+import {
+  formatLocationMinDaysLabel,
+  type LocationMinDaysRow,
+} from "@/lib/rental-min-days";
 
 export interface TimeSlot {
   open: string;
   close: string;
 }
 
-interface LocationData {
+export type LocationMinDaysConfig = LocationMinDaysRow & { slug: string };
+
+interface LocationData extends LocationMinDaysRow {
   id: string;
   slug: string;
   name: string;
   address: string | null;
-  min_days: number | null;
   opening_hours: TimeSlot[] | null;
   active_from: string | null;
   active_until: string | null;
@@ -34,25 +39,24 @@ function isLocationAvailableForDate(location: LocationData, pickupDate: string |
   if (!pickupDate) return true;
 
   if (location.active_recurring) {
-    const [, pickupMonth, pickupDay] = pickupDate.split('-').map(Number);
+    const [, pickupMonth, pickupDay] = pickupDate.split("-").map(Number);
     const pickupMD = pickupMonth * 100 + pickupDay;
 
     let fromMD = 0;
     let untilMD = 1231;
 
     if (location.active_from) {
-      const [, fromMonth, fromDay] = location.active_from.split('-').map(Number);
+      const [, fromMonth, fromDay] = location.active_from.split("-").map(Number);
       fromMD = fromMonth * 100 + fromDay;
     }
     if (location.active_until) {
-      const [, untilMonth, untilDay] = location.active_until.split('-').map(Number);
+      const [, untilMonth, untilDay] = location.active_until.split("-").map(Number);
       untilMD = untilMonth * 100 + untilDay;
     }
 
     if (fromMD <= untilMD) {
       return pickupMD >= fromMD && pickupMD <= untilMD;
     } else {
-      // Rango cruzado (ej: oct-feb): disponible si >= from O <= until
       return pickupMD >= fromMD || pickupMD <= untilMD;
     }
   } else {
@@ -64,7 +68,13 @@ function isLocationAvailableForDate(location: LocationData, pickupDate: string |
 
 interface LocationSelectorProps {
   value: string;
-  onChange: (slug: string, minDays: number | null, openingHours: TimeSlot[] | null, extraFee: number | null, locationName: string) => void;
+  onChange: (
+    slug: string,
+    minDaysConfig: LocationMinDaysConfig,
+    openingHours: TimeSlot[] | null,
+    extraFee: number | null,
+    locationName: string
+  ) => void;
   placeholder?: string;
   pickupDate?: string | null;
   defaultLocation?: string;
@@ -89,11 +99,13 @@ export function LocationSelector({
       const supabase = createClient();
       const { data } = await supabase
         .from("locations")
-        .select("id, slug, name, address, min_days, opening_hours, active_from, active_until, active_recurring, extra_fee")
+        .select(
+          "id, slug, name, address, min_days, min_days_peak, min_days_off_peak, opening_hours, active_from, active_until, active_recurring, extra_fee"
+        )
         .eq("is_active", true)
         .eq("is_pickup", true)
         .order("name");
-      
+
       if (data) {
         setAllLocations(data as LocationData[]);
       }
@@ -101,34 +113,41 @@ export function LocationSelector({
     loadLocations();
   }, []);
 
-  // Filtrar ubicaciones disponibles según la fecha de recogida
-  const locations = allLocations.filter(loc => isLocationAvailableForDate(loc, pickupDate));
+  const locations = allLocations.filter((loc) =>
+    isLocationAvailableForDate(loc, pickupDate)
+  );
 
-  // Aplicar preselección: primero intenta defaultLocation (slug de la landing),
-  // si no existe como ubicación activa, usa fallbackLocation (nearest_location)
+  const toConfig = (loc: LocationData): LocationMinDaysConfig => ({
+    slug: loc.slug,
+    min_days: loc.min_days,
+    min_days_peak: loc.min_days_peak,
+    min_days_off_peak: loc.min_days_off_peak,
+  });
+
   useEffect(() => {
     if (defaultApplied || allLocations.length === 0 || value) return;
     if (!defaultLocation && !fallbackLocation) return;
 
-    const loc = (defaultLocation && allLocations.find(l => l.slug === defaultLocation))
-      || (fallbackLocation && allLocations.find(l => l.slug === fallbackLocation));
+    const loc =
+      (defaultLocation && allLocations.find((l) => l.slug === defaultLocation)) ||
+      (fallbackLocation && allLocations.find((l) => l.slug === fallbackLocation));
 
     if (loc) {
-      onChange(loc.slug, loc.min_days, loc.opening_hours, loc.extra_fee, loc.name);
+      onChange(
+        loc.slug,
+        toConfig(loc),
+        loc.opening_hours,
+        loc.extra_fee,
+        loc.name
+      );
       setDefaultApplied(true);
     }
   }, [defaultLocation, fallbackLocation, allLocations, defaultApplied, value, onChange]);
 
   const selectedLocation = locations.find((loc) => loc.slug === value);
 
-  const getMinDaysLabel = (minDays: number | null) => {
-    if (minDays) return `${t("Mínimo")} ${minDays} ${t("días")}`;
-    return t("Mín. según temporada");
-  };
-
   return (
     <div className="relative">
-      {/* Trigger button */}
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
@@ -143,7 +162,7 @@ export function LocationSelector({
               {selectedLocation ? t(selectedLocation.name) : placeholder}
               {selectedLocation && (
                 <span className="text-xs text-gray-500 font-normal normal-case ml-1">
-                  ({getMinDaysLabel(selectedLocation.min_days)})
+                  ({formatLocationMinDaysLabel(selectedLocation, pickupDate, t)})
                 </span>
               )}
             </span>
@@ -162,7 +181,6 @@ export function LocationSelector({
         />
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <>
           <div
@@ -182,7 +200,13 @@ export function LocationSelector({
                 role="option"
                 aria-selected={value === location.slug}
                 onClick={() => {
-                  onChange(location.slug, location.min_days, location.opening_hours, location.extra_fee, location.name);
+                  onChange(
+                    location.slug,
+                    toConfig(location),
+                    location.opening_hours,
+                    location.extra_fee,
+                    location.name
+                  );
                   setIsOpen(false);
                 }}
                 className={`w-full px-4 py-3.5 hover:bg-furgocasa-blue hover:text-white transition-colors text-left touch-target ${
@@ -190,25 +214,32 @@ export function LocationSelector({
                 }`}
               >
                 <div className="flex items-center gap-3 w-full">
-                  <MapPin className={`h-4 w-4 flex-shrink-0 ${
-                    value === location.slug ? "text-white/80" : "text-furgocasa-blue/60"
-                  }`} aria-hidden="true" />
+                  <MapPin
+                    className={`h-4 w-4 flex-shrink-0 ${
+                      value === location.slug ? "text-white/80" : "text-furgocasa-blue/60"
+                    }`}
+                    aria-hidden="true"
+                  />
                   <div className="flex flex-col flex-1 text-left">
                     <span className="block font-semibold uppercase text-sm">
                       {t(location.name)}
                     </span>
-                    <span className={`text-xs mt-0.5 ${
-                      value === location.slug ? "text-white/80" : "text-gray-500"
-                    }`}>
-                      {getMinDaysLabel(location.min_days)}
+                    <span
+                      className={`text-xs mt-0.5 ${
+                        value === location.slug ? "text-white/80" : "text-gray-500"
+                      }`}
+                    >
+                      {formatLocationMinDaysLabel(location, pickupDate, t)}
                     </span>
                   </div>
                   {location.extra_fee ? (
-                    <div className={`text-xs font-semibold px-2 py-1 rounded-md whitespace-nowrap flex-shrink-0 ${
-                      value === location.slug 
-                        ? "bg-white/20 text-white" 
-                        : "bg-orange-100 text-furgocasa-orange"
-                    }`}>
+                    <div
+                      className={`text-xs font-semibold px-2 py-1 rounded-md whitespace-nowrap flex-shrink-0 ${
+                        value === location.slug
+                          ? "bg-white/20 text-white"
+                          : "bg-orange-100 text-furgocasa-orange"
+                      }`}
+                    >
                       +{location.extra_fee * 2}€
                     </div>
                   ) : null}

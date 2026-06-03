@@ -877,6 +877,8 @@ export type Database = {
           latitude: number | null
           longitude: number | null
           min_days: number | null
+          min_days_off_peak: number | null
+          min_days_peak: number | null
           name: string
           notes: string | null
           opening_time: string | null
@@ -903,6 +905,8 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           min_days?: number | null
+          min_days_off_peak?: number | null
+          min_days_peak?: number | null
           name: string
           notes?: string | null
           opening_time?: string | null
@@ -929,6 +933,8 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           min_days?: number | null
+          min_days_off_peak?: number | null
+          min_days_peak?: number | null
           name?: string
           notes?: string | null
           opening_time?: string | null

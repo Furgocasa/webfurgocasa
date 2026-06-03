@@ -181,6 +181,8 @@ export interface Database {
           is_dropoff: boolean;
           extra_fee: number;
           min_days: number | null;
+          min_days_peak: number | null;
+          min_days_off_peak: number | null;
           active_from: string | null;
           active_until: string | null;
           active_recurring: boolean;
@@ -206,6 +208,8 @@ export interface Database {
           is_dropoff?: boolean;
           extra_fee?: number;
           min_days?: number | null;
+          min_days_peak?: number | null;
+          min_days_off_peak?: number | null;
           active_from?: string | null;
           active_until?: string | null;
           active_recurring?: boolean;

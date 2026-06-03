@@ -1,7 +1,7 @@
 # 📋 PROCESO DE RESERVA COMPLETO - Guía Técnica
 
-**Versión**: 1.1.0  
-**Última actualización**: 25 de Febrero 2026  
+**Versión**: 1.1.1  
+**Última actualización**: 3 de Junio 2026  
 **Estado**: ✅ Producción - TOTALMENTE FUNCIONAL
 
 ---
@@ -35,6 +35,12 @@ Usuario ingresa:
 Acción: Click en "Buscar"
 → Redirige a: /buscar?pickup_date=...&dropoff_date=...&...
 ```
+
+**Sedes de entrega virtuales (junio 2026)**:
+
+- La flota física está **solo en Murcia**. Madrid, Alicante y Albacete son puntos de recogida/devolución con recargo (`locations.extra_fee`, por trayecto; en reserva: `location_fee = pickup + dropoff`).
+- Si el usuario elige una sede con recargo y pulsa «Buscar», se muestra un modal: **«Cambiar a Murcia sin comisión»** o mantener la sede (`src/components/booking/search-widget.tsx`).
+- Madrid: **150 €/trayecto** (300 € ida y vuelta); `min_days` override (p. ej. **20** en verano). Política operativa y análisis de rentabilidad 2026: **[SEDES-ENTREGA-Y-RENTABILIDAD.md](./SEDES-ENTREGA-Y-RENTABILIDAD.md)** (Alejandro Paro / Narciso Pardo, sociotrabajadores, cobertura mutua).
 
 **Franjas horarias (v1.1.0)**:
 - Cada ubicación tiene franjas horarias configurables en `opening_hours` (JSONB)

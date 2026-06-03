@@ -30,6 +30,8 @@ interface Location {
   opening_hours?: TimeSlot[] | null;
   extra_fee?: number | null;
   min_days?: number | null;
+  min_days_peak?: number | null;
+  min_days_off_peak?: number | null;
   active_from?: string | null;
   active_until?: string | null;
   active_recurring?: boolean | null;
@@ -52,6 +54,7 @@ export default function UbicacionesPage() {
 
   const [saving, setSaving] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingSlug, setEditingSlug] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,7 +74,8 @@ export default function UbicacionesPage() {
     latitude: '',
     longitude: '',
     extra_fee: '',
-    min_days: '',
+    min_days_peak: '',
+    min_days_off_peak: '',
     active_from: '',
     active_until: '',
     active_recurring: false,
@@ -130,7 +134,10 @@ export default function UbicacionesPage() {
       setSaving(true);
       const supabase = createClient();
       const slug = formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-      
+      const resolvedSlug =
+        editingSlug ?? (editingId ? locations?.find((l) => l.id === editingId)?.slug : null) ?? slug;
+      const isMurcia = resolvedSlug === 'murcia';
+
       const validSlots = openingHours.filter(s => s.open && s.close && s.open < s.close);
       const dataToSave = {
         name: formData.name,
@@ -143,7 +150,17 @@ export default function UbicacionesPage() {
         latitude: formData.latitude ? parseFloat(formData.latitude) : null,
         longitude: formData.longitude ? parseFloat(formData.longitude) : null,
         extra_fee: formData.extra_fee ? parseFloat(formData.extra_fee) : 0,
-        min_days: formData.min_days ? parseInt(formData.min_days) : null,
+        min_days: null,
+        min_days_peak: isMurcia
+          ? null
+          : formData.min_days_peak
+            ? parseInt(formData.min_days_peak, 10)
+            : null,
+        min_days_off_peak: isMurcia
+          ? null
+          : formData.min_days_off_peak
+            ? parseInt(formData.min_days_off_peak, 10)
+            : null,
         active_from: formData.active_from || null,
         active_until: formData.active_until || null,
         active_recurring: formData.active_recurring,
@@ -199,7 +216,8 @@ export default function UbicacionesPage() {
       latitude: location.latitude?.toString() || '',
       longitude: location.longitude?.toString() || '',
       extra_fee: location.extra_fee?.toString() || '0',
-      min_days: location.min_days?.toString() || '',
+      min_days_peak: location.min_days_peak?.toString() || '',
+      min_days_off_peak: location.min_days_off_peak?.toString() || '',
       active_from: location.active_from || '',
       active_until: location.active_until || '',
       active_recurring: location.active_recurring ?? false,
@@ -213,6 +231,7 @@ export default function UbicacionesPage() {
         : DEFAULT_TIME_SLOTS
     );
     setEditingId(location.id);
+    setEditingSlug(location.slug);
     setShowAddForm(true);
   };
 
@@ -277,7 +296,8 @@ export default function UbicacionesPage() {
       latitude: '',
       longitude: '',
       extra_fee: '',
-      min_days: '',
+      min_days_peak: '',
+      min_days_off_peak: '',
       active_from: '',
       active_until: '',
       active_recurring: false,
@@ -287,6 +307,7 @@ export default function UbicacionesPage() {
     });
     setOpeningHours(DEFAULT_TIME_SLOTS);
     setEditingId(null);
+    setEditingSlug(null);
     setShowAddForm(false);
   };
 
@@ -482,23 +503,58 @@ export default function UbicacionesPage() {
                   Cargo adicional que se aplicará a las reservas que incluyan esta ubicación (recogida o entrega)
                 </p>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Días mínimos de alquiler
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={formData.min_days}
-                  onChange={(e) => setFormData({ ...formData, min_days: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                  placeholder="Según temporada"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Mínimo de días obligatorio para esta ubicación. Vacío = usa el mínimo de la temporada.
-                </p>
-              </div>
+              {editingSlug === 'murcia' ? (
+                <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4">
+                  <p className="text-sm font-medium text-gray-800">Días mínimos</p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Murcia usa el mínimo configurado en{' '}
+                    <strong>Temporadas</strong> (admin). No se fijan aquí.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <p className="text-sm font-medium text-gray-700">Días mínimos por tramo</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">
+                        Pico (jul, ago, sep)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={formData.min_days_peak}
+                        onChange={(e) =>
+                          setFormData({ ...formData, min_days_peak: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                        placeholder="Ej. 20 · 0 = temporada"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">
+                        Resto del año (oct–jun)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="1"
+                        value={formData.min_days_off_peak}
+                        onChange={(e) =>
+                          setFormData({ ...formData, min_days_off_peak: e.target.value })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
+                        placeholder="Ej. 12 · 0 = temporada"
+                      />
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Según la <strong>fecha de recogida</strong>. El mínimo de la sede manda
+                    sobre las temporadas. Pon <strong>0</strong> (o déjalo vacío) en un tramo
+                    para que ese tramo use el mínimo de las temporadas. La flota sigue en Murcia.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Franjas horarias */}
@@ -758,7 +814,20 @@ export default function UbicacionesPage() {
                 )}
                 <div className="flex items-center gap-2 text-sm text-gray-600 flex-wrap">
                   <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-50 text-blue-700 font-medium">
-                    Mín. {location.min_days ? `${location.min_days} días` : 'según temporada'}
+                    {location.slug === 'murcia'
+                      ? 'Mín. según temporadas'
+                      : (() => {
+                          const peak = (location.min_days_peak ?? 0) > 0
+                            ? `${location.min_days_peak}`
+                            : 'temporada';
+                          const off = (location.min_days_off_peak ?? 0) > 0
+                            ? `${location.min_days_off_peak}`
+                            : 'temporada';
+                          if (peak === 'temporada' && off === 'temporada') {
+                            return 'Mín. según temporadas';
+                          }
+                          return `Mín. ${peak} (verano) / ${off} (resto)`;
+                        })()}
                   </span>
                   {location.active_from || location.active_until ? (
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-amber-50 text-amber-700 font-medium">

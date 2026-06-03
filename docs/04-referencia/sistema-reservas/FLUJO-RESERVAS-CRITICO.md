@@ -19,6 +19,13 @@ Resumen para no leer todo el doc:
 
 Implementación: `src/app/api/bookings/create/route.ts` + trigger SQL `prevent_booking_conflicts` (migración `20260429-prevent-conflicts-pending-rgpd.sql`).
 
+## 🚐 Sedes de entrega (Murcia / Madrid / Alicante / Albacete) — junio 2026
+
+- **Flota única en Murcia.** Las demás sedes son entrega/recogida + SEO, no stock local.
+- Recargo: `locations.extra_fee` (€/trayecto) → `bookings.location_fee` en la reserva. Madrid: 300 € ida+vuelta; modal «Murcia sin comisión» en búsqueda.
+- Operativa: **Alejandro Paro** (operaciones) y **Narciso Pardo** (socio); cobertura mutua, sin relevo por calendario de libres.
+- Política de rentabilidad, datos 2026 y `min_days` estacional: **[SEDES-ENTREGA-Y-RENTABILIDAD.md](./SEDES-ENTREGA-Y-RENTABILIDAD.md)**.
+
 ## 🚨 ADVERTENCIA CRÍTICA
 
 Este flujo representa el **CORE DEL NEGOCIO**. Sin este flujo funcionando, **NO SE PUEDEN HACER RESERVAS** = **NO HAY INGRESOS**.

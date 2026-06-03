@@ -312,6 +312,8 @@ opening_time, closing_time, is_pickup, is_dropoff,
 extra_fee, notes, is_active, created_at, updated_at, sort_order
 ```
 
+**Negocio (jun 2026):** `extra_fee` = recargo **por trayecto** (€); en reserva `bookings.location_fee = pickup.extra_fee + dropoff.extra_fee`. Mínimos: Murcia → temporadas (`min_days` NULL); otras sedes → `min_days_peak` (jul–sep) + `min_days_off_peak` (oct–jun). Ver **[SEDES-ENTREGA-Y-RENTABILIDAD.md](../sistema-reservas/SEDES-ENTREGA-Y-RENTABILIDAD.md)**.
+
 ### Query correcta:
 ```typescript
 const { data } = await supabase

@@ -2,9 +2,22 @@
 
 **Versión**: 1.0.28 ✅ PRODUCCIÓN — Banners blog + GTM solo tras cobro pasarela + stats Storytellers  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 21 de mayo de 2026
+**Última actualización**: 3 de junio de 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🚐 Junio 2026 — Sedes virtuales (Madrid / Alicante / Albacete) y rentabilidad
+
+| Tema | Dónde leer |
+|------|------------|
+| Modelo: flota solo en Murcia; sedes remotas = entrega + SEO; recargo 150 €/trayecto Madrid (300 € ida+vuelta); `min_days` estacional; datos 2026; operativa Alejandro Paro / Narciso Pardo | **[SEDES-ENTREGA-Y-RENTABILIDAD.md](./04-referencia/sistema-reservas/SEDES-ENTREGA-Y-RENTABILIDAD.md)** |
+| Modal «Cambiar a Murcia sin comisión» en búsqueda | `src/components/booking/search-widget.tsx` |
+| Mínimos pico (jul–sep) / valle (oct–jun) por sede de entrega | `locations.min_days_peak`, `locations.min_days_off_peak` · **`src/lib/rental-min-days.ts`** · migración `20260603-location-min-days-peak-offpeak.sql` |
+| Admin: editar mínimos por tramo | `/administrator/ubicaciones` |
+| Campos `locations.extra_fee`, `bookings.location_fee` | **[SUPABASE-SCHEMA-REAL.md](./04-referencia/arquitectura/SUPABASE-SCHEMA-REAL.md)** |
+| Flujo de reserva (contexto) | **[PROCESO-RESERVA-COMPLETO.md](./04-referencia/sistema-reservas/PROCESO-RESERVA-COMPLETO.md)** — sección *Sedes de entrega virtuales* |
 
 ---
 

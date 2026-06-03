@@ -186,7 +186,7 @@ export function useMinimumRentalDaysGuard(params: {
           pickupLocation
             ? supabase
                 .from("locations")
-                .select("min_days")
+                .select("slug, min_days, min_days_peak, min_days_off_peak")
                 .eq("slug", pickupLocation)
                 .maybeSingle()
             : Promise.resolve({ data: null, error: null }),
@@ -198,7 +198,7 @@ export function useMinimumRentalDaysGuard(params: {
           pickupTime,
           dropoffTime,
           seasons: seasonsRes.data || [],
-          locationMinDays: locationRes.data?.min_days ?? null,
+          location: locationRes.data ?? null,
         });
 
         if (!cancelled) {
