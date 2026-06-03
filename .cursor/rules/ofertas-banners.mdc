@@ -1,0 +1,36 @@
+---
+description: Página /ofertas — banners manuales, NUNCA cupones desde BD
+globs: src/app/**/ofertas-client.tsx, src/lib/offers/**, src/app/api/offers/**
+alwaysApply: false
+---
+
+# Página /ofertas — Cupones de temporada vs BD
+
+## PROHIBIDO
+
+**No conectar la tabla `coupons` (ni APIs que la listen) a la página pública `/ofertas`.**
+
+Motivo: en `coupons` hay códigos **personales** (`gift`, un solo cliente) y datos internos que **no deben publicarse** en la web.
+
+Implementaciones prohibidas (ya causaron un incidente en jun 2026):
+
+- `GET /api/offers/seasonal-coupons` u otra API que liste cupones activos de BD
+- Mostrar automáticamente cupones `is_active = true` en `/ofertas`
+- Asumir que un cupón del admin debe promocionarse en la web
+
+## CORRECTO
+
+| Sección en `/ofertas` | Fuente |
+|----------------------|--------|
+| Banners cupones de temporada | **`src/lib/offers/seasonal-banners.ts`** — array manual, vacío = sección oculta |
+| Ofertas de última hora | BD `last_minute_offers` vía `/api/offers/last-minute` |
+
+### Añadir o quitar promoción en web
+
+1. Solo bajo **petición explícita** del negocio
+2. Editar `SEASONAL_OFFER_BANNERS` en `seasonal-banners.ts`
+3. El cupón en BD (admin) es independiente: sirve para checkout, no para decidir visibilidad web
+
+## Antes de implementar
+
+Leer: `docs/04-referencia/sistemas/PAGINA-OFERTAS-WEB.md`

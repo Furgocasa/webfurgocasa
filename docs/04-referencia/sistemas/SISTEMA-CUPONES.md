@@ -208,13 +208,27 @@ El sistema valida:
 | **Válido hasta** | 20 marzo 2026 |
 | **Usos** | Ilimitados |
 
-**Visible en**: https://www.furgocasa.com/es/ofertas
+**Visibilidad en web pública (`/ofertas`)**: **NO automática**. Aunque el cupón funcione en checkout, solo aparece en la página de ofertas si se añade un banner manual en `src/lib/offers/seasonal-banners.ts` bajo petición del negocio. Ver **`PAGINA-OFERTAS-WEB.md`**.
+
+---
+
+## ⚠️ Privacidad — Cupones y página `/ofertas`
+
+La tabla `coupons` incluye códigos **gift** (un solo cliente). **Nunca** listar cupones de BD en la web pública.
+
+| Sistema | Dónde se gestiona | Dónde se promociona |
+|---------|-------------------|---------------------|
+| Cupones checkout (`coupons`) | `/administrator/cupones` | Solo banner manual en `seasonal-banners.ts` |
+| Cupones Storytellers (`STO-*`) | `storyteller_coupons` | No en `/ofertas` |
+| Ofertas última hora | `last_minute_offers` | Automático en `/ofertas` (otro doc) |
+
+Documentación obligatoria: **`PAGINA-OFERTAS-WEB.md`**
 
 ---
 
 ## 🔒 Seguridad (RLS)
 
-- **Público**: Solo puede leer cupones activos (para validación)
+- **Público**: Puede validar cupones activos en checkout (`/api/coupons/validate`) — **no** implica listarlos en `/ofertas`
 - **Admin**: CRUD completo sobre cupones
 - **Sistema**: Registro de uso via service_role
 
@@ -271,6 +285,7 @@ ORDER BY c.current_uses DESC;
 ---
 
 **Documentación relacionada**:
+- `PAGINA-OFERTAS-WEB.md` - **Reglas obligatorias** página `/ofertas` (banners manuales vs BD)
 - `FLUJO-RESERVAS-CRITICO.md` - Flujo completo de reservas
 - `supabase/README.md` - Esquema de base de datos
 - `CHANGELOG.md` - Historial de versiones

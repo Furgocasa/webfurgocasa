@@ -122,8 +122,9 @@ Documentación técnica de referencia:
 - Campañas masivas en carpeta local `emails/mailing/` (no versionada; ver `emails/README.md` y `.gitignore`)
 
 #### sistemas/
+- **[Página /ofertas (web)](./04-referencia/sistemas/PAGINA-OFERTAS-WEB.md)** — Banners manuales; **nunca** cupones desde BD
 - Sistema de ofertas de última hora
-- Sistema de cupones
+- Sistema de cupones (checkout, no promoción web automática)
 - **Prevención de conflictos** — Regla unificada (status operativo bloquea, `payment_status` no importa) + regla "última pending gana" + mensajes sin PII (RGPD). Ver [`SISTEMA-PREVENCION-CONFLICTOS.md`](./04-referencia/sistemas/SISTEMA-PREVENCION-CONFLICTOS.md) (v1.2 — actualizada 29/04/2026).
 - Sistema de temporadas
 

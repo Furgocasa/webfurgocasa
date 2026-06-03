@@ -293,7 +293,8 @@ Ver **[PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTI
 - **gift**: Un solo uso, personalizados (ej: `RAMON20`)
 - **permanent**: Múltiples usos, promociones (ej: `INV2026`)
 
-Ver **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** para detalles completos.
+Ver **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** para detalles completos.  
+Ver **[PAGINA-OFERTAS-WEB.md](./04-referencia/sistemas/PAGINA-OFERTAS-WEB.md)** para qué se muestra en `/ofertas` (banners manuales; no auto-publicar cupones de BD).
 
 ### 🎯 Highlights v1.0.12:
 - ✅ **Panel Admin**: Nueva sección `/administrator/cupones`
@@ -398,6 +399,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo de reservas | Antes de tocar /reservar/** |
 | **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** | 🎟️ Sistema de cupones de descuento | Antes de tocar cupones o `/reservar/nueva` |
+| **[PAGINA-OFERTAS-WEB.md](./04-referencia/sistemas/PAGINA-OFERTAS-WEB.md)** | ⚠️ **OBLIGATORIO** — `/ofertas`: banners manuales, **no** listar `coupons` en web | Antes de tocar `/ofertas`, `seasonal-banners.ts` o APIs de ofertas |
 | **[GUIA-TRADUCCION.md](./GUIA-TRADUCCION.md)** | Sistema de traducción dual | Cuando uses `t()` |
 | **[CHECKLIST-PRE-COMMIT.md](./CHECKLIST-PRE-COMMIT.md)** | Verificación pre-commit | Antes de cada commit |
 

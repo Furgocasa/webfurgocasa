@@ -234,7 +234,9 @@ Oferta publicada:
 
 ## 🌐 Web Pública
 
-La sección "Ofertas de Última Hora" en `/ofertas` se alimenta automáticamente de la tabla `last_minute_offers` filtrando por `status = 'published'`.
+La sección **"Ofertas de Última Hora"** en `/ofertas` se alimenta automáticamente de la tabla `last_minute_offers` filtrando por `status = 'published'`.
+
+La sección **"Cupones de Temporada"** (banners promocionales) **no** usa esta tabla ni `coupons`. Es manual: ver **`PAGINA-OFERTAS-WEB.md`**.
 
 ---
 
@@ -249,6 +251,7 @@ La sección "Ofertas de Última Hora" en `/ofertas` se alimenta automáticamente
 ---
 
 **Documentación relacionada**:
+- `PAGINA-OFERTAS-WEB.md` - Reglas página `/ofertas` (banners manuales vs última hora automática)
 - `SISTEMA-CUPONES.md` - Sistema de cupones de descuento
 - `FLUJO-RESERVAS-CRITICO.md` - Flujo de reservas
 - `supabase/README.md` - Esquema de base de datos

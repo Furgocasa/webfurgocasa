@@ -4,6 +4,8 @@
  * NO se leen de la base de datos: los cupones del admin pueden ser personales
  * (un solo cliente) y no deben aparecer en la web.
  *
+ * Documentación obligatoria: docs/04-referencia/sistemas/PAGINA-OFERTAS-WEB.md
+ *
  * Para publicar una promoción, añade aquí un banner bajo petición explícita.
  * Si el array está vacío, la sección de cupones no se muestra.
  */
