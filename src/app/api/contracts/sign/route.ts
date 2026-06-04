@@ -24,6 +24,10 @@ import {
   CONTRACT_VERSION,
 } from "@/lib/contracts/config";
 import { generateSignedContractPdf } from "@/lib/contracts/pdf";
+import {
+  ALL_CONFIRMATION_IDS,
+  findConfirmationLabel,
+} from "@/lib/contracts/confirmations";
 import { createAdminClient } from "@/lib/supabase/server";
 import { sendEmail, getCompanyEmail } from "@/lib/email/smtp-client";
 import { getEmailBaseTemplate } from "@/lib/email/templates";
@@ -49,6 +53,7 @@ const schema = z.object({
   acceptedDataProtection: z.literal(true),
   signatureConditions: pngDataUrl,
   signatureDataProtection: pngDataUrl,
+  confirmations: z.array(z.string()).default([]),
 });
 
 export const runtime = "nodejs";
@@ -80,7 +85,19 @@ export async function POST(req: NextRequest) {
       sessionToken,
       signatureConditions,
       signatureDataProtection,
+      confirmations,
     } = parsed.data;
+
+    // Todas las confirmaciones de puntos delicados son obligatorias.
+    const confirmedSet = new Set(confirmations);
+    const allConfirmed = ALL_CONFIRMATION_IDS.every((id) => confirmedSet.has(id));
+    if (!allConfirmed) {
+      return NextResponse.json({ ok: false, error: BOTH_REQUIRED_MSG }, { status: 400 });
+    }
+    const confirmationsDetail = ALL_CONFIRMATION_IDS.map((id) => ({
+      id,
+      label: findConfirmationLabel(id) || id,
+    }));
 
     const session = verifySignSessionToken(sessionToken);
     if (!session.ok) {
@@ -125,6 +142,7 @@ export async function POST(req: NextRequest) {
       ipAddress: ip,
       signatureConditions,
       signatureDataProtection,
+      confirmations: confirmationsDetail,
       baseUrl,
     });
     const pdfBuffer = Buffer.from(pdfBytes);
@@ -159,6 +177,7 @@ export async function POST(req: NextRequest) {
         accepted_conditions: true,
         accepted_data_protection: true,
         contract_version: CONTRACT_VERSION,
+        confirmations: confirmationsDetail,
         signed_pdf_path: storagePath,
         signed_at: signedAt.toISOString(),
         ip_address: ip,

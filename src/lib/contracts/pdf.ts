@@ -36,6 +36,8 @@ export interface SignedContractInput {
   signatureConditions: string;
   /** dataURL PNG de la firma para el anexo de protección de datos */
   signatureDataProtection: string;
+  /** Puntos delicados confirmados por el cliente (evidencia legal) */
+  confirmations: Array<{ id: string; label: string }>;
   /** Origen del sitio para descargar los PDFs base, p.ej. https://www.furgocasa.com */
   baseUrl: string;
 }
@@ -97,7 +99,12 @@ export async function generateSignedContractPdf(
   const dataPages = await out.copyPages(srcData, srcData.getPageIndices());
   dataPages.forEach((p) => out.addPage(p));
 
-  // 3: página de firma
+  // 3: página de puntos confirmados (evidencia legal)
+  if (input.confirmations.length > 0) {
+    drawConfirmationsPage(out.addPage(), { helv, helvBold, input });
+  }
+
+  // 4: página de firma
   const sigConditionsBytes = dataUrlToBytes(input.signatureConditions);
   const sigDataBytes = dataUrlToBytes(input.signatureDataProtection);
   const sigConditionsImg = await out.embedPng(sigConditionsBytes);
@@ -112,6 +119,93 @@ export async function generateSignedContractPdf(
   });
 
   return out.save();
+}
+
+function wrapText(
+  text: string,
+  font: PDFFont,
+  size: number,
+  maxWidth: number
+): string[] {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    const candidate = current ? `${current} ${word}` : word;
+    if (font.widthOfTextAtSize(candidate, size) > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function drawConfirmationsPage(
+  page: PDFPage,
+  ctx: { helv: PDFFont; helvBold: PDFFont; input: SignedContractInput }
+) {
+  const { helv, helvBold, input } = ctx;
+  const { width, height } = page.getSize();
+  const margin = 50;
+  const contentWidth = width - margin * 2;
+  let y = height - margin;
+
+  page.drawRectangle({ x: 0, y: height - 8, width, height: 8, color: BRAND_ORANGE });
+
+  page.drawText("Puntos importantes confirmados por el cliente", {
+    x: margin,
+    y: y - 18,
+    size: 17,
+    font: helvBold,
+    color: BRAND_BLUE,
+  });
+  y -= 40;
+
+  page.drawText(
+    `Reserva ${input.bookingNumber} · ${input.customerName || ""}`.trim(),
+    { x: margin, y, size: 10, font: helv, color: GRAY }
+  );
+  y -= 26;
+
+  const itemSize = 10.5;
+  const lineHeight = 14;
+  const checkColWidth = 18;
+  const textWidth = contentWidth - checkColWidth;
+
+  for (const c of input.confirmations) {
+    const lines = wrapText(c.label, helv, itemSize, textWidth);
+    const blockHeight = lines.length * lineHeight + 8;
+    if (y - blockHeight < margin + 20) {
+      // Sin espacio: paramos (caso extremo, no debería ocurrir con 8 items).
+      break;
+    }
+    // marca de check
+    page.drawText("[X]", {
+      x: margin,
+      y: y - itemSize,
+      size: itemSize,
+      font: helvBold,
+      color: rgb(0.1, 0.55, 0.25),
+    });
+    lines.forEach((line, idx) => {
+      page.drawText(line, {
+        x: margin + checkColWidth,
+        y: y - itemSize - idx * lineHeight,
+        size: itemSize,
+        font: helv,
+        color: DARK,
+      });
+    });
+    y -= blockHeight + 6;
+  }
+
+  page.drawText(
+    "El cliente ha marcado expresamente cada una de las casillas anteriores antes de firmar.",
+    { x: margin, y: margin + 4, size: 8, font: helv, color: GRAY }
+  );
 }
 
 function drawSignaturePage(

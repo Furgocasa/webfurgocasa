@@ -17,7 +17,29 @@ import {
   Eraser,
   PenLine,
   Lock,
+  ArrowDown,
+  X,
 } from "lucide-react";
+import {
+  CONDITIONS_CONFIRMATIONS,
+  DATA_PROTECTION_CONFIRMATIONS,
+  ALL_CONFIRMATION_IDS,
+  type ConfirmationItem,
+} from "@/lib/contracts/confirmations";
+
+// Polyfill para navegadores antiguos (Safari 15 / iOS 15): pdf.js v4 usa
+// Promise.withResolvers, que no existe en esos navegadores soportados.
+if (typeof (Promise as any).withResolvers !== "function") {
+  (Promise as any).withResolvers = function <T>() {
+    let resolve!: (value: T | PromiseLike<T>) => void;
+    let reject!: (reason?: unknown) => void;
+    const promise = new Promise<T>((res, rej) => {
+      resolve = res;
+      reject = rej;
+    });
+    return { promise, resolve, reject };
+  };
+}
 
 interface DocInfo {
   id: "condiciones-alquiler" | "proteccion-datos";
@@ -34,6 +56,170 @@ interface BookingInfo {
 }
 
 type Step = "form" | "sign" | "done";
+
+function confirmationsForDoc(docId: DocInfo["id"]): ConfirmationItem[] {
+  return docId === "condiciones-alquiler"
+    ? CONDITIONS_CONFIRMATIONS
+    : DATA_PROTECTION_CONFIRMATIONS;
+}
+
+// ============================================
+// PdfReader — visor propio con pdf.js que obliga a llegar al final
+// ============================================
+function PdfReader({
+  url,
+  onReadComplete,
+}: {
+  url: string;
+  onReadComplete: () => void;
+}) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const pagesRef = useRef<HTMLDivElement | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const completedRef = useRef(false);
+
+  const markComplete = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setProgress(100);
+    onReadComplete();
+  }, [onReadComplete]);
+
+  const handleScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const scrolled = el.scrollTop + el.clientHeight;
+    const total = el.scrollHeight;
+    const pct = total > 0 ? Math.min(100, Math.round((scrolled / total) * 100)) : 0;
+    setProgress((p) => (pct > p ? pct : p));
+    if (scrolled >= total - 12) {
+      markComplete();
+    }
+  }, [markComplete]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    (async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const pdfjs: any = await import("pdfjs-dist");
+        pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+
+        const loadingTask = pdfjs.getDocument(url);
+        const pdf = await loadingTask.promise;
+        if (cancelled) return;
+
+        const container = pagesRef.current;
+        if (!container) return;
+        container.innerHTML = "";
+
+        const containerWidth = container.clientWidth || 600;
+
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+          const page = await pdf.getPage(pageNum);
+          if (cancelled) return;
+
+          const baseViewport = page.getViewport({ scale: 1 });
+          const scale = (containerWidth - 4) / baseViewport.width;
+          const viewport = page.getViewport({ scale });
+
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          const ratio = window.devicePixelRatio || 1;
+          canvas.width = Math.floor(viewport.width * ratio);
+          canvas.height = Math.floor(viewport.height * ratio);
+          canvas.style.width = "100%";
+          canvas.style.height = "auto";
+          canvas.className = "mb-3 rounded shadow-sm bg-white";
+
+          container.appendChild(canvas);
+
+          await page.render({
+            canvasContext: ctx,
+            viewport,
+            transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : undefined,
+          }).promise;
+        }
+
+        if (cancelled) return;
+        setLoading(false);
+
+        // Si el documento cabe entero sin scroll, lo damos por leído.
+        requestAnimationFrame(() => {
+          const el = scrollRef.current;
+          if (el && el.scrollHeight <= el.clientHeight + 12) {
+            markComplete();
+          }
+        });
+      } catch (e) {
+        console.error("[PdfReader] error:", e);
+        if (!cancelled) {
+          setError("No se ha podido cargar el documento. Recarga la página.");
+          setLoading(false);
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [url, markComplete]);
+
+  return (
+    <div>
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="relative w-full h-[480px] overflow-y-auto rounded-lg border border-gray-200 bg-gray-100 p-2"
+      >
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+            <Loader2 className="h-6 w-6 animate-spin mr-2" />
+            Cargando documento...
+          </div>
+        )}
+        {error && (
+          <div className="absolute inset-0 flex items-center justify-center text-red-500 text-sm px-4 text-center">
+            {error}
+          </div>
+        )}
+        <div ref={pagesRef} />
+      </div>
+
+      {/* Barra de progreso de lectura */}
+      <div className="mt-2">
+        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+          <span className="inline-flex items-center gap-1">
+            {progress >= 100 ? (
+              <>
+                <CheckCircle2 className="h-3.5 w-3.5 text-green-500" />
+                Documento leído hasta el final
+              </>
+            ) : (
+              <>
+                <ArrowDown className="h-3.5 w-3.5" />
+                Desplázate hasta el final para poder aceptar
+              </>
+            )}
+          </span>
+          <span>{progress}%</span>
+        </div>
+        <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className={`h-full transition-all ${
+              progress >= 100 ? "bg-green-500" : "bg-furgocasa-orange"
+            }`}
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ============================================
 // SignaturePad — recuadro para garabatear la firma (ratón o dedo)
@@ -58,7 +244,6 @@ const SignaturePad = forwardRef<
     if (!canvas) return;
     const ratio = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
-    // Preservar contenido al redimensionar
     const prev = hasContentRef.current ? canvas.toDataURL() : null;
     canvas.width = Math.max(1, Math.floor(rect.width * ratio));
     canvas.height = Math.max(1, Math.floor(rect.height * ratio));
@@ -132,7 +317,6 @@ const SignaturePad = forwardRef<
   useImperativeHandle(ref, () => ({
     getDataUrl: () => {
       if (!hasContentRef.current || !canvasRef.current) return null;
-      // Pintar la firma sobre fondo blanco para el PDF
       const src = canvasRef.current;
       const tmp = document.createElement("canvas");
       tmp.width = src.width;
@@ -189,17 +373,22 @@ export default function ContractSigning() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingInfo | null>(null);
   const [documents, setDocuments] = useState<DocInfo[]>([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
-  const [acceptedConditions, setAcceptedConditions] = useState(false);
-  const [acceptedData, setAcceptedData] = useState(false);
-  const [hasSigConditions, setHasSigConditions] = useState(false);
-  const [hasSigData, setHasSigData] = useState(false);
+  // Estado por documento
+  const [readDocs, setReadDocs] = useState<Record<string, boolean>>({});
+  const [acceptedDocs, setAcceptedDocs] = useState<Record<string, boolean>>({});
+  const [signedDocs, setSignedDocs] = useState<Record<string, boolean>>({});
+  // Estado por punto de confirmación
+  const [confirmed, setConfirmed] = useState<Record<string, boolean>>({});
 
-  const sigConditionsRef = useRef<SignaturePadHandle>(null);
-  const sigDataRef = useRef<SignaturePadHandle>(null);
+  const sigRefs = useRef<Record<string, SignaturePadHandle | null>>({});
 
-  const canSubmit =
-    acceptedConditions && acceptedData && hasSigConditions && hasSigData && !loading;
+  const allRead = documents.length > 0 && documents.every((d) => readDocs[d.id]);
+  const allAccepted = documents.length > 0 && documents.every((d) => acceptedDocs[d.id]);
+  const allSigned = documents.length > 0 && documents.every((d) => signedDocs[d.id]);
+  const allConfirmed = ALL_CONFIRMATION_IDS.every((id) => confirmed[id]);
+  const canSubmit = allRead && allAccepted && allSigned && allConfirmed && !loading;
 
   const validateBooking = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -220,7 +409,6 @@ export default function ContractSigning() {
       setBooking(data.booking);
       setDocuments(data.documents || []);
       setStep("sign");
-      // Llevar al usuario a la zona de firma
       setTimeout(() => {
         document.getElementById("firma-contrato")?.scrollIntoView({ behavior: "smooth" });
       }, 50);
@@ -231,16 +419,21 @@ export default function ContractSigning() {
     }
   };
 
-  const submitSignature = async () => {
+  const doSubmit = async () => {
+    setShowConfirmModal(false);
     setError(null);
-    if (!acceptedConditions || !acceptedData || !hasSigConditions || !hasSigData) {
-      setError("No se puede continuar con el alquiler. Debes aceptar y firmar ambos documentos.");
+    if (!canSubmit) {
+      setError(
+        "No se puede continuar con el alquiler. Debes leer, confirmar y firmar ambos documentos."
+      );
       return;
     }
-    const sigCond = sigConditionsRef.current?.getDataUrl();
-    const sigData = sigDataRef.current?.getDataUrl();
+    const sigCond = sigRefs.current["condiciones-alquiler"]?.getDataUrl();
+    const sigData = sigRefs.current["proteccion-datos"]?.getDataUrl();
     if (!sigCond || !sigData) {
-      setError("No se puede continuar con el alquiler. Debes aceptar y firmar ambos documentos.");
+      setError(
+        "No se puede continuar con el alquiler. Debes aceptar y firmar ambos documentos."
+      );
       return;
     }
     setLoading(true);
@@ -254,6 +447,7 @@ export default function ContractSigning() {
           acceptedDataProtection: true,
           signatureConditions: sigCond,
           signatureDataProtection: sigData,
+          confirmations: ALL_CONFIRMATION_IDS,
         }),
       });
       const data = await res.json();
@@ -272,6 +466,17 @@ export default function ContractSigning() {
     }
   };
 
+  const onClickFirmar = () => {
+    setError(null);
+    if (!canSubmit) {
+      setError(
+        "No se puede continuar con el alquiler. Debes leer hasta el final, marcar todas las casillas y firmar los dos documentos."
+      );
+      return;
+    }
+    setShowConfirmModal(true);
+  };
+
   return (
     <section id="firma-contrato" className="py-12 bg-gray-50 scroll-mt-20">
       <div className="container mx-auto px-4 max-w-4xl">
@@ -284,8 +489,8 @@ export default function ContractSigning() {
             Firma tu contrato sin imprimir nada
           </h2>
           <p className="text-gray-600 mt-2">
-            Introduce tu número de reserva, lee los documentos y fírmalos aquí mismo.
-            Recibirás una copia por email.
+            Introduce tu número de reserva, lee los documentos completos y fírmalos
+            aquí mismo. Recibirás una copia por email.
           </p>
         </div>
 
@@ -324,7 +529,6 @@ export default function ContractSigning() {
               className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none"
             />
 
-            {/* Honeypot oculto */}
             <input
               type="text"
               tabIndex={-1}
@@ -359,7 +563,7 @@ export default function ContractSigning() {
           </form>
         )}
 
-        {/* PASO 2: lectura + firma */}
+        {/* PASO 2: lectura + confirmaciones + firma */}
         {step === "sign" && booking && (
           <div className="space-y-6">
             <div className="bg-furgocasa-blue/5 border border-furgocasa-blue/20 rounded-xl p-4 text-center">
@@ -377,10 +581,9 @@ export default function ContractSigning() {
             {documents.map((doc) => {
               const isConditions = doc.id === "condiciones-alquiler";
               const Icon = isConditions ? FileText : Shield;
-              const accepted = isConditions ? acceptedConditions : acceptedData;
-              const setAccepted = isConditions ? setAcceptedConditions : setAcceptedData;
-              const padRef = isConditions ? sigConditionsRef : sigDataRef;
-              const setHasSig = isConditions ? setHasSigConditions : setHasSigData;
+              const isRead = !!readDocs[doc.id];
+              const accepted = !!acceptedDocs[doc.id];
+              const docConfirmations = confirmationsForDoc(doc.id);
 
               return (
                 <div
@@ -394,38 +597,97 @@ export default function ContractSigning() {
                     <h3 className="text-lg font-bold text-gray-900">{doc.title}</h3>
                   </div>
 
-                  {/* Visor de solo lectura */}
                   <div className="p-5">
-                    <iframe
-                      title={doc.title}
-                      src={`${doc.url}#toolbar=0&navpanes=0&view=FitH`}
-                      className="w-full h-[480px] rounded-lg border border-gray-200 bg-gray-50"
+                    {/* Visor con bloqueo por lectura */}
+                    <PdfReader
+                      url={doc.url}
+                      onReadComplete={() =>
+                        setReadDocs((prev) => ({ ...prev, [doc.id]: true }))
+                      }
                     />
 
-                    {/* Aceptación */}
-                    <label className="flex items-start gap-3 mt-5 cursor-pointer">
+                    {/* Confirmaciones de puntos delicados */}
+                    <div
+                      className={`mt-5 rounded-xl border p-4 ${
+                        isRead
+                          ? "border-gray-200 bg-gray-50"
+                          : "border-gray-100 bg-gray-50/50 opacity-60"
+                      }`}
+                    >
+                      <p className="text-sm font-semibold text-gray-700 mb-3">
+                        {isConditions
+                          ? "Confirma que has leído estos puntos importantes:"
+                          : "Confirma este punto importante:"}
+                      </p>
+                      <div className="space-y-3">
+                        {docConfirmations.map((c) => (
+                          <label
+                            key={c.id}
+                            className={`flex items-start gap-3 ${
+                              isRead ? "cursor-pointer" : "cursor-not-allowed"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              disabled={!isRead}
+                              checked={!!confirmed[c.id]}
+                              onChange={(e) =>
+                                setConfirmed((prev) => ({
+                                  ...prev,
+                                  [c.id]: e.target.checked,
+                                }))
+                              }
+                              className="mt-0.5 h-5 w-5 rounded border-gray-300 text-furgocasa-orange focus:ring-furgocasa-orange disabled:opacity-50"
+                            />
+                            <span className="text-sm text-gray-700">{c.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Aceptación general */}
+                    <label
+                      className={`flex items-start gap-3 mt-5 ${
+                        isRead ? "cursor-pointer" : "cursor-not-allowed"
+                      }`}
+                    >
                       <input
                         type="checkbox"
+                        disabled={!isRead}
                         checked={accepted}
-                        onChange={(e) => setAccepted(e.target.checked)}
-                        className="mt-1 h-5 w-5 rounded border-gray-300 text-furgocasa-orange focus:ring-furgocasa-orange"
+                        onChange={(e) =>
+                          setAcceptedDocs((prev) => ({
+                            ...prev,
+                            [doc.id]: e.target.checked,
+                          }))
+                        }
+                        className="mt-1 h-5 w-5 rounded border-gray-300 text-furgocasa-orange focus:ring-furgocasa-orange disabled:opacity-50"
                       />
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm font-medium text-gray-800">
                         {isConditions
                           ? "He leído y acepto las Condiciones del Alquiler Detalladas."
                           : "He leído y acepto el Anexo de Protección de Datos (tratamiento de mis datos personales)."}
                       </span>
                     </label>
 
+                    {!isRead && (
+                      <p className="mt-2 text-xs text-amber-600 flex items-center gap-1">
+                        <ArrowDown className="h-3.5 w-3.5" />
+                        Lee el documento hasta el final para poder marcar las casillas.
+                      </p>
+                    )}
+
                     {/* Firma */}
                     <div className="mt-4">
-                      <p className="text-sm font-semibold text-gray-700 mb-2">
-                        Tu firma
-                      </p>
+                      <p className="text-sm font-semibold text-gray-700 mb-2">Tu firma</p>
                       <SignaturePad
-                        ref={padRef}
+                        ref={(el) => {
+                          sigRefs.current[doc.id] = el;
+                        }}
                         ariaLabel={`Firma para ${doc.title}`}
-                        onChange={setHasSig}
+                        onChange={(has) =>
+                          setSignedDocs((prev) => ({ ...prev, [doc.id]: has }))
+                        }
                       />
                     </div>
                   </div>
@@ -433,10 +695,13 @@ export default function ContractSigning() {
               );
             })}
 
-            {!canSubmit && (acceptedConditions || acceptedData || hasSigConditions || hasSigData) && (
+            {!canSubmit && (allAccepted || allSigned) && (
               <div className="flex items-start gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-3">
                 <AlertCircle className="h-5 w-5 flex-shrink-0" />
-                <span>Para enviar debes aceptar y firmar los dos documentos.</span>
+                <span>
+                  Para enviar debes leer ambos documentos hasta el final, marcar todas
+                  las casillas de confirmación y firmar los dos.
+                </span>
               </div>
             )}
 
@@ -449,7 +714,7 @@ export default function ContractSigning() {
 
             <button
               type="button"
-              onClick={submitSignature}
+              onClick={onClickFirmar}
               disabled={!canSubmit}
               className="w-full inline-flex items-center justify-center gap-2 px-6 py-4 text-white font-semibold bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -488,6 +753,58 @@ export default function ContractSigning() {
           </div>
         )}
       </div>
+
+      {/* Modal de confirmación final */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
+            <button
+              type="button"
+              onClick={() => setShowConfirmModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+              aria-label="Cerrar"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <div className="w-12 h-12 bg-furgocasa-orange/10 rounded-full flex items-center justify-center mb-4">
+              <PenLine className="h-6 w-6 text-furgocasa-orange" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">
+              ¿Confirmas la firma del contrato?
+            </h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Declaras que has leído y entendido las Condiciones del Alquiler y el
+              Anexo de Protección de Datos de la reserva{" "}
+              <strong>{booking?.bookingNumber}</strong>, y que los firmas de forma
+              vinculante. Se enviará una copia a tu email y a Furgocasa.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                type="button"
+                onClick={() => setShowConfirmModal(false)}
+                className="flex-1 px-5 py-3 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={doSubmit}
+                disabled={loading}
+                className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold text-white bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors disabled:opacity-60"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Firmando...
+                  </>
+                ) : (
+                  "Sí, firmar y enviar"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
