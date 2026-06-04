@@ -1,17 +1,19 @@
 /**
- * GET /api/admin/signed-contracts
+ * GET  /api/admin/signed-contracts — listar
+ * DELETE /api/admin/signed-contracts?id=... | ?bookingNumber=...
  *
- * Lista los contratos firmados para el panel de administración. Para cada uno
- * genera una URL firmada temporal (1h) que permite descargar el PDF desde el
- * bucket privado `signed-contracts`.
- *
+ * Lista o elimina contratos firmados (registro + PDF en bucket privado).
  * Solo accesible por administradores autenticados.
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/require-admin";
 import { createAdminClient } from "@/lib/supabase/server";
-import { SIGNED_CONTRACTS_BUCKET } from "@/lib/contracts/config";
+import {
+  SIGNED_CONTRACTS_BUCKET,
+  normalizeBookingNumber,
+} from "@/lib/contracts/config";
+import { deleteSignedContractRecords } from "@/lib/contracts/delete-signed-contracts";
 
 export const dynamic = "force-dynamic";
 
@@ -90,5 +92,55 @@ export async function GET(req: NextRequest) {
   } catch (e) {
     console.error("[admin/signed-contracts]", e);
     return NextResponse.json({ error: "Error del servidor." }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  const guard = await requireAdmin();
+  if (guard) return guard;
+
+  const id = req.nextUrl.searchParams.get("id")?.trim();
+  const bookingNumber = req.nextUrl.searchParams.get("bookingNumber")?.trim();
+
+  if (!id && !bookingNumber) {
+    return NextResponse.json(
+      { error: "Indica ?id= o ?bookingNumber= para eliminar." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const supabase = createAdminClient();
+    let query = (supabase as any)
+      .from("signed_contracts")
+      .select("id, signed_pdf_path");
+
+    if (id) {
+      query = query.eq("id", id);
+    } else {
+      query = query.eq("booking_number", normalizeBookingNumber(bookingNumber!));
+    }
+
+    const { data: rows, error } = await query;
+    if (error) {
+      console.error("[admin/signed-contracts] delete query:", error);
+      return NextResponse.json({ error: "Error al buscar contratos." }, { status: 500 });
+    }
+
+    const list = rows || [];
+    if (!list.length) {
+      return NextResponse.json({ ok: true, deleted: 0 });
+    }
+
+    const result = await deleteSignedContractRecords(supabase, list);
+
+    return NextResponse.json({
+      ok: true,
+      deleted: result.deleted,
+      storageWarnings: result.storageErrors.length ? result.storageErrors : undefined,
+    });
+  } catch (e) {
+    console.error("[admin/signed-contracts] DELETE", e);
+    return NextResponse.json({ error: "Error al eliminar." }, { status: 500 });
   }
 }

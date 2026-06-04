@@ -9,6 +9,7 @@ import {
   Search,
   CheckCircle2,
   AlertCircle,
+  Trash2,
 } from "lucide-react";
 
 interface SignedContractItem {
@@ -46,6 +47,8 @@ export default function ContratosFirmadosPage() {
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [query, setQuery] = useState("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletingBulk, setDeletingBulk] = useState(false);
 
   const load = useCallback(async (q: string) => {
     setLoading(true);
@@ -79,6 +82,66 @@ export default function ContratosFirmadosPage() {
     setQuery(search.trim());
   };
 
+  const deleteOne = async (item: SignedContractItem) => {
+    if (
+      !confirm(
+        `¿Eliminar el contrato firmado del ${formatDateTime(item.signedAt)} (reserva ${item.bookingNumber})? Esta acción no se puede deshacer.`
+      )
+    ) {
+      return;
+    }
+    setDeletingId(item.id);
+    setError(null);
+    try {
+      const res = await fetch(`/api/admin/signed-contracts?id=${item.id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setError(data.error || "No se pudo eliminar.");
+        return;
+      }
+      setItems((prev) => prev.filter((i) => i.id !== item.id));
+    } catch {
+      setError("Error de conexión al eliminar.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const deleteAllForBooking = async () => {
+    const bn = query.trim();
+    if (!bn) {
+      setError("Busca primero por nº de reserva para eliminar todos los de esa reserva.");
+      return;
+    }
+    if (
+      !confirm(
+        `¿Eliminar TODOS los contratos firmados de la reserva ${bn}? (${items.length} registro(s)). No se puede deshacer.`
+      )
+    ) {
+      return;
+    }
+    setDeletingBulk(true);
+    setError(null);
+    try {
+      const res = await fetch(
+        `/api/admin/signed-contracts?bookingNumber=${encodeURIComponent(bn)}`,
+        { method: "DELETE" }
+      );
+      const data = await res.json();
+      if (!res.ok || !data.ok) {
+        setError(data.error || "No se pudieron eliminar.");
+        return;
+      }
+      await load(query);
+    } catch {
+      setError("Error de conexión al eliminar.");
+    } finally {
+      setDeletingBulk(false);
+    }
+  };
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -93,13 +156,30 @@ export default function ContratosFirmadosPage() {
             </p>
           </div>
         </div>
-        <button
-          onClick={() => load(query)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <RefreshCw className="h-4 w-4" />
-          Actualizar
-        </button>
+        <div className="flex flex-wrap gap-2">
+          {query && items.length > 0 && (
+            <button
+              type="button"
+              onClick={deleteAllForBooking}
+              disabled={deletingBulk || loading}
+              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100 transition-colors disabled:opacity-50"
+            >
+              {deletingBulk ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+              Eliminar todos ({query})
+            </button>
+          )}
+          <button
+            onClick={() => load(query)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw className="h-4 w-4" />
+            Actualizar
+          </button>
+        </div>
       </div>
 
       <form onSubmit={onSearch} className="mb-6 flex gap-2 max-w-md">
@@ -149,7 +229,7 @@ export default function ContratosFirmadosPage() {
                   <th className="px-4 py-3 font-semibold">Aceptaciones</th>
                   <th className="px-4 py-3 font-semibold">Fecha firma</th>
                   <th className="px-4 py-3 font-semibold">IP</th>
-                  <th className="px-4 py-3 font-semibold text-right">PDF</th>
+                  <th className="px-4 py-3 font-semibold text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -194,19 +274,34 @@ export default function ContratosFirmadosPage() {
                       {item.ipAddress || "—"}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      {item.downloadUrl ? (
-                        <a
-                          href={item.downloadUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors"
+                      <div className="inline-flex items-center justify-end gap-2">
+                        {item.downloadUrl ? (
+                          <a
+                            href={item.downloadUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-white bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                            Descargar
+                          </a>
+                        ) : (
+                          <span className="text-xs text-gray-300">—</span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => deleteOne(item)}
+                          disabled={deletingId === item.id}
+                          title="Eliminar registro y PDF"
+                          className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50"
                         >
-                          <Download className="h-3.5 w-3.5" />
-                          Descargar
-                        </a>
-                      ) : (
-                        <span className="text-xs text-gray-300">No disponible</span>
-                      )}
+                          {deletingId === item.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
