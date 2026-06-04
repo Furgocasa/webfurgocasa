@@ -95,7 +95,7 @@ interface LayoutCtx {
   pdf: PDFDocument;
   helv: PDFFont;
   helvBold: PDFFont;
-  page: PDFPage;
+  page: PDFPage | null;
   y: number;
   pageNum: number;
 }
@@ -108,6 +108,7 @@ function addPage(ctx: LayoutCtx): void {
 }
 
 function drawPageFooter(ctx: LayoutCtx): void {
+  if (!ctx.page) return;
   ctx.page.drawText(`Furgocasa · Contrato firmado · ${ctx.pageNum}`, {
     x: MARGIN,
     y: FOOTER_Y,
@@ -118,6 +119,10 @@ function drawPageFooter(ctx: LayoutCtx): void {
 }
 
 function ensureSpace(ctx: LayoutCtx, needed: number): void {
+  if (!ctx.page) {
+    addPage(ctx);
+    return;
+  }
   if (ctx.y - needed < MARGIN + 24) {
     addPage(ctx);
   }
@@ -461,11 +466,10 @@ export async function generateSignedContractPdf(
     pdf,
     helv,
     helvBold,
-    page: pdf.addPage([PAGE_W, PAGE_H]),
-    y: PAGE_H - MARGIN,
-    pageNum: 1,
+    page: null,
+    y: 0,
+    pageNum: 0,
   };
-  drawPageFooter(ctx);
 
   renderDocument(ctx, CONTRACT_CONTENT["condiciones-alquiler"]);
   renderDocument(ctx, CONTRACT_CONTENT["proteccion-datos"]);
