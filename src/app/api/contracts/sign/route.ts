@@ -63,6 +63,31 @@ export const maxDuration = 60;
 const BOTH_REQUIRED_MSG =
   "No se puede continuar con el alquiler. Debes aceptar y firmar ambos documentos.";
 
+function formatPickupDateForSubject(pickupDate: string | null | undefined): string {
+  if (!pickupDate) return "";
+  const date = new Date(pickupDate);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "Europe/Madrid",
+  });
+}
+
+function buildSignedContractEmailSubject(params: {
+  bookingNumber: string;
+  vehicleInternalCode: string | null | undefined;
+  pickupDate: string | null | undefined;
+}): string {
+  const parts = [`Reserva ${params.bookingNumber}`];
+  const vehicle = params.vehicleInternalCode?.trim();
+  parts.push(vehicle || "SIN ASIGNAR");
+  const pickup = formatPickupDateForSubject(params.pickupDate);
+  if (pickup) parts.push(pickup);
+  return `Furgocasa | Contrato firmado - ${parts.join(" - ")}`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const ip = getClientIP(req);
@@ -112,7 +137,9 @@ export async function POST(req: NextRequest) {
     // Recargar reserva (fuente de verdad para el sello/email)
     const { data: booking, error: bookingErr } = await supabase
       .from("bookings")
-      .select("id, booking_number, customer_email, customer_name")
+      .select(
+        "id, booking_number, customer_email, customer_name, pickup_date, vehicle:vehicles(internal_code)"
+      )
       .eq("id", session.bookingId)
       .maybeSingle();
 
@@ -193,9 +220,15 @@ export async function POST(req: NextRequest) {
     // 4. Email con el PDF adjunto (cliente + empresa)
     const filename = `Contrato-firmado-${booking.booking_number}.pdf`;
     const companyEmail = getCompanyEmail();
+    const vehicleInternalCode =
+      (booking.vehicle as { internal_code?: string | null } | null)?.internal_code ?? null;
+    const pickupDateLabel = formatPickupDateForSubject(booking.pickup_date);
+
     const html = buildSignedContractEmail({
       customerName: booking.customer_name,
       bookingNumber: booking.booking_number,
+      vehicleInternalCode,
+      pickupDateLabel,
       signedAtLabel: signedAt.toLocaleString("es-ES", {
         day: "2-digit",
         month: "2-digit",
@@ -208,7 +241,11 @@ export async function POST(req: NextRequest) {
 
     const emailResult = await sendEmail({
       to: [customerEmail, companyEmail],
-      subject: `Furgocasa | Contrato firmado - Reserva ${booking.booking_number}`,
+      subject: buildSignedContractEmailSubject({
+        bookingNumber: booking.booking_number,
+        vehicleInternalCode,
+        pickupDate: booking.pickup_date,
+      }),
       html,
       attachments: [
         { filename, content: pdfBuffer, contentType: "application/pdf" },
@@ -233,6 +270,8 @@ export async function POST(req: NextRequest) {
 function buildSignedContractEmail(params: {
   customerName: string | null;
   bookingNumber: string;
+  vehicleInternalCode: string | null;
+  pickupDateLabel: string;
   signedAtLabel: string;
 }): string {
   const name = params.customerName?.trim().split(/\s+/)[0] || "cliente";
@@ -254,6 +293,8 @@ function buildSignedContractEmail(params: {
           <tr>
             <td style="background-color: #f4f4f5; border-radius: 8px; padding: 16px;">
               <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;">Nº de reserva: <strong style="color:#111827;">${params.bookingNumber}</strong></p>
+              <p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;">Vehículo: <strong style="color:#111827;">${params.vehicleInternalCode?.trim() || "SIN ASIGNAR"}</strong></p>
+              ${params.pickupDateLabel ? `<p style="margin: 0 0 6px 0; font-size: 13px; color: #6b7280;">Inicio del alquiler: <strong style="color:#111827;">${params.pickupDateLabel}</strong></p>` : ""}
               <p style="margin: 0; font-size: 13px; color: #6b7280;">Fecha de firma: <strong style="color:#111827;">${params.signedAtLabel}</strong> (hora peninsular)</p>
             </td>
           </tr>
@@ -264,5 +305,10 @@ function buildSignedContractEmail(params: {
       </td>
     </tr>
   `;
-  return getEmailBaseTemplate(content, `Contrato firmado - Reserva ${params.bookingNumber}`);
+  const previewParts = [
+    `Reserva ${params.bookingNumber}`,
+    params.vehicleInternalCode?.trim() || "SIN ASIGNAR",
+    params.pickupDateLabel,
+  ].filter(Boolean);
+  return getEmailBaseTemplate(content, `Contrato firmado - ${previewParts.join(" - ")}`);
 }
