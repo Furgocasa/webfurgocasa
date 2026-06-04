@@ -1,8 +1,9 @@
 "use client";
 
-import { FileText, Download, Eye, CheckCircle, AlertCircle, Shield, Lock } from "lucide-react";
+import { FileText, Eye, CheckCircle, AlertCircle, Shield, Lock } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { COMPANY } from "@/lib/company";
+import ContractSigning from "@/components/contracts/contract-signing";
 
 const documents = [
   {
@@ -37,7 +38,7 @@ export default function DocumentacionClient() {
 
   const pasosConfirmacion = [
     { paso: "1", titulo: t("Envía tu documentación"), descripcion: t("DNI/Pasaporte y carnet de conducir (foto o escaneo)") },
-    { paso: "2", titulo: t("Firma y envía el contrato"), descripcion: t("Descarga la documentación de esta página, fírmala y envíanosla por email") },
+    { paso: "2", titulo: t("Firma el contrato online"), descripcion: t("Lee y firma el contrato en esta misma página con tu número de reserva") },
     { paso: "3", titulo: t("Paga la fianza"), descripcion: `${t("Transferencia de")} ${COMPANY.depositAmount.toLocaleString("es-ES")}€ (${t("máx.")} ${COMPANY.rentalPolicy.deposit.paymentDeadlineHoursBeforePickup}h ${t("antes del inicio")})` },
     { paso: "4", titulo: t("Recibe confirmación"), descripcion: t("Te confirmaremos la cita de recogida por email") },
   ];
@@ -56,7 +57,7 @@ export default function DocumentacionClient() {
             {t("Documentación de tu Alquiler")}
           </h1>
           <p className="text-xl text-white/80 max-w-2xl mx-auto">
-            {t("Descarga, firma y envía los documentos por email para confirmar tu reserva")}
+            {t("Consulta y firma online los documentos para confirmar tu reserva")}
           </p>
         </div>
       </section>
@@ -124,7 +125,7 @@ export default function DocumentacionClient() {
             {t("Documentación del Contrato")}
           </h2>
           <p className="text-gray-600 mb-8">
-            {t("Por favor, lee detenidamente estos documentos, fírmalos y envíalos por email a")} <strong>reservas@furgocasa.com</strong>
+            {t("Consulta detenidamente estos documentos. Después podrás firmarlos online en esta misma página con tu número de reserva.")}
           </p>
 
           <div className="grid lg:grid-cols-2 gap-8">
@@ -149,7 +150,7 @@ export default function DocumentacionClient() {
                   
                   <div className="flex flex-col sm:flex-row gap-3">
                     <a
-                      href={doc.url}
+                      href={`${doc.url}#toolbar=0`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors"
@@ -157,22 +158,17 @@ export default function DocumentacionClient() {
                       <Eye className="h-5 w-5" />
                       {t("Ver documento")}
                     </a>
-                    <a
-                      href={doc.url}
-                      download={doc.filename}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-white bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors"
-                    >
-                      <Download className="h-5 w-5" />
-                      {t("Descargar PDF")}
-                    </a>
                   </div>
-                  <p className="text-xs text-gray-400 mt-3">PDF • {doc.size}</p>
+                  <p className="text-xs text-gray-400 mt-3">{t("Solo lectura")} • PDF</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Firma online del contrato */}
+      <ContractSigning />
 
       {/* Info adicional */}
       <section className="py-12 bg-gray-50">
@@ -182,7 +178,7 @@ export default function DocumentacionClient() {
             <div className="prose prose-gray max-w-none">
               <h3>{t("¿Cuándo firmo el contrato?")}</h3>
               <p>
-                {t("El contrato debe firmarse antes del comienzo del alquiler y enviarse por email a Furgocasa. La confirmación de la cita de recogida se realizará una vez recibida la documentación firmada. Te recomendamos leerlo detenidamente y enviarlo con suficiente antelación.")}
+                {t("El contrato debe firmarse antes del comienzo del alquiler. Puedes hacerlo online en esta misma página: introduce tu número de reserva, lee los documentos y fírmalos. Recibirás una copia por email y la confirmación de la cita de recogida se realizará una vez firmado.")}
               </p>
 
               <h3>{t("¿Cómo se paga la fianza?")}</h3>

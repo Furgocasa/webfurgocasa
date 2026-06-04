@@ -1,7 +1,8 @@
 "use client";
 
-import { FileText, Download, Eye, CheckCircle, AlertCircle, Shield, Lock } from "lucide-react";
+import { FileText, Eye, CheckCircle, AlertCircle, Shield, Lock } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import ContractSigning from "@/components/contracts/contract-signing";
 
 const documents = [
   {
@@ -148,7 +149,7 @@ export default function DocumentacionClient() {
                   
                   <div className="flex flex-col sm:flex-row gap-3">
                     <a
-                      href={doc.url}
+                      href={`${doc.url}#toolbar=0`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors"
@@ -156,22 +157,17 @@ export default function DocumentacionClient() {
                       <Eye className="h-5 w-5" />
                       {t("Ver documento")}
                     </a>
-                    <a
-                      href={doc.url}
-                      download={doc.filename}
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-white bg-furgocasa-orange rounded-lg hover:bg-furgocasa-orange/90 transition-colors"
-                    >
-                      <Download className="h-5 w-5" />
-                      {t("Descargar PDF")}
-                    </a>
                   </div>
-                  <p className="text-xs text-gray-400 mt-3">PDF • {doc.size}</p>
+                  <p className="text-xs text-gray-400 mt-3">{t("Solo lectura")} • PDF</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* Firma online del contrato */}
+      <ContractSigning />
 
       {/* Info adicional */}
       <section className="py-12 bg-gray-50">

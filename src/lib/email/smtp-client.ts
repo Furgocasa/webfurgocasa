@@ -70,11 +70,18 @@ export function getCompanyEmail(): string {
 /**
  * Envía un email usando el transporter SMTP
  */
+export interface EmailAttachment {
+  filename: string;
+  content: Buffer | Uint8Array;
+  contentType?: string;
+}
+
 export async function sendEmail(options: {
   to: string | string[];
   subject: string;
   html: string;
   replyTo?: string;
+  attachments?: EmailAttachment[];
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {
   try {
     const transport = getSmtpTransporter();
@@ -87,6 +94,11 @@ export async function sendEmail(options: {
       subject: options.subject,
       html: options.html,
       replyTo: options.replyTo || fromEmail,
+      attachments: options.attachments?.map((a) => ({
+        filename: a.filename,
+        content: Buffer.isBuffer(a.content) ? a.content : Buffer.from(a.content),
+        contentType: a.contentType || 'application/octet-stream',
+      })),
     });
 
     console.log('✅ Email enviado:', {

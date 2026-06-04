@@ -31,6 +31,7 @@ import {
   Palmtree,
   Mail,
   Sparkles,
+  FileSignature,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
 import type { Admin } from "@/types/blog";
@@ -60,6 +61,7 @@ const navigation: NavItem[] = [
   { name: "Calendario", href: "/administrator/calendario", icon: Calendar },
   { name: "Clientes", href: "/administrator/clientes", icon: Users },
   { name: "Configuración", href: "/administrator/configuracion", icon: Settings },
+  { name: "Contratos firmados", href: "/administrator/contratos-firmados", icon: FileSignature },
   { name: "Cupones", href: "/administrator/cupones", icon: Tag },
   { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
   { name: "Equipamiento", href: "/administrator/equipamiento", icon: Wrench },
