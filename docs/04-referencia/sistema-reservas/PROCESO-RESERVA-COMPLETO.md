@@ -1,7 +1,7 @@
 # 📋 PROCESO DE RESERVA COMPLETO - Guía Técnica
 
-**Versión**: 1.1.1  
-**Última actualización**: 3 de Junio 2026  
+**Versión**: 1.1.2  
+**Última actualización**: 4 de Junio 2026  
 **Estado**: ✅ Producción - TOTALMENTE FUNCIONAL
 
 ---
@@ -16,7 +16,8 @@
 6. [Gestión de clientes](#gestión-de-clientes)
 7. [Navegación entre pasos](#navegación-entre-pasos)
 8. [Variables de URL](#variables-de-url)
-9. [Problemas comunes y soluciones](#problemas-comunes-y-soluciones)
+9. [Post-reserva: documentacion y firma online](#post-reserva-documentacion-y-firma-online)
+10. [Problemas comunes y soluciones](#problemas-comunes-y-soluciones)
 
 ---
 
@@ -224,6 +225,23 @@ Click en "Reservar ahora"
 - Precio total
 - **Depósito**: 1000€ vía transferencia ✅ (corregido desde 500€)
 - **Teléfono de contacto**: Correcto desde footer ✅
+
+---
+
+## Post-reserva documentacion y firma online
+
+**URL pública:** `/es/documentacion-alquiler` (EN/DE/FR equivalentes)
+
+Tras pagar / confirmar la reserva, el cliente debe completar (fuera del checkout):
+
+1. Enviar DNI y carnet por email a `reservas@furgocasa.com`
+2. **Firmar el contrato online** en la misma página (nº reserva + email → lectura en texto → checks → firma)
+3. Transferir la fianza (1000 €, máx. 72 h antes del inicio)
+4. Recibir confirmación de cita de recogida por email
+
+**Importante (junio 2026):** los PDF del contrato **no** están enlazados públicamente en esa página; solo se muestran tras validar la reserva. El PDF firmado se envía por email al completar la firma.
+
+Documentación técnica: **[FIRMA-CONTRATOS-ONLINE.md](../../02-desarrollo/contratos/FIRMA-CONTRATOS-ONLINE.md)**
 
 ---
 

@@ -465,5 +465,30 @@ Más contexto: [`SISTEMA-PREVENCION-CONFLICTOS.md`](../sistemas/SISTEMA-PREVENCI
 
 ---
 
-**Última actualización:** 2026-01-08  
-**Fuente:** Consulta directa a Supabase desde `/api/debug/schema`
+## 📋 TABLA: `signed_contracts` (firma online, junio 2026)
+
+Registro de cada firma completada en `/es/documentacion-alquiler`. Acceso vía **service_role** (API) o admin autenticado. RLS deniega al público.
+
+```
+id UUID PK
+booking_id UUID FK → bookings(id) ON DELETE CASCADE
+booking_number VARCHAR(40)
+customer_email, customer_name
+accepted_conditions, accepted_data_protection BOOLEAN (ambos TRUE)
+contract_version VARCHAR(40)   -- p.ej. v2
+confirmations JSONB            -- checks obligatorios firmados
+signed_pdf_path TEXT           -- ruta en bucket signed-contracts
+signed_at TIMESTAMPTZ
+ip_address, user_agent, notes
+```
+
+**Bucket Storage:** `signed-contracts` (privado, PDF, máx. 20 MB).
+
+Migraciones: `20260604-signed-contracts.sql`, `20260604-signed-contracts-confirmations.sql`.
+
+Documentación: [FIRMA-CONTRATOS-ONLINE.md](../../02-desarrollo/contratos/FIRMA-CONTRATOS-ONLINE.md)
+
+---
+
+**Última actualización:** 2026-06-04 (añadido `signed_contracts`) · schema base 2026-01-08  
+**Fuente:** Consulta directa a Supabase desde `/api/debug/schema` + migraciones contratos

@@ -33,7 +33,32 @@ Este documento describe el sistema completo de envío de correos electrónicos i
 - `src/app/api/redsys/verify-payment/route.ts` (fallback Redsys)
 - `src/app/api/stripe/webhook/route.ts`
 
-### 3. Segundo Pago Confirmado
+### 3. Contrato firmado online (junio 2026)
+
+**Cuándo:** El cliente completa la firma en `/es/documentacion-alquiler` (validación reserva + email, lectura, checks y rúbricas).
+
+**Quién recibe:**
+- ✉️ **Cliente:** PDF del contrato firmado adjunto
+- ✉️ **Empresa (`reservas@furgocasa.com`):** Misma copia
+
+**Asunto del email (sin nº de reserva):**
+
+```text
+Contrato firmado - {código interno vehículo} - {fecha inicio DD/MM/AAAA} - {Nombre completo}
+```
+
+Ejemplo: `Contrato firmado - MA0014 - 18/06/2026 - Narciso Pardo Buendia`
+
+Si no hay vehículo asignado: `SIN ASIGNAR` en el asunto.
+
+**Archivos:**
+- `src/app/api/contracts/sign/route.ts`
+- `src/lib/contracts/pdf.ts` (PDF generado desde texto, versión `v2`)
+- `src/lib/email/smtp-client.ts` (adjuntos)
+
+**Documentación:** [FIRMA-CONTRATOS-ONLINE.md](../../02-desarrollo/contratos/FIRMA-CONTRATOS-ONLINE.md)
+
+### 4. Segundo Pago Confirmado
 **Cuándo:** Cuando el cliente completa el pago del 50 % restante (o cualquier cobro posterior con `amount_paid > 0` antes del pago).
 
 **Disparadores automáticos:** mismos endpoints que el primer pago (Redsys y Stripe).
@@ -66,6 +91,11 @@ src/
         │   └── verify-payment/route.ts # Fallback Redsys en /pago/exito
         ├── stripe/
         │   └── webhook/route.ts        # Webhook Stripe → email automático
+        ├── contracts/
+        │   ├── validate-booking/route.ts  # Validación reserva+email → token sesión
+        │   └── sign/route.ts              # Firma → PDF + Storage + email
+        ├── admin/
+        │   └── signed-contracts/route.ts  # Listar / eliminar contratos firmados
         ├── cron/
         │   └── return-reminders/
         │       └── route.ts      # Cron: recordatorio de devolución (diario 18:00 UTC)
@@ -373,10 +403,11 @@ Ideas para futuras mejoras:
 
 ---
 
-**Última actualización:** 29 de abril de 2026
-**Versión:** 1.2.0
+**Última actualización:** 4 de junio de 2026
+**Versión:** 1.4.0
 
 **Changelog del documento:**
+- `1.4.0` (04/06/2026) — Email de contrato firmado online (`/api/contracts/sign`), asunto con vehículo + fecha inicio + nombre (sin nº reserva).
 - `1.3.0` (21/05/2026) — Documentado envío automático de emails en webhook Stripe (`checkout.session.completed`), alineado con Redsys; reenvío manual vía `/api/bookings/send-email`.
 - `1.2.0` (29/04/2026) — Añadido aviso de hora flexible en el recordatorio de devolución (asterisco rojo + nota explicativa); script de prueba sin admin (`scripts/test-return-reminder-email.ts`).
 - `1.1.0` (23/03/2026) — Añadido recordatorio de devolución (cron diario, plantilla `getReturnReminderTemplate`, idempotencia vía `bookings.return_reminder_sent`).

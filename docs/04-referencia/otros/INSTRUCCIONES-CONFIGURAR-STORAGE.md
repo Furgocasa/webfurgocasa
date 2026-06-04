@@ -122,3 +122,13 @@ Si prefieres una configuración más simple (sin restricciones de admin), puedes
 **Para producción (recomendado):**
 - Usa las políticas con validación de admins como se indica arriba
 
+---
+
+## Bucket `signed-contracts` (contratos firmados, junio 2026)
+
+No se crea a mano en este tutorial: lo provisiona la migración `supabase/migrations/20260604-signed-contracts.sql`.
+
+- **Privado** (`public: false`) — PDFs de contratos firmados online
+- Acceso solo vía API (service_role) o admin con URL firmada
+- Ver [FIRMA-CONTRATOS-ONLINE.md](../../02-desarrollo/contratos/FIRMA-CONTRATOS-ONLINE.md)
+

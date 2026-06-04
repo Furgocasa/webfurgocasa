@@ -17,6 +17,15 @@ Sistema completo de gestión de alquiler de campers y autocaravanas desarrollado
 
 ---
 
+## ✍️ Junio 2026 — Firma online de contratos (04/06/2026)
+
+- Los clientes firman condiciones + anexo GPS en **https://www.furgocasa.com/es/documentacion-alquiler** (reserva + email, sin PDFs públicos).
+- PDF firmado generado desde texto (`contract-content.ts`, versión **v2**); email con asunto `Contrato firmado - {vehículo} - {fecha inicio} - {nombre}`.
+- Admin: **/administrator/contratos-firmados** (listar, descargar, eliminar pruebas).
+- **Documentación:** [`docs/02-desarrollo/contratos/FIRMA-CONTRATOS-ONLINE.md`](./docs/02-desarrollo/contratos/FIRMA-CONTRATOS-ONLINE.md) · [`docs/INDICE-DOCUMENTACION.md`](./docs/INDICE-DOCUMENTACION.md) · [`SISTEMA-EMAILS.md`](./docs/04-referencia/emails/SISTEMA-EMAILS.md).
+
+---
+
 ## 🗺️ Landings SEO alquiler por ciudad (estado marzo 2026)
 
 - **`location_targets` activos**: **59** en producción (verificar: `npm run check:location-targets-db`).

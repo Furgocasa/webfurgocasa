@@ -1,10 +1,23 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.28 ✅ PRODUCCIÓN — Banners blog + GTM solo tras cobro pasarela + stats Storytellers  
+**Versión**: 1.0.29 ✅ PRODUCCIÓN — Firma online contratos + PDF texto v2  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 3 de junio de 2026
+**Última actualización**: 4 de junio de 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## ✍️ Junio 2026 — Firma online de contratos (documentación alquiler)
+
+| Tema | Dónde leer |
+|------|------------|
+| Flujo cliente, API, texto/HTML, PDF v2, email, BD, Storage, mantenimiento | **[FIRMA-CONTRATOS-ONLINE.md](./02-desarrollo/contratos/FIRMA-CONTRATOS-ONLINE.md)** |
+| Panel admin listar / descargar / eliminar | **[CONTRATOS-FIRMADOS.md](./04-referencia/admin/CONTRATOS-FIRMADOS.md)** |
+| Email tras firmar (asunto sin nº reserva) | **[SISTEMA-EMAILS.md](./04-referencia/emails/SISTEMA-EMAILS.md)** — *Contrato firmado online* |
+| Página pública | `/es/documentacion-alquiler` · `src/components/contracts/contract-signing.tsx` |
+| Migraciones SQL | `20260604-signed-contracts.sql` · `20260604-signed-contracts-confirmations.sql` |
+| Limpieza pruebas SQL puntual | `20260605-cleanup-test-signed-contracts-fg85813107.sql` |
 
 ---
 
@@ -409,6 +422,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[PAGINAS-VEHICULOS-GARANTIA.md](./PAGINAS-VEHICULOS-GARANTIA.md)** | ⚠️ Garantía páginas vehículos | Antes de tocar `/vehiculos/**`, `/ventas/**` o `/reservar/vehiculo` |
 | **[SISTEMA-VEHICULOS-VENDIDOS.md](./04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)** | 🚗 **NUEVO** - Estado vendido e informes | Admin vehículos, calendario, informes, daños |
 | **[INFORMES-HISTORICO-EXCEL.md](./04-referencia/admin/INFORMES-HISTORICO-EXCEL.md)** | 📊 **NUEVO** - Histórico Excel + modos de ingresos | Antes de tocar `/administrator/informes` o reimportar histórico |
+| **[CONTRATOS-FIRMADOS.md](./04-referencia/admin/CONTRATOS-FIRMADOS.md)** | ✍️ Contratos firmados online — listar, descargar, eliminar | `/administrator/contratos-firmados` |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo de reservas | Antes de tocar /reservar/** |
 | **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** | 🎟️ Sistema de cupones de descuento | Antes de tocar cupones o `/reservar/nueva` |
