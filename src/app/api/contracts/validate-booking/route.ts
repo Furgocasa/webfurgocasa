@@ -90,7 +90,6 @@ export async function POST(req: NextRequest) {
       documents: CONTRACT_DOCUMENTS.map((d) => ({
         id: d.id,
         title: d.title,
-        url: d.publicPath,
       })),
     });
   } catch (e) {

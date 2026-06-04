@@ -31,7 +31,6 @@ import { CONTRACT_CONTENT } from "@/lib/contracts/contract-content";
 interface DocInfo {
   id: "condiciones-alquiler" | "proteccion-datos";
   title: string;
-  url: string;
 }
 
 interface BookingInfo {

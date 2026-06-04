@@ -1,15 +1,12 @@
 /**
- * Genera el PDF combinado del contrato firmado.
+ * Genera el PDF del contrato firmado a partir del texto íntegro (contract-content),
+ * no desde los PDF antiguos de /public/documentos.
  *
- * Estructura del PDF resultante:
- *   1. Condiciones del alquiler detalladas (PDF original).
- *   2. Anexo de protección de datos (PDF original).
- *   3. Página de firma: rúbricas del cliente para ambos documentos + sello
- *      (nº de reserva, nombre, email, fecha/hora e IP) y aceptaciones.
- *
- * Los PDFs base se cargan desde la URL pública del sitio (en serverless los
- * ficheros de /public no se incluyen en el bundle de la función, por eso se
- * descargan por HTTP en lugar de leerse del filesystem).
+ * Estructura:
+ *   1. Condiciones del alquiler (texto paginado)
+ *   2. Anexo de protección de datos (texto paginado)
+ *   3. Puntos confirmados por el cliente
+ *   4. Hoja de firma electrónica (datos + rúbricas)
  */
 
 import {
@@ -19,12 +16,26 @@ import {
   type PDFFont,
   type PDFPage,
 } from "pdf-lib";
-import { CONTRACT_DOCUMENTS, CONTRACT_VERSION } from "./config";
+import { CONTRACT_VERSION } from "./config";
+import {
+  CONTRACT_CONTENT,
+  type ContractBlock,
+  type ContractDocContent,
+} from "./contract-content";
+
+const PAGE_W = 595;
+const PAGE_H = 842;
+const MARGIN = 48;
+const CONTENT_W = PAGE_W - MARGIN * 2;
+const FOOTER_Y = 36;
 
 const BRAND_BLUE = rgb(6 / 255, 57 / 255, 113 / 255);
 const BRAND_ORANGE = rgb(234 / 255, 88 / 255, 12 / 255);
-const GRAY = rgb(0.35, 0.35, 0.35);
-const DARK = rgb(0.1, 0.1, 0.1);
+const GRAY = rgb(0.4, 0.4, 0.4);
+const DARK = rgb(0.12, 0.12, 0.12);
+const HIGHLIGHT = rgb(0.72, 0.12, 0.1);
+const HIGHLIGHT_BG = rgb(1, 0.96, 0.96);
+const LINE_GRAY = rgb(0.82, 0.82, 0.82);
 
 export interface SignedContractInput {
   bookingNumber: string;
@@ -32,28 +43,24 @@ export interface SignedContractInput {
   customerEmail: string;
   signedAt: Date;
   ipAddress: string | null;
-  /** dataURL PNG de la firma para las condiciones del alquiler */
   signatureConditions: string;
-  /** dataURL PNG de la firma para el anexo de protección de datos */
   signatureDataProtection: string;
-  /** Puntos delicados confirmados por el cliente (evidencia legal) */
   confirmations: Array<{ id: string; label: string }>;
-  /** Origen del sitio para descargar los PDFs base, p.ej. https://www.furgocasa.com */
-  baseUrl: string;
+}
+
+function pdfSafeText(text: string): string {
+  return text
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/\u2013|\u2014/g, "-")
+    .replace(/\u2026/g, "...")
+    .replace(/\u00A0/g, " ");
 }
 
 function dataUrlToBytes(dataUrl: string): Uint8Array {
   const comma = dataUrl.indexOf(",");
   const base64 = comma >= 0 ? dataUrl.slice(comma + 1) : dataUrl;
   return new Uint8Array(Buffer.from(base64, "base64"));
-}
-
-async function fetchPdfBytes(url: string): Promise<ArrayBuffer> {
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) {
-    throw new Error(`No se pudo descargar el PDF base: ${url} (${res.status})`);
-  }
-  return res.arrayBuffer();
 }
 
 function formatDateTime(d: Date): string {
@@ -67,67 +74,8 @@ function formatDateTime(d: Date): string {
   });
 }
 
-export async function generateSignedContractPdf(
-  input: SignedContractInput
-): Promise<Uint8Array> {
-  const baseUrl = input.baseUrl.replace(/\/$/, "");
-
-  const conditionsDoc = CONTRACT_DOCUMENTS.find((d) => d.id === "condiciones-alquiler")!;
-  const dataProtectionDoc = CONTRACT_DOCUMENTS.find((d) => d.id === "proteccion-datos")!;
-
-  const [conditionsBytes, dataProtectionBytes] = await Promise.all([
-    fetchPdfBytes(`${baseUrl}${conditionsDoc.publicPath}`),
-    fetchPdfBytes(`${baseUrl}${dataProtectionDoc.publicPath}`),
-  ]);
-
-  const out = await PDFDocument.create();
-  out.setTitle(`Contrato firmado - Reserva ${input.bookingNumber}`);
-  out.setAuthor("Furgocasa");
-  out.setSubject("Contrato de alquiler y anexo de protección de datos firmados");
-  out.setProducer("Furgocasa");
-  out.setCreationDate(input.signedAt);
-
-  const helv = await out.embedFont(StandardFonts.Helvetica);
-  const helvBold = await out.embedFont(StandardFonts.HelveticaBold);
-
-  // 1 + 2: copiar páginas de los dos documentos originales
-  const srcConditions = await PDFDocument.load(conditionsBytes);
-  const srcData = await PDFDocument.load(dataProtectionBytes);
-
-  const condPages = await out.copyPages(srcConditions, srcConditions.getPageIndices());
-  condPages.forEach((p) => out.addPage(p));
-  const dataPages = await out.copyPages(srcData, srcData.getPageIndices());
-  dataPages.forEach((p) => out.addPage(p));
-
-  // 3: página de puntos confirmados (evidencia legal)
-  if (input.confirmations.length > 0) {
-    drawConfirmationsPage(out.addPage(), { helv, helvBold, input });
-  }
-
-  // 4: página de firma
-  const sigConditionsBytes = dataUrlToBytes(input.signatureConditions);
-  const sigDataBytes = dataUrlToBytes(input.signatureDataProtection);
-  const sigConditionsImg = await out.embedPng(sigConditionsBytes);
-  const sigDataImg = await out.embedPng(sigDataBytes);
-
-  drawSignaturePage(out.addPage(), {
-    helv,
-    helvBold,
-    input,
-    sigConditionsImg,
-    sigDataImg,
-  });
-
-  return out.save();
-}
-
-function wrapText(
-  text: string,
-  font: PDFFont,
-  size: number,
-  maxWidth: number
-): string[] {
-  const words = text.split(/\s+/);
+function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): string[] {
+  const words = pdfSafeText(text).split(/\s+/);
   const lines: string[] = [];
   let current = "";
   for (const word of words) {
@@ -140,208 +88,395 @@ function wrapText(
     }
   }
   if (current) lines.push(current);
-  return lines;
+  return lines.length ? lines : [""];
 }
 
-function drawConfirmationsPage(
-  page: PDFPage,
-  ctx: { helv: PDFFont; helvBold: PDFFont; input: SignedContractInput }
-) {
-  const { helv, helvBold, input } = ctx;
-  const { width, height } = page.getSize();
-  const margin = 50;
-  const contentWidth = width - margin * 2;
-  let y = height - margin;
+interface LayoutCtx {
+  pdf: PDFDocument;
+  helv: PDFFont;
+  helvBold: PDFFont;
+  page: PDFPage;
+  y: number;
+  pageNum: number;
+}
 
-  page.drawRectangle({ x: 0, y: height - 8, width, height: 8, color: BRAND_ORANGE });
+function addPage(ctx: LayoutCtx): void {
+  ctx.page = ctx.pdf.addPage([PAGE_W, PAGE_H]);
+  ctx.pageNum += 1;
+  ctx.y = PAGE_H - MARGIN;
+  drawPageFooter(ctx);
+}
 
-  page.drawText("Puntos importantes confirmados por el cliente", {
-    x: margin,
-    y: y - 18,
-    size: 17,
-    font: helvBold,
+function drawPageFooter(ctx: LayoutCtx): void {
+  ctx.page.drawText(`Furgocasa · Contrato firmado · ${ctx.pageNum}`, {
+    x: MARGIN,
+    y: FOOTER_Y,
+    size: 7.5,
+    font: ctx.helv,
+    color: GRAY,
+  });
+}
+
+function ensureSpace(ctx: LayoutCtx, needed: number): void {
+  if (ctx.y - needed < MARGIN + 24) {
+    addPage(ctx);
+  }
+}
+
+function drawLines(
+  ctx: LayoutCtx,
+  lines: string[],
+  opts: {
+    x: number;
+    width: number;
+    size: number;
+    font: PDFFont;
+    color: ReturnType<typeof rgb>;
+    lineHeight: number;
+    beforeGap?: number;
+    highlightBg?: boolean;
+  }
+): void {
+  const blockH = lines.length * opts.lineHeight + (opts.beforeGap || 0);
+  ensureSpace(ctx, blockH);
+
+  if (opts.highlightBg && lines.length > 0) {
+    const bgH = lines.length * opts.lineHeight + 6;
+    ctx.page.drawRectangle({
+      x: opts.x - 4,
+      y: ctx.y - bgH + 2,
+      width: opts.width + 8,
+      height: bgH,
+      color: HIGHLIGHT_BG,
+    });
+  }
+
+  ctx.y -= opts.beforeGap || 0;
+  for (const line of lines) {
+    ensureSpace(ctx, opts.lineHeight);
+    ctx.page.drawText(line, {
+      x: opts.x,
+      y: ctx.y - opts.size,
+      size: opts.size,
+      font: opts.font,
+      color: opts.color,
+    });
+    ctx.y -= opts.lineHeight;
+  }
+}
+
+function drawSectionBanner(ctx: LayoutCtx, title: string, subtitle?: string): void {
+  addPage(ctx);
+  ctx.page.drawRectangle({
+    x: 0,
+    y: PAGE_H - 6,
+    width: PAGE_W,
+    height: 6,
+    color: BRAND_ORANGE,
+  });
+  ctx.page.drawText(title, {
+    x: MARGIN,
+    y: ctx.y - 20,
+    size: 16,
+    font: ctx.helvBold,
     color: BRAND_BLUE,
   });
-  y -= 40;
+  ctx.y -= 32;
+  if (subtitle) {
+    ctx.page.drawText(pdfSafeText(subtitle), {
+      x: MARGIN,
+      y: ctx.y - 10,
+      size: 9,
+      font: ctx.helv,
+      color: GRAY,
+    });
+    ctx.y -= 22;
+  }
+  ctx.y -= 8;
+}
 
-  page.drawText(
-    `Reserva ${input.bookingNumber} · ${input.customerName || ""}`.trim(),
-    { x: margin, y, size: 10, font: helv, color: GRAY }
+function renderBlock(ctx: LayoutCtx, block: ContractBlock): void {
+  const highlight = "highlight" in block && block.highlight;
+
+  if (block.type === "h") {
+    const lines = wrapText(block.text, ctx.helvBold, 11, CONTENT_W);
+    drawLines(ctx, lines, {
+      x: MARGIN,
+      width: CONTENT_W,
+      size: 11,
+      font: ctx.helvBold,
+      color: BRAND_BLUE,
+      lineHeight: 14,
+      beforeGap: 10,
+    });
+    ctx.y -= 4;
+    return;
+  }
+
+  if (block.type === "li") {
+    const bullet = "• ";
+    const lines = wrapText(block.text, ctx.helv, 9, CONTENT_W - 14);
+    const first = `${bullet}${lines[0] || ""}`;
+    const rest = lines.slice(1);
+    drawLines(ctx, [first, ...rest], {
+      x: MARGIN + 2,
+      width: CONTENT_W - 14,
+      size: 9,
+      font: ctx.helv,
+      color: highlight ? HIGHLIGHT : DARK,
+      lineHeight: 11.5,
+      beforeGap: 3,
+      highlightBg: highlight,
+    });
+    return;
+  }
+
+  const lines = wrapText(block.text, ctx.helv, 9, CONTENT_W);
+  drawLines(ctx, lines, {
+    x: MARGIN,
+    width: CONTENT_W,
+    size: 9,
+    font: ctx.helv,
+    color: highlight ? HIGHLIGHT : DARK,
+    lineHeight: 11.5,
+    beforeGap: 5,
+    highlightBg: highlight,
+  });
+}
+
+function renderDocument(ctx: LayoutCtx, doc: ContractDocContent): void {
+  drawSectionBanner(ctx, doc.title, "FURGOCASA CAMPERVANS, S.L. · NIF B-87947412");
+  for (const block of doc.blocks) {
+    renderBlock(ctx, block);
+  }
+  ctx.y -= 12;
+}
+
+function renderConfirmations(ctx: LayoutCtx, input: SignedContractInput): void {
+  drawSectionBanner(
+    ctx,
+    "Puntos importantes confirmados",
+    `Reserva ${input.bookingNumber} · ${input.customerName || input.customerEmail}`
   );
-  y -= 26;
 
-  const itemSize = 10.5;
-  const lineHeight = 14;
-  const checkColWidth = 18;
-  const textWidth = contentWidth - checkColWidth;
+  const size = 9.5;
+  const lineHeight = 12.5;
+  const checkX = MARGIN;
+  const textX = MARGIN + 14;
+  const textW = CONTENT_W - 14;
 
   for (const c of input.confirmations) {
-    const lines = wrapText(c.label, helv, itemSize, textWidth);
-    const blockHeight = lines.length * lineHeight + 8;
-    if (y - blockHeight < margin + 20) {
-      // Sin espacio: paramos (caso extremo, no debería ocurrir con 8 items).
-      break;
-    }
-    // marca de check
-    page.drawText("[X]", {
-      x: margin,
-      y: y - itemSize,
-      size: itemSize,
-      font: helvBold,
-      color: rgb(0.1, 0.55, 0.25),
+    const lines = wrapText(c.label, ctx.helv, size, textW);
+    const blockH = lines.length * lineHeight + 8;
+    ensureSpace(ctx, blockH);
+
+    ctx.page.drawText("[x]", {
+      x: checkX,
+      y: ctx.y - size,
+      size: size + 1,
+      font: ctx.helvBold,
+      color: rgb(0.1, 0.5, 0.25),
     });
     lines.forEach((line, idx) => {
-      page.drawText(line, {
-        x: margin + checkColWidth,
-        y: y - itemSize - idx * lineHeight,
-        size: itemSize,
-        font: helv,
+      ctx.page.drawText(line, {
+        x: textX,
+        y: ctx.y - size - idx * lineHeight,
+        size,
+        font: ctx.helv,
         color: DARK,
       });
     });
-    y -= blockHeight + 6;
+    ctx.y -= blockH;
   }
 
-  page.drawText(
-    "El cliente ha marcado expresamente cada una de las casillas anteriores antes de firmar.",
-    { x: margin, y: margin + 4, size: 8, font: helv, color: GRAY }
+  ctx.y -= 6;
+  drawLines(
+    ctx,
+    wrapText(
+      "El cliente ha marcado expresamente cada punto anterior en la web antes de firmar.",
+      ctx.helv,
+      8,
+      CONTENT_W
+    ),
+    {
+      x: MARGIN,
+      width: CONTENT_W,
+      size: 8,
+      font: ctx.helv,
+      color: GRAY,
+      lineHeight: 10,
+    }
   );
 }
 
 function drawSignaturePage(
-  page: PDFPage,
-  ctx: {
-    helv: PDFFont;
-    helvBold: PDFFont;
-    input: SignedContractInput;
-    sigConditionsImg: Awaited<ReturnType<PDFDocument["embedPng"]>>;
-    sigDataImg: Awaited<ReturnType<PDFDocument["embedPng"]>>;
-  }
-) {
-  const { helv, helvBold, input, sigConditionsImg, sigDataImg } = ctx;
-  const { width, height } = page.getSize();
-  const margin = 50;
-  const contentWidth = width - margin * 2;
-  let y = height - margin;
+  ctx: LayoutCtx,
+  input: SignedContractInput,
+  sigConditionsImg: Awaited<ReturnType<PDFDocument["embedPng"]>>,
+  sigDataImg: Awaited<ReturnType<PDFDocument["embedPng"]>>
+): void {
+  drawSectionBanner(ctx, "Firma electrónica del cliente");
 
-  // Cabecera
-  page.drawRectangle({
-    x: 0,
-    y: height - 8,
-    width,
-    height: 8,
-    color: BRAND_ORANGE,
-  });
-
-  page.drawText("Confirmación de firma", {
-    x: margin,
-    y: y - 18,
-    size: 22,
-    font: helvBold,
-    color: BRAND_BLUE,
-  });
-  y -= 44;
-
-  page.drawText(
-    "El cliente declara haber leído, comprendido y aceptado los documentos anteriores",
-    { x: margin, y, size: 10, font: helv, color: GRAY }
-  );
-  y -= 14;
-  page.drawText(
-    "(Condiciones del alquiler detalladas y Anexo de protección de datos) y los firma.",
-    { x: margin, y, size: 10, font: helv, color: GRAY }
-  );
-  y -= 30;
-
-  // Datos de la reserva
   const rows: Array<[string, string]> = [
-    ["Nº de reserva:", input.bookingNumber],
-    ["Cliente:", input.customerName || "—"],
-    ["Email:", input.customerEmail],
-    ["Fecha y hora de firma:", `${formatDateTime(input.signedAt)} (hora peninsular)`],
-    ["Dirección IP:", input.ipAddress || "—"],
-    ["Versión de documentos:", CONTRACT_VERSION],
+    ["Nº de reserva", input.bookingNumber],
+    ["Cliente", input.customerName || "—"],
+    ["Email", input.customerEmail],
+    ["Fecha y hora", `${formatDateTime(input.signedAt)} (peninsular)`],
+    ["IP", input.ipAddress || "—"],
+    ["Versión documento", CONTRACT_VERSION],
   ];
+
   for (const [label, value] of rows) {
-    page.drawText(label, { x: margin, y, size: 11, font: helvBold, color: DARK });
-    page.drawText(value, { x: margin + 165, y, size: 11, font: helv, color: DARK });
-    y -= 20;
+    ensureSpace(ctx, 16);
+    ctx.page.drawText(`${label}:`, {
+      x: MARGIN,
+      y: ctx.y - 10,
+      size: 9.5,
+      font: ctx.helvBold,
+      color: DARK,
+    });
+    const valueLines = wrapText(value, ctx.helv, 9.5, CONTENT_W - 120);
+    valueLines.forEach((line, idx) => {
+      ctx.page.drawText(line, {
+        x: MARGIN + 115,
+        y: ctx.y - 10 - idx * 12,
+        size: 9.5,
+        font: ctx.helv,
+        color: DARK,
+      });
+    });
+    ctx.y -= Math.max(16, valueLines.length * 12 + 4);
   }
 
-  y -= 10;
-  page.drawLine({
-    start: { x: margin, y },
-    end: { x: width - margin, y },
-    thickness: 1,
-    color: rgb(0.85, 0.85, 0.85),
+  ctx.y -= 16;
+  ctx.page.drawLine({
+    start: { x: MARGIN, y: ctx.y },
+    end: { x: PAGE_W - MARGIN, y: ctx.y },
+    thickness: 0.5,
+    color: LINE_GRAY,
   });
-  y -= 30;
+  ctx.y -= 24;
 
-  // Bloques de firma
-  const boxWidth = contentWidth;
-  const boxHeight = 130;
-
-  const drawSignatureBlock = (
-    title: string,
-    acceptText: string,
-    img: Awaited<ReturnType<PDFDocument["embedPng"]>>,
-    topY: number
+  const drawSig = (
+    label: string,
+    sublabel: string,
+    img: Awaited<ReturnType<PDFDocument["embedPng"]>>
   ) => {
-    page.drawText(title, { x: margin, y: topY, size: 12, font: helvBold, color: BRAND_BLUE });
-    page.drawText(acceptText, {
-      x: margin,
-      y: topY - 16,
-      size: 9.5,
-      font: helv,
+    ensureSpace(ctx, 100);
+    ctx.page.drawText(label, {
+      x: MARGIN,
+      y: ctx.y - 11,
+      size: 11,
+      font: ctx.helvBold,
+      color: BRAND_BLUE,
+    });
+    ctx.y -= 18;
+    ctx.page.drawText(sublabel, {
+      x: MARGIN,
+      y: ctx.y - 9,
+      size: 8.5,
+      font: ctx.helv,
       color: GRAY,
     });
-    const boxTop = topY - 26;
-    page.drawRectangle({
-      x: margin,
-      y: boxTop - boxHeight,
-      width: boxWidth,
-      height: boxHeight,
-      borderColor: rgb(0.8, 0.8, 0.8),
-      borderWidth: 1,
-      color: rgb(0.99, 0.99, 0.99),
-    });
-    // Escalar la firma para que quepa con margen interior
-    const maxW = boxWidth - 24;
-    const maxH = boxHeight - 24;
+    ctx.y -= 14;
+
+    const maxW = CONTENT_W;
+    const maxH = 56;
     const scale = Math.min(maxW / img.width, maxH / img.height, 1);
     const drawW = img.width * scale;
     const drawH = img.height * scale;
-    page.drawImage(img, {
-      x: margin + (boxWidth - drawW) / 2,
-      y: boxTop - boxHeight + (boxHeight - drawH) / 2,
+
+    ensureSpace(ctx, drawH + 28);
+    const imgY = ctx.y - drawH;
+    ctx.page.drawImage(img, {
+      x: MARGIN,
+      y: imgY,
       width: drawW,
       height: drawH,
     });
-    return boxTop - boxHeight;
+    ctx.y = imgY - 8;
+
+    ctx.page.drawLine({
+      start: { x: MARGIN, y: ctx.y },
+      end: { x: MARGIN + 220, y: ctx.y },
+      thickness: 0.75,
+      color: DARK,
+    });
+    ctx.y -= 12;
+    ctx.page.drawText("Firma del cliente", {
+      x: MARGIN,
+      y: ctx.y - 8,
+      size: 8,
+      font: ctx.helv,
+      color: GRAY,
+    });
+    ctx.y -= 28;
   };
 
-  let nextY = y;
-  nextY = drawSignatureBlock(
-    "1. Condiciones del Alquiler Detalladas",
-    "He leído y acepto las condiciones del alquiler.",
-    sigConditionsImg,
-    nextY
+  drawSig(
+    "1. Condiciones del alquiler detalladas",
+    "He leído, acepto y firmo las condiciones del alquiler.",
+    sigConditionsImg
   );
-  nextY -= 34;
-  nextY = drawSignatureBlock(
-    "2. Anexo de Protección de Datos (RGPD)",
-    "He leído y acepto el tratamiento de mis datos personales.",
-    sigDataImg,
-    nextY
+  drawSig(
+    "2. Anexo de protección de datos (RGPD)",
+    "He leído, acepto y firmo el tratamiento de mis datos y la geolocalización GPS.",
+    sigDataImg
   );
 
-  // Pie legal
-  page.drawText(
-    "Documento generado electrónicamente por Furgocasa. La firma manuscrita digital y los datos de",
-    { x: margin, y: margin + 14, size: 8, font: helv, color: GRAY }
+  ensureSpace(ctx, 30);
+  drawLines(
+    ctx,
+    wrapText(
+      "Documento generado electrónicamente por Furgocasa. La firma manuscrita digital, la fecha, la hora y la dirección IP constituyen evidencia de la aceptación del cliente.",
+      ctx.helv,
+      7.5,
+      CONTENT_W
+    ),
+    {
+      x: MARGIN,
+      width: CONTENT_W,
+      size: 7.5,
+      font: ctx.helv,
+      color: GRAY,
+      lineHeight: 9.5,
+    }
   );
-  page.drawText(
-    "fecha, hora e IP constituyen evidencia de la aceptación por parte del cliente.",
-    { x: margin, y: margin + 4, size: 8, font: helv, color: GRAY }
-  );
+}
+
+export async function generateSignedContractPdf(
+  input: SignedContractInput
+): Promise<Uint8Array> {
+  const pdf = await PDFDocument.create();
+  pdf.setTitle(`Contrato firmado - Reserva ${input.bookingNumber}`);
+  pdf.setAuthor("Furgocasa");
+  pdf.setSubject("Contrato de alquiler y anexo de protección de datos firmados");
+  pdf.setProducer("Furgocasa");
+  pdf.setCreationDate(input.signedAt);
+
+  const helv = await pdf.embedFont(StandardFonts.Helvetica);
+  const helvBold = await pdf.embedFont(StandardFonts.HelveticaBold);
+
+  const ctx: LayoutCtx = {
+    pdf,
+    helv,
+    helvBold,
+    page: pdf.addPage([PAGE_W, PAGE_H]),
+    y: PAGE_H - MARGIN,
+    pageNum: 1,
+  };
+  drawPageFooter(ctx);
+
+  renderDocument(ctx, CONTRACT_CONTENT["condiciones-alquiler"]);
+  renderDocument(ctx, CONTRACT_CONTENT["proteccion-datos"]);
+
+  if (input.confirmations.length > 0) {
+    renderConfirmations(ctx, input);
+  }
+
+  const sigConditionsImg = await pdf.embedPng(dataUrlToBytes(input.signatureConditions));
+  const sigDataImg = await pdf.embedPng(dataUrlToBytes(input.signatureDataProtection));
+  drawSignaturePage(ctx, input, sigConditionsImg, sigDataImg);
+
+  return pdf.save();
 }

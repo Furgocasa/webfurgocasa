@@ -76,16 +76,17 @@ function formatPickupDateForSubject(pickupDate: string | null | undefined): stri
 }
 
 function buildSignedContractEmailSubject(params: {
-  bookingNumber: string;
+  customerName: string | null | undefined;
   vehicleInternalCode: string | null | undefined;
   pickupDate: string | null | undefined;
 }): string {
-  const parts = [`Reserva ${params.bookingNumber}`];
-  const vehicle = params.vehicleInternalCode?.trim();
-  parts.push(vehicle || "SIN ASIGNAR");
+  const parts: string[] = ["Contrato firmado"];
+  parts.push(params.vehicleInternalCode?.trim() || "SIN ASIGNAR");
   const pickup = formatPickupDateForSubject(params.pickupDate);
   if (pickup) parts.push(pickup);
-  return `Furgocasa | Contrato firmado - ${parts.join(" - ")}`;
+  const name = params.customerName?.trim();
+  if (name) parts.push(name);
+  return parts.join(" - ");
 }
 
 export async function POST(req: NextRequest) {
@@ -153,14 +154,7 @@ export async function POST(req: NextRequest) {
     const customerEmail = (booking.customer_email || session.email).trim().toLowerCase();
     const signedAt = new Date();
 
-    // URL base para descargar los PDFs originales (en serverless /public no se
-    // incluye en el bundle de la función, hay que descargarlo por HTTP).
-    const baseUrl =
-      process.env.NEXT_PUBLIC_BASE_URL ||
-      process.env.NEXT_PUBLIC_APP_URL ||
-      req.nextUrl.origin;
-
-    // 1. Generar PDF combinado firmado
+    // 1. Generar PDF firmado (texto íntegro + firmas, sin PDFs antiguos)
     const pdfBytes = await generateSignedContractPdf({
       bookingNumber: booking.booking_number,
       customerName: booking.customer_name,
@@ -170,7 +164,6 @@ export async function POST(req: NextRequest) {
       signatureConditions,
       signatureDataProtection,
       confirmations: confirmationsDetail,
-      baseUrl,
     });
     const pdfBuffer = Buffer.from(pdfBytes);
 
@@ -228,6 +221,7 @@ export async function POST(req: NextRequest) {
       customerName: booking.customer_name,
       bookingNumber: booking.booking_number,
       vehicleInternalCode,
+      pickupDate: booking.pickup_date,
       pickupDateLabel,
       signedAtLabel: signedAt.toLocaleString("es-ES", {
         day: "2-digit",
@@ -242,7 +236,7 @@ export async function POST(req: NextRequest) {
     const emailResult = await sendEmail({
       to: [customerEmail, companyEmail],
       subject: buildSignedContractEmailSubject({
-        bookingNumber: booking.booking_number,
+        customerName: booking.customer_name,
         vehicleInternalCode,
         pickupDate: booking.pickup_date,
       }),
@@ -271,6 +265,7 @@ function buildSignedContractEmail(params: {
   customerName: string | null;
   bookingNumber: string;
   vehicleInternalCode: string | null;
+  pickupDate: string | null;
   pickupDateLabel: string;
   signedAtLabel: string;
 }): string {
@@ -305,10 +300,10 @@ function buildSignedContractEmail(params: {
       </td>
     </tr>
   `;
-  const previewParts = [
-    `Reserva ${params.bookingNumber}`,
-    params.vehicleInternalCode?.trim() || "SIN ASIGNAR",
-    params.pickupDateLabel,
-  ].filter(Boolean);
-  return getEmailBaseTemplate(content, `Contrato firmado - ${previewParts.join(" - ")}`);
+  const previewSubject = buildSignedContractEmailSubject({
+    customerName: params.customerName,
+    vehicleInternalCode: params.vehicleInternalCode,
+    pickupDate: params.pickupDate,
+  });
+  return getEmailBaseTemplate(content, previewSubject);
 }

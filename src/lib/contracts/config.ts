@@ -13,26 +13,22 @@ import crypto from "crypto";
 
 export const SIGNED_CONTRACTS_BUCKET = "signed-contracts";
 
-/** Versión de los documentos. Súbela si cambian los PDFs base (trazabilidad legal). */
-export const CONTRACT_VERSION = "v1";
+/** Versión del texto del contrato. Súbela si cambia contract-content.ts (trazabilidad legal). */
+export const CONTRACT_VERSION = "v2";
 
 export interface ContractDocument {
   id: "condiciones-alquiler" | "proteccion-datos";
   title: string;
-  /** Ruta pública del PDF base servido desde /public */
-  publicPath: string;
 }
 
 export const CONTRACT_DOCUMENTS: ContractDocument[] = [
   {
     id: "condiciones-alquiler",
     title: "Condiciones del Alquiler Detalladas",
-    publicPath: "/documentos/condiciones-alquiler.pdf",
   },
   {
     id: "proteccion-datos",
     title: "Anexo de Protección de Datos",
-    publicPath: "/documentos/proteccion-datos.pdf",
   },
 ];
 

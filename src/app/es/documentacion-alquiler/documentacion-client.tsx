@@ -1,32 +1,9 @@
 "use client";
 
-import { FileText, Eye, CheckCircle, AlertCircle, Shield, Lock } from "lucide-react";
+import { FileText, CheckCircle, AlertCircle, Lock } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { COMPANY } from "@/lib/company";
 import ContractSigning from "@/components/contracts/contract-signing";
-
-const documents = [
-  {
-    id: "condiciones-alquiler",
-    titleKey: "Condiciones del Alquiler Detalladas",
-    descriptionKey: "Documento completo con todas las condiciones del servicio de alquiler, incluyendo derechos, obligaciones, política de cancelación, seguros y más. Lectura obligatoria antes de la recogida.",
-    filename: "condiciones-alquiler.pdf",
-    url: "/documentos/condiciones-alquiler.pdf",
-    size: "195 KB",
-    required: true,
-    icon: FileText,
-  },
-  {
-    id: "proteccion-datos",
-    titleKey: "Anexo de Protección de Datos",
-    descriptionKey: "Información sobre el tratamiento de tus datos personales conforme al RGPD. Incluye tus derechos y cómo ejercerlos.",
-    filename: "proteccion-datos.pdf",
-    url: "/documentos/proteccion-datos.pdf",
-    size: "84 KB",
-    required: true,
-    icon: Shield,
-  },
-];
 
 export default function DocumentacionClient() {
   const { t } = useLanguage();
@@ -118,56 +95,7 @@ export default function DocumentacionClient() {
         </div>
       </section>
 
-      {/* Documentos principales */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {t("Documentación del Contrato")}
-          </h2>
-          <p className="text-gray-600 mb-8">
-            {t("Consulta detenidamente estos documentos. Después podrás firmarlos online en esta misma página con tu número de reserva.")}
-          </p>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {documents.map((doc) => (
-              <div
-                key={doc.id}
-                className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100"
-              >
-                <div className="p-6">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
-                      <doc.icon className="h-7 w-7 text-red-600" />
-                    </div>
-                    {doc.required && (
-                      <span className="text-xs bg-furgocasa-orange/10 text-furgocasa-orange px-3 py-1.5 rounded-full font-semibold">
-                        {t("Lectura obligatoria")}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2">{t(doc.titleKey)}</h3>
-                  <p className="text-gray-600 text-sm mb-6">{t(doc.descriptionKey)}</p>
-                  
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href={`${doc.url}#toolbar=0`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-200 rounded-lg hover:bg-gray-200 transition-colors"
-                    >
-                      <Eye className="h-5 w-5" />
-                      {t("Ver documento")}
-                    </a>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-3">{t("Solo lectura")} • PDF</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Firma online del contrato */}
+      {/* Firma online del contrato — documentos solo tras validar reserva */}
       <ContractSigning />
 
       {/* Info adicional */}

@@ -3,8 +3,8 @@
  *
  * Se muestra como texto (no PDF) para que la lectura sea fiable en todos los
  * dispositivos y se pueda detectar de forma nativa cuándo el cliente ha llegado
- * al final. El documento FIRMADO que recibe el cliente sigue siendo el PDF
- * oficial completo (ver src/lib/contracts/pdf.ts).
+ * al final. El PDF firmado que recibe el cliente se genera desde este mismo
+ * texto (ver src/lib/contracts/pdf.ts).
  *
  * Fiel a: public/documentos/condiciones-alquiler.pdf y proteccion-datos.pdf
  * Sin dependencias de Node (se usa en el componente cliente).
