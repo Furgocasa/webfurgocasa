@@ -26,20 +26,7 @@ import {
   ALL_CONFIRMATION_IDS,
   type ConfirmationItem,
 } from "@/lib/contracts/confirmations";
-
-// Polyfill para navegadores antiguos (Safari 15 / iOS 15): pdf.js v4 usa
-// Promise.withResolvers, que no existe en esos navegadores soportados.
-if (typeof (Promise as any).withResolvers !== "function") {
-  (Promise as any).withResolvers = function <T>() {
-    let resolve!: (value: T | PromiseLike<T>) => void;
-    let reject!: (reason?: unknown) => void;
-    const promise = new Promise<T>((res, rej) => {
-      resolve = res;
-      reject = rej;
-    });
-    return { promise, resolve, reject };
-  };
-}
+import { CONTRACT_CONTENT } from "@/lib/contracts/contract-content";
 
 interface DocInfo {
   id: "condiciones-alquiler" | "proteccion-datos";
@@ -64,21 +51,20 @@ function confirmationsForDoc(docId: DocInfo["id"]): ConfirmationItem[] {
 }
 
 // ============================================
-// PdfReader — visor propio con pdf.js que obliga a llegar al final
+// ContractTextReader — lector de texto con scroll nativo que obliga a leer
 // ============================================
-function PdfReader({
-  url,
+function ContractTextReader({
+  docId,
   onReadComplete,
 }: {
-  url: string;
+  docId: DocInfo["id"];
   onReadComplete: () => void;
 }) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const pagesRef = useRef<HTMLDivElement | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
   const completedRef = useRef(false);
+
+  const content = CONTRACT_CONTENT[docId];
 
   const markComplete = useCallback(() => {
     if (completedRef.current) return;
@@ -94,100 +80,87 @@ function PdfReader({
     const total = el.scrollHeight;
     const pct = total > 0 ? Math.min(100, Math.round((scrolled / total) * 100)) : 0;
     setProgress((p) => (pct > p ? pct : p));
-    if (scrolled >= total - 12) {
+    if (scrolled >= total - 16) {
       markComplete();
     }
   }, [markComplete]);
 
+  // Si el documento cabe entero sin scroll, se da por leído.
   useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const pdfjs: any = await import("pdfjs-dist");
-        pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
-
-        const loadingTask = pdfjs.getDocument(url);
-        const pdf = await loadingTask.promise;
-        if (cancelled) return;
-
-        const container = pagesRef.current;
-        if (!container) return;
-        container.innerHTML = "";
-
-        const containerWidth = container.clientWidth || 600;
-
-        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-          const page = await pdf.getPage(pageNum);
-          if (cancelled) return;
-
-          const baseViewport = page.getViewport({ scale: 1 });
-          const scale = (containerWidth - 4) / baseViewport.width;
-          const viewport = page.getViewport({ scale });
-
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
-          const ratio = window.devicePixelRatio || 1;
-          canvas.width = Math.floor(viewport.width * ratio);
-          canvas.height = Math.floor(viewport.height * ratio);
-          canvas.style.width = "100%";
-          canvas.style.height = "auto";
-          canvas.className = "mb-3 rounded shadow-sm bg-white";
-
-          container.appendChild(canvas);
-
-          await page.render({
-            canvasContext: ctx,
-            viewport,
-            transform: ratio !== 1 ? [ratio, 0, 0, ratio, 0, 0] : undefined,
-          }).promise;
-        }
-
-        if (cancelled) return;
-        setLoading(false);
-
-        // Si el documento cabe entero sin scroll, lo damos por leído.
-        requestAnimationFrame(() => {
-          const el = scrollRef.current;
-          if (el && el.scrollHeight <= el.clientHeight + 12) {
-            markComplete();
-          }
-        });
-      } catch (e) {
-        console.error("[PdfReader] error:", e);
-        if (!cancelled) {
-          setError("No se ha podido cargar el documento. Recarga la página.");
-          setLoading(false);
-        }
+    requestAnimationFrame(() => {
+      const el = scrollRef.current;
+      if (el && el.scrollHeight <= el.clientHeight + 16) {
+        markComplete();
       }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [url, markComplete]);
+    });
+  }, [markComplete]);
 
   return (
     <div>
       <div
         ref={scrollRef}
         onScroll={handleScroll}
-        className="relative w-full h-[480px] overflow-y-auto rounded-lg border border-gray-200 bg-gray-100 p-2"
+        className="w-full h-[460px] overflow-y-auto rounded-lg border border-gray-200 bg-white p-5 text-gray-700 leading-relaxed"
       >
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-            <Loader2 className="h-6 w-6 animate-spin mr-2" />
-            Cargando documento...
+        {content ? (
+          <div className="space-y-3 text-[13px]">
+            <p className="text-xs text-gray-500 bg-amber-50 border border-amber-200 rounded p-2">
+              Los <span className="text-red-700 font-semibold">puntos resaltados en rojo</span> son
+              cláusulas importantes que deberás confirmar antes de firmar.
+            </p>
+            {content.blocks.map((b, i) => {
+              if (b.type === "h") {
+                return (
+                  <h4
+                    key={i}
+                    className="text-furgocasa-blue font-bold text-[15px] pt-3"
+                  >
+                    {b.text}
+                  </h4>
+                );
+              }
+              const hl = "highlight" in b && b.highlight;
+              if (b.type === "li") {
+                return (
+                  <p
+                    key={i}
+                    className={`pl-4 relative ${
+                      hl
+                        ? "text-red-700 font-medium bg-red-50 border-l-2 border-red-400 py-1 pr-2 rounded-r"
+                        : ""
+                    }`}
+                  >
+                    <span
+                      className={`absolute left-1 ${
+                        hl ? "text-red-500" : "text-furgocasa-orange"
+                      }`}
+                    >
+                      •
+                    </span>
+                    {b.text}
+                  </p>
+                );
+              }
+              return (
+                <p
+                  key={i}
+                  className={
+                    hl
+                      ? "text-red-700 font-medium bg-red-50 border-l-2 border-red-400 py-2 px-3 rounded-r"
+                      : ""
+                  }
+                >
+                  {b.text}
+                </p>
+              );
+            })}
+            <p className="pt-4 text-center text-xs text-gray-400 border-t border-gray-100 mt-4">
+              — Fin del documento —
+            </p>
           </div>
+        ) : (
+          <p className="text-gray-400">Documento no disponible.</p>
         )}
-        {error && (
-          <div className="absolute inset-0 flex items-center justify-center text-red-500 text-sm px-4 text-center">
-            {error}
-          </div>
-        )}
-        <div ref={pagesRef} />
       </div>
 
       {/* Barra de progreso de lectura */}
@@ -598,9 +571,9 @@ export default function ContractSigning() {
                   </div>
 
                   <div className="p-5">
-                    {/* Visor con bloqueo por lectura */}
-                    <PdfReader
-                      url={doc.url}
+                    {/* Lector de texto con bloqueo por lectura */}
+                    <ContractTextReader
+                      docId={doc.id}
                       onReadComplete={() =>
                         setReadDocs((prev) => ({ ...prev, [doc.id]: true }))
                       }
