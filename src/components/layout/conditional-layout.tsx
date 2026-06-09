@@ -14,7 +14,9 @@ export function ConditionalLayout({ children }: { children: React.ReactNode }) {
     pathname?.startsWith("/administrator") || 
     pathname?.includes("/administrator");
 
-  if (isAdministratorRoute) {
+  const isImmersiveRoute = pathname?.includes("/guia-camper-3d");
+
+  if (isAdministratorRoute || isImmersiveRoute) {
     return <>{children}</>;
   }
 

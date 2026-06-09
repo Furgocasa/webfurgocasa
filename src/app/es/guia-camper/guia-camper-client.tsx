@@ -1,9 +1,10 @@
 "use client";
 
 import { LocalizedLink } from "@/components/localized-link";
-import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight, MapPin } from "lucide-react";
+import { BookOpen, Gauge, Zap, Flame, Thermometer, Droplets, AlertTriangle, Info, ArrowRight, MapPin, Box } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import Image from "next/image";
+import Link from "next/link";
 
 export function GuiaCamperClient() {
   const { t } = useLanguage();
@@ -50,6 +51,30 @@ export function GuiaCamperClient() {
                 <p className="mt-2 text-gray-600">
                   {t("Para ayudarte hemos creado esta sección donde te explicamos al detalle como funcionan cada uno de los equipamientos que lleva instalada tu camper.")}
                 </p>
+              </div>
+
+              <div className="mt-8 rounded-2xl overflow-hidden border border-gray-200 shadow-md bg-gradient-to-br from-[#0B1024] via-[#1a2744] to-[#0B1024] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6">
+                <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-furgocasa-orange/20 flex items-center justify-center">
+                  <Box className="h-8 w-8 text-furgocasa-orange" />
+                </div>
+                <div className="flex-1 text-center md:text-left">
+                  <p className="text-xs uppercase tracking-[0.25em] text-furgocasa-orange font-semibold mb-2">
+                    {t("¿Primera vez con una camper?")}
+                  </p>
+                  <h4 className="text-xl md:text-2xl font-heading font-bold text-white mb-2">
+                    {t("Explora la Guía Camper en 3D")}
+                  </h4>
+                  <p className="text-blue-100/90 text-sm md:text-base leading-relaxed">
+                    {t("Recorre la furgo por dentro con modo rayos X: batería, gas, aguas, WC y calefacción explicados mientras la cámara vuela a cada sistema.")}
+                  </p>
+                </div>
+                <Link
+                  href="/es/guia-camper/guia-camper-3d"
+                  className="flex-shrink-0 inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold py-3 px-6 rounded-full hover:bg-furgocasa-orange-dark transition-all shadow-lg hover:-translate-y-0.5"
+                >
+                  {t("Abrir guía 3D")}
+                  <ArrowRight className="h-5 w-5" />
+                </Link>
               </div>
             </div>
           </div>
