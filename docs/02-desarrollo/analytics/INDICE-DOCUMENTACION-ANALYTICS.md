@@ -2,7 +2,7 @@
 
 **Proyecto**: Sistema de Analytics + GTM con @next/third-parties  
 **Estado**: ✅ Ecommerce GTM solo en éxito de pasarela: `purchase` + `additional_payment_received`; anti-doble-conteo 50 %+50 %  
-**Última actualización**: 18 de mayo de 2026 (eliminados eventos intermedios del código)  
+**Última actualización**: 3 de junio de 2026 (Fix de conversiones infladas en Google Ads)  
 **Versión**: v4.5.0+
 
 ---
@@ -52,6 +52,11 @@ Ya **no** se envían desde la web `generate_lead`, `begin_checkout` ni `add_paym
 - **Documentación**: `FIX-ANALYTICS-VISITAS-DUPLICADAS.md`
 - **Estado**: ✅ Resuelto con configuración GA4
 - **Solución**: Desactivar "Page changes based on browser history events" en Enhanced Measurement
+
+### Problema #5: Conversiones Infladas en Google Ads (03/06/2026)
+- **Documentación**: `FIX-CONVERSIONES-INFLADAS-ADS.md`
+- **Estado**: ✅ Resuelto configurando la acción de conversión en Google Ads.
+- **Solución**: La conversión principal en Ads estaba midiendo visitas a páginas web en lugar de estar conectada a GTM. Se creó una nueva conversión manual conectada a GTM y se pasó la antigua a "Secundaria".
 
 ---
 

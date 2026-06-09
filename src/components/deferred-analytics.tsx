@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import Script from "next/script";
 
@@ -34,6 +35,9 @@ export function DeferredAnalytics({
   metaPixelId,
 }: DeferredAnalyticsProps) {
   const [shouldLoad, setShouldLoad] = useState(false);
+  const pathname = usePathname();
+  // ⛔ Nunca cargar analytics en el panel de administración
+  const isAdmin = pathname?.startsWith("/administrator");
 
   useEffect(() => {
     if (shouldLoad) return;
@@ -77,7 +81,7 @@ export function DeferredAnalytics({
     };
   }, [shouldLoad]);
 
-  if (!shouldLoad) return null;
+  if (isAdmin || !shouldLoad) return null;
 
   return (
     <>

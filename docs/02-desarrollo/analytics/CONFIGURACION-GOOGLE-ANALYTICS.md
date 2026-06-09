@@ -184,7 +184,7 @@ if (isFirstPayment) {
 |---|---|---|
 | GA4 — `purchase` event | Custom event `purchase` | Mapear `transaction_id`, `value`, `currency`, `items`, `payment_type` |
 | GA4 — `additional_payment_received` | Custom event `additional_payment_received` | Para reportes internos. **NO** marcarlo como conversión |
-| **Google Ads — Conversión "Reserva"** | Custom event `purchase` | **SOLO `purchase`**, nunca `additional_payment_received`. De lo contrario se duplica conversión cuando llega el segundo 50 % |
+| **Google Ads — Conversión "Reserva"** | Custom event `purchase` | **SOLO `purchase`**, nunca `additional_payment_received`. De lo contrario se duplica conversión cuando llega el segundo 50 %. **IMPORTANTE (Junio 2026):** Asegurarse en Google Ads de que la conversión principal está enlazada a GTM (Etiqueta de conversión) y no a un evento automático de "Página vista" que inflaba las conversiones a >30 diarias. |
 | Google Ads — Remarketing | Pageviews o eventos propios en GTM | Ya no hay `begin_checkout` / `add_payment_info` desde la web; usar audiencias por URL o etiquetas custom si hace falta |
 
 ### Payload `ecommerce` enviado
@@ -336,7 +336,7 @@ Edita `src/app/layout.tsx`:
 
 ---
 
-**Última actualización**: 18 de mayo de 2026 (solo `purchase` / `additional_payment_received` desde página éxito)  
+**Última actualización**: 3 de junio de 2026 (Fix de conversiones infladas en Google Ads)  
 **ID de Medición GA4**: G-G5YLBN5XXZ  
 **Contenedor GTM**: GTM-5QLGH57  
 **Estado**: ✅ Conversión ecommerce alineada con cobro real en pasarela  
