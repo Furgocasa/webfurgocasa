@@ -90,6 +90,10 @@ commit-message.txt
 # Archivos de migración de datos antiguos (demasiado grandes)
 OLD_FURGOCASA_DATOS/*-mysql*
 OLD_FURGOCASA_DATOS/orders-raw*.txt
+# Exportaciones con datos personales de clientes (PII): nunca versionar
+OLD_FURGOCASA_DATOS/*.json
+OLD_FURGOCASA_DATOS/*.csv
+OLD_FURGOCASA_DATOS/*.txt
 
 # Mailing (HTML, imágenes de campañas): no versionar
 emails/mailing/
