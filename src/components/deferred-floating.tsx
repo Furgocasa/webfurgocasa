@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
 /**
@@ -48,6 +49,8 @@ const AnalyticsDebug = dynamic(
 
 export function DeferredFloating() {
   const [ready, setReady] = useState(false);
+  const pathname = usePathname();
+  const isImmersiveRoute = pathname?.includes("/guia-camper-3d");
 
   useEffect(() => {
     let cancelled = false;
@@ -85,8 +88,8 @@ export function DeferredFloating() {
     <>
       <CookieBanner />
       <CookieSettingsModal />
-      <BackToTop />
-      <WhatsAppChatbot />
+      {!isImmersiveRoute && <BackToTop />}
+      {!isImmersiveRoute && <WhatsAppChatbot />}
       <AdminFABButton />
       <Toaster position="top-right" richColors />
       <AnalyticsDebug />
