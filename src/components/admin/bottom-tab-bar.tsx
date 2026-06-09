@@ -24,6 +24,9 @@ import {
   Wrench,
   AlertTriangle,
   Image as ImageIcon,
+  Mail,
+  Sparkles,
+  FileSignature,
 } from "lucide-react";
 import { useState, useCallback, useEffect, memo } from "react";
 
@@ -41,23 +44,31 @@ const mainTabs: TabItem[] = [
   { name: "Más", href: "#more", icon: MoreHorizontal },
 ];
 
+// Todas las secciones del admin (mismo listado que el sidebar de escritorio)
 const moreTabs: TabItem[] = [
+  { name: "Dashboard", href: "/administrator", icon: LayoutDashboard },
   { name: "Bloqueos", href: "/administrator/bloqueos", icon: Ban },
   { name: "Blog", href: "/administrator/blog/articulos", icon: FileText },
   { name: "Búsquedas", href: "/administrator/busquedas", icon: Search },
+  { name: "Calendario", href: "/administrator/calendario", icon: Calendar },
   { name: "Clientes", href: "/administrator/clientes", icon: Users },
   { name: "Configuración", href: "/administrator/configuracion", icon: Settings },
+  { name: "Contratos", href: "/administrator/contratos-firmados", icon: FileSignature },
   { name: "Cupones", href: "/administrator/cupones", icon: Tag },
   { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
   { name: "Equipamiento", href: "/administrator/equipamiento", icon: Wrench },
   { name: "Extras", href: "/administrator/extras", icon: Package },
   { name: "Informes", href: "/administrator/informes", icon: BarChart3 },
+  { name: "Mailing", href: "/administrator/mails", icon: Mail },
   { name: "Media", href: "/administrator/media", icon: ImageIcon },
   { name: "Pagos", href: "/administrator/pagos", icon: CreditCard },
+  { name: "Reservas", href: "/administrator/reservas", icon: Calendar },
+  { name: "Storytellers", href: "/administrator/storyteller-uploads", icon: Sparkles },
   { name: "Temporadas", href: "/administrator/temporadas", icon: Sun },
   { name: "Ubicaciones", href: "/administrator/ubicaciones", icon: MapPin },
   { name: "Última Hora", href: "/administrator/ofertas-ultima-hora", icon: Clock },
   { name: "Vacaciones", href: "/administrator/vacaciones", icon: Palmtree },
+  { name: "Vehículos", href: "/administrator/vehiculos", icon: Car },
 ];
 
 function BottomTabBarComponent() {
@@ -73,11 +84,15 @@ function BottomTabBarComponent() {
     [pathname]
   );
 
-  const isInMoreSection = moreTabs.some((tab) =>
-    tab.href === "/administrator"
-      ? pathname === tab.href
-      : pathname.startsWith(tab.href)
-  );
+  // Solo secciones sin pestaña propia en la barra inferior activan el indicador de "Más"
+  const mainHrefs = mainTabs.map((tab) => tab.href);
+  const isInMoreSection = moreTabs
+    .filter((tab) => !mainHrefs.includes(tab.href))
+    .some((tab) =>
+      tab.href === "/administrator"
+        ? pathname === tab.href
+        : pathname.startsWith(tab.href)
+    );
 
   useEffect(() => {
     if (showMore) {

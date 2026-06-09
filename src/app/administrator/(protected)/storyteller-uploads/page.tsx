@@ -40,6 +40,22 @@ interface UploadItem {
 }
 
 /**
+ * Añade el parámetro `download` a la URL firmada de Supabase para que el servidor
+ * responda con Content-Disposition: attachment y el navegador descargue el archivo
+ * directamente a la carpeta de Descargas (el atributo `download` del <a> se ignora
+ * en URLs de otro origen).
+ */
+function buildDownloadUrl(url: string, filename: string): string {
+  try {
+    const u = new URL(url);
+    u.searchParams.set("download", filename);
+    return u.toString();
+  } catch {
+    return url;
+  }
+}
+
+/**
  * Vídeos .mov del iPhone suelen ir en HEVC/H.265. Chrome y Edge en Windows no los reproducen
  * en el elemento HTML video (pantalla negra, 0:00). Safari y VLC sí. Mostramos aviso + descarga firmada.
  */
@@ -106,10 +122,8 @@ function StorytellerAdminVideo({
             o descarga el archivo y ábrelo con <strong className="text-white">VLC</strong> o el visor del sistema.
           </p>
           <a
-            href={previewUrl}
+            href={buildDownloadUrl(previewUrl, originalFilename || "video.mov")}
             download={originalFilename || "video.mov"}
-            target="_blank"
-            rel="noopener noreferrer"
             className="mt-2 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-100"
           >
             <Download className="h-4 w-4 shrink-0" aria-hidden />
@@ -553,10 +567,11 @@ function UploadCard({
         </button>
         {item.previewUrl && (
           <a
-            href={item.previewUrl}
+            href={buildDownloadUrl(
+              item.previewUrl,
+              item.originalFilename || (item.fileType === "video" ? "video.mov" : "imagen.jpg")
+            )}
             download={item.originalFilename || (item.fileType === "video" ? "video.mov" : "imagen.jpg")}
-            target="_blank"
-            rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
             className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-full bg-black/70 px-2.5 py-1.5 text-xs font-semibold text-white opacity-90 backdrop-blur-sm hover:bg-black/90"
             title={`Descargar ${item.fileType === "video" ? "vídeo" : "imagen"} original`}
@@ -724,10 +739,11 @@ function PreviewModal({ item, onClose }: { item: UploadItem; onClose: () => void
           </div>
           {item.previewUrl && (
             <a
-              href={item.previewUrl}
+              href={buildDownloadUrl(
+                item.previewUrl,
+                item.originalFilename || (item.fileType === "video" ? "video.mov" : "imagen.jpg")
+              )}
               download={item.originalFilename || (item.fileType === "video" ? "video.mov" : "imagen.jpg")}
-              target="_blank"
-              rel="noopener noreferrer"
               className="inline-flex shrink-0 items-center gap-2 rounded-lg bg-furgocasa-orange px-3 py-2 text-xs font-bold text-white hover:bg-furgocasa-orange-dark md:text-sm"
               title={`Descargar ${item.fileType === "video" ? "vídeo" : "imagen"} original`}
             >
