@@ -17,10 +17,10 @@ const GUIA_CAMPER_3D_METADATA: Metadata = {
     locale: "es_ES",
     images: [
       {
-        url: "https://www.furgocasa.com/images/slides/hero-05.webp",
+        url: "https://www.furgocasa.com/images/guia-camper/guia-camper-3d-og.png",
         width: 1200,
         height: 630,
-        alt: "Guía Camper 3D - Furgocasa",
+        alt: "Guía Camper 3D interactiva - primera vista con camper en área de servicio",
       },
     ],
   },
@@ -28,6 +28,7 @@ const GUIA_CAMPER_3D_METADATA: Metadata = {
     card: "summary_large_image",
     title: "Guía Camper 3D Interactiva | Furgocasa",
     description: "Aprende a usar tu camper con una experiencia 3D interactiva.",
+    images: ["https://www.furgocasa.com/images/guia-camper/guia-camper-3d-og.png"],
   },
   robots: {
     index: true,
