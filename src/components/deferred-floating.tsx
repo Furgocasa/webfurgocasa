@@ -92,7 +92,7 @@ export function DeferredFloating() {
       {!isImmersiveRoute && <WhatsAppChatbot />}
       <AdminFABButton />
       <Toaster position="top-right" richColors />
-      <AnalyticsDebug />
+      {!isImmersiveRoute && <AnalyticsDebug />}
     </>
   );
 }
