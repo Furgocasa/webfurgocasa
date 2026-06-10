@@ -9,6 +9,17 @@ export function GuiaCamper3dClient() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [lessonName, setLessonName] = useState("Inicio");
   const [xrayOn, setXrayOn] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(max > 0 ? window.scrollY / max : 0);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -31,9 +42,23 @@ export function GuiaCamper3dClient() {
     };
   }, []);
 
+  const progressPct = Math.round(scrollProgress * 100);
+  const showScrollNudge = scrollProgress < 0.12;
+
   return (
     <div className="guia3d-root">
       <canvas ref={canvasRef} id="bg" aria-hidden="true" />
+
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-valuenow={progressPct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label="Progreso de la lección"
+      >
+        <div className="progress-fill" style={{ width: `${progressPct}%` }} />
+      </div>
 
       <div className="top">
         <LocalizedLink href="/es/guia-camper" className="logo-link" aria-label="Volver a la Guía Camper">
@@ -47,9 +72,20 @@ export function GuiaCamper3dClient() {
           />
         </LocalizedLink>
         <div className="leccion">
-          <b>{lessonName}</b> · Guía 3D
+          <b>{lessonName}</b> · Guía 3D · {progressPct}%
         </div>
+        <div className="leccion-mobile">{progressPct}%</div>
       </div>
+
+      {showScrollNudge && (
+        <div className="scroll-nudge" aria-hidden="true">
+          <span className="scroll-nudge-label">Desliza hacia abajo</span>
+          <span className="scroll-nudge-chevrons">
+            <span>▼</span>
+            <span>▼</span>
+          </span>
+        </div>
+      )}
 
       <div className={`xray${xrayOn ? " on" : ""}`}>
         <span className="dot" />
@@ -72,7 +108,10 @@ export function GuiaCamper3dClient() {
               al final, recoges las llaves sabiendo más que muchos veteranos.
             </p>
           </div>
-          <span className="scroll">▼ Scroll para empezar la lección</span>
+          <span className="scroll">
+            <span className="scroll-label">Scroll para empezar la lección</span>
+            <span className="scroll-chevrons">▼ ▼</span>
+          </span>
         </section>
 
         <section>
@@ -235,6 +274,22 @@ export function GuiaCamper3dClient() {
           inset: 0;
           z-index: 0;
         }
+        .guia3d-root .progress-track {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          z-index: 40;
+          background: rgba(11, 16, 36, 0.35);
+          pointer-events: none;
+        }
+        .guia3d-root .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, var(--naranja), #ffb35c);
+          box-shadow: 0 0 12px rgba(255, 107, 44, 0.65);
+          transition: width 0.12s ease-out;
+        }
         .guia3d-root .top {
           position: fixed;
           top: 0;
@@ -272,6 +327,77 @@ export function GuiaCamper3dClient() {
         .guia3d-root .leccion b {
           color: var(--naranja);
           font-weight: 500;
+        }
+        .guia3d-root .leccion-mobile {
+          display: none;
+          pointer-events: none;
+          font-size: 0.68rem;
+          letter-spacing: 0.22em;
+          text-transform: uppercase;
+          background: rgba(11, 16, 36, 0.45);
+          backdrop-filter: blur(8px);
+          border: 1px solid rgba(255, 255, 255, 0.22);
+          border-radius: 99px;
+          padding: 0.6rem 1rem;
+          font-variant-numeric: tabular-nums;
+          color: var(--naranja);
+          font-weight: 600;
+        }
+        .guia3d-root .scroll-nudge {
+          position: fixed;
+          left: 50%;
+          bottom: 1.6rem;
+          transform: translateX(-50%);
+          z-index: 28;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.35rem;
+          pointer-events: none;
+          background: rgba(11, 16, 36, 0.5);
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          border-radius: 99px;
+          padding: 0.65rem 1.2rem 0.5rem;
+          animation: guia3d-nudge-in 0.5s ease-out;
+        }
+        .guia3d-root .scroll-nudge-label {
+          font-size: 0.58rem;
+          letter-spacing: 0.32em;
+          text-transform: uppercase;
+          color: #fff;
+          opacity: 0.9;
+        }
+        .guia3d-root .scroll-nudge-chevrons {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          line-height: 0.55;
+          color: var(--naranja);
+          font-size: 0.72rem;
+          animation: guia3d-bounce 1.8s ease-in-out infinite;
+        }
+        .guia3d-root .scroll-nudge-chevrons span:last-child {
+          opacity: 0.45;
+        }
+        @keyframes guia3d-nudge-in {
+          from {
+            opacity: 0;
+            transform: translateX(-50%) translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+          }
+        }
+        @keyframes guia3d-bounce {
+          0%,
+          100% {
+            transform: translateY(0);
+          }
+          50% {
+            transform: translateY(5px);
+          }
         }
         .guia3d-root .xray {
           position: fixed;
@@ -420,13 +546,25 @@ export function GuiaCamper3dClient() {
           bottom: 5vh;
           left: 50%;
           transform: translateX(-50%);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.45rem;
+          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        }
+        .guia3d-root .scroll-label {
           font-size: 0.62rem;
           letter-spacing: 0.45em;
           text-transform: uppercase;
           color: #fff;
           opacity: 0.85;
           animation: guia3d-pulse 2.6s infinite;
-          text-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+        }
+        .guia3d-root .scroll-chevrons {
+          color: var(--naranja);
+          font-size: 0.75rem;
+          letter-spacing: 0.35em;
+          animation: guia3d-bounce 1.8s ease-in-out infinite;
         }
         @keyframes guia3d-pulse {
           50% {
@@ -481,6 +619,15 @@ export function GuiaCamper3dClient() {
           }
           .guia3d-root .leccion {
             display: none;
+          }
+          .guia3d-root .leccion-mobile {
+            display: block;
+          }
+          .guia3d-root .scroll-nudge {
+            bottom: 1.1rem;
+          }
+          .guia3d-root .xray {
+            bottom: 4.6rem;
           }
         }
         @media (prefers-reduced-motion: reduce) {
