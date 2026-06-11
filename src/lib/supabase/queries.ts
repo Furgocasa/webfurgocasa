@@ -11,6 +11,7 @@
 
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { createClient } from './server';
+import { advanceConfirmedToInProgress } from '@/lib/bookings/advance-rental-status';
 
 // Cliente público para queries de datos públicos (sin cookies)
 // Funciona tanto en servidor como en cliente
@@ -298,6 +299,8 @@ export async function createBooking(bookingData: any) {
  * Obtener todas las reservas (para administrador)
  */
 export async function getAllBookings() {
+  await advanceConfirmedToInProgress();
+
   const supabaseServer = await createClient();
   const { data, error } = await supabaseServer
     .from('bookings')
@@ -320,6 +323,8 @@ export async function getAllBookings() {
  * Obtener estadísticas avanzadas del dashboard
  */
 export async function getDashboardStats() {
+  await advanceConfirmedToInProgress();
+
   const supabaseServer = await createClient();
   
   const today = new Date();
@@ -595,14 +600,23 @@ export async function getDashboardStats() {
       return { ...mapped, currentDay, totalDays, daysRemaining };
     });
 
+  // Pendientes de revisión: recogida ya realizada y devolución hoy o en el pasado,
+  // sin marcar como completada (incluye confirmadas que no pasaron a in_progress).
   const pendingReview = nonCancelledBookings
-    .filter(b => b.status === 'in_progress' && b.dropoff_date < todayStr)
+    .filter(b =>
+      (b.status === 'in_progress' || b.status === 'confirmed') &&
+      b.pickup_date <= todayStr &&
+      b.dropoff_date <= todayStr
+    )
     .sort((a, b) => a.dropoff_date.localeCompare(b.dropoff_date))
     .map(b => {
       const mapped = mapBookingOps(b);
-      const daysSinceReturn = Math.ceil((today.getTime() - new Date(b.dropoff_date).getTime()) / (1000 * 60 * 60 * 24));
+      const isReturned = b.dropoff_date < todayStr;
+      const daysSinceReturn = isReturned
+        ? Math.ceil((today.getTime() - new Date(b.dropoff_date + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24))
+        : 0;
       const vehicleDamages = damagesData?.filter(d => d.vehicle_id === b.vehicle_id).length || 0;
-      return { ...mapped, daysSinceReturn, vehicleDamages };
+      return { ...mapped, daysSinceReturn, isReturned, vehicleDamages };
     });
 
   // Estado de flota

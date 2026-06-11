@@ -549,7 +549,7 @@ export default async function AdminDashboard() {
                 Reservas
               </Link>
             </div>
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-gray-100 max-h-[28rem] overflow-y-auto">
               {(stats.pendingReview || []).length > 0 ? (
                 stats.pendingReview.map((b) => (
                   <ReservationCardActions
@@ -570,12 +570,14 @@ export default async function AdminDashboard() {
                       </p>
                       <span
                         className={`text-xs font-bold whitespace-nowrap px-2 py-0.5 rounded ${
-                          b.daysSinceReturn > 2
-                            ? "bg-red-100 text-red-700"
-                            : "bg-amber-100 text-amber-700"
+                          b.isReturned
+                            ? b.daysSinceReturn > 2
+                              ? "bg-red-100 text-red-700"
+                              : "bg-amber-100 text-amber-700"
+                            : "bg-blue-100 text-blue-700"
                         }`}
                       >
-                        {b.daysSinceReturn}d
+                        {b.isReturned ? `${b.daysSinceReturn}d` : "Hoy"}
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-0.5">
@@ -583,7 +585,7 @@ export default async function AdminDashboard() {
                     </p>
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs mt-1">
                       <span className="text-gray-500">
-                        Devuelto{" "}
+                        {b.isReturned ? "Devuelto" : "Devolución"}{" "}
                         {new Date(
                           b.dropoffDate + "T12:00:00"
                         ).toLocaleDateString("es-ES", {
