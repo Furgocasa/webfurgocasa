@@ -549,7 +549,7 @@ export default async function AdminDashboard() {
                 Reservas
               </Link>
             </div>
-            <div className="divide-y divide-gray-100 max-h-[28rem] overflow-y-auto">
+            <div className="divide-y divide-gray-100">
               {(stats.pendingReview || []).length > 0 ? (
                 stats.pendingReview.map((b) => (
                   <ReservationCardActions
