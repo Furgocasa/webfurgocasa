@@ -56,6 +56,17 @@ La FK sigue existiendo: si hay valor, debe apuntar a un `vehicles.id` real. El `
 | `in_progress` | ❌ | Cliente ya tiene físicamente una camper |
 | `completed` | ❌ | Cliente ya devolvió una camper |
 
+### Transición automática `confirmed` → `in_progress` (junio 2026)
+
+Desde junio 2026 **no hace falta** cambiar manualmente a «En curso» el día de la entrega:
+
+- Cuando la **fecha y hora de pickup** (Europe/Madrid) ya pasaron, el sistema actualiza `status` de `confirmed` a `in_progress`.
+- Solo si **`vehicle_id` está asignado** (sin vehículo la reserva no avanza).
+- Se ejecuta al cargar el **dashboard** o el **listado de reservas**, y cada hora con el cron `/api/cron/advance-booking-status` (`vercel.json`: `5 * * * *`).
+- Implementación: `src/lib/bookings/advance-rental-status.ts`.
+
+**Sigue siendo manual:** `in_progress` → `completed` (revisión del vehículo + fianza). El admin lo marca desde el calendario, la ficha o el editor inline.
+
 **Safeguard implementado en dos lugares:**
 
 1. `src/app/administrator/(protected)/reservas/[id]/editar/page.tsx` — `handleSubmit` rechaza guardar con error amable.

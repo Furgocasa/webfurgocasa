@@ -65,11 +65,25 @@ SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key-aqui
 
 ### Dashboard
 
-Una vez autenticado, serás redirigido a `/administrator` donde verás:
-- Estadísticas del negocio
-- Acciones rápidas
-- Últimas reservas
-- Acciones de hoy
+Una vez autenticado, serás redirigido a `/administrator` donde verás el **dashboard de operaciones**:
+
+| Columna | Contenido |
+|---------|-----------|
+| **Entregas 7 días** | Recogidas confirmadas/en curso en los próximos 7 días |
+| **En curso** | Alquileres activos (pickup pasado, dropoff futuro o hoy) |
+| **Entregas / Recogidas** | Acciones de la semana (pickup y dropoff) |
+| **Pendientes revisión** | Recogida ya hecha y devolución hoy o pasada, sin marcar `completed` |
+
+**Estados de reserva — qué es automático y qué no:**
+
+| Transición | ¿Automática? | Cuándo |
+|------------|--------------|--------|
+| `confirmed` → `in_progress` | ✅ Sí | Al llegar fecha/hora de entrega (Europe/Madrid), si hay vehículo asignado |
+| `in_progress` → `completed` | ❌ No (manual) | Tras revisar el vehículo y gestionar la fianza |
+
+La transición a `in_progress` se dispara al abrir el dashboard o el listado de reservas, y además cada hora vía cron (`/api/cron/advance-booking-status`). Ver `src/lib/bookings/advance-rental-status.ts`.
+
+También incluye KPIs de flota (libres, alquilados, mantenimiento, bloqueos) y accesos rápidos.
 
 ## 🔒 Seguridad Implementada
 

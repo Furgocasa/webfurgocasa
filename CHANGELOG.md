@@ -4,6 +4,32 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🚐 Dashboard operaciones + auto `confirmed` → `in_progress` — 11 de junio de 2026
+
+**Objetivo:** reducir trabajo manual en el panel admin al entregar campers y mostrar todas las devoluciones pendientes de revisión.
+
+**Transición automática de estado (`confirmed` → `in_progress`):**
+- Lib `src/lib/bookings/advance-rental-status.ts`: cuando la fecha/hora de **pickup** (Europe/Madrid) ya pasó, la reserva pasa sola a `in_progress`.
+- Requiere **vehículo asignado** (`vehicle_id` no nulo) — misma regla que el calendario admin.
+- Se ejecuta al cargar **dashboard** (`getDashboardStats`) y **listado de reservas** (`getAllBookings`), y además vía cron horario.
+- **`in_progress` → `completed` sigue siendo manual** (revisión del vehículo + devolución de fianza).
+
+**Cron Vercel:**
+- Endpoint: `GET /api/cron/advance-booking-status`
+- Schedule: `5 * * * *` en `vercel.json` (cada hora, minuto 5 UTC)
+- Protegido con `CRON_SECRET` en producción.
+
+**Dashboard — columna «Pendientes revisión»:**
+- Incluye reservas `confirmed` o `in_progress` con recogida ya realizada y devolución hoy o en el pasado, sin marcar `completed`.
+- Lista completa sin scroll interno (misma altura dinámica que el resto de columnas).
+- Badge «Hoy» para devoluciones del día; días transcurridos en ámbar/rojo para devoluciones anteriores.
+
+**Archivos clave:** `src/lib/bookings/advance-rental-status.ts`, `src/app/api/cron/advance-booking-status/route.ts`, `src/lib/supabase/queries.ts`, `src/app/administrator/(protected)/page.tsx`, `vercel.json`.
+
+**Commits:** `e0465402` (feat auto in_progress + pendientes revisión), `ca6f7d1d` (fix scroll columna).
+
+---
+
 ## 📊 Histórico Excel en informes + modos de ingresos — 2 de junio de 2026
 
 **Objetivo:** integrar el histórico de ocupación 2018–2026 del Excel `FURGOCASA - ANALISIS OCUPACION.xlsx` en `/administrator/informes`, combinado con las reservas reales de la web sin doble conteo, y que cuadre con el pivot del Excel.

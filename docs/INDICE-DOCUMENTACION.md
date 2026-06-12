@@ -1,10 +1,25 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.29 ✅ PRODUCCIÓN — Firma online contratos + PDF texto v2  
+**Versión**: 1.0.30 ✅ PRODUCCIÓN — Auto estados reserva + dashboard operaciones  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 4 de junio de 2026
+**Última actualización**: 11 de junio de 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 🚐 Junio 2026 — Auto `confirmed` → `in_progress` y dashboard operaciones
+
+| Tema | Dónde leer |
+|------|------------|
+| Transición automática al entregar, cron horario, sync al abrir admin | **[README raíz](../README.md)** — *Junio 2026 — Auto confirmed → in_progress* |
+| Reglas de estado en calendario (manual `completed`, vehículo obligatorio) | **[CALENDARIO-ADMIN-EDICION.md](./04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)** — sección *Transición automática confirmed → in_progress* |
+| Dashboard admin (columnas operativas) | **[ADMIN_SETUP.md](./01-guias-basicas/ADMIN_SETUP.md)** — sección *Dashboard de operaciones* |
+| Lib + cron | `src/lib/bookings/advance-rental-status.ts` · `src/app/api/cron/advance-booking-status/route.ts` · `vercel.json` (`5 * * * *`) |
+| Columna «Pendientes revisión» | `getDashboardStats()` en `src/lib/supabase/queries.ts` · `src/app/administrator/(protected)/page.tsx` |
+| Changelog | **[CHANGELOG.md](../CHANGELOG.md)** — 11 jun 2026 |
+
+**Commits:** `e0465402`, `ca6f7d1d`.
 
 ---
 

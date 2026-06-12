@@ -236,6 +236,30 @@ Cada día a las 20:00 h (Madrid) un cron de Vercel busca reservas `confirmed` / 
 
 ---
 
+## 🚐 Junio 2026 — Auto `confirmed` → `in_progress` + dashboard operaciones
+
+**Documentación:** [`docs/01-guias-basicas/ADMIN_SETUP.md`](./docs/01-guias-basicas/ADMIN_SETUP.md) · [`docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md`](./docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)
+
+Cuando llega la **fecha y hora de entrega** (Europe/Madrid), las reservas `confirmed` con vehículo asignado pasan automáticamente a `in_progress`. No hace falta marcarlo a mano en el calendario.
+
+| Pieza | Ubicación |
+|-------|-----------|
+| Lógica | `src/lib/bookings/advance-rental-status.ts` |
+| Cron horario | `src/app/api/cron/advance-booking-status/route.ts` |
+| Sync al abrir admin | `getDashboardStats()` y `getAllBookings()` en `src/lib/supabase/queries.ts` |
+| Schedule | `5 * * * *` en `vercel.json` |
+
+**Reglas:**
+- Solo si `vehicle_id` está asignado (sin furgo no avanza — igual que el calendario).
+- El día de entrega, espera a que pase `pickup_time` (default 09:00).
+- **`in_progress` → `completed` es manual** tras revisar el vehículo y gestionar la fianza.
+
+**Dashboard `/administrator` — columna «Pendientes revisión»:**
+- Lista todas las reservas con recogida hecha y devolución hoy o pasada, aún sin `completed`.
+- Misma altura dinámica que «Entregas / Recogidas» (sin scroll interno).
+
+---
+
 ## 🧾 Marzo 2026 — Comisión Stripe en el PVP y precio correcto de extras en el admin
 
 **Documentación detallada:** [`docs/02-desarrollo/pagos/SISTEMA-PAGOS.md`](./docs/02-desarrollo/pagos/SISTEMA-PAGOS.md) · [`docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md`](./docs/02-desarrollo/pagos/STRIPE-CONFIGURACION.md)
@@ -2510,7 +2534,7 @@ Desarrollado con ❤️ para Furgocasa
 **PageSpeed Desktop**: 99/100 (LCP: 0.9s)  
 **PageSpeed Mobile**: 92/100 (LCP: **0.83s**) 🏆  
 **SEO**: 100/100 ✅  
-**Última actualización**: 23 de marzo de 2026 (cron recordatorio devolución; i18n tarifas completa; cupones por fecha recogida)  
+**Última actualización**: 11 de junio de 2026 (auto confirmed→in_progress; dashboard pendientes revisión; cron horario)  
 
 ---
 
