@@ -6,7 +6,16 @@ import {
   User, Clock, RefreshCw, Lock, CreditCard, XCircle, Info, Download
 } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
+import { COMPANY } from "@/lib/company";
 import { SeasonsCalendar } from "@/components/seasons-calendar";
+import type { Locale } from "@/lib/i18n/config";
+
+const depositLocaleByLanguage: Record<Locale, string> = {
+  es: "es-ES",
+  en: "en-GB",
+  fr: "fr-FR",
+  de: "de-DE",
+};
 
 const pricingTable = [
   { season: "Baja", lessThanWeek: "95,00", oneWeek: "85,00", twoWeeks: "75,00", threeWeeks: "65,00" },
@@ -64,7 +73,7 @@ const vehicleReturnTableRows: { requirement: string; ifNot: string; charge: stri
 ];
 
 export function TarifasClient() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const currentYear = new Date().getFullYear();
   const nextYear = currentYear + 1;
   
@@ -80,6 +89,17 @@ export function TarifasClient() {
           <p className="text-xl text-blue-100 max-w-3xl mx-auto font-light leading-relaxed">
             {t("Información clara y transparente sobre precios, requisitos y condiciones de alquiler de nuestras autocaravanas")}
           </p>
+        </div>
+      </section>
+
+      {/* Bloque respuesta breve - precios y condiciones */}
+      <section className="py-8 bg-white border-b border-gray-100">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+              <strong>{t("Tarifas Furgocasa:")}</strong> {t("Precios desde")} {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}{t("€/día")} {t("(temporada baja),")} {COMPANY.rentalPolicy.dailyRateFrom.midSeason}{t("€/día")} {t("(media),")} {COMPANY.rentalPolicy.dailyRateFrom.highSeason}{t("€/día")} {t("(alta).")} {t("Descuentos de hasta")} {COMPANY.rentalPolicy.durationDiscounts.oneWeek}, {COMPANY.rentalPolicy.durationDiscounts.twoWeeks} {t("y")} {COMPANY.rentalPolicy.durationDiscounts.threeWeeks} {t("en alquileres de 1, 2 o 3 semanas.")} {t("Incluido:")} {t("Kilómetros ilimitados")}, {t("seguro,")} {t("segundo conductor, kit cocina y camping.")} {t("Fianza:")} {COMPANY.depositAmount.toLocaleString(depositLocaleByLanguage[language])}€. {t("Pago:")} {COMPANY.rentalPolicy.bookingPayment.reservationPercent}% {t("al reservar,")} {COMPANY.rentalPolicy.bookingPayment.reservationPercent}% {t("15 días antes.")} {t("Cancelación gratuita hasta")} {COMPANY.rentalPolicy.cancellation.freeUntilDaysBeforePickup} {t("días antes.")}
+            </p>
+          </div>
         </div>
       </section>
 
