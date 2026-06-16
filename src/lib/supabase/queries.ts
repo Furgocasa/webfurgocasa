@@ -534,7 +534,8 @@ export async function getDashboardStats() {
   })) || [];
 
   // ===== DATOS PARA DASHBOARD DE OPERACIONES =====
-  const weekEnd = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+  // Ventana de próximos 14 días para entregas y recogidas del dashboard
+  const weekEnd = new Date(today.getTime() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
   type BookingVeh = { name?: string; internal_code?: string } | null;
   type BookingExtra = { quantity: number; extra: { name: string } | null } | null;

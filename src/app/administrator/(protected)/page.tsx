@@ -167,11 +167,11 @@ export default async function AdminDashboard() {
 
       {/* ── Columnas principales ── */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        {/* 1. Entregas próximos 7 días */}
+        {/* 1. Entregas próximos 14 días */}
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              Entregas 7 días
+              Entregas 14 días
               <span className="ml-1.5 text-xs font-normal text-gray-400">
                 ({stats.upcomingRentals?.length || 0})
               </span>

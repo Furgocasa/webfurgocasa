@@ -124,6 +124,12 @@ export default function CalendarioPage() {
   const [monthsToShow, setMonthsToShow] = useState(3); // Por defecto 3 meses
   const [isMobile, setIsMobile] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState<(Booking & { vehicle?: Vehicle }) | null>(null);
+  // Estado para el resumen de eventos de un día (móvil): al pulsar un día con
+  // varios eventos se abre una emergente con todos ordenados por hora.
+  const [selectedDay, setSelectedDay] = useState<{
+    date: string;
+    events: Array<{ type: 'pickup' | 'dropoff'; booking: Booking & { vehicle?: Vehicle } }>;
+  } | null>(null);
   // Estado para reasignación rápida de vehículo desde el modal emergente
   const [assignSaving, setAssignSaving] = useState(false);
   const [assignMessage, setAssignMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -1432,9 +1438,8 @@ export default function CalendarioPage() {
                           <div 
                             key={day}
                             onClick={() => {
-                              if (dayEvents.length === 1) {
-                                const ev = dayEvents[0];
-                                setSelectedBooking({ ...ev.booking, vehicle: ev.booking.vehicle });
+                              if (dayEvents.length > 0) {
+                                setSelectedDay({ date: dateKey, events: dayEvents });
                               }
                             }}
                             className={`aspect-square border rounded-lg p-0.5 sm:p-1 flex flex-col transition-colors ${
@@ -1443,7 +1448,7 @@ export default function CalendarioPage() {
                                 : hasEvents
                                   ? 'border-gray-200 dark:border-gray-600 bg-gray-50/50 dark:bg-gray-700/30'
                                   : 'border-gray-100 dark:border-gray-700'
-                            } ${dayEvents.length === 1 ? 'cursor-pointer active:scale-95' : ''}`}
+                            } ${hasEvents ? 'cursor-pointer active:scale-95' : ''}`}
                           >
                             {/* Número del día */}
                             <div className={`text-[10px] sm:text-xs font-semibold text-center leading-none ${
@@ -1478,11 +1483,7 @@ export default function CalendarioPage() {
                                   return (
                                     <div
                                       key={idx}
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        setSelectedBooking({ ...event.booking, vehicle });
-                                      }}
-                                      className="cursor-pointer hover:opacity-75 active:scale-95 transition-all"
+                                      className="hover:opacity-75 transition-opacity"
                                     >
                                       <div className={`flex items-center gap-0.5 text-[8px] sm:text-[9px] leading-tight px-0.5 py-[1px] rounded ${
                                         !event.booking.vehicle_id
@@ -1580,6 +1581,113 @@ export default function CalendarioPage() {
           </p>
         </div>
       </div>
+
+      {/* Modal resumen de eventos del día (móvil) */}
+      {selectedDay && (
+        <div
+          className="fixed inset-0 bg-black/50 backdrop-blur-[2px] z-[100] flex items-end sm:items-center justify-center sm:p-4"
+          onClick={() => setSelectedDay(null)}
+        >
+          <div
+            className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl max-w-lg w-full max-h-[85vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Handle para drag en móvil */}
+            <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mt-2 mb-1 sm:hidden" />
+            {/* Header */}
+            <div className="bg-furgocasa-blue text-white px-4 sm:px-6 py-3 sm:py-4 sm:rounded-t-2xl flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-base sm:text-lg font-bold capitalize">
+                  {new Date(selectedDay.date + 'T12:00:00').toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    timeZone: 'Europe/Madrid',
+                  })}
+                </h3>
+                <p className="text-xs sm:text-sm text-white/80 mt-0.5">
+                  {selectedDay.events.length} evento{selectedDay.events.length !== 1 ? 's' : ''}
+                </p>
+              </div>
+              <button
+                onClick={() => setSelectedDay(null)}
+                className="text-white/80 hover:text-white transition-colors flex-shrink-0"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Lista de eventos ordenados por hora */}
+            <div className="p-3 sm:p-4 space-y-2">
+              {selectedDay.events.map((event, idx) => {
+                const isPickup = event.type === 'pickup';
+                const vehicle = event.booking.vehicle;
+                const time = isPickup
+                  ? formatBookingClockTime(event.booking.pickup_time)
+                  : formatBookingClockTime(event.booking.dropoff_time);
+                const location = isPickup
+                  ? event.booking.pickup_location?.name || event.booking.pickup_location_name || ''
+                  : event.booking.dropoff_location?.name || event.booking.dropoff_location_name || '';
+                const noVehicle = !event.booking.vehicle_id;
+                return (
+                  <button
+                    key={`${event.booking.id}-${event.type}-${idx}`}
+                    onClick={() => {
+                      setSelectedBooking({ ...event.booking, vehicle });
+                      setSelectedDay(null);
+                    }}
+                    className={`w-full text-left flex items-center gap-3 rounded-xl border p-3 transition-colors active:scale-[0.98] ${
+                      noVehicle
+                        ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-300 dark:border-amber-700'
+                        : isPickup
+                          ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800 hover:bg-green-100'
+                          : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800 hover:bg-red-100'
+                    }`}
+                  >
+                    {/* Hora */}
+                    <div className="flex flex-col items-center justify-center w-14 flex-shrink-0">
+                      <span className="text-base font-bold tabular-nums text-gray-800 dark:text-gray-100 leading-none">
+                        {time}
+                      </span>
+                      <span
+                        className={`mt-1 text-[10px] font-bold uppercase ${
+                          isPickup ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'
+                        }`}
+                      >
+                        {isPickup ? '▲ Entrega' : '▼ Recogida'}
+                      </span>
+                    </div>
+                    {/* Datos */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm leading-tight truncate">
+                        <span className="font-bold text-furgocasa-orange">
+                          {noVehicle ? '⚠️ Sin asignar' : (vehicle?.internal_code || '?')}
+                        </span>{' '}
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {vehicle?.name || ''}
+                        </span>
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                        {event.booking.customer?.name || 'Sin cliente'} · {event.booking.booking_number}
+                      </p>
+                      {location && (
+                        <p className="text-[11px] text-gray-500 dark:text-gray-500 truncate mt-0.5">
+                          📍 {location}
+                        </p>
+                      )}
+                    </div>
+                    <svg className="w-4 h-4 text-gray-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de información de reserva (todas las resoluciones) */}
       {selectedBooking && (
