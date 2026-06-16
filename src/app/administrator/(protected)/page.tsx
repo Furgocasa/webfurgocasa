@@ -44,12 +44,6 @@ const paymentBadge: Record<string, { cls: string; label: string }> = {
   refunded: { cls: "bg-gray-100 text-gray-600", label: "Reembolsado" },
 };
 
-const severityColor: Record<string, string> = {
-  minor: "text-yellow-600",
-  moderate: "text-orange-600",
-  severe: "text-red-600",
-};
-
 // Mapa de carnets caducados por booking ID (para mostrar aviso dentro de cada tarjeta)
 function buildExpiringLicenseMap(
   expiringLicenses: Array<{ id: string; licenseExpiry: string; pickupDate: string }> | undefined
@@ -621,97 +615,6 @@ export default async function AdminDashboard() {
 
         </div>
       </div>
-
-      {/* ── Daños pendientes por vehículo ── */}
-      {(stats.damagesByVehicleList?.length || 0) > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
-            <h2 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-              Daños pendientes
-              <span className="ml-1.5 text-xs font-normal text-gray-400">
-                ({stats.damagesByVehicleList.reduce((acc, v) => acc + v.damages.length, 0)})
-              </span>
-            </h2>
-            <Link
-              href="/administrator/danos"
-              className="text-xs text-furgocasa-orange hover:underline font-medium"
-            >
-              Ver daños
-            </Link>
-          </div>
-          <div className="p-4">
-            <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4">
-              {stats.damagesByVehicleList.map((v: { vehicleId?: string; name: string; code: string; damages: { severity: string; status: string; description: string; damage_type?: string }[] }) => {
-                const extDamages = v.damages.filter((d) => d.damage_type !== 'interior');
-                const intDamages = v.damages.filter((d) => d.damage_type === 'interior');
-                return (
-                  <Link
-                    key={v.name}
-                    href={`/administrator/danos/${v.vehicleId || ''}`}
-                    className="block bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4 break-inside-avoid hover:bg-amber-100 hover:border-amber-300 transition-colors"
-                  >
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <p className="text-sm font-semibold leading-tight">
-                        {v.code && (
-                          <span className="font-bold text-furgocasa-orange">
-                            {v.code}
-                          </span>
-                        )}{" "}
-                        <span className="text-gray-700">{v.name}</span>
-                      </p>
-                      <span className="text-xs font-bold bg-amber-200 text-amber-800 px-2 py-0.5 rounded-full shrink-0">
-                        {v.damages.length}
-                      </span>
-                    </div>
-
-                    {extDamages.length > 0 && (
-                      <div className="mb-2">
-                        <p className="text-[10px] font-semibold text-orange-600 uppercase tracking-wide mb-0.5">
-                          Exteriores ({extDamages.length})
-                        </p>
-                        <div className="space-y-0">
-                          {extDamages.map((d: { severity: string; status: string; description: string }, i: number) => (
-                            <p
-                              key={`ext-${i}`}
-                              className={`text-xs leading-tight ${severityColor[d.severity] || "text-gray-600"}`}
-                            >
-                              • {d.description || d.severity}{" "}
-                              <span className="text-gray-400">
-                                ({d.status === "pending" ? "pte" : "rep."})
-                              </span>
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {intDamages.length > 0 && (
-                      <div>
-                        <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide mb-0.5">
-                          Interiores ({intDamages.length})
-                        </p>
-                        <div className="space-y-0">
-                          {intDamages.map((d: { severity: string; status: string; description: string }, i: number) => (
-                            <p
-                              key={`int-${i}`}
-                              className={`text-xs leading-tight ${severityColor[d.severity] || "text-gray-600"}`}
-                            >
-                              • {d.description || d.severity}{" "}
-                              <span className="text-gray-400">
-                                ({d.status === "pending" ? "pte" : "rep."})
-                              </span>
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Bloqueos activos ── */}
       {hasBlocks && (
