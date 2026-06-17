@@ -2,7 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { Phone, MessageCircle, FileText, ExternalLink, Copy, Check } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Phone, MessageCircle, FileText, ExternalLink, Copy, Check, Car, CheckCircle, Loader2 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import { BottomSheet } from "./bottom-sheet";
 
 function normalizePhone(phone: string): string {
@@ -18,6 +20,10 @@ interface ReservationCardActionsProps {
   children: React.ReactNode;
   className?: string;
   highlight?: boolean;
+  /** Muestra acciones para cambiar el estado de la reserva (en curso / completada) */
+  showStatusActions?: boolean;
+  /** Estado actual de la reserva, necesario para resaltar la opción activa */
+  currentStatus?: string;
 }
 
 export function ReservationCardActions({
@@ -26,10 +32,14 @@ export function ReservationCardActions({
   children,
   className = "",
   highlight = false,
+  showStatusActions = false,
+  currentStatus,
 }: ReservationCardActionsProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -62,6 +72,25 @@ export function ReservationCardActions({
       navigator.clipboard.writeText(phone);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleUpdateStatus = async (newStatus: string) => {
+    if (updatingStatus) return;
+    try {
+      setUpdatingStatus(newStatus);
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: newStatus })
+        .eq("id", reservationId);
+      if (error) throw error;
+      setOpen(false);
+      router.refresh();
+    } catch (err) {
+      console.error("Error actualizando el estado de la reserva:", err);
+    } finally {
+      setUpdatingStatus(null);
     }
   };
 
@@ -110,7 +139,52 @@ export function ReservationCardActions({
           </button>
         </div>
       )}
-      <div className={phone ? "border-t border-gray-100 dark:border-gray-700 pt-1 mt-1" : ""}>
+      {showStatusActions && (
+        <div className={phone ? "border-t border-gray-100 dark:border-gray-700 pt-1 mt-1" : ""}>
+          <div className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
+            Cambiar estado
+          </div>
+          <button
+            onClick={() => handleUpdateStatus("in_progress")}
+            disabled={!!updatingStatus || currentStatus === "in_progress"}
+            className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 transition-colors rounded-xl mx-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/40 rounded-lg">
+              {updatingStatus === "in_progress" ? (
+                <Loader2 className="h-4 w-4 text-blue-600 dark:text-blue-400 animate-spin" />
+              ) : (
+                <Car className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              )}
+            </div>
+            <span className="font-medium">
+              En curso
+              {currentStatus === "in_progress" && (
+                <span className="ml-1.5 text-xs text-gray-400">(actual)</span>
+              )}
+            </span>
+          </button>
+          <button
+            onClick={() => handleUpdateStatus("completed")}
+            disabled={!!updatingStatus || currentStatus === "completed"}
+            className="flex items-center gap-3 w-full px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 active:bg-gray-100 transition-colors rounded-xl mx-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <div className="p-2 bg-green-100 dark:bg-green-900/40 rounded-lg">
+              {updatingStatus === "completed" ? (
+                <Loader2 className="h-4 w-4 text-green-600 dark:text-green-400 animate-spin" />
+              ) : (
+                <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+              )}
+            </div>
+            <span className="font-medium">
+              Completado
+              {currentStatus === "completed" && (
+                <span className="ml-1.5 text-xs text-gray-400">(actual)</span>
+              )}
+            </span>
+          </button>
+        </div>
+      )}
+      <div className={(phone || showStatusActions) ? "border-t border-gray-100 dark:border-gray-700 pt-1 mt-1" : ""}>
         <div className="px-4 py-2 text-[10px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
           Reserva
         </div>

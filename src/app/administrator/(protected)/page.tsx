@@ -550,6 +550,8 @@ export default async function AdminDashboard() {
                     key={b.id}
                     reservationId={b.id}
                     phone={b.customerPhone}
+                    showStatusActions
+                    currentStatus={b.status}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <p className="text-sm leading-tight">

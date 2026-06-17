@@ -320,6 +320,24 @@ export async function getAllBookings() {
 }
 
 /**
+ * Cuenta los días hábiles (lunes a viernes, sin sábados ni domingos)
+ * transcurridos desde `fromDateStr` (exclusivo) hasta `toDateStr` (inclusivo).
+ * Formato de fecha esperado: 'YYYY-MM-DD'.
+ */
+function countBusinessDaysBetween(fromDateStr: string, toDateStr: string): number {
+  let count = 0;
+  const cursor = new Date(fromDateStr + 'T00:00:00');
+  const end = new Date(toDateStr + 'T00:00:00');
+  cursor.setDate(cursor.getDate() + 1);
+  while (cursor <= end) {
+    const day = cursor.getDay();
+    if (day !== 0 && day !== 6) count++;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return count;
+}
+
+/**
  * Obtener estadísticas avanzadas del dashboard
  */
 export async function getDashboardStats() {
@@ -613,8 +631,9 @@ export async function getDashboardStats() {
     .map(b => {
       const mapped = mapBookingOps(b);
       const isReturned = b.dropoff_date < todayStr;
+      // Días hábiles desde la devolución (sin contar sábados ni domingos)
       const daysSinceReturn = isReturned
-        ? Math.ceil((today.getTime() - new Date(b.dropoff_date + 'T00:00:00').getTime()) / (1000 * 60 * 60 * 24))
+        ? countBusinessDaysBetween(b.dropoff_date, todayStr)
         : 0;
       const vehicleDamages = damagesData?.filter(d => d.vehicle_id === b.vehicle_id).length || 0;
       return { ...mapped, daysSinceReturn, isReturned, vehicleDamages };
