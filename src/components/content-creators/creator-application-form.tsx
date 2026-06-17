@@ -1,12 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle2, Loader2, Send } from "lucide-react";
+import { format } from "date-fns";
+import { es as esLocale } from "date-fns/locale";
+import { DayPicker, type DateRange } from "react-day-picker";
+import { Calendar, CheckCircle2, Loader2, Lock, Send, X } from "lucide-react";
 import { LocalizedLink } from "@/components/localized-link";
 import { MAX_REQUESTED_DAYS, levelFromDays } from "@/lib/content-creators/levels";
+import { supabase } from "@/lib/supabase/client";
+import { getMadridToday, toDateString } from "@/lib/utils";
+
+/** Rango de temporada alta (fechas locales) en el que NO se permite colaborar. */
+interface HighSeasonRange {
+  from: Date;
+  to: Date;
+  name: string;
+}
+
+function parseYmd(value: string): Date {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, (m ?? 1) - 1, d ?? 1);
+}
+
+/**
+ * Meses bloqueados siempre para colaboradores (0-indexados):
+ * junio (5), julio (6), agosto (7) y septiembre (8).
+ */
+const BLOCKED_MONTHS = [5, 6, 7, 8];
+
+function isBlockedMonth(date: Date): boolean {
+  return BLOCKED_MONTHS.includes(date.getMonth());
+}
+
+function isDateBlocked(date: Date, highSeason: HighSeasonRange[]): boolean {
+  if (isBlockedMonth(date)) return true;
+  return highSeason.some((hs) => date >= hs.from && date <= hs.to);
+}
+
+/** ¿Algún día del rango [from, to] cae en una fecha bloqueada (alta o jun-sep)? */
+function rangeOverlapsBlocked(
+  from: Date,
+  to: Date,
+  highSeason: HighSeasonRange[]
+): boolean {
+  const cursor = new Date(from);
+  while (cursor <= to) {
+    if (isDateBlocked(cursor, highSeason)) return true;
+    cursor.setDate(cursor.getDate() + 1);
+  }
+  return false;
+}
 
 const formSchema = z.object({
   name: z.string().trim().min(2, "Indica tu nombre"),
@@ -35,6 +81,8 @@ const formSchema = z.object({
     .int("Indica un número entero")
     .min(1, "Mínimo 1 día")
     .max(MAX_REQUESTED_DAYS, `Máximo ${MAX_REQUESTED_DAYS} días`),
+  availableFrom: z.string().min(1, "Indica desde qué fecha podrías colaborar"),
+  availableTo: z.string().min(1, "Indica hasta qué fecha podrías colaborar"),
   proposal: z.string().trim().min(40, "Detalla tu propuesta (mín. 40 caracteres)"),
   contentToDeliver: z.string().trim().min(20, "Describe qué entregarías"),
   destinationsStyle: z.string().trim().optional(),
@@ -51,6 +99,14 @@ const formSchema = z.object({
     message: "Debes aceptar el modelo de cobro del alquiler y reembolso al entregar el material",
   }),
   companyWebsite: z.string().optional(),
+}).superRefine((data, ctx) => {
+  if (data.availableFrom && data.availableTo && data.availableTo < data.availableFrom) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["availableTo"],
+      message: "La fecha final no puede ser anterior a la inicial",
+    });
+  }
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -68,10 +124,24 @@ export function CreatorApplicationForm() {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [serverMessage, setServerMessage] = useState("");
 
+  // Temporada alta (no se puede colaborar): se carga de la BD y se bloquea en el calendario
+  const [highSeason, setHighSeason] = useState<HighSeasonRange[]>([]);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  const [blockedNotice, setBlockedNotice] = useState(false);
+
+  const today = getMadridToday();
+  const maxDate = useMemo(() => {
+    const d = new Date(today);
+    d.setMonth(d.getMonth() + 24);
+    return d;
+  }, [today]);
+
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
+    trigger,
     formState: { errors },
     reset,
   } = useForm<FormValues>({
@@ -81,8 +151,98 @@ export function CreatorApplicationForm() {
       rightsAccepted: false,
       deliveryRefundAccepted: false,
       companyWebsite: "",
+      availableFrom: "",
+      availableTo: "",
     },
   });
+
+  // Registramos los campos de fechas (se controlan vía setValue desde el calendario)
+  useEffect(() => {
+    register("availableFrom");
+    register("availableTo");
+  }, [register]);
+
+  // Cargar las temporadas altas activas (futuras) para bloquearlas en el calendario
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const todayStr = toDateString(getMadridToday());
+        const { data, error } = await supabase
+          .from("seasons")
+          .select("name,start_date,end_date,season_type,is_active")
+          .eq("is_active", true)
+          .eq("season_type", "alta")
+          .gte("end_date", todayStr);
+        if (error || cancelled || !data) return;
+        const ranges: HighSeasonRange[] = data.map((row) => ({
+          from: parseYmd(row.start_date),
+          to: parseYmd(row.end_date),
+          name: row.name ?? "Temporada alta",
+        }));
+        setHighSeason(ranges);
+      } catch {
+        /* Si falla la carga, el calendario sigue funcionando sin bloqueos de alta */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const availableFrom = watch("availableFrom");
+  const availableTo = watch("availableTo");
+
+  const selectedRange: DateRange | undefined = availableFrom
+    ? { from: parseYmd(availableFrom), to: availableTo ? parseYmd(availableTo) : undefined }
+    : undefined;
+
+  const handleRangeSelect = (range: DateRange | undefined) => {
+    setBlockedNotice(false);
+
+    // Sin selección o reinicio: empezar de nuevo con la fecha pulsada como inicio
+    if (!range?.from) {
+      setValue("availableFrom", "", { shouldValidate: false });
+      setValue("availableTo", "", { shouldValidate: false });
+      return;
+    }
+
+    // Si ya había un rango completo, el nuevo click reinicia el inicio
+    if (availableFrom && availableTo) {
+      setValue("availableFrom", toDateString(range.from), { shouldValidate: false });
+      setValue("availableTo", "", { shouldValidate: false });
+      return;
+    }
+
+    if (range.from && range.to) {
+      // No permitir que el rango incluya días bloqueados (temporada alta o jun-sep)
+      if (rangeOverlapsBlocked(range.from, range.to, highSeason)) {
+        setBlockedNotice(true);
+        return;
+      }
+      setValue("availableFrom", toDateString(range.from), { shouldValidate: true });
+      setValue("availableTo", toDateString(range.to), { shouldValidate: true });
+      trigger(["availableFrom", "availableTo"]);
+      setTimeout(() => setCalendarOpen(false), 250);
+      return;
+    }
+
+    setValue("availableFrom", toDateString(range.from), { shouldValidate: false });
+    setValue("availableTo", "", { shouldValidate: false });
+  };
+
+  const clearDates = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setBlockedNotice(false);
+    setValue("availableFrom", "", { shouldValidate: true });
+    setValue("availableTo", "", { shouldValidate: true });
+  };
+
+  const datesDisplay = availableFrom
+    ? availableTo
+      ? `${format(parseYmd(availableFrom), "dd MMM yyyy", { locale: esLocale })} — ${format(parseYmd(availableTo), "dd MMM yyyy", { locale: esLocale })}`
+      : `${format(parseYmd(availableFrom), "dd MMM yyyy", { locale: esLocale })} — selecciona fin`
+    : "Selecciona las fechas en las que podrías colaborar";
 
   const watchedDaysRaw = watch("requestedDays");
   const watchedDays =
@@ -109,6 +269,8 @@ export function CreatorApplicationForm() {
           portfolioUrl: data.portfolioUrl || "",
           destinationsStyle: data.destinationsStyle || "",
           shootsRawLog: data.shootsRawLog,
+          availableFrom: data.availableFrom,
+          availableTo: data.availableTo,
           rightsAccepted: data.rightsAccepted,
           deliveryRefundAccepted: data.deliveryRefundAccepted,
         }),
@@ -395,6 +557,124 @@ export function CreatorApplicationForm() {
                   pública de niveles). Cuéntanos el porqué de tantos días y qué entregables propones en la propuesta
                   de abajo.
                 </div>
+              )}
+            </div>
+
+            <div>
+              <span className={labelClass}>
+                ¿En qué fechas podrías hacerlo? <span className="text-furgocasa-orange">*</span>
+              </span>
+              <p className="mb-2 text-xs text-gray-500">
+                Solo colaboramos en <strong>temporada baja y media</strong>. <strong>Junio, julio, agosto y septiembre</strong>{" "}
+                no están disponibles, igual que la temporada alta (Semana Santa, puentes y picos navideños): aparecen
+                bloqueados y no se pueden seleccionar.
+              </p>
+
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setCalendarOpen((v) => !v)}
+                  aria-expanded={calendarOpen}
+                  className={`${inputClass} flex items-center justify-between gap-2 text-left`}
+                >
+                  <span className={availableFrom ? "text-gray-900" : "text-gray-400"}>{datesDisplay}</span>
+                  <span className="flex items-center gap-2">
+                    {availableFrom && (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={clearDates}
+                        onKeyDown={(e) => e.key === "Enter" && clearDates(e as unknown as React.MouseEvent)}
+                        className="p-1 text-gray-400 transition-colors hover:text-red-500"
+                        title="Borrar fechas"
+                      >
+                        <X className="h-4 w-4" />
+                      </span>
+                    )}
+                    <Calendar className="h-5 w-5 text-gray-600" aria-hidden />
+                  </span>
+                </button>
+
+                {calendarOpen && (
+                  <>
+                    <div className="fixed inset-0 z-[100]" onClick={() => setCalendarOpen(false)} aria-hidden="true" />
+                    <div className="absolute left-0 right-0 z-[200] mt-2 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white p-2 shadow-2xl md:right-auto md:w-auto md:p-4">
+                      {blockedNotice && (
+                        <div className="mb-3 flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-700">
+                          <Lock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden />
+                          <span>
+                            Ese periodo incluye fechas <strong>no disponibles</strong> (junio–septiembre o temporada
+                            alta), en las que no colaboramos. Elige fechas dentro de temporada baja o media.
+                          </span>
+                        </div>
+                      )}
+                      <DayPicker
+                        mode="range"
+                        selected={selectedRange}
+                        onSelect={handleRangeSelect}
+                        locale={esLocale}
+                        numberOfMonths={1}
+                        disabled={[
+                          { before: today },
+                          { after: maxDate },
+                          (d: Date) => isDateBlocked(d, highSeason),
+                        ]}
+                        modifiers={{ high_season: (d: Date) => isDateBlocked(d, highSeason) }}
+                        modifiersStyles={{
+                          high_season: {
+                            color: "#9ca3af",
+                            textDecoration: "line-through",
+                            cursor: "not-allowed",
+                          },
+                        }}
+                        classNames={{
+                          months: "flex gap-2 md:gap-4 flex-col md:flex-row w-full",
+                          month: "space-y-2 md:space-y-4 w-full",
+                          caption: "flex justify-center pt-1 relative items-center mb-2",
+                          caption_label: "text-sm md:text-base font-medium text-gray-900",
+                          nav: "space-x-1 flex items-center",
+                          nav_button:
+                            "h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100 flex items-center justify-center",
+                          nav_button_previous: "absolute left-0 md:left-1",
+                          nav_button_next: "absolute right-0 md:right-1",
+                          table: "w-full border-collapse",
+                          head_row: "flex w-full",
+                          head_cell: "text-gray-500 rounded-md flex-1 font-normal text-xs md:text-sm",
+                          row: "flex w-full mt-1 md:mt-2",
+                          cell: "text-center text-xs md:text-sm p-0 relative flex-1 [&:has([aria-selected])]:bg-furgocasa-blue/10 first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20",
+                          day: "h-8 w-8 md:h-9 md:w-9 mx-auto p-0 font-normal aria-selected:opacity-100 hover:bg-gray-100 rounded-md transition-colors text-xs md:text-sm",
+                          day_selected: "bg-furgocasa-blue text-white hover:bg-blue-700 focus:bg-furgocasa-blue",
+                          day_today: "bg-gray-100 text-gray-900 font-bold",
+                          day_outside: "text-gray-300 opacity-50",
+                          day_disabled: "text-gray-300 opacity-50 cursor-not-allowed",
+                          day_range_middle: "aria-selected:bg-furgocasa-blue/10 aria-selected:text-gray-900",
+                          day_hidden: "invisible",
+                        }}
+                      />
+                      <div className="mt-2 flex flex-col items-center gap-2 border-t pt-2 text-xs md:mt-4 md:pt-4 md:text-sm">
+                        <span className="flex items-center gap-1.5 text-gray-500">
+                          <span className="inline-block h-3 w-3 rounded-sm bg-gray-200 line-through" aria-hidden />
+                          Días tachados = no disponible (jun–sep o temporada alta)
+                        </span>
+                        {availableFrom && availableTo && (
+                          <button
+                            type="button"
+                            onClick={() => setCalendarOpen(false)}
+                            className="w-full rounded-lg bg-furgocasa-blue px-6 py-2 font-medium text-white transition-colors hover:bg-blue-700 md:w-auto"
+                          >
+                            Confirmar
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {(errors.availableFrom || errors.availableTo) && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.availableTo?.message || errors.availableFrom?.message}
+                </p>
               )}
             </div>
 

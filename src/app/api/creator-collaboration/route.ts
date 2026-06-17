@@ -16,6 +16,8 @@ const schema = z.object({
   shootsRawLog: z.enum(["si", "no", "no_se"]),
   workExamplesUrl: z.string().trim().url().max(2000),
   requestedDays: z.coerce.number().int().min(1).max(MAX_REQUESTED_DAYS),
+  availableFrom: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha no válida"),
+  availableTo: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha no válida"),
   proposal: z.string().trim().min(40).max(8000),
   contentToDeliver: z.string().trim().min(20).max(8000),
   destinationsStyle: z.string().trim().max(8000).optional().or(z.literal("")),
@@ -51,7 +53,36 @@ export async function POST(req: NextRequest) {
     }
 
     const d = parsed.data;
+
+    // Colaboraciones cerradas en junio, julio, agosto y septiembre (defensa en servidor)
+    const rangeHitsBlockedMonth = (fromYmd: string, toYmd: string): boolean => {
+      const start = new Date(`${fromYmd}T00:00:00`);
+      const end = new Date(`${toYmd}T00:00:00`);
+      if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) return true;
+      const cursor = new Date(start);
+      while (cursor <= end) {
+        const month = cursor.getMonth(); // 0-indexado: jun=5 … sep=8
+        if (month >= 5 && month <= 8) return true;
+        cursor.setDate(cursor.getDate() + 1);
+      }
+      return false;
+    };
+
+    if (rangeHitsBlockedMonth(d.availableFrom, d.availableTo)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Las colaboraciones no están disponibles entre junio y septiembre. Elige fechas en temporada baja o media.",
+        },
+        { status: 400 }
+      );
+    }
+
     const levelTag = levelTagFromDays(d.requestedDays);
+    const fmtDate = (ymd: string) => {
+      const [y, m, day] = ymd.split("-");
+      return `${day}/${m}/${y}`;
+    };
 
     const rows: [string, string][] = [
       ["Nombre", d.name],
@@ -75,6 +106,10 @@ export async function POST(req: NextRequest) {
       [
         "Días solicitados / nivel",
         `${d.requestedDays} ${d.requestedDays === 1 ? "día" : "días"} → nivel ${levelTag}`,
+      ],
+      [
+        "Fechas disponibles (baja/media)",
+        `${fmtDate(d.availableFrom)} — ${fmtDate(d.availableTo)}`,
       ],
       ["Propuesta de colaboración", d.proposal],
       ["Contenido a entregar", d.contentToDeliver],
