@@ -35,7 +35,7 @@ const FAQ_QA: { q: string; a: string }[] = [
   },
   {
     q: "¿La colaboración implica uso de la camper sin coste?",
-    a: "En los casos seleccionados puede acordarse una cesión de vehículo como parte de un acuerdo profesional, siempre en función del valor del contenido acordado, fechas y disponibilidad. No es un \u201cviaje gratis\u201d genérico: cada propuesta se evalúa de forma individual y nunca cedemos en temporada alta de verano ni grandes puentes. Toda cesión va sujeta a contrato, fianza, seguro y condiciones de uso.",
+    a: "En los casos seleccionados puede acordarse una cesión de vehículo como parte de un acuerdo profesional, siempre en función del valor del contenido acordado, fechas y disponibilidad. No es un \u201cviaje gratis\u201d genérico: cada propuesta se evalúa de forma individual y nunca cedemos de junio a septiembre, ni en Semana Santa, puentes o picos navideños. Toda cesión va sujeta a contrato, fianza, seguro y condiciones de uso.",
   },
   {
     q: "¿Cómo funciona entonces el coste del alquiler?",
@@ -67,7 +67,7 @@ const FAQ_QA: { q: string; a: string }[] = [
   },
   {
     q: "¿Cedéis siempre varios días de viaje?",
-    a: "No. La duración y las condiciones se ajustan al alcance de la producción y al calendario de la flota, y nunca en temporada alta de verano, Semana Santa ni grandes puentes. A veces bastan uno o dos días bien planificados; otras veces tiene sentido algo más largo en baja o media temporada.",
+    a: "No. La duración y las condiciones se ajustan al alcance de la producción y al calendario de la flota, y nunca de junio a septiembre, ni en Semana Santa, puentes o picos navideños. A veces bastan uno o dos días bien planificados; otras veces tiene sentido algo más largo en baja o media temporada.",
   },
 ];
 
@@ -302,7 +302,7 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
             {[
               {
                 title: "Cesión de camper de gran volumen",
-                body: "Cuando la propuesta y el calendario lo permiten, puede acordarse el uso de una de nuestras campers de gran volumen (Fiat Ducato camperizadas) como parte del intercambio profesional —nunca como promesa genérica y nunca en temporada alta de verano.",
+                body: "Cuando la propuesta y el calendario lo permiten, puede acordarse el uso de una de nuestras campers de gran volumen (Fiat Ducato camperizadas) como parte del intercambio profesional —nunca como promesa genérica y nunca de junio a septiembre.",
               },
               {
                 title: "Colaboraciones puntuales o recurrentes",
@@ -352,9 +352,9 @@ export function ContentCreatorsLanding({ locale = "es" }: { locale?: Locale }) {
                   Cuándo colaboramos
                 </h2>
                 <p className="mt-4 text-base leading-relaxed text-gray-700 md:text-lg">
-                  Colaboramos entre <strong>octubre y mayo</strong>, y en huecos puntuales de otras temporadas.{" "}
+                  Colaboramos entre <strong>octubre y mayo</strong>, y excepcionalmente en huecos puntuales de otras temporadas.{" "}
                   <strong className="text-furgocasa-orange-dark">
-                    No cedemos camper en julio, primera quincena de agosto, Semana Santa, puentes ni picos navideños.
+                    No cedemos camper en junio, julio, agosto ni septiembre, ni en Semana Santa, puentes o picos navideños.
                   </strong>{" "}
                   Esto no es regateo: es la única forma de poder ofrecerte un acuerdo real.
                 </p>
