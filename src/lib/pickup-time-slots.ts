@@ -14,6 +14,9 @@ export const SUMMER_RESTRICTED_MONTHS = [6, 7, 8, 9] as const;
 const SUMMER_MORNING_LAST = "12:00";
 const SUMMER_AFTERNOON_SLOTS = new Set(["18:00", "18:30", "19:00"]);
 
+/** Hora por defecto al resetear una selección inválida (p. ej. tarde en verano). */
+export const DEFAULT_PREFERRED_PICKUP_TIME = "11:00";
+
 export function generateSlotsFromRanges(
   ranges: TimeSlotRange[],
   interval: number = 30
@@ -75,7 +78,12 @@ export function getFirstSelectableTime(
   openingHours?: TimeSlotRange[] | null
 ): string | null {
   const options = getTimeSlotOptions(referenceDate, openingHours);
-  return options.find((o) => o.enabled)?.time ?? null;
+  const enabled = options.filter((o) => o.enabled).map((o) => o.time);
+  if (enabled.length === 0) return null;
+  if (enabled.includes(DEFAULT_PREFERRED_PICKUP_TIME)) {
+    return DEFAULT_PREFERRED_PICKUP_TIME;
+  }
+  return enabled[0];
 }
 
 export function validateBookingTimes(params: {
