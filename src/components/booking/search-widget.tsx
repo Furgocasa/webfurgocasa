@@ -15,6 +15,10 @@ import { calculateRentalDays } from "@/lib/utils";
 import { getTranslatedRoute } from "@/lib/route-translations";
 import { useSeasonMinDays } from "@/hooks/use-season-min-days";
 import { type BusinessClosedRange } from "@/lib/business-closed-dates";
+import {
+  getFirstSelectableTime,
+  isTimeSlotSelectable,
+} from "@/lib/pickup-time-slots";
 
 interface SearchWidgetProps {
   defaultLocation?: string;
@@ -72,7 +76,24 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
 
   // Obtener mínimo de días según temporadas activas
   const pickupDateStr = dateRange.from ? format(dateRange.from, 'yyyy-MM-dd') : null;
+  const dropoffDateStr = dateRange.to ? format(dateRange.to, 'yyyy-MM-dd') : null;
   const seasonMinDays = useSeasonMinDays(pickupDateStr, pickupDateStr);
+
+  useEffect(() => {
+    if (!pickupDateStr) return;
+    if (!isTimeSlotSelectable(pickupDateStr, pickupTime, locationOpeningHours)) {
+      const next = getFirstSelectableTime(pickupDateStr, locationOpeningHours);
+      if (next) setPickupTime(next);
+    }
+  }, [pickupDateStr, locationOpeningHours, pickupTime]);
+
+  useEffect(() => {
+    if (!dropoffDateStr) return;
+    if (!isTimeSlotSelectable(dropoffDateStr, dropoffTime, locationOpeningHours)) {
+      const next = getFirstSelectableTime(dropoffDateStr, locationOpeningHours);
+      if (next) setDropoffTime(next);
+    }
+  }, [dropoffDateStr, locationOpeningHours, dropoffTime]);
 
   const getMinDays = () => {
     if (pickupDateStr && locationMinConfig) {
@@ -246,6 +267,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
                 value={pickupTime}
                 onChange={setPickupTime}
                 timeSlots={locationOpeningHours}
+                referenceDate={pickupDateStr}
               />
             </div>
 
@@ -258,6 +280,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
                 value={dropoffTime}
                 onChange={setDropoffTime}
                 timeSlots={locationOpeningHours}
+                referenceDate={dropoffDateStr}
               />
             </div>
           </div>

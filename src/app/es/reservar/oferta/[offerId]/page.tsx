@@ -13,6 +13,11 @@ import { LocalizedLink } from "@/components/localized-link";
 import Image from "next/image";
 import { formatPrice, extraLineUnitPriceEuros } from "@/lib/utils";
 import { getTranslatedRoute } from "@/lib/route-translations";
+import { TimeSelector } from "@/components/booking/time-selector";
+import {
+  getFirstSelectableTime,
+  isTimeSlotSelectable,
+} from "@/lib/pickup-time-slots";
 
 interface OfferData {
   id: string;
@@ -114,6 +119,18 @@ export default function ReservarOfertaPage({
   useEffect(() => {
     loadOfferAndData();
   }, [offerId]);
+
+  useEffect(() => {
+    if (!offer) return;
+    if (!isTimeSlotSelectable(offer.offer_start_date, pickupTime)) {
+      const next = getFirstSelectableTime(offer.offer_start_date);
+      if (next) setPickupTime(next);
+    }
+    if (!isTimeSlotSelectable(offer.offer_end_date, dropoffTime)) {
+      const next = getFirstSelectableTime(offer.offer_end_date);
+      if (next) setDropoffTime(next);
+    }
+  }, [offer, pickupTime, dropoffTime]);
 
   const loadOfferAndData = async () => {
     try {
@@ -510,29 +527,23 @@ export default function ReservarOfertaPage({
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t("Hora de recogida")}
                   </label>
-                  <select
+                  <TimeSelector
                     value={pickupTime}
-                    onChange={(e) => setPickupTime(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
-                  >
-                    {Array.from({ length: 11 }, (_, i) => i + 9).map(hour => (
-                      <option key={hour} value={`${hour}:00`}>{hour}:00</option>
-                    ))}
-                  </select>
+                    onChange={setPickupTime}
+                    referenceDate={offer?.offer_start_date}
+                    label={t("Hora de recogida")}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     {t("Hora de devolución")}
                   </label>
-                  <select
+                  <TimeSelector
                     value={dropoffTime}
-                    onChange={(e) => setDropoffTime(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-furgocasa-blue focus:border-transparent"
-                  >
-                    {Array.from({ length: 11 }, (_, i) => i + 9).map(hour => (
-                      <option key={hour} value={`${hour}:00`}>{hour}:00</option>
-                    ))}
-                  </select>
+                    onChange={setDropoffTime}
+                    referenceDate={offer?.offer_end_date}
+                    label={t("Hora de devolución")}
+                  />
                 </div>
               </div>
             </div>

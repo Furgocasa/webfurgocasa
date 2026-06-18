@@ -1,38 +1,18 @@
 "use client";
 
 import { Clock } from "lucide-react";
-
-interface TimeSlotRange {
-  open: string;
-  close: string;
-}
-
-const DEFAULT_RANGES: TimeSlotRange[] = [
-  { open: "10:00", close: "14:00" },
-  { open: "17:00", close: "19:00" },
-];
-
-function generateSlotsFromRanges(ranges: TimeSlotRange[], interval: number = 30): string[] {
-  const slots: string[] = [];
-  for (const range of ranges) {
-    const [startH, startM] = range.open.split(':').map(Number);
-    const [endH, endM] = range.close.split(':').map(Number);
-    let minutes = startH * 60 + startM;
-    const endMinutes = endH * 60 + endM;
-    while (minutes <= endMinutes) {
-      const h = Math.floor(minutes / 60);
-      const m = minutes % 60;
-      slots.push(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`);
-      minutes += interval;
-    }
-  }
-  return [...new Set(slots)].sort();
-}
+import {
+  type TimeSlotRange,
+  getFirstSelectableTime,
+  getTimeSlotOptions,
+  isTimeSlotSelectable,
+} from "@/lib/pickup-time-slots";
 
 interface TimeSelectorProps {
   value: string;
   onChange: (value: string) => void;
   timeSlots?: TimeSlotRange[] | null;
+  referenceDate?: string | null;
   label?: string;
   id?: string;
 }
@@ -41,11 +21,14 @@ export function TimeSelector({
   value,
   onChange,
   timeSlots,
+  referenceDate,
   label = "Seleccionar hora",
   id,
 }: TimeSelectorProps) {
-  const ranges = timeSlots && timeSlots.length > 0 ? timeSlots : DEFAULT_RANGES;
-  const availableSlots = generateSlotsFromRanges(ranges);
+  const options = getTimeSlotOptions(referenceDate, timeSlots);
+  const effectiveValue = isTimeSlotSelectable(referenceDate, value, timeSlots)
+    ? value
+    : getFirstSelectableTime(referenceDate, timeSlots) || "10:00";
 
   const selectId = id || `time-selector-${Math.random().toString(36).substr(2, 9)}`;
 
@@ -56,13 +39,13 @@ export function TimeSelector({
       </label>
       <select
         id={selectId}
-        value={availableSlots.includes(value) ? value : availableSlots[0] || "10:00"}
+        value={effectiveValue}
         onChange={(e) => onChange(e.target.value)}
         aria-label={label}
         className="w-full pl-4 pr-10 py-3.5 border-2 border-gray-300 rounded-lg bg-white hover:border-furgocasa-blue focus:outline-none focus:ring-2 focus:ring-furgocasa-blue/30 focus:border-furgocasa-blue transition-colors appearance-none cursor-pointer touch-target text-sm font-medium text-gray-800 text-center"
       >
-        {availableSlots.map((time) => (
-          <option key={time} value={time}>
+        {options.map(({ time, enabled }) => (
+          <option key={time} value={time} disabled={!enabled}>
             {time}
           </option>
         ))}

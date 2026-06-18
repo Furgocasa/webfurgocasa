@@ -3,6 +3,10 @@ import type { Database } from "@/lib/supabase/database.types";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { validatePickupDropoffAgainstClosedDates } from "@/lib/business-closed-dates";
+import {
+  type TimeSlotRange,
+  validateBookingTimes,
+} from "@/lib/pickup-time-slots";
 import { buildPricingForSearch } from "@/lib/rental-search-pricing";
 import { loadMinimumRentalDaysCheck } from "@/lib/rental-min-days";
 import { extraLineUnitPriceEuros } from "@/lib/utils";
@@ -110,6 +114,30 @@ export async function POST(request: Request) {
     );
     if (!closedCheck.ok) {
       return NextResponse.json({ error: closedCheck.error }, { status: 400 });
+    }
+
+    const { data: timeLocationRows } = await supabase
+      .from("locations")
+      .select("id, opening_hours")
+      .in("id", [booking.pickup_location_id, booking.dropoff_location_id]);
+
+    const pickupOpeningHours =
+      (timeLocationRows?.find((l) => l.id === booking.pickup_location_id)
+        ?.opening_hours as TimeSlotRange[] | null) ?? null;
+    const dropoffOpeningHours =
+      (timeLocationRows?.find((l) => l.id === booking.dropoff_location_id)
+        ?.opening_hours as TimeSlotRange[] | null) ?? null;
+
+    const timeCheck = validateBookingTimes({
+      pickupDate: booking.pickup_date,
+      pickupTime: booking.pickup_time,
+      dropoffDate: booking.dropoff_date,
+      dropoffTime: booking.dropoff_time,
+      pickupOpeningHours,
+      dropoffOpeningHours,
+    });
+    if (!timeCheck.ok) {
+      return NextResponse.json({ error: timeCheck.error }, { status: 400 });
     }
 
     if (!booking.last_minute_offer_id) {
