@@ -4,6 +4,8 @@ import { useState, useEffect } from"react";
 import { useLanguage } from"@/contexts/language-context";
 import { useRouter, useParams } from"next/navigation";
 import { formatPrice } from"@/lib/utils";
+import { BookingDiscountLine } from "@/components/booking/booking-discount-line";
+import type { LastMinuteOfferSnapshot } from "@/lib/bookings/discount-display";
 import { 
   ArrowLeft, Calendar, MapPin, Car, User, Mail, Phone, 
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
@@ -56,6 +58,8 @@ interface Booking {
   discount: number;
   coupon_code?: string | null;
   coupon_discount?: number | null;
+  last_minute_offer_id?: string | null;
+  last_minute_offer?: LastMinuteOfferSnapshot | null;
   stripe_fee_total?: number;
   total_price: number;
   amount_paid: number;
@@ -717,16 +721,12 @@ export default function ReservaPage() {
                     </div>
                   )}
 
-                  {((booking.discount ?? booking.coupon_discount) || 0) > 0 && (
-                    <div className="flex justify-between text-sm">
-                      <span className="opacity-90">
-                        {booking.coupon_code ? `${t("Cupón")} ${booking.coupon_code}` : t("Descuento")}
-                      </span>
-                      <span className="font-semibold text-green-300">
-                        - {formatPrice(booking.discount ?? booking.coupon_discount ?? 0)}
-                      </span>
-                    </div>
-                  )}
+                  <BookingDiscountLine
+                    booking={booking}
+                    offer={booking.last_minute_offer}
+                    theme="client"
+                    t={t}
+                  />
 
                   {(booking.stripe_fee_total ?? 0) > 0 && (
                     <div className="flex justify-between text-sm">

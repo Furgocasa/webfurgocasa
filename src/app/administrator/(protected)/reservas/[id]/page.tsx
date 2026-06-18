@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { formatPrice } from "@/lib/utils";
+import { BookingDiscountLine } from "@/components/booking/booking-discount-line";
+import type { LastMinuteOfferSnapshot } from "@/lib/bookings/discount-display";
 
 interface Booking {
   id: string;
@@ -25,6 +27,8 @@ interface Booking {
   discount: number;
   coupon_code: string | null;
   coupon_discount: number;
+  last_minute_offer_id: string | null;
+  last_minute_offer?: LastMinuteOfferSnapshot | null;
   total_price: number;
   amount_paid: number | null;
   stripe_fee_total: number;
@@ -151,6 +155,14 @@ export default function ReservaDetalleAdminPage() {
             unit_price,
             total_price,
             extra:extras(name, price_type)
+          ),
+          last_minute_offer:last_minute_offers!bookings_last_minute_offer_id_fkey(
+            id,
+            discount_percentage,
+            original_price_per_day,
+            final_price_per_day,
+            offer_days,
+            status
           )
         `)
         .eq('id', bookingId)
@@ -600,27 +612,12 @@ Devolución en ${dropoffLocation}`;
               </div>
             )}
             
-            {/* Cupón */}
-            {(booking.coupon_discount || 0) > 0 && (
-              <div className="flex justify-between">
-                <span className="opacity-90">
-                  {booking.coupon_code ? `Cupón ${booking.coupon_code}` : 'Cupón'}:
-                </span>
-                <span className="font-semibold text-green-300">
-                  - {formatPrice(booking.coupon_discount)}
-                </span>
-              </div>
-            )}
-            
-            {/* Descuento manual (sin cupón) */}
-            {(booking.discount || 0) > 0 && !(booking.coupon_discount > 0) && (
-              <div className="flex justify-between">
-                <span className="opacity-90">Descuento:</span>
-                <span className="font-semibold text-green-300">
-                  - {formatPrice(booking.discount)}
-                </span>
-              </div>
-            )}
+            {/* Cupón, oferta última hora o descuento manual */}
+            <BookingDiscountLine
+              booking={booking}
+              offer={booking.last_minute_offer}
+              theme="admin-orange"
+            />
 
             {/* Comisión Stripe (forma parte del PVP) */}
             {(booking.stripe_fee_total || 0) > 0 && (

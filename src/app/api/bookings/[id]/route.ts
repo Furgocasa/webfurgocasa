@@ -64,6 +64,14 @@ export async function GET(
           unit_price,
           total_price,
           extra:extras(name, description)
+        ),
+        last_minute_offer:last_minute_offers!bookings_last_minute_offer_id_fkey(
+          id,
+          discount_percentage,
+          original_price_per_day,
+          final_price_per_day,
+          offer_days,
+          status
         )
       `
       )

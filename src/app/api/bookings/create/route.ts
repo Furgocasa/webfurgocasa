@@ -40,7 +40,7 @@ const bookingSchema = z.object({
   notes: z.string().max(2000).optional().nullable(),
   status: z.string().optional(),
   payment_status: z.string().optional(),
-  last_minute_offer_id: z.string().uuid().optional().nullable(), // Aceptado pero no insertado (no existe en DB)
+  last_minute_offer_id: z.string().uuid().optional().nullable(),
   // Campos de cupón (opcionales)
   coupon_id: z.string().uuid().optional().nullable(),
   coupon_code: z.string().max(50).optional().nullable(),
@@ -347,14 +347,12 @@ export async function POST(request: Request) {
     }
     // ================================================================
 
-    // Filtrar columnas que NO existen en la tabla bookings antes de insertar
-    // (ej: last_minute_offer_id - la relación es last_minute_offers.booking_id)
     const ALLOWED_BOOKING_COLUMNS = [
       "booking_number", "vehicle_id", "customer_id", "pickup_location_id", "dropoff_location_id",
       "pickup_date", "pickup_time", "dropoff_date", "dropoff_time", "days",
       "base_price", "extras_price", "location_fee", "discount", "total_price", "amount_paid",
       "status", "payment_status", "customer_name", "customer_email", "notes",
-      "coupon_id", "coupon_code", "coupon_discount"
+      "coupon_id", "coupon_code", "coupon_discount", "last_minute_offer_id"
     ] as const;
     const bookingForInsert = Object.fromEntries(
       Object.entries(booking).filter(([key]) => ALLOWED_BOOKING_COLUMNS.includes(key as any))
@@ -408,6 +406,23 @@ export async function POST(request: Request) {
           { error: "Error al crear extras de la reserva" },
           { status: 500 }
         );
+      }
+    }
+
+    // Vincular oferta de última hora en servidor (trazabilidad + evita PATCH fallido en cliente)
+    if (booking.last_minute_offer_id) {
+      const { error: offerLinkError } = await supabase
+        .from("last_minute_offers")
+        .update({
+          status: "reserved_pending_payment",
+          booking_id: createdBooking.id,
+          reserved_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", booking.last_minute_offer_id);
+
+      if (offerLinkError) {
+        console.error("[bookings/create] Error vinculando oferta de última hora:", offerLinkError);
       }
     }
 

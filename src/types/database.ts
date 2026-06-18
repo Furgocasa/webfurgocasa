@@ -240,6 +240,7 @@ export interface Database {
           total_price: number;
           amount_paid: number;
           stripe_fee_total: number;
+          last_minute_offer_id: string | null;
           status: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
           payment_status: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;
@@ -273,6 +274,7 @@ export interface Database {
           total_price: number;
           amount_paid?: number;
           stripe_fee_total?: number;
+          last_minute_offer_id?: string | null;
           status?: "pending" | "confirmed" | "in_progress" | "completed" | "cancelled";
           payment_status?: "pending" | "partial" | "paid" | "refunded";
           customer_name: string;

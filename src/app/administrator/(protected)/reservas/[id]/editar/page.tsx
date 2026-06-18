@@ -8,6 +8,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { calculateRentalDays, formatPrice, extraLineUnitPriceEuros } from "@/lib/utils";
+import { calculateBookingTotalPrice } from "@/lib/bookings/discount-display";
+import { BookingDiscountLine } from "@/components/booking/booking-discount-line";
+import type { LastMinuteOfferSnapshot } from "@/lib/bookings/discount-display";
 import EditarClienteModal from "@/components/admin/EditarClienteModal";
 import CambiarClienteModal from "@/components/admin/CambiarClienteModal";
 
@@ -86,6 +89,8 @@ interface FormData {
   extras_price: number;
   location_fee: number;
   discount: number;
+  coupon_discount: number;
+  last_minute_offer_id: string | null;
   // Comisión acumulada de pagos Stripe (se añade al total_price cuando el
   // cliente paga con tarjeta para repercutirle la tasa de la pasarela).
   stripe_fee_total: number;
@@ -125,6 +130,7 @@ export default function EditarReservaPage() {
   const [extras, setExtras] = useState<Extra[]>([]);
   const [bookingExtras, setBookingExtras] = useState<Record<string, number>>({});
   const [existingExtras, setExistingExtras] = useState<BookingExtra[]>([]);
+  const [lastMinuteOffer, setLastMinuteOffer] = useState<LastMinuteOfferSnapshot | null>(null);
   
   // Estado para el modal de editar cliente
   const [isEditClientModalOpen, setIsEditClientModalOpen] = useState(false);
@@ -144,6 +150,8 @@ export default function EditarReservaPage() {
     extras_price: 0,
     location_fee: 0,
     discount: 0,
+    coupon_discount: 0,
+    last_minute_offer_id: null,
     stripe_fee_total: 0,
     total_price: 0,
     amount_paid: 0,
@@ -177,27 +185,26 @@ export default function EditarReservaPage() {
   }, [formData.pickup_date, formData.dropoff_date, formData.pickup_time, formData.dropoff_time]);
 
   useEffect(() => {
-    // Recalcular precio total: base + extras + location_fee - discount + comisión Stripe acumulada.
-    // IMPORTANTE: stripe_fee_total debe sumarse al total porque cuando el
-    // cliente paga con tarjeta se le repercute la tasa de la pasarela y
-    // amount_paid en BD ya la incluye. Si no la sumamos, amount_paid > total_price
-    // y se corrompe la reserva.
     const extrasTotal = calculateExtrasTotal();
-    const newTotal =
-      formData.base_price +
-      extrasTotal +
-      (formData.location_fee || 0) -
-      (formData.discount || 0) +
-      (formData.stripe_fee_total || 0);
+    const newTotal = calculateBookingTotalPrice({
+      base_price: formData.base_price,
+      extras_price: extrasTotal,
+      location_fee: formData.location_fee,
+      discount: formData.discount,
+      coupon_discount: formData.coupon_discount,
+      coupon_code: formData.coupon_code,
+      last_minute_offer_id: formData.last_minute_offer_id,
+      stripe_fee_total: formData.stripe_fee_total,
+    });
 
     if (formData.extras_price !== extrasTotal || formData.total_price !== newTotal) {
       setFormData(prev => ({
         ...prev,
         extras_price: extrasTotal,
-        total_price: Math.max(0, Math.round(newTotal * 100) / 100)
+        total_price: newTotal,
       }));
     }
-  }, [bookingExtras, formData.days, formData.base_price, formData.location_fee, formData.discount, formData.stripe_fee_total, extras]);
+  }, [bookingExtras, formData.days, formData.base_price, formData.location_fee, formData.discount, formData.coupon_discount, formData.coupon_code, formData.last_minute_offer_id, formData.stripe_fee_total, extras]);
 
   useEffect(() => {
     // Calcular automáticamente el payment_status según el monto pagado
@@ -304,6 +311,14 @@ export default function EditarReservaPage() {
             unit_price,
             total_price,
             extra:extras(name)
+          ),
+          last_minute_offer:last_minute_offers!bookings_last_minute_offer_id_fkey(
+            id,
+            discount_percentage,
+            original_price_per_day,
+            final_price_per_day,
+            offer_days,
+            status
           )
         `)
         .eq('id', bookingId)
@@ -320,6 +335,8 @@ export default function EditarReservaPage() {
       setCustomerId(booking.customer_id || '');
       setCustomerData(booking.customer || null);
       
+      setLastMinuteOffer((booking as any).last_minute_offer ?? null);
+
       setFormData({
         vehicle_id: booking.vehicle_id,
         pickup_location_id: booking.pickup_location_id,
@@ -332,7 +349,9 @@ export default function EditarReservaPage() {
         base_price: booking.base_price ?? 0,
         extras_price: booking.extras_price ?? 0,
         location_fee: (booking as any).location_fee ?? 0,
-        discount: (booking as any).discount || (booking as any).coupon_discount || 0,
+        discount: (booking as any).discount ?? 0,
+        coupon_discount: (booking as any).coupon_discount ?? 0,
+        last_minute_offer_id: (booking as any).last_minute_offer_id ?? null,
         stripe_fee_total: (booking as any).stripe_fee_total ?? 0,
         total_price: booking.total_price ?? 0,
         amount_paid: booking.amount_paid ?? 0,
@@ -1202,20 +1221,35 @@ export default function EditarReservaPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Descuento / cupón
+                    Descuento / cupón / oferta
                   </label>
                   {formData.coupon_code && (
                     <p className="text-xs text-gray-500 mb-1">Cupón aplicado: <span className="font-mono font-semibold">{formData.coupon_code}</span></p>
                   )}
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.discount}
-                    onChange={(e) => handleInputChange('discount', parseFloat(e.target.value) || 0)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent"
-                    placeholder="Importe descontado"
-                  />
+                  {formData.last_minute_offer_id && lastMinuteOffer && (
+                    <p className="text-xs text-amber-700 mb-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                      Oferta última hora (-{lastMinuteOffer.discount_percentage}%): ahorro de {formatPrice(formData.discount)} ya incluido en el precio base.
+                    </p>
+                  )}
+                  {!formData.last_minute_offer_id && (
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={formData.coupon_discount > 0 ? formData.coupon_discount : formData.discount}
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value) || 0;
+                        if (formData.coupon_code) {
+                          handleInputChange('coupon_discount', value);
+                        } else {
+                          handleInputChange('discount', value);
+                        }
+                      }}
+                      disabled={!!formData.coupon_code && formData.coupon_discount > 0}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-furgocasa-orange focus:border-transparent disabled:bg-gray-100"
+                      placeholder="Importe descontado del total"
+                    />
+                  )}
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
@@ -1233,14 +1267,11 @@ export default function EditarReservaPage() {
                       <span className="font-semibold">{formatPrice(formData.location_fee)}</span>
                     </div>
                   )}
-                  {(formData.discount || 0) > 0 && (
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="text-gray-600">
-                        {formData.coupon_code ? `Cupón ${formData.coupon_code}` : 'Descuento'}:
-                      </span>
-                      <span className="font-semibold text-green-600">- {formatPrice(formData.discount)}</span>
-                    </div>
-                  )}
+                  <BookingDiscountLine
+                    booking={formData}
+                    offer={lastMinuteOffer}
+                    theme="admin-light"
+                  />
                   {(formData.stripe_fee_total || 0) > 0 && (
                     <div className="flex justify-between text-sm mb-2">
                       <span className="text-gray-600">Comisión pasarela Stripe:</span>

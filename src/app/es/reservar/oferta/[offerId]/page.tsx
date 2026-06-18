@@ -340,16 +340,7 @@ export default function ReservarOfertaPage({
         throw new Error(result.error);
       }
 
-      // Marcar la oferta como "reservada pendiente de pago" (no "reserved" hasta que se pague)
-      await fetch('/api/admin/last-minute-offers', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: offer.id,
-          status: 'reserved_pending_payment',
-          booking_id: result.booking.id
-        })
-      });
+      // La vinculación oferta ↔ reserva se hace en el servidor (POST /api/bookings/create)
 
       // Redirigir a confirmación/pago con ruta traducida
       const paymentPath = getTranslatedRoute(`/reservar/${result.booking.id}/pago`, language);

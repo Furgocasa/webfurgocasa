@@ -1204,6 +1204,18 @@ export const staticTranslations = {
     fr: "Réduction",
     de: "Rabatt"
   },
+  "Oferta última hora": {
+    es: "Oferta última hora",
+    en: "Last-minute offer",
+    fr: "Offre de dernière minute",
+    de: "Last-Minute-Angebot"
+  },
+  "Ya incluido en el precio del alquiler": {
+    es: "Ya incluido en el precio del alquiler",
+    en: "Already included in the rental price",
+    fr: "Déjà inclus dans le prix de la location",
+    de: "Bereits im Mietpreis enthalten"
+  },
   "Fianza": {
     es: "Fianza",
     en: "Deposit",
@@ -3449,6 +3461,18 @@ export const staticTranslations = {
     en: "Discount",
     fr: "Réduction",
     de: "Rabatt"
+  },
+  "Oferta última hora": {
+    es: "Oferta última hora",
+    en: "Last-minute offer",
+    fr: "Offre de dernière minute",
+    de: "Last-Minute-Angebot"
+  },
+  "Ya incluido en el precio del alquiler": {
+    es: "Ya incluido en el precio del alquiler",
+    en: "Already included in the rental price",
+    fr: "Déjà inclus dans le prix de la location",
+    de: "Bereits im Mietpreis enthalten"
   },
   "Fianza": {
     es: "Fianza",
