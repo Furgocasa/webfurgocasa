@@ -3,15 +3,22 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   AlertCircle,
+  Award,
   Ban,
   CheckCircle2,
   Download,
+  HardDrive,
   Image as ImageIcon,
   Loader2,
   RefreshCw,
   RotateCcw,
   Search,
+  Sparkles,
+  Star,
+  Ticket,
   Trash2,
+  TrendingUp,
+  Users,
   Video,
   X,
 } from "lucide-react";
@@ -257,11 +264,55 @@ interface ListResponse {
   error?: string;
 }
 
+interface StatsResponse {
+  ok: boolean;
+  error?: string;
+  uploads: {
+    total: number;
+    photos: number;
+    videos: number;
+    pending: number;
+    selected: number;
+    discarded: number;
+    selectedPhotos: number;
+    selectedVideos: number;
+    storageBytes: number;
+  };
+  points: { awarded: number; removed: number; net: number };
+  coupons: {
+    total: number;
+    active: number;
+    used: number;
+    superseded: number;
+    expired: number;
+    bySource: Record<string, number>;
+    bestActivePct: number;
+  };
+  storytellersCount: number;
+  leaderboard: Array<{
+    email: string;
+    name: string | null;
+    balance: number;
+    unlockedPct: number;
+    photos: number;
+    videos: number;
+    selected: number;
+  }>;
+  tiers: Array<{ threshold: number; pct: number; label: string }>;
+  maxDiscountPct: number;
+  discardedSupported: boolean;
+}
+
 const PAGE_SIZE = 60;
 
 function bytesToHuman(b: number): string {
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(0)} KB`;
-  return `${(b / (1024 * 1024)).toFixed(1)} MB`;
+  if (b < 1024 * 1024 * 1024) return `${(b / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(b / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
+function numberEs(n: number): string {
+  return n.toLocaleString("es-ES");
 }
 
 export default function StorytellerUploadsAdminPage() {
@@ -285,6 +336,11 @@ export default function StorytellerUploadsAdminPage() {
   const [page, setPage] = useState(0);
 
   const [previewItem, setPreviewItem] = useState<UploadItem | null>(null);
+
+  // Versión que fuerza recarga del dashboard tras acciones que afectan a puntos
+  // o cupones (seleccionar, revertir, descartar, restaurar) y al refrescar.
+  const [statsVersion, setStatsVersion] = useState(0);
+  const refreshStats = useCallback(() => setStatsVersion((v) => v + 1), []);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -337,6 +393,7 @@ export default function StorytellerUploadsAdminPage() {
         text: `Seleccionada (+${json.delta} ptos).${couponMsg}`,
       });
       fetchData();
+      refreshStats();
     } catch {
       setMessage({ type: "error", text: "Error de red." });
     } finally {
@@ -359,6 +416,7 @@ export default function StorytellerUploadsAdminPage() {
       }
       setMessage({ type: "success", text: "Selección revertida." });
       fetchData();
+      refreshStats();
     } catch {
       setMessage({ type: "error", text: "Error de red." });
     } finally {
@@ -387,6 +445,7 @@ export default function StorytellerUploadsAdminPage() {
       }
       setMessage({ type: "success", text: "Subida descartada (sin notificar al cliente)." });
       fetchData();
+      refreshStats();
     } catch {
       setMessage({ type: "error", text: "Error de red." });
     } finally {
@@ -408,6 +467,7 @@ export default function StorytellerUploadsAdminPage() {
       }
       setMessage({ type: "success", text: "Subida restaurada a pendiente." });
       fetchData();
+      refreshStats();
     } catch {
       setMessage({ type: "error", text: "Error de red." });
     } finally {
@@ -437,12 +497,18 @@ export default function StorytellerUploadsAdminPage() {
         </h1>
         <button
           type="button"
-          onClick={() => fetchData()}
+          onClick={() => {
+            fetchData();
+            refreshStats();
+          }}
           className="ml-auto inline-flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           <RefreshCw className="h-4 w-4" aria-hidden /> Refrescar
         </button>
       </div>
+
+      {/* Dashboard de métricas del programa Storytellers */}
+      <StatsDashboard refreshKey={statsVersion} />
 
       {/* Filtros */}
       <div className="mb-6 grid gap-3 rounded-2xl border border-gray-200 bg-white p-4 md:grid-cols-4">
@@ -612,6 +678,327 @@ export default function StorytellerUploadsAdminPage() {
       {previewItem && (
         <PreviewModal item={previewItem} onClose={() => setPreviewItem(null)} />
       )}
+    </div>
+  );
+}
+
+/**
+ * Tarjeta de métrica simple para el dashboard.
+ */
+function StatCard({
+  icon,
+  label,
+  value,
+  sub,
+  accent,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: ReactNode;
+  sub?: ReactNode;
+  accent?: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-4">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <span className={accent || "text-gray-400"}>{icon}</span>
+        {label}
+      </div>
+      <p className="mt-2 text-2xl font-bold text-gray-900">{value}</p>
+      {sub ? <p className="mt-1 text-xs text-gray-500">{sub}</p> : null}
+    </div>
+  );
+}
+
+/**
+ * Dashboard agregado del programa Storytellers. Se sitúa encima del listado de
+ * subidas y resume puntos, cupones/descuentos generados, recuento de fotos y
+ * vídeos, almacenamiento y un ranking de los mejores storytellers.
+ *
+ * Se recarga cuando cambia `refreshKey` (tras seleccionar/revertir/descartar).
+ */
+function StatsDashboard({ refreshKey }: { refreshKey: number }) {
+  const [stats, setStats] = useState<StatsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const res = await fetch("/api/admin/storyteller-uploads/stats");
+        const json: StatsResponse = await res.json();
+        if (cancelled) return;
+        if (!res.ok || !json.ok) {
+          setError(json.error || "No se pudo cargar el resumen.");
+          return;
+        }
+        setStats(json);
+      } catch {
+        if (!cancelled) setError("Error de red al cargar el resumen.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [refreshKey]);
+
+  if (loading && !stats) {
+    return (
+      <div className="mb-6 flex items-center justify-center rounded-2xl border border-gray-200 bg-white py-10 text-gray-500">
+        <Loader2 className="mr-2 h-5 w-5 animate-spin" aria-hidden /> Cargando resumen…
+      </div>
+    );
+  }
+
+  if (error && !stats) {
+    return (
+      <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+        <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+        <span>{error}</span>
+      </div>
+    );
+  }
+
+  if (!stats) return null;
+
+  const { uploads, points, coupons, leaderboard } = stats;
+  const pendingPct =
+    uploads.total > 0 ? Math.round((uploads.pending / uploads.total) * 100) : 0;
+  const selectedPct =
+    uploads.total > 0 ? Math.round((uploads.selected / uploads.total) * 100) : 0;
+
+  return (
+    <section className="mb-8">
+      <div className="mb-3 flex items-center gap-2">
+        <Sparkles className="h-5 w-5 text-furgocasa-orange" aria-hidden />
+        <h2 className="font-heading text-lg font-bold text-gray-900">
+          Resumen del programa Storytellers
+        </h2>
+        {loading && (
+          <Loader2 className="h-4 w-4 animate-spin text-gray-400" aria-hidden />
+        )}
+      </div>
+
+      {/* Fila de KPIs principales */}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard
+          icon={<Users className="h-4 w-4" aria-hidden />}
+          label="Storytellers"
+          value={numberEs(stats.storytellersCount)}
+          sub="clientes participando"
+          accent="text-blue-500"
+        />
+        <StatCard
+          icon={<Star className="h-4 w-4" aria-hidden />}
+          label="Puntos en circulación"
+          value={numberEs(points.net)}
+          sub={`${numberEs(points.awarded)} otorgados · ${numberEs(
+            Math.abs(points.removed)
+          )} restados`}
+          accent="text-furgocasa-orange"
+        />
+        <StatCard
+          icon={<ImageIcon className="h-4 w-4" aria-hidden />}
+          label="Archivos subidos"
+          value={numberEs(uploads.total)}
+          sub={`${numberEs(uploads.photos)} fotos · ${numberEs(uploads.videos)} vídeos`}
+          accent="text-purple-500"
+        />
+        <StatCard
+          icon={<HardDrive className="h-4 w-4" aria-hidden />}
+          label="Almacenamiento"
+          value={bytesToHuman(uploads.storageBytes)}
+          sub="en el bucket de subidas"
+          accent="text-gray-500"
+        />
+      </div>
+
+      {/* Estado de curaduría */}
+      <div className="mt-3 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard
+          icon={<Search className="h-4 w-4" aria-hidden />}
+          label="Pendientes"
+          value={numberEs(uploads.pending)}
+          sub={`${pendingPct}% del total · por curar`}
+          accent="text-amber-500"
+        />
+        <StatCard
+          icon={<CheckCircle2 className="h-4 w-4" aria-hidden />}
+          label="Seleccionadas"
+          value={numberEs(uploads.selected)}
+          sub={`${selectedPct}% · ${numberEs(uploads.selectedPhotos)} fotos / ${numberEs(
+            uploads.selectedVideos
+          )} vídeos`}
+          accent="text-green-600"
+        />
+        <StatCard
+          icon={<Ban className="h-4 w-4" aria-hidden />}
+          label="Descartadas"
+          value={stats.discardedSupported ? numberEs(uploads.discarded) : "—"}
+          sub={
+            stats.discardedSupported
+              ? "rechazadas por admin"
+              : "migración pendiente"
+          }
+          accent="text-gray-500"
+        />
+        <StatCard
+          icon={<TrendingUp className="h-4 w-4" aria-hidden />}
+          label="Mejor descuento activo"
+          value={`${coupons.bestActivePct}%`}
+          sub={`techo del programa ${stats.maxDiscountPct}%`}
+          accent="text-furgocasa-orange"
+        />
+      </div>
+
+      {/* Cupones / descuentos generados */}
+      <div className="mt-3 grid gap-3 lg:grid-cols-3">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 lg:col-span-1">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <Ticket className="h-4 w-4 text-furgocasa-orange" aria-hidden />
+            Cupones generados
+          </div>
+          <p className="mt-2 text-2xl font-bold text-gray-900">
+            {numberEs(coupons.total)}
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+            <CouponStat label="Activos" value={coupons.active} color="text-green-600" />
+            <CouponStat label="Usados" value={coupons.used} color="text-blue-600" />
+            <CouponStat
+              label="Sustituidos"
+              value={coupons.superseded}
+              color="text-amber-600"
+            />
+            <CouponStat label="Expirados" value={coupons.expired} color="text-red-600" />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 lg:col-span-1">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <Award className="h-4 w-4 text-purple-500" aria-hidden />
+            Origen de los cupones
+          </div>
+          <div className="mt-3 space-y-2 text-sm">
+            <SourceRow
+              label="Bienvenida (1ª subida, 3%)"
+              value={coupons.bySource.instant_upload || 0}
+            />
+            <SourceRow
+              label="Por umbral de puntos"
+              value={coupons.bySource.threshold || 0}
+            />
+            <SourceRow
+              label="Concedidos por admin"
+              value={coupons.bySource.admin_grant || 0}
+            />
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 lg:col-span-1">
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <Star className="h-4 w-4 text-furgocasa-orange" aria-hidden />
+            Escala de descuentos
+          </div>
+          <div className="mt-3 space-y-1.5 text-sm">
+            {stats.tiers.map((t) => (
+              <div key={t.threshold} className="flex items-center justify-between">
+                <span className="text-gray-600">{numberEs(t.threshold)} ptos</span>
+                <span className="font-semibold text-furgocasa-orange-dark">
+                  {t.pct}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Ranking de storytellers */}
+      {leaderboard.length > 0 && (
+        <div className="mt-3 overflow-hidden rounded-2xl border border-gray-200 bg-white">
+          <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-3 text-xs font-semibold uppercase tracking-wide text-gray-500">
+            <Award className="h-4 w-4 text-furgocasa-orange" aria-hidden />
+            Top storytellers por puntos
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-left text-xs text-gray-500">
+                <tr>
+                  <th className="px-4 py-2 font-semibold">#</th>
+                  <th className="px-4 py-2 font-semibold">Cliente</th>
+                  <th className="px-4 py-2 text-right font-semibold">Puntos</th>
+                  <th className="px-4 py-2 text-right font-semibold">Descuento</th>
+                  <th className="px-4 py-2 text-right font-semibold">Fotos</th>
+                  <th className="px-4 py-2 text-right font-semibold">Vídeos</th>
+                  <th className="px-4 py-2 text-right font-semibold">Seleccionadas</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {leaderboard.map((row, i) => (
+                  <tr key={row.email} className="hover:bg-gray-50">
+                    <td className="px-4 py-2 font-semibold text-gray-400">{i + 1}</td>
+                    <td className="px-4 py-2">
+                      <p className="font-medium text-gray-900">{row.name || "—"}</p>
+                      <p className="truncate text-xs text-gray-500">{row.email}</p>
+                    </td>
+                    <td className="px-4 py-2 text-right font-bold text-gray-900">
+                      {numberEs(row.balance)}
+                    </td>
+                    <td className="px-4 py-2 text-right">
+                      {row.unlockedPct > 0 ? (
+                        <span className="rounded-full bg-furgocasa-orange/10 px-2 py-0.5 text-xs font-semibold text-furgocasa-orange-dark">
+                          {row.unlockedPct}%
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-400">—</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-2 text-right text-gray-600">
+                      {numberEs(row.photos)}
+                    </td>
+                    <td className="px-4 py-2 text-right text-gray-600">
+                      {numberEs(row.videos)}
+                    </td>
+                    <td className="px-4 py-2 text-right text-gray-600">
+                      {numberEs(row.selected)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
+function CouponStat({
+  label,
+  value,
+  color,
+}: {
+  label: string;
+  value: number;
+  color: string;
+}) {
+  return (
+    <div className="rounded-lg bg-gray-50 px-3 py-2">
+      <p className={`text-lg font-bold ${color}`}>{numberEs(value)}</p>
+      <p className="text-xs text-gray-500">{label}</p>
+    </div>
+  );
+}
+
+function SourceRow({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-gray-600">{label}</span>
+      <span className="font-semibold text-gray-900">{numberEs(value)}</span>
     </div>
   );
 }
