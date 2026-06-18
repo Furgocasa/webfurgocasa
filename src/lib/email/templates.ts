@@ -943,3 +943,164 @@ export function getReturnReminderTemplate(data: ReturnReminderData): string {
   const preheader = `${data.customerFirstName}, mañana devuelves la ${data.vehicleName}. Revisa el checklist de devolución para evitar suplementos.`;
   return getEmailBaseTemplate(content, preheader);
 }
+
+/* ───────────────────────────────────────────────────────────────────
+ *  Cambio de horario de verano (recogida + devolución en franja de calor)
+ * ─────────────────────────────────────────────────────────────────── */
+
+export interface SummerScheduleChangeData {
+  customerFirstName: string;
+  customerName: string;
+  bookingNumber: string;
+  vehicleName: string;
+  pickupDate: string;
+  pickupTime: string;
+  dropoffDate: string;
+  dropoffTime: string;
+  pickupLocation?: string;
+}
+
+const SUMMER_MORNING_SLOTS = ["10:00", "10:30", "11:00", "11:30", "12:00"];
+const SUMMER_AFTERNOON_SLOTS = ["18:00", "18:30", "19:00"];
+
+function formatTimeLabel(time: string): string {
+  const match = String(time).match(/^(\d{1,2}):(\d{2})/);
+  if (!match) return time;
+  return `${match[1].padStart(2, "0")}:${match[2]}`;
+}
+
+function summerSlotList(slots: string[]): string {
+  return slots
+    .map(
+      (slot) => `
+    <tr>
+      <td style="padding: 6px 0; font-size: 14px; color: #111827; font-weight: 600;">
+        &#8226;&nbsp;${slot} h
+      </td>
+    </tr>`
+    )
+    .join("");
+}
+
+function formatShortDateForMailSubject(dateStr: string): string {
+  const [year, month, day] = dateStr.split("-");
+  if (!year || !month || !day) return dateStr;
+  return `${day}/${month}/${year}`;
+}
+
+function buildSummerScheduleReplySubject(data: SummerScheduleChangeData): string {
+  return `Horario reserva ${data.bookingNumber} - ${data.customerName} - ${formatShortDateForMailSubject(data.pickupDate)}`;
+}
+
+export function getSummerScheduleChangeTemplate(
+  data: SummerScheduleChangeData
+): string {
+  const pickupTime = formatTimeLabel(data.pickupTime);
+  const dropoffTime = formatTimeLabel(data.dropoffTime);
+  const replySubject = encodeURIComponent(buildSummerScheduleReplySubject(data));
+
+  const content = `
+    <tr>
+      <td style="padding: 30px 20px 20px 20px;">
+        <h2 style="margin: 0 0 15px 0; color: #111827; font-size: 20px;">
+          Un pequeño cambio en el horario de tu reserva
+        </h2>
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151;">
+          Hola <strong>${data.customerFirstName}</strong>,
+        </p>
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151; line-height: 1.6;">
+          Este verano hemos decidido cambiar nuestros horarios de entrega y
+          devolución. Los años anteriores el calor dentro de la nave a mediodía
+          ya era difícil de soportar, y este año preferimos adelantarnos: queremos
+          cuidar al equipo y que recibas la camper en las mejores condiciones
+          posibles.
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #374151; line-height: 1.6;">
+          Al revisar tu reserva <strong>${data.bookingNumber}</strong> hemos visto
+          que la hora de recogida y/o de devolución cae en una franja que ya no
+          trabajamos en verano. Nada grave: solo necesitamos que elijas otra hora
+          de las que te dejamos abajo, tanto para recoger como para devolver el
+          vehículo.
+        </p>
+      </td>
+    </tr>
+
+    ${sectionTitle("Tu reserva actual")}
+    ${detailsTable(`
+      ${tableRow("Reserva", data.bookingNumber)}
+      ${tableRow("Vehículo", data.vehicleName)}
+      ${data.pickupLocation ? tableRow("Ubicación", data.pickupLocation) : ""}
+      ${tableRow("Recogida", `${formatDate(data.pickupDate)} &mdash; ${pickupTime} h`, "#dc2626")}
+      ${tableRow("Devolución", `${formatDate(data.dropoffDate)} &mdash; ${dropoffTime} h`, "#dc2626")}
+    `)}
+
+    ${sectionTitle("Horarios disponibles en verano")}
+    <tr>
+      <td style="padding: 10px 20px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <td width="50%" style="vertical-align: top; padding-right: 8px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0;">
+                <tr>
+                  <td style="padding: 14px 16px;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold; color: #166534; text-transform: uppercase;">
+                      Por la mañana
+                    </p>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      ${summerSlotList(SUMMER_MORNING_SLOTS)}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+            <td width="50%" style="vertical-align: top; padding-left: 8px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color: #eff6ff; border: 1px solid #bfdbfe;">
+                <tr>
+                  <td style="padding: 14px 16px;">
+                    <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold; color: #1e40af; text-transform: uppercase;">
+                      Por la tarde
+                    </p>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0">
+                      ${summerSlotList(SUMMER_AFTERNOON_SLOTS)}
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding: 8px 20px 0 20px;">
+        <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.6;">
+          Puedes elegir una hora de la mañana <strong>o</strong> de la tarde,
+          tanto para la recogida como para la devolución. Te recomendamos
+          mantener la <strong>misma hora</strong> en ambas citas para aprovechar
+          al máximo los periodos completos de 24 horas de tu alquiler.
+        </p>
+      </td>
+    </tr>
+
+    ${ctaButton("Responder a reservas@furgocasa.com", "mailto:reservas@furgocasa.com?subject=" + replySubject)}
+
+    <tr>
+      <td style="padding: 0 20px 30px 20px;">
+        <p style="margin: 0 0 10px 0; font-size: 14px; color: #374151; line-height: 1.6;">
+          Cuéntanos por email cuál te va mejor para la <strong>recogida</strong> y
+          la <strong>devolución</strong>, o si lo prefieres llámanos al
+          <a href="tel:+34868364161" style="color: #063971; text-decoration: none; font-weight: 600;">868 364 161</a>.
+          Estaremos encantados de ayudarte.
+        </p>
+        <p style="margin: 0; font-size: 14px; color: #374151;">
+          Mil gracias por tu comprensión.<br/>
+          <strong>El equipo de Furgocasa</strong>
+        </p>
+      </td>
+    </tr>
+  `;
+
+  const preheader = `${data.customerFirstName}, en verano hemos ajustado los horarios de entrega: necesitamos acordar contigo la recogida y devolución de tu reserva.`;
+  return getEmailBaseTemplate(content, preheader);
+}

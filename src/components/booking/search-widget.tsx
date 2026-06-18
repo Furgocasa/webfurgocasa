@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { format } from "date-fns";
 import { DateRangePicker } from "./date-range-picker";
 import {
@@ -43,6 +43,8 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
   });
   const [pickupTime, setPickupTime] = useState("11:00");
   const [dropoffTime, setDropoffTime] = useState("11:00");
+  /** Si el cliente tocó la hora de devolución, deja de seguir a la de recogida. */
+  const [dropoffTimeManuallySet, setDropoffTimeManuallySet] = useState(false);
   const [closedRanges, setClosedRanges] = useState<BusinessClosedRange[]>([]);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
   const [locationName, setLocationName] = useState("");
@@ -89,11 +91,54 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
 
   useEffect(() => {
     if (!dropoffDateStr) return;
-    if (!isTimeSlotSelectable(dropoffDateStr, dropoffTime, locationOpeningHours)) {
-      const next = getFirstSelectableTime(dropoffDateStr, locationOpeningHours);
-      if (next) setDropoffTime(next);
+
+    if (dropoffTimeManuallySet) {
+      if (!isTimeSlotSelectable(dropoffDateStr, dropoffTime, locationOpeningHours)) {
+        const next = getFirstSelectableTime(dropoffDateStr, locationOpeningHours);
+        if (next) setDropoffTime(next);
+      }
+      return;
     }
-  }, [dropoffDateStr, locationOpeningHours, dropoffTime]);
+
+    const synced = isTimeSlotSelectable(
+      dropoffDateStr,
+      pickupTime,
+      locationOpeningHours
+    )
+      ? pickupTime
+      : getFirstSelectableTime(dropoffDateStr, locationOpeningHours);
+    if (synced && synced !== dropoffTime) {
+      setDropoffTime(synced);
+    }
+  }, [
+    dropoffDateStr,
+    dropoffTime,
+    dropoffTimeManuallySet,
+    pickupTime,
+    locationOpeningHours,
+  ]);
+
+  const handlePickupTimeChange = useCallback((time: string) => {
+    setPickupTime(time);
+    if (!dropoffTimeManuallySet) {
+      setDropoffTime(time);
+    }
+  }, [dropoffTimeManuallySet]);
+
+  const handleDropoffTimeChange = useCallback((time: string) => {
+    setDropoffTimeManuallySet(true);
+    setDropoffTime(time);
+  }, []);
+
+  const handleDateChange = useCallback(
+    (range: { from: Date | undefined; to: Date | undefined }) => {
+      setDateRange(range);
+      if (!range.from && !range.to) {
+        setDropoffTimeManuallySet(false);
+      }
+    },
+    []
+  );
 
   const getMinDays = () => {
     if (pickupDateStr && locationMinConfig) {
@@ -250,7 +295,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
             </label>
             <DateRangePicker
               dateRange={dateRange}
-              onDateChange={setDateRange}
+              onDateChange={handleDateChange}
               minDays={getMinDays()}
               closedRanges={closedRanges}
             />
@@ -265,7 +310,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
               </label>
               <TimeSelector
                 value={pickupTime}
-                onChange={setPickupTime}
+                onChange={handlePickupTimeChange}
                 timeSlots={locationOpeningHours}
                 referenceDate={pickupDateStr}
               />
@@ -278,7 +323,7 @@ export function SearchWidget({ defaultLocation, fallbackLocation }: SearchWidget
               </label>
               <TimeSelector
                 value={dropoffTime}
-                onChange={setDropoffTime}
+                onChange={handleDropoffTimeChange}
                 timeSlots={locationOpeningHours}
                 referenceDate={dropoffDateStr}
               />
