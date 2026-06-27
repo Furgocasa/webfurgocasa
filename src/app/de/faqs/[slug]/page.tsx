@@ -67,13 +67,16 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     category:"Seguro y fianza",
     related: ["pago-fianza","devolucion-fianza","condiciones-devolucion"]
   },"horarios-entrega": {
-    question:"¿A qué hora tengo que entregar y recoger mi camper?",
-    answer: `<p>Los horarios estándar son:</p>
-    <h4>Recogida</h4>
-    <p>Entre las <strong>10:00 y las 13:00</strong> o entre las <strong>17:00 y las 19:00</strong></p>
-    <h4>Devolución</h4>
-    <p>Antes de las <strong>10:00</strong></p>
-    <p>Si necesitas horarios especiales, consúltanos. Podemos adaptarnos a tus necesidades (puede aplicar suplemento fuera de horario).</p>`,
+    question:"Wann hole ich mein Wohnmobil ab und gebe es zurück?",
+    answer: `<p>Die Standardzeiten für Abholung und Rückgabe sind:</p>
+    <h4>Abholung</h4>
+    <p>Zwischen <strong>10:00 und 14:00</strong> oder zwischen <strong>17:00 und 19:00</strong></p>
+    <h4>Rückgabe</h4>
+    <p>Vor <strong>10:00</strong></p>
+    <h4>Sommer (Juni bis September)</h4>
+    <p>Von Juni bis September bieten wir wegen der hohen Temperaturen in unserer Halle <strong>keine Abholungen oder Rückgaben zur Mittagszeit</strong> an. In diesem Zeitraum sind folgende Termine verfügbar:</p>
+    <ul><li><strong>Vormittag:</strong> 10:00 bis 12:00</li><li><strong>Nachmittag:</strong> 18:00 bis 19:00</li></ul>
+    <p>Bei Bedarf an Sonderzeiten kontaktieren Sie uns. Wir passen uns Ihren Bedürfnissen an (Außerhalb der Öffnungszeiten kann ein Zuschlag anfallen).</p>`,
     category:"Entrega y devolución",
     related: ["proceso-recogida","documentos-necesarios"]
   },"documentos-necesarios": {

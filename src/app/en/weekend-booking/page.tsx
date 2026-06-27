@@ -62,6 +62,7 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
                 <h3 className="font-bold text-green-800 mb-4">Pick-up - FRIDAY</h3>
                 <div className="space-y-2 text-green-700">
                   <p className="flex items-center gap-2"><Clock className="h-4 w-4" />From 5:00 PM to 7:00 PM</p>
+                  <p className="text-sm text-orange-700 bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2">In summer (June to September), Friday pick-up is from 6:00 PM to 7:00 PM, as we do not offer midday handovers due to heat in our warehouse.</p>
                   <p className="text-sm">We will be waiting to hand over the fully prepared camper and explain how it works.</p>
                 </div>
               </div>

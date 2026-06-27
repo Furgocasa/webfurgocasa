@@ -3663,8 +3663,44 @@ export const staticTranslations = {
   "El horario de entrega y recogida de vehículos es:": {
     es: "El horario de entrega y recogida de vehículos es:",
     en: "Vehicle pick-up and drop-off hours are:",
-    fr: "Vehicle pick-up and drop-off hours are:",
-    de: "Vehicle pick-up and drop-off hours are:"
+    fr: "Les horaires de retrait et de restitution des véhicules sont :",
+    de: "Die Abhol- und Rückgabezeiten für Fahrzeuge sind:"
+  },
+  "En verano (jun–sep), sin citas a mediodía: mañana hasta 12:00 y tarde 18:00–19:00.": {
+    es: "En verano (jun–sep), sin citas a mediodía: mañana hasta 12:00 y tarde 18:00–19:00.",
+    en: "In summer (Jun–Sep), no midday slots: morning until 12:00 and afternoon 18:00–19:00.",
+    fr: "En été (juin–sep.), pas de créneaux à midi : matin jusqu'à 12:00 et après-midi 18:00–19:00.",
+    de: "Im Sommer (Jun.–Sep.) keine Mittagstermine: vormittags bis 12:00 und nachmittags 18:00–19:00."
+  },
+  "Horarios de entrega y recogida": {
+    es: "Horarios de entrega y recogida",
+    en: "Pick-up and drop-off hours",
+    fr: "Horaires de retrait et de restitution",
+    de: "Abhol- und Rückgabezeiten"
+  },
+  "Recogida de lunes a sábado": {
+    es: "Recogida de lunes a sábado",
+    en: "Pick-up Monday to Saturday",
+    fr: "Retrait du lundi au samedi",
+    de: "Abholung Montag bis Samstag"
+  },
+  "Verano (junio a septiembre)": {
+    es: "Verano (junio a septiembre)",
+    en: "Summer (June to September)",
+    fr: "Été (juin à septembre)",
+    de: "Sommer (Juni bis September)"
+  },
+  "De junio a septiembre, por las altas temperaturas en nuestra nave, no realizamos entregas ni recogidas a mediodía. Las citas disponibles en ese periodo son por la mañana (hasta las 12:00) y por la tarde (de 18:00 a 19:00).": {
+    es: "De junio a septiembre, por las altas temperaturas en nuestra nave, no realizamos entregas ni recogidas a mediodía. Las citas disponibles en ese periodo son por la mañana (hasta las 12:00) y por la tarde (de 18:00 a 19:00).",
+    en: "From June to September, due to high temperatures in our warehouse, we do not offer pick-ups or drop-offs at midday. Available slots during this period are in the morning (until 12:00) and in the afternoon (18:00 to 19:00).",
+    fr: "De juin à septembre, en raison des fortes chaleurs dans notre entrepôt, nous ne proposons pas de retraits ni de restitutions à midi. Les créneaux disponibles sont le matin (jusqu'à 12:00) et l'après-midi (de 18:00 à 19:00).",
+    de: "Von Juni bis September bieten wir wegen der hohen Temperaturen in unserer Halle keine Abholungen oder Rückgaben zur Mittagszeit an. Verfügbare Termine sind vormittags (bis 12:00) und nachmittags (18:00 bis 19:00)."
+  },
+  "En verano, la recogida del viernes es de 18:00 a 19:00 (sin franja de mediodía).": {
+    es: "En verano, la recogida del viernes es de 18:00 a 19:00 (sin franja de mediodía).",
+    en: "In summer, Friday pick-up is from 18:00 to 19:00 (no midday slot).",
+    fr: "En été, le retrait du vendredi est de 18:00 à 19:00 (pas de créneau à midi).",
+    de: "Im Sommer ist die Freitagsabholung von 18:00 bis 19:00 (kein Mittagsfenster)."
   },
   "De Lunes a Sábado": {
     es: "De Lunes a Sábado",

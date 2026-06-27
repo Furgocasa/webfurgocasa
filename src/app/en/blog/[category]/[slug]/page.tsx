@@ -12,7 +12,7 @@ import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, getTranslatedRecords, type Locale } from "@/lib/translations/get-translations";
 import { translateServer } from "@/lib/i18n/server-translation";
-import { buildBlogCanonicalAlternates, truncateTitle, OG_DEFAULT_IMAGE } from "@/lib/seo/multilingual-metadata";
+import { buildBlogCanonicalAlternates, truncateTitle, formatOgTitle, OG_DEFAULT_IMAGE } from "@/lib/seo/multilingual-metadata";
 import { BlogContentWithBanners } from "@/components/blog/blog-banners";
 
 /**
@@ -82,7 +82,7 @@ export async function generateMetadata({
   
   const fullTitle = translatedMeta.meta_title || translatedMeta.title;
   const htmlTitle = truncateTitle(fullTitle, 60);
-  const ogTitle = truncateTitle(fullTitle, 95);
+  const ogTitle = formatOgTitle(fullTitle);
   const twitterTitle = truncateTitle(fullTitle, 70);
   return {
     title: htmlTitle,

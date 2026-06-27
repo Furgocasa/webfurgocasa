@@ -233,7 +233,7 @@ export function FaqsClient() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <p className="text-base md:text-lg text-gray-700 leading-relaxed">
-              <strong>{t("Preguntas frecuentes alquiler camper Furgocasa:")}</strong> {t("Requisitos: carnet B con 2 años, edad mínima 25 años.")} {t("Fianza:")} {COMPANY.depositAmount.toLocaleString("es-ES")}€. {t("Precios desde")} {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/día {t("según temporada.")} {t("Kilómetros ilimitados en")} {COMPANY.rentalPolicy.unlimitedKilometersArea}. {t("Recogida en")} {COMPANY.rentalPolicy.pickupLocationsLabel}. {t("Horarios:")} {COMPANY.rentalPolicy.pickupWindowLabel}, {t("devolución")} {COMPANY.rentalPolicy.dropoffWindowLabel}. {t("Teléfono:")} {COMPANY.phoneDisplay}.
+              <strong>{t("Preguntas frecuentes alquiler camper Furgocasa:")}</strong> {t("Requisitos: carnet B con 2 años, edad mínima 25 años.")} {t("Fianza:")} {COMPANY.depositAmount.toLocaleString("es-ES")}€. {t("Precios desde")} {COMPANY.rentalPolicy.dailyRateFrom.lowSeason}€/día {t("según temporada.")} {t("Kilómetros ilimitados en")} {COMPANY.rentalPolicy.unlimitedKilometersArea}. {t("Recogida en")} {COMPANY.rentalPolicy.pickupLocationsLabel}. {t("Horarios:")} {COMPANY.rentalPolicy.pickupWindowLabel}, {t("devolución")} {COMPANY.rentalPolicy.dropoffWindowLabel}. {t("En verano (jun–sep), sin citas a mediodía: mañana hasta 12:00 y tarde 18:00–19:00.")} {t("Teléfono:")} {COMPANY.phoneDisplay}.
             </p>
           </div>
         </div>

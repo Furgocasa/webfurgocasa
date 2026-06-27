@@ -8,7 +8,7 @@ import type { Locale } from "@/lib/i18n/config";
 // 🎯 SEO Metadata - Único y optimizado para /faqs
 const FAQS_METADATA: Metadata = {
   title: "Preguntas Frecuentes sobre Alquiler de Campers",
-  description: "FAQs alquiler camper: carnet B con 2 años, edad mínima 25 años. Fianza 1.000€. Precios desde 95€/día. Kilómetros ilimitados en España. Recogida Murcia o Madrid. Horarios 10:00-13:00 o 17:00-19:00. Teléfono 868 36 41 61.",
+  description: "FAQs alquiler camper: carnet B con 2 años, edad mínima 25 años. Fianza 1.000€. Precios desde 95€/día. Kilómetros ilimitados en España. Recogida Murcia o Madrid. Horarios 10:00-14:00 o 17:00-19:00 (verano sin mediodía). Teléfono 868 36 41 61.",
   keywords: "preguntas frecuentes alquiler camper, dudas autocaravana, requisitos alquiler camper, faqs furgocasa, información alquiler autocaravana",
   openGraph: {
       images: [{ url: "https://www.furgocasa.com/images/slides/hero-05.webp", width: 1200, height: 630, alt: "Furgocasa" }],

@@ -77,11 +77,14 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     related: ["pago-fianza","devolucion-fianza","condiciones-devolucion"]
   },"horarios-entrega": {
     question:"¿A qué hora tengo que entregar y recoger mi camper?",
-    answer: `<p>Los horarios estándar son:</p>
+    answer: `<p>Los horarios estándar de recogida y entrega son:</p>
     <h4>Recogida</h4>
-    <p>Entre las <strong>10:00 y las 13:00</strong> o entre las <strong>17:00 y las 19:00</strong></p>
+    <p>Entre las <strong>10:00 y las 14:00</strong> o entre las <strong>17:00 y las 19:00</strong></p>
     <h4>Devolución</h4>
     <p>Antes de las <strong>10:00</strong></p>
+    <h4>Verano (junio a septiembre)</h4>
+    <p>De junio a septiembre, por las altas temperaturas en nuestra nave, <strong>no realizamos entregas ni recogidas a mediodía</strong>. En ese periodo las citas disponibles son:</p>
+    <ul><li><strong>Mañana:</strong> de 10:00 a 12:00</li><li><strong>Tarde:</strong> de 18:00 a 19:00</li></ul>
     <p>Si necesitas horarios especiales, consúltanos. Podemos adaptarnos a tus necesidades (puede aplicar suplemento fuera de horario).</p>`,
     category:"Entrega y devolución",
     related: ["proceso-recogida","documentos-necesarios"]

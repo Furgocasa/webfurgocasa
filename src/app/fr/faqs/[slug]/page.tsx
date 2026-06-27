@@ -75,13 +75,16 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     category:"Seguro y fianza",
     related: ["pago-fianza","devolucion-fianza","condiciones-devolucion"]
   },"horarios-entrega": {
-    question:"¿A qué hora tengo que entregar y recoger mi camper?",
-    answer: `<p>Los horarios estándar son:</p>
-    <h4>Recogida</h4>
-    <p>Entre las <strong>10:00 y las 13:00</strong> o entre las <strong>17:00 y las 19:00</strong></p>
-    <h4>Devolución</h4>
-    <p>Antes de las <strong>10:00</strong></p>
-    <p>Si necesitas horarios especiales, consúltanos. Podemos adaptarnos a tus necesidades (puede aplicar suplemento fuera de horario).</p>`,
+    question:"À quelle heure dois-je récupérer et restituer mon camping-car ?",
+    answer: `<p>Les horaires standard de retrait et de restitution sont :</p>
+    <h4>Retrait</h4>
+    <p>Entre <strong>10:00 et 14:00</strong> ou entre <strong>17:00 et 19:00</strong></p>
+    <h4>Restitution</h4>
+    <p>Avant <strong>10:00</strong></p>
+    <h4>Été (juin à septembre)</h4>
+    <p>De juin à septembre, en raison des fortes chaleurs dans notre entrepôt, <strong>nous ne proposons pas de retraits ni de restitutions à midi</strong>. Pendant cette période, les créneaux disponibles sont :</p>
+    <ul><li><strong>Matin :</strong> de 10:00 à 12:00</li><li><strong>Après-midi :</strong> de 18:00 à 19:00</li></ul>
+    <p>Si vous avez besoin d'horaires spéciaux, contactez-nous. Nous pouvons nous adapter à vos besoins (un supplément hors horaires peut s'appliquer).</p>`,
     category:"Entrega y devolución",
     related: ["proceso-recogida","documentos-necesarios"]
   },"documentos-necesarios": {

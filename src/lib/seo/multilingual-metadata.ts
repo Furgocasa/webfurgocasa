@@ -6,6 +6,19 @@ import type { Metadata } from "next";
 /** Imagen OG por defecto (estática en public/images/slides). Absoluta para crawlers (Meta, etc.). */
 export const OG_DEFAULT_IMAGE = 'https://www.furgocasa.com/images/slides/hero-05.webp';
 
+/** Meta og:title — Meta/Facebook aceptan hasta ~255 caracteres. */
+export const OG_TITLE_MAX_LENGTH = 255;
+
+/**
+ * Título para Open Graph sin recorte por palabras (evita perder el final del titular).
+ */
+export function formatOgTitle(title: string | null | undefined): string {
+  if (!title) return '';
+  const trimmed = title.trim();
+  if (trimmed.length <= OG_TITLE_MAX_LENGTH) return trimmed;
+  return trimmed.substring(0, OG_TITLE_MAX_LENGTH).trim();
+}
+
 /**
  * Helper para truncar el título SEO
  */

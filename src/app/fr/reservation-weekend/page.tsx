@@ -62,6 +62,7 @@ export default async function LocaleComoReservarFinSemanaPage({ params }: PagePr
                 <h3 className="font-bold text-green-800 mb-4">Recogida - VIERNES</h3>
                 <div className="space-y-2 text-green-700">
                   <p className="flex items-center gap-2"><Clock className="h-4 w-4" />De 17:00 a 19:00</p>
+                  <p className="text-sm text-orange-700 bg-orange-50 border border-orange-200 rounded-lg p-3 mt-2">En été (juin à septembre), le retrait du vendredi est de 18:00 à 19:00, car nous ne proposons pas de livraisons à midi en raison de la chaleur dans notre entrepôt.</p>
                   <p className="text-sm">Te esperamos para entregarte el camper totalmente preparado y explicarte su funcionamiento.</p>
                 </div>
               </div>

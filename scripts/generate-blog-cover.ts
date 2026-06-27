@@ -5,6 +5,7 @@
  * Uso:
  *   npx tsx scripts/generate-blog-cover.ts "https://www.furgocasa.com/es/blog/rutas/slug-del-post"
  *   npx tsx scripts/generate-blog-cover.ts --post-id="uuid-del-post"
+ *   npx tsx scripts/generate-blog-cover.ts "url" --scene-type=human_experience --scene-focus="pareja en pozas del rio Segura"
  *
  * Solo reconvertir la portada actual a WebP (sin IA):
  *   npm run reencode:blog-cover-webp -- "url1" "url2" ...
@@ -26,6 +27,20 @@ function parsePostIdFlag(args: string[]): string | null {
     }
   }
   return null;
+}
+
+function readFlagValue(args: string[], longName: string): string | null {
+  for (const arg of args) {
+    if (arg.startsWith(`${longName}=`)) return arg.slice(longName.length + 1).trim() || null;
+  }
+  return null;
+}
+
+function parseSceneType(value: string | null): "vehicle" | "human_experience" | "landscape" | undefined {
+  if (!value) return undefined;
+  const v = value.toLowerCase().trim();
+  if (v === "vehicle" || v === "human_experience" || v === "landscape") return v;
+  return undefined;
 }
 
 async function main() {
@@ -57,7 +72,12 @@ async function main() {
   }
 
   const postId = parsePostIdFlag(args);
-  const articleUrl = postId ? undefined : args.filter((a) => !a.startsWith("--post-id="))[0] || DEFAULT_URL;
+  const sceneTypeOverride = parseSceneType(readFlagValue(args, "--scene-type"));
+  const sceneFocus = readFlagValue(args, "--scene-focus") || undefined;
+  const articleUrl = postId
+    ? undefined
+    : args.filter((a) => !a.startsWith("--post-id=") && !a.startsWith("--scene-type=") && !a.startsWith("--scene-focus="))[0] ||
+      DEFAULT_URL;
 
   if (!process.env.OPENAI_API_KEY || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     console.error("❌ Falta OPENAI_API_KEY o SUPABASE_SERVICE_ROLE_KEY en .env.local");
@@ -73,7 +93,9 @@ async function main() {
   }
 
   const result = await generateBlogCoverFromTarget(
-    postId ? { postId, forceRegenerate: true } : { articleUrl: articleUrl!, forceRegenerate: true }
+    postId
+      ? { postId, forceRegenerate: true, sceneTypeOverride, sceneFocus }
+      : { articleUrl: articleUrl!, forceRegenerate: true, sceneTypeOverride, sceneFocus }
   );
 
   if ("reused" in result && result.reused) {
@@ -94,6 +116,9 @@ async function main() {
     }
   } else {
     console.log("Modelo de referencia: ninguno (prompt-only)");
+  }
+  if ("sceneType" in result && result.sceneType) {
+    console.log("Scene type:", result.sceneType);
   }
 }
 

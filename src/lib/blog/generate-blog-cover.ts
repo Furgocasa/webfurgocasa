@@ -151,8 +151,9 @@ Criterios:
 Reglas duras de decision:
 - Si el articulo se centra en "que hacer", "que ver", "mercados", "gastronomia", "fiestas", "pueblos con encanto", "rutas a pie", "talleres" o "experiencias", normalmente "human_experience".
 - Si el articulo se centra en "ruta en camper por X", "como conducir", "consejos para el viaje en camper", "que camper alquilar", normalmente "vehicle".
+- Si el articulo trata de descansar fresco, banarse, pozas, rios, altitud, noches veraniegas, confort nocturno o escapar del calor, y el mensaje visual natural es el destino o la experiencia humana (no el vehiculo aparcado de perfil), preferir "human_experience" o "landscape" antes que "vehicle".
 - Si el articulo se centra en paisaje puro, naturaleza salvaje o fenomenos geograficos, "landscape".
-- Si dudas entre "vehicle" y "human_experience", gana "human_experience": meter la camper con calzador en escenas que no le pertenecen empobrece la portada.
+- Si dudas entre "vehicle" y "human_experience", gana "human_experience": meter la camper con calzador en escenas que no le pertenecen empobrece la portada y genera repeticion visual en el listado del blog.
 - "landscape" es una eleccion seria; usala solo cuando el dossier sea claramente paisajistico.
 
 Devuelve SOLO el JSON, sin markdown, sin explicacion adicional.`;
@@ -390,13 +391,16 @@ function getSlugField(locale: "es" | "en" | "fr" | "de") {
   return "slug";
 }
 
-function inferVisualClues(text: string) {
+function inferVisualClues(text: string, sceneType?: CoverSceneType) {
   const normalized = text
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 
-  const clues: string[] = ["camper gran volumen realista tipo furgon camperizado europeo integrada en un contexto de viaje real"];
+  const clues: string[] =
+    sceneType === "human_experience" || sceneType === "landscape"
+      ? []
+      : ["camper gran volumen realista tipo furgon camperizado europeo integrada en un contexto de viaje real"];
 
   const rules: Array<[RegExp, string]> = [
     [/\bdesiert|\btabernas|\bbadlands|\bsecano|\barid/, "paisaje arido, ramblas, terreno seco y luz intensa"],
@@ -407,6 +411,7 @@ function inferVisualClues(text: string) {
     [/\bcarretera|\bruta|\broad trip|\bmirador/, "carretera secundaria escenica, parada de viaje o mirador real"],
     [/\bpueblo|\bcasco historico|\bmercado/, "pueblo real, arquitectura vivida y escala humana natural"],
     [/\bmontana|\bsierra/, "sierra o relieve montanoso integrado en la escena"],
+    [/\brio\b|\bsegura\b|\bcharca|\bpoza|\bbanarse|\brefresc/, "rio de montana con agua clara y fresca, pozas naturales, rocas calizas y vegetacion de ribera"],
   ];
 
   for (const [pattern, clue] of rules) {
@@ -418,7 +423,12 @@ function inferVisualClues(text: string) {
   return clues.slice(0, 5);
 }
 
-function buildDossier(post: CoverPost, articleUrl?: string, vehicleModelLabel?: string) {
+function buildDossier(
+  post: CoverPost,
+  articleUrl?: string,
+  vehicleModelLabel?: string,
+  options?: { sceneType?: CoverSceneType; sceneFocus?: string }
+) {
   const plainContent = truncate(stripHtml(post.content), 4200);
   const excerpt = collapseWhitespace(post.excerpt || post.meta_description || "");
   const keywords = collapseWhitespace(
@@ -432,8 +442,12 @@ function buildDossier(post: CoverPost, articleUrl?: string, vehicleModelLabel?: 
       .join(", ")
   );
   const visualClues = inferVisualClues(
-    [post.title, excerpt, plainContent, keywords].filter(Boolean).join(" ")
+    [post.title, excerpt, plainContent, keywords].filter(Boolean).join(" "),
+    options?.sceneType
   );
+  const editorBrief = options?.sceneFocus?.trim()
+    ? `\n--- Direccion creativa obligatoria del editor ---\n${options.sceneFocus.trim()}\nEsta direccion tiene PRIORIDAD sobre cualquier inferencia automatica del dossier.`
+    : "";
 
   return collapseWhitespace(`
 === DOSSIER DEL ELEMENTO (usalo entero; prioriza coherencia tematica, geografica y editorial) ===
@@ -469,7 +483,7 @@ Debe resumir el articulo con una sola escena real, fotografiable y util como por
 Si el articulo habla de carretera, paisaje o ruta, prioriza una escena exterior real.
 Si aparece un vehiculo, que se integre con naturalidad y no robe protagonismo al paisaje salvo que el propio articulo lo exija.
 Tiempo de lectura aproximado: ${post.reading_time || "sin dato"} minutos
-URL del articulo: ${articleUrl || `https://www.furgocasa.com/es/blog/${post.category?.slug || "blog"}/${post.slug || ""}`}
+URL del articulo: ${articleUrl || `https://www.furgocasa.com/es/blog/${post.category?.slug || "blog"}/${post.slug || ""}`}${editorBrief}
 `);
 }
 
@@ -1043,6 +1057,8 @@ export async function generateBlogCoverFromTarget(input: {
   postId?: string;
   articleUrl?: string;
   forceRegenerate?: boolean;
+  sceneTypeOverride?: CoverSceneType;
+  sceneFocus?: string;
 }) {
   if (!process.env.OPENAI_API_KEY) {
     throw new Error("Falta OPENAI_API_KEY en el servidor");
@@ -1053,7 +1069,7 @@ export async function generateBlogCoverFromTarget(input: {
   }
 
   const adminSupabase = createServiceSupabase();
-  const { postId, articleUrl, forceRegenerate = true } = input;
+  const { postId, articleUrl, forceRegenerate = true, sceneTypeOverride, sceneFocus } = input;
 
   if (!postId && !articleUrl) {
     throw new Error("Debes indicar postId o articleUrl");
@@ -1076,15 +1092,28 @@ export async function generateBlogCoverFromTarget(input: {
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-  const preliminaryDossier = buildDossier(post, loaded.canonicalUrl, undefined);
-  const sceneDecision = await classifyCoverScene(openai, preliminaryDossier);
+  const preliminaryDossier = buildDossier(post, loaded.canonicalUrl, undefined, {
+    sceneType: sceneTypeOverride,
+    sceneFocus,
+  });
+  const sceneDecision = sceneTypeOverride
+    ? {
+        sceneType: sceneTypeOverride,
+        rationale: sceneFocus
+          ? "Forzado por editor con direccion creativa explicita"
+          : "Forzado por editor (--scene-type)",
+      }
+    : await classifyCoverScene(openai, preliminaryDossier);
   console.log(
     `[BLOG-COVER] scene_type=${sceneDecision.sceneType} (${sceneDecision.rationale})`
   );
 
   const vehicleSelection =
     sceneDecision.sceneType === "vehicle" ? await selectVehicleReferenceImages() : null;
-  const dossier = buildDossier(post, loaded.canonicalUrl, vehicleSelection?.modelLabel);
+  const dossier = buildDossier(post, loaded.canonicalUrl, vehicleSelection?.modelLabel, {
+    sceneType: sceneDecision.sceneType,
+    sceneFocus,
+  });
   const prompts = await buildVisualPrompt(openai, dossier, sceneDecision.sceneType);
   const imageBuffer = await generateImageBuffer(
     openai,

@@ -75,13 +75,16 @@ const faqs: Record<string, { question: string; answer: string; category: string;
     category:"Seguro y fianza",
     related: ["pago-fianza","devolucion-fianza","condiciones-devolucion"]
   },"horarios-entrega": {
-    question:"¿A qué hora tengo que entregar y recoger mi camper?",
-    answer: `<p>Los horarios estándar son:</p>
-    <h4>Recogida</h4>
-    <p>Entre las <strong>10:00 y las 13:00</strong> o entre las <strong>17:00 y las 19:00</strong></p>
-    <h4>Devolución</h4>
-    <p>Antes de las <strong>10:00</strong></p>
-    <p>Si necesitas horarios especiales, consúltanos. Podemos adaptarnos a tus necesidades (puede aplicar suplemento fuera de horario).</p>`,
+    question:"What time do I pick up and return my camper?",
+    answer: `<p>Standard pick-up and drop-off hours are:</p>
+    <h4>Pick-up</h4>
+    <p>Between <strong>10:00 and 14:00</strong> or between <strong>17:00 and 19:00</strong></p>
+    <h4>Drop-off</h4>
+    <p>Before <strong>10:00</strong></p>
+    <h4>Summer (June to September)</h4>
+    <p>From June to September, due to high temperatures in our warehouse, <strong>we do not offer pick-ups or drop-offs at midday</strong>. During this period, available slots are:</p>
+    <ul><li><strong>Morning:</strong> 10:00 to 12:00</li><li><strong>Afternoon:</strong> 18:00 to 19:00</li></ul>
+    <p>If you need special hours, contact us. We can adapt to your needs (an out-of-hours surcharge may apply).</p>`,
     category:"Entrega y devolución",
     related: ["proceso-recogida","documentos-necesarios"]
   },"documentos-necesarios": {

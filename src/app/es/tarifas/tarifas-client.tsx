@@ -896,6 +896,45 @@ export function TarifasClient() {
         </div>
       </section>
 
+      {/* Horarios de entrega y recogida */}
+      <section id="horarios-entrega" className="py-16 md:py-20 bg-white border-y border-gray-100">
+        <div className="container mx-auto px-4 max-w-4xl">
+          <div className="rounded-3xl bg-gray-50 p-8 md:p-12 shadow-inner border border-gray-100">
+            <div className="flex flex-col md:flex-row gap-6 md:gap-8 items-start">
+              <div className="shrink-0 flex justify-center md:block w-full md:w-auto">
+                <div className="rounded-2xl bg-furgocasa-blue/10 p-4 md:p-5 inline-flex">
+                  <Clock className="h-12 w-12 md:h-14 md:w-14 text-furgocasa-blue" strokeWidth={2} aria-hidden />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-6">
+                  {t("Horarios de entrega y recogida")}
+                </h2>
+                <div className="grid md:grid-cols-2 gap-4 mb-6">
+                  <div className="bg-white rounded-2xl p-5 border border-green-100">
+                    <h3 className="font-heading font-bold text-green-800 mb-2">{t("Recogida de lunes a sábado")}</h3>
+                    <p className="text-green-700 font-semibold text-lg">{COMPANY.rentalPolicy.pickupWindowLabel}</p>
+                  </div>
+                  <div className="bg-white rounded-2xl p-5 border border-blue-100">
+                    <h3 className="font-heading font-bold text-blue-800 mb-2">{t("Devolución")}</h3>
+                    <p className="text-blue-700 font-semibold text-lg">{COMPANY.rentalPolicy.dropoffWindowLabel}</p>
+                  </div>
+                </div>
+                <div className="rounded-2xl bg-orange-50 border border-orange-200 p-6">
+                  <h3 className="font-heading font-bold text-orange-900 text-lg mb-3 flex items-center gap-2">
+                    <AlertCircle className="h-5 w-5 text-orange-600 shrink-0" aria-hidden />
+                    {t("Verano (junio a septiembre)")}
+                  </h3>
+                  <p className="text-orange-900 leading-relaxed">
+                    {t("De junio a septiembre, por las altas temperaturas en nuestra nave, no realizamos entregas ni recogidas a mediodía. Las citas disponibles en ese periodo son por la mañana (hasta las 12:00) y por la tarde (de 18:00 a 19:00).")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Puntualidad en citas de entrega / devolución (después de seguro y devolución, antes del CTA) */}
       <section id="puntualidad-citas" className="py-16 md:py-20 bg-gradient-to-b from-amber-50 to-orange-50/70 border-y-2 border-furgocasa-orange/25">
         <div className="container mx-auto px-4 max-w-4xl">
