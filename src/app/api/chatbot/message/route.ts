@@ -100,18 +100,32 @@ export async function POST(request: NextRequest) {
   // 3. Contexto RAG
   const context = await retrieveContext(ragQuery);
 
-  // 4. Historial reciente
+  // 4. Historial reciente. Incluimos media_url para que las imagenes enviadas en
+  // turnos anteriores sigan siendo "visibles" por el modelo en los mensajes
+  // posteriores de la misma conversacion (si no, solo veria la imagen del turno
+  // exacto en que se envio y respondia de forma incoherente despues).
   const { data: history } = await supabase
     .from('chatbot_messages')
-    .select('role, content')
+    .select('role, content, media_url, media_type')
     .eq('conversation_id', convId)
     .order('created_at', { ascending: false })
     .limit(HISTORY_LIMIT);
 
   const historyMessages: ChatMessage[] = (history || [])
     .reverse()
-    .filter((m) => m.content)
-    .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }));
+    .filter((m) => m.content || m.media_url)
+    .map((m) => {
+      if (m.role === 'user' && m.media_type === 'image' && m.media_url) {
+        return {
+          role: 'user',
+          content: [
+            { type: 'text', text: m.content || 'Te envio esta imagen, ayudame con ella.' },
+            { type: 'image_url', image_url: { url: m.media_url } },
+          ],
+        } as ChatMessage;
+      }
+      return { role: m.role as 'user' | 'assistant', content: m.content || '' };
+    });
 
   // 5. Mensaje actual del usuario (con imagen si aplica)
   let currentUserMessage: ChatMessage;

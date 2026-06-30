@@ -31,6 +31,8 @@ interface ConversationRow {
   message_count: number;
   assistant_count: number;
   unclassified_responses: number;
+  classified_responses: number;
+  quality_score: number | null;
   first_user_message: string;
   last_message: string;
 }
@@ -86,6 +88,16 @@ const LANGUAGE_LABEL: Record<string, string> = {
   desconocido: "Desconocido",
 };
 
+const LANGUAGE_COLORS: Record<string, string> = {
+  es: "#2563eb",
+  en: "#16a34a",
+  fr: "#f59e0b",
+  de: "#ef4444",
+  it: "#8b5cf6",
+  pt: "#14b8a6",
+  desconocido: "#9ca3af",
+};
+
 function fmtDate(v: string | null): string {
   if (!v) return "-";
   return new Date(v).toLocaleString("es-ES", {
@@ -136,6 +148,18 @@ export default function ChatbotAdminPage() {
       .filter((d) => d.value > 0);
   }, [stats]);
 
+  const languageDonutData = useMemo(() => {
+    const byLanguage = stats?.byLanguage || {};
+    return Object.entries(byLanguage)
+      .map(([lang, value]) => ({
+        name: LANGUAGE_LABEL[lang] || lang,
+        value: value || 0,
+        color: LANGUAGE_COLORS[lang] || "#9ca3af",
+      }))
+      .filter((d) => d.value > 0)
+      .sort((a, b) => b.value - a.value);
+  }, [stats]);
+
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: ["admin-chatbot"] });
     queryClient.invalidateQueries({ queryKey: ["admin-chatbot-detail"] });
@@ -167,8 +191,8 @@ export default function ChatbotAdminPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 lg:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-3 content-start">
           {view === "conversations" && (
             <SummaryCard label="Conversaciones" value={stats?.totalConversations ?? 0} />
           )}
@@ -177,25 +201,8 @@ export default function ChatbotAdminPage() {
           <SummaryCard label="Mejorables" value={stats?.byQuality.mejorable ?? 0} color="text-amber-600" />
           <SummaryCard label="Incorrectas" value={stats?.byQuality.incorrecta ?? 0} color="text-red-600" />
         </div>
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Calidad por respuesta</h3>
-          <div className="h-40">
-            {donutData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie data={donutData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={2}>
-                    {donutData.map((d, i) => (
-                      <Cell key={i} fill={d.color} />
-                    ))}
-                  </Pie>
-                  <RechartsTooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <div className="h-full flex items-center justify-center text-sm text-gray-400">Sin datos</div>
-            )}
-          </div>
-        </div>
+        <DonutCard title="Calidad por respuesta" data={donutData} />
+        <DonutCard title="Mensajes por idioma" data={languageDonutData} />
       </div>
 
       <FiltersBar
@@ -273,9 +280,53 @@ function TabButton({ active, onClick, children }: { active: boolean; onClick: ()
 
 function SummaryCard({ label, value, color }: { label: string; value: number; color?: string }) {
   return (
-    <div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
-      <p className={`text-2xl font-bold ${color || "text-gray-900 dark:text-white"}`}>{value}</p>
+    <div className="rounded-lg bg-gray-50 dark:bg-gray-700/40 px-3 py-2">
+      <p className="text-[11px] leading-tight text-gray-500 dark:text-gray-400">{label}</p>
+      <p className={`text-lg font-bold leading-tight ${color || "text-gray-900 dark:text-white"}`}>{value}</p>
+    </div>
+  );
+}
+
+function DonutCard({
+  title,
+  data,
+}: {
+  title: string;
+  data: { name: string; value: number; color: string }[];
+}) {
+  const total = data.reduce((acc, d) => acc + d.value, 0);
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+      <h3 className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{title}</h3>
+      <div className="h-32">
+        {data.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie data={data} dataKey="value" nameKey="name" innerRadius={34} outerRadius={52} paddingAngle={2}>
+                {data.map((d, i) => (
+                  <Cell key={i} fill={d.color} />
+                ))}
+              </Pie>
+              <RechartsTooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="h-full flex items-center justify-center text-xs text-gray-400">Sin datos</div>
+        )}
+      </div>
+      {data.length > 0 && (
+        <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1">
+          {data.map((d, i) => (
+            <span key={i} className="inline-flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400">
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: d.color }} />
+              {d.name}
+              <b className="text-gray-700 dark:text-gray-300">
+                {total > 0 ? Math.round((d.value / total) * 100) : 0}%
+              </b>
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -457,7 +508,7 @@ function ConversationsTable({ rows, onSelect }: { rows: ConversationRow[]; onSel
             <th className="px-4 py-3 font-medium">Idioma</th>
             <th className="px-4 py-3 font-medium">Primer mensaje</th>
             <th className="px-4 py-3 font-medium text-center">Resp.</th>
-            <th className="px-4 py-3 font-medium text-center">Sin clasificar</th>
+            <th className="px-4 py-3 font-medium text-center">Nota media</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -468,17 +519,47 @@ function ConversationsTable({ rows, onSelect }: { rows: ConversationRow[]; onSel
               <td className="px-4 py-3 max-w-xs truncate text-gray-700 dark:text-gray-200">{c.first_user_message || "-"}</td>
               <td className="px-4 py-3 text-center text-gray-500">{c.assistant_count}</td>
               <td className="px-4 py-3 text-center">
-                {c.unclassified_responses > 0 ? (
-                  <span className="text-amber-600 font-medium">{c.unclassified_responses}</span>
-                ) : (
-                  <span className="text-gray-400">0</span>
-                )}
+                <ScoreBadge score={c.quality_score} classified={c.classified_responses} pending={c.unclassified_responses} />
               </td>
             </tr>
           ))}
         </tbody>
       </table>
     </div>
+  );
+}
+
+function ScoreBadge({
+  score,
+  classified,
+  pending,
+}: {
+  score: number | null;
+  classified: number;
+  pending: number;
+}) {
+  if (score === null) {
+    return (
+      <span className="inline-flex items-center gap-1 text-xs text-gray-400" title="Aún no hay respuestas clasificadas">
+        Sin valorar
+        {pending > 0 && <span className="text-amber-500">({pending})</span>}
+      </span>
+    );
+  }
+  const color =
+    score >= 7
+      ? "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300"
+      : score >= 4
+        ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
+        : "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold ${color}`}
+      title={`Media de ${classified} respuesta(s) clasificada(s)${pending > 0 ? ` · ${pending} sin clasificar` : ""}`}
+    >
+      {score.toFixed(1)}/10
+      {pending > 0 && <span className="font-normal opacity-70">·{pending}</span>}
+    </span>
   );
 }
 

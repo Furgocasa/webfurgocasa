@@ -96,9 +96,20 @@ export async function GET(request: NextRequest) {
 
   const ids = (conversations || []).map((c) => c.id);
 
+  // Puntuacion por calidad de respuesta (para la nota media de la conversacion).
+  const QUALITY_SCORE: Record<string, number> = { correcta: 10, mejorable: 5, incorrecta: 0 };
+
   const previews = new Map<
     string,
-    { count: number; assistantCount: number; unclassified: number; firstUser: string; last: string }
+    {
+      count: number;
+      assistantCount: number;
+      unclassified: number;
+      classified: number;
+      scoreSum: number;
+      firstUser: string;
+      last: string;
+    }
   >();
 
   if (ids.length > 0) {
@@ -113,6 +124,8 @@ export async function GET(request: NextRequest) {
         count: 0,
         assistantCount: 0,
         unclassified: 0,
+        classified: 0,
+        scoreSum: 0,
         firstUser: '',
         last: '',
       };
@@ -124,7 +137,13 @@ export async function GET(request: NextRequest) {
       if (m.role === 'user' && !entry.firstUser) entry.firstUser = text;
       if (m.role === 'assistant') {
         entry.assistantCount++;
-        if ((m.response_quality || 'sin_tipo') === 'sin_tipo') entry.unclassified++;
+        const qd = (m.response_quality || 'sin_tipo') as Quality;
+        if (qd === 'sin_tipo') {
+          entry.unclassified++;
+        } else if (qd in QUALITY_SCORE) {
+          entry.classified++;
+          entry.scoreSum += QUALITY_SCORE[qd];
+        }
       }
       entry.last = text;
       previews.set(m.conversation_id, entry);
@@ -136,6 +155,8 @@ export async function GET(request: NextRequest) {
       count: 0,
       assistantCount: 0,
       unclassified: 0,
+      classified: 0,
+      scoreSum: 0,
       firstUser: '',
       last: '',
     };
@@ -152,6 +173,8 @@ export async function GET(request: NextRequest) {
       message_count: p.count,
       assistant_count: p.assistantCount,
       unclassified_responses: p.unclassified,
+      classified_responses: p.classified,
+      quality_score: p.classified > 0 ? Math.round((p.scoreSum / p.classified) * 10) / 10 : null,
       first_user_message: p.firstUser,
       last_message: p.last,
     };

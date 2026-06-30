@@ -13,7 +13,7 @@ export const CHAT_MODEL = process.env.OPENAI_CHATBOT_MODEL || 'gpt-4o';
 export const EMBEDDING_MODEL = 'text-embedding-3-small';
 export const CHATBOT_BUCKET = 'chatbot-uploads';
 export const RAG_MATCH_COUNT = 6;
-export const HISTORY_LIMIT = 12;
+export const HISTORY_LIMIT = 20;
 
 let _supabase: SupabaseClient<Database> | null = null;
 let _openai: OpenAI | null = null;
