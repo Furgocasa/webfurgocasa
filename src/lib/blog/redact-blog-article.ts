@@ -49,6 +49,8 @@ export type RedactBlogArticleInput = {
   articleUrl?: string;
   slug?: string;
   dryRun?: boolean;
+  /** Solo regenera excerpt, meta_title, meta_description y meta_keywords (no reescribe el HTML). */
+  seoOnly?: boolean;
 };
 
 export type RedactBlogArticleResult = {
@@ -60,6 +62,7 @@ export type RedactBlogArticleResult = {
   excerpt: string;
   metaTitle: string;
   metaDescription: string;
+  metaKeywords: string;
   contentPreview: string;
   updated: boolean;
   model: string;
@@ -210,13 +213,44 @@ function extractHtmlFromModelOutput(raw: string): string {
   return text.trim();
 }
 
+function decodeHtmlEntities(text: string): string {
+  return text
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&([a-z]+);/gi, (match, name) => {
+      const entities: Record<string, string> = {
+        ntilde: "ñ",
+        Ntilde: "Ñ",
+        aacute: "á",
+        eacute: "é",
+        iacute: "í",
+        oacute: "ó",
+        uacute: "ú",
+        Aacute: "Á",
+        Eacute: "É",
+        Iacute: "Í",
+        Oacute: "Ó",
+        Uacute: "Ú",
+        uuml: "ü",
+        Uuml: "Ü",
+      };
+      return entities[name] ?? match;
+    });
+}
+
 function stripHtmlToText(html: string): string {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+  return decodeHtmlEntities(
+    html
+      .replace(/<script[\s\S]*?<\/script>/gi, " ")
+      .replace(/<style[\s\S]*?<\/style>/gi, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 function countWords(html: string): number {
@@ -247,6 +281,36 @@ async function callRedactor(
   return content;
 }
 
+const SEO_FIELDS_SYSTEM_PROMPT = `Genera metadatos SEO en español para un artículo del blog de rutas en camper/autocaravana de Furgocasa (alquiler en Murcia y España).
+
+Responde SOLO JSON con estas keys:
+- excerpt: resumen editorial para la ficha del artículo (máx. 280 caracteres, sin repetir el título literal).
+- meta_title: título SEO para <title> y Open Graph (50-60 caracteres). Incluye keyword principal (camper/autocaravana + destino). No uses comillas.
+- meta_description: meta description (140-155 caracteres). Debe ser única, incluir destino, tipo de viaje y CTA suave (guía, consejos, alquiler camper). No copies el excerpt.
+- meta_keywords: hasta 10 keywords separadas por coma (alquiler camper, autocaravana, nombre del destino, Furgocasa si encaja).
+
+Reglas:
+- Español natural, orientado a búsquedas comerciales e informativas.
+- No inventes precios ni datos que no aparezcan en el contenido.
+- Prioriza términos que un viajero buscaría: "ruta en camper", "alquiler autocaravana", nombres de lugares del artículo.`;
+
+function clampSeoText(text: string, maxLen: number): string {
+  const trimmed = text.trim();
+  if (trimmed.length <= maxLen) return trimmed;
+  const cut = trimmed.slice(0, maxLen);
+  const lastSpace = cut.lastIndexOf(" ");
+  return (lastSpace > maxLen * 0.6 ? cut.slice(0, lastSpace) : cut).trim();
+}
+
+function normalizeTitleKey(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 async function generateSeoFields(
   openai: OpenAI,
   title: string,
@@ -262,12 +326,11 @@ async function generateSeoFields(
     messages: [
       {
         role: "system",
-        content:
-          "Genera metadatos SEO en español para un artículo del blog Furgocasa. Responde JSON con keys: excerpt (max 300 chars), meta_title (max 60 chars), meta_description (max 155 chars), meta_keywords (comma separated, max 10).",
+        content: SEO_FIELDS_SYSTEM_PROMPT,
       },
       {
         role: "user",
-        content: `Título: ${title}\n\nContenido:\n${plain}`,
+        content: `Título del artículo (H1 de la página, no repetir como excerpt):\n${title}\n\nContenido:\n${plain}`,
       },
     ],
     max_completion_tokens: 600,
@@ -281,11 +344,37 @@ async function generateSeoFields(
     meta_keywords?: string;
   };
 
+  const titleKey = normalizeTitleKey(title);
+  const pickField = (value: string | undefined, fallback: string, maxLen: number) => {
+    const trimmed = decodeHtmlEntities((value || fallback).trim());
+    const cleanFallback = decodeHtmlEntities(fallback.trim());
+    if (!trimmed) return clampSeoText(cleanFallback, maxLen);
+    if (normalizeTitleKey(trimmed) === titleKey) {
+      return clampSeoText(cleanFallback, maxLen);
+    }
+    // Evitar excerpt/description que solo repiten el primer párrafo del cuerpo
+    if (maxLen >= 140 && normalizeTitleKey(trimmed).length > 40) {
+      const bodyStart = normalizeTitleKey(stripHtmlToText(html).slice(0, 200));
+      const valueStart = normalizeTitleKey(trimmed.slice(0, 200));
+      if (bodyStart.startsWith(valueStart.slice(0, Math.min(80, valueStart.length)))) {
+        return clampSeoText(cleanFallback, maxLen);
+      }
+    }
+    return clampSeoText(trimmed, maxLen);
+  };
+
+  const defaultKeywords =
+    "alquiler camper, autocaravana, ruta en camper, Furgocasa, alquiler autocaravana Murcia";
+
   return {
-    excerpt: (parsed.excerpt || title).trim(),
-    metaTitle: (parsed.meta_title || title).trim(),
-    metaDescription: (parsed.meta_description || parsed.excerpt || title).trim(),
-    metaKeywords: (parsed.meta_keywords || "alquiler campers, autocaravana, Furgocasa").trim(),
+    excerpt: pickField(parsed.excerpt, stripHtmlToText(html).slice(0, 280), 300),
+    metaTitle: pickField(parsed.meta_title, title, 60),
+    metaDescription: pickField(
+      parsed.meta_description,
+      stripHtmlToText(html).slice(0, 150),
+      155
+    ),
+    metaKeywords: pickField(parsed.meta_keywords, defaultKeywords, 500),
   };
 }
 
@@ -302,6 +391,45 @@ export async function redactBlogArticle(input: RedactBlogArticleInput): Promise<
 
   console.log(`[BLOG-REDACTOR] Artículo: ${post.title}`);
   console.log(`[BLOG-REDACTOR] Modelo: ${model} | temperature: ${modelSupportsTemperature(model) ? temperature : "default (gpt-5.x)"}`);
+
+  if (input.seoOnly) {
+    const html = post.content?.trim();
+    if (!html) throw new Error("El artículo no tiene contenido HTML para generar SEO");
+
+    const seo = await generateSeoFields(openai, post.title, html, model, temperature);
+    const wordCount = countWords(html);
+    const readingTime = post.reading_time || estimateReadingTimeMinutes(wordCount);
+    const payload = {
+      excerpt: clampSeoText(seo.excerpt, 300),
+      meta_title: clampSeoText(seo.metaTitle, 60),
+      meta_description: clampSeoText(seo.metaDescription, 155),
+      meta_keywords: clampSeoText(seo.metaKeywords, 500),
+      reading_time: readingTime,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (!input.dryRun) {
+      const { error } = await supabase.from("posts").update(payload).eq("id", post.id);
+      if (error) throw new Error(`Error guardando SEO: ${error.message}`);
+    }
+
+    console.log("[BLOG-REDACTOR] Modo SEO-only: metadatos regenerados");
+    return {
+      postId: post.id,
+      title: post.title,
+      slug: post.slug,
+      wordCount,
+      readingTime,
+      excerpt: payload.excerpt,
+      metaTitle: payload.meta_title,
+      metaDescription: payload.meta_description,
+      metaKeywords: payload.meta_keywords,
+      contentPreview: stripHtmlToText(html).slice(0, 280) + "...",
+      updated: !input.dryRun,
+      model,
+      temperature,
+    };
+  }
 
   const dossier = await buildResearchDossier(post.title, post.category?.slug);
   console.log("[BLOG-REDACTOR] Investigación SerpAPI + Wikipedia completada");
@@ -343,10 +471,10 @@ export async function redactBlogArticle(input: RedactBlogArticleInput): Promise<
 
   const payload = {
     content,
-    excerpt: seo.excerpt,
-    meta_title: seo.metaTitle,
-    meta_description: seo.metaDescription,
-    meta_keywords: seo.metaKeywords,
+    excerpt: clampSeoText(seo.excerpt, 300),
+    meta_title: clampSeoText(seo.metaTitle, 60),
+    meta_description: clampSeoText(seo.metaDescription, 155),
+    meta_keywords: clampSeoText(seo.metaKeywords, 500),
     reading_time: readingTime,
     updated_at: new Date().toISOString(),
   };
@@ -362,9 +490,10 @@ export async function redactBlogArticle(input: RedactBlogArticleInput): Promise<
     slug: post.slug,
     wordCount,
     readingTime,
-    excerpt: seo.excerpt,
-    metaTitle: seo.metaTitle,
-    metaDescription: seo.metaDescription,
+    excerpt: payload.excerpt,
+    metaTitle: payload.meta_title,
+    metaDescription: payload.meta_description,
+    metaKeywords: payload.meta_keywords,
     contentPreview: stripHtmlToText(content).slice(0, 280) + "...",
     updated: !input.dryRun,
     model,

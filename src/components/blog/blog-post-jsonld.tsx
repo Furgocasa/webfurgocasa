@@ -6,12 +6,18 @@ interface BlogPostJsonLdProps {
   url: string;
 }
 
+export function getBlogPostKeywords(post: Post): string | undefined {
+  const fromTags = post.tags?.map((tag) => tag.name).filter(Boolean).join(", ");
+  if (fromTags) return fromTags;
+  return post.meta_keywords?.trim() || undefined;
+}
+
 export function BlogPostJsonLd({ post, url }: BlogPostJsonLdProps) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.excerpt || post.meta_description || "",
+    "headline": post.meta_title || post.title,
+    "description": post.meta_description || post.excerpt || "",
     "image": post.featured_image ? [post.featured_image] : [],
     "datePublished": post.published_at,
     "dateModified": post.updated_at || post.published_at,
@@ -32,7 +38,7 @@ export function BlogPostJsonLd({ post, url }: BlogPostJsonLdProps) {
       "@id": url
     },
     "articleSection": post.category?.name || "Blog",
-    "keywords": post.tags?.map(tag => tag.name).join(", ") || "",
+    "keywords": getBlogPostKeywords(post) || "",
     "wordCount": post.content?.split(/\s+/).length || 0,
     "timeRequired": `PT${post.reading_time || 5}M`,
   };

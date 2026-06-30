@@ -32,27 +32,29 @@ function parseArgs() {
   let slug: string | undefined;
   let dryRun = false;
   let translate = false;
+  let seoOnly = false;
 
   for (const arg of args) {
     if (arg === "--dry-run") dryRun = true;
     else if (arg === "--translate") translate = true;
+    else if (arg === "--seo-only") seoOnly = true;
     else if (arg.startsWith("--slug=")) slug = arg.slice("--slug=".length).trim() || undefined;
     else if (arg.startsWith("http")) articleUrl = arg;
     else if (!arg.startsWith("--")) slug = arg;
   }
 
-  return { articleUrl, slug, dryRun, translate };
+  return { articleUrl, slug, dryRun, translate, seoOnly };
 }
 
 async function main() {
-  const { articleUrl, slug, dryRun, translate } = parseArgs();
+  const { articleUrl, slug, dryRun, translate, seoOnly } = parseArgs();
   if (!articleUrl && !slug) {
     console.error("❌ Indica URL del artículo o --slug=...");
     process.exit(1);
   }
 
   const { redactBlogArticle } = await import("@/lib/blog/redact-blog-article");
-  const result = await redactBlogArticle({ articleUrl, slug, dryRun });
+  const result = await redactBlogArticle({ articleUrl, slug, dryRun, seoOnly });
 
   console.log("\n=== RESULTADO ===");
   console.log("Título:", result.title);
@@ -61,6 +63,8 @@ async function main() {
   console.log("Lectura:", result.readingTime, "min");
   console.log("Modelo:", result.model, "| temp:", result.temperature);
   console.log("Meta title:", result.metaTitle);
+  console.log("Meta description:", result.metaDescription);
+  console.log("Meta keywords:", result.metaKeywords);
   console.log("Excerpt:", result.excerpt);
   console.log("Actualizado en Supabase:", result.updated ? "sí" : "no (dry-run)");
   console.log("Preview:", result.contentPreview);

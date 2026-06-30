@@ -8,7 +8,7 @@ import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
 import { getCategoryName, buildBlogRouteDataFromPost, translateCategorySlug, sanitizeBlogContentLinks } from "@/lib/blog-translations";
 import { ShareButtons } from "@/components/blog/share-buttons";
-import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
+import { BlogPostJsonLd, getBlogPostKeywords } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, type Locale } from "@/lib/translations/get-translations";
 import { getActiveLocationTargetNames, pickPrimaryLocation } from "@/lib/locations/server-actions";
@@ -75,7 +75,7 @@ export async function generateMetadata({
     title: htmlTitle,
     description: post.meta_description || post.excerpt || post.title,
     authors: [{ name: "Furgocasa" }],
-    keywords: post.tags?.map(tag => tag.name).join(","),
+    keywords: getBlogPostKeywords(post),
     openGraph: {
       title: ogTitle,
       description: post.excerpt || post.meta_description || "",

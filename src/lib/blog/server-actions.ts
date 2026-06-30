@@ -33,6 +33,7 @@ export interface Post {
   views: number;
   meta_title: string | null;
   meta_description: string | null;
+  meta_keywords: string | null;
   category_id: string | null;
   category: Category | null;
   tags?: TagItem[];
@@ -78,6 +79,7 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
     views,
     meta_title,
     meta_description,
+    meta_keywords,
     category_id,
     location_tags,
     category:content_categories(id, name, slug, description)

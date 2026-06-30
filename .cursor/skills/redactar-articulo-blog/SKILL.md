@@ -32,7 +32,13 @@ npx tsx scripts/redact-blog-article.ts "https://www.furgocasa.com/es/blog/rutas/
 npx tsx scripts/redact-blog-article.ts "https://www.furgocasa.com/es/blog/rutas/SLUG"
 ```
 
-3. Opcional pipeline completo tras redactar:
+3. Regenerar **solo metadatos SEO** (sin tocar el HTML) si el contenido ya está bien:
+
+```bash
+npx tsx scripts/redact-blog-article.ts "URL" --seo-only
+```
+
+4. Opcional pipeline completo tras redactar:
 
 ```bash
 npx tsx scripts/redact-blog-article.ts "URL" --translate
@@ -41,7 +47,21 @@ npm run generate:blog-cover-and-body -- "URL"
 
 (`generate:blog-cover-and-body` con `npx tsx` si lleva flags `--scene-type`.)
 
-4. Informar al usuario: palabras, tiempo de lectura, slug y si quiere portada/imágenes/traducción
+5. Informar al usuario: palabras, tiempo de lectura, slug y si quiere portada/imágenes/traducción
+
+## Metadatos SEO (automáticos)
+
+Tras redactar (o con `--seo-only`), el agente guarda en Supabase:
+
+| Campo | Uso |
+|-------|-----|
+| `excerpt` | Lead del artículo + Open Graph / Twitter |
+| `meta_title` | `<title>` y og:title (50-60 chars) |
+| `meta_description` | Meta description (140-155 chars) |
+| `meta_keywords` | Keywords meta + JSON-LD si no hay tags |
+| `reading_time` | Calculado por palabras |
+
+Verificar con `--seo-only` antes de traducir. La traducción copia `meta_title` y `meta_description` a EN/FR/DE.
 
 ## Reglas del redactor (resumen)
 
