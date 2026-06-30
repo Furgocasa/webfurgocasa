@@ -1,0 +1,4 @@
+# Exports personales de WhatsApp (datos personales) y binarios pesados: no versionar.
+WHATSAPP CHAT*.csv
+*.bmp
+*.zip

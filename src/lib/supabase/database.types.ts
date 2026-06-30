@@ -14,6 +14,119 @@ export type Database = {
   }
   public: {
     Tables: {
+      chatbot_kb_chunks: {
+        Row: {
+          id: string
+          source: string
+          title: string
+          content: string
+          content_hash: string
+          embedding: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          source: string
+          title: string
+          content: string
+          content_hash: string
+          embedding?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          source?: string
+          title?: string
+          content?: string
+          content_hash?: string
+          embedding?: string | null
+          created_at?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_conversations: {
+        Row: {
+          id: string
+          session_id: string
+          contact_name: string | null
+          contact_phone: string | null
+          contact_email: string | null
+          language: string | null
+          status: string
+          response_quality: string
+          admin_notes: string | null
+          created_at: string | null
+          last_message_at: string | null
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          contact_email?: string | null
+          language?: string | null
+          status?: string
+          response_quality?: string
+          admin_notes?: string | null
+          created_at?: string | null
+          last_message_at?: string | null
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          contact_email?: string | null
+          language?: string | null
+          status?: string
+          response_quality?: string
+          admin_notes?: string | null
+          created_at?: string | null
+          last_message_at?: string | null
+        }
+        Relationships: []
+      }
+      chatbot_messages: {
+        Row: {
+          id: string
+          conversation_id: string
+          role: string
+          content: string
+          media_url: string | null
+          media_type: string | null
+          transcription: string | null
+          created_at: string | null
+        }
+        Insert: {
+          id?: string
+          conversation_id: string
+          role: string
+          content?: string
+          media_url?: string | null
+          media_type?: string | null
+          transcription?: string | null
+          created_at?: string | null
+        }
+        Update: {
+          id?: string
+          conversation_id?: string
+          role?: string
+          content?: string
+          media_url?: string | null
+          media_type?: string | null
+          transcription?: string | null
+          created_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chatbot_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chatbot_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       activity_log: {
         Row: {
           action: string
@@ -2447,6 +2560,16 @@ export type Database = {
       }
     }
     Functions: {
+      match_chatbot_chunks: {
+        Args: { query_embedding: string; match_count?: number }
+        Returns: {
+          id: string
+          source: string
+          title: string
+          content: string
+          similarity: number
+        }[]
+      }
       calculate_payment_status: {
         Args: { p_amount_paid: number; p_total_price: number }
         Returns: string

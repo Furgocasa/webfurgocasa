@@ -1,0 +1,474 @@
+"use client";
+
+import React, { useMemo, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from "recharts";
+import {
+  MessageCircle,
+  Loader2,
+  X,
+  Search,
+  User,
+  Bot,
+  Image as ImageIcon,
+  Mic,
+  Save,
+} from "lucide-react";
+
+type Quality = "correcta" | "mejorable" | "incorrecta" | "sin_tipo";
+
+interface ConversationRow {
+  id: string;
+  created_at: string | null;
+  last_message_at: string | null;
+  language: string | null;
+  status: string;
+  response_quality: Quality;
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+  message_count: number;
+  first_user_message: string;
+  last_message: string;
+}
+
+interface Stats {
+  total: number;
+  byQuality: Record<string, number>;
+  byLanguage: Record<string, number>;
+}
+
+interface MessageRow {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  media_url: string | null;
+  media_type: "image" | "audio" | null;
+  transcription: string | null;
+  created_at: string | null;
+}
+
+const QUALITY_META: Record<Quality, { label: string; color: string; badge: string }> = {
+  correcta: { label: "Correcta", color: "#22c55e", badge: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300" },
+  mejorable: { label: "Mejorable", color: "#f59e0b", badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300" },
+  incorrecta: { label: "Incorrecta", color: "#ef4444", badge: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300" },
+  sin_tipo: { label: "Sin tipo", color: "#9ca3af", badge: "bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300" },
+};
+
+const LANGUAGE_LABEL: Record<string, string> = {
+  es: "Español",
+  en: "Inglés",
+  fr: "Francés",
+  de: "Alemán",
+  it: "Italiano",
+  pt: "Portugués",
+  desconocido: "Desconocido",
+};
+
+function fmtDate(v: string | null): string {
+  if (!v) return "-";
+  const d = new Date(v);
+  return d.toLocaleString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+export default function ChatbotAdminPage() {
+  const queryClient = useQueryClient();
+  const [filters, setFilters] = useState({ quality: "", language: "", from: "", to: "", q: "" });
+  const [searchInput, setSearchInput] = useState("");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  const listQuery = useQuery({
+    queryKey: ["admin-chatbot", filters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (filters.quality) params.set("quality", filters.quality);
+      if (filters.language) params.set("language", filters.language);
+      if (filters.from) params.set("from", filters.from);
+      if (filters.to) params.set("to", filters.to);
+      if (filters.q) params.set("q", filters.q);
+      const res = await fetch(`/api/admin/chatbot?${params.toString()}`);
+      if (!res.ok) throw new Error("Error al cargar");
+      return (await res.json()) as { conversations: ConversationRow[]; stats: Stats };
+    },
+  });
+
+  const donutData = useMemo(() => {
+    const byQuality = listQuery.data?.stats.byQuality || {};
+    return (Object.keys(QUALITY_META) as Quality[])
+      .map((q) => ({ name: QUALITY_META[q].label, value: byQuality[q] || 0, color: QUALITY_META[q].color }))
+      .filter((d) => d.value > 0);
+  }, [listQuery.data]);
+
+  const stats = listQuery.data?.stats;
+
+  return (
+    <div className="space-y-6">
+      {/* Cabecera */}
+      <div className="flex items-center gap-3">
+        <div className="bg-blue-600 text-white rounded-xl p-2.5">
+          <MessageCircle className="w-6 h-6" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Chatbot</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Registro de conversaciones del asistente virtual</p>
+        </div>
+      </div>
+
+      {/* Resumen */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <SummaryCard label="Conversaciones" value={stats?.total ?? 0} />
+          <SummaryCard label="Correctas" value={stats?.byQuality.correcta ?? 0} color="text-green-600" />
+          <SummaryCard label="Mejorables" value={stats?.byQuality.mejorable ?? 0} color="text-amber-600" />
+          <SummaryCard label="Incorrectas" value={stats?.byQuality.incorrecta ?? 0} color="text-red-600" />
+        </div>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tipo de respuesta</h3>
+          <div className="h-40">
+            {donutData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie data={donutData} dataKey="value" nameKey="name" innerRadius={45} outerRadius={70} paddingAngle={2}>
+                    {donutData.map((d, i) => (
+                      <Cell key={i} fill={d.color} />
+                    ))}
+                  </Pie>
+                  <RechartsTooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-full flex items-center justify-center text-sm text-gray-400">Sin datos</div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Filtros */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-wrap gap-3 items-end">
+        <div className="flex-1 min-w-[200px]">
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Buscar en mensajes</label>
+          <div className="flex gap-2">
+            <input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && setFilters((f) => ({ ...f, q: searchInput.trim() }))}
+              placeholder="Texto..."
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+            />
+            <button
+              onClick={() => setFilters((f) => ({ ...f, q: searchInput.trim() }))}
+              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2"
+              aria-label="Buscar"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+        <FilterSelect
+          label="Tipo de respuesta"
+          value={filters.quality}
+          onChange={(v) => setFilters((f) => ({ ...f, quality: v }))}
+          options={[
+            { value: "", label: "Todas" },
+            { value: "correcta", label: "Correcta" },
+            { value: "mejorable", label: "Mejorable" },
+            { value: "incorrecta", label: "Incorrecta" },
+            { value: "sin_tipo", label: "Sin tipo" },
+          ]}
+        />
+        <FilterSelect
+          label="Idioma"
+          value={filters.language}
+          onChange={(v) => setFilters((f) => ({ ...f, language: v }))}
+          options={[
+            { value: "", label: "Todos" },
+            ...Object.entries(LANGUAGE_LABEL).map(([value, label]) => ({ value, label })),
+          ]}
+        />
+        <div>
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Desde</label>
+          <input
+            type="date"
+            value={filters.from}
+            onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
+            className="rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+          />
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Hasta</label>
+          <input
+            type="date"
+            value={filters.to}
+            onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
+            className="rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+          />
+        </div>
+        {(filters.quality || filters.language || filters.from || filters.to || filters.q) && (
+          <button
+            onClick={() => {
+              setFilters({ quality: "", language: "", from: "", to: "", q: "" });
+              setSearchInput("");
+            }}
+            className="text-sm text-gray-500 hover:text-gray-700 underline px-2 py-2"
+          >
+            Limpiar
+          </button>
+        )}
+      </div>
+
+      {/* Tabla */}
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+        {listQuery.isLoading ? (
+          <div className="p-10 flex items-center justify-center text-gray-400">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : listQuery.isError ? (
+          <div className="p-10 text-center text-red-500">Error al cargar las conversaciones</div>
+        ) : (listQuery.data?.conversations.length ?? 0) === 0 ? (
+          <div className="p-10 text-center text-gray-400">No hay conversaciones</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 dark:bg-gray-700/50 text-left text-gray-500 dark:text-gray-400">
+                <tr>
+                  <th className="px-4 py-3 font-medium">Fecha</th>
+                  <th className="px-4 py-3 font-medium">Idioma</th>
+                  <th className="px-4 py-3 font-medium">Contacto</th>
+                  <th className="px-4 py-3 font-medium">Primer mensaje</th>
+                  <th className="px-4 py-3 font-medium text-center">Msgs</th>
+                  <th className="px-4 py-3 font-medium">Tipo de respuesta</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                {listQuery.data!.conversations.map((c) => (
+                  <tr
+                    key={c.id}
+                    onClick={() => setSelectedId(c.id)}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer"
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">{fmtDate(c.last_message_at || c.created_at)}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{LANGUAGE_LABEL[c.language || "desconocido"] || c.language}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{c.contact_name || c.contact_phone || c.contact_email || "-"}</td>
+                    <td className="px-4 py-3 max-w-xs truncate text-gray-700 dark:text-gray-200">{c.first_user_message || "-"}</td>
+                    <td className="px-4 py-3 text-center text-gray-500">{c.message_count}</td>
+                    <td className="px-4 py-3">
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${QUALITY_META[c.response_quality].badge}`}>
+                        {QUALITY_META[c.response_quality].label}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {selectedId && (
+        <ConversationDetail
+          id={selectedId}
+          onClose={() => setSelectedId(null)}
+          onUpdated={() => queryClient.invalidateQueries({ queryKey: ["admin-chatbot"] })}
+        />
+      )}
+    </div>
+  );
+}
+
+function SummaryCard({ label, value, color }: { label: string; value: number; color?: string }) {
+  return (
+    <div>
+      <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
+      <p className={`text-2xl font-bold ${color || "text-gray-900 dark:text-white"}`}>{value}</p>
+    </div>
+  );
+}
+
+function FilterSelect({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <div>
+      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">{label}</label>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function ConversationDetail({
+  id,
+  onClose,
+  onUpdated,
+}: {
+  id: string;
+  onClose: () => void;
+  onUpdated: () => void;
+}) {
+  const detailQuery = useQuery({
+    queryKey: ["admin-chatbot-detail", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/admin/chatbot/${id}`);
+      if (!res.ok) throw new Error("Error");
+      return (await res.json()) as {
+        conversation: ConversationRow & { admin_notes: string | null };
+        messages: MessageRow[];
+      };
+    },
+  });
+
+  const [quality, setQuality] = useState<Quality | null>(null);
+  const [notes, setNotes] = useState<string | null>(null);
+
+  const conversation = detailQuery.data?.conversation;
+  const effectiveQuality = quality ?? conversation?.response_quality ?? "sin_tipo";
+  const effectiveNotes = notes ?? conversation?.admin_notes ?? "";
+
+  const mutation = useMutation({
+    mutationFn: async (body: { response_quality?: Quality; admin_notes?: string | null }) => {
+      const res = await fetch(`/api/admin/chatbot/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("Error al guardar");
+      return res.json();
+    },
+    onSuccess: () => {
+      onUpdated();
+      detailQuery.refetch();
+    },
+  });
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
+      <div
+        className="w-full max-w-xl bg-white dark:bg-gray-800 h-full overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
+          <h2 className="font-semibold text-gray-900 dark:text-white">Conversación</h2>
+          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {detailQuery.isLoading ? (
+          <div className="p-10 flex justify-center text-gray-400">
+            <Loader2 className="w-6 h-6 animate-spin" />
+          </div>
+        ) : !conversation ? (
+          <div className="p-10 text-center text-red-500">No encontrada</div>
+        ) : (
+          <div className="p-4 space-y-4">
+            {/* Metadatos + clasificacion */}
+            <div className="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-3 space-y-3 text-sm">
+              <div className="grid grid-cols-2 gap-2 text-gray-600 dark:text-gray-300">
+                <span>Idioma: <b>{LANGUAGE_LABEL[conversation.language || "desconocido"] || conversation.language}</b></span>
+                <span>Inicio: <b>{fmtDate(conversation.created_at)}</b></span>
+                {conversation.contact_phone && <span>Tel: <b>{conversation.contact_phone}</b></span>}
+                {conversation.contact_email && <span>Email: <b>{conversation.contact_email}</b></span>}
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Tipo de respuesta</label>
+                <div className="flex flex-wrap gap-2">
+                  {(Object.keys(QUALITY_META) as Quality[]).map((q) => (
+                    <button
+                      key={q}
+                      onClick={() => setQuality(q)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                        effectiveQuality === q
+                          ? QUALITY_META[q].badge + " border-transparent ring-2 ring-offset-1 ring-blue-400"
+                          : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-500"
+                      }`}
+                    >
+                      {QUALITY_META[q].label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Notas internas</label>
+                <textarea
+                  value={effectiveNotes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={2}
+                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+                  placeholder="Anotaciones sobre esta conversación..."
+                />
+              </div>
+
+              <button
+                onClick={() => mutation.mutate({ response_quality: effectiveQuality, admin_notes: effectiveNotes })}
+                disabled={mutation.isPending}
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-2 text-sm"
+              >
+                {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Guardar
+              </button>
+              {mutation.isSuccess && <span className="text-green-600 text-xs ml-2">Guardado</span>}
+            </div>
+
+            {/* Hilo */}
+            <div className="space-y-3">
+              {detailQuery.data!.messages.map((m) => (
+                <div key={m.id} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                  {m.role === "assistant" && <Bot className="w-5 h-5 text-blue-500 mt-1 shrink-0" />}
+                  <div
+                    className={`rounded-lg p-3 max-w-[80%] text-sm ${
+                      m.role === "user"
+                        ? "bg-blue-50 dark:bg-blue-900/30 text-gray-800 dark:text-gray-100"
+                        : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
+                    }`}
+                  >
+                    {m.media_type === "image" && m.media_url && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={m.media_url} alt="adjunto" className="rounded mb-2 max-h-48" />
+                    )}
+                    {m.media_type === "audio" && m.media_url && (
+                      <div className="mb-2">
+                        <audio controls src={m.media_url} className="max-w-full" />
+                        {m.transcription && (
+                          <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
+                            <Mic className="w-3 h-3" /> {m.transcription}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                    {m.content && <p className="whitespace-pre-wrap">{m.content}</p>}
+                    {!m.content && m.media_type === "image" && (
+                      <p className="text-xs text-gray-400 flex items-center gap-1">
+                        <ImageIcon className="w-3 h-3" /> imagen
+                      </p>
+                    )}
+                    <p className="text-[10px] text-gray-400 mt-1">{fmtDate(m.created_at)}</p>
+                  </div>
+                  {m.role === "user" && <User className="w-5 h-5 text-gray-400 mt-1 shrink-0" />}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

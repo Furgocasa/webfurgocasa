@@ -50,6 +50,8 @@
     "generate:blog-body-images": "tsx scripts/generate-blog-body-images.ts",
     "generate:blog-cover-and-body": "tsx scripts/generate-blog-cover-and-body.ts",
     "redact:blog": "tsx scripts/redact-blog-article.ts",
+    "ingest:chatbot-kb": "tsx scripts/ingest-chatbot-kb.ts",
+    "verify:chatbot-kb": "tsx scripts/verify-chatbot-coherence.ts",
     "generate:blog-banners": "tsx scripts/generate-blog-banners.ts",
     "generate:showcase-images": "tsx scripts/generate-content-creator-showcase-images.ts",
     "generate:storytellers-images": "tsx scripts/generate-storytellers-showcase-images.ts",
