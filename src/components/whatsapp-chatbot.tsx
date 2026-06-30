@@ -131,7 +131,7 @@ export default function WhatsAppChatbot() {
           }
         }
         const label = m[1] || url;
-        const cls = 'text-[#075E54] underline font-medium hover:text-[#25D366] break-words';
+        const cls = 'text-[#063971] underline font-medium hover:text-[#094F9A] break-words';
         if (INTERNAL_RE.test(url)) {
           const path = url.replace(INTERNAL_RE, '') || '/';
           nodes.push(
@@ -320,8 +320,8 @@ export default function WhatsAppChatbot() {
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed bottom-6 right-6 z-50 bg-[#25D366] hover:bg-[#20BA59] text-white rounded-full p-4 shadow-2xl transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-[#25D366]/50"
-        aria-label="Abrir chat de Furgocasa"
+        className="fixed bottom-6 right-6 z-50 bg-[#063971] hover:bg-[#042A54] text-white rounded-full p-4 shadow-2xl transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-[#063971]/40"
+        aria-label="Abrir chat con Andrea de Furgocasa"
       >
         {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
       </button>
@@ -329,21 +329,21 @@ export default function WhatsAppChatbot() {
       {isOpen && (
         <div className="fixed bottom-24 right-6 z-50 w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
           {/* Header */}
-          <div className="bg-[#075E54] text-white p-4 flex items-center gap-3">
+          <div className="bg-[#063971] text-white p-4 flex items-center gap-3">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-[#25D366]" />
+              <MessageCircle className="w-6 h-6 text-[#063971]" />
             </div>
             <div className="flex-1">
-              <h3 className="font-rubik font-semibold text-lg">Asistente Furgocasa</h3>
-              <p className="text-xs text-white/80">Resuelve tus dudas al instante</p>
+              <h3 className="font-rubik font-semibold text-lg">Andrea</h3>
+              <p className="text-xs text-white/80">Asistente virtual de Furgocasa</p>
             </div>
           </div>
 
           {/* Body */}
-          <div ref={scrollRef} className="p-5 bg-[#E5DDD5] min-h-[320px] max-h-[450px] overflow-y-auto">
+          <div ref={scrollRef} className="p-5 bg-[#EEF2F7] min-h-[320px] max-h-[450px] overflow-y-auto">
             <div className="bg-white rounded-lg rounded-tl-none p-4 shadow-sm mb-4">
               <p className="text-gray-800 text-sm font-amiko">
-                ¡Hola! 👋 Soy el asistente virtual de Furgocasa.
+                ¡Hola! 👋 Soy Andrea, la asistente virtual de Furgocasa.
               </p>
               <p className="text-gray-800 text-sm font-amiko mt-2">¿En qué puedo ayudarte hoy?</p>
             </div>
@@ -354,7 +354,7 @@ export default function WhatsAppChatbot() {
                   <button
                     key={index}
                     onClick={() => handleQuickQuestion(question)}
-                    className="w-full bg-white hover:bg-gray-50 text-left p-3 rounded-lg shadow-sm transition-colors duration-200 text-sm font-amiko text-gray-700 border border-gray-100"
+                    className="w-full bg-white hover:bg-[#063971] hover:text-white text-left p-3 rounded-lg shadow-sm transition-colors duration-200 text-sm font-amiko text-gray-700 border border-[#063971]/15 hover:border-[#063971]"
                   >
                     {question}
                   </button>
@@ -365,7 +365,7 @@ export default function WhatsAppChatbot() {
             {messages.map((m) =>
               m.role === 'user' ? (
                 <div key={m.id} className="flex justify-end mb-3">
-                  <div className="bg-[#DCF8C6] rounded-lg rounded-tr-none p-3 shadow-sm max-w-[80%]">
+                  <div className="bg-[#063971] rounded-lg rounded-tr-none p-3 shadow-sm max-w-[80%]">
                     {m.mediaType === 'image' && m.mediaUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={m.mediaUrl} alt="adjunto" className="rounded-md mb-1 max-h-40 object-cover" />
@@ -374,7 +374,7 @@ export default function WhatsAppChatbot() {
                       <audio controls src={m.mediaUrl} className="max-w-full" />
                     )}
                     {m.content && (
-                      <p className="text-gray-800 text-sm font-amiko whitespace-pre-wrap">{m.content}</p>
+                      <p className="text-white text-sm font-amiko whitespace-pre-wrap">{m.content}</p>
                     )}
                   </div>
                 </div>
@@ -392,6 +392,21 @@ export default function WhatsAppChatbot() {
                 </div>
               )
             )}
+
+            {/* Sugerencias siempre disponibles durante la conversacion */}
+            {messages.length > 0 && !isSending && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {QUICK_QUESTIONS.map((question, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleQuickQuestion(question)}
+                    className="text-xs font-amiko bg-white text-[#063971] border border-[#063971]/30 rounded-full px-3 py-1.5 shadow-sm hover:bg-[#063971] hover:text-white transition-colors duration-200"
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Footer - Input */}
@@ -407,7 +422,7 @@ export default function WhatsAppChatbot() {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isSending || isRecording}
-                className="text-gray-500 hover:text-[#075E54] disabled:opacity-40 p-2"
+                className="text-gray-500 hover:text-[#063971] disabled:opacity-40 p-2"
                 aria-label="Adjuntar imagen"
               >
                 <ImagePlus className="w-5 h-5" />
@@ -417,7 +432,7 @@ export default function WhatsAppChatbot() {
                 onClick={isRecording ? stopRecording : startRecording}
                 disabled={isSending}
                 className={`p-2 disabled:opacity-40 ${
-                  isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-[#075E54]'
+                  isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-[#063971]'
                 }`}
                 aria-label={isRecording ? 'Detener grabación' : 'Grabar audio'}
               >
@@ -431,12 +446,12 @@ export default function WhatsAppChatbot() {
                 placeholder={isRecording ? 'Grabando audio...' : 'Escribe tu mensaje...'}
                 rows={1}
                 disabled={isRecording}
-                className="flex-1 resize-none rounded-full px-4 py-2.5 text-sm font-amiko focus:outline-none focus:ring-2 focus:ring-[#25D366] border border-gray-300 disabled:bg-gray-100"
+                className="flex-1 resize-none rounded-full px-4 py-2.5 text-sm font-amiko focus:outline-none focus:ring-2 focus:ring-[#063971] border border-gray-300 disabled:bg-gray-100"
               />
               <button
                 onClick={handleSendText}
                 disabled={!message.trim() || isSending}
-                className="bg-[#25D366] hover:bg-[#20BA59] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full p-2.5 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#25D366]"
+                className="bg-[#063971] hover:bg-[#042A54] disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-full p-2.5 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#063971]"
                 aria-label="Enviar mensaje"
               >
                 {isSending ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
