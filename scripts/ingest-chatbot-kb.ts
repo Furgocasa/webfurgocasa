@@ -57,7 +57,6 @@ type Source =
   | 'faqs'
   | 'modelos_general'
   | 'vehiculos'
-  | 'ventas'
   | 'ubicaciones'
   | 'extras'
   | 'empresa'
@@ -338,10 +337,12 @@ async function buildVentas(out: Chunk[], db: SupabaseClient) {
     }
     if (v.slug) lines.push(`Ficha y compra: ${SITE_URL}/es/ventas/${v.slug}`);
 
-    addChunks(out, 'ventas', `En venta: ${title}`, lines.join('\n'));
+    // Se indexa bajo la fuente 'vehiculos' (el CHECK de la BBDD no admite 'ventas');
+    // el texto deja claro que es una camper EN VENTA.
+    addChunks(out, 'vehiculos', `En venta: ${title}`, lines.join('\n'));
   }
 
-  console.log(`🏷️  ventas (BBDD, solo lectura): ${data?.length || 0} campers en venta -> ${out.length - before} fragmentos (ventas)`);
+  console.log(`🏷️  ventas (BBDD, solo lectura): ${data?.length || 0} campers en venta -> ${out.length - before} fragmentos (vehiculos/ventas)`);
 }
 
 /** ubicaciones: ficha por sede activa con direccion, horario, sobrecoste real (x2) y minimos por sede. */

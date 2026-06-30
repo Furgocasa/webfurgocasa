@@ -1,6 +1,6 @@
 # Informe de coherencia RAG vs web
 
-Generado: 2026-06-30T20:18:49.899Z
+Generado: 2026-06-30T20:32:52.438Z
 
 - Avisos (revisar): **8**
 - Informativos: **5**
