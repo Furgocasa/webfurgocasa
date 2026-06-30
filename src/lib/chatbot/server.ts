@@ -11,7 +11,6 @@ import type { Database } from '@/lib/supabase/database.types';
 
 export const CHAT_MODEL = process.env.OPENAI_CHATBOT_MODEL || 'gpt-4o';
 export const EMBEDDING_MODEL = 'text-embedding-3-small';
-export const WHISPER_MODEL = 'whisper-1';
 export const CHATBOT_BUCKET = 'chatbot-uploads';
 export const RAG_MATCH_COUNT = 6;
 export const HISTORY_LIMIT = 12;
@@ -114,11 +113,11 @@ export function detectLanguage(text: string): string {
 export async function uploadChatMedia(
   buffer: Buffer,
   mimeType: string,
-  kind: 'image' | 'audio'
+  kind: 'image'
 ): Promise<string | null> {
   try {
     const supabase = getServiceClient();
-    const ext = mimeType.split('/')[1]?.split(';')[0] || (kind === 'image' ? 'jpg' : 'webm');
+    const ext = mimeType.split('/')[1]?.split(';')[0] || 'jpg';
     const path = `${kind}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
     const { error } = await supabase.storage
       .from(CHATBOT_BUCKET)
@@ -131,20 +130,6 @@ export async function uploadChatMedia(
   } catch (err) {
     console.error('[chatbot] uploadChatMedia fallo:', err);
     return null;
-  }
-}
-
-/** Transcribe audio con Whisper. */
-export async function transcribeAudio(buffer: Buffer, mimeType: string): Promise<string> {
-  try {
-    const openai = getOpenAI();
-    const ext = mimeType.split('/')[1]?.split(';')[0] || 'webm';
-    const file = await OpenAI.toFile(buffer, `audio.${ext}`, { type: mimeType });
-    const res = await openai.audio.transcriptions.create({ file, model: WHISPER_MODEL });
-    return res.text?.trim() || '';
-  } catch (err) {
-    console.error('[chatbot] transcribeAudio fallo:', err);
-    return '';
   }
 }
 

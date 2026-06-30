@@ -10,7 +10,6 @@ import {
   getServiceClient,
   parseDataUrl,
   retrieveContext,
-  transcribeAudio,
   uploadChatMedia,
 } from '@/lib/chatbot/server';
 
@@ -24,7 +23,7 @@ const bodySchema = z.object({
   text: z.string().max(4000).optional(),
   media: z
     .object({
-      type: z.enum(['image', 'audio']),
+      type: z.literal('image'),
       dataUrl: z.string().startsWith('data:'),
     })
     .optional(),
@@ -77,10 +76,9 @@ export async function POST(request: NextRequest) {
     convId = created.id;
   }
 
-  // 2. Adjuntos (imagen / audio)
+  // 2. Adjuntos (solo imagen)
   let mediaUrl: string | null = null;
-  let mediaType: 'image' | 'audio' | null = null;
-  let transcription: string | null = null;
+  let mediaType: 'image' | null = null;
 
   if (media) {
     const parsedMedia = parseDataUrl(media.dataUrl);
@@ -93,13 +91,10 @@ export async function POST(request: NextRequest) {
     }
     mediaType = media.type;
     mediaUrl = await uploadChatMedia(parsedMedia.buffer, parsedMedia.mimeType, media.type);
-    if (media.type === 'audio') {
-      transcription = await transcribeAudio(parsedMedia.buffer, parsedMedia.mimeType);
-    }
   }
 
-  // Texto efectivo del usuario (lo escrito o la transcripcion del audio)
-  const userText = (text?.trim() || transcription || '').trim();
+  // Texto efectivo del usuario
+  const userText = (text?.trim() || '').trim();
   const ragQuery = userText || 'consulta general sobre la camper';
 
   // 3. Contexto RAG
@@ -145,7 +140,6 @@ export async function POST(request: NextRequest) {
     content: userText,
     media_url: mediaUrl,
     media_type: mediaType,
-    transcription,
   });
 
   // 7. Llamada al modelo en streaming

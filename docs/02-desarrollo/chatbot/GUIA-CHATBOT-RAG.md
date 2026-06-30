@@ -1,6 +1,6 @@
 # Guía de implementación: Chatbot RAG + Panel de conversaciones
 
-> Sustituye el flujo **WhatsApp + N8N + Airtable + Notion** por un **chatbot embebido** en la web de Furgocasa que responde con un **RAG (pgvector en Supabase)** sobre la documentación oficial, acepta **texto, imagen y audio**, y registra todas las conversaciones en un panel nuevo del administrador (`/administrator/chatbot`).
+> Sustituye el flujo **WhatsApp + N8N + Airtable + Notion** por un **chatbot embebido** (la asistente **Andrea**) en la web de Furgocasa que responde con un **RAG (pgvector en Supabase)** sobre la documentación oficial, acepta **texto e imagen**, y registra todas las conversaciones en un panel nuevo del administrador (`/administrator/chatbot`).
 
 Última actualización: 2026-06-30
 
@@ -14,16 +14,15 @@
 | Agente OpenAI en N8N | API propia en Next.js (`/api/chatbot/message`) |
 | Búsqueda en tablas Airtable (`filterByFormula`) | RAG con embeddings + pgvector en Supabase |
 | Registro de conversaciones en Notion ("DATOS MENSAJES") | Tablas Supabase + panel `/administrator/chatbot` |
-| Audio / imágenes vía WhatsApp | Audio (Whisper) + imágenes (visión GPT-4o) en el widget |
+| Audio / imágenes vía WhatsApp | Imágenes (visión GPT-4o) en el widget (audio retirado) |
 
 Decisiones confirmadas con el cliente:
 - **RAG real** con embeddings + pgvector.
-- **Multimodal completo**: texto + imagen + audio.
+- **Multimodal**: texto + imagen (sin audio).
 - **Notion se sustituye**: el registro vive solo en Supabase y se ve en el admin.
 
 Modelos por defecto (configurables por env):
 - Chat / visión: `gpt-4o` (`OPENAI_CHATBOT_MODEL`).
-- Audio: `whisper-1`.
 - Embeddings: `text-embedding-3-small` (1536 dimensiones).
 
 ---
@@ -31,7 +30,7 @@ Modelos por defecto (configurables por env):
 ## 2. Arquitectura
 
 ```
-Widget web  ──►  /api/chatbot/message  ──►  OpenAI (Whisper / Embeddings / GPT-4o)
+Widget web  ──►  /api/chatbot/message  ──►  OpenAI (Embeddings / GPT-4o visión)
                           │                         │
                           ├──► match_chatbot_chunks (pgvector)  ◄── chatbot_kb_chunks
                           ├──► chatbot_conversations / chatbot_messages
@@ -96,7 +95,7 @@ Trocea (split de las muy largas), calcula `content_hash`, embebe con `text-embed
 ### 4.4. API pública del chat
 `src/app/api/chatbot/message/route.ts` (POST, runtime nodejs):
 1. Asegura/crea conversación por `sessionId`.
-2. Audio → Whisper (transcribe); imagen → input de visión GPT-4o; sube adjunto a `chatbot-uploads`.
+2. Imagen → input de visión GPT-4o; sube adjunto a `chatbot-uploads`.
 3. Embede la consulta → `match_chatbot_chunks` → contexto top-k.
 4. GPT-4o con prompt + historial + contexto, en **streaming** (ReadableStream).
 5. Persiste mensajes user/assistant, actualiza `last_message_at` e `language`.
@@ -104,7 +103,7 @@ Trocea (split de las muy largas), calcula `content_hash`, embebe con `text-embed
 ### 4.5. Widget embebido
 Reescribir `src/components/whatsapp-chatbot.tsx` (sigue montado global, oculto en `/administrator` y barras de reserva):
 - Conversa contra `/api/chatbot/message` (historial, burbujas, streaming) en vez de abrir `wa.me`.
-- Botones para adjuntar imagen y grabar audio (MediaRecorder).
+- Botón para adjuntar imagen (audio retirado).
 - `sessionId` persistido en `localStorage`.
 - **Navegación interna**: los enlaces a `furgocasa.com` que devuelve el bot se renderizan como botones que navegan con el router de Next (sin recargar), manteniendo el chat abierto; los externos abren en pestaña nueva.
 - **Persistencia de la conversación**: mensajes + `conversationId` + estado abierto/cerrado en `localStorage` (`furgocasa-chat-state`), de modo que el chat sobrevive a recargas y acompaña al usuario por toda la web.

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { X, Send, MessageCircle, ImagePlus, Mic, Square, Loader2 } from 'lucide-react';
+import { X, Send, MessageCircle, ImagePlus, Loader2 } from 'lucide-react';
 
 const STORAGE_KEY = 'furgocasa-chat-session';
 const STATE_KEY = 'furgocasa-chat-state';
@@ -20,7 +20,7 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
   mediaUrl?: string;
-  mediaType?: 'image' | 'audio';
+  mediaType?: 'image';
   pending?: boolean;
 }
 
@@ -52,15 +52,12 @@ export default function WhatsAppChatbot() {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isSending, setIsSending] = useState(false);
-  const [isRecording, setIsRecording] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
   const conversationIdRef = useRef<string | undefined>(undefined);
   const sessionIdRef = useRef<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
 
   useEffect(() => {
     sessionIdRef.current = getSessionId();
@@ -173,7 +170,7 @@ export default function WhatsAppChatbot() {
     pathname.includes('/reserver/nouvelle');
 
   const sendToApi = useCallback(
-    async (payload: { text?: string; media?: { type: 'image' | 'audio'; dataUrl: string } }) => {
+    async (payload: { text?: string; media?: { type: 'image'; dataUrl: string } }) => {
       setIsSending(true);
       const assistantId = `a-${Date.now()}`;
       setMessages((prev) => [...prev, { id: assistantId, role: 'assistant', content: '', pending: true }]);
@@ -270,39 +267,6 @@ export default function WhatsAppChatbot() {
     void sendToApi({ text: caption || undefined, media: { type: 'image', dataUrl } });
   };
 
-  const startRecording = async () => {
-    if (isSending) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      audioChunksRef.current = [];
-      recorder.ondataavailable = (ev) => {
-        if (ev.data.size > 0) audioChunksRef.current.push(ev.data);
-      };
-      recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(audioChunksRef.current, { type: recorder.mimeType || 'audio/webm' });
-        if (blob.size === 0) return;
-        const dataUrl = await fileToDataUrl(blob);
-        setMessages((prev) => [
-          ...prev,
-          { id: `u-${Date.now()}`, role: 'user', content: '', mediaUrl: dataUrl, mediaType: 'audio' },
-        ]);
-        void sendToApi({ media: { type: 'audio', dataUrl } });
-      };
-      recorder.start();
-      mediaRecorderRef.current = recorder;
-      setIsRecording(true);
-    } catch (err) {
-      alert('No se pudo acceder al micrófono.');
-    }
-  };
-
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
-    setIsRecording(false);
-  };
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -370,9 +334,6 @@ export default function WhatsAppChatbot() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={m.mediaUrl} alt="adjunto" className="rounded-md mb-1 max-h-40 object-cover" />
                     )}
-                    {m.mediaType === 'audio' && m.mediaUrl && (
-                      <audio controls src={m.mediaUrl} className="max-w-full" />
-                    )}
                     {m.content && (
                       <p className="text-white text-sm font-amiko whitespace-pre-wrap">{m.content}</p>
                     )}
@@ -421,31 +382,19 @@ export default function WhatsAppChatbot() {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                disabled={isSending || isRecording}
+                disabled={isSending}
                 className="text-gray-500 hover:text-[#063971] disabled:opacity-40 p-2"
                 aria-label="Adjuntar imagen"
               >
                 <ImagePlus className="w-5 h-5" />
               </button>
 
-              <button
-                onClick={isRecording ? stopRecording : startRecording}
-                disabled={isSending}
-                className={`p-2 disabled:opacity-40 ${
-                  isRecording ? 'text-red-500 animate-pulse' : 'text-gray-500 hover:text-[#063971]'
-                }`}
-                aria-label={isRecording ? 'Detener grabación' : 'Grabar audio'}
-              >
-                {isRecording ? <Square className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
-              </button>
-
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder={isRecording ? 'Grabando audio...' : 'Escribe tu mensaje...'}
+                placeholder="Escribe tu mensaje..."
                 rows={1}
-                disabled={isRecording}
                 className="flex-1 resize-none rounded-full px-4 py-2.5 text-sm font-amiko focus:outline-none focus:ring-2 focus:ring-[#063971] border border-gray-300 disabled:bg-gray-100"
               />
               <button
