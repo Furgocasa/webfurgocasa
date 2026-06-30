@@ -95,6 +95,8 @@ export type Database = {
           media_url: string | null
           media_type: string | null
           transcription: string | null
+          response_quality: string
+          admin_notes: string | null
           created_at: string | null
         }
         Insert: {
@@ -105,6 +107,8 @@ export type Database = {
           media_url?: string | null
           media_type?: string | null
           transcription?: string | null
+          response_quality?: string
+          admin_notes?: string | null
           created_at?: string | null
         }
         Update: {
@@ -115,6 +119,8 @@ export type Database = {
           media_url?: string | null
           media_type?: string | null
           transcription?: string | null
+          response_quality?: string
+          admin_notes?: string | null
           created_at?: string | null
         }
         Relationships: [

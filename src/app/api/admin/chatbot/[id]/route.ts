@@ -50,7 +50,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 }
 
 const patchSchema = z.object({
-  response_quality: z.enum(['correcta', 'mejorable', 'incorrecta', 'sin_tipo']).optional(),
   status: z.enum(['open', 'closed', 'archived']).optional(),
   admin_notes: z.string().max(5000).nullable().optional(),
 });

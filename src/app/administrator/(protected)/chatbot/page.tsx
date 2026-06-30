@@ -11,11 +11,12 @@ import {
   User,
   Bot,
   Image as ImageIcon,
-  Mic,
   Save,
+  MessagesSquare,
 } from "lucide-react";
 
 type Quality = "correcta" | "mejorable" | "incorrecta" | "sin_tipo";
+type ViewMode = "conversations" | "messages";
 
 interface ConversationRow {
   id: string;
@@ -23,17 +24,35 @@ interface ConversationRow {
   last_message_at: string | null;
   language: string | null;
   status: string;
-  response_quality: Quality;
+  admin_notes: string | null;
   contact_name: string | null;
   contact_phone: string | null;
   contact_email: string | null;
   message_count: number;
+  assistant_count: number;
+  unclassified_responses: number;
   first_user_message: string;
   last_message: string;
 }
 
+interface AssistantMessageRow {
+  id: string;
+  conversation_id: string;
+  content: string;
+  response_quality: Quality;
+  admin_notes: string | null;
+  created_at: string | null;
+  user_question: string;
+  language: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
+  contact_email: string | null;
+}
+
 interface Stats {
-  total: number;
+  totalResponses?: number;
+  total?: number;
+  totalConversations?: number;
   byQuality: Record<string, number>;
   byLanguage: Record<string, number>;
 }
@@ -45,6 +64,8 @@ interface MessageRow {
   media_url: string | null;
   media_type: "image" | "audio" | null;
   transcription: string | null;
+  response_quality: Quality;
+  admin_notes: string | null;
   created_at: string | null;
 }
 
@@ -67,18 +88,30 @@ const LANGUAGE_LABEL: Record<string, string> = {
 
 function fmtDate(v: string | null): string {
   if (!v) return "-";
-  const d = new Date(v);
-  return d.toLocaleString("es-ES", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return new Date(v).toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function truncate(s: string, n = 120): string {
+  if (!s) return "-";
+  return s.length > n ? `${s.slice(0, n)}…` : s;
 }
 
 export default function ChatbotAdminPage() {
   const queryClient = useQueryClient();
+  const [view, setView] = useState<ViewMode>("messages");
   const [filters, setFilters] = useState({ quality: "", language: "", from: "", to: "", q: "" });
   const [searchInput, setSearchInput] = useState("");
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedConvId, setSelectedConvId] = useState<string | null>(null);
+  const [selectedMsgId, setSelectedMsgId] = useState<string | null>(null);
 
   const listQuery = useQuery({
-    queryKey: ["admin-chatbot", filters],
+    queryKey: ["admin-chatbot", view, filters],
     queryFn: async () => {
       const params = new URLSearchParams();
       if (filters.quality) params.set("quality", filters.quality);
@@ -86,44 +119,66 @@ export default function ChatbotAdminPage() {
       if (filters.from) params.set("from", filters.from);
       if (filters.to) params.set("to", filters.to);
       if (filters.q) params.set("q", filters.q);
-      const res = await fetch(`/api/admin/chatbot?${params.toString()}`);
+      const base = view === "messages" ? "/api/admin/chatbot/messages" : "/api/admin/chatbot";
+      const res = await fetch(`${base}?${params.toString()}`);
       if (!res.ok) throw new Error("Error al cargar");
-      return (await res.json()) as { conversations: ConversationRow[]; stats: Stats };
+      return res.json();
     },
   });
 
+  const stats = listQuery.data?.stats as Stats | undefined;
+  const responseTotal = stats?.totalResponses ?? stats?.total ?? 0;
+
   const donutData = useMemo(() => {
-    const byQuality = listQuery.data?.stats.byQuality || {};
+    const byQuality = stats?.byQuality || {};
     return (Object.keys(QUALITY_META) as Quality[])
       .map((q) => ({ name: QUALITY_META[q].label, value: byQuality[q] || 0, color: QUALITY_META[q].color }))
       .filter((d) => d.value > 0);
-  }, [listQuery.data]);
+  }, [stats]);
 
-  const stats = listQuery.data?.stats;
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-chatbot"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-chatbot-detail"] });
+    queryClient.invalidateQueries({ queryKey: ["admin-chatbot-message-detail"] });
+  };
 
   return (
     <div className="space-y-6">
-      {/* Cabecera */}
-      <div className="flex items-center gap-3">
-        <div className="bg-blue-600 text-white rounded-xl p-2.5">
-          <MessageCircle className="w-6 h-6" />
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-600 text-white rounded-xl p-2.5">
+            <MessageCircle className="w-6 h-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Chatbot</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Clasifica respuestas de Andrea mensaje a mensaje
+            </p>
+          </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Chatbot</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Registro de conversaciones del asistente virtual</p>
+        <div className="flex rounded-lg border border-gray-200 dark:border-gray-600 overflow-hidden">
+          <TabButton active={view === "messages"} onClick={() => setView("messages")}>
+            <MessagesSquare className="w-4 h-4 inline mr-1.5" />
+            Respuestas
+          </TabButton>
+          <TabButton active={view === "conversations"} onClick={() => setView("conversations")}>
+            Conversaciones
+          </TabButton>
         </div>
       </div>
 
-      {/* Resumen */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <SummaryCard label="Conversaciones" value={stats?.total ?? 0} />
+          {view === "conversations" && (
+            <SummaryCard label="Conversaciones" value={stats?.totalConversations ?? 0} />
+          )}
+          <SummaryCard label="Respuestas Andrea" value={responseTotal} />
           <SummaryCard label="Correctas" value={stats?.byQuality.correcta ?? 0} color="text-green-600" />
           <SummaryCard label="Mejorables" value={stats?.byQuality.mejorable ?? 0} color="text-amber-600" />
           <SummaryCard label="Incorrectas" value={stats?.byQuality.incorrecta ?? 0} color="text-red-600" />
         </div>
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5">
-          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Tipo de respuesta</h3>
+          <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Calidad por respuesta</h3>
           <div className="h-40">
             {donutData.length > 0 ? (
               <ResponsiveContainer width="100%" height="100%">
@@ -143,135 +198,76 @@ export default function ChatbotAdminPage() {
         </div>
       </div>
 
-      {/* Filtros */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-wrap gap-3 items-end">
-        <div className="flex-1 min-w-[200px]">
-          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Buscar en mensajes</label>
-          <div className="flex gap-2">
-            <input
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && setFilters((f) => ({ ...f, q: searchInput.trim() }))}
-              placeholder="Texto..."
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
-            />
-            <button
-              onClick={() => setFilters((f) => ({ ...f, q: searchInput.trim() }))}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2"
-              aria-label="Buscar"
-            >
-              <Search className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-        <FilterSelect
-          label="Tipo de respuesta"
-          value={filters.quality}
-          onChange={(v) => setFilters((f) => ({ ...f, quality: v }))}
-          options={[
-            { value: "", label: "Todas" },
-            { value: "correcta", label: "Correcta" },
-            { value: "mejorable", label: "Mejorable" },
-            { value: "incorrecta", label: "Incorrecta" },
-            { value: "sin_tipo", label: "Sin tipo" },
-          ]}
-        />
-        <FilterSelect
-          label="Idioma"
-          value={filters.language}
-          onChange={(v) => setFilters((f) => ({ ...f, language: v }))}
-          options={[
-            { value: "", label: "Todos" },
-            ...Object.entries(LANGUAGE_LABEL).map(([value, label]) => ({ value, label })),
-          ]}
-        />
-        <div>
-          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Desde</label>
-          <input
-            type="date"
-            value={filters.from}
-            onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
-            className="rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
-          />
-        </div>
-        <div>
-          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Hasta</label>
-          <input
-            type="date"
-            value={filters.to}
-            onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
-            className="rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
-          />
-        </div>
-        {(filters.quality || filters.language || filters.from || filters.to || filters.q) && (
-          <button
-            onClick={() => {
-              setFilters({ quality: "", language: "", from: "", to: "", q: "" });
-              setSearchInput("");
-            }}
-            className="text-sm text-gray-500 hover:text-gray-700 underline px-2 py-2"
-          >
-            Limpiar
-          </button>
-        )}
-      </div>
+      <FiltersBar
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+        filters={filters}
+        setFilters={setFilters}
+        searchPlaceholder={view === "messages" ? "Buscar en respuestas..." : "Buscar en mensajes..."}
+      />
 
-      {/* Tabla */}
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
         {listQuery.isLoading ? (
           <div className="p-10 flex items-center justify-center text-gray-400">
             <Loader2 className="w-6 h-6 animate-spin" />
           </div>
         ) : listQuery.isError ? (
-          <div className="p-10 text-center text-red-500">Error al cargar las conversaciones</div>
-        ) : (listQuery.data?.conversations.length ?? 0) === 0 ? (
+          <div className="p-10 text-center text-red-500">Error al cargar</div>
+        ) : view === "messages" ? (
+          (listQuery.data?.messages as AssistantMessageRow[] | undefined)?.length === 0 ? (
+            <div className="p-10 text-center text-gray-400">No hay respuestas del asistente</div>
+          ) : (
+            <MessagesTable
+              rows={listQuery.data!.messages as AssistantMessageRow[]}
+              onSelect={(id) => setSelectedMsgId(id)}
+              onOpenConversation={(convId) => setSelectedConvId(convId)}
+            />
+          )
+        ) : (listQuery.data?.conversations as ConversationRow[] | undefined)?.length === 0 ? (
           <div className="p-10 text-center text-gray-400">No hay conversaciones</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 dark:bg-gray-700/50 text-left text-gray-500 dark:text-gray-400">
-                <tr>
-                  <th className="px-4 py-3 font-medium">Fecha</th>
-                  <th className="px-4 py-3 font-medium">Idioma</th>
-                  <th className="px-4 py-3 font-medium">Contacto</th>
-                  <th className="px-4 py-3 font-medium">Primer mensaje</th>
-                  <th className="px-4 py-3 font-medium text-center">Msgs</th>
-                  <th className="px-4 py-3 font-medium">Tipo de respuesta</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                {listQuery.data!.conversations.map((c) => (
-                  <tr
-                    key={c.id}
-                    onClick={() => setSelectedId(c.id)}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer"
-                  >
-                    <td className="px-4 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">{fmtDate(c.last_message_at || c.created_at)}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{LANGUAGE_LABEL[c.language || "desconocido"] || c.language}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{c.contact_name || c.contact_phone || c.contact_email || "-"}</td>
-                    <td className="px-4 py-3 max-w-xs truncate text-gray-700 dark:text-gray-200">{c.first_user_message || "-"}</td>
-                    <td className="px-4 py-3 text-center text-gray-500">{c.message_count}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${QUALITY_META[c.response_quality].badge}`}>
-                        {QUALITY_META[c.response_quality].label}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ConversationsTable
+            rows={listQuery.data!.conversations as ConversationRow[]}
+            onSelect={(id) => setSelectedConvId(id)}
+          />
         )}
       </div>
 
-      {selectedId && (
+      {selectedConvId && (
         <ConversationDetail
-          id={selectedId}
-          onClose={() => setSelectedId(null)}
-          onUpdated={() => queryClient.invalidateQueries({ queryKey: ["admin-chatbot"] })}
+          id={selectedConvId}
+          onClose={() => setSelectedConvId(null)}
+          onUpdated={invalidateAll}
+        />
+      )}
+
+      {selectedMsgId && (
+        <MessageDetail
+          id={selectedMsgId}
+          onClose={() => setSelectedMsgId(null)}
+          onUpdated={invalidateAll}
+          onOpenConversation={(convId) => {
+            setSelectedMsgId(null);
+            setSelectedConvId(convId);
+          }}
         />
       )}
     </div>
+  );
+}
+
+function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-4 py-2 text-sm font-medium ${
+        active
+          ? "bg-blue-600 text-white"
+          : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+      }`}
+    >
+      {children}
+    </button>
   );
 }
 
@@ -280,6 +276,94 @@ function SummaryCard({ label, value, color }: { label: string; value: number; co
     <div>
       <p className="text-xs text-gray-500 dark:text-gray-400">{label}</p>
       <p className={`text-2xl font-bold ${color || "text-gray-900 dark:text-white"}`}>{value}</p>
+    </div>
+  );
+}
+
+function FiltersBar({
+  searchInput,
+  setSearchInput,
+  filters,
+  setFilters,
+  searchPlaceholder,
+}: {
+  searchInput: string;
+  setSearchInput: (v: string) => void;
+  filters: { quality: string; language: string; from: string; to: string; q: string };
+  setFilters: React.Dispatch<React.SetStateAction<typeof filters>>;
+  searchPlaceholder: string;
+}) {
+  return (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 flex flex-wrap gap-3 items-end">
+      <div className="flex-1 min-w-[200px]">
+        <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Buscar</label>
+        <div className="flex gap-2">
+          <input
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && setFilters((f) => ({ ...f, q: searchInput.trim() }))}
+            placeholder={searchPlaceholder}
+            className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+          />
+          <button
+            onClick={() => setFilters((f) => ({ ...f, q: searchInput.trim() }))}
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2"
+            aria-label="Buscar"
+          >
+            <Search className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+      <FilterSelect
+        label="Tipo de respuesta"
+        value={filters.quality}
+        onChange={(v) => setFilters((f) => ({ ...f, quality: v }))}
+        options={[
+          { value: "", label: "Todas" },
+          { value: "correcta", label: "Correcta" },
+          { value: "mejorable", label: "Mejorable" },
+          { value: "incorrecta", label: "Incorrecta" },
+          { value: "sin_tipo", label: "Sin tipo" },
+        ]}
+      />
+      <FilterSelect
+        label="Idioma"
+        value={filters.language}
+        onChange={(v) => setFilters((f) => ({ ...f, language: v }))}
+        options={[
+          { value: "", label: "Todos" },
+          ...Object.entries(LANGUAGE_LABEL).map(([value, label]) => ({ value, label })),
+        ]}
+      />
+      <div>
+        <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Desde</label>
+        <input
+          type="date"
+          value={filters.from}
+          onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))}
+          className="rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+        />
+      </div>
+      <div>
+        <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Hasta</label>
+        <input
+          type="date"
+          value={filters.to}
+          onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))}
+          className="rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+        />
+      </div>
+      {(filters.quality || filters.language || filters.from || filters.to || filters.q) && (
+        <button
+          onClick={() => {
+            setFilters({ quality: "", language: "", from: "", to: "", q: "" });
+            setSearchInput("");
+          }}
+          className="text-sm text-gray-500 hover:text-gray-700 underline px-2 py-2"
+        >
+          Limpiar
+        </button>
+      )}
     </div>
   );
 }
@@ -313,36 +397,235 @@ function FilterSelect({
   );
 }
 
-function ConversationDetail({
+function MessagesTable({
+  rows,
+  onSelect,
+  onOpenConversation,
+}: {
+  rows: AssistantMessageRow[];
+  onSelect: (id: string) => void;
+  onOpenConversation: (convId: string) => void;
+}) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 dark:bg-gray-700/50 text-left text-gray-500 dark:text-gray-400">
+          <tr>
+            <th className="px-4 py-3 font-medium">Fecha</th>
+            <th className="px-4 py-3 font-medium">Pregunta del cliente</th>
+            <th className="px-4 py-3 font-medium">Respuesta Andrea</th>
+            <th className="px-4 py-3 font-medium">Tipo</th>
+            <th className="px-4 py-3 font-medium">Conv.</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+          {rows.map((m) => (
+            <tr key={m.id} onClick={() => onSelect(m.id)} className="hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer">
+              <td className="px-4 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">{fmtDate(m.created_at)}</td>
+              <td className="px-4 py-3 max-w-xs text-gray-700 dark:text-gray-200">{truncate(m.user_question, 80)}</td>
+              <td className="px-4 py-3 max-w-md text-gray-700 dark:text-gray-200">{truncate(m.content, 100)}</td>
+              <td className="px-4 py-3">
+                <QualityBadge quality={m.response_quality} />
+              </td>
+              <td className="px-4 py-3">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenConversation(m.conversation_id);
+                  }}
+                  className="text-blue-600 hover:underline text-xs"
+                >
+                  Ver hilo
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ConversationsTable({ rows, onSelect }: { rows: ConversationRow[]; onSelect: (id: string) => void }) {
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 dark:bg-gray-700/50 text-left text-gray-500 dark:text-gray-400">
+          <tr>
+            <th className="px-4 py-3 font-medium">Fecha</th>
+            <th className="px-4 py-3 font-medium">Idioma</th>
+            <th className="px-4 py-3 font-medium">Primer mensaje</th>
+            <th className="px-4 py-3 font-medium text-center">Resp.</th>
+            <th className="px-4 py-3 font-medium text-center">Sin clasificar</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+          {rows.map((c) => (
+            <tr key={c.id} onClick={() => onSelect(c.id)} className="hover:bg-gray-50 dark:hover:bg-gray-700/40 cursor-pointer">
+              <td className="px-4 py-3 whitespace-nowrap text-gray-600 dark:text-gray-300">{fmtDate(c.last_message_at || c.created_at)}</td>
+              <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{LANGUAGE_LABEL[c.language || "desconocido"] || c.language}</td>
+              <td className="px-4 py-3 max-w-xs truncate text-gray-700 dark:text-gray-200">{c.first_user_message || "-"}</td>
+              <td className="px-4 py-3 text-center text-gray-500">{c.assistant_count}</td>
+              <td className="px-4 py-3 text-center">
+                {c.unclassified_responses > 0 ? (
+                  <span className="text-amber-600 font-medium">{c.unclassified_responses}</span>
+                ) : (
+                  <span className="text-gray-400">0</span>
+                )}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function QualityBadge({ quality }: { quality: Quality }) {
+  return (
+    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${QUALITY_META[quality].badge}`}>
+      {QUALITY_META[quality].label}
+    </span>
+  );
+}
+
+function QualityPicker({
+  value,
+  onChange,
+  compact,
+}: {
+  value: Quality;
+  onChange: (q: Quality) => void;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`flex flex-wrap gap-2 ${compact ? "" : "mt-1"}`}>
+      {(Object.keys(QUALITY_META) as Quality[]).map((q) => (
+        <button
+          key={q}
+          type="button"
+          onClick={() => onChange(q)}
+          className={`px-3 py-1 rounded-full text-xs font-medium border ${
+            value === q
+              ? QUALITY_META[q].badge + " border-transparent ring-2 ring-offset-1 ring-blue-400"
+              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-500"
+          }`}
+        >
+          {QUALITY_META[q].label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function useMessageMutation(onSuccess: () => void) {
+  return useMutation({
+    mutationFn: async ({ id, body }: { id: string; body: { response_quality?: Quality; admin_notes?: string | null } }) => {
+      const res = await fetch(`/api/admin/chatbot/messages/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) throw new Error("Error al guardar");
+      return res.json();
+    },
+    onSuccess,
+  });
+}
+
+function MessageDetail({
   id,
   onClose,
   onUpdated,
+  onOpenConversation,
 }: {
   id: string;
   onClose: () => void;
   onUpdated: () => void;
+  onOpenConversation: (convId: string) => void;
 }) {
+  const query = useQuery({
+    queryKey: ["admin-chatbot-message-detail", id],
+    queryFn: async () => {
+      const res = await fetch(`/api/admin/chatbot/messages/${id}`);
+      if (!res.ok) throw new Error("Error");
+      return (await res.json()) as { message: AssistantMessageRow };
+    },
+  });
+
+  const [quality, setQuality] = useState<Quality | null>(null);
+  const [notes, setNotes] = useState<string | null>(null);
+  const msg = query.data?.message;
+  const effectiveQuality = quality ?? msg?.response_quality ?? "sin_tipo";
+  const effectiveNotes = notes ?? msg?.admin_notes ?? "";
+
+  const mutation = useMessageMutation(() => {
+    onUpdated();
+    query.refetch();
+  });
+
+  return (
+    <SidePanel title="Respuesta de Andrea" onClose={onClose}>
+      {query.isLoading ? (
+        <PanelLoading />
+      ) : !msg ? (
+        <div className="p-10 text-center text-red-500">No encontrada</div>
+      ) : (
+        <div className="p-4 space-y-4">
+          <MetaBlock>
+            <p className="text-xs text-gray-500">{fmtDate(msg.created_at)} · {LANGUAGE_LABEL[msg.language || "desconocido"]}</p>
+            <button type="button" onClick={() => onOpenConversation(msg.conversation_id)} className="text-blue-600 text-xs hover:underline mt-1">
+              Ver conversación completa
+            </button>
+          </MetaBlock>
+
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-3 text-sm">
+            <p className="text-xs text-gray-500 mb-1">Pregunta del cliente</p>
+            <p className="whitespace-pre-wrap">{msg.user_question || "(sin texto previo)"}</p>
+          </div>
+
+          <div className="rounded-lg bg-gray-100 dark:bg-gray-700 p-3 text-sm">
+            <p className="text-xs text-gray-500 mb-1 flex items-center gap-1">
+              <Bot className="w-3 h-3" /> Respuesta Andrea
+            </p>
+            <p className="whitespace-pre-wrap">{msg.content}</p>
+          </div>
+
+          <ClassificationForm
+            quality={effectiveQuality}
+            onQualityChange={setQuality}
+            notes={effectiveNotes}
+            onNotesChange={setNotes}
+            onSave={() => mutation.mutate({ id, body: { response_quality: effectiveQuality, admin_notes: effectiveNotes } })}
+            saving={mutation.isPending}
+            saved={mutation.isSuccess}
+          />
+        </div>
+      )}
+    </SidePanel>
+  );
+}
+
+function ConversationDetail({ id, onClose, onUpdated }: { id: string; onClose: () => void; onUpdated: () => void }) {
   const detailQuery = useQuery({
     queryKey: ["admin-chatbot-detail", id],
     queryFn: async () => {
       const res = await fetch(`/api/admin/chatbot/${id}`);
       if (!res.ok) throw new Error("Error");
       return (await res.json()) as {
-        conversation: ConversationRow & { admin_notes: string | null };
+        conversation: ConversationRow;
         messages: MessageRow[];
       };
     },
   });
 
-  const [quality, setQuality] = useState<Quality | null>(null);
-  const [notes, setNotes] = useState<string | null>(null);
-
+  const [convNotes, setConvNotes] = useState<string | null>(null);
   const conversation = detailQuery.data?.conversation;
-  const effectiveQuality = quality ?? conversation?.response_quality ?? "sin_tipo";
-  const effectiveNotes = notes ?? conversation?.admin_notes ?? "";
+  const effectiveConvNotes = convNotes ?? conversation?.admin_notes ?? "";
 
-  const mutation = useMutation({
-    mutationFn: async (body: { response_quality?: Quality; admin_notes?: string | null }) => {
+  const convMutation = useMutation({
+    mutationFn: async (body: { admin_notes?: string | null }) => {
       const res = await fetch(`/api/admin/chatbot/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -358,117 +641,198 @@ function ConversationDetail({
   });
 
   return (
+    <SidePanel title="Conversación" onClose={onClose}>
+      {detailQuery.isLoading ? (
+        <PanelLoading />
+      ) : !conversation ? (
+        <div className="p-10 text-center text-red-500">No encontrada</div>
+      ) : (
+        <div className="p-4 space-y-4">
+          <MetaBlock>
+            <div className="grid grid-cols-2 gap-2 text-gray-600 dark:text-gray-300">
+              <span>
+                Idioma: <b>{LANGUAGE_LABEL[conversation.language || "desconocido"]}</b>
+              </span>
+              <span>
+                Inicio: <b>{fmtDate(conversation.created_at)}</b>
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mt-2">
+              Clasifica cada respuesta de Andrea en el hilo (mensaje a mensaje).
+            </p>
+            <div className="mt-3">
+              <label className="block text-xs text-gray-500 mb-1">Notas de la conversación (opcional)</label>
+              <textarea
+                value={effectiveConvNotes}
+                onChange={(e) => setConvNotes(e.target.value)}
+                rows={2}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+              />
+              <button
+                type="button"
+                onClick={() => convMutation.mutate({ admin_notes: effectiveConvNotes })}
+                disabled={convMutation.isPending}
+                className="mt-2 inline-flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg px-3 py-1.5 text-xs"
+              >
+                {convMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                Guardar notas
+              </button>
+            </div>
+          </MetaBlock>
+
+          <div className="space-y-4">
+            {detailQuery.data!.messages.map((m) =>
+              m.role === "user" ? (
+                <UserBubble key={m.id} message={m} />
+              ) : (
+                <AssistantBubble key={m.id} message={m} onUpdated={onUpdated} />
+              )
+            )}
+          </div>
+        </div>
+      )}
+    </SidePanel>
+  );
+}
+
+function UserBubble({ message: m }: { message: MessageRow }) {
+  return (
+    <div className="flex gap-2 justify-end">
+      <div className="rounded-lg p-3 max-w-[85%] text-sm bg-blue-50 dark:bg-blue-900/30">
+        {m.media_type === "image" && m.media_url && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={m.media_url} alt="adjunto" className="rounded mb-2 max-h-48" />
+        )}
+        {m.content && <p className="whitespace-pre-wrap">{m.content}</p>}
+        {!m.content && m.media_type === "image" && (
+          <p className="text-xs text-gray-400 flex items-center gap-1">
+            <ImageIcon className="w-3 h-3" /> imagen
+          </p>
+        )}
+        <p className="text-[10px] text-gray-400 mt-1">{fmtDate(m.created_at)}</p>
+      </div>
+      <User className="w-5 h-5 text-gray-400 mt-1 shrink-0" />
+    </div>
+  );
+}
+
+function AssistantBubble({ message: m, onUpdated }: { message: MessageRow; onUpdated: () => void }) {
+  const [quality, setQuality] = useState<Quality | null>(null);
+  const [notes, setNotes] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState(false);
+  const effectiveQuality = quality ?? m.response_quality ?? "sin_tipo";
+  const effectiveNotes = notes ?? m.admin_notes ?? "";
+
+  const mutation = useMessageMutation(onUpdated);
+
+  return (
+    <div className="flex gap-2 justify-start">
+      <Bot className="w-5 h-5 text-blue-500 mt-1 shrink-0" />
+      <div className="rounded-lg p-3 max-w-[90%] text-sm bg-gray-100 dark:bg-gray-700 border border-gray-200 dark:border-gray-600">
+        {m.content && <p className="whitespace-pre-wrap">{m.content}</p>}
+        <p className="text-[10px] text-gray-400 mt-1">{fmtDate(m.created_at)}</p>
+        <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-600">
+          <button type="button" onClick={() => setExpanded(!expanded)} className="text-xs text-blue-600 hover:underline">
+            {expanded ? "Ocultar clasificación" : "Clasificar respuesta"}
+          </button>
+          {expanded && (
+            <div className="mt-2">
+              <ClassificationForm
+                quality={effectiveQuality}
+                onQualityChange={setQuality}
+                notes={effectiveNotes}
+                onNotesChange={setNotes}
+                onSave={() =>
+                  mutation.mutate({
+                    id: m.id,
+                    body: { response_quality: effectiveQuality, admin_notes: effectiveNotes },
+                  })
+                }
+                saving={mutation.isPending}
+                saved={mutation.isSuccess}
+                compact
+              />
+            </div>
+          )}
+          {!expanded && <div className="mt-2"><QualityBadge quality={effectiveQuality} /></div>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ClassificationForm({
+  quality,
+  onQualityChange,
+  notes,
+  onNotesChange,
+  onSave,
+  saving,
+  saved,
+  compact,
+}: {
+  quality: Quality;
+  onQualityChange: (q: Quality) => void;
+  notes: string;
+  onNotesChange: (v: string) => void;
+  onSave: () => void;
+  saving: boolean;
+  saved: boolean;
+  compact?: boolean;
+}) {
+  return (
+    <div>
+      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Tipo de respuesta</label>
+      <QualityPicker value={quality} onChange={onQualityChange} compact={compact} />
+      <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1 mt-3">Notas (opcional)</label>
+      <textarea
+        value={notes}
+        onChange={(e) => onNotesChange(e.target.value)}
+        rows={2}
+        className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
+        placeholder="Por qué es correcta, mejorable o incorrecta..."
+      />
+      <button
+        type="button"
+        onClick={onSave}
+        disabled={saving}
+        className="mt-2 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-2 text-sm"
+      >
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        Guardar clasificación
+      </button>
+      {saved && <span className="text-green-600 text-xs ml-2">Guardado</span>}
+    </div>
+  );
+}
+
+function SidePanel({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
+  return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
       <div
         className="w-full max-w-xl bg-white dark:bg-gray-800 h-full overflow-y-auto shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between">
-          <h2 className="font-semibold text-gray-900 dark:text-white">Conversación</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between z-10">
+          <h2 className="font-semibold text-gray-900 dark:text-white">{title}</h2>
+          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X className="w-5 h-5" />
           </button>
         </div>
-
-        {detailQuery.isLoading ? (
-          <div className="p-10 flex justify-center text-gray-400">
-            <Loader2 className="w-6 h-6 animate-spin" />
-          </div>
-        ) : !conversation ? (
-          <div className="p-10 text-center text-red-500">No encontrada</div>
-        ) : (
-          <div className="p-4 space-y-4">
-            {/* Metadatos + clasificacion */}
-            <div className="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-3 space-y-3 text-sm">
-              <div className="grid grid-cols-2 gap-2 text-gray-600 dark:text-gray-300">
-                <span>Idioma: <b>{LANGUAGE_LABEL[conversation.language || "desconocido"] || conversation.language}</b></span>
-                <span>Inicio: <b>{fmtDate(conversation.created_at)}</b></span>
-                {conversation.contact_phone && <span>Tel: <b>{conversation.contact_phone}</b></span>}
-                {conversation.contact_email && <span>Email: <b>{conversation.contact_email}</b></span>}
-              </div>
-
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Tipo de respuesta</label>
-                <div className="flex flex-wrap gap-2">
-                  {(Object.keys(QUALITY_META) as Quality[]).map((q) => (
-                    <button
-                      key={q}
-                      onClick={() => setQuality(q)}
-                      className={`px-3 py-1 rounded-full text-xs font-medium border ${
-                        effectiveQuality === q
-                          ? QUALITY_META[q].badge + " border-transparent ring-2 ring-offset-1 ring-blue-400"
-                          : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 text-gray-500"
-                      }`}
-                    >
-                      {QUALITY_META[q].label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Notas internas</label>
-                <textarea
-                  value={effectiveNotes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 px-3 py-2 text-sm"
-                  placeholder="Anotaciones sobre esta conversación..."
-                />
-              </div>
-
-              <button
-                onClick={() => mutation.mutate({ response_quality: effectiveQuality, admin_notes: effectiveNotes })}
-                disabled={mutation.isPending}
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg px-3 py-2 text-sm"
-              >
-                {mutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                Guardar
-              </button>
-              {mutation.isSuccess && <span className="text-green-600 text-xs ml-2">Guardado</span>}
-            </div>
-
-            {/* Hilo */}
-            <div className="space-y-3">
-              {detailQuery.data!.messages.map((m) => (
-                <div key={m.id} className={`flex gap-2 ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                  {m.role === "assistant" && <Bot className="w-5 h-5 text-blue-500 mt-1 shrink-0" />}
-                  <div
-                    className={`rounded-lg p-3 max-w-[80%] text-sm ${
-                      m.role === "user"
-                        ? "bg-blue-50 dark:bg-blue-900/30 text-gray-800 dark:text-gray-100"
-                        : "bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100"
-                    }`}
-                  >
-                    {m.media_type === "image" && m.media_url && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img src={m.media_url} alt="adjunto" className="rounded mb-2 max-h-48" />
-                    )}
-                    {m.media_type === "audio" && m.media_url && (
-                      <div className="mb-2">
-                        <audio controls src={m.media_url} className="max-w-full" />
-                        {m.transcription && (
-                          <p className="text-xs text-gray-500 mt-1 flex items-center gap-1">
-                            <Mic className="w-3 h-3" /> {m.transcription}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    {m.content && <p className="whitespace-pre-wrap">{m.content}</p>}
-                    {!m.content && m.media_type === "image" && (
-                      <p className="text-xs text-gray-400 flex items-center gap-1">
-                        <ImageIcon className="w-3 h-3" /> imagen
-                      </p>
-                    )}
-                    <p className="text-[10px] text-gray-400 mt-1">{fmtDate(m.created_at)}</p>
-                  </div>
-                  {m.role === "user" && <User className="w-5 h-5 text-gray-400 mt-1 shrink-0" />}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {children}
       </div>
+    </div>
+  );
+}
+
+function MetaBlock({ children }: { children: React.ReactNode }) {
+  return <div className="bg-gray-50 dark:bg-gray-700/40 rounded-lg p-3 text-sm">{children}</div>;
+}
+
+function PanelLoading() {
+  return (
+    <div className="p-10 flex justify-center text-gray-400">
+      <Loader2 className="w-6 h-6 animate-spin" />
     </div>
   );
 }

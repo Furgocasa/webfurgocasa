@@ -130,11 +130,25 @@ CREATE TABLE IF NOT EXISTS chatbot_messages (
     media_url TEXT,
     media_type TEXT CHECK (media_type IN ('image', 'audio')),
 
-    -- Transcripcion del audio (Whisper)
+    -- Transcripcion del audio (legacy; el chat ya no usa audio)
     transcription TEXT,
+
+    -- Clasificacion de calidad (solo relevante para role = assistant)
+    response_quality TEXT NOT NULL DEFAULT 'sin_tipo' CHECK (response_quality IN (
+        'correcta',
+        'mejorable',
+        'incorrecta',
+        'sin_tipo'
+    )),
+
+    admin_notes TEXT,
 
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+CREATE INDEX IF NOT EXISTS idx_chatbot_msg_assistant_quality
+    ON chatbot_messages (response_quality, created_at DESC)
+    WHERE role = 'assistant';
 
 CREATE INDEX IF NOT EXISTS idx_chatbot_msg_conversation ON chatbot_messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_chatbot_msg_created ON chatbot_messages(created_at);
