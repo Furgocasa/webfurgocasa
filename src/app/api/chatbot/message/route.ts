@@ -179,27 +179,30 @@ export async function POST(request: NextRequest) {
           full = fallback;
           controller.enqueue(encoder.encode(fallback));
         }
-      } finally {
-        controller.close();
-        // 8. Persistir respuesta y actualizar la conversacion (fuera del flujo de bytes)
-        try {
-          const sb = getServiceClient();
-          await sb.from('chatbot_messages').insert({
-            conversation_id: finalConvId,
-            role: 'assistant',
-            content: full,
-          });
-          await sb
-            .from('chatbot_conversations')
-            .update({
-              last_message_at: new Date().toISOString(),
-              language: detectLanguage(userText),
-            })
-            .eq('id', finalConvId);
-        } catch (persistErr) {
-          console.error('[chatbot] error persistiendo respuesta:', persistErr);
-        }
       }
+
+      // 8. Persistir la respuesta ANTES de cerrar el stream. En entornos serverless
+      // (Vercel) el trabajo posterior a controller.close() puede cancelarse, por lo
+      // que el mensaje del asistente debe guardarse mientras la funcion sigue viva.
+      try {
+        const sb = getServiceClient();
+        await sb.from('chatbot_messages').insert({
+          conversation_id: finalConvId,
+          role: 'assistant',
+          content: full,
+        });
+        await sb
+          .from('chatbot_conversations')
+          .update({
+            last_message_at: new Date().toISOString(),
+            language: detectLanguage(userText),
+          })
+          .eq('id', finalConvId);
+      } catch (persistErr) {
+        console.error('[chatbot] error persistiendo respuesta:', persistErr);
+      }
+
+      controller.close();
     },
   });
 
