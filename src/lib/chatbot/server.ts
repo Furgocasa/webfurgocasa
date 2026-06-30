@@ -44,10 +44,42 @@ function toVectorLiteral(vec: number[]): string {
 }
 
 /**
+ * Traduce una consulta al espanol para mejorar la recuperacion del RAG (la base
+ * de conocimiento esta indexada en espanol). Si el texto ya parece espanol o la
+ * traduccion falla, devuelve el original. Llamada barata con un modelo pequeno.
+ */
+async function translateQueryToSpanish(text: string): Promise<string> {
+  try {
+    const openai = getOpenAI();
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
+      temperature: 0,
+      max_tokens: 200,
+      messages: [
+        {
+          role: 'system',
+          content:
+            'Traduce el texto del usuario al espanol para una busqueda interna. Si ya esta en espanol, devuelvelo igual. Responde SOLO con la traduccion, sin comillas ni explicaciones.',
+        },
+        { role: 'user', content: text },
+      ],
+    });
+    const out = completion.choices[0]?.message?.content?.trim();
+    return out || text;
+  } catch {
+    return text;
+  }
+}
+
+/**
  * Embebe una consulta y recupera los fragmentos mas relevantes de la base de conocimiento.
  * Devuelve un bloque de texto listo para inyectar en el prompt del sistema.
+ *
+ * @param query   Texto de busqueda (mensaje del cliente).
+ * @param locale  Idioma de la web; si no es 'es', se traduce la consulta a espanol
+ *                antes de embeber para mejorar la recuperacion multilingue.
  */
-export async function retrieveContext(query: string): Promise<string> {
+export async function retrieveContext(query: string, locale?: string): Promise<string> {
   const text = query.trim();
   if (!text) return '';
 
@@ -55,7 +87,9 @@ export async function retrieveContext(query: string): Promise<string> {
     const openai = getOpenAI();
     const supabase = getServiceClient();
 
-    const emb = await openai.embeddings.create({ model: EMBEDDING_MODEL, input: text });
+    const searchText = locale && locale !== 'es' ? await translateQueryToSpanish(text) : text;
+
+    const emb = await openai.embeddings.create({ model: EMBEDDING_MODEL, input: searchText });
     const vector = toVectorLiteral(emb.data[0].embedding as number[]);
 
     const { data, error } = await supabase.rpc('match_chatbot_chunks', {

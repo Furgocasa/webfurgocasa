@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { X, Send, MessageCircle, ImagePlus, Loader2, RefreshCw, ChevronLeft } from 'lucide-react';
+import { getLocaleFromPathname } from '@/lib/i18n/config';
 
 const STORAGE_KEY = 'furgocasa-chat-session';
 const STATE_KEY = 'furgocasa-chat-state';
@@ -21,71 +22,346 @@ interface ChatCategory {
   options: QuickOption[];
 }
 
-// Menus preconfigurados agrupados por tema. Al elegir un tema se muestran sus
-// subopciones; al pulsar una subopcion se envia la pregunta concreta al chat.
-const CHAT_CATEGORIES: ChatCategory[] = [
-  {
-    id: 'alquiler',
-    label: 'Alquiler de campers',
-    emoji: '🚐',
-    question: '¿Qué quieres saber sobre el alquiler?',
-    options: [
-      { label: 'Precios y tarifas', prompt: '¿Cuáles son vuestras tarifas y precios orientativos de alquiler?' },
-      { label: 'Condiciones del alquiler', prompt: '¿Cuáles son las condiciones del alquiler?' },
-      { label: 'Requisitos para alquilar', prompt: '¿Qué requisitos necesito para alquilar una camper?' },
-      { label: 'Modelos disponibles', prompt: '¿Qué modelos de camper tenéis disponibles para alquilar?' },
-      { label: 'Dónde se recogen', prompt: '¿Dónde se recogen y se devuelven las campers?' },
+type WidgetLocale = 'es' | 'en' | 'fr' | 'de';
+
+interface WidgetStrings {
+  subtitle: string;
+  welcome1: string;
+  welcome2: string;
+  chooseTopic: string;
+  back: string;
+  change: string;
+  refresh: string;
+  refreshAria: string;
+  refreshTitle: string;
+  placeholder: string;
+  openAria: string;
+  imageTooLarge: string;
+  error: string;
+  noResponse: string;
+  categories: ChatCategory[];
+}
+
+// Textos y menus del widget por idioma de la web. Al pulsar una subopcion se
+// envia su "prompt" (en el idioma del cliente) al chat; Andrea responde en ese idioma.
+const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
+  es: {
+    subtitle: 'Asistente virtual de Furgocasa',
+    welcome1: '¡Hola! 👋 Soy Andrea, la asistente virtual de Furgocasa.',
+    welcome2: '¿En qué puedo ayudarte hoy?',
+    chooseTopic: 'Elige el tema sobre el que quieres hablar:',
+    back: 'Volver a los temas',
+    change: 'Cambiar de tema',
+    refresh: 'Refrescar',
+    refreshAria: 'Empezar una conversación nueva',
+    refreshTitle: 'Empezar de nuevo (no borra el historial)',
+    placeholder: 'Escribe tu mensaje...',
+    openAria: 'Abrir chat con Andrea de Furgocasa',
+    imageTooLarge: 'La imagen es demasiado grande (máx. 8MB).',
+    error: 'Ha ocurrido un error. Inténtalo de nuevo o escríbenos al +34 678 081 261.',
+    noResponse: 'Lo siento, no he podido generar una respuesta.',
+    categories: [
+      {
+        id: 'alquiler',
+        label: 'Alquiler de campers',
+        emoji: '🚐',
+        question: '¿Qué quieres saber sobre el alquiler?',
+        options: [
+          { label: 'Precios y tarifas', prompt: '¿Cuáles son vuestras tarifas y precios orientativos de alquiler?' },
+          { label: 'Condiciones del alquiler', prompt: '¿Cuáles son las condiciones del alquiler?' },
+          { label: 'Requisitos para alquilar', prompt: '¿Qué requisitos necesito para alquilar una camper?' },
+          { label: 'Modelos disponibles', prompt: '¿Qué modelos de camper tenéis disponibles para alquilar?' },
+          { label: 'Dónde se recogen', prompt: '¿Dónde se recogen y se devuelven las campers?' },
+        ],
+      },
+      {
+        id: 'compra',
+        label: 'Comprar una camper',
+        emoji: '🔑',
+        question: '¿Qué tipo de camper te interesa comprar?',
+        options: [
+          { label: 'Modelo de 2 plazas', prompt: 'Estoy interesado en comprar una camper de 2 plazas, ¿qué opciones tenéis?' },
+          { label: 'Modelo de 4 plazas', prompt: 'Estoy interesado en comprar una camper de 4 plazas, ¿qué opciones tenéis?' },
+          { label: 'Alquiler con opción a compra', prompt: '¿Cómo funciona el alquiler con opción a compra?' },
+          { label: 'Hablar con ventas', prompt: 'Quiero que me pongáis en contacto con el equipo de ventas para comprar una camper.' },
+        ],
+      },
+      {
+        id: 'reservas',
+        label: 'Administración y reservas',
+        emoji: '📅',
+        question: '¿Qué necesitas sobre tu reserva o el proceso de reserva?',
+        options: [
+          { label: 'Cómo reservar', prompt: '¿Cómo hago una reserva paso a paso?' },
+          { label: 'Fianza y pagos', prompt: '¿Cómo funcionan la fianza y los pagos de la reserva?' },
+          { label: 'Modificar o cancelar', prompt: '¿Puedo modificar o cancelar mi reserva? ¿Cómo se hace?' },
+          { label: 'Documentación necesaria', prompt: '¿Qué documentación necesito para la recogida de la camper?' },
+        ],
+      },
+      {
+        id: 'incidencias',
+        label: 'Otras consultas',
+        emoji: '❓',
+        question: '¿En qué puedo ayudarte?',
+        options: [
+          { label: 'Incidencia con una reserva', prompt: 'Tengo una incidencia con mi reserva y necesito ayuda.' },
+          { label: 'Problema con un pago', prompt: 'Tengo un problema con un pago.' },
+          { label: 'Otra consulta', prompt: 'Tengo otra consulta que no encaja en los temas anteriores.' },
+        ],
+      },
+      {
+        id: 'ruta',
+        label: 'Estoy en ruta (asistencia)',
+        emoji: '🛣️',
+        question: '¿Con qué necesitas ayuda durante el viaje?',
+        options: [
+          { label: 'Algo no funciona', prompt: 'Estoy en ruta y algo de la camper no funciona, necesito ayuda.' },
+          { label: 'Calefacción, agua o gas', prompt: 'Estoy en ruta y tengo un problema con la calefacción, el agua o el gas.' },
+          { label: 'Dónde puedo dormir', prompt: '¿Dónde puedo dormir o pernoctar con la camper?' },
+          { label: 'Avería o accidente', prompt: 'He tenido una avería o un accidente en ruta, ¿qué hago?' },
+          { label: 'Contactar con asistencia', prompt: 'Necesito contactar con la asistencia en viaje.' },
+        ],
+      },
     ],
   },
-  {
-    id: 'compra',
-    label: 'Comprar una camper',
-    emoji: '🔑',
-    question: '¿Qué tipo de camper te interesa comprar?',
-    options: [
-      { label: 'Modelo de 2 plazas', prompt: 'Estoy interesado en comprar una camper de 2 plazas, ¿qué opciones tenéis?' },
-      { label: 'Modelo de 4 plazas', prompt: 'Estoy interesado en comprar una camper de 4 plazas, ¿qué opciones tenéis?' },
-      { label: 'Alquiler con opción a compra', prompt: '¿Cómo funciona el alquiler con opción a compra?' },
-      { label: 'Hablar con ventas', prompt: 'Quiero que me pongáis en contacto con el equipo de ventas para comprar una camper.' },
+  en: {
+    subtitle: 'Furgocasa virtual assistant',
+    welcome1: "Hi! 👋 I'm Andrea, Furgocasa's virtual assistant.",
+    welcome2: 'How can I help you today?',
+    chooseTopic: "Choose the topic you'd like to talk about:",
+    back: 'Back to topics',
+    change: 'Change topic',
+    refresh: 'Restart',
+    refreshAria: 'Start a new conversation',
+    refreshTitle: "Start over (doesn't delete history)",
+    placeholder: 'Type your message...',
+    openAria: 'Open chat with Andrea from Furgocasa',
+    imageTooLarge: 'The image is too large (max. 8MB).',
+    error: 'Something went wrong. Please try again or write to us at +34 678 081 261.',
+    noResponse: "Sorry, I couldn't generate a response.",
+    categories: [
+      {
+        id: 'alquiler',
+        label: 'Campervan rental',
+        emoji: '🚐',
+        question: 'What would you like to know about renting?',
+        options: [
+          { label: 'Prices and rates', prompt: 'What are your rental rates and approximate prices?' },
+          { label: 'Rental conditions', prompt: 'What are the rental conditions?' },
+          { label: 'Requirements to rent', prompt: 'What requirements do I need to rent a campervan?' },
+          { label: 'Available models', prompt: 'Which campervan models do you have available to rent?' },
+          { label: 'Where to pick up', prompt: 'Where are the campervans picked up and returned?' },
+        ],
+      },
+      {
+        id: 'compra',
+        label: 'Buy a campervan',
+        emoji: '🔑',
+        question: 'What kind of campervan are you interested in buying?',
+        options: [
+          { label: '2-berth model', prompt: "I'm interested in buying a 2-berth campervan, what options do you have?" },
+          { label: '4-berth model', prompt: "I'm interested in buying a 4-berth campervan, what options do you have?" },
+          { label: 'Rent-to-own', prompt: 'How does rent-to-own work?' },
+          { label: 'Talk to sales', prompt: "I'd like you to put me in touch with the sales team to buy a campervan." },
+        ],
+      },
+      {
+        id: 'reservas',
+        label: 'Admin and bookings',
+        emoji: '📅',
+        question: 'What do you need about your booking or the booking process?',
+        options: [
+          { label: 'How to book', prompt: 'How do I make a booking step by step?' },
+          { label: 'Deposit and payments', prompt: 'How do the deposit and booking payments work?' },
+          { label: 'Modify or cancel', prompt: 'Can I modify or cancel my booking? How?' },
+          { label: 'Required documents', prompt: 'What documents do I need to pick up the campervan?' },
+        ],
+      },
+      {
+        id: 'incidencias',
+        label: 'Other questions',
+        emoji: '❓',
+        question: 'How can I help you?',
+        options: [
+          { label: 'Issue with a booking', prompt: 'I have an issue with my booking and need help.' },
+          { label: 'Payment problem', prompt: 'I have a problem with a payment.' },
+          { label: 'Another question', prompt: "I have another question that doesn't fit the topics above." },
+        ],
+      },
+      {
+        id: 'ruta',
+        label: "I'm on the road (assistance)",
+        emoji: '🛣️',
+        question: 'What do you need help with during your trip?',
+        options: [
+          { label: "Something isn't working", prompt: "I'm on the road and something in the campervan isn't working, I need help." },
+          { label: 'Heating, water or gas', prompt: "I'm on the road and have a problem with the heating, water or gas." },
+          { label: 'Where can I sleep', prompt: 'Where can I sleep or stay overnight with the campervan?' },
+          { label: 'Breakdown or accident', prompt: "I've had a breakdown or accident on the road, what do I do?" },
+          { label: 'Contact assistance', prompt: 'I need to contact roadside assistance.' },
+        ],
+      },
     ],
   },
-  {
-    id: 'reservas',
-    label: 'Administración y reservas',
-    emoji: '📅',
-    question: '¿Qué necesitas sobre tu reserva o el proceso de reserva?',
-    options: [
-      { label: 'Cómo reservar', prompt: '¿Cómo hago una reserva paso a paso?' },
-      { label: 'Fianza y pagos', prompt: '¿Cómo funcionan la fianza y los pagos de la reserva?' },
-      { label: 'Modificar o cancelar', prompt: '¿Puedo modificar o cancelar mi reserva? ¿Cómo se hace?' },
-      { label: 'Documentación necesaria', prompt: '¿Qué documentación necesito para la recogida de la camper?' },
+  fr: {
+    subtitle: 'Assistante virtuelle de Furgocasa',
+    welcome1: "Bonjour ! 👋 Je suis Andrea, l'assistante virtuelle de Furgocasa.",
+    welcome2: "Comment puis-je vous aider aujourd'hui ?",
+    chooseTopic: 'Choisissez le sujet dont vous voulez parler :',
+    back: 'Retour aux sujets',
+    change: 'Changer de sujet',
+    refresh: 'Recommencer',
+    refreshAria: 'Démarrer une nouvelle conversation',
+    refreshTitle: "Recommencer (n'efface pas l'historique)",
+    placeholder: 'Écrivez votre message...',
+    openAria: 'Ouvrir le chat avec Andrea de Furgocasa',
+    imageTooLarge: "L'image est trop volumineuse (max. 8 Mo).",
+    error: "Une erreur s'est produite. Réessayez ou écrivez-nous au +34 678 081 261.",
+    noResponse: "Désolée, je n'ai pas pu générer de réponse.",
+    categories: [
+      {
+        id: 'alquiler',
+        label: 'Location de campers',
+        emoji: '🚐',
+        question: 'Que souhaitez-vous savoir sur la location ?',
+        options: [
+          { label: 'Prix et tarifs', prompt: 'Quels sont vos tarifs et prix indicatifs de location ?' },
+          { label: 'Conditions de location', prompt: 'Quelles sont les conditions de location ?' },
+          { label: 'Conditions requises', prompt: 'Quelles conditions dois-je remplir pour louer un camper ?' },
+          { label: 'Modèles disponibles', prompt: 'Quels modèles de camper proposez-vous à la location ?' },
+          { label: 'Lieux de prise en charge', prompt: 'Où récupère-t-on et rend-on les campers ?' },
+        ],
+      },
+      {
+        id: 'compra',
+        label: 'Acheter un camper',
+        emoji: '🔑',
+        question: 'Quel type de camper souhaitez-vous acheter ?',
+        options: [
+          { label: 'Modèle 2 places', prompt: 'Je souhaite acheter un camper 2 places, quelles options avez-vous ?' },
+          { label: 'Modèle 4 places', prompt: 'Je souhaite acheter un camper 4 places, quelles options avez-vous ?' },
+          { label: "Location avec option d'achat", prompt: "Comment fonctionne la location avec option d'achat ?" },
+          { label: 'Parler aux ventes', prompt: "Je voudrais être mis en contact avec l'équipe commerciale pour acheter un camper." },
+        ],
+      },
+      {
+        id: 'reservas',
+        label: 'Administration et réservations',
+        emoji: '📅',
+        question: 'De quoi avez-vous besoin concernant votre réservation ?',
+        options: [
+          { label: 'Comment réserver', prompt: 'Comment faire une réservation étape par étape ?' },
+          { label: 'Caution et paiements', prompt: 'Comment fonctionnent la caution et les paiements ?' },
+          { label: 'Modifier ou annuler', prompt: 'Puis-je modifier ou annuler ma réservation ? Comment ?' },
+          { label: 'Documents nécessaires', prompt: 'Quels documents me faut-il pour récupérer le camper ?' },
+        ],
+      },
+      {
+        id: 'incidencias',
+        label: 'Autres questions',
+        emoji: '❓',
+        question: 'Comment puis-je vous aider ?',
+        options: [
+          { label: 'Problème avec une réservation', prompt: "J'ai un problème avec ma réservation et besoin d'aide." },
+          { label: 'Problème de paiement', prompt: "J'ai un problème avec un paiement." },
+          { label: 'Autre question', prompt: "J'ai une autre question qui ne correspond pas aux thèmes ci-dessus." },
+        ],
+      },
+      {
+        id: 'ruta',
+        label: 'Je suis en route (assistance)',
+        emoji: '🛣️',
+        question: 'Pour quoi avez-vous besoin d\'aide pendant le voyage ?',
+        options: [
+          { label: 'Quelque chose ne fonctionne pas', prompt: "Je suis en route et quelque chose dans le camper ne fonctionne pas, j'ai besoin d'aide." },
+          { label: 'Chauffage, eau ou gaz', prompt: "Je suis en route et j'ai un problème de chauffage, d'eau ou de gaz." },
+          { label: 'Où puis-je dormir', prompt: 'Où puis-je dormir ou passer la nuit avec le camper ?' },
+          { label: 'Panne ou accident', prompt: "J'ai eu une panne ou un accident sur la route, que faire ?" },
+          { label: "Contacter l'assistance", prompt: "Je dois contacter l'assistance routière." },
+        ],
+      },
     ],
   },
-  {
-    id: 'incidencias',
-    label: 'Otras consultas',
-    emoji: '❓',
-    question: '¿En qué puedo ayudarte?',
-    options: [
-      { label: 'Incidencia con una reserva', prompt: 'Tengo una incidencia con mi reserva y necesito ayuda.' },
-      { label: 'Problema con un pago', prompt: 'Tengo un problema con un pago.' },
-      { label: 'Otra consulta', prompt: 'Tengo otra consulta que no encaja en los temas anteriores.' },
+  de: {
+    subtitle: 'Virtuelle Assistentin von Furgocasa',
+    welcome1: 'Hallo! 👋 Ich bin Andrea, die virtuelle Assistentin von Furgocasa.',
+    welcome2: 'Wie kann ich Ihnen heute helfen?',
+    chooseTopic: 'Wählen Sie das Thema, über das Sie sprechen möchten:',
+    back: 'Zurück zu den Themen',
+    change: 'Thema wechseln',
+    refresh: 'Neu starten',
+    refreshAria: 'Neue Unterhaltung starten',
+    refreshTitle: 'Neu beginnen (löscht den Verlauf nicht)',
+    placeholder: 'Schreiben Sie Ihre Nachricht...',
+    openAria: 'Chat mit Andrea von Furgocasa öffnen',
+    imageTooLarge: 'Das Bild ist zu groß (max. 8 MB).',
+    error: 'Es ist ein Fehler aufgetreten. Versuchen Sie es erneut oder schreiben Sie uns unter +34 678 081 261.',
+    noResponse: 'Entschuldigung, ich konnte keine Antwort generieren.',
+    categories: [
+      {
+        id: 'alquiler',
+        label: 'Camper mieten',
+        emoji: '🚐',
+        question: 'Was möchten Sie über die Vermietung wissen?',
+        options: [
+          { label: 'Preise und Tarife', prompt: 'Was sind Ihre Mietpreise und Richtpreise?' },
+          { label: 'Mietbedingungen', prompt: 'Wie lauten die Mietbedingungen?' },
+          { label: 'Voraussetzungen zum Mieten', prompt: 'Welche Voraussetzungen brauche ich, um einen Camper zu mieten?' },
+          { label: 'Verfügbare Modelle', prompt: 'Welche Camper-Modelle haben Sie zur Miete?' },
+          { label: 'Abholorte', prompt: 'Wo werden die Camper abgeholt und zurückgegeben?' },
+        ],
+      },
+      {
+        id: 'compra',
+        label: 'Camper kaufen',
+        emoji: '🔑',
+        question: 'Welche Art von Camper möchten Sie kaufen?',
+        options: [
+          { label: '2-Schlafplätze-Modell', prompt: 'Ich möchte einen Camper mit 2 Schlafplätzen kaufen, welche Optionen gibt es?' },
+          { label: '4-Schlafplätze-Modell', prompt: 'Ich möchte einen Camper mit 4 Schlafplätzen kaufen, welche Optionen gibt es?' },
+          { label: 'Miete mit Kaufoption', prompt: 'Wie funktioniert die Miete mit Kaufoption?' },
+          { label: 'Mit dem Verkauf sprechen', prompt: 'Ich möchte mit dem Verkaufsteam in Kontakt gebracht werden, um einen Camper zu kaufen.' },
+        ],
+      },
+      {
+        id: 'reservas',
+        label: 'Verwaltung und Buchungen',
+        emoji: '📅',
+        question: 'Was brauchen Sie zu Ihrer Buchung oder zum Buchungsprozess?',
+        options: [
+          { label: 'Wie buche ich', prompt: 'Wie mache ich Schritt für Schritt eine Buchung?' },
+          { label: 'Kaution und Zahlungen', prompt: 'Wie funktionieren Kaution und Zahlungen der Buchung?' },
+          { label: 'Ändern oder stornieren', prompt: 'Kann ich meine Buchung ändern oder stornieren? Wie?' },
+          { label: 'Erforderliche Unterlagen', prompt: 'Welche Unterlagen brauche ich für die Abholung des Campers?' },
+        ],
+      },
+      {
+        id: 'incidencias',
+        label: 'Weitere Fragen',
+        emoji: '❓',
+        question: 'Wie kann ich Ihnen helfen?',
+        options: [
+          { label: 'Problem mit einer Buchung', prompt: 'Ich habe ein Problem mit meiner Buchung und brauche Hilfe.' },
+          { label: 'Zahlungsproblem', prompt: 'Ich habe ein Problem mit einer Zahlung.' },
+          { label: 'Andere Frage', prompt: 'Ich habe eine andere Frage, die nicht zu den obigen Themen passt.' },
+        ],
+      },
+      {
+        id: 'ruta',
+        label: 'Ich bin unterwegs (Pannenhilfe)',
+        emoji: '🛣️',
+        question: 'Wobei brauchen Sie während der Reise Hilfe?',
+        options: [
+          { label: 'Etwas funktioniert nicht', prompt: 'Ich bin unterwegs und etwas im Camper funktioniert nicht, ich brauche Hilfe.' },
+          { label: 'Heizung, Wasser oder Gas', prompt: 'Ich bin unterwegs und habe ein Problem mit Heizung, Wasser oder Gas.' },
+          { label: 'Wo kann ich schlafen', prompt: 'Wo kann ich mit dem Camper schlafen oder übernachten?' },
+          { label: 'Panne oder Unfall', prompt: 'Ich hatte eine Panne oder einen Unfall unterwegs, was soll ich tun?' },
+          { label: 'Pannenhilfe kontaktieren', prompt: 'Ich muss die Pannenhilfe kontaktieren.' },
+        ],
+      },
     ],
   },
-  {
-    id: 'ruta',
-    label: 'Estoy en ruta (asistencia)',
-    emoji: '🛣️',
-    question: '¿Con qué necesitas ayuda durante el viaje?',
-    options: [
-      { label: 'Algo no funciona', prompt: 'Estoy en ruta y algo de la camper no funciona, necesito ayuda.' },
-      { label: 'Calefacción, agua o gas', prompt: 'Estoy en ruta y tengo un problema con la calefacción, el agua o el gas.' },
-      { label: 'Dónde puedo dormir', prompt: '¿Dónde puedo dormir o pernoctar con la camper?' },
-      { label: 'Avería o accidente', prompt: 'He tenido una avería o un accidente en ruta, ¿qué hago?' },
-      { label: 'Contactar con asistencia', prompt: 'Necesito contactar con la asistencia en viaje.' },
-    ],
-  },
-];
+};
 
 interface ChatMessage {
   id: string;
@@ -163,6 +439,11 @@ export default function WhatsAppChatbot() {
   const sessionIdRef = useRef<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Idioma de la web -> textos y menus del widget en ese idioma.
+  const locale: WidgetLocale = (getLocaleFromPathname(pathname) || 'es') as WidgetLocale;
+  const t = WIDGET_I18N[locale] || WIDGET_I18N.es;
+  const categories = t.categories;
 
   useEffect(() => {
     sessionIdRef.current = getSessionId();
@@ -371,6 +652,7 @@ export default function WhatsAppChatbot() {
             conversationId: conversationIdRef.current,
             text: payload.text,
             media: payload.media,
+            locale: getLocaleFromPathname(pathname) || 'es',
           }),
         });
 
@@ -395,31 +677,18 @@ export default function WhatsAppChatbot() {
         }
         if (!acc.trim()) {
           setMessages((prev) =>
-            prev.map((m) =>
-              m.id === assistantId
-                ? { ...m, content: 'Lo siento, no he podido generar una respuesta.', pending: false }
-                : m
-            )
+            prev.map((m) => (m.id === assistantId ? { ...m, content: t.noResponse, pending: false } : m))
           );
         }
       } catch (err) {
         setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId
-              ? {
-                  ...m,
-                  content:
-                    'Ha ocurrido un error. Inténtalo de nuevo o escríbenos al +34 678 081 261.',
-                  pending: false,
-                }
-              : m
-          )
+          prev.map((m) => (m.id === assistantId ? { ...m, content: t.error, pending: false } : m))
         );
       } finally {
         setIsSending(false);
       }
     },
-    []
+    [pathname, t]
   );
 
   const handleSendText = useCallback(() => {
@@ -451,7 +720,7 @@ export default function WhatsAppChatbot() {
     e.target.value = '';
     if (!file || isSending) return;
     if (file.size > 8 * 1024 * 1024) {
-      alert('La imagen es demasiado grande (máx. 8MB).');
+      alert(t.imageTooLarge);
       return;
     }
     const dataUrl = await fileToDataUrl(file);
@@ -476,14 +745,14 @@ export default function WhatsAppChatbot() {
   }
 
   const showWelcome = messages.length === 0;
-  const activeCategoryObj = CHAT_CATEGORIES.find((c) => c.id === activeCategory) || null;
+  const activeCategoryObj = categories.find((c) => c.id === activeCategory) || null;
 
   return (
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 z-[1300] bg-[#063971] hover:bg-[#042A54] text-white rounded-full p-4 shadow-2xl transition-all duration-300 transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-[#063971]/40"
-        aria-label="Abrir chat con Andrea de Furgocasa"
+        aria-label={t.openAria}
       >
         {isOpen ? <X className="w-7 h-7" /> : <MessageCircle className="w-7 h-7" />}
       </button>
@@ -492,22 +761,25 @@ export default function WhatsAppChatbot() {
         <div className="fixed bottom-24 right-6 z-[1300] w-[380px] max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-5 duration-300">
           {/* Header */}
           <div className="bg-[#063971] text-white p-4 flex items-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
-              <MessageCircle className="w-6 h-6 text-[#063971]" />
-            </div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/images/andrea-avatar.png"
+              alt="Andrea, asistente virtual de Furgocasa"
+              className="w-12 h-12 rounded-full object-cover ring-2 ring-white/80"
+            />
             <div className="flex-1">
               <h3 className="font-rubik font-semibold text-lg">Andrea</h3>
-              <p className="text-xs text-white/80">Asistente virtual de Furgocasa</p>
+              <p className="text-xs text-white/80">{t.subtitle}</p>
             </div>
             <button
               onClick={handleRefresh}
               disabled={isSending}
               className="flex items-center gap-1.5 text-xs font-amiko text-white/90 hover:text-white bg-white/10 hover:bg-white/20 disabled:opacity-40 rounded-full px-3 py-1.5 transition-colors"
-              aria-label="Empezar una conversación nueva"
-              title="Empezar de nuevo (no borra el historial)"
+              aria-label={t.refreshAria}
+              title={t.refreshTitle}
             >
               <RefreshCw className="w-3.5 h-3.5" />
-              Refrescar
+              {t.refresh}
             </button>
           </div>
 
@@ -515,19 +787,19 @@ export default function WhatsAppChatbot() {
           <div ref={scrollRef} className="p-5 bg-[#EEF2F7] min-h-[320px] max-h-[450px] overflow-y-auto">
             <div className="bg-white rounded-2xl rounded-tl-md p-4 shadow-sm mb-4">
               <p className="text-gray-800 text-sm font-amiko leading-relaxed">
-                ¡Hola! 👋 Soy Andrea, la asistente virtual de Furgocasa.
+                {t.welcome1}
               </p>
               <p className="text-gray-800 text-sm font-amiko mt-2 leading-relaxed">
-                ¿En qué puedo ayudarte hoy?
+                {t.welcome2}
               </p>
             </div>
 
             {showWelcome && !activeCategoryObj && (
               <div className="space-y-2">
                 <p className="text-xs font-amiko text-gray-500 mb-1 px-1">
-                  Elige el tema sobre el que quieres hablar:
+                  {t.chooseTopic}
                 </p>
-                {CHAT_CATEGORIES.map((cat) => (
+                {categories.map((cat) => (
                   <button
                     key={cat.id}
                     onClick={() => setActiveCategory(cat.id)}
@@ -546,7 +818,7 @@ export default function WhatsAppChatbot() {
                   onClick={() => setActiveCategory(null)}
                   className="flex items-center gap-1 text-xs font-amiko text-[#063971] hover:underline mb-1 px-1"
                 >
-                  <ChevronLeft className="w-3.5 h-3.5" /> Volver a los temas
+                  <ChevronLeft className="w-3.5 h-3.5" /> {t.back}
                 </button>
                 <p className="text-sm font-amiko text-gray-700 mb-1 px-1">
                   {activeCategoryObj.emoji} {activeCategoryObj.question}
@@ -611,11 +883,11 @@ export default function WhatsAppChatbot() {
                       onClick={() => setActiveCategory(null)}
                       className="text-xs font-amiko bg-[#EEF2F7] text-gray-600 border border-gray-300 rounded-full px-3 py-1.5 shadow-sm hover:bg-gray-200 transition-colors duration-200"
                     >
-                      ↺ Cambiar de tema
+                      ↺ {t.change}
                     </button>
                   </>
                 ) : (
-                  CHAT_CATEGORIES.map((cat) => (
+                  categories.map((cat) => (
                     <button
                       key={cat.id}
                       onClick={() => setActiveCategory(cat.id)}
@@ -652,7 +924,7 @@ export default function WhatsAppChatbot() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyPress={handleKeyPress}
-                placeholder="Escribe tu mensaje..."
+                placeholder={t.placeholder}
                 rows={1}
                 className="flex-1 resize-none rounded-full px-4 py-2.5 text-base sm:text-sm font-amiko focus:outline-none focus:ring-2 focus:ring-[#063971] border border-gray-300 disabled:bg-gray-100"
               />

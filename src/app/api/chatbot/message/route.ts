@@ -21,6 +21,8 @@ const bodySchema = z.object({
   sessionId: z.string().min(8).max(128),
   conversationId: z.string().uuid().optional(),
   text: z.string().max(4000).optional(),
+  // Idioma de navegacion de la web (señal fiable del idioma del cliente).
+  locale: z.enum(['es', 'en', 'fr', 'de']).optional(),
   media: z
     .object({
       type: z.literal('image'),
@@ -39,7 +41,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, error: 'Solicitud invalida' }, { status: 400 });
   }
 
-  const { sessionId, conversationId, text, media } = parsed;
+  const { sessionId, conversationId, text, media, locale } = parsed;
 
   if (!text?.trim() && !media) {
     return NextResponse.json({ ok: false, error: 'Mensaje vacio' }, { status: 400 });
@@ -65,9 +67,12 @@ export async function POST(request: NextRequest) {
     }
   }
   if (!convId) {
+    // Idioma de la conversacion: el locale de la web es la señal mas fiable;
+    // si no llega, caemos a la deteccion por contenido. Se fija UNA sola vez.
+    const conversationLanguage = locale || detectLanguage(text || '');
     const { data: created, error: convError } = await supabase
       .from('chatbot_conversations')
-      .insert({ session_id: sessionId, language: detectLanguage(text || '') })
+      .insert({ session_id: sessionId, language: conversationLanguage })
       .select('id')
       .single();
     if (convError || !created) {
@@ -97,8 +102,8 @@ export async function POST(request: NextRequest) {
   const userText = (text?.trim() || '').trim();
   const ragQuery = userText || 'consulta general sobre la camper';
 
-  // 3. Contexto RAG
-  const context = await retrieveContext(ragQuery);
+  // 3. Contexto RAG (traduce la consulta a espanol si el cliente navega en otro idioma)
+  const context = await retrieveContext(ragQuery, locale);
 
   // 4. Historial reciente. Incluimos media_url para que las imagenes enviadas en
   // turnos anteriores sigan siendo "visibles" por el modelo en los mensajes
@@ -205,12 +210,12 @@ export async function POST(request: NextRequest) {
           role: 'assistant',
           content: full,
         });
+        // No recalculamos el idioma aqui: se fijo al crear la conversacion con el
+        // locale de la web. Recalcularlo en cada turno con una heuristica debil
+        // provocaba que un mensaje suelto cambiara mal la etiqueta (es -> pt).
         await sb
           .from('chatbot_conversations')
-          .update({
-            last_message_at: new Date().toISOString(),
-            language: detectLanguage(userText),
-          })
+          .update({ last_message_at: new Date().toISOString() })
           .eq('id', finalConvId);
       } catch (persistErr) {
         console.error('[chatbot] error persistiendo respuesta:', persistErr);
