@@ -96,6 +96,38 @@ interface ChatMessage {
   pending?: boolean;
 }
 
+// Etiquetas cortas para enlaces conocidos de furgocasa.com, para que el chat
+// muestre un texto legible en vez de la URL completa (que desbordaba el ancho).
+const LINK_LABELS: Record<string, string> = {
+  '/es/tarifas': 'Tarifas y condiciones',
+  '/es/reservar': 'Reservar fechas',
+  '/es/vehiculos': 'Ver campers',
+  '/es/ofertas': 'Ofertas',
+  '/es/ventas': 'Comprar camper',
+  '/es/guia-camper': 'Guía de la camper',
+  '/es/video-tutoriales': 'Vídeos tutoriales',
+  '/es/contacto': 'Contacto',
+};
+
+// Convierte una URL en una etiqueta corta y legible para mostrar como enlace.
+function friendlyLabel(url: string): string {
+  try {
+    const u = new URL(url);
+    const path = `${u.pathname}`.replace(/\/$/, '');
+    if (INTERNAL_RE.test(url)) {
+      if (LINK_LABELS[path]) return LINK_LABELS[path];
+      const seg = path.split('/').filter(Boolean).pop();
+      if (!seg) return 'furgocasa.com';
+      return seg
+        .replace(/[-_]/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+    return u.host.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
+
 function getSessionId(): string {
   if (typeof window === 'undefined') return '';
   let id = localStorage.getItem(STORAGE_KEY);
@@ -185,56 +217,131 @@ export default function WhatsAppChatbot() {
     }
   }, [messages, isOpen]);
 
-  // Renderiza el texto del asistente convirtiendo URLs en enlaces.
-  // Los enlaces internos (furgocasa.com) navegan sin recargar y mantienen el chat abierto.
-  const renderRichText = useCallback(
-    (text: string) => {
-      if (!text) return null;
-      const regex = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s)]+)/g;
+  // Crea un enlace (interno -> navegacion SPA; externo -> nueva pestana) con
+  // texto corto para que nunca desborde el ancho del chat.
+  const renderLink = useCallback(
+    (url: string, label: string, key: number) => {
+      const cls =
+        'text-[#063971] underline decoration-[#063971]/40 underline-offset-2 font-semibold hover:text-[#094F9A] hover:decoration-[#094F9A] break-words';
+      if (INTERNAL_RE.test(url)) {
+        const path = url.replace(INTERNAL_RE, '') || '/';
+        return (
+          <button key={key} type="button" onClick={() => router.push(path)} className={cls}>
+            {label}
+          </button>
+        );
+      }
+      return (
+        <a key={key} href={url} target="_blank" rel="noopener noreferrer" className={cls}>
+          {label}
+        </a>
+      );
+    },
+    [router]
+  );
+
+  // Formato inline: **negrita**, *cursiva*, [texto](url) y URLs sueltas.
+  const renderInline = useCallback(
+    (text: string): React.ReactNode[] => {
       const nodes: React.ReactNode[] = [];
+      const regex =
+        /\*\*([^*]+)\*\*|__([^_]+)__|\*([^*\n]+)\*|_([^_\n]+)_|\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|(https?:\/\/[^\s)]+)/g;
       let last = 0;
       let m: RegExpExecArray | null;
       let key = 0;
       while ((m = regex.exec(text)) !== null) {
         if (m.index > last) nodes.push(text.slice(last, m.index));
-        const isMarkdown = Boolean(m[1]);
-        let url = m[2] || m[3] || '';
-        let trailing = '';
-        if (!isMarkdown) {
+        if (m[1] !== undefined || m[2] !== undefined) {
+          nodes.push(
+            <strong key={key++} className="font-semibold text-gray-900">
+              {m[1] ?? m[2]}
+            </strong>
+          );
+        } else if (m[3] !== undefined || m[4] !== undefined) {
+          nodes.push(
+            <em key={key++} className="italic">
+              {m[3] ?? m[4]}
+            </em>
+          );
+        } else if (m[5] !== undefined && m[6] !== undefined) {
+          nodes.push(renderLink(m[6], m[5], key++));
+        } else if (m[7] !== undefined) {
+          let url = m[7];
+          let trailing = '';
           const tm = url.match(/[.,;:!?)]+$/);
           if (tm) {
             trailing = tm[0];
             url = url.slice(0, -trailing.length);
           }
+          nodes.push(renderLink(url, friendlyLabel(url), key++));
+          if (trailing) nodes.push(trailing);
         }
-        const label = m[1] || url;
-        const cls = 'text-[#063971] underline font-medium hover:text-[#094F9A] break-words';
-        if (INTERNAL_RE.test(url)) {
-          const path = url.replace(INTERNAL_RE, '') || '/';
-          nodes.push(
-            <button
-              key={key++}
-              type="button"
-              onClick={() => router.push(path)}
-              className={cls}
-            >
-              {label}
-            </button>
-          );
-        } else {
-          nodes.push(
-            <a key={key++} href={url} target="_blank" rel="noopener noreferrer" className={cls}>
-              {label}
-            </a>
-          );
-        }
-        if (trailing) nodes.push(trailing);
         last = regex.lastIndex;
       }
       if (last < text.length) nodes.push(text.slice(last));
       return nodes;
     },
-    [router]
+    [renderLink]
+  );
+
+  // Renderiza la respuesta del asistente como bloques (parrafos y listas) con
+  // formato Markdown ligero, coherente con la tipografia de la web.
+  const renderRichText = useCallback(
+    (text: string) => {
+      if (!text) return null;
+      const lines = text.split('\n');
+      const blocks: React.ReactNode[] = [];
+      let listItems: React.ReactNode[] = [];
+      let ordered = false;
+      let key = 0;
+
+      const flushList = () => {
+        if (!listItems.length) return;
+        const items = listItems;
+        listItems = [];
+        if (ordered) {
+          blocks.push(
+            <ol key={`ol-${key++}`} className="list-decimal pl-5 space-y-1 my-1">
+              {items}
+            </ol>
+          );
+        } else {
+          blocks.push(
+            <ul key={`ul-${key++}`} className="list-disc pl-5 space-y-1 my-1">
+              {items}
+            </ul>
+          );
+        }
+      };
+
+      for (const raw of lines) {
+        const line = raw.trim();
+        const bullet = line.match(/^[-*•]\s+(.*)$/);
+        const numbered = line.match(/^\d+[.)]\s+(.*)$/);
+        if (bullet) {
+          if (listItems.length && ordered) flushList();
+          ordered = false;
+          listItems.push(<li key={`li-${key++}`}>{renderInline(bullet[1])}</li>);
+        } else if (numbered) {
+          if (listItems.length && !ordered) flushList();
+          ordered = true;
+          listItems.push(<li key={`li-${key++}`}>{renderInline(numbered[1])}</li>);
+        } else if (!line) {
+          flushList();
+        } else {
+          flushList();
+          const heading = line.match(/^#{1,6}\s+(.*)$/);
+          blocks.push(
+            <p key={`p-${key++}`} className={heading ? 'font-semibold text-gray-900' : undefined}>
+              {renderInline(heading ? heading[1] : line)}
+            </p>
+          );
+        }
+      }
+      flushList();
+      return blocks;
+    },
+    [renderInline]
   );
 
   // No mostrar en administracion ni en barras de reserva (igual que antes)
@@ -406,11 +513,13 @@ export default function WhatsAppChatbot() {
 
           {/* Body */}
           <div ref={scrollRef} className="p-5 bg-[#EEF2F7] min-h-[320px] max-h-[450px] overflow-y-auto">
-            <div className="bg-white rounded-lg rounded-tl-none p-4 shadow-sm mb-4">
-              <p className="text-gray-800 text-sm font-amiko">
+            <div className="bg-white rounded-2xl rounded-tl-md p-4 shadow-sm mb-4">
+              <p className="text-gray-800 text-sm font-amiko leading-relaxed">
                 ¡Hola! 👋 Soy Andrea, la asistente virtual de Furgocasa.
               </p>
-              <p className="text-gray-800 text-sm font-amiko mt-2">¿En qué puedo ayudarte hoy?</p>
+              <p className="text-gray-800 text-sm font-amiko mt-2 leading-relaxed">
+                ¿En qué puedo ayudarte hoy?
+              </p>
             </div>
 
             {showWelcome && !activeCategoryObj && (
@@ -457,25 +566,27 @@ export default function WhatsAppChatbot() {
             {messages.map((m) =>
               m.role === 'user' ? (
                 <div key={m.id} className="flex justify-end mb-3">
-                  <div className="bg-[#063971] rounded-lg rounded-tr-none p-3 shadow-sm max-w-[80%]">
+                  <div className="bg-[#063971] rounded-2xl rounded-tr-md p-3 shadow-sm max-w-[80%]">
                     {m.mediaType === 'image' && m.mediaUrl && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={m.mediaUrl} alt="adjunto" className="rounded-md mb-1 max-h-40 object-cover" />
                     )}
                     {m.content && (
-                      <p className="text-white text-sm font-amiko whitespace-pre-wrap">{m.content}</p>
+                      <p className="text-white text-sm font-amiko leading-relaxed whitespace-pre-wrap [overflow-wrap:anywhere]">
+                        {m.content}
+                      </p>
                     )}
                   </div>
                 </div>
               ) : (
                 <div key={m.id} className="flex justify-start mb-3">
-                  <div className="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[85%]">
+                  <div className="bg-white rounded-2xl rounded-tl-md p-3 shadow-sm max-w-[85%]">
                     {m.pending && !m.content ? (
                       <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
                     ) : (
-                      <p className="text-gray-800 text-sm font-amiko whitespace-pre-wrap">
+                      <div className="text-gray-800 text-sm font-amiko leading-relaxed space-y-1.5 break-words [overflow-wrap:anywhere]">
                         {renderRichText(m.content)}
-                      </p>
+                      </div>
                     )}
                   </div>
                 </div>
