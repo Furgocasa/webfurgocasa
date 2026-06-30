@@ -889,9 +889,9 @@ function ClassificationForm({
 
 function SidePanel({ title, onClose, children }: { title: string; onClose: () => void; children: React.ReactNode }) {
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex justify-end" onClick={onClose}>
       <div
-        className="w-full max-w-xl bg-white dark:bg-gray-800 h-full overflow-y-auto shadow-2xl"
+        className="w-full max-w-xl bg-white dark:bg-gray-800 h-full overflow-y-auto shadow-2xl border-l border-gray-200 dark:border-gray-700 ring-1 ring-black/5"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 p-4 flex items-center justify-between z-10">
