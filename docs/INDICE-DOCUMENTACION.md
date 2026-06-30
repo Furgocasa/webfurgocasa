@@ -483,6 +483,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md](./PAGINAS-MOTORHOME-EUROPA-MULTIIDIOMA.md)** | ⚠️ **NUEVO** - Páginas "Motorhome Europa" diferenciadas por audiencia |
 | **[AUDITORIA-SEO-CRITICA.md](./AUDITORIA-SEO-CRITICA.md)** | Por qué Server Components son críticos |
 | **[NORMAS-SEO-OBLIGATORIAS.md](./NORMAS-SEO-OBLIGATORIAS.md)** | Normas SEO del proyecto |
+| **[DIAGNOSTICO-Y-ENLAZADO-INTERNO-2026-06.md](./02-desarrollo/seo/DIAGNOSTICO-Y-ENLAZADO-INTERNO-2026-06.md)** | ⚠️ **NUEVO** (jun 2026) - Diagnóstico caída de tráfico, caso "camper" España y enlazado interno blog → landings |
 
 ### 👨‍💼 Administración
 

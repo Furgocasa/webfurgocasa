@@ -1390,6 +1390,42 @@ export const staticTranslations = {
     fr: "Liens rapides",
     de: "Schnelllinks"
   },
+  "Alquiler de campers y autocaravanas por ciudad": {
+    es: "Alquiler de campers y autocaravanas por ciudad",
+    en: "Campervan & motorhome hire by city",
+    fr: "Location de camping-cars par ville",
+    de: "Wohnmobil- & Campervermietung nach Stadt"
+  },
+  "Alquiler de campers en": {
+    es: "Alquiler de campers en",
+    en: "Campervan hire in",
+    fr: "Location de camping-car à",
+    de: "Wohnmobil mieten in"
+  },
+  "Alquiler de campers y autocaravanas en": {
+    es: "Alquiler de campers y autocaravanas en",
+    en: "Campervan & motorhome hire in",
+    fr: "Location de campers et camping-cars à",
+    de: "Camper- & Wohnmobilvermietung in"
+  },
+  "¿Quieres recorrer {ciudad} en camper?": {
+    es: "¿Quieres recorrer {ciudad} en camper?",
+    en: "Want to explore {ciudad} by campervan?",
+    fr: "Envie de découvrir {ciudad} en camping-car ?",
+    de: "{ciudad} im Wohnmobil entdecken?"
+  },
+  "Campers y autocaravanas totalmente equipadas, kilómetros ilimitados y asistencia 24/7.": {
+    es: "Campers y autocaravanas totalmente equipadas, kilómetros ilimitados y asistencia 24/7.",
+    en: "Fully equipped campervans and motorhomes, unlimited mileage and 24/7 assistance.",
+    fr: "Camping-cars entièrement équipés, kilométrage illimité et assistance 24h/24 et 7j/7.",
+    de: "Voll ausgestattete Camper und Wohnmobile, unbegrenzte Kilometer und 24/7-Pannenhilfe."
+  },
+  "Alquila tu camper o autocaravana en {ciudad} y empieza a viajar.": {
+    es: "Alquila tu camper o autocaravana en {ciudad} y empieza a viajar.",
+    en: "Rent your campervan or motorhome in {ciudad} and start your trip.",
+    fr: "Louez votre camping-car à {ciudad} et partez à l'aventure.",
+    de: "Miete deinen Camper oder dein Wohnmobil in {ciudad} und leg los."
+  },
   "Legal": {
     es: "Legal",
     en: "Legal",

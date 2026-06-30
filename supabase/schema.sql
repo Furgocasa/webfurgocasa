@@ -709,13 +709,20 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Función para incrementar vistas de un post
+-- Función para incrementar vistas de un post (SECURITY DEFINER: RLS solo permite SELECT público)
 CREATE OR REPLACE FUNCTION increment_post_views(post_id UUID)
-RETURNS VOID AS $$
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
-    UPDATE posts SET views = views + 1 WHERE id = post_id;
+    UPDATE posts
+    SET views = COALESCE(views, 0) + 1
+    WHERE id = post_id
+      AND status = 'published';
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- ============================================
 -- ROW LEVEL SECURITY (RLS)

@@ -79,6 +79,8 @@ export function DestinationsGrid({
               <a
                 key={destination.slug} 
                 href={translatedRoute}
+                aria-label={`${t("Alquiler de campers en")} ${destination.name}`}
+                title={`${t("Alquiler de campers en")} ${destination.name}`}
                 className="group block"
                 style={{
                   transform: `rotate(${rotation}deg)`,
@@ -117,6 +119,8 @@ export function DestinationsGrid({
                   
                   {/* Texto en la parte inferior del polaroid */}
                   <div className="text-center px-2">
+                    {/* Anchor text completo para SEO (no rompe el diseño visual) */}
+                    <span className="sr-only">{t("Alquiler de campers en")} </span>
                     <h3 className="font-bold text-gray-900 text-sm lg:text-base mb-0.5 group-hover:text-furgocasa-blue transition-colors">
                       {destination.name}
                     </h3>

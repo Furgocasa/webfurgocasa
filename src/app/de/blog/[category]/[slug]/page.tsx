@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { LocalizedLink } from "@/components/localized-link";
-import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight } from "lucide-react";
+import { Calendar, User, Clock, ArrowLeft, Tag, BookOpen, Eye, ChevronRight, MapPin } from "lucide-react";
 import { getPostBySlug, getRelatedPosts, getAllPublishedPostSlugs } from "@/lib/blog/server-actions";
 import { BlogViewTracker } from "@/components/blog/blog-view-tracker";
 import { getCategoryName, buildBlogRouteDataFromPost, translateCategorySlug, sanitizeBlogContentLinks } from "@/lib/blog-translations";
@@ -11,6 +11,7 @@ import { ShareButtons } from "@/components/blog/share-buttons";
 import { BlogPostJsonLd } from "@/components/blog/blog-post-jsonld";
 import { BlogRouteDataProvider } from "@/components/blog/blog-route-data";
 import { getTranslatedContent, getTranslatedRecords, type Locale } from "@/lib/translations/get-translations";
+import { getActiveLocationTargetNames, pickPrimaryLocation } from "@/lib/locations/server-actions";
 import { translateServer } from "@/lib/i18n/server-translation";
 import { buildBlogCanonicalAlternates, truncateTitle, formatOgTitle, OG_DEFAULT_IMAGE } from "@/lib/seo/multilingual-metadata";
 import { BlogContentWithBanners } from "@/components/blog/blog-banners";
@@ -188,6 +189,13 @@ export default async function LocaleBlogPostPage({
     ? getCategoryName(post.category.slug, locale)
     : "Blog";
 
+  // 🔗 Enlazado interno: ciudad principal del artículo (location_tags) → landing de alquiler
+  const activeLocationNames = await getActiveLocationTargetNames();
+  const primaryCity = pickPrimaryLocation(post.location_tags, activeLocationNames);
+  const cityLandingHref = primaryCity
+    ? `/alquiler-autocaravanas-campervans/${primaryCity.slug}`
+    : null;
+
   // ⚠️ URL canónica con el idioma actual
   const url = `https://www.furgocasa.com/${locale}/blog/${category}/${slug}`;
 
@@ -298,6 +306,32 @@ export default async function LocaleBlogPostPage({
                 proseClassName="prose prose-lg max-w-none prose-headings:font-heading prose-headings:font-bold prose-a:text-furgocasa-blue hover:prose-a:text-furgocasa-blue-dark prose-img:rounded-2xl prose-img:shadow-lg"
               />
 
+              {/* 🔗 CTA geolocalizado → landing de alquiler de la ciudad del artículo */}
+              {cityLandingHref && primaryCity && (
+                <div className="mt-12 rounded-2xl bg-gradient-to-br from-furgocasa-orange/10 to-furgocasa-blue/5 border border-furgocasa-orange/30 p-6 lg:p-8">
+                  <div className="flex items-start gap-4">
+                    <span className="flex-shrink-0 w-12 h-12 rounded-xl bg-furgocasa-orange flex items-center justify-center">
+                      <MapPin className="h-6 w-6 text-white" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <h2 className="text-xl lg:text-2xl font-heading font-bold text-furgocasa-blue mb-2">
+                        {t("¿Quieres recorrer {ciudad} en camper?").replace("{ciudad}", primaryCity.name)}
+                      </h2>
+                      <p className="text-gray-700 text-sm lg:text-base mb-4 leading-relaxed">
+                        {t("Campers y autocaravanas totalmente equipadas, kilómetros ilimitados y asistencia 24/7.")}
+                      </p>
+                      <LocalizedLink
+                        href={cityLandingHref}
+                        className="inline-flex items-center gap-2 bg-furgocasa-orange text-white font-bold px-6 py-3 rounded-xl hover:bg-furgocasa-orange-dark transition-colors text-sm uppercase tracking-wide shadow-lg"
+                      >
+                        {t("Alquiler de campers y autocaravanas en")} {primaryCity.name}
+                        <span className="text-lg">→</span>
+                      </LocalizedLink>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="mt-12 pt-8 border-t border-gray-200">
@@ -398,13 +432,17 @@ export default async function LocaleBlogPostPage({
                     {t("¿Listo para tu aventura?")}
                   </h2>
                   <p className="text-blue-100 text-sm mb-6">
-                    {t("Descubre nuestra flota de campers y comienza tu viaje")}
+                    {cityLandingHref && primaryCity
+                      ? t("Alquila tu camper o autocaravana en {ciudad} y empieza a viajar.").replace("{ciudad}", primaryCity.name)
+                      : t("Descubre nuestra flota de campers y comienza tu viaje")}
                   </p>
                   <LocalizedLink
-                    href="/vehiculos"
+                    href={cityLandingHref || "/vehiculos"}
                     className="block w-full bg-white text-furgocasa-blue font-bold py-3 px-4 rounded-xl hover:bg-gray-100 transition-colors text-center text-sm uppercase tracking-wide shadow-lg"
                   >
-                    {t("Ver vehículos")}
+                    {cityLandingHref && primaryCity
+                      ? `${t("Alquiler de campers en")} ${primaryCity.name}`
+                      : t("Ver vehículos")}
                   </LocalizedLink>
                 </div>
               </div>

@@ -165,6 +165,33 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Alquiler por ciudad - enlaces internos a landings (SEO local) */}
+        <div className="border-t border-white/10 mt-12 pt-8">
+          <h3 className="text-sm font-heading font-bold mb-4 text-white uppercase tracking-wider">
+            {t("Alquiler de campers y autocaravanas por ciudad")}
+          </h3>
+          <ul className="flex flex-wrap gap-x-5 gap-y-2.5">
+            {[
+              { name: "Murcia", slug: "murcia" },
+              { name: "Alicante", slug: "alicante" },
+              { name: "Madrid", slug: "madrid" },
+              { name: "Cartagena", slug: "cartagena" },
+              { name: "Albacete", slug: "albacete" },
+              { name: "Almería", slug: "almeria" },
+              { name: "Valencia", slug: "valencia" },
+            ].map((city) => (
+              <li key={city.slug}>
+                <LocalizedLink
+                  href={`/alquiler-autocaravanas-campervans/${city.slug}`}
+                  className="text-gray-300 hover:text-furgocasa-orange transition-colors text-sm"
+                >
+                  {t("Alquiler de campers en")} {city.name}
+                </LocalizedLink>
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* Bottom bar - Mejorado */}
         <div className="border-t border-white/10 mt-12 pt-8 text-center text-gray-400 text-sm">
           <p className="font-medium">

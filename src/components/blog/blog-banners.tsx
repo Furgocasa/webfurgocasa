@@ -254,8 +254,11 @@ interface BlogContentWithBannersProps {
   proseClassName: string;
 }
 
+const BLOG_PROSE_CLASS = "fc-blog-prose";
+
 export function BlogContentWithBanners({ htmlContent, readingTime, proseClassName }: BlogContentWithBannersProps) {
   const [seed, setSeed] = useState(0);
+  const articleProseClassName = `${BLOG_PROSE_CLASS} ${proseClassName}`;
 
   useEffect(() => {
     setSeed(Math.floor(Math.random() * 2147483646) + 1);
@@ -296,7 +299,7 @@ export function BlogContentWithBanners({ htmlContent, readingTime, proseClassNam
   if (seed === 0) {
     return (
       <div
-        className={proseClassName}
+        className={articleProseClassName}
         dangerouslySetInnerHTML={{ __html: htmlContent }}
       />
     );
@@ -309,7 +312,7 @@ export function BlogContentWithBanners({ htmlContent, readingTime, proseClassNam
     result.push(
       <div
         key={`section-${i}`}
-        className={proseClassName}
+        className={articleProseClassName}
         dangerouslySetInnerHTML={{ __html: section }}
       />
     );

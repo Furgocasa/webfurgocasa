@@ -594,11 +594,11 @@ html, body {
     padding-left: 1.25rem;
   }
 
-  /* Reducir márgenes de headings en móvil */
-  .prose h1,
-  .prose h2,
-  .prose h3,
-  .prose h4 {
+  /* Reducir márgenes de headings en móvil (excepto cuerpo de artículos del blog) */
+  .prose:not(.fc-blog-prose) h1,
+  .prose:not(.fc-blog-prose) h2,
+  .prose:not(.fc-blog-prose) h3,
+  .prose:not(.fc-blog-prose) h4 {
     margin-top: 1.5rem;
     margin-bottom: 0.75rem;
   }

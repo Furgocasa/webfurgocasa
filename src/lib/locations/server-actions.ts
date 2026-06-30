@@ -75,6 +75,38 @@ export const getAllLocations = cache(async (): Promise<Array<{ city: string }>> 
   }));
 });
 
+/**
+ * Mapa slug → nombre de todas las landings de ciudad activas (alquiler).
+ * Se usa para enlazar desde el blog a su landing geolocalizada validando que exista y esté activa.
+ */
+export const getActiveLocationTargetNames = cache(async (): Promise<Record<string, string>> => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data } = await supabase
+    .from('location_targets')
+    .select('slug, name')
+    .eq('is_active', true);
+
+  const map: Record<string, string> = {};
+  (data || []).forEach((loc: { slug: string; name: string }) => {
+    map[loc.slug] = loc.name;
+  });
+  return map;
+});
+
+/** Devuelve la primera ciudad de `tags` que tenga landing activa (slug + nombre), o null. */
+export function pickPrimaryLocation(
+  tags: string[] | null | undefined,
+  activeNames: Record<string, string>
+): { slug: string; name: string } | null {
+  if (!tags?.length) return null;
+  const slug = tags.find((s) => activeNames[s]);
+  return slug ? { slug, name: activeNames[slug] } : null;
+}
+
 // Obtener destinos cercanos
 export const getNearbyDestinations = cache(async (locationId: string): Promise<NearbyDestination[]> => {
   // Por ahora retornar array vacío, se puede implementar lógica más adelante

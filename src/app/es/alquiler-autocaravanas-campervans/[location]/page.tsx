@@ -154,9 +154,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   );
 
   const displayName = translated.name || location.name;
-  const title = translated.meta_title || location.meta_title || `Alquiler de campers y autocaravanas en ${displayName}`;
+  const title = translated.meta_title || location.meta_title || `Alquiler de Campers y Autocaravanas en ${displayName} · 95€/día`;
   const description = translated.meta_description || location.meta_description ||
-    `Campers gran volumen totalmente equipadas en ${displayName}. El confort de una autocaravana, conducción más ágil y sencilla. Kilómetros ilimitados desde 95€/día.`;
+    `Alquiler de campers y autocaravanas en ${displayName} desde 95€/día. Kilómetros ilimitados, asistencia 24/7 y cancelación gratuita. Paga solo el 50% al reservar.`;
 
   const path = `/alquiler-autocaravanas-campervans/${slug}`;
   const alternates = buildCanonicalAlternates(path, locale, { useActualPath: true });

@@ -10,6 +10,20 @@ Mostrar **contenido cada vez más específico** en cada destino. En la landing d
 2. En cada landing de ubicación se buscan artículos cuyo `location_tags` contenga el slug de esa ubicación.
 3. Si no hay artículos etiquetados, se muestran los últimos 3 del blog (comportamiento anterior).
 
+### Uso bidireccional (desde junio 2026)
+
+`location_tags` ahora alimenta el enlazado en **los dos sentidos**:
+
+- **Landing → blog** (original): la landing de ciudad muestra artículos etiquetados con su slug.
+- **Blog → landing** (nuevo): cada artículo enlaza a la landing de su **primera ciudad con landing activa**
+  mediante un CTA geolocalizado y el sidebar, con anchor *"Alquiler de campers en {Ciudad}"*.
+  Implementado en `src/app/{es,en,fr,de}/blog/[category]/[slug]/page.tsx` usando los helpers
+  `getActiveLocationTargetNames` y `pickPrimaryLocation` de `src/lib/locations/server-actions.ts`.
+
+> Por tanto, **etiquetar bien `location_tags` mejora directamente el SEO**: cuantos más artículos
+> etiquetados, más enlaces internos (con anchor de keyword de dinero) reciben las landings de ciudad.
+> Detalle completo: `docs/02-desarrollo/seo/DIAGNOSTICO-Y-ENLAZADO-INTERNO-2026-06.md`.
+
 ## Cómo etiquetar artículos
 
 En **Supabase** → tabla `posts` → columna `location_tags`:

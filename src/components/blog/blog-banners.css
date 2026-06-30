@@ -18,6 +18,26 @@
   .fc-blog-banner-slot__h { display: block; width: 100%; }
 }
 
+/* Espaciado del cuerpo de artículos (prose del blog).
+   !important: Tailwind Typography pone margin-top:0 en :first-child;
+   al partir el HTML por H2 (banners), cada bloque empieza con un h2 pegado al párrafo anterior. */
+.fc-blog-prose.prose :where(h1, h2, h3, h4, h5, h6) {
+  margin-top: 20px !important;
+}
+.fc-blog-prose.prose p {
+  margin-bottom: 1.25em;
+}
+.fc-blog-prose.prose h2 {
+  margin-bottom: 0.75em;
+}
+.fc-blog-prose.prose h3 {
+  margin-bottom: 0.5em;
+}
+.fc-blog-prose.prose ul,
+.fc-blog-prose.prose ol {
+  margin-bottom: 1.25em;
+}
+
 /* =========================================================
    H1 — HORIZONTAL · OFERTAS (overlay + imagen full)
    ========================================================= */

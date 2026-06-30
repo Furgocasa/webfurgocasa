@@ -36,6 +36,7 @@ export interface Post {
   category_id: string | null;
   category: Category | null;
   tags?: TagItem[];
+  location_tags?: string[] | null;
 }
 
 export interface RelatedPost {
@@ -78,6 +79,7 @@ export const getPostBySlug = cache(async (slug: string, categorySlug?: string, l
     meta_title,
     meta_description,
     category_id,
+    location_tags,
     category:content_categories(id, name, slug, description)
   `;
 
