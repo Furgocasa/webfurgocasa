@@ -42,6 +42,9 @@ function parseArgs() {
   const args = process.argv.slice(2);
   return {
     dryRun: args.includes('--dry-run'),
+    // --all: re-evalua TODOS los mensajes del asistente (no solo los 'sin_tipo'),
+    // util tras mejorar el auditor para reclasificar lo evaluado con la version antigua.
+    all: args.includes('--all'),
     limit: Number(args.find((a) => a.startsWith('--limit='))?.split('=')[1] || '0') || undefined,
   };
 }
@@ -179,15 +182,17 @@ function buildReport(results: ReviewResult[], dryRun: boolean) {
 }
 
 async function main() {
-  const { dryRun, limit } = parseArgs();
+  const { dryRun, all, limit } = parseArgs();
   const supabase = getServiceClient();
 
   let query = supabase
     .from('chatbot_messages')
     .select('id, conversation_id, content, response_quality, created_at')
     .eq('role', 'assistant')
-    .eq('response_quality', 'sin_tipo')
     .order('created_at', { ascending: true });
+
+  // Por defecto solo los no clasificados; con --all se reevaluan todos.
+  if (!all) query = query.eq('response_quality', 'sin_tipo');
 
   if (limit) query = query.limit(limit);
 
@@ -201,7 +206,7 @@ async function main() {
   }
 
   const rows = (data || []) as AssistantRow[];
-  console.log(`Mensajes sin clasificar: ${rows.length}${dryRun ? ' (dry-run)' : ''}`);
+  console.log(`Mensajes a revisar: ${rows.length}${all ? ' (todos)' : ' (sin clasificar)'}${dryRun ? ' (dry-run)' : ''}`);
 
   if (!rows.length) {
     console.log('Nada que revisar.');
