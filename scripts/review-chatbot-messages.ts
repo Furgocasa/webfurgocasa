@@ -11,7 +11,7 @@
 import { config } from 'dotenv';
 import { resolve } from 'path';
 import { mkdirSync, writeFileSync } from 'fs';
-import { getOpenAI, getServiceClient, retrieveContext } from '../src/lib/chatbot/server';
+import { buildBusinessDataBlock, getOpenAI, getServiceClient, retrieveContext } from '../src/lib/chatbot/server';
 import { buildSystemPrompt } from '../src/lib/chatbot/prompt';
 
 config({ path: resolve(process.cwd(), '.env.local') });
@@ -64,7 +64,7 @@ async function getUserQuestion(conversationId: string, createdAt: string | null)
   return lastUser;
 }
 
-async function evaluateMessage(row: AssistantRow): Promise<ReviewResult> {
+async function evaluateMessage(row: AssistantRow, businessData: string): Promise<ReviewResult> {
   const userQuestion = await getUserQuestion(row.conversation_id, row.created_at);
   const assistantAnswer = (row.content || '').trim();
   const ragContext = await retrieveContext(userQuestion || assistantAnswer.slice(0, 200));
@@ -73,24 +73,36 @@ async function evaluateMessage(row: AssistantRow): Promise<ReviewResult> {
   const openai = getOpenAI();
   const completion = await openai.chat.completions.create({
     model: process.env.OPENAI_CHATBOT_MODEL || 'gpt-4o',
-    temperature: 0.1,
+    temperature: 0,
     response_format: { type: 'json_object' },
     messages: [
       {
         role: 'system',
         content: `${systemPrompt}
 
-Eres un auditor de calidad del chatbot de Furgocasa. Evalua UNA respuesta concreta del asistente.
+=== DATOS REALES DE LA WEB (FUENTE DE VERDAD, PRIORIDAD MAXIMA) ===
+Estos datos vienen directamente de las tablas de la web y MANDAN sobre el RAG (que puede estar incompleto o desfasado). Si la respuesta del asistente contradice estos datos, es INCORRECTA aunque el RAG parezca respaldarla.
+${businessData}
+=== FIN DATOS REALES ===
+
+Eres un auditor de calidad ESCRUPULOSO del chatbot de Furgocasa. Evalua UNA respuesta concreta del asistente comparandola con los DATOS REALES de arriba y las reglas, NO solo con el RAG.
+
+Verificaciones obligatorias antes de puntuar:
+1. Precios: si la respuesta da un precio €/dia para un MES o FECHAS concretas, comprueba contra TEMPORADAS Y PRECIOS REALES. Si no coincide con la temporada de esas fechas, es INCORRECTA. Dar la tabla generica (155/145/135/125) para un mes concreto es INCORRECTO.
+2. Sedes: minimos por sede y SOBRECOSTE (ida+vuelta, extra_fee x2). Si dice un minimo o un sobrecoste que no coincide con los DATOS REALES, es INCORRECTA.
+3. Fianza vs pago: fianza SOLO por transferencia; pago del alquiler con tarjeta. Confundirlos es INCORRECTA.
+4. Plazas: maximo 4 por camper. Extras: precios reales.
+5. Idioma: debe responder en el idioma del cliente.
 
 Criterios:
-- correcta: responde bien, coherente con el RAG y las reglas, sin errores relevantes.
-- mejorable: la idea es correcta pero falta precision, enlaces utiles, tono, o podria ser mas clara.
-- incorrecta: informacion erronea, contradice el RAG/reglas, no responde a la pregunta o inventa datos.
+- correcta: responde bien, coherente con los DATOS REALES y las reglas, sin errores.
+- mejorable: la idea es correcta pero falta precision, enlaces utiles, tono, o podria ser mas clara (sin errores de datos).
+- incorrecta: contradice los DATOS REALES o las reglas, da cifras erroneas, no responde a la pregunta o inventa datos.
 
 Responde SOLO JSON valido:
 {
   "quality": "correcta" | "mejorable" | "incorrecta",
-  "notes": "breve explicacion en espanol (1-3 frases)",
+  "notes": "breve explicacion en espanol (1-3 frases), citando el dato real si hubo error",
   "suggested_fix": "si es mejorable o incorrecta, que deberia haber dicho o que cambiar en prompt/RAG (opcional)"
 }`,
       },
@@ -196,13 +208,17 @@ async function main() {
     return;
   }
 
+  // Cargar UNA vez la fuente de verdad (tablas reales) para auditar contra ella.
+  console.log('Cargando datos reales de la web (temporadas, sedes, extras, flota)...');
+  const businessData = await buildBusinessDataBlock();
+
   const results: ReviewResult[] = [];
 
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     process.stdout.write(`[${i + 1}/${rows.length}] ${row.id.slice(0, 8)}… `);
     try {
-      const review = await evaluateMessage(row);
+      const review = await evaluateMessage(row, businessData);
       results.push(review);
       console.log(review.quality);
 

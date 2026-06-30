@@ -112,6 +112,131 @@ export async function retrieveContext(query: string, locale?: string): Promise<s
 }
 
 /**
+ * Construye un bloque de DATOS REALES (fuente de verdad) leido directamente de las
+ * tablas de la web: temporadas con precios reales, sedes con sobrecoste real
+ * (extra_fee x2 = ida + vuelta) y minimos por sede, extras, flota y reglas de negocio.
+ *
+ * Pensado para el AUDITOR de respuestas: el RAG puede estar incompleto o desfasado,
+ * asi que estos datos tienen PRIORIDAD sobre el contexto recuperado.
+ */
+export async function buildBusinessDataBlock(): Promise<string> {
+  const sb = getServiceClient();
+  const lines: string[] = [];
+
+  // Temporadas: precios reales por tramo de duracion + minimos.
+  const { data: seasons } = await sb
+    .from('seasons')
+    .select(
+      'name, season_type, start_date, end_date, min_days, price_less_than_week, price_one_week, price_two_weeks, price_three_weeks, is_active'
+    )
+    .eq('is_active', true)
+    .order('start_date', { ascending: true });
+  if (seasons?.length) {
+    lines.push(
+      'TEMPORADAS Y PRECIOS REALES (€/dia segun duracion: menos de 1 semana / 1+ sem / 2+ sem / 3+ sem):'
+    );
+    for (const s of seasons) {
+      lines.push(
+        `- ${s.name} (${s.season_type}) del ${s.start_date} al ${s.end_date}: ${s.price_less_than_week}/${s.price_one_week}/${s.price_two_weeks}/${s.price_three_weeks} €/dia; minimo ${s.min_days} dias.`
+      );
+    }
+    lines.push(
+      'Estos son los precios EXACTOS por fecha. El total final lo calcula el buscador de reservas.'
+    );
+  }
+
+  // Sedes: sobrecoste real al cliente = extra_fee x2; minimos por sede (pico jul-sep / resto).
+  const { data: locs } = await sb
+    .from('locations')
+    .select('slug, name, is_active, is_pickup, min_days, min_days_peak, min_days_off_peak, extra_fee')
+    .eq('is_active', true)
+    .eq('is_pickup', true)
+    .order('name');
+  if (locs?.length) {
+    lines.push('', 'SEDES DE RECOGIDA (sobrecoste real al cliente = recogida + devolucion; minimos por sede):');
+    for (const l of locs) {
+      const fee = Number(l.extra_fee) || 0;
+      const feeTxt = fee > 0 ? `sobrecoste +${fee * 2} € (ida y vuelta)` : 'sin sobrecoste';
+      let minTxt: string;
+      if (l.slug === 'murcia') {
+        minTxt = 'minimo segun temporada';
+      } else {
+        const peak = l.min_days_peak ?? l.min_days ?? null;
+        const off = l.min_days_off_peak ?? l.min_days ?? null;
+        minTxt = `minimo ${off ?? '?'} dias (octubre-junio) / ${peak ?? '?'} dias (julio-septiembre)`;
+      }
+      lines.push(`- ${l.name}: ${feeTxt}; ${minTxt}. Devolucion en la misma sede.`);
+    }
+  }
+
+  // Extras opcionales con su precio real.
+  const { data: extras } = await sb
+    .from('extras')
+    .select('name, price_per_day, price_per_rental, price_per_unit, price_type, is_active')
+    .eq('is_active', true);
+  if (extras?.length) {
+    lines.push('', 'EXTRAS OPCIONALES (precio real):');
+    for (const e of extras) {
+      let price = 'incluido / sin coste';
+      if (e.price_type === 'per_day' && Number(e.price_per_day) > 0) price = `${e.price_per_day} €/dia`;
+      else if (Number(e.price_per_rental) > 0) price = `${e.price_per_rental} €/alquiler`;
+      else if (Number(e.price_per_unit) > 0) price = `${e.price_per_unit} €/unidad`;
+      lines.push(`- ${e.name}: ${price}.`);
+    }
+  }
+
+  // Flota de alquiler (plazas).
+  const { data: vehicles } = await sb
+    .from('vehicles')
+    .select('name, brand, model, seats, beds, is_for_rent, status')
+    .eq('is_for_rent', true)
+    .neq('status', 'inactive');
+  if (vehicles?.length) {
+    lines.push('', `FLOTA DE ALQUILER (${vehicles.length} campers, maximo 4 plazas de viaje cada una):`);
+    for (const v of vehicles) {
+      const title = [v.brand, v.model].filter(Boolean).join(' ').trim() || v.name;
+      lines.push(`- ${title}: ${v.seats ?? 4} plazas de dia / ${v.beds ?? '-'} camas.`);
+    }
+  }
+
+  // Flota EN VENTA (campers a la venta, con precio y plazas/camas).
+  const { data: forSale } = await sb
+    .from('vehicles')
+    .select('name, brand, model, slug, seats, beds, sale_price, sale_price_negotiable, year, is_for_sale, sale_status')
+    .eq('is_for_sale', true)
+    .eq('sale_status', 'available');
+  lines.push('', `CAMPERS EN VENTA (${forSale?.length || 0} disponibles actualmente):`);
+  if (forSale?.length) {
+    for (const v of forSale) {
+      const title = [v.brand, v.model].filter(Boolean).join(' ').trim() || v.name;
+      const price = Number(v.sale_price) > 0
+        ? `${v.sale_price} €${v.sale_price_negotiable ? ' (negociable)' : ''}`
+        : 'precio a consultar';
+      lines.push(
+        `- ${title}${v.year ? ` (${v.year})` : ''}: ${v.seats ?? '-'} plazas / ${v.beds ?? '-'} camas; precio ${price}. Ficha: https://www.furgocasa.com/es/ventas/${v.slug || ''}`
+      );
+    }
+    lines.push('Para informacion exacta de modelos en venta usa SIEMPRE esta lista (no inventes modelos ni precios).');
+  } else {
+    lines.push('Ahora mismo no hay campers en venta publicadas; deriva a ventas para novedades.');
+  }
+
+  // Reglas de negocio fijas (verdad absoluta).
+  lines.push(
+    '',
+    'REGLAS DE NEGOCIO (verdad absoluta):',
+    '- FIANZA: 1.000 € SIEMPRE por TRANSFERENCIA bancaria (nunca con tarjeta), maximo 72 h antes, con justificante + certificado de titularidad; devolucion en 10 dias laborables.',
+    '- PAGO DEL ALQUILER: con TARJETA via pasarela Redsys; 50% al reservar y 50% 15 dias antes del inicio.',
+    '- Sobrecoste de sede distinta de Murcia = extra_fee x2 (recogida + devolucion).',
+    '- La devolucion es SIEMPRE en la misma sede de recogida.',
+    '- Maximo 4 plazas de viaje por camper; Furgocasa NO alquila caravanas.',
+    '- Para PRECIO o DISPONIBILIDAD de fechas concretas, la fuente final es el buscador de reservas (no dar tabla de precios por un mes/fechas).'
+  );
+
+  return lines.join('\n');
+}
+
+/**
  * Deteccion de idioma sencilla (heuristica por palabras frecuentes) para
  * etiquetar la conversacion en el panel de admin. El modelo responde igualmente
  * en el idioma del usuario por instruccion del prompt.

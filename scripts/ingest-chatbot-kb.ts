@@ -57,6 +57,7 @@ type Source =
   | 'faqs'
   | 'modelos_general'
   | 'vehiculos'
+  | 'ventas'
   | 'ubicaciones'
   | 'extras'
   | 'empresa'
@@ -301,12 +302,54 @@ async function buildVehiculos(out: Chunk[], db: SupabaseClient) {
   console.log(`🚐 vehicles (BBDD, solo lectura): ${data?.length || 0} campers -> ${out.length - before} fragmentos (vehiculos)`);
 }
 
-/** ubicaciones: ficha por sede activa con direccion, horario, tasa y recogida/entrega. */
+/** ventas: ficha por cada camper EN VENTA disponible (mismo filtro que la web de ventas). */
+async function buildVentas(out: Chunk[], db: SupabaseClient) {
+  const before = out.length;
+  const { data, error } = await db
+    .from('vehicles')
+    .select('name, brand, model, slug, seats, beds, length_m, height_m, fuel_type, transmission, year, sale_price, sale_price_negotiable, short_description, description, features, is_for_sale, sale_status')
+    .eq('is_for_sale', true)
+    .eq('sale_status', 'available');
+
+  if (error) {
+    console.warn(`⚠️  No se pudieron leer campers en venta: ${error.message}`);
+    return;
+  }
+
+  for (const v of data || []) {
+    const title = [v.brand, v.model].filter(Boolean).join(' ').trim() || v.name;
+    const lines: string[] = [];
+    lines.push(`Camper EN VENTA de Furgocasa. Marca: ${v.brand || '-'}. Modelo: ${v.model || v.name}${v.year ? `. Año ${v.year}` : ''}.`);
+    lines.push(`Plazas: ${v.seats ?? '-'} de viaje (día) / ${v.beds ?? '-'} camas (noche).`);
+    const price = Number(v.sale_price) > 0
+      ? `${v.sale_price} €${v.sale_price_negotiable ? ' (precio negociable)' : ''}`
+      : 'precio a consultar';
+    lines.push(`Precio de venta: ${price}.`);
+    const ficha = [
+      v.transmission ? `cambio ${String(v.transmission).toLowerCase()}` : null,
+      v.fuel_type ? String(v.fuel_type).toLowerCase() : null,
+    ].filter(Boolean).join(', ');
+    if (ficha) lines.push(`Características: ${ficha}.`);
+    if (v.short_description) lines.push(`Resumen: ${v.short_description.trim()}`);
+    const desc = stripHtml(v.description);
+    if (desc) lines.push(`Descripción: ${desc}`);
+    if (Array.isArray(v.features) && v.features.length) {
+      lines.push(`Equipamiento: ${(v.features as string[]).join('; ')}.`);
+    }
+    if (v.slug) lines.push(`Ficha y compra: ${SITE_URL}/es/ventas/${v.slug}`);
+
+    addChunks(out, 'ventas', `En venta: ${title}`, lines.join('\n'));
+  }
+
+  console.log(`🏷️  ventas (BBDD, solo lectura): ${data?.length || 0} campers en venta -> ${out.length - before} fragmentos (ventas)`);
+}
+
+/** ubicaciones: ficha por sede activa con direccion, horario, sobrecoste real (x2) y minimos por sede. */
 async function buildUbicaciones(out: Chunk[], db: SupabaseClient) {
   const before = out.length;
   const { data, error } = await db
     .from('locations')
-    .select('name, city, address, slug, is_active, is_pickup, is_dropoff, opening_time, closing_time, extra_fee, phone, notes')
+    .select('name, city, address, slug, is_active, is_pickup, is_dropoff, opening_time, closing_time, extra_fee, min_days, min_days_peak, min_days_off_peak, phone, notes')
     .eq('is_active', true);
 
   if (error) {
@@ -324,11 +367,25 @@ async function buildUbicaciones(out: Chunk[], db: SupabaseClient) {
     const close = hhmm(l.closing_time);
     if (open && close) lines.push(`Horario de recogida y entrega: de ${open} a ${close}.`);
     const tipo = [l.is_pickup ? 'recogida' : null, l.is_dropoff ? 'entrega' : null].filter(Boolean).join(' y ');
-    if (tipo) lines.push(`Punto de ${tipo}. La devolución se realiza en la misma sede de recogida.`);
-    if (l.extra_fee && Number(l.extra_fee) > 0) {
-      lines.push(`Tasa por usar esta sede: ${l.extra_fee} € por alquiler (la sede principal de Murcia no tiene coste adicional).`);
+    if (tipo) lines.push(`Punto de ${tipo}. La devolución se realiza SIEMPRE en la misma sede de recogida.`);
+    // Sobrecoste REAL al cliente = extra_fee x2 (recogida + devolución), igual que el buscador de la web.
+    const fee = Number(l.extra_fee) || 0;
+    if (fee > 0) {
+      lines.push(`Sobrecoste por usar esta sede: ${fee * 2} € por alquiler (incluye recogida y devolución; la sede principal de Murcia no tiene sobrecoste).`);
     } else {
-      lines.push(`Sin coste adicional por usar esta sede.`);
+      lines.push(`Sin sobrecoste por usar esta sede.`);
+    }
+    // Mínimo de días por sede: las sedes distintas de Murcia tienen su propio mínimo (pico jul-sep / resto del año).
+    if (l.slug === 'murcia') {
+      lines.push(`Duración mínima del alquiler en esta sede: según la temporada (2 días en baja/media, 7 días en alta).`);
+    } else {
+      const peak = l.min_days_peak ?? l.min_days ?? null;
+      const off = l.min_days_off_peak ?? l.min_days ?? null;
+      if (peak != null || off != null) {
+        lines.push(
+          `Duración mínima del alquiler en esta sede: ${off ?? '?'} días de octubre a junio y ${peak ?? '?'} días en julio, agosto y septiembre.`
+        );
+      }
     }
     if (l.phone) lines.push(`Teléfono: ${l.phone}.`);
     if (l.notes) lines.push(stripHtml(l.notes));
@@ -458,6 +515,7 @@ async function buildAllChunks(): Promise<Chunk[]> {
 
   // Base de datos de la web (solo lectura)
   await buildVehiculos(out, supabase);
+  await buildVentas(out, supabase);
   await buildUbicaciones(out, supabase);
   await buildExtras(out, supabase);
   await buildEmpresa(out, supabase);

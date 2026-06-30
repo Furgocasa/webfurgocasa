@@ -258,6 +258,70 @@ async function checkLocations(supabase: SupabaseClient, issues: CoherenceIssue[]
   }
 }
 
+/**
+ * Sedes: minimos por sede (peak/off) y sobrecoste real al cliente (extra_fee x2).
+ * Estos datos no estaban en el RAG y eran fuente de errores del chatbot.
+ */
+async function checkLocationMinDaysAndFees(supabase: SupabaseClient, issues: CoherenceIssue[]) {
+  const { data: locations, error } = await supabase
+    .from('locations')
+    .select('slug, name, is_active, is_pickup, min_days, min_days_peak, min_days_off_peak, extra_fee')
+    .eq('is_active', true)
+    .eq('is_pickup', true);
+
+  if (error) {
+    issues.push({ area: 'Sedes (minimos/sobrecoste)', severity: 'warn', message: `No se pudo leer locations: ${error.message}` });
+    return;
+  }
+
+  for (const l of (locations || []) as any[]) {
+    const fee = Number(l.extra_fee) || 0;
+    const feeReal = fee * 2;
+
+    if (l.slug === 'murcia') {
+      issues.push({
+        area: 'Sedes (minimos/sobrecoste)',
+        severity: 'ok',
+        message: `Murcia: sin sobrecoste; minimo segun temporada.`,
+      });
+      continue;
+    }
+
+    const peak = l.min_days_peak ?? l.min_days ?? null;
+    const off = l.min_days_off_peak ?? l.min_days ?? null;
+
+    // Aviso si una sede distinta de Murcia no tiene minimo configurado.
+    if (peak == null && off == null) {
+      issues.push({
+        area: 'Sedes (minimos/sobrecoste)',
+        severity: 'warn',
+        message: `Sede "${l.name}" sin minimo de dias configurado (min_days/min_days_peak/min_days_off_peak). El chatbot no podra indicarlo.`,
+      });
+    } else {
+      issues.push({
+        area: 'Sedes (minimos/sobrecoste)',
+        severity: 'ok',
+        message: `"${l.name}": minimo ${off ?? '?'} dias (oct-jun) / ${peak ?? '?'} dias (jul-sep).`,
+      });
+    }
+
+    // Sobrecoste real al cliente = extra_fee x2 (lo que cobra el buscador de la web).
+    if (fee > 0) {
+      issues.push({
+        area: 'Sedes (minimos/sobrecoste)',
+        severity: 'info',
+        message: `"${l.name}": extra_fee en BBDD = ${fee} € (por trayecto). Sobrecoste REAL al cliente = ${feeReal} € (recogida + devolucion). El RAG debe indexar ${feeReal} €, no ${fee} €.`,
+      });
+    } else {
+      issues.push({
+        area: 'Sedes (minimos/sobrecoste)',
+        severity: 'warn',
+        message: `Sede "${l.name}" distinta de Murcia con extra_fee = 0. Revisar si deberia tener sobrecoste.`,
+      });
+    }
+  }
+}
+
 /** Fianza y franquicia del CSV vs ajustes (best-effort). */
 async function checkSettings(supabase: SupabaseClient, issues: CoherenceIssue[]) {
   const { data: settings, error } = await supabase.from('settings').select('key, value');
@@ -291,6 +355,7 @@ export async function runCoherenceChecks(provided?: SupabaseClient): Promise<Coh
   await checkExtras(supabase, issues);
   await checkSeasonPrices(supabase, issues);
   await checkLocations(supabase, issues);
+  await checkLocationMinDaysAndFees(supabase, issues);
   await checkSettings(supabase, issues);
 
   return issues;

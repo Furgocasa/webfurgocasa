@@ -1,10 +1,10 @@
 # Informe de coherencia RAG vs web
 
-Generado: 2026-06-30T14:18:07.007Z
+Generado: 2026-06-30T20:18:49.899Z
 
 - Avisos (revisar): **8**
-- Informativos: **2**
-- Correctos: **8**
+- Informativos: **5**
+- Correctos: **12**
 
 ## Avisos a revisar
 
@@ -22,6 +22,11 @@ Generado: 2026-06-30T14:18:07.007Z
 
 ### Vehiculos
 - El CSV de modelos aun contiene 12 fichas individuales que se IGNORAN (las fichas se toman de la BBDD). Puedes eliminarlas para evitar confusion: DETHLEFFS GLOBETRAIL 600 DB, KNAUS BOXSTAR STREET MANUAL, WEINSBERG CARATOUR 600 MQ, KNAUS BOXSTAR STREET FAMILY, LIVINGSTONE SPORT 5, SUNLIGHT CLIFF 601 ADVENTURE, ADRIA TWIN PLUS 600 SPB FAMILY, CHALLENGER V114 MAX ROAD PREMIUM, KNAUS BOXSTAR STREET AUTOMATICA, KNAUS BOXLIFE 600 QD, WEINSBERG CARABUS 600 MQ EDITION FIRE, WEINSBERG CARABUS 540 MQ EDITION FIRE
+
+### Sedes (minimos/sobrecoste)
+- "Madrid": extra_fee en BBDD = 150 € (por trayecto). Sobrecoste REAL al cliente = 300 € (recogida + devolucion). El RAG debe indexar 300 €, no 150 €.
+- "Albacete": extra_fee en BBDD = 200 € (por trayecto). Sobrecoste REAL al cliente = 400 € (recogida + devolucion). El RAG debe indexar 400 €, no 200 €.
+- "Alicante": extra_fee en BBDD = 200 € (por trayecto). Sobrecoste REAL al cliente = 400 € (recogida + devolucion). El RAG debe indexar 400 €, no 200 €.
 
 ### Ajustes
 - No hay ajustes de fianza/franquicia en settings. El CSV indica fianza 1000 € y franquicia 900 €/siniestro; verificar manualmente.
@@ -43,4 +48,10 @@ Generado: 2026-06-30T14:18:07.007Z
 - Sede "MADRID" coherente entre CSV y web.
 - Sede "ALBACETE" coherente entre CSV y web.
 - Sede "ALICANTE" coherente entre CSV y web.
+
+### Sedes (minimos/sobrecoste)
+- "Madrid": minimo 12 dias (oct-jun) / 20 dias (jul-sep).
+- Murcia: sin sobrecoste; minimo segun temporada.
+- "Albacete": minimo 7 dias (oct-jun) / 7 dias (jul-sep).
+- "Alicante": minimo 7 dias (oct-jun) / 7 dias (jul-sep).
 
