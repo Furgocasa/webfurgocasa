@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS chatbot_kb_chunks (
 
     -- Origen del fragmento (de que fuente proviene)
     -- CSV: condiciones, funcionamiento, faqs, modelos_general
-    -- BBDD web (solo lectura): vehiculos, ubicaciones, extras, empresa, temporadas
+    -- BBDD web (solo lectura): vehiculos, ventas, ubicaciones, extras, empresa, temporadas, blog
     source TEXT NOT NULL CHECK (source IN (
         'condiciones',
         'funcionamiento',
@@ -23,10 +23,12 @@ CREATE TABLE IF NOT EXISTS chatbot_kb_chunks (
         'modelos_general',
         'faqs',
         'vehiculos',
+        'ventas',
         'ubicaciones',
         'extras',
         'empresa',
         'temporadas',
+        'blog',
         'prompt'
     )),
 

@@ -57,10 +57,12 @@ type Source =
   | 'faqs'
   | 'modelos_general'
   | 'vehiculos'
+  | 'ventas'
   | 'ubicaciones'
   | 'extras'
   | 'empresa'
-  | 'temporadas';
+  | 'temporadas'
+  | 'blog';
 
 const DOCS_DIR = resolve(process.cwd(), 'chatbot_documentacion');
 
@@ -254,12 +256,50 @@ function buildFaqs(out: Chunk[]) {
 // Fuentes de la base de datos de la web (SOLO LECTURA)
 // ---------------------------------------------------------------------------
 
+/**
+ * Carga el equipamiento detallado por vehiculo combinando dos tablas:
+ *  - vehicle_equipment (join con equipment): equipamiento del catalogo, con notas.
+ *  - vehicle_features: caracteristicas libres (nombre/valor) de cada camper.
+ * Devuelve un Map<vehicle_id, string[]> con las etiquetas listas para mostrar.
+ */
+async function loadVehicleEquipment(db: SupabaseClient): Promise<Map<string, string[]>> {
+  const map = new Map<string, string[]>();
+  const push = (id: string, label: string) => {
+    if (!id || !label) return;
+    const arr = map.get(id) || [];
+    if (!arr.includes(label)) arr.push(label);
+    map.set(id, arr);
+  };
+
+  const { data: veq } = await db
+    .from('vehicle_equipment')
+    .select('vehicle_id, notes, equipment:equipment(name, category, is_active)');
+  for (const row of (veq as any[]) || []) {
+    const eq = row.equipment;
+    if (!eq || eq.is_active === false) continue;
+    const label = row.notes ? `${eq.name} (${String(row.notes).trim()})` : eq.name;
+    push(row.vehicle_id, label);
+  }
+
+  const { data: feats } = await db
+    .from('vehicle_features')
+    .select('vehicle_id, feature_name, feature_value, sort_order')
+    .order('sort_order', { ascending: true });
+  for (const f of (feats as any[]) || []) {
+    if (!f.feature_name) continue;
+    const label = f.feature_value ? `${f.feature_name}: ${String(f.feature_value).trim()}` : String(f.feature_name).trim();
+    push(f.vehicle_id, label);
+  }
+
+  return map;
+}
+
 /** vehiculos: ficha por cada camper de alquiler activa (mismo filtro que el catalogo web ES). */
-async function buildVehiculos(out: Chunk[], db: SupabaseClient) {
+async function buildVehiculos(out: Chunk[], db: SupabaseClient, equipmentMap: Map<string, string[]>) {
   const before = out.length;
   const { data, error } = await db
     .from('vehicles')
-    .select('name, brand, model, slug, seats, beds, length_m, height_m, width_m, fuel_type, transmission, year, short_description, description, features')
+    .select('id, name, brand, model, slug, seats, beds, length_m, height_m, width_m, fuel_type, transmission, year, short_description, description, features')
     .eq('is_for_rent', true)
     .neq('status', 'inactive');
 
@@ -290,9 +330,8 @@ async function buildVehiculos(out: Chunk[], db: SupabaseClient) {
     if (v.short_description) lines.push(`Resumen: ${v.short_description.trim()}`);
     const desc = stripHtml(v.description);
     if (desc) lines.push(`Descripción: ${desc}`);
-    if (Array.isArray(v.features) && v.features.length) {
-      lines.push(`Equipamiento: ${(v.features as string[]).join('; ')}.`);
-    }
+    const equip = mergeEquipment(v.features as unknown, equipmentMap.get(v.id as string));
+    if (equip.length) lines.push(`Equipamiento: ${equip.join('; ')}.`);
     if (v.slug) lines.push(`Ficha y reserva: ${SITE_URL}/es/vehiculos/${v.slug}`);
 
     addChunks(out, 'vehiculos', title, lines.join('\n'));
@@ -301,12 +340,29 @@ async function buildVehiculos(out: Chunk[], db: SupabaseClient) {
   console.log(`🚐 vehicles (BBDD, solo lectura): ${data?.length || 0} campers -> ${out.length - before} fragmentos (vehiculos)`);
 }
 
+/** Combina el array libre `features` con el equipamiento detallado de las tablas relacionales, sin duplicar. */
+function mergeEquipment(features: unknown, detailed: string[] | undefined): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  const add = (s: string) => {
+    const v = (s || '').trim();
+    if (!v) return;
+    const key = v.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(v);
+  };
+  if (Array.isArray(features)) for (const f of features as string[]) add(String(f));
+  if (detailed) for (const d of detailed) add(d);
+  return out;
+}
+
 /** ventas: ficha por cada camper EN VENTA disponible (mismo filtro que la web de ventas). */
-async function buildVentas(out: Chunk[], db: SupabaseClient) {
+async function buildVentas(out: Chunk[], db: SupabaseClient, equipmentMap: Map<string, string[]>) {
   const before = out.length;
   const { data, error } = await db
     .from('vehicles')
-    .select('name, brand, model, slug, seats, beds, length_m, height_m, fuel_type, transmission, year, sale_price, sale_price_negotiable, short_description, description, features, is_for_sale, sale_status')
+    .select('id, name, brand, model, slug, seats, beds, length_m, height_m, fuel_type, transmission, year, sale_price, sale_price_negotiable, short_description, description, features, is_for_sale, sale_status')
     .eq('is_for_sale', true)
     .eq('sale_status', 'available');
 
@@ -332,17 +388,14 @@ async function buildVentas(out: Chunk[], db: SupabaseClient) {
     if (v.short_description) lines.push(`Resumen: ${v.short_description.trim()}`);
     const desc = stripHtml(v.description);
     if (desc) lines.push(`Descripción: ${desc}`);
-    if (Array.isArray(v.features) && v.features.length) {
-      lines.push(`Equipamiento: ${(v.features as string[]).join('; ')}.`);
-    }
+    const equip = mergeEquipment(v.features as unknown, equipmentMap.get(v.id as string));
+    if (equip.length) lines.push(`Equipamiento: ${equip.join('; ')}.`);
     if (v.slug) lines.push(`Ficha y compra: ${SITE_URL}/es/ventas/${v.slug}`);
 
-    // Se indexa bajo la fuente 'vehiculos' (el CHECK de la BBDD no admite 'ventas');
-    // el texto deja claro que es una camper EN VENTA.
-    addChunks(out, 'vehiculos', `En venta: ${title}`, lines.join('\n'));
+    addChunks(out, 'ventas', `En venta: ${title}`, lines.join('\n'));
   }
 
-  console.log(`🏷️  ventas (BBDD, solo lectura): ${data?.length || 0} campers en venta -> ${out.length - before} fragmentos (vehiculos/ventas)`);
+  console.log(`🏷️  ventas (BBDD, solo lectura): ${data?.length || 0} campers en venta -> ${out.length - before} fragmentos (ventas)`);
 }
 
 /** ubicaciones: ficha por sede activa con direccion, horario, sobrecoste real (x2) y minimos por sede. */
@@ -501,6 +554,43 @@ async function buildTemporadas(out: Chunk[], db: SupabaseClient) {
   console.log(`📅 seasons (BBDD, solo lectura): ${data.length} temporadas -> ${out.length - before} fragmentos (temporadas)`);
 }
 
+/** blog: articulos publicados (guias de viaje, rutas, consejos) para responder dudas de destino/ruta. */
+async function buildBlog(out: Chunk[], db: SupabaseClient) {
+  const before = out.length;
+  const { data, error } = await db
+    .from('posts')
+    .select('title, slug, excerpt, content, post_type, status, published_at, category:content_categories(name, slug)')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
+
+  if (error) {
+    console.warn(`⚠️  No se pudieron leer posts del blog: ${error.message}`);
+    return;
+  }
+
+  // Indexacion COMPACTA del blog: titulo + extracto + introduccion corta. El objetivo
+  // es que el bot reconozca el articulo y lo recomiende/enlace (rutas, destinos,
+  // consejos), no recitar el texto completo. Asi el blog no ahoga la info de negocio
+  // en el RAG. ~1 fragmento por articulo.
+  const MAX_CONTENT_CHARS = 900;
+  for (const p of (data as any[]) || []) {
+    if (!p.title) continue;
+    const cat = p.category as { name?: string; slug?: string } | null;
+    const catSlug = cat?.slug || 'blog';
+    const lines: string[] = [];
+    lines.push(`Artículo del blog de Furgocasa${cat?.name ? ` (categoría: ${cat.name})` : ''}: ${p.title}.`);
+    const excerpt = stripHtml(p.excerpt);
+    if (excerpt) lines.push(excerpt.slice(0, 600));
+    const content = stripHtml(p.content);
+    if (content) lines.push(content.slice(0, MAX_CONTENT_CHARS));
+    if (p.slug) lines.push(`Leer el artículo completo: ${SITE_URL}/es/blog/${catSlug}/${p.slug}`);
+
+    addChunks(out, 'blog', p.title, lines.join('\n\n'));
+  }
+
+  console.log(`📝 posts (BBDD, solo lectura): ${data?.length || 0} artículos -> ${out.length - before} fragmentos (blog)`);
+}
+
 // ---------------------------------------------------------------------------
 // Orquestacion
 // ---------------------------------------------------------------------------
@@ -515,12 +605,14 @@ async function buildAllChunks(): Promise<Chunk[]> {
   buildModelosGeneral(out);
 
   // Base de datos de la web (solo lectura)
-  await buildVehiculos(out, supabase);
-  await buildVentas(out, supabase);
+  const equipmentMap = await loadVehicleEquipment(supabase);
+  await buildVehiculos(out, supabase, equipmentMap);
+  await buildVentas(out, supabase, equipmentMap);
   await buildUbicaciones(out, supabase);
   await buildExtras(out, supabase);
   await buildEmpresa(out, supabase);
   await buildTemporadas(out, supabase);
+  await buildBlog(out, supabase);
 
   // Deduplicar por content_hash dentro de la ejecucion.
   const seen = new Set<string>();

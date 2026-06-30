@@ -6,6 +6,7 @@ import {
   CHAT_MODEL,
   HISTORY_LIMIT,
   detectLanguage,
+  getActiveOffersBlock,
   getOpenAI,
   getServiceClient,
   parseDataUrl,
@@ -103,7 +104,11 @@ export async function POST(request: NextRequest) {
   const ragQuery = userText || 'consulta general sobre la camper';
 
   // 3. Contexto RAG (traduce la consulta a espanol si el cliente navega en otro idioma)
-  const context = await retrieveContext(ragQuery, locale);
+  //    + ofertas de ultima hora vigentes en tiempo real (no estan en el RAG porque caducan).
+  const [context, offersBlock] = await Promise.all([
+    retrieveContext(ragQuery, locale),
+    getActiveOffersBlock(),
+  ]);
 
   // 4. Historial reciente. Incluimos media_url para que las imagenes enviadas en
   // turnos anteriores sigan siendo "visibles" por el modelo en los mensajes
@@ -147,7 +152,7 @@ export async function POST(request: NextRequest) {
   }
 
   const messages: ChatMessage[] = [
-    { role: 'system', content: buildSystemPrompt(context) },
+    { role: 'system', content: buildSystemPrompt(context, offersBlock) },
     ...historyMessages,
     currentUserMessage,
   ];

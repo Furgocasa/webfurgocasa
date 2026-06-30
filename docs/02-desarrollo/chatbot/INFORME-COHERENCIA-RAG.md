@@ -1,27 +1,25 @@
 # Informe de coherencia RAG vs web
 
-Generado: 2026-06-30T20:32:52.438Z
+Generado: 2026-06-30T20:46:03.111Z
 
-- Avisos (revisar): **8**
-- Informativos: **5**
-- Correctos: **12**
+- Avisos (revisar): **0**
+- Informativos: **9**
+- Correctos: **10**
 
 ## Avisos a revisar
 
-### Temporadas
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "baja" -> web "Temporada Media - San José": [115, 105, 95, 85] vs texto CSV: [95, 85, 75, 65]. Revisar/actualizar el texto orientativo del CSV.
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "baja" -> web "Temporada Media - Semana Santa 2026": [115, 105, 95, 85] vs texto CSV: [95, 85, 75, 65]. Revisar/actualizar el texto orientativo del CSV.
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "media" -> web "Temporada Media - Mediados Junio": [110, 100, 95, 85] vs texto CSV: [125, 115, 105, 95]. Revisar/actualizar el texto orientativo del CSV.
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "alta" -> web "Temporada Alta - Verano (Jun-Jul)": [125, 115, 105, 95] vs texto CSV: [155, 145, 135, 125]. Revisar/actualizar el texto orientativo del CSV.
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "baja" -> web "Final abril - inicio mayo 2026": [95, 85, 80, 65] vs texto CSV: [95, 85, 75, 65]. Revisar/actualizar el texto orientativo del CSV.
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "media" -> web "Temporada Media - Septiembre y Octubre": [115, 105, 95, 85] vs texto CSV: [125, 115, 105, 95]. Revisar/actualizar el texto orientativo del CSV.
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "alta" -> web "Temporada Alta - Verano (Agosto Centro)": [155, 145, 125, 115] vs texto CSV: [155, 145, 135, 125]. Revisar/actualizar el texto orientativo del CSV.
-- [ ] Precio orientativo del CSV CONDICIONES no coincide con la BBDD en temporada "alta" -> web "Temporada Alta - Verano (Ago-Sep)": [125, 115, 105, 95] vs texto CSV: [155, 145, 135, 125]. Revisar/actualizar el texto orientativo del CSV.
+Sin avisos. Todo cuadra.
 
 ## Informativos
 
 ### Vehiculos
 - El CSV de modelos aun contiene 12 fichas individuales que se IGNORAN (las fichas se toman de la BBDD). Puedes eliminarlas para evitar confusion: DETHLEFFS GLOBETRAIL 600 DB, KNAUS BOXSTAR STREET MANUAL, WEINSBERG CARATOUR 600 MQ, KNAUS BOXSTAR STREET FAMILY, LIVINGSTONE SPORT 5, SUNLIGHT CLIFF 601 ADVENTURE, ADRIA TWIN PLUS 600 SPB FAMILY, CHALLENGER V114 MAX ROAD PREMIUM, KNAUS BOXSTAR STREET AUTOMATICA, KNAUS BOXLIFE 600 QD, WEINSBERG CARABUS 600 MQ EDITION FIRE, WEINSBERG CARABUS 540 MQ EDITION FIRE
+
+### Temporadas
+- No se pudieron extraer los precios orientativos del CSV CONDICIONES para comparar.
+- Temporada web "Temporada Media - Fin Diciembre 2025" (media) precios=[125, 115, 105, 95] (sin equivalente claro en el CSV para comparar).
+- Temporada web "Temporada Media - San José" (baja) precios=[115, 105, 95, 85] (sin equivalente claro en el CSV para comparar).
+- Temporada web "Temporada Alta - Verano 2027" (alta) precios=[155, 145, 135, 125] (sin equivalente claro en el CSV para comparar).
 
 ### Sedes (minimos/sobrecoste)
 - "Madrid": extra_fee en BBDD = 150 € (por trayecto). Sobrecoste REAL al cliente = 300 € (recogida + devolucion). El RAG debe indexar 300 €, no 150 €.
@@ -38,10 +36,6 @@ Generado: 2026-06-30T20:32:52.438Z
 
 ### Extras
 - Extras indexados desde la BBDD (7): Edredón invierno, 2ª cama (4 plazas), Mascotas permitidas, Bicicletas, Aparcamiento en Murcia, Toallas de baño, Sábanas y almohadas
-
-### Temporadas
-- Precios temporada "media" coinciden web/CSV: [125, 115, 105, 95]
-- Precios temporada "alta" coinciden web/CSV: [155, 145, 135, 125]
 
 ### Ubicaciones
 - Sede "MURCIA" coherente entre CSV y web.

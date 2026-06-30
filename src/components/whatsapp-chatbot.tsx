@@ -72,6 +72,8 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: 'Requisitos para alquilar', prompt: '¿Qué requisitos necesito para alquilar una camper?' },
           { label: 'Modelos disponibles', prompt: '¿Qué modelos de camper tenéis disponibles para alquilar?' },
           { label: 'Dónde se recogen', prompt: '¿Dónde se recogen y se devuelven las campers?' },
+          { label: 'Ofertas y descuentos', prompt: '¿Tenéis ofertas de última hora o descuentos disponibles ahora mismo?' },
+          { label: 'Equipamiento incluido', prompt: '¿Qué equipamiento llevan las campers? (cocina, ducha, nevera, calefacción, placas solares...)' },
         ],
       },
       {
@@ -122,6 +124,18 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: 'Contactar con asistencia', prompt: 'Necesito contactar con la asistencia en viaje.' },
         ],
       },
+      {
+        id: 'rutas',
+        label: 'Rutas y consejos de viaje',
+        emoji: '🗺️',
+        question: '¿Sobre qué quieres que te oriente?',
+        options: [
+          { label: 'Rutas y destinos', prompt: '¿Me recomiendas rutas o destinos para viajar en camper?' },
+          { label: 'Consejos para viajar en camper', prompt: '¿Tienes consejos para viajar en camper, sobre todo si es mi primera vez?' },
+          { label: 'Viajar con mascota', prompt: '¿Puedo viajar con mi mascota en la camper? ¿Algún consejo?' },
+          { label: 'Viajar al extranjero', prompt: '¿Puedo viajar al extranjero con la camper? ¿A qué países?' },
+        ],
+      },
     ],
   },
   en: {
@@ -151,6 +165,8 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: 'Requirements to rent', prompt: 'What requirements do I need to rent a campervan?' },
           { label: 'Available models', prompt: 'Which campervan models do you have available to rent?' },
           { label: 'Where to pick up', prompt: 'Where are the campervans picked up and returned?' },
+          { label: 'Offers and discounts', prompt: 'Do you have any last-minute offers or discounts available right now?' },
+          { label: 'Equipment included', prompt: 'What equipment do the campervans have? (kitchen, shower, fridge, heating, solar panels...)' },
         ],
       },
       {
@@ -201,6 +217,18 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: 'Contact assistance', prompt: 'I need to contact roadside assistance.' },
         ],
       },
+      {
+        id: 'rutas',
+        label: 'Routes and travel tips',
+        emoji: '🗺️',
+        question: 'What would you like advice on?',
+        options: [
+          { label: 'Routes and destinations', prompt: 'Can you recommend routes or destinations for a campervan trip?' },
+          { label: 'Tips for campervan travel', prompt: 'Do you have tips for travelling by campervan, especially if it is my first time?' },
+          { label: 'Travelling with a pet', prompt: 'Can I travel with my pet in the campervan? Any tips?' },
+          { label: 'Travelling abroad', prompt: 'Can I travel abroad with the campervan? Which countries?' },
+        ],
+      },
     ],
   },
   fr: {
@@ -230,6 +258,8 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: 'Conditions requises', prompt: 'Quelles conditions dois-je remplir pour louer un camper ?' },
           { label: 'Modèles disponibles', prompt: 'Quels modèles de camper proposez-vous à la location ?' },
           { label: 'Lieux de prise en charge', prompt: 'Où récupère-t-on et rend-on les campers ?' },
+          { label: 'Offres et réductions', prompt: 'Avez-vous des offres de dernière minute ou des réductions disponibles en ce moment ?' },
+          { label: 'Équipement inclus', prompt: 'Quel équipement y a-t-il dans les campers ? (cuisine, douche, frigo, chauffage, panneaux solaires...)' },
         ],
       },
       {
@@ -280,6 +310,18 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: "Contacter l'assistance", prompt: "Je dois contacter l'assistance routière." },
         ],
       },
+      {
+        id: 'rutas',
+        label: 'Itinéraires et conseils de voyage',
+        emoji: '🗺️',
+        question: 'Sur quoi souhaitez-vous des conseils ?',
+        options: [
+          { label: 'Itinéraires et destinations', prompt: 'Pouvez-vous me recommander des itinéraires ou des destinations pour un voyage en camper ?' },
+          { label: 'Conseils pour voyager en camper', prompt: 'Avez-vous des conseils pour voyager en camper, surtout si c\'est ma première fois ?' },
+          { label: 'Voyager avec un animal', prompt: 'Puis-je voyager avec mon animal dans le camper ? Des conseils ?' },
+          { label: "Voyager à l'étranger", prompt: "Puis-je voyager à l'étranger avec le camper ? Dans quels pays ?" },
+        ],
+      },
     ],
   },
   de: {
@@ -309,6 +351,8 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: 'Voraussetzungen zum Mieten', prompt: 'Welche Voraussetzungen brauche ich, um einen Camper zu mieten?' },
           { label: 'Verfügbare Modelle', prompt: 'Welche Camper-Modelle haben Sie zur Miete?' },
           { label: 'Abholorte', prompt: 'Wo werden die Camper abgeholt und zurückgegeben?' },
+          { label: 'Angebote und Rabatte', prompt: 'Haben Sie aktuell Last-Minute-Angebote oder Rabatte?' },
+          { label: 'Enthaltene Ausstattung', prompt: 'Welche Ausstattung haben die Camper? (Küche, Dusche, Kühlschrank, Heizung, Solarmodule...)' },
         ],
       },
       {
@@ -357,6 +401,18 @@ const WIDGET_I18N: Record<WidgetLocale, WidgetStrings> = {
           { label: 'Wo kann ich schlafen', prompt: 'Wo kann ich mit dem Camper schlafen oder übernachten?' },
           { label: 'Panne oder Unfall', prompt: 'Ich hatte eine Panne oder einen Unfall unterwegs, was soll ich tun?' },
           { label: 'Pannenhilfe kontaktieren', prompt: 'Ich muss die Pannenhilfe kontaktieren.' },
+        ],
+      },
+      {
+        id: 'rutas',
+        label: 'Routen und Reisetipps',
+        emoji: '🗺️',
+        question: 'Wozu möchten Sie Tipps?',
+        options: [
+          { label: 'Routen und Reiseziele', prompt: 'Können Sie mir Routen oder Reiseziele für eine Camper-Reise empfehlen?' },
+          { label: 'Tipps fürs Reisen im Camper', prompt: 'Haben Sie Tipps fürs Reisen im Camper, besonders wenn es mein erstes Mal ist?' },
+          { label: 'Reisen mit Haustier', prompt: 'Kann ich mit meinem Haustier im Camper reisen? Irgendwelche Tipps?' },
+          { label: 'Ins Ausland reisen', prompt: 'Kann ich mit dem Camper ins Ausland reisen? In welche Länder?' },
         ],
       },
     ],

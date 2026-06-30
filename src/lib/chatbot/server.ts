@@ -12,7 +12,7 @@ import type { Database } from '@/lib/supabase/database.types';
 export const CHAT_MODEL = process.env.OPENAI_CHATBOT_MODEL || 'gpt-4o';
 export const EMBEDDING_MODEL = 'text-embedding-3-small';
 export const CHATBOT_BUCKET = 'chatbot-uploads';
-export const RAG_MATCH_COUNT = 6;
+export const RAG_MATCH_COUNT = 8;
 export const HISTORY_LIMIT = 20;
 
 let _supabase: SupabaseClient<Database> | null = null;
@@ -107,6 +107,48 @@ export async function retrieveContext(query: string, locale?: string): Promise<s
       .join('\n\n---\n\n');
   } catch (err) {
     console.error('[chatbot] retrieveContext fallo:', err);
+    return '';
+  }
+}
+
+/**
+ * Ofertas de ultima hora VIGENTES en tiempo real (misma fuente que la web /ofertas:
+ * RPC get_active_last_minute_offers). No se indexan en el RAG porque caducan; se
+ * inyectan en cada turno para que el bot solo hable de ofertas realmente activas.
+ * Devuelve '' si no hay ofertas o si falla la consulta.
+ */
+export async function getActiveOffersBlock(): Promise<string> {
+  try {
+    const sb = getServiceClient();
+    const { data, error } = await sb.rpc('get_active_last_minute_offers');
+    if (error || !data) return '';
+    const offers = data as Array<Record<string, any>>;
+    if (!offers.length) return '';
+
+    const lines: string[] = [
+      'OFERTAS DE ULTIMA HORA VIGENTES AHORA MISMO (huecos entre reservas con descuento; datos en tiempo real). Si el cliente busca el mejor precio, una oferta o un chollo, menciona las que encajen con lo que pide (modelo, plazas, fechas o sede) y enlaza a la pagina de Ofertas:',
+    ];
+    for (const o of offers.slice(0, 15)) {
+      const title = [o.vehicle_brand, o.vehicle_model].filter(Boolean).join(' ').trim() || o.vehicle_name || 'Camper';
+      const seats = o.vehicle_seats != null ? `${o.vehicle_seats} plazas` : '';
+      const beds = o.vehicle_beds != null ? `${o.vehicle_beds} camas` : '';
+      const ficha = [seats, beds].filter(Boolean).join('/');
+      lines.push(
+        `- ${title}${ficha ? ` (${ficha})` : ''}: del ${o.offer_start_date} al ${o.offer_end_date}` +
+          `${o.offer_days ? ` (${o.offer_days} días)` : ''}` +
+          `${o.pickup_location_name ? `, recogida en ${o.pickup_location_name}` : ''}.` +
+          `${o.discount_percentage ? ` Descuento ${o.discount_percentage}%:` : ''}` +
+          `${o.final_price_per_day ? ` ${o.final_price_per_day} €/día` : ''}` +
+          `${o.original_price_per_day ? ` (antes ${o.original_price_per_day} €/día)` : ''}` +
+          `${o.total_final_price ? `, total ${o.total_final_price} €` : ''}` +
+          `${o.savings ? `, ahorras ${o.savings} €` : ''}.`
+      );
+    }
+    lines.push(
+      'Estas ofertas son para FECHAS y vehiculos concretos y caducan: para reservarlas o ver el detalle, enlaza a la pagina de Ofertas. Si ninguna encaja con lo que pide el cliente, no te las inventes.'
+    );
+    return lines.join('\n');
+  } catch {
     return '';
   }
 }

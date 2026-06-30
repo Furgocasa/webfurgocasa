@@ -110,6 +110,7 @@ Cuando enlazar:
 - REGLA CRITICA (precios con mes o fechas): si el cliente menciona un MES (agosto, Semana Santa, navidades...) o unas FECHAS concretas, NO escribas NINGUNA cifra de precio: ni €/dia, ni precio por tramo, ni rango, ni la tabla 155/145/135/125. Esos numeros son de la tabla generica y NO coinciden con la temporada real de ese mes (te equivocas, error real detectado). Aunque te pregunten "¿cuanto cuesta dos semanas en agosto?", NO des ninguna cifra. Responde asi: di a que temporada pertenece (baja/media/alta), explica que el precio exacto depende de los dias y la disponibilidad, y remite al buscador para verlo: [Reservar](${CONTACT.reservarUrl}). Si quieres, recuerda que a mayor duracion menor precio/dia, pero SIN cifras.
 - Solo cuando la pregunta es GENERAL de precios SIN mes ni fechas (tipo "¿que precios teneis?") puedes mencionar la tabla orientativa general de [Tarifas](${CONTACT.tarifasUrl}) (desde ~95 €/dia en baja, ~125 en media, ~155 en alta), siempre dejando claro que es orientativa.
 - Si el cliente busca el mejor precio, descuentos o promociones, mencionale que hay ofertas y enlaza [Ofertas](${CONTACT.ofertasUrl}).
+- Si en "DATOS EN TIEMPO REAL" aparecen ofertas de ultima hora vigentes, usalas: nombra las que encajen con lo que pide el cliente (modelo, plazas, fechas o sede) con su precio con descuento, y enlaza a [Ofertas](${CONTACT.ofertasUrl}) para reservarlas. Son ofertas para fechas y vehiculos concretos y caducan; si ninguna encaja, no las menciones ni inventes ofertas.
 
 ### Limites importantes
 - NUNCA des precio ni disponibilidad para FECHAS CONCRETAS ni hagas cotizaciones de un periodo, ni desgloses los precios por tramo de duracion de un mes/fechas concretas. Para eso remite al buscador de reservas: ${CONTACT.reservarUrl}
@@ -176,14 +177,19 @@ Cuando enlazar:
 - No inventes disponibilidad ni precios de fechas concretas.`;
 
 /**
- * Construye el prompt del sistema completo inyectando el contexto recuperado del RAG.
+ * Construye el prompt del sistema completo inyectando el contexto recuperado del RAG
+ * y, opcionalmente, datos en tiempo real (p. ej. ofertas de ultima hora vigentes).
  */
-export function buildSystemPrompt(context: string): string {
+export function buildSystemPrompt(context: string, liveData?: string): string {
   const contextBlock = context.trim()
     ? `\n\n### INFORMACION DE FURGOCASA (usa esto como fuente principal)\n${context.trim()}`
     : `\n\n### INFORMACION DE FURGOCASA\n(No se ha recuperado contexto especifico para esta consulta. Responde con tus conocimientos generales respetando las reglas anteriores.)`;
 
-  return `${BASE_SYSTEM_PROMPT}${contextBlock}`;
+  const liveBlock = liveData?.trim()
+    ? `\n\n### DATOS EN TIEMPO REAL (prioritarios y siempre actualizados)\n${liveData.trim()}`
+    : '';
+
+  return `${BASE_SYSTEM_PROMPT}${contextBlock}${liveBlock}`;
 }
 
 export default buildSystemPrompt;
