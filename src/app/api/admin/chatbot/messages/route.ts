@@ -41,7 +41,7 @@ function precedingUserQuestion(
   let last = '';
   for (const m of conversationMessages) {
     const mt = m.created_at ? new Date(m.created_at).getTime() : 0;
-    if (mt >= ts) break;
+    if (mt > ts) break;
     if (m.role === 'user' && m.content?.trim()) last = m.content.trim();
   }
   return last;
@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
     )
     .eq('role', 'assistant')
     .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
     .limit(300);
 
   if (quality) query = query.eq('response_quality', quality);
@@ -107,7 +108,8 @@ export async function GET(request: NextRequest) {
       .from('chatbot_messages')
       .select('conversation_id, role, content, created_at')
       .in('conversation_id', convIds)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true });
 
     for (const m of thread || []) {
       const list = threadMap.get(m.conversation_id) || [];

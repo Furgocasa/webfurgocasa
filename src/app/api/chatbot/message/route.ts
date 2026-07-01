@@ -115,6 +115,7 @@ export async function POST(request: NextRequest) {
     .select('role, content, media_url, media_type')
     .eq('conversation_id', convId)
     .order('created_at', { ascending: false })
+    .order('id', { ascending: false })
     .limit(HISTORY_LIMIT);
 
   // 3. Contexto RAG: la consulta combina los ultimos mensajes del usuario con el
@@ -175,12 +176,14 @@ export async function POST(request: NextRequest) {
   ];
 
   // 6. Guardar el mensaje del usuario
+  const userCreatedAt = new Date().toISOString();
   await supabase.from('chatbot_messages').insert({
     conversation_id: convId,
     role: 'user',
     content: userText,
     media_url: mediaUrl,
     media_type: mediaType,
+    created_at: userCreatedAt,
   });
 
   // 7. Llamada al modelo en streaming
@@ -231,6 +234,7 @@ export async function POST(request: NextRequest) {
           conversation_id: finalConvId,
           role: 'assistant',
           content: full,
+          created_at: new Date().toISOString(),
         });
         // No recalculamos el idioma aqui: se fijo al crear la conversacion con el
         // locale de la web. Recalcularlo en cada turno con una heuristica debil

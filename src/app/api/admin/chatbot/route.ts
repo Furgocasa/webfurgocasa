@@ -117,7 +117,8 @@ export async function GET(request: NextRequest) {
       .from('chatbot_messages')
       .select('conversation_id, role, content, media_type, transcription, created_at, response_quality')
       .in('conversation_id', ids)
-      .order('created_at', { ascending: true });
+      .order('created_at', { ascending: true })
+      .order('id', { ascending: true });
 
     for (const m of messages || []) {
       const entry = previews.get(m.conversation_id) || {

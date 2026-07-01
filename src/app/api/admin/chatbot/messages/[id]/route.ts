@@ -69,13 +69,14 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     .from('chatbot_messages')
     .select('role, content, created_at')
     .eq('conversation_id', row.conversation_id)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true });
 
   let userQuestion = '';
   const ts = row.created_at ? new Date(row.created_at).getTime() : 0;
   for (const m of thread || []) {
     const mt = m.created_at ? new Date(m.created_at).getTime() : 0;
-    if (mt >= ts) break;
+    if (mt > ts) break;
     if (m.role === 'user' && m.content?.trim()) userQuestion = m.content.trim();
   }
 

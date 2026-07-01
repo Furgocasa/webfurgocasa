@@ -55,13 +55,14 @@ async function getUserQuestion(conversationId: string, createdAt: string | null)
     .from('chatbot_messages')
     .select('role, content, created_at')
     .eq('conversation_id', conversationId)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true });
 
   const ts = createdAt ? new Date(createdAt).getTime() : 0;
   let lastUser = '';
   for (const m of data || []) {
     const mt = m.created_at ? new Date(m.created_at).getTime() : 0;
-    if (mt >= ts) break;
+    if (mt > ts) break;
     if (m.role === 'user' && m.content?.trim()) lastUser = m.content.trim();
   }
   return lastUser;
@@ -189,7 +190,8 @@ async function main() {
     .from('chatbot_messages')
     .select('id, conversation_id, content, response_quality, created_at')
     .eq('role', 'assistant')
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true });
 
   // Por defecto solo los no clasificados; con --all se reevaluan todos.
   if (!all) query = query.eq('response_quality', 'sin_tipo');

@@ -44,7 +44,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     .from('chatbot_messages')
     .select('*')
     .eq('conversation_id', id)
-    .order('created_at', { ascending: true });
+    .order('created_at', { ascending: true })
+    .order('id', { ascending: true });
 
   return NextResponse.json({ conversation, messages: messages || [] });
 }
