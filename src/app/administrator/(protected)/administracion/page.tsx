@@ -233,7 +233,7 @@ export default function AdministracionPage() {
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [panel, setPanel] = useState<Row | null>(null);
   const [sortField, setSortField] = useState<SortField>("inicio");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [statusFilter, setStatusFilter] = useState<string>("confirmed_in_progress");
   const [pageSize, setPageSize] = useState<PageSize>("all");
   const [page, setPage] = useState(1);
@@ -322,11 +322,11 @@ export default function AdministracionPage() {
     return rows.filter((r) => r.status === statusFilter);
   }, [rows, statusFilter]);
 
-  // Ordenación por columnas (por defecto: inicio, más reciente primero)
+  // Ordenación por columnas (por defecto: inicio, más antigua primero)
   const sorted = useMemo(() => {
     const arr = [...filtered];
     const field = sortField ?? "inicio";
-    const dir = sortField === null ? "desc" : sortDir;
+    const dir = sortField === null ? "asc" : sortDir;
     const mul = dir === "asc" ? 1 : -1;
     arr.sort((a, b) => {
       let va: number | string;
