@@ -103,23 +103,35 @@ export async function POST(request: NextRequest) {
   const userText = (text?.trim() || '').trim();
   const ragQuery = userText || 'consulta general sobre la camper';
 
-  // 3. Contexto RAG (traduce la consulta a espanol si el cliente navega en otro idioma)
-  //    + ofertas de ultima hora vigentes en tiempo real (no estan en el RAG porque caducan).
-  const [context, offersBlock] = await Promise.all([
-    retrieveContext(ragQuery, locale),
-    getActiveOffersBlock(),
-  ]);
-
   // 4. Historial reciente. Incluimos media_url para que las imagenes enviadas en
   // turnos anteriores sigan siendo "visibles" por el modelo en los mensajes
   // posteriores de la misma conversacion (si no, solo veria la imagen del turno
   // exacto en que se envio y respondia de forma incoherente despues).
+  // Se obtiene ANTES del RAG para poder enriquecer la busqueda con el contexto.
   const { data: history } = await supabase
     .from('chatbot_messages')
     .select('role, content, media_url, media_type')
     .eq('conversation_id', convId)
     .order('created_at', { ascending: false })
     .limit(HISTORY_LIMIT);
+
+  // 3. Contexto RAG: la consulta combina los ultimos mensajes del usuario con el
+  //    actual, para no perder el tema de la conversacion. Ej: si el cliente dijo
+  //    "Portugal" y luego "¿me recomiendas rutas?", la busqueda debe incluir
+  //    "Portugal" para recuperar el articulo de rutas de Portugal (y no rutas
+  //    genericas). + ofertas de ultima hora vigentes en tiempo real.
+  const recentUserTexts = (history || [])
+    .filter((m) => m.role === 'user' && m.content)
+    .slice(0, 2) // history en orden descendente: los 2 mensajes de usuario mas recientes
+    .map((m) => m.content as string)
+    .reverse();
+  const contextualQuery =
+    [...recentUserTexts, userText].filter(Boolean).join('\n') || ragQuery;
+
+  const [context, offersBlock] = await Promise.all([
+    retrieveContext(contextualQuery, locale),
+    getActiveOffersBlock(),
+  ]);
 
   const historyMessages: ChatMessage[] = (history || [])
     .reverse()

@@ -46,11 +46,12 @@ CREATE TABLE IF NOT EXISTS chatbot_kb_chunks (
 
 CREATE INDEX IF NOT EXISTS idx_chatbot_kb_source ON chatbot_kb_chunks(source);
 
--- Indice de similitud por coseno (ivfflat). Requiere ANALYZE tras la ingesta.
+-- Indice de similitud por coseno (HNSW). Mejor recall que ivfflat para este tamano
+-- de dataset (cientos-miles de vectores) sin tener que ajustar 'probes'. Con ivfflat
+-- y lists=100 sobre pocos vectores, probes=1 se saltaba resultados relevantes.
 CREATE INDEX IF NOT EXISTS idx_chatbot_kb_embedding
     ON chatbot_kb_chunks
-    USING ivfflat (embedding vector_cosine_ops)
-    WITH (lists = 100);
+    USING hnsw (embedding vector_cosine_ops);
 
 -- Funcion RPC para recuperar los fragmentos mas relevantes (la llama el API con service role)
 CREATE OR REPLACE FUNCTION match_chatbot_chunks(

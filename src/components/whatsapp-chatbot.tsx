@@ -637,15 +637,26 @@ export default function WhatsAppChatbot() {
         const items = listItems;
         listItems = [];
         if (ordered) {
+          // Numeracion manual: evita que cada item suelto muestre "1." (pasa si el
+          // modelo deja lineas en blanco entre puntos o si list-style no aplica bien).
           blocks.push(
-            <ol key={`ol-${key++}`} className="list-decimal pl-5 space-y-1 my-1">
-              {items}
+            <ol key={`ol-${key++}`} className="list-none space-y-1.5 my-1 pl-0">
+              {items.map((item, i) => (
+                <li key={`oli-${i}`} className="flex gap-2 items-start">
+                  <span className="shrink-0 font-semibold text-gray-700 tabular-nums min-w-[1.1rem]">
+                    {i + 1}.
+                  </span>
+                  <span className="flex-1 min-w-0">{item}</span>
+                </li>
+              ))}
             </ol>
           );
         } else {
           blocks.push(
             <ul key={`ul-${key++}`} className="list-disc pl-5 space-y-1 my-1">
-              {items}
+              {items.map((item, i) => (
+                <li key={`uli-${i}`}>{item}</li>
+              ))}
             </ul>
           );
         }
@@ -658,13 +669,15 @@ export default function WhatsAppChatbot() {
         if (bullet) {
           if (listItems.length && ordered) flushList();
           ordered = false;
-          listItems.push(<li key={`li-${key++}`}>{renderInline(bullet[1])}</li>);
+          listItems.push(<>{renderInline(bullet[1])}</>);
         } else if (numbered) {
           if (listItems.length && !ordered) flushList();
           ordered = true;
-          listItems.push(<li key={`li-${key++}`}>{renderInline(numbered[1])}</li>);
+          listItems.push(<>{renderInline(numbered[1])}</>);
         } else if (!line) {
-          flushList();
+          // Linea en blanco dentro de una lista: no cortar la lista (el modelo suele
+          // dejar espacios entre "1.", "2.", "3." y eso generaba varios <ol> con un solo 1).
+          if (!listItems.length) continue;
         } else {
           flushList();
           const heading = line.match(/^#{1,6}\s+(.*)$/);
