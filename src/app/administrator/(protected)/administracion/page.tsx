@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import {
   ListChecks,
   Loader2,
@@ -16,6 +17,7 @@ import {
   X,
   Trash2,
   ExternalLink,
+  Edit,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
@@ -230,8 +232,8 @@ export default function AdministracionPage() {
   const [query, setQuery] = useState("");
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [panel, setPanel] = useState<Row | null>(null);
-  const [sortField, setSortField] = useState<SortField>(null);
-  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [sortField, setSortField] = useState<SortField>("inicio");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [statusFilter, setStatusFilter] = useState<string>("confirmed_in_progress");
   const [pageSize, setPageSize] = useState<PageSize>("all");
   const [page, setPage] = useState(1);
@@ -320,25 +322,16 @@ export default function AdministracionPage() {
     return rows.filter((r) => r.status === statusFilter);
   }, [rows, statusFilter]);
 
-  // Ordenación (con orden "inteligente" por defecto: próximos primero)
+  // Ordenación por columnas (por defecto: inicio, más reciente primero)
   const sorted = useMemo(() => {
     const arr = [...filtered];
-    if (sortField === null) {
-      arr.sort((a, b) => {
-        const sa = hasStartedRow(a, today) ? 1 : 0;
-        const sb = hasStartedRow(b, today) ? 1 : 0;
-        if (sa !== sb) return sa - sb;
-        return sa === 0
-          ? a.pickupDate.localeCompare(b.pickupDate)
-          : b.pickupDate.localeCompare(a.pickupDate);
-      });
-      return arr;
-    }
-    const mul = sortDir === "asc" ? 1 : -1;
+    const field = sortField ?? "inicio";
+    const dir = sortField === null ? "desc" : sortDir;
+    const mul = dir === "asc" ? 1 : -1;
     arr.sort((a, b) => {
       let va: number | string;
       let vb: number | string;
-      switch (sortField) {
+      switch (field) {
         case "reserva":
           va = (a.customerName || "").toLowerCase();
           vb = (b.customerName || "").toLowerCase();
@@ -364,15 +357,15 @@ export default function AdministracionPage() {
           vb = statusRank(b.status);
           break;
         default:
-          va = 0;
-          vb = 0;
+          va = a.pickupDate;
+          vb = b.pickupDate;
       }
       if (va < vb) return -mul;
       if (va > vb) return mul;
       return 0;
     });
     return arr;
-  }, [filtered, sortField, sortDir, today]);
+  }, [filtered, sortField, sortDir]);
 
   // Paginación
   const total = sorted.length;
@@ -637,14 +630,32 @@ export default function AdministracionPage() {
                           />
                         </td>
                         <td className="px-3 py-3 text-right">
-                          <button
-                            type="button"
-                            onClick={() => setPanel(r)}
-                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-furgocasa-blue border border-furgocasa-blue/30 rounded-lg hover:bg-furgocasa-blue/5"
-                          >
-                            <Mail className="h-3.5 w-3.5" />
-                            Emails / Docs
-                          </button>
+                          <div className="flex flex-col items-end gap-1.5">
+                            <button
+                              type="button"
+                              onClick={() => setPanel(r)}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-furgocasa-blue border border-furgocasa-blue/30 rounded-lg hover:bg-furgocasa-blue/5"
+                            >
+                              <Mail className="h-3.5 w-3.5" />
+                              Emails / Docs
+                            </button>
+                            <Link
+                              href={`/administrator/reservas/${r.bookingId}/editar`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+                            >
+                              <Edit className="h-3.5 w-3.5" />
+                              Editar reserva
+                            </Link>
+                            <a
+                              href={`/reservar/${r.bookingId}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+                            >
+                              <ExternalLink className="h-3.5 w-3.5" />
+                              Ver en front
+                            </a>
+                          </div>
                         </td>
                       </tr>
                     );
