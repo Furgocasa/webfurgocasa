@@ -6,8 +6,9 @@
  *   - el cron /api/cron/booking-admin-reminders
  *   - el cron /api/cron/booking-management-email (email 1, 20 min tras 1er pago)
  *
- * Cada envío se registra en `booking_email_dispatches` para trazabilidad e
- * idempotencia (el cron nunca reenvía un tipo ya enviado a esa reserva).
+ * Cada envío se registra en `booking_email_dispatches` para trazabilidad.
+ * Los recordatorios (2–5) pueden reenviarse cada día mientras el asunto siga
+ * pendiente; la cita y el email de gestión inicial son de un solo envío.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -42,6 +43,10 @@ const BUILDERS: Record<GestionEmailType, (d: AdminGestionEmailData) => AdminGest
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.furgocasa.com";
 const COMPANY_EMAIL = process.env.COMPANY_EMAIL || "reservas@furgocasa.com";
+
+function madridDateIso(d: Date): string {
+  return d.toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
+}
 
 export const BOOKING_SELECT = `
   id, booking_number, pickup_date, pickup_time, dropoff_date, dropoff_time,
@@ -87,17 +92,29 @@ export interface DispatchResult {
 /**
  * Envía un email de gestión a la reserva indicada y registra el dispatch.
  *
- * @param opts.onlyIfNotSent  si true, no reenvía si ya hay un dispatch sent/skipped
- *                            de ese tipo (idempotencia del cron).
- * @param opts.ccCompany      si true (por defecto), CC a reservas@furgocasa.com.
+ * @param opts.onlyIfNotSent       si true, no reenvía si ya hay un dispatch sent
+ *                               de ese tipo (cita, gestión inicial).
+ * @param opts.onlyIfNotSentToday si true, como máximo un envío al día (recordatorios
+ *                               2–5 mientras el asunto siga pendiente).
+ * @param opts.ccCompany          si true (por defecto), CC a reservas@furgocasa.com.
  */
 export async function sendGestionEmail(
   supabase: SupabaseClient,
   bookingId: string,
   type: GestionEmailType,
-  opts: { onlyIfNotSent?: boolean; ccCompany?: boolean; source?: string } = {}
+  opts: {
+    onlyIfNotSent?: boolean;
+    onlyIfNotSentToday?: boolean;
+    ccCompany?: boolean;
+    source?: string;
+  } = {}
 ): Promise<DispatchResult> {
-  const { onlyIfNotSent = false, ccCompany = true, source = "admin" } = opts;
+  const {
+    onlyIfNotSent = false,
+    onlyIfNotSentToday = false,
+    ccCompany = true,
+    source = "admin",
+  } = opts;
 
   const { data: booking, error: bErr } = await supabase
     .from("bookings")
@@ -121,10 +138,27 @@ export async function sendGestionEmail(
       .select("id")
       .eq("booking_id", bookingId)
       .eq("email_type", type)
-      .in("status", ["sent", "skipped", "bounced"])
+      .eq("status", "sent")
       .limit(1);
     if (existing && existing.length > 0) {
       return { ok: true, skipped: true, to: customerEmail };
+    }
+  }
+
+  let existingSentId: string | null = null;
+  if (onlyIfNotSentToday) {
+    const { data: existing } = await supabase
+      .from("booking_email_dispatches")
+      .select("id, sent_at")
+      .eq("booking_id", bookingId)
+      .eq("email_type", type)
+      .eq("status", "sent")
+      .maybeSingle();
+    if (existing?.sent_at) {
+      if (madridDateIso(new Date(existing.sent_at)) === madridDateIso(new Date())) {
+        return { ok: true, skipped: true, to: customerEmail };
+      }
+      existingSentId = existing.id;
     }
   }
 
@@ -135,15 +169,27 @@ export async function sendGestionEmail(
   const result = await sendEmail({ to, subject, html });
 
   if (result.success) {
-    await supabase.from("booking_email_dispatches").insert({
-      booking_id: bookingId,
+    const dispatchPayload = {
       customer_email: customerEmail,
-      email_type: type,
-      status: "sent",
+      status: "sent" as const,
       sent_at: new Date().toISOString(),
       smtp_message_id: result.messageId || null,
       metadata: { booking_number: b.booking_number, source },
-    });
+      updated_at: new Date().toISOString(),
+    };
+
+    if (existingSentId) {
+      await supabase
+        .from("booking_email_dispatches")
+        .update(dispatchPayload)
+        .eq("id", existingSentId);
+    } else {
+      await supabase.from("booking_email_dispatches").insert({
+        booking_id: bookingId,
+        email_type: type,
+        ...dispatchPayload,
+      });
+    }
     // La cita marca el checklist como confirmada.
     if (type === "appointment") {
       await supabase

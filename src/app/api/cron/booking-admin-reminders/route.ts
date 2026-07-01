@@ -4,13 +4,9 @@
  * Cron diario (Vercel). Sustituye la automatización n8n "Avisos MAIL pendientes
  * NOTION". Para cada reserva próxima aplica las reglas:
  *
- *   · Vencimiento (inicio − 15 días) ≤ hoy y 2º pago pendiente  → recordatorio 2º pago
- *   · Vencimiento ≤ hoy y contrato sin firmar                   → recordatorio contrato
- *   · Vencimiento ≤ hoy y documentación incompleta              → recordatorio documentación
- *   · Límite fianza (inicio − 8 días) ≤ hoy y fianza pendiente  → recordatorio fianza
- *   · 2º pago + contrato + documentación + fianza OK y sin cita → email de CITA
- *
- * Idempotencia: cada tipo se envía UNA vez por reserva (booking_email_dispatches).
+ *   · 2º pago / contrato / documentación / fianza pendientes → recordatorio DIARIO
+ *     (una vez al día mientras siga sin resolver, cron 06:00 UTC)
+ *   · 2º pago + contrato + documentación + fianza OK y sin cita → email de CITA (una vez)
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -123,8 +119,10 @@ export async function GET(request: NextRequest) {
     if (ready) jobs.push("appointment");
 
     for (const type of jobs) {
+      const isAppointment = type === "appointment";
       const res = await sendGestionEmail(supabase, b.id, type as any, {
-        onlyIfNotSent: true,
+        onlyIfNotSent: isAppointment,
+        onlyIfNotSentToday: !isAppointment,
         ccCompany: true,
         source: "cron",
       });
