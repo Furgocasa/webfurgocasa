@@ -23,6 +23,8 @@ import {
   ArrowDown,
   ChevronLeft,
   ChevronRight,
+  Truck,
+  LayoutGrid,
 } from "lucide-react";
 
 type ReminderKey = "secondPayment" | "contract" | "documentation" | "deposit";
@@ -229,6 +231,212 @@ function Check({
   );
 }
 
+function vehicleGroupKey(r: Row): string {
+  return r.vehicleInternalCode?.trim() || r.vehicleName?.trim() || "__sin_vehiculo__";
+}
+
+function vehicleGroupLabel(key: string, sample: Row): string {
+  if (key === "__sin_vehiculo__") return "Sin vehículo asignado";
+  const code = sample.vehicleInternalCode?.trim();
+  const name = sample.vehicleName?.trim();
+  if (code && name && code !== name) return `${code} · ${name}`;
+  return code || name || key;
+}
+
+function AdminTableHeader({
+  sortField,
+  sortDir,
+  onSort,
+}: {
+  sortField: SortField;
+  sortDir: SortDir;
+  onSort: (f: Exclude<SortField, null>) => void;
+}) {
+  return (
+    <thead>
+      <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide">
+        <SortHeader label="Reserva" field="reserva" active={sortField === "reserva"} dir={sortDir} onSort={onSort} />
+        <SortHeader label="Estado" field="estado" active={sortField === "estado"} dir={sortDir} onSort={onSort} />
+        <SortHeader label="Inicio" field="inicio" active={sortField === "inicio"} dir={sortDir} onSort={onSort} />
+        <SortHeader label="Fin" field="fin" active={sortField === "fin"} dir={sortDir} onSort={onSort} />
+        <th className="px-3 py-3 font-semibold text-center" title="Devuelta según fecha fin de reserva">
+          Devuelta
+        </th>
+        <SortHeader label="Venc. 2º pago" field="venc" active={sortField === "venc"} dir={sortDir} onSort={onSort} />
+        <th className="px-3 py-3 font-semibold text-center">1ª fact.</th>
+        <th className="px-3 py-3 font-semibold text-center">2ª fact.</th>
+        <th className="px-3 py-3 font-semibold text-center">Contrato</th>
+        <th className="px-3 py-3 font-semibold text-center">Docs.</th>
+        <th className="px-3 py-3 font-semibold text-center">Fianza</th>
+        <th className="px-3 py-3 font-semibold text-center">Cita</th>
+        <th className="px-3 py-3 font-semibold text-right">Acciones</th>
+      </tr>
+    </thead>
+  );
+}
+
+function AdminTableRow({
+  r,
+  today,
+  savingKey,
+  hideVehicleLine,
+  onToggleField,
+  onOpenPanel,
+}: {
+  r: Row;
+  today: string;
+  savingKey: string | null;
+  hideVehicleLine?: boolean;
+  onToggleField: (row: Row, field: FieldKey, value: boolean) => void;
+  onOpenPanel: (row: Row) => void;
+}) {
+  const started = hasStartedRow(r, today);
+  const pending = (r.totalPrice ?? 0) - (r.amountPaid ?? 0);
+  const paidFull = pending <= 0;
+  const secondPaymentLate =
+    !started && !r.secondInvoiceDone && !paidFull && r.secondPaymentDueDate < today;
+  const sm = STATUS_META[r.status] ?? {
+    label: r.status,
+    cls: "bg-gray-100 text-gray-600",
+  };
+  const contractOk = started || r.contractSigned;
+  const docOk = started || r.docComplete;
+  const citaOk = started || r.appointmentConfirmed;
+  const returned = isReturnedRow(r, today);
+
+  return (
+    <tr key={r.bookingId} className="hover:bg-gray-50 align-top">
+      <td className="px-3 py-3 min-w-[220px]">
+        <div className="font-medium text-gray-900">{r.customerName || "—"}</div>
+        {!hideVehicleLine && (
+          <div className="text-xs text-gray-500">
+            {[r.vehicleInternalCode, r.vehicleName].filter(Boolean).join(" · ") || "—"}
+          </div>
+        )}
+        <div className="text-xs text-gray-400">
+          {r.pickupLocation || "—"}
+          {r.dropoffLocation && r.dropoffLocation !== r.pickupLocation
+            ? ` → ${r.dropoffLocation}`
+            : ""}
+        </div>
+      </td>
+      <td className="px-3 py-3 whitespace-nowrap">
+        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sm.cls}`}>
+          {sm.label}
+        </span>
+      </td>
+      <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
+        {fmtDate(r.pickupDate)}
+        {r.pickupTime ? <span className="block text-xs text-gray-400">{r.pickupTime}</span> : null}
+      </td>
+      <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
+        {fmtDate(r.dropoffDate)}
+        {r.dropoffTime ? <span className="block text-xs text-gray-400">{r.dropoffTime}</span> : null}
+      </td>
+      <td className="px-3 py-3 text-center">
+        <CheckCircle2
+          className={`h-5 w-5 mx-auto ${returned ? "text-green-500" : "text-gray-300"}`}
+          title={returned ? "Devuelta (fin de reserva)" : "Aún no devuelta"}
+        />
+      </td>
+      <td className="px-3 py-3 whitespace-nowrap">
+        <span
+          className={`inline-flex items-center gap-1 ${
+            secondPaymentLate ? "text-red-600 font-medium" : "text-gray-500"
+          }`}
+        >
+          {secondPaymentLate && <CalendarClock className="h-3.5 w-3.5" />}
+          {fmtDate(r.secondPaymentDueDate)}
+        </span>
+        <span
+          className={`block text-xs ${paidFull ? "text-green-600 font-medium" : "text-gray-500"}`}
+        >
+          {paidFull ? "Pagado" : `Pendiente: ${fmtEUR(pending)}`}
+        </span>
+      </td>
+      <td className="px-3 py-3 text-center">
+        {started ? (
+          <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
+        ) : (
+          <Check
+            checked={r.firstInvoiceDone}
+            disabled={savingKey === `${r.bookingId}:first_invoice_done`}
+            onChange={(v) => onToggleField(r, "first_invoice_done", v)}
+          />
+        )}
+      </td>
+      <td className="px-3 py-3 text-center">
+        {started ? (
+          <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
+        ) : (
+          <Check
+            checked={r.secondInvoiceDone}
+            disabled={savingKey === `${r.bookingId}:second_invoice_done`}
+            onChange={(v) => onToggleField(r, "second_invoice_done", v)}
+          />
+        )}
+      </td>
+      <td className="px-3 py-3 text-center">
+        <CheckCircle2
+          className={`h-5 w-5 mx-auto ${contractOk ? "text-green-500" : "text-gray-300"}`}
+        />
+      </td>
+      <td className="px-3 py-3 text-center">
+        <div className="flex flex-col items-center gap-1">
+          <CheckCircle2 className={`h-5 w-5 ${docOk ? "text-green-500" : "text-gray-300"}`} />
+          {r.docsUploadedCount > 0 && (
+            <span className="text-[10px] text-gray-400">{r.docsUploadedCount} arch.</span>
+          )}
+        </div>
+      </td>
+      <td className="px-3 py-3 text-center">
+        {started ? (
+          <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
+        ) : (
+          <Check
+            checked={r.depositReceived}
+            disabled={savingKey === `${r.bookingId}:deposit_received`}
+            onChange={(v) => onToggleField(r, "deposit_received", v)}
+          />
+        )}
+      </td>
+      <td className="px-3 py-3 text-center">
+        <CheckCircle2
+          className={`h-5 w-5 mx-auto ${citaOk ? "text-green-500" : "text-gray-300"}`}
+        />
+      </td>
+      <td className="px-2 py-3">
+        <div className="flex items-center justify-end gap-0.5">
+          <button
+            type="button"
+            onClick={() => onOpenPanel(r)}
+            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            title="Emails / Docs"
+          >
+            <Mail className="h-3.5 w-3.5" />
+          </button>
+          <Link
+            href={`/administrator/reservas/${r.bookingId}/editar`}
+            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            title="Editar reserva"
+          >
+            <Edit className="h-3.5 w-3.5" />
+          </Link>
+          <a
+            href={`/reservar/${r.bookingId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="p-1.5 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded transition-colors"
+            title="Ver en front"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 export default function AdministracionPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -242,6 +450,7 @@ export default function AdministracionPage() {
   const [statusFilter, setStatusFilter] = useState<string>("confirmed_in_progress");
   const [pageSize, setPageSize] = useState<PageSize>("all");
   const [page, setPage] = useState(1);
+  const [groupByVehicle, setGroupByVehicle] = useState(false);
 
   const load = useCallback(async (q: string) => {
     setLoading(true);
@@ -258,6 +467,9 @@ export default function AdministracionPage() {
         return;
       }
       setRows(data.items || []);
+      if (data.meta?.searchMatchedVehicles) {
+        setGroupByVehicle(true);
+      }
     } catch {
       setError("Error de conexión.");
       setRows([]);
@@ -372,7 +584,7 @@ export default function AdministracionPage() {
     return arr;
   }, [filtered, sortField, sortDir]);
 
-  // Paginación
+  // Paginación (solo vista plana)
   const total = sorted.length;
   const size = pageSize === "all" ? total || 1 : pageSize;
   const totalPages = Math.max(1, Math.ceil(total / size));
@@ -382,10 +594,33 @@ export default function AdministracionPage() {
   const fromRow = total === 0 ? 0 : (currentPage - 1) * size + 1;
   const toRow = pageSize === "all" ? total : Math.min(currentPage * size, total);
 
+  // Agrupación por código de vehículo
+  const vehicleGroups = useMemo(() => {
+    if (!groupByVehicle) return [];
+    const map = new Map<string, Row[]>();
+    for (const r of sorted) {
+      const key = vehicleGroupKey(r);
+      const list = map.get(key);
+      if (list) list.push(r);
+      else map.set(key, [r]);
+    }
+    return [...map.entries()]
+      .sort(([ka], [kb]) => {
+        if (ka === "__sin_vehiculo__") return 1;
+        if (kb === "__sin_vehiculo__") return -1;
+        return ka.localeCompare(kb, "es");
+      })
+      .map(([key, items]) => ({
+        key,
+        label: vehicleGroupLabel(key, items[0]),
+        items,
+      }));
+  }, [sorted, groupByVehicle]);
+
   // Al cambiar filtros/orden/tamaño, volver a la primera página
   useEffect(() => {
     setPage(1);
-  }, [query, statusFilter, pageSize, sortField, sortDir]);
+  }, [query, statusFilter, pageSize, sortField, sortDir, groupByVehicle]);
 
   return (
     <div className="p-4 sm:p-6 lg:p-8">
@@ -418,7 +653,7 @@ export default function AdministracionPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar por nº reserva, cliente o email"
+              placeholder="Buscar por nº reserva, cliente, email o vehículo (código/nombre)"
               className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none text-sm"
             />
           </div>
@@ -429,6 +664,24 @@ export default function AdministracionPage() {
             Buscar
           </button>
         </form>
+
+        <button
+          type="button"
+          onClick={() => setGroupByVehicle((v) => !v)}
+          title="Agrupar alquileres en tablas separadas por código de vehículo"
+          className={`inline-flex items-center gap-2 px-3 py-2.5 text-sm font-medium rounded-lg border transition-colors ${
+            groupByVehicle
+              ? "text-white bg-furgocasa-blue border-furgocasa-blue"
+              : "text-gray-700 bg-white border-gray-200 hover:bg-gray-50"
+          }`}
+        >
+          {groupByVehicle ? (
+            <LayoutGrid className="h-4 w-4" />
+          ) : (
+            <Truck className="h-4 w-4" />
+          )}
+          {groupByVehicle ? "Agrupado por vehículo" : "Agrupar por vehículo"}
+        </button>
 
         <div className="flex items-center gap-3 flex-wrap">
           <label className="flex items-center gap-2 text-sm text-gray-600">
@@ -454,7 +707,9 @@ export default function AdministracionPage() {
               onChange={(e) =>
                 setPageSize(e.target.value === "all" ? "all" : (Number(e.target.value) as PageSize))
               }
-              className="py-2 pl-3 pr-8 rounded-lg border border-gray-300 bg-white text-sm focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none"
+              disabled={groupByVehicle}
+              title={groupByVehicle ? "Desactiva la agrupación para paginar" : undefined}
+              className="py-2 pl-3 pr-8 rounded-lg border border-gray-300 bg-white text-sm focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="10">10</option>
               <option value="50">50</option>
@@ -484,198 +739,61 @@ export default function AdministracionPage() {
             <ListChecks className="h-10 w-10 mx-auto mb-3 opacity-40" />
             <p>No hay alquileres que coincidan con el filtro.</p>
           </div>
+        ) : groupByVehicle ? (
+          <div className="divide-y divide-gray-200">
+            {vehicleGroups.map((group) => (
+              <section key={group.key}>
+                <div className="flex items-center justify-between gap-3 px-4 py-3 bg-furgocasa-blue/5 border-b border-gray-100">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Truck className="h-4 w-4 text-furgocasa-blue shrink-0" />
+                    <h2 className="font-semibold text-gray-900 truncate">{group.label}</h2>
+                  </div>
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    {group.items.length} alquiler{group.items.length === 1 ? "" : "es"}
+                  </span>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <AdminTableHeader sortField={sortField} sortDir={sortDir} onSort={onSort} />
+                    <tbody className="divide-y divide-gray-100">
+                      {group.items.map((r) => (
+                        <AdminTableRow
+                          key={r.bookingId}
+                          r={r}
+                          today={today}
+                          savingKey={savingKey}
+                          hideVehicleLine
+                          onToggleField={toggleField}
+                          onOpenPanel={setPanel}
+                        />
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            ))}
+            <div className="px-4 py-3 border-t border-gray-100 text-sm text-gray-500">
+              <span className="font-medium text-gray-700">{total}</span> alquileres en{" "}
+              <span className="font-medium text-gray-700">{vehicleGroups.length}</span> vehículo
+              {vehicleGroups.length === 1 ? "" : "s"}
+            </div>
+          </div>
         ) : (
           <>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide">
-                    <SortHeader label="Reserva" field="reserva" active={sortField === "reserva"} dir={sortDir} onSort={onSort} />
-                    <SortHeader label="Estado" field="estado" active={sortField === "estado"} dir={sortDir} onSort={onSort} />
-                    <SortHeader label="Inicio" field="inicio" active={sortField === "inicio"} dir={sortDir} onSort={onSort} />
-                    <SortHeader label="Fin" field="fin" active={sortField === "fin"} dir={sortDir} onSort={onSort} />
-                    <th className="px-3 py-3 font-semibold text-center" title="Devuelta según fecha fin de reserva">
-                      Devuelta
-                    </th>
-                    <SortHeader label="Venc. 2º pago" field="venc" active={sortField === "venc"} dir={sortDir} onSort={onSort} />
-                    <th className="px-3 py-3 font-semibold text-center">1ª fact.</th>
-                    <th className="px-3 py-3 font-semibold text-center">2ª fact.</th>
-                    <th className="px-3 py-3 font-semibold text-center">Contrato</th>
-                    <th className="px-3 py-3 font-semibold text-center">Docs.</th>
-                    <th className="px-3 py-3 font-semibold text-center">Fianza</th>
-                    <th className="px-3 py-3 font-semibold text-center">Cita</th>
-                    <th className="px-3 py-3 font-semibold text-right">Acciones</th>
-                  </tr>
-                </thead>
+                <AdminTableHeader sortField={sortField} sortDir={sortDir} onSort={onSort} />
                 <tbody className="divide-y divide-gray-100">
-                  {paged.map((r) => {
-                    const started = hasStartedRow(r, today);
-                    const pending = (r.totalPrice ?? 0) - (r.amountPaid ?? 0);
-                    const paidFull = pending <= 0;
-                    const secondPaymentLate =
-                      !started && !r.secondInvoiceDone && !paidFull && r.secondPaymentDueDate < today;
-                    const sm = STATUS_META[r.status] ?? {
-                      label: r.status,
-                      cls: "bg-gray-100 text-gray-600",
-                    };
-                    const contractOk = started || r.contractSigned;
-                    const docOk = started || r.docComplete;
-                    const citaOk = started || r.appointmentConfirmed;
-                    const returned = isReturnedRow(r, today);
-                    return (
-                      <tr key={r.bookingId} className="hover:bg-gray-50 align-top">
-                        {/* Reserva (código vehículo + ubicación + cliente, estilo Notion) */}
-                        <td className="px-3 py-3 min-w-[220px]">
-                          <div className="font-medium text-gray-900">{r.customerName || "—"}</div>
-                          <div className="text-xs text-gray-500">
-                            {[r.vehicleInternalCode, r.vehicleName].filter(Boolean).join(" · ") || "—"}
-                          </div>
-                          <div className="text-xs text-gray-400">
-                            {r.pickupLocation || "—"}
-                            {r.dropoffLocation && r.dropoffLocation !== r.pickupLocation
-                              ? ` → ${r.dropoffLocation}`
-                              : ""}
-                          </div>
-                        </td>
-                        {/* Estado */}
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <span
-                            className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sm.cls}`}
-                          >
-                            {sm.label}
-                          </span>
-                        </td>
-                        {/* Inicio */}
-                        <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
-                          {fmtDate(r.pickupDate)}
-                          {r.pickupTime ? (
-                            <span className="block text-xs text-gray-400">{r.pickupTime}</span>
-                          ) : null}
-                        </td>
-                        {/* Fin */}
-                        <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
-                          {fmtDate(r.dropoffDate)}
-                          {r.dropoffTime ? (
-                            <span className="block text-xs text-gray-400">{r.dropoffTime}</span>
-                          ) : null}
-                        </td>
-                        {/* Devuelta (auto: fecha fin ≤ hoy) */}
-                        <td className="px-3 py-3 text-center">
-                          <CheckCircle2
-                            className={`h-5 w-5 mx-auto ${returned ? "text-green-500" : "text-gray-300"}`}
-                            title={returned ? "Devuelta (fin de reserva)" : "Aún no devuelta"}
-                          />
-                        </td>
-                        {/* Venc. 2º pago + importe pendiente */}
-                        <td className="px-3 py-3 whitespace-nowrap">
-                          <span
-                            className={`inline-flex items-center gap-1 ${
-                              secondPaymentLate ? "text-red-600 font-medium" : "text-gray-500"
-                            }`}
-                          >
-                            {secondPaymentLate && <CalendarClock className="h-3.5 w-3.5" />}
-                            {fmtDate(r.secondPaymentDueDate)}
-                          </span>
-                          <span
-                            className={`block text-xs ${
-                              paidFull ? "text-green-600 font-medium" : "text-gray-500"
-                            }`}
-                          >
-                            {paidFull ? "Pagado" : `Pendiente: ${fmtEUR(pending)}`}
-                          </span>
-                        </td>
-                        {/* 1ª factura */}
-                        <td className="px-3 py-3 text-center">
-                          {started ? (
-                            <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
-                          ) : (
-                            <Check
-                              checked={r.firstInvoiceDone}
-                              disabled={savingKey === `${r.bookingId}:first_invoice_done`}
-                              onChange={(v) => toggleField(r, "first_invoice_done", v)}
-                            />
-                          )}
-                        </td>
-                        {/* 2ª factura */}
-                        <td className="px-3 py-3 text-center">
-                          {started ? (
-                            <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
-                          ) : (
-                            <Check
-                              checked={r.secondInvoiceDone}
-                              disabled={savingKey === `${r.bookingId}:second_invoice_done`}
-                              onChange={(v) => toggleField(r, "second_invoice_done", v)}
-                            />
-                          )}
-                        </td>
-                        {/* Contrato (solo lectura) */}
-                        <td className="px-3 py-3 text-center">
-                          <CheckCircle2
-                            className={`h-5 w-5 mx-auto ${contractOk ? "text-green-500" : "text-gray-300"}`}
-                          />
-                        </td>
-                        {/* Documentación (auto + override) */}
-                        <td className="px-3 py-3 text-center">
-                          <div className="flex flex-col items-center gap-1">
-                            <CheckCircle2
-                              className={`h-5 w-5 ${docOk ? "text-green-500" : "text-gray-300"}`}
-                            />
-                            {r.docsUploadedCount > 0 && (
-                              <span className="text-[10px] text-gray-400">
-                                {r.docsUploadedCount} arch.
-                              </span>
-                            )}
-                          </div>
-                        </td>
-                        {/* Fianza */}
-                        <td className="px-3 py-3 text-center">
-                          {started ? (
-                            <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
-                          ) : (
-                            <Check
-                              checked={r.depositReceived}
-                              disabled={savingKey === `${r.bookingId}:deposit_received`}
-                              onChange={(v) => toggleField(r, "deposit_received", v)}
-                            />
-                          )}
-                        </td>
-                        {/* Cita */}
-                        <td className="px-3 py-3 text-center">
-                          <CheckCircle2
-                            className={`h-5 w-5 mx-auto ${citaOk ? "text-green-500" : "text-gray-300"}`}
-                          />
-                        </td>
-                        <td className="px-2 py-3">
-                          <div className="flex items-center justify-end gap-0.5">
-                            <button
-                              type="button"
-                              onClick={() => setPanel(r)}
-                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
-                              title="Emails / Docs"
-                            >
-                              <Mail className="h-3.5 w-3.5" />
-                            </button>
-                            <Link
-                              href={`/administrator/reservas/${r.bookingId}/editar`}
-                              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
-                              title="Editar reserva"
-                            >
-                              <Edit className="h-3.5 w-3.5" />
-                            </Link>
-                            <a
-                              href={`/reservar/${r.bookingId}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-1.5 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded transition-colors"
-                              title="Ver en front"
-                            >
-                              <ExternalLink className="h-3.5 w-3.5" />
-                            </a>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {paged.map((r) => (
+                    <AdminTableRow
+                      key={r.bookingId}
+                      r={r}
+                      today={today}
+                      savingKey={savingKey}
+                      onToggleField={toggleField}
+                      onOpenPanel={setPanel}
+                    />
+                  ))}
                 </tbody>
               </table>
             </div>

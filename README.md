@@ -236,6 +236,28 @@ Cada día a las 20:00 h (Madrid) un cron de Vercel busca reservas `confirmed` / 
 
 ---
 
+## 📋 Julio 2026 — Gestión de alquileres KILL NOTION (Notion + n8n → app)
+
+La operativa de seguimiento de alquileres (checklist, recordatorios y cita) vive ahora en la app y sustituye las automatizaciones de Notion/n8n.
+
+| Pieza | Ubicación |
+|-------|-----------|
+| Panel admin | `/administrator/administracion` · `src/app/administrator/(protected)/administracion/page.tsx` |
+| API checklist | `src/app/api/admin/administracion/route.ts` |
+| 6 emails gestión (texto plano) | `src/lib/email/templates.ts` · envío `src/lib/rental-admin/dispatch.ts` |
+| Email 1 (+20 min tras 1er pago) | `src/lib/rental-admin/schedule-management-email.ts` · cron `/api/cron/booking-management-email` (cada 5 min) |
+| Recordatorios 2–5 + cita 6 | cron `/api/cron/booking-admin-reminders` (06:00 UTC ≈ 08:00 Madrid verano) |
+| Docs cliente + IA | `/es/documentacion-alquiler` · `src/lib/rental-docs/` · `src/app/api/rental-docs/` |
+| Tabla checklist | `booking_admin_checklist` (+ `management_email_due_at`) |
+| Migraciones SQL | `20260701-kill-notion-gestion.sql` · `20260701b-rental-documents.sql` · `20260702-management-email-schedule.sql` |
+| Prueba emails | `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]` |
+
+**Emails (resumen):** (1) gestión inicial 20 min post-pago; (2–4) recordatorios diarios desde inicio−15 días (2º pago, contrato, docs); (5) fianza desde inicio−8 días; (6) cita única cuando todo OK.
+
+**Documentación:** [`docs/04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md`](./docs/04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md) (guía completa) · [`SISTEMA-EMAILS.md`](./docs/04-referencia/emails/SISTEMA-EMAILS.md) sección 5
+
+---
+
 ## 🚐 Junio 2026 — Auto `confirmed` → `in_progress` + dashboard operaciones
 
 **Documentación:** [`docs/01-guias-basicas/ADMIN_SETUP.md`](./docs/01-guias-basicas/ADMIN_SETUP.md) · [`docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md`](./docs/04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)

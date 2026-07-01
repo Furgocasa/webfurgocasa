@@ -1,10 +1,25 @@
 # 📚 ÍNDICE MAESTRO DE DOCUMENTACIÓN - Furgocasa
 
-**Versión**: 1.0.30 ✅ PRODUCCIÓN — Auto estados reserva + dashboard operaciones  
+**Versión**: 1.0.31 ✅ PRODUCCIÓN — Gestión alquileres KILL NOTION  
 **URL**: https://www.furgocasa.com  
-**Última actualización**: 11 de junio de 2026
+**Última actualización**: 1 de julio de 2026
 
 Este documento es tu punto de partida para encontrar cualquier documentación del proyecto.
+
+---
+
+## 📋 Julio 2026 — Gestión de alquileres KILL NOTION (Notion + n8n → app)
+
+| Tema | Dónde leer |
+|------|------------|
+| Guía completa (emails, crons, checklist, docs IA, diagrama) | **[KILL-NOTION-SISTEMA-GESTION.md](./04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md)** |
+| Resumen en catálogo de emails (sección 5) | **[SISTEMA-EMAILS.md](./04-referencia/emails/SISTEMA-EMAILS.md)** |
+| README raíz (tabla rápida) | **[README raíz](../README.md)** — *Julio 2026 — Gestión de alquileres KILL NOTION* |
+| Panel admin | `/administrator/administracion` |
+| Página docs cliente | `/es/documentacion-alquiler` |
+| Crons | `vercel.json` — `booking-management-email` (5 min) · `booking-admin-reminders` (06:00 UTC) |
+| Migraciones SQL | `20260701-kill-notion-gestion.sql` · `20260701b-rental-documents.sql` · `20260702-management-email-schedule.sql` |
+| Prueba emails | `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]` |
 
 ---
 
@@ -438,6 +453,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[SISTEMA-VEHICULOS-VENDIDOS.md](./04-referencia/vehiculos/SISTEMA-VEHICULOS-VENDIDOS.md)** | 🚗 **NUEVO** - Estado vendido e informes | Admin vehículos, calendario, informes, daños |
 | **[INFORMES-HISTORICO-EXCEL.md](./04-referencia/admin/INFORMES-HISTORICO-EXCEL.md)** | 📊 **NUEVO** - Histórico Excel + modos de ingresos | Antes de tocar `/administrator/informes` o reimportar histórico |
 | **[CONTRATOS-FIRMADOS.md](./04-referencia/admin/CONTRATOS-FIRMADOS.md)** | ✍️ Contratos firmados online — listar, descargar, eliminar | `/administrator/contratos-firmados` |
+| **[KILL-NOTION-SISTEMA-GESTION.md](./04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md)** | 📋 **NUEVO** — Gestión alquileres (checklist, 6 emails, docs IA, crons) | Antes de tocar `/administrator/administracion` o retirar Notion/n8n |
 | **[GESTION-CLIENTES-OBLIGATORIO.md](./GESTION-CLIENTES-OBLIGATORIO.md)** | ⚠️ Gestión de clientes | Antes de tocar `/reservar/nueva` o formularios de cliente |
 | **[FLUJO-RESERVAS-CRITICO.md](./FLUJO-RESERVAS-CRITICO.md)** | ⚠️ **CORE DEL NEGOCIO** - Flujo de reservas | Antes de tocar /reservar/** |
 | **[SISTEMA-CUPONES.md](./SISTEMA-CUPONES.md)** | 🎟️ Sistema de cupones de descuento | Antes de tocar cupones o `/reservar/nueva` |
@@ -530,7 +546,7 @@ Al refactorizar código para SEO (separar client/server), **copiar exactamente**
 | **[STRIPE-VERCEL-PRODUCCION.md](./STRIPE-VERCEL-PRODUCCION.md)** | ⚠️ **NUEVO** - 🚀 Configurar Stripe en Vercel (USAR ESTE) |
 | **[STRIPE-SETUP-RAPIDO.md](./STRIPE-SETUP-RAPIDO.md)** | Guía para desarrollo local (localhost) |
 | **[METODOS-PAGO-RESUMEN.md](./METODOS-PAGO-RESUMEN.md)** | ⚠️ **NUEVO** - Comparativa y decisiones de métodos de pago |
-| **[SISTEMA-EMAILS.md](./SISTEMA-EMAILS.md)** | Sistema completo de envío de emails |
+| **[SISTEMA-EMAILS.md](./04-referencia/emails/SISTEMA-EMAILS.md)** | Sistema completo de envío de emails (incl. gestión KILL NOTION §5) |
 | **[PRUEBAS-EMAILS.md](./PRUEBAS-EMAILS.md)** | Guía de testing del sistema de emails |
 | **[IMPLEMENTACION-EMAILS-RESUMEN.md](./IMPLEMENTACION-EMAILS-RESUMEN.md)** | Resumen técnico de la implementación |
 
@@ -749,7 +765,9 @@ Ver carpeta `scripts/`:
 | ¿Cómo configurar Stripe EN PRODUCCIÓN? | `STRIPE-VERCEL-PRODUCCION.md` ⚠️ **NUEVO** 🚀 |
 | ¿Cómo configurar Stripe en local? | `STRIPE-SETUP-RAPIDO.md` |
 | ¿Qué método de pago usar? | `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO** |
-| ¿Cómo configurar emails automáticos? | `SISTEMA-EMAILS.md` |
+| ¿Cómo configurar emails automáticos? | `04-referencia/emails/SISTEMA-EMAILS.md` |
+| ¿Cómo funciona la gestión de alquileres (KILL NOTION)? | `04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md` · `SISTEMA-EMAILS.md` §5 · `/administrator/administracion` |
+| ¿Cómo probar los 6 emails de gestión? | `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]` · `KILL-NOTION-SISTEMA-GESTION.md` |
 | ¿Cómo probar el sistema de emails? | `PRUEBAS-EMAILS.md` ⚠️ **NUEVO** |
 | ¿Cómo subo imágenes? | `02-desarrollo/media/GESTION-MEDIA-STORAGE.md`, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
 | ¿Cómo creo carpetas en storage? | `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |

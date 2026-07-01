@@ -63,11 +63,27 @@ export async function GET(req: NextRequest) {
       .order("pickup_date", { ascending: false })
       .limit(2000);
 
+    let searchMatchedVehicles = false;
+
     if (q) {
-      // Búsqueda por nº de reserva, nombre o email
-      query = query.or(
-        `booking_number.ilike.%${q}%,customer_name.ilike.%${q}%,customer_email.ilike.%${q}%`
-      );
+      const searchTerm = `%${q}%`;
+
+      const { data: matchingVehicles } = await supabase
+        .from("vehicles")
+        .select("id")
+        .or(`name.ilike.${searchTerm},internal_code.ilike.${searchTerm}`);
+
+      const vehicleIds = matchingVehicles?.map((v) => v.id) || [];
+      searchMatchedVehicles = vehicleIds.length > 0;
+      const orConditions = [
+        `booking_number.ilike.${searchTerm}`,
+        `customer_name.ilike.${searchTerm}`,
+        `customer_email.ilike.${searchTerm}`,
+      ];
+      if (vehicleIds.length > 0) {
+        orConditions.push(`vehicle_id.in.(${vehicleIds.join(",")})`);
+      }
+      query = query.or(orConditions.join(","));
     }
 
     const { data: bookings, error } = await query;
@@ -214,7 +230,11 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    return NextResponse.json({ ok: true, items });
+    return NextResponse.json({
+      ok: true,
+      items,
+      meta: q ? { searchMatchedVehicles } : undefined,
+    });
   } catch (e) {
     console.error("[admin/administracion] GET", e);
     return NextResponse.json({ ok: false, error: "Error del servidor." }, { status: 500 });

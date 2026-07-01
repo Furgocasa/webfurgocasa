@@ -72,17 +72,58 @@ Si no hay vehículo asignado: `SIN ASIGNAR` en el asunto.
 - `src/app/api/redsys/verify-payment/route.ts` (fallback Redsys)
 - `src/app/api/stripe/webhook/route.ts`
 
+### 5. Emails de gestión de alquileres (KILL NOTION — julio 2026)
+
+**Qué son:** 6 emails en **texto plano** (estilo operativo, firmados como gestión interna) que
+sustituyen las automatizaciones n8n/Notion. Panel admin: `/administrator/administracion`.
+
+**Documentación completa (fuente de verdad):**
+[`KILL-NOTION-SISTEMA-GESTION.md`](../admin/KILL-NOTION-SISTEMA-GESTION.md)
+
+| # | Tipo | Cuándo | ¿Se repite? |
+|---|------|--------|-------------|
+| 1 | Gestión inicial (`Alquiler…`) | **20 min** tras 1er pago + reserva `pending`→`confirmed` | No |
+| 2 | Recordatorio 2º pago | Desde **inicio − 15 días** si hay importe pendiente | **Sí, cada día** hasta pagar |
+| 3 | Recordatorio contrato | Desde **inicio − 15 días** si no firmó | **Sí, cada día** hasta firmar |
+| 4 | Recordatorio documentación | Desde **inicio − 15 días** si docs incompletas | **Sí, cada día** hasta completar |
+| 5 | Recordatorio fianza | Desde **inicio − 8 días** si fianza sin marcar | **Sí, cada día** hasta marcar |
+| 6 | Cita | Cuando 2ª factura + contrato + docs + fianza OK | **No** (una sola vez) |
+
+**Crons (Vercel):**
+- Email 1: `/api/cron/booking-management-email` — cada **5 min**
+- Emails 2–6: `/api/cron/booking-admin-reminders` — **06:00 UTC** (≈08:00 Madrid verano)
+
+**Archivos clave:**
+- Plantillas: `getBookingManagementEmail`, `getSecondPaymentReminderEmail`, etc. en `src/lib/email/templates.ts`
+- Envío: `src/lib/rental-admin/dispatch.ts`
+- Programación email 1: `src/lib/rental-admin/schedule-management-email.ts`
+- Prueba: `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]`
+
+> Estos 6 emails son **independientes** de los de confirmación de pago (secciones 2 y 4) y del
+> contrato firmado (sección 3).
+
 ## 📁 Estructura de Archivos
 
 ```
 src/
 ├── lib/
-│   └── email/
-│       ├── index.ts              # Funciones principales de envío
-│       ├── smtp-client.ts        # Cliente SMTP (Nodemailer)
-│       └── templates.ts          # Plantillas HTML de emails (4 plantillas)
+│   ├── email/
+│   │   ├── index.ts              # Funciones principales de envío
+│   │   ├── smtp-client.ts        # Cliente SMTP (Nodemailer)
+│   │   └── templates.ts          # Plantillas HTML + gestión KILL NOTION (texto plano)
+│   └── rental-admin/
+│       ├── dispatch.ts           # Envío compartido emails gestión 1–6
+│       └── schedule-management-email.ts  # Programa email 1 (+20 min)
 └── app/
     └── api/
+        ├── admin/
+        │   └── administracion/
+        │       ├── route.ts              # Checklist gestión alquileres
+        │       ├── send-email/route.ts   # Reenvío manual emails 1–6
+        │       └── documents/route.ts    # Docs subidos por cliente
+        ├── rental-docs/
+        │   ├── validate-booking/route.ts
+        │   └── upload/route.ts
         ├── bookings/
         │   └── send-email/
         │       └── route.ts      # API endpoint para envío manual / reenvío desde admin
@@ -97,8 +138,9 @@ src/
         ├── admin/
         │   └── signed-contracts/route.ts  # Listar / eliminar contratos firmados
         ├── cron/
-        │   └── return-reminders/
-        │       └── route.ts      # Cron: recordatorio de devolución (diario 18:00 UTC)
+        │   ├── return-reminders/route.ts           # Devolución (diario 18:00 UTC)
+        │   ├── booking-management-email/route.ts   # Email gestión 1 (cada 5 min)
+        │   └── booking-admin-reminders/route.ts    # Recordatorios 2–5 + cita 6 (06:00 UTC)
         ├── test-email/
         │   └── route.ts          # Endpoint de prueba SMTP
         └── test-return-reminder/
@@ -346,7 +388,7 @@ Si tienes problemas con el envío de emails:
 3. Comprueba el dashboard de Resend para ver el estado de los envíos
 4. Verifica que el dominio esté correctamente verificado en Resend
 
-### 4. Recordatorio de Devolución (víspera del dropoff)
+### 6. Recordatorio de Devolución (víspera del dropoff)
 **Cuándo:** Automático, cada día a las 20:00 h (Madrid) vía Vercel Cron.
 
 **Quién recibe:**
@@ -393,8 +435,8 @@ Archivo: `supabase/migrations/20260323-add-return-reminder-sent.sql`
 Ideas para futuras mejoras:
 
 - [x] ~~Email de recordatorio de devolución la víspera~~ ✅ Implementado (marzo 2026)
+- [x] ~~Emails de gestión de alquileres (KILL NOTION): gestión, recordatorios 2–5, cita~~ ✅ Julio 2026 — ver sección 5 y [`KILL-NOTION-SISTEMA-GESTION.md`](../admin/KILL-NOTION-SISTEMA-GESTION.md)
 - [ ] Email de recordatorio 7 días antes de la recogida
-- [ ] Email de recordatorio para el segundo pago
 - [ ] Email de agradecimiento después de la devolución
 - [ ] Email con encuesta de satisfacción
 - [ ] Emails en múltiples idiomas según el usuario
@@ -403,10 +445,11 @@ Ideas para futuras mejoras:
 
 ---
 
-**Última actualización:** 4 de junio de 2026
-**Versión:** 1.4.0
+**Última actualización:** 1 de julio de 2026
+**Versión:** 1.5.0
 
 **Changelog del documento:**
+- `1.5.0` (01/07/2026) — Emails de gestión de alquileres KILL NOTION (6 emails, crons, panel `/administrator/administracion`). Guía completa en `KILL-NOTION-SISTEMA-GESTION.md`.
 - `1.4.0` (04/06/2026) — Email de contrato firmado online (`/api/contracts/sign`), asunto con vehículo + fecha inicio + nombre (sin nº reserva).
 - `1.3.0` (21/05/2026) — Documentado envío automático de emails en webhook Stripe (`checkout.session.completed`), alineado con Redsys; reenvío manual vía `/api/bookings/send-email`.
 - `1.2.0` (29/04/2026) — Añadido aviso de hora flexible en el recordatorio de devolución (asterisco rojo + nota explicativa); script de prueba sin admin (`scripts/test-return-reminder-email.ts`).

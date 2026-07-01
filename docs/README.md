@@ -91,6 +91,7 @@ Documentación técnica de referencia:
 - Buscador global inteligente
 - Panel de administración
 - **Calendario admin — reasignación ágil + edición inline** (abr. 2026): reservas sin vehículo asignado (`vehicle_id` nullable), filas "Sin asignar N" en el Gantt, modal emergente con editores inline de estado/vehículo/fechas/horas/ubicaciones y fix de `total_price` con comisión Stripe — ver [`CALENDARIO-ADMIN-EDICION.md`](./04-referencia/admin/CALENDARIO-ADMIN-EDICION.md)
+- **Gestión de alquileres KILL NOTION** (jul. 2026): checklist operativa en `/administrator/administracion` (sustituye Notion+n8n), 6 emails de gestión, subida documentación cliente con IA, crons automáticos — guía completa [`KILL-NOTION-SISTEMA-GESTION.md`](./04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md); resumen en [`SISTEMA-EMAILS.md`](./04-referencia/emails/SISTEMA-EMAILS.md) sección 5
 
 #### pwa/
 - Progressive Web App
@@ -114,11 +115,13 @@ Documentación técnica de referencia:
 - **Listados grid (mar. 2026):** flota (`vehicle-list-client`), ventas (`sale-vehicle-card` + `ventas-client`), búsqueda (`vehicle-card`); transmisión vía `isAutomaticTransmission()` — ver **PAGINAS-VEHICULOS-GARANTIA.md**
 
 #### emails/
-- Sistema de emails automatizados (reserva creada, 1.er pago, 2.º pago, **recordatorio devolución**)
+- Sistema de emails automatizados (reserva creada, 1.er pago, 2.º pago, **recordatorio devolución**, **gestión de alquileres KILL NOTION**)
 - Templates y configuración SMTP (OVH)
 - Cron diario de recordatorio de devolución (`/api/cron/return-reminders`, 20:00 Madrid)
+- **Gestión de alquileres (jul. 2026):** 6 emails texto plano + crons (`booking-management-email` cada 5 min, `booking-admin-reminders` 06:00 UTC) — ver [`SISTEMA-EMAILS.md`](./04-referencia/emails/SISTEMA-EMAILS.md) sección 5 y [`KILL-NOTION-SISTEMA-GESTION.md`](./04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md)
 - 🆕 **Aviso de hora flexible (abr. 2026):** asterisco rojo `(*)` junto a la hora + nota explicativa en rojo bajo la tabla "Tu devolución" para evitar que los clientes se asusten cuando se les ha ampliado verbalmente el margen — ver [`SISTEMA-EMAILS.md`](./04-referencia/emails/SISTEMA-EMAILS.md) (v1.2.0).
-- Script de prueba sin admin: `npx tsx scripts/test-return-reminder-email.ts [BOOKING_NUMBER]` (envía solo a `reservas@furgocasa.com`).
+- Script de prueba recordatorio devolución: `npx tsx scripts/test-return-reminder-email.ts [BOOKING_NUMBER]` (envía solo a `reservas@furgocasa.com`).
+- Script de prueba emails gestión: `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]`
 - Campañas masivas en carpeta local `emails/mailing/` (no versionada; ver `emails/README.md` y `.gitignore`)
 
 #### sistemas/

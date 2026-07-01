@@ -11,6 +11,12 @@
 - **Ámbito:** nueva sección `administrator/administracion` + emails + subida de
   documentación del cliente con validación por IA.
 
+**Documentación relacionada (índice general):**
+- [`docs/INDICE-DOCUMENTACION.md`](../../INDICE-DOCUMENTACION.md) — sección *Julio 2026 — KILL NOTION*
+- [`docs/04-referencia/emails/SISTEMA-EMAILS.md`](../emails/SISTEMA-EMAILS.md) — sección 5 (resumen emails)
+- [`README.md`](../../../README.md) — sección *Julio 2026 — Gestión de alquileres KILL NOTION*
+- [`docs/README.md`](../../README.md) — áreas `admin/` y `emails/`
+
 ---
 
 ## 1. Contexto: qué hacía Notion (y n8n) hasta ahora
