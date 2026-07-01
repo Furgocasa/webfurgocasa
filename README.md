@@ -247,14 +247,18 @@ La operativa de seguimiento de alquileres (checklist, recordatorios y cita) vive
 | 6 emails gestión (texto plano) | `src/lib/email/templates.ts` · envío `src/lib/rental-admin/dispatch.ts` |
 | Email 1 (+20 min tras 1er pago) | `src/lib/rental-admin/schedule-management-email.ts` · cron `/api/cron/booking-management-email` (cada 5 min) |
 | Recordatorios 2–5 + cita 6 | cron `/api/cron/booking-admin-reminders` (06:00 UTC ≈ 08:00 Madrid verano) |
-| Docs cliente + IA | `/es/documentacion-alquiler` · `src/lib/rental-docs/` · `src/app/api/rental-docs/` |
-| Tabla checklist | `booking_admin_checklist` (+ `management_email_due_at`) |
-| Migraciones SQL | `20260701-kill-notion-gestion.sql` · `20260701b-rental-documents.sql` · `20260702-management-email-schedule.sql` |
+| Docs cliente + IA | `/es/documentacion-alquiler` · `src/lib/rental-docs/` (`ai-validate`, `cross-check`, `veracity-agent`) · `src/app/api/rental-docs/` |
+| Panel revisión docs | `/administrator/documentacion` · `src/app/api/admin/documentacion/route.ts` (verificar / revalidar IA) |
+| Aviso interno doc subida | `getDocsUploadedAdminEmail` → `reservas@` en cada subida |
+| Tabla checklist / docs | `booking_admin_checklist` · `rental_documents` (+ `is_driver`) |
+| Migraciones SQL | `20260701-kill-notion-gestion.sql` · `20260701b-rental-documents.sql` · `20260702-management-email-schedule.sql` · `20260703-booking-admin-contract-received.sql` · `20260705-rental-documents-roles.sql` |
 | Prueba emails | `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]` |
 
-**Emails (resumen):** (1) gestión inicial 20 min post-pago; (2–4) recordatorios diarios desde inicio−15 días (2º pago, contrato, docs); (5) fianza desde inicio−8 días; (6) cita única cuando todo OK.
+**Emails (resumen):** (1) gestión inicial 20 min post-pago; (2–4) recordatorios diarios desde inicio−15 días (2º pago, contrato, docs); (5) fianza desde inicio−8 días; (6) cita única cuando todo OK. Además, **aviso interno** a `reservas@` en cada subida de documentación.
 
-**Documentación:** [`docs/04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md`](./docs/04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md) (guía completa) · [`SISTEMA-EMAILS.md`](./docs/04-referencia/emails/SISTEMA-EMAILS.md) sección 5
+**Verificación documental (RD 933/2021):** extracción IA (GPT-4o Vision) + **cotejo determinista** contra la reserva + **coherencia DNI↔carnet** + **agente de veracidad** (detecta capturas de pantalla, fotocopias y manipulación). Roles **arrendatario** (obligatorio aunque no conduzca) y **conductores** (`is_driver`).
+
+**Documentación:** [`docs/04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md`](./docs/04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md) (guía completa, incl. marco legal sección 11) · [`SISTEMA-EMAILS.md`](./docs/04-referencia/emails/SISTEMA-EMAILS.md) sección 5
 
 ---
 

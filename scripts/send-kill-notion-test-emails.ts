@@ -25,6 +25,7 @@ import {
   getDocumentationReminderEmail,
   getDepositReminderEmail,
   getAppointmentEmail,
+  getDocsUploadedAdminEmail,
   type AdminGestionEmailData,
 } from "@/lib/email/templates";
 
@@ -39,6 +40,9 @@ const EMAIL_ALIASES: Record<string, string> = {
   contrato: "3-contrato",
   fianza: "5-fianza",
   cita: "6-cita",
+  aviso: "7-aviso-doc-subida",
+  notif: "7-aviso-doc-subida",
+  subida: "7-aviso-doc-subida",
 };
 
 async function main() {
@@ -134,6 +138,70 @@ async function main() {
   console.log("");
   console.log("✉️  Destinatario del test:", TO);
   console.log("");
+
+  // Caso especial: aviso interno al administrador de documentación subida.
+  // Enviamos 3 variantes (validado, requiere revisión, arrendatario ≠ conductor).
+  if (onlyKey === "7-aviso-doc-subida") {
+    const base = {
+      bookingId: booking.id,
+      bookingNumber: booking.booking_number,
+      customerName: fullName,
+      vehicleInternalCode: emailData.vehicleInternalCode,
+      vehicleName: emailData.vehicleName,
+      pickupDate: booking.pickup_date,
+    };
+    const variants = [
+      {
+        label: "validado",
+        data: {
+          ...base,
+          driverTitle: "Conductor titular",
+          driverLabel: fullName,
+          docLabel: "DNI (anverso)",
+          aiStatus: "ok" as const,
+          aiNotes: "Documento legible y del tipo esperado.",
+          crossIssues: [],
+          arrendatarioMismatch: false,
+        },
+      },
+      {
+        label: "revisar",
+        data: {
+          ...base,
+          driverTitle: "Conductor titular",
+          driverLabel: fullName,
+          docLabel: "Carnet de conducir (reverso)",
+          aiStatus: "warning" as const,
+          aiNotes: "Imagen algo borrosa en la tabla de categorías.",
+          crossIssues: ["Antigüedad carnet ≥ 2 años: no se ha podido confirmar la fecha de la categoría B."],
+          arrendatarioMismatch: false,
+        },
+      },
+      {
+        label: "arrendatario-distinto",
+        data: {
+          ...base,
+          driverTitle: "Conductor titular",
+          driverLabel: "Otra persona",
+          docLabel: "DNI (anverso)",
+          aiStatus: "warning" as const,
+          aiNotes: "El nombre del documento no coincide con el titular de la reserva.",
+          crossIssues: ["El nombre del documento no coincide con el titular."],
+          arrendatarioMismatch: true,
+        },
+      },
+    ];
+    const sleepMs = (ms: number) => new Promise((r) => setTimeout(r, ms));
+    for (let i = 0; i < variants.length; i++) {
+      const v = variants[i];
+      const { subject, html } = getDocsUploadedAdminEmail(v.data);
+      const res = await sendEmail({ to: TO, subject: `[TEST ${v.label}] ${subject}`, html, skipCompanyCopy: true });
+      console.log(res.success ? `✅ ${v.label} → enviado (${subject})` : `❌ ${v.label} → FALLÓ: ${res.error}`);
+      if (i < variants.length - 1) await sleepMs(4000);
+    }
+    console.log("\n✔️  Avisos de prueba enviados. Revisa la bandeja de", TO);
+    return;
+  }
 
   const emails = [
     { key: "1-gestion", build: getBookingManagementEmail },

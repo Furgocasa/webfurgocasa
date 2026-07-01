@@ -102,6 +102,23 @@ sustituyen las automatizaciones n8n/Notion. Panel admin: `/administrator/adminis
 > Estos 6 emails son **independientes** de los de confirmación de pago (secciones 2 y 4) y del
 > contrato firmado (sección 3).
 
+#### 5.1 Aviso interno de documentación subida (solo a `reservas@`)
+
+**Qué es:** email **interno** (no se envía al cliente) que se dispara **cada vez
+que un cliente sube un documento** desde `/es/documentacion-alquiler`.
+
+**Contenido:** documento y conductor, **veredicto** de la IA + cotejo + agente de
+veracidad (✅ validado / ⚠️ requiere revisión / ❌ error / 🕐 pendiente), avisos del
+cotejo, aviso legal si el titular no coincide con el arrendatario (RD 933/2021), y
+enlaces al panel `/administrator/documentacion` y a la ficha de la reserva.
+
+- Plantilla: `getDocsUploadedAdminEmail` en `src/lib/email/templates.ts`
+- Disparo: `src/app/api/rental-docs/upload/route.ts` (a `COMPANY_EMAIL`, `skipCompanyCopy`)
+- Prueba (3 variantes): `npx tsx scripts/send-kill-notion-test-emails.ts aviso`
+
+> Detalle del agente de veracidad, cotejo, coherencia DNI↔carnet y roles
+> arrendatario/conductor en [`KILL-NOTION-SISTEMA-GESTION.md`](../admin/KILL-NOTION-SISTEMA-GESTION.md) (secciones 7 y 11).
+
 ## 📁 Estructura de Archivos
 
 ```
@@ -446,9 +463,10 @@ Ideas para futuras mejoras:
 ---
 
 **Última actualización:** 1 de julio de 2026
-**Versión:** 1.5.0
+**Versión:** 1.6.0
 
 **Changelog del documento:**
+- `1.6.0` (01/07/2026) — Aviso interno de documentación subida a `reservas@` (`getDocsUploadedAdminEmail`, sección 5.1) con veredicto IA + agente de veracidad + cotejo, y roles arrendatario/conductor (RD 933/2021).
 - `1.5.0` (01/07/2026) — Emails de gestión de alquileres KILL NOTION (6 emails, crons, panel `/administrator/administracion`). Guía completa en `KILL-NOTION-SISTEMA-GESTION.md`.
 - `1.4.0` (04/06/2026) — Email de contrato firmado online (`/api/contracts/sign`), asunto con vehículo + fecha inicio + nombre (sin nº reserva).
 - `1.3.0` (21/05/2026) — Documentado envío automático de emails en webhook Stripe (`checkout.session.completed`), alineado con Redsys; reenvío manual vía `/api/bookings/send-email`.

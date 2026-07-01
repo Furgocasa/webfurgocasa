@@ -111,7 +111,7 @@ export async function GET(req: NextRequest) {
         .in("booking_id", ids),
       supabase
         .from("rental_documents")
-        .select("booking_id, driver_index, doc_kind, ai_status")
+        .select("booking_id, driver_index, doc_kind, ai_status, is_driver")
         .in("booking_id", ids),
     ]);
 
@@ -131,13 +131,16 @@ export async function GET(req: NextRequest) {
     // Documentos por reserva → por conductor
     const docsByBooking = new Map<
       string,
-      Map<number, { kinds: Record<string, string> }>
+      Map<number, { kinds: Record<string, string>; isDriver: boolean }>
     >();
     for (const d of docsRes.data || []) {
       if (!docsByBooking.has(d.booking_id)) docsByBooking.set(d.booking_id, new Map());
       const drivers = docsByBooking.get(d.booking_id)!;
-      if (!drivers.has(d.driver_index)) drivers.set(d.driver_index, { kinds: {} });
-      drivers.get(d.driver_index)!.kinds[d.doc_kind] = d.ai_status;
+      if (!drivers.has(d.driver_index))
+        drivers.set(d.driver_index, { kinds: {}, isDriver: (d as { is_driver?: boolean }).is_driver !== false });
+      const entry = drivers.get(d.driver_index)!;
+      entry.kinds[d.doc_kind] = d.ai_status;
+      if ((d as { is_driver?: boolean }).is_driver === false) entry.isDriver = false;
     }
 
     const items = (bookings || []).map((b) => {
@@ -145,8 +148,9 @@ export async function GET(req: NextRequest) {
       const sent = dispatchByBooking.get(b.id) || new Set<string>();
       const drivers = docsByBooking.get(b.id);
 
-      // Documentación auto: el titular (conductor 0) tiene DNI anverso + carnet
-      // anverso validados OK por la IA. (aproximación; el admin puede hacer override)
+      // Documentación auto (RD 933/2021): el arrendatario (index 0) tiene DNI
+      // anverso OK, y CADA conductor (is_driver) tiene DNI anverso + carnet
+      // anverso OK. (aproximación; el admin puede hacer override manual)
       let docsAutoOk = false;
       let docsUploadedCount = 0;
       let driversCount = 0;
@@ -155,14 +159,15 @@ export async function GET(req: NextRequest) {
         for (const [, dv] of drivers) {
           docsUploadedCount += Object.keys(dv.kinds).length;
         }
-        const titular = drivers.get(0);
-        if (
-          titular &&
-          titular.kinds["dni_front"] === "ok" &&
-          titular.kinds["license_front"] === "ok"
-        ) {
-          docsAutoOk = true;
-        }
+        const arrendatario = drivers.get(0);
+        const arrendatarioOk = !!arrendatario && arrendatario.kinds["dni_front"] === "ok";
+        const conductores = [...drivers.values()].filter((dv) => dv.isDriver);
+        const conductoresOk =
+          conductores.length > 0 &&
+          conductores.every(
+            (dv) => dv.kinds["dni_front"] === "ok" && dv.kinds["license_front"] === "ok"
+          );
+        docsAutoOk = arrendatarioOk && conductoresOk;
       }
 
       const documentationReceived = Boolean(chk.documentation_received);

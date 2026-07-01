@@ -21,12 +21,17 @@ import { verifySignSessionToken } from "@/lib/contracts/config";
 import {
   RENTAL_DOCS_BUCKET,
   DOC_KINDS,
+  DOC_KIND_LABELS,
   MAX_DOC_SIZE_BYTES,
   MAX_DRIVERS,
   isAllowedDocMime,
   type DocKind,
 } from "@/lib/rental-docs/config";
 import { validateDocImage } from "@/lib/rental-docs/ai-validate";
+import { crossCheckDocument, combineAiAndCrossCheck, type CrossCheckResult } from "@/lib/rental-docs/cross-check";
+import { analyzeVeracity, applyVeracityToStatus } from "@/lib/rental-docs/veracity-agent";
+import { sendEmail, getCompanyEmail } from "@/lib/email/smtp-client";
+import { getDocsUploadedAdminEmail } from "@/lib/email/templates";
 import {
   checkRateLimit,
   getClientIP,
@@ -57,6 +62,8 @@ export async function POST(req: NextRequest) {
     const docKind = String(form.get("docKind") || "") as DocKind;
     const driverIndex = parseInt(String(form.get("driverIndex") || "0"), 10);
     const driverLabel = String(form.get("driverLabel") || "").slice(0, 120) || null;
+    // El arrendatario (index 0) puede no conducir; el resto son conductores.
+    const isDriver = String(form.get("isDriver") ?? "true") !== "false";
     const file = form.get("file");
 
     const session = verifySignSessionToken(sessionToken);
@@ -96,12 +103,28 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient();
 
-    // Nombre del titular para el cotejo IA
+    // Datos de la reserva + cliente para el cotejo (nombre, DNI, nacimiento, recogida)
     const { data: booking } = await supabase
       .from("bookings")
-      .select("customer_name")
+      .select(
+        `customer_name, pickup_date, booking_number,
+         vehicle:vehicles!vehicle_id(name, internal_code),
+         customer:customers!customer_id(name, dni, date_of_birth)`
+      )
       .eq("id", session.bookingId)
       .maybeSingle();
+
+    const bookingRow = booking as
+      | {
+          customer_name?: string | null;
+          pickup_date?: string | null;
+          booking_number?: string | null;
+          vehicle?: { name?: string | null; internal_code?: string | null } | null;
+          customer?: { name?: string | null; dni?: string | null; date_of_birth?: string | null } | null;
+        }
+      | null;
+    const customer = bookingRow?.customer || null;
+    const titularName = customer?.name || bookingRow?.customer_name || null;
 
     // Ruta estable (sin extensión) → re-subir reemplaza y no deja huérfanos.
     const storagePath = `bookings/${session.bookingId}/${driverIndex}/${docKind}`;
@@ -123,13 +146,45 @@ export async function POST(req: NextRequest) {
       extracted: Record<string, unknown>;
       notes: string;
     };
+    let crossResult: CrossCheckResult | null = null;
     if (mime.startsWith("image/") && mime !== "image/heic" && mime !== "image/heif") {
       const dataUrl = `data:${mime};base64,${buffer.toString("base64")}`;
-      ai = await validateDocImage({
+      const aiResult = await validateDocImage({
         docKind,
         imageDataUrl: dataUrl,
-        expectedName: (booking as { customer_name?: string } | null)?.customer_name || null,
+        expectedName: titularName,
       });
+      // Cotejo determinista contra los datos reales del titular.
+      crossResult = crossCheckDocument({
+        docKind,
+        extracted: aiResult.extracted,
+        customerName: titularName,
+        customerDni: customer?.dni || null,
+        customerBirthDate: customer?.date_of_birth || null,
+        pickupDate: bookingRow?.pickup_date || null,
+      });
+      const combined = combineAiAndCrossCheck(aiResult.status, aiResult.notes, crossResult);
+
+      // 2ª pasada: agente de veracidad (forense) sobre la misma imagen.
+      const veracity = await analyzeVeracity({
+        docKind,
+        imageDataUrl: dataUrl,
+        extracted: aiResult.extracted,
+      });
+      const withVeracity = applyVeracityToStatus(combined.status, combined.notes, veracity);
+
+      ai = {
+        status: withVeracity.status,
+        extracted: {
+          ...aiResult.extracted,
+          _veracity: {
+            status: veracity.status,
+            flags: veracity.flags,
+            confidence: veracity.confidence,
+          },
+        },
+        notes: withVeracity.notes,
+      };
     } else if (mime === "image/heic" || mime === "image/heif") {
       ai = {
         status: "pending",
@@ -150,6 +205,7 @@ export async function POST(req: NextRequest) {
       booking_id: session.bookingId,
       driver_index: driverIndex,
       driver_label: driverLabel,
+      is_driver: isDriver,
       doc_kind: docKind,
       storage_path: storagePath,
       mime_type: mime,
@@ -168,6 +224,36 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ¿El titular subido no coincide con quien hizo la reserva? (RD 933/2021:
+    // hay que registrar también al arrendatario aunque no conduzca).
+    const nameItem = crossResult?.items.find((i) => i.key === "name");
+    const arrendatarioMismatch = driverIndex === 0 && nameItem?.level === "error";
+    const crossIssues = (crossResult?.items || [])
+      .filter((i) => i.level === "warning" || i.level === "error")
+      .map((i) => i.detail || i.label);
+
+    // Aviso interno a reservas@ (no bloquea la respuesta al cliente si falla).
+    try {
+      const { subject, html } = getDocsUploadedAdminEmail({
+        bookingId: session.bookingId,
+        bookingNumber: bookingRow?.booking_number || session.bookingId.slice(0, 8),
+        customerName: titularName || "Cliente",
+        vehicleInternalCode: bookingRow?.vehicle?.internal_code || undefined,
+        vehicleName: bookingRow?.vehicle?.name || undefined,
+        pickupDate: bookingRow?.pickup_date || undefined,
+        driverTitle: driverIndex === 0 ? "Conductor titular" : `Conductor ${driverIndex + 1}`,
+        driverLabel,
+        docLabel: DOC_KIND_LABELS[docKind] || docKind,
+        aiStatus: ai.status,
+        aiNotes: ai.notes,
+        crossIssues,
+        arrendatarioMismatch,
+      });
+      await sendEmail({ to: getCompanyEmail(), subject, html, skipCompanyCopy: true });
+    } catch (mailErr) {
+      console.error("[rental-docs/upload] aviso reservas@ falló:", mailErr);
+    }
+
     return NextResponse.json({
       ok: true,
       doc: {
@@ -175,6 +261,7 @@ export async function POST(req: NextRequest) {
         docKind,
         aiStatus: ai.status,
         aiNotes: ai.notes,
+        arrendatarioMismatch,
       },
     });
   } catch (e) {

@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     const supabase = createAdminClient();
     const { data: docs } = await supabase
       .from("rental_documents")
-      .select("driver_index, driver_label, doc_kind, ai_status, ai_notes, uploaded_at")
+      .select("driver_index, driver_label, is_driver, doc_kind, ai_status, ai_notes, uploaded_at")
       .eq("booking_id", result.booking.bookingId)
       .order("driver_index", { ascending: true });
 

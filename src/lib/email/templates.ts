@@ -1330,3 +1330,140 @@ export function getAppointmentEmail(data: AdminGestionEmailData): AdminGestionEm
   ]);
   return { subject: buildRentalSubject('Cita', data), html };
 }
+
+/* ============================================================================
+ * AVISO INTERNO — Documentación subida por el cliente
+ * ----------------------------------------------------------------------------
+ * Se envía SOLO a reservas@furgocasa.com cuando un cliente sube un documento.
+ * Informa de qué se ha subido, el veredicto de la IA + cotejo (RD 933/2021) y
+ * si requiere verificación manual, con enlaces al panel de administración.
+ * ==========================================================================*/
+
+export interface DocsUploadedAdminEmailData {
+  bookingId: string;
+  bookingNumber: string;
+  customerName: string;
+  vehicleInternalCode?: string;
+  vehicleName?: string;
+  pickupDate?: string;
+  /** Etiqueta del conductor (titular / conductor N). */
+  driverTitle: string;
+  /** Nombre del conductor tal cual lo escribió el cliente (opcional). */
+  driverLabel?: string | null;
+  /** Etiqueta del documento subido (p. ej. "DNI (anverso)"). */
+  docLabel: string;
+  aiStatus: 'pending' | 'ok' | 'warning' | 'error';
+  aiNotes?: string | null;
+  /** Avisos del cotejo contra los datos de la reserva/cliente. */
+  crossIssues?: string[];
+  /** true si es el conductor titular y su nombre NO coincide con el arrendatario. */
+  arrendatarioMismatch?: boolean;
+}
+
+const ADMIN_STATUS_META: Record<
+  DocsUploadedAdminEmailData['aiStatus'],
+  { title: string; bg: string; border: string; verdict: string }
+> = {
+  ok: {
+    title: '✅ Validado por la IA',
+    bg: '#d1fae5',
+    border: '#10b981',
+    verdict: 'La IA ha validado el documento y los datos cuadran con la reserva. Conviene una revisión rápida de confirmación.',
+  },
+  warning: {
+    title: '⚠️ Requiere verificación manual',
+    bg: '#fef3c7',
+    border: '#f59e0b',
+    verdict: 'La IA ha detectado algo que revisar. Verifica el documento manualmente antes de darlo por bueno.',
+  },
+  error: {
+    title: '❌ Documento con error',
+    bg: '#fee2e2',
+    border: '#ef4444',
+    verdict: 'La IA no ha podido validar el documento (ilegible, tipo incorrecto o datos que no coinciden). Requiere revisión manual.',
+  },
+  pending: {
+    title: '🕐 Pendiente de revisión manual',
+    bg: '#f3f4f6',
+    border: '#9ca3af',
+    verdict: 'El documento no se ha podido validar automáticamente (PDF o formato HEIC). Revísalo manualmente.',
+  },
+};
+
+export function getDocsUploadedAdminEmail(data: DocsUploadedAdminEmailData): AdminGestionEmail {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.furgocasa.com';
+  const adminDocsUrl = `${siteUrl}/administrator/documentacion`;
+  const adminBookingUrl = `${siteUrl}/administrator/reservas/${data.bookingId}/editar`;
+  const meta = ADMIN_STATUS_META[data.aiStatus] || ADMIN_STATUS_META.pending;
+  const vehicleInfo = data.vehicleInternalCode
+    ? `${data.vehicleInternalCode}${data.vehicleName ? ` - ${data.vehicleName}` : ''}`
+    : data.vehicleName || '—';
+
+  const issues = (data.crossIssues || []).filter(Boolean);
+
+  const content = `
+    <tr>
+      <td style="padding: 30px 20px 10px 20px;">
+        <h2 style="margin: 0 0 8px 0; color: #111827; font-size: 20px;">Nueva documentación subida</h2>
+        <p style="margin: 0; font-size: 14px; color: #374151;">
+          Un cliente ha subido documentación desde la web. Resumen y veredicto de la IA:
+        </p>
+      </td>
+    </tr>
+
+    ${alertBox(meta.title, meta.verdict, meta.bg, meta.border)}
+
+    ${sectionTitle('📄 Documento subido')}
+    ${detailsTable(`
+      ${tableRow('Conductor', `${data.driverTitle}${data.driverLabel ? ` · ${data.driverLabel}` : ''}`)}
+      ${tableRow('Documento', data.docLabel)}
+      ${tableRow('Estado IA', meta.title)}
+      ${data.aiNotes ? tableRow('Notas IA', data.aiNotes) : ''}
+    `)}
+
+    ${
+      issues.length > 0
+        ? `${sectionTitle('🔎 Cotejo con la reserva')}
+    <tr>
+      <td style="padding: 10px 20px;">
+        <ul style="margin: 0; padding-left: 20px; font-size: 13px; color: #b45309; line-height: 1.7;">
+          ${issues.map((i) => `<li>${i}</li>`).join('')}
+        </ul>
+      </td>
+    </tr>`
+        : ''
+    }
+
+    ${
+      data.arrendatarioMismatch
+        ? alertBox(
+            '👥 Falta documentación del arrendatario',
+            'El nombre del conductor titular NO coincide con la persona que hizo la reserva. Según el RD 933/2021 hay que registrar también al arrendatario. Habrá que pedir la documentación de quien hizo la reserva, aunque no conduzca.',
+            '#ede9fe',
+            '#7c3aed'
+          )
+        : ''
+    }
+
+    ${sectionTitle('📋 Reserva')}
+    ${detailsTable(`
+      ${tableRow('Nº reserva', data.bookingNumber)}
+      ${tableRow('Cliente', data.customerName)}
+      ${tableRow('Vehículo', vehicleInfo)}
+      ${data.pickupDate ? tableRow('Recogida', formatDate(data.pickupDate)) : ''}
+    `)}
+
+    ${ctaButton('Revisar documentación en el panel', adminDocsUrl)}
+
+    <tr>
+      <td style="padding: 0 20px 30px 20px; text-align: center;">
+        <p style="margin: 0; font-size: 13px; color: #6b7280;">
+          O abre la <a href="${adminBookingUrl}" style="color: #063971;">ficha de la reserva</a>.
+        </p>
+      </td>
+    </tr>
+  `;
+
+  const preheader = `Doc subida · ${data.bookingNumber} · ${data.docLabel} · ${meta.title}`;
+  return { subject: `[Documentación] ${data.bookingNumber} · ${data.docLabel} — ${meta.title}`, html: getEmailBaseTemplate(content, preheader) };
+}

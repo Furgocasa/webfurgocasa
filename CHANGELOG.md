@@ -4,6 +4,33 @@ Historial de cambios y versiones del proyecto.
 
 ---
 
+## 🛡️ Verificación documental IA + veracidad + RD 933/2021 — 1 de julio de 2026
+
+**Objetivo:** verificar la documentación de alquiler más allá de la simple extracción, con base legal (RD 933/2021), y dar a los administradores un panel de revisión.
+
+**Extracción y cotejo (IA):**
+- Prompt reforzado con claves normalizadas (`full_name`, `document_number`, `birth_date`, `expiry_date`, `issue_date`, `license_b_since`, `categories`) en `src/lib/rental-docs/ai-validate.ts`.
+- **Cotejo determinista** (`src/lib/rental-docs/cross-check.ts`): compara nombre, nº de documento, fecha de nacimiento, caducidad y antigüedad del carnet (B ≥ 2 años) contra la reserva/cliente. Solo puede empeorar el `ai_status`.
+- **Coherencia DNI↔carnet** del mismo conductor (`crossCheckDriverCoherence`).
+
+**Agente de veracidad (2ª pasada):**
+- `src/lib/rental-docs/veracity-agent.ts`: análisis forense con GPT-4o (captura de pantalla, fotocopia, manipulación, MRZ, incoherencia de fechas). Guarda flags en `ai_extracted._veracity`. Desactivable con `RENTAL_DOCS_VERACITY=off`.
+
+**Roles arrendatario/conductor (RD 933/2021):**
+- Nueva columna `rental_documents.is_driver` (`supabase/migrations/20260705-rental-documents-roles.sql`).
+- UI de subida (`rental-docs-upload.tsx`): bloque del arrendatario (index 0, obligatorio aunque no conduzca) + conductores; aviso `arrendatarioMismatch` si el titular no coincide con la reserva.
+- `docsAutoOk` actualizado en `administracion/route.ts` y cron de recordatorios.
+
+**Panel de revisión + aviso interno:**
+- Página `/administrator/documentacion` + API `src/app/api/admin/documentacion/route.ts` (cola por reserva→conductor→documento, verificar/quitar/revalidar IA).
+- Email interno a `reservas@` en cada subida (`getDocsUploadedAdminEmail`).
+
+**Marco legal:** análisis del RD 933/2021 (BOE-A-2021-17461) en `KILL-NOTION-SISTEMA-GESTION.md` §11.
+
+**Documentación:** `docs/04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md` (§7 y §11), `docs/04-referencia/emails/SISTEMA-EMAILS.md` (§5.1).
+
+---
+
 ## 🚐 Dashboard operaciones + auto `confirmed` → `in_progress` — 11 de junio de 2026
 
 **Objetivo:** reducir trabajo manual en el panel admin al entregar campers y mostrar todas las devoluciones pendientes de revisión.

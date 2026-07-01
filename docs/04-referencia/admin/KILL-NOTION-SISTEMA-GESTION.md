@@ -333,14 +333,90 @@ Configuración en `vercel.json`. Autenticación: header `Authorization: Bearer C
 
 ## 7. Subida de documentación del cliente + IA
 
+> **Marco legal:** el sistema implementa el **RD 933/2021** (registro documental
+> de alquiler de vehículos, Anexo II). Obliga a registrar al **arrendatario**
+> (quien contrata, aunque no conduzca), al **conductor principal** y al
+> **segundo conductor**, con datos que **deben coincidir con el documento**
+> acreditativo (art. 4.3). Comunicación a Interior ≤24 h y conservación 3 años.
+> Ver análisis en la sección 11.
+
 - Identidad sin login: reutilizar `contracts/validate-booking` (nº reserva + email).
 - Subida directa a bucket privado `rental-documents` (patrón Storytellers
-  `upload-init` → signed URL → confirm), pero simple: 4 slots por conductor.
+  `upload-init` → signed URL → confirm), pero simple: 4 slots por persona.
 - Validación con **GPT-4o Vision** (OpenAI ya integrado, `src/lib/chatbot/server.ts`):
-  extrae nombre, nº documento, fecha nacimiento → edad, categoría B, antigüedad
-  del carnet (≥ 2 años, apartado 2.1), caducidades; coteja contra `customers`.
+  el prompt (`src/lib/rental-docs/ai-validate.ts`) pide claves normalizadas
+  (`full_name`, `document_number`, `birth_date`, `expiry_date`, `issue_date`,
+  `license_b_since`, `categories`) y devuelve `matches_expected_type`, `readable`,
+  `issues`, `confidence` → de ahí sale `ai_status` (ok/warning/error).
+- **Cotejo determinista** contra los datos reales (`src/lib/rental-docs/cross-check.ts`):
+  compara nombre y nº de documento con `customers`, valida la fecha de nacimiento,
+  la caducidad frente a la fecha de recogida y la antigüedad del carnet (categoría B
+  ≥ 2 años, `MIN_LICENSE_YEARS`). El resultado ajusta `ai_status`/`ai_notes` en la
+  subida y se recalcula en vivo en el panel de revisión.
 - UI de subida dentro de `es/documentacion-alquiler` (junto a la firma).
 - El recordatorio de documentación pasará a enlazar al link de subida.
+
+### 7.1 Roles: arrendatario vs conductores (RD 933/2021)
+
+- La subida distingue por **persona** (`driver_index`):
+  - **`driver_index = 0` = arrendatario** (quien hizo la reserva). Se registra
+    **siempre**, conduzca o no. El nombre viene precargado con el de la reserva.
+  - `driver_index ≥ 1` = conductores adicionales.
+- Columna **`rental_documents.is_driver`** (migración `20260705`): indica si esa
+  persona conduce. El arrendatario puede tener `is_driver = false`.
+- UI (`rental-docs-upload.tsx`): bloque fijo del arrendatario con checkbox
+  «También conducirá». Si NO conduce, solo se le piden los slots de **DNI** (se
+  ocultan los de carnet) y se avisa de añadir al conductor real.
+- **Caso mujer reserva / marido conduce:** si al subir el DNI del titular (index 0)
+  el nombre **no coincide** con el de la reserva, el backend devuelve
+  `arrendatarioMismatch` → la web muestra un banner pidiendo también la
+  documentación del arrendatario, y el email de aviso lo marca.
+- **`docsAutoOk`** (en `administracion/route.ts` y el cron de recordatorios) exige:
+  arrendatario con `dni_front = ok` **y** cada conductor (`is_driver`) con
+  `dni_front` + `license_front = ok`.
+
+### 7.2 Agente de veracidad (2ª pasada) — `src/lib/rental-docs/veracity-agent.ts`
+
+Tras la extracción, una **segunda llamada a GPT-4o** hace un análisis *forense*
+de la imagen (no vuelve a extraer datos). Detecta:
+
+- Manipulación digital / montaje (`tampering_suspected`).
+- **Foto de una pantalla o captura** (`is_screen_capture`: moiré, rejilla, reflejos).
+- **Fotocopia** en blanco y negro (`is_photocopy`).
+- **MRZ** presente en el reverso del DNI (`mrz_detected`).
+- **Incoherencia de fechas** (`date_inconsistency`).
+
+Devuelve `status` = `ok` | `suspicious` | `error` + `flags[]`. `applyVeracityToStatus`
+solo puede **empeorar** el `ai_status` (nunca mejorarlo). Se ejecuta en la subida
+y en la revalidación; se guarda en `ai_extracted._veracity`. Desactivable con
+`RENTAL_DOCS_VERACITY=off`.
+
+### 7.3 Coherencia entre documentos del mismo conductor
+
+`crossCheckDriverCoherence` (en `cross-check.ts`) comprueba que el **DNI y el
+carnet son de la misma persona** (mismo nombre y misma fecha de nacimiento). Se
+calcula en la API del panel y se muestra por conductor.
+
+### 7.4 Aviso interno de documentación subida (solo a reservas@)
+
+Cada vez que un cliente sube un documento, `upload/route.ts` envía un email a
+`reservas@furgocasa.com` (plantilla `getDocsUploadedAdminEmail` en `templates.ts`)
+con: documento y conductor, **veredicto IA + cotejo + veracidad**, avisos del
+cotejo, aviso legal si falta el arrendatario, y enlaces al panel y a la reserva.
+No se envía copia al cliente. Prueba: `npx tsx scripts/send-kill-notion-test-emails.ts aviso`.
+
+### Panel de revisión — `administrator/documentacion`
+
+- Cola de revisión agrupada por reserva → conductor → documentos.
+- Muestra la imagen (signed URL 1h), los datos extraídos por la IA, el cotejo
+  contra la reserva/cliente, la **coherencia DNI↔carnet** por conductor y el
+  **veredicto de veracidad** con sus señales, todo con semáforo (ok/aviso/error).
+- El conductor `index 0` se etiqueta como **«Arrendatario (titular)»**.
+- Acciones por documento: **Verificar** (guarda `verified_by`/`verified_at`),
+  **Quitar verificación** y **Revalidar IA** (re-descarga la imagen y relanza
+  validación + cotejo + veracidad).
+- Filtros por estado IA (errores/avisos/pendientes/correctos) y buscador por
+  reserva/cliente/vehículo. API: `src/app/api/admin/documentacion/route.ts`.
 
 ---
 
@@ -355,10 +431,12 @@ Configuración en `vercel.json`. Autenticación: header `Authorization: Bearer C
 
 ### Variables de entorno usadas
 - `OPENAI_API_KEY` (validación IA; opcional `OPENAI_VISION_MODEL`, por defecto `gpt-4o`).
+- `RENTAL_DOCS_VERACITY` (opcional; `off` desactiva el agente de veracidad de 2ª pasada).
 - `CONTRACTS_HMAC_SECRET` (o `STORYTELLERS_HMAC_SECRET`) para el token de sesión de subida.
 - `NEXT_PUBLIC_SITE_URL` (por defecto `https://www.furgocasa.com`).
 - `CRON_SECRET` (autenticación crons Vercel).
-- `COMPANY_EMAIL` (por defecto `reservas@furgocasa.com`, CC en emails de gestión).
+- `COMPANY_EMAIL` (por defecto `reservas@furgocasa.com`, CC en emails de gestión y
+  destinatario del aviso de documentación subida).
 
 ---
 
@@ -377,12 +455,14 @@ Configuración en `vercel.json`. Autenticación: header `Authorization: Bearer C
 - Config: `vercel.json`
 
 ### Admin UI + API
-- Página: `src/app/administrator/(protected)/administracion/page.tsx`
-- API: `src/app/api/admin/administracion/{route,send-email,documents}/route.ts`
-- Sidebar: `src/components/admin/sidebar.tsx`
+- Página administración: `src/app/administrator/(protected)/administracion/page.tsx`
+- Página documentación (revisión): `src/app/administrator/(protected)/documentacion/page.tsx`
+- API administración: `src/app/api/admin/administracion/{route,send-email,documents}/route.ts`
+- API documentación: `src/app/api/admin/documentacion/route.ts` (GET cola+cotejo+coherencia, PATCH verificar/revalidar)
+- Sidebar + móvil: `src/components/admin/{sidebar,bottom-tab-bar}.tsx`
 
 ### Subida documentación cliente
-- Config/IA: `src/lib/rental-docs/{config,ai-validate}.ts`
+- Config/IA: `src/lib/rental-docs/{config,ai-validate,cross-check,veracity-agent}.ts`
 - API: `src/app/api/rental-docs/{validate-booking,upload}/route.ts`
 - UI: `src/components/rental-docs/rental-docs-upload.tsx`
 - Página cliente: `src/app/es/documentacion-alquiler/`
@@ -391,6 +471,8 @@ Configuración en `vercel.json`. Autenticación: header `Authorization: Bearer C
 1. `supabase/migrations/20260701-kill-notion-gestion.sql`
 2. `supabase/migrations/20260701b-rental-documents.sql`
 3. `supabase/migrations/20260702-management-email-schedule.sql`
+4. `supabase/migrations/20260703-booking-admin-contract-received.sql`
+5. `supabase/migrations/20260705-rental-documents-roles.sql` (columna `is_driver`)
 
 ### Hooks de pago (programan email 1)
 - `src/app/api/redsys/notification/route.ts`
@@ -434,3 +516,29 @@ Cron diario 08:00 Madrid
         │
         └── 2ª fact + contrato + docs + fianza OK ──► Email 6: Cita (UNA vez)
 ```
+
+---
+
+## 11. Marco legal — RD 933/2021 (por qué verificamos la documentación)
+
+**Real Decreto 933/2021** ([BOE-A-2021-17461](https://www.boe.es/eli/es/rd/2021/10/26/933)),
+de registro documental e información de las actividades de hospedaje y **alquiler
+de vehículos a motor sin conductor**. Furgocasa entra en el **Anexo II**.
+
+**Obligaciones que aterrizan en el sistema:**
+
+| Norma | Implementación en la app |
+|-------|--------------------------|
+| Registrar **arrendatario** (quien contrata), **conductor principal** y **2º conductor** (Anexo II.2/3/4) | Roles por persona: `driver_index=0` = arrendatario (obligatorio aunque no conduzca) + `is_driver` |
+| Datos que **coincidan con el documento** acreditativo (art. 4.3) | Extracción IA + **cotejo** contra `customers` + **coherencia DNI↔carnet** + **agente de veracidad** |
+| Datos del conductor: carnet (tipo, validez, número, nº soporte) (Anexo II.3.m) | Slots de carnet (anverso/reverso) solo si `is_driver`; antigüedad B ≥ 2 años |
+| Comunicación a Interior ≤ 24 h de reserva/inicio (art. 6.3) | Panel de revisión + aviso a `reservas@` en cada subida (base para el envío a SES.HOSPEDAJES) |
+| Conservación de datos **3 años** (art. 5.3) | Se conservan en `rental_documents` (bucket privado) y `booking_admin_checklist` |
+
+**Sanciones (art. 8, remite a LO 4/2015):** carencia de registros u omisión de
+comunicaciones = **grave**; datos incompletos/erróneos = **leve**. De ahí la
+importancia de que el cotejo y la veracidad fuercen revisión manual ante dudas.
+
+> Nota: el envío telemático automático a la plataforma de Interior
+> (SES.HOSPEDAJES) aún **no** está implementado; hoy el sistema deja los datos
+> verificados y listos para esa comunicación.

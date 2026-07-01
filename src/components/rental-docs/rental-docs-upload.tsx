@@ -16,9 +16,11 @@ import {
 type DocKind = "dni_front" | "dni_back" | "license_front" | "license_back";
 type AiStatus = "pending" | "ok" | "warning" | "error";
 
-const DOC_SLOTS: { kind: DocKind; label: string }[] = [
+const ID_SLOTS: { kind: DocKind; label: string }[] = [
   { kind: "dni_front", label: "DNI (anverso)" },
   { kind: "dni_back", label: "DNI (reverso)" },
+];
+const LICENSE_SLOTS: { kind: DocKind; label: string }[] = [
   { kind: "license_front", label: "Carnet de conducir (anverso)" },
   { kind: "license_back", label: "Carnet de conducir (reverso)" },
 ];
@@ -26,6 +28,7 @@ const DOC_SLOTS: { kind: DocKind; label: string }[] = [
 interface ExistingDoc {
   driver_index: number;
   driver_label: string | null;
+  is_driver?: boolean | null;
   doc_kind: DocKind;
   ai_status: AiStatus;
   ai_notes: string | null;
@@ -71,30 +74,44 @@ export default function RentalDocsUpload() {
 
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [booking, setBooking] = useState<BookingInfo | null>(null);
+  const [arrendatarioNotice, setArrendatarioNotice] = useState(false);
 
-  // driverIndex -> { label, slots: { docKind -> SlotState } }
+  // Persona 0 = arrendatario (quien hizo la reserva); 1+ = conductores.
+  // isDriver indica si conduce (el arrendatario puede no conducir).
   const [drivers, setDrivers] = useState<
-    { index: number; label: string; slots: Record<string, SlotState> }[]
-  >([{ index: 0, label: "", slots: {} }]);
+    { index: number; label: string; isDriver: boolean; slots: Record<string, SlotState> }[]
+  >([{ index: 0, label: "", isDriver: true, slots: {} }]);
 
   const fileInputs = useRef<Record<string, HTMLInputElement | null>>({});
 
-  const applyExisting = useCallback((docs: ExistingDoc[]) => {
-    if (!docs.length) return;
-    const byDriver = new Map<number, { label: string; slots: Record<string, SlotState> }>();
+  const applyExisting = useCallback((docs: ExistingDoc[], customerName?: string | null) => {
+    const byDriver = new Map<
+      number,
+      { label: string; isDriver: boolean; slots: Record<string, SlotState> }
+    >();
     for (const d of docs) {
       if (!byDriver.has(d.driver_index)) {
-        byDriver.set(d.driver_index, { label: d.driver_label || "", slots: {} });
+        byDriver.set(d.driver_index, {
+          label: d.driver_label || "",
+          isDriver: d.is_driver !== false,
+          slots: {},
+        });
       }
       const entry = byDriver.get(d.driver_index)!;
       if (d.driver_label && !entry.label) entry.label = d.driver_label;
+      if (d.is_driver === false) entry.isDriver = false;
       entry.slots[d.doc_kind] = { status: d.ai_status, notes: d.ai_notes };
     }
     const maxIndex = Math.max(0, ...Array.from(byDriver.keys()));
-    const next: { index: number; label: string; slots: Record<string, SlotState> }[] = [];
+    const next: { index: number; label: string; isDriver: boolean; slots: Record<string, SlotState> }[] = [];
     for (let i = 0; i <= maxIndex; i++) {
       const e = byDriver.get(i);
-      next.push({ index: i, label: e?.label || "", slots: e?.slots || {} });
+      next.push({
+        index: i,
+        label: e?.label || (i === 0 ? customerName || "" : ""),
+        isDriver: e?.isDriver ?? true,
+        slots: e?.slots || {},
+      });
     }
     setDrivers(next);
   }, []);
@@ -116,7 +133,7 @@ export default function RentalDocsUpload() {
       }
       setSessionToken(data.session.token);
       setBooking(data.booking);
-      applyExisting(data.documents || []);
+      applyExisting(data.documents || [], data.booking?.customerName);
       setStep("upload");
     } catch {
       setError("Error de conexión. Inténtalo de nuevo.");
@@ -137,6 +154,10 @@ export default function RentalDocsUpload() {
     setDrivers((prev) => prev.map((d) => (d.index === driverIndex ? { ...d, label } : d)));
   };
 
+  const setDriverIsDriver = (driverIndex: number, isDriver: boolean) => {
+    setDrivers((prev) => prev.map((d) => (d.index === driverIndex ? { ...d, isDriver } : d)));
+  };
+
   const onFile = async (driverIndex: number, kind: DocKind, file: File | null) => {
     if (!file || !sessionToken) return;
     setError(null);
@@ -147,6 +168,7 @@ export default function RentalDocsUpload() {
       fd.append("sessionToken", sessionToken);
       fd.append("driverIndex", String(driverIndex));
       fd.append("driverLabel", driver?.label || "");
+      fd.append("isDriver", String(driver?.isDriver !== false));
       fd.append("docKind", kind);
       fd.append("file", file);
       const res = await fetch("/api/rental-docs/upload", { method: "POST", body: fd });
@@ -160,13 +182,14 @@ export default function RentalDocsUpload() {
         notes: data.doc.aiNotes,
         filename: file.name,
       });
+      if (data.doc.arrendatarioMismatch) setArrendatarioNotice(true);
     } catch {
       setSlot(driverIndex, kind, { status: "error", notes: "Error de conexión." });
     }
   };
 
   const addDriver = () => {
-    setDrivers((prev) => [...prev, { index: prev.length, label: "", slots: {} }]);
+    setDrivers((prev) => [...prev, { index: prev.length, label: "", isDriver: true, slots: {} }]);
   };
 
   return (
@@ -181,8 +204,10 @@ export default function RentalDocsUpload() {
             Sube tu DNI y carnet de conducir
           </h2>
           <p className="text-gray-600 mt-2">
-            Ya no hace falta enviarlos por email. Súbelos aquí de forma segura: DNI
-            (anverso y reverso) y carnet de conducir (anverso y reverso) de cada conductor.
+            Ya no hace falta enviarlos por email. Súbelos aquí de forma segura. Por
+            normativa (RD 933/2021) debemos registrar a quien hace la reserva
+            (arrendatario) y a cada conductor: DNI (anverso y reverso) y, para quien
+            conduzca, también el carnet (anverso y reverso).
           </p>
         </div>
 
@@ -270,87 +295,134 @@ export default function RentalDocsUpload() {
               </div>
             )}
 
-            {drivers.map((driver) => (
-              <div
-                key={driver.index}
-                className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-5 border-b border-gray-100">
-                  <div className="w-11 h-11 bg-furgocasa-blue/10 rounded-xl flex items-center justify-center shrink-0">
-                    <CreditCard className="h-6 w-6 text-furgocasa-blue" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900">
-                      {driver.index === 0 ? "Conductor titular" : `Conductor ${driver.index + 1}`}
-                    </h3>
-                    <input
-                      type="text"
-                      value={driver.label}
-                      onChange={(e) => setDriverLabel(driver.index, e.target.value)}
-                      placeholder="Nombre y apellidos del conductor"
-                      className="mt-1 w-full sm:max-w-sm px-3 py-2 text-sm rounded-lg border border-gray-300 focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none"
-                    />
-                  </div>
-                </div>
-
-                <div className="p-5 grid sm:grid-cols-2 gap-4">
-                  {DOC_SLOTS.map(({ kind, label }) => {
-                    const slot = driver.slots[kind] || { status: "idle" as const };
-                    const badge = statusBadge(slot.status);
-                    const Icon = badge.icon;
-                    const inputKey = `${driver.index}-${kind}`;
-                    return (
-                      <div
-                        key={kind}
-                        className="rounded-xl border border-gray-200 p-4 flex flex-col gap-2"
-                      >
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-semibold text-gray-700">{label}</span>
-                          <span className={`inline-flex items-center gap-1 text-xs ${badge.cls}`}>
-                            <Icon className="h-3.5 w-3.5" />
-                            {badge.label}
-                          </span>
-                        </div>
-
-                        <input
-                          ref={(el) => {
-                            fileInputs.current[inputKey] = el;
-                          }}
-                          type="file"
-                          accept="image/*,application/pdf"
-                          capture="environment"
-                          className="hidden"
-                          onChange={(e) => onFile(driver.index, kind, e.target.files?.[0] || null)}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => fileInputs.current[inputKey]?.click()}
-                          disabled={slot.status === "uploading"}
-                          className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-furgocasa-blue border border-furgocasa-blue/30 rounded-lg hover:bg-furgocasa-blue/5 transition-colors disabled:opacity-50"
-                        >
-                          <UploadCloud className="h-4 w-4" />
-                          {slot.status === "idle" ? "Subir imagen" : "Reemplazar"}
-                        </button>
-
-                        {slot.notes && (
-                          <p
-                            className={`text-xs ${
-                              slot.status === "error"
-                                ? "text-red-500"
-                                : slot.status === "warning"
-                                  ? "text-amber-600"
-                                  : "text-gray-500"
-                            }`}
-                          >
-                            {slot.notes}
-                          </p>
-                        )}
-                      </div>
-                    );
-                  })}
+            {arrendatarioNotice && (
+              <div className="flex items-start gap-3 text-sm bg-purple-50 border border-purple-200 rounded-xl p-4">
+                <AlertTriangle className="h-5 w-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                <div className="text-purple-900">
+                  <p className="font-semibold mb-1">Falta la documentación de quien hizo la reserva</p>
+                  <p>
+                    El documento del conductor titular no coincide con la persona que
+                    realizó la reserva. Por normativa (RD 933/2021) debemos registrar
+                    también a quien contrata el alquiler,{" "}
+                    <strong>aunque no vaya a conducir</strong>. Añade su DNI en un
+                    conductor nuevo con el botón «Añadir otro conductor», e indica en el
+                    nombre que es el titular de la reserva.
+                  </p>
                 </div>
               </div>
-            ))}
+            )}
+
+            {drivers.map((driver) => {
+              const isRenter = driver.index === 0;
+              const slots = [...ID_SLOTS, ...(driver.isDriver ? LICENSE_SLOTS : [])];
+              return (
+                <div
+                  key={driver.index}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden"
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-start gap-3 p-5 border-b border-gray-100">
+                    <div className="w-11 h-11 bg-furgocasa-blue/10 rounded-xl flex items-center justify-center shrink-0">
+                      <CreditCard className="h-6 w-6 text-furgocasa-blue" />
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900">
+                        {isRenter ? "Arrendatario · quien hizo la reserva" : `Conductor ${driver.index + 1}`}
+                      </h3>
+                      {isRenter && (
+                        <p className="text-xs text-gray-500 mb-1">
+                          Es obligatorio registrar a quien contrata el alquiler, aunque no conduzca.
+                        </p>
+                      )}
+                      <input
+                        type="text"
+                        value={driver.label}
+                        onChange={(e) => setDriverLabel(driver.index, e.target.value)}
+                        placeholder="Nombre y apellidos"
+                        className="mt-1 w-full sm:max-w-sm px-3 py-2 text-sm rounded-lg border border-gray-300 focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none"
+                      />
+                      {isRenter && (
+                        <label className="mt-2 flex items-center gap-2 text-sm text-gray-700 cursor-pointer select-none">
+                          <input
+                            type="checkbox"
+                            checked={driver.isDriver}
+                            onChange={(e) => setDriverIsDriver(driver.index, e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-300 text-furgocasa-blue focus:ring-furgocasa-blue/30"
+                          />
+                          Esta persona también conducirá el vehículo
+                        </label>
+                      )}
+                    </div>
+                  </div>
+
+                  {isRenter && !driver.isDriver && (
+                    <div className="mx-5 mt-4 flex items-start gap-2 text-xs bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-800">
+                      <AlertTriangle className="h-4 w-4 flex-shrink-0 mt-0.5" />
+                      <span>
+                        Solo necesitamos su DNI (no conduce). Recuerda añadir abajo, como
+                        conductor, a la persona que sí vaya a conducir.
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="p-5 grid sm:grid-cols-2 gap-4">
+                    {slots.map(({ kind, label }) => {
+                      const slot = driver.slots[kind] || { status: "idle" as const };
+                      const badge = statusBadge(slot.status);
+                      const Icon = badge.icon;
+                      const inputKey = `${driver.index}-${kind}`;
+                      return (
+                        <div
+                          key={kind}
+                          className="rounded-xl border border-gray-200 p-4 flex flex-col gap-2"
+                        >
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm font-semibold text-gray-700">{label}</span>
+                            <span className={`inline-flex items-center gap-1 text-xs ${badge.cls}`}>
+                              <Icon className="h-3.5 w-3.5" />
+                              {badge.label}
+                            </span>
+                          </div>
+
+                          <input
+                            ref={(el) => {
+                              fileInputs.current[inputKey] = el;
+                            }}
+                            type="file"
+                            accept="image/*,application/pdf"
+                            capture="environment"
+                            className="hidden"
+                            onChange={(e) => onFile(driver.index, kind, e.target.files?.[0] || null)}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => fileInputs.current[inputKey]?.click()}
+                            disabled={slot.status === "uploading"}
+                            className="inline-flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-furgocasa-blue border border-furgocasa-blue/30 rounded-lg hover:bg-furgocasa-blue/5 transition-colors disabled:opacity-50"
+                          >
+                            <UploadCloud className="h-4 w-4" />
+                            {slot.status === "idle" ? "Subir imagen" : "Reemplazar"}
+                          </button>
+
+                          {slot.notes && (
+                            <p
+                              className={`text-xs ${
+                                slot.status === "error"
+                                  ? "text-red-500"
+                                  : slot.status === "warning"
+                                    ? "text-amber-600"
+                                    : "text-gray-500"
+                              }`}
+                            >
+                              {slot.notes}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
 
             {drivers.length < 4 && (
               <button

@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     supabase.from("signed_contracts").select("booking_id").in("booking_id", ids),
     supabase
       .from("rental_documents")
-      .select("booking_id, driver_index, doc_kind, ai_status")
+      .select("booking_id, driver_index, doc_kind, ai_status, is_driver")
       .in("booking_id", ids),
   ]);
 
@@ -71,12 +71,15 @@ export async function GET(request: NextRequest) {
   for (const c of checklistRes.data || []) checklistBy.set(c.booking_id, c);
   const contractSet = new Set<string>();
   for (const c of contractsRes.data || []) contractSet.add(c.booking_id);
-  const docsBy = new Map<string, Map<number, Record<string, string>>>();
+  const docsBy = new Map<string, Map<number, { kinds: Record<string, string>; isDriver: boolean }>>();
   for (const d of docsRes.data || []) {
     if (!docsBy.has(d.booking_id)) docsBy.set(d.booking_id, new Map());
     const drivers = docsBy.get(d.booking_id)!;
-    if (!drivers.has(d.driver_index)) drivers.set(d.driver_index, {});
-    drivers.get(d.driver_index)![d.doc_kind] = d.ai_status;
+    if (!drivers.has(d.driver_index))
+      drivers.set(d.driver_index, { kinds: {}, isDriver: (d as { is_driver?: boolean }).is_driver !== false });
+    const entry = drivers.get(d.driver_index)!;
+    entry.kinds[d.doc_kind] = d.ai_status;
+    if ((d as { is_driver?: boolean }).is_driver === false) entry.isDriver = false;
   }
 
   const actions: Array<{ booking: string; type: string; result: string }> = [];
@@ -98,10 +101,15 @@ export async function GET(request: NextRequest) {
     const contractComplete = contractSignedOnline || contractReceived;
 
     const drivers = docsBy.get(b.id);
-    const titular = drivers?.get(0);
-    const docsAutoOk = Boolean(
-      titular && titular["dni_front"] === "ok" && titular["license_front"] === "ok"
-    );
+    const arrendatario = drivers?.get(0);
+    const arrendatarioOk = Boolean(arrendatario && arrendatario.kinds["dni_front"] === "ok");
+    const conductores = drivers ? [...drivers.values()].filter((dv) => dv.isDriver) : [];
+    const conductoresOk =
+      conductores.length > 0 &&
+      conductores.every(
+        (dv) => dv.kinds["dni_front"] === "ok" && dv.kinds["license_front"] === "ok"
+      );
+    const docsAutoOk = arrendatarioOk && conductoresOk;
     const docComplete = Boolean(chk.documentation_received) || docsAutoOk;
 
     const secondInvoiceDone = Boolean(chk.second_invoice_done);

@@ -32,6 +32,7 @@ import {
   Mail,
   Sparkles,
   FileSignature,
+  FileCheck2,
   ListChecks,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
@@ -67,6 +68,7 @@ const navigation: NavItem[] = [
   { name: "Contratos firmados", href: "/administrator/contratos-firmados", icon: FileSignature },
   { name: "Cupones", href: "/administrator/cupones", icon: Tag },
   { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
+  { name: "Documentación", href: "/administrator/documentacion", icon: FileCheck2 },
   { name: "Equipamiento", href: "/administrator/equipamiento", icon: Wrench },
   { name: "Extras", href: "/administrator/extras", icon: Package },
   { name: "Informes", href: "/administrator/informes", icon: BarChart3 },

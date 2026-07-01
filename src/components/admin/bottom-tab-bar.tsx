@@ -27,6 +27,7 @@ import {
   Mail,
   Sparkles,
   FileSignature,
+  FileCheck2,
   MessageSquare,
 } from "lucide-react";
 import { useState, useCallback, useEffect, memo } from "react";
@@ -58,6 +59,7 @@ const moreTabs: TabItem[] = [
   { name: "Contratos", href: "/administrator/contratos-firmados", icon: FileSignature },
   { name: "Cupones", href: "/administrator/cupones", icon: Tag },
   { name: "Daños", href: "/administrator/danos", icon: AlertTriangle },
+  { name: "Documentación", href: "/administrator/documentacion", icon: FileCheck2 },
   { name: "Equipamiento", href: "/administrator/equipamiento", icon: Wrench },
   { name: "Extras", href: "/administrator/extras", icon: Package },
   { name: "Informes", href: "/administrator/informes", icon: BarChart3 },

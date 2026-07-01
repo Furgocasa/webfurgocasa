@@ -16,10 +16,12 @@ Este documento es tu punto de partida para encontrar cualquier documentación de
 | Resumen en catálogo de emails (sección 5) | **[SISTEMA-EMAILS.md](./04-referencia/emails/SISTEMA-EMAILS.md)** |
 | README raíz (tabla rápida) | **[README raíz](../README.md)** — *Julio 2026 — Gestión de alquileres KILL NOTION* |
 | Panel admin | `/administrator/administracion` |
+| Panel revisión documentación (IA + veracidad + cotejo) | `/administrator/documentacion` |
 | Página docs cliente | `/es/documentacion-alquiler` |
+| Verificación documental + marco legal RD 933/2021 | **[KILL-NOTION-SISTEMA-GESTION.md](./04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md)** — secciones 7 y 11 |
 | Crons | `vercel.json` — `booking-management-email` (5 min) · `booking-admin-reminders` (06:00 UTC) |
-| Migraciones SQL | `20260701-kill-notion-gestion.sql` · `20260701b-rental-documents.sql` · `20260702-management-email-schedule.sql` |
-| Prueba emails | `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]` |
+| Migraciones SQL | `20260701-kill-notion-gestion.sql` · `20260701b-rental-documents.sql` · `20260702-management-email-schedule.sql` · `20260703-booking-admin-contract-received.sql` · `20260705-rental-documents-roles.sql` (`is_driver`) |
+| Prueba emails (incl. aviso doc subida) | `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]` · `... aviso` |
 
 ---
 
@@ -767,6 +769,7 @@ Ver carpeta `scripts/`:
 | ¿Qué método de pago usar? | `METODOS-PAGO-RESUMEN.md` ⚠️ **NUEVO** |
 | ¿Cómo configurar emails automáticos? | `04-referencia/emails/SISTEMA-EMAILS.md` |
 | ¿Cómo funciona la gestión de alquileres (KILL NOTION)? | `04-referencia/admin/KILL-NOTION-SISTEMA-GESTION.md` · `SISTEMA-EMAILS.md` §5 · `/administrator/administracion` |
+| ¿Cómo se verifica la documentación (IA, veracidad, RD 933/2021)? | `KILL-NOTION-SISTEMA-GESTION.md` §7 y §11 · `/administrator/documentacion` |
 | ¿Cómo probar los 6 emails de gestión? | `npx tsx scripts/send-kill-notion-test-emails.ts [BOOKING_NUMBER]` · `KILL-NOTION-SISTEMA-GESTION.md` |
 | ¿Cómo probar el sistema de emails? | `PRUEBAS-EMAILS.md` ⚠️ **NUEVO** |
 | ¿Cómo subo imágenes? | `02-desarrollo/media/GESTION-MEDIA-STORAGE.md`, `SOLUCION-RAPIDA-MEDIA.md` ⚠️ **NUEVO** |
