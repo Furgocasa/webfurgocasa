@@ -312,10 +312,13 @@ export default function AdministracionPage() {
   };
 
   // Filtrado por estado
-  const filtered = useMemo(
-    () => (statusFilter === "all" ? rows : rows.filter((r) => r.status === statusFilter)),
-    [rows, statusFilter]
-  );
+  const filtered = useMemo(() => {
+    if (statusFilter === "all") return rows;
+    if (statusFilter === "confirmed_in_progress") {
+      return rows.filter((r) => r.status === "confirmed" || r.status === "in_progress");
+    }
+    return rows.filter((r) => r.status === statusFilter);
+  }, [rows, statusFilter]);
 
   // Ordenación (con orden "inteligente" por defecto: próximos primero)
   const sorted = useMemo(() => {
@@ -438,6 +441,7 @@ export default function AdministracionPage() {
               className="py-2 pl-3 pr-8 rounded-lg border border-gray-300 bg-white text-sm focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none"
             >
               <option value="all">Todos</option>
+              <option value="confirmed_in_progress">Confirmada + En curso</option>
               <option value="pending">Pendiente</option>
               <option value="confirmed">Confirmada</option>
               <option value="in_progress">En curso</option>
