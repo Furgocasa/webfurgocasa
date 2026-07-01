@@ -629,31 +629,31 @@ export default function AdministracionPage() {
                             className={`h-5 w-5 mx-auto ${citaOk ? "text-green-500" : "text-gray-300"}`}
                           />
                         </td>
-                        <td className="px-3 py-3 text-right">
-                          <div className="flex flex-col items-end gap-1.5">
+                        <td className="px-2 py-3">
+                          <div className="flex items-center justify-end gap-0.5">
                             <button
                               type="button"
                               onClick={() => setPanel(r)}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-furgocasa-blue border border-furgocasa-blue/30 rounded-lg hover:bg-furgocasa-blue/5"
+                              className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                              title="Emails / Docs"
                             >
                               <Mail className="h-3.5 w-3.5" />
-                              Emails / Docs
                             </button>
                             <Link
                               href={`/administrator/reservas/${r.bookingId}/editar`}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+                              className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                              title="Editar reserva"
                             >
                               <Edit className="h-3.5 w-3.5" />
-                              Editar reserva
                             </Link>
                             <a
                               href={`/reservar/${r.bookingId}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50"
+                              className="p-1.5 text-gray-400 hover:text-furgocasa-orange hover:bg-furgocasa-orange/10 rounded transition-colors"
+                              title="Ver en front"
                             >
                               <ExternalLink className="h-3.5 w-3.5" />
-                              Ver en front
                             </a>
                           </div>
                         </td>
