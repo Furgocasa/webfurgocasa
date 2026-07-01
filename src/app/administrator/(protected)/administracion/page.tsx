@@ -300,7 +300,6 @@ function AdminTableRow({
     cls: "bg-gray-100 text-gray-600",
   };
   const contractOk = started || r.contractSigned;
-  const docOk = started || r.docComplete;
   const citaOk = started || r.appointmentConfirmed;
   const returned = isReturnedRow(r, today);
 
@@ -383,7 +382,21 @@ function AdminTableRow({
       </td>
       <td className="px-3 py-3 text-center">
         <div className="flex flex-col items-center gap-1">
-          <CheckCircle2 className={`h-5 w-5 ${docOk ? "text-green-500" : "text-gray-300"}`} />
+          {started ? (
+            <CheckCircle2 className="h-5 w-5 text-green-500" />
+          ) : r.docsAutoOk ? (
+            <>
+              <CheckCircle2 className="h-5 w-5 text-green-500" title="Validado por IA" />
+              <span className="text-[10px] text-green-600">IA</span>
+            </>
+          ) : (
+            <Check
+              checked={r.documentationReceived}
+              disabled={savingKey === `${r.bookingId}:documentation_received`}
+              onChange={(v) => onToggleField(r, "documentation_received", v)}
+              title="Marcar documentación recibida (como en Notion)"
+            />
+          )}
           {r.docsUploadedCount > 0 && (
             <span className="text-[10px] text-gray-400">{r.docsUploadedCount} arch.</span>
           )}

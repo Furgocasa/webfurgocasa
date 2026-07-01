@@ -8,6 +8,7 @@
  * Uso:
  *   npx tsx scripts/send-kill-notion-test-emails.ts             # reserva automática
  *   npx tsx scripts/send-kill-notion-test-emails.ts FG12345678  # reserva concreta
+ *   npx tsx scripts/send-kill-notion-test-emails.ts doc           # solo recordatorio documentación
  */
 
 import { config } from "dotenv";
@@ -29,8 +30,31 @@ import {
 
 const TO = "reservas@furgocasa.com";
 
+const EMAIL_ALIASES: Record<string, string> = {
+  doc: "4-documentacion",
+  documentation: "4-documentacion",
+  documentacion: "4-documentacion",
+  gestion: "1-gestion",
+  "2pago": "2-vencido-2pago",
+  contrato: "3-contrato",
+  fianza: "5-fianza",
+  cita: "6-cita",
+};
+
 async function main() {
-  const argBooking = process.argv[2];
+  const arg2 = process.argv[2];
+  const arg3 = process.argv[3];
+  let argBooking: string | undefined;
+  let onlyKey: string | undefined;
+
+  if (arg2 && EMAIL_ALIASES[arg2.toLowerCase()]) {
+    onlyKey = EMAIL_ALIASES[arg2.toLowerCase()];
+  } else if (arg2) {
+    argBooking = arg2;
+  }
+  if (arg3) {
+    onlyKey = EMAIL_ALIASES[arg3.toLowerCase()] || arg3;
+  }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,6 +85,8 @@ async function main() {
 
   if (argBooking) {
     query = supabase.from("bookings").select(select).eq("booking_number", argBooking).limit(1);
+  } else {
+    query = query.eq("status", "confirmed");
   }
 
   const { data, error } = await query;
@@ -123,8 +149,14 @@ async function main() {
   const GAP_MS = 5000;
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  for (let i = 0; i < emails.length; i++) {
-    const { key, build } = emails[i];
+  const toSend = onlyKey ? emails.filter((e) => e.key === onlyKey) : emails;
+  if (onlyKey && toSend.length === 0) {
+    console.error(`❌ Tipo de email desconocido: ${process.argv[3]}`);
+    process.exit(1);
+  }
+
+  for (let i = 0; i < toSend.length; i++) {
+    const { key, build } = toSend[i];
     const { subject, html } = build(emailData);
     const result = await sendEmail({
       to: TO,
@@ -136,7 +168,7 @@ async function main() {
     } else {
       console.error(`❌ ${key}  →  FALLÓ: ${result.error}`);
     }
-    if (i < emails.length - 1) {
+    if (i < toSend.length - 1) {
       console.log(`   ⏳ esperando ${GAP_MS / 1000}s antes del siguiente…`);
       await sleep(GAP_MS);
     }
