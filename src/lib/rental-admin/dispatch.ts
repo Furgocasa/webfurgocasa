@@ -4,6 +4,7 @@
  * Compartido por:
  *   - el reenvío manual desde /api/admin/administracion/send-email
  *   - el cron /api/cron/booking-admin-reminders
+ *   - el cron /api/cron/booking-management-email (email 1, 20 min tras 1er pago)
  *
  * Cada envío se registra en `booking_email_dispatches` para trazabilidad e
  * idempotencia (el cron nunca reenvía un tipo ya enviado a esa reserva).

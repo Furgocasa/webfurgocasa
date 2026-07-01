@@ -6,6 +6,7 @@ import {
   sendSecondPaymentConfirmedEmail,
   getBookingDataForEmail 
 } from "@/lib/email";
+import { scheduleBookingManagementEmail } from "@/lib/rental-admin/schedule-management-email";
 
 /**
  * POST /api/redsys/verify-payment
@@ -278,6 +279,14 @@ export async function POST(request: NextRequest) {
         });
       } else {
         console.log("✅ [5/8] Reserva actualizada correctamente");
+
+        const isFirstPayment = currentPaid === 0;
+        if (fullBooking.status === "pending" && isFirstPayment) {
+          await scheduleBookingManagementEmail(supabase, payment.booking_id, {
+            wasPending: true,
+            isFirstPayment: true,
+          });
+        }
         
         // 📊 TRACKING: Marcar conversión REAL en search_queries
         try {
@@ -361,10 +370,10 @@ export async function POST(request: NextRequest) {
         
         // Enviar email de confirmación DIRECTAMENTE (sin fetch HTTP)
         console.log("📧 [6/8] Enviando email de confirmación...");
-        const isFirstPayment = currentPaid === 0;
+        const isFirstPaymentForEmail = currentPaid === 0;
         
         console.log("📧 [6/8] Tipo de pago:", {
-          isFirstPayment,
+          isFirstPayment: isFirstPaymentForEmail,
           currentPaid,
           newPaid,
           totalPrice,
@@ -394,7 +403,7 @@ export async function POST(request: NextRequest) {
               bookingData.pendingAmount = totalPrice - newPaid;
               
               // Enviar email correspondiente
-              if (isFirstPayment) {
+              if (isFirstPaymentForEmail) {
                 console.log("📧 [6/8] Enviando email de PRIMER PAGO a:", customerEmail);
                 const result = await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
                 

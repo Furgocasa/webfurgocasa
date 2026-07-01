@@ -7,6 +7,7 @@ import {
   sendSecondPaymentConfirmedEmail,
   getBookingDataForEmail,
 } from "@/lib/email";
+import { scheduleBookingManagementEmail } from "@/lib/rental-admin/schedule-management-email";
 import Stripe from "stripe";
 
 /**
@@ -97,13 +98,14 @@ export async function POST(request: NextRequest) {
         if (status === "authorized") {
           const { data: booking, error: bookingError } = await supabase
             .from("bookings")
-            .select("amount_paid, total_price, stripe_fee_total, customer_email")
+            .select("amount_paid, total_price, stripe_fee_total, customer_email, status")
             .eq("id", payment.booking_id)
             .single();
 
           if (!bookingError && booking) {
             const fee = Number(payment.stripe_fee ?? 0);
             const currentPaid = booking.amount_paid || 0;
+            const wasPending = booking.status === "pending";
             const newAmountPaid = currentPaid + payment.amount;
             const newTotalPrice = (booking.total_price || 0) + fee;
             const newStripeFeeTotal = (booking.stripe_fee_total || 0) + fee;
@@ -124,6 +126,13 @@ export async function POST(request: NextRequest) {
             if (bookingUpdateError) {
               console.error("❌ Error actualizando reserva:", bookingUpdateError);
             } else {
+              if (wasPending && isFirstPayment) {
+                await scheduleBookingManagementEmail(supabase, payment.booking_id, {
+                  wasPending: true,
+                  isFirstPayment: true,
+                });
+              }
+
               if (isFullyPaid) {
                 // 📌 Marcar oferta de última hora como "reserved" cuando el pago está completado
                 const { data: offerToUpdate } = await supabase

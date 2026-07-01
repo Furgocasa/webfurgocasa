@@ -130,7 +130,7 @@ Asuntos UNIFICADOS (formato del primero): `{prefijo} FURGOCASA {code} - {vehícu
 
 | Función | Uso | Prefijo del asunto | Base |
 |---|---|---|---|
-| `getBookingManagementEmail` | Manual, tras confirmar pago | `Alquiler` | `kill_notion/1 - Alquiler…msg` + n8n |
+| `getBookingManagementEmail` | Auto 20 min tras 1er pago + confirmación (cron cada 5 min) | `Alquiler` | `kill_notion/1 - Alquiler…msg` + n8n |
 | `getSecondPaymentReminderEmail` | Recordatorio 2º pago | `VENCIDO 2º pago` | n8n "Pedir 2º Pago" |
 | `getContractReminderEmail` | Recordatorio contrato | `Contrato pendiente` | n8n "Pedir firmar contrato" |
 | `getDocumentationReminderEmail` | Recordatorio documentación (link de subida) | `Documentación pendiente` | n8n "Pedir documentación" |

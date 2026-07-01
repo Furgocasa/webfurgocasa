@@ -5,6 +5,7 @@ import {
   sendSecondPaymentConfirmedEmail,
   getBookingDataForEmail 
 } from "@/lib/email";
+import { scheduleBookingManagementEmail } from "@/lib/rental-admin/schedule-management-email";
 
 /**
  * POST /api/payments/update-manual
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     console.log("🔍 [2/7] Buscando pago...");
     const { data: payment, error: paymentFetchError } = await supabase
       .from("payments")
-      .select("*, booking:bookings(total_price, amount_paid, booking_number)")
+      .select("*, booking:bookings(total_price, amount_paid, booking_number, status)")
       .eq("id", paymentId)
       .single();
     
@@ -167,6 +168,15 @@ export async function POST(request: NextRequest) {
       }
       
       console.log("✅ [5/7] Reserva actualizada correctamente");
+
+      const wasPending = booking.status === "pending";
+      const isFirstPayment = currentPaid === 0;
+      if (wasPending && isFirstPayment) {
+        await scheduleBookingManagementEmail(supabase, bookingId, {
+          wasPending: true,
+          isFirstPayment: true,
+        });
+      }
       
       // 📌 Marcar oferta de última hora como "reserved" solo cuando el pago está completado
       if (newPaymentStatus === "paid") {
@@ -191,10 +201,10 @@ export async function POST(request: NextRequest) {
       
       // 4. Enviar email de confirmación DIRECTAMENTE (sin fetch HTTP)
       console.log("📧 [6/7] Enviando email de confirmación...");
-      const isFirstPayment = currentPaid === 0;
+      const isFirstPaymentForEmail = currentPaid === 0;
       
       console.log("📧 [6/7] Tipo de pago:", {
-        isFirstPayment,
+        isFirstPayment: isFirstPaymentForEmail,
         currentPaid,
         newPaid,
         totalPrice,
@@ -225,7 +235,7 @@ export async function POST(request: NextRequest) {
             bookingData.pendingAmount = totalPrice - newPaid;
             
             // Enviar email correspondiente
-            if (isFirstPayment) {
+            if (isFirstPaymentForEmail) {
               console.log("📧 [6/7] Enviando email de PRIMER PAGO a:", customerEmail);
               const result = await sendFirstPaymentConfirmedEmail(customerEmail, bookingData);
               
