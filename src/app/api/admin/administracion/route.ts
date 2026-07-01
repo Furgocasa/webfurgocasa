@@ -30,6 +30,7 @@ const MANUAL_FIELDS = [
   "second_invoice_done",
   "deposit_received",
   "documentation_received",
+  "contract_received",
   "appointment_confirmed",
   "damages_checked",
   "cleaning_done",
@@ -165,7 +166,9 @@ export async function GET(req: NextRequest) {
       }
 
       const documentationReceived = Boolean(chk.documentation_received);
-      const contractSigned = contractByBooking.has(b.id);
+      const contractSignedOnline = contractByBooking.has(b.id);
+      const contractReceived = Boolean(chk.contract_received);
+      const contractComplete = contractSignedOnline || contractReceived;
       const firstInvoiceDone = Boolean(chk.first_invoice_done);
       const secondInvoiceDone = Boolean(chk.second_invoice_done);
       const depositReceived = Boolean(chk.deposit_received);
@@ -202,10 +205,14 @@ export async function GET(req: NextRequest) {
         secondInvoiceDone,
         depositReceived,
         documentationReceived,
+        contractReceived,
         damagesChecked: Boolean(chk.damages_checked),
         cleaningDone: Boolean(chk.cleaning_done),
-        // Derivados / solo lectura
-        contractSigned,
+        // Contrato: firma online y/o manual (email, Notion…)
+        contractSignedOnline,
+        contractComplete,
+        // Alias legado
+        contractSigned: contractComplete,
         firstMailSent: sent.has("booking_management") || sent.has("booking_created"),
         appointmentConfirmed,
         // Documentación
@@ -223,7 +230,7 @@ export async function GET(req: NextRequest) {
         // ¿Listo para enviar la cita? (4 checks + contrato + docs, y no enviada aún)
         readyForAppointment:
           secondInvoiceDone &&
-          contractSigned &&
+          contractComplete &&
           docComplete &&
           depositReceived &&
           !appointmentConfirmed,

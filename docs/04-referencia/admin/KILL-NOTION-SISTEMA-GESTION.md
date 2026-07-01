@@ -53,7 +53,7 @@ por reserva. Dos automatizaciones n8n operaban sobre ella (ver carpeta
 | `1º Pago` | **He hecho la factura** del 1er pago | `booking_admin_checklist` (manual) |
 | `2º Pago` | **He hecho la factura** del 2º pago | `booking_admin_checklist` (manual) |
 | `Doc` | Documentación de conductores recibida | `rental_documents` + IA (auto con revisión) |
-| `Contrato` | Contrato firmado | `signed_contracts` (auto, solo lectura) |
+| `Contrato` | Contrato firmado | `signed_contracts` (auto, firma web) **+** `contract_received` (manual, email/Notion) |
 | `Fianza (3 días)` | Fianza recibida (visto en banco) | `booking_admin_checklist` (manual) |
 | `Cita` | Cita de recogida confirmada al cliente | `booking_email_dispatches` (auto) |
 | `ESTADO DEL ALQUILER` | EN PREPARACIÓN / EN RUTA / FINALIZADO… | `bookings.status` |

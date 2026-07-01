@@ -54,6 +54,9 @@ interface Row {
   documentationReceived: boolean;
   damagesChecked: boolean;
   cleaningDone: boolean;
+  contractSignedOnline: boolean;
+  contractReceived: boolean;
+  contractComplete: boolean;
   contractSigned: boolean;
   firstMailSent: boolean;
   appointmentConfirmed: boolean;
@@ -84,6 +87,7 @@ const MANUAL_FIELDS = {
   second_invoice_done: "secondInvoiceDone",
   deposit_received: "depositReceived",
   documentation_received: "documentationReceived",
+  contract_received: "contractReceived",
   damages_checked: "damagesChecked",
   cleaning_done: "cleaningDone",
 } as const;
@@ -310,7 +314,6 @@ function AdminTableRow({
     label: r.status,
     cls: "bg-gray-100 text-gray-600",
   };
-  const contractOk = started || r.contractSigned;
   const citaOk = started || r.appointmentConfirmed;
   const returned = isReturnedRow(r, today);
 
@@ -387,9 +390,23 @@ function AdminTableRow({
         )}
       </td>
       <td className="px-3 py-3 text-center">
-        <CheckCircle2
-          className={`h-5 w-5 mx-auto ${contractOk ? "text-green-500" : "text-gray-300"}`}
-        />
+        <div className="flex flex-col items-center gap-1">
+          {started ? (
+            <CheckCircle2 className="h-5 w-5 text-green-500" />
+          ) : r.contractSignedOnline ? (
+            <>
+              <CheckCircle2 className="h-5 w-5 text-green-500" title="Firmado online" />
+              <span className="text-[10px] text-green-600">Web</span>
+            </>
+          ) : (
+            <Check
+              checked={r.contractReceived}
+              disabled={savingKey === `${r.bookingId}:contract_received`}
+              onChange={(v) => onToggleField(r, "contract_received", v)}
+              title="Marcar contrato recibido/firmado (p. ej. por email)"
+            />
+          )}
+        </div>
       </td>
       <td className="px-3 py-3 text-center">
         <div className="flex flex-col items-center gap-1">
@@ -995,7 +1012,7 @@ function BookingPanel({
 
           {/* Estado resumido */}
           <div className="flex flex-wrap gap-2">
-            <StatusPill ok={row.contractSigned} label="Contrato firmado" />
+            <StatusPill ok={row.contractComplete} label="Contrato firmado" />
             <StatusPill ok={row.docComplete} label="Documentación" />
             <StatusPill ok={row.appointmentConfirmed} label="Cita enviada" />
           </div>
@@ -1164,7 +1181,7 @@ function BookingPanel({
             <span className="text-gray-300">·</span>
             <span className="text-gray-500 inline-flex items-center gap-1">
               <FileSignature className="h-3 w-3" />
-              Contrato: {row.contractSigned ? "firmado" : "pendiente"}
+              Contrato: {row.contractComplete ? (row.contractSignedOnline ? "firmado online" : "recibido manual") : "pendiente"}
             </span>
           </div>
         </div>

@@ -93,7 +93,9 @@ export async function GET(request: NextRequest) {
         b.amount_paid >= b.total_price &&
         b.total_price > 0);
 
-    const contractSigned = contractSet.has(b.id);
+    const contractSignedOnline = contractSet.has(b.id);
+    const contractReceived = Boolean(chk.contract_received);
+    const contractComplete = contractSignedOnline || contractReceived;
 
     const drivers = docsBy.get(b.id);
     const titular = drivers?.get(0);
@@ -109,13 +111,13 @@ export async function GET(request: NextRequest) {
     const jobs: string[] = [];
 
     if (today >= venc && !paymentComplete) jobs.push("second_payment_reminder");
-    if (today >= venc && !contractSigned) jobs.push("contract_reminder");
+    if (today >= venc && !contractComplete) jobs.push("contract_reminder");
     if (today >= venc && !docComplete) jobs.push("documentation_reminder");
     if (today >= limiteFianza && !depositReceived) jobs.push("deposit_reminder");
 
     // Cita automática: todo listo y no enviada.
     const ready =
-      secondInvoiceDone && contractSigned && docComplete && depositReceived && !appointmentConfirmed;
+      secondInvoiceDone && contractComplete && docComplete && depositReceived && !appointmentConfirmed;
     if (ready) jobs.push("appointment");
 
     for (const type of jobs) {
