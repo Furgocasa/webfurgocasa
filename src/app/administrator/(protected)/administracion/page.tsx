@@ -145,6 +145,11 @@ function hasStartedRow(r: Row, today: string): boolean {
   return r.status === "in_progress" || r.status === "completed" || r.pickupDate <= today;
 }
 
+/** ¿Camper devuelta? (fecha de fin de reserva ya pasada) */
+function isReturnedRow(r: Row, today: string): boolean {
+  return r.dropoffDate <= today;
+}
+
 function SortHeader({
   label,
   field,
@@ -489,6 +494,9 @@ export default function AdministracionPage() {
                     <SortHeader label="Estado" field="estado" active={sortField === "estado"} dir={sortDir} onSort={onSort} />
                     <SortHeader label="Inicio" field="inicio" active={sortField === "inicio"} dir={sortDir} onSort={onSort} />
                     <SortHeader label="Fin" field="fin" active={sortField === "fin"} dir={sortDir} onSort={onSort} />
+                    <th className="px-3 py-3 font-semibold text-center" title="Devuelta según fecha fin de reserva">
+                      Devuelta
+                    </th>
                     <SortHeader label="Venc. 2º pago" field="venc" active={sortField === "venc"} dir={sortDir} onSort={onSort} />
                     <th className="px-3 py-3 font-semibold text-center">1ª fact.</th>
                     <th className="px-3 py-3 font-semibold text-center">2ª fact.</th>
@@ -513,6 +521,7 @@ export default function AdministracionPage() {
                     const contractOk = started || r.contractSigned;
                     const docOk = started || r.docComplete;
                     const citaOk = started || r.appointmentConfirmed;
+                    const returned = isReturnedRow(r, today);
                     return (
                       <tr key={r.bookingId} className="hover:bg-gray-50 align-top">
                         {/* Reserva (código vehículo + ubicación + cliente, estilo Notion) */}
@@ -549,6 +558,13 @@ export default function AdministracionPage() {
                           {r.dropoffTime ? (
                             <span className="block text-xs text-gray-400">{r.dropoffTime}</span>
                           ) : null}
+                        </td>
+                        {/* Devuelta (auto: fecha fin ≤ hoy) */}
+                        <td className="px-3 py-3 text-center">
+                          <CheckCircle2
+                            className={`h-5 w-5 mx-auto ${returned ? "text-green-500" : "text-gray-300"}`}
+                            title={returned ? "Devuelta (fin de reserva)" : "Aún no devuelta"}
+                          />
                         </td>
                         {/* Venc. 2º pago + importe pendiente */}
                         <td className="px-3 py-3 whitespace-nowrap">
