@@ -2,7 +2,9 @@
 
 > Sustituye el flujo **WhatsApp + N8N + Airtable + Notion** por un **chatbot embebido** (la asistente **Andrea**) en la web de Furgocasa que responde con un **RAG (pgvector en Supabase)** sobre la documentación oficial, acepta **texto e imagen**, registra todas las conversaciones en un panel del administrador (`/administrator/chatbot`) con **clasificación de calidad por mensaje**, y cuenta con un **agente de revisión automática** que audita las respuestas contra el RAG.
 
-Última actualización: **2026-07-01**
+Última actualización: **2026-07-01** · **Estado: en producción** (sustituye el flujo N8N/WhatsApp)
+
+> **Sesión 2026-07-01 (tarde)** (§21-22): bloques en tiempo real de **equipamiento** y **electricidad 12 V / 220 V** (sin inversor), reglas reforzadas en prompt, correcciones CSV del RAG, pruebas en seco sin persistir en BBDD, flujo de depuración continua.
 
 > **Sesión 2026-07-01** (§14-19): RAG ampliado (equipamiento, ventas, blog, ofertas en tiempo real), multilingüe completo, índice **HNSW**, búsqueda contextual, botones nuevos del widget, auditor con datos reales de Supabase, y correcciones de coherencia (Portugal, listas 1-2-3, fianza, sedes, mascotas).
 
@@ -24,6 +26,7 @@ Decisiones confirmadas con el cliente:
 - **RAG real** con embeddings + pgvector.
 - **Multimodal**: texto + imagen (sin audio).
 - **Notion se sustituye**: el registro vive solo en Supabase y se ve en el admin.
+- **N8N se retira**: el agente OpenAI + Airtable + Notion del flujo WhatsApp queda **obsoleto**; la fuente de verdad pasa a ser este stack (Next.js + Supabase + panel admin + auditor).
 
 Modelos por defecto (configurables por env):
 - Chat / visión: `gpt-4o` (`OPENAI_CHATBOT_MODEL`).
@@ -37,7 +40,10 @@ Modelos por defecto (configurables por env):
 Widget web  ──►  /api/chatbot/message  ──►  OpenAI (Embeddings / GPT-4o visión)
                           │                         │
                           ├──► match_chatbot_chunks (pgvector HNSW)  ◄── chatbot_kb_chunks
-                          ├──► getActiveOffersBlock() (RPC ofertas última hora, tiempo real)
+                          ├──► Bloques "DATOS EN TIEMPO REAL" (cada turno, no van al RAG):
+                          │       getActiveOffersBlock()     — ofertas última hora
+                          │       buildEquipmentDataBlock()  — equipamiento flota + por modelo
+                          │       buildElectricityDataBlock()— 12 V vs 220 V, sin inversor
                           ├──► chatbot_conversations / chatbot_messages
                           └──► storage: chatbot-uploads (imagen)
 
@@ -114,8 +120,11 @@ Trocea (split de las muy largas), calcula `content_hash`, embebe con `text-embed
 1. Asegura/crea conversación por `sessionId` (idioma fijado con `locale` de la URL al crear, no se recalcula en cada turno).
 2. Imagen → input de visión GPT-4o; sube adjunto a `chatbot-uploads`.
 3. **Búsqueda RAG contextual**: combina los **últimos mensajes del usuario** + el actual antes de embeber (p. ej. "portugal" + "¿me recomiendas rutas?" recupera el artículo de Portugal). Traduce la consulta al español si `locale !== 'es'`.
-4. **`getActiveOffersBlock()`**: inyecta ofertas de última hora vigentes (RPC `get_active_last_minute_offers`) como bloque "DATOS EN TIEMPO REAL" — no van al RAG porque caducan.
-5. GPT-4o con prompt + historial (**20 mensajes**) + contexto RAG + ofertas, en **streaming**.
+4. **Datos en tiempo real** (bloque `### DATOS EN TIEMPO REAL`, ver §21):
+   - `getActiveOffersBlock()` — ofertas última hora (RPC `get_active_last_minute_offers`).
+   - `buildEquipmentDataBlock()` — equipamiento estándar de flota + detalle por modelo (Supabase).
+   - `buildElectricityDataBlock()` — reglas 12 V / 220 V, sin inversor.
+5. GPT-4o con prompt + historial (**20 mensajes**) + contexto RAG + datos en tiempo real, en **streaming**.
 6. Persiste mensajes user/assistant, actualiza `last_message_at`.
 
 ### 4.5. Widget embebido
@@ -202,6 +211,8 @@ npm run review:chatbot-messages                    # solo sin clasificar
 - [x] Índice HNSW + búsqueda contextual (§17)
 - [x] Botones widget ampliados + listas 1-2-3 (§9, §18)
 - [x] Auditor con datos reales Supabase (`buildBusinessDataBlock`) (§11)
+- [x] Bloques live equipamiento + electricidad 12 V/220 V (§21)
+- [x] **Sustitución del flujo N8N** — chat embebido en producción con RAG, admin y auditor
 
 ---
 
@@ -431,7 +442,9 @@ Errores reales detectados por el auditor y corregidos en `src/lib/chatbot/prompt
 | **Ofertas** | Enlazar `/ofertas`; usar bloque tiempo real si hay ofertas vigentes |
 | **Compra** | Listar modelos en venta del contexto (filtrar por camas/plazas) |
 | **Mascotas** | Permitidas con **+40 €/alquiler** (extra) |
-| **Rutas** | Coherencia con historial + enlaces al blog |
+| **Rutas** | Coherencia con historial + **enlace obligatorio** al blog si hay URL en contexto |
+| **Equipamiento** | Todas llevan placa solar, baño con WC químico; no inventar Ah universal |
+| **Electricidad** | Solo **12 V** con baterías/placas; **220 V** solo enchufada a red; **sin inversor** |
 | **Multimodal** | No diagnosticar símbolos del panel sin ver la foto |
 | **FrostControl** | Causa habitual de agua bajo la camper (puede saltar con frío nocturno) |
 
@@ -447,6 +460,7 @@ Errores reales detectados por el auditor y corregidos en `src/lib/chatbot/prompt
 | Revisar coherencia RAG vs web | `npm run verify:chatbot-kb` |
 | Auditar respuestas nuevas | `npm run review:chatbot-messages` |
 | Reauditar todo tras mejoras | `npx tsx scripts/review-chatbot-messages.ts --all` |
+| Probar respuestas sin guardar en BBDD | Ver §22.4 (prueba en seco con `retrieveContext` + prompt) |
 | Comprobar fragmentos por source | `SELECT source, count(*) FROM chatbot_kb_chunks GROUP BY source;` |
 
 Informes generados automáticamente:
@@ -472,3 +486,96 @@ Informes generados automáticamente:
 | Migraciones | `supabase/migrations/create-chatbot.sql`, `chatbot-message-quality.sql` |
 | Informes generados | `docs/02-desarrollo/chatbot/INFORME-COHERENCIA-RAG.md`, `INFORME-REVISION-MENSAJES.md` |
 | CSVs fuente | `chatbot_documentacion/*.csv` |
+| Flujo N8N original (referencia histórica) | `chatbot_documentacion/FLUJO N8N.bmp`, `PROMP AGENTE ANTIGUO N8N.txt` |
+
+---
+
+## 21. Datos en tiempo real: equipamiento y electricidad (sesión 2026-07-01)
+
+Algunos datos **no deben ir al RAG** (caducan, son reglas absolutas o están mejor como bloque fijo). Se inyectan en **cada turno** del chat como `### DATOS EN TIEMPO REAL`, con **prioridad sobre el RAG** si hay contradicción.
+
+Implementación en `src/lib/chatbot/server.ts`, ensamblados en `route.ts`:
+
+| Función | Contenido | Origen |
+|---------|-----------|--------|
+| `getActiveOffersBlock()` | Ofertas última hora vigentes | RPC `get_active_last_minute_offers` |
+| `buildEquipmentDataBlock()` | Placas solares en todas, baño/WC químico, cocina, Truma; detalle batería/solar por modelo | `vehicles` + reglas fijas |
+| `buildElectricityDataBlock()` | 12 V (baterías/placas/marcha) vs 220 V (solo cable a camping); **sin inversor**; cafetera/micro/secador solo con red externa | Reglas fijas + FAQs |
+
+El auditor (`buildBusinessDataBlock()`) incluye equipamiento, electricidad, temporadas, sedes, extras, flota y ventas.
+
+### 21.1. Equipamiento (reglas clave)
+
+- **Placas solares**: comunicar que **todas** las campers las llevan instaladas. *(Nota interna: la Dreamer es la única excepción real; se mantiene el mensaje unificado "todas".)*
+- **Baño**: completo con ducha y **WC químico** (cassette).
+- **Batería**: no citar "95 Ah" como dato de toda la flota; varía por modelo (gel vs litio). Usar ficha del modelo o bloque por vehículo.
+- **CSV corregido**: `FUNCIONAMIENTO-Grid view.csv` — "algunas campers" → "todas"; eliminada mención ambigua de inversor en texto de baterías de litio.
+
+### 21.2. Electricidad (reglas clave)
+
+| Situación | Qué hay | Qué funciona |
+|-----------|---------|--------------|
+| Parado, solo baterías + placas | **12 V** | Luces, nevera compresor, Truma, bomba, USB, mechero |
+| Conectado con cable a camping/área | **220 V** en enchufes interiores | Cafetera eléctrica, micro, secador, plancha… |
+| Sin cable externo | **No hay 220 V** | Las campers **no llevan inversor** |
+
+Alternativas sin 220 V: cafetera italiana (incluida), cocina a gas, aparatos 12 V. Furgocasa facilita cable/adaptador para camping.
+
+Preguntas tipo probadas en seco (2026-07-01): funcionamiento eléctrico, cafetera, enchufes 220 V, microondas sin red, secador/plancha con baterías → respuestas correctas tras §21.
+
+---
+
+## 22. Depuración continua del chatbot
+
+Canal abierto para seguir mejorando Andrea. Flujo recomendado cuando detectes una respuesta mala:
+
+### 22.1. Detectar
+
+1. **Panel admin** → `/administrator/chatbot` → pestaña **Respuestas** (filtrar incorrectas/mejorables).
+2. **Auditor automático** sobre mensajes nuevos:
+   ```bash
+   npm run review:chatbot-messages
+   ```
+3. Informe generado: `INFORME-REVISION-MENSAJES.md`.
+
+### 22.2. Diagnosticar la causa
+
+| Síntoma | Causa probable | Acción |
+|---------|----------------|--------|
+| Dato de negocio erróneo (fianza, sedes, precios) | Prompt o bloque live desactualizado | `prompt.ts` + `buildBusinessDataBlock()` / bloques §21 |
+| Dato técnico (equipamiento, electricidad) | RAG ambiguo o prompt | Bloques §21 + CSV `FUNCIONAMIENTO` / `FAQS` + re-ingesta |
+| No encuentra artículo del blog / destino | RAG (recall o contexto) | Ver §17 (HNSW, búsqueda contextual en `route.ts`) |
+| Respuesta genérica ignorando conversación | Prompt coherencia | Reglas §17.4 y §18 (rutas) |
+| Dato desfasado vs web | Ingesta no ejecutada | `npm run ingest:chatbot-kb` |
+
+### 22.3. Corregir (orden típico)
+
+1. **Prompt** (`src/lib/chatbot/prompt.ts`) — reglas de negocio y tono.
+2. **Bloques live** (`server.ts`) — verdad absoluta que no debe depender del RAG.
+3. **CSV / BBDD** — corregir fuente + `npm run ingest:chatbot-kb` + `ANALYZE chatbot_kb_chunks;`.
+4. **Verificar coherencia**: `npm run verify:chatbot-kb`.
+5. **Re-auditar**: `npx tsx scripts/review-chatbot-messages.ts --all` (tras cambios grandes).
+
+### 22.4. Probar sin ensuciar la BBDD
+
+Para probar preguntas concretas **sin crear conversaciones en Supabase**, llamar directamente a:
+- `retrieveContext(pregunta)`
+- bloques live (`buildEquipmentDataBlock`, `buildElectricityDataBlock`, `getActiveOffersBlock`)
+- `buildSystemPrompt(context, liveData)`
+- OpenAI chat (sin insert en `chatbot_messages`)
+
+Patrón usado en sesión 2026-07-01 (electricidad): script temporal en seco (no commiteado; recrear si hace falta).
+
+### 22.5. Commits de referencia (main)
+
+| Commit | Contenido |
+|--------|-----------|
+| `ad6cfb4a` | RAG enriquecido + ofertas tiempo real + botones widget |
+| `0ddd2633` | Mascota +40 € + informe revisión |
+| `8d5cf0a6` | Portugal, listas 1-2-3, HNSW |
+| `ff5a440e` | Equipamiento + electricidad 12 V/220 V + documentación |
+
+### 22.6. Qué NO tocar
+
+- `src/lib/redsys/crypto.ts` — pagos Redsys (protegido, ver `.cursor/rules/redsys-crypto.mdc`).
+- Cupones personales en RAG — ver `.cursor/rules/ofertas-banners.mdc`.

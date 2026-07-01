@@ -1104,3 +1104,229 @@ export function getSummerScheduleChangeTemplate(
   const preheader = `${data.customerFirstName}, en verano hemos ajustado los horarios de entrega: necesitamos acordar contigo la recogida y devolución de tu reserva.`;
   return getEmailBaseTemplate(content, preheader);
 }
+
+/* ============================================================================
+ * PLANTILLAS DE GESTIÓN — "KILL NOTION"
+ * ----------------------------------------------------------------------------
+ * Emails en TEXTO PLANO simple (estilo Narciso / los .msg originales), NO usan
+ * la plantilla HTML corporativa. Replican los correos que hoy dispara n8n
+ * contra Notion: email de gestión inicial, recordatorios (2º pago, contrato,
+ * documentación, fianza) y email de cita.
+ *
+ * Todas devuelven { subject, html }. Documentación: docs/04-referencia/admin/
+ * KILL-NOTION-SISTEMA-GESTION.md
+ * ==========================================================================*/
+
+export interface AdminGestionEmailData {
+  /** Nombre completo del cliente (para el código de cita). */
+  customerName: string;
+  /** Nombre de pila (para el saludo). */
+  customerFirstName: string;
+  /** Nº de reserva (ej. FG12345678). */
+  bookingNumber: string;
+  /** Link público a la reserva: https://www.furgocasa.com/reservar/{id} */
+  reservationUrl: string;
+  vehicleInternalCode: string;
+  vehicleName: string;
+  /** Fechas en ISO yyyy-mm-dd. */
+  pickupDate: string;
+  pickupTime?: string;
+  dropoffDate: string;
+  dropoffTime?: string;
+  pickupLocation?: string;
+  pickupLocationAddress?: string;
+  dropoffLocation?: string;
+  /** Canal de venta (FURGOCASA por defecto). */
+  salesChannel?: string;
+}
+
+export interface AdminGestionEmail {
+  subject: string;
+  html: string;
+}
+
+/** Envuelve el cuerpo en un contenedor de texto plano sobrio. */
+function plainEmailWrap(innerHtml: string): string {
+  return `<div style="font-family: Arial, Helvetica, sans-serif; font-size: 14px; line-height: 1.6; color: #222222; max-width: 640px; margin: 0 auto;">${innerHtml}</div>`;
+}
+
+/** Une párrafos con doble salto de línea. */
+function joinParas(paras: string[]): string {
+  return plainEmailWrap(paras.join('<br><br>'));
+}
+
+/** Fecha ISO -> "YYYY/MM/DD" (zona Madrid, sin desfase de día). */
+function gSlashDate(iso: string): string {
+  const d = new Date(`${iso}T12:00:00`);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}/${p(d.getMonth() + 1)}/${p(d.getDate())}`;
+}
+
+/** Fecha ISO -> "15 de junio de 2026". */
+function gFriendlyDate(iso: string): string {
+  return new Date(`${iso}T12:00:00`).toLocaleDateString('es-ES', {
+    day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Madrid',
+  });
+}
+
+/** Fecha ISO -> "martes, día 23 de junio" (como en el .msg de cita). */
+function gFriendlyWeekday(iso: string): string {
+  const d = new Date(`${iso}T12:00:00`);
+  const weekday = d.toLocaleDateString('es-ES', { weekday: 'long', timeZone: 'Europe/Madrid' });
+  const day = d.toLocaleDateString('es-ES', { day: 'numeric', timeZone: 'Europe/Madrid' });
+  const month = d.toLocaleDateString('es-ES', { month: 'long', timeZone: 'Europe/Madrid' });
+  return `${weekday}, día ${day} de ${month}`;
+}
+
+/** Resta días a una fecha ISO y devuelve otra ISO yyyy-mm-dd. */
+function gMinusDaysIso(iso: string, days: number): string {
+  const d = new Date(`${iso}T12:00:00`);
+  d.setDate(d.getDate() - days);
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+/** Enlace clicable mostrado en formato amigable (el propio URL). */
+function gLink(url: string): string {
+  return `<a href="${url}" style="color: #063971;">${url}</a>`;
+}
+
+/** Colapsa espacios múltiples y recorta (evita dobles espacios en asuntos). */
+function gTidy(text: string): string {
+  return text.replace(/\s{2,}/g, ' ').trim();
+}
+
+/**
+ * Asunto UNIFICADO para todos los emails de gestión. Formato coherente:
+ *   "{prefijo} FURGOCASA {código} - {vehículo} del {inicio} al {fin}"
+ * Solo cambia el prefijo según el tipo de email.
+ */
+function buildRentalSubject(prefix: string, data: AdminGestionEmailData): string {
+  return gTidy(`${prefix} FURGOCASA ${data.vehicleInternalCode} - ${data.vehicleName} del ${gSlashDate(data.pickupDate)} al ${gSlashDate(data.dropoffDate)}`);
+}
+
+/**
+ * 1) EMAIL DE GESTIÓN INICIAL (manual, tras confirmar el pago).
+ *    Firmado por Narciso. Base: kill_notion/1 - Alquiler…msg + n8n.
+ */
+export function getBookingManagementEmail(data: AdminGestionEmailData): AdminGestionEmail {
+  const channel = data.salesChannel || 'FURGOCASA';
+  const vencimiento = gFriendlyDate(gMinusDaysIso(data.pickupDate, 15));
+  const html = joinParas([
+    `Hola, ${data.customerFirstName},`,
+    `Te confirmamos que hemos recibido tu reserva ${data.bookingNumber} a través de la web de ${channel}. Puedes consultar su estado a través del siguiente link: ${gLink(data.reservationUrl)}`,
+    `Te facilitamos link a nuestro contrato de alquiler y hoja de protección de datos a razón de los geo localizadores instalados en los vehículos: ${gLink('https://www.furgocasa.com/es/documentacion-alquiler')}`,
+    `Este es el contrato que aplicará durante el alquiler y todas sus cláusulas son de ineludible aplicación. Te pedimos, por favor, que lo revises con detalle y cuanto antes mejor.`,
+    `En cuanto al precio, si al hacer la reserva has abonado solo el primer 50%, el importe restante debes abonarlo, como máximo, 15 días antes del comienzo de alquiler: que, en este caso, sería antes del día <strong>${vencimiento}</strong>. Si ya estuviera vencida esa fecha, el pago debe realizarse cuanto antes.`,
+    `Para realizar el pago tienes que acceder al link de la reserva que aparece arriba y ahí encontrarás un nuevo botón de pago para la cantidad restante.`,
+    `Si al hacer la reserva abonaste el 100%, entonces ya el único pago a realizar es el pago de la fianza, por importe de 1.000 euros, que debes realizar por transferencia con tiempo suficiente para que la recibamos con 72 horas de antelación al comienzo del alquiler y podamos confirmar la recepción y la cita.`,
+    `Por otra parte, a fin de verificar los requisitos exigidos al conductor/es (apartado 2.1) necesitamos la documentación de las personas que tengáis previsto vayan a conducir:`,
+    `• DNI (anverso y reverso).<br>• Carnet de conducir (anverso y reverso).`,
+    `Puedes subirla de forma rápida y segura desde el link de documentación, identificándote con tu número de reserva, ${data.bookingNumber}, y tu email:<br>${gLink('https://www.furgocasa.com/es/documentacion-alquiler')}`,
+    `Si viajáis varios conductores, dentro de ese mismo enlace puedes añadir la documentación de cada uno.`,
+    `Muchas gracias. A tu disposición.`,
+    `Salu2`,
+    `Narciso Pardo<br>Teléfono y WhatsApp: +34 678 081 261<br>${gLink('https://www.furgocasa.com')}`,
+  ]);
+  return { subject: buildRentalSubject('Alquiler', data), html };
+}
+
+/**
+ * 2) RECORDATORIO 2º PAGO (VENCIDO). Base: n8n "Pedir 2º Pago".
+ */
+export function getSecondPaymentReminderEmail(data: AdminGestionEmailData): AdminGestionEmail {
+  const html = joinParas([
+    `Estimado/a ${data.customerFirstName},`,
+    `Te enviamos este mail para informarte de que el pago de la segunda mitad de tu alquiler está pendiente. Te recordamos que el 100% del alquiler debe quedar abonado como máximo 15 días antes del comienzo del alquiler.`,
+    `Por favor, completa este pago lo antes posible para evitar problemas con tu alquiler.`,
+    `Debes hacer el pago en el link de tu reserva:<br>${gLink(data.reservationUrl)}`,
+    `Muchas gracias.<br>Un saludo.`,
+    `EL EQUIPO DE FURGOCASA`,
+    gLink('https://www.furgocasa.com'),
+  ]);
+  return { subject: buildRentalSubject('VENCIDO 2º pago', data), html };
+}
+
+/**
+ * 3) RECORDATORIO CONTRATO NO FIRMADO. Base: n8n "Pedir firmar contrato".
+ */
+export function getContractReminderEmail(data: AdminGestionEmailData): AdminGestionEmail {
+  const html = joinParas([
+    `Estimado/a ${data.customerFirstName},`,
+    `Te enviamos este mail para informarte de que faltan 15 días para el comienzo del alquiler y ha llegado el momento de firmar el contrato.`,
+    `Te recordamos que el contrato fue puesto a tu disposición en el mail que recibiste al hacer la reserva y, entonces, te conferimos un plazo para desistir sin penalización. No habiendo ejercitado tal derecho, entendemos seguimos adelante con el alquiler.`,
+    `La firma del contrato es un trámite imprescindible para que podamos confirmar la cita de tu alquiler.`,
+    `Para firmar el contrato debes acceder a este link, leer los documentos, aceptando todas las casillas de verificación y firmarlos en la misma página:<br>${gLink('https://www.furgocasa.com/es/documentacion-alquiler')}`,
+    `Para acceder a la documentación necesitarías introducir tu número de reserva, ${data.bookingNumber}, y tu email.`,
+    `Una vez lo firmes recibirás la copia por email.`,
+    `Muchas gracias.<br>Un saludo.`,
+    `PD: Si ya has enviado el contrato firmado y aun así recibes este email, NO TE PREOCUPES. Es posible que aún no hayamos procesado tu email y por eso recibes este mail automático. En cuanto lo procesemos dejarás de recibirlo. Disculpa las molestias.`,
+    `EL EQUIPO DE FURGOCASA`,
+    gLink('https://www.furgocasa.com'),
+  ]);
+  return { subject: buildRentalSubject('Contrato pendiente', data), html };
+}
+
+/**
+ * 4) RECORDATORIO DOCUMENTACIÓN. Base: n8n "Pedir documentación".
+ */
+export function getDocumentationReminderEmail(data: AdminGestionEmailData): AdminGestionEmail {
+  const html = joinParas([
+    `Estimado/a ${data.customerFirstName},`,
+    `Te enviamos este mail para informarte de que quedan apenas 15 días para el comienzo del alquiler y seguimos a la espera de recibir la documentación de las personas que vayan a conducir.`,
+    `Te recuerdo: a fin de verificar los requisitos exigidos al conductor/es (apartado 2.1) necesitamos la documentación de las personas que tengáis previsto vayan a conducir:`,
+    `• DNI (anverso y reverso).<br>• Carnet de conducir (anverso y reverso).`,
+    `La documentación ya NO se envía por email: puedes subirla en unos segundos desde el link de documentación de tu reserva, identificándote con tu número de reserva, ${data.bookingNumber}, y tu email:<br>${gLink('https://www.furgocasa.com/es/documentacion-alquiler')}`,
+    `Si viajáis varios conductores, dentro de ese mismo enlace puedes añadir la documentación de cada uno.`,
+    `Muchas gracias.<br>Un saludo.`,
+    `PD: Si ya has subido tu documentación y aun así recibes este email, NO TE PREOCUPES. Es posible que aún no la hayamos procesado y por eso recibes este mail automático. En cuanto la validemos dejarás de recibirlo. Disculpa la molestia.`,
+    `EL EQUIPO DE FURGOCASA`,
+    gLink('https://www.furgocasa.com'),
+  ]);
+  return { subject: buildRentalSubject('Documentación pendiente', data), html };
+}
+
+/**
+ * 5) RECORDATORIO FIANZA. Base: n8n "Pedir fianza".
+ */
+export function getDepositReminderEmail(data: AdminGestionEmailData): AdminGestionEmail {
+  const html = joinParas([
+    `Estimado/a ${data.customerFirstName},`,
+    `Te enviamos este mail para informarte de que se acerca la fecha del comienzo del alquiler y ha llegado el momento de realizar el pago de la fianza del alquiler.`,
+    `Te recordamos que la fianza, por importe de 1.000 euros, debe ser abonada por transferencia y debemos haberla recibido, para poder verificarla correctamente, como máximo 72 horas (3 días) antes del comienzo del alquiler.`,
+    `La cuenta a la que debes hacer la transferencia es la siguiente:<br>TITULAR: FURGOCASA CAMPERVANS, S.L.<br>ENTIDAD: Sabadell (recuerda verificar la entidad cuando introduzcas el número de cuenta).<br>IBAN: ES68 0081 0210 1900 0254 5860<br>SWIFT (para transferencias internacionales): BSABESBBXXX`,
+    `Recuerda, una vez realizado el pago de la fianza, debes enviarnos por email la siguiente documentación:`,
+    `&nbsp;&nbsp;&bull; Justificante de la transferencia; y<br>&nbsp;&nbsp;&bull; Certificado de titularidad bancaria de la cuenta a la que desees te sea devuelta la fianza una vez finalizado el alquiler.`,
+    `Este segundo documento es imprescindible para que conozcamos la cuenta a la que transferir.`,
+    `Muchas gracias.<br>Un saludo.`,
+    `PD: Si ya has pagado la fianza y aun así recibes este email, NO TE PREOCUPES. Es posible que aún no hayamos procesado tu transferencia y por eso recibes este mail automático. En cuanto lo procesemos dejarás de recibirlo. Disculpa las molestias.`,
+    `EL EQUIPO DE FURGOCASA`,
+    gLink('https://www.furgocasa.com'),
+  ]);
+  return { subject: buildRentalSubject('Fianza pendiente', data), html };
+}
+
+/**
+ * 6) EMAIL DE CITA (todo completado). Base: kill_notion/5 - Cita…msg.
+ *    Firmado por Narciso Pardo Buendía.
+ */
+export function getAppointmentEmail(data: AdminGestionEmailData): AdminGestionEmail {
+  const cuando = `${gFriendlyWeekday(data.pickupDate)}${data.pickupTime ? `, a las ${data.pickupTime}` : ''}`;
+  const lugarNombre = data.pickupLocation || 'Furgocasa Campervans';
+  const lugarDir = data.pickupLocationAddress || 'Av. Puente Tocinos, 4, 30007 Casillas, Murcia';
+  const html = joinParas([
+    `Buenas tardes, ${data.customerFirstName},`,
+    `Te confirmo la cita del próximo ${cuando}. Por favor, rogamos puntualidad ya que acudimos expresamente a las citas.`,
+    `El lugar donde debéis acudir a recoger la camper es:<br>${lugarNombre}<br>${lugarDir}<br>${gLink('https://g.page/furgocasa?share')}`,
+    `Y si durante el viaje os surge cualquier duda o incidencia, podéis hablar con nuestro asistente online cuando queráis desde este enlace: <a href="https://www.furgocasa.com/?chat=open" style="color: #063971;">Hablar con nuestro chat</a>.`,
+    `Para que conozcáis cómo funciona la camper y todos sus accesorios podéis acceder a este link a video tutoriales de funcionamiento de la camper: ${gLink('https://www.furgocasa.com/es/video-tutoriales')}`,
+    `Si después tenéis cualquier duda, la responderemos el día de la entrega.`,
+    `Por último, ponemos a vuestra disposición las siguientes herramientas para mejorar vuestra experiencia en el viaje:`,
+    `&bull; Mapa interactivo totalmente gratuito (solo requiere registrarse) de ÁREAS DE AUTOCARAVANAS que hemos creado y lanzado recientemente: ${gLink('https://www.mapafurgocasa.com')} Dispone de una herramienta RUTA que permite calcular una ruta y localizar áreas dentro de un radio de la ruta.`,
+    `&bull; CASICINCO: una aplicación nueva que hemos lanzado que filtra en Google Maps solo lugares con más de 4,7. Es bastante útil para buscar buenos restaurantes para comer en ruta 😉 ${gLink('https://www.casicinco.com')} Podéis registraros y usarlo de forma gratuita durante 30 días.`,
+    `Gracias. A vuestra disposición.`,
+    `PD: Os invitamos a que nos acompañéis en las redes sociales.<br>Página de Instagram: ${gLink('https://www.instagram.com/furgocasa/')}<br>Página de Facebook: ${gLink('https://www.facebook.com/furgocasa')}<br>Grupo de amantes de las Campervans: ${gLink('https://www.facebook.com/groups/campervan.lovers')}`,
+    `Narciso Pardo Buendía<br>${gLink('https://www.furgocasa.com')}<br>E: <a href="mailto:reservas@furgocasa.com" style="color: #063971;">reservas@furgocasa.com</a>`,
+  ]);
+  return { subject: buildRentalSubject('Cita', data), html };
+}

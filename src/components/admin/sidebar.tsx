@@ -32,6 +32,7 @@ import {
   Mail,
   Sparkles,
   FileSignature,
+  ListChecks,
 } from "lucide-react";
 import { useState, useEffect, useCallback, memo } from "react";
 import type { Admin } from "@/types/blog";
@@ -45,6 +46,7 @@ interface NavItem {
 
 const navigation: NavItem[] = [
   { name: "Dashboard", href: "/administrator", icon: LayoutDashboard },
+  { name: "Administración", href: "/administrator/administracion", icon: ListChecks },
   { name: "Bloqueos", href: "/administrator/bloqueos", icon: Ban },
   {
     name: "Blog",

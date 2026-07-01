@@ -1,0 +1,842 @@
+{
+  "name": "FURGOCASA - Actualización alquileres NOTION + SUPABASE",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        16
+      ],
+      "id": "8b7ad97a-4348-4474-a815-98dbda6a1196",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Extra los siguientes datos de alquiler de esta reserva:\nNombre: {{ $('Get CUSTOMER').item.json.name }}\n\nApellido 1: when, because of its country of origin, client has two last names, you will write the first one here. If only has one last name it will also be here.\n\nApellido 2: when, because of its country of origin, client has two last names, you will write the second one here.\n\nCodigo vehículo: {{ $('Get VEHICLE').item.json.internal_code }}\n\nVehículo alquilado: {{ $('Get VEHICLE').item.json.name }}\n\nPropietaria vehiculo: son propiedad de \"F MURCIA\" la FU0006, FU0007, FU0008, FU0009, FU0010, FU0011,FU0012. Y son propiedad de \"F MADRID\" la FU005, FU0013, FU0014, FU0015, FU0016, FU0017 y FU0018.\n\nFecha Inicio: {{ $('Get BOOKING').item.json.pickup_date }} (siempre con el formato AAAA/MM/DD sin hora)\n\nHora Inicio: {{ $('Get BOOKING').item.json.pickup_time }} (siempre con el formato HH:MM sin segundos)\n\nFecha Fin: {{ $('Get BOOKING').item.json.dropoff_date }} (siempre con el formato AAAA/MM/DD sin hora)\n\nHora Fin: {{ $('Get BOOKING').item.json.dropoff_time }} (siempre con el formato HH:MM sin segundos)\n\nDuracion (días): la calculas teniendo en cuenta la fecha inicio y fecha fin\nUbicación de recogida: {{ $('Get LOCATION').item.json.name }} (expresaras solo el nombr de la localidad, sin () despues)\n\nUbicación de devolución: {{ $('Get LOCATION').item.json.name }}\n\nAparcamiento: (within one of the extras. If it shows it is above the total price. Make sure you see the extra!! Do not make it up) (opciones: \"SI PARKING\" siempre en mayusculas o \" \")\n\nPrecio del alquiler: {{ $('Get BOOKING').item.json.total_price }}\n\nCupón aplicado: {{ $('Get BOOKING').item.json.discount }}\n\nTotal a pagar: {{ $('Get BOOKING').item.json.total_price }}\n\nPagado: {{ $('Get BOOKING').item.json.amount_paid }} (en los alquileres Canal de ventas INDIE CAMPERS o YESCAPA el pago vence y se cobra el dia de comienzo de alquiler. Nunca podra haber importe pagado antes)\n\nSaldo restante (por pagar):\n\nVencimiento: (Será siempre 15 días antes del comienzo del alquiler)\n\nFianza: (Será siempre 8 días antes del comienzo del alquiler; asegurate de calcular bien la fecha y no fallar en el dia, mes o año)\n\nFecha de pedido: {{ $('Get BOOKING').item.json.created_at }} [sin hora, solo fecha] Ten en cuenta que si estas creando registros nuevos, la fecha tendra que ser cercana a la ejecucion. lleva cuidado con no bailar dias y meses. El formato en el que lo recibes siempre es DD/MM/YYYY\n\nCanal Venta: (siempre en mayusculas)(exsiten tres posibles canales de venta: \nFURGOCASA, en este caso no aparecerea informacion en la reserva.\nINDIE CAMPERS en este caso aparecera el termino \"INDIE CAMPERS\" en la reserva\nYESCAPA en esta caso aparecerea el termino \"YESCAPA\" en la reserva)\n\nNúmero de pedido: {{ $('Get BOOKING').item.json.booking_number }}\n\nNúmero de confirmación:\n\nDirección: {{ $('Get CUSTOMER').item.json.address }}\n\nCódigo Postal: {{ $('Get CUSTOMER').item.json.postal_code }}\n\nMunicipio: {{ $('Get CUSTOMER').item.json.city }}\n\nCodigo del Municipio: solo cuando el pais del cliente, {{ $('Get CUSTOMER').item.json.country }}, sea España,  devolverás el \"Codigo de Municipio\" segun la lista del INE (Instituto Nacional de Estadistica). You must search this in internet. Las ciudades de paises no España no tiene codigo del municipio!!\n\nPaís: ¡Devolverás este campo SIEMPRE EN MAYUSCULAS! {{ $('Get CUSTOMER').item.json.country }} Debes devolver unicamente letras, no el nombre de pais completo, debes facilitar el CODIGO PAIS de acuerdo con las normas ISO: ESP, ARG, ... NUNCA DEVOLVERAS NOMBRES DE PAISES COMPLETOS COMO: COLOMBIA, REINO UNIDO. Recuerda!! solo codigo PAIS!\n\nEdad del conductor: lo calcularas considerado el lapso entre su fecha de nacimiento {{ $('Get CUSTOMER').item.json.date_of_birth }} y el dia de hoy {{ $json.currentDate }}, expresado en AÑOS\n\nDNI - ID number: {{ $('Get CUSTOMER').item.json.dni }} eliminaras cualquier caracter que no sea una letra o un numero: por ejemplo \" \" o \"-\"\n\nTipo_documento: ¡Devolverás este campo SIEMPRE EN MAYUSCULAS! Valorarás en base al {{ $('Get CUSTOMER').item.json.dni }} y darás una de estas respuestas: \"NIF\", \"NIE\", \"PAS\" u \"OTRO\", en funcion de si consideras que es un Documento Nacional de Identidad, un Numero de Identificacion de Extranjeros, Pasaporte u otro. Para determinar si es uno u otro documento tendras en cuenta las siguientes reglas: 1) Solo los que tengan como pais \"España\" pueden tener un NIF o NIE. El resto son \"OTRO\". 2) el DNI empieza por numero. El NIE empieza en \"X\" o \"Y\". Y recuerda, siempre en Mayusculas, incluso \"OTRO\". 3) Si no determinas ninguno devoleras \"OTRO\". Si tienes dudas, ten en consideración el dato PAIS {{ $('Get CUSTOMER').item.json.country }} del cliente\n\nTeléfono: {{ $('Get CUSTOMER').item.json.phone }}\n\nEmail: {{ $('Get CUSTOMER').item.json.email }}\n\nComentarios: {{ $('Get BOOKING').item.json.admin_notes }}\n\nFacilitame simplemente el listado de datos, sin niguna frase adicional. Y MUY IMPORTANTE NO IMOTIR EL CALCULO DE NIGUN DATO!!\n"
+            },
+            {
+              "content": "{\n    \"Nombre\": \"\",\n    \"Apellido1\": \"\",\n    \"Apellido2\": \"\",\n    \"CodigoVehiculo\": \"\",\n    \"VehiculoAlquilado\": \"\",\n    \"PropietariaVehiculo\": \"\",\n    \"FechaInicio\": \"\", siempre con el formato AAAA/MM/DD sin hora\n    \"HoraInicio\": \"\",\n    \"FechaFin\": \"\", siempre con el formato AAAA/MM/DD sin hora\n    \"HoraFin\": \"\",\n    \"DuracionDias\": 0,\n    \"UbicacionRecogida\": \"\",\n    \"UbicacionDevolucion\": \"\",\n    \"Aparcamiento\": \"\",\n    \"PrecioAlquiler\": 0.0,\n    \"CuponAplicado\": \"\",\n    \"TotalAPagar\": 0.0,\n    \"Pagado\": 0.0,\n    \"SaldoRestante\": 0.0,\n    \"Vencimiento\": \"\",  // Calculado restando 15 días a la fecha de \"Inicio\"\n    \"Fianza\": \"\",  // Calculado restando 6 días a la fecha de \"Inicio\"\n    \"CanalVenta\": \"\",\n    \"FechaPedido\": \"\",\n    \"NumeroPedido\": \"\",\n    \"NumeroConfirmacion\": \"\",\n    \"Direccion\": \"\",\n    \"CodigoPostal\": \"\",\n    \"Municipio\": \"\",\n    \"CodigoMunicipio\": \"\",\n    \"Pais\": \"\",\n    \"EdadConductor\": 0,\n    \"DNI_IDNumber\": \"\",\n    \"Tipo_documento\": \"\",\n    \"Telefono\": \"\",\n    \"Email\": \"\",\n    \"Comentarios\": \"\"\n}",
+              "role": "assistant"
+            },
+            {
+              "content": "=Tu misión es obtener y extraer información relativa a reservas de alquiler de Campers de Furgocasa.\n\nTodas las fechas se trabajaran en formato ISO (yyyy/mm/dd).\n\nCuando se te diga que devuelvas todos los campos en Mayusculas lo harás.\n\nRevisa con especial cuidado los canales de venta: FURGOCASA, INDIE CAMPERS y YESCAPA. Si no aparece \"INDIE CAMPERS\" o \"YESCAPA\", es \"FURGOCASA\". Recuerda este campo, como excepción, siempre en mayúsculas.\n\nSi no se te indica nada sobre mayusculas, devolveras la primera letra en Mayuscuales y el resto minisculas.\n\nAsegúrate de incluir parking solo si verdaderamente ves el extra de aparcamiento.\n",
+              "role": "system"
+            }
+          ]
+        },
+        "simplify": false,
+        "jsonOutput": true,
+        "options": {
+          "maxTokens": 16000,
+          "temperature": 0,
+          "topP": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        640,
+        16
+      ],
+      "id": "130a87ab-5044-4f65-b847-1ea6647942ee",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "JLHjUR2gz6Pll59D",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        368,
+        0
+      ],
+      "id": "7797fb43-f6f5-44ac-8dc6-945d088afde7",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get many database pages1').item.json.id }}",
+          "mode": "id"
+        },
+        "simple": false,
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "CODIGO CITA|title",
+              "title": "={{ $json.choices[0].message.content.CodigoVehiculo }} - {{ $json.choices[0].message.content.UbicacionRecogida }} {{ $json.choices[0].message.content.FechaInicio }} {{ $json.choices[0].message.content.HoraInicio }} / {{ $json.choices[0].message.content.UbicacionDevolucion }} {{ $json.choices[0].message.content.FechaFin }} {{ $json.choices[0].message.content.HoraFin }} - {{ $json.choices[0].message.content.Nombre }} {{ $json.choices[0].message.content.Apellido1 }} {{ $json.choices[0].message.content.Apellido2 }} {{ $json.choices[0].message.content.Aparcamiento }}"
+            },
+            {
+              "key": "Código Vehículo|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.CodigoVehiculo }} - {{ $json.choices[0].message.content.VehiculoAlquilado }}"
+            },
+            {
+              "key": "Propietaria|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.PropietariaVehiculo }}"
+            },
+            {
+              "key": "Canal Venta|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.CanalVenta }}"
+            },
+            {
+              "key": "Id Reserva|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.NumeroPedido }}"
+            },
+            {
+              "key": "Fecha Reserva|date",
+              "includeTime": false,
+              "date": "={{ $json.choices[0].message.content.FechaPedido }}"
+            },
+            {
+              "key": "DNI - ID number:|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.DNI_IDNumber }}"
+            },
+            {
+              "key": "Nombre|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Nombre }}"
+            },
+            {
+              "key": "Apellido 1|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Apellido1 }}"
+            },
+            {
+              "key": "Apellido 2|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Apellido2 }}"
+            },
+            {
+              "key": "Tipo Documento|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Tipo_documento }}"
+            },
+            {
+              "key": "Pais|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Pais }}"
+            },
+            {
+              "key": "Dirección|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Direccion }}"
+            },
+            {
+              "key": "Código Postal|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.CodigoPostal }}"
+            },
+            {
+              "key": "Codigo Municipio|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.CodigoMunicipio }}"
+            },
+            {
+              "key": "Municipio|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Municipio }}"
+            },
+            {
+              "key": "Email|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Email }}"
+            },
+            {
+              "key": "Fecha Inicio|date",
+              "includeTime": false,
+              "date": "={{ $json.choices[0].message.content.FechaInicio }}"
+            },
+            {
+              "key": "Hora Inicio|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.HoraInicio }}"
+            },
+            {
+              "key": "Fecha Fin:|date",
+              "includeTime": false,
+              "date": "={{ $json.choices[0].message.content.FechaFin }}"
+            },
+            {
+              "key": "Hora Fin|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.HoraFin }}"
+            },
+            {
+              "key": "Duración |number",
+              "numberValue": "={{ $json.choices[0].message.content.DuracionDias }}"
+            },
+            {
+              "key": "Localizacion|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.UbicacionRecogida }}"
+            },
+            {
+              "key": "PARKING|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Aparcamiento }}"
+            },
+            {
+              "key": "Precio Total|number",
+              "numberValue": "={{ $json.choices[0].message.content.TotalAPagar }}"
+            },
+            {
+              "key": "Pagado|number",
+              "numberValue": "={{ $json.choices[0].message.content.Pagado }}"
+            },
+            {
+              "key": "Pendiente|number",
+              "numberValue": "={{ $json.choices[0].message.content.SaldoRestante }}"
+            },
+            {
+              "key": "Vencimiento|date",
+              "includeTime": false,
+              "date": "={{ $json.choices[0].message.content.Vencimiento }}"
+            },
+            {
+              "key": "Limite FIANZA|date",
+              "includeTime": false,
+              "date": "={{ $json.choices[0].message.content.Fianza }}"
+            },
+            {
+              "key": "Concepto factura|rich_text",
+              "textContent": "={{ $json.choices[0].message.content.DuracionDias }} días\nDel {{ $json.choices[0].message.content.FechaInicio }} al {{ $json.choices[0].message.content.FechaFin }}\n{{ $json.choices[0].message.content.UbicacionRecogida }} / {{ $json.choices[0].message.content.UbicacionDevolucion }}\nHora inicio / fin: {{ $json.choices[0].message.content.HoraInicio }} / {{ $json.choices[0].message.content.HoraFin }}"
+            },
+            {
+              "key": "Telefono |rich_text",
+              "textContent": "={{ $json.choices[0].message.content.Telefono }}"
+            },
+            {
+              "key": "Edad conductor|number",
+              "numberValue": "={{ $json.choices[0].message.content.EdadConductor }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1040,
+        224
+      ],
+      "id": "5151ae91-9312-41db-96ac-e64c2dffe68e",
+      "name": "Update a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "Fe53Zwaecx4rqiQf",
+          "name": "Notion account FURGOCASA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c469d80b-b8af-49c2-bd20-2744e48a687b",
+              "leftValue": "={{ $('Get many database pages1').item.json.properties['Primer mail'].checkbox }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1024,
+        16
+      ],
+      "id": "4d25c682-ffa9-4031-a4d3-ae371fd72153",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.choices[0].message.content.CanalVenta }}",
+                    "rightValue": "FURGOCASA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8fe0805a-e14e-446f-9df6-42a09e9f9d87"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "08d074aa-b5b3-497d-9265-512e47f479d7",
+                    "leftValue": "={{ $json.choices[0].message.content.CanalVenta }}",
+                    "rightValue": "FURGOCASA",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        1248,
+        0
+      ],
+      "id": "baaf78a3-b42f-4a2a-974f-0c21126dc346",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4.1-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4.1-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "Produce json text\n\nEres un escritor de emails. \n\nLos links incluidos mails seran directamente clicables por el usuario y se mostraran siempre en formato amigable.\n\nEscribiras el email de forma literal al ejemplo, sin omitir ninguna palabra entre \"\", ni alterar el texto. solo se alteran las variables de que recibes \"json\".\n\nen todos los email omite la parte final \nSaludos,  \n[Tu Nombre]  \nFurgocasa\nQue acabe en \"www.furgocasa.com\"",
+              "role": "system"
+            },
+            {
+              "content": " {\n            \"email\": \"\",\n            \"asunto\": \"\",\n            \"texto\": \"\"\n        }",
+              "role": "assistant"
+            },
+            {
+              "content": "=Completaras una tabla con la siguiente información\n\nEmail: \"{{ $json.choices[0].message.content.Email }}\"\n\nAsunto: \"Alquiler FURGOCASA {{ $json.choices[0].message.content.CodigoVehiculo }} - {{ $json.choices[0].message.content.VehiculoAlquilado }} del {{ $json.choices[0].message.content.FechaInicio }} al {{ $json.choices[0].message.content.FechaFin }}\"\n\nTexto (en formato html): \"Hola, {{ $json.choices[0].message.content.Nombre }}, \n\nTe confirmamos que hemos recibido tu reserva {{ $('Get BOOKING').item.json.booking_number }} a través de la web de {{ $json.choices[0].message.content.CanalVenta }}. Puedes consultar su estado a través del siguiente link: {{ $('Get many database pages1').item.json.properties['URL Reserva'].formula.string }}[active link]\n\nTe facilitamos link a nuestro contrato de alquier y hoja de protección de datos a razón de los geo localizadores instalados en los vehículos: https://www.furgocasa.com/es/documentacion-alquiler[active link]\n\nEste es el contrato que aplicará durante el alquiler y todas sus cláusulas son de ineludible aplicación. Te pedimos, por favor, que lo revises con detalle y cuanto antes mejor.\n\nEn cuanto al precio, si al hacer la reserva has abonado solo el primer 50%, el importe restante debes abonarlo, como máximo, 15 días antes del comienzo de alquiler: que, en este caso, sería antes del día {{ $json.choices[0].message.content.Vencimiento }}[esta fecha la expresaras en formato friendly, xx del mes del año, y en negrita]. Si ya estuviera vencida esa fecha, el pago debe realizarse cuanto antes.\n\nPara realizar el pago tienes que acceder al link de la reserva que aparece arriba y ahí encontraras un nuevo botón de pago para la cantidad restante.\n\nSi al hacer la reserva abonaste el 100%, entonces ya el unico pago a realizar es el pago de la fianza, por importe de 1.000 euros, que debes realizar por transferencia con tiempo suficiente para que la recibamos con 72 horas de antelacion al comienzo del alquiler y podamos confimar la recepción y la cita.\n\nPor otra parte, a fin de verificar los requisitos exigidos al conductor/es (apartado 2.1) necesitaríamos nos hicieras llegar la siguiente documentación de las personas que tengáis previsto vayan a conducir:\n\n• Copia del DNI.\n\n• Carnet de conducir.\n\nPor favor, envíanoslo respondiendo a este email.\n\nMuchas gracias. A tu disposición.\n\nSalu2\n\nNarciso Pardo\nTeléfono y WhastApp: +34 678 081 261\nwww.furgocasa.com\"\n"
+            }
+          ]
+        },
+        "jsonOutput": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        1440,
+        -16
+      ],
+      "id": "fa935c29-fc3f-4d49-9c13-4b863e83a532",
+      "name": "Message a model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "JLHjUR2gz6Pll59D",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Get many database pages1').item.json.id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Primer mail|checkbox",
+              "checkboxValue": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1968,
+        -16
+      ],
+      "id": "a6a085c3-08d0-434f-b915-963f81644dd2",
+      "name": "Update a database page1",
+      "credentials": {
+        "notionApi": {
+          "id": "Fe53Zwaecx4rqiQf",
+          "name": "Notion account FURGOCASA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "reservas@furgocasa.com",
+        "toEmail": "={{ $('Message a model1').item.json.message.content.email }}",
+        "subject": "={{ $('Message a model1').item.json.message.content.asunto }}",
+        "html": "={{ $('Message a model1').item.json.message.content.texto }}",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "reservas@furgocasa.com"
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1760,
+        -16
+      ],
+      "id": "90157d1d-85c1-4bd3-abcd-940867a4ef30",
+      "name": "Send email",
+      "webhookId": "1178419a-92f9-4aa5-87a4-080e1830bd82",
+      "notesInFlow": false,
+      "credentials": {
+        "smtp": {
+          "id": "JCJXSYBTOkD12yj5",
+          "name": "SMTP Reservas furgocasa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "customers",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.customer_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -432,
+        0
+      ],
+      "id": "35e66337-0e08-45e8-81b9-a1e1269344ed",
+      "name": "Get CUSTOMER",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FnywdlL8luiiPJwa",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "vehicles",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Get BOOKING').item.json.vehicle_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "d2259e61-d1e4-499a-ae91-0b82a1077568",
+      "name": "Get VEHICLE",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FnywdlL8luiiPJwa",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0613c3a5-5dfc-4b84-9288-4dd86e13db5e",
+              "leftValue": "={{ $json.properties['ID RESERVA'].rich_text[0].text.content }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "d8584c5c-86d2-429a-9eec-78f9ec434ccc",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -864,
+        16
+      ],
+      "id": "6302a838-e5da-434f-8725-746540f7b8c5",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "27759c62-8f77-805b-8bbd-f00c62372789",
+          "mode": "list",
+          "cachedResultName": "ALQUILER RESERVAS",
+          "cachedResultUrl": "https://www.notion.so/27759c628f77805b8bbdf00c62372789"
+        },
+        "returnAll": true,
+        "simple": false,
+        "filterType": "manual",
+        "filters": {
+          "conditions": [
+            {
+              "key": "Finalizado|checkbox",
+              "condition": "equals"
+            }
+          ]
+        },
+        "options": {
+          "downloadFiles": false
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        -1072,
+        16
+      ],
+      "id": "bb16ee08-9f8f-48c3-adce-1eac131c696a",
+      "name": "Get many database pages1",
+      "credentials": {
+        "notionApi": {
+          "id": "Fe53Zwaecx4rqiQf",
+          "name": "Notion account FURGOCASA"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "bookings",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.properties['ID RESERVA'].rich_text[0].text.content }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -608,
+        0
+      ],
+      "id": "4a5c4b30-4ed9-4f50-a33a-c1752ec4c8e4",
+      "name": "Get BOOKING",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "FnywdlL8luiiPJwa",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "locations",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('Get BOOKING').item.json.pickup_location_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "aa89814d-3e8b-4abe-abad-263becbb95f6",
+      "name": "Get LOCATION",
+      "credentials": {
+        "supabaseApi": {
+          "id": "FnywdlL8luiiPJwa",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        96,
+        0
+      ],
+      "id": "0ed6df68-737d-4c37-906b-896b3b61b6a9",
+      "name": "Date & Time"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Update a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Message a model1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model1": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page1": {
+      "main": [
+        []
+      ]
+    },
+    "Send email": {
+      "main": [
+        [
+          {
+            "node": "Update a database page1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get CUSTOMER": {
+      "main": [
+        [
+          {
+            "node": "Get VEHICLE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get VEHICLE": {
+      "main": [
+        [
+          {
+            "node": "Get LOCATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Get BOOKING",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get BOOKING": {
+      "main": [
+        [
+          {
+            "node": "Get CUSTOMER",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get LOCATION": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timezone": "Europe/Madrid",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "2033368d-4442-4ba4-8b5f-d083dd3b7e1f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be4c8a1b2ea7fdce07a03f9ba176ee7ce608ba893e2a478d2cfc7c0b71106b0b"
+  },
+  "nodeGroups": [],
+  "id": "NVb50RhtUdzLkuhr",
+  "tags": []
+}

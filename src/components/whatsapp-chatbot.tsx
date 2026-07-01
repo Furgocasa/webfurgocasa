@@ -527,6 +527,22 @@ export default function WhatsAppChatbot() {
     setHydrated(true);
   }, []);
 
+  // Abrir el chat automáticamente si se llega con ?chat=open (o #chat).
+  // Se usa en enlaces externos (p. ej. el email de cita) para llevar al cliente
+  // directamente a hablar con el asistente. Limpiamos el parámetro para que no
+  // se reabra al navegar o recargar.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const wantsChat = params.get('chat') === 'open' || window.location.hash === '#chat';
+    if (!wantsChat) return;
+    setIsOpen(true);
+    params.delete('chat');
+    const cleanHash = window.location.hash === '#chat' ? '' : window.location.hash;
+    const newUrl = `${window.location.pathname}${params.toString() ? `?${params}` : ''}${cleanHash}`;
+    window.history.replaceState(null, '', newUrl);
+  }, []);
+
   // Persistir conversacion (sin adjuntos pesados) y estado abierto.
   useEffect(() => {
     if (!hydrated) return;

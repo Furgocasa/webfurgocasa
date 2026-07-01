@@ -1,0 +1,526 @@
+{
+  "name": "FURGOCASA - Avisos MAIL pendientes NOTION",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "d9ca60cf-db69-48f3-baba-15e0302db8f6",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "includeTime": false,
+        "outputFieldName": "={{$today}}",
+        "options": {
+          "timezone": "Europe/madrid"
+        }
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ],
+      "id": "b093565f-3b4c-4f38-947b-028ab0de28ac",
+      "name": "Date & Time"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d5f9104d-cf88-4f42-a99b-f8f58f705941",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Vencimiento.date.start }}",
+              "rightValue": "={{$today}}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            },
+            {
+              "id": "32dec53e-f261-47c8-b9f6-534eff6d2e99",
+              "leftValue": "={{ $('Get many database pages').item.json.properties['2º Pago'].checkbox }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        -352
+      ],
+      "id": "05a02626-3d74-4fec-ab95-0d9d7c6077d0",
+      "name": "If - SEGUNDO PAGO VENCIDO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d5f9104d-cf88-4f42-a99b-f8f58f705941",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Vencimiento.date.start }}",
+              "rightValue": "={{$today}}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            },
+            {
+              "id": "32dec53e-f261-47c8-b9f6-534eff6d2e99",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Contrato.checkbox }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        -176
+      ],
+      "id": "808333bb-3c41-4d88-936a-7402d9af3d02",
+      "name": "If - CONTRATO NO FIRMADO"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d5f9104d-cf88-4f42-a99b-f8f58f705941",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Vencimiento.date.start }}",
+              "rightValue": "={{$today}}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            },
+            {
+              "id": "32dec53e-f261-47c8-b9f6-534eff6d2e99",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Doc.checkbox }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        0
+      ],
+      "id": "633a072d-c736-4301-b5ac-a7dc52de46f9",
+      "name": "If - DOCUMENTACION NO EVIANDA"
+    },
+    {
+      "parameters": {
+        "fromEmail": "reservas@furgocasa.com",
+        "toEmail": "={{ $('Get many database pages').item.json.properties.Email.rich_text[0].text.content }}",
+        "subject": "=VENCIDO - {{ $('Get many database pages').item.json.properties['CODIGO CITA'].title[0].text.content }}",
+        "html": "=Estimado/a {{ $('Get many database pages').item.json.properties.Nombre.rich_text[0].text.content }},\n<br>\n<br>\nTe enviamos este mail para informarte de que el pago de la segunda mitad de tu alquiler está pendiente. Te recordamos que el 100% del alquiler debe quedar abonado como máximo 15 días antes del comienzo del alquiler.\n<br>\n<br>\nPor favor, completa este pago lo antes posible para evitar problemas con tu alquiler.\n<br>\n<br>\nDebes hacer el pago en el link de tu reserva:\n<br>\n{{ $('Get many database pages').item.json.properties['URL Reserva'].formula.string }}\n<br>\n<br>\nMuchas gracias.\n<br>\nUn saludo. \n<br>\n<br>\nEL EQUIPO DE FURGOCASA\n<br>\n<br>\nwww.furgocasa.com",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "reservas@furgocasa.com "
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        -368
+      ],
+      "id": "9b7353e0-fea3-4dba-80a3-c8187b7bda3f",
+      "name": "Pedir 2º Pago",
+      "webhookId": "5e3673a1-62fd-4a6e-ba9d-69c0a0ceb216",
+      "credentials": {
+        "smtp": {
+          "id": "JCJXSYBTOkD12yj5",
+          "name": "SMTP Reservas furgocasa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d5f9104d-cf88-4f42-a99b-f8f58f705941",
+              "leftValue": "={{ $('Get many database pages').item.json.properties['Limite FIANZA'].date.start }}",
+              "rightValue": "={{$today}}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "beforeOrEquals"
+              }
+            },
+            {
+              "id": "32dec53e-f261-47c8-b9f6-534eff6d2e99",
+              "leftValue": "={{ $('Get many database pages').item.json.properties['Fianza (3 días)'].checkbox }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        176
+      ],
+      "id": "fe0e4ef1-2f7f-48d8-939f-ffb0c2f8a29b",
+      "name": "If - FIANZA NO RECIBIDA"
+    },
+    {
+      "parameters": {
+        "fromEmail": "reservas@furgocasa.com",
+        "toEmail": "={{ $('Get many database pages').item.json.properties.Email.rich_text[0].text.content }}",
+        "subject": "=CONTRATO - {{ $('Get many database pages').item.json.properties['CODIGO CITA'].title[0].text.content }}",
+        "html": "=Estimado/a {{ $('Get many database pages').item.json.properties.Nombre.rich_text[0].text.content }},\n<br>\n<br>\nTe enviamos este mail para informarte de faltan 15 días para el comienzo del alquiler y ha llegado el momento de firmar el contrato. \n<br>\n<br>\nTe recordamos que el contrato fue puesto a tu disposición en el mail que recibiste al hacer la reserva y, entonces, te conferimos un plazo para desistir sin penalización. No habiendo ejercitado tal derecho, entendemos seguimos adelante con el alquiler.\n<br>\n<br>\nLa firma del contrato es un trámite imprescindible para que podamos confirmar la cita de tu alquiler.\n<br>\n<br>\nPara firmar el contrato debes acceder a este link, leer los documentos, aceptando todos las casillas de verificación y firmarlos en la misma página:\nhttps://www.furgocasa.com/documentacion-alquiler\n<br>\n<br>\nPara acceder a la documentacion necesitarias introducir tu numero de reserva, {{ $('Get many database pages').item.json.properties['Id Reserva'].rich_text[0].text.content }}, y tu email.\n<br>\n<br>\nUna vez lo firmes recibirás la copia por email.\n<br>\n<br>\nMuchas gracias.\n<br>\nUn saludo. \n<br>\n<br>\nPD: Si ya has enviado el contrato firmado y aun así recibes este email, NO TE PREOCUPES. Es posible que aún no hayamos procesado tu email y por eso recibes este mail automático. En cuanto lo procesemos dejarás de recibirlo. Disculpa las molestias.\n<br>\n<br>\nEL EQUIPO DE FURGOCASA\n<br>\n<br>\nwww.furgocasa.com\n",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "reservas@furgocasa.com "
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        -192
+      ],
+      "id": "f7495c90-35bb-4c11-8140-1bbb6fc13091",
+      "name": "Pedir firmar contrato",
+      "webhookId": "6fc0afa1-901b-4059-9996-56aade874570",
+      "credentials": {
+        "smtp": {
+          "id": "JCJXSYBTOkD12yj5",
+          "name": "SMTP Reservas furgocasa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "reservas@furgocasa.com",
+        "toEmail": "={{ $('Get many database pages').item.json.properties.Email.rich_text[0].text.content }}",
+        "subject": "=DOCUMENTACION - {{ $('Get many database pages').item.json.properties['CODIGO CITA'].title[0].text.content }}",
+        "html": "=Estimado/a {{ $('Get many database pages').item.json.properties.Nombre.rich_text[0].text.content }},\n<br>\n<br>\nTe enviamos este mail para informarte de que quedan apenas 15 dias para el comienzo del alquiler y seguimos a la espera de recibir la documentación de las personas que vayan a conducir.\n<br>\n<br>\nTe recuerdo: A fin de verificar los requisitos exigidos al conductor/es (apartado 2.1) necesitaríamos nos hicieras llegar la siguiente documentación de las personas que tengáis previsto vayan a conducir:\n<br>\n<br>\n• Copia del DNI.\n<br>\n• Carnet de conducir.\n<br>\n<br>\nPor favor, envíanos la documentación en respuesta a este email.\n<br>\n<br>\nMuchas gracias.\n<br>\nUn saludo. \n<br>\n<br>\nPD: Si ya has enviado tu documentación aun así recibes este email, NO TE PREOCUPES. Es posible que aún no hayamos procesado tu email y por eso recibes este mail automático. En cuanto lo procesemos dejarás de recibirlo. Disculpa la molestia.\n<br>\n<br>\nEL EQUIPO DE FURGOCASA\n<br>\n<br>\nwww.furgocasa.com\n",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "reservas@furgocasa.com "
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        -16
+      ],
+      "id": "80b1504e-5f55-434b-b3d3-16fe08c04ea7",
+      "name": "Pedir documentación",
+      "webhookId": "ac8ee0c6-0e12-4e71-9b7f-e8aabd276e67",
+      "credentials": {
+        "smtp": {
+          "id": "JCJXSYBTOkD12yj5",
+          "name": "SMTP Reservas furgocasa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "reservas@furgocasa.com",
+        "toEmail": "={{ $('Get many database pages').item.json.properties.Email.rich_text[0].text.content }}",
+        "subject": "=FIANZA - {{ $('Get many database pages').item.json.properties['CODIGO CITA'].title[0].text.content }}",
+        "html": "=Estimado/a {{ $('Get many database pages').item.json.properties.Nombre.rich_text[0].text.content }},\n<br>\n<br>\nTe enviamos este mail para informarte de que se acerca la fecha del comienzo del alquiler y ha llegado el momento de realizar el pago de la fianza del alquiler. \n<br>\n<br>\nTe recordamos que la fianza, por importe de 1.000 euros, debe ser abonada por transferencia y debemos haberla recibido, para poder verificarla correctamente, como máximo 72 horas (3 días) antes del comienzo del alquiler.\n<br>\n<br>\nLa cuenta a la que debe hacer la transferencia es la siguiente:\nTITULAR: FURGOCASA CAMPERVANS, S.L.\nENTIDAD: Sabadell (recuerda verificar la entidad cuando introduzcas el numero de cuenta).\nIBAN: ES68 0081 0210 1900 0254 5860\nSWIFT (para transferencias internacionales): BSABESBBXXX\n<br>\n<br>\nRecuerda, una vez realizado el pago de la fianza, debes enviarnos por email la siguiente documentación:\n<br>\n<br>\n   •\tJustificante de la transferencia; y\n<br>\n   •\tCertificado de titularidad bancaria de la cuenta a la que desees te sea devuelta la fianza una vez finalizado el alquiler. \n<br>\n<br>\nEste segundo documento es imprescindible para que conozcamos la cuenta a la que transferir.\n<br>\n<br>\nMuchas gracias.\n<br>\nUn saludo. \n<br>\n<br>\nPD: Si ya has pagado la fianza y aun así recibes este email, NO TE PREOCUPES. Es posible que aún no hayamos procesado tu transferencia y por eso recibes este mail automático. En cuanto lo procesemos dejarás de recibirlo. Disculpa las molestias.\n<br>\n<br>\nEL EQUIPO DE FURGOCASA\n<br>\n<br>\nwww.furgocasa.com\n",
+        "options": {
+          "appendAttribution": false,
+          "ccEmail": "reservas@furgocasa.com "
+        }
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        160
+      ],
+      "id": "a9f004ae-1b4b-4040-b27f-f1dfab94d0b0",
+      "name": "Pedir fianza",
+      "webhookId": "032c2f7e-71c2-49c3-9b9d-eca67beacd47",
+      "credentials": {
+        "smtp": {
+          "id": "JCJXSYBTOkD12yj5",
+          "name": "SMTP Reservas furgocasa"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b6bf2686-252c-4259-a15f-b7dd53093913",
+              "leftValue": "={{ $('Get many database pages').item.json.properties['2º Pago'].checkbox }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "1243d725-bc0a-45d9-be97-2e9315d4883e",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Doc.checkbox }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "3e85cd5b-0cb8-4f32-84b7-27ed45d6e8a0",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Contrato.checkbox }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "f84d5abd-cdf2-4d13-893d-b868a6589561",
+              "leftValue": "={{ $('Get many database pages').item.json.properties['Fianza (3 días)'].checkbox }}",
+              "rightValue": "true",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "d6f9add8-fc67-4e9d-9792-b357c2aa1c9a",
+              "leftValue": "={{ $('Get many database pages').item.json.properties.Cita.checkbox }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        928,
+        352
+      ],
+      "id": "18aceace-c851-467f-ab63-db3be89e1e8d",
+      "name": "If - TODO HECHO"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "getAll",
+        "databaseId": {
+          "__rl": true,
+          "value": "27759c62-8f77-805b-8bbd-f00c62372789",
+          "mode": "list",
+          "cachedResultName": "ALQUILER RESERVAS",
+          "cachedResultUrl": "https://www.notion.so/27759c628f77805b8bbdf00c62372789"
+        },
+        "returnAll": true,
+        "simple": false,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "8fa90b1b-4fa2-4159-a79d-165b0fb34895",
+      "name": "Get many database pages",
+      "credentials": {
+        "notionApi": {
+          "id": "Fe53Zwaecx4rqiQf",
+          "name": "Notion account FURGOCASA"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many database pages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "If - TODO HECHO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If - SEGUNDO PAGO VENCIDO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If - CONTRATO NO FIRMADO",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If - DOCUMENTACION NO EVIANDA",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "If - FIANZA NO RECIBIDA",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If - SEGUNDO PAGO VENCIDO": {
+      "main": [
+        [
+          {
+            "node": "Pedir 2º Pago",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If - CONTRATO NO FIRMADO": {
+      "main": [
+        [
+          {
+            "node": "Pedir firmar contrato",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If - DOCUMENTACION NO EVIANDA": {
+      "main": [
+        [
+          {
+            "node": "Pedir documentación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If - FIANZA NO RECIBIDA": {
+      "main": [
+        [
+          {
+            "node": "Pedir fianza",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many database pages": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "8ceb7322-b67d-4737-8545-5e4ee251fcfe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "be4c8a1b2ea7fdce07a03f9ba176ee7ce608ba893e2a478d2cfc7c0b71106b0b"
+  },
+  "nodeGroups": [],
+  "id": "4hxAMnx2LSqc2OLW",
+  "tags": []
+}

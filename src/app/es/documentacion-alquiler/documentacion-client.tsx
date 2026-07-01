@@ -4,6 +4,7 @@ import { FileText, CheckCircle, AlertCircle, Lock } from "lucide-react";
 import { useLanguage } from "@/contexts/language-context";
 import { COMPANY } from "@/lib/company";
 import ContractSigning from "@/components/contracts/contract-signing";
+import RentalDocsUpload from "@/components/rental-docs/rental-docs-upload";
 
 export default function DocumentacionClient() {
   const { t } = useLanguage();
@@ -14,7 +15,7 @@ export default function DocumentacionClient() {
   ];
 
   const pasosConfirmacion = [
-    { paso: "1", titulo: t("Envía tu documentación"), descripcion: t("DNI/Pasaporte y carnet de conducir (foto o escaneo)") },
+    { paso: "1", titulo: t("Sube tu documentación"), descripcion: t("DNI y carnet de conducir (anverso y reverso) desde esta misma página") },
     { paso: "2", titulo: t("Firma el contrato online"), descripcion: t("Lee y firma el contrato en esta misma página con tu número de reserva") },
     { paso: "3", titulo: t("Paga la fianza"), descripcion: `${t("Transferencia de")} ${COMPANY.depositAmount.toLocaleString("es-ES")}€ (${t("máx.")} ${COMPANY.rentalPolicy.deposit.paymentDeadlineHoursBeforePickup}h ${t("antes del inicio")})` },
     { paso: "4", titulo: t("Recibe confirmación"), descripcion: t("Te confirmaremos la cita de recogida por email") },
@@ -60,8 +61,12 @@ export default function DocumentacionClient() {
           
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
             <p className="text-blue-800">
-              <strong>{t("Email para enviar documentación:")}</strong>{" "}
-              <a href="mailto:reservas@furgocasa.com" className="text-furgocasa-blue hover:underline">reservas@furgocasa.com</a>
+              {t("Sube tu DNI y carnet de conducir de forma segura más abajo, en el apartado")}{" "}
+              <a href="#documentacion-conductores" className="text-furgocasa-blue font-semibold hover:underline">
+                {t("«Documentación de conductores»")}
+              </a>
+              . {t("Si tienes cualquier duda, escríbenos a")}{" "}
+              <a href="mailto:reservas@furgocasa.com" className="text-furgocasa-blue hover:underline">reservas@furgocasa.com</a>.
             </p>
           </div>
         </div>
@@ -87,13 +92,16 @@ export default function DocumentacionClient() {
                   ))}
                 </ul>
                 <p className="text-sm text-yellow-700 mt-3">
-                  {t("El resto de documentación ya la habrás enviado previamente por email.")}
+                  {t("El resto de documentación ya la habrás subido previamente desde esta página.")}
                 </p>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Subida de documentación de conductores (DNI + carnet) con validación IA */}
+      <RentalDocsUpload />
 
       {/* Firma online del contrato — documentos solo tras validar reserva */}
       <ContractSigning />
@@ -116,12 +124,12 @@ export default function DocumentacionClient() {
 
               <h3>{t("¿Puedo añadir un segundo conductor?")}</h3>
               <p>
-                {t("Sí, el segundo conductor está incluido en el precio. Solo necesitamos su DNI y carnet de conducir enviados por email antes del alquiler.")}
+                {t("Sí, el segundo conductor está incluido en el precio. En el apartado de documentación de esta página puedes añadir tantos conductores como necesites y subir el DNI y carnet de cada uno.")}
               </p>
 
-              <h3>{t("¿Cómo envío la documentación?")}</h3>
+              <h3>{t("¿Cómo subo la documentación?")}</h3>
               <p>
-                {t("Puedes enviarnos los documentos por email a reservas@furgocasa.com. Aceptamos imágenes escaneadas o fotografías legibles de los documentos (DNI, carnet de conducir, contrato firmado, justificante de fianza).")}
+                {t("En esta misma página, en el apartado «Documentación de conductores», introduce tu número de reserva y email y sube una foto o escaneo legible del DNI (anverso y reverso) y del carnet de conducir (anverso y reverso). Si tienes dudas, escríbenos a reservas@furgocasa.com.")}
               </p>
             </div>
           </div>

@@ -1,0 +1,229 @@
+﻿CODIGO CITA,ID RESERVA,Primer mail,1º Pago,2º Pago,Doc,Contrato,Fianza (3 días),Cita,ESTADO DEL ALQUILER,Daños,Limpieza,Finalizado,URL Reserva,url API,NOW,Código Vehículo,Propietaria,Canal Venta,Id Reserva,Fecha Reserva,DNI - ID number:,Nombre,Apellido 1,Apellido 2,Tipo Documento,Pais,Dirección,Código Postal,Codigo Municipio,Municipio,Email,"Telefono ",Edad conductor,Fecha Inicio,Hora Inicio,Fecha Fin:,Hora Fin,"Duración ",Localizacion,PARKING,Precio Total,Pagado,Pendiente,Vencimiento,Limite FIANZA,Creada,Dia reserva,Ultima modificacion,Concepto factura,Código Vehículo (rel)
+"FU0019 - Murcia 2026/05/27 11:00 / Murcia 2026/06/30 11:00 - Grzegorz Jurek  ",f1958c94-856f-4c08-847c-3a0082903778,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/f1958c94-856f-4c08-847c-3a0082903778,https://www.furgocasa.com/api/bookings/f1958c94-856f-4c08-847c-3a0082903778,1 de julio de 2026,FU0019 - Weinsberg Carabus 600 MQ,F MADRID,FURGOCASA,FG81370361,19 de mayo de 2026,DJU595391,Grzegorz,Jurek,,OTRO,POL,Ignaceko Krasickiego 87,05-500,,Nowa Iwiczna,gj111@poczta.onet.pl,+48501031408,53,2026/05/27,11:00,2026/06/30,11:00,35,Murcia,,2397,2397,0,2026/05/12,2026/05/19,19 de mayo de 2026 12:41,2026-05-19,1 de julio de 2026 19:14,"35 días
+Del 2026/05/27 al 2026/06/30
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0011 - Madrid 2026/06/05 16:30 / Madrid 2026/06/26 11:00 - Gustavo julian Marina   ",33b61a2b-9dc8-4725-b154-139112fbd4d2,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/33b61a2b-9dc8-4725-b154-139112fbd4d2,https://www.furgocasa.com/api/bookings/33b61a2b-9dc8-4725-b154-139112fbd4d2,1 de julio de 2026,FU0011 - Weinsberg CaraTour MQ,F MURCIA,FURGOCASA,FG16895847,19 de mayo de 2026,22493176,Gustavo julian,Marina,,OTRO,ARG,El Cisne2486,1778,,Ciudad evita,gustavojmarina@gmail.com,+5491149948362,54,2026/06/05,16:30,2026/06/26,11:00,21,Madrid," ","1499,4","1499,4",0,2026/05/21,2026/05/28,21 de mayo de 2026 9:21,2026-05-21,1 de julio de 2026 19:13,"21 días
+Del 2026/06/05 al 2026/06/26
+Madrid / Madrid
+Hora inicio / fin: 16:30 / 11:00",
+"FU0020 - Murcia 2026/06/17 10:00 / Murcia 2026/06/23 19:00 - Jorge Jiménez Azcue  ",fffbb807-36f9-4b1e-b2f3-e785ac700288,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/fffbb807-36f9-4b1e-b2f3-e785ac700288,https://www.furgocasa.com/api/bookings/fffbb807-36f9-4b1e-b2f3-e785ac700288,1 de julio de 2026,FU0020 - Weinsberg Carabus 540 MQ,F MURCIA,FURGOCASA,FG72747609,6 de mayo de 2026,48081823R,Jorge,Jiménez,Azcue,NIF,ESP,"C. Junterones, 8",30008,30030,Murcia,contactjor3@gmail.com,+34653157043,27,2026/06/17,10:00,2026/06/23,19:00,6,Murcia," ",745,745,0,2026/06/02,2026/06/09,6 de mayo de 2026 17:13,2026-05-06,1 de julio de 2026 19:15,"6 días
+Del 2026/06/17 al 2026/06/23
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 19:00",
+"MA0017 - Murcia 2026/06/18 12:00 / Murcia 2026/06/22 12:00 - Francisco Antonio Sabier Pérez  ",172fb269-5119-4fcb-8cc2-3a3dedc9d417,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/172fb269-5119-4fcb-8cc2-3a3dedc9d417,https://www.furgocasa.com/api/bookings/172fb269-5119-4fcb-8cc2-3a3dedc9d417,1 de julio de 2026,MA0017 - Knaus Boxstar Street AUT,"""F MADRID""",FURGOCASA,FG37753288,14 de junio de 2026,15481926M,Francisco Antonio,Sabier,Pérez,NIF,ESP,Calle Almez Esc 38 66b,30153,30030,Murcia,maymr11@gmail.com,661172168,33,2026/06/18,12:00,2026/06/22,12:00,4,Murcia," ",480,480,0,2026/06/03,2026/06/10,14 de junio de 2026 22:32,2026-06-14,1 de julio de 2026 19:12,"4 días
+Del 2026/06/18 al 2026/06/22
+Murcia / Murcia
+Hora inicio / fin: 12:00 / 12:00",
+"FU0021 - Murcia 2026/06/18 11:00 / Murcia 2026/06/22 11:00 - Antonio García Hernández  ",49ef1b91-c132-427e-8698-138474d22d03,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/49ef1b91-c132-427e-8698-138474d22d03,https://www.furgocasa.com/api/bookings/49ef1b91-c132-427e-8698-138474d22d03,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,F MURCIA,FURGOCASA,FG31511793,23 de mayo de 2026,48451309S,Antonio,García,Hernández,NIF,ESP,Calle algezares 130 3C,30570,30030,Murcia,tonigarciahernandez4@gmail.com,649655491,38,2026/06/18,11:00,2026/06/22,11:00,4,Murcia," ",340,340,0,2026/06/03,2026/06/10,25 de mayo de 2026 10:13,2026-05-25,1 de julio de 2026 19:13,"4 días
+Del 2026/06/18 al 2026/06/22
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0012 - Murcia 2026/06/18 16:00 / Murcia 2026/06/21 16:00 - Efrén Rodríguez Silva  ",b56ee78d-240c-4866-9030-7179920210df,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/b56ee78d-240c-4866-9030-7179920210df,https://www.furgocasa.com/api/bookings/b56ee78d-240c-4866-9030-7179920210df,1 de julio de 2026,FU0012 - Knaus Boxstar Family,F MURCIA,FURGOCASA,FG94826512,18 de mayo de 2026,47090484P,Efrén,Rodríguez,Silva,NIF,ESP,"Hoyo 1,11",30506,30005,Altorreal,esilrod@gmail.com,635836346,38,2026/06/18,16:00,2026/06/21,16:00,3,Murcia," ",345,345,0,2026/06/03,2026/06/10,18 de mayo de 2026 18:15,2026-05-18,1 de julio de 2026 19:14,"3 días
+Del 2026/06/18 al 2026/06/21
+Murcia / Murcia
+Hora inicio / fin: 16:00 / 16:00",
+"FU0006 - Murcia 2026/06/19 18:00 / Murcia 2026/06/22 18:00 - Daniel Fernández Rodríguez  ",4984b0ca-e6ef-4207-9f21-5c384248f381,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/4984b0ca-e6ef-4207-9f21-5c384248f381,https://www.furgocasa.com/api/bookings/4984b0ca-e6ef-4207-9f21-5c384248f381,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG83103543,3 de junio de 2026,08839534J,Daniel,Fernández,Rodríguez,NIF,ESP,"Camino Gontade 36, P2",36390,,Vigo,danifr@gmail.com,34608980380,45,2026/06/19,18:00,2026/06/22,18:00,3,Murcia," ",330,330,0,2026/06/04,2026/06/11,4 de junio de 2026 9:53,2026-06-04,1 de julio de 2026 19:13,"3 días
+Del 2026/06/19 al 2026/06/22
+Murcia / Murcia
+Hora inicio / fin: 18:00 / 18:00",
+"FU0010 - Murcia 2026/06/19 18:00 / Murcia 2026/06/23 18:00 - Jose Angel Perez Marin  ",afd0a314-df5b-4361-85ab-9a69f409516c,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/afd0a314-df5b-4361-85ab-9a69f409516c,https://www.furgocasa.com/api/bookings/afd0a314-df5b-4361-85ab-9a69f409516c,1 de julio de 2026,FU0010 - Knaus Boxstar Street,F MURCIA,FURGOCASA,FG82272686,20 de mayo de 2026,48735417G,Jose Angel,Perez,Marin,NIF,ESP,Calle orilla del azarbe 143,30140,30089,Santomera,perillo_95@hotmail.com,660634281,31,2026/06/19,18:00,2026/06/23,18:00,4,Murcia," ",340,340,0,2026/06/04,2026/06/11,20 de mayo de 2026 18:06,2026-05-20,1 de julio de 2026 19:14,"4 días
+Del 2026/06/19 al 2026/06/23
+Murcia / Murcia
+Hora inicio / fin: 18:00 / 18:00",
+"FU0018 - Murcia 2026/06/20 13:00 / Murcia 2026/07/10 11:00 - Sonia Bo Cadena  ",23e42e1a-1f52-438e-b8a3-06d913d81d04,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/23e42e1a-1f52-438e-b8a3-06d913d81d04,https://www.furgocasa.com/api/bookings/23e42e1a-1f52-438e-b8a3-06d913d81d04,1 de julio de 2026,FU0018 - Knaus Boxlife DQ,F MADRID,FURGOCASA,FG19690979,29 de marzo de 2026,45661090H,Sonia,Bo,Cadena,NIF,ESP,"Avda. Alhambra, 6 - Pareado 25. Urb Coto De Vera",04621,04621,Vera,soniabcad16@hotmail.com,+34669646291,50,2026/06/20,13:00,2026/07/10,11:00,20,Murcia," ",2276,2276,0,2026/06/05,2026/06/12,7 de abril de 2026 10:06,2026-04-07,1 de julio de 2026 19:16,"20 días
+Del 2026/06/20 al 2026/07/10
+Murcia / Murcia
+Hora inicio / fin: 13:00 / 11:00",
+"FU0006 - Murcia 2026/06/23 19:00 / Murcia 2026/06/28 19:00 - Diego Rodriguez  ",297724ec-7a13-4f21-a0f6-0d26b9cf7e9c,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/297724ec-7a13-4f21-a0f6-0d26b9cf7e9c,https://www.furgocasa.com/api/bookings/297724ec-7a13-4f21-a0f6-0d26b9cf7e9c,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG09171565,16 de junio de 2026,23284394E,Diego,Rodriguez,,NIF,ESP,"La Humosa, Albacete, Castilla-La-Mancha, España",02006,02001,Albacete,diegorodriparra@gmail.com,+34654169492,43,2026/06/23,19:00,2026/06/28,19:00,5,Murcia,,705,705,0,2026/06/08,2026/06/15,17 de junio de 2026 9:38,2026-06-17,1 de julio de 2026 19:12,"5 días
+Del 2026/06/23 al 2026/06/28
+Murcia / Murcia
+Hora inicio / fin: 19:00 / 19:00",
+"FU0021 - Murcia 2026/06/26 11:00 / Murcia 2026/07/04 11:00 - Diego Muñoz Paredes  ",cf030547-f769-4c80-a94c-36c01cc3d494,Yes,Yes,Yes,Yes,Yes,Yes,Yes,EN RUTA,No,No,No,https://www.furgocasa.com/reservar/cf030547-f769-4c80-a94c-36c01cc3d494,https://www.furgocasa.com/api/bookings/cf030547-f769-4c80-a94c-36c01cc3d494,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,F MURCIA,FURGOCASA,FG96959667,23 de marzo de 2026,77838482L,Diego,Muñoz,Paredes,NIF,ESP,Calle Alfarería Número 11,04610,04023,Cuevas Del Almanzora,josefaramosmulero96@gmail.com,+34627825075,32,2026/06/26,11:00,2026/07/04,11:00,8,Murcia," ",1160,1160,0,2026/06/11,2026/06/18,23 de marzo de 2026 21:24,2026-03-23,1 de julio de 2026 19:17,"8 días
+Del 2026/06/26 al 2026/07/04
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0012 - Murcia 2026/06/28 11:00 / Murcia 2026/07/05 14:00 - Marta Robles García  ",1599ba17-b52d-4659-89e7-d7136e57aa31,Yes,Yes,Yes,Yes,Yes,Yes,Yes,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/1599ba17-b52d-4659-89e7-d7136e57aa31,https://www.furgocasa.com/api/bookings/1599ba17-b52d-4659-89e7-d7136e57aa31,1 de julio de 2026,FU0012 - Knaus Boxstar Family,F MURCIA,FURGOCASA,FG99751807,6 de mayo de 2026,49194639P,Marta,Robles,García,NIF,ESP,"Catedrático Fernando Piñuela, Número 2. 7D",30009,30031,Murcia,marta.rg8995@gmail.com,638564715,30,2026/06/28,11:00,2026/07/05,14:00,7,Murcia," ",1160,1160,0,2026/06/13,2026/06/20,7 de mayo de 2026 9:20,2026-05-07,1 de julio de 2026 19:14,"7 días
+Del 2026/06/28 al 2026/07/05
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 14:00",
+"FU0006 - Albacete 2026/06/30 18:00 / Albacete 2026/07/07 19:00 - Manuel Carcelén Picazo  ",116e054f-c3c1-4a62-a65f-d14fa27fa74a,Yes,Yes,Yes,Yes,Yes,Yes,Yes,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/116e054f-c3c1-4a62-a65f-d14fa27fa74a,https://www.furgocasa.com/api/bookings/116e054f-c3c1-4a62-a65f-d14fa27fa74a,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG98022370,26 de junio de 2026,47083488G,Manuel,Carcelén,Picazo,NIF,ESP,José Carbajal nº24 2º B,02008,02002,Albacete,kharonzia@hotmail.com,+646656132,40,2026/06/30,18:00,2026/07/07,19:00,7,Albacete," ",1120,1120,0,2026/06/15,2026/06/22,26 de junio de 2026 23:32,2026-06-26,1 de julio de 2026 20:08,"7 días
+Del 2026/06/30 al 2026/07/07
+Albacete / Albacete
+Hora inicio / fin: 18:00 / 19:00",
+"FU0020 - Murcia 2026/07/02 10:00 / Murcia 2026/07/11 19:00 - Cristina Martínez Riquelme  ",0432f540-131c-47d5-8874-2d62428862f6,Yes,Yes,Yes,Yes,Yes,Yes,Yes,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/0432f540-131c-47d5-8874-2d62428862f6,https://www.furgocasa.com/api/bookings/0432f540-131c-47d5-8874-2d62428862f6,1 de julio de 2026,FU0020 - Weinsberg Carabus 540 MQ,F MURCIA,FURGOCASA,FG56264930,7 de abril de 2026,48421068L,Cristina,Martínez,Riquelme,NIF,ESP,C/La Cruz 60,30500,30050,Molina de Segura,kais79ls@gmail.com,+34697219010,46,2026/07/02,10:00,2026/07/11,19:00,9,Murcia," ",1490,1490,0,2026/06/17,2026/06/24,8 de abril de 2026 21:23,2026-04-08,1 de julio de 2026 19:16,"9 días
+Del 2026/07/02 al 2026/07/11
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 19:00",
+"FU0021 - Murcia 2026/07/07 13:00 / Murcia 2026/07/15 13:00 - Carlos Gabucio Hernández  ",cb8ead46-50b8-4c71-aa4c-4e6e2114eebb,Yes,Yes,Yes,Yes,Yes,Yes,Yes,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/cb8ead46-50b8-4c71-aa4c-4e6e2114eebb,https://www.furgocasa.com/api/bookings/cb8ead46-50b8-4c71-aa4c-4e6e2114eebb,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,F MURCIA,FURGOCASA,FG17776927,17 de junio de 2026,26040556W,Carlos,Gabucio,Hernández,NIF,ESP,Paseo Pedaneo José Marin Serna numero 19. 3f,30010,30030,Murcia,gabuzzini@gmail.com,622058531,44,2026/07/07,13:00,2026/07/15,13:00,8,Murcia," ",920,920,0,2026/06/22,2026/06/29,18 de junio de 2026 11:57,2026-06-18,1 de julio de 2026 19:18,"8 días
+Del 2026/07/07 al 2026/07/15
+Murcia / Murcia
+Hora inicio / fin: 13:00 / 13:00",
+"MA0014 - Murcia 2026/07/10 11:00 / Murcia 2026/07/17 11:00 - Girardot Sin  ",bc8b1598-4da8-4ef8-bedf-5ae798e63c35,Yes,Yes,Yes,Yes,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/bc8b1598-4da8-4ef8-bedf-5ae798e63c35,https://www.furgocasa.com/api/bookings/bc8b1598-4da8-4ef8-bedf-5ae798e63c35,1 de julio de 2026,MA0014 - Sunlight Cliff Adventure,F MADRID,FURGOCASA,FC26020054,4 de febrero de 2026,ew2x6jy21,Girardot,Sin,,OTRO,FRA,4c rue largentier,10000,,Troyes,bettinahenriet.10@gmail.com,0618423738,42,2026/07/10,11:00,2026/07/17,11:00,7,Murcia,,1085,1085,0,2026/06/25,2026/07/02,4 de febrero de 2026 13:52,2026-02-04,1 de julio de 2026 19:17,"7 días
+Del 2026/07/10 al 2026/07/17
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0010 - Murcia 2026/07/11 18:00 / Murcia 2026/07/21 18:00 - Laura Sáez Sánchez  ",55b799f9-d1bd-41bc-9688-9be26f665980,Yes,Yes,Yes,Yes,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/55b799f9-d1bd-41bc-9688-9be26f665980,https://www.furgocasa.com/api/bookings/55b799f9-d1bd-41bc-9688-9be26f665980,1 de julio de 2026,FU0010 - Knaus Boxstar Street,F MURCIA,FURGOCASA,FG00009432,12 de junio de 2026,48692240K,Laura,Sáez,Sánchez,NIF,ESP,"Calle Buero Vallejo, 12",30565,30091,Torres De Cotillas,laura.sznch@gmail.com,+34629907388,36,2026/07/11,18:00,2026/07/21,18:00,10,Murcia," ",1150,1150,0,2026/06/26,2026/07/03,13 de junio de 2026 9:29,2026-06-13,1 de julio de 2026 19:12,"10 días
+Del 2026/07/11 al 2026/07/21
+Murcia / Murcia
+Hora inicio / fin: 18:00 / 18:00",
+"MA0017 - Murcia 2026/07/13 10:00 / Murcia 2026/07/22 19:00 - Jose Manuel Martinez Ortin  ",daf0bc3d-3953-4610-9f89-4a26809bd127,Yes,Yes,Yes,Yes,Yes,Yes,Yes,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/daf0bc3d-3953-4610-9f89-4a26809bd127,https://www.furgocasa.com/api/bookings/daf0bc3d-3953-4610-9f89-4a26809bd127,1 de julio de 2026,MA0017 - Knaus Boxstar Street AUT,F MADRID,FURGOCASA,FG82289264,17 de junio de 2026,34834619S,Jose Manuel,Martinez,Ortin,NIF,ESP,"C. de Félix Rodríguez de la Fuente, 2, 2ºb",30831,30038,Javalí Viejo,j.m.martinezortin@gmail.com,+34690950022,48,2026/07/13,10:00,2026/07/22,19:00,9,Murcia," ",1150,1150,0,2026/06/28,2026/07/05,17 de junio de 2026 19:47,2026-06-17,1 de julio de 2026 19:18,"9 días
+Del 2026/07/13 al 2026/07/22
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 19:00",
+"FU0020 - Murcia 2026/07/14 11:00 / Murcia 2026/07/23 11:00 - Marina Jiménez Díaz  ",a805ddaa-716b-4e6b-8c90-936f109b9e5c,Yes,Yes,Yes,Yes,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/a805ddaa-716b-4e6b-8c90-936f109b9e5c,https://www.furgocasa.com/api/bookings/a805ddaa-716b-4e6b-8c90-936f109b9e5c,1 de julio de 2026,FU0020 - Weinsberg Carabus 540 MQ,,FURGOCASA,FG55175002,24 de mayo de 2026,23836476N,Marina,Jiménez,Díaz,NIF,ESP,Camino cañaveral número 66,30814,24043,Lorca,marinafpbsc@gmail.com,658130195,27,2026/07/14,11:00,2026/07/23,11:00,9,Murcia," ",1125,1125,0,2026/06/29,2026/07/06,25 de mayo de 2026 9:26,2026-05-25,1 de julio de 2026 19:20,"9 días
+Del 2026/07/14 al 2026/07/23
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0012 - Murcia 2026/07/14 19:00 / Murcia 2026/08/06 19:00 - David Lopez Sanchez  ",abe629b1-c5a2-475f-b5eb-ccc4bc132568,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/abe629b1-c5a2-475f-b5eb-ccc4bc132568,https://www.furgocasa.com/api/bookings/abe629b1-c5a2-475f-b5eb-ccc4bc132568,1 de julio de 2026,FU0012 - Knaus Boxstar Family,F MURCIA,FURGOCASA,FG63448946,29 de abril de 2026,47056451S,David,Lopez,Sanchez,NIF,ESP,Avenida Unión Europea 26,30739,30077,San Javier,davidtecnonet@gmail.com,680795741,47,2026/07/14,19:00,2026/08/06,19:00,23,Murcia," ",2485,1000,1485,2026/06/29,2026/07/06,30 de abril de 2026 8:50,2026-04-30,1 de julio de 2026 19:15,"23 días
+Del 2026/07/14 al 2026/08/06
+Murcia / Murcia
+Hora inicio / fin: 19:00 / 19:00",
+"FU0006 - Murcia 2026/07/16 11:00 / Murcia 2026/07/26 11:00 - Antonio Lucas Costa  ",2b786b0f-6bd7-4a79-a635-0998438ee74b,Yes,Yes,Yes,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/2b786b0f-6bd7-4a79-a635-0998438ee74b,https://www.furgocasa.com/api/bookings/2b786b0f-6bd7-4a79-a635-0998438ee74b,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG01226708,23 de marzo de 2026,34788602K,Antonio,Lucas,Costa,NIF,ESP,Homero n 3,30158,30030,Murcia,mabelodi@gmail.com,637190515,50,2026/07/16,11:00,2026/07/26,11:00,10,Murcia," ",1350,1350,0,2026/07/01,2026/07/08,24 de marzo de 2026 10:23,2026-03-24,1 de julio de 2026 19:20,"10 días
+Del 2026/07/16 al 2026/07/26
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0011 - Murcia 2026/07/18 11:00 / Murcia 2026/07/30 11:00 - Blanca Fernández de Cormenzana  ",9699410d-5341-4b42-972d-3277266f4aaa,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/9699410d-5341-4b42-972d-3277266f4aaa,https://www.furgocasa.com/api/bookings/9699410d-5341-4b42-972d-3277266f4aaa,1 de julio de 2026,FU0011 - Weinsberg CaraTour MQ,F MURCIA,FURGOCASA,FG06284881,17 de junio de 2026,25128681P,Blanca,Fernández,de Cormenzana,NIF,ESP,Avenida Catedrático Soler 43 escalera derecha 3E,03008,03013,Alicante,micorreoelectronicoblanca@gmail.com,654907084,56,2026/07/18,11:00,2026/07/30,11:00,12,Murcia," ",1420,710,710,2026/07/03,2026/07/10,17 de junio de 2026 19:15,2026-06-17,1 de julio de 2026 19:12,"12 días
+Del 2026/07/18 al 2026/07/30
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0019 - Murcia 2026/07/18 11:00 / Murcia 2026/07/25 19:00 - Araceli Párraga Diaz  ",27635477-ede8-4835-bec2-b35d94fd2873,Yes,Yes,Yes,Yes,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/27635477-ede8-4835-bec2-b35d94fd2873,https://www.furgocasa.com/api/bookings/27635477-ede8-4835-bec2-b35d94fd2873,1 de julio de 2026,FU0019 - Weinsberg Carabus 600 MQ,F MADRID,FURGOCASA,FG88704271,28 de mayo de 2026,48492179Z,Araceli,Párraga,Diaz,NIF,ESP,Av. Juan Carlos I 27,30140,30089,Santomera,araceliparraga@gmail.com,646722965,44,2026/07/18,11:00,2026/07/25,19:00,7,Murcia," ",1000,1000,0,2026/07/03,2026/07/10,29 de mayo de 2026 13:42,2026-05-29,1 de julio de 2026 19:13,"7 días
+Del 2026/07/18 al 2026/07/25
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 19:00",
+"MA0014 - Murcia 2026/07/19 11:00 / Murcia 2026/08/02 11:00 - Carlos Molina Campos  ",2b7a6a54-6a28-4d96-b6d9-aae22038990a,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/2b7a6a54-6a28-4d96-b6d9-aae22038990a,https://www.furgocasa.com/api/bookings/2b7a6a54-6a28-4d96-b6d9-aae22038990a,1 de julio de 2026,MA0014 - Sunlight Cliff Adventure,F MADRID,FURGOCASA,FG60204426,6 de mayo de 2026,23278879G,Carlos,Molina,Campos,NIF,ESP,Los Cortijos,30890,30073,Puerto Lumbreras,carlos.carloscmc@gmail.com,637400196,43,2026/07/19,11:00,2026/08/02,11:00,14,Murcia," ","1552,98","776,49","776,49",2026/07/04,2026/07/11,6 de mayo de 2026 11:52,2026-05-06,1 de julio de 2026 19:15,"14 días
+Del 2026/07/19 al 2026/08/02
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0021 - Murcia 2026/07/20 11:00 / Murcia 2026/07/29 11:00 - Carmen Serrano   ",80fb40c9-7573-4846-9803-526d484763ae,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/80fb40c9-7573-4846-9803-526d484763ae,https://www.furgocasa.com/api/bookings/80fb40c9-7573-4846-9803-526d484763ae,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,F MURCIA,FURGOCASA,FG71422938,3 de junio de 2026,48391225F,Carmen,Serrano,,NIF,ESP,"Plaza La Almazara, 4, 2º D",30140,30089,Santomera,serranopuche@gmail.com,+34676450666,48,2026/07/20,11:00,2026/07/29,11:00,9,Murcia," ",1125,"562,5","562,5",2026/07/05,2026/07/12,3 de junio de 2026 10:05,2026-06-03,1 de julio de 2026 19:13,"9 días
+Del 2026/07/20 al 2026/07/29
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0018 - Murcia 2026/07/20 11:00 / Murcia 2026/08/03 11:00 - Carlos Tapioles Martinez  ",b001f937-202e-41df-bd1c-8b44976e5573,Yes,Yes,No,Yes,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/b001f937-202e-41df-bd1c-8b44976e5573,https://www.furgocasa.com/api/bookings/b001f937-202e-41df-bd1c-8b44976e5573,1 de julio de 2026,FU0018 - Knaus Boxlife DQ,F MADRID,FURGOCASA,FC26020075,18 de febrero de 2026,23027686V,Carlos,Tapioles,Martinez,NIF,ESP,Avenida Academia de Infantería n28 6B escalera 1 edificio Ortiz de Zarate,30007,30030,Murcia,carlostapioles@gmail.com,+34630634949,47,2026/07/20,11:00,2026/08/03,11:00,14,Murcia," ","1606,5",945,"661,5",2026/07/05,2026/07/12,19 de febrero de 2026 10:12,2026-02-19,1 de julio de 2026 19:17,"14 días
+Del 2026/07/20 al 2026/08/03
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0015 - Murcia 2026/07/27 11:00 / Murcia 2026/08/11 11:00 - Francisco Javier Ros González  ",8c190d43-cbd7-49a2-93f3-69af1c83cb5e,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/8c190d43-cbd7-49a2-93f3-69af1c83cb5e,https://www.furgocasa.com/api/bookings/8c190d43-cbd7-49a2-93f3-69af1c83cb5e,1 de julio de 2026,FU0015 - Adria Twin Family,F MADRID,FURGOCASA,FC26030093,15 de marzo de 2026,34809382D,Francisco Javier,Ros,González,NIF,ESP,"C/ Apostoles, 10 - 3º B, MURCIA",30001,30030,Murcia,javier.ros.gonzalez@gmail.com,+34615382113,55,2026/07/27,11:00,2026/08/11,11:00,15,Murcia," ",1625,760,865,2026/07/12,2026/07/19,15 de marzo de 2026 21:37,2026-03-15,1 de julio de 2026 19:17,"15 días
+Del 2026/07/27 al 2026/08/11
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0019 - Murcia 2026/07/30 10:00 / Murcia 2026/08/06 18:00 - Miguel Angel Sarabia Alonso  ",0b88ccf9-5b2d-4d1f-9d69-4a708d8c1a4d,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/0b88ccf9-5b2d-4d1f-9d69-4a708d8c1a4d,https://www.furgocasa.com/api/bookings/0b88ccf9-5b2d-4d1f-9d69-4a708d8c1a4d,1 de julio de 2026,FU0019 - Weinsberg Carabus 600 MQ,F MADRID,FURGOCASA,FG51793899,23 de junio de 2026,48351922B,Miguel Angel,Sarabia,Alonso,NIF,ESP,C/ Donadores 24,03360,03014,Almoradi,maikel197@hotmail.com,658454747,47,2026/07/30,10:00,2026/08/06,18:00,7,Murcia," ",1100,550,550,2026/07/15,2026/07/22,24 de junio de 2026 18:56,2026-06-24,1 de julio de 2026 19:11,"7 días
+Del 2026/07/30 al 2026/08/06
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 18:00",
+"FU0006 - Murcia 2026/07/31 10:00 / Murcia 2026/08/07 10:00 - Alejandro Amat Pascual  ",ee350868-362f-4e4b-9198-2b94c15f5f1a,Yes,Yes,No,No,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/ee350868-362f-4e4b-9198-2b94c15f5f1a,https://www.furgocasa.com/api/bookings/ee350868-362f-4e4b-9198-2b94c15f5f1a,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG00490689,24 de junio de 2026,48638436Z,Alejandro,Amat,Pascual,NIF,ESP,"Calle del Pino, 88",30006,30079,Puente Tocinos,alejandro.ampas@gmail.com,636652832,37,2026/07/31,10:00,2026/08/07,10:00,7,Murcia," ",985,"492,5","492,5",2026/07/16,2026/07/23,24 de junio de 2026 18:29,2026-06-24,1 de julio de 2026 19:11,"7 días
+Del 2026/07/31 al 2026/08/07
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 10:00",
+"MA0017 - Murcia 2026/08/01 11:00 / Murcia 2026/08/08 11:00 - Alberto García Santacatalina  ",7ac756a4-79ca-419c-842f-4be3ff40ecae,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/7ac756a4-79ca-419c-842f-4be3ff40ecae,https://www.furgocasa.com/api/bookings/7ac756a4-79ca-419c-842f-4be3ff40ecae,1 de julio de 2026,MA0017 - Knaus Boxstar Street AUT,F MADRID,FURGOCASA,FG20845901,24 de junio de 2026,23029363S,Alberto,García,Santacatalina,NIF,ESP,"Calle Gregory Peter, 62",30700,30614,Torre-Pacheco,albertogarciasantacatalina@gmail.com,619488805,45,2026/08/01,11:00,2026/08/08,11:00,7,Murcia," ",1015,"507,5","507,5",2026/07/17,2026/07/24,24 de junio de 2026 19:22,2026-06-24,1 de julio de 2026 19:11,"7 días
+Del 2026/08/01 al 2026/08/08
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0010 - Murcia 2026/08/03 10:00 / Murcia 2026/08/10 10:00 - José Antonio Navarro Ávila  ",163a542f-964c-41b6-84ea-75a7394190d6,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/163a542f-964c-41b6-84ea-75a7394190d6,https://www.furgocasa.com/api/bookings/163a542f-964c-41b6-84ea-75a7394190d6,1 de julio de 2026,FU0010 - Knaus Boxstar Street,F MURCIA,FURGOCASA,FG97970854,29 de abril de 2026,23306663G,José Antonio,Navarro,Ávila,NIF,ESP,Calle nueva 2,04600,04048,Huercal overa,mariajpp2213@gmail.com,666343819,33,2026/08/03,10:00,2026/08/10,10:00,7,Murcia," ",1055,"527,5","527,5",2026/07/19,2026/07/26,30 de abril de 2026 8:50,2026-04-30,1 de julio de 2026 19:15,"7 días
+Del 2026/08/03 al 2026/08/10
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 10:00",
+"FU0018 - Murcia 2026/08/03 19:00 / Murcia 2026/08/11 19:00 - Maria Ángeles Baños Diaz  ",7e4704da-16dc-4f3e-865a-1a50b5efbc36,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/7e4704da-16dc-4f3e-865a-1a50b5efbc36,https://www.furgocasa.com/api/bookings/7e4704da-16dc-4f3e-865a-1a50b5efbc36,1 de julio de 2026,FU0018 - Knaus Boxlife DQ,F MADRID,FURGOCASA,FG66751925,15 de abril de 2026,48700158G,Maria Ángeles,Baños,Diaz,NIF,ESP,"Calderas del gas, 27",30010,30030,Murcia,mariam.diaz.93@gmail.com,626675286,33,2026/08/03,19:00,2026/08/11,19:00,8,Murcia," ",1240,620,620,2026/07/19,2026/07/26,18 de abril de 2026 10:22,2026-04-18,1 de julio de 2026 19:16,"8 días
+Del 2026/08/03 al 2026/08/11
+Murcia / Murcia
+Hora inicio / fin: 19:00 / 19:00",
+"FU0020 - Murcia 2026/08/04 10:00 / Murcia 2026/08/15 18:00 - Alberto González Ivorra  ",73e30c1b-eb95-49d8-a759-8b54456179c7,Yes,Yes,Yes,Yes,Yes,No,No,INDIE CAMPERS,No,No,No,https://www.furgocasa.com/reservar/73e30c1b-eb95-49d8-a759-8b54456179c7,https://www.furgocasa.com/api/bookings/73e30c1b-eb95-49d8-a759-8b54456179c7,1 de julio de 2026,FU0020 - Weinsberg Carabus 540 MQ,F MURCIA,FURGOCASA,FG74601997,5 de mayo de 2026,74392475X,Alberto,González,Ivorra,NIF,ESP,"C/ Felix Laorden García, 6",03202,03203,Elche,albertogiv93@gmail.com,+34655320428,32,2026/08/04,10:00,2026/08/15,18:00,11,Murcia," ",1540,1540,0,2026/07/20,2026/07/27,5 de mayo de 2026 19:30,2026-05-05,1 de julio de 2026 19:15,"11 días
+Del 2026/08/04 al 2026/08/15
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 18:00",
+"FU0021 - Murcia 2026/08/06 10:00 / Murcia 2026/08/13 18:00 - Cristina Rebagliato   ",2a10284d-1a58-408e-b815-cc3118791b7f,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/2a10284d-1a58-408e-b815-cc3118791b7f,https://www.furgocasa.com/api/bookings/2a10284d-1a58-408e-b815-cc3118791b7f,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,,FURGOCASA,FC26030091,13 de marzo de 2026,48128187C,Cristina,Rebagliato,,NIF,ESP,"Calle Malasaña 32, 2h",30150,30030,Murcia,crm17crm@gmail.com,651828993,27,2026/08/06,10:00,2026/08/13,18:00,7,Murcia," ",1080,540,540,2026/07/22,2026/07/29,13 de marzo de 2026 12:47,2026-03-13,1 de julio de 2026 19:17,"7 días
+Del 2026/08/06 al 2026/08/13
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 18:00",
+"MA0014 - Murcia 2026/08/07 10:00 / Murcia 2026/08/17 19:00 - David Tomas Viudez  ",5bdd8b00-d7b7-47fc-ba15-ab94c70b8092,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/5bdd8b00-d7b7-47fc-ba15-ab94c70b8092,https://www.furgocasa.com/api/bookings/5bdd8b00-d7b7-47fc-ba15-ab94c70b8092,1 de julio de 2026,MA0014 - Sunlight Cliff Adventure,F MADRID,FURGOCASA,FG41090875,24 de abril de 2026,48704937E,David,Tomas,Viudez,NIF,ESP,Calle rosario num30,30820,30011,Alcantarilla,dviudezr@gmail.com,654920623,28,2026/08/07,10:00,2026/08/17,19:00,10,Murcia," ",1540,775,765,2026/07/23,2026/07/30,26 de abril de 2026 14:51,2026-04-26,1 de julio de 2026 19:16,"10 días
+Del 2026/08/07 al 2026/08/17
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 19:00",
+"FU0019 - Murcia 2026/08/07 10:00 / Murcia 2026/08/16 13:00 - Alberto Abellán Brigido  ",bff002de-3762-48f1-b7d4-134a0108f0e6,Yes,No,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/bff002de-3762-48f1-b7d4-134a0108f0e6,https://www.furgocasa.com/api/bookings/bff002de-3762-48f1-b7d4-134a0108f0e6,1 de julio de 2026,FU0019 - Weinsberg Carabus 600 MQ,F MADRID,FURGOCASA,FG40578543,24 de abril de 2026,49175882L,Alberto,Abellán,Brigido,NIF,ESP,"Calle Obispo Pedro Gállego, n4. 2°A",30002,30030,Murcia,abellanhendrix@gmail.com,+34687660514,29,2026/08/07,10:00,2026/08/16,13:00,9,Murcia," ",1320,0,1320,2026/07/23,2026/07/30,26 de abril de 2026 14:51,2026-04-26,1 de julio de 2026 19:16,"9 días
+Del 2026/08/07 al 2026/08/16
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 13:00",
+"FU0006 - Murcia 2026/08/08 11:00 / Murcia 2026/08/15 11:00 - Irene Avilés Pardo  ",334eeee0-20f1-4865-9c8c-9806c5aa2e3a,Yes,Yes,Yes,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/334eeee0-20f1-4865-9c8c-9806c5aa2e3a,https://www.furgocasa.com/api/bookings/334eeee0-20f1-4865-9c8c-9806c5aa2e3a,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG79941309,27 de abril de 2026,23060146R,Irene,Avilés,Pardo,NIF,ESP,Calle Poeta Miguel Hernández N9 2B,30204,30041,Cartagena,iaviles167@gmail.com,619005830,33,2026/08/08,11:00,2026/08/15,11:00,7,Murcia," ",1055,1055,0,2026/07/24,2026/08/01,27 de abril de 2026 10:57,2026-04-27,1 de julio de 2026 19:15,"7 días
+Del 2026/08/08 al 2026/08/15
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"MA0017 - Murcia 2026/08/09 11:00 / Murcia 2026/08/18 12:00 - Carmelo Solano   ",7bf5044c-d9e8-43f0-90ab-a66c06910acf,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/7bf5044c-d9e8-43f0-90ab-a66c06910acf,https://www.furgocasa.com/api/bookings/7bf5044c-d9e8-43f0-90ab-a66c06910acf,1 de julio de 2026,MA0017 - Knaus Boxstar Street AUT,F MADRID,FURGOCASA,FG70447958,25 de junio de 2026,23035089Z,Carmelo,Solano,,NIF,ESP,Calle Tierno Galván 15 2B,30310,30041,Cartagena,solanoing@gmail.com,615227031,44,2026/08/09,11:00,2026/08/18,12:00,9,Murcia," ",1044,522,522,2026/07/25,2026/08/01,25 de junio de 2026 11:53,2026-06-25,1 de julio de 2026 19:10,"9 días
+Del 2026/08/09 al 2026/08/18
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 12:00",
+"FU0012 - Murcia 2026/08/09 10:00 / Murcia 2026/08/16 19:00 - Jesus Adrián Gómez Bernal  ",f3df77ac-7389-4333-945c-6a08d61a9a94,Yes,Yes,No,Yes,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/f3df77ac-7389-4333-945c-6a08d61a9a94,https://www.furgocasa.com/api/bookings/f3df77ac-7389-4333-945c-6a08d61a9a94,1 de julio de 2026,FU0012 - Knaus Boxstar Family,F MURCIA,FURGOCASA,FC26030089,11 de marzo de 2026,48630604W,Jesus Adrián,Gómez,Bernal,NIF,ESP,La bomba n19,30500,30050,Molina De Segura,jesus_adrian_gober@hotmail.com,633150876,31,2026/08/09,10:00,2026/08/16,19:00,7,Murcia," ",1080,540,540,2026/07/25,2026/08/01,13 de marzo de 2026 12:47,2026-03-13,1 de julio de 2026 19:17,"7 días
+Del 2026/08/09 al 2026/08/16
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 19:00",
+"FU0011 - Murcia 2026/08/10 11:00 / Murcia 2026/08/17 11:00 - Joaquín García Asensio  ",4c0ecc1d-e62c-47f4-b184-56fb8978393c,Yes,Yes,No,Yes,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/4c0ecc1d-e62c-47f4-b184-56fb8978393c,https://www.furgocasa.com/api/bookings/4c0ecc1d-e62c-47f4-b184-56fb8978393c,1 de julio de 2026,FU0011 - Weinsberg CaraTour MQ,F MURCIA,FURGOCASA,FG67290268,19 de junio de 2026,22984279B,Joaquín,García,Asensio,NIF,ESP,"Carretera María Orce, Km7",04838,04053,María,info@integraciondirecta.com,+34 659 38 24 00,55,2026/08/10,11:00,2026/08/17,11:00,7,Murcia," ",1055,"527,5","527,5",2026/07/26,2026/08/02,19 de junio de 2026 21:07,2026-06-19,1 de julio de 2026 19:11,"7 días
+Del 2026/08/10 al 2026/08/17
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0010 - Murcia 2026/08/11 11:00 / Murcia 2026/08/20 18:30 - Elvira Astolfi Machado  ",d80ea594-4f0a-48f6-abbe-98f9c90bc9a5,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/d80ea594-4f0a-48f6-abbe-98f9c90bc9a5,https://www.furgocasa.com/api/bookings/d80ea594-4f0a-48f6-abbe-98f9c90bc9a5,1 de julio de 2026,FU0010 - Knaus Boxstar Street,F MURCIA,FURGOCASA,FG71413954,20 de junio de 2026,60759287a,Elvira,Astolfi,Machado,NIF,ESP,Calle Pintor lonrenzo casanova 57,03003,03013,Alicante,elvira.astolfi@hotmail.com,604827936,46,2026/08/11,11:00,2026/08/20,18:30,9,Murcia," ",1450,725,725,2026/07/27,2026/08/03,20 de junio de 2026 22:28,2026-06-20,1 de julio de 2026 19:11,"9 días
+Del 2026/08/11 al 2026/08/20
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 18:30",
+"FU0006 - Murcia 2026/08/11 10:00 / Murcia 2026/08/18 18:30 - David Levy Espinosa  ",5297573a-571f-409f-bef0-1c3c789d13f8,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/5297573a-571f-409f-bef0-1c3c789d13f8,https://www.furgocasa.com/api/bookings/5297573a-571f-409f-bef0-1c3c789d13f8,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG45428733,2 de abril de 2026,75243801Z,David,Levy,Espinosa,NIF,ESP,"Calle Sierra De Santa Ana, 22",30163,30030,Murcia,tktk.handoff845@passinbox.com,630285012,47,2026/08/11,10:00,2026/08/18,18:30,7,Murcia," ",1240,620,620,2026/07/27,2026/08/03,2 de abril de 2026 19:51,2026-04-02,1 de julio de 2026 19:16,"7 días
+Del 2026/08/11 al 2026/08/18
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 18:30",
+"FU0018 - Murcia 2026/08/13 10:00 / Murcia 2026/08/20 18:00 - Guillermo Cuevas Baquero  ",a7d8a851-1ddd-427a-b0bd-2adf1de2f414,Yes,Yes,Yes,Yes,Yes,No,No,INDIE CAMPERS,No,No,No,https://www.furgocasa.com/reservar/a7d8a851-1ddd-427a-b0bd-2adf1de2f414,https://www.furgocasa.com/api/bookings/a7d8a851-1ddd-427a-b0bd-2adf1de2f414,1 de julio de 2026,FU0018 - Knaus Boxlife DQ,F MADRID,FURGOCASA,FG74943060,5 de mayo de 2026,48753332W,Guillermo,Cuevas,Baquero,NIF,ESP,C/ Abad pierre n3 esc 1 bajo D,30500,30050,Molina de Segura,guillecuevas7@gmail.com,+34622033964,28,2026/08/13,10:00,2026/08/20,18:00,7,Murcia," ",980,980,0,2026/07/29,2026/08/05,5 de mayo de 2026 13:40,2026-05-05,1 de julio de 2026 19:15,"7 días
+Del 2026/08/13 al 2026/08/20
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 18:00",
+"FU0021 - Murcia 2026/08/14 12:00 / Murcia 2026/08/22 12:00 - Mario García Tovar  ",202b3fd3-92c9-418b-9286-50e66cb951a7,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/202b3fd3-92c9-418b-9286-50e66cb951a7,https://www.furgocasa.com/api/bookings/202b3fd3-92c9-418b-9286-50e66cb951a7,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,F MURCIA,FURGOCASA,FG23577534,14 de junio de 2026,34836276Q,Mario,García,Tovar,NIF,ESP,"Torrica,11,1",30820,30011,Alcantarilla,brujadelavilla@gmail.com,669994911,44,2026/08/14,12:00,2026/08/22,12:00,8,Murcia," ",986,493,493,2026/07/30,2026/08/06,14 de junio de 2026 22:32,2026-06-14,1 de julio de 2026 19:12,"8 días
+Del 2026/08/14 al 2026/08/22
+Murcia / Murcia
+Hora inicio / fin: 12:00 / 12:00",
+"FU0015 - Murcia 2026/08/15 10:00 / Murcia 2026/08/27 10:00 - Mathieu Fulmar   ",92f254de-61c6-4ae1-a443-c04f4c458d3f,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/92f254de-61c6-4ae1-a443-c04f4c458d3f,https://www.furgocasa.com/api/bookings/92f254de-61c6-4ae1-a443-c04f4c458d3f,1 de julio de 2026,FU0015 - Adria Twin Family,F MADRID,FURGOCASA,FG18570163,5 de mayo de 2026,Z4013338G,Mathieu,Fulmar,,NIF,ESP,Calle rosalie de castro 169,30107,30036,Guadalupe murcia,julie.coustal@hotmail.fr,614894371,37,2026/08/15,10:00,2026/08/27,10:00,12,Murcia," ",2010,1005,1005,2026/07/31,2026/08/07,6 de mayo de 2026 20:25,2026-05-06,1 de julio de 2026 19:15,"12 días
+Del 2026/08/15 al 2026/08/27
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 10:00",
+"FU0019 - Murcia 2026/08/17 12:00 / Murcia 2026/08/25 12:00 - Jose Antonio Salar Campillo  ",2d2f8db6-4e81-4681-bf7a-ac8c1c395d28,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/2d2f8db6-4e81-4681-bf7a-ac8c1c395d28,https://www.furgocasa.com/api/bookings/2d2f8db6-4e81-4681-bf7a-ac8c1c395d28,1 de julio de 2026,FU0019 - Weinsberg Carabus 600 MQ,F MADRID,FURGOCASA,FG85519363,6 de abril de 2026,48663269F,Jose Antonio,Salar,Campillo,NIF,ESP,"C/Enrique Riquelme Vidal, 4",30500,30050,Molina de Segura,tecnicoeypc@gmail.com,638078092,31,2026/08/17,12:00,2026/08/25,12:00,8,Murcia," ",1200,"527,5","672,5",2026/08/02,2026/08/09,6 de abril de 2026 19:53,2026-04-06,1 de julio de 2026 19:16,"8 días
+Del 2026/08/17 al 2026/08/25
+Murcia / Murcia
+Hora inicio / fin: 12:00 / 12:00",
+"FU0020 - Murcia 2026/08/17 11:00 / Murcia 2026/08/27 11:00 - Antonio Ruiz Gimenex  ",391b4a7d-90c5-4762-99f8-41a4ddae3078,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/391b4a7d-90c5-4762-99f8-41a4ddae3078,https://www.furgocasa.com/api/bookings/391b4a7d-90c5-4762-99f8-41a4ddae3078,1 de julio de 2026,FU0020 - Weinsberg Carabus 540 MQ,,FURGOCASA,BK-20260119-6110,11 de noviembre de 2025,23249326Y,Antonio,Ruiz,Gimenex,NIF,ESP,Rambla de bejar 10,30400,30019,Caravaca de la cruz,latraviattadelnoroeste@gmail.com,+34660466847,44,2026/08/17,11:00,2026/08/27,11:00,10,Murcia," ",1260,700,560,2026/08/02,2026/08/09,11 de noviembre de 2025 11:00,2025-11-11,1 de julio de 2026 19:18,"10 días
+Del 2026/08/17 al 2026/08/27
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"MA0017 - Murcia 2026/08/19 19:00 / Murcia 2026/08/26 14:00 - Francesco Boreri   ",40d075af-8060-4e8d-af17-ec75b8c9ce2c,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/40d075af-8060-4e8d-af17-ec75b8c9ce2c,https://www.furgocasa.com/api/bookings/40d075af-8060-4e8d-af17-ec75b8c9ce2c,1 de julio de 2026,MA0017 - Knaus Boxstar Street AUT,F MADRID,FURGOCASA,FG44487553,16 de junio de 2026,Z3173456J,Francesco,Boreri,,NIF,ESP,"Carrer de París, 146",08001,,Barcellona,francescoboreri114@gmail.com,3333046456,24,2026/08/19,19:00,2026/08/26,14:00,7,Murcia," ",955,"477,5","477,5",2026/08/04,2026/08/11,17 de junio de 2026 9:38,2026-06-17,1 de julio de 2026 19:12,"7 días
+Del 2026/08/19 al 2026/08/26
+Murcia / Murcia
+Hora inicio / fin: 19:00 / 14:00",
+"FU0012 - Murcia 2026/08/21 11:00 / Murcia 2026/08/31 18:30 - Ernesto Tobías Imbernón  ",1fece588-65d1-4fb4-9f56-1e6ee78efd9b,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/1fece588-65d1-4fb4-9f56-1e6ee78efd9b,https://www.furgocasa.com/api/bookings/1fece588-65d1-4fb4-9f56-1e6ee78efd9b,1 de julio de 2026,FU0012 - Knaus Boxstar Family,F MURCIA,FURGOCASA,FG69471246,13 de junio de 2026,48403510X,Ernesto,Tobías,Imbernón,NIF,ESP,Calle Río Sena 17 2ºh,30010,30013,Murcia,folbick@gmail.com,+34 618 328 323,42,2026/08/21,11:00,2026/08/31,18:30,11,Murcia," ",1465,"732,5","732,5",2026/08/06,2026/08/13,13 de junio de 2026 20:16,2026-06-13,1 de julio de 2026 19:12,"11 días
+Del 2026/08/21 al 2026/08/31
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 18:30",
+"FU0021 - Murcia 2026/08/23 12:00 / Murcia 2026/09/06 12:00 - Francisco José García García  ",7ba32242-56d8-4153-9fd9-244b399ee9d5,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/7ba32242-56d8-4153-9fd9-244b399ee9d5,https://www.furgocasa.com/api/bookings/7ba32242-56d8-4153-9fd9-244b399ee9d5,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,F MURCIA,FURGOCASA,FG61051767,7 de junio de 2026,74336459E,Francisco José,García,García,NIF,ESP,Vereda Barca 22,30139,30030,El Raal Murcia,paco_cartucho@hotmail.com,657600149,65,2026/08/23,12:00,2026/09/06,12:00,14,Murcia," ",1780,890,890,2026/08/08,2026/08/15,8 de junio de 2026 10:01,2026-06-08,1 de julio de 2026 19:13,"14 días
+Del 2026/08/23 al 2026/09/06
+Murcia / Murcia
+Hora inicio / fin: 12:00 / 12:00",
+"FU0010 - Murcia 2026/09/07 10:00 / Murcia 2026/09/16 19:00 - Javier Batlles Belmonte  ",9cbb67f2-4db9-4b09-b34a-3deaae0793bc,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/9cbb67f2-4db9-4b09-b34a-3deaae0793bc,https://www.furgocasa.com/api/bookings/9cbb67f2-4db9-4b09-b34a-3deaae0793bc,1 de julio de 2026,FU0010 - Knaus Boxstar Street,F MURCIA,FURGOCASA,FG42684472,15 de mayo de 2026,48694003J,Javier,Batlles,Belmonte,NIF,ESP,Camino las lentiscosas 450,30892,30030,Murcia,javi2292@hotmail.com,618254729,34,2026/09/07,10:00,2026/09/16,19:00,9,Murcia," ",1390,695,695,2026/08/23,2026/08/30,15 de mayo de 2026 16:19,2026-05-15,1 de julio de 2026 19:14,"9 días
+Del 2026/09/07 al 2026/09/16
+Murcia / Murcia
+Hora inicio / fin: 10:00 / 19:00",
+"FU0021 - Murcia 2026/09/07 11:00 / Murcia 2026/09/24 11:00 - Tomás Vivancos San Nicolás  ",7cbce660-e59a-4d30-abcf-a58fda9ae59a,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/7cbce660-e59a-4d30-abcf-a58fda9ae59a,https://www.furgocasa.com/api/bookings/7cbce660-e59a-4d30-abcf-a58fda9ae59a,1 de julio de 2026,FU0021 - Dethleffs Globetrail 600 DS,F MURCIA,FURGOCASA,FG58514422,13 de mayo de 2026,23064593D,Tomás,Vivancos,San Nicolás,NIF,ESP,"Calle la Paz, 3, 3A",30204,30041,Cartagena,t.vivancosingeniero@gmail.com,+34693352583,35,2026/09/07,11:00,2026/09/24,11:00,17,Murcia," ",2065,"1032,5","1032,5",2026/08/23,2026/08/30,13 de mayo de 2026 10:25,2026-05-13,1 de julio de 2026 19:14,"17 días
+Del 2026/09/07 al 2026/09/24
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0020 - Madrid 2026/09/07 11:00 / Madrid 2026/09/27 11:00 - Nestor Enrique Brunke   ",bf8cad32-2935-4878-9be4-25ae1dd387eb,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/bf8cad32-2935-4878-9be4-25ae1dd387eb,https://www.furgocasa.com/api/bookings/bf8cad32-2935-4878-9be4-25ae1dd387eb,1 de julio de 2026,FU0020 - Weinsberg Carabus 540 MQ,F MURCIA,FURGOCASA,BK-20260119-4349,28 de noviembre de 2025,17448538,Nestor Enrique,Brunke,,OTRO,ARG,Bolivar 2719,7600,,"Mar del Plata , Buenes Aires",nestorbrunke@hotmail.com,625915877,,2026/09/07,11:00,2026/09/27,11:00,20,Madrid," ",2006,"986,25","1019,75",2026/08/23,2026/08/30,29 de noviembre de 2025 9:39,2025-11-29,1 de julio de 2026 19:17,"20 días
+Del 2026/09/07 al 2026/09/27
+Madrid / Madrid
+Hora inicio / fin: 11:00 / 11:00",
+"FU0019 - Murcia 2026/09/09 11:00 / Murcia 2026/10/14 11:00 - Andreas Brungger   ",a2e3efeb-bba8-4f18-8737-12c43f911f08,Yes,Yes,No,Yes,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/a2e3efeb-bba8-4f18-8737-12c43f911f08,https://www.furgocasa.com/api/bookings/a2e3efeb-bba8-4f18-8737-12c43f911f08,1 de julio de 2026,FU0019 - Weinsberg Carabus 600 MQ,F MADRID,FURGOCASA,FG86347148,7 de mayo de 2026,K0M75C66,Andreas,Brungger,,OTRO,CHE,Chälenstrasse 19,8187,,Weiach,bruengger6@bluewin.ch,+41796054320,66,2026/09/09,11:00,2026/10/14,11:00,35,Murcia," ","3131,51","1581,26","1550,25",2026/08/25,2026/09/01,8 de mayo de 2026 9:06,2026-05-08,1 de julio de 2026 19:14,"35 días
+Del 2026/09/09 al 2026/10/14
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0011 - Murcia 2026/09/14 11:00 / Murcia 2026/09/19 11:00 - Sarah Shipton   ",5c67af3b-d05e-4da8-9d0f-d1992ce4b1bf,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/5c67af3b-d05e-4da8-9d0f-d1992ce4b1bf,https://www.furgocasa.com/api/bookings/5c67af3b-d05e-4da8-9d0f-d1992ce4b1bf,1 de julio de 2026,FU0011 - Weinsberg CaraTour MQ,F MURCIA,FURGOCASA,FC26010003,22 de enero de 2026,Z1131219S,Sarah,Shipton,,OTRO,GBR,Middle Huntingford Office,GL12 8EY,,Wotton-under-Edge,Saraheshipton@gmail.com,07812564295,48,2026/09/14,11:00,2026/09/19,11:00,5,Murcia," ",775,"387,5","387,5",2026/08/30,2026/09/06,26 de enero de 2026 8:58,2026-01-26,1 de julio de 2026 19:17,"5 días
+Del 2026/09/14 al 2026/09/19
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0006 - Murcia 2026/09/19 11:00 / Murcia 2026/09/24 11:00 - Daniel Gómez Bravo  ",d1fa4fab-42e6-4de8-b978-ae067ff5efee,Yes,Yes,No,No,No,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/d1fa4fab-42e6-4de8-b978-ae067ff5efee,https://www.furgocasa.com/api/bookings/d1fa4fab-42e6-4de8-b978-ae067ff5efee,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,BK-20260119-1784,25 de noviembre de 2025,29047687K,Daniel,Gómez,Bravo,NIF,ESP,Rosales 17,30528,30073,Jumilla,66danielgomezbravo@gmail.com,669377138,,2026/09/19,11:00,2026/09/24,11:00,5,Murcia," ","487,5","243,75","243,75",2026/09/04,2026/09/11,26 de noviembre de 2025 9:01,2025-11-26,1 de julio de 2026 19:18,"5 días
+Del 2026/09/19 al 2026/09/24
+Murcia / Murcia
+Hora inicio / fin: 11:00 / 11:00",
+"FU0006 - Murcia 2026/09/25 12:00 / Murcia 2026/09/27 19:00 - Juan Pablo Gámez España  ",1f4b7b38-77b5-486c-a4b9-f66cfe7c4c22,Yes,No,No,No,Yes,No,No,PREPARACION,No,No,No,https://www.furgocasa.com/reservar/1f4b7b38-77b5-486c-a4b9-f66cfe7c4c22,https://www.furgocasa.com/api/bookings/1f4b7b38-77b5-486c-a4b9-f66cfe7c4c22,1 de julio de 2026,FU0006 - Dreamer Fun D55,F MURCIA,FURGOCASA,FG38396975,30 de junio de 2026,53740602K,Juan Pablo,Gámez,España,NIF,ESP,"Zaguan, nº 5",04820,04092,Vélez-Rubio,juanpge1507@hotmail.com,+34646857253,34,2026/09/25,12:00,2026/09/27,19:00,2,Murcia," ",415,415,0,2026/09/10,2026/09/17,1 de julio de 2026 19:09,2026-07-01,1 de julio de 2026 20:09,"2 días
+Del 2026/09/25 al 2026/09/27
+Murcia / Murcia
+Hora inicio / fin: 12:00 / 19:00",
