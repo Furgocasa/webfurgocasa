@@ -43,14 +43,10 @@ export async function GET(req: NextRequest) {
     const supabase = createAdminClient();
     const q = (req.nextUrl.searchParams.get("q") || "").trim();
 
-    // Umbral: mostrar reservas no canceladas cuya devolución sea de hace ≤ 30 días
-    // en adelante (gestión de próximos + recién finalizados).
-    const now = new Date();
-    const madrid = new Date(now.toLocaleString("en-US", { timeZone: "Europe/Madrid" }));
-    const threshold = new Date(madrid);
-    threshold.setDate(threshold.getDate() - 30);
-    const thresholdStr = threshold.toISOString().slice(0, 10);
-
+    // Se muestran todas las reservas no canceladas (próximas, en curso y
+    // finalizadas). El filtrado/ordenación/paginación se hace en el cliente.
+    // Se ordena por fecha de inicio descendente para conservar las más
+    // recientes/futuras si algún día se superara el límite.
     let query = supabase
       .from("bookings")
       .select(
@@ -64,9 +60,8 @@ export async function GET(req: NextRequest) {
       `
       )
       .neq("status", "cancelled")
-      .gte("dropoff_date", thresholdStr)
-      .order("pickup_date", { ascending: true })
-      .limit(300);
+      .order("pickup_date", { ascending: false })
+      .limit(2000);
 
     if (q) {
       // Búsqueda por nº de reserva, nombre o email

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ListChecks,
   Loader2,
@@ -16,6 +16,11 @@ import {
   X,
   Trash2,
   ExternalLink,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 type ReminderKey = "secondPayment" | "contract" | "documentation" | "deposit";
@@ -109,6 +114,81 @@ function todayIso(): string {
   return madrid.toISOString().slice(0, 10);
 }
 
+function fmtEUR(n: number | null): string {
+  if (n == null) return "—";
+  return new Intl.NumberFormat("es-ES", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(n);
+}
+
+const STATUS_META: Record<string, { label: string; cls: string }> = {
+  pending: { label: "Pendiente", cls: "bg-amber-100 text-amber-700" },
+  confirmed: { label: "Confirmada", cls: "bg-emerald-100 text-emerald-700" },
+  in_progress: { label: "En curso", cls: "bg-blue-100 text-blue-700" },
+  completed: { label: "Completada", cls: "bg-gray-100 text-gray-600" },
+  cancelled: { label: "Cancelada", cls: "bg-red-100 text-red-600" },
+};
+
+function statusRank(s: string): number {
+  return { pending: 0, confirmed: 1, in_progress: 2, completed: 3 }[s] ?? 9;
+}
+
+type SortField = "reserva" | "inicio" | "fin" | "venc" | "pendiente" | "estado" | null;
+type SortDir = "asc" | "desc";
+
+/** ¿El alquiler ya ha empezado? (en curso / completado / fecha de inicio pasada) */
+function hasStartedRow(r: Row, today: string): boolean {
+  return r.status === "in_progress" || r.status === "completed" || r.pickupDate <= today;
+}
+
+function SortHeader({
+  label,
+  field,
+  active,
+  dir,
+  onSort,
+  className = "",
+  align = "left",
+}: {
+  label: string;
+  field: Exclude<SortField, null>;
+  active: boolean;
+  dir: SortDir;
+  onSort: (f: Exclude<SortField, null>) => void;
+  className?: string;
+  align?: "left" | "center" | "right";
+}) {
+  const justify =
+    align === "center" ? "justify-center" : align === "right" ? "justify-end" : "justify-start";
+  return (
+    <th className={`px-3 py-3 font-semibold ${className}`}>
+      <button
+        type="button"
+        onClick={() => onSort(field)}
+        className={`inline-flex items-center gap-1 w-full ${justify} hover:text-furgocasa-blue transition-colors ${
+          active ? "text-furgocasa-blue" : ""
+        }`}
+      >
+        {label}
+        {active ? (
+          dir === "asc" ? (
+            <ArrowUp className="h-3 w-3" />
+          ) : (
+            <ArrowDown className="h-3 w-3" />
+          )
+        ) : (
+          <ArrowUpDown className="h-3 w-3 opacity-40" />
+        )}
+      </button>
+    </th>
+  );
+}
+
+const PAGE_SIZES = [10, 50, 100, 500, "all"] as const;
+type PageSize = (typeof PAGE_SIZES)[number];
+
 function StatusPill({ ok, label }: { ok: boolean; label: string }) {
   return (
     <span
@@ -150,6 +230,11 @@ export default function AdministracionPage() {
   const [query, setQuery] = useState("");
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [panel, setPanel] = useState<Row | null>(null);
+  const [sortField, setSortField] = useState<SortField>(null);
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [pageSize, setPageSize] = useState<PageSize>(50);
+  const [page, setPage] = useState(1);
 
   const load = useCallback(async (q: string) => {
     setLoading(true);
@@ -217,6 +302,90 @@ export default function AdministracionPage() {
 
   const today = todayIso();
 
+  const onSort = (f: Exclude<SortField, null>) => {
+    if (sortField === f) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(f);
+      setSortDir("asc");
+    }
+  };
+
+  // Filtrado por estado
+  const filtered = useMemo(
+    () => (statusFilter === "all" ? rows : rows.filter((r) => r.status === statusFilter)),
+    [rows, statusFilter]
+  );
+
+  // Ordenación (con orden "inteligente" por defecto: próximos primero)
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    if (sortField === null) {
+      arr.sort((a, b) => {
+        const sa = hasStartedRow(a, today) ? 1 : 0;
+        const sb = hasStartedRow(b, today) ? 1 : 0;
+        if (sa !== sb) return sa - sb;
+        return sa === 0
+          ? a.pickupDate.localeCompare(b.pickupDate)
+          : b.pickupDate.localeCompare(a.pickupDate);
+      });
+      return arr;
+    }
+    const mul = sortDir === "asc" ? 1 : -1;
+    arr.sort((a, b) => {
+      let va: number | string;
+      let vb: number | string;
+      switch (sortField) {
+        case "reserva":
+          va = (a.customerName || "").toLowerCase();
+          vb = (b.customerName || "").toLowerCase();
+          break;
+        case "inicio":
+          va = a.pickupDate;
+          vb = b.pickupDate;
+          break;
+        case "fin":
+          va = a.dropoffDate;
+          vb = b.dropoffDate;
+          break;
+        case "venc":
+          va = a.secondPaymentDueDate;
+          vb = b.secondPaymentDueDate;
+          break;
+        case "pendiente":
+          va = (a.totalPrice ?? 0) - (a.amountPaid ?? 0);
+          vb = (b.totalPrice ?? 0) - (b.amountPaid ?? 0);
+          break;
+        case "estado":
+          va = statusRank(a.status);
+          vb = statusRank(b.status);
+          break;
+        default:
+          va = 0;
+          vb = 0;
+      }
+      if (va < vb) return -mul;
+      if (va > vb) return mul;
+      return 0;
+    });
+    return arr;
+  }, [filtered, sortField, sortDir, today]);
+
+  // Paginación
+  const total = sorted.length;
+  const size = pageSize === "all" ? total || 1 : pageSize;
+  const totalPages = Math.max(1, Math.ceil(total / size));
+  const currentPage = Math.min(page, totalPages);
+  const paged =
+    pageSize === "all" ? sorted : sorted.slice((currentPage - 1) * size, currentPage * size);
+  const fromRow = total === 0 ? 0 : (currentPage - 1) * size + 1;
+  const toRow = pageSize === "all" ? total : Math.min(currentPage * size, total);
+
+  // Al cambiar filtros/orden/tamaño, volver a la primera página
+  useEffect(() => {
+    setPage(1);
+  }, [query, statusFilter, pageSize, sortField, sortDir]);
+
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -240,24 +409,60 @@ export default function AdministracionPage() {
         </button>
       </div>
 
-      <form onSubmit={onSearch} className="mb-6 flex gap-2 max-w-md">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nº reserva, cliente o email"
-            className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none text-sm"
-          />
+      <div className="mb-6 flex flex-col lg:flex-row lg:items-center gap-3">
+        <form onSubmit={onSearch} className="flex gap-2 flex-1 min-w-[240px] max-w-md">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar por nº reserva, cliente o email"
+              className="w-full pl-9 pr-4 py-2.5 rounded-lg border border-gray-300 focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none text-sm"
+            />
+          </div>
+          <button
+            type="submit"
+            className="px-4 py-2.5 text-sm font-medium text-white bg-furgocasa-blue rounded-lg hover:bg-furgocasa-blue/90 transition-colors"
+          >
+            Buscar
+          </button>
+        </form>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="text-gray-500">Estado:</span>
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="py-2 pl-3 pr-8 rounded-lg border border-gray-300 bg-white text-sm focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none"
+            >
+              <option value="all">Todos</option>
+              <option value="pending">Pendiente</option>
+              <option value="confirmed">Confirmada</option>
+              <option value="in_progress">En curso</option>
+              <option value="completed">Completada</option>
+            </select>
+          </label>
+
+          <label className="flex items-center gap-2 text-sm text-gray-600">
+            <span className="text-gray-500">Ver:</span>
+            <select
+              value={String(pageSize)}
+              onChange={(e) =>
+                setPageSize(e.target.value === "all" ? "all" : (Number(e.target.value) as PageSize))
+              }
+              className="py-2 pl-3 pr-8 rounded-lg border border-gray-300 bg-white text-sm focus:border-furgocasa-blue focus:ring-2 focus:ring-furgocasa-blue/20 outline-none"
+            >
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="500">500</option>
+              <option value="all">Todos</option>
+            </select>
+          </label>
         </div>
-        <button
-          type="submit"
-          className="px-4 py-2.5 text-sm font-medium text-white bg-furgocasa-blue rounded-lg hover:bg-furgocasa-blue/90 transition-colors"
-        >
-          Buscar
-        </button>
-      </form>
+      </div>
 
       {error && (
         <div className="mb-4 flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
@@ -272,144 +477,210 @@ export default function AdministracionPage() {
             <Loader2 className="h-6 w-6 animate-spin mr-2" />
             Cargando...
           </div>
-        ) : rows.length === 0 ? (
+        ) : total === 0 ? (
           <div className="text-center py-16 text-gray-400">
             <ListChecks className="h-10 w-10 mx-auto mb-3 opacity-40" />
-            <p>No hay alquileres en gestión.</p>
+            <p>No hay alquileres que coincidan con el filtro.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide">
-                  <th className="px-3 py-3 font-semibold">Reserva</th>
-                  <th className="px-3 py-3 font-semibold">Inicio</th>
-                  <th className="px-3 py-3 font-semibold" title="Vencimiento del 2º pago (inicio − 15 días)">
-                    Venc. 2º pago
-                  </th>
-                  <th className="px-3 py-3 font-semibold" title="Límite de la fianza (inicio − 8 días)">
-                    Límite fianza
-                  </th>
-                  <th className="px-3 py-3 font-semibold text-center">1ª fact.</th>
-                  <th className="px-3 py-3 font-semibold text-center">2ª fact.</th>
-                  <th className="px-3 py-3 font-semibold text-center">Contrato</th>
-                  <th className="px-3 py-3 font-semibold text-center">Docs.</th>
-                  <th className="px-3 py-3 font-semibold text-center">Fianza</th>
-                  <th className="px-3 py-3 font-semibold text-center">Cita</th>
-                  <th className="px-3 py-3 font-semibold text-right">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {rows.map((r) => {
-                  const secondPaymentLate =
-                    !r.secondInvoiceDone && r.secondPaymentDueDate < today;
-                  const depositLate = !r.depositReceived && r.depositDueDate < today;
-                  return (
-                    <tr key={r.bookingId} className="hover:bg-gray-50 align-top">
-                      <td className="px-3 py-3">
-                        <div className="font-medium text-gray-900">{r.bookingNumber}</div>
-                        <div className="text-xs text-gray-500">{r.customerName || "—"}</div>
-                        <div className="text-xs text-gray-400">
-                          {r.vehicleInternalCode} · {r.vehicleName}
-                        </div>
-                      </td>
-                      <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
-                        {fmtDate(r.pickupDate)}
-                        {r.pickupTime ? (
-                          <span className="block text-xs text-gray-400">{r.pickupTime}</span>
-                        ) : null}
-                      </td>
-                      <td className="px-3 py-3 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center gap-1 ${
-                            secondPaymentLate ? "text-red-600 font-medium" : "text-gray-500"
-                          }`}
-                        >
-                          {secondPaymentLate && <CalendarClock className="h-3.5 w-3.5" />}
-                          {fmtDate(r.secondPaymentDueDate)}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 whitespace-nowrap">
-                        <span
-                          className={`inline-flex items-center gap-1 ${
-                            depositLate ? "text-red-600 font-medium" : "text-gray-500"
-                          }`}
-                        >
-                          {depositLate && <CalendarClock className="h-3.5 w-3.5" />}
-                          {fmtDate(r.depositDueDate)}
-                        </span>
-                      </td>
-                      {/* 1ª factura */}
-                      <td className="px-3 py-3 text-center">
-                        <Check
-                          checked={r.firstInvoiceDone}
-                          disabled={savingKey === `${r.bookingId}:first_invoice_done`}
-                          onChange={(v) => toggleField(r, "first_invoice_done", v)}
-                        />
-                      </td>
-                      {/* 2ª factura */}
-                      <td className="px-3 py-3 text-center">
-                        <Check
-                          checked={r.secondInvoiceDone}
-                          disabled={savingKey === `${r.bookingId}:second_invoice_done`}
-                          onChange={(v) => toggleField(r, "second_invoice_done", v)}
-                        />
-                      </td>
-                      {/* Contrato (solo lectura) */}
-                      <td className="px-3 py-3 text-center">
-                        <CheckCircle2
-                          className={`h-5 w-5 mx-auto ${
-                            r.contractSigned ? "text-green-500" : "text-gray-300"
-                          }`}
-                        />
-                      </td>
-                      {/* Documentación (auto + override) */}
-                      <td className="px-3 py-3 text-center">
-                        <div className="flex flex-col items-center gap-1">
-                          <CheckCircle2
-                            className={`h-5 w-5 ${
-                              r.docComplete ? "text-green-500" : "text-gray-300"
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide">
+                    <SortHeader label="Reserva" field="reserva" active={sortField === "reserva"} dir={sortDir} onSort={onSort} />
+                    <SortHeader label="Estado" field="estado" active={sortField === "estado"} dir={sortDir} onSort={onSort} />
+                    <SortHeader label="Inicio" field="inicio" active={sortField === "inicio"} dir={sortDir} onSort={onSort} />
+                    <SortHeader label="Fin" field="fin" active={sortField === "fin"} dir={sortDir} onSort={onSort} />
+                    <SortHeader label="Venc. 2º pago" field="venc" active={sortField === "venc"} dir={sortDir} onSort={onSort} />
+                    <th className="px-3 py-3 font-semibold text-center">1ª fact.</th>
+                    <th className="px-3 py-3 font-semibold text-center">2ª fact.</th>
+                    <th className="px-3 py-3 font-semibold text-center">Contrato</th>
+                    <th className="px-3 py-3 font-semibold text-center">Docs.</th>
+                    <th className="px-3 py-3 font-semibold text-center">Fianza</th>
+                    <th className="px-3 py-3 font-semibold text-center">Cita</th>
+                    <th className="px-3 py-3 font-semibold text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {paged.map((r) => {
+                    const started = hasStartedRow(r, today);
+                    const pending = (r.totalPrice ?? 0) - (r.amountPaid ?? 0);
+                    const paidFull = pending <= 0;
+                    const secondPaymentLate =
+                      !started && !r.secondInvoiceDone && !paidFull && r.secondPaymentDueDate < today;
+                    const sm = STATUS_META[r.status] ?? {
+                      label: r.status,
+                      cls: "bg-gray-100 text-gray-600",
+                    };
+                    const contractOk = started || r.contractSigned;
+                    const docOk = started || r.docComplete;
+                    const citaOk = started || r.appointmentConfirmed;
+                    return (
+                      <tr key={r.bookingId} className="hover:bg-gray-50 align-top">
+                        {/* Reserva (código vehículo + ubicación + cliente, estilo Notion) */}
+                        <td className="px-3 py-3 min-w-[220px]">
+                          <div className="font-medium text-gray-900">{r.customerName || "—"}</div>
+                          <div className="text-xs text-gray-500">
+                            {[r.vehicleInternalCode, r.vehicleName].filter(Boolean).join(" · ") || "—"}
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            {r.pickupLocation || "—"}
+                            {r.dropoffLocation && r.dropoffLocation !== r.pickupLocation
+                              ? ` → ${r.dropoffLocation}`
+                              : ""}
+                          </div>
+                        </td>
+                        {/* Estado */}
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span
+                            className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sm.cls}`}
+                          >
+                            {sm.label}
+                          </span>
+                        </td>
+                        {/* Inicio */}
+                        <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
+                          {fmtDate(r.pickupDate)}
+                          {r.pickupTime ? (
+                            <span className="block text-xs text-gray-400">{r.pickupTime}</span>
+                          ) : null}
+                        </td>
+                        {/* Fin */}
+                        <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
+                          {fmtDate(r.dropoffDate)}
+                          {r.dropoffTime ? (
+                            <span className="block text-xs text-gray-400">{r.dropoffTime}</span>
+                          ) : null}
+                        </td>
+                        {/* Venc. 2º pago + importe pendiente */}
+                        <td className="px-3 py-3 whitespace-nowrap">
+                          <span
+                            className={`inline-flex items-center gap-1 ${
+                              secondPaymentLate ? "text-red-600 font-medium" : "text-gray-500"
                             }`}
-                          />
-                          {r.docsUploadedCount > 0 && (
-                            <span className="text-[10px] text-gray-400">
-                              {r.docsUploadedCount} arch.
-                            </span>
+                          >
+                            {secondPaymentLate && <CalendarClock className="h-3.5 w-3.5" />}
+                            {fmtDate(r.secondPaymentDueDate)}
+                          </span>
+                          <span
+                            className={`block text-xs ${
+                              paidFull ? "text-green-600 font-medium" : "text-gray-500"
+                            }`}
+                          >
+                            {paidFull ? "Pagado" : `Pendiente: ${fmtEUR(pending)}`}
+                          </span>
+                        </td>
+                        {/* 1ª factura */}
+                        <td className="px-3 py-3 text-center">
+                          {started ? (
+                            <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
+                          ) : (
+                            <Check
+                              checked={r.firstInvoiceDone}
+                              disabled={savingKey === `${r.bookingId}:first_invoice_done`}
+                              onChange={(v) => toggleField(r, "first_invoice_done", v)}
+                            />
                           )}
-                        </div>
-                      </td>
-                      {/* Fianza */}
-                      <td className="px-3 py-3 text-center">
-                        <Check
-                          checked={r.depositReceived}
-                          disabled={savingKey === `${r.bookingId}:deposit_received`}
-                          onChange={(v) => toggleField(r, "deposit_received", v)}
-                        />
-                      </td>
-                      {/* Cita */}
-                      <td className="px-3 py-3 text-center">
-                        <CheckCircle2
-                          className={`h-5 w-5 mx-auto ${
-                            r.appointmentConfirmed ? "text-green-500" : "text-gray-300"
-                          }`}
-                        />
-                      </td>
-                      <td className="px-3 py-3 text-right">
-                        <button
-                          type="button"
-                          onClick={() => setPanel(r)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-furgocasa-blue border border-furgocasa-blue/30 rounded-lg hover:bg-furgocasa-blue/5"
-                        >
-                          <Mail className="h-3.5 w-3.5" />
-                          Emails / Docs
-                        </button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                        </td>
+                        {/* 2ª factura */}
+                        <td className="px-3 py-3 text-center">
+                          {started ? (
+                            <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
+                          ) : (
+                            <Check
+                              checked={r.secondInvoiceDone}
+                              disabled={savingKey === `${r.bookingId}:second_invoice_done`}
+                              onChange={(v) => toggleField(r, "second_invoice_done", v)}
+                            />
+                          )}
+                        </td>
+                        {/* Contrato (solo lectura) */}
+                        <td className="px-3 py-3 text-center">
+                          <CheckCircle2
+                            className={`h-5 w-5 mx-auto ${contractOk ? "text-green-500" : "text-gray-300"}`}
+                          />
+                        </td>
+                        {/* Documentación (auto + override) */}
+                        <td className="px-3 py-3 text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <CheckCircle2
+                              className={`h-5 w-5 ${docOk ? "text-green-500" : "text-gray-300"}`}
+                            />
+                            {r.docsUploadedCount > 0 && (
+                              <span className="text-[10px] text-gray-400">
+                                {r.docsUploadedCount} arch.
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        {/* Fianza */}
+                        <td className="px-3 py-3 text-center">
+                          {started ? (
+                            <CheckCircle2 className="h-5 w-5 mx-auto text-green-500" />
+                          ) : (
+                            <Check
+                              checked={r.depositReceived}
+                              disabled={savingKey === `${r.bookingId}:deposit_received`}
+                              onChange={(v) => toggleField(r, "deposit_received", v)}
+                            />
+                          )}
+                        </td>
+                        {/* Cita */}
+                        <td className="px-3 py-3 text-center">
+                          <CheckCircle2
+                            className={`h-5 w-5 mx-auto ${citaOk ? "text-green-500" : "text-gray-300"}`}
+                          />
+                        </td>
+                        <td className="px-3 py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => setPanel(r)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-furgocasa-blue border border-furgocasa-blue/30 rounded-lg hover:bg-furgocasa-blue/5"
+                          >
+                            <Mail className="h-3.5 w-3.5" />
+                            Emails / Docs
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pie: recuento + paginación */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 px-4 py-3 border-t border-gray-100 text-sm text-gray-500">
+              <span>
+                Mostrando <span className="font-medium text-gray-700">{fromRow}</span>–
+                <span className="font-medium text-gray-700">{toRow}</span> de{" "}
+                <span className="font-medium text-gray-700">{total}</span> alquileres
+              </span>
+              {pageSize !== "all" && totalPages > 1 && (
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage <= 1}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <ChevronLeft className="h-4 w-4" /> Anterior
+                  </button>
+                  <span className="text-gray-600">
+                    Página {currentPage} de {totalPages}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                    disabled={currentPage >= totalPages}
+                    className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Siguiente <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
 
