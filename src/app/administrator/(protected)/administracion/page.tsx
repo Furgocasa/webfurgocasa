@@ -232,8 +232,8 @@ export default function AdministracionPage() {
   const [panel, setPanel] = useState<Row | null>(null);
   const [sortField, setSortField] = useState<SortField>(null);
   const [sortDir, setSortDir] = useState<SortDir>("asc");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [pageSize, setPageSize] = useState<PageSize>(50);
+  const [statusFilter, setStatusFilter] = useState<string>("confirmed_in_progress");
+  const [pageSize, setPageSize] = useState<PageSize>("all");
   const [page, setPage] = useState(1);
 
   const load = useCallback(async (q: string) => {
