@@ -196,7 +196,7 @@ function SortHeader({
   const justify =
     align === "center" ? "justify-center" : align === "right" ? "justify-end" : "justify-start";
   return (
-    <th className={`px-3 py-3 font-semibold ${className}`}>
+    <th className={`px-3 py-3 font-semibold bg-gray-50 ${className}`}>
       <button
         type="button"
         onClick={() => onSort(field)}
@@ -277,23 +277,23 @@ function AdminTableHeader({
   onSort: (f: Exclude<SortField, null>) => void;
 }) {
   return (
-    <thead>
-      <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide">
+    <thead className="sticky top-0 z-20">
+      <tr className="bg-gray-50 text-left text-gray-500 text-xs uppercase tracking-wide shadow-[0_1px_0_0_rgba(0,0,0,0.08)]">
         <SortHeader label="Reserva" field="reserva" active={sortField === "reserva"} dir={sortDir} onSort={onSort} />
         <SortHeader label="Estado" field="estado" active={sortField === "estado"} dir={sortDir} onSort={onSort} />
         <SortHeader label="Inicio" field="inicio" active={sortField === "inicio"} dir={sortDir} onSort={onSort} />
         <SortHeader label="Fin" field="fin" active={sortField === "fin"} dir={sortDir} onSort={onSort} />
-        <th className="px-3 py-3 font-semibold text-center" title="Devuelta según fecha fin de reserva">
+        <th className="px-3 py-3 font-semibold text-center bg-gray-50" title="Devuelta según fecha fin de reserva">
           Devuelta
         </th>
         <SortHeader label="Venc. 2º pago" field="venc" active={sortField === "venc"} dir={sortDir} onSort={onSort} />
-        <th className="px-3 py-3 font-semibold text-center">1ª fact.</th>
-        <th className="px-3 py-3 font-semibold text-center">2ª fact.</th>
-        <th className="px-3 py-3 font-semibold text-center">Contrato</th>
-        <th className="px-3 py-3 font-semibold text-center">Docs.</th>
-        <th className="px-3 py-3 font-semibold text-center">Fianza</th>
-        <th className="px-3 py-3 font-semibold text-center">Cita</th>
-        <th className="px-3 py-3 font-semibold text-right">Acciones</th>
+        <th className="px-3 py-3 font-semibold text-center bg-gray-50">1ª fact.</th>
+        <th className="px-3 py-3 font-semibold text-center bg-gray-50">2ª fact.</th>
+        <th className="px-3 py-3 font-semibold text-center bg-gray-50">Contrato</th>
+        <th className="px-3 py-3 font-semibold text-center bg-gray-50">Docs.</th>
+        <th className="px-3 py-3 font-semibold text-center bg-gray-50">Fianza</th>
+        <th className="px-3 py-3 font-semibold text-center bg-gray-50">Cita</th>
+        <th className="px-3 py-3 font-semibold text-right bg-gray-50">Acciones</th>
       </tr>
     </thead>
   );
@@ -893,7 +893,7 @@ export default function AdministracionPage() {
           </div>
         ) : (
           <>
-            <div className="overflow-x-auto">
+            <div className="overflow-auto max-h-[calc(100vh-16rem)]">
               <table className="w-full text-sm">
                 <AdminTableHeader sortField={sortField} sortDir={sortDir} onSort={onSort} />
                 <tbody className="divide-y divide-gray-100">
