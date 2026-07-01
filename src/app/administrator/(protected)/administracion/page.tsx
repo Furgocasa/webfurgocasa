@@ -26,6 +26,7 @@ import {
   Truck,
   LayoutGrid,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 
 type ReminderKey = "secondPayment" | "contract" | "documentation" | "deposit";
 
@@ -142,13 +143,21 @@ function fmtEUR(n: number | null): string {
   }).format(n);
 }
 
-const STATUS_META: Record<string, { label: string; cls: string }> = {
-  pending: { label: "Pendiente", cls: "bg-amber-100 text-amber-700" },
-  confirmed: { label: "Confirmada", cls: "bg-emerald-100 text-emerald-700" },
-  in_progress: { label: "En curso", cls: "bg-blue-100 text-blue-700" },
-  completed: { label: "Completada", cls: "bg-gray-100 text-gray-600" },
-  cancelled: { label: "Cancelada", cls: "bg-red-100 text-red-600" },
+const STATUS_META: Record<string, { label: string; cls: string; short: string }> = {
+  pending: { label: "Pendiente", cls: "bg-amber-100 text-amber-700", short: "⏱ Pdte" },
+  confirmed: { label: "Confirmada", cls: "bg-emerald-100 text-emerald-700", short: "✓ Conf" },
+  in_progress: { label: "En curso", cls: "bg-blue-100 text-blue-700", short: "▶ Curso" },
+  completed: { label: "Completada", cls: "bg-gray-100 text-gray-600", short: "✓ Comp" },
+  cancelled: { label: "Cancelada", cls: "bg-red-100 text-red-600", short: "✗ Canc" },
 };
+
+const BOOKING_STATUS_OPTIONS = [
+  "pending",
+  "confirmed",
+  "in_progress",
+  "completed",
+  "cancelled",
+] as const;
 
 function statusRank(s: string): number {
   return { pending: 0, confirmed: 1, in_progress: 2, completed: 3 }[s] ?? 9;
@@ -296,6 +305,7 @@ function AdminTableRow({
   savingKey,
   hideVehicleLine,
   onToggleField,
+  onStatusChange,
   onOpenPanel,
 }: {
   r: Row;
@@ -303,6 +313,7 @@ function AdminTableRow({
   savingKey: string | null;
   hideVehicleLine?: boolean;
   onToggleField: (row: Row, field: FieldKey, value: boolean) => void;
+  onStatusChange: (row: Row, status: string) => void;
   onOpenPanel: (row: Row) => void;
 }) {
   const started = hasStartedRow(r, today);
@@ -313,7 +324,9 @@ function AdminTableRow({
   const sm = STATUS_META[r.status] ?? {
     label: r.status,
     cls: "bg-gray-100 text-gray-600",
+    short: r.status,
   };
+  const statusSaving = savingKey === `${r.bookingId}:status`;
   const citaOk = started || r.appointmentConfirmed;
   const returned = isReturnedRow(r, today);
 
@@ -334,9 +347,19 @@ function AdminTableRow({
         </div>
       </td>
       <td className="px-3 py-3 whitespace-nowrap">
-        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sm.cls}`}>
-          {sm.label}
-        </span>
+        <select
+          value={r.status}
+          onChange={(e) => onStatusChange(r, e.target.value)}
+          disabled={statusSaving}
+          title="Cambiar estado de la reserva"
+          className={`text-xs font-medium px-2 py-1 rounded-full border-0 cursor-pointer focus:ring-2 focus:ring-furgocasa-blue disabled:opacity-50 ${sm.cls}`}
+        >
+          {BOOKING_STATUS_OPTIONS.map((s) => (
+            <option key={s} value={s}>
+              {STATUS_META[s]?.short ?? s}
+            </option>
+          ))}
+        </select>
       </td>
       <td className="px-3 py-3 text-gray-600 whitespace-nowrap">
         {fmtDate(r.pickupDate)}
@@ -526,6 +549,47 @@ export default function AdministracionPage() {
   const onSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setQuery(search.trim());
+  };
+
+  const revertOfferIfLinked = async (bookingId: string) => {
+    try {
+      await fetch("/api/admin/last-minute-offers/revert-by-booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ bookingId }),
+      });
+    } catch {
+      /* no bloquea */
+    }
+  };
+
+  const changeStatus = async (row: Row, newStatus: string) => {
+    if (newStatus === row.status) return;
+    const key = `${row.bookingId}:status`;
+    setSavingKey(key);
+    setError(null);
+    const prevStatus = row.status;
+    setRows((prev) =>
+      prev.map((r) => (r.bookingId === row.bookingId ? { ...r, status: newStatus } : r))
+    );
+    try {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("bookings")
+        .update({ status: newStatus })
+        .eq("id", row.bookingId);
+      if (error) throw error;
+      if (newStatus === "cancelled") {
+        await revertOfferIfLinked(row.bookingId);
+      }
+    } catch {
+      setError("No se pudo actualizar el estado de la reserva.");
+      setRows((prev) =>
+        prev.map((r) => (r.bookingId === row.bookingId ? { ...r, status: prevStatus } : r))
+      );
+    } finally {
+      setSavingKey(null);
+    }
   };
 
   const toggleField = async (row: Row, field: FieldKey, value: boolean) => {
@@ -812,6 +876,7 @@ export default function AdministracionPage() {
                           savingKey={savingKey}
                           hideVehicleLine
                           onToggleField={toggleField}
+                          onStatusChange={changeStatus}
                           onOpenPanel={setPanel}
                         />
                       ))}
@@ -839,6 +904,7 @@ export default function AdministracionPage() {
                       today={today}
                       savingKey={savingKey}
                       onToggleField={toggleField}
+                      onStatusChange={changeStatus}
                       onOpenPanel={setPanel}
                     />
                   ))}
