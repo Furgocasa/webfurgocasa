@@ -118,6 +118,17 @@ function todayIso(): string {
   return madrid.toISOString().slice(0, 10);
 }
 
+/** Clave de ordenación fecha+hora (inicio/fin de reserva). */
+function dateTimeSortKey(date: string | null | undefined, time: string | null | undefined): number {
+  if (!date) return 0;
+  const parts = (time || "00:00:00").trim().split(":");
+  const h = (parts[0] || "00").padStart(2, "0");
+  const m = (parts[1] || "00").padStart(2, "0");
+  const s = (parts[2] || "00").padStart(2, "0");
+  const ms = Date.parse(`${date}T${h}:${m}:${s}`);
+  return Number.isNaN(ms) ? 0 : ms;
+}
+
 function fmtEUR(n: number | null): string {
   if (n == null) return "—";
   return new Intl.NumberFormat("es-ES", {
@@ -567,12 +578,12 @@ export default function AdministracionPage() {
           vb = (b.customerName || "").toLowerCase();
           break;
         case "inicio":
-          va = a.pickupDate;
-          vb = b.pickupDate;
+          va = dateTimeSortKey(a.pickupDate, a.pickupTime);
+          vb = dateTimeSortKey(b.pickupDate, b.pickupTime);
           break;
         case "fin":
-          va = a.dropoffDate;
-          vb = b.dropoffDate;
+          va = dateTimeSortKey(a.dropoffDate, a.dropoffTime);
+          vb = dateTimeSortKey(b.dropoffDate, b.dropoffTime);
           break;
         case "venc":
           va = a.secondPaymentDueDate;
@@ -587,11 +598,18 @@ export default function AdministracionPage() {
           vb = statusRank(b.status);
           break;
         default:
-          va = a.pickupDate;
-          vb = b.pickupDate;
+          va = dateTimeSortKey(a.pickupDate, a.pickupTime);
+          vb = dateTimeSortKey(b.pickupDate, b.pickupTime);
       }
       if (va < vb) return -mul;
       if (va > vb) return mul;
+      // Desempate estable por nombre
+      if (field === "inicio" || field === "fin") {
+        const na = (a.customerName || "").toLowerCase();
+        const nb = (b.customerName || "").toLowerCase();
+        if (na < nb) return -mul;
+        if (na > nb) return mul;
+      }
       return 0;
     });
     return arr;

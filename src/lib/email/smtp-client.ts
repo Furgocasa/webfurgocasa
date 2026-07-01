@@ -61,10 +61,39 @@ export function getFromName(): string {
 }
 
 /**
- * Email de la empresa para recibir notificaciones
+ * Email de la empresa para recibir copia de emails a clientes
  */
 export function getCompanyEmail(): string {
   return process.env.COMPANY_EMAIL || 'reservas@furgocasa.com';
+}
+
+function normalizeEmailAddress(email: string): string {
+  return email.trim().toLowerCase();
+}
+
+/**
+ * Añade reservas@ (COMPANY_EMAIL) cuando el envío va a un cliente externo y aún
+ * no incluye copia a la empresa. Si el único destinatario es la empresa, no duplica.
+ */
+export function resolveEmailRecipients(
+  to: string | string[],
+  skipCompanyCopy = false
+): string[] {
+  const recipients = (Array.isArray(to) ? to : [to])
+    .map((e) => e.trim())
+    .filter(Boolean);
+
+  if (skipCompanyCopy || recipients.length === 0) return recipients;
+
+  const companyEmail = getCompanyEmail();
+  const companyNorm = normalizeEmailAddress(companyEmail);
+  const hasCompany = recipients.some((r) => normalizeEmailAddress(r) === companyNorm);
+  const hasExternal = recipients.some((r) => normalizeEmailAddress(r) !== companyNorm);
+
+  if (hasExternal && !hasCompany) {
+    return [...recipients, companyEmail];
+  }
+  return recipients;
 }
 
 /**
@@ -82,15 +111,18 @@ export async function sendEmail(options: {
   html: string;
   replyTo?: string;
   attachments?: EmailAttachment[];
+  /** Solo para tests internos: no añadir copia automática a reservas@ */
+  skipCompanyCopy?: boolean;
 }): Promise<{ success: boolean; messageId?: string; error?: string }> {
   try {
     const transport = getSmtpTransporter();
     const fromEmail = getFromEmail();
     const fromName = getFromName();
+    const to = resolveEmailRecipients(options.to, options.skipCompanyCopy);
 
     const result = await transport.sendMail({
       from: `"${fromName}" <${fromEmail}>`,
-      to: Array.isArray(options.to) ? options.to.join(', ') : options.to,
+      to: to.join(', '),
       subject: options.subject,
       html: options.html,
       replyTo: options.replyTo || fromEmail,
@@ -103,7 +135,7 @@ export async function sendEmail(options: {
 
     console.log('✅ Email enviado:', {
       messageId: result.messageId,
-      to: options.to,
+      to,
       subject: options.subject,
     });
 

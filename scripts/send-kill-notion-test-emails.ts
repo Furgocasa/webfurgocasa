@@ -162,6 +162,7 @@ async function main() {
       to: TO,
       subject: `[TEST ${key}] ${subject}`,
       html,
+      skipCompanyCopy: true,
     });
     if (result.success) {
       console.log(`✅ ${key}  →  enviado  (${subject})`);

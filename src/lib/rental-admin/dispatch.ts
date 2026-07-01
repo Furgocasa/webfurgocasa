@@ -42,7 +42,6 @@ const BUILDERS: Record<GestionEmailType, (d: AdminGestionEmailData) => AdminGest
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.furgocasa.com";
-const COMPANY_EMAIL = process.env.COMPANY_EMAIL || "reservas@furgocasa.com";
 
 function madridDateIso(d: Date): string {
   return d.toLocaleDateString("en-CA", { timeZone: "Europe/Madrid" });
@@ -96,7 +95,8 @@ export interface DispatchResult {
  *                               de ese tipo (cita, gestión inicial).
  * @param opts.onlyIfNotSentToday si true, como máximo un envío al día (recordatorios
  *                               2–5 mientras el asunto siga pendiente).
- * @param opts.ccCompany          si true (por defecto), CC a reservas@furgocasa.com.
+ * @param opts.ccCompany          reservado; la copia a reservas@ la añade sendEmail
+ *                               automáticamente salvo skipCompanyCopy.
  */
 export async function sendGestionEmail(
   supabase: SupabaseClient,
@@ -165,8 +165,12 @@ export async function sendGestionEmail(
   const data = buildEmailDataFromBooking(b);
   const { subject, html } = BUILDERS[type](data);
 
-  const to = ccCompany ? [customerEmail, COMPANY_EMAIL] : [customerEmail];
-  const result = await sendEmail({ to, subject, html });
+  const result = await sendEmail({
+    to: customerEmail,
+    subject,
+    html,
+    skipCompanyCopy: !ccCompany,
+  });
 
   if (result.success) {
     const dispatchPayload = {
