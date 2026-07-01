@@ -263,6 +263,9 @@ export async function buildBusinessDataBlock(): Promise<string> {
     lines.push('Ahora mismo no hay campers en venta publicadas; deriva a ventas para novedades.');
   }
 
+  lines.push('', await buildEquipmentDataBlock());
+  lines.push('', buildElectricityDataBlock());
+
   // Reglas de negocio fijas (verdad absoluta).
   lines.push(
     '',
@@ -274,6 +277,61 @@ export async function buildBusinessDataBlock(): Promise<string> {
     '- Maximo 4 plazas de viaje por camper; Furgocasa NO alquila caravanas.',
     '- Para PRECIO o DISPONIBILIDAD de fechas concretas, la fuente final es el buscador de reservas (no dar tabla de precios por un mes/fechas).'
   );
+
+  return lines.join('\n');
+}
+
+/**
+ * Reglas de electricidad (12V vs 220V, sin inversor). Prioridad sobre RAG ambiguo.
+ */
+export function buildElectricityDataBlock(): string {
+  return [
+    'ELECTRICIDAD EN LA CAMPER (verdad absoluta):',
+    '- Con baterias de vivienda y placas solares (sin cable a red externa): solo hay 12 V (CC). Alimenta luces, nevera compresor, calefaccion Truma, bomba de agua, USB y tomas mechero.',
+    '- Los enchufes de 220 V del interior SOLO funcionan cuando la camper esta conectada con cable a una red externa (camping o area con toma). Sin ese cable, los enchufes 220 V NO dan corriente.',
+    '- NO hay inversor: no se puede convertir 12 V de las baterias en 220 V dentro de la camper.',
+    '- Cafetera electrica, microondas, secador, plancha, tostadora u otros aparatos de 220 V: SOLO con la camper enchufada a red externa. Con baterias/placas solas NO.',
+    '- Alternativas sin 220 V: cafetera italiana (incluida), cocina a gas, aparatos 12 V especificos para camper.',
+    '- Furgocasa facilita cable y adaptador para conectar a red de 220 V en camping.',
+  ].join('\n');
+}
+
+/**
+ * Datos reales de equipamiento (flota estandar + detalle por modelo).
+ * Se inyecta en cada turno del chat y en el auditor via buildBusinessDataBlock.
+ */
+export async function buildEquipmentDataBlock(): Promise<string> {
+  const sb = getServiceClient();
+  const lines: string[] = [
+    'EQUIPAMIENTO ESTANDAR EN TODAS LAS CAMPERS DE ALQUILER (verdad absoluta):',
+    '- Placas solares INSTALADAS en el techo en TODAS las campers (nunca "algunas", "opcional" ni "preinstalacion").',
+    '- Baño completo con ducha y WC quimico (cassette de aguas negras).',
+    '- Cocina a gas: placa, fregadero y nevera (capacidad y tipo compresor/gas varian por modelo).',
+    '- Calefaccion Truma Combi (calefaccion del habitaculo + agua caliente).',
+    '- Toldo exterior, camara marcha atras, radio multimedia.',
+    '- NO cites capacidad Ah de bateria (p. ej. "95 Ah") como dato universal de toda la flota: varia por modelo (gel vs litio). Solo mencionalo si preguntan por un modelo concreto y aparece en su ficha.',
+  ];
+
+  const { data: vehicles } = await sb
+    .from('vehicles')
+    .select('name, brand, model, slug, battery_capacity, solar_power, has_solar_panel')
+    .eq('is_for_rent', true)
+    .neq('status', 'inactive')
+    .order('name');
+
+  if (vehicles?.length) {
+    lines.push('', 'DETALLE POR MODELO (usar solo si preguntan por un modelo concreto o diferencias):');
+    for (const v of vehicles) {
+      const title = [v.brand, v.model].filter(Boolean).join(' ').trim() || v.name;
+      const parts: string[] = [];
+      if (v.has_solar_panel !== false) parts.push('placa solar');
+      if (v.solar_power) parts.push(`${v.solar_power} W solar`);
+      if (v.battery_capacity) parts.push(`bateria ${v.battery_capacity}`);
+      const detail = parts.length ? parts.join(', ') : 'equipamiento estandar';
+      const ficha = v.slug ? ` Ficha: https://www.furgocasa.com/es/vehiculos/${v.slug}` : '';
+      lines.push(`- ${title}: ${detail}.${ficha}`);
+    }
+  }
 
   return lines.join('\n');
 }

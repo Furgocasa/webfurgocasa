@@ -2,9 +2,11 @@
 
 > Sustituye el flujo **WhatsApp + N8N + Airtable + Notion** por un **chatbot embebido** (la asistente **Andrea**) en la web de Furgocasa que responde con un **RAG (pgvector en Supabase)** sobre la documentación oficial, acepta **texto e imagen**, registra todas las conversaciones en un panel del administrador (`/administrator/chatbot`) con **clasificación de calidad por mensaje**, y cuenta con un **agente de revisión automática** que audita las respuestas contra el RAG.
 
-Última actualización: 2026-06-30
+Última actualización: **2026-07-01**
 
-> **Secciones 8-12**: añadidas en la sesión del 2026-06-30 (clasificación por mensaje, menús por temas, botón Refrescar, formato Markdown del chat y el **agente de revisión automática**). Si solo buscas lo nuevo, ve directamente ahí.
+> **Sesión 2026-07-01** (§14-19): RAG ampliado (equipamiento, ventas, blog, ofertas en tiempo real), multilingüe completo, índice **HNSW**, búsqueda contextual, botones nuevos del widget, auditor con datos reales de Supabase, y correcciones de coherencia (Portugal, listas 1-2-3, fianza, sedes, mascotas).
+
+> **Sesión 2026-06-30** (§8-12): clasificación por mensaje, menús por temas, botón Refrescar, formato Markdown del chat y el **agente de revisión automática**.
 
 ---
 
@@ -34,15 +36,16 @@ Modelos por defecto (configurables por env):
 ```
 Widget web  ──►  /api/chatbot/message  ──►  OpenAI (Embeddings / GPT-4o visión)
                           │                         │
-                          ├──► match_chatbot_chunks (pgvector)  ◄── chatbot_kb_chunks
+                          ├──► match_chatbot_chunks (pgvector HNSW)  ◄── chatbot_kb_chunks
+                          ├──► getActiveOffersBlock() (RPC ofertas última hora, tiempo real)
                           ├──► chatbot_conversations / chatbot_messages
-                          └──► storage: chatbot-uploads (imagen/audio)
+                          └──► storage: chatbot-uploads (imagen)
 
 Admin  ──►  /api/admin/chatbot/*  ──►  chatbot_conversations / chatbot_messages
                                           (calidad por mensaje: response_quality)
 
-Agente de revisión (script)  ──►  lee respuestas sin clasificar
-   review:chatbot-messages         ├──► retrieveContext (RAG) + buildSystemPrompt
+Agente de revisión (script)  ──►  lee respuestas (sin_tipo o --all)
+   review:chatbot-messages         ├──► retrieveContext (RAG) + buildBusinessDataBlock (datos reales BBDD)
                                     ├──► GPT-4o como auditor (correcta/mejorable/incorrecta)
                                     └──► escribe response_quality + admin_notes + informe MD
 ```
@@ -54,9 +57,11 @@ Agente de revisión (script)  ──►  lee respuestas sin clasificar
 Archivo: `supabase/migrations/create-chatbot.sql`
 
 - `CREATE EXTENSION IF NOT EXISTS vector;`
-- **`chatbot_kb_chunks`**: `id`, `source` (CSV: `condiciones|funcionamiento|modelos_general|faqs` · BBDD web solo-lectura: `vehiculos|ubicaciones|extras|empresa|temporadas` · `modelos|prompt` legacy), `title`, `content`, `content_hash` (UNIQUE, para upsert idempotente), `embedding vector(1536)`, `created_at`. Índice `ivfflat` coseno.
-  - El `CHECK` de `source` se amplió con `ALTER TABLE` para admitir las fuentes de BBDD (`vehiculos`, `ubicaciones`, `extras`, `empresa`, `temporadas`, `modelos_general`).
-- **RPC `match_chatbot_chunks(query_embedding, match_count)`**: top-k por distancia coseno.
+- **`chatbot_kb_chunks`**: `id`, `source`, `title`, `content`, `content_hash` (UNIQUE), `embedding vector(1536)`, `created_at`.
+  - **Fuentes CSV**: `condiciones`, `funcionamiento`, `modelos_general`, `faqs`.
+  - **Fuentes BBDD** (solo lectura): `vehiculos`, **`ventas`**, `ubicaciones`, `extras`, `empresa`, `temporadas`, **`blog`**. Legacy: `modelos`, `prompt`.
+  - **Índice vectorial**: **`hnsw`** (coseno). ⚠️ El `ivfflat` original con `lists=100` sobre ~576 fragmentos tenía recall muy bajo (no encontraba artículos como Portugal); ver §17.
+- **RPC `match_chatbot_chunks(query_embedding, match_count)`**: top-k por distancia coseno (default en código: **8** fragmentos).
 - **`chatbot_conversations`**: `id`, `session_id`, `contact_name/phone/email`, `language`, `status` (`open|closed|archived`), `response_quality` (`correcta|mejorable|incorrecta|sin_tipo`, **legacy** desde la sesión 2026-06-30: la clasificación pasó a nivel de mensaje), `admin_notes`, `created_at`, `last_message_at`.
 - **`chatbot_messages`**: `id`, `conversation_id` (FK CASCADE), `role` (`user|assistant`), `content`, `media_url`, `media_type` (`image|audio`), `transcription`, `created_at`, **`response_quality`** (`correcta|mejorable|incorrecta|sin_tipo`, default `sin_tipo`) y **`admin_notes`** — añadidos por `chatbot-message-quality.sql` (ver §8).
 - **RLS**: el API público escribe con `service_role` (bypassa RLS); los `admins` autenticados pueden leer/gestionar.
@@ -68,7 +73,7 @@ Verificación rápida en Supabase:
 - `Database > Functions`: aparece `match_chatbot_chunks`.
 - `Storage`: existe el bucket `chatbot-uploads`.
 
-> Nota: el índice `ivfflat` se crea sobre tabla vacía; conviene ejecutar `ANALYZE chatbot_kb_chunks;` después de la primera ingesta para mejor rendimiento.
+> Nota: tras cada ingesta ejecutar `ANALYZE chatbot_kb_chunks;` en Supabase. Si migras de `ivfflat` a `hnsw`, ver §17.
 
 ---
 
@@ -92,21 +97,26 @@ Fuentes CSV (`chatbot_documentacion/`):
 - `MODELOS`: SOLO las filas genéricas (`ESP - ...`: características comunes, diferencias, cómo elegir). Las fichas por modelo ya **no** se usan del CSV.
 
 Fuentes BBDD de la web (solo lectura, garantizan coherencia automática):
-- `vehiculos` ← `vehicles` (filtro del catálogo ES: `is_for_rent=true AND status<>'inactive'`). Ficha por camper: marca/modelo, plazas día/noche, transmisión, dimensiones, `short_description`, `description` (HTML limpiado), `features`, y **URL de ficha** `…/es/vehiculos/{slug}`. Excluye vendidos/inactivos.
-- `ubicaciones` ← `locations` activas: dirección, horario, recogida/entrega, tasa por sede.
+- `vehiculos` ← `vehicles` de alquiler (`is_for_rent=true`, `status<>'inactive'`) + equipamiento detallado (`vehicle_equipment` + `vehicle_features` + array `features`).
+- **`ventas`** ← `vehicles` en venta (`is_for_sale=true`, `sale_status='available'`): modelo, plazas/camas, precio, enlace `/es/ventas/{slug}`.
+- `ubicaciones` ← `locations` activas: dirección, horario, **sobrecoste real = extra_fee × 2**, mínimos por sede.
 - `extras` ← `extras` activos: 1 fragmento por extra con su precio.
 - `empresa` ← `settings`: contacto + reglas de reserva/pago.
-- `temporadas` ← `seasons` activas: fechas y mínimos (sin precios diarios).
+- `temporadas` ← `seasons` activas: fechas y mínimos (sin precios diarios en el RAG).
+- **`blog`** ← `posts` publicados (`status='published'`): título + extracto + introducción corta (~900 chars) + enlace `/es/blog/{categoria}/{slug}`. Indexación **compacta** (~1 fragmento/artículo) para no ahogar la info de negocio.
+
+**CSV CONDICIONES**: se eliminó la tabla de precios genérica por tramo (95/125/155 €/día) porque no coincidía con `seasons` y provocaba respuestas incorrectas. El prompt prohíbe dar cifras por mes/fechas concretas.
 
 Trocea (split de las muy largas), calcula `content_hash`, embebe con `text-embedding-3-small`, borra por `source` e inserta. Requiere `OPENAI_API_KEY` y `SUPABASE_SERVICE_ROLE_KEY`. Al final lanza la verificación de coherencia (4.8).
 
 ### 4.4. API pública del chat
 `src/app/api/chatbot/message/route.ts` (POST, runtime nodejs):
-1. Asegura/crea conversación por `sessionId`.
+1. Asegura/crea conversación por `sessionId` (idioma fijado con `locale` de la URL al crear, no se recalcula en cada turno).
 2. Imagen → input de visión GPT-4o; sube adjunto a `chatbot-uploads`.
-3. Embede la consulta → `match_chatbot_chunks` → contexto top-k.
-4. GPT-4o con prompt + historial + contexto, en **streaming** (ReadableStream).
-5. Persiste mensajes user/assistant, actualiza `last_message_at` e `language`.
+3. **Búsqueda RAG contextual**: combina los **últimos mensajes del usuario** + el actual antes de embeber (p. ej. "portugal" + "¿me recomiendas rutas?" recupera el artículo de Portugal). Traduce la consulta al español si `locale !== 'es'`.
+4. **`getActiveOffersBlock()`**: inyecta ofertas de última hora vigentes (RPC `get_active_last_minute_offers`) como bloque "DATOS EN TIEMPO REAL" — no van al RAG porque caducan.
+5. GPT-4o con prompt + historial (**20 mensajes**) + contexto RAG + ofertas, en **streaming**.
+6. Persiste mensajes user/assistant, actualiza `last_message_at`.
 
 ### 4.5. Widget embebido
 Reescribir `src/components/whatsapp-chatbot.tsx` (sigue montado global, oculto en `/administrator` y barras de reserva):
@@ -143,14 +153,18 @@ Reescribir `src/components/whatsapp-chatbot.tsx` (sigue montado global, oculto e
 
 ```bash
 # 1. (Ya hecho) Ejecutar supabase/migrations/create-chatbot.sql en Supabase
-# 1b. Ejecutar supabase/migrations/chatbot-message-quality.sql en Supabase (calidad por mensaje, §8)
+# 1b. Ejecutar supabase/migrations/chatbot-message-quality.sql (calidad por mensaje, §8)
+# 1c. Ampliar CHECK source + índice HNSW (§17 y §19) — obligatorio en producción
 # 2. Ingestar la base de conocimiento
 npm run ingest:chatbot-kb
-# 3. Arrancar
+# 3. En Supabase SQL Editor:
+ANALYZE chatbot_kb_chunks;
+# 4. Arrancar
 npm run dev
-# 4. Probar el widget en la web pública y el panel en /administrator/chatbot
-# 5. (Opcional) Auditar respuestas pendientes con el agente de revisión (§11)
-npm run review:chatbot-messages
+# 5. Probar el widget en la web pública y el panel en /administrator/chatbot
+# 6. Auditar respuestas con el agente de revisión (§11)
+npx tsx scripts/review-chatbot-messages.ts --all   # reevaluar todo tras mejoras
+npm run review:chatbot-messages                    # solo sin clasificar
 ```
 
 ---
@@ -159,8 +173,10 @@ npm run review:chatbot-messages
 
 - NO se toca `src/lib/redsys/crypto.ts` ni nada de pagos (archivo protegido).
 - El API público SOLO usa `service_role` en el servidor; nunca se expone al cliente.
-- Reingestar (`npm run ingest:chatbot-kb`) cada vez que cambie la documentación de `chatbot_documentacion/`.
-- Tras la primera ingesta: `ANALYZE chatbot_kb_chunks;` en Supabase.
+- Reingestar (`npm run ingest:chatbot-kb`) cuando cambien CSVs, datos de BBDD relevantes, o la lógica de ingesta.
+- Tras cada ingesta: `ANALYZE chatbot_kb_chunks;` en Supabase.
+- **No indexar cupones de BD en el RAG** ni en `/ofertas` público (ver regla `ofertas-banners.mdc`). Las ofertas de última hora sí van en tiempo real vía RPC.
+- **No meter datos sensibles** en el RAG: `customers`, `bookings`, `payments`, etc.
 - Notion deja de usarse; el histórico vive en Supabase.
 
 ---
@@ -175,12 +191,17 @@ npm run review:chatbot-messages
 - [x] Widget embebido (`whatsapp-chatbot.tsx`) + navegación interna + persistencia
 - [x] Panel admin + API admin + sidebar
 - [x] Documentar env y verificar lint/build
-- [x] Ingesta ejecutada: **215 fragmentos** indexados
+- [x] Ingesta ejecutada: **~576 fragmentos** indexados (308 blog, 20 vehículos, 19 ventas, resto negocio)
 - [x] Clasificación de calidad **por mensaje** + panel con pestañas (§8)
 - [x] Widget: menús por temas, botón Refrescar, z-index, sin zoom en móvil (§9)
 - [x] Formato Markdown y enlaces cortos en las respuestas (§10)
 - [x] **Agente de revisión automática** de mensajes (§11)
 - [x] Mejoras de prompt derivadas de la revisión (§12)
+- [x] Multilingüe completo (§14)
+- [x] RAG ampliado: equipamiento, ventas, blog, ofertas tiempo real (§15-16)
+- [x] Índice HNSW + búsqueda contextual (§17)
+- [x] Botones widget ampliados + listas 1-2-3 (§9, §18)
+- [x] Auditor con datos reales Supabase (`buildBusinessDataBlock`) (§11)
 
 ---
 
@@ -225,10 +246,12 @@ CREATE INDEX IF NOT EXISTS idx_chatbot_msg_assistant_quality
 
 `src/components/whatsapp-chatbot.tsx`:
 
-### 9.1. Menús preconfigurados agrupados por temas
-- Sustituyen los 4 botones fijos por un menú en **dos niveles**: el cliente elige primero el **tema** y luego una **subopción** concreta.
-- Categorías (`CHAT_CATEGORIES`): 🚐 Alquiler, 🔑 Compra, 📅 Administración y reservas, ❓ Otras consultas, 🛣️ Estoy en ruta (asistencia).
-- Cada tema tiene su pregunta guía y sus subopciones (precios, condiciones, requisitos; 2/4 plazas; fianza; avería; etc.).
+### 9.1. Menús preconfigurados agrupados por temas (6 categorías, 4 idiomas)
+- Menú en **dos niveles**: tema → subopción. Textos en `WIDGET_I18N` (`es`, `en`, `fr`, `de`) según `locale` de la URL.
+- Categorías: 🚐 Alquiler, 🔑 Compra, 📅 Administración y reservas, ❓ Otras consultas, 🛣️ Estoy en ruta, **🗺️ Rutas y consejos de viaje** (nuevo 2026-07-01).
+- Subopciones nuevas en **Alquiler**: **Ofertas y descuentos**, **Equipamiento incluido**.
+- Subopciones **Rutas y consejos**: rutas/destinos, consejos camper, viajar con mascota, viajar al extranjero.
+- Avatar de **Andrea** en cabecera: `/images/andrea-avatar.png`.
 - El tema activo (`activeCategory`) se persiste en `localStorage` y filtra las sugerencias persistentes durante la charla. Botones para "Volver a los temas" / "Cambiar de tema".
 
 ### 9.2. Botón "Refrescar"
@@ -247,8 +270,8 @@ CREATE INDEX IF NOT EXISTS idx_chatbot_msg_assistant_quality
 
 `src/components/whatsapp-chatbot.tsx`:
 
-- **Markdown ligero** en las respuestas de Andrea: `**negritas**`, *cursivas*, listas con `-` y numeradas, párrafos con interlineado; los encabezados `#` se degradan a negrita (el chat es estrecho).
-  - `renderRichText` divide por líneas y agrupa listas (`<ul>`/`<ol>`); `renderInline` resuelve negrita/cursiva/enlaces.
+- **Markdown ligero** en las respuestas de Andrea: `**negritas**`, *cursivas*, listas con `-` y numeradas, párrafos con interlineado.
+- **Listas numeradas 1-2-3** (fix 2026-07-01): numeración manual; las líneas en blanco entre ítems ya no parten la lista (antes cada `<ol>` tenía un solo ítem y todo salía como "1.").
 - **Enlaces cortos**: en vez de pegar la URL larga (que desbordaba el ancho), se muestra texto legible mediante `friendlyLabel()` + el mapa `LINK_LABELS` (p. ej. `…/es/tarifas` → "Tarifas y condiciones"). Red de seguridad con `break-words` + `[overflow-wrap:anywhere]`.
 - Enlaces internos a `furgocasa.com` navegan con el router (sin recargar) y mantienen el chat abierto; los externos abren en pestaña nueva.
 - **Coherencia visual con la web**: tipografías **Rubik** (título) y **Amiko** (cuerpo) — las mismas de `layout.tsx`; burbujas tipo tarjeta (`rounded-2xl` con esquina de origen recortada); color corporativo `#063971`.
@@ -262,27 +285,33 @@ CREATE INDEX IF NOT EXISTS idx_chatbot_msg_assistant_quality
 Archivo: `scripts/review-chatbot-messages.ts` · npm: **`review:chatbot-messages`**.
 
 ### 11.1. Qué hace
-1. Lee en Supabase todas las **respuestas del asistente** con `response_quality = 'sin_tipo'`.
-2. Para cada una recupera la **pregunta previa** del usuario y el **contexto RAG** (con `retrieveContext`, igual que en producción) y construye el prompt del sistema real (`buildSystemPrompt`).
-3. Llama al modelo (`OPENAI_CHATBOT_MODEL`, default `gpt-4o`, `temperature 0.1`, `response_format: json_object`) actuando como **auditor de calidad** con estos criterios:
-   - **correcta**: responde bien, coherente con el RAG y las reglas, sin errores relevantes.
-   - **mejorable**: idea correcta pero falta precisión, enlaces útiles, tono o claridad.
-   - **incorrecta**: información errónea, contradice el RAG/reglas, no responde o inventa datos.
-4. Guarda en cada mensaje `response_quality` y `admin_notes` (`[auto] <notas> | Fix: <sugerencia>`).
-5. Genera el informe `docs/02-desarrollo/chatbot/INFORME-REVISION-MENSAJES.md` (resumen + lista de mejorables/incorrectas con pregunta, respuesta, notas y sugerencia).
+1. Lee respuestas del asistente (`sin_tipo` por defecto, o **todas** con `--all`).
+2. Para cada una recupera la pregunta previa, el **contexto RAG** y un bloque **`buildBusinessDataBlock()`** con datos reales de Supabase (temporadas con precios, sedes con sobrecoste ×2, extras, flota alquiler, campers en venta, reglas de fianza/pago). Este bloque tiene **prioridad máxima** sobre el RAG.
+3. GPT-4o auditor clasifica: correcta / mejorable / incorrecta.
+4. Escribe `response_quality` + `admin_notes` y genera `INFORME-REVISION-MENSAJES.md`.
 
 ### 11.2. Uso
 ```bash
-npm run review:chatbot-messages              # revisa y CLASIFICA lo pendiente (escribe en BBDD)
-npm run review:chatbot-messages -- --dry-run # solo informe, sin escribir
+npm run review:chatbot-messages                    # solo sin clasificar
+npx tsx scripts/review-chatbot-messages.ts --all  # reevaluar TODAS (recomendado tras mejoras)
+npm run review:chatbot-messages -- --dry-run
 npm run review:chatbot-messages -- --limit=50
 ```
+> **Nota**: `npm run … -- --all` a veces no pasa el flag; usar `npx tsx scripts/review-chatbot-messages.ts --all` para reevaluación completa.
 Requiere `.env.local` con `SUPABASE_SERVICE_ROLE_KEY` + `OPENAI_API_KEY`. En local, igual que el resto de scripts, se ejecuta con `NODE_TLS_REJECT_UNAUTHORIZED=0` por el TLS corporativo. Cada mensaje consume 1 llamada de embeddings + 1 de chat.
 
-### 11.3. Resultado de la primera pasada (4 mensajes)
+### 11.3. Resultados de revisión
+
+**Primera pasada (4 mensajes, 2026-06-30):**
 - Correctas: 2 · Mejorables: 1 · Incorrectas: 1.
 - **Incorrecta**: ante `"Hu"` (saludo/typo) el bot soltó la lista completa de requisitos y se re-presentó. → corregido en prompt (§12).
 - **Mejorable**: "¿Dónde se recogen las campers?" correcta pero con enlace poco útil. → enlazar a tarifas/condiciones por sede (§12).
+
+**Revisión completa con `--all` (43 mensajes, 2026-07-01):**
+- Correctas: **27** · Mejorables: **4** · Incorrectas: **12**.
+- La mayoría de incorrectas son **históricas** (anteriores a mejoras de prompt, HNSW y datos reales en auditor): precios genéricos del CSV, fianza mal explicada, respuestas genéricas sin contexto (p. ej. Portugal).
+- Tras deploy de §14-18, conviene re-ejecutar `--all` para medir mejora real en conversaciones nuevas.
+- Informe detallado: `INFORME-REVISION-MENSAJES.md`.
 
 ### 11.4. Limitaciones / buenas prácticas
 - Es triaje automático: conviene revisar a mano las **incorrectas/mejorables** en el admin.
@@ -303,12 +332,135 @@ Requiere `.env.local` con `SUPABASE_SERVICE_ROLE_KEY` + `OPENAI_API_KEY`. En loc
 
 ---
 
-## 13. Mapa de archivos (referencia rápida)
+## 14. Multilingüe (sesión 2026-06-30 / 2026-07-01)
+
+### 14.1. Respuestas del modelo
+- El prompt exige responder **siempre en el idioma del último mensaje** del cliente (no limitado a locales de la web).
+- El idioma de conversación se fija **una vez** al crear el hilo con el `locale` de la URL (`es|en|fr|de`); no se recalcula con heurística en cada turno (evita etiquetas erróneas tipo `pt`).
+
+### 14.2. RAG multilingüe
+- Si `locale !== 'es'`, la consulta se traduce al español con `gpt-4o-mini` antes de embeber (`translateQueryToSpanish` en `server.ts`), porque la KB está indexada en español.
+
+### 14.3. Widget traducido
+- `WIDGET_I18N` en `whatsapp-chatbot.tsx`: bienvenida, placeholders, errores y **todos los botones** de temas/subopciones en `es`, `en`, `fr`, `de`.
+
+---
+
+## 15. Ampliación del RAG (sesión 2026-07-01)
+
+| Fuente | Origen | Fragmentos típicos | Notas |
+|--------|--------|-------------------|-------|
+| `vehiculos` | `vehicles` alquiler + equipamiento | ~20 | Incluye `vehicle_equipment`, `vehicle_features` |
+| `ventas` | `vehicles` venta disponibles | ~19 | Precio, plazas/camas, enlace ventas |
+| `blog` | `posts` publicados | ~308 | Compacto: extracto + intro + enlace |
+| Resto | CSV + sedes/extras/temporadas | ~229 | Sin cambio estructural |
+| **Total** | | **~576** | Verificado en Supabase 2026-07-01 |
+
+Scripts: `scripts/ingest-chatbot-kb.ts` · `npm run ingest:chatbot-kb`
+
+Coherencia: `npm run verify:chatbot-kb` → `INFORME-COHERENCIA-RAG.md` (0 avisos tras limpiar CSV precios).
+
+---
+
+## 16. Ofertas de última hora en tiempo real (sesión 2026-07-01)
+
+**No van al RAG** (caducan). Se inyectan en cada turno del chat:
+
+- Función: `getActiveOffersBlock()` en `src/lib/chatbot/server.ts`
+- Fuente: RPC Supabase `get_active_last_minute_offers` (misma que `/api/offers/last-minute` y página `/ofertas`)
+- Bloque en prompt: `### DATOS EN TIEMPO REAL` con modelo, fechas, descuento, precio/día, sede
+- Regla en prompt: si el cliente pide ofertas/chollo, usar las vigentes y enlazar a [Ofertas](https://www.furgocasa.com/es/ofertas)
+
+**No indexar** cupones de la tabla `coupons` (pueden ser personales). Ver `.cursor/rules/ofertas-banners.mdc`.
+
+---
+
+## 17. Índice vectorial HNSW y búsqueda contextual (sesión 2026-07-01)
+
+### 17.1. Problema detectado (caso Portugal)
+Conversación real: cliente dice "portugal" → luego "¿me recomiendas rutas?". El bot listó rutas genéricas de Murcia/España.
+
+**Causas verificadas en Supabase:**
+1. El artículo **sí estaba indexado**: *Encantos Ocultos de Portugal… Costa Vicentina* (`source: blog`).
+2. El RAG solo buscaba el último mensaje (genérico), sin contexto → **fix**: búsqueda contextual en `route.ts`.
+3. El índice **`ivfflat`** con `lists=100` sobre ~576 vectores tenía **recall muy bajo**: ni "Portugal" directo recuperaba el chunk → **fix**: migrar a **HNSW**.
+
+### 17.2. SQL obligatorio en Supabase (producción)
+
+```sql
+-- 1) Ampliar CHECK source (solo si aún no hay filas ventas/blog; ya aplicado en prod 2026-07-01)
+ALTER TABLE chatbot_kb_chunks DROP CONSTRAINT IF EXISTS chatbot_kb_chunks_source_check;
+ALTER TABLE chatbot_kb_chunks ADD CONSTRAINT chatbot_kb_chunks_source_check CHECK (source IN (
+  'condiciones','funcionamiento','modelos','modelos_general','faqs',
+  'vehiculos','ventas','ubicaciones','extras','empresa','temporadas','blog','prompt'
+));
+
+-- 2) Sustituir ivfflat por HNSW (OBLIGATORIO)
+DROP INDEX IF EXISTS idx_chatbot_kb_embedding;
+CREATE INDEX idx_chatbot_kb_embedding ON chatbot_kb_chunks USING hnsw (embedding vector_cosine_ops);
+ANALYZE chatbot_kb_chunks;
+
+-- 3) Verificar
+SELECT indexname, indexdef FROM pg_indexes
+WHERE schemaname = 'public' AND tablename = 'chatbot_kb_chunks';
+-- indexdef debe contener: USING hnsw
+```
+
+### 17.3. Verificación post-HNSW (2026-07-01)
+Tras ejecutar el SQL, pruebas en vivo contra Supabase:
+- `"Portugal"` → recupera el artículo Costa Vicentina ✓
+- `"portugal" + "¿me recomiendas rutas?"` (contextual) → recupera Portugal ✓
+- **4/4** consultas Portugal OK
+
+### 17.4. Reglas de prompt (coherencia conversacional)
+- Si el cliente ya mencionó un país/zona, **personalizar** recomendaciones (no listar Murcia genérico).
+- Si hay artículo del blog en el contexto, **enlazarlo** en markdown.
+- Si no hay contenido del destino, decirlo y ofrecer alternativas (no inventar rutas).
+
+---
+
+## 18. Reglas de negocio reforzadas en prompt (sesión 2026-06-30 / 2026-07-01)
+
+Errores reales detectados por el auditor y corregidos en `src/lib/chatbot/prompt.ts`:
+
+| Tema | Regla |
+|------|-------|
+| **Fianza** | 1.000 € **solo transferencia bancaria**; alquiler con **tarjeta Redsys** (50%+50%) |
+| **Sedes** | Murcia sin sobrecoste; Albacete/Alicante +400 €; Madrid +300 €; mínimos Madrid 12/20 días |
+| **Precios** | **Prohibido** dar €/día por mes/fechas concretas; remitir a `/reservar` |
+| **Ofertas** | Enlazar `/ofertas`; usar bloque tiempo real si hay ofertas vigentes |
+| **Compra** | Listar modelos en venta del contexto (filtrar por camas/plazas) |
+| **Mascotas** | Permitidas con **+40 €/alquiler** (extra) |
+| **Rutas** | Coherencia con historial + enlaces al blog |
+| **Multimodal** | No diagnosticar símbolos del panel sin ver la foto |
+| **FrostControl** | Causa habitual de agua bajo la camper (puede saltar con frío nocturno) |
+
+---
+
+## 19. SQL y operaciones de mantenimiento (referencia)
+
+| Cuándo | Comando / SQL |
+|--------|----------------|
+| Tras cambiar CSVs o lógica ingesta | `npm run ingest:chatbot-kb` |
+| Tras ingesta | `ANALYZE chatbot_kb_chunks;` |
+| Migrar índice (una vez) | SQL §17.2 (HNSW) |
+| Revisar coherencia RAG vs web | `npm run verify:chatbot-kb` |
+| Auditar respuestas nuevas | `npm run review:chatbot-messages` |
+| Reauditar todo tras mejoras | `npx tsx scripts/review-chatbot-messages.ts --all` |
+| Comprobar fragmentos por source | `SELECT source, count(*) FROM chatbot_kb_chunks GROUP BY source;` |
+
+Informes generados automáticamente:
+- `docs/02-desarrollo/chatbot/INFORME-COHERENCIA-RAG.md`
+- `docs/02-desarrollo/chatbot/INFORME-REVISION-MENSAJES.md`
+
+---
+
+## 20. Mapa de archivos (referencia rápida)
 
 | Área | Rutas |
 |------|--------|
 | Prompt del sistema | `src/lib/chatbot/prompt.ts` |
-| Helpers de servidor (RAG, OpenAI, Supabase) | `src/lib/chatbot/server.ts` |
+| Helpers de servidor (RAG, OpenAI, Supabase, ofertas, datos reales) | `src/lib/chatbot/server.ts` |
 | API pública del chat | `src/app/api/chatbot/message/route.ts` |
 | Widget embebido | `src/components/whatsapp-chatbot.tsx` |
 | Ingesta de la KB | `scripts/ingest-chatbot-kb.ts` (`ingest:chatbot-kb`) |

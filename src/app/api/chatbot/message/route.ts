@@ -6,6 +6,8 @@ import {
   CHAT_MODEL,
   HISTORY_LIMIT,
   detectLanguage,
+  buildEquipmentDataBlock,
+  buildElectricityDataBlock,
   getActiveOffersBlock,
   getOpenAI,
   getServiceClient,
@@ -128,10 +130,13 @@ export async function POST(request: NextRequest) {
   const contextualQuery =
     [...recentUserTexts, userText].filter(Boolean).join('\n') || ragQuery;
 
-  const [context, offersBlock] = await Promise.all([
+  const [context, offersBlock, equipmentBlock, electricityBlock] = await Promise.all([
     retrieveContext(contextualQuery, locale),
     getActiveOffersBlock(),
+    buildEquipmentDataBlock(),
+    Promise.resolve(buildElectricityDataBlock()),
   ]);
+  const liveData = [offersBlock, equipmentBlock, electricityBlock].filter((s) => s?.trim()).join('\n\n');
 
   const historyMessages: ChatMessage[] = (history || [])
     .reverse()
@@ -164,7 +169,7 @@ export async function POST(request: NextRequest) {
   }
 
   const messages: ChatMessage[] = [
-    { role: 'system', content: buildSystemPrompt(context, offersBlock) },
+    { role: 'system', content: buildSystemPrompt(context, liveData) },
     ...historyMessages,
     currentUserMessage,
   ];
